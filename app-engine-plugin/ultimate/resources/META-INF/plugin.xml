@@ -26,7 +26,8 @@
   <extensions defaultExtensionNs="com.intellij">
     <javaee.appServerIntegration implementation="com.intellij.appengine.server.integration.AppEngineServerIntegration"/>
     <applicationService serviceInterface="com.intellij.appengine.facet.AppEngineWebIntegration"
-                        serviceImplementation="com.intellij.appengine.facet.impl.AppEngineUltimateWebIntegration"/>
+                        serviceImplementation="com.intellij.appengine.facet.impl.AppEngineUltimateWebIntegration"
+                        overrides="true"/>
 
     <configurationType implementation="com.intellij.appengine.server.run.AppEngineServerConfigurationType"/>
     <configurationProducer implementation="com.intellij.appengine.server.run.AppEngineServerConfigurationProducer"/>
