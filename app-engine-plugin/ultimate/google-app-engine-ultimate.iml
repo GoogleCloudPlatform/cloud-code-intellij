@@ -9,7 +9,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="openapi" />
-    <orderEntry type="module" module-name="GoogleAppEngine" />
+    <orderEntry type="module" module-name="google-app-engine" />
     <orderEntry type="module" module-name="web-openapi" />
     <orderEntry type="module" module-name="j2ee-openapi" />
     <orderEntry type="module" module-name="J2EE" />
