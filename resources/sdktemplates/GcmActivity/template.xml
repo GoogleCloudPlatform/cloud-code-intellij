@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<template
+        format="3"
+        revision="2"
+        name="Android GCM Library"
+        description="Creates an Android GCM Library for use with an existing Android module.">
+    <dependency name="android-support-v4" revision="8"/>
+
+    <category value="Activities"/>
+
+    <parameter
+        id="packageName"
+        name="Package name"
+        type="string"
+        constraints="package|nonempty"
+        default="com.mycompany.myapp"/>
+
+    <!--
+      Usually the same as minApi, but when minApi is a code name this will be the corresponding
+      API level
+    -->
+
+    <parameter
+        id="minApi"
+        name="Minimum API level"
+        type="string"
+        constraints="apilevel"
+        default="7"/>
+
+    <parameter
+        id="minApiLevel"
+        name="Minimum API level"
+        type="string"
+        contraints="apilevel"
+        default="7"/>
+
+    <parameter
+        id="targetApi"
+        name="Target API level"
+        type="string"
+        constraints="apilevel"
+        default="16"/>
+
+    <parameter
+        id="buildApi"
+        name="Build API level"
+        type="string"
+        constraints="apilevel"
+        default="17"/>
+
+    <parameter
+        id="buildApi"
+        name="Build API level"
+        type="string"
+        constraints="apilevel"
+        default="17"/>
+
+    <parameter
+        id="clientLibVersion"
+        name="Java Client API Version"
+        type="string"
+        default="1.15.0-rc" />
+
+    <parameter
+        id="deviceInfoEndpointImport"
+        name="Import package for DeviceinfoEndpoint class (generated)"
+        type="string"
+        constraints="package"/>
+
+    <parameter
+        id="deviceInfoImport"
+        name="Import package for DeviceInfo class (generated)"
+        type="string"
+        constraints="package"/>
+
+
+    <parameter
+        id="messageEndpointImport"
+        name="Import package for MessageEndpoint class (generated)"
+        type="string"
+        constraints="package"/>
+
+    <parameter
+        id="messageDataImport"
+        name="Import package for MessageData class (generated)"
+        type="string"
+        constraints="package"/>
+
+    <parameter
+        id="collectionResponseMessageDataImport"
+        name="Import package for CollectionResponseMessageData class (generated)"
+        type="string"
+        constraints="package"/>
+
+    <parameter
+        id="gcmProjectNumber"
+        name="Project number for your Google Cloud Messaging-enabled Cloud Project"
+        type="string"
+        default=""/>
+
+
+    <globals file="globals.xml.ftl"/>
+    <execute file="recipe.xml.ftl"/>
+
+  </template>

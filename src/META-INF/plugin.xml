@@ -1,0 +1,46 @@
+<idea-plugin version="2">
+  <name>Google Cloud Tools For Android Studio</name>
+  <description>Cloud Tools for Android Studio</description>
+  <version>0.2.4</version>
+  <vendor>Google</vendor>
+  <id>com.google.gct</id>
+
+  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="107.105"/>
+
+  <depends>org.jetbrains.android</depends>
+  <depends>org.jetbrains.idea.maven</depends>
+  <depends>org.jetbrains.plugins.gradle</depends>
+
+  <application-components>
+  </application-components>
+
+  <project-components>
+  </project-components>
+
+  <actions>
+    <action id="GoogleCloudTools.GenerateAppEngineBackend"
+            class="com.google.gct.intellij.endpoints.actions.GenerateMavenBackend"
+            text="Generate App Engine Backend"
+            description="This action generates an app engine backend for an Android project"/>
+    <action id="GoogleCloudTools.GenerateEndpoint"
+            class="com.google.gct.intellij.endpoints.actions.GenerateEndpointForMaven"
+            text="Generate Endpoint"
+            description="Create an Endpoints Class for this Entity"/>
+    <action id="GoogleCloudTools.GenerateClientLibrariesAction"
+            class="com.google.gct.intellij.endpoints.actions.GenerateClientLibrariesForMaven"
+            text="Generate Client Libraries" />
+
+    <group id="com.google.gct.intellij.endpoints.MenuGroup"
+           text="Google Cloud Tools"
+           description="Endpoints Actions"
+           popup="true"
+           icon="/icons/appEngine.png">
+      <reference id="GoogleCloudTools.GenerateAppEngineBackend"/>
+      <reference id="GoogleCloudTools.GenerateEndpoint"/>
+      <reference id="GoogleCloudTools.GenerateClientLibrariesAction"/>
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </group>
+  </actions>
+
+</idea-plugin>
