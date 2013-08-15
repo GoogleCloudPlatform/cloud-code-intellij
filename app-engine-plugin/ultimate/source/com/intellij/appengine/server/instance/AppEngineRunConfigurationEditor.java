@@ -90,9 +90,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     return myMainPanel;
   }
 
-  protected void disposeEditor() {
-  }
-
   @Override
   public JComponent getAnchor() {
     return anchor;

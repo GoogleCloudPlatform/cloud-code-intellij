@@ -31,7 +31,4 @@ public class AppEngineServerEditor extends ApplicationServerPersistentDataEditor
   protected JComponent createEditor() {
     return myMainPanel;
   }
-
-  protected void disposeEditor() {
-  }
 }
