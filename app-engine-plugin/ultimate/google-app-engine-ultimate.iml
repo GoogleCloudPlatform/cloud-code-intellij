@@ -11,7 +11,7 @@
     <orderEntry type="module" module-name="openapi" />
     <orderEntry type="module" module-name="google-app-engine" />
     <orderEntry type="module" module-name="web-openapi" />
-    <orderEntry type="module" module-name="j2ee-openapi" />
+    <orderEntry type="module" module-name="javaee-api" />
     <orderEntry type="module" module-name="J2EE" />
     <orderEntry type="module" module-name="GwtStudio" />
     <orderEntry type="module" module-name="execution-openapi" />
