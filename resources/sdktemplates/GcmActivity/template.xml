@@ -27,6 +27,13 @@
         constraints="apilevel"
         default="7"/>
 
+  <parameter
+      id="minApiLevel"
+      name="Minimum API level"
+      type="string"
+      constraints="apilevel"
+      default="7"/>
+
     <parameter
         id="minApiLevel"
         name="Minimum API level"

@@ -26,7 +26,10 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrComman
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.path.GrMethodCallExpression;
 
-/* utilities for editing gradle files (like settings.gradle and build.gradle) */
+/**
+ * Utilities for editing gradle files (like settings.gradle and build.gradle)
+ * this should be retired soon in favor of the GradleBuildFile/GradleSettingsFile functionality
+ */
 public class GradleUtils {
 
   public static final String REPO_MAVEN_CENTRAL = "mavenCentral()";
