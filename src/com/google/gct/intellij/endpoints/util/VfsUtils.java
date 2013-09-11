@@ -13,41 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.gct.intellij.endpoints.util;
 
-import com.intellij.facet.Facet;
-import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.android.facet.AndroidFacet;
 
 /**
- * Utilities for working with facets
- * TODO : This class maybe not be useful anymore, maybe move the file finding into something else
+ * Utilities for working with virtual file system
  */
-public class FacetUtils {
+public class VfsUtils {
 
   // don't instantiate
-  private FacetUtils() {
+  private VfsUtils() {
   }
 
   /**
    * Note : requires readAction if not on the dispatch thread
    * Find a file under all the defined content roots for a module
-   * @param m
-   * @param relPath
    * @return
+   *    file or null if file can't be found
    */
-  public static VirtualFile findFileUnderContentRoots(Module m, String relPath) {
-    for (VirtualFile contentRoot : ModuleRootManager.getInstance(m).getContentRoots()) {
-      VirtualFile potentialMatch = contentRoot.findFileByRelativePath(relPath);
+  public static VirtualFile findFileUnderContentRoots(Module module, String relativePath) {
+    for (VirtualFile contentRoot : ModuleRootManager.getInstance(module).getContentRoots()) {
+      VirtualFile potentialMatch = contentRoot.findFileByRelativePath(relativePath);
       if (potentialMatch != null) {
         return potentialMatch;
       }
     }
-
     return null;
+  }
+
+  /**
+   * Note : requires readAction if not on the dispatch thread
+   * Find a module root
+   * @return
+   *    file or null if root can't be found
+   */
+  public static VirtualFile findModuleRoot(Module module) {
+    return findFileUnderContentRoots(module, "");
   }
 }

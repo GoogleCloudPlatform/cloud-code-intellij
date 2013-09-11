@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <name>Google Cloud Tools For Android Studio</name>
   <description>Cloud Tools for Android Studio</description>
-  <version>0.2.4</version>
+  <version>0.2.8</version>
   <vendor>Google</vendor>
   <id>com.google.gct</id>
 
@@ -19,26 +19,25 @@
   </project-components>
 
   <actions>
-    <action id="GoogleCloudTools.GenerateAppEngineBackend"
-            class="com.google.gct.intellij.endpoints.actions.GenerateMavenBackend"
+    <action id="GoogleCloudTools.GenerateCloudBackend"
+            class="com.google.gct.intellij.endpoints.action.GenerateCloudBackendAction"
             text="Generate App Engine Backend"
-            description="This action generates an app engine backend for an Android project"/>
+            description="Generates an App Engine backend for an Android project and a corresponding Android library module"/>
     <action id="GoogleCloudTools.GenerateEndpoint"
-            class="com.google.gct.intellij.endpoints.actions.GenerateEndpointForMaven"
+            class="com.google.gct.intellij.endpoints.action.GenerateEndpointAction"
             text="Generate Endpoint"
             description="Create an Endpoints Class for this Entity"/>
-    <action id="GoogleCloudTools.GenerateClientLibrariesAction"
-            class="com.google.gct.intellij.endpoints.actions.GenerateClientLibrariesForMaven"
+    <action id="GoogleCloudTools.GenerateClientLibraries"
+            class="com.google.gct.intellij.endpoints.action.GenerateClientLibrariesAction"
             text="Generate Client Libraries" />
-
     <group id="com.google.gct.intellij.endpoints.MenuGroup"
            text="Google Cloud Tools"
            description="Endpoints Actions"
            popup="true"
            icon="/icons/appEngine.png">
-      <reference id="GoogleCloudTools.GenerateAppEngineBackend"/>
+      <reference id="GoogleCloudTools.GenerateCloudBackend"/>
       <reference id="GoogleCloudTools.GenerateEndpoint"/>
-      <reference id="GoogleCloudTools.GenerateClientLibrariesAction"/>
+      <reference id="GoogleCloudTools.GenerateClientLibraries"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </group>
   </actions>

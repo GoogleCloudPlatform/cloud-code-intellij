@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.gct.intellij.endpoints.templates;
+package com.google.gct.intellij.endpoints.generator.template;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.google.gct.intellij.endpoints.util.PsiUtils;
-import com.google.gct.intellij.endpoints.util.ResourceUtils;
 
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.ide.highlighter.XmlFileType;
@@ -33,7 +32,6 @@ import com.intellij.psi.util.PropertyUtil;
 
 import java.beans.Introspector;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -90,7 +88,6 @@ public class TemplateHelper {
    * <code>DEFAULT_PACKAGE_INFO</code> will be returned.
    *
    * @param rootPackage the root package. Cannot be null.
-   * @return
    */
   public static EndpointPackageInfo getEndpointPackageInfo(String rootPackage) {
 
@@ -116,8 +113,7 @@ public class TemplateHelper {
     return new EndpointPackageInfo(ownerDomain, packagePath);
   }
 
-  public static final EndpointPackageInfo DEFAULT_PACKAGE_INFO = new EndpointPackageInfo(
-    "mycompany.com", "services");
+  public static final EndpointPackageInfo DEFAULT_PACKAGE_INFO = new EndpointPackageInfo("mycompany.com", "services");
 
   private static final String FILE_TEMPLATE_MANAGER_FACTORY_CLASS = "ManagerFactoryClass.java.template";
   private static final String FILE_TEMPLATE_JPA_SWARM_SERVICE = "JpaSwarmService.java.template";
@@ -185,7 +181,6 @@ public class TemplateHelper {
   /**
    * NOTE : requires runWriteAction
    * Load in entity manager factory as java file
-   * @return the PsiFile reference to the loaded java file
    * @throws IOException
    */
   public static PsiFile loadJpaEntityManagerFactoryClass(Project project, String javaPackage) throws IOException {
@@ -296,7 +291,6 @@ public class TemplateHelper {
   /**
    * NOTE : requires runWriteAction
    * Non-Static version of {@link #loadPersistenceXml(com.intellij.openapi.project.Project)}
-   * @return
    * @throws IOException
    */
   public PsiFile loadPersistenceXml() throws IOException {
@@ -345,7 +339,6 @@ public class TemplateHelper {
     return PsiUtils.createFormattedFile(p, className + ".java", JavaFileType.INSTANCE, templateString);
   }
 
-
   /**
    * NOTE : requires runWriteAction
    * load in generic plain text (html, css, js, ...) file
@@ -361,4 +354,5 @@ public class TemplateHelper {
     URL resourceURL = TemplateHelper.class.getResource(resourceName);
     return Resources.toString(resourceURL, Charsets.UTF_8);
   }
+
 }
