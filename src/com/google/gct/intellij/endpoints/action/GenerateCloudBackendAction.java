@@ -107,8 +107,9 @@ public class GenerateCloudBackendAction extends AnAction {
 
     final GenerateBackendDialog dialog = new GenerateBackendDialog(project);
     dialog.show();
-
-    doAction(project, androidModule, dialog);
+    if(dialog.isOK()) {
+      doAction(project, androidModule, dialog);
+    }
   }
 
   void doAction(final Project project, Module androidModule, GenerateBackendDialog dialog) {
