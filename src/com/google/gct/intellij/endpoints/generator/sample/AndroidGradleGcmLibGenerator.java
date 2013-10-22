@@ -22,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.PathUtil;
 
+import org.jetbrains.android.sdk.AndroidPlatform;
 import org.jetbrains.android.sdk.AndroidSdkUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -213,19 +214,22 @@ public class AndroidGradleGcmLibGenerator {
     nameToObjMap.put(TemplateMetadata.ATTR_IS_LIBRARY_MODULE, true);
     nameToObjMap.put(NewModuleWizardState.ATTR_CREATE_ACTIVITY, false);
 
-
+    // get the latest build tool, like the NewModuleWizard
     BuildToolInfo buildTool = AndroidSdkUtils.tryToChooseAndroidSdk().getLatestBuildTool();
     if (buildTool != null) {
       // If buildTool is null, the template will use buildApi instead, which might be good enough.
       nameToObjMap.put(TemplateMetadata.ATTR_BUILD_TOOLS_VERSION, buildTool.getRevision().toString());
     }
 
+    // Set the buildApi to the parent Android Module Build Api
+    AndroidPlatform platform = AndroidPlatform.getInstance(myAndroidModule);
+    nameToObjMap.put(TemplateMetadata.ATTR_BUILD_API, platform.getTarget().getVersion().getApiLevel());
+
     nameToObjMap.put(TemplateMetadata.ATTR_PACKAGE_NAME, myRootPackage);
 
     // Convert these values to ints
     convertToInt(nameToObjMap, loadedTemplate, TemplateMetadata.ATTR_MIN_API);
     convertToInt(nameToObjMap, loadedTemplate, TemplateMetadata.ATTR_MIN_API_LEVEL);
-    convertToInt(nameToObjMap, loadedTemplate, TemplateMetadata.ATTR_BUILD_API);
     convertToInt(nameToObjMap, loadedTemplate, TemplateMetadata.ATTR_TARGET_API);
 
     File mainFlavorSourceRoot = new File(myLibModuleRoot, TemplateWizard.MAIN_FLAVOR_SOURCE_PATH);
