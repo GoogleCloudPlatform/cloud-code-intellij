@@ -23,7 +23,7 @@ dependencies {
 
 android {
     compileSdkVersion ${buildApi}
-    buildToolsVersion "${buildApi}"
+    buildToolsVersion "${buildToolsVersion}"
 
     defaultConfig {
         minSdkVersion ${minApi}

@@ -56,13 +56,6 @@
         default="17"/>
 
     <parameter
-        id="buildApi"
-        name="Build API level"
-        type="string"
-        constraints="apilevel"
-        default="17"/>
-
-    <parameter
         id="clientLibVersion"
         name="Java Client API Version"
         type="string"
