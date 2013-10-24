@@ -91,8 +91,8 @@ public abstract class AppEngineMavenGenerator {
 
   protected void waitForMavenImport() {
     MavenProjectsManager.getInstance(myProject).waitForResolvingCompletion();
-    // TODO: I'm not sure if the above wait include the wait below, we should look into this
-    MavenProjectsManager.getInstance(myProject).waitForPluginsResolvingCompletion();
+    //TODO : this is causing the UI to hang, leave out for now
+    //MavenProjectsManager.getInstance(myProject).waitForPluginsResolvingCompletion();
   }
 
 

@@ -97,7 +97,6 @@ public class AppEngineMavenGcmGenerator extends AppEngineMavenGenerator {
 
     try {
       addMavenFunctionality();
-      waitForMavenImport();
     }
     catch (IOException e) {
       logAndCallbackFailure("IOException when trying to add Maven functionality to App Engine module", e, callback);
@@ -121,13 +120,10 @@ public class AppEngineMavenGcmGenerator extends AppEngineMavenGenerator {
     ApplicationManager.getApplication().invokeLater(new Runnable() {
       @Override
       public void run() {
+        // Needed to call this here instead of immediately after addMavenFunctionality to prevent
+        // the UI from hanging
+        waitForMavenImport();
         myModule = ModuleManager.getInstance(myProject).findModuleByName(myModuleName);
-
-        // TODO : It is also worth taking a look at this
-        // Sometimes the AppEngine plugin isn't picked up by the module import even if the main maven information is
-        // Force an update so our AppEngineMavenProject functionality works properly.
-        MavenProjectsManager.getInstance(myProject).forceUpdateProjects(
-          Arrays.asList(MavenProjectsManager.getInstance(myProject).findProject(myModule)));
 
 
         final AppEngineMavenProject mavenProject = AppEngineMavenProject.get(myModule);
