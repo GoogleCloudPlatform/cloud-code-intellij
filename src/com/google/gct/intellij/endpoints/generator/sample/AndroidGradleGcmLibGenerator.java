@@ -3,6 +3,7 @@ package com.google.gct.intellij.endpoints.generator.sample;
 import com.android.SdkConstants;
 import com.android.sdklib.BuildToolInfo;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
+import com.android.tools.idea.gradle.util.GradleUtil;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
 import com.android.tools.idea.wizard.NewModuleWizardState;
@@ -210,6 +211,7 @@ public class AndroidGradleGcmLibGenerator {
     // All of these hardcoded values can be implied from the master Android module
     //nameToObjMap.put(TemplateMetadata.ATTR_IS_NEW_PROJECT, false);
     nameToObjMap.put(TemplateMetadata.ATTR_IS_GRADLE, "true");
+    nameToObjMap.put(TemplateMetadata.ATTR_GRADLE_PLUGIN_VERSION, GradleUtil.GRADLE_PLUGIN_LATEST_VERSION);
     nameToObjMap.put(TemplateMetadata.ATTR_CREATE_ICONS, false);
     nameToObjMap.put(TemplateMetadata.ATTR_IS_LIBRARY_MODULE, true);
     nameToObjMap.put(NewModuleWizardState.ATTR_CREATE_ACTIVITY, false);
