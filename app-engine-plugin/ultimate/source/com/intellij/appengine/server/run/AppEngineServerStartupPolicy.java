@@ -8,8 +8,6 @@ import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.configuration.JavaCommandLineStartupPolicy;
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
@@ -40,11 +38,6 @@ public class AppEngineServerStartupPolicy implements JavaCommandLineStartupPolic
     if (artifact == null) {
       throw new ExecutionException("Artifact isn't specified");
     }
-    final Sdk jdk = ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk();
-    if (jdk == null) {
-      throw new ExecutionException("JDK isn't specified for the project");
-    }
-    javaParameters.setJdk(jdk);
 
     final ParametersList parameters = javaParameters.getProgramParametersList();
     parameters.addParametersString(serverModel.getServerParameters());
