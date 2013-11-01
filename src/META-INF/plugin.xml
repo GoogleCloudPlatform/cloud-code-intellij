@@ -22,7 +22,8 @@
     <action id="GoogleCloudTools.GenerateCloudBackend"
             class="com.google.gct.intellij.endpoints.action.GenerateCloudBackendAction"
             text="Generate App Engine Backend"
-            description="Generates an App Engine backend for an Android project and a corresponding Android library module"/>
+            description="Generates an App Engine backend for an Android project and a corresponding Android library module"
+            icon="/icons/appEngine.png"/>
     <action id="GoogleCloudTools.GenerateEndpoint"
             class="com.google.gct.intellij.endpoints.action.GenerateEndpointAction"
             text="Generate Endpoint"
@@ -34,7 +35,7 @@
            text="Google Cloud Tools"
            description="Endpoints Actions"
            popup="true"
-           icon="/icons/appEngine.png">
+           icon="/icons/cloud_platform-16.png">
       <reference id="GoogleCloudTools.GenerateCloudBackend"/>
       <reference id="GoogleCloudTools.GenerateEndpoint"/>
       <reference id="GoogleCloudTools.GenerateClientLibraries"/>
