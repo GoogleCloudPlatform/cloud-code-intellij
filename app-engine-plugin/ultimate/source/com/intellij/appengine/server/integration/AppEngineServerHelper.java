@@ -10,7 +10,8 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
   public ApplicationServerInfo getApplicationServerInfo(ApplicationServerPersistentData persistentData)
       throws CantFindApplicationServerJarsException {
     final AppEngineSdk sdk = ((AppEngineServerData)persistentData).getSdk();
-    return new ApplicationServerInfo(sdk.getLibraries(), "AppEngine Dev");
+    String version = sdk.getVersion();
+    return new ApplicationServerInfo(sdk.getLibraries(), "AppEngine Dev" + (version != null ? " " + version : ""));
   }
 
   public ApplicationServerPersistentData createPersistentDataEmptyInstance() {

@@ -6,8 +6,8 @@ import com.intellij.appengine.server.instance.AppEngineServerModel;
 import com.intellij.appengine.server.integration.AppEngineServerData;
 import com.intellij.appengine.server.integration.AppEngineServerIntegration;
 import com.intellij.appengine.server.run.AppEngineServerConfigurationType;
+import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.facet.FacetManager;
 import com.intellij.javaee.JavaeePersistenceDescriptorsConstants;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
@@ -69,16 +69,28 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
     }
   }
 
-  public void setupRunConfiguration(@NotNull ModifiableRootModel rootModel, @NotNull AppEngineSdk sdk, Artifact artifact, @NotNull Project project) {
+  public void setupRunConfiguration(@NotNull AppEngineSdk sdk,
+                                    Artifact artifact,
+                                    @NotNull Project project) {
     final ApplicationServer appServer = getOrCreateAppServer(sdk);
     if (appServer != null) {
-      final ConfigurationFactory type = AppEngineServerConfigurationType.getInstance().getConfigurationFactories()[0];
-      final RunnerAndConfigurationSettings settings = J2EEConfigurationFactory.getInstance().addAppServerConfiguration(project, type, appServer);
-      if (artifact != null) {
-        final CommonModel configuration = (CommonModel)settings.getConfiguration();
-        ((AppEngineServerModel)configuration.getServerModel()).setArtifact(artifact);
-        BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRun(project, configuration, artifact);
+      AppEngineServerConfigurationType configurationType = AppEngineServerConfigurationType.getInstance();
+      List<RunnerAndConfigurationSettings> list = RunManager.getInstance(project).getConfigurationSettingsList(configurationType);
+      if (list.isEmpty()) {
+        final RunnerAndConfigurationSettings settings = J2EEConfigurationFactory.getInstance().addAppServerConfiguration(project, configurationType.getLocalFactory(), appServer);
+        if (artifact != null) {
+          final CommonModel configuration = (CommonModel)settings.getConfiguration();
+          ((AppEngineServerModel)configuration.getServerModel()).setArtifact(artifact);
+          BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRun(project, configuration, artifact);
+        }
       }
+    }
+  }
+
+  @Override
+  public void addDevServerToModuleDependencies(@NotNull ModifiableRootModel rootModel, @NotNull AppEngineSdk sdk) {
+    final ApplicationServer appServer = getOrCreateAppServer(sdk);
+    if (appServer != null) {
       rootModel.addLibraryEntry(appServer.getLibrary()).setScope(DependencyScope.PROVIDED);
     }
   }
