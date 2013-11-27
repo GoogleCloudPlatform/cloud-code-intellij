@@ -18,6 +18,13 @@
   <project-components>
   </project-components>
 
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- facet disabled for now
+    <facetType implementation="com.google.gct.idea.appengine.facet.AppEngineGradleFacetType"/>
+    <framework.detector implementation="com.google.gct.idea.appengine.facet.AppEngineFrameworkDetector"/>
+     -->
+  </extensions>
+
   <actions>
     <action id="GoogleCloudTools.GenerateCloudBackend"
             class="com.google.gct.intellij.endpoints.action.GenerateCloudBackendAction"
@@ -31,11 +38,18 @@
     <action id="GoogleCloudTools.GenerateClientLibraries"
             class="com.google.gct.intellij.endpoints.action.GenerateClientLibrariesAction"
             text="Generate Client Libraries" />
+    <action id="GoogleCloudTools.NewAppEngineModule"
+            class="com.google.gct.idea.appengine.wizard.NewAppEngineModuleAction"
+            text="New App Engine Gradle Module"
+            icon="/icons/appEngine.png"/>
     <group id="com.google.gct.intellij.endpoints.MenuGroup"
            text="Google Cloud Tools"
            description="Endpoints Actions"
            popup="true"
-           icon="/icons/cloud_platform-16.png">
+           icon="/icons/cloudPlatform.png">
+      <!-- action disabled for now
+        <reference id="GoogleCloudTools.NewAppEngineModule"/>
+        -->
       <reference id="GoogleCloudTools.GenerateCloudBackend"/>
       <reference id="GoogleCloudTools.GenerateEndpoint"/>
       <reference id="GoogleCloudTools.GenerateClientLibraries"/>
