@@ -20,6 +20,7 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.psi.util.PsiTreeUtil;
 
 /**
  * Utilities for working with Intellij Psi constructs
@@ -159,4 +160,14 @@ public class PsiUtils {
     return formattedFile;
   }
 
+  /**
+   * Returns the parent class of element. If element is a class, it returns element.
+   * If element is null, it returns null.
+   *
+   * @param element The PsiElement we want to know the class of.
+   * @return
+   */
+  public static PsiClass findClass(PsiElement element) {
+    return (element instanceof PsiClass) ? (PsiClass) element : PsiTreeUtil.getParentOfType(element, PsiClass.class);
+  }
 }
