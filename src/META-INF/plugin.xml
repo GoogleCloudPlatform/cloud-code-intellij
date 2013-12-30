@@ -23,6 +23,10 @@
     <facetType implementation="com.google.gct.idea.appengine.facet.AppEngineGradleFacetType"/>
     <framework.detector implementation="com.google.gct.idea.appengine.facet.AppEngineFrameworkDetector"/>
      -->
+
+    <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
+                     key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
+                     implementationClass="com.google.gct.intellij.endpoints.validation.ApiNameInspection"/>
   </extensions>
 
   <actions>
