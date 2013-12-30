@@ -34,6 +34,7 @@ public final class GctConstants {
   public static final String APP_ENGINE_MODULE_SUFFIX = "-AppEngine";
   public static final String APP_ENGINE_GENERATED_LIB_DIR = "google_generated";
   public static final String APP_ENGINE_ANNOTATION_API = "com.google.api.server.spi.config.Api";
+  public static final String APP_ENGINE_ANNOTATION_API_NAMESPACE = "com.google.api.server.spi.config.ApiNamespace";
   public static final String APP_ENGINE_ANNOTATION_ENTITY = "javax.persistence.Entity";
   public static final String APP_ENGINE_ANNOTATION_ID = "javax.persistence.Id";
   public static final String APP_ENGINE_TYPE_KEY = "com.google.appengine.api.datastore.Key";

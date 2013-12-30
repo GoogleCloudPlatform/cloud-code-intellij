@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<problems>
+  <problem>
+    <file>test.java</file>
+    <line>7</line>
+    <description>Invalid namespace configuration. If a namespace is set, make sure to set an Owner Domain and Name. Package Path is optional.</description>
+  </problem>
+</problems>
