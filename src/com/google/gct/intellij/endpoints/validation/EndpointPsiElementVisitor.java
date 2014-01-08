@@ -18,16 +18,17 @@ package com.google.gct.intellij.endpoints.validation;
 
 import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.util.PsiUtils;
+
 import com.intellij.codeInsight.AnnotationUtil;
+import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
 
 
 /**
  * A visitor that has endpoint validation specific functionality.
  */
-public class EndpointPsiElementVisitor extends PsiElementVisitor {
+public class EndpointPsiElementVisitor extends JavaElementVisitor {
   // TODO: Add tests
 
   /**

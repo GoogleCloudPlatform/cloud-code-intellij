@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<problems>
+  <problem>
+    <file>test.java</file>
+    <line>5</line>
+    <description>Invalid api name. The api name must match '[a-z]+[A-Za-z0-9]*'</description>
+  </problem>
+</problems>
