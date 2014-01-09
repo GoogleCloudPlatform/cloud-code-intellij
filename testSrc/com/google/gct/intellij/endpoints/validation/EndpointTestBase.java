@@ -31,7 +31,6 @@ import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 public class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
   @Override
   protected String getTestDataPath() {
-
     String homePath = PathManagerEx.getHomePath(getClass());
     String homePathParent = homePath.substring(0, homePath.lastIndexOf('/'));
     return homePathParent + FileUtil.toSystemDependentName("/studio/cloud/testData/");
