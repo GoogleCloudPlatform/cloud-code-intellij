@@ -20,7 +20,6 @@ import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.util.EndpointBundle;
 import com.google.gct.intellij.endpoints.util.EndpointUtilities;
 
-import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationParameterList;
@@ -36,7 +35,7 @@ import java.util.regex.Pattern;
 /**
  * Inspection class for validating endpoint API name.
  */
-public class ApiNameInspection extends LocalInspectionTool {
+public class ApiNameInspection extends EndpointInspectionBase {
   private static final String API_NAME_ATTRIBUTE = "name";
   private static final Pattern API_NAME_PATTERN = Pattern.compile("^[a-z]+[A-Za-z0-9]*$");
 
@@ -97,7 +96,8 @@ public class ApiNameInspection extends LocalInspectionTool {
 
         if (!API_NAME_PATTERN.matcher(nameValue).matches()) {
           // TODO: Add quick fix.
-          holder.registerProblem(element, "Invalid api name. The api name must match '[a-z]+[A-Za-z0-9]*'", LocalQuickFix.EMPTY_ARRAY);
+          holder.registerProblem(element, "Invalid api name: it must start with a lower case letter and consists only of letter and digits",
+            LocalQuickFix.EMPTY_ARRAY);
         }
 
       }

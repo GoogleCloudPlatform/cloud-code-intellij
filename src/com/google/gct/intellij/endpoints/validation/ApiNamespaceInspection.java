@@ -20,7 +20,6 @@ import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.util.EndpointBundle;
 import com.google.gct.intellij.endpoints.util.EndpointUtilities;
 
-import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
@@ -34,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Inspection class for validating endpoint API namespace.
  */
-public class ApiNamespaceInspection extends LocalInspectionTool{
+public class ApiNamespaceInspection extends EndpointInspectionBase{
   private static final String API_NAMESPACE_DOMAIN_ATTRIBUTE = "ownerDomain";
   private static final String API_NAMESPACE_NAME_ATTRIBUTE = "ownerName";
   private static final String API_NAMESPACE_PACKAGE_PATH_ATTRIBUTE = "packagePath";
