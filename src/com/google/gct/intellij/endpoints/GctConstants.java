@@ -40,6 +40,7 @@ public final class GctConstants {
   public static final String APP_ENGINE_ANNOTATION_API_TRANSFORMER = "com.google.api.server.spi.config.ApiTransformer";
   public static final String APP_ENGINE_ANNOTATION_ENTITY = "javax.persistence.Entity";
   public static final String APP_ENGINE_ANNOTATION_ID = "javax.persistence.Id";
+  public static final String APP_ENGINE_ANNOTATION_NAMED = "com.google.api.server.spi.config.Named";
   public static final String APP_ENGINE_TYPE_KEY = "com.google.appengine.api.datastore.Key";
 
 

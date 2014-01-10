@@ -44,6 +44,9 @@
                      key="method.parameter.type.name" groupKey="inspections.group.name" enabledByDefault="false"
                      level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.MethodParameterTypeInspection"/>
 
+    <localInspection language="JAVA" shortName="NamedResource" bundle="messages.EndpointBundle"  hasStaticDescription="true"
+                     key="named.resource.name" groupKey="inspections.group.name" enabledByDefault="false"
+                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.NamedResourceInspection"/>
   </extensions>
 
   <actions>
