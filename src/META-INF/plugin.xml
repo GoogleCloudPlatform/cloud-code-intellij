@@ -31,6 +31,10 @@
     <localInspection language="JAVA" shortName="ApiNamespace" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.namespace.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
                      implementationClass="com.google.gct.intellij.endpoints.validation.ApiNamespaceInspection"/>
+
+    <localInspection language="JAVA" shortName="MethodParameterType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
+                     key="method.parameter.type.name" groupKey="inspections.group.name" enabledByDefault="true"
+                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.MethodParameterTypeInspection"/>
   </extensions>
 
   <actions>

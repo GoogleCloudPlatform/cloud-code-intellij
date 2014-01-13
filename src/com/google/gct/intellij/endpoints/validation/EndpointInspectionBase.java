@@ -18,6 +18,10 @@ package com.google.gct.intellij.endpoints.validation;
 
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifier;
+import com.intellij.psi.PsiModifierList;
+import org.jetbrains.annotations.NonNls;
 
 /**
  * The base class for all endpoint inspections.
@@ -25,4 +29,13 @@ import com.intellij.openapi.diagnostic.Logger;
 public class EndpointInspectionBase extends LocalInspectionTool {
   public static final Logger LOG =
     Logger.getInstance(EndpointInspectionBase.class);
+
+  public boolean isApiMethod(@NonNls PsiMethod psiMethod) {
+    PsiModifierList psiModifierList =  psiMethod.getModifierList();
+    if(psiModifierList.hasModifierProperty(PsiModifier.PUBLIC) &&
+       !psiModifierList.hasModifierProperty(PsiModifier.STATIC)) {
+      return true;
+    }
+    return false;
+  }
 }
