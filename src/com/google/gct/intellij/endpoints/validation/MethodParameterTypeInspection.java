@@ -29,6 +29,8 @@ import org.jetbrains.annotations.Nullable;
  * Inspection to check that parameter types do not contain multiple levels of collections or arrays.
  */
 public class MethodParameterTypeInspection extends EndpointInspectionBase {
+  // TODO: check if class has a transformer and add check that only parameter and entity types have @Named
+
   @Override
   @Nullable
   public String getStaticDescription() {

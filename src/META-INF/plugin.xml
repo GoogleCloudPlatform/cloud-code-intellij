@@ -32,6 +32,10 @@
                      key="api.namespace.name" groupKey="inspections.group.name" enabledByDefault="false" level="ERROR"
                      implementationClass="com.google.gct.intellij.endpoints.validation.ApiNamespaceInspection"/>
 
+    <localInspection language="JAVA" shortName="ApiParameter" bundle="messages.EndpointBundle"  hasStaticDescription="true"
+                     key="api.parameter.name" groupKey="inspections.group.name" enabledByDefault="false"
+                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.ApiParameterInspection"/>
+
     <localInspection language="JAVA" shortName="Constructor" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="constructor.name" groupKey="inspections.group.name" enabledByDefault="false"
                      level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.ConstructorInspection"/>
