@@ -32,13 +32,18 @@
                      key="api.namespace.name" groupKey="inspections.group.name" enabledByDefault="false" level="ERROR"
                      implementationClass="com.google.gct.intellij.endpoints.validation.ApiNamespaceInspection"/>
 
-    <localInspection language="JAVA" shortName="MethodParameterType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="method.parameter.type.name" groupKey="inspections.group.name" enabledByDefault="false"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.MethodParameterTypeInspection"/>
+    <localInspection language="JAVA" shortName="Constructor" bundle="messages.EndpointBundle"  hasStaticDescription="true"
+                     key="constructor.name" groupKey="inspections.group.name" enabledByDefault="false"
+                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.ConstructorInspection"/>
 
     <localInspection language="JAVA" shortName="FullJavaName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="backend.name.name" groupKey="inspections.group.name" enabledByDefault="false"
                      level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.FullJavaNameInspection"/>
+
+    <localInspection language="JAVA" shortName="MethodParameterType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
+                     key="method.parameter.type.name" groupKey="inspections.group.name" enabledByDefault="false"
+                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.MethodParameterTypeInspection"/>
+
   </extensions>
 
   <actions>
