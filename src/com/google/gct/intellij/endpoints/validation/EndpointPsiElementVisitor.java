@@ -44,7 +44,9 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
       return false;
     }
 
-    if (AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API, false)) {
+    if (AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API, true) ||
+        AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, true) ||
+        AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_REFERENCE, true) ) {
       return true;
     } else {
       return false;
