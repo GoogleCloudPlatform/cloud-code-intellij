@@ -106,16 +106,20 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
     return new EndpointPsiElementVisitor() {
       @Override
       public void visitParameter (PsiParameter psiParameter){
+        if (!isEndpointClass(psiParameter)) {
+          return;
+        }
+
+        if(hasTransformer(psiParameter)) {
+          return;
+        }
+
         PsiElement psiElement = psiParameter.getDeclarationScope();
         if (psiElement instanceof PsiMethod) {
           if(!isApiMethod((PsiMethod)psiElement)) {
             return;
           }
         } else {
-          return;
-        }
-
-        if (!isEndpointClass(psiParameter)) {
           return;
         }
 
