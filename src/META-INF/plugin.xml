@@ -25,11 +25,11 @@
      -->
 
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
+                     key="api.name.name" groupKey="inspections.group.name" enabledByDefault="false" level="ERROR"
                      implementationClass="com.google.gct.intellij.endpoints.validation.ApiNameInspection"/>
 
     <localInspection language="JAVA" shortName="ApiNamespace" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="api.namespace.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
+                     key="api.namespace.name" groupKey="inspections.group.name" enabledByDefault="false" level="ERROR"
                      implementationClass="com.google.gct.intellij.endpoints.validation.ApiNamespaceInspection"/>
 
     <localInspection language="JAVA" shortName="MethodParameterType" bundle="messages.EndpointBundle"  hasStaticDescription="true"

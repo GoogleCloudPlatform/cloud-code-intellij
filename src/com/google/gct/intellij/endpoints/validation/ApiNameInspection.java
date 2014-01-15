@@ -96,7 +96,8 @@ public class ApiNameInspection extends EndpointInspectionBase {
 
         if (!API_NAME_PATTERN.matcher(nameValue).matches()) {
           // TODO: Add quick fix.
-          holder.registerProblem(element, "Invalid api name. The api name must match '[a-z]+[A-Za-z0-9]*'", LocalQuickFix.EMPTY_ARRAY);
+          holder.registerProblem(element, "Invalid api name: it must start with a lower case letter and consists only of letter and digits",
+            LocalQuickFix.EMPTY_ARRAY);
         }
 
       }
