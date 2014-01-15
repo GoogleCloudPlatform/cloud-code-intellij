@@ -20,11 +20,7 @@ import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 
 /**
- * Created with IntelliJ IDEA.
- * User: nbashirbello
- * Date: 12/30/13
- * Time: 12:27 PM
- * To change this template use File | Settings | File Templates.
+ * Tests for {@link ApiNamespaceInspection}
  */
 public class ApiNamespaceInspectionTest extends EndpointTestBase  {
 
