@@ -3,6 +3,6 @@
   <problem>
     <file>test.java</file>
     <line>5</line>
-    <description>Invalid api name. The api name must match '[a-z]+[A-Za-z0-9]*'</description>
+    <description>Invalid api name: it must start with a lower case letter and consists only of letter and digits</description>
   </problem>
 </problems>

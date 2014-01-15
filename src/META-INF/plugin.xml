@@ -33,11 +33,11 @@
                      implementationClass="com.google.gct.intellij.endpoints.validation.ApiNamespaceInspection"/>
 
     <localInspection language="JAVA" shortName="MethodParameterType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="method.parameter.type.name" groupKey="inspections.group.name" enabledByDefault="true"
+                     key="method.parameter.type.name" groupKey="inspections.group.name" enabledByDefault="false"
                      level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.MethodParameterTypeInspection"/>
 
     <localInspection language="JAVA" shortName="FullJavaName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="backend.name.name" groupKey="inspections.group.name" enabledByDefault="true"
+                     key="backend.name.name" groupKey="inspections.group.name" enabledByDefault="false"
                      level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.FullJavaNameInspection"/>
   </extensions>
 

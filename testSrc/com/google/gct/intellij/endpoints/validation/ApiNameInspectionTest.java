@@ -19,6 +19,9 @@ package com.google.gct.intellij.endpoints.validation;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 
+/**
+ *  Tests for {@link ApiNameInspection}
+ */
 public class ApiNameInspectionTest extends EndpointTestBase {
   /**
    *  Test to verify that when the API name attribute is not used,
