@@ -20,7 +20,15 @@ import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.util.PsiUtils;
 
 import com.intellij.codeInsight.AnnotationUtil;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaElementVisitor;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiNameValuePair;
+import com.intellij.psi.PsiParameter;
+import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -95,4 +103,37 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
     return false;
   }
 
+  /**
+   * Returns the value for @Named if it exists for <code>psiParameter</code>
+   * or null if it does not exist.
+   * @param psiParameter The parameter whose @Named value is to be returned.
+   * @return  The @Named value if it exists for <code>psiParameter</code>
+   * or null if it does not exist.
+   */
+  @Nullable
+  public PsiAnnotationMemberValue getNamedAnnotationValue(PsiParameter psiParameter) {
+    PsiModifierList modifierList = psiParameter.getModifierList();
+    if(modifierList == null) {
+      return null;
+    }
+
+    PsiAnnotation annotation = modifierList.findAnnotation("javax.inject.Named");
+    if(annotation == null) {
+      annotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED );
+      if(annotation == null) {
+        return null;
+      }
+    }
+
+    PsiNameValuePair[] nameValuePairs = annotation.getParameterList().getAttributes();
+    if(nameValuePairs.length != 1){
+      return null;
+    }
+
+    if(nameValuePairs[0] == null) {
+      return null;
+    }
+
+    return nameValuePairs[0].getValue();
+  }
 }
