@@ -20,9 +20,7 @@ import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.util.PsiUtils;
 
 import com.intellij.codeInsight.AnnotationUtil;
-import com.intellij.psi.JavaElementVisitor;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.*;
 
 
 /**
@@ -30,6 +28,8 @@ import com.intellij.psi.PsiElement;
  */
 public class EndpointPsiElementVisitor extends JavaElementVisitor {
   // TODO: Add tests
+  private static final String API_TRANSFORMER_ATTRIBUTE = "transformers";
+
 
   /**
    * Returns true if the class containing the psiElement has the @Api annotation
@@ -51,6 +51,48 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
     } else {
       return false;
     }
+  }
+
+  /**
+   *  Returns true if the class containing <code>psiElement</code> has a transformer
+   *  specified by using the @ApiTransformer annotation on a class or by
+   *  using the transformer attribute of the @Api annotation. Returns false otherwise.
+   * @param psiElement
+   * @return  True if the class containing <code>psiElement</code> has a transformer
+   * and false otherwise.
+   */
+  public boolean hasTransformer(PsiElement psiElement) {
+    PsiClass psiClass = PsiUtils.findClass(psiElement);
+    if(psiClass == null) {
+      return false;
+    }
+
+    PsiModifierList modifierList = psiClass.getModifierList();
+    if(modifierList == null) {
+      return false;
+    }
+
+    // Check if class has @ApiTransformer to specify a transformer
+    PsiAnnotation apiTransformerAnnotation =
+      modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API_TRANSFORMER);
+    if (apiTransformerAnnotation != null) {
+      return true;
+    }
+
+    // Check if class utilizes the transformer attribute of the @Api annotation
+    // to specify its transformer
+    PsiAnnotation apiAnnotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API);
+    if (apiAnnotation != null) {
+      PsiAnnotationMemberValue transformerMember =
+        apiAnnotation.findAttributeValue(API_TRANSFORMER_ATTRIBUTE);
+      if(transformerMember != null) {
+        if(!transformerMember.getText().equals("{}")) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
 }
