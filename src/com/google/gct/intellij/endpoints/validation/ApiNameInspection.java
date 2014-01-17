@@ -22,8 +22,7 @@ import com.google.gct.intellij.endpoints.util.EndpointUtilities;
 
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiAnnotationParameterList;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiElementVisitor;
 
 import org.jetbrains.annotations.Nls;
@@ -45,7 +44,6 @@ public class ApiNameInspection extends EndpointInspectionBase {
     return EndpointBundle.message("api.name.description");
   }
 
-
   @Nls
   @NotNull
   @Override
@@ -53,14 +51,11 @@ public class ApiNameInspection extends EndpointInspectionBase {
     return EndpointBundle.message("api.name.name");
   }
 
-
   @NotNull
   @Override
   public String getShortName() {
     return EndpointBundle.message("api.name.short.name");
   }
-
-
 
   @NotNull
   @Override
@@ -68,35 +63,22 @@ public class ApiNameInspection extends EndpointInspectionBase {
     return new EndpointPsiElementVisitor() {
 
       @Override
-      public void visitElement(PsiElement element) {
-        if(!(element instanceof PsiAnnotation)) {
-          return;
-        }
-
-        if (!isEndpointClass(element)) {
-          return;
-        }
-
-        PsiAnnotation annotation = (PsiAnnotation)element;
+      public void visitAnnotation(PsiAnnotation annotation) {
         if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API)) {
           return;
         }
 
-        PsiAnnotationParameterList annotationMemberValue = annotation.getParameterList();
+        PsiAnnotationMemberValue annotationMemberValue = annotation.findAttributeValue(API_NAME_ATTRIBUTE);
         if(annotationMemberValue == null) {
           return;
         }
 
-        if(annotationMemberValue.getAttributes().length == 0) {
-          return;
-        }
-
-        String nameValueWithQuotes = annotation.findAttributeValue(API_NAME_ATTRIBUTE).getText();
+        String nameValueWithQuotes = annotationMemberValue.getText();
         String nameValue = EndpointUtilities.removeBeginningAndEndingQuotes(nameValueWithQuotes);
 
         if (!API_NAME_PATTERN.matcher(nameValue).matches()) {
           // TODO: Add quick fix.
-          holder.registerProblem(element, "Invalid api name: it must start with a lower case letter and consists only of letter and digits",
+          holder.registerProblem(annotation, "Invalid api name: it must start with a lower case letter and consists only of letter and digits",
             LocalQuickFix.EMPTY_ARRAY);
         }
 
