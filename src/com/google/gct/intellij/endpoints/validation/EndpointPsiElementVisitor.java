@@ -20,15 +20,25 @@ import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.util.PsiUtils;
 
 import com.intellij.codeInsight.AnnotationUtil;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaElementVisitor;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiArrayType;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiType;
+
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -135,5 +145,108 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
     }
 
     return nameValuePairs[0].getValue();
+  }
+
+  /**
+   * Returns set of supported parameter types.
+   *
+   * @param project The current project.
+   * @return Set of parameter types.
+   */
+  private static Set<PsiClassType> createParameterTypes(Project project) {
+    Set<PsiClassType> parameterTypes = new HashSet<PsiClassType>();
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Enum"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.String"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Boolean"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Integer"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Long"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Float"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Double"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Date"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("com.google.api.server.spi.types.DateAndTime"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("com.google.api.server.spi.types.SimpleDate"));
+
+    return Collections.unmodifiableSet(parameterTypes);
+  }
+
+  /**
+   * Returns set of endpoint injected types.
+   *
+   * @param project The current project.
+   * @return Set of injected types.
+   */
+  private static Set<PsiClassType> createInjectedClassTypes(Project project) {
+    Set<PsiClassType> injectedClassTypes = new HashSet<PsiClassType>();
+    injectedClassTypes.add(
+      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("com.google.appengine.api.users.User"));
+    injectedClassTypes.add(
+      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("javax.servlet.http.HttpServletRequest"));
+    injectedClassTypes.add(
+      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("javax.servlet.ServletContext"));
+
+    return Collections.unmodifiableSet(injectedClassTypes);
+  }
+
+  /**
+   * Returns true if the raw or base type of <code>psiParameter</code> is
+   * one of endpoint parameter type.
+   * @return
+   */
+  public boolean isApiParameter(PsiType psiType, Project project) {
+    PsiType baseType = psiType;
+    PsiClassType collectionType =
+      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
+
+    // If type is an array or collection, get the component type
+    if (psiType instanceof PsiArrayType) {
+      PsiArrayType arrayType = (PsiArrayType)psiType;
+      baseType= arrayType.getDeepComponentType();
+    } else if (collectionType.isAssignableFrom(psiType)) {
+      assert (psiType instanceof PsiClassType);
+      PsiClassType classType = (PsiClassType) psiType;
+      PsiType[] parameters = classType.getParameters();
+      if(parameters.length == 0) {
+        return false;
+      }
+      baseType = parameters[0];
+    }
+
+    Set<PsiClassType> parameterTypes = createParameterTypes(project);
+    for(PsiClassType aClassType : parameterTypes) {
+      if (aClassType.isAssignableFrom(baseType)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Returns true if the raw or base type of <code>psiParameter</code> is
+   * one of endpoint injected type.
+   * @return
+   */
+  public boolean isInjectedParameter(PsiType psiType, Project project) {
+    Set<PsiClassType> injectedClassTypes = createInjectedClassTypes(project);
+    for(PsiClassType aClassType : injectedClassTypes) {
+      if (aClassType.isAssignableFrom(psiType)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Returns true if the raw or base type of <code>psiType</code> is
+   * one a entity(resource) type i.e. not of parameter type nor of entity type
+   * @return
+   */
+  public boolean isEntityParameter(PsiType psiType, Project project) {
+    if(!isApiParameter(psiType, project) && !isInjectedParameter(psiType, project)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

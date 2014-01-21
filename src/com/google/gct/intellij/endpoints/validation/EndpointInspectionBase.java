@@ -18,6 +18,9 @@ package com.google.gct.intellij.endpoints.validation;
 
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiInvalidElementAccessException;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
@@ -37,5 +40,20 @@ public class EndpointInspectionBase extends LocalInspectionTool {
       return true;
     }
     return false;
+  }
+
+  public Project getProject(PsiElement element ) {
+    Project project;
+    try {
+      project = element.getContainingFile().getProject();
+      if (project == null) {
+        return null;
+      }
+    } catch (PsiInvalidElementAccessException e) {
+      LOG.error("Error getting project with annotation " + element.getText(), e);
+      return null;
+    }
+
+    return  project;
   }
 }

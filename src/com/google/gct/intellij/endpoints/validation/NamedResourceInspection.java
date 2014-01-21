@@ -62,6 +62,10 @@ public class NamedResourceInspection extends EndpointInspectionBase {
           return;
         }
 
+        if(hasTransformer(psiMethod)) {
+          return;
+        }
+
         // Check if method is public or non-static
         if(!isApiMethod(psiMethod)) {
           return;
