@@ -84,6 +84,10 @@ public class FullJavaNameInspection extends EndpointInspectionBase {
           return;
         }
 
+        if(psiMethod.isConstructor()) {
+          return;
+        }
+
         String javaName = psiMethod.getContainingClass().getQualifiedName() + "." + psiMethod.getName();
         PsiMethod seenMethod = javaMethodNames.get(javaName);
         if (seenMethod == null) {

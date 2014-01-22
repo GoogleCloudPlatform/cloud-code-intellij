@@ -23,24 +23,52 @@ import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
  * Tests for {@link ConstructorInspection}
  */
 public class ConstructorInspectionTest extends EndpointTestBase {
+
   /**
-   * Tests that a ConstructorInspection error is not generated for a nullary constructor.
+   * Tests that a ConstructorInspection error is generated for a class with only a constructor
+   * with arguments.
    */
-  public void testNullaryConstructor() {
+  public void  testClassWithConstructorWithArgument() {
     doTest();
   }
 
   /**
-   * Tests that a ConstructorInspection error is generated for a private constructor.
+   * Tests that a ConstructorInspection error is not generated for a class with
+   * with no user provided constructor.
    */
-  public void testPrivateConstructor() {
+  public void testClassWithNoConstructor() {
     doTest();
   }
 
   /**
-   * Tests that a ConstructorInspection error is generated for a constructor with arguments.
+   * Tests that a ConstructorInspection error is generated for a class with only a
+   * private constructor.
    */
-  public void  testConstructorWithArgument() {
+  public void testClassWithPrivateConstructor() {
+    doTest();
+  }
+
+  /**
+   * Tests that a ConstructorInspection error is not generated for a class with only a constructor
+   * without arguments.
+   */
+  public void  testClassWithPublicNullaryConstructor() {
+    doTest();
+  }
+
+  /**
+   *  Tests that a ConstructorInspection error is not generated for a class with multiple
+   *  constructors including a public nullary constructor.
+   */
+  public void testMultipleConstructorsIncludingPublicNullary() {
+    doTest();
+  }
+
+  /**
+   *  Tests that a ConstructorInspection error is generated for a class with multiple
+   *  constructors that does not include a public nullary constructor.
+   */
+  public void testMultipleConstructorsWithoutPublicNullary() {
     doTest();
   }
 

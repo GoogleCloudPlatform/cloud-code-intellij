@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<problems>
-  <problem>
-    <file>test.java</file>
-    <line>7</line>
-    <description>Each class that is within an API must have a public nullary constructor.</description>
-  </problem>
-</problems>
