@@ -32,7 +32,7 @@ public class AppEngineGwtServer extends GwtDevModeServer {
   }
 
   @Override
-  public void patchParameters(@NotNull JavaParameters parameters, @NotNull GwtFacet gwtFacet) {
+  public void patchParameters(@NotNull JavaParameters parameters, String originalOutputDir, @NotNull GwtFacet gwtFacet) {
     final ParametersList programParameters = parameters.getProgramParametersList();
     programParameters.add("-server");
     programParameters.add("com.google.appengine.tools.development.gwt.AppEngineLauncher");
