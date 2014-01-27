@@ -16,7 +16,7 @@
 
 package com.google.gct.intellij.endpoints.action;
 
-import com.android.tools.idea.rendering.ManifestInfo;
+import com.android.tools.idea.model.ManifestInfo;
 
 import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.generator.sample.CloudBackendGenerator;
