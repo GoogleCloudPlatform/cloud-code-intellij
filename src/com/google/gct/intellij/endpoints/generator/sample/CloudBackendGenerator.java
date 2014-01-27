@@ -15,7 +15,7 @@
  */
 package com.google.gct.intellij.endpoints.generator.sample;
 
-import com.android.tools.idea.rendering.ManifestInfo;
+import com.android.tools.idea.model.ManifestInfo;
 import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.generator.AppEngineMavenGenerator;
 import com.google.gct.intellij.endpoints.project.AppEngineMavenProject;
