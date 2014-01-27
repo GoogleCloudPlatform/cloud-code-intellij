@@ -59,6 +59,10 @@
     <localInspection language="JAVA" shortName="NamedResource" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="named.resource.name" groupKey="inspections.group.name" enabledByDefault="false"
                      level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.NamedResourceInspection"/>
+
+    <localInspection language="JAVA" shortName="RestSignature" bundle="messages.EndpointBundle"  hasStaticDescription="true"
+                     key="unique.rest.signature.name" groupKey="inspections.group.name" enabledByDefault="false"
+                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.RestSignatureInspection"/>
   </extensions>
 
   <actions>
