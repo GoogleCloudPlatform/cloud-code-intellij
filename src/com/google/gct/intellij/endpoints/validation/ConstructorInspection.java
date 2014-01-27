@@ -19,6 +19,7 @@ package com.google.gct.intellij.endpoints.validation;
 import com.google.gct.intellij.endpoints.util.EndpointBundle;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Inspection to check that each class within an Endpoint API has a public nullary constructor.
+ * The class is allowed to have other constructors.
  */
 public class ConstructorInspection extends EndpointInspectionBase {
   @Override
@@ -57,19 +59,27 @@ public class ConstructorInspection extends EndpointInspectionBase {
   public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
     return new EndpointPsiElementVisitor() {
       @Override
-      public void visitMethod(PsiMethod method) {
-        if (!isEndpointClass(method)) {
+      public void visitClass(PsiClass psiClass) {
+        if (!isEndpointClass(psiClass)) {
           return;
         }
 
-        if(!method.isConstructor()) {
+        PsiMethod[] allConstructors = psiClass.getConstructors();
+        if(allConstructors.length == 0) {
           return;
         }
 
-        if(!isPublicNullaryConstructor(method)) {
-          holder.registerProblem(method, "Each class that is within an API must have a public nullary constructor.",
+        // If there are user defined constructors, check that one of them
+        // is a public nullary constructor
+        for(PsiMethod aConstructor : allConstructors) {
+           if(isPublicNullaryConstructor(aConstructor)) {
+             return;
+           }
+        }
+
+        // Register error if class does not have a public nullary constructor
+        holder.registerProblem(psiClass, "Each class that is within an API must have a public nullary constructor.",
           LocalQuickFix.EMPTY_ARRAY);
-        }
       }
 
       private boolean isPublicNullaryConstructor(PsiMethod method) {
@@ -78,11 +88,11 @@ public class ConstructorInspection extends EndpointInspectionBase {
         }
 
         PsiModifierList modifierList = method.getModifierList();
-        if(!modifierList.hasModifierProperty(PsiModifier.PUBLIC)) {
-          return false;
+        if(modifierList.hasModifierProperty(PsiModifier.PUBLIC)) {
+          return true;
         }
 
-        return true;
+        return false;
       }
     };
   }
