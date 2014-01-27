@@ -23,10 +23,15 @@ apply plugin: 'appengine'
 
 dependencies {
   appengineSdk 'com.google.appengine:appengine-java-sdk:1.8.7'
+  compile 'com.google.appengine:appengine-endpoints:1.8.7'
   compile 'javax.servlet:servlet-api:2.5'
 }
 
 appengine {
   downloadSdk = true
   httpPort = 8080
+  endpoints {
+    getClientLibsOnBuild = true
+    getDiscoveryDocsOnBuild = true
+  }
 }

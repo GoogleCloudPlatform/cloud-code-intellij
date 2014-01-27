@@ -8,6 +8,17 @@ public class MyServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         resp.setContentType("text/plain");
-        resp.getWriter().println("Hello, world!");
+        resp.getWriter().println("Please use the form to POST to this url");
+    }
+
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        String name = (String) req.getParameter("name");
+        resp.setContentType("text/plain");
+        if(name == null) {
+          resp.getWriter().println("Please enter a name");
+        }
+        resp.getWriter().println("Hello " + name);
     }
 }
