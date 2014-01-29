@@ -24,10 +24,18 @@ import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
  */
 public class ApiNameInspectionTest extends EndpointTestBase {
   /**
-   *  Test to verify that when the API name attribute is not used,
+   *  Test to verify that when the API name attribute is an empty string,
    *  an ApiNameInspection error is not generated.
    */
   public void testEmptyApiNameAttribute() {
+    doTest();
+  }
+
+  /**
+   *  Test to verify that when the API name attribute is not specified,
+   *  an ApiNameInspection error is not generated.
+   */
+  public void testNoApiNameAttribute() {
     doTest();
   }
 
