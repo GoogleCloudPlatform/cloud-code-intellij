@@ -30,7 +30,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 /**
- * Inspection to check named resource names for a parameters for a single endpoint method are unique.
+ * Inspection to check named resource names for a parameters for a single endpoint method are unique
+ * and that the resource names are specified in the @Named annotations.
  */
 public class NamedResourceInspection extends EndpointInspectionBase {
   @Override
@@ -90,7 +91,11 @@ public class NamedResourceInspection extends EndpointInspectionBase {
         }
 
         PsiNameValuePair[] nameValuePairs = annotation.getParameterList().getAttributes();
-        if(nameValuePairs.length != 1){
+        if(nameValuePairs.length == 0) {
+          // For @Named, @Named()
+          holder.registerProblem(annotation, "Parameter name must be specified.", LocalQuickFix.EMPTY_ARRAY);
+          return;
+        } else if(nameValuePairs.length != 1){
           return;
         }
 
@@ -105,6 +110,12 @@ public class NamedResourceInspection extends EndpointInspectionBase {
 
         String nameValueWithQuotes = memberValue.getText();
         String nameValue = EndpointUtilities.removeBeginningAndEndingQuotes(nameValueWithQuotes);
+
+        // For @Named("")
+        if(nameValue.isEmpty()){
+          holder.registerProblem(annotation, "Parameter name must be specified.", LocalQuickFix.EMPTY_ARRAY);
+          return;
+        }
 
         PsiParameter seenParameter = methodNames.get(nameValue);
         if (seenParameter == null) {
