@@ -68,7 +68,7 @@ public class NewAppEngineModuleAction extends AnAction {
   }
 
   void doAction(@NotNull final Project project, final AppEngineModuleWizard dialog) {
-    final Template myTemplate = Template.createFromPath(findTemplate());
+    final Template myTemplate = Template.createFromPath(dialog.getTemplate());
 
     final File projectRoot = new File(project.getBasePath());
     final File moduleRoot = new File(projectRoot, dialog.getModuleName());
@@ -85,6 +85,10 @@ public class NewAppEngineModuleAction extends AnAction {
     }
     replacementMap.put(ATTR_MODULE_NAME, dialog.getModuleName());
     replacementMap.put(TemplateMetadata.ATTR_PACKAGE_NAME, dialog.getPackageName());
+
+    if(AppEngineTemplates.LOCAL_ENDPOINTS_TEMPLATES.contains(dialog.getTemplate().getName())) {
+      AppEngineTemplates.populateEndpointParameters(replacementMap, dialog.getPackageName());
+    }
 
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
 
@@ -132,19 +136,5 @@ public class NewAppEngineModuleAction extends AnAction {
     });
   }
 
-  @Nullable
-  private static File findTemplate() {
-    File jarPath = new File(PathUtil.getJarPathForClass(NewAppEngineModuleAction.class));
-    if (jarPath.isFile()) {
-      jarPath = jarPath.getParentFile();
-    }
-
-    File localTemplateDir = new File(jarPath, "templates");
-    File blankLibraryTemplateDir = new File(localTemplateDir, "HelloWorld");
-
-    if(blankLibraryTemplateDir.exists()) {
-      return blankLibraryTemplateDir;
-    }
-    return null;
-  }
 }
+

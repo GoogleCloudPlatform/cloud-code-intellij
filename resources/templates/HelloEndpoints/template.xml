@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-  ~ Copyright (C) 2013 The Android Open Source Project
+  ~ Copyright (C) 2014 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,13 +17,16 @@
 <template
     format="4"
     revision="1"
-    name="App Engine Java Servlet Module"
-    description="Creates an App Engine Gradle Module with a Hello World Servlet">
+    name="App Engine Java Endpoints Module"
+    description="Creates an App Engine Gradle Module with a simple Endpoint">
 
   <category value="AppEngine"/>
 
   <parameter id="packageName" name="Package name" type="string" constraints="package|nonempty" default="com.mycompany.myapp"/>
   <parameter id="appId" name="Application Id" type="string" constraints="nonempty" default="myApplicationId"/>
+  <parameter id="endpointOwnerDomain" name="Endpoint Owner Domain" type="string" constraints="package" default="com.mycompany"/>
+  <parameter id="endpointPackagePath" name="Endpoint Package Path" type="string" constraints="package" default="myapp"/>
+
 
   <globals file="globals.xml.ftl"/>
   <execute file="recipe.xml.ftl"/>
