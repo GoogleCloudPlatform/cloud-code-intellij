@@ -19,12 +19,11 @@ package com.google.gct.intellij.endpoints.validation;
 import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.util.EndpointBundle;
 import com.google.gct.intellij.endpoints.util.EndpointUtilities;
-
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiAnnotationParameterList;
 import com.intellij.psi.PsiElementVisitor;
-
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,6 +64,13 @@ public class ApiNameInspection extends EndpointInspectionBase {
       @Override
       public void visitAnnotation(PsiAnnotation annotation) {
         if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API)) {
+          return;
+        }
+
+        // Need to check for user added attributes because default values are used when not
+        // specified by user and we are only interested in the user specified values
+        PsiAnnotationParameterList parameterList = annotation.getParameterList();
+        if(parameterList.getAttributes().length == 0) {
           return;
         }
 
