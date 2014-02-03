@@ -49,6 +49,6 @@ public class ApiNamespaceInspectionTest extends EndpointTestBase  {
     String testName = getTestName(true);
     final String testDataPath = getTestDataPath();
     myFixture.setTestDataPath(testDataPath);
-    myFixture.testInspection("inspections/apiNamespaceInspectionTest/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    myFixture.testInspection("inspections/apiNamespaceInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
   }
 }
