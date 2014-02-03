@@ -116,6 +116,10 @@ public class RestSignatureInspection extends EndpointInspectionBase {
           return;
         }
 
+        if(psiMethod.isConstructor()) {
+          return;
+        }
+
         String restSignature = getRestfulSignature(psiMethod);
         PsiMethod seenMethod = restfulSignatures.get(restSignature);
         if (seenMethod == null) {

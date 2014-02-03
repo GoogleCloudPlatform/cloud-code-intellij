@@ -16,6 +16,14 @@ public class ApiParameterInspectionTest extends EndpointTestBase {
     doTest();
   }
 
+  /**
+   * Tests that no ApiParameterInspection errors are generated for constructors with parameters
+   * that are of API parameter type.
+   */
+  public void testConstructors() {
+    doTest();
+  }
+
   private void doTest() {
     LocalInspectionTool localInspectionTool = new ApiParameterInspection();
     String testName = getTestName(true);
