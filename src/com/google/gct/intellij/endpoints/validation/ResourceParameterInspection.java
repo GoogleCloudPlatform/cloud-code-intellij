@@ -65,9 +65,15 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
   @Override
   public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
     return new EndpointPsiElementVisitor() {
+      private int resourceParameterCount = 0;
+
       @Override
       public void visitMethod(PsiMethod method) {
         if (!isEndpointClass(method)) {
+          return;
+        }
+
+        if(method.isConstructor()) {
           return;
         }
 
@@ -87,8 +93,15 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
           return;
         }
 
+        resourceParameterCount = 0;
         for (PsiParameter aParameter : method.getParameterList().getParameters()) {
           validateMethodParameters(aParameter, project);
+        }
+
+        // Check that there is no more than one resource (entity) parameter for this methof
+        if(resourceParameterCount > 1) {
+          holder.registerProblem(method, "Multiple entity parameters. There can only be a single entity parameter per method.",
+            LocalQuickFix.EMPTY_ARRAY);
         }
       }
 
@@ -98,6 +111,9 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
         if(!isEntityParameter(type, project)) {
           return;
         }
+
+        // Update count of resource (entity) parameters for this method
+        resourceParameterCount++;
 
         // Check that parameter is not a collection or an array
         PsiClassType collectionType =
