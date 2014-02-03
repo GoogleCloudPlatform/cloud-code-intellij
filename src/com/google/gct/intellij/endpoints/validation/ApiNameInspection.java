@@ -82,6 +82,11 @@ public class ApiNameInspection extends EndpointInspectionBase {
         String nameValueWithQuotes = annotationMemberValue.getText();
         String nameValue = EndpointUtilities.removeBeginningAndEndingQuotes(nameValueWithQuotes);
 
+        // Empty API name is valid
+        if(nameValue.isEmpty()) {
+          return;
+        }
+
         if (!API_NAME_PATTERN.matcher(nameValue).matches()) {
           // TODO: Add quick fix.
           holder.registerProblem(annotation, "Invalid api name: it must start with a lower case letter and consists only of letter and digits",
