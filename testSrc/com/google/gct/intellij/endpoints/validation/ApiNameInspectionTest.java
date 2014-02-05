@@ -19,6 +19,8 @@ package com.google.gct.intellij.endpoints.validation;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 
+import junit.framework.Assert;
+
 /**
  *  Tests for {@link ApiNameInspection}
  */
@@ -61,6 +63,47 @@ public class ApiNameInspectionTest extends EndpointTestBase {
    */
   public void testApiNameAttribute_withSpecialCharacter() {
     doTest();
+  }
+
+  /**
+   * Tests that {@link ApiNameInspection.MyQuickFix} returns the same value when passed
+   * in a valid API name.
+   */
+  public void testQuickFix_withValidApiName() {
+    ApiNameInspection.MyQuickFix localQuickFix =  new ApiNameInspection().new MyQuickFix();
+    Assert.assertEquals("foo", localQuickFix.getNameSuggestions("foo"));
+  }
+
+  /**
+   * Tests that {@link ApiNameInspection.MyQuickFix} provides the correct suggestion for an
+   * API names with invalid characters.
+   */
+  public void testQuickFix_withInvalidCharacters() {
+    ApiNameInspection.MyQuickFix localQuickFix =  new ApiNameInspection().new MyQuickFix();
+    Assert.assertEquals("invalidcharacters", localQuickFix.getNameSuggestions("@invalid&characters#"));
+    Assert.assertEquals("invalidCharacters", localQuickFix.getNameSuggestions("@Invalid&()Characters#"));
+    Assert.assertEquals("invalidCharacters", localQuickFix.getNameSuggestions("@23Inval&*idChara(cters#"));
+  }
+
+  /**
+   * Tests that {@link ApiNameInspection.MyQuickFix} provides the correct suggestion for an
+   * API names beginning with digits.
+   */
+  public void testQuickFix_withStartingDigits() {
+    ApiNameInspection.MyQuickFix localQuickFix =  new ApiNameInspection().new MyQuickFix();
+    Assert.assertEquals("digit", localQuickFix.getNameSuggestions("1digit"));
+    Assert.assertEquals("digit", localQuickFix.getNameSuggestions("123digit"));
+    Assert.assertEquals("api12345", localQuickFix.getNameSuggestions("12345"));
+  }
+
+  /**
+   *  Tests that {@link ApiNameInspection.MyQuickFix} provides the correct suggestion for
+   *  API names beginning with uppercase letters.
+   */
+  public void testQuickFix_withUppercaseLetters() {
+    ApiNameInspection.MyQuickFix localQuickFix =  new ApiNameInspection().new MyQuickFix();
+    Assert.assertEquals("foo", localQuickFix.getNameSuggestions("Foo"));
+    Assert.assertEquals("fOO", localQuickFix.getNameSuggestions("FOO"));
   }
 
   private void doTest() {
