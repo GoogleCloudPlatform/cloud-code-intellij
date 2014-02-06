@@ -18,12 +18,14 @@ package com.google.gct.intellij.endpoints.validation;
 
 import com.google.gct.intellij.endpoints.util.EndpointBundle;
 import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiModifier;
-import com.intellij.psi.PsiModifierList;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -79,21 +81,43 @@ public class ConstructorInspection extends EndpointInspectionBase {
 
         // Register error if class does not have a public nullary constructor
         holder.registerProblem(psiClass, "Each class that is within an API must have a public nullary constructor.",
-          LocalQuickFix.EMPTY_ARRAY);
-      }
-
-      private boolean isPublicNullaryConstructor(PsiMethod method) {
-        if(method.getParameterList().getParametersCount() > 0) {
-          return false;
-        }
-
-        PsiModifierList modifierList = method.getModifierList();
-        if(modifierList.hasModifierProperty(PsiModifier.PUBLIC)) {
-          return true;
-        }
-
-        return false;
+          new MyQuickFix(psiClass));
       }
     };
+  }
+
+  public class MyQuickFix implements LocalQuickFix {
+    private final PsiClass psiClass;
+
+    public MyQuickFix(PsiClass psiClass) {
+      this.psiClass = psiClass;
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+      return getFamilyName() + ": Add nullary constructor";
+    }
+
+    @NotNull
+    @Override
+    public String getFamilyName() {
+      return getDisplayName();
+    }
+
+    @Override
+    public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+      for(PsiMethod aConstructor : psiClass.getConstructors()) {
+        if(isPublicNullaryConstructor(aConstructor)) {
+          return;
+        }
+      }
+
+      PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
+      PsiMethod newConstructor = factory.createMethodFromText("public " + psiClass.getName() + "() { }", psiClass);
+      final PsiMethod[] psiMethods = psiClass.getMethods();
+      PsiMethod firstMethod = (psiMethods.length == 0) ? null : psiMethods [0];
+      psiClass.addBefore(newConstructor, firstMethod);
+    }
   }
 }
