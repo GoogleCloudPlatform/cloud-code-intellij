@@ -28,6 +28,10 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
     doTest();
   }
 
+  public void testMethodsWithUnnamedResources() {
+    doTest();
+  }
+
   private void doTest() {
     LocalInspectionTool localInspectionTool = new NamedResourceInspection();
     String testName = getTestName(true);
