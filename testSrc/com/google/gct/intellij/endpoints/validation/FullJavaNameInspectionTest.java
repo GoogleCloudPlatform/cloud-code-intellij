@@ -16,7 +16,14 @@
 package com.google.gct.intellij.endpoints.validation;
 
 import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiType;
+import com.intellij.testFramework.MockProblemDescriptor;
+
+import junit.framework.Assert;
 
 /**
  * Tests for {@link FullJavaNameInspection}
@@ -28,6 +35,19 @@ public class FullJavaNameInspectionTest extends EndpointTestBase {
 
   public void testClassWithDuplicateMethodNames() {
     doTest();
+  }
+
+  public void testQuickFix() {
+    PsiMethod someFunction =
+      JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory().createMethod("someFunction", PsiType.VOID);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(someFunction, "", ProblemHighlightType.ERROR, null);
+
+    FullJavaNameInspection.MyQuickFix myQuickFix = new FullJavaNameInspection().new MyQuickFix();
+    myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);
+    Assert.assertEquals("someFunction_1", someFunction.getName());
+
+    myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);
+    Assert.assertEquals("someFunction_1_1", someFunction.getName());
   }
 
   private void doTest() {

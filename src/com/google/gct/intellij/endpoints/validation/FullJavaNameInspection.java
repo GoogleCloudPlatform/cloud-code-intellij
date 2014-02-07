@@ -18,11 +18,16 @@ package com.google.gct.intellij.endpoints.validation;
 
 import com.google.common.collect.Maps;
 import com.google.gct.intellij.endpoints.util.EndpointBundle;
+
 import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,6 +63,9 @@ public class FullJavaNameInspection extends EndpointInspectionBase {
   @Override
   public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
     return new EndpointPsiElementVisitor() {
+      /**
+       * Flags methods that have a duplicate full java name.
+       */
       @Override
       public void visitClass(PsiClass aClass){
         if (!isEndpointClass(aClass)) {
@@ -99,10 +107,45 @@ public class FullJavaNameInspection extends EndpointInspectionBase {
             seenMethod.getParameterList().getText();;
           holder.registerProblem(psiMethod, "Overloaded methods are not supported. " +  javaName +
             " has at least one overload: " + psiMethodName + " and " + seenMethodName,
-            LocalQuickFix.EMPTY_ARRAY);
+            new MyQuickFix());
         }
 
       }
     };
+  }
+
+  /**
+   * Quick fix for {@link FullJavaNameInspection} problems.
+   */
+  public class MyQuickFix implements LocalQuickFix {
+    public MyQuickFix() {
+
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+      return getFamilyName() + ": Rename method";
+    }
+
+    @NotNull
+    @Override
+    public String getFamilyName() {
+      return getDisplayName();
+    }
+
+    /**
+     * Adds "_1" to the name of the PsiElement in <code>desciptor</code>.
+     */
+    @Override
+    public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+      PsiElement element = descriptor.getPsiElement();
+      if(!(element instanceof PsiMethod)) {
+        return;
+      }
+      PsiMethod method = (PsiMethod)element;
+      method.setName(method.getName() + "_1");
+    }
+
   }
 }
