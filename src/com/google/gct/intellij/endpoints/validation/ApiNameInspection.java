@@ -16,14 +16,27 @@
 
 package com.google.gct.intellij.endpoints.validation;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.util.EndpointBundle;
 import com.google.gct.intellij.endpoints.util.EndpointUtilities;
+
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.codeInspection.ProblemDescriptorBase;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiAnnotationParameterList;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiUtilBase;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -88,13 +101,103 @@ public class ApiNameInspection extends EndpointInspectionBase {
         }
 
         if (!API_NAME_PATTERN.matcher(nameValue).matches()) {
-          // TODO: Add quick fix.
-          holder.registerProblem(annotation, "Invalid api name: it must start with a lower case letter and consists only of letter and digits",
-            LocalQuickFix.EMPTY_ARRAY);
+          holder.registerProblem(annotationMemberValue, "Invalid api name: it must start with a lower case letter and consists only of letter and digits",
+            new MyQuickFix());
         }
 
       }
     };
+  }
+
+  public class MyQuickFix implements LocalQuickFix {
+    private static final String DEFAULT_API_NAME = "myApi";
+
+    public MyQuickFix() {
+
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+      return getFamilyName() + ": Rename API name";
+    }
+
+    @NotNull
+    @Override
+    public String getFamilyName() {
+      return getDisplayName();
+    }
+
+    @Override
+    public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+      PsiElement element = descriptor.getPsiElement();
+      if (element == null) return;
+
+      Editor editor = PsiUtilBase.findEditor(element);
+      if (editor == null) {
+        return;
+      }
+
+      TextRange textRange = ((ProblemDescriptorBase)descriptor).getTextRange();
+      editor.getSelectionModel().setSelection(textRange.getStartOffset(), textRange.getEndOffset());
+
+      String wordWithQuotes = editor.getSelectionModel().getSelectedText();
+      String word = EndpointUtilities.removeBeginningAndEndingQuotes(wordWithQuotes);
+
+      if (word == null || StringUtil.isEmpty(word)) {
+        return;
+      }
+
+      String variant = "\"" + getNameSuggestions(word) + "\"";
+      LookupManager lookupManager = LookupManager.getInstance(project);
+      lookupManager.showLookup(editor, LookupElementBuilder.create(variant));
+    }
+
+    @VisibleForTesting
+    public String getNameSuggestions(String baseString) {
+      if(baseString.isEmpty()) {
+        return DEFAULT_API_NAME;
+      }
+
+      // If name consists of illegal characters, remove all illegal characters
+      String noInvalidChars = baseString.replaceAll("[^a-zA-Z0-9]+","");
+      if(noInvalidChars.isEmpty()) {
+        return DEFAULT_API_NAME;
+      }
+
+      if(API_NAME_PATTERN.matcher(noInvalidChars).matches()) {
+        return noInvalidChars;
+      }
+      baseString = noInvalidChars;
+
+      // If name starts with digit, suggestion will be to remove beginning digits
+      if (Character.isDigit(baseString.charAt(0))) {
+        int n = 0;
+        while ((n < baseString.length()) && Character.isDigit(baseString.charAt(n))) {
+          n += 1;
+        }
+        String nonDigitName = baseString.substring(n);
+
+        if(API_NAME_PATTERN.matcher(nonDigitName).matches()) {
+          return nonDigitName;
+        }
+
+        if (nonDigitName.isEmpty()) {
+          return "api" + noInvalidChars;
+        }
+        baseString = nonDigitName;
+      }
+
+      // If name starts with uppercase, suggestion will be to change to lower case
+      if(Character.isUpperCase(baseString.charAt(0))){
+        String beginWithLowerCase = baseString.substring(0, 1).toLowerCase() + baseString.substring(1);
+        if(API_NAME_PATTERN.matcher(beginWithLowerCase).matches()) {
+          return beginWithLowerCase;
+        }
+      }
+
+      return DEFAULT_API_NAME;
+    }
   }
 }
 
