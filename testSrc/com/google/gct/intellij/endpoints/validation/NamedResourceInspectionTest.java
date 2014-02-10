@@ -16,20 +16,100 @@
 
 package com.google.gct.intellij.endpoints.validation;
 
+import com.google.gct.intellij.endpoints.GctConstants;
+
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
+import com.intellij.codeInspection.ex.ProblemDescriptorImpl;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiParameter;
+import junit.framework.Assert;
+
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link NamedResourceInspection}.
  */
 public class NamedResourceInspectionTest extends EndpointTestBase {
 
+  /**
+   * Tests that NamedResourceInspection problems are generated for @Named parameters
+   * that have duplicate query names as other @Named parameters within the same method.
+   */
   public void testMethodsWithNamedResources() {
     doTest();
   }
 
+  /**
+   * Tests that NamedResourceInspection problems are generated for @Named parameters
+   * that do not have specified query names.
+   */
   public void testMethodsWithUnnamedResources() {
     doTest();
+  }
+
+  /**
+   * Tests that the NamedResourceInspection's quick fix flagged with
+   * {@link NamedResourceInspection.Error.DUPLICATE_PARAMETER} for an @Named annotation updates
+   * the query name by adding "_1" as a suffix.
+   */
+  public void testQuickFix_duplicateParameter() {
+    Project myProject = myFixture.getProject();
+    String annotationString = "@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED + "(\"someName\")";
+    PsiAnnotation annotation =
+      JavaPsiFacade.getInstance(myProject).getElementFactory().createAnnotationFromText(annotationString, null);
+    NamedResourceInspection.DuplicateNameQuickFix myQuickFix =
+      new NamedResourceInspection().new DuplicateNameQuickFix();
+    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
+    when(problemDescriptorMock.getPsiElement()).thenReturn(annotation);
+
+    myQuickFix.applyFix(myProject, problemDescriptorMock);
+    Assert.assertEquals("@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED + "(\"someName_1\")", annotation.getText());
+  }
+
+  /**
+   * Tests that the NamedResourceInspection's quick fix flagged with
+   * {@link NamedResourceInspection.Error.MISSING_NAME} for an @Named annotation
+   * with no parent updates the query name to "myName".
+   */
+  public void testQuickFix_noQueryNameSpecifiedWithoutParameter() {
+    Project myProject = myFixture.getProject();
+    String annotationString = "@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED + "()";
+    PsiAnnotation annotation =
+      JavaPsiFacade.getInstance(myProject).getElementFactory().createAnnotationFromText(annotationString, null);
+    NamedResourceInspection.MissingNameQuickFix myQuickFix =
+      new NamedResourceInspection().new MissingNameQuickFix();
+    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
+    when(problemDescriptorMock.getPsiElement()).thenReturn(annotation);
+
+    myQuickFix.applyFix(myProject, problemDescriptorMock);
+    Assert.assertEquals("@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED + "(\"myName\")", annotation.getText());
+  }
+
+  /**
+   * Tests that the NamedResourceInspection's quick fix flagged with
+   * {@link NamedResourceInspection.Error.MISSING_NAME} for an @Named annotation
+   * with a {@link PsiParameter} parent updates the query name to to the name of the
+   * {@link PsiParameter}.
+   */
+  public void testQuickFix_noQueryNameSpecifiedWithParameter() {
+    Project myProject = myFixture.getProject();
+    PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
+      .createParameterFromText("@javax.inject.Named() String foobar", null);
+    PsiAnnotation[] annotationsList = parameter.getModifierList().getAnnotations();
+    assert (annotationsList.length == 1);
+    NamedResourceInspection.MissingNameQuickFix myQuickFix =
+      new NamedResourceInspection().new MissingNameQuickFix();
+
+    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
+    when(problemDescriptorMock.getPsiElement()).thenReturn(annotationsList[0]);
+
+    myQuickFix.applyFix(myProject, problemDescriptorMock);
+    Assert.assertEquals("@javax.inject.Named(\"foobar\")", annotationsList[0].getText());
   }
 
   private void doTest() {
