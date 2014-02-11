@@ -18,17 +18,27 @@ package com.google.gct.intellij.endpoints.validation;
 
 import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.util.EndpointBundle;
+
 import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiInvalidElementAccessException;
+import com.intellij.psi.PsiJavaFile;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiType;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import org.jetbrains.generate.tostring.psi.PsiAdapter;
 
 /**
  * Inspection to check that API parameters of parameter type have an API parameter
@@ -100,44 +110,10 @@ public class ApiParameterInspection extends EndpointInspectionBase {
           holder.registerProblem(psiParameter, "Missing parameter name. Parameter type (" +
           psiType.getPresentableText() +
           ") is not an entity type and thus should be annotated with @Named.",
-          LocalQuickFix.EMPTY_ARRAY);
+          new MyQuickFix());
         }
       }
     };
-  }
-
-  /**
-   * Returns true if the raw or base type of <code>psiParameter</code> is
-   * one of endpoint parameter type.
-   * @return
-   */
-  private boolean isApiParameter(PsiType psiType, Project project) {
-    PsiType baseType = psiType;
-    PsiClassType collectionType =
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
-
-    // If type is an array or collection, get the component type
-    if (psiType instanceof PsiArrayType) {
-      PsiArrayType arrayType = (PsiArrayType)psiType;
-      baseType= arrayType.getDeepComponentType();
-    } else if (collectionType.isAssignableFrom(psiType)) {
-      assert (psiType instanceof PsiClassType);
-      PsiClassType classType = (PsiClassType) psiType;
-      PsiType[] parameters = classType.getParameters();
-      if(parameters.length == 0) {
-        return false;
-      }
-      baseType = parameters[0];
-    }
-
-    Map<PsiClassType, String> parameterTypes = createParameterTypes(project);
-    for(PsiClassType aClassType : parameterTypes.keySet()) {
-      if (aClassType.isAssignableFrom(baseType)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   private boolean hasParameterName(PsiParameter psiParameter) {
@@ -159,29 +135,73 @@ public class ApiParameterInspection extends EndpointInspectionBase {
     return  false;
   }
 
-  private static Map<PsiClassType, String> createParameterTypes(Project project) {
-    Map<PsiClassType, String> parameterTypes = new HashMap<PsiClassType, String>();
-    parameterTypes.put(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Enum"),"enum");
-    parameterTypes.put(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.String"),"string");
-    parameterTypes.put(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Boolean"),"boolean");
-    parameterTypes.put(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Integer"),"int32");
-    parameterTypes.put(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Long"),"int64");
-    parameterTypes.put(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Float"),"float");
-    parameterTypes.put(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Double"),"double");
-    parameterTypes.put(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Date"),"datetime");
-    parameterTypes.put(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("com.google.api.server.spi.types.DateAndTime"),"datetime");
-    parameterTypes.put(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("com.google.api.server.spi.types.SimpleDate"),"date");
+  /**
+   * Quick fix for {@link ApiParameterInspection} problems to add @Named to method parameters.
+   */
+  public class MyQuickFix implements LocalQuickFix {
+    public MyQuickFix() {
 
-    return Collections.unmodifiableMap(parameterTypes);
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+      return getFamilyName() + ": Add @Named";
+    }
+
+    @NotNull
+    @Override
+    public String getFamilyName() {
+      return getDisplayName();
+    }
+
+    /**
+     * Add the {@link GctConstants.APP_ENGINE_ANNOTATION_NAMED} annotation to the {@link PsiParameter}
+     * in <code>descriptor</code>. The query name in {@link GctConstants.APP_ENGINE_ANNOTATION_NAMED}
+     * will be the name of the {@link PsiParameter} in <code>descriptor</code>.
+     * If the {@link PsiElement} in <code>descriptor</code> is not of {@link PsiParameter} type or
+     * if the {@link PsiParameter} in <code>descriptor</code> already has
+     * {@link GctConstants.APP_ENGINE_ANNOTATION_NAMED} or javax.inject.Named, no annotation will be added.
+     */
+    @Override
+    public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+      PsiElement element = descriptor.getPsiElement();
+      if (element == null) {
+        return;
+      }
+
+      if(!(element instanceof PsiParameter)) {
+        return;
+      }
+      PsiParameter parameter = (PsiParameter)element;
+
+      PsiModifierList modifierList = parameter.getModifierList();
+      if(modifierList == null) {
+        return;
+      }
+
+      if(modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED) != null) {
+        return;
+      }
+
+      if(modifierList.findAnnotation("") != null) {
+        return;
+      }
+
+      String annotationString = "@Named(\"" + parameter.getName() + "\")";
+      PsiAnnotation annotation = JavaPsiFacade.getElementFactory(project).createAnnotationFromText(annotationString, element);
+      modifierList.add(annotation);
+
+      PsiFile file = parameter.getContainingFile();
+      if(file == null) {
+        return;
+      }
+
+      if(!(file instanceof PsiJavaFile)) {
+        return;
+      }
+
+      PsiAdapter.addImportStatement((PsiJavaFile)file, GctConstants.APP_ENGINE_ANNOTATION_NAMED);
+    }
   }
 }
