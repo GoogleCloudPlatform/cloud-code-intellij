@@ -70,6 +70,10 @@ public class ApiParameterInspection extends EndpointInspectionBase {
           if(!isApiMethod((PsiMethod)psiElement)) {
             return;
           }
+
+          if(((PsiMethod)psiElement).isConstructor()) {
+            return;
+          }
         } else {
           return;
         }

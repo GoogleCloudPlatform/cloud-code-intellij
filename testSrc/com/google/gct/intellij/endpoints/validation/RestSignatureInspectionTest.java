@@ -215,6 +215,10 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
     doTest();
   }
 
+  public void testMultipleConstructors() {
+    doTest();
+  }
+
   private void doTest() {
     LocalInspectionTool localInspectionTool = new RestSignatureInspection();
     String testName = getTestName(true);
