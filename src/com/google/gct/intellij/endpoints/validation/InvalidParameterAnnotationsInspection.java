@@ -19,16 +19,18 @@ package com.google.gct.intellij.endpoints.validation;
 import com.google.gct.intellij.endpoints.GctConstants;
 import com.google.gct.intellij.endpoints.util.EndpointBundle;
 import com.google.gct.intellij.endpoints.util.EndpointUtilities;
-
 import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
-
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -119,7 +121,7 @@ public class InvalidParameterAnnotationsInspection extends EndpointInspectionBas
              (aParameter.getModifierList().findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE) != null)) {
             holder.registerProblem(aParameter, "Invalid parameter configuration. " +
               "A parameter in the method path should not be marked @Nullable or @DefaultValue.",
-              LocalQuickFix.EMPTY_ARRAY);
+              new MyQuickFix());
           }
         }
 
@@ -142,5 +144,57 @@ public class InvalidParameterAnnotationsInspection extends EndpointInspectionBas
         return pathParameters;
       }
     };
+  }
+
+  /**
+   * Quick fix for {@link InvalidParameterAnnotationsInspection} problems.
+   */
+  public class MyQuickFix implements LocalQuickFix {
+    public MyQuickFix() {
+
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+      return getFamilyName() + ": Remove @Nullable and/or @DefaultValue";
+    }
+
+    @NotNull
+    @Override
+    public String getFamilyName() {
+      return EndpointBundle.message("api.name.name");
+    }
+
+    /**
+     * Remove @Default and @Nullable from the method parameter if they exist.
+     */
+    @Override
+    public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+      PsiElement element = descriptor.getPsiElement();
+      if (element == null) {
+        return;
+      }
+
+      if(!(element instanceof PsiParameter)) {
+        return;
+      }
+
+      PsiModifierList modifierList = ((PsiParameter)element).getModifierList();
+      PsiAnnotation gaeNullableAnnotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE);
+      if(gaeNullableAnnotation != null){
+        gaeNullableAnnotation.delete();
+      }
+
+      PsiAnnotation javaxNullableAnnotation = modifierList.findAnnotation("javax.annotation.Nullable");
+      if(javaxNullableAnnotation != null){
+        javaxNullableAnnotation.delete();
+      }
+
+      PsiAnnotation defaultValueAnnotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
+      if(defaultValueAnnotation != null){
+        defaultValueAnnotation.delete();
+      }
+    }
   }
 }
