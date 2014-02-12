@@ -26,6 +26,7 @@ import com.intellij.util.xmlb.SkipDefaultValuesSerializationFilters;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Tag;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -40,38 +41,48 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   private String myServerParameters = "";
   private CommonModel myCommonModel;
 
+  @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
     return new AppEngineServerInstance(myCommonModel);
   }
 
+  @Override
   public DeploymentProvider getDeploymentProvider() {
     return null;
   }
 
+  @Override
+  @NotNull
   public String getDefaultUrlForBrowser() {
     return "http://" + myCommonModel.getHost() + ":" + myPort;
   }
 
+  @Override
   public SettingsEditor<CommonModel> getEditor() {
     return new AppEngineRunConfigurationEditor(myCommonModel.getProject());
   }
 
+  @Override
   public OutputProcessor createOutputProcessor(ProcessHandler processHandler, J2EEServerInstance serverInstance) {
     return new DefaultOutputProcessor(processHandler);
   }
 
+  @Override
   public List<Pair<String, Integer>> getAddressesToCheck() {
     return Collections.singletonList(Pair.create(myCommonModel.getHost(), myPort));
   }
 
+  @Override
   public boolean isResourcesReloadingSupported() {
     return myCommonModel.isLocal();
   }
 
+  @Override
   public List<Artifact> getArtifactsToDeploy() {
     return ContainerUtil.createMaybeSingletonList(getArtifact());
   }
 
+  @Override
   public void checkConfiguration() throws RuntimeConfigurationException {
     Artifact artifact;
     if (myArtifactPointer == null || (artifact = myArtifactPointer.getArtifact()) == null) {
@@ -84,22 +95,27 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     }
   }
 
+  @Override
   public int getDefaultPort() {
     return 8080;
   }
 
+  @Override
   public void setCommonModel(CommonModel commonModel) {
     myCommonModel = commonModel;
   }
 
+  @Override
   public Object clone() throws CloneNotSupportedException {
     return super.clone();
   }
 
+  @Override
   public int getLocalPort() {
     return myPort;
   }
 
+  @Override
   public void readExternal(Element element) throws InvalidDataException {
     final AppEngineModelSettings settings = new AppEngineModelSettings();
     XmlSerializer.deserializeInto(settings, element);
@@ -114,6 +130,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     }
   }
 
+  @Override
   public void writeExternal(Element element) throws WriteExternalException {
     XmlSerializer.serializeInto(new AppEngineModelSettings(myPort, myArtifactPointer, myServerParameters), element, new SkipDefaultValuesSerializationFilters());
   }
