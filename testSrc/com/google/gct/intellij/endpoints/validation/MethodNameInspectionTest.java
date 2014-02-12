@@ -17,22 +17,64 @@ package com.google.gct.intellij.endpoints.validation;
 
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
+import junit.framework.Assert;
 
 /**
  * Test for {@link MethodNameInspection}
  */
 public class MethodNameInspectionTest extends EndpointTestBase {
 
+  /**
+   *  Test to verify that a valid API method name does not generate
+   *  a MethodNameInspection error.
+   */
   public void testValidMethodName() {
     doTest();
   }
 
+  /**
+   *  Test to verify that a valid API method name with special characters
+   *  generates a MethodNameInspection error.
+   */
   public void testMethodNameWithSpecialCharacter() {
     doTest();
   }
 
+  /**
+   *  Test to verify that a valid API method name containing a dot does not
+   *  generate a MethodNameInspection error.
+   */
   public void testMethodNameContainingDot() {
     doTest();
+  }
+
+  /**
+   * Tests that {@link MethodNameInspection.MyQuickFix} returns the same value when passed
+   * in a valid API method name.
+   */
+  public void testQuickFix_validName() {
+    MethodNameInspection.MyQuickFix myQuickFix = new MethodNameInspection().new MyQuickFix();
+    Assert.assertEquals("foo.1_2_3", myQuickFix.getMethodNameSuggestions("foo.1_2_3"));
+    Assert.assertEquals("foo.boo", myQuickFix.getMethodNameSuggestions("foo...boo"));
+  }
+
+  /**
+   * Tests that {@link MethodNameInspection.MyQuickFix} returns the same value without
+   * the starting and trailing dots when the API method name is a valid string with starting
+   * and trailing dots.
+   */
+  public void testQuickFix_nameWithStartingTrailingDots() {
+    MethodNameInspection.MyQuickFix myQuickFix = new MethodNameInspection().new MyQuickFix();
+    Assert.assertEquals("foo", myQuickFix.getMethodNameSuggestions("..foo....."));
+  }
+
+  /**
+   * Tests that {@link MethodNameInspection.MyQuickFix} provides the correct suggestion for an
+   * API names with invalid characters.
+   */
+  public void testQuickFix_nameWithIllegalCharacter() {
+    MethodNameInspection.MyQuickFix myQuickFix = new MethodNameInspection().new MyQuickFix();
+    Assert.assertEquals("foo", myQuickFix.getMethodNameSuggestions("f*o&o."));
   }
 
   private void doTest() {

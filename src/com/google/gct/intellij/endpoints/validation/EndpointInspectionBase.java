@@ -25,6 +25,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The base class for all endpoint inspections.
@@ -55,5 +56,12 @@ public class EndpointInspectionBase extends LocalInspectionTool {
     }
 
     return  project;
+  }
+
+  /**
+   * Replace sequence of dots with single dot.
+   */
+  public String collapseSequenceOfDots(@NotNull String word){
+    return word.replaceAll("[.]+",".");
   }
 }
