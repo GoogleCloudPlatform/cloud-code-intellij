@@ -3,4 +3,8 @@
     <application>${appId}</application>
     <version>1</version>
     <threadsafe>true</threadsafe>
+
+    <system-properties>
+        <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+    </system-properties>
 </appengine-web-app>

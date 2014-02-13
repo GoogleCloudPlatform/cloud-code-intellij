@@ -35,9 +35,10 @@ public class AppEngineTemplates {
   public static final String TEMPLATES_DIR = "templates";
   public static final String HELLO_WORLD = "HelloWorld";
   public static final String HELLO_ENDPOINTS = "HelloEndpoints";
+  public static final String GCM_ENDPOINTS = "GcmEndpoints";
 
-  public static final List<String> LOCAL_TEMPLATES = Arrays.asList(HELLO_WORLD, HELLO_ENDPOINTS);
-  public static final List<String> LOCAL_ENDPOINTS_TEMPLATES = Arrays.asList(HELLO_ENDPOINTS);
+  public static final List<String> LOCAL_TEMPLATES = Arrays.asList(HELLO_WORLD, HELLO_ENDPOINTS, GCM_ENDPOINTS);
+  public static final List<String> LOCAL_ENDPOINTS_TEMPLATES = Arrays.asList(HELLO_ENDPOINTS, GCM_ENDPOINTS);
 
   /** Class that encapsulates a templates and its metadata */
   public static class TemplateInfo {

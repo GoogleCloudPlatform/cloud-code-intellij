@@ -26,6 +26,8 @@ dependencies {
   appengineSdk 'com.google.appengine:appengine-java-sdk:1.8.7'
   compile 'com.google.appengine:appengine-endpoints:1.8.7'
   compile 'javax.servlet:servlet-api:2.5'
+  compile 'com.googlecode.objectify:objectify:4.0b3'
+  compile 'com.ganyo:gcm-server:1.0.2'
 }
 
 appengine {
