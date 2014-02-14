@@ -78,7 +78,8 @@
     <action id="GoogleCloudTools.GenerateEndpoint"
             class="com.google.gct.intellij.endpoints.action.GenerateEndpointAction"
             text="Generate Endpoint"
-            description="Create an Endpoints Class for this Entity"/>
+            description="Create an Endpoints Class for this Entity"
+            icon="/icons/cloudEndpoints.png"/>
     <action id="GoogleCloudTools.GenerateClientLibraries"
             class="com.google.gct.intellij.endpoints.action.GenerateClientLibrariesAction"
             text="Generate Client Libraries" />
