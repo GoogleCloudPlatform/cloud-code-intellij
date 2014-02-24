@@ -19,10 +19,11 @@ package com.google.gct.idea.appengine.validation;
 import com.intellij.psi.PsiAnnotation;
 
 /**
- * Exception when an attribute does not exist in an antotation.
+ * Exception when an attribute does not exist in an annotation.
  */
-public class AttributeDoesNotExistException extends Exception{
-  public AttributeDoesNotExistException(PsiAnnotation annotation, String attribute) {
-    super(attribute + " does not exist in " + annotation.getText());
+public class MissingAttributeException extends Exception {
+  public MissingAttributeException(PsiAnnotation annotation, String attribute) {
+    super("Attribute \"" + attribute + "\" does not exist in annotation \"" + annotation.getText()+ "\"");
   }
 }
+

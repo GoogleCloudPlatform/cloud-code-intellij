@@ -22,7 +22,6 @@ import com.intellij.psi.PsiAnnotation;
  */
 public class InvalidAnnotationException extends Exception {
   public InvalidAnnotationException(PsiAnnotation annotation, String annotationType) {
-    super(annotation + "is not of type " + annotationType);
+    super("Annotation \"" + annotation.getText() + "\" is not of type \"" + annotationType + "\"");
   }
 }
-
