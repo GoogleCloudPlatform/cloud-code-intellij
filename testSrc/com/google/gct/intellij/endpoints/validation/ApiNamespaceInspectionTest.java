@@ -18,16 +18,13 @@ package com.google.gct.intellij.endpoints.validation;
 
 import com.google.gct.intellij.endpoints.GctConstants;
 import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
-import com.intellij.codeInspection.ex.ProblemDescriptorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
-import org.junit.Assert;
-import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.intellij.testFramework.MockProblemDescriptor;
+import junit.framework.Assert;
 
 /**
  * Tests for {@link ApiNamespaceInspection}
@@ -102,16 +99,13 @@ public class ApiNamespaceInspectionTest extends EndpointTestBase  {
   }
 
   private void runQuickFixTest(String annotationString, String expectedString) {
-    Project  myProject = myFixture.getProject();
+   final Project myProject = myFixture.getProject();
     PsiAnnotation annotation = JavaPsiFacade.getInstance(myProject).getElementFactory()
       .createAnnotationFromText(annotationString, null);
-    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
-    when(problemDescriptorMock.getPsiElement()).thenReturn(annotation);
-    MockitoAnnotations.initMocks(this);
-
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR, null);
 
     ApiNamespaceInspection.MyQuickFix myQuickFix = new ApiNamespaceInspection().new  MyQuickFix();
-    myQuickFix.applyFix(myProject, problemDescriptorMock);
+    myQuickFix.applyFix(myProject, problemDescriptor);
     Assert.assertEquals(expectedString, annotation.getText());
   }
 
