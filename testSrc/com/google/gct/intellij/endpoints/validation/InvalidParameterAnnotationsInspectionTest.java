@@ -16,19 +16,15 @@
 package com.google.gct.intellij.endpoints.validation;
 
 import com.google.gct.intellij.endpoints.GctConstants;
-
 import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
-import com.intellij.codeInspection.ex.ProblemDescriptorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
-
+import com.intellij.testFramework.MockProblemDescriptor;
 import junit.framework.Assert;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link InvalidParameterAnnotationsInspection}
@@ -77,12 +73,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
     Project myProject = myFixture.getProject();
     PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
       .createParameter("param", PsiType.BOOLEAN);
-    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
-    when(problemDescriptorMock.getPsiElement()).thenReturn(parameter);
-
-    InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection().new MyQuickFix();
-    myQuickFix.applyFix(myProject, problemDescriptorMock);
-    Assert.assertEquals("boolean param", parameter.getText());
+    runQuickFixTest(parameter, "boolean param");
   }
 
   /**
@@ -93,12 +84,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
     PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
       .createParameter("param", PsiType.BOOLEAN);
     parameter.getModifierList().addAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED);
-    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
-    when(problemDescriptorMock.getPsiElement()).thenReturn(parameter);
-
-    InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection().new MyQuickFix();
-    myQuickFix.applyFix(myProject, problemDescriptorMock);
-    Assert.assertEquals("@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED  + " boolean param", parameter.getText());
+    runQuickFixTest(parameter, "@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED + " boolean param");
   }
 
   /**
@@ -110,12 +96,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
     PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
       .createParameter("param", PsiType.BOOLEAN);
     parameter.getModifierList().addAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE);
-    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
-    when(problemDescriptorMock.getPsiElement()).thenReturn(parameter);
-
-    InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection().new MyQuickFix();
-    myQuickFix.applyFix(myProject, problemDescriptorMock);
-    Assert.assertEquals(" boolean param", parameter.getText());
+    runQuickFixTest(parameter, " boolean param");
   }
 
   /**
@@ -127,12 +108,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
     PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
       .createParameter("param", PsiType.BOOLEAN);
     parameter.getModifierList().addAnnotation("javax.annotation.Nullable");
-    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
-    when(problemDescriptorMock.getPsiElement()).thenReturn(parameter);
-
-    InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection().new MyQuickFix();
-    myQuickFix.applyFix(myProject, problemDescriptorMock);
-    Assert.assertEquals(" boolean param", parameter.getText());
+    runQuickFixTest(parameter, " boolean param");
   }
 
   /**
@@ -144,12 +120,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
     PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
       .createParameter("param", PsiType.BOOLEAN);
     parameter.getModifierList().addAnnotation(GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
-    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
-    when(problemDescriptorMock.getPsiElement()).thenReturn(parameter);
-
-    InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection().new MyQuickFix();
-    myQuickFix.applyFix(myProject, problemDescriptorMock);
-    Assert.assertEquals(" boolean param", parameter.getText());
+    runQuickFixTest(parameter, " boolean param");
   }
 
   /**
@@ -162,12 +133,14 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
       .createParameter("param", PsiType.BOOLEAN);
     parameter.getModifierList().addAnnotation("javax.annotation.Nullable");
     parameter.getModifierList().addAnnotation(GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
-    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
-    when(problemDescriptorMock.getPsiElement()).thenReturn(parameter);
+    runQuickFixTest(parameter, " boolean param");
+  }
 
+  private void runQuickFixTest(PsiParameter parameter, String expectedString) {
     InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection().new MyQuickFix();
-    myQuickFix.applyFix(myProject, problemDescriptorMock);
-    Assert.assertEquals(" boolean param", parameter.getText());
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR, null);
+    myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);
+    Assert.assertEquals(expectedString, parameter.getText());
   }
 
   private void doTest() {
