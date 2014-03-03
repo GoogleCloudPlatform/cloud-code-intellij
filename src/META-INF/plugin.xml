@@ -22,6 +22,8 @@
     <!-- facet disabled for now
     <facetType implementation="com.google.gct.idea.appengine.facet.AppEngineGradleFacetType"/>
     <framework.detector implementation="com.google.gct.idea.appengine.facet.AppEngineFrameworkDetector"/>
+    <configurationType implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationType"/>
+    <configurationProducer implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationProducer"/>
      -->
 
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"

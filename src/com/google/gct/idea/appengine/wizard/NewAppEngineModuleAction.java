@@ -19,8 +19,12 @@ package com.google.gct.idea.appengine.wizard;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
-import com.google.gct.idea.appengine.facet.AppEngineGradleFacet;
-import com.intellij.facet.Facet;
+
+import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
+import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
+
+import com.intellij.execution.RunManagerEx;
+import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.ModifiableFacetModel;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -33,9 +37,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,15 +106,31 @@ public class NewAppEngineModuleAction extends AnAction {
                 @Override
                 public void run() {
                   Module module = ModuleManager.getInstance(project).findModuleByName(dialog.getModuleName());
+
+                  // Create a run configuration for this module
+                  final RunManagerEx runManager = RunManagerEx.getInstanceEx(project);
+                  final RunnerAndConfigurationSettings settings = runManager.
+                    createRunConfiguration(module.getName(), AppEngineRunConfigurationType.getInstance().getFactory());
+                  final AppEngineRunConfiguration configuration = (AppEngineRunConfiguration)settings.getConfiguration();
+                  configuration.setModule(module);
+                  configuration.setWarPath(new File(moduleRoot, "build/exploded-app").getAbsolutePath());
+                  // This is a little strange because the sdk is "downloaded", we probably should fix this up in the future
+                  // to ensure a run configuration is always generated correctly
+                  configuration.setSdkPath(
+                    new File(System.getProperty("user.home"), "/.gradle/appengine-sdk/appengine-java-sdk-1.8.9").getAbsolutePath());
+                  configuration.setServerPort("8080");
+                  runManager.addConfiguration(settings, false);
+
                   // Module does not have AppEngine-Gradle facet. Create one and add it.
-                  FacetManager facetManager = FacetManager.getInstance(module);
-                  ModifiableFacetModel model = facetManager.createModifiableModel();
-                  try {
-                    Facet facet = facetManager.createFacet(AppEngineGradleFacet.getFacetType(), AppEngineGradleFacet.NAME, null);
-                    model.addFacet(facet);
-                  } finally {
-                    model.commit();
-                  }
+                  // Commented out for now, ENABLE when AppEngine Gradle facet is ready.
+                  // FacetManager facetManager = FacetManager.getInstance(module);
+                  // ModifiableFacetModel model = facetManager.createModifiableModel();
+                  //try {
+                  //  Facet facet = facetManager.createFacet(AppEngineGradleFacet.getFacetType(), AppEngineGradleFacet.NAME, null);
+                  //  model.addFacet(facet);
+                  //} finally {
+                  //  model.commit();
+                  //}
                 }
               });
             }
