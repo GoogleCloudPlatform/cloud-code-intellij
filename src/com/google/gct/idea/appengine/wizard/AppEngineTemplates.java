@@ -92,30 +92,12 @@ public class AppEngineTemplates {
     return templates;
   }
 
-  private static final String DEFAULT_OWNER = "mycompany.com";
-  private static final String DEFAULT_PACKAGE = "services";
   public static final String ATTR_ENDPOINTS_OWNER = "endpointOwnerDomain";
   public static final String ATTR_ENDPOINTS_PACKAGE = "endpointPackagePath";
 
   /** Populate endpoints specific template parameters into the replacement map */
   public static void populateEndpointParameters(Map<String, Object> replacementMap, String rootPackage) {
-
-    String[] packageComponents = rootPackage.split("\\.");
-
-    String ownerDomain = DEFAULT_OWNER;
-    String packagePath = DEFAULT_PACKAGE;
-
-    if (packageComponents.length >= 2) {
-      ownerDomain = packageComponents[1] + "." + packageComponents[0];
-      packagePath = "";
-      for (int i = 2; i < packageComponents.length; i++) {
-        packagePath += packageComponents[i];
-        if (i != packageComponents.length - 1) {
-          packagePath += ".";
-        }
-      }
-    }
-    replacementMap.put(ATTR_ENDPOINTS_OWNER, ownerDomain);
-    replacementMap.put(ATTR_ENDPOINTS_PACKAGE, packagePath);
+    replacementMap.put(ATTR_ENDPOINTS_OWNER, rootPackage);
+    replacementMap.put(ATTR_ENDPOINTS_PACKAGE, "");
   }
 }

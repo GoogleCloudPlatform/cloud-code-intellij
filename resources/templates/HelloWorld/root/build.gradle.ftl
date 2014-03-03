@@ -6,11 +6,10 @@
 
 buildscript {
     repositories {
-        mavenLocal()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.google.appengine:gradle-appengine-plugin:1.8.7-SNAPSHOT'
+        classpath 'com.google.appengine:gradle-appengine-plugin:${appEngineVersion}'
     }
 }
 
@@ -23,7 +22,7 @@ apply plugin: 'war'
 apply plugin: 'appengine'
 
 dependencies {
-  appengineSdk 'com.google.appengine:appengine-java-sdk:1.8.7'
+  appengineSdk 'com.google.appengine:appengine-java-sdk:${appEngineVersion}'
   compile 'javax.servlet:servlet-api:2.5'
 }
 
