@@ -154,5 +154,9 @@ public class NewAppEngineModuleAction extends AnAction {
     });
   }
 
+  @Override
+  public void update(AnActionEvent e) {
+    e.getPresentation().setVisible(Boolean.parseBoolean(System.getProperty("com.google.gct.newModuleAction.enabled", "false")));
+  }
 }
 

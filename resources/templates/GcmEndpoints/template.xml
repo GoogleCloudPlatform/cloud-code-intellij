@@ -26,7 +26,8 @@
   <parameter id="appId" name="Application Id" type="string" constraints="nonempty" default="myApplicationId"/>
   <parameter id="endpointOwnerDomain" name="Endpoint Owner Domain" type="string" constraints="package" default="com.mycompany"/>
   <parameter id="endpointPackagePath" name="Endpoint Package Path" type="string" constraints="package" default="myapp"/>
-  <parameter id="apiKey" name="Gcm Api Key" type="string" constraints="package" default="REPLACE WITH YOUR API KEY"/>
+  <parameter id="apiKey" name="Gcm Api Key" type="string" default="REPLACE WITH YOUR API KEY"/>
+  <parameter id="appEngineVersion" name="AppEngine Version" type="string" default="1.8.9" />
 
 
   <globals file="globals.xml.ftl"/>

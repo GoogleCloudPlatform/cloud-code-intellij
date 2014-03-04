@@ -94,9 +94,8 @@
            description="Endpoints Actions"
            popup="true"
            icon="/icons/cloudPlatform.png">
-      <!-- action disabled for now
-        <reference id="GoogleCloudTools.NewAppEngineModule"/>
-        -->
+      <!-- this action is flag guarded using the com.google.gct.newModuleAction.enabled=true system property -->
+      <reference id="GoogleCloudTools.NewAppEngineModule"/>
       <reference id="GoogleCloudTools.GenerateCloudBackend"/>
       <reference id="GoogleCloudTools.GenerateEndpoint"/>
       <reference id="GoogleCloudTools.GenerateClientLibraries"/>
