@@ -55,6 +55,22 @@ public class ResourceParameterInspectionTest extends EndpointTestBase {
     doTest();
   }
 
+  /**
+   * Tests that a ResourceParameterInspection error is generated for a method that has
+   * multiple resource parameters.
+   */
+  public void testMultipleResourceParameters() {
+    doTest();
+  }
+
+  /**
+   * Tests that a ResourceParameterInspection error is not generated for constructor
+   * with a resource parameter.
+   */
+  public void testConstructor() {
+    doTest();
+  }
+
   private void doTest() {
     LocalInspectionTool localInspectionTool = new ResourceParameterInspection();
     String testName = getTestName(true);
