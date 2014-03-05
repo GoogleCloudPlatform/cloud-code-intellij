@@ -45,8 +45,8 @@ public class AppEngineSdk {
 
   @Nullable
   public File getToolsApiJarFile() {
-    final String path = FileUtil.toSystemDependentName(mySdkPath + TOOLS_API_JAR_PATH);
-    File toolsJar = new File(path);
+    final File sdkDir = new File(mySdkPath);
+    File toolsJar = new File(sdkDir, TOOLS_API_JAR_PATH);
     if(toolsJar.exists()) {
       return toolsJar;
     }
