@@ -20,11 +20,11 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- facet disabled for now
-    <facetType implementation="com.google.gct.idea.appengine.facet.AppEngineGradleFacetType"/>
-    <framework.detector implementation="com.google.gct.idea.appengine.facet.AppEngineFrameworkDetector"/>
+    <facetType implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetType"/>
+    <framework.detector implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineFrameworkDetector"/>
+     -->
     <configurationType implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationType"/>
     <configurationProducer implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationProducer"/>
-     -->
 
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.name.name" groupKey="inspections.group.name" enabledByDefault="false" level="ERROR"
@@ -89,6 +89,10 @@
             class="com.google.gct.idea.appengine.wizard.NewAppEngineModuleAction"
             text="New App Engine Gradle Module"
             icon="/icons/appEngine.png"/>
+    <action id="GoogleCloudTools.InstallClientLibraries"
+            class="com.google.gct.idea.appengine.gradle.action.InstallClientLibrariesAction"
+            text="Install Client Libraries"
+            icon="/icons/cloudEndpoints.png"/>
     <group id="com.google.gct.intellij.endpoints.MenuGroup"
            text="Google Cloud Tools"
            description="Endpoints Actions"
@@ -96,6 +100,8 @@
            icon="/icons/cloudPlatform.png">
       <!-- this action is flag guarded using the com.google.gct.newModuleAction.enabled=true system property -->
       <reference id="GoogleCloudTools.NewAppEngineModule"/>
+      <reference id="GoogleCloudTools.InstallClientLibraries"/>
+      <!-- end flag guarded actions -->
       <reference id="GoogleCloudTools.GenerateCloudBackend"/>
       <reference id="GoogleCloudTools.GenerateEndpoint"/>
       <reference id="GoogleCloudTools.GenerateClientLibraries"/>

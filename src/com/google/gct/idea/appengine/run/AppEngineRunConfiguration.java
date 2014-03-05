@@ -15,7 +15,7 @@
  */
 package com.google.gct.idea.appengine.run;
 
-import com.google.gct.idea.appengine.facet.AppEngineGradleFacet;
+import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.sdk.AppEngineSdk;
 
 import com.intellij.execution.ExecutionException;
@@ -52,6 +52,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /** A run configuration for App Engine modules, calls KickStart directly from the sdk */
@@ -109,6 +110,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
   public Collection<Module> getValidModules() {
     Module[] modules = ModuleManager.getInstance(getProject()).getModules();
 
+    /* comment out for now since we don't have facet
     ArrayList<Module> res = new ArrayList<Module>();
     for (Module module : modules) {
       Facet[] facetList = FacetManager.getInstance(module).getAllFacets();
@@ -118,8 +120,8 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
           break;
         }
       }
-    }
-    return res;
+    }*/
+    return Arrays.asList(modules);
   }
 
   @Override
