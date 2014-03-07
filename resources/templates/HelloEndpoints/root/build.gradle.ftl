@@ -21,6 +21,9 @@ apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'appengine'
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 dependencies {
   appengineSdk 'com.google.appengine:appengine-java-sdk:${appEngineVersion}'
   compile 'com.google.appengine:appengine-endpoints:${appEngineVersion}'
