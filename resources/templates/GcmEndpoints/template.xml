@@ -24,7 +24,7 @@
 
   <parameter id="packageName" name="Package name" type="string" constraints="package|nonempty" default="com.mycompany.myapp"/>
   <parameter id="appId" name="Application Id" type="string" constraints="nonempty" default="myApplicationId"/>
-  <parameter id="endpointOwnerDomain" name="Endpoint Owner Domain" type="string" constraints="package" default="com.mycompany"/>
+  <parameter id="endpointOwnerDomain" name="Endpoint Owner Domain" type="string" constraints="package" default="mycompany.com"/>
   <parameter id="endpointPackagePath" name="Endpoint Package Path" type="string" constraints="package" default="myapp"/>
   <parameter id="apiKey" name="Gcm Api Key" type="string" default="REPLACE WITH YOUR API KEY"/>
   <parameter id="appEngineVersion" name="AppEngine Version" type="string" default="1.8.9" />

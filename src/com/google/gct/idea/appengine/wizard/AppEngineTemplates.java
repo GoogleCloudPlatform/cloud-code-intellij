@@ -19,6 +19,8 @@ import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateManager;
 import com.android.tools.idea.templates.TemplateMetadata;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.ArrayUtil;
 import com.intellij.util.PathUtil;
 
 import java.io.File;
@@ -95,9 +97,14 @@ public class AppEngineTemplates {
   public static final String ATTR_ENDPOINTS_OWNER = "endpointOwnerDomain";
   public static final String ATTR_ENDPOINTS_PACKAGE = "endpointPackagePath";
 
-  /** Populate endpoints specific template parameters into the replacement map */
+  /**
+   * Populate endpoints specific template parameters into the replacement map
+   * Owner Domain is reverse of package path
+   */
   public static void populateEndpointParameters(Map<String, Object> replacementMap, String rootPackage) {
-    replacementMap.put(ATTR_ENDPOINTS_OWNER, rootPackage);
+    String[] pkgParts = rootPackage.split("\\.");
+    String ownerDomain = StringUtil.join(ArrayUtil.reverseArray(pkgParts),".");
+    replacementMap.put(ATTR_ENDPOINTS_OWNER, ownerDomain);
     replacementMap.put(ATTR_ENDPOINTS_PACKAGE, "");
   }
 }
