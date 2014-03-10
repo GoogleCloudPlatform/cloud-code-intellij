@@ -42,9 +42,4 @@ public class InstallClientLibrariesAction extends AnAction {
 
     GradleInvoker.getInstance(project).executeTasks(Arrays.asList(appEngineModule.getName() + ":appengineEndpointsInstallClientLibs"));
   }
-
-  @Override
-  public void update(AnActionEvent e) {
-    e.getPresentation().setVisible(Boolean.parseBoolean(System.getProperty("com.google.gct.newModuleAction.enabled", "false")));
-  }
 }

@@ -135,11 +135,6 @@ public class NewAppEngineModuleAction extends AnAction {
     });
   }
 
-  @Override
-  public void update(AnActionEvent e) {
-    e.getPresentation().setVisible(Boolean.parseBoolean(System.getProperty("com.google.gct.newModuleAction.enabled", "false")));
-  }
-
   private void createRunConfiguration(Project project, Module module, File moduleRoot) {
     // Create a run configuration for this module
     final RunManagerEx runManager = RunManagerEx.getInstanceEx(project);

@@ -16,15 +16,19 @@
 package com.google.gct.idea.appengine.wizard;
 
 import com.android.tools.idea.templates.TemplateMetadata;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.psi.JavaPsiFacade;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +38,7 @@ public class AppEngineModuleWizard extends DialogWrapper {
   private JTextField myModuleNameField;
   private JTextField myPackageNameField;
   private JComboBox myTemplateBox;
+  private JEditorPane myDescriptionPane;
   private String myModuleName;
   private String myPackageName;
   private File myTemplate;
@@ -98,7 +103,31 @@ public class AppEngineModuleWizard extends DialogWrapper {
   @Override
   protected JComponent createCenterPanel() {
     populateTemplates();
+    createDescriptionPane();
     return myRootPanel;
   }
 
+  protected void createDescriptionPane() {
+    myDescriptionPane.setContentType(UIUtil.HTML_MIME);
+    myDescriptionPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+    myDescriptionPane.setFont(UIManager.getFont("Label.font"));
+    myDescriptionPane.setOpaque(false);
+    myDescriptionPane.setEditable(false);
+    myDescriptionPane.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
+    myDescriptionPane.setText("<html>" +
+                              "<body>" +
+                              "Add a Gradle based, App Engine module to your Android project. Find more information about the templates " +
+                              "<a href='https://github.com/GoogleCloudPlatform/gradle-appengine-templates'>here</a>." +
+                              "</body>" +
+                              "</html> ");
+
+    myDescriptionPane.addHyperlinkListener(new HyperlinkListener() {
+      @Override
+      public void hyperlinkUpdate(HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+          BrowserUtil.browse(e.getURL().toString());
+        }
+      }
+    });
+  }
 }
