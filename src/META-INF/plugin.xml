@@ -76,19 +76,6 @@
   </extensions>
 
   <actions>
-    <action id="GoogleCloudTools.GenerateCloudBackend"
-            class="com.google.gct.intellij.endpoints.action.GenerateCloudBackendAction"
-            text="Generate App Engine Backend"
-            description="Generates an App Engine backend for an Android project and a corresponding Android library module"
-            icon="/icons/appEngine.png"/>
-    <action id="GoogleCloudTools.GenerateEndpoint"
-            class="com.google.gct.intellij.endpoints.action.GenerateEndpointAction"
-            text="Generate Endpoint"
-            description="Create an Endpoints Class for this Entity"
-            icon="/icons/cloudEndpoints.png"/>
-    <action id="GoogleCloudTools.GenerateClientLibraries"
-            class="com.google.gct.intellij.endpoints.action.GenerateClientLibrariesAction"
-            text="Generate Client Libraries" />
     <action id="GoogleCloudTools.NewAppEngineModule"
             class="com.google.gct.idea.appengine.wizard.NewAppEngineModuleAction"
             text="New App Engine Gradle Module"
@@ -102,13 +89,8 @@
            description="Endpoints Actions"
            popup="true"
            icon="/icons/cloudPlatform.png">
-      <!-- this action is flag guarded using the com.google.gct.newModuleAction.enabled=true system property -->
       <reference id="GoogleCloudTools.NewAppEngineModule"/>
       <reference id="GoogleCloudTools.InstallClientLibraries"/>
-      <!-- end flag guarded actions -->
-      <reference id="GoogleCloudTools.GenerateCloudBackend"/>
-      <reference id="GoogleCloudTools.GenerateEndpoint"/>
-      <reference id="GoogleCloudTools.GenerateClientLibraries"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </group>
   </actions>
