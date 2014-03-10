@@ -15,6 +15,8 @@
  */
 package com.google.gct.idea.appengine.sdk;
 
+import com.intellij.execution.configurations.ParametersList;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,8 +27,11 @@ import java.io.File;
  */
 public class AppEngineSdk {
 
+  public static final Logger LOG = Logger.getInstance(AppEngineSdk.class);
+
   private static final String TOOLS_API_JAR_PATH = "/lib/appengine-tools-api.jar";
-  public static final String KICK_STARTER_CLASS = "com.google.appengine.tools.KickStart";
+  private static final String AGENT_JAR_PATH = "/lib/agent/appengine-agent.jar";
+  private static final String OVERRIDES_JAR_PATH = "/lib/override/appengine-dev-jdk-overrides.jar";
   public static final String DEV_APPSERVER_CLASS = "com.google.appengine.tools.development.DevAppServerMain";
 
   private final String mySdkPath;
@@ -43,13 +48,38 @@ public class AppEngineSdk {
     return getToolsApiJarFile() != null;
   }
 
+  /**
+   * Find a jar in an SDK based on a path
+   * @param jarPath
+   * @return File if it exists, null otherwise
+   */
   @Nullable
-  public File getToolsApiJarFile() {
-    final File sdkDir = new File(mySdkPath);
-    File toolsJar = new File(sdkDir, TOOLS_API_JAR_PATH);
-    if(toolsJar.exists()) {
-      return toolsJar;
+  public File getSdkJar(String jarPath) {
+    final String fullJarPath = mySdkPath + jarPath;
+    File sdkJar = new File(FileUtil.toSystemDependentName(fullJarPath));
+    if(sdkJar.exists()) {
+      return sdkJar;
     }
     return null;
+  }
+
+  /** Get the App Engine tools api jar */
+  @Nullable
+  public File getToolsApiJarFile() {
+    return getSdkJar(TOOLS_API_JAR_PATH);
+  }
+
+  /** When running dev app server and not using Kick Start, use these params to run DevAppServerMain directly */
+  public void addServerVmParams(ParametersList vmParams) {
+      File agentJar = getSdkJar(AGENT_JAR_PATH);
+      if (agentJar != null) {
+        vmParams.add("-javaagent:" + agentJar.getAbsolutePath());
+        LOG.warn("App Engine SDK Agent jar not found : " + AGENT_JAR_PATH);
+      }
+      File overridesJar = getSdkJar(OVERRIDES_JAR_PATH);
+      if (overridesJar != null) {
+        vmParams.add("-Xbootclasspath/p:" + overridesJar.getAbsolutePath());
+        LOG.warn("App Engine SDK Overrides JAR not found " + OVERRIDES_JAR_PATH);
+      }
   }
 }
