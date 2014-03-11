@@ -15,7 +15,6 @@
  */
 package com.google.gct.idea.appengine.run;
 
-import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.sdk.AppEngineSdk;
 
 import com.intellij.execution.ExecutionException;
@@ -33,8 +32,6 @@ import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.facet.Facet;
-import com.intellij.facet.FacetManager;
 import com.intellij.openapi.components.PathMacroManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -51,11 +48,10 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-/** A run configuration for App Engine modules, calls KickStart directly from the sdk */
+/** A run configuration for App Engine modules, calls DevAppServerMain directly from the sdk bypassing KickStart*/
 public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunConfigurationModule> {
 
   public static final String NAME = "App Engine DevAppServer";
@@ -193,7 +189,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
       final JavaParameters params = new JavaParameters();
       final JavaRunConfigurationModule module = configuration.getConfigurationModule();
 
-      params.setMainClass(AppEngineSdk.KICK_STARTER_CLASS);
+      params.setMainClass(AppEngineSdk.DEV_APPSERVER_CLASS);
 
       AppEngineSdk sdk = new AppEngineSdk(configuration.mySdkPath);
 
@@ -201,10 +197,9 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
       if (configuration.myVmArgs != null && !configuration.myVmArgs.trim().isEmpty()) {
         vmParams.add(configuration.myVmArgs);
       }
+      sdk.addServerVmParams(vmParams);
 
       ParametersList programParams = params.getProgramParametersList();
-      // since we are using kickstart, make the first parameter of kickstart the devapp server
-      programParams.prepend(AppEngineSdk.DEV_APPSERVER_CLASS);
       programParams.add("--port=" + configuration.myServerPort);
 
       String warPath = configuration.myWarPath;
