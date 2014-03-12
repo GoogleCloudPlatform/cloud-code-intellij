@@ -33,6 +33,7 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
   private JTextField myVmArgsField;
   private TextFieldWithBrowseButton myWarPathField;
   private TextFieldWithBrowseButton myAppEngineSdkField;
+  private JTextField myServerAddressField;
   private final Project myProject;
   private final ConfigurationModuleSelector moduleSelector;
 
@@ -54,6 +55,7 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
       myWarPathField.setText(configuration.getWarPath());
     }
     myServerPortField.setText(configuration.getServerPort());
+    myServerAddressField.setText(configuration.getServerAddress());
     myVmArgsField.setText(configuration.getVmArgs());
     moduleSelector.reset(configuration);
   }
@@ -61,10 +63,11 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
   @Override
   protected void applyEditorTo(AppEngineRunConfiguration configuration) throws ConfigurationException {
     moduleSelector.applyTo(configuration);
-    configuration.setWarPath(myWarPathField.getText());
     configuration.setSdkPath(myAppEngineSdkField.getText());
+    configuration.setServerAddress(myServerAddressField.getText());
     configuration.setServerPort(myServerPortField.getText());
     configuration.setVmArgs(myVmArgsField.getText());
+    configuration.setWarPath(myWarPathField.getText());
   }
 
   @NotNull

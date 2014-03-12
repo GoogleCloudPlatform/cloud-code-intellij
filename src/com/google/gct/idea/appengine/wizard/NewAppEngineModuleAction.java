@@ -140,6 +140,7 @@ public class NewAppEngineModuleAction extends AnAction {
     final RunManagerEx runManager = RunManagerEx.getInstanceEx(project);
     final RunnerAndConfigurationSettings settings = runManager.
       createRunConfiguration(module.getName(), AppEngineRunConfigurationType.getInstance().getFactory());
+    settings.setSingleton(true);
     final AppEngineRunConfiguration configuration = (AppEngineRunConfiguration)settings.getConfiguration();
     configuration.setModule(module);
     configuration.setWarPath(new File(moduleRoot, "build/exploded-app").getAbsolutePath());

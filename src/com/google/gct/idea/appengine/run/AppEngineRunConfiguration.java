@@ -56,15 +56,17 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
 
   public static final String NAME = "App Engine DevAppServer";
 
-  private String myWarPath = "";
+  private String myServerAddress = "";
   private String mySdkPath = "";
-  private String myServerPort = "8080";
+  private String myServerPort = "";
   private String myVmArgs = "";
+  private String myWarPath = "";
 
-  private static final String KEY_WAR_PATH = "warPath";
+  private static final String KEY_SERVER_ADDRESS = "serverAddress";
   private static final String KEY_SERVER_PORT = "serverPort";
   private static final String KEY_SDK_PATH = "sdkPath";
   private static final String KEY_VM_ARGS = "vmArgs";
+  private static final String KEY_WAR_PATH = "warPath";
 
   public String getWarPath() {
     return myWarPath;
@@ -72,6 +74,14 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
 
   public void setWarPath(String warPath) {
     this.myWarPath = warPath;
+  }
+
+  public String getServerAddress() {
+    return myServerAddress;
+  }
+
+  public void setServerAddress(String serverAddress) {
+    myServerAddress = serverAddress;
   }
 
   public String getSdkPath() {
@@ -162,15 +172,20 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
       throw new RuntimeConfigurationError("No War Path Specified");
     }
 
-    try {
-      int value = Integer.parseInt(myServerPort);
-      if (value < 1024 || value >  65535) {
-        throw new RuntimeConfigurationError("Invalid port number [valid range : 1024 - 65535]");
-      }
-    } catch (NumberFormatException nfe) {
-      throw new RuntimeConfigurationError("Non numeric/invalid port number [valid range : 1024 - 65535]");
+    if(StringUtil.containsWhitespaces(myServerAddress.trim())) {
+      throw new RuntimeConfigurationError("Server address must contain no spaces");
     }
 
+    if (!(myServerPort == null || myServerPort.trim().isEmpty())) {
+      try {
+        int value = Integer.parseInt(myServerPort);
+        if (value < 1024 || value >  65535) {
+          throw new RuntimeConfigurationError("Invalid port number [valid range : 1024 - 65535]");
+        }
+      } catch (NumberFormatException nfe) {
+        throw new RuntimeConfigurationError("Non numeric/invalid port number [valid range : 1024 - 65535]");
+      }
+    }
   }
 
   /** Class to configure command line state of the dev app server **/
@@ -200,7 +215,12 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
       sdk.addServerVmParams(vmParams);
 
       ParametersList programParams = params.getProgramParametersList();
-      programParams.add("--port=" + configuration.myServerPort);
+      if (configuration.myServerAddress != null && !configuration.myServerAddress.trim().isEmpty()) {
+        programParams.add("--address=" + configuration.myServerAddress);
+      }
+      if (configuration.myServerPort != null && !configuration.myServerPort.trim().isEmpty()) {
+        programParams.add("--port=" + configuration.myServerPort);
+      }
 
       String warPath = configuration.myWarPath;
       if (warPath == null) {
@@ -230,6 +250,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     PathMacroManager.getInstance(getProject()).expandPaths(element);
     super.readExternal(element);
     readModule(element);
+    myServerAddress = StringUtil.notNullize(JDOMExternalizer.readString(element, KEY_SERVER_ADDRESS));
     mySdkPath = ExternalizablePath.localPathValue(JDOMExternalizer.readString(element, KEY_SDK_PATH));
     myServerPort = StringUtil.notNullize(JDOMExternalizer.readString(element, KEY_SERVER_PORT));
     myVmArgs = StringUtil.notNullize(JDOMExternalizer.readString(element, KEY_VM_ARGS));
@@ -240,6 +261,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
   public void writeExternal(Element element) throws WriteExternalException {
     super.writeExternal(element);
     writeModule(element);
+    JDOMExternalizer.write(element, KEY_SERVER_ADDRESS, myServerAddress);
     JDOMExternalizer.write(element, KEY_SDK_PATH, ExternalizablePath.urlValue(mySdkPath));
     JDOMExternalizer.write(element, KEY_SERVER_PORT, myServerPort);
     JDOMExternalizer.write(element, KEY_VM_ARGS, myVmArgs);
