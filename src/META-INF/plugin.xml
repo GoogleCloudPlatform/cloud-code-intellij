@@ -59,7 +59,7 @@
                      level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.MethodParameterTypeInspection"/>
 
     <localInspection language="JAVA" shortName="MethodReturnType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="method.return.type.name" groupKey="inspections.group.name" enabledByDefault="false"
+                     key="method.return.type.name" groupKey="inspections.group.name" enabledByDefault="true"
                      level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.MethodReturnTypeInspection"/>
 
     <localInspection language="JAVA" shortName="NamedResource" bundle="messages.EndpointBundle"  hasStaticDescription="true"
