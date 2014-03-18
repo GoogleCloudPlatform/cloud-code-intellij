@@ -18,6 +18,17 @@ package com.google.gct.intellij.endpoints.validation;
 
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
+import com.intellij.codeInspection.ex.ProblemDescriptorImpl;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElementFactory;
+import com.intellij.psi.PsiMethod;
+
+import junit.framework.Assert;
+
+import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests for {@link ConstructorInspection}
@@ -70,6 +81,50 @@ public class ConstructorInspectionTest extends EndpointTestBase {
    */
   public void testMultipleConstructorsWithoutPublicNullary() {
     doTest();
+  }
+
+  public void testQuickFix_noConstructor() {
+    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
+    MockitoAnnotations.initMocks(this);
+
+    PsiClass psiClass = JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory().createClass(getName());
+    ConstructorInspection constructorInspection = new ConstructorInspection();
+    ConstructorInspection.MyQuickFix myQuickFix = constructorInspection.new MyQuickFix(psiClass);
+    myQuickFix.applyFix(myFixture.getProject(), problemDescriptorMock);
+    Assert.assertEquals(1, psiClass.getConstructors().length);
+    Assert.assertTrue(constructorInspection.isPublicNullaryConstructor(psiClass.getConstructors()[0]));
+  }
+
+  public void testQuickFix_classWithNullaryConstructor() {
+    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
+    MockitoAnnotations.initMocks(this);
+
+    PsiElementFactory factory = JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory();
+    PsiClass psiClass = factory.createClass(getName());
+    PsiMethod nullaryConstructor = factory.createMethodFromText("public " + psiClass.getName() + "() { }", psiClass);
+    psiClass.addAfter(nullaryConstructor, null);
+
+    ConstructorInspection constructorInspection = new ConstructorInspection();
+    ConstructorInspection.MyQuickFix myQuickFix = constructorInspection.new MyQuickFix(psiClass);
+    myQuickFix.applyFix(myFixture.getProject(), problemDescriptorMock);
+    Assert.assertEquals(1, psiClass.getConstructors().length);
+    Assert.assertTrue(constructorInspection.isPublicNullaryConstructor(psiClass.getConstructors()[0]));
+  }
+
+  public void testQuickFix_classWithNonNullaryConstructor() {
+    ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
+    MockitoAnnotations.initMocks(this);
+
+    PsiElementFactory factory = JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory();
+    PsiClass psiClass = factory.createClass(getName());
+    PsiMethod nullaryConstructor = factory.createMethodFromText("public " + psiClass.getName() + "(String param) { }", psiClass);
+    psiClass.addAfter(nullaryConstructor, null);
+
+    ConstructorInspection constructorInspection = new ConstructorInspection();
+    ConstructorInspection.MyQuickFix myQuickFix = constructorInspection.new MyQuickFix(psiClass);
+    myQuickFix.applyFix(myFixture.getProject(), problemDescriptorMock);
+    Assert.assertEquals(2, psiClass.getConstructors().length);
+    Assert.assertTrue(constructorInspection.isPublicNullaryConstructor(psiClass.getConstructors()[0]));
   }
 
   private void doTest() {

@@ -64,4 +64,21 @@ public class EndpointInspectionBase extends LocalInspectionTool {
   public String collapseSequenceOfDots(@NotNull String word){
     return word.replaceAll("[.]+",".");
   }
+
+  public boolean isPublicNullaryConstructor(PsiMethod method) {
+    if(!method.isConstructor()) {
+      return false;
+    }
+
+    if(method.getParameterList().getParametersCount() > 0) {
+      return false;
+    }
+
+    PsiModifierList modifierList = method.getModifierList();
+    if(modifierList.hasModifierProperty(PsiModifier.PUBLIC)) {
+      return true;
+    }
+
+    return false;
+  }
 }
