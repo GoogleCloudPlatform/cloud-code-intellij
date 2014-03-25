@@ -23,6 +23,11 @@
     <facetType implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetType"/>
     <framework.detector implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineFrameworkDetector"/>
      -->
+
+    <!-- Temporarily disable
+    <applicationConfigurable instance="com.google.gct.intellij.endpoints.synchronization.SampleSyncConfigurable"></applicationConfigurable>
+    -->
+
     <configurationType implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationType"/>
     <configurationProducer implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationProducer"/>
 
