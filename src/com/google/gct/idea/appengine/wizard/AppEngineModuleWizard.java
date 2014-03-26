@@ -15,7 +15,6 @@
  */
 package com.google.gct.idea.appengine.wizard;
 
-import com.android.tools.idea.templates.TemplateMetadata;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -23,15 +22,12 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.util.ui.UIUtil;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AppEngineModuleWizard extends DialogWrapper {
   private JPanel myRootPanel;
@@ -95,8 +91,7 @@ public class AppEngineModuleWizard extends DialogWrapper {
   }
 
   protected void populateTemplates() {
-    List<AppEngineTemplates.TemplateInfo> templates = AppEngineTemplates.getLocalTemplates();
-    myTemplateBox.setModel(new DefaultComboBoxModel(AppEngineTemplates.getLocalTemplates().toArray()));
+    myTemplateBox.setModel(new DefaultComboBoxModel(AppEngineTemplates.getTemplates().toArray()));
   }
 
   @Nullable

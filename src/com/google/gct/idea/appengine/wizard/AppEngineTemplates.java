@@ -22,6 +22,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.PathUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,6 +42,9 @@ public class AppEngineTemplates {
 
   public static final List<String> LOCAL_TEMPLATES = Arrays.asList(HELLO_WORLD, HELLO_ENDPOINTS, GCM_ENDPOINTS);
   public static final List<String> LOCAL_ENDPOINTS_TEMPLATES = Arrays.asList(HELLO_ENDPOINTS, GCM_ENDPOINTS);
+
+  // ToDo: remove after integrating with SampleSyncTask
+  private final static String ANDROID_REPO_PATH = System.getProperty("user.home") + "/.android/cloud";
 
   /** Class that encapsulates a templates and its metadata */
   public static class TemplateInfo {
@@ -66,32 +70,47 @@ public class AppEngineTemplates {
     }
   }
 
+  /** Returns a list of App Engine templates.
+   * Depending on user preference, returns either the built-in templates or the cached
+   * templates in the local git repository.
+   */
+  public static List<TemplateInfo> getTemplates() {
+    boolean usingBuiltInTemplates = true; //SampleSyncConfiguration.usingBuiltInSamples()
+    if(usingBuiltInTemplates) {
+      return getLocalTemplates();
+    } else {
+      return getCachedTemplates();
+    }
+  }
+
   /** Returns a list of templates that are stored locally as part of the cloud tools plugin */
   public static List<TemplateInfo> getLocalTemplates() {
-    TemplateManager templateManager = TemplateManager.getInstance();
+    LOG.info("Populating built-in App Engine templates...");
+
     File jarPath = new File(PathUtil.getJarPathForClass(AppEngineTemplates.class));
     if (jarPath.isFile()) {
       jarPath = jarPath.getParentFile();
     }
     File root = new File(jarPath, TEMPLATES_DIR);
 
-    List<TemplateInfo> templates = new ArrayList<TemplateInfo>();
-    if (root.exists()) {
-      for(String template : LOCAL_TEMPLATES) {
-        File file = new File(root, template);
-        if(file.exists() && file.isDirectory() && (new File(file, Template.TEMPLATE_XML_NAME)).exists()) {
-          templates.add(new TemplateInfo(file, templateManager.getTemplate(file)));
-        }
-        else {
-          LOG.error("Template is corrupt or missing : " + template);
-        }
-      }
-    }
-    else {
+    if (!root.exists()) {
       LOG.error("Failed to find templates directory, perhaps your cloud tools plugin is corrupt?");
     }
 
-    return templates;
+    return populateTemplates(root);
+  }
+
+  /** Returns a list of templates that are stored in a local repository */
+  public static List<TemplateInfo> getCachedTemplates() {
+    LOG.info("Populating cached App Engine templates...");
+
+    File root = new File(ANDROID_REPO_PATH, TEMPLATES_DIR);
+    if(!root.exists()) {
+      LOG.error("Failed to find cached templates directory, using built-in templates");
+      return getLocalTemplates();
+    }
+
+    return populateTemplates(root);
   }
 
   public static final String ATTR_ENDPOINTS_OWNER = "endpointOwnerDomain";
@@ -106,5 +125,26 @@ public class AppEngineTemplates {
     String ownerDomain = StringUtil.join(ArrayUtil.reverseArray(pkgParts),".");
     replacementMap.put(ATTR_ENDPOINTS_OWNER, ownerDomain);
     replacementMap.put(ATTR_ENDPOINTS_PACKAGE, "");
+  }
+
+  private static List<TemplateInfo> populateTemplates(@NotNull File root) {
+    TemplateManager templateManager = TemplateManager.getInstance();
+    List<TemplateInfo> templates = new ArrayList<TemplateInfo>();
+
+    if (root.exists()) {
+      for(String template : LOCAL_TEMPLATES) {
+        File file = new File(root, template);
+        if(file.exists() && file.isDirectory() && (new File(file, Template.TEMPLATE_XML_NAME)).exists()) {
+          templates.add(new TemplateInfo(file, templateManager.getTemplate(file)));
+        }
+        else {
+          LOG.error("Template is corrupt or missing : " + template);
+        }
+      }
+    }
+    else {
+      LOG.error("Invalid templates directory");
+    }
+    return templates;
   }
 }
