@@ -24,7 +24,9 @@
     <framework.detector implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineFrameworkDetector"/>
      -->
     <configurationType implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationType"/>
-    <configurationProducer implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationProducer"/>
+    <!-- hide this, it was causing context menus to pick appengine, fix and re-enable
+    <runConfigurationProducer implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationProducer"/>
+    -->
 
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"

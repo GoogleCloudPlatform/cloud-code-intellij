@@ -15,58 +15,30 @@
  */
 package com.google.gct.idea.appengine.run;
 
-import com.intellij.execution.Location;
-import com.intellij.execution.RunManagerEx;
-import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.actions.ConfigurationContext;
-import com.intellij.execution.junit.JavaRuntimeConfigurationProducerBase;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
+import com.intellij.execution.junit.JavaRunConfigurationProducerBase;
+import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.Nullable;
 
-/** Run configuration producer for App Engine modules */
-public class AppEngineRunConfigurationProducer extends JavaRuntimeConfigurationProducerBase {
-
-  private PsiElement myElementContext;
+/**
+ * Run configuration producer for App Engine modules
+ * TODO: Make this useful or remove
+ */
+public class AppEngineRunConfigurationProducer extends JavaRunConfigurationProducerBase<AppEngineRunConfiguration> {
 
   public AppEngineRunConfigurationProducer() {
     super(AppEngineRunConfigurationType.getInstance());
   }
 
   @Override
-  public PsiElement getSourceElement() {
-    return myElementContext;
-  }
-
-  @Nullable
-  @Override
-  protected RunnerAndConfigurationSettings createConfigurationByElement(Location location, ConfigurationContext context) {
-    Module module = context.getModule();
-    if (module == null) return null;
-
-    myElementContext = location.getPsiElement();
-
-    return createConfiguration(location.getProject(), module);
+  protected boolean setupConfigurationFromContext(AppEngineRunConfiguration configuration,
+                                                  ConfigurationContext context,
+                                                  Ref<PsiElement> sourceElement) {
+    return false;
   }
 
   @Override
-  public int compareTo(Object o) {
-    // TODO: Provide better comparison algorithm
-    return 0;
-  }
-
-  private RunnerAndConfigurationSettings createConfiguration(@Nullable Project project, Module module) {
-    if (project == null) {
-      return null;
-    }
-
-    RunnerAndConfigurationSettings settings =
-      RunManagerEx.getInstanceEx(project).createRunConfiguration(module.getName() + " - " + AppEngineRunConfiguration.NAME, getConfigurationFactory());
-    final AppEngineRunConfiguration configuration = (AppEngineRunConfiguration)settings.getConfiguration();
-
-    configuration.setModule(module);
-
-    return settings;
+  public boolean isConfigurationFromContext(AppEngineRunConfiguration configuration, ConfigurationContext context) {
+    return false;
   }
 }
