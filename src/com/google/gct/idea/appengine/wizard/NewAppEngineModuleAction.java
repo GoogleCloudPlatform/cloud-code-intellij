@@ -17,6 +17,7 @@
 package com.google.gct.idea.appengine.wizard;
 
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
+import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
 
@@ -73,7 +74,7 @@ public class NewAppEngineModuleAction extends AnAction {
   }
 
   void doAction(@NotNull final Project project, final AppEngineModuleWizard dialog) {
-    final Template myTemplate = Template.createFromPath(dialog.getTemplate());
+    final Template template = Template.createFromPath(dialog.getTemplate());
 
     final File projectRoot = new File(project.getBasePath());
     final File moduleRoot = new File(projectRoot, dialog.getModuleName());
@@ -99,7 +100,7 @@ public class NewAppEngineModuleAction extends AnAction {
 
       @Override
       public void run() {
-        myTemplate.render(projectRoot, moduleRoot, replacementMap);
+        template.render(projectRoot, moduleRoot, replacementMap);
         GradleProjectImporter projectImporter = GradleProjectImporter.getInstance();
         try {
           projectImporter.reImportProject(project, new GradleProjectImporter.Callback() {
@@ -110,7 +111,10 @@ public class NewAppEngineModuleAction extends AnAction {
                 public void run() {
                   Module module = ModuleManager.getInstance(project).findModuleByName(dialog.getModuleName());
 
-                  createRunConfiguration(project, module, moduleRoot);
+                  Parameter appEngineVersionParam = template.getMetadata().getParameter("appEngineVersion");
+                  String appEngineVersion = (appEngineVersionParam == null) ? "unknown" : appEngineVersionParam.initial;
+
+                  createRunConfiguration(project, module, moduleRoot, appEngineVersion);
                   addAppEngineGradleFacet();
                 }
               });
@@ -135,7 +139,7 @@ public class NewAppEngineModuleAction extends AnAction {
     });
   }
 
-  private void createRunConfiguration(Project project, Module module, File moduleRoot) {
+  private void createRunConfiguration(Project project, Module module, File moduleRoot, String appEngineVersion) {
     // Create a run configuration for this module
     final RunManagerEx runManager = RunManagerEx.getInstanceEx(project);
     final RunnerAndConfigurationSettings settings = runManager.
@@ -151,7 +155,7 @@ public class NewAppEngineModuleAction extends AnAction {
     // This is a little strange because the sdk is "downloaded", but in our templates that's where the sdk is
     // TODO, perhaps extract this from the build.gradle
     // TODO, add support for the appengine environment/system properties (probably in the runconfig not here)
-    configuration.setSdkPath(new File(gradleHomePath, "/appengine-sdk/appengine-java-sdk-1.8.9").getAbsolutePath());
+    configuration.setSdkPath(new File(gradleHomePath, "/appengine-sdk/appengine-java-sdk-" + appEngineVersion).getAbsolutePath());
     configuration.setServerPort("8080");
     runManager.addConfiguration(settings, false);
   }

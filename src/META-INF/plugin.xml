@@ -80,7 +80,7 @@
   <actions>
     <action id="GoogleCloudTools.NewAppEngineModule"
             class="com.google.gct.idea.appengine.wizard.NewAppEngineModuleAction"
-            text="New App Engine Gradle Module"
+            text="Add App Engine Backend"
             icon="/icons/appEngine.png"/>
     <action id="GoogleCloudTools.InstallClientLibraries"
             class="com.google.gct.idea.appengine.gradle.action.InstallClientLibrariesAction"

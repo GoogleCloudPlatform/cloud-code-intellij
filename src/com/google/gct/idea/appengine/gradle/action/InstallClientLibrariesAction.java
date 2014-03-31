@@ -17,14 +17,13 @@
 package com.google.gct.idea.appengine.gradle.action;
 
 import com.android.tools.idea.gradle.invoker.GradleInvoker;
-import com.android.tools.idea.gradle.util.GradleUtil;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.ui.Messages;
 
 import java.util.Arrays;
 
@@ -33,12 +32,18 @@ import java.util.Arrays;
  */
 public class InstallClientLibrariesAction extends AnAction {
 
+  private static final String ERROR_MSG_TITLE = "Install Client Libraries";
+
   @Override
   public void actionPerformed(AnActionEvent e) {
     final Project project = e.getProject();
     final Module appEngineModule = e.getData(LangDataKeys.MODULE);
 
-    // TODO : check if App Engine Module or not
+    if(project == null || appEngineModule == null) {
+      Messages.showErrorDialog(project, "Please select an App Engine module.", ERROR_MSG_TITLE);
+      return;
+    }
+    // TODO : check if module is App Engine Module or not
 
     GradleInvoker.getInstance(project).executeTasks(Arrays.asList(appEngineModule.getName() + ":appengineEndpointsInstallClientLibs"));
   }

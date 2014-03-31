@@ -71,15 +71,20 @@ public class AppEngineSdk {
 
   /** When running dev app server and not using Kick Start, use these params to run DevAppServerMain directly */
   public void addServerVmParams(ParametersList vmParams) {
-      File agentJar = getSdkJar(AGENT_JAR_PATH);
-      if (agentJar != null) {
-        vmParams.add("-javaagent:" + agentJar.getAbsolutePath());
+    File agentJar = getSdkJar(AGENT_JAR_PATH);
+    if (agentJar != null) {
+      vmParams.add("-javaagent:" + agentJar.getAbsolutePath());
+    }
+    else {
         LOG.warn("App Engine SDK Agent jar not found : " + AGENT_JAR_PATH);
-      }
-      File overridesJar = getSdkJar(OVERRIDES_JAR_PATH);
-      if (overridesJar != null) {
-        vmParams.add("-Xbootclasspath/p:" + overridesJar.getAbsolutePath());
-        LOG.warn("App Engine SDK Overrides JAR not found " + OVERRIDES_JAR_PATH);
-      }
+    }
+
+    File overridesJar = getSdkJar(OVERRIDES_JAR_PATH);
+    if (overridesJar != null) {
+      vmParams.add("-Xbootclasspath/p:" + overridesJar.getAbsolutePath());
+    }
+    else {
+      LOG.warn("App Engine SDK Overrides JAR not found " + OVERRIDES_JAR_PATH);
+    }
   }
 }
