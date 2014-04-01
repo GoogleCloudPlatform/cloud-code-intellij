@@ -13,6 +13,11 @@
   <depends>org.jetbrains.plugins.gradle</depends>
 
   <application-components>
+    <!-- Disable temporarily
+    <component>
+      <implementation-class>com.google.gct.intellij.endpoints.synchronization.SampleSyncRegistration</implementation-class>
+    </component>
+    -->
   </application-components>
 
   <project-components>
