@@ -32,6 +32,7 @@ import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -83,6 +84,7 @@ public class SampleSyncTaskTest extends RepositoryTestCase {
     FileUtils.forceDelete(new File(mockAndroidRepoPath));
   }
 
+  @Ignore
   @Test
   public void testSync_noLocalRepo() throws IOException, GitAPIException {
     // Sync files from mock Git Hub repo to mock local Android sample template repo
@@ -112,6 +114,7 @@ public class SampleSyncTaskTest extends RepositoryTestCase {
     }
   }
 
+  @Ignore
   @Test
   public void testSync_singleCommit() throws GitAPIException, IOException, URISyntaxException {
     // Sync files from mock Git Hub repo to mock local Android sample template repo
@@ -142,6 +145,7 @@ public class SampleSyncTaskTest extends RepositoryTestCase {
     Assert.assertTrue(hasCommits);
   }
 
+  @Ignore
   @Test
   public void testSync_multipleCommits() throws GitAPIException, IOException {
     // Sync files from mock Git Hub repo to mock local Android sample template repo
