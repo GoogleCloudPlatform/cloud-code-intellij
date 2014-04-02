@@ -53,6 +53,10 @@
                      key="backend.name.name" groupKey="inspections.group.name" enabledByDefault="true"
                      level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.FullJavaNameInspection"/>
 
+    <localInspection language="JAVA" shortName="FullMethodName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
+                     key="full.method.name.name" groupKey="inspections.group.name" enabledByDefault="true"
+                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.FullMethodNameInspection"/>
+
     <localInspection language="JAVA" shortName="InvalidParameterAnnotations" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="invalid.parameter.annotations.name" groupKey="inspections.group.name" enabledByDefault="true"
                      level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.InvalidParameterAnnotationsInspection"/>
