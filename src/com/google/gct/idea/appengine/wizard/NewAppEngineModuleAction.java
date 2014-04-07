@@ -105,7 +105,11 @@ public class NewAppEngineModuleAction extends AnAction {
         try {
           projectImporter.reImportProject(project, new GradleProjectImporter.Callback() {
             @Override
-            public void projectImported(@NotNull final Project project) {
+            public void syncStarted(@NotNull Project project) {
+            }
+
+            @Override
+            public void syncEnded(@NotNull final Project project) {
               ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 @Override
                 public void run() {
@@ -121,7 +125,7 @@ public class NewAppEngineModuleAction extends AnAction {
             }
 
             @Override
-            public void importFailed(@NotNull Project project, @NotNull final String errorMessage) {
+            public void syncFailed(@NotNull Project project, @NotNull final String errorMessage) {
               ApplicationManager.getApplication().invokeLater(new Runnable() {
                 @Override
                 public void run() {
