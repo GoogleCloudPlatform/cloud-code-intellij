@@ -116,7 +116,7 @@ public class AppEngineModuleWizard extends DialogWrapper {
     myDescriptionPane.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
     myDescriptionPane.setText("<html>" +
                               "<body>" +
-                              "Add a Gradle based, App Engine module to your Android project. Find more information about the templates " +
+                              "Add a Gradle based App Engine module to your Android project. Find more information about the templates " +
                               "<a href='https://github.com/GoogleCloudPlatform/gradle-appengine-templates'>here</a>." +
                               "</body>" +
                               "</html> ");
