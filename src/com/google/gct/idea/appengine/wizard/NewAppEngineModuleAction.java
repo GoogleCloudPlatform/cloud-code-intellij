@@ -17,31 +17,26 @@
 package com.google.gct.idea.appengine.wizard;
 
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
+import com.android.tools.idea.gradle.project.GradleSyncListener;
 import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
-
 import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
-
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.facet.FacetManager;
-import com.intellij.facet.ModifiableFacetModel;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.gradle.settings.GradleSettings;
-import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,43 +97,37 @@ public class NewAppEngineModuleAction extends AnAction {
       public void run() {
         template.render(projectRoot, moduleRoot, replacementMap);
         GradleProjectImporter projectImporter = GradleProjectImporter.getInstance();
-        try {
-          projectImporter.reImportProject(project, new GradleProjectImporter.Callback() {
-            @Override
-            public void syncStarted(@NotNull Project project) {
-            }
+        projectImporter.requestProjectSync(project, new GradleSyncListener() {
+          @Override
+          public void syncStarted(@NotNull Project project) {
+          }
 
-            @Override
-            public void syncEnded(@NotNull final Project project) {
-              ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                @Override
-                public void run() {
-                  Module module = ModuleManager.getInstance(project).findModuleByName(dialog.getModuleName());
+          @Override
+          public void syncEnded(@NotNull final Project project) {
+            ApplicationManager.getApplication().runWriteAction(new Runnable() {
+              @Override
+              public void run() {
+                Module module = ModuleManager.getInstance(project).findModuleByName(dialog.getModuleName());
 
-                  Parameter appEngineVersionParam = template.getMetadata().getParameter("appEngineVersion");
-                  String appEngineVersion = (appEngineVersionParam == null) ? "unknown" : appEngineVersionParam.initial;
+                Parameter appEngineVersionParam = template.getMetadata().getParameter("appEngineVersion");
+                String appEngineVersion = (appEngineVersionParam == null) ? "unknown" : appEngineVersionParam.initial;
 
-                  createRunConfiguration(project, module, moduleRoot, appEngineVersion);
-                  addAppEngineGradleFacet();
-                }
-              });
-            }
+                createRunConfiguration(project, module, moduleRoot, appEngineVersion);
+                addAppEngineGradleFacet();
+              }
+            });
+          }
 
-            @Override
-            public void syncFailed(@NotNull Project project, @NotNull final String errorMessage) {
-              ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                  Messages.showErrorDialog("Error importing App Engine module : " + errorMessage, ERROR_MESSAGE_TITLE);
-                }
-              });
-            }
-          });
-        }
-        catch (ConfigurationException e) {
-          Messages.showErrorDialog(e.getMessage(), ERROR_MESSAGE_TITLE);
-          LOG.error(e);
-        }
+          @Override
+          public void syncFailed(@NotNull Project project, @NotNull final String errorMessage) {
+            ApplicationManager.getApplication().invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                Messages.showErrorDialog("Error importing App Engine module : " + errorMessage, ERROR_MESSAGE_TITLE);
+              }
+            });
+          }
+        });
       }
     });
   }
