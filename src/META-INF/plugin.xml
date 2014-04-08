@@ -15,7 +15,7 @@
   <application-components>
     <!-- Disable temporarily
     <component>
-      <implementation-class>com.google.gct.intellij.endpoints.synchronization.SampleSyncRegistration</implementation-class>
+      <implementation-class>com.google.gct.idea.appengine.synchronization.SampleSyncRegistration</implementation-class>
     </component>
     -->
   </application-components>
@@ -30,7 +30,7 @@
      -->
 
     <!-- Temporarily disable
-    <applicationConfigurable instance="com.google.gct.intellij.endpoints.synchronization.SampleSyncConfigurable"></applicationConfigurable>
+    <applicationConfigurable instance="com.google.gct.idea.appengine.synchronization.SampleSyncConfigurable"></applicationConfigurable>
     -->
 
     <configurationType implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationType"/>
@@ -40,55 +40,55 @@
 
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
-                     implementationClass="com.google.gct.intellij.endpoints.validation.ApiNameInspection"/>
+                     implementationClass="com.google.gct.idea.appengine.validation.ApiNameInspection"/>
 
     <localInspection language="JAVA" shortName="ApiNamespace" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.namespace.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
-                     implementationClass="com.google.gct.intellij.endpoints.validation.ApiNamespaceInspection"/>
+                     implementationClass="com.google.gct.idea.appengine.validation.ApiNamespaceInspection"/>
 
     <localInspection language="JAVA" shortName="ApiParameter" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.parameter.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.ApiParameterInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.ApiParameterInspection"/>
 
     <localInspection language="JAVA" shortName="Constructor" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="constructor.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.ConstructorInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.ConstructorInspection"/>
 
     <localInspection language="JAVA" shortName="FullJavaName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="backend.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.FullJavaNameInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.FullJavaNameInspection"/>
 
     <localInspection language="JAVA" shortName="FullMethodName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="full.method.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.FullMethodNameInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.FullMethodNameInspection"/>
 
     <localInspection language="JAVA" shortName="InvalidParameterAnnotations" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="invalid.parameter.annotations.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.InvalidParameterAnnotationsInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.InvalidParameterAnnotationsInspection"/>
 
     <localInspection language="JAVA" shortName="MethodName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="method.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.MethodNameInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.MethodNameInspection"/>
 
     <localInspection language="JAVA" shortName="MethodParameterType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="method.parameter.type.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.MethodParameterTypeInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.MethodParameterTypeInspection"/>
 
     <localInspection language="JAVA" shortName="MethodReturnType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="method.return.type.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.MethodReturnTypeInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.MethodReturnTypeInspection"/>
 
     <localInspection language="JAVA" shortName="NamedResource" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="named.resource.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.NamedResourceInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.NamedResourceInspection"/>
 
     <localInspection language="JAVA" shortName="ResourceParameter" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="resource.parameter.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.ResourceParameterInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.ResourceParameterInspection"/>
 
     <localInspection language="JAVA" shortName="RestSignature" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="unique.rest.signature.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.intellij.endpoints.validation.RestSignatureInspection"/>
+                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.RestSignatureInspection"/>
   </extensions>
 
   <actions>
