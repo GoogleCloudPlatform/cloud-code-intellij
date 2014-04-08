@@ -76,7 +76,7 @@ public class AppEngineTemplates {
    */
   public static List<TemplateInfo> getTemplates() {
     boolean usingBuiltInTemplates = true; //SampleSyncConfiguration.usingBuiltInSamples()
-    if(usingBuiltInTemplates) {
+    if (usingBuiltInTemplates) {
       return getLocalTemplates();
     } else {
       return getCachedTemplates();
@@ -105,7 +105,7 @@ public class AppEngineTemplates {
     LOG.info("Populating cached App Engine templates...");
 
     File root = new File(ANDROID_REPO_PATH, TEMPLATES_DIR);
-    if(!root.exists()) {
+    if (!root.exists()) {
       LOG.error("Failed to find cached templates directory, using built-in templates");
       return getLocalTemplates();
     }
@@ -132,9 +132,9 @@ public class AppEngineTemplates {
     List<TemplateInfo> templates = new ArrayList<TemplateInfo>();
 
     if (root.exists()) {
-      for(String template : LOCAL_TEMPLATES) {
+      for (String template : LOCAL_TEMPLATES) {
         File file = new File(root, template);
-        if(file.exists() && file.isDirectory() && (new File(file, Template.TEMPLATE_XML_NAME)).exists()) {
+        if (file.exists() && file.isDirectory() && (new File(file, Template.TEMPLATE_XML_NAME)).exists()) {
           templates.add(new TemplateInfo(file, templateManager.getTemplate(file)));
         }
         else {

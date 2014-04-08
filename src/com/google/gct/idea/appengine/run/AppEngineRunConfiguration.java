@@ -172,7 +172,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
       throw new RuntimeConfigurationError("No War Path Specified");
     }
 
-    if(StringUtil.containsWhitespaces(myServerAddress.trim())) {
+    if (StringUtil.containsWhitespaces(myServerAddress.trim())) {
       throw new RuntimeConfigurationError("Server address must contain no spaces");
     }
 

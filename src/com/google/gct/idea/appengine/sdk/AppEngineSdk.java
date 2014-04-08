@@ -57,7 +57,7 @@ public class AppEngineSdk {
   public File getSdkJar(String jarPath) {
     final String fullJarPath = mySdkPath + jarPath;
     File sdkJar = new File(FileUtil.toSystemDependentName(fullJarPath));
-    if(sdkJar.exists()) {
+    if (sdkJar.exists()) {
       return sdkJar;
     }
     return null;

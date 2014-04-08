@@ -27,7 +27,7 @@ public class EndpointUtilities {
    * @return input string with quotes at the beginning and end removed if they both exist.
    */
   public static String removeBeginningAndEndingQuotes(String input) {
-    if(input == null || !input.startsWith("\"") || !input.endsWith("\"")) {
+    if (input == null || !input.startsWith("\"") || !input.endsWith("\"")) {
       return input;
     }
 

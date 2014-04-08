@@ -23,7 +23,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 /** GUI for configuring App Engine Run Configurations */
 public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppEngineRunConfiguration> {
@@ -48,10 +51,10 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
 
   @Override
   protected void resetEditorFrom(AppEngineRunConfiguration configuration) {
-    if(configuration.getSdkPath() != null) {
+    if (configuration.getSdkPath() != null) {
       myAppEngineSdkField.setText(configuration.getSdkPath());
     }
-    if(configuration.getWarPath() != null) {
+    if (configuration.getWarPath() != null) {
       myWarPathField.setText(configuration.getWarPath());
     }
     myServerPortField.setText(configuration.getServerPort());
