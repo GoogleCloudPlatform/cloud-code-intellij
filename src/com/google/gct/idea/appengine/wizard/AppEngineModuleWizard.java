@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiNameHelper;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,14 +69,14 @@ public class AppEngineModuleWizard extends DialogWrapper {
   protected ValidationInfo doValidate() {
     String moduleName = myModuleNameField.getText().trim();
     String packageName = myPackageNameField.getText().trim();
-    if(moduleName.length() == 0) {
+    if (moduleName.length() == 0) {
       return new ValidationInfo("Module name is empty.", myModuleNameField);
     }
-    if(ModuleManager.getInstance(myProject).findModuleByName(moduleName) != null ||
+    if (ModuleManager.getInstance(myProject).findModuleByName(moduleName) != null ||
       new File(myProject.getBasePath(), moduleName).exists()) {
       return new ValidationInfo("Module " + moduleName + " already exists.", myModuleNameField);
     }
-    if(!JavaPsiFacade.getInstance(myProject).getNameHelper().isQualifiedName(packageName)) {
+    if (!PsiNameHelper.getInstance(myProject).isQualifiedName(packageName)) {
       return new ValidationInfo("Package name is invalid.", myPackageNameField);
     }
     return null;

@@ -39,7 +39,7 @@ public class InstallClientLibrariesAction extends AnAction {
     final Project project = e.getProject();
     final Module appEngineModule = e.getData(LangDataKeys.MODULE);
 
-    if(project == null || appEngineModule == null) {
+    if (project == null || appEngineModule == null) {
       Messages.showErrorDialog(project, "Please select an App Engine module.", ERROR_MSG_TITLE);
       return;
     }

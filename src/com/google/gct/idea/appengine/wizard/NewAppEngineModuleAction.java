@@ -21,8 +21,10 @@ import com.android.tools.idea.gradle.project.GradleSyncListener;
 import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
+
 import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
+
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -62,7 +64,7 @@ public class NewAppEngineModuleAction extends AnAction {
     AppEngineModuleWizard dialog = new AppEngineModuleWizard(project);
     dialog.show();
 
-    if(dialog.isOK()) {
+    if (dialog.isOK()) {
       doAction(project, dialog);
     }
 
@@ -87,7 +89,7 @@ public class NewAppEngineModuleAction extends AnAction {
     replacementMap.put(ATTR_MODULE_NAME, dialog.getModuleName());
     replacementMap.put(TemplateMetadata.ATTR_PACKAGE_NAME, dialog.getPackageName());
 
-    if(AppEngineTemplates.LOCAL_ENDPOINTS_TEMPLATES.contains(dialog.getTemplate().getName())) {
+    if (AppEngineTemplates.LOCAL_ENDPOINTS_TEMPLATES.contains(dialog.getTemplate().getName())) {
       AppEngineTemplates.populateEndpointParameters(replacementMap, dialog.getPackageName());
     }
 
@@ -142,7 +144,7 @@ public class NewAppEngineModuleAction extends AnAction {
     configuration.setModule(module);
     configuration.setWarPath(new File(moduleRoot, "build/exploded-app").getAbsolutePath());
     String gradleHomePath = GradleSettings.getInstance(project).getServiceDirectoryPath();
-    if(StringUtil.isEmpty(gradleHomePath)) {
+    if (StringUtil.isEmpty(gradleHomePath)) {
       gradleHomePath = new File(System.getProperty("user.home"), ".gradle").getAbsolutePath();
     }
     // This is a little strange because the sdk is "downloaded", but in our templates that's where the sdk is
