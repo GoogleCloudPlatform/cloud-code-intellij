@@ -210,7 +210,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
 
       ParametersList vmParams = params.getVMParametersList();
       if (configuration.myVmArgs != null && !configuration.myVmArgs.trim().isEmpty()) {
-        vmParams.add(configuration.myVmArgs);
+        vmParams.addParametersString(configuration.myVmArgs);
       }
       sdk.addServerVmParams(vmParams);
 
