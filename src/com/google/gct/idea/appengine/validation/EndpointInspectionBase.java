@@ -34,15 +34,6 @@ public class EndpointInspectionBase extends LocalInspectionTool {
   public static final Logger LOG =
     Logger.getInstance(EndpointInspectionBase.class);
 
-  public boolean isApiMethod(@NonNls PsiMethod psiMethod) {
-    PsiModifierList psiModifierList =  psiMethod.getModifierList();
-    if(psiModifierList.hasModifierProperty(PsiModifier.PUBLIC) &&
-       !psiModifierList.hasModifierProperty(PsiModifier.STATIC)) {
-      return true;
-    }
-    return false;
-  }
-
   public Project getProject(PsiElement element ) {
     Project project;
     try {
@@ -56,29 +47,5 @@ public class EndpointInspectionBase extends LocalInspectionTool {
     }
 
     return  project;
-  }
-
-  /**
-   * Replace sequence of dots with single dot.
-   */
-  public String collapseSequenceOfDots(@NotNull String word){
-    return word.replaceAll("[.]+",".");
-  }
-
-  public boolean isPublicNullaryConstructor(PsiMethod method) {
-    if(!method.isConstructor()) {
-      return false;
-    }
-
-    if(method.getParameterList().getParametersCount() > 0) {
-      return false;
-    }
-
-    PsiModifierList modifierList = method.getModifierList();
-    if(modifierList.hasModifierProperty(PsiModifier.PUBLIC)) {
-      return true;
-    }
-
-    return false;
   }
 }

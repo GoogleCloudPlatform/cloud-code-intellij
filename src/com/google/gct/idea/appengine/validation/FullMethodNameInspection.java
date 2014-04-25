@@ -75,7 +75,7 @@ public class FullMethodNameInspection extends EndpointInspectionBase  {
        */
       @Override
       public void visitClass(PsiClass aClass){
-        if (!isEndpointClass(aClass)) {
+        if (!EndpointUtilities.isEndpointClass(aClass)) {
           return;
         }
 
@@ -93,7 +93,7 @@ public class FullMethodNameInspection extends EndpointInspectionBase  {
        */
       private void validateBackendMethodNameUnique(PsiMethod psiMethod, Map<String, PsiMethod> apiMethodNames) {
         // Check if method is a public or non-static
-        if(!isApiMethod(psiMethod)) {
+        if(!EndpointUtilities.isApiMethod(psiMethod)) {
           return;
         }
 

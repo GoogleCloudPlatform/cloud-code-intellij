@@ -71,7 +71,7 @@ public class ApiNamespaceInspection extends EndpointInspectionBase{
        */
       @Override
       public void visitAnnotation(PsiAnnotation annotation) {
-        if (!isEndpointClass(annotation)) {
+        if (!EndpointUtilities.isEndpointClass(annotation)) {
           return;
         }
 

@@ -19,6 +19,7 @@ package com.google.gct.idea.appengine.validation;
 
 import com.google.gct.idea.appengine.GctConstants;
 import com.google.gct.idea.appengine.util.EndpointBundle;
+import com.google.gct.idea.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
@@ -69,7 +70,7 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
 
       @Override
       public void visitMethod(PsiMethod method) {
-        if (!isEndpointClass(method)) {
+        if (!EndpointUtilities.isEndpointClass(method)) {
           return;
         }
 
@@ -78,7 +79,7 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
         }
 
         // Check if method is public or non-static
-        if(!isApiMethod(method)) {
+        if(!EndpointUtilities.isApiMethod(method)) {
           return;
         }
 

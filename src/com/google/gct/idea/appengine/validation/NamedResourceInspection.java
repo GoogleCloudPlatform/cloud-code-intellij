@@ -74,7 +74,7 @@ public class NamedResourceInspection extends EndpointInspectionBase {
     return new EndpointPsiElementVisitor() {
       @Override
       public void visitMethod(PsiMethod psiMethod) {
-        if (!isEndpointClass(psiMethod)) {
+        if (!EndpointUtilities.isEndpointClass(psiMethod)) {
           return;
         }
 
@@ -83,7 +83,7 @@ public class NamedResourceInspection extends EndpointInspectionBase {
         }
 
         // Check if method is public or non-static
-        if(!isApiMethod(psiMethod)) {
+        if(!EndpointUtilities.isApiMethod(psiMethod)) {
           return;
         }
 

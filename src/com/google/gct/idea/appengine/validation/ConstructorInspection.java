@@ -17,6 +17,7 @@
 package com.google.gct.idea.appengine.validation;
 
 import com.google.gct.idea.appengine.util.EndpointBundle;
+import com.google.gct.idea.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -62,7 +63,7 @@ public class ConstructorInspection extends EndpointInspectionBase {
     return new EndpointPsiElementVisitor() {
       @Override
       public void visitClass(PsiClass psiClass) {
-        if (!isEndpointClass(psiClass)) {
+        if (!EndpointUtilities.isEndpointClass(psiClass)) {
           return;
         }
 
@@ -74,7 +75,7 @@ public class ConstructorInspection extends EndpointInspectionBase {
         // If there are user defined constructors, check that one of them
         // is a public nullary constructor
         for(PsiMethod aConstructor : allConstructors) {
-           if(isPublicNullaryConstructor(aConstructor)) {
+           if(EndpointUtilities.isPublicNullaryConstructor(aConstructor)) {
              return;
            }
         }
@@ -108,7 +109,7 @@ public class ConstructorInspection extends EndpointInspectionBase {
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
       for(PsiMethod aConstructor : psiClass.getConstructors()) {
-        if(isPublicNullaryConstructor(aConstructor)) {
+        if(EndpointUtilities.isPublicNullaryConstructor(aConstructor)) {
           return;
         }
       }

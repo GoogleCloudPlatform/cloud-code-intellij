@@ -48,29 +48,6 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
   // TODO: Add tests
   private static final String API_TRANSFORMER_ATTRIBUTE = "transformers";
 
-
-  /**
-   * Returns true if the class containing the psiElement has the @Api annotation
-   *     (com.google.api.server.spi.config.Api). Returns false otherwise.
-   * @param psiElement
-   * @return true if the class containing to the psiElement has the @Api
-   *     (com.google.api.server.spi.config.Api). Returns false otherwise.
-   */
-  public boolean isEndpointClass(PsiElement psiElement) {
-    PsiClass psiClass = PsiUtils.findClass(psiElement);
-    if(psiClass == null) {
-      return false;
-    }
-
-    if (AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API, true) ||
-        AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, true) ||
-        AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_REFERENCE, true) ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   /**
    *  Returns true if the class containing <code>psiElement</code> has a transformer
    *  specified by using the @ApiTransformer annotation on a class or by

@@ -71,11 +71,11 @@ public class InvalidParameterAnnotationsInspection extends EndpointInspectionBas
     return new EndpointPsiElementVisitor() {
       @Override
       public void visitMethod (PsiMethod method){
-        if (!isEndpointClass(method)) {
+        if (!EndpointUtilities.isEndpointClass(method)) {
           return;
         }
 
-        if(!isApiMethod(method)) {
+        if(!EndpointUtilities.isApiMethod(method)) {
           return;
         }
 

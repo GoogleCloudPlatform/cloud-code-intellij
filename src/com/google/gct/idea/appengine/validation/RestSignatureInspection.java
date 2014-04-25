@@ -19,6 +19,7 @@ package com.google.gct.idea.appengine.validation;
 import com.google.common.collect.Maps;
 import com.google.gct.idea.appengine.GctConstants;
 import com.google.gct.idea.appengine.util.EndpointBundle;
+import com.google.gct.idea.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.*;
@@ -98,7 +99,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     return new EndpointPsiElementVisitor() {
       @Override
       public void visitClass(PsiClass aClass){
-        if (!isEndpointClass(aClass)) {
+        if (!EndpointUtilities.isEndpointClass(aClass)) {
           return;
         }
 
@@ -112,7 +113,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
 
       private void validateRestSignatureUnique(PsiMethod psiMethod, Map<String, PsiMethod> restfulSignatures) {
         // Check if method public or non-static
-        if(!isApiMethod(psiMethod)) {
+        if(!EndpointUtilities.isApiMethod(psiMethod)) {
           return;
         }
 

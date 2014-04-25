@@ -19,6 +19,7 @@ package com.google.gct.idea.appengine.validation;
 import com.google.common.collect.Maps;
 import com.google.gct.idea.appengine.util.EndpointBundle;
 
+import com.google.gct.idea.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -68,7 +69,7 @@ public class FullJavaNameInspection extends EndpointInspectionBase {
        */
       @Override
       public void visitClass(PsiClass aClass){
-        if (!isEndpointClass(aClass)) {
+        if (!EndpointUtilities.isEndpointClass(aClass)) {
           return;
         }
 
@@ -88,7 +89,7 @@ public class FullJavaNameInspection extends EndpointInspectionBase {
        */
       private void validateBackendMethodNameUnique(PsiMethod psiMethod, Map<String, PsiMethod> javaMethodNames) {
         // Check if method is a public or non-static
-        if(!isApiMethod(psiMethod)) {
+        if(!EndpointUtilities.isApiMethod(psiMethod)) {
           return;
         }
 
