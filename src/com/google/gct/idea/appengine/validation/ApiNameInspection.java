@@ -76,7 +76,16 @@ public class ApiNameInspection extends EndpointInspectionBase {
 
       @Override
       public void visitAnnotation(PsiAnnotation annotation) {
-        if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API)) {
+        if(annotation == null) {
+          return;
+        }
+
+        String annotationQualifiedName = annotation.getQualifiedName();
+        if(annotationQualifiedName == null) {
+          return;
+        }
+
+        if(!annotationQualifiedName.equals(GctConstants.APP_ENGINE_ANNOTATION_API)) {
           return;
         }
 
