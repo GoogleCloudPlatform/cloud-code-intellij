@@ -75,7 +75,7 @@ public class MethodNameInspection extends EndpointInspectionBase {
     return new EndpointPsiElementVisitor() {
       @Override
       public void visitAnnotation(PsiAnnotation annotation) {
-        if (!isEndpointClass(annotation)) {
+        if (!EndpointUtilities.isEndpointClass(annotation)) {
           return;
         }
 
@@ -94,7 +94,7 @@ public class MethodNameInspection extends EndpointInspectionBase {
           return;
         }
 
-        if (!API_NAME_PATTERN.matcher(collapseSequenceOfDots(nameValue)).matches()) {
+        if (!API_NAME_PATTERN.matcher(EndpointUtilities.collapseSequenceOfDots(nameValue)).matches()) {
           holder.registerProblem(memberValue, "Invalid method name: letters, digits, underscores and dots are acceptable characters. " +
             "Leading and trailing dots are prohibited.", new MyQuickFix());
         }
@@ -174,7 +174,7 @@ public class MethodNameInspection extends EndpointInspectionBase {
       baseString = noInvalidChars;
 
       // Replace sequence of dots with single dot
-      String noSequencingDots = collapseSequenceOfDots(baseString);
+      String noSequencingDots = EndpointUtilities.collapseSequenceOfDots(baseString);
       if(API_NAME_PATTERN.matcher(noSequencingDots).matches()) {
         return noSequencingDots;
       }

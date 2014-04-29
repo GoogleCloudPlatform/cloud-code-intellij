@@ -38,6 +38,8 @@
     <runConfigurationProducer implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationProducer"/>
     -->
 
+    <implicitUsageProvider implementation="com.google.gct.idea.appengine.validation.EndpointImplicitUsageProvider"/>
+
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
                      implementationClass="com.google.gct.idea.appengine.validation.ApiNameInspection"/>

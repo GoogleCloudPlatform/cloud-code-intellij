@@ -19,6 +19,7 @@ package com.google.gct.idea.appengine.validation;
 import com.google.gct.idea.appengine.GctConstants;
 import com.google.gct.idea.appengine.util.EndpointBundle;
 
+import com.google.gct.idea.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -70,14 +71,14 @@ public class ApiParameterInspection extends EndpointInspectionBase {
     return new EndpointPsiElementVisitor() {
       @Override
       public void visitParameter(PsiParameter psiParameter){
-        if (!isEndpointClass(psiParameter)) {
+        if (!EndpointUtilities.isEndpointClass(psiParameter)) {
           return;
         }
 
         // Check if method is public or non-static
         PsiElement psiElement = psiParameter.getDeclarationScope();
         if (psiElement instanceof PsiMethod) {
-          if(!isApiMethod((PsiMethod)psiElement)) {
+          if(!EndpointUtilities.isApiMethod((PsiMethod)psiElement)) {
             return;
           }
 

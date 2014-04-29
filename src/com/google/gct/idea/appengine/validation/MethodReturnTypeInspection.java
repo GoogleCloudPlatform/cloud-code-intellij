@@ -18,6 +18,7 @@ package com.google.gct.idea.appengine.validation;
 
 import com.google.gct.idea.appengine.util.EndpointBundle;
 
+import com.google.gct.idea.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
@@ -59,7 +60,7 @@ public class MethodReturnTypeInspection extends EndpointInspectionBase{
     return new EndpointPsiElementVisitor() {
       @Override
       public void visitMethod(PsiMethod method) {
-        if (!isEndpointClass(method)) {
+        if (!EndpointUtilities.isEndpointClass(method)) {
           return;
         }
 
@@ -67,7 +68,7 @@ public class MethodReturnTypeInspection extends EndpointInspectionBase{
           return;
         }
 
-        if(!isApiMethod(method)) {
+        if(!EndpointUtilities.isApiMethod(method)) {
           return;
         }
 

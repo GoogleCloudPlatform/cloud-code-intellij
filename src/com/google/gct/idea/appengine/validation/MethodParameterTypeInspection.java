@@ -17,6 +17,7 @@
 package com.google.gct.idea.appengine.validation;
 
 import com.google.gct.idea.appengine.util.EndpointBundle;
+import com.google.gct.idea.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
@@ -108,7 +109,7 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
     return new EndpointPsiElementVisitor() {
       @Override
       public void visitParameter (PsiParameter psiParameter){
-        if (!isEndpointClass(psiParameter)) {
+        if (!EndpointUtilities.isEndpointClass(psiParameter)) {
           return;
         }
 
@@ -118,7 +119,7 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
 
         PsiElement psiElement = psiParameter.getDeclarationScope();
         if (psiElement instanceof PsiMethod) {
-          if(!isApiMethod((PsiMethod)psiElement)) {
+          if(!EndpointUtilities.isApiMethod((PsiMethod)psiElement)) {
             return;
           }
         } else {

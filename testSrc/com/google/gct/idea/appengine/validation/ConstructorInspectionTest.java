@@ -16,6 +16,7 @@
 
 package com.google.gct.idea.appengine.validation;
 
+import com.google.gct.idea.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 import com.intellij.codeInspection.ex.ProblemDescriptorImpl;
@@ -92,7 +93,7 @@ public class ConstructorInspectionTest extends EndpointTestBase {
     ConstructorInspection.MyQuickFix myQuickFix = constructorInspection.new MyQuickFix(psiClass);
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptorMock);
     Assert.assertEquals(1, psiClass.getConstructors().length);
-    Assert.assertTrue(constructorInspection.isPublicNullaryConstructor(psiClass.getConstructors()[0]));
+    Assert.assertTrue(EndpointUtilities.isPublicNullaryConstructor(psiClass.getConstructors()[0]));
   }
 
   public void testQuickFix_classWithNullaryConstructor() {
@@ -108,7 +109,7 @@ public class ConstructorInspectionTest extends EndpointTestBase {
     ConstructorInspection.MyQuickFix myQuickFix = constructorInspection.new MyQuickFix(psiClass);
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptorMock);
     Assert.assertEquals(1, psiClass.getConstructors().length);
-    Assert.assertTrue(constructorInspection.isPublicNullaryConstructor(psiClass.getConstructors()[0]));
+    Assert.assertTrue(EndpointUtilities.isPublicNullaryConstructor(psiClass.getConstructors()[0]));
   }
 
   public void testQuickFix_classWithNonNullaryConstructor() {
@@ -124,7 +125,7 @@ public class ConstructorInspectionTest extends EndpointTestBase {
     ConstructorInspection.MyQuickFix myQuickFix = constructorInspection.new MyQuickFix(psiClass);
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptorMock);
     Assert.assertEquals(2, psiClass.getConstructors().length);
-    Assert.assertTrue(constructorInspection.isPublicNullaryConstructor(psiClass.getConstructors()[0]));
+    Assert.assertTrue(EndpointUtilities.isPublicNullaryConstructor(psiClass.getConstructors()[0]));
   }
 
   private void doTest() {
