@@ -18,11 +18,13 @@ package com.google.gct.idea.appengine.wizard;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateManager;
 import com.android.tools.idea.templates.TemplateMetadata;
+import com.google.gct.idea.appengine.util.AppEngineUtils;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -86,18 +88,7 @@ public class AppEngineTemplates {
   /** Returns a list of templates that are stored locally as part of the cloud tools plugin */
   public static List<TemplateInfo> getLocalTemplates() {
     LOG.info("Populating built-in App Engine templates...");
-
-    File jarPath = new File(PathUtil.getJarPathForClass(AppEngineTemplates.class));
-    if (jarPath.isFile()) {
-      jarPath = jarPath.getParentFile();
-    }
-    File root = new File(jarPath, TEMPLATES_DIR);
-
-    if (!root.exists()) {
-      LOG.error("Failed to find templates directory, perhaps your cloud tools plugin is corrupt?");
-    }
-
-    return populateTemplates(root);
+    return getAppEngineTemplates(LOCAL_TEMPLATES);
   }
 
   /** Returns a list of templates that are stored in a local repository */
@@ -110,7 +101,7 @@ public class AppEngineTemplates {
       return getLocalTemplates();
     }
 
-    return populateTemplates(root);
+    return populateAppEngineTemplates(root, LOCAL_TEMPLATES);
   }
 
   public static final String ATTR_ENDPOINTS_OWNER = "endpointOwnerDomain";
@@ -127,12 +118,55 @@ public class AppEngineTemplates {
     replacementMap.put(ATTR_ENDPOINTS_PACKAGE, "");
   }
 
-  private static List<TemplateInfo> populateTemplates(@NotNull File root) {
+  /**
+   * Returns the App Engine template located in the <code>templateDirectory</code>
+   * of the App Engine template depot.
+   * @param templateDirectory The template directory of interest.
+   * @return  The template and its metadata in the <code>templateDirectory</code> of template depot or null
+   * if the template is not found.
+   */
+  public static @Nullable
+  TemplateInfo getAppEngineTemplate(String templateDirectory) {
+    List<String> templateDirectories = Arrays.asList(templateDirectory);
+    List<TemplateInfo> templateInfoList = getAppEngineTemplates(templateDirectories);
+
+    if (templateInfoList.size() == 1) {
+      return templateInfoList.get(0);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Returns a list of App Engine templates from the App Engine template depot
+   * associated with the specified <code>templateDirectories</code>.
+   * @param templateDirectories  The list of template directories of interest.
+   * @return A list of templates and their associated metadata.
+   */
+  public static @NotNull
+  List<TemplateInfo> getAppEngineTemplates(List<String> templateDirectories) {
+    File jarPath = new File(PathUtil.getJarPathForClass(AppEngineUtils.class));
+    if (jarPath.isFile()) {
+      jarPath = jarPath.getParentFile();
+    }
+
+    File root = new File(jarPath, TEMPLATES_DIR);
+    return populateAppEngineTemplates(root, templateDirectories);
+  }
+
+  /**
+   * Returns a list of App Engine templates from <code>root</code>
+   * associated with the specified <code>templateDirectories</code>.
+   * @param root The template depot.
+   * @param templateDirectories  The list of template directories of interest.
+   * @return A list of templates and their associated metadata.
+   */
+  public static List<TemplateInfo> populateAppEngineTemplates(@NotNull File root, List<String> templateDirectories) {
     TemplateManager templateManager = TemplateManager.getInstance();
     List<TemplateInfo> templates = new ArrayList<TemplateInfo>();
 
     if (root.exists()) {
-      for (String template : LOCAL_TEMPLATES) {
+      for (String template : templateDirectories) {
         File file = new File(root, template);
         if (file.exists() && file.isDirectory() && (new File(file, Template.TEMPLATE_XML_NAME)).exists()) {
           templates.add(new TemplateInfo(file, templateManager.getTemplate(file)));
@@ -143,8 +177,9 @@ public class AppEngineTemplates {
       }
     }
     else {
-      LOG.error("Invalid templates directory");
+      LOG.error("Failed to find templates directory at \"" + root + "\", perhaps your cloud tools plugin is corrupt?");
     }
     return templates;
   }
+
 }
