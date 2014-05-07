@@ -93,6 +93,10 @@
                      level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.RestSignatureInspection"/>
   </extensions>
 
+  <extensions defaultExtensionNs="org.jetbrains.android">
+    <newModuleWizardPathFactory implementation="com.google.gct.idea.appengine.wizard.BackendWizardPathFactory"/>
+  </extensions>
+
   <actions>
     <action id="GoogleCloudTools.NewAppEngineModule"
             class="com.google.gct.idea.appengine.wizard.NewAppEngineModuleAction"

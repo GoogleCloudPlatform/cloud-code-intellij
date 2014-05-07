@@ -18,7 +18,6 @@ package com.google.gct.idea.appengine.wizard;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateManager;
 import com.android.tools.idea.templates.TemplateMetadata;
-import com.google.gct.idea.appengine.util.AppEngineUtils;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ArrayUtil;
@@ -38,6 +37,7 @@ public class AppEngineTemplates {
   public static final Logger LOG = Logger.getInstance(AppEngineTemplates.class);
 
   public static final String TEMPLATES_DIR = "templates";
+  public static final String CLIENT_TEMPLATES_DIR = "clientTemplates";
   public static final String HELLO_WORLD = "HelloWorld";
   public static final String HELLO_ENDPOINTS = "HelloEndpoints";
   public static final String GCM_ENDPOINTS = "GcmEndpoints";
@@ -145,12 +145,7 @@ public class AppEngineTemplates {
    */
   public static @NotNull
   List<TemplateInfo> getAppEngineTemplates(List<String> templateDirectories) {
-    File jarPath = new File(PathUtil.getJarPathForClass(AppEngineUtils.class));
-    if (jarPath.isFile()) {
-      jarPath = jarPath.getParentFile();
-    }
-
-    File root = new File(jarPath, TEMPLATES_DIR);
+    File root = findTemplatesDirInPluginJar(TEMPLATES_DIR);
     return populateAppEngineTemplates(root, templateDirectories);
   }
 
@@ -180,6 +175,23 @@ public class AppEngineTemplates {
       LOG.error("Failed to find templates directory at \"" + root + "\", perhaps your cloud tools plugin is corrupt?");
     }
     return templates;
+  }
+
+  public static Template getClientModuleTemplate(String templateName) {
+    File root = findTemplatesDirInPluginJar(CLIENT_TEMPLATES_DIR);
+    File templateFile = new File(root, templateName);
+    if (!templateFile.exists()) {
+      LOG.error("Failed to find client template " + templateName);
+    }
+    return Template.createFromPath(templateFile);
+  }
+
+  private static File findTemplatesDirInPluginJar(String name) {
+    File jarPath = new File(PathUtil.getJarPathForClass(AppEngineTemplates.class));
+    if (jarPath.isFile()) {
+      jarPath = jarPath.getParentFile();
+    }
+    return new File(jarPath, name);
   }
 
 }

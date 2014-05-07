@@ -16,15 +16,15 @@
 
 package com.google.gct.idea.appengine.wizard;
 
+import com.android.builder.model.SourceProvider;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.android.tools.idea.gradle.project.GradleSyncListener;
 import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
-
+import com.android.tools.idea.wizard.NewTemplateObjectWizard;
 import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
-
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -34,15 +34,22 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.android.facet.AndroidFacet;
+import org.jetbrains.android.facet.IdeaSourceProvider;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.gradle.settings.GradleSettings;
+import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,7 +60,9 @@ public class NewAppEngineModuleAction extends AnAction {
 
   private static final String ERROR_MESSAGE_TITLE = "New App Engine Module";
   private static final Logger LOG = Logger.getInstance(NewAppEngineModuleAction.class);
-  private static final String ATTR_MODULE_NAME = "moduleName";
+  public static final String ATTR_MODULE_NAME = "moduleName";
+  public static final String ATTR_CLIENT_MODULE_NAME = "clientModuleName";
+  public static final String ATTR_SERVER_MODULE_PATH = "serverModulePath";
 
   @Override
   public void actionPerformed(AnActionEvent e) {
@@ -71,10 +80,19 @@ public class NewAppEngineModuleAction extends AnAction {
   }
 
   void doAction(@NotNull final Project project, final AppEngineModuleWizard dialog) {
-    final Template template = Template.createFromPath(dialog.getTemplate());
+    createModule(project, dialog.getTemplate(), dialog.getModuleName(), dialog.getPackageName(), "");
+  }
+
+  public static void createModule(final Project project, File templateFile, final String moduleName, String packageName,
+                                  final String clientModuleName) {
+    final Template template = Template.createFromPath(templateFile);
+    final Template clientTemplate = AppEngineTemplates.getClientModuleTemplate(templateFile.getName());
+    final Module clientModule = StringUtil.isEmpty(clientModuleName)
+                                ? null
+                                : ModuleManager.getInstance(project).findModuleByName(clientModuleName);
 
     final File projectRoot = new File(project.getBasePath());
-    final File moduleRoot = new File(projectRoot, dialog.getModuleName());
+    final File moduleRoot = new File(projectRoot, moduleName);
     FileUtil.createDirectory(moduleRoot);
 
     final Map<String, Object> replacementMap = new HashMap<String, Object>();
@@ -86,11 +104,11 @@ public class NewAppEngineModuleAction extends AnAction {
       LOG.error(e);
       return;
     }
-    replacementMap.put(ATTR_MODULE_NAME, dialog.getModuleName());
-    replacementMap.put(TemplateMetadata.ATTR_PACKAGE_NAME, dialog.getPackageName());
+    replacementMap.put(ATTR_MODULE_NAME, moduleName);
+    replacementMap.put(TemplateMetadata.ATTR_PACKAGE_NAME, packageName);
 
-    if (AppEngineTemplates.LOCAL_ENDPOINTS_TEMPLATES.contains(dialog.getTemplate().getName())) {
-      AppEngineTemplates.populateEndpointParameters(replacementMap, dialog.getPackageName());
+    if (AppEngineTemplates.LOCAL_ENDPOINTS_TEMPLATES.contains(templateFile.getName())) {
+      AppEngineTemplates.populateEndpointParameters(replacementMap, packageName);
     }
 
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
@@ -98,6 +116,11 @@ public class NewAppEngineModuleAction extends AnAction {
       @Override
       public void run() {
         template.render(projectRoot, moduleRoot, replacementMap);
+
+        if (clientModule != null) {
+          patchClientModule(clientModule, clientTemplate, replacementMap);
+        }
+
         GradleProjectImporter projectImporter = GradleProjectImporter.getInstance();
         projectImporter.requestProjectSync(project, new GradleSyncListener() {
           @Override
@@ -109,7 +132,7 @@ public class NewAppEngineModuleAction extends AnAction {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
               @Override
               public void run() {
-                Module module = ModuleManager.getInstance(project).findModuleByName(dialog.getModuleName());
+                Module module = ModuleManager.getInstance(project).findModuleByName(moduleName);
 
                 Parameter appEngineVersionParam = template.getMetadata().getParameter("appEngineVersion");
                 String appEngineVersion = (appEngineVersionParam == null) ? "unknown" : appEngineVersionParam.initial;
@@ -134,7 +157,38 @@ public class NewAppEngineModuleAction extends AnAction {
     });
   }
 
-  private void createRunConfiguration(Project project, Module module, File moduleRoot, String appEngineVersion) {
+  private static void patchClientModule(Module clientModule, Template clientTemplate, Map<String, Object> replacementMap) {
+    AndroidFacet facet = AndroidFacet.getInstance(clientModule);
+
+    VirtualFile targetFolder = findTargetContentRoot(clientModule);
+    if (targetFolder != null && facet != null) {
+      String backendModulePath = (String) replacementMap.get(TemplateMetadata.ATTR_PROJECT_OUT);
+      replacementMap.put(ATTR_SERVER_MODULE_PATH, FileUtil.getRelativePath(targetFolder.getPath(), backendModulePath, '/'));
+      replacementMap.put(TemplateMetadata.ATTR_PROJECT_OUT, targetFolder.getPath());
+      List<SourceProvider> sourceProviders = IdeaSourceProvider.getSourceProvidersForFile(facet, targetFolder, facet.getMainSourceSet());
+      SourceProvider sourceProvider = sourceProviders.get(0);
+      File manifestDirectory = NewTemplateObjectWizard.findManifestDirectory(sourceProvider);
+      replacementMap.put(TemplateMetadata.ATTR_MANIFEST_DIR, manifestDirectory.getPath());
+      File clientContentRoot = new File(targetFolder.getPath());
+      clientTemplate.render(clientContentRoot, clientContentRoot, replacementMap);
+    }
+  }
+
+  @Nullable
+  private static VirtualFile findTargetContentRoot(Module clientModule) {
+    VirtualFile[] contentRoots = ModuleRootManager.getInstance(clientModule).getContentRoots();
+    for (VirtualFile contentRoot : contentRoots) {
+      if (contentRoot.findChild(GradleConstants.DEFAULT_SCRIPT_NAME) != null) {
+        return contentRoot;
+      }
+    }
+    if (contentRoots.length > 0) {
+      return contentRoots[0];
+    }
+    return null;
+  }
+
+  private static void createRunConfiguration(Project project, Module module, File moduleRoot, String appEngineVersion) {
     // Create a run configuration for this module
     final RunManagerEx runManager = RunManagerEx.getInstanceEx(project);
     final RunnerAndConfigurationSettings settings = runManager.
@@ -155,7 +209,7 @@ public class NewAppEngineModuleAction extends AnAction {
     runManager.addConfiguration(settings, false);
   }
 
-  private void addAppEngineGradleFacet() {
+  private static void addAppEngineGradleFacet() {
     // Module does not have AppEngine-Gradle facet. Create one and add it.
     // Commented out for now, ENABLE when AppEngine Gradle facet is ready.
     // FacetManager facetManager = FacetManager.getInstance(module);
