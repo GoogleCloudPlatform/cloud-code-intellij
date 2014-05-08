@@ -18,53 +18,54 @@ package com.google.gct.login;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.gdt.eclipse.login.common.*;
-import com.intellij.openapi.application.Application;
+import com.google.common.base.Strings;
+import com.google.gct.login.ui.GoogleLoginCopyAndPasteDialog;
+import com.google.gct.login.ui.GoogleLoginToolbarButton;
+import com.google.gdt.eclipse.login.common.GoogleLoginState;
+import com.google.gdt.eclipse.login.common.LoggerFacade;
+import com.google.gdt.eclipse.login.common.OAuthData;
+import com.google.gdt.eclipse.login.common.OAuthDataStore;
+import com.google.gdt.eclipse.login.common.UiFacade;
+
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.Extensions;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
+
+import com.intellij.util.containers.hash.LinkedHashMap;
 import net.jcip.annotations.Immutable;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.SortedSet;
 
 
 /**
  * Class that handles logging in to Google services.
  */
+// TODO: explore changing class to an application service
 public class GoogleLogin {
 
   private static final String CLIENT_ID = "ANDROID_CLIENT_ID";
   private static final String CLIENT_SECRET = "ANDROID_CLIENT_SECRET";
-  private static AndroidUiFacade uiFacade;
+  private ClientIdSecretPair clientInfo;
+  private AndroidUiFacade uiFacade;
+  private AndroidPreferencesOAuthDataStore dataStore;
+  private CredentialedUserRoster users;
   private static GoogleLogin instance;
-  private final GoogleLoginState delegate;
 
   public static final Logger GOOGLE_LOGIN_LOG =  Logger.getInstance(GoogleLogin.class);
 
-  static {
-    ClientIdSecretPair clientInfo = getClientIdAndSecretFromExtensionPoints();
-    uiFacade = new AndroidUiFacade();
-    GoogleLoginState state =
-      new GoogleLoginState(
-        clientInfo.getClientId(),
-        clientInfo.getClientSecret(),
-        OAuthScopeRegistry.getScopes(),
-        new AndroidPreferencesOAuthDataStore(),
-        uiFacade,
-        new AndroidLoggerFacade());
-    addLoginListenersFromExtensionPoints(state);
-    instance = new GoogleLogin(state);
-  }
-
-
   /**
    * Constructor
-   * @param delegate The {@link GoogleLoginState} for this application.
    */
-  protected GoogleLogin(GoogleLoginState delegate) {
-    this.delegate = delegate;
+  private GoogleLogin() {
+    this.clientInfo = getClientIdAndSecretFromExtensionPoints();
+    this.uiFacade = new AndroidUiFacade();
+    this.users = new CredentialedUserRoster();
+    this.dataStore =  new AndroidPreferencesOAuthDataStore();
   }
 
   /**
@@ -72,34 +73,34 @@ public class GoogleLogin {
    * @return the {@link GoogleLogin} object.
    */
   public static GoogleLogin getInstance() {
+    if(instance == null) {
+      instance = new GoogleLogin();
+      instance.dataStore.initializeUsers();
+    }
     return instance;
   }
 
   /**
    *  Displays a dialog to prompt the user to login into Google Services.
+   * @throws InvalidThreadTypeException
    */
-  public static void promptToLogIn() {
+  public static void promptToLogIn() throws InvalidThreadTypeException {
     promptToLogIn(null);
   }
 
   /**
    * Displays a dialog to prompt the user to login into Google Services
+   * if there is current no active user. Does nothing if there is an active
+   * user. This function must be called from the event dispatch thread (EDT).
    * @param message  If not null, this message would be the title of the dialog.
+   * @throws InvalidThreadTypeException
    */
-  public static void promptToLogIn(final String message) {
+  public static void promptToLogIn(final String message) throws InvalidThreadTypeException {
     if (!instance.isLoggedIn()) {
-      Application application = ApplicationManager.getApplication();
-      Runnable promptToLoginTask = new Runnable() {
-        @Override
-        public void run() {
-          GoogleLogin.getInstance().logIn(message);
-        }
-      };
-      if (application.isDispatchThread()) {
-        promptToLoginTask.run();
-      }
-      else {
-        application.invokeAndWait(promptToLoginTask, ModalityState.defaultModalityState());
+      if(ApplicationManager.getApplication().isDispatchThread()) {
+        getInstance().logIn(message);
+      } else {
+        throw new InvalidThreadTypeException("promptToLogin");
       }
     }
   }
@@ -110,7 +111,7 @@ public class GoogleLogin {
    * signed in, this method will block and pop up the login dialog to the user.
    * If the user cancels signing in, this method will return null.
    *
-   *  If the access token that was used to sign this transport was revoked or
+   * If the access token that was used to sign this transport was revoked or
    * has expired, then execute() invoked on Request objects constructed from
    * this transport will throw an exception, for example,
    * "com.google.api.client.http.HttpResponseException: 401 Unauthorized"
@@ -119,7 +120,7 @@ public class GoogleLogin {
    * authentication headers or null if there is no active user.
    */
   public HttpRequestFactory createRequestFactory() {
-    return delegate.createRequestFactory(null);
+    return createRequestFactory(null);
   }
 
   /**
@@ -140,20 +141,28 @@ public class GoogleLogin {
    * authentication headers or null if there is no active user.
    */
   public HttpRequestFactory createRequestFactory(String message) {
-    return delegate.createRequestFactory(message);
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      // TODO: prompt user to select an existing user or sign in
+      return null;
+    }
+    return activeUser.getGoogleLoginState().createRequestFactory(message);
   }
 
   /**
    * Makes a request to get an OAuth2 access token from the OAuth2 refresh token
    * if it is expired.
    *
-   * @return an OAuth2 token, or null if there was an error or if the user
-   *         wasn't signed in or canceled signing in.
+   * @return an OAuth2 token, or null if there was an error or no active user
    * @throws IOException if something goes wrong while fetching the token.
    *
    */
   public String fetchAccessToken() throws IOException {
-    return delegate.fetchAccessToken();
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return null;
+    }
+    return activeUser.getGoogleLoginState().fetchAccessToken();
   }
 
   /**
@@ -161,7 +170,11 @@ public class GoogleLogin {
    * @return the OAuth2 Client ID for the active user.
    */
   public String fetchOAuth2ClientId() {
-    return delegate.fetchOAuth2ClientId();
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return null;
+    }
+    return activeUser.getGoogleLoginState().fetchOAuth2ClientId();
   }
 
   /**
@@ -169,7 +182,11 @@ public class GoogleLogin {
    * @return the OAuth2 Client Secret for the active user.
    */
   public String fetchOAuth2ClientSecret() {
-    return delegate.fetchOAuth2ClientSecret();
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return null;
+    }
+    return activeUser.getGoogleLoginState().fetchOAuth2ClientSecret();
   }
 
   /**
@@ -180,20 +197,28 @@ public class GoogleLogin {
    * @return the refresh token, or {@code null} if the user cancels out of a request to log in
    */
   public String fetchOAuth2RefreshToken() {
-    return delegate.fetchOAuth2RefreshToken();
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return null;
+    }
+    return activeUser.getGoogleLoginState().fetchOAuth2RefreshToken();
   }
 
   /**
    * Makes a request to get an OAuth2 access token from the OAuth2 refresh
    * token. This token is short lived.
    *
-   * @return an OAuth2 token, or null if there was an error or if the user
-   *         wasn't signed in and canceled signing in.
+   * @return an OAuth2 token, or null if there was an error or if there is
+   * active user.
    * @throws IOException if something goes wrong while fetching the token.
    *
    */
   public String fetchOAuth2Token() throws IOException {
-    return delegate.fetchOAuth2Token();
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return null;
+    }
+    return activeUser.getGoogleLoginState().fetchOAuth2Token();
   }
 
   /**
@@ -202,25 +227,35 @@ public class GoogleLogin {
    * @return the OAuth credentials.
    */
   public Credential getCredential() {
-    return delegate.getCredential();
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return null;
+    }
+    return activeUser.getGoogleLoginState().getCredential();
   }
 
   /**
-   * Returns the active user's email address, or the empty string if there is no active user,
-   *         or null if the active user's email couldn't be retrieved
-   * @return the active user's email address, or the empty string if there is no active user,
-   *         or null if the active user's email couldn't be retrieved
+   * Returns the active user's email address, or null if there is no active user,
+   * @return the active user's email address, or null if there is no active user,
    */
   public String getEmail() {
-    return delegate.getEmail();
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return null;
+    }
+    return activeUser.getGoogleLoginState().getEmail();
   }
 
   /**
    * Returns true if the plugin was able to connect to the internet to try to
-   * verify the stored oauth credentials at start up.
+   * verify the stored oauth credentials at start up or false otherwise.
    */
   public boolean isConnected() {
-    return delegate.isConnected();
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return false;
+    }
+    return activeUser.getGoogleLoginState().isConnected();
   }
 
   /**
@@ -228,14 +263,15 @@ public class GoogleLogin {
    * @return true if there is an active user, false otherwise.
    */
   public boolean isLoggedIn() {
-    return delegate.isLoggedIn();
+    return users.isActiveUserAvailable();
   }
 
   /**
    * See {@link #logIn(String)}.
    */
   public boolean logIn() {
-    return delegate.logIn(null);
+    users.removeActiveUser();
+    return logIn(null);
   }
 
   /**
@@ -252,7 +288,20 @@ public class GoogleLogin {
    * @return true if the user signed in or is already signed in, false otherwise
    */
   public boolean logIn(String message) {
-    return delegate.logIn(message);
+    GoogleLoginState state = createGoogleLoginState();
+    boolean loggedIn = state.logIn(message);
+    IGoogleLoginUpdateUser callback = new IGoogleLoginUpdateUser() {
+      @Override
+      public void updateUser() {
+        uiFacade.notifyStatusIndicator();
+      }
+    };
+
+    if(loggedIn) {
+      users.addUser(new CredentialedUser(state, callback));
+    }
+
+    return loggedIn;
   }
 
   /**
@@ -262,7 +311,17 @@ public class GoogleLogin {
    * @return true if the user logged out, false otherwise
    */
   public boolean logOut() {
-    return delegate.logOut();
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return false;
+    }
+
+    boolean loggedOut =  activeUser.getGoogleLoginState().logOut();
+    if(loggedOut) {
+      users.removeUser(activeUser.getEmail());
+    }
+
+    return loggedOut;
   }
 
   /**
@@ -274,7 +333,11 @@ public class GoogleLogin {
    *         if the user chose not to log out
    */
   public boolean logOut(boolean showPrompt) {
-    return delegate.logOut(showPrompt);
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return false;
+    }
+    return activeUser.getGoogleLoginState().logOut(showPrompt);
   }
 
   /**
@@ -284,7 +347,12 @@ public class GoogleLogin {
    * @return a new {@link Credential}.
    */
   public Credential makeCredential() {
-    return delegate.makeCredential();
+    CredentialedUser activeUser = users.getActiveUser();
+    if(activeUser == null) {
+      return null;
+    } else {
+      return activeUser.getGoogleLoginState().makeCredential();
+    }
   }
 
   /**
@@ -298,6 +366,46 @@ public class GoogleLogin {
   }
 
   /**
+   * Sets the active user to <code>userEmail</code> if <code>userEmail</code> is a logged
+   * in user.
+   * @param userEmail The user to be set as active.
+   * @throws IllegalArgumentException if the <code>userEmail</code> does not exist i.e. is
+   * not a logged in user.
+   */
+  public void setActiveUser(String userEmail) throws IllegalArgumentException {
+    users.setActiveUser(userEmail);
+    uiFacade.notifyStatusIndicator();
+  }
+
+  /**
+   * Returns a copy of the map of the current logged in users.
+   * @return Copy of current logged in users.
+   */
+  public Map<String, CredentialedUser> getAllUsers() {
+    return users.getAllUsers();
+  }
+
+  /**
+   * Returns the active user.
+   * @return the active user.
+   */
+  @Nullable
+  public CredentialedUser getActiveUser() {
+    return users.getActiveUser();
+  }
+
+  /**
+   * When the login menu item is instantiated by the UI, it calls this method so that
+   * when logIn() is called by something other than the login menu item itself, the
+   * login menu item can be notified to update its UI.
+   *
+   * @param button The login menu item.
+   */
+  public void setLoginMenuItemContribution(GoogleLoginToolbarButton button) {
+    uiFacade.setLoginMenuItemContribution(button);
+  }
+
+  /**
    * Gets all the implementations of  {@link GoogleLoginListener} and registers them to
    * <code>state</code>.
    * @param state the {@link GoogleLoginState} for which we want to register listeners to.
@@ -307,6 +415,24 @@ public class GoogleLogin {
     for(GoogleLoginListener listener : loginListeners) {
       state.addLoginListener(listener);
     }
+  }
+
+  /**
+   * Creates a new instance of {@link GoogleLoginState}
+   * @return a new instance of {@link GoogleLoginState}
+   */
+  private GoogleLoginState createGoogleLoginState() {
+    GoogleLoginState state =
+      new GoogleLoginState(
+        clientInfo.getClientId(),
+        clientInfo.getClientSecret(),
+        OAuthScopeRegistry.getScopes(),
+        new AndroidPreferencesOAuthDataStore(),
+        uiFacade,
+        new AndroidLoggerFacade());
+
+    addLoginListenersFromExtensionPoints(state);
+    return state;
   }
 
   /**
@@ -350,12 +476,17 @@ public class GoogleLogin {
    * An implementation of {@link UiFacade} using Swing dialogs and external browsers.
    */
   private static class AndroidUiFacade implements UiFacade {
+    private GoogleLoginToolbarButton myButton;
+
     @Override
     public String obtainVerificationCodeFromUserInteraction(String title, GoogleAuthorizationCodeRequestUrl authCodeRequestUrl) {
-      // TODO: implement this
-      // TODO: add step to list all logged in users in the ui, so user can either log a new
-      // user in or select an already signed in user.
-      return null;
+      GoogleLoginCopyAndPasteDialog dialog = new GoogleLoginCopyAndPasteDialog(myButton, authCodeRequestUrl, "Google Login");
+      dialog.show();
+      if (dialog.getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
+        return null;
+      }
+
+      return Strings.emptyToNull(dialog.getVerificationCode());
     }
 
     @Override
@@ -370,14 +501,30 @@ public class GoogleLogin {
 
     @Override
     public void notifyStatusIndicator() {
-      // TODO: implement this
+      if (myButton != null) {
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            myButton.updateUi();
+          }
+        });
+      }
+    }
+
+    /**
+     * Sets the login menu item.
+     *
+     * @param button The login menu item.
+     */
+    public void setLoginMenuItemContribution(GoogleLoginToolbarButton trim) {
+      this.myButton = trim;
     }
   }
 
   /**
    * An implementation of the {@link OAuthDataStore} interface using java preferences.
    */
-  private static class AndroidPreferencesOAuthDataStore implements OAuthDataStore {
+  private class AndroidPreferencesOAuthDataStore implements OAuthDataStore {
 
     @Override
     public void saveOAuthData(OAuthData credentials) {
@@ -392,6 +539,34 @@ public class GoogleLogin {
     @Override
     public void clearStoredOAuthData() {
       GoogleLoginPrefs.clearStoredOAuthData();
+    }
+
+    public void initializeUsers() {
+      SortedSet<String> allUsers = GoogleLoginPrefs.getStoredUsers();
+      for(String aUser : allUsers) {
+        // Add a new user, so that loadOAuth called from the GoogleLoginState constructor
+        // will be able to create a customized key to get that user's OAuth data
+        // This will be overwritten with new GoogleLoginState object
+        users.addUser(new CredentialedUser(aUser));
+
+        // CredentialedUser's credentials will be updated from the persistent storage in GoogleLoginState constructor
+        GoogleLoginState delegate = createGoogleLoginState();
+        IGoogleLoginUpdateUser callback = new IGoogleLoginUpdateUser() {
+          @Override
+          public void updateUser() {
+            uiFacade.notifyStatusIndicator();
+          }
+        };
+
+        users.addUser(new CredentialedUser(delegate, callback));
+      }
+
+      String activeUserString = GoogleLoginPrefs.getActiveUser();
+      if(activeUserString == null) {
+        users.removeActiveUser();
+      } else {
+        users.setActiveUser(activeUserString);
+      }
     }
   }
 

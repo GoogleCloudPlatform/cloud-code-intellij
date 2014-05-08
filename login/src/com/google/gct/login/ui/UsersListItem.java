@@ -13,15 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.gct.login;
+package com.google.gct.login.ui;
 
-import com.google.gdt.eclipse.login.common.LoginListener;
-import com.intellij.openapi.extensions.ExtensionPointName;
+import com.google.gct.login.CredentialedUser;
+
+import java.awt.Image;
 
 /**
- * Listener for changes in the login status.
+ * A single user item in the Google Login panel.
  */
-public interface GoogleLoginListener extends LoginListener {
-  public static ExtensionPointName<GoogleLoginListener> EP_NAME =
-    new ExtensionPointName<GoogleLoginListener>("com.google.gct.googleLoginListener");
+public class UsersListItem {
+  private final CredentialedUser myUser;
+
+  public UsersListItem (CredentialedUser aUser) {
+    myUser = aUser;
+  }
+
+  public String getUserEmail() {
+    return myUser.getEmail();
+  }
+
+  public boolean isActiveUser() {
+    return myUser.isActive();
+  }
+
+  public String getUserName() {
+    return myUser.getName();
+  }
+
+  public Image getUserPicture() {
+    return myUser.getPicture();
+  }
 }

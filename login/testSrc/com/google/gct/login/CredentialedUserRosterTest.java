@@ -15,26 +15,28 @@
  */
 package com.google.gct.login;
 
+import com.intellij.util.containers.HashMap;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import java.util.Map;
 
 /**
- *  Tests for {@link Users}
+ *  Tests for {@link CredentialedUserRoster}
  */
-public class UsersTest extends TestCase {
-  private Users users;
-  User user1;
-  User user2;
-  User user3;
+public class CredentialedUserRosterTest extends TestCase {
+  private CredentialedUserRoster users;
+  CredentialedUser user1;
+  CredentialedUser user2;
+  CredentialedUser user3;
 
   @Override
   public void setUp() {
-    users = new Users();
-    user1 = new User("user1");
-    user2 = new User("user2");
-    user3 = new User("user3");
+    users = new CredentialedUserRoster();
+    user1 = new CredentialedUser("user1");
+    user2 = new CredentialedUser("user2");
+    user3 = new CredentialedUser("user3");
   }
 
   @Override
@@ -46,7 +48,7 @@ public class UsersTest extends TestCase {
   }
 
   /**
-   * Tests that {@link com.google.intellij.login.Users#addUser(User)}
+   * Tests that {@link com.google.intellij.login.Users#addUser(CredentialedUser)}
    * stores the proper users and currently manages the active user.
    */
   public void testAddUser() {
@@ -60,7 +62,7 @@ public class UsersTest extends TestCase {
     Assert.assertTrue(user2.isActive());
     Assert.assertFalse(user1.isActive());
 
-    Map<String, User> allUsers = users.getAllUsers();
+    Map<String, CredentialedUser> allUsers = users.getAllUsers();
     Assert.assertEquals(2, allUsers.size());
     Assert.assertNotNull(allUsers.get(user1.getEmail()));
     Assert.assertNotNull(allUsers.get(user2.getEmail()));
@@ -90,8 +92,16 @@ public class UsersTest extends TestCase {
     users.removeUser(users.getActiveUser().getEmail());
     Assert.assertNull(users.getActiveUser());
 
-    Assert.assertFalse(users.setActiveUser(user2.getEmail()));
-    Assert.assertTrue(users.setActiveUser(user1.getEmail()));
+    boolean exceptionThrown = false;
+    try{
+      users.setActiveUser(user2.getEmail());
+    }
+    catch (IllegalArgumentException ex) {
+      exceptionThrown = true;
+    }
+    Assert.assertTrue(exceptionThrown);
+
+    users.setActiveUser(user1.getEmail());
     Assert.assertTrue(user1.isActive());
   }
 
@@ -101,20 +111,17 @@ public class UsersTest extends TestCase {
   public void testGetAllUsers() {
     Assert.assertEquals(0, users.getAllUsers().size());
 
-    Assert.assertTrue(users.addUser(user1));
+    users.addUser(user1);
     Assert.assertEquals(1, users.getAllUsers().size());
 
-    Assert.assertTrue(users.addUser(user2));
-    Assert.assertTrue(users.addUser(user3));
+    users.addUser(user2);
+    users.addUser(user3);
     Assert.assertEquals(3, users.getAllUsers().size());
 
-    Assert.assertFalse(users.addUser(user3));
+    users.addUser(user3);
 
     Assert.assertTrue(users.removeUser(user1.getEmail()));
     Assert.assertEquals(2, users.getAllUsers().size());
-
-    users.removeAllUsers();
-    Assert.assertEquals(0, users.getAllUsers().size());
   }
 
   /**
@@ -136,8 +143,7 @@ public class UsersTest extends TestCase {
     users.removeUser(users.getActiveUser().getEmail());
     Assert.assertNull(users.getActiveUser());
 
-    Assert.assertFalse(users.setActiveUser(user2.getEmail()));
-    Assert.assertTrue(users.setActiveUser(user1.getEmail()));
+    users.setActiveUser(user1.getEmail());
     Assert.assertTrue(user1.isActive());
   }
 
@@ -159,17 +165,23 @@ public class UsersTest extends TestCase {
   }
 
   /**
-   * Tests {@link com.google.intellij.login.Users#removeAllUsers()}
+   * Tests {@link CredentialedUserRoster#removeActiveUser()}
    */
-  public void testRemoveAllUsers() {
+  public void testRemoveActiveUser() {
+    Assert.assertNull(users.getActiveUser());
+
     users.addUser(user1);
+    Assert.assertEquals(user1.getEmail(), users.getActiveUser().getEmail());
+    users.removeActiveUser();
+    Assert.assertNull(users.getActiveUser());
+    Assert.assertFalse(user1.isActive());
+
     users.addUser(user2);
     users.addUser(user3);
-    Assert.assertEquals(3, users.numberOfUsers());
-
-    users.removeAllUsers();
-    Assert.assertEquals(0, users.numberOfUsers());
+    Assert.assertEquals(user3.getEmail(), users.getActiveUser().getEmail());
+    users.removeActiveUser();
     Assert.assertNull(users.getActiveUser());
+    Assert.assertFalse(user3.isActive());
   }
 
   /**
@@ -199,8 +211,31 @@ public class UsersTest extends TestCase {
     users.setActiveUser(user1.getEmail());
     Assert.assertEquals(user1.getEmail(), users.getActiveUser().getEmail());
 
-    Assert.assertFalse(users.setActiveUser("noUser"));
+    boolean exceptionThrown = false;
+    try{
+      users.setActiveUser("noUser");
+    } catch (IllegalArgumentException ex) {
+      exceptionThrown = true;
+    }
+    Assert.assertTrue(exceptionThrown);
     Assert.assertTrue(user1.isActive());
   }
 
+  /**
+   * Tests {@link CredentialedUserRoster#setAllUsers(java.util.Map)}
+   */
+  public void testSetAllUsers() {
+    users.addUser(user1);
+
+    Map<String, CredentialedUser> newUsers = new HashMap<String, CredentialedUser>();
+    newUsers.put(user2.getEmail(), user2);
+    newUsers.put(user3.getEmail(), user3);
+
+    users.setAllUsers(newUsers);
+    Map<String, CredentialedUser> setUsers = users.getAllUsers();
+    Assert.assertEquals(2, setUsers.size());
+    Assert.assertFalse(setUsers.containsKey(user1.getEmail()));
+    Assert.assertTrue(setUsers.containsKey(user2.getEmail()));
+    Assert.assertTrue(setUsers.containsKey(user3.getEmail()));
+  }
 }

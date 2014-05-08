@@ -15,23 +15,28 @@
  */
 package com.google.gct.login;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages the list of logged in users.
+ * Tracks which users are logged in, and which of these (if any) is currently designated as the
+ * "active user". Maintains a map from email addresses of logged-in users to the corresponding
+ * {@link CredentialedUser} objects.
  */
-public class Users {
-  private final Map<String, User> allUsers = new HashMap<String, User>();
-  private User activeUser;
+public class CredentialedUserRoster {
+  private final Map<String, CredentialedUser> allUsers = new HashMap<String, CredentialedUser>();
+  private CredentialedUser activeUser;
 
   /**
    * Returns a copy of the map of the current logged in users.
    * @return Copy of current logged in users.
    */
-  public Map<String, User> getAllUsers() {
+  public Map<String, CredentialedUser> getAllUsers() {
     synchronized (this) {
-      Map<String, User> clone = new HashMap<String, User>();
+      Map<String, CredentialedUser> clone = new HashMap<String, CredentialedUser>();
       clone.putAll(allUsers);
       return clone;
     }
@@ -41,7 +46,7 @@ public class Users {
    * Completely overrides current map of logged in users with <code>users</code>.
    * @param users Map of users to set.
    */
-  public void setAllUsers(Map<String, User> users) {
+  public void setAllUsers(Map<String, CredentialedUser> users) {
     synchronized (this) {
       allUsers.clear();
       allUsers.putAll(users);
@@ -52,23 +57,22 @@ public class Users {
    * Returns the active user.
    * @return the active user.
    */
-  public User getActiveUser() {
-    synchronized (this) {
-      return activeUser;
-    }
+  @Nullable
+  public CredentialedUser getActiveUser() {
+    return activeUser;
   }
 
   /**
    * Sets the active user to <code>userEmail</code> if <code>userEmail</code> is a logged
    * in user.
    * @param userEmail The user to be set as active.
-   * @return Returns true if <code>userEmail</code> was successfully set as the active user.
-   * Returns false, if <code>userEmail</code> is not a logged in user.
+   * @throws IllegalArgumentException if the <code>userEmail</code> does not exist i.e. is
+   * not a logged in user.
    */
-  public boolean setActiveUser(String userEmail) {
+  public void setActiveUser(@NotNull String userEmail) throws IllegalArgumentException {
     synchronized (this) {
       if(!allUsers.containsKey(userEmail)) {
-        return false;
+        throw new IllegalArgumentException(userEmail + " is not a logged in user.");
       }
 
       if(activeUser != null) {
@@ -77,8 +81,20 @@ public class Users {
 
       activeUser = allUsers.get(userEmail);
       activeUser.setActive(true);
-      // TODO: Send message out of changed user
-      return true;
+      GoogleLoginPrefs.saveActiveUser(userEmail);
+    }
+  }
+
+  /**
+   * If there is an active user, makes the active use no longer active.
+   */
+  public void removeActiveUser() {
+    synchronized (this) {
+      if(activeUser != null) {
+        activeUser.setActive(false);
+        activeUser = null;
+        GoogleLoginPrefs.removeActiveUser();
+      }
     }
   }
 
@@ -97,27 +113,20 @@ public class Users {
    * @return True if there is an active user and false otherwise.
    */
   public boolean isActiveUserAvailable() {
-    synchronized (this) {
-      return activeUser != null;
-    }
+    return activeUser != null;
   }
 
   /**
-   * Adds a user to the list of current users.
+   * Adds a user to the list of current users. If the user already exists,
+   * the user will be updated.
    * The <code>user</code> becomes the active user.
    * @param user
    * @return
    */
-  public boolean addUser(User user) {
+  public void addUser(CredentialedUser user) {
     synchronized (this) {
-      if(allUsers.containsKey(user.getEmail())) {
-        return false;
-      }
-
       allUsers.put(user.getEmail(), user);
       setActiveUser(user.getEmail());
-
-      return true;
     }
   }
 
@@ -138,7 +147,7 @@ public class Users {
 
       if(activeUser.getEmail().equals(userEmail)) {
         activeUser = null;
-        // TODO: Send message out of changed user
+        GoogleLoginPrefs.removeActiveUser();
       }
 
       allUsers.remove(userEmail);
@@ -146,14 +155,4 @@ public class Users {
     }
   }
 
-  /**
-   * Clears the map of logged in users.
-   */
-  public void removeAllUsers(){
-    synchronized (this) {
-      allUsers.clear();
-      activeUser = null;
-      // TODO: Send message out of changed user
-    }
-  }
 }

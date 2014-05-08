@@ -17,9 +17,11 @@ package com.google.gct.login;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.gdt.eclipse.login.common.OAuthData;
 
 import com.intellij.openapi.diagnostic.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -31,9 +33,10 @@ import java.util.prefs.Preferences;
  * object persistently, retrieving it, and clearing it. Only the active
  * user's data is managed at any given time.
  */
+// TODO: see if PersistentStateComponent is a better way to store settings
 public class GoogleLoginPrefs {
   // Delimiter for the list of scopes.
-  private static final String SCOPE_DELIMITER = " ";
+  private static final String DELIMITER = " ";
 
   private static final String PREFERENCES_PATH = "/com/google/gct/login";
   private static String preferencesPath = PREFERENCES_PATH;
@@ -46,6 +49,8 @@ public class GoogleLoginPrefs {
   private static final String ICON_ONLY_KEY = "icon_only";
   private static final String LOGOUT_ON_EXIT_KEY = "logout_on_exit";
   private static final String OAUTH_SCOPES_KEY = "oauth_scopes";
+  private static final String USERS = "all_users";
+  private static final String ACTIVE_USER = "active_user";
 
   public static final Logger LOG =  Logger.getInstance(GoogleLoginPrefs.class);
 
@@ -55,21 +60,24 @@ public class GoogleLoginPrefs {
    */
   public static void saveOAuthData(OAuthData credentials) {
     Preferences prefs = getPrefs();
-    prefs.put(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_KEY), credentials.getAccessToken());
-    prefs.put(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY), credentials.getRefreshToken());
+    String userEmail = credentials.getStoredEmail();
+    prefs.put(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_KEY, userEmail), credentials.getAccessToken());
+    prefs.put(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY, userEmail), credentials.getRefreshToken());
     prefs.put(
-      getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_EXPIRY_TIME_KEY),
+      getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_EXPIRY_TIME_KEY, userEmail),
       Long.toString(credentials.getAccessTokenExpiryTime()));
 
     // we save the scopes so that if the user updates the plugin and the
     // scopes change, we can force the plugin to log out.
-    Joiner joiner = Joiner.on(SCOPE_DELIMITER);
-    prefs.put(getCustomUserKey(OAUTH_SCOPES_KEY), joiner.join(credentials.getStoredScopes()));
+    Joiner joiner = Joiner.on(DELIMITER);
+    prefs.put(getCustomUserKey(OAUTH_SCOPES_KEY, userEmail), joiner.join(credentials.getStoredScopes()));
 
     String storedEmail = credentials.getStoredEmail();
     if (storedEmail != null) {
-      prefs.put(getCustomUserKey(OAUTH_DATA_EMAIL_KEY), storedEmail);
+      prefs.put(getCustomUserKey(OAUTH_DATA_EMAIL_KEY, userEmail), storedEmail);
     }
+    addUser(credentials.getStoredEmail());
+
     flushPrefs(prefs);
   }
 
@@ -84,14 +92,12 @@ public class GoogleLoginPrefs {
     String accessToken = prefs.get(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_KEY), null);
     String refreshToken = prefs.get(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY), null);
     String storedEmail = prefs.get(getCustomUserKey(OAUTH_DATA_EMAIL_KEY), null);
-    String storedScopesString = prefs.get(getCustomUserKey(OAUTH_SCOPES_KEY), null);
+    String storedScopesString = prefs.get(getCustomUserKey(OAUTH_SCOPES_KEY), "");
 
     // Use a set to ensure uniqueness.
     SortedSet<String> storedScopes = new TreeSet<String>();
-    if (storedScopesString != null) {
-      for (String scope : storedScopesString.split(SCOPE_DELIMITER)) {
-        storedScopes.add(scope);
-      }
+    for (String scope : storedScopesString.split(DELIMITER)) {
+      storedScopes.add(scope);
     }
     long accessTokenExpiryTime = 0;
     String accessTokenExpiryTimeString = prefs.get(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_EXPIRY_TIME_KEY), null);
@@ -106,12 +112,18 @@ public class GoogleLoginPrefs {
    * Clears the persistently stored {@link OAuthData} object for the active user, if any.
    */
   public static void clearStoredOAuthData() {
+    CredentialedUser activeUser = GoogleLogin.getInstance().getActiveUser();
+    if(activeUser == null) {
+      return;
+    }
+
     Preferences prefs = getPrefs();
     prefs.remove(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_KEY));
     prefs.remove(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY));
     prefs.remove(getCustomUserKey(OAUTH_DATA_EMAIL_KEY));
     prefs.remove(getCustomUserKey(OAUTH_SCOPES_KEY));
     prefs.remove(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_EXPIRY_TIME_KEY));
+    removeUser(prefs, activeUser.getEmail());
     flushPrefs(prefs);
   }
 
@@ -146,6 +158,58 @@ public class GoogleLoginPrefs {
     flushPrefs(prefs);
   }
 
+  /**
+   * Retrieves the persistently stored list of users.
+   * @return the stored list of users.
+   */
+  @NotNull
+  public static SortedSet<String> getStoredUsers() {
+    Preferences prefs = getPrefs();
+    String allUsersString = prefs.get(USERS, "");
+    SortedSet<String> allUsers = new TreeSet<String>();
+    if(allUsersString.isEmpty()) {
+      return allUsers;
+    }
+
+    Splitter splitter = Splitter.on(DELIMITER).omitEmptyStrings();
+    for (String aUser : splitter.split(allUsersString)) {
+      allUsers.add(aUser);
+    }
+    return allUsers;
+  }
+
+  /**
+   * Stores <code>user</code> as the active user.
+   * @param user The user to be stored as active.
+   */
+  public static void saveActiveUser(@NotNull String user) {
+    Preferences prefs = getPrefs();
+    prefs.put(ACTIVE_USER, user);
+    flushPrefs(prefs);
+  }
+
+  /**
+   * Clears the persistently stored active user.
+   */
+  public static void removeActiveUser() {
+    Preferences prefs = getPrefs();
+    prefs.remove(ACTIVE_USER);
+    flushPrefs(prefs);
+  }
+
+  /**
+   * Retrieves the persistently stored active user.
+   * @return the stored active user.
+   */
+  public static String getActiveUser() {
+    Preferences prefs = getPrefs();
+    String activeUser = prefs.get(ACTIVE_USER, null);
+    if((activeUser == null) || activeUser.isEmpty()) {
+      return null;
+    }
+    return activeUser;
+  }
+
   @VisibleForTesting
   public static void setTestPreferencesPath(String testPreferencesPath) {
     preferencesPath = testPreferencesPath;
@@ -164,16 +228,54 @@ public class GoogleLoginPrefs {
   }
 
   private static String getCustomUserKey(String key) {
-
-    // ToDo: uncomment when merged User object
-    /**
-     User activeUser = GoogleLogin.getInstance().getActiveUser();
+     CredentialedUser activeUser = GoogleLogin.getInstance().getActiveUser();
      if(activeUser == null) {
      return key;
      }
 
      return key + "_" + activeUser.getEmail();
-     **/
-    return key;
+  }
+
+  private static String getCustomUserKey(String key, String userEmail) {
+    if(userEmail == null) {
+      return key;
+    }
+
+    return key + "_" + userEmail;
+  }
+
+  private static void addUser(String user) {
+    Preferences prefs = getPrefs();
+    String allUsersString = prefs.get(USERS, null);
+    if(allUsersString == null) {
+      prefs.put(USERS, user);
+      return;
+    }
+
+    SortedSet<String> allUsers = new TreeSet<String>();
+    Splitter splitter = Splitter.on(DELIMITER).omitEmptyStrings();
+    for (String scope : splitter.split(allUsersString)) {
+      allUsers.add(scope);
+    }
+
+    if(allUsers.contains(user)) {
+      return;
+    }
+
+    Joiner joiner = Joiner.on(DELIMITER);
+    prefs.put(USERS, joiner.join(allUsersString, user));
+    flushPrefs(prefs);
+  }
+
+  private static void removeUser(Preferences prefs, String user) {;
+    String allUsersString = prefs.get(USERS, "");
+    SortedSet<String> allUsers = new TreeSet<String>();
+    for (String scope : allUsersString.split(DELIMITER)) {
+      allUsers.add(scope);
+    }
+
+    allUsers.remove(user);
+    Joiner joiner = Joiner.on(DELIMITER);
+    prefs.put(USERS, joiner.join(allUsers));
   }
 }
