@@ -29,54 +29,6 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
   private PsiMethod mockPsiMethod;
   private PsiClass mockPsiClass;
 
-  private void initializePsiMethod(String methodName, String httpMethodValue, String pathValue) {
-    PsiAnnotationMemberValue mockAnnotationMemberValue1 = mock(PsiAnnotationMemberValue.class);
-    when(mockAnnotationMemberValue1.getText()).thenReturn(httpMethodValue);
-
-    PsiAnnotationMemberValue mockAnnotationMemberValue2 = mock(PsiAnnotationMemberValue.class);
-    when(mockAnnotationMemberValue2.getText()).thenReturn(pathValue);
-
-    PsiAnnotation mockAnnotation = mock(PsiAnnotation.class);
-    when(mockAnnotation.getQualifiedName()).thenReturn(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD);
-    when(mockAnnotation.findAttributeValue("httpMethod")).thenReturn(mockAnnotationMemberValue1);
-    when(mockAnnotation.findAttributeValue("path")).thenReturn(mockAnnotationMemberValue2);
-    PsiAnnotation[] mockAnnotationsArray = {mockAnnotation};
-
-    PsiModifierList mockModifierList = mock(PsiModifierList.class);
-    when(mockModifierList.getAnnotations()).thenReturn(mockAnnotationsArray);
-
-    mockPsiMethod = mock(PsiMethod.class);
-    when(mockPsiMethod.getModifierList()).thenReturn(mockModifierList);
-    when(mockPsiMethod.getName()).thenReturn(methodName);
-    when(mockPsiMethod.getContainingClass()).thenReturn(mockPsiClass);
-  }
-
-  private void initializePsiClass(String apiResource, String apiClassResource) {
-    PsiAnnotationMemberValue mockAnnotationMemberValue1 = mock(PsiAnnotationMemberValue.class);
-    when(mockAnnotationMemberValue1.getText()).thenReturn(apiResource);
-
-    PsiAnnotationMemberValue mockAnnotationMemberValue2 = mock(PsiAnnotationMemberValue.class);
-    when(mockAnnotationMemberValue2.getText()).thenReturn(apiClassResource);
-
-    // Mock @Api(resource = "")
-    PsiAnnotation mockAnnotation1 = mock(PsiAnnotation.class);
-    when(mockAnnotation1.getQualifiedName()).thenReturn(GctConstants.APP_ENGINE_ANNOTATION_API);
-    when(mockAnnotation1.findAttributeValue("resource")).thenReturn(mockAnnotationMemberValue1);
-
-    // Mock @ApiClass(resource = "")
-    PsiAnnotation mockAnnotation2 = mock(PsiAnnotation.class);
-    when(mockAnnotation2.getQualifiedName()).thenReturn(GctConstants.APP_ENGINE_ANNOTATION_API_CLASS);
-    when(mockAnnotation2.findAttributeValue("resource")).thenReturn(mockAnnotationMemberValue2);
-
-    PsiAnnotation[] mockAnnotationsArray = {mockAnnotation1, mockAnnotation2};
-
-    PsiModifierList mockModifierList = mock(PsiModifierList.class);
-    when(mockModifierList.getAnnotations()).thenReturn(mockAnnotationsArray);
-
-    mockPsiClass = mock(PsiClass.class);
-    when(mockPsiClass.getModifierList()).thenReturn(mockModifierList);
-  }
-
   public void testGetRestfulSignature() {
     initializePsiClass("\"\"", "\"\"");
     initializePsiMethod("methodName", "\"\"", "\"\"");
@@ -226,4 +178,53 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
     myFixture.testInspection("inspections/restSignatureInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
   }
 
+  private void initializePsiMethod(String methodName, String httpMethodValue, String pathValue) {
+    PsiAnnotationMemberValue mockAnnotationMemberValue1 = mock(PsiAnnotationMemberValue.class);
+    when(mockAnnotationMemberValue1.getText()).thenReturn(httpMethodValue);
+
+    PsiAnnotationMemberValue mockAnnotationMemberValue2 = mock(PsiAnnotationMemberValue.class);
+    when(mockAnnotationMemberValue2.getText()).thenReturn(pathValue);
+
+    PsiAnnotation mockAnnotation = mock(PsiAnnotation.class);
+    when(mockAnnotation.getQualifiedName()).thenReturn(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD);
+    when(mockAnnotation.findAttributeValue("httpMethod")).thenReturn(mockAnnotationMemberValue1);
+    when(mockAnnotation.findAttributeValue("path")).thenReturn(mockAnnotationMemberValue2);
+    PsiAnnotation[] mockAnnotationsArray = {mockAnnotation};
+
+    PsiModifierList mockModifierList = mock(PsiModifierList.class);
+    when(mockModifierList.getAnnotations()).thenReturn(mockAnnotationsArray);
+
+    mockPsiMethod = mock(PsiMethod.class);
+    when(mockPsiMethod.getModifierList()).thenReturn(mockModifierList);
+    when(mockPsiMethod.getName()).thenReturn(methodName);
+    when(mockPsiMethod.getContainingClass()).thenReturn(mockPsiClass);
+  }
+
+  private void initializePsiClass(String apiResource, String apiClassResource) {
+    PsiAnnotationMemberValue mockAnnotationMemberValue1 = mock(PsiAnnotationMemberValue.class);
+    when(mockAnnotationMemberValue1.getText()).thenReturn(apiResource);
+
+    PsiAnnotationMemberValue mockAnnotationMemberValue2 = mock(PsiAnnotationMemberValue.class);
+    when(mockAnnotationMemberValue2.getText()).thenReturn(apiClassResource);
+
+    // Mock @Api(resource = "")
+    PsiAnnotation mockAnnotation1 = mock(PsiAnnotation.class);
+    when(mockAnnotation1.getQualifiedName()).thenReturn(GctConstants.APP_ENGINE_ANNOTATION_API);
+    when(mockAnnotation1.findAttributeValue("resource")).thenReturn(mockAnnotationMemberValue1);
+
+    // Mock @ApiClass(resource = "")
+    PsiAnnotation mockAnnotation2 = mock(PsiAnnotation.class);
+    when(mockAnnotation2.getQualifiedName()).thenReturn(GctConstants.APP_ENGINE_ANNOTATION_API_CLASS);
+    when(mockAnnotation2.findAttributeValue("resource")).thenReturn(mockAnnotationMemberValue2);
+
+    PsiAnnotation[] mockAnnotationsArray = {mockAnnotation1, mockAnnotation2};
+
+    PsiModifierList mockModifierList = mock(PsiModifierList.class);
+    when(mockModifierList.getAnnotations()).thenReturn(mockAnnotationsArray);
+
+    mockPsiClass = mock(PsiClass.class);
+    when(mockPsiClass.getModifierList()).thenReturn(mockModifierList);
+  }
+
 }
+

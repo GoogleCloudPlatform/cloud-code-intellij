@@ -160,7 +160,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         httpMethod = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "httpMethod");
       } catch (InvalidAnnotationException e) {
         // do nothing
-      } catch (AttributeDoesNotExistException e) {
+      } catch (MissingAttributeException e) {
         break;
       }
 
@@ -191,7 +191,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         path = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "path");
       } catch (InvalidAnnotationException e) {
         // do nothing
-      } catch (AttributeDoesNotExistException e) {
+      } catch (MissingAttributeException e) {
         break;
       }
 
@@ -258,7 +258,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, "resource");
       } catch (InvalidAnnotationException e) {
         // do nothing
-      } catch (AttributeDoesNotExistException e) {
+      } catch (MissingAttributeException e) {
         break;
       }
 
@@ -276,7 +276,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API, "resource");
       } catch (InvalidAnnotationException e) {
         // do nothing;
-      } catch (AttributeDoesNotExistException e) {
+      } catch (MissingAttributeException e) {
         break;
       }
 
@@ -294,12 +294,12 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   }
 
   private String getAttributeFromAnnotation (PsiAnnotation annotation, String annotationType,
-    final String attribute) throws InvalidAnnotationException, AttributeDoesNotExistException {
+    final String attribute) throws InvalidAnnotationException, MissingAttributeException {
 
     if(annotation.getQualifiedName().equals(annotationType)) {
       PsiAnnotationMemberValue annotationMemberValue =  annotation.findAttributeValue(attribute);
       if(annotationMemberValue == null) {
-        throw new AttributeDoesNotExistException(annotation, attribute);
+        throw new MissingAttributeException(annotation, attribute);
       }
 
       String httpMethodWithQuotes = annotationMemberValue.getText();
@@ -313,4 +313,5 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     return String.format("Multiple methods with same rest path \"%s\": \"%s\" and \"%s\"",
                          restSignature, method1, method2);
   }
+
 }
