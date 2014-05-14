@@ -102,6 +102,10 @@
             class="com.google.gct.idea.appengine.gradle.action.InstallClientLibrariesAction"
             text="Install Client Libraries"
             icon="/icons/cloudEndpoints.png"/>
+    <action id="GoogleCloudTools.GenerateEndpoint"
+            class="com.google.gct.idea.appengine.gradle.action.GenerateEndpointAction"
+            text="Generate Endpoint"
+            icon="/icons/cloudEndpoints.png"/>
     <group id="com.google.gct.intellij.endpoints.MenuGroup"
            text="Google Cloud Tools"
            description="Endpoints Actions"
@@ -109,6 +113,7 @@
            icon="/icons/cloudPlatform.png">
       <reference id="GoogleCloudTools.NewAppEngineModule"/>
       <reference id="GoogleCloudTools.InstallClientLibraries"/>
+      <reference id="GoogleCloudTools.GenerateEndpoint"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </group>
   </actions>

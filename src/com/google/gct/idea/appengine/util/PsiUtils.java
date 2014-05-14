@@ -16,11 +16,14 @@
 package com.google.gct.idea.appengine.util;
 
 import com.intellij.codeInsight.AnnotationUtil;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Utilities for working with Intellij Psi constructs
@@ -169,5 +172,21 @@ public class PsiUtils {
    */
   public static PsiClass findClass(PsiElement element) {
     return (element instanceof PsiClass) ? (PsiClass) element : PsiTreeUtil.getParentOfType(element, PsiClass.class);
+  }
+
+  /**
+   * Returns the PsiJavaFile associated with <code>actionEvent</code> and null if non exists.
+   * @param actionEvent The actionEvent to be evaluated.
+   * @return The PsiJavaFile associated with <code>actionEvent</code> and null if non exists.
+   */
+  @Nullable
+  public static PsiJavaFile getPsiJavaFileFromContext(AnActionEvent actionEvent) {
+    PsiFile psiFile = actionEvent.getData(LangDataKeys.PSI_FILE);
+    if (psiFile == null || !(psiFile instanceof PsiJavaFile)) {
+      return null;
+    }
+    else {
+      return (PsiJavaFile) psiFile;
+    }
   }
 }
