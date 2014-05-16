@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.android.login;
+package com.google.gct.login;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
@@ -35,7 +35,7 @@ public class GoogleLoginPrefs {
   // Delimiter for the list of scopes.
   private static final String SCOPE_DELIMITER = " ";
 
-  private static final String PREFERENCES_PATH = "/com/google/android/login";
+  private static final String PREFERENCES_PATH = "/com/google/gct/login";
   private static String preferencesPath = PREFERENCES_PATH;
 
   private static final String OAUTH_DATA_EMAIL_KEY = "credentials_email";
