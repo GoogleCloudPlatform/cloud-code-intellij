@@ -39,7 +39,7 @@ public class BackendWizardPathFactory implements NewModuleWizardPathFactory {
                                                   @Nullable Project project,
                                                   @Nullable Icon sidePanelIcon,
                                                   @NotNull Disposable disposable) {
-    if (!ApplicationManager.getApplication().isInternal()) {
+    if (project == null || !ApplicationManager.getApplication().isInternal()) {
       return Collections.emptyList();
     }
     return Collections.<WizardPath>singleton(new BackendWizardPath(project, wizardState, updateListener, sidePanelIcon));
