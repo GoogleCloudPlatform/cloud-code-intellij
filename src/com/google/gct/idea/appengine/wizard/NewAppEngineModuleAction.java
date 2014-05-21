@@ -19,9 +19,7 @@ package com.google.gct.idea.appengine.wizard;
 import com.android.builder.model.SourceProvider;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.android.tools.idea.gradle.project.GradleSyncListener;
-import com.android.tools.idea.templates.Parameter;
-import com.android.tools.idea.templates.Template;
-import com.android.tools.idea.templates.TemplateMetadata;
+import com.android.tools.idea.templates.*;
 import com.android.tools.idea.wizard.NewTemplateObjectWizard;
 import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
@@ -39,6 +37,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.android.dom.manifest.Manifest;
 import org.jetbrains.android.facet.AndroidFacet;
 import org.jetbrains.android.facet.IdeaSourceProvider;
 import org.jetbrains.annotations.NotNull;
@@ -48,9 +47,12 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.android.tools.idea.templates.KeystoreUtils.getDebugKeystore;
 
 /**
  * Action to generate client libraries for an AppEngine endpoints project and copy them to an associated android project
@@ -62,6 +64,7 @@ public class NewAppEngineModuleAction extends AnAction {
   private static final Logger LOG = Logger.getInstance(NewAppEngineModuleAction.class);
   public static final String ATTR_MODULE_NAME = "moduleName";
   public static final String ATTR_CLIENT_MODULE_NAME = "clientModuleName";
+  public static final String ATTR_CLIENT_PACKAGE = "clientPackageName";
   public static final String ATTR_SERVER_MODULE_PATH = "serverModulePath";
 
   @Override
@@ -106,6 +109,7 @@ public class NewAppEngineModuleAction extends AnAction {
     }
     replacementMap.put(ATTR_MODULE_NAME, moduleName);
     replacementMap.put(TemplateMetadata.ATTR_PACKAGE_NAME, packageName);
+    addPropertiesFromClientModule(clientModule, replacementMap);
 
     if (AppEngineTemplates.LOCAL_ENDPOINTS_TEMPLATES.contains(templateFile.getName())) {
       AppEngineTemplates.populateEndpointParameters(replacementMap, packageName);
@@ -115,11 +119,16 @@ public class NewAppEngineModuleAction extends AnAction {
 
       @Override
       public void run() {
+        List<File> allFilesToOpen = new ArrayList<File>();
         template.render(projectRoot, moduleRoot, replacementMap);
+        allFilesToOpen.addAll(template.getFilesToOpen());
 
         if (clientModule != null) {
           patchClientModule(clientModule, clientTemplate, replacementMap);
+          allFilesToOpen.addAll(clientTemplate.getFilesToOpen());
         }
+
+        TemplateUtils.openEditors(project, allFilesToOpen, true);
 
         GradleProjectImporter projectImporter = GradleProjectImporter.getInstance();
         projectImporter.requestProjectSync(project, new GradleSyncListener() {
@@ -155,6 +164,26 @@ public class NewAppEngineModuleAction extends AnAction {
         });
       }
     });
+  }
+
+  private static void addPropertiesFromClientModule(@Nullable Module clientModule, Map<String, Object> replacementMap) {
+    replacementMap.put(TemplateMetadata.ATTR_DEBUG_KEYSTORE_SHA1, "");
+    replacementMap.put(ATTR_CLIENT_PACKAGE, "");
+    if (clientModule != null) {
+      AndroidFacet facet = AndroidFacet.getInstance(clientModule);
+      if (facet != null) {
+        try {
+          replacementMap.put(TemplateMetadata.ATTR_DEBUG_KEYSTORE_SHA1, KeystoreUtils.sha1(getDebugKeystore(facet)));
+        }
+        catch (Exception e) {
+          LOG.info("Failed to calculate SHA-1 of debug keystore", e);
+        }
+        Manifest manifest = facet.getManifest();
+        if (manifest != null) {
+          replacementMap.put(ATTR_CLIENT_PACKAGE, manifest.getPackage().getValue());
+        }
+      }
+    }
   }
 
   private static void patchClientModule(Module clientModule, Template clientTemplate, Map<String, Object> replacementMap) {

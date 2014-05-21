@@ -1,3 +1,3 @@
 dependencies {
-    compile project(path: '${serverModulePath}', configuration: 'android-endpoints')
+    compile project(path: ':${moduleName}', configuration: 'android-endpoints')
 }
