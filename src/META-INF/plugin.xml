@@ -122,4 +122,11 @@
     </group>
   </actions>
 
+  <!-- Extension point for Google Login Listener -->
+  <!--
+  <extensionPoints>
+    <extensionPoint name="GoogleLoginListener" interface="com.google.gct.login.GoogleLoginListener"/>
+  </extensionPoints>
+  -->
+
 </idea-plugin>
