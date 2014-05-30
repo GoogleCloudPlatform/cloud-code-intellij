@@ -27,9 +27,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.psi.PsiNameHelper;
-import com.intellij.ui.CollectionComboBoxModel;
-import com.intellij.ui.ColoredListCellRenderer;
-import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.*;
 import com.intellij.ui.components.JBLabel;
 import org.jetbrains.android.dom.manifest.Manifest;
 import org.jetbrains.android.facet.AndroidFacet;
@@ -44,6 +42,8 @@ import java.util.List;
  * Wizard step for specifying the parameters of a backend module.
  */
 public class BackendModuleWizardStep extends ModuleWizardStep implements AndroidStudioWizardStep {
+  private static final String ATTR_DOC_URL = "docUrl";
+
   private final Project myProject;
   private final NewModuleWizardState myWizardState;
   private final TemplateWizardStep.UpdateListener myUpdateListener;
@@ -53,7 +53,12 @@ public class BackendModuleWizardStep extends ModuleWizardStep implements Android
   private JTextField myModuleNameField;
   private JComboBox myClientModuleCombo;
   private JBLabel myValidationStatus;
+  private HyperlinkLabel myDocLabel;
+  private JLabel myDocLabel2;
+  private JPanel myDocPanel;
+  private JLabel myDocLabel3;
   private boolean myUpdating;
+  private boolean myPackageNameModified;
 
   public BackendModuleWizardStep(Project project,
                                  NewModuleWizardState wizardState,
@@ -63,8 +68,8 @@ public class BackendModuleWizardStep extends ModuleWizardStep implements Android
     myWizardState = wizardState;
     myUpdateListener = updateListener;
     mySidePanelIcon = sidePanelIcon;
-    setupListener(myPackageNameField);
-    setupListener(myModuleNameField);
+    setupListener(myModuleNameField, true);
+    setupListener(myPackageNameField, false);
 
     List<Module> clientModules = new ArrayList<Module>();
     Module[] modules = ModuleManager.getInstance(project).getModules();
@@ -80,9 +85,16 @@ public class BackendModuleWizardStep extends ModuleWizardStep implements Android
     myClientModuleCombo.setRenderer(new AndroidModuleListCellRenderer());
 
     myValidationStatus.setIcon(MessageType.ERROR.getDefaultIcon());
+
+    // IntelliJ IDEA has a number of hyperlink components but none that support all 3 of: wrapping; hover cursor over a link; marking only
+    // part of text as link. So we have to use multiple separate labels here. :(
+    // Add some space above and below the doc and match HighlightableComponent.getTextOffset() (2 pixels left border on second label).
+    myDocLabel.setBorder(IdeBorderFactory.createEmptyBorder(8, 0, 0, 0));
+    myDocLabel2.setBorder(IdeBorderFactory.createEmptyBorder(0, 2, 0, 0));
+    myDocLabel3.setBorder(IdeBorderFactory.createEmptyBorder(0, 2, 8, 0));
   }
 
-  private void setupListener(JTextField field) {
+  private void setupListener(JTextField field, final boolean updatePackageName) {
     field.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent e) {
@@ -91,6 +103,7 @@ public class BackendModuleWizardStep extends ModuleWizardStep implements Android
         }
         myUpdating = true;
         try {
+          synchronizePackageName(updatePackageName);
           updateDataModel();
           myUpdateListener.update();
         }
@@ -99,6 +112,19 @@ public class BackendModuleWizardStep extends ModuleWizardStep implements Android
         }
       }
     });
+  }
+
+  private void synchronizePackageName(boolean updatePackageName) {
+    if (!myPackageNameModified) {
+      if (updatePackageName) {
+        String oldPackageName = myPackageNameField.getText();
+        int lastDot = oldPackageName.lastIndexOf('.');
+        String newPackageName = (lastDot >= 0 ? oldPackageName.substring(0, lastDot + 1) : "") + myModuleNameField.getText();
+        myPackageNameField.setText(newPackageName);
+      } else {
+        myPackageNameModified = true;
+      }
+    }
   }
 
   @Override
@@ -123,9 +149,24 @@ public class BackendModuleWizardStep extends ModuleWizardStep implements Android
       if (packageName != null) {
         myPackageNameField.setText(packageName.toString());
       }
+
+      updateDocLabels();
     }
     finally {
       myUpdating = false;
+    }
+  }
+
+  private void updateDocLabels() {
+    String docUrl = (String)myWizardState.get(ATTR_DOC_URL);
+    TemplateMetadata metadata = myWizardState.getTemplateMetadata();
+    String title = metadata != null ? metadata.getTitle() : null;
+    if (docUrl != null && title != null) {
+      myDocPanel.setVisible(true);
+      myDocLabel.setHyperlinkText("Check the ", "\"" + title + "\" documentation", "");
+      myDocLabel.setHyperlinkTarget(docUrl);
+    } else {
+      myDocPanel.setVisible(false);
     }
   }
 
