@@ -20,7 +20,6 @@ import com.android.tools.idea.wizard.NewModuleWizardState;
 import com.android.tools.idea.wizard.TemplateWizardStep;
 import com.android.tools.idea.wizard.WizardPath;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +38,7 @@ public class BackendWizardPathFactory implements NewModuleWizardPathFactory {
                                                   @Nullable Project project,
                                                   @Nullable Icon sidePanelIcon,
                                                   @NotNull Disposable disposable) {
-    if (project == null || !ApplicationManager.getApplication().isInternal()) {
+    if (project == null) {
       return Collections.emptyList();
     }
     return Collections.<WizardPath>singleton(new BackendWizardPath(project, wizardState, updateListener, sidePanelIcon));
