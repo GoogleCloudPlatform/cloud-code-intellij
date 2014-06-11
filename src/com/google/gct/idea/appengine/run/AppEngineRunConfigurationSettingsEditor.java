@@ -15,8 +15,6 @@
  */
 package com.google.gct.idea.appengine.run;
 
-import com.google.appengine.gradle.model.AppEngineModel;
-import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.intellij.execution.ui.ConfigurationModuleSelector;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
@@ -25,7 +23,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -50,19 +47,6 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
                                                 FileChooserDescriptorFactory.createSingleFolderDescriptor());
     myWarPathField.addBrowseFolderListener("Select Exploded War Root", null, myProject,
                                            FileChooserDescriptorFactory.createSingleFolderDescriptor());
-  }
-
-  // TODO: unused currently, but useful once gradle facet for App Engine is completely set up.
-  protected void syncWithBuildFile() {
-    AppEngineGradleFacet facet = AppEngineGradleFacet.getInstance(moduleSelector.getModule());
-    if(facet != null) {
-      // proof of concept of usefulness of Gradle model
-      AppEngineModel model = facet.getIdeaAppEngineProject().getDelegate();
-      myServerPortField.setText(model.getHttpPort().toString());
-      myServerAddressField.setText(model.getHttpAddress());
-      myAppEngineSdkField.setText(model.getAppEngineSdkRoot());
-      myWarPathField.setText(model.getWarDir().getAbsolutePath());
-    }
   }
 
   @Override
