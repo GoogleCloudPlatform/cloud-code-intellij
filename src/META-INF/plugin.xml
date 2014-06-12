@@ -23,17 +23,11 @@
   <project-components>
   </project-components>
 
-  <depends>org.jetbrains.plugins.gradle</depends>
-  <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
-     <projectResolve implementation="com.google.gct.idea.appengine.gradle.project.AppEngineGradleProjectResolver"/>
-  </extensions>
-
   <extensions defaultExtensionNs="com.intellij">
+    <!-- facet disabled for now
     <facetType implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetType"/>
-    <!-- facet detector disabled for now, use the gradle project importer to add the facet
     <framework.detector implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineFrameworkDetector"/>
-    -->
-    <externalProjectDataService implementation="com.google.gct.idea.appengine.gradle.service.AppEngineGradleProjectDataService" />
+     -->
 
     <!-- Temporarily disable
     <applicationConfigurable instance="com.google.gct.idea.appengine.synchronization.SampleSyncConfigurable"></applicationConfigurable>
