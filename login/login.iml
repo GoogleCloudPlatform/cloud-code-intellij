@@ -93,6 +93,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="platform-impl" />
   </component>
 </module>
 
