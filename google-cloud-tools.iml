@@ -44,6 +44,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" scope="TEST" name="mockito" level="project" />
+    <orderEntry type="module" module-name="login" />
   </component>
 </module>
 

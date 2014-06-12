@@ -120,12 +120,22 @@
       <reference id="GoogleCloudTools.GenerateEndpoint"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </group>
+
+    <!-- Google Login -->
+    <!--
+    <action id="GoogleLogin.UserProfile"
+            class="com.google.gct.login.ui.GoogleLoginAction"
+            text="Google Login">
+      <add-to-group group-id="MainToolBar" anchor="first"  />
+    </action>
+    -->
+
   </actions>
 
   <!-- Extension point for Google Login Listener -->
   <!--
   <extensionPoints>
-    <extensionPoint name="GoogleLoginListener" interface="com.google.gct.login.GoogleLoginListener"/>
+    <extensionPoint name="googleLoginListener" interface="com.google.gct.login.GoogleLoginListener"/>
   </extensionPoints>
   -->
 

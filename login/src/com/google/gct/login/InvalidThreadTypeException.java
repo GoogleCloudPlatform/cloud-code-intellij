@@ -15,13 +15,14 @@
  */
 package com.google.gct.login;
 
-import com.google.gdt.eclipse.login.common.LoginListener;
-import com.intellij.openapi.extensions.ExtensionPointName;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Listener for changes in the login status.
+ * Exception when a method is required but not called from an Event Dispatch Thread (EDT).
  */
-public interface GoogleLoginListener extends LoginListener {
-  public static ExtensionPointName<GoogleLoginListener> EP_NAME =
-    new ExtensionPointName<GoogleLoginListener>("com.google.gct.googleLoginListener");
+public class InvalidThreadTypeException extends Exception  {
+  public InvalidThreadTypeException(@NotNull String methodName) {
+    super(methodName.isEmpty()? "Method" : methodName +
+      " must be called from an event dispatch thread (EDT)");
+  }
 }

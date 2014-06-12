@@ -15,13 +15,9 @@
  */
 package com.google.gct.login;
 
-import com.google.gdt.eclipse.login.common.LoginListener;
-import com.intellij.openapi.extensions.ExtensionPointName;
-
 /**
- * Listener for changes in the login status.
+ * A common callback interface for getting user data.
  */
-public interface GoogleLoginListener extends LoginListener {
-  public static ExtensionPointName<GoogleLoginListener> EP_NAME =
-    new ExtensionPointName<GoogleLoginListener>("com.google.gct.googleLoginListener");
+public interface IUserPropertyCallback<T>{
+  public void setProperty(T t);
 }
