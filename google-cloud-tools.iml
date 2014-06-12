@@ -25,26 +25,26 @@
     <orderEntry type="module" module-name="external-system-api" />
     <orderEntry type="module" module-name="gradle" />
     <orderEntry type="module" module-name="jetgroovy" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/org.eclipse.jgit-3.3.0.201403021825-r.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/org.eclipse.jgit.junit-3.0.0.201306101825-r.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="library" scope="TEST" name="mockito" level="project" />
     <orderEntry type="module" module-name="login" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib-working/org.eclipse.jgit-3.3.0.201403021825-r.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib-working/org.eclipse.jgit.junit-3.0.0.201306101825-r.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 
