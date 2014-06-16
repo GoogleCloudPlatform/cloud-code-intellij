@@ -8,17 +8,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/google.login.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/../lib/google.login.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
     <orderEntry type="module" module-name="openapi" />
     <orderEntry type="library" name="Guava" level="project" />
     <orderEntry type="module-library" scope="TEST">
@@ -42,7 +31,19 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/google-api-client-1.18.0-rc.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib-working/google.login.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../lib-working/google.login.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="google-api-java-client" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../lib-working/google-http-client-jackson-1.18.0-rc.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -51,7 +52,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/google-http-client-1.18.0-rc.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib-working/google-api-services-oauth2-v2-rev70-1.18.0-rc.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -60,7 +61,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/google-oauth-client-1.18.0-rc.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib-working/jackson-core-asl-1.9.11.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -69,25 +70,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/google-http-client-jackson-1.18.0-rc.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/jackson-core-asl-1.9.11.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/google-api-services-oauth2-v2-rev70-1.18.0-rc.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib-working/javax.servlet-api-3.1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
