@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 
 /**
- * Project wrapper for App Engine Gradle Projects
+ * Transient project wrapper for App Engine Gradle Projects during gradle imports
  */
 public class IdeaAppEngineProject {
   @NotNull private final String myModuleName;

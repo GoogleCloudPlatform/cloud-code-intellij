@@ -116,7 +116,6 @@ public class NewAppEngineModuleAction extends AnAction {
     }
 
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
-
       @Override
       public void run() {
         List<File> allFilesToOpen = new ArrayList<File>();
@@ -132,18 +131,14 @@ public class NewAppEngineModuleAction extends AnAction {
 
         GradleProjectImporter projectImporter = GradleProjectImporter.getInstance();
         projectImporter.requestProjectSync(project, new GradleSyncListener.Adapter() {
+
           @Override
           public void syncSucceeded(@NotNull final Project project) {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
               @Override
               public void run() {
                 Module module = ModuleManager.getInstance(project).findModuleByName(moduleName);
-
-                Parameter appEngineVersionParam = template.getMetadata().getParameter("appEngineVersion");
-                String appEngineVersion = (appEngineVersionParam == null) ? "unknown" : appEngineVersionParam.initial;
-
-                createRunConfiguration(project, module, moduleRoot, appEngineVersion);
-                addAppEngineGradleFacet();
+                createRunConfiguration(project, module);
               }
             });
           }
@@ -213,7 +208,7 @@ public class NewAppEngineModuleAction extends AnAction {
     return null;
   }
 
-  private static void createRunConfiguration(Project project, Module module, File moduleRoot, String appEngineVersion) {
+  private static void createRunConfiguration(Project project, Module module) {
     // Create a run configuration for this module
     final RunManagerEx runManager = RunManagerEx.getInstanceEx(project);
     final RunnerAndConfigurationSettings settings = runManager.
@@ -221,30 +216,9 @@ public class NewAppEngineModuleAction extends AnAction {
     settings.setSingleton(true);
     final AppEngineRunConfiguration configuration = (AppEngineRunConfiguration)settings.getConfiguration();
     configuration.setModule(module);
-    configuration.setWarPath(new File(moduleRoot, "build/exploded-app").getAbsolutePath());
-    String gradleHomePath = GradleSettings.getInstance(project).getServiceDirectoryPath();
-    if (StringUtil.isEmpty(gradleHomePath)) {
-      gradleHomePath = new File(System.getProperty("user.home"), ".gradle").getAbsolutePath();
-    }
-    // This is a little strange because the sdk is "downloaded", but in our templates that's where the sdk is
-    // TODO, perhaps extract this from the build.gradle
-    // TODO, add support for the appengine environment/system properties (probably in the runconfig not here)
-    configuration.setSdkPath(new File(gradleHomePath, "/appengine-sdk/appengine-java-sdk-" + appEngineVersion).getAbsolutePath());
-    configuration.setServerPort("8080");
+    // pull configuration out of gradle
+    configuration.setSyncWithGradle(true);
     runManager.addConfiguration(settings, false);
-  }
-
-  private static void addAppEngineGradleFacet() {
-    // Module does not have AppEngine-Gradle facet. Create one and add it.
-    // Commented out for now, ENABLE when AppEngine Gradle facet is ready.
-    // FacetManager facetManager = FacetManager.getInstance(module);
-    // ModifiableFacetModel model = facetManager.createModifiableModel();
-    //try {
-    //  Facet facet = facetManager.createFacet(AppEngineGradleFacet.getFacetType(), AppEngineGradleFacet.NAME, null);
-    //  model.addFacet(facet);
-    //} finally {
-    //  model.commit();
-    //}
   }
 }
 
