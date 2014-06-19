@@ -15,8 +15,12 @@
  */
 package com.google.gct.login;
 
+import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
+import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.common.base.Strings;
 import com.google.gct.login.ui.GoogleLoginActionButton;
@@ -27,14 +31,17 @@ import com.google.gdt.eclipse.login.common.OAuthData;
 import com.google.gdt.eclipse.login.common.OAuthDataStore;
 import com.google.gdt.eclipse.login.common.UiFacade;
 
+import com.google.gdt.eclipse.login.common.VerificationCodeHolder;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 
-import com.intellij.util.containers.hash.LinkedHashMap;
 import net.jcip.annotations.Immutable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -269,14 +276,16 @@ public class GoogleLogin {
   /**
    * See {@link #logIn(String)}.
    */
-  public boolean logIn() {
+  public void logIn() {
     users.removeActiveUser();
-    return logIn(null);
+    logIn(null);
   }
 
   /**
-   * Pops up the dialogs to allow the user to sign in. If the user is already
-   * signed in, then this does nothing and returns true.
+   * Opens an external browser to allow the user to sign in.
+   * If the user is already signed in, this updates the user's credentials.
+   * If the logging process fails, a message dialog will pop up to notify
+   * the user. If the logging process succeeds, a logging event will be fired.
    *
    * @param message if not null, then this message is displayed above the
    *          login dialog. This is for when the user is presented
@@ -284,24 +293,28 @@ public class GoogleLogin {
    *          as accessing Google API services. It should say something like
    *          "Importing a project from Google Project Hosting requires signing
    *          in."
-   *
-   * @return true if the user signed in or is already signed in, false otherwise
    */
-  public boolean logIn(String message) {
-    GoogleLoginState state = createGoogleLoginState();
-    boolean loggedIn = state.logIn(message);
-    IGoogleLoginUpdateUser callback = new IGoogleLoginUpdateUser() {
+  public void logIn(final String message) {
+    final GoogleLoginState state = createGoogleLoginState();
+
+    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
       @Override
-      public void updateUser() {
-        uiFacade.notifyStatusIndicator();
+      public void run() {
+        boolean loggedIn = state.logInWithLocalServer(message);
+
+        // TODO: add user preference to chose to use pop-up copy and paste dialog
+
+        if(loggedIn) {
+          IGoogleLoginUpdateUser callback = new IGoogleLoginUpdateUser() {
+            @Override
+            public void updateUser() {
+              uiFacade.notifyStatusIndicator();
+            }
+          };
+          users.addUser(new CredentialedUser(state, callback));
+        }
       }
-    };
-
-    if(loggedIn) {
-      users.addUser(new CredentialedUser(state, callback));
-    }
-
-    return loggedIn;
+    });
   }
 
   /**
@@ -439,7 +452,7 @@ public class GoogleLogin {
    * Returns the OAuth 2.0 Client ID and Secret for Android Studio in a {@link ClientIdSecretPair}.
    * @return the OAuth 2.0 Client ID and Secret for Android Studio in a {@link ClientIdSecretPair}.
    */
-  private static ClientIdSecretPair getClientIdAndSecretFromExtensionPoints() {
+  private ClientIdSecretPair getClientIdAndSecretFromExtensionPoints() {
       String clientId = System.getenv().get(CLIENT_ID);
       String clientSecret = System.getenv().get(CLIENT_SECRET);
       if (clientId != null && clientId.trim().length() > 0
@@ -448,6 +461,22 @@ public class GoogleLogin {
     }
 
     throw new IllegalStateException("The Google OAuth 2.0 Client id and/or secret for Android Studio was not found");
+  }
+
+  // TODO: update code to specify parent
+  private void logErrorAndDisplayDialog(@NotNull final String title, @NotNull final Exception exception) {
+    if (ApplicationManager.getApplication().isDispatchThread()) {
+      Messages.showErrorDialog(exception.getMessage(), title);
+    } else {
+      ApplicationManager.getApplication().invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          Messages.showErrorDialog(exception.getMessage(), title);
+        }
+      }, ModalityState.defaultModalityState());
+    }
+
+    GOOGLE_LOGIN_LOG.error(exception.getMessage(), exception);
   }
 
   /**
@@ -475,7 +504,7 @@ public class GoogleLogin {
   /**
    * An implementation of {@link UiFacade} using Swing dialogs and external browsers.
    */
-  private static class AndroidUiFacade implements UiFacade {
+  private class AndroidUiFacade implements UiFacade {
     private GoogleLoginActionButton myButton;
 
     @Override
@@ -487,6 +516,37 @@ public class GoogleLogin {
       }
 
       return Strings.emptyToNull(dialog.getVerificationCode());
+    }
+
+    @Override
+    public VerificationCodeHolder obtainVerificationCodeFromExternalUserInteraction(String title) {
+      VerificationCodeReceiver receiver = new LocalServerReceiver();
+      String redirectUrl;
+      try {
+        redirectUrl = receiver.getRedirectUri();
+      }
+      catch (IOException e) {
+        logErrorAndDisplayDialog(title == null? "Google Login" : title, e);
+        return null;
+      }
+
+      AuthorizationCodeRequestUrl authCodeRequestUrl =
+        new AuthorizationCodeRequestUrl(GoogleOAuthConstants.AUTHORIZATION_SERVER_URL, clientInfo.getClientId())
+          .setRedirectUri(redirectUrl)
+          .setScopes(OAuthScopeRegistry.getScopes());
+
+      BrowserUtil.browse(authCodeRequestUrl.build());
+
+      String verificationCode;
+      try {
+        verificationCode = receiver.waitForCode();
+      }
+      catch (IOException e) {
+        logErrorAndDisplayDialog(title == null? "Google Login" : title, e);
+        return null;
+      }
+
+      return new VerificationCodeHolder(verificationCode, redirectUrl);
     }
 
     @Override

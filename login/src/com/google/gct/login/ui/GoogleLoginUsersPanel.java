@@ -117,28 +117,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   class AddAccountListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-      boolean successful = GoogleLogin.getInstance().logIn();
-
-      if(!successful) {
-        return;
-      }
-
-      // Add new user/active user
-      CredentialedUser activeUser = GoogleLogin.getInstance().getActiveUser();
-      if(activeUser == null) {
-        return;
-      }
-
-      if(alreadyInList(activeUser.getEmail())) {
-        int index = listModel.lastIndexOf(activeUser.getEmail());
-        list.setSelectedIndex(index);
-        list.ensureIndexIsVisible(index);
-      } else {
-        // Add new user
-        listModel.add(0, new UsersListItem(activeUser));
-        list.setSelectedIndex(0);
-        list.ensureIndexIsVisible(0);
-      }
+      GoogleLogin.getInstance().logIn();
     }
 
     protected boolean alreadyInList(String name) {
