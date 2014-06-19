@@ -19,8 +19,8 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.common.base.Strings;
+import com.google.gct.login.ui.GoogleLoginActionButton;
 import com.google.gct.login.ui.GoogleLoginCopyAndPasteDialog;
-import com.google.gct.login.ui.GoogleLoginToolbarButton;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gdt.eclipse.login.common.LoggerFacade;
 import com.google.gdt.eclipse.login.common.OAuthData;
@@ -401,7 +401,7 @@ public class GoogleLogin {
    *
    * @param button The login menu item.
    */
-  public void setLoginMenuItemContribution(GoogleLoginToolbarButton button) {
+  public void setLoginMenuItemContribution(GoogleLoginActionButton button) {
     uiFacade.setLoginMenuItemContribution(button);
   }
 
@@ -476,7 +476,7 @@ public class GoogleLogin {
    * An implementation of {@link UiFacade} using Swing dialogs and external browsers.
    */
   private static class AndroidUiFacade implements UiFacade {
-    private GoogleLoginToolbarButton myButton;
+    private GoogleLoginActionButton myButton;
 
     @Override
     public String obtainVerificationCodeFromUserInteraction(String title, GoogleAuthorizationCodeRequestUrl authCodeRequestUrl) {
@@ -516,7 +516,7 @@ public class GoogleLogin {
      *
      * @param button The login menu item.
      */
-    public void setLoginMenuItemContribution(GoogleLoginToolbarButton trim) {
+    public void setLoginMenuItemContribution(GoogleLoginActionButton trim) {
       this.myButton = trim;
     }
   }

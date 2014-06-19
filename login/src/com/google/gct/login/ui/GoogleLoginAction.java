@@ -15,18 +15,19 @@
  */
 package com.google.gct.login.ui;
 
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
+import com.intellij.openapi.actionSystem.impl.ActionButton;
+import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.ui.awt.RelativePoint;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
+import java.awt.Point;
 
 /**
  * Action to open the Google Login panel.
@@ -35,11 +36,22 @@ public class GoogleLoginAction extends AnAction implements CustomComponentAction
 
   @Override
   public void actionPerformed(AnActionEvent e) {
-    // do nothing
+    showPopup(e);
   }
 
   @Override
   public JComponent createCustomComponent(Presentation presentation) {
-    return new GoogleLoginToolbarButton();
+    return new GoogleLoginActionButton(this, presentation, presentation.getText(), ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
   }
+
+  /**
+   * Opens up the Google Login panel as a popup.
+   */
+  private void showPopup(AnActionEvent e) {
+    GoogleLoginUsersPanel usersPanel = new GoogleLoginUsersPanel();
+    ComponentPopupBuilder popup = JBPopupFactory.getInstance().createComponentPopupBuilder(usersPanel, usersPanel.getList());
+    ActionButton source = (ActionButton)e.getInputEvent().getSource();
+    popup.createPopup().show(new RelativePoint(source, new Point(0, source.getHeight() - 1)));
+  }
+
 }
