@@ -602,6 +602,7 @@ public class GoogleLogin {
     }
 
     public void initializeUsers() {
+      String activeUserString = GoogleLoginPrefs.getActiveUser();
       SortedSet<String> allUsers = GoogleLoginPrefs.getStoredUsers();
       for(String aUser : allUsers) {
         // Add a new user, so that loadOAuth called from the GoogleLoginState constructor
@@ -621,7 +622,6 @@ public class GoogleLogin {
         users.addUser(new CredentialedUser(delegate, callback));
       }
 
-      String activeUserString = GoogleLoginPrefs.getActiveUser();
       if(activeUserString == null) {
         users.removeActiveUser();
       } else {
