@@ -104,10 +104,6 @@
   </extensions>
 
   <actions>
-    <action id="GoogleCloudTools.NewAppEngineModule"
-            class="com.google.gct.idea.appengine.wizard.NewAppEngineModuleAction"
-            text="Add App Engine Backend"
-            icon="/icons/appEngine.png"/>
     <action id="GoogleCloudTools.InstallClientLibraries"
             class="com.google.gct.idea.appengine.gradle.action.InstallClientLibrariesAction"
             text="Install Client Libraries"
@@ -121,7 +117,6 @@
            description="Endpoints Actions"
            popup="true"
            icon="/icons/cloudPlatform.png">
-      <reference id="GoogleCloudTools.NewAppEngineModule"/>
       <reference id="GoogleCloudTools.InstallClientLibraries"/>
       <reference id="GoogleCloudTools.GenerateEndpoint"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
