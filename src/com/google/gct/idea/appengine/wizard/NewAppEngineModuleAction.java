@@ -56,7 +56,7 @@ import static com.android.tools.idea.templates.KeystoreUtils.getDebugKeystore;
 
 /**
  * Action to generate client libraries for an AppEngine endpoints project and copy them to an associated android project
- * Currently hidden from UI in plugin.xml
+ * TODO : No Longer in use, transition constants to WizardPath and remove this mechanism
  */
 public class NewAppEngineModuleAction extends AnAction {
 
