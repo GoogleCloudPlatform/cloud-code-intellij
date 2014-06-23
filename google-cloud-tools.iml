@@ -26,7 +26,6 @@
     <orderEntry type="module" module-name="gradle" />
     <orderEntry type="module" module-name="jetgroovy" />
     <orderEntry type="library" scope="TEST" name="mockito" level="project" />
-    <orderEntry type="module" module-name="login" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
