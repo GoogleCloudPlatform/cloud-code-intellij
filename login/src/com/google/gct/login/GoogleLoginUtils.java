@@ -69,6 +69,7 @@ public class GoogleLoginUtils {
       @Override
       public void run() {
         Image image = Toolkit.getDefaultToolkit().getImage(newUrl);
+        Toolkit.getDefaultToolkit().prepareImage(image, -1, -1, null);
         pictureCallback.setProperty(image);
       }
     });

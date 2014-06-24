@@ -119,10 +119,6 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     public void actionPerformed(ActionEvent e) {
       GoogleLogin.getInstance().logIn();
     }
-
-    protected boolean alreadyInList(String name) {
-      return listModel.contains(name);
-    }
   }
 
   //This method is required by ListSelectionListener.
