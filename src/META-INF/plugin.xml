@@ -104,10 +104,6 @@
   </extensions>
 
   <actions>
-    <action id="GoogleCloudTools.InstallClientLibraries"
-            class="com.google.gct.idea.appengine.gradle.action.InstallClientLibrariesAction"
-            text="Install Client Libraries"
-            icon="/icons/cloudEndpoints.png"/>
     <action id="GoogleCloudTools.GenerateEndpoint"
             class="com.google.gct.idea.appengine.gradle.action.GenerateEndpointAction"
             text="Generate Endpoint"
