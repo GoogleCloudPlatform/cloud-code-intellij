@@ -55,9 +55,7 @@ import java.util.SortedSet;
 // TODO: explore changing class to an application service
 public class GoogleLogin {
 
-  private static final String CLIENT_ID = "ANDROID_CLIENT_ID";
-  private static final String CLIENT_SECRET = "ANDROID_CLIENT_SECRET";
-  private ClientIdSecretPair clientInfo;
+  private ClientInfo clientInfo;
   private AndroidUiFacade uiFacade;
   private AndroidPreferencesOAuthDataStore dataStore;
   private CredentialedUserRoster users;
@@ -69,7 +67,7 @@ public class GoogleLogin {
    * Constructor
    */
   private GoogleLogin() {
-    this.clientInfo = getClientIdAndSecretFromExtensionPoints();
+    this.clientInfo = getClientInfo();
     this.uiFacade = new AndroidUiFacade();
     this.users = new CredentialedUserRoster();
     this.dataStore =  new AndroidPreferencesOAuthDataStore();
@@ -437,8 +435,8 @@ public class GoogleLogin {
   private GoogleLoginState createGoogleLoginState() {
     GoogleLoginState state =
       new GoogleLoginState(
-        clientInfo.getClientId(),
-        clientInfo.getClientSecret(),
+        clientInfo.getId(),
+        clientInfo.getInfo(),
         OAuthScopeRegistry.getScopes(),
         new AndroidPreferencesOAuthDataStore(),
         uiFacade,
@@ -449,18 +447,18 @@ public class GoogleLogin {
   }
 
   /**
-   * Returns the OAuth 2.0 Client ID and Secret for Android Studio in a {@link ClientIdSecretPair}.
-   * @return the OAuth 2.0 Client ID and Secret for Android Studio in a {@link ClientIdSecretPair}.
+   * Returns the Client Info for Android Studio in a {@link com.google.gct.login.GoogleLogin.ClientInfo}.
+   * @return the Client Info for Android Studio in a {@link com.google.gct.login.GoogleLogin.ClientInfo}.
    */
-  private ClientIdSecretPair getClientIdAndSecretFromExtensionPoints() {
-      String clientId = System.getenv().get(CLIENT_ID);
-      String clientSecret = System.getenv().get(CLIENT_SECRET);
-      if (clientId != null && clientId.trim().length() > 0
-          && clientSecret != null && clientSecret.trim().length() > 0) {
-        return new ClientIdSecretPair(clientId, clientSecret);
+  private ClientInfo getClientInfo() {
+      String id = LoginContext.getId();
+      String info = LoginContext.getInfo();
+      if (id != null && id.trim().length() > 0
+          && info != null && info.trim().length() > 0) {
+        return new ClientInfo(id, info);
     }
 
-    throw new IllegalStateException("The Google OAuth 2.0 Client id and/or secret for Android Studio was not found");
+    throw new IllegalStateException("The client information for Android Studio was not found");
   }
 
   // TODO: update code to specify parent
@@ -480,24 +478,24 @@ public class GoogleLogin {
   }
 
   /**
-   * A pair consisting of the OAuth client ID and OAuth client secret for a client application.
+   * The client information for an application.
    */
   @Immutable
-  private static class ClientIdSecretPair {
-    private final String clientId;
-    private final String clientSecret;
+  private static class ClientInfo {
+    private final String id;
+    private final String info;
 
-    public ClientIdSecretPair(String clientId, String clientSecret) {
-      this.clientId = clientId;
-      this.clientSecret = clientSecret;
+    public ClientInfo(String id, String info) {
+      this.id = id;
+      this.info = info;
     }
 
-    public String getClientId() {
-      return clientId;
+    public String getId() {
+      return id;
     }
 
-    public String getClientSecret() {
-      return clientSecret;
+    public String getInfo() {
+      return info;
     }
   }
 
@@ -531,7 +529,7 @@ public class GoogleLogin {
       }
 
       AuthorizationCodeRequestUrl authCodeRequestUrl =
-        new AuthorizationCodeRequestUrl(GoogleOAuthConstants.AUTHORIZATION_SERVER_URL, clientInfo.getClientId())
+        new AuthorizationCodeRequestUrl(GoogleOAuthConstants.AUTHORIZATION_SERVER_URL, clientInfo.getId())
           .setRedirectUri(redirectUrl)
           .setScopes(OAuthScopeRegistry.getScopes());
 
