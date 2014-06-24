@@ -23,5 +23,5 @@ import com.intellij.openapi.extensions.ExtensionPointName;
  */
 public interface GoogleLoginListener extends LoginListener {
   public static ExtensionPointName<GoogleLoginListener> EP_NAME =
-    new ExtensionPointName<GoogleLoginListener>("com.google.gct.googleLoginListener");
+    new ExtensionPointName<GoogleLoginListener>("com.google.gct.login.googleLoginListener");
 }
