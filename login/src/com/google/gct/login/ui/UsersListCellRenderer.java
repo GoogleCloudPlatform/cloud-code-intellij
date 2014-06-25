@@ -18,6 +18,7 @@ package com.google.gct.login.ui;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -30,9 +31,13 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.FontMetrics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 
 
 /**
@@ -40,17 +45,32 @@ import java.awt.Image;
  * how each user item in the Google Login panel would be displayed.
  */
 public class UsersListCellRenderer extends JComponent implements ListCellRenderer {
+  private final static String CLOUD_LABEL_TEXT = "Open Cloud Console";
+  private final static String PLAY_LABEL_TEXT = "Open Play Developer Console";
+  private final static String DEFAULT_AVATAR = "/icons/loginAvatar.png";
   private final Color ACTIVE_COLOR = JBColor.LIGHT_GRAY;
   private final int PLAIN_IMAGE_WIDTH = 48;
   private final int PLAIN_IMAGE_HEIGHT = 48;
-  private final Font PLAIN_NAME_FONT;
-  private final Font PLAIN_EMAIL_FONT;
+  private final int ACTIVE_IMAGE_WIDTH = 96;
+  private final int ACTIVE_IMAGE_HEIGHT = 96;
+  private final int HGAP = 10;
+  private final int VGAP = 10;
+  private final Font NAME_FONT;
+  private final Font GENERAL_FONT;
   private final Dimension MAIN_PANEL_DIMENSION;
+  private final Dimension ACTIVE_MAIN_PANEL_DIMENSION;
+  private final Dimension CLOUD_LABEL_DIMENSION;
+  private final Dimension PLAY_LABEL_DIMENSION;
 
   public UsersListCellRenderer() {
-    PLAIN_NAME_FONT = new Font("Helvetica", Font.BOLD, 13);
-    PLAIN_EMAIL_FONT = new Font("Helvetica", Font.PLAIN, 13);;
+    NAME_FONT = new Font("Helvetica", Font.BOLD, 13);
+    GENERAL_FONT = new Font("Helvetica", Font.PLAIN, 13);;
     MAIN_PANEL_DIMENSION = new Dimension(250, 68);
+    ACTIVE_MAIN_PANEL_DIMENSION = new Dimension(250, 116);
+
+    FontMetrics fontMetrics = getFontMetrics(GENERAL_FONT);
+    CLOUD_LABEL_DIMENSION = new Dimension(fontMetrics.stringWidth(CLOUD_LABEL_TEXT), fontMetrics.getHeight());
+    PLAY_LABEL_DIMENSION = new Dimension(fontMetrics.stringWidth(PLAY_LABEL_TEXT), fontMetrics.getHeight());
   }
 
   @Override
@@ -58,29 +78,92 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     if(!(value instanceof UsersListItem)) {
       return null;
     }
+    UsersListItem usersListItem = (UsersListItem)value;
 
-    JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-    mainPanel.setMinimumSize(MAIN_PANEL_DIMENSION);
+    boolean calcIsSelected;
+    if (list.getSelectedIndex() == index) {
+      calcIsSelected = true;
+    } else {
+      calcIsSelected = false;
+    }
+
+    JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, HGAP, VGAP));
+    mainPanel.setMinimumSize(calcIsSelected ? ACTIVE_MAIN_PANEL_DIMENSION : MAIN_PANEL_DIMENSION);
     mainPanel.setAlignmentX(LEFT_ALIGNMENT);
 
     // Update colors
-    final Color bg = isSelected ? ACTIVE_COLOR : UIUtil.getListBackground();
-    final Color fg = isSelected ? UIUtil.getListSelectionForeground() : UIUtil.getListForeground();
+    final Color bg = calcIsSelected ? ACTIVE_COLOR : UIUtil.getListBackground();
+    final Color fg = calcIsSelected ? UIUtil.getListSelectionForeground() : UIUtil.getListForeground();
     mainPanel.setBackground(bg);
     mainPanel.setForeground(fg);
 
-    Image image = ((UsersListItem)value).getUserPicture();
-    Image scaledImage = image.getScaledInstance(PLAIN_IMAGE_WIDTH, PLAIN_IMAGE_HEIGHT, java.awt.Image.SCALE_SMOOTH);
+    // TODO: add step to cache scaled image
+    Image image = usersListItem.getUserPicture();
+    if(image == null){
+      // use default image
+      image = Toolkit.getDefaultToolkit().getImage(DEFAULT_AVATAR);
+    }
+
+    int imageWidth = calcIsSelected ? ACTIVE_IMAGE_WIDTH : PLAIN_IMAGE_WIDTH;
+    int imageHeight = calcIsSelected ? ACTIVE_IMAGE_HEIGHT : PLAIN_IMAGE_HEIGHT;
+    Image scaledImage = image.getScaledInstance(imageWidth, imageHeight, java.awt.Image.SCALE_SMOOTH);
+
+    JComponent textPanel;
+    if (calcIsSelected) {
+      textPanel =  createActiveTextDisplay(usersListItem);
+    } else {
+      textPanel =  createTextDisplay(calcIsSelected, usersListItem);
+    }
 
     mainPanel.add(new JLabel(new ImageIcon(scaledImage)));
-    mainPanel.add(createTextDisplay(isSelected, (UsersListItem)value));
+    mainPanel.add(textPanel);
 
     // TODO: add Separator to bottom of panel
 
     return mainPanel;
   }
 
-  protected JComponent createTextDisplay(boolean isSelected, UsersListItem usersListItem) {
+  public boolean inPlayConsoleUrl(Point point, int activeIndex) {
+    // 2 is for the number of labels before this one
+    double playYStart = VGAP + ACTIVE_IMAGE_HEIGHT - PLAY_LABEL_DIMENSION.getHeight()
+      - CLOUD_LABEL_DIMENSION.getHeight() - 2 + (MAIN_PANEL_DIMENSION.getHeight() * activeIndex);
+    double playYEnd = playYStart + PLAY_LABEL_DIMENSION.getHeight();
+    double playXStart = ACTIVE_IMAGE_WIDTH + HGAP + VGAP;
+    double playXEnd = playXStart + PLAY_LABEL_DIMENSION.getWidth();
+
+    if((point.getX() > playXStart) && (point.getX() < playXEnd)
+       && (point.getY() > playYStart) && (point.getY() < playYEnd)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public boolean inCloudConsoleUrl(Point point, int activeIndex) {
+    // 3 is for the number of labels before this one
+    double playYStart = VGAP + ACTIVE_IMAGE_HEIGHT - CLOUD_LABEL_DIMENSION.getHeight()
+      - 3 + (MAIN_PANEL_DIMENSION.getHeight() * activeIndex);
+    double playYEnd = playYStart + CLOUD_LABEL_DIMENSION.getHeight();
+    double playXStart = ACTIVE_IMAGE_WIDTH + HGAP + VGAP;
+    double playXEnd = playXStart + CLOUD_LABEL_DIMENSION.getWidth();
+
+    if((point.getX() > playXStart) && (point.getX() < playXEnd)
+       && (point.getY() > playYStart) && (point.getY() < playYEnd)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public int getMainPanelHeight() {
+    return (int)MAIN_PANEL_DIMENSION.getHeight();
+  }
+
+  public int getActivePanelHeight() {
+    return (int)ACTIVE_MAIN_PANEL_DIMENSION.getHeight();
+  }
+
+  private JComponent createTextDisplay(boolean isSelected, UsersListItem usersListItem) {
     final JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(2,1));
 
@@ -90,14 +173,57 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     panel.setForeground(fg);
 
     JLabel nameLabel = new JLabel( usersListItem.getUserName());
-    nameLabel.setFont(PLAIN_NAME_FONT);
+    nameLabel.setFont(NAME_FONT);
     panel.add(nameLabel);
 
     JLabel emailLabel = new JLabel(usersListItem.getUserEmail());
-    emailLabel.setFont(PLAIN_EMAIL_FONT);
+    emailLabel.setFont(GENERAL_FONT);
     panel.add(emailLabel);
 
-    panel.setMinimumSize(new Dimension(160, 40));
     return panel;
+  }
+
+  private JComponent createActiveTextDisplay(UsersListItem usersListItem) {
+    JPanel mainPanel = new JPanel();
+    mainPanel.setLayout(new GridBagLayout());
+
+    mainPanel.setBackground(ACTIVE_COLOR);
+    mainPanel.setForeground(UIUtil.getListSelectionForeground());
+    mainPanel.setPreferredSize(new Dimension(200, 96));
+
+    JPanel bottomPanel = new JPanel();
+    bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.PAGE_AXIS));
+    bottomPanel.setBackground(ACTIVE_COLOR);
+    bottomPanel.setForeground(UIUtil.getListSelectionForeground());
+    bottomPanel.setPreferredSize(new Dimension(200, 40));
+
+    JLabel playLabel = new JLabel(PLAY_LABEL_TEXT);
+    playLabel.setFont(GENERAL_FONT);
+    playLabel.setForeground(JBColor.BLUE);
+    playLabel.setPreferredSize(PLAY_LABEL_DIMENSION);
+    bottomPanel.add(playLabel, BOTTOM_ALIGNMENT);
+
+    JLabel cloudLabel = new JLabel(CLOUD_LABEL_TEXT);
+    cloudLabel.setFont(GENERAL_FONT);
+    cloudLabel.setForeground(JBColor.BLUE);
+    cloudLabel.setPreferredSize(CLOUD_LABEL_DIMENSION);
+    bottomPanel.add(cloudLabel, BOTTOM_ALIGNMENT);
+
+    GridBagConstraints topConstraints = new GridBagConstraints();
+    topConstraints.gridx = 0;
+    topConstraints.gridy = 0;
+    topConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+    GridBagConstraints bottomConstraints = new GridBagConstraints();
+    bottomConstraints.gridx = 0;
+    bottomConstraints.gridy = 1;
+    bottomConstraints.weightx = 1;
+    bottomConstraints.weighty = 5;
+    bottomConstraints.anchor = GridBagConstraints.SOUTHWEST;
+
+    JComponent topPanel = createTextDisplay(true, usersListItem);
+    mainPanel.add(topPanel, topConstraints);
+    mainPanel.add(bottomPanel, bottomConstraints);
+    return mainPanel;
   }
 }

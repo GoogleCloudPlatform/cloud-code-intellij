@@ -17,6 +17,7 @@ package com.google.gct.login.ui;
 
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 
@@ -32,8 +33,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Map;
 
 /**
@@ -41,28 +45,77 @@ import java.util.Map;
  * add a new user and sign out a logged in user.
  */
 public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListener {
+  private static final String PLAY_CONSOLE_URL = "https://play.google.com/apps/publish/#ProfilePlace";
+  private static final String CLOUD_CONSOLE_URL = "https://console.developers.google.com/accountsettings";
   private JBList list;
   private DefaultListModel listModel;
-
   private static final int MAX_VISIBLE_ROW_COUNT = 3;
   private static final String addAccountString = "Add Account";
   private static final String signOutString = "Sign Out";
   private JButton signOutButton;
   private JButton addAccountButton;
+  private boolean valueChanged = false;
 
   public GoogleLoginUsersPanel() {
     super(new BorderLayout());
 
     int indexToSelect = initializeUsers();
+    final UsersListCellRenderer usersListCellRenderer = new UsersListCellRenderer();
 
     //Create the list that displays the users and put it in a scroll pane.
-    list = new JBList(listModel);
+    list = new JBList(listModel) {
+      @Override
+      public Dimension getPreferredScrollableViewportSize() {
+        int numUsers = listModel.size();
+        Dimension superPreferredSize = super.getPreferredScrollableViewportSize();
+        if(numUsers <= 1) {
+          return superPreferredSize;
+        }
+
+        if(GoogleLogin.getInstance().getActiveUser() == null){
+          return superPreferredSize;
+        } else if(!isActiveUserInVisibleArea()) {
+          return superPreferredSize;
+        } else {
+          // if there is an active user in the visible area
+          int usersToShow = numUsers > MAX_VISIBLE_ROW_COUNT ? MAX_VISIBLE_ROW_COUNT : numUsers;
+          int scrollHeight = ((usersToShow - 1) *  usersListCellRenderer.getMainPanelHeight())
+            + usersListCellRenderer.getActivePanelHeight();
+          return new Dimension((int)superPreferredSize.getWidth(), scrollHeight);
+        }
+      }
+    };
+
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.setSelectedIndex(indexToSelect);
     list.addListSelectionListener(this);
     list.setVisibleRowCount(getVisibleRowCount());
-    list.setCellRenderer(new UsersListCellRenderer());
+    list.setCellRenderer(usersListCellRenderer);
     JBScrollPane listScrollPane = new JBScrollPane(list);
+
+    list.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent mouseEvent) {
+        list.updateUI();
+
+        if(!valueChanged) {
+          // Clicking on an already active user
+          int index = list.locationToIndex(mouseEvent.getPoint());
+          if (index >= 0) {
+            boolean inPlayUrl = usersListCellRenderer.inPlayConsoleUrl(mouseEvent.getPoint(), index);
+            if(inPlayUrl){
+              BrowserUtil.browse(PLAY_CONSOLE_URL);
+            } else {
+              boolean inCloudUrl = usersListCellRenderer.inCloudConsoleUrl(mouseEvent.getPoint(), index);
+              if(inCloudUrl) {
+                BrowserUtil.browse(CLOUD_CONSOLE_URL);
+              }
+            }
+          }
+        }
+        valueChanged = false;
+      }
+    });
 
     addAccountButton = new JButton(addAccountString);
     AddAccountListener addAccountListener = new AddAccountListener();
@@ -105,7 +158,6 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
         listModel.remove(index);
         if (listModel.getSize() == 0) {
           signOutButton.setEnabled(false);
-
         }
       }
     }
@@ -124,6 +176,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   //This method is required by ListSelectionListener.
   @Override
   public void valueChanged(ListSelectionEvent e) {
+    valueChanged = true;
     if (e.getValueIsAdjusting() == false) {
 
       if (list.getSelectedIndex() == -1) {
@@ -173,5 +226,17 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     } else {
       return  size;
     }
+  }
+
+  private boolean isActiveUserInVisibleArea() {
+    int max = listModel.getSize() < MAX_VISIBLE_ROW_COUNT ?
+      listModel.getSize() : MAX_VISIBLE_ROW_COUNT;
+
+    for(int i = 0; i < max; i++){
+      if(((UsersListItem)listModel.get(i)).isActiveUser()) {
+        return true;
+      }
+    }
+    return false;
   }
 }
