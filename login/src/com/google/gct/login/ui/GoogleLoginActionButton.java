@@ -31,7 +31,7 @@ import java.awt.Image;
 /**
  * The Google Login button that appears on the main toolbar.
  */
-public class GoogleLoginActionButton extends ActionButton {
+public final class GoogleLoginActionButton extends ActionButton {
   private Icon defaultIcon;
   private final static String SIGN_IN_MESSAGE = "Sign in to Google...";
   private final static String DEFAULT_AVATAR = "/icons/loginAvatar.png";
