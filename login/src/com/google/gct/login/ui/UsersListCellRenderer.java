@@ -18,13 +18,7 @@ package com.google.gct.login.ui;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -38,6 +32,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.net.URL;
 
 
 /**
@@ -48,11 +43,21 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   private final static String CLOUD_LABEL_TEXT = "Open Cloud Console";
   private final static String PLAY_LABEL_TEXT = "Open Play Developer Console";
   private final static String DEFAULT_AVATAR = "/icons/loginAvatar.png";
+  private final static String GOOGLE_IMG = "/icons/google.png";
+  private final static String SIGN_IN_TEXT = "Sign in with your Google account";
   private final Color ACTIVE_COLOR = JBColor.LIGHT_GRAY;
-  private final int PLAIN_IMAGE_WIDTH = 48;
-  private final int PLAIN_IMAGE_HEIGHT = 48;
-  private final int ACTIVE_IMAGE_WIDTH = 96;
-  private final int ACTIVE_IMAGE_HEIGHT = 96;
+  private final int PLAIN_USER_IMAGE_WIDTH = 48;
+  private final int PLAIN_USER_IMAGE_HEIGHT = 48;
+  private final int ACTIVE_USER_IMAGE_WIDTH = 96;
+  private final int ACTIVE_USER_IMAGE_HEIGHT = 96;
+  private final int GOOGLE_IMAGE_WIDTH = 96;
+  private final int GOOGLE_IMAGE_HEIGHT = 35;
+  private final int GOOGLE_IMAGE_NORTH = 18;
+  private final int GOOGLE_IMAGE_WEST = 18;
+  private final int WELCOME_LABEL_NORTH = 15;
+  private final int WELCOME_LABEL_SOUTH = 25;
+  private final int WELCOME_LABEL_EAST = 19;
+  private final int WELCOME_LABEL_WEST = 21;
   private final int HGAP = 10;
   private final int VGAP = 10;
   private final Font NAME_FONT;
@@ -75,6 +80,10 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
 
   @Override
   public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    if(value instanceof NoUsersListItem) {
+      return createNoUserDisplay();
+    }
+
     if(!(value instanceof UsersListItem)) {
       return null;
     }
@@ -104,8 +113,8 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
       image = Toolkit.getDefaultToolkit().getImage(DEFAULT_AVATAR);
     }
 
-    int imageWidth = calcIsSelected ? ACTIVE_IMAGE_WIDTH : PLAIN_IMAGE_WIDTH;
-    int imageHeight = calcIsSelected ? ACTIVE_IMAGE_HEIGHT : PLAIN_IMAGE_HEIGHT;
+    int imageWidth = calcIsSelected ? ACTIVE_USER_IMAGE_WIDTH : PLAIN_USER_IMAGE_WIDTH;
+    int imageHeight = calcIsSelected ? ACTIVE_USER_IMAGE_HEIGHT : PLAIN_USER_IMAGE_HEIGHT;
     Image scaledImage = image.getScaledInstance(imageWidth, imageHeight, java.awt.Image.SCALE_SMOOTH);
 
     JComponent textPanel;
@@ -125,10 +134,10 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
 
   public boolean inPlayConsoleUrl(Point point, int activeIndex) {
     // 2 is for the number of labels before this one
-    double playYStart = VGAP + ACTIVE_IMAGE_HEIGHT - PLAY_LABEL_DIMENSION.getHeight()
+    double playYStart = VGAP + ACTIVE_USER_IMAGE_HEIGHT - PLAY_LABEL_DIMENSION.getHeight()
       - CLOUD_LABEL_DIMENSION.getHeight() - 2 + (MAIN_PANEL_DIMENSION.getHeight() * activeIndex);
     double playYEnd = playYStart + PLAY_LABEL_DIMENSION.getHeight();
-    double playXStart = ACTIVE_IMAGE_WIDTH + HGAP + VGAP;
+    double playXStart = ACTIVE_USER_IMAGE_WIDTH + HGAP + VGAP;
     double playXEnd = playXStart + PLAY_LABEL_DIMENSION.getWidth();
 
     if((point.getX() > playXStart) && (point.getX() < playXEnd)
@@ -141,10 +150,10 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
 
   public boolean inCloudConsoleUrl(Point point, int activeIndex) {
     // 3 is for the number of labels before this one
-    double playYStart = VGAP + ACTIVE_IMAGE_HEIGHT - CLOUD_LABEL_DIMENSION.getHeight()
+    double playYStart = VGAP + ACTIVE_USER_IMAGE_HEIGHT - CLOUD_LABEL_DIMENSION.getHeight()
       - 3 + (MAIN_PANEL_DIMENSION.getHeight() * activeIndex);
     double playYEnd = playYStart + CLOUD_LABEL_DIMENSION.getHeight();
-    double playXStart = ACTIVE_IMAGE_WIDTH + HGAP + VGAP;
+    double playXStart = ACTIVE_USER_IMAGE_WIDTH + HGAP + VGAP;
     double playXEnd = playXStart + CLOUD_LABEL_DIMENSION.getWidth();
 
     if((point.getX() > playXStart) && (point.getX() < playXEnd)
@@ -224,6 +233,34 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     JComponent topPanel = createTextDisplay(true, usersListItem);
     mainPanel.add(topPanel, topConstraints);
     mainPanel.add(bottomPanel, bottomConstraints);
+    return mainPanel;
+  }
+
+  private JPanel createNoUserDisplay() {
+    JPanel mainPanel = new JPanel();
+    BoxLayout layout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
+    mainPanel.setLayout(layout);
+    mainPanel.setBackground(JBColor.WHITE);
+
+    URL url = UsersListCellRenderer.class.getResource(GOOGLE_IMG);
+    Image image = Toolkit.getDefaultToolkit().getImage(url);
+    Image scaledImage = image.getScaledInstance(
+      GOOGLE_IMAGE_WIDTH, GOOGLE_IMAGE_HEIGHT, java.awt.Image.SCALE_SMOOTH);
+    JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
+
+    JLabel textLabel = new JLabel(SIGN_IN_TEXT);
+    Dimension textSize = textLabel.getPreferredSize();
+    textLabel.setPreferredSize(new Dimension((int)textSize.getWidth() + WELCOME_LABEL_EAST,
+      (int)textSize.getHeight()));
+
+    mainPanel.add(Box.createVerticalStrut(GOOGLE_IMAGE_NORTH));
+    mainPanel.add(Box.createHorizontalStrut(GOOGLE_IMAGE_WEST));
+    mainPanel.add(imageLabel);
+    mainPanel.add(Box.createVerticalStrut(WELCOME_LABEL_NORTH));
+    mainPanel.add(Box.createHorizontalStrut(WELCOME_LABEL_WEST - GOOGLE_IMAGE_WEST));
+    mainPanel.add(textLabel);
+    mainPanel.add(Box.createVerticalStrut(WELCOME_LABEL_SOUTH));
+
     return mainPanel;
   }
 }
