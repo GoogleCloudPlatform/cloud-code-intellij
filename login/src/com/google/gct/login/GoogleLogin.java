@@ -71,6 +71,7 @@ public class GoogleLogin {
     this.uiFacade = new AndroidUiFacade();
     this.users = new CredentialedUserRoster();
     this.dataStore =  new AndroidPreferencesOAuthDataStore();
+    addLoginListenersFromExtensionPoints();
   }
 
   /**
@@ -419,12 +420,11 @@ public class GoogleLogin {
   /**
    * Gets all the implementations of  {@link GoogleLoginListener} and registers them to
    * <code>state</code>.
-   * @param state the {@link GoogleLoginState} for which we want to register listeners to.
    */
-  private static void addLoginListenersFromExtensionPoints(GoogleLoginState state) {
+  private void addLoginListenersFromExtensionPoints() {
     GoogleLoginListener[] loginListeners = Extensions.getExtensions(GoogleLoginListener.EP_NAME);
     for(GoogleLoginListener listener : loginListeners) {
-      state.addLoginListener(listener);
+      users.addLoginListener(listener);
     }
   }
 
@@ -441,8 +441,6 @@ public class GoogleLogin {
         new AndroidPreferencesOAuthDataStore(),
         uiFacade,
         new AndroidLoggerFacade());
-
-    addLoginListenersFromExtensionPoints(state);
     return state;
   }
 
