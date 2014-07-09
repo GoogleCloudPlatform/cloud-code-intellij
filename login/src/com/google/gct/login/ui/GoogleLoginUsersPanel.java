@@ -128,7 +128,13 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     if(list.isSelectionEmpty()) {
       signOutButton.setEnabled(false);
     } else {
-      signOutButton.setEnabled(true);
+      // If list contains the NoUsersListItem place holder
+      // sign out button should be disabled
+      if(listModel.get(0) instanceof NoUsersListItem) {
+        signOutButton.setEnabled(false);
+      } else {
+        signOutButton.setEnabled(true);
+      }
     }
 
     //Create a panel to hold the buttons
@@ -158,6 +164,9 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
         listModel.remove(index);
         if (listModel.getSize() == 0) {
           signOutButton.setEnabled(false);
+
+          // Add no user panel
+          listModel.addElement(NoUsersListItem.INSTANCE);
         }
       }
     }
@@ -178,10 +187,8 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   public void valueChanged(ListSelectionEvent e) {
     valueChanged = true;
     if (e.getValueIsAdjusting() == false) {
-
       if (list.getSelectedIndex() == -1) {
         signOutButton.setEnabled(false);
-
       } else {
         signOutButton.setEnabled(true);
 
@@ -208,6 +215,11 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
       if(aUser.isActive()) {
         activeUserIndex = listModel .getSize() - 1;
       }
+    }
+
+    if(listModel.getSize() == 0) {
+      // Add no user panel
+      listModel.addElement(NoUsersListItem.INSTANCE);
     }
 
     return activeUserIndex;
