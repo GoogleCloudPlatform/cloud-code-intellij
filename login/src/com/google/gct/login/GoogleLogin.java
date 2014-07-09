@@ -90,7 +90,7 @@ public class GoogleLogin {
    * @throws InvalidThreadTypeException
    */
   public static void promptToLogIn() throws InvalidThreadTypeException {
-    promptToLogIn(null);
+    promptToLogIn(null, null);
   }
 
   /**
@@ -98,12 +98,15 @@ public class GoogleLogin {
    * if there is current no active user. Does nothing if there is an active
    * user. This function must be called from the event dispatch thread (EDT).
    * @param message  If not null, this message would be the title of the dialog.
+   * @param callback if not null, then this callback is called when the login
+   * either succeeds or fails.
    * @throws InvalidThreadTypeException
    */
-  public static void promptToLogIn(final String message) throws InvalidThreadTypeException {
+  public static void promptToLogIn(final String message, @Nullable final IGoogleLoginCompletedCallback callback)
+    throws InvalidThreadTypeException {
     if (!instance.isLoggedIn()) {
       if(ApplicationManager.getApplication().isDispatchThread()) {
-        getInstance().logIn(message);
+        getInstance().logIn(message, callback);
       } else {
         throw new InvalidThreadTypeException("promptToLogin");
       }
@@ -276,7 +279,7 @@ public class GoogleLogin {
    */
   public void logIn() {
     users.removeActiveUser();
-    logIn(null);
+    logIn(null, null);
   }
 
   /**
@@ -291,8 +294,10 @@ public class GoogleLogin {
    *          as accessing Google API services. It should say something like
    *          "Importing a project from Google Project Hosting requires signing
    *          in."
+   * @param callback if not null, then this callback is called when the login
+   * either succeeds or fails.
    */
-  public void logIn(final String message) {
+  public void logIn(final String message, @Nullable final IGoogleLoginCompletedCallback callback) {
     final GoogleLoginState state = createGoogleLoginState();
 
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
@@ -303,13 +308,16 @@ public class GoogleLogin {
         // TODO: add user preference to chose to use pop-up copy and paste dialog
 
         if(loggedIn) {
-          IGoogleLoginUpdateUser callback = new IGoogleLoginUpdateUser() {
+          IGoogleLoginCompletedCallback localCallback = new IGoogleLoginCompletedCallback() {
             @Override
-            public void updateUser() {
+            public void onLoginCompleted() {
               uiFacade.notifyStatusIndicator();
+              if(callback != null) {
+                callback.onLoginCompleted();
+              }
             }
           };
-          users.addUser(new CredentialedUser(state, callback));
+          users.addUser(new CredentialedUser(state, localCallback));
         }
       }
     });
@@ -610,9 +618,9 @@ public class GoogleLogin {
 
         // CredentialedUser's credentials will be updated from the persistent storage in GoogleLoginState constructor
         GoogleLoginState delegate = createGoogleLoginState();
-        IGoogleLoginUpdateUser callback = new IGoogleLoginUpdateUser() {
+        IGoogleLoginCompletedCallback callback = new IGoogleLoginCompletedCallback() {
           @Override
-          public void updateUser() {
+          public void onLoginCompleted() {
             uiFacade.notifyStatusIndicator();
           }
         };
