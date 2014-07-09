@@ -18,7 +18,15 @@ package com.google.gct.login.ui;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -42,7 +50,7 @@ import java.net.URL;
 public class UsersListCellRenderer extends JComponent implements ListCellRenderer {
   private final static String CLOUD_LABEL_TEXT = "Open Cloud Console";
   private final static String PLAY_LABEL_TEXT = "Open Play Developer Console";
-  private final static String DEFAULT_AVATAR = "/icons/loginAvatar.png";
+  private final static String DEFAULT_AVATAR = "/icons/loginAvatar@2x.png";
   private final static String GOOGLE_IMG = "/icons/google.png";
   private final static String SIGN_IN_TEXT = "Sign in with your Google account";
   private final Color ACTIVE_COLOR = JBColor.LIGHT_GRAY;
@@ -110,7 +118,8 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     Image image = usersListItem.getUserPicture();
     if(image == null){
       // use default image
-      image = Toolkit.getDefaultToolkit().getImage(DEFAULT_AVATAR);
+      URL url = UsersListCellRenderer.class.getResource(DEFAULT_AVATAR);
+      image = Toolkit.getDefaultToolkit().getImage(url);
     }
 
     int imageWidth = calcIsSelected ? ACTIVE_USER_IMAGE_WIDTH : PLAIN_USER_IMAGE_WIDTH;
@@ -126,8 +135,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
 
     mainPanel.add(new JLabel(new ImageIcon(scaledImage)));
     mainPanel.add(textPanel);
-
-    // TODO: add Separator to bottom of panel
+    mainPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, UIUtil.getBorderColor()));
 
     return mainPanel;
   }
