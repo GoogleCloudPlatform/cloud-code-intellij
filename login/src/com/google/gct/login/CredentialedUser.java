@@ -44,7 +44,7 @@ public class CredentialedUser {
     googleLoginState = null;
   }
 
-  public CredentialedUser(GoogleLoginState state, final IGoogleLoginUpdateUser updateUserCallback) {
+  public CredentialedUser(GoogleLoginState state, final IGoogleLoginCompletedCallback updateUserCallback) {
     this.email = state.getEmail();
     googleLoginState = state;
     credential = googleLoginState.makeCredential();
@@ -95,7 +95,7 @@ public class CredentialedUser {
     this.isActive = isActive;
   }
 
-  private void initializeUserInfo(Userinfoplus userInfo, final IGoogleLoginUpdateUser updateUserCallback) {
+  private void initializeUserInfo(Userinfoplus userInfo, final IGoogleLoginCompletedCallback updateUserCallback) {
     if(userInfo == null) {
       name = null;
       image = null;
@@ -105,7 +105,7 @@ public class CredentialedUser {
         @Override
         public void setProperty(Image newImage) {
           image = newImage;
-          updateUserCallback.updateUser();
+          updateUserCallback.onLoginCompleted();
         }
       };
       GoogleLoginUtils.getUserPicture(userInfo, pictureCallback);

@@ -15,6 +15,12 @@
  */
 package com.google.gct.login;
 
-public interface IGoogleLoginUpdateUser {
-  public void updateUser();
+/**
+ * Callback for when a login is completed.
+ */
+public interface IGoogleLoginCompletedCallback {
+  /**
+   * Called when log in is complete.
+   */
+  public void onLoginCompleted();
 }
