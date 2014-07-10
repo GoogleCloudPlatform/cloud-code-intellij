@@ -38,7 +38,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * The Google Login Panel that displays the currently logged in users and buttons to
@@ -206,7 +206,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   }
 
   private int initializeUsers() {
-    Map<String, CredentialedUser> allUsers = GoogleLogin.getInstance().getAllUsers();
+    LinkedHashMap<String, CredentialedUser> allUsers = GoogleLogin.getInstance().getAllUsers();
     listModel = new DefaultListModel();
 
     int activeUserIndex = allUsers.size();

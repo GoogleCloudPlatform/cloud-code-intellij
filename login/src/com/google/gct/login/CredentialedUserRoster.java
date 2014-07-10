@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +29,7 @@ import java.util.Map;
  * {@link CredentialedUser} objects.
  */
 public class CredentialedUserRoster {
-  private final Map<String, CredentialedUser> allUsers = new HashMap<String, CredentialedUser>();
+  private final LinkedHashMap<String, CredentialedUser> allUsers = new LinkedHashMap<String, CredentialedUser>();
   private CredentialedUser activeUser;
   private Collection<GoogleLoginListener> listeners;
 
@@ -41,9 +41,9 @@ public class CredentialedUserRoster {
    * Returns a copy of the map of the current logged in users.
    * @return Copy of current logged in users.
    */
-  public Map<String, CredentialedUser> getAllUsers() {
+  public LinkedHashMap<String, CredentialedUser> getAllUsers() {
     synchronized (this) {
-      Map<String, CredentialedUser> clone = new HashMap<String, CredentialedUser>();
+      LinkedHashMap<String, CredentialedUser> clone = new LinkedHashMap<String, CredentialedUser>();
       clone.putAll(allUsers);
       return clone;
     }

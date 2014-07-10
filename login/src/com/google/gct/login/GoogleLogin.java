@@ -45,6 +45,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
@@ -401,7 +403,7 @@ public class GoogleLogin {
    * Returns a copy of the map of the current logged in users.
    * @return Copy of current logged in users.
    */
-  public Map<String, CredentialedUser> getAllUsers() {
+  public LinkedHashMap<String, CredentialedUser> getAllUsers() {
     return users.getAllUsers();
   }
 
@@ -607,7 +609,7 @@ public class GoogleLogin {
 
     public void initializeUsers() {
       String activeUserString = GoogleLoginPrefs.getActiveUser();
-      SortedSet<String> allUsers = GoogleLoginPrefs.getStoredUsers();
+      List<String> allUsers = GoogleLoginPrefs.getStoredUsers();
       for(String aUser : allUsers) {
         // Add a new user, so that loadOAuth called from the GoogleLoginState constructor
         // will be able to create a customized key to get that user's OAuth data
