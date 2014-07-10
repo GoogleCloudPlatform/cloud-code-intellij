@@ -15,9 +15,11 @@
  */
 package com.google.gct.login;
 
+import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +31,11 @@ import java.util.Map;
 public class CredentialedUserRoster {
   private final Map<String, CredentialedUser> allUsers = new HashMap<String, CredentialedUser>();
   private CredentialedUser activeUser;
+  private Collection<GoogleLoginListener> listeners;
+
+  public CredentialedUserRoster() {
+    listeners = Lists.newLinkedList();
+  }
 
   /**
    * Returns a copy of the map of the current logged in users.
@@ -82,6 +89,7 @@ public class CredentialedUserRoster {
       activeUser = allUsers.get(userEmail);
       activeUser.setActive(true);
       GoogleLoginPrefs.saveActiveUser(userEmail);
+      notifyLoginStatusChange();
     }
   }
 
@@ -94,6 +102,7 @@ public class CredentialedUserRoster {
         activeUser.setActive(false);
         activeUser = null;
         GoogleLoginPrefs.removeActiveUser();
+        notifyLoginStatusChange();
       }
     }
   }
@@ -151,7 +160,28 @@ public class CredentialedUserRoster {
       }
 
       allUsers.remove(userEmail);
+      notifyLoginStatusChange();
       return true;
+    }
+  }
+
+  /**
+   * Register a specified {@link GoogleLoginListener} to be notified of changes to the
+   * logged-in state.
+   *
+   * @param listener the specified {@code GoogleLoginListener}
+   */
+  void addLoginListener(GoogleLoginListener listener) {
+    synchronized(listeners) {
+      listeners.add(listener);
+    }
+  }
+
+  private void notifyLoginStatusChange() {
+    synchronized(listeners) {
+      for (GoogleLoginListener listener : listeners) {
+        listener.statusChanged();
+      }
     }
   }
 
