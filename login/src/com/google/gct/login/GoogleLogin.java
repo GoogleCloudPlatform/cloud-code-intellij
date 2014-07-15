@@ -30,17 +30,20 @@ import com.google.gdt.eclipse.login.common.LoggerFacade;
 import com.google.gdt.eclipse.login.common.OAuthData;
 import com.google.gdt.eclipse.login.common.OAuthDataStore;
 import com.google.gdt.eclipse.login.common.UiFacade;
-
 import com.google.gdt.eclipse.login.common.VerificationCodeHolder;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.Extensions;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.progress.util.ProgressIndicatorBase;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.openapi.wm.ex.ProgressIndicatorEx;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -307,15 +310,43 @@ public class GoogleLogin {
 
     final GoogleLoginState state = createGoogleLoginState();
 
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+    new Task.Modal(null, "Please Log in...", true) {
+      private boolean loggedIn = false;
+
       @Override
-      public void run() {
-        boolean loggedIn = state.logInWithLocalServer(message);
+      public void run(@NotNull ProgressIndicator indicator) {
+        indicator.setIndeterminate(true);
+        if (!(indicator instanceof ProgressIndicatorEx)) {
+          return;
+        }
 
+        ((ProgressIndicatorEx)indicator).addStateDelegate(new ProgressIndicatorBase() {
+          @Override
+          public void cancel() {
+            assert uiFacade != null;
+            uiFacade.stop();
+            super.cancel();
+          }
+        });
+
+        loggedIn = state.logInWithLocalServer(message);
+      }
+
+      @Override
+      public void onCancel() {
+        notifyOnComplete();
+      }
+
+      @Override
+      public void onSuccess() {
+        notifyOnComplete();
+      }
+
+      private void notifyOnComplete() {
         // TODO: add user preference to chose to use pop-up copy and paste dialog
-
         if(loggedIn) {
           IGoogleLoginCompletedCallback localCallback = new IGoogleLoginCompletedCallback() {
+
             @Override
             public void onLoginCompleted() {
               uiFacade.notifyStatusIndicator();
@@ -326,8 +357,11 @@ public class GoogleLogin {
           };
           users.addUser(new CredentialedUser(state, localCallback));
         }
+        else if (callback != null) {
+          callback.onLoginCompleted();
+        }
       }
-    });
+    }.queue();
   }
 
   /**
@@ -517,6 +551,7 @@ public class GoogleLogin {
   private class AndroidUiFacade implements UiFacade {
     private GoogleLoginActionButton myButton;
     private final static String GOOGLE_IMG = "/icons/googleFavicon@2x.png";
+    private volatile CancellableServerReceiver receiver = null;
 
     @Override
     public String obtainVerificationCodeFromUserInteraction(String title, GoogleAuthorizationCodeRequestUrl authCodeRequestUrl) {
@@ -529,9 +564,21 @@ public class GoogleLogin {
       return Strings.emptyToNull(dialog.getVerificationCode());
     }
 
+    public void stop() {
+      CancellableServerReceiver localreceiver = receiver;
+      if (localreceiver != null) {
+        try {
+          localreceiver.stop();
+        }
+        catch(IOException e) {
+          logErrorAndDisplayDialog("Google Login", e);
+        }
+      }
+    }
+
     @Override
     public VerificationCodeHolder obtainVerificationCodeFromExternalUserInteraction(String title) {
-      VerificationCodeReceiver receiver = new LocalServerReceiver();
+      receiver = new CancellableServerReceiver();
       String redirectUrl;
       try {
         redirectUrl = receiver.getRedirectUri();
@@ -555,6 +602,9 @@ public class GoogleLogin {
       catch (IOException e) {
         logErrorAndDisplayDialog(title == null? "Google Login" : title, e);
         return null;
+      }
+      finally {
+        receiver = null;
       }
 
       return new VerificationCodeHolder(verificationCode, redirectUrl);
