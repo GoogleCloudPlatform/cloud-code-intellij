@@ -19,16 +19,20 @@ import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.facet.ui.FacetValidatorsManager;
+import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.util.xmlb.XmlSerializer;
 
 import org.jdom.Element;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Currently an empty configuration for App Engine Gradle configurations
  */
-public class AppEngineGradleFacetConfiguration implements FacetConfiguration {
+public class AppEngineGradleFacetConfiguration implements FacetConfiguration, PersistentStateComponent<AppEngineConfigurationProperties> {
+  AppEngineConfigurationProperties myProperties = new AppEngineConfigurationProperties();
+
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
     return new FacetEditorTab[] {
@@ -46,4 +50,14 @@ public class AppEngineGradleFacetConfiguration implements FacetConfiguration {
     XmlSerializer.serializeInto(this, element);
   }
 
+  @Nullable
+  @Override
+  public AppEngineConfigurationProperties getState() {
+    return myProperties;
+  }
+
+  @Override
+  public void loadState(AppEngineConfigurationProperties state) {
+    myProperties = state;
+  }
 }
