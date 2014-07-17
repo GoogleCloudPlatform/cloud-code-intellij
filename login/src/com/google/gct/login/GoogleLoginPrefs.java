@@ -44,9 +44,6 @@ public class GoogleLoginPrefs {
   private static String preferencesPath = PREFERENCES_PATH;
 
   private static final String OAUTH_DATA_EMAIL_KEY = "credentials_email";
-  private static final String OAUTH_DATA_ACCESS_TOKEN_KEY = "credentials_access_token";
-  private static final String OAUTH_DATA_ACCESS_TOKEN_EXPIRY_TIME_KEY =
-    "credentials_access_token_expiry_time";
   private static final String OAUTH_DATA_REFRESH_TOKEN_KEY = "credentials_refresh_token";
   private static final String ICON_ONLY_KEY = "icon_only";
   private static final String LOGOUT_ON_EXIT_KEY = "logout_on_exit";
@@ -63,11 +60,7 @@ public class GoogleLoginPrefs {
   public static void saveOAuthData(OAuthData credentials) {
     Preferences prefs = getPrefs();
     String userEmail = credentials.getStoredEmail();
-    prefs.put(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_KEY, userEmail), credentials.getAccessToken());
     prefs.put(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY, userEmail), credentials.getRefreshToken());
-    prefs.put(
-      getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_EXPIRY_TIME_KEY, userEmail),
-      Long.toString(credentials.getAccessTokenExpiryTime()));
 
     // we save the scopes so that if the user updates the plugin and the
     // scopes change, we can force the plugin to log out.
@@ -91,7 +84,6 @@ public class GoogleLoginPrefs {
   public static OAuthData loadOAuthData() {
     Preferences prefs = getPrefs();
 
-    String accessToken = prefs.get(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_KEY), null);
     String refreshToken = prefs.get(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY), null);
     String storedEmail = prefs.get(getCustomUserKey(OAUTH_DATA_EMAIL_KEY), null);
     String storedScopesString = prefs.get(getCustomUserKey(OAUTH_SCOPES_KEY), "");
@@ -101,13 +93,7 @@ public class GoogleLoginPrefs {
     for (String scope : storedScopesString.split(DELIMITER)) {
       storedScopes.add(scope);
     }
-    long accessTokenExpiryTime = 0;
-    String accessTokenExpiryTimeString = prefs.get(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_EXPIRY_TIME_KEY), null);
-    if (accessTokenExpiryTimeString != null) {
-      accessTokenExpiryTime = Long.parseLong(accessTokenExpiryTimeString);
-    }
-    return new OAuthData(
-      accessToken, refreshToken, storedEmail, storedScopes, accessTokenExpiryTime);
+    return new OAuthData(null, refreshToken, storedEmail, storedScopes, 0);
   }
 
   /**
@@ -120,11 +106,9 @@ public class GoogleLoginPrefs {
     }
 
     Preferences prefs = getPrefs();
-    prefs.remove(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_KEY));
     prefs.remove(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY));
     prefs.remove(getCustomUserKey(OAUTH_DATA_EMAIL_KEY));
     prefs.remove(getCustomUserKey(OAUTH_SCOPES_KEY));
-    prefs.remove(getCustomUserKey(OAUTH_DATA_ACCESS_TOKEN_EXPIRY_TIME_KEY));
     removeUser(prefs, activeUser.getEmail());
     flushPrefs(prefs);
   }
