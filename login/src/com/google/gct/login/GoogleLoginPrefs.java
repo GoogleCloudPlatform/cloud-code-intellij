@@ -23,6 +23,8 @@ import com.google.gdt.eclipse.login.common.OAuthData;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
@@ -163,10 +165,10 @@ public class GoogleLoginPrefs {
    * @return the stored list of users.
    */
   @NotNull
-  public static SortedSet<String> getStoredUsers() {
+  public static List<String> getStoredUsers() {
     Preferences prefs = getPrefs();
     String allUsersString = prefs.get(USERS, "");
-    SortedSet<String> allUsers = new TreeSet<String>();
+    List<String> allUsers = new ArrayList<String>();
     if(allUsersString.isEmpty()) {
       return allUsers;
     }
@@ -252,7 +254,7 @@ public class GoogleLoginPrefs {
       return;
     }
 
-    SortedSet<String> allUsers = new TreeSet<String>();
+    List<String> allUsers = new ArrayList<String>();
     Splitter splitter = Splitter.on(DELIMITER).omitEmptyStrings();
     for (String scope : splitter.split(allUsersString)) {
       allUsers.add(scope);
@@ -269,7 +271,7 @@ public class GoogleLoginPrefs {
 
   private static void removeUser(Preferences prefs, String user) {;
     String allUsersString = prefs.get(USERS, "");
-    SortedSet<String> allUsers = new TreeSet<String>();
+    List<String> allUsers = new ArrayList<String>();
     for (String scope : allUsersString.split(DELIMITER)) {
       allUsers.add(scope);
     }
