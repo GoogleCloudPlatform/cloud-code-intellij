@@ -281,7 +281,6 @@ public class GoogleLogin {
    * See {@link #logIn(String)}.
    */
   public void logIn() {
-    users.removeActiveUser();
     logIn(null, null);
   }
 
@@ -301,6 +300,9 @@ public class GoogleLogin {
    * either succeeds or fails.
    */
   public void logIn(final String message, @Nullable final IGoogleLoginCompletedCallback callback) {
+    users.removeActiveUser();
+    uiFacade.notifyStatusIndicator();
+
     final GoogleLoginState state = createGoogleLoginState();
 
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
