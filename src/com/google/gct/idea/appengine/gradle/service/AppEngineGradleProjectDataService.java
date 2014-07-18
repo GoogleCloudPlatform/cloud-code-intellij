@@ -99,7 +99,18 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
         model.commit();
       }
     }
-    facet.setIdeaAppEngineProject(ideaAppEngineProject);
+
+    //deserialize state from ideaAppEngineProject into facet config.
+    if (facet != null) {
+      facet.getConfiguration().getState().APPENGINE_SDKROOT = ideaAppEngineProject.getDelegate().getAppEngineSdkRoot();
+      facet.getConfiguration().getState().HTTP_ADDRESS = ideaAppEngineProject.getDelegate().getHttpAddress();
+      facet.getConfiguration().getState().HTTP_PORT = ideaAppEngineProject.getDelegate().getHttpPort();
+      for(String flag : ideaAppEngineProject.getDelegate().getJvmFlags()) {
+        facet.getConfiguration().getState().JVM_FLAGS.add(flag);
+      }
+      facet.getConfiguration().getState().WAR_DIR = ideaAppEngineProject.getDelegate().getWarDir().getAbsolutePath();
+      facet.getConfiguration().getState().WEB_APP_DIR = ideaAppEngineProject.getDelegate().getWebAppDir().getAbsolutePath();
+    }
   }
 
   @NotNull

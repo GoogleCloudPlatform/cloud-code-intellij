@@ -15,7 +15,6 @@
  */
 package com.google.gct.idea.appengine.gradle.facet;
 
-import com.google.gct.idea.appengine.gradle.project.IdeaAppEngineProject;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
@@ -37,8 +36,6 @@ public class AppEngineGradleFacet extends Facet<AppEngineGradleFacetConfiguratio
   @NonNls public static final String NAME = "App Engine Gradle";
 
   public static final FacetTypeId<AppEngineGradleFacet> TYPE_ID = new FacetTypeId<AppEngineGradleFacet>(ID);
-
-  private IdeaAppEngineProject myIdeaAppEngineProject;
 
   @Nullable
   public static AppEngineGradleFacet getInstance(@NotNull Module module) {
@@ -62,13 +59,4 @@ public class AppEngineGradleFacet extends Facet<AppEngineGradleFacetConfiguratio
     if (module == null) return null;
     return FacetManager.getInstance(module).getFacetByType(TYPE_ID);
   }
-
-  public IdeaAppEngineProject getIdeaAppEngineProject() {
-    return myIdeaAppEngineProject;
-  }
-
-  public void setIdeaAppEngineProject(IdeaAppEngineProject ideaAppEngineProject) {
-    myIdeaAppEngineProject = ideaAppEngineProject;
-  }
-
 }
