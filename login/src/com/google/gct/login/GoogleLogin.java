@@ -40,10 +40,12 @@ import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 
+import com.intellij.openapi.util.IconLoader;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.Icon;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -514,6 +516,7 @@ public class GoogleLogin {
    */
   private class AndroidUiFacade implements UiFacade {
     private GoogleLoginActionButton myButton;
+    private final static String GOOGLE_IMG = "/icons/googleFavicon@2x.png";
 
     @Override
     public String obtainVerificationCodeFromUserInteraction(String title, GoogleAuthorizationCodeRequestUrl authCodeRequestUrl) {
@@ -564,7 +567,8 @@ public class GoogleLogin {
 
     @Override
     public boolean askYesOrNo(String title, String message) {
-      return (Messages.showYesNoDialog(message, title, Messages.getQuestionIcon()) == Messages.YES);
+      Icon icon = IconLoader.getIcon(GOOGLE_IMG);
+      return (Messages.showYesNoDialog(message, title, icon) == Messages.YES);
     }
 
     @Override
