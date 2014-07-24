@@ -131,11 +131,7 @@ public class NewAppEngineModuleAction extends AnAction {
         TemplateUtils.openEditors(project, allFilesToOpen, true);
 
         GradleProjectImporter projectImporter = GradleProjectImporter.getInstance();
-        projectImporter.requestProjectSync(project, new GradleSyncListener() {
-          @Override
-          public void syncStarted(@NotNull Project project) {
-          }
-
+        projectImporter.requestProjectSync(project, new GradleSyncListener.Adapter() {
           @Override
           public void syncSucceeded(@NotNull final Project project) {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
