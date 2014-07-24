@@ -137,7 +137,7 @@ public class NewAppEngineModuleAction extends AnAction {
           }
 
           @Override
-          public void syncEnded(@NotNull final Project project) {
+          public void syncSucceeded(@NotNull final Project project) {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
               @Override
               public void run() {
