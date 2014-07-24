@@ -26,7 +26,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/google-api-services-oauth2-v2-rev70-1.18.0-rc.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/google-api-services-oauth2-v2-rev70-1.18.0-rc.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -35,7 +35,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/google-gct-login-context-pg.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/google-gct-login-context-pg.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -44,7 +44,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/google-http-client-jackson-1.18.0-rc.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/google-http-client-jackson-1.18.0-rc.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -53,18 +53,18 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/google.gdt.eclipse.login.common.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/google.gdt.eclipse.login.common.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../lib/google.gdt.eclipse.login.common.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/google.gdt.eclipse.login.common.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/jackson-core-asl-1.9.11.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jackson-core-asl-1.9.11.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -73,7 +73,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/javax.servlet-api-3.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/javax.servlet-api-3.0.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
