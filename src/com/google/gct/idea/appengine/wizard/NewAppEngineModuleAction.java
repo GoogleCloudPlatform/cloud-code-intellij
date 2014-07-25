@@ -190,7 +190,7 @@ public class NewAppEngineModuleAction extends AnAction {
       String backendModulePath = (String) replacementMap.get(TemplateMetadata.ATTR_PROJECT_OUT);
       replacementMap.put(ATTR_SERVER_MODULE_PATH, FileUtil.getRelativePath(targetFolder.getPath(), backendModulePath, '/'));
       replacementMap.put(TemplateMetadata.ATTR_PROJECT_OUT, targetFolder.getPath());
-      List<SourceProvider> sourceProviders = IdeaSourceProvider.getSourceProvidersForFile(facet, targetFolder, facet.getMainSourceSet());
+      List<SourceProvider> sourceProviders = IdeaSourceProvider.getSourceProvidersForFile(facet, targetFolder, facet.getMainSourceProvider());
       SourceProvider sourceProvider = sourceProviders.get(0);
       File manifestDirectory = NewTemplateObjectWizard.findManifestDirectory(sourceProvider);
       replacementMap.put(TemplateMetadata.ATTR_MANIFEST_DIR, manifestDirectory.getPath());
