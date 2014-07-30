@@ -25,10 +25,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /** GUI for configuring App Engine Run Configurations */
 public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppEngineRunConfiguration> {
@@ -39,28 +42,57 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
   private TextFieldWithBrowseButton myWarPathField;
   private TextFieldWithBrowseButton myAppEngineSdkField;
   private JTextField myServerAddressField;
+  private JCheckBox mySynchronizeWithBuildGradleCheckBox;
   private final Project myProject;
   private final ConfigurationModuleSelector moduleSelector;
 
   public AppEngineRunConfigurationSettingsEditor(Project project) {
-    this.myProject = project;
+    myProject = project;
     moduleSelector = new ConfigurationModuleSelector(project, myModuleComboBox);
+    myModuleComboBox.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        updateSync();
+      }
+    });
+    mySynchronizeWithBuildGradleCheckBox.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        updateSync();
+      }
+    });
     myAppEngineSdkField.addBrowseFolderListener("Select App Engine Sdk Root", null, null,
                                                 FileChooserDescriptorFactory.createSingleFolderDescriptor());
     myWarPathField.addBrowseFolderListener("Select Exploded War Root", null, myProject,
                                            FileChooserDescriptorFactory.createSingleFolderDescriptor());
   }
 
-  // TODO: unused currently, but useful once gradle facet for App Engine is completely set up.
+  protected void updateSync() {
+    boolean isSync = mySynchronizeWithBuildGradleCheckBox.isSelected();
+    if (isSync) {
+      syncWithBuildFile();
+    }
+    myWarPathField.setEditable(!isSync);
+    myServerAddressField.setEditable(!isSync);
+    myServerPortField.setEditable(!isSync);
+    myAppEngineSdkField.setEditable(!isSync);
+  }
+
+  // Syncs a run configuration with information from build.gradle via the App Engine Gradle facet
+  // This is also a near-duplicate of the sync in AppEngineRunConfiguration, but this is required
+  // here to update the UI correctly when "sync" is checked and turned on, if we didn't reflect the
+  // configuration in the UI, we wouldn't need this.
   protected void syncWithBuildFile() {
+
     AppEngineGradleFacet facet = AppEngineGradleFacet.getInstance(moduleSelector.getModule());
-    if(facet != null) {
-      // proof of concept of usefulness of Gradle model
+    if (facet != null) {
       AppEngineConfigurationProperties model = facet.getConfiguration().getState();
-      myServerPortField.setText(model.HTTP_PORT.toString());
-      myServerAddressField.setText(model.HTTP_ADDRESS);
-      myAppEngineSdkField.setText(model.APPENGINE_SDKROOT);
-      myWarPathField.setText(model.WAR_DIR);
+      if (model != null) {
+        myServerPortField.setText(model.HTTP_PORT.toString());
+        myServerAddressField.setText(model.HTTP_ADDRESS);
+        myAppEngineSdkField.setText(model.APPENGINE_SDKROOT);
+        myWarPathField.setText(model.WAR_DIR);
+      }
     }
   }
 
@@ -76,6 +108,8 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
     myServerAddressField.setText(configuration.getServerAddress());
     myVmArgsField.setText(configuration.getVmArgs());
     moduleSelector.reset(configuration);
+    mySynchronizeWithBuildGradleCheckBox.setSelected(configuration.getSyncWithGradle());
+    updateSync();
   }
 
   @Override
@@ -86,6 +120,7 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
     configuration.setServerPort(myServerPortField.getText());
     configuration.setVmArgs(myVmArgsField.getText());
     configuration.setWarPath(myWarPathField.getText());
+    configuration.setSyncWithGradle(mySynchronizeWithBuildGradleCheckBox.isSelected());
   }
 
   @NotNull

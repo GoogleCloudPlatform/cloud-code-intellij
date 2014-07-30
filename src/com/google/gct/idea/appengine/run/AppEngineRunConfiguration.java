@@ -15,6 +15,8 @@
  */
 package com.google.gct.idea.appengine.run;
 
+import com.google.gct.idea.appengine.gradle.facet.AppEngineConfigurationProperties;
+import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.sdk.AppEngineSdk;
 
 import com.intellij.execution.ExecutionException;
@@ -59,11 +61,13 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
   private String myServerAddress = "";
   private String mySdkPath = "";
   private String myServerPort = "";
+  private Boolean mySyncWithGradle = false;
   private String myVmArgs = "";
   private String myWarPath = "";
 
   private static final String KEY_SERVER_ADDRESS = "serverAddress";
   private static final String KEY_SERVER_PORT = "serverPort";
+  private static final String KEY_SYNC = "sync";
   private static final String KEY_SDK_PATH = "sdkPath";
   private static final String KEY_VM_ARGS = "vmArgs";
   private static final String KEY_WAR_PATH = "warPath";
@@ -100,6 +104,14 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     this.myServerPort = serverPort;
   }
 
+  public Boolean getSyncWithGradle() {
+    return mySyncWithGradle;
+  }
+
+  public void setSyncWithGradle(Boolean syncWithGradle) {
+    mySyncWithGradle = syncWithGradle;
+  }
+
   public String getVmArgs() {
     return myVmArgs;
   }
@@ -107,6 +119,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
   public void setVmArgs(String vmArgs) {
     this.myVmArgs = vmArgs;
   }
+
 
   public AppEngineRunConfiguration(String name, Project project, ConfigurationFactory factory) {
     super(name, new JavaRunConfigurationModule(project, false), factory);
@@ -120,7 +133,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     ArrayList<Module> res = new ArrayList<Module>();
     for (Module module : modules) {
       Facet[] facetList = FacetManager.getInstance(module).getAllFacets();
-      for(Facet f : facetList) {
+      for (Facet f : facetList) {
         if (f.getTypeId() == AppEngineGradleFacet.TYPE_ID) {
           res.add(module);
           break;
@@ -149,6 +162,23 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     return state;
   }
 
+  // Syncs a run configuration with information from build.gradle via the App Engine Gradle facet
+  protected void syncWithBuildFileViaFacet() {
+    Module module = getConfigurationModule().getModule();
+    if (module != null) {
+      AppEngineGradleFacet facet = AppEngineGradleFacet.getInstance(module);
+      if (facet != null) {
+        AppEngineConfigurationProperties model = facet.getConfiguration().getState();
+        if (model != null) {
+          myServerPort = model.HTTP_PORT.toString();
+          myServerAddress = model.HTTP_ADDRESS;
+          mySdkPath = model.APPENGINE_SDKROOT;
+          myWarPath = model.WAR_DIR;
+        }
+      }
+    }
+  }
+
   @Override
   public final void checkConfiguration() throws RuntimeConfigurationException {
     JavaRunConfigurationModule configurationModule = getConfigurationModule();
@@ -158,11 +188,21 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     if (module == null) {
       return;
     }
-    /* this will be useful in future when we enable the appengine gradle facet
     AppEngineGradleFacet facet = AppEngineGradleFacet.getAppEngineFacetByModule(module);
     if (facet == null) {
-      throw new RuntimeConfigurationError("No App-Engine Facet");
-    }*/
+      throw new RuntimeConfigurationError(
+        "App Engine Gradle configuration not detected on module, maybe you need to Sync Project with Gradle");
+    }
+
+    if (mySyncWithGradle &&
+        (facet.getConfiguration().getState() == null || StringUtil.isEmpty(facet.getConfiguration().getState().WEB_APP_DIR))) {
+      throw new RuntimeConfigurationError(
+        "App Engine Gradle configuration does not appear to be loaded, please Sync Project with Gradle files before running");
+    }
+
+    if (mySyncWithGradle) {
+      syncWithBuildFileViaFacet();
+    }
 
     if (mySdkPath == null || mySdkPath.trim().isEmpty() || !new AppEngineSdk(mySdkPath).canRunDevAppServer()) {
       throw new RuntimeConfigurationError("Invalid App-Engine SDK Path");
@@ -255,6 +295,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     myServerPort = StringUtil.notNullize(JDOMExternalizer.readString(element, KEY_SERVER_PORT));
     myVmArgs = StringUtil.notNullize(JDOMExternalizer.readString(element, KEY_VM_ARGS));
     myWarPath = StringUtil.notNullize(JDOMExternalizer.readString(element, KEY_WAR_PATH));
+    mySyncWithGradle = JDOMExternalizer.readBoolean(element, KEY_SYNC);
   }
 
   @Override
@@ -266,6 +307,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     JDOMExternalizer.write(element, KEY_SERVER_PORT, myServerPort);
     JDOMExternalizer.write(element, KEY_VM_ARGS, myVmArgs);
     JDOMExternalizer.write(element, KEY_WAR_PATH, myWarPath);
+    JDOMExternalizer.write(element, KEY_SYNC, mySyncWithGradle);
     PathMacroManager.getInstance(getProject()).collapsePathsRecursively(element);
   }
 }

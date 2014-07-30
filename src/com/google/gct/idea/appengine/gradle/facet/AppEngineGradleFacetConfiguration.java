@@ -22,13 +22,12 @@ import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-import com.intellij.util.xmlb.XmlSerializer;
 
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Currently an empty configuration for App Engine Gradle configurations
+ * A configuration for App Engine Gradle Facets that is populated during gradle project import
  */
 public class AppEngineGradleFacetConfiguration implements FacetConfiguration, PersistentStateComponent<AppEngineConfigurationProperties> {
   AppEngineConfigurationProperties myProperties = new AppEngineConfigurationProperties();
@@ -42,12 +41,12 @@ public class AppEngineGradleFacetConfiguration implements FacetConfiguration, Pe
 
   @Override
   public void readExternal(Element element) throws InvalidDataException {
-    XmlSerializer.deserializeInto(this, element);
+    //Deprecated abstract method, using persistent state component now
   }
 
   @Override
   public void writeExternal(Element element) throws WriteExternalException {
-    XmlSerializer.serializeInto(this, element);
+    //Deprecated abstract method, using persistent state component now
   }
 
   @Nullable
