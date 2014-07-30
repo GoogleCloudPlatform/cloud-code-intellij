@@ -15,10 +15,7 @@
  */
 package com.google.gct.login.ui;
 
-import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
@@ -32,7 +29,7 @@ import java.awt.Point;
 /**
  * Action to open the Google Login panel.
  */
-public class GoogleLoginAction extends AnAction implements CustomComponentAction {
+public class GoogleLoginAction extends AnAction implements CustomComponentAction, RightAlignedToolbarAction {
 
   @Override
   public void actionPerformed(AnActionEvent e) {
@@ -50,8 +47,7 @@ public class GoogleLoginAction extends AnAction implements CustomComponentAction
   private void showPopup(AnActionEvent e) {
     GoogleLoginUsersPanel usersPanel = new GoogleLoginUsersPanel();
     ComponentPopupBuilder popup = JBPopupFactory.getInstance().createComponentPopupBuilder(usersPanel, usersPanel.getList());
-    ActionButton source = (ActionButton)e.getInputEvent().getSource();
+    JComponent source = (JComponent)e.getInputEvent().getSource();
     popup.createPopup().show(new RelativePoint(source, new Point(0, source.getHeight() - 1)));
   }
-
 }
