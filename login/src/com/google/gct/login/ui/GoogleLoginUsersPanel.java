@@ -51,6 +51,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   private DefaultListModel listModel;
   private static final int MAX_VISIBLE_ROW_COUNT = 3;
   private static final String addAccountString = "Add Account";
+  private static final String signInString = "Sign In";
   private static final String signOutString = "Sign Out";
   private JButton signOutButton;
   private JButton addAccountButton;
@@ -117,7 +118,8 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
       }
     });
 
-    addAccountButton = new JButton(addAccountString);
+    boolean noUsersAvailable = (listModel.getSize() == 1) && (listModel.get(0) instanceof NoUsersListItem);
+    addAccountButton = new JButton(noUsersAvailable ? signInString : addAccountString);
     AddAccountListener addAccountListener = new AddAccountListener();
     addAccountButton.addActionListener(addAccountListener);
     addAccountButton.setHorizontalAlignment(SwingConstants.LEFT);
@@ -129,9 +131,9 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
       signOutButton.setEnabled(false);
     } else {
       // If list contains the NoUsersListItem place holder
-      // sign out button should be disabled
-      if(listModel.get(0) instanceof NoUsersListItem) {
-        signOutButton.setEnabled(false);
+      // sign out button should be hidden
+      if(noUsersAvailable) {
+        signOutButton.setVisible(false);
       } else {
         signOutButton.setEnabled(true);
       }
@@ -155,20 +157,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   class SignOutListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-      //This method can be called only if there's a valid selection
-      int index = list.getSelectedIndex();
-
-      boolean signedOut = GoogleLogin.getInstance().logOut();
-      if(signedOut) {
-        // remove logged out user
-        listModel.remove(index);
-        if (listModel.getSize() == 0) {
-          signOutButton.setEnabled(false);
-
-          // Add no user panel
-          listModel.addElement(NoUsersListItem.INSTANCE);
-        }
-      }
+      GoogleLogin.getInstance().logOut();
     }
   }
 
