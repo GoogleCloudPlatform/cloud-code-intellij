@@ -617,8 +617,16 @@ public class GoogleLogin {
 
     @Override
     public boolean askYesOrNo(String title, String message) {
+      String updatedMessage = message;
+      if(message.equals("Are you sure you want to sign out?")) {
+        CredentialedUser activeUser = getActiveUser();
+        String name = activeUser.getName().isEmpty() ? "" : activeUser.getName() + " ";
+        updatedMessage = "Are you sure you want to sign out " + name
+          + "(" + activeUser.getEmail() + ")?";
+      }
+
       Icon icon = IconLoader.getIcon(GOOGLE_IMG);
-      return (Messages.showYesNoDialog(message, title, icon) == Messages.YES);
+      return (Messages.showYesNoDialog(updatedMessage, title, icon) == Messages.YES);
     }
 
     @Override
