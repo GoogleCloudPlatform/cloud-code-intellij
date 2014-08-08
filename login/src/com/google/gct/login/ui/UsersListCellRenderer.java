@@ -48,12 +48,13 @@ import java.net.URL;
  * how each user item in the Google Login panel would be displayed.
  */
 public class UsersListCellRenderer extends JComponent implements ListCellRenderer {
-  private final static String CLOUD_LABEL_TEXT = "Open Cloud Console";
+  private final static String CLOUD_LABEL_TEXT = "Open Google Developers Console";
   private final static String PLAY_LABEL_TEXT = "Open Play Developer Console";
   private final static String DEFAULT_AVATAR = "/icons/loginAvatar@2x.png";
   private final static String GOOGLE_IMG = "/icons/google.png";
   private final static String SIGN_IN_TEXT = "Sign in with your Google account";
-  private final Color ACTIVE_COLOR = JBColor.LIGHT_GRAY;
+  private final Color ACTIVE_COLOR;
+  private final Color INACTIVE_COLOR;
   private final int PLAIN_USER_IMAGE_WIDTH = 48;
   private final int PLAIN_USER_IMAGE_HEIGHT = 48;
   private final int ACTIVE_USER_IMAGE_WIDTH = 96;
@@ -66,8 +67,10 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   private final int WELCOME_LABEL_SOUTH = 25;
   private final int WELCOME_LABEL_EAST = 19;
   private final int WELCOME_LABEL_WEST = 21;
+  private final int USER_LABEL_VERTICAL_STRUT = 3;
   private final int HGAP = 10;
   private final int VGAP = 10;
+  private final int GENERAL_FONT_HEIGHT;
   private final Font NAME_FONT;
   private final Font GENERAL_FONT;
   private final Dimension MAIN_PANEL_DIMENSION;
@@ -81,9 +84,13 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     MAIN_PANEL_DIMENSION = new Dimension(250, 68);
     ACTIVE_MAIN_PANEL_DIMENSION = new Dimension(250, 116);
 
+    ACTIVE_COLOR = new Color(0xffffff);
+    INACTIVE_COLOR = new Color(0xf5f5f5);
+
     FontMetrics fontMetrics = getFontMetrics(GENERAL_FONT);
-    CLOUD_LABEL_DIMENSION = new Dimension(fontMetrics.stringWidth(CLOUD_LABEL_TEXT), fontMetrics.getHeight());
-    PLAY_LABEL_DIMENSION = new Dimension(fontMetrics.stringWidth(PLAY_LABEL_TEXT), fontMetrics.getHeight());
+    GENERAL_FONT_HEIGHT = fontMetrics.getHeight();
+    CLOUD_LABEL_DIMENSION = new Dimension(fontMetrics.stringWidth(CLOUD_LABEL_TEXT), GENERAL_FONT_HEIGHT);
+    PLAY_LABEL_DIMENSION = new Dimension(fontMetrics.stringWidth(PLAY_LABEL_TEXT), GENERAL_FONT_HEIGHT);
   }
 
   @Override
@@ -109,7 +116,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     mainPanel.setAlignmentX(LEFT_ALIGNMENT);
 
     // Update colors
-    final Color bg = calcIsSelected ? ACTIVE_COLOR : UIUtil.getListBackground();
+    final Color bg = calcIsSelected ? ACTIVE_COLOR : INACTIVE_COLOR;
     final Color fg = calcIsSelected ? UIUtil.getListSelectionForeground() : UIUtil.getListForeground();
     mainPanel.setBackground(bg);
     mainPanel.setForeground(fg);
@@ -143,7 +150,8 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   public boolean inPlayConsoleUrl(Point point, int activeIndex) {
     // 2 is for the number of labels before this one
     double playYStart = VGAP + ACTIVE_USER_IMAGE_HEIGHT - PLAY_LABEL_DIMENSION.getHeight()
-      - CLOUD_LABEL_DIMENSION.getHeight() - 2 + (MAIN_PANEL_DIMENSION.getHeight() * activeIndex);
+      - CLOUD_LABEL_DIMENSION.getHeight() - 2 + (MAIN_PANEL_DIMENSION.getHeight() * activeIndex)
+      + USER_LABEL_VERTICAL_STRUT;
     double playYEnd = playYStart + PLAY_LABEL_DIMENSION.getHeight();
     double playXStart = ACTIVE_USER_IMAGE_WIDTH + HGAP + VGAP;
     double playXEnd = playXStart + PLAY_LABEL_DIMENSION.getWidth();
@@ -159,7 +167,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   public boolean inCloudConsoleUrl(Point point, int activeIndex) {
     // 3 is for the number of labels before this one
     double playYStart = VGAP + ACTIVE_USER_IMAGE_HEIGHT - CLOUD_LABEL_DIMENSION.getHeight()
-      - 3 + (MAIN_PANEL_DIMENSION.getHeight() * activeIndex);
+      - 3 + (MAIN_PANEL_DIMENSION.getHeight() * activeIndex) + (USER_LABEL_VERTICAL_STRUT * 2);
     double playYEnd = playYStart + CLOUD_LABEL_DIMENSION.getHeight();
     double playXStart = ACTIVE_USER_IMAGE_WIDTH + HGAP + VGAP;
     double playXEnd = playXStart + CLOUD_LABEL_DIMENSION.getWidth();
@@ -182,16 +190,18 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
 
   private JComponent createTextDisplay(boolean isSelected, UsersListItem usersListItem) {
     final JPanel panel = new JPanel();
-    panel.setLayout(new GridLayout(2,1));
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-    final Color bg = isSelected ? ACTIVE_COLOR : UIUtil.getListBackground();
+    final Color bg = isSelected ? ACTIVE_COLOR : INACTIVE_COLOR;
     final Color fg = isSelected ? UIUtil.getListSelectionForeground() : UIUtil.getListForeground();
     panel.setBackground(bg);
     panel.setForeground(fg);
 
     JLabel nameLabel = new JLabel( usersListItem.getUserName());
     nameLabel.setFont(NAME_FONT);
+    nameLabel.setForeground(JBColor.BLACK);
     panel.add(nameLabel);
+    panel.add(Box.createVerticalStrut(USER_LABEL_VERTICAL_STRUT));
 
     JLabel emailLabel = new JLabel(usersListItem.getUserEmail());
     emailLabel.setFont(GENERAL_FONT);
@@ -206,19 +216,20 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
 
     mainPanel.setBackground(ACTIVE_COLOR);
     mainPanel.setForeground(UIUtil.getListSelectionForeground());
-    mainPanel.setPreferredSize(new Dimension(200, 96));
+    mainPanel.setPreferredSize(new Dimension(220, ACTIVE_USER_IMAGE_HEIGHT));
 
     JPanel bottomPanel = new JPanel();
     bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.PAGE_AXIS));
     bottomPanel.setBackground(ACTIVE_COLOR);
     bottomPanel.setForeground(UIUtil.getListSelectionForeground());
-    bottomPanel.setPreferredSize(new Dimension(200, 40));
+    bottomPanel.setPreferredSize(new Dimension(220, (GENERAL_FONT_HEIGHT * 2) + USER_LABEL_VERTICAL_STRUT));
 
     JLabel playLabel = new JLabel(PLAY_LABEL_TEXT);
     playLabel.setFont(GENERAL_FONT);
     playLabel.setForeground(JBColor.BLUE);
     playLabel.setPreferredSize(PLAY_LABEL_DIMENSION);
     bottomPanel.add(playLabel, BOTTOM_ALIGNMENT);
+    bottomPanel.add(Box.createVerticalStrut(USER_LABEL_VERTICAL_STRUT));
 
     JLabel cloudLabel = new JLabel(CLOUD_LABEL_TEXT);
     cloudLabel.setFont(GENERAL_FONT);

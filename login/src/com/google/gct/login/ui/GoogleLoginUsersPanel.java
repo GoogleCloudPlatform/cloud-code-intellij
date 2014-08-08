@@ -33,11 +33,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.LinkedHashMap;
 
 /**
@@ -115,6 +117,40 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
           }
         }
         valueChanged = false;
+      }
+    });
+
+    list.addMouseMotionListener(new MouseMotionListener() {
+      @Override
+      public void mouseMoved(MouseEvent mouseEvent) {
+        // Determine if the user under the cursor is an active user, a non-active user or a non-user
+        int index = list.locationToIndex(mouseEvent.getPoint());
+        if (index >= 0) {
+          // If current object is the non-user list item, use default cursor
+          Object currentObject = listModel.get(index);
+          if(currentObject instanceof NoUsersListItem) {
+            list.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            return;
+          }
+
+          if (((UsersListItem)currentObject).isActiveUser()) {
+            // Active user
+            boolean inPlayUrl = usersListCellRenderer.inPlayConsoleUrl(mouseEvent.getPoint(), index);
+            boolean inCloudUrl = usersListCellRenderer.inCloudConsoleUrl(mouseEvent.getPoint(), index);
+            if(inPlayUrl || inCloudUrl){
+              list.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            } else {
+              list.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+          } else {
+            // For non-active user
+            list.setCursor(new Cursor(Cursor.HAND_CURSOR));
+          }
+        }
+      }
+
+      @Override
+      public void mouseDragged(MouseEvent e) {
       }
     });
 
