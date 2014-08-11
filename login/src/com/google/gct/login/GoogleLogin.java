@@ -310,7 +310,7 @@ public class GoogleLogin {
 
     final GoogleLoginState state = createGoogleLoginState();
 
-    new Task.Modal(null, "Please Log in...", true) {
+    new Task.Modal(null, "Please sign in via the opened browser...", true) {
       private boolean loggedIn = false;
 
       @Override
