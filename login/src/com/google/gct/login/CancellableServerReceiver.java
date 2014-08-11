@@ -233,15 +233,14 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
 
       PrintWriter doc = response.getWriter();
       doc.println("<html>");
-      doc.println("<head><title>OAuth 2.0 Authentication Token Recieved</title></head>");
+      doc.println("<head><title>OAuth 2.0 Authentication Token Received</title></head>");
       doc.println("<body>");
       doc.println("Received verification code. Closing...");
       doc.println("<script type='text/javascript'>");
       // We open "" in the same window to trigger JS ownership of it, which lets
       // us then close it via JS, at least in Chrome.
       doc.println("window.setTimeout(function() {");
-      doc.println("    window.open('', '_self', ''); window.close(); }, 1000);");
-      doc.println("if (window.opener) { window.opener.checkToken(); }");
+      doc.println("    window.open('https://developers.google.com/', '_self', '');}, 100);");
       doc.println("</script>");
       doc.println("</body>");
       doc.println("</HTML>");
