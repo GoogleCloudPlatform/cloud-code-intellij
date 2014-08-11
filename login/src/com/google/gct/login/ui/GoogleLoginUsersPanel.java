@@ -49,6 +49,7 @@ import java.util.LinkedHashMap;
 public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListener {
   private static final String PLAY_CONSOLE_URL = "https://play.google.com/apps/publish/#ProfilePlace";
   private static final String CLOUD_CONSOLE_URL = "https://console.developers.google.com/accountsettings";
+  private final static String LEARN_MORE_URL = "https://developers.google.com/cloud/devtools/android_studio_templates/";
   private JBList list;
   private DefaultListModel listModel;
   private static final int MAX_VISIBLE_ROW_COUNT = 3;
@@ -101,17 +102,25 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
       public void mouseClicked(MouseEvent mouseEvent) {
         list.updateUI();
 
-        if(!valueChanged) {
-          // Clicking on an already active user
-          int index = list.locationToIndex(mouseEvent.getPoint());
-          if (index >= 0) {
-            boolean inPlayUrl = usersListCellRenderer.inPlayConsoleUrl(mouseEvent.getPoint(), index);
-            if(inPlayUrl){
-              BrowserUtil.browse(PLAY_CONSOLE_URL);
-            } else {
-              boolean inCloudUrl = usersListCellRenderer.inCloudConsoleUrl(mouseEvent.getPoint(), index);
-              if(inCloudUrl) {
-                BrowserUtil.browse(CLOUD_CONSOLE_URL);
+        if(listModel.getSize() == 1 && (listModel.get(0) instanceof NoUsersListItem)) {
+          // When there are no users available
+          if(usersListCellRenderer.inLearnMoreUrl(mouseEvent.getPoint())){
+            BrowserUtil.browse(LEARN_MORE_URL);
+          }
+        } else {
+          // When users are available
+          if(!valueChanged) {
+            // Clicking on an already active user
+            int index = list.locationToIndex(mouseEvent.getPoint());
+            if (index >= 0) {
+              boolean inPlayUrl = usersListCellRenderer.inPlayConsoleUrl(mouseEvent.getPoint(), index);
+              if(inPlayUrl){
+                BrowserUtil.browse(PLAY_CONSOLE_URL);
+              } else {
+                boolean inCloudUrl = usersListCellRenderer.inCloudConsoleUrl(mouseEvent.getPoint(), index);
+                if(inCloudUrl) {
+                  BrowserUtil.browse(CLOUD_CONSOLE_URL);
+                }
               }
             }
           }
@@ -129,7 +138,11 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
           // If current object is the non-user list item, use default cursor
           Object currentObject = listModel.get(index);
           if(currentObject instanceof NoUsersListItem) {
-            list.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            if(usersListCellRenderer.inLearnMoreUrl(mouseEvent.getPoint())) {
+              list.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            } else {
+              list.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
             return;
           }
 

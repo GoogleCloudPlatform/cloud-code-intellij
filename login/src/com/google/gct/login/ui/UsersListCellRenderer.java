@@ -52,7 +52,11 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   private final static String PLAY_LABEL_TEXT = "Open Play Developer Console";
   private final static String DEFAULT_AVATAR = "/icons/loginAvatar@2x.png";
   private final static String GOOGLE_IMG = "/icons/google.png";
-  private final static String SIGN_IN_TEXT = "Sign in with your Google account";
+  private final static String SIGN_IN_TEXT = "<HTML> Sign in with your Google account to start <br> adding "
+    + "Cloud functionality to your <br> Android applications from Android Studio. </HTML>";
+  private final static String LEARN_MORE_TEXT = "Learn more";
+  private final Color LEARN_MORE_COLOR;
+  private final Color SIGN_IN_COLOR;
   private final Color ACTIVE_COLOR;
   private final Color INACTIVE_COLOR;
   private final int PLAIN_USER_IMAGE_WIDTH = 48;
@@ -65,8 +69,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   private final int GOOGLE_IMAGE_WEST = 18;
   private final int WELCOME_LABEL_NORTH = 15;
   private final int WELCOME_LABEL_SOUTH = 25;
-  private final int WELCOME_LABEL_EAST = 19;
-  private final int WELCOME_LABEL_WEST = 21;
+  private final int WELCOME_LABEL_EAST = 38;
   private final int USER_LABEL_VERTICAL_STRUT = 3;
   private final int HGAP = 10;
   private final int VGAP = 10;
@@ -77,12 +80,15 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   private final Dimension ACTIVE_MAIN_PANEL_DIMENSION;
   private final Dimension CLOUD_LABEL_DIMENSION;
   private final Dimension PLAY_LABEL_DIMENSION;
+  private final Dimension LEARN_MORE_LABEL_DIMENSION;
 
   public UsersListCellRenderer() {
     NAME_FONT = new Font("Helvetica", Font.BOLD, 13);
-    GENERAL_FONT = new Font("Helvetica", Font.PLAIN, 13);;
+    GENERAL_FONT = new Font("Helvetica", Font.PLAIN, 13);
     MAIN_PANEL_DIMENSION = new Dimension(250, 68);
     ACTIVE_MAIN_PANEL_DIMENSION = new Dimension(250, 116);
+    SIGN_IN_COLOR = new Color(666666);
+    LEARN_MORE_COLOR = new Color(666);
 
     ACTIVE_COLOR = new Color(0xffffff);
     INACTIVE_COLOR = new Color(0xf5f5f5);
@@ -91,6 +97,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     GENERAL_FONT_HEIGHT = fontMetrics.getHeight();
     CLOUD_LABEL_DIMENSION = new Dimension(fontMetrics.stringWidth(CLOUD_LABEL_TEXT), GENERAL_FONT_HEIGHT);
     PLAY_LABEL_DIMENSION = new Dimension(fontMetrics.stringWidth(PLAY_LABEL_TEXT), GENERAL_FONT_HEIGHT);
+    LEARN_MORE_LABEL_DIMENSION = new Dimension(fontMetrics.stringWidth(LEARN_MORE_TEXT), GENERAL_FONT_HEIGHT);
   }
 
   @Override
@@ -180,6 +187,22 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     return false;
   }
 
+  public boolean inLearnMoreUrl(Point point) {
+    // 3 is for the number of labels and row of texts
+    double urlYStart = GOOGLE_IMAGE_NORTH + GOOGLE_IMAGE_HEIGHT + WELCOME_LABEL_NORTH
+      + (GENERAL_FONT_HEIGHT * 3) + 3;
+    double urlYEnd = urlYStart + LEARN_MORE_LABEL_DIMENSION.getHeight();
+    double urlXStart = GOOGLE_IMAGE_WEST;
+    double urlXEnd = urlXStart + LEARN_MORE_LABEL_DIMENSION.getWidth();
+
+    if((point.getX() > urlXStart) && (point.getX() < urlXEnd)
+       && (point.getY() > urlYStart) && (point.getY() < urlYEnd)) {
+      return true;
+    }
+
+    return false;
+  }
+
   public int getMainPanelHeight() {
     return (int)MAIN_PANEL_DIMENSION.getHeight();
   }
@@ -260,6 +283,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     BoxLayout layout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
     mainPanel.setLayout(layout);
     mainPanel.setBackground(JBColor.WHITE);
+    mainPanel.setBorder(BorderFactory.createEmptyBorder(0, GOOGLE_IMAGE_WEST, 0, 0));
 
     URL url = UsersListCellRenderer.class.getResource(GOOGLE_IMG);
     Image image = Toolkit.getDefaultToolkit().getImage(url);
@@ -267,17 +291,22 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
       GOOGLE_IMAGE_WIDTH, GOOGLE_IMAGE_HEIGHT, java.awt.Image.SCALE_SMOOTH);
     JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
 
-    JLabel textLabel = new JLabel(SIGN_IN_TEXT);
-    Dimension textSize = textLabel.getPreferredSize();
-    textLabel.setPreferredSize(new Dimension((int)textSize.getWidth() + WELCOME_LABEL_EAST,
-      (int)textSize.getHeight()));
+    JLabel signInLabel = new JLabel(SIGN_IN_TEXT);
+    signInLabel.setFont(GENERAL_FONT);
+    signInLabel.setForeground(SIGN_IN_COLOR);
+    Dimension textSize = signInLabel.getPreferredSize();
+    signInLabel.setPreferredSize(new Dimension((int)textSize.getWidth() + WELCOME_LABEL_EAST, (int)textSize.getHeight()));
+
+    JLabel urlLabel = new JLabel(LEARN_MORE_TEXT);
+    urlLabel.setFont(GENERAL_FONT);
+    urlLabel.setForeground(LEARN_MORE_COLOR);
+    urlLabel.setPreferredSize(LEARN_MORE_LABEL_DIMENSION);
 
     mainPanel.add(Box.createVerticalStrut(GOOGLE_IMAGE_NORTH));
-    mainPanel.add(Box.createHorizontalStrut(GOOGLE_IMAGE_WEST));
     mainPanel.add(imageLabel);
     mainPanel.add(Box.createVerticalStrut(WELCOME_LABEL_NORTH));
-    mainPanel.add(Box.createHorizontalStrut(WELCOME_LABEL_WEST - GOOGLE_IMAGE_WEST));
-    mainPanel.add(textLabel);
+    mainPanel.add(signInLabel);
+    mainPanel.add(urlLabel);
     mainPanel.add(Box.createVerticalStrut(WELCOME_LABEL_SOUTH));
 
     return mainPanel;
