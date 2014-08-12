@@ -59,6 +59,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   private JButton signOutButton;
   private JButton addAccountButton;
   private boolean valueChanged = false;
+  private boolean ignoreSelection = false;
 
   public GoogleLoginUsersPanel() {
     super(new BorderLayout());
@@ -150,7 +151,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
             // Active user
             boolean inPlayUrl = usersListCellRenderer.inPlayConsoleUrl(mouseEvent.getPoint(), index);
             boolean inCloudUrl = usersListCellRenderer.inCloudConsoleUrl(mouseEvent.getPoint(), index);
-            if(inPlayUrl || inCloudUrl){
+            if (inPlayUrl || inCloudUrl) {
               list.setCursor(new Cursor(Cursor.HAND_CURSOR));
             } else {
               list.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -223,6 +224,9 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   //This method is required by ListSelectionListener.
   @Override
   public void valueChanged(ListSelectionEvent e) {
+    if(ignoreSelection) {
+      return;
+    }
     valueChanged = true;
     if (e.getValueIsAdjusting() == false) {
       if (list.getSelectedIndex() == -1) {
@@ -234,6 +238,19 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
         UsersListItem selectedUser = (UsersListItem)listModel.get(list.getSelectedIndex());
         if(!selectedUser.isActiveUser()) {
           GoogleLogin.getInstance().setActiveUser(selectedUser.getUserEmail());
+        }
+
+        // Change order of elements in the list so that the
+        // active user becomes the first element in the list
+        ignoreSelection = true;
+        try {
+          listModel.remove(list.getSelectedIndex());
+          listModel.add(0, selectedUser);
+
+          // Re-select the active user
+          list.setSelectedIndex(0);
+        } finally {
+          ignoreSelection = false;
         }
       }
     }
@@ -258,6 +275,12 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     if(listModel.getSize() == 0) {
       // Add no user panel
       listModel.addElement(NoUsersListItem.INSTANCE);
+    } else if ((activeUserIndex != 0) && (activeUserIndex < listModel.getSize())) {
+      // Change order of elements in the list so that the
+      // active user becomes the first element in the list
+      UsersListItem activeUser = (UsersListItem)listModel.remove(activeUserIndex);
+      listModel.add(0, activeUser);
+      activeUserIndex = 0;
     }
 
     return activeUserIndex;
