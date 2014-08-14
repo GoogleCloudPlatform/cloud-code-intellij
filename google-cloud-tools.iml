@@ -53,6 +53,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="google-login" />
   </component>
 </module>
 
