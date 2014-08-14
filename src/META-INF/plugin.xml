@@ -18,9 +18,6 @@
       <implementation-class>com.google.gct.idea.appengine.synchronization.SampleSyncRegistration</implementation-class>
     </component>
     -->
-    <component>
-      <implementation-class>com.google.gct.idea.appengine.initialization.CloudPluginRegistration</implementation-class>
-    </component>
   </application-components>
 
   <project-components>
@@ -46,9 +43,6 @@
     <!-- hide this, it was causing context menus to pick appengine, fix and re-enable
     <runConfigurationProducer implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationProducer"/>
     -->
-
-    <!-- Dom for the App Engine config file -->
-    <dom.fileDescription implementation="com.google.gct.idea.appengine.dom.AppEngineWebFileDescription"/>
 
     <implicitUsageProvider implementation="com.google.gct.idea.appengine.validation.EndpointImplicitUsageProvider"/>
 

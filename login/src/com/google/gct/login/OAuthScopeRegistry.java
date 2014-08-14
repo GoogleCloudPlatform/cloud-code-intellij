@@ -32,7 +32,6 @@ class OAuthScopeRegistry {
   static {
     SortedSet<String> scopes = new TreeSet<String>();
     scopes.add("https://www.googleapis.com/auth/userinfo#email");
-    scopes.add("https://www.googleapis.com/auth/appengine.admin");
     sScopes = Collections.unmodifiableSortedSet(scopes);
   }
 
