@@ -15,8 +15,6 @@
  */
 package com.google.gct.idea.appengine.gradle.facet;
 
-import com.google.common.base.Strings;
-import com.google.gct.idea.appengine.dom.AppEngineWebApp;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
@@ -24,17 +22,9 @@ import com.intellij.facet.FacetTypeId;
 import com.intellij.facet.FacetTypeRegistry;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.xml.XmlFile;
-import com.intellij.util.xml.DomManager;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
 
 /**
  * App Engine Gradle facet for App Engine Modules with a Gradle build file
@@ -58,30 +48,6 @@ public class AppEngineGradleFacet extends Facet<AppEngineGradleFacetConfiguratio
                               @NotNull String name,
                               @NotNull AppEngineGradleFacetConfiguration configuration) {
     super(facetType, module, name, configuration, null);
-  }
-
-  /**
-   * Returns an object holding information from the appengine-web.xml file.
-   */
-  public AppEngineWebApp getAppEngineWebXml() {
-    AppEngineConfigurationProperties model = getConfiguration().getState();
-    if (model == null || Strings.isNullOrEmpty(model.WEB_APP_DIR)) {
-      return null;
-    }
-
-    String path = model.WEB_APP_DIR + "/WEB-INF/appengine-web.xml";
-    VirtualFile appEngineFile = LocalFileSystem.getInstance().findFileByPath(path.replace(File.separatorChar, '/'));
-    if (appEngineFile == null) {
-      return null;
-    }
-
-    PsiFile psiFile = PsiManager.getInstance(getModule().getProject()).findFile(appEngineFile);
-    if (psiFile == null || !(psiFile instanceof XmlFile)) {
-      return null;
-    }
-
-    final DomManager domManager = DomManager.getDomManager(getModule().getProject());
-    return domManager.getFileElement((XmlFile)psiFile, AppEngineWebApp.class).getRootElement();
   }
 
   public static FacetType<AppEngineGradleFacet, AppEngineGradleFacetConfiguration> getFacetType() {
