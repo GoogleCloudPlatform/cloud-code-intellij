@@ -34,7 +34,8 @@
     <action id="GoogleLogin.LoginService"
             class="com.google.gct.login.ui.GoogleLoginAction"
             text="Google Login">
-      <add-to-group group-id="MainToolBar" anchor="first"  />
+      <add-to-group group-id="MainToolBar" anchor="last"  />
+      <add-to-group group-id="NavBarToolBar" anchor="last"  />
     </action>
   </actions>
 
