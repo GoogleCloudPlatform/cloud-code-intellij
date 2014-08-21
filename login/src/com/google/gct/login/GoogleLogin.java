@@ -695,7 +695,13 @@ public class GoogleLogin {
       if(activeUserString == null) {
         users.removeActiveUser();
       } else {
-        users.setActiveUser(activeUserString);
+        try {
+          users.setActiveUser(activeUserString);
+        } catch (IllegalArgumentException ex) {
+          GOOGLE_LOGIN_LOG.error("Error while initiating users", ex);
+          // Set no active user
+          users.removeActiveUser();
+        }
       }
     }
   }
