@@ -83,6 +83,7 @@ public class GenerateEndpointAction extends AnAction {
     try {
       if (!AppEngineUtils.isAppEngineModule(project, module)) {
         Messages.showErrorDialog(project, "Endpoints can only be generated for App Engine projects.", ERROR_MESSAGE_TITLE);
+        return;
       }
     }
     catch (FileNotFoundException error) {
