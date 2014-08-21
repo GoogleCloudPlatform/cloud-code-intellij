@@ -119,7 +119,6 @@
            description="Endpoints Actions"
            popup="true"
            icon="/icons/cloudPlatform.png">
-      <reference id="GoogleCloudTools.InstallClientLibraries"/>
       <reference id="GoogleCloudTools.GenerateEndpoint"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </group>
