@@ -20,6 +20,7 @@ import com.android.tools.idea.wizard.AndroidStudioWizardStep;
 import com.android.tools.idea.wizard.NewModuleWizardState;
 import com.android.tools.idea.wizard.NewProjectWizardState;
 import com.android.tools.idea.wizard.TemplateWizardStep;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -29,11 +30,15 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.psi.PsiNameHelper;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.android.dom.manifest.Manifest;
 import org.jetbrains.android.facet.AndroidFacet;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -55,10 +60,8 @@ public class BackendModuleWizardStep extends ModuleWizardStep implements Android
   private JTextField myModuleNameField;
   private JComboBox myClientModuleCombo;
   private JBLabel myValidationStatus;
-  private HyperlinkLabel myDocLabel;
-  private JLabel myDocLabel2;
   private JPanel myDocPanel;
-  private JLabel myDocLabel3;
+  private JEditorPane myModuleDescriptionText;
   private boolean myUpdating;
   private boolean myPackageNameModified;
 
@@ -92,14 +95,22 @@ public class BackendModuleWizardStep extends ModuleWizardStep implements Android
     myClientModuleCombo.setModel(new CollectionComboBoxModel(clientModules));
     myClientModuleCombo.setRenderer(new AndroidModuleListCellRenderer());
 
-    myValidationStatus.setIcon(MessageType.ERROR.getDefaultIcon());
+    myModuleDescriptionText.setContentType(UIUtil.HTML_MIME);
+    myModuleDescriptionText.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+    myModuleDescriptionText.setFont(UIManager.getFont("Label.font"));
+    myModuleDescriptionText.setOpaque(false);
+    myModuleDescriptionText.setEditable(false);
+    myModuleDescriptionText.setMargin(new Insets(4, 0, 0, 0));
+    myModuleDescriptionText.addHyperlinkListener(new HyperlinkListener() {
+      @Override
+      public void hyperlinkUpdate(HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+          BrowserUtil.browse(e.getURL().toString());
+        }
+      }
+    });
 
-    // IntelliJ IDEA has a number of hyperlink components but none that support all 3 of: wrapping; hover cursor over a link; marking only
-    // part of text as link. So we have to use multiple separate labels here. :(
-    // Add some space above and below the doc and match HighlightableComponent.getTextOffset() (2 pixels left border on second label).
-    myDocLabel.setBorder(IdeBorderFactory.createEmptyBorder(8, 0, 0, 0));
-    myDocLabel2.setBorder(IdeBorderFactory.createEmptyBorder(0, 2, 0, 0));
-    myDocLabel3.setBorder(IdeBorderFactory.createEmptyBorder(0, 2, 8, 0));
+    myValidationStatus.setIcon(MessageType.ERROR.getDefaultIcon());
   }
 
   private void setupListener(JTextField field, final boolean updatePackageName) {
@@ -166,13 +177,16 @@ public class BackendModuleWizardStep extends ModuleWizardStep implements Android
   }
 
   private void updateDocLabels() {
-    String docUrl = (String)myWizardState.get(ATTR_DOC_URL);
+    String docUrl = (String) myWizardState.get(ATTR_DOC_URL);
     TemplateMetadata metadata = myWizardState.getTemplateMetadata();
     String title = metadata != null ? metadata.getTitle() : null;
     if (docUrl != null && title != null) {
       myDocPanel.setVisible(true);
-      myDocLabel.setHyperlinkText("Check the ", "\"" + title + "\" documentation", "");
-      myDocLabel.setHyperlinkTarget(docUrl);
+      String hyperlink = String.format("<a href='%s'>\"%s\"</a>", docUrl, title);
+      myModuleDescriptionText.setText("<html><body>Check the " + hyperlink + " documentation for more " +
+                           "information about the contents of this backend module, and for " +
+                           "detailed instructions about connecting your Android app to this " +
+                           "backend.</body></html>");
     } else {
       myDocPanel.setVisible(false);
     }
