@@ -19,6 +19,7 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
+import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 
@@ -46,8 +47,12 @@ public class GoogleLoginAction extends AnAction implements CustomComponentAction
    */
   private void showPopup(AnActionEvent e) {
     GoogleLoginUsersPanel usersPanel = new GoogleLoginUsersPanel();
-    ComponentPopupBuilder popup = JBPopupFactory.getInstance().createComponentPopupBuilder(usersPanel, usersPanel.getList());
     JComponent source = (JComponent)e.getInputEvent().getSource();
-    popup.createPopup().show(new RelativePoint(source, new Point(0, source.getHeight() - 1)));
+
+    ComponentPopupBuilder popupBuilder = JBPopupFactory.getInstance().createComponentPopupBuilder(usersPanel, usersPanel.getList());
+    JBPopup popup = popupBuilder.createPopup();
+    JComponent component = popup.getContent();
+    int startingPoint = (int)(source.getWidth() - component.getPreferredSize().getWidth());
+    popup.show(new RelativePoint(source, new Point(startingPoint, source.getHeight() - 1)));
   }
 }
