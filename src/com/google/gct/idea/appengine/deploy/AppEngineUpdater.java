@@ -15,6 +15,7 @@
  */
 package com.google.gct.idea.appengine.deploy;
 
+import com.android.tools.idea.gradle.invoker.GradleInvocationResult;
 import com.android.tools.idea.gradle.invoker.GradleInvoker;
 import com.google.common.base.Strings;
 import com.google.gct.idea.appengine.sdk.AppEngineSdk;
@@ -118,8 +119,19 @@ class AppEngineUpdater {
       }
     };
 
-    GradleInvoker.getInstance(myProject).compileJava(new Module[]{myModule});
-    startUploading.run();
+    final GradleInvoker invoker = GradleInvoker.getInstance(myProject);
+    final GradleInvoker.AfterGradleInvocationTask deployAfter = new GradleInvoker.AfterGradleInvocationTask() {
+      @Override
+      public void execute(@NotNull GradleInvocationResult result) {
+        invoker.removeAfterGradleInvocationTask(this);
+        if (result.isBuildSuccessful()) {
+          startUploading.run();
+        }
+      }
+    };
+
+    invoker.addAfterGradleInvocationTask(deployAfter);
+    invoker.assemble(new Module[]{myModule}, GradleInvoker.TestCompileType.NONE);
   }
 
   private void startUploadingProcess() {
@@ -131,6 +143,10 @@ class AppEngineUpdater {
       parameters.configureByModule(myModule, JavaParameters.JDK_ONLY);
       parameters.setMainClass("com.google.appengine.tools.admin.AppCfg");
       AppEngineSdk mySdk = new AppEngineSdk(mySdkPath);
+      if (mySdk.getToolsApiJarFile() == null) {
+        Messages.showErrorDialog("Cannot start uploading: The tools sdk jar could not be located.", "Error");
+        return;
+      }
       parameters.getClassPath().add(mySdk.getToolsApiJarFile().getAbsolutePath());
 
       final List<KeyValue<String, String>> list = HttpConfigurable.getJvmPropertiesList(false, null);
