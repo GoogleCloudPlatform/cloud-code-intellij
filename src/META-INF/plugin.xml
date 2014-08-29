@@ -111,7 +111,7 @@
 
   <actions>
     <action id="GoogleCloudTools.GenerateEndpoint"
-            class="com.google.gct.idea.appengine.gradle.action.GenerateEndpointAction"
+            class="com.google.gct.idea.appengine.action.NewEndpointFromClassAction"
             text="Generate Endpoint"
             icon="/icons/cloudEndpoints.png"/>
     <group id="com.google.gct.intellij.endpoints.MenuGroup"
