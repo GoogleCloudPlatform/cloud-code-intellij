@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.gct.idea.appengine.gradle.action;
+package com.google.gct.idea.appengine.action;
 
 import com.android.tools.idea.gradle.parser.BuildFileKey;
 import com.android.tools.idea.gradle.parser.BuildFileStatement;
@@ -57,7 +57,7 @@ import java.util.Map;
 /**
  * Action to generate an Endpoint class from a specified class.
  */
-public class GenerateEndpointAction extends AnAction {
+public class NewEndpointFromClassAction extends AnAction {
   public static final String ENTITY_NAME = "entityName";
   public static final String ENTITY_TYPE = "entityType";
   public static final String ENDPOINT_TEMPLATE = "RudimentaryEndpoint";
@@ -67,7 +67,7 @@ public class GenerateEndpointAction extends AnAction {
   private static final String DEFAULT_ERROR_MESSAGE = "Error occurred while generating Endpoint class";
   private static final String ENDPOINTS_DEPENDENCY = "com.google.appengine:appengine-endpoints:";
   private static final String ENDPOINTS_DEPS_DEPENDENCY = "com.google.appengine:appengine-endpoints-deps:";
-  private static final Logger LOG = Logger.getInstance(GenerateEndpointAction.class);
+  private static final Logger LOG = Logger.getInstance(NewEndpointFromClassAction.class);
 
   @Override
   public void actionPerformed(AnActionEvent e) {
