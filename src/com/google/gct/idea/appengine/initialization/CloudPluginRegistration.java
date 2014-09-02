@@ -27,29 +27,23 @@ import org.jetbrains.annotations.NotNull;
  * Initializes the menus for deploy.
  */
 public class CloudPluginRegistration implements ApplicationComponent {
-
-  // We are reusing the flag for login.
-  private final static String SHOW_DEPLOY = "show.google.login.button";
-
   public CloudPluginRegistration() {
   }
 
   @Override
   public void initComponent() {
-    if (Boolean.getBoolean(SHOW_DEPLOY)) {
-      ActionManager am = ActionManager.getInstance();
+    ActionManager am = ActionManager.getInstance();
 
-      AppEngineUpdateAction action = new AppEngineUpdateAction();
-      action.getTemplatePresentation().setText("Deploy Module to App Engine...");
+    AppEngineUpdateAction action = new AppEngineUpdateAction();
+    action.getTemplatePresentation().setText("Deploy Module to App Engine...");
 
-      am.registerAction("GoogleCloudTools.AppEngineUpdate", action);
-      DefaultActionGroup buildMenu = (DefaultActionGroup)am.getAction("BuildMenu");
+    am.registerAction("GoogleCloudTools.AppEngineUpdate", action);
+    DefaultActionGroup buildMenu = (DefaultActionGroup)am.getAction("BuildMenu");
 
-      DefaultActionGroup appEngineUpdateGroup = new DefaultActionGroup();
-      appEngineUpdateGroup.addSeparator();
-      appEngineUpdateGroup.add(action);
-      buildMenu.add(appEngineUpdateGroup, new Constraints(Anchor.AFTER, "Compile"));
-    }
+    DefaultActionGroup appEngineUpdateGroup = new DefaultActionGroup();
+    appEngineUpdateGroup.addSeparator();
+    appEngineUpdateGroup.add(action);
+    buildMenu.add(appEngineUpdateGroup, new Constraints(Anchor.AFTER, "Compile"));
   }
 
   @Override

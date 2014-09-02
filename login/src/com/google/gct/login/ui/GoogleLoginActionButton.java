@@ -35,19 +35,9 @@ public final class GoogleLoginActionButton extends ActionButton {
   private Icon defaultIcon;
   private final static String SIGN_IN_MESSAGE = "Sign in to Google...";
   private final static String DEFAULT_AVATAR = "/icons/loginAvatar.png";
-  private final static String SHOW_LOGIN_BUTTON_PROPERTY = "show.google.login.button";
-
 
   public GoogleLoginActionButton(AnAction action, Presentation presentation, String place, @NotNull Dimension minimumSize) {
     super(action, presentation, place, minimumSize);
-
-    // The Google login toolbar item is hidden by default temporarily.
-    // To view the login button, add "-Dshow.google.login.button=true" to the JVM options
-    boolean showLoginButton = Boolean.getBoolean(SHOW_LOGIN_BUTTON_PROPERTY);
-    if(!showLoginButton) {
-      setVisible(false);
-      return;
-    }
 
     GoogleLogin.getInstance().setLoginMenuItemContribution(this);
     defaultIcon = IconLoader.getIcon(DEFAULT_AVATAR);
