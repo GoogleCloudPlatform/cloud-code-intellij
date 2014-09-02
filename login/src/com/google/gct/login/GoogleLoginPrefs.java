@@ -39,10 +39,7 @@ import java.util.prefs.Preferences;
 public class GoogleLoginPrefs {
   // Delimiter for the list of scopes.
   private static final String DELIMITER = " ";
-
   private static final String PREFERENCES_PATH = "/com/google/gct/login";
-  private static String preferencesPath = PREFERENCES_PATH;
-
   private static final String OAUTH_DATA_EMAIL_KEY = "credentials_email";
   private static final String OAUTH_DATA_REFRESH_TOKEN_KEY = "credentials_refresh_token";
   private static final String ICON_ONLY_KEY = "icon_only";
@@ -197,8 +194,8 @@ public class GoogleLoginPrefs {
   }
 
   @VisibleForTesting
-  public static void setTestPreferencesPath(String testPreferencesPath) {
-    preferencesPath = testPreferencesPath;
+  public static String getPreferencesPath() {
+    return PREFERENCES_PATH;
   }
 
   private static void flushPrefs(Preferences prefs) {
@@ -210,7 +207,7 @@ public class GoogleLoginPrefs {
   }
 
   private static Preferences getPrefs() {
-    return Preferences.userRoot().node(preferencesPath);
+    return Preferences.userRoot().node(PREFERENCES_PATH);
   }
 
   private static String getCustomUserKey(String key) {
