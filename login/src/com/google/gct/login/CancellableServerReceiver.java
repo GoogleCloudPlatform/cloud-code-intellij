@@ -207,14 +207,15 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
    * where {@link #waitForCode} will find it.
    */
   class CallbackHandler extends AbstractHandler {
+    private static final String AUTH_SUCCESS_LANDING_PAGE = "https://developers.google.com/cloud/mobile/auth_success";
+    private static final String AUTH_FAILURE_LANDING_PAGE = "https://developers.google.com/cloud/mobile/auth_failure";
 
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) throws IOException {
       if (!CALLBACK_PATH.equals(target)) {
         return;
       }
-      writeLandingHtml(response);
-      response.flushBuffer();
+
       ((Request)request).setHandled(true);
       lock.lock();
       try {
@@ -225,26 +226,9 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
       finally {
         lock.unlock();
       }
-    }
 
-    private void writeLandingHtml(HttpServletResponse response) throws IOException {
-      response.setStatus(HttpServletResponse.SC_OK);
-      response.setContentType("text/html");
-
-      PrintWriter doc = response.getWriter();
-      doc.println("<html>");
-      doc.println("<head><title>OAuth 2.0 Authentication Token Received</title></head>");
-      doc.println("<body>");
-      doc.println("Received verification code. Closing...");
-      doc.println("<script type='text/javascript'>");
-      // We open "" in the same window to trigger JS ownership of it, which lets
-      // us then close it via JS, at least in Chrome.
-      doc.println("window.setTimeout(function() {");
-      doc.println("    window.open('https://developers.google.com/', '_self', '');}, 100);");
-      doc.println("</script>");
-      doc.println("</body>");
-      doc.println("</HTML>");
-      doc.flush();
+      response.sendRedirect(error == null ? AUTH_SUCCESS_LANDING_PAGE : AUTH_FAILURE_LANDING_PAGE);
+      response.flushBuffer();
     }
   }
 }
