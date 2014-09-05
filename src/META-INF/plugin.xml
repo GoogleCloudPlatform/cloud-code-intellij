@@ -10,6 +10,7 @@
 
   <depends>org.jetbrains.android</depends>
   <depends>org.jetbrains.plugins.gradle</depends>
+  <depends>com.google.gct.login</depends>
 
   <application-components>
     <!-- Disable temporarily
