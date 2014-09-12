@@ -80,15 +80,8 @@ public class NewEndpointFromClassAction extends AnAction {
       return;
     }
 
-    try {
-      if (!AppEngineUtils.isAppEngineModule(project, module)) {
-        Messages.showErrorDialog(project, "Endpoints can only be generated for App Engine projects.", ERROR_MESSAGE_TITLE);
-        return;
-      }
-    }
-    catch (FileNotFoundException error) {
-      LOG.error(ERROR_MESSAGE_TITLE, error);
-      Messages.showErrorDialog(project, DEFAULT_ERROR_MESSAGE, ERROR_MESSAGE_TITLE);
+    if (!AppEngineUtils.isAppEngineModule(module)) {
+      Messages.showErrorDialog(project, "Endpoints can only be generated for App Engine projects.", ERROR_MESSAGE_TITLE);
       return;
     }
 

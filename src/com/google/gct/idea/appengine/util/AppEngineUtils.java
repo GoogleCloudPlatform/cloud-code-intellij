@@ -19,6 +19,7 @@ import com.android.tools.idea.gradle.parser.GradleBuildFile;
 import com.android.tools.idea.gradle.util.GradleUtil;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateManager;
+import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.wizard.AppEngineTemplates;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -44,25 +45,15 @@ import java.util.List;
  * Utility methods for App Engine.
  */
 public class AppEngineUtils {
-  private static final Logger LOG = Logger.getInstance(AppEngineUtils.class);
-  private static final String APP_ENGINE_PLUGIN = "appengine";
 
   /**
-   * Returns true if <code>module</code> is an App Engine module by checking to see
-   * if the App Engine plugin is part of the gradle build. Returns false otherwise.
-   * @param project The project associated with <code>module</code>
-   * @param module The module to be evaluated for being an App Engine module.
-   * @return true if <code>module</code> is an App Engine module, false otherwise.
-   * @throws FileNotFoundException if the gradle build file associated with <code>module</code> does not exist.
+   * Returns {@code true} if the provide module is an App Engine module, and returns {@code false} if the module is
+   * null or not an App Engine module.
    */
-  public static boolean isAppEngineModule(Project project, Module module) throws FileNotFoundException {
-    final VirtualFile buildFile = GradleUtil.getGradleBuildFile(module);
-    if (buildFile == null) {
-      throw new FileNotFoundException("Cannot find gradle build file for module \"" + module.getName() + "\"");
+  public static boolean isAppEngineModule(@Nullable Module module) {
+    if (module == null) {
+      return false;
     }
-
-    final GradleBuildFile gradleBuildFile = new GradleBuildFile(buildFile, project);
-    List<String> allPlugins = gradleBuildFile.getPlugins();
-    return allPlugins.contains(APP_ENGINE_PLUGIN);
+    return AppEngineGradleFacet.getAppEngineFacetByModule(module) != null;
   }
 }
