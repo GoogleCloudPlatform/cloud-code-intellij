@@ -110,17 +110,16 @@
   </extensions>
 
   <actions>
-    <action id="GoogleCloudTools.GenerateEndpoint"
+    <action id="GoogleCloudTools.NewEndpointFromClass"
             class="com.google.gct.idea.appengine.action.NewEndpointFromClassAction"
-            text="Generate Endpoint"
+            text="Generate Cloud Endpoint from Java class"
             icon="/icons/cloudEndpoints.png"/>
-    <group id="com.google.gct.intellij.endpoints.MenuGroup"
-           text="Google Cloud Tools"
-           description="Endpoints Actions"
-           popup="true"
-           icon="/icons/cloudPlatform.png">
-      <reference id="GoogleCloudTools.GenerateEndpoint"/>
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    <group id="GoogleCloudTools.GenerateGroup">
+      <separator/>
+      <reference ref="GoogleCloudTools.NewEndpointFromClass"/>
+      <separator/>
+      <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
     </group>
   </actions>
 
