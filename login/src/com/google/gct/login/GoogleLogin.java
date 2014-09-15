@@ -32,6 +32,8 @@ import com.google.gdt.eclipse.login.common.OAuthDataStore;
 import com.google.gdt.eclipse.login.common.UiFacade;
 import com.google.gdt.eclipse.login.common.VerificationCodeHolder;
 import com.intellij.ide.BrowserUtil;
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
@@ -39,16 +41,19 @@ import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.progress.util.ProgressIndicatorBase;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.wm.ex.ProgressIndicatorEx;
+import com.intellij.openapi.wm.ex.WindowManagerEx;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
+import java.awt.*;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -304,13 +309,15 @@ public class GoogleLogin {
    * @param callback if not null, then this callback is called when the login
    * either succeeds or fails.
    */
-  public void logIn(final String message, @Nullable final IGoogleLoginCompletedCallback callback) {
+  public void logIn(@Nullable final String message, @Nullable final IGoogleLoginCompletedCallback callback) {
     users.removeActiveUser();
     uiFacade.notifyStatusIndicator();
 
     final GoogleLoginState state = createGoogleLoginState();
 
-    new Task.Modal(null, "Please sign in via the opened browser...", true) {
+    // We pass in the current project, which causes intelliJ to properly figure out the parent window.
+    // This keeps the cancel dialog on top and visible.
+    new Task.Modal(getCurrentProject(), "Please sign in via the opened browser...", true) {
       private boolean loggedIn = false;
 
       @Override
@@ -362,6 +369,15 @@ public class GoogleLogin {
         }
       }
     }.queue();
+  }
+
+  @Nullable
+  private static Project getCurrentProject() {
+    Window activeWindow = WindowManagerEx.getInstanceEx().getMostRecentFocusedWindow();
+    if (activeWindow == null) {
+      return null;
+    }
+    return CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(activeWindow));
   }
 
   /**

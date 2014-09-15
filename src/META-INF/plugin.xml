@@ -107,6 +107,7 @@
 
   <extensions defaultExtensionNs="org.jetbrains.android">
     <newModuleWizardPathFactory implementation="com.google.gct.idea.appengine.wizard.BackendWizardPathFactory"/>
+    <wizardParameterFactory implementation="com.google.gct.idea.cloudsave.CloudWizardParameterFactory"/>
   </extensions>
 
   <actions>

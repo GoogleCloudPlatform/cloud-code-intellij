@@ -68,6 +68,12 @@ public class CredentialedUser {
   }
 
   /**
+   * Returns the credential of this user.
+   * @return Credential of user.
+   */
+  public Credential getCredential() { return credential; }
+
+  /**
    * Returns true if this user is the active user and false otherwise.
    * @return True if this user is active and false otherwise.
    */
