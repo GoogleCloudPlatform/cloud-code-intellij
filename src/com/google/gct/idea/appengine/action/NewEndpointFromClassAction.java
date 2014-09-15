@@ -25,11 +25,10 @@ import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
 import com.android.tools.idea.templates.TemplateUtils;
-
 import com.google.gct.idea.appengine.util.AppEngineUtils;
 import com.google.gct.idea.appengine.util.PsiUtils;
 import com.google.gct.idea.appengine.wizard.AppEngineTemplates;
-
+import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
@@ -37,18 +36,20 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
-
+import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,6 +69,31 @@ public class NewEndpointFromClassAction extends AnAction {
   private static final String ENDPOINTS_DEPENDENCY = "com.google.appengine:appengine-endpoints:";
   private static final String ENDPOINTS_DEPS_DEPENDENCY = "com.google.appengine:appengine-endpoints-deps:";
   private static final Logger LOG = Logger.getInstance(NewEndpointFromClassAction.class);
+
+  @Override
+  public void update(AnActionEvent e) {
+    if (ActionPlaces.isPopupPlace(e.getPlace())) {
+      e.getPresentation().setVisible(shouldDisplayAction(e));
+    }
+  }
+
+  private boolean shouldDisplayAction(AnActionEvent e) {
+    if (!AppEngineUtils.isAppEngineModule(e.getData(LangDataKeys.MODULE))) {
+      return false;
+    }
+    PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
+    if (psiFile == null || !(psiFile instanceof PsiJavaFileImpl)) {
+      return false;
+    }
+    Module srcModule = ModuleUtilCore.findModuleForPsiElement(psiFile);
+    if (srcModule == null) {
+      return false;
+    }
+    if (ProjectRootManager.getInstance(srcModule.getProject()).getFileIndex().getSourceRootForFile(psiFile.getVirtualFile()) == null) {
+      return false;
+    }
+    return true;
+  }
 
   @Override
   public void actionPerformed(AnActionEvent e) {
