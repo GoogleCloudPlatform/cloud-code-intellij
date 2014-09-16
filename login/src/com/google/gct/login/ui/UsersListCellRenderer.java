@@ -36,7 +36,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -282,7 +281,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     JPanel mainPanel = new JPanel();
     BoxLayout layout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
     mainPanel.setLayout(layout);
-    mainPanel.setBackground(JBColor.WHITE);
+    mainPanel.setBackground(Color.WHITE);
     mainPanel.setBorder(BorderFactory.createEmptyBorder(0, GOOGLE_IMAGE_WEST, 0, 0));
 
     URL url = UsersListCellRenderer.class.getResource(GOOGLE_IMG);
