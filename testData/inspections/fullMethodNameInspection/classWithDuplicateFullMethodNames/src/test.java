@@ -29,4 +29,14 @@ public class Foo {
   public void function2() {
     // do nothing
   }
+
+  @ApiMethod(name = "")
+  public void function3() {
+    // do nothing
+  }
+
+  @ApiMethod
+  public void function4() {
+    // do nothing
+  }
 }

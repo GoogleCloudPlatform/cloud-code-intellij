@@ -115,6 +115,9 @@ public class FullMethodNameInspection extends EndpointInspectionBase  {
 
         String nameValueWithQuotes = apiMethodNameAttribute.getText();
         String nameValue = EndpointUtilities.removeBeginningAndEndingQuotes(nameValueWithQuotes);
+        if(nameValue.isEmpty()) {
+          return;
+        }
 
         // Check that @ApiMethod's name attribute has been used previously
         PsiMethod seenMethod = apiMethodNames.get(nameValue);
