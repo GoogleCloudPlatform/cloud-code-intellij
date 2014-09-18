@@ -11,6 +11,7 @@ import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.facet.FacetManager;
 import com.intellij.javaee.JavaeePersistenceDescriptorsConstants;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
+import com.intellij.javaee.artifact.JavaeeArtifactUtil;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.configuration.J2EEConfigurationFactory;
 import com.intellij.javaee.serverInstances.ApplicationServersManager;
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,8 +44,8 @@ import java.util.List;
 public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
   @NotNull
   @Override
-  public ArtifactType getAppEngineTargetArtifactType() {
-    return WebArtifactUtil.getInstance().getExplodedWarArtifactType();
+  public List<ArtifactType> getAppEngineTargetArtifactType() {
+    return Arrays.asList(WebArtifactUtil.getInstance().getExplodedWarArtifactType(), JavaeeArtifactUtil.getInstance().getExplodedEarArtifactType());
   }
 
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(@NotNull Module module, @NotNull ModifiableRootModel rootModel) {

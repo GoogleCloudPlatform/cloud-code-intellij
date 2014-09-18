@@ -14,7 +14,7 @@
         </constraints>
         <properties>
           <labelFor value="20025"/>
-          <text value="&amp;Web Artifact to deploy:"/>
+          <text value="Artifact to &amp;deploy:"/>
         </properties>
       </component>
       <vspacer id="f11f3">
