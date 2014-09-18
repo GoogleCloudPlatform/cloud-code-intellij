@@ -24,11 +24,27 @@ import javax.swing.*;
  * http://youtrack.jetbrains.com/issue/IDEA-103558
  */
 public class GoogleCloudToolsIcons {
-  private static Icon load(String path) {
-    return IconLoader.getIcon(path, GoogleCloudToolsIcons.class);
-  }
+  private static final int STEPS_COUNT = 12;
 
   public static final Icon AppEngine = load("/icons/appEngine.png"); // 16x16
 
   public static final Icon Cloud = load("/icons/cloudPlatform.png"); // 16x16
+
+  public static final Icon GoogleTransparent = load("/icons/google.png");
+
+  public static final Icon Refresh = load("/icons/refresh.png");
+
+  public static final Icon[] StepIcons = findStepIcons("/icons/step_");
+
+  private static Icon load(String path) {
+    return IconLoader.getIcon(path, GoogleCloudToolsIcons.class);
+  }
+
+  private static Icon[] findStepIcons(String prefix) {
+    Icon[] icons = new Icon[STEPS_COUNT];
+    for (int i = 0; i <= STEPS_COUNT - 1; i++) {
+      icons[i] = IconLoader.getIcon(prefix + (i + 1) + ".png");
+    }
+    return icons;
+  }
 }
