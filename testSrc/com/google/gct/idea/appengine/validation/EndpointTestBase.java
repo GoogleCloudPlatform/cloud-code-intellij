@@ -33,7 +33,7 @@ public class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
   protected String getTestDataPath() {
     String homePath = PathManagerEx.getHomePath(getClass());
     String homePathParent = homePath.substring(0, homePath.lastIndexOf('/'));
-    return homePathParent + FileUtil.toSystemDependentName("/studio/cloud/testData/");
+    return homePathParent + FileUtil.toSystemDependentName("/studio/google/cloud/tools/testData/");
   }
 
   @Override
