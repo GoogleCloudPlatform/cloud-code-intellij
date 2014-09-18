@@ -44,7 +44,7 @@ import java.util.List;
 public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
   @NotNull
   @Override
-  public List<ArtifactType> getAppEngineTargetArtifactType() {
+  public List<ArtifactType> getAppEngineTargetArtifactTypes() {
     return Arrays.asList(WebArtifactUtil.getInstance().getExplodedWarArtifactType(), JavaeeArtifactUtil.getInstance().getExplodedEarArtifactType());
   }
 
