@@ -30,28 +30,14 @@ import com.intellij.openapi.roots.ui.configuration.ModulesCombobox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.artifacts.ArtifactManager;
-import com.intellij.packaging.elements.PackagingElementResolvingContext;
-import com.intellij.packaging.impl.artifacts.ArtifactUtil;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.xml.XmlFile;
 import com.intellij.ui.SortedComboBoxModel;
-import com.intellij.util.xml.DomElement;
-import com.intellij.util.xml.DomFileElement;
-import com.intellij.util.xml.DomManager;
 import com.intellij.xml.util.XmlStringUtil;
-import org.eclipse.jgit.util.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -219,9 +205,9 @@ public class AppEngineUpdateDialog extends DialogWrapper {
       String client_id = login.fetchOAuth2ClientId();
       String refresh_token = login.fetchOAuth2RefreshToken();
 
-      if (StringUtils.isEmptyOrNull(client_secret) ||
-          StringUtils.isEmptyOrNull(client_id) ||
-          StringUtils.isEmptyOrNull(refresh_token)) {
+      if (Strings.isNullOrEmpty(client_secret) ||
+          Strings.isNullOrEmpty(client_id) ||
+          Strings.isNullOrEmpty(refresh_token)) {
         // The login is somehow invalid, bail -- this shouldn't happen.
         LOG.error("StartUploading while logged in, but it doesn't have full credentials.");
         Messages.showErrorDialog(this.getPeer().getOwner(), "Login credentials are not valid.", "Login");
