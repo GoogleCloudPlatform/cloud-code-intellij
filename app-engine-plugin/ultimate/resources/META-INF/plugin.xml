@@ -33,6 +33,7 @@
     <configurationType implementation="com.intellij.appengine.server.run.AppEngineServerConfigurationType"/>
     <configurationProducer implementation="com.intellij.appengine.server.run.AppEngineServerConfigurationProducer"/>
 
+    <javaee.frameworkSupportContributor implementation="com.intellij.appengine.facet.impl.AppEngineJavaeeSupportContributor"/>
   </extensions>
 
 </idea-plugin>

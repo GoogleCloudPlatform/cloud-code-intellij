@@ -1,5 +1,6 @@
 package com.intellij.appengine.facet.impl;
 
+import com.intellij.appengine.facet.AppEngineFacet;
 import com.intellij.appengine.facet.AppEngineWebIntegration;
 import com.intellij.appengine.sdk.AppEngineSdk;
 import com.intellij.appengine.server.instance.AppEngineServerModel;
@@ -9,9 +10,11 @@ import com.intellij.appengine.server.run.AppEngineServerConfigurationType;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.facet.FacetManager;
+import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.javaee.JavaeePersistenceDescriptorsConstants;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
 import com.intellij.javaee.artifact.JavaeeArtifactUtil;
+import com.intellij.javaee.facet.JavaeeFrameworkSupportInfoCollector;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.configuration.J2EEConfigurationFactory;
 import com.intellij.javaee.serverInstances.ApplicationServersManager;
@@ -32,10 +35,10 @@ import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.descriptors.ConfigFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,8 +47,14 @@ import java.util.List;
 public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
   @NotNull
   @Override
-  public List<ArtifactType> getAppEngineTargetArtifactTypes() {
-    return Arrays.asList(WebArtifactUtil.getInstance().getExplodedWarArtifactType(), JavaeeArtifactUtil.getInstance().getExplodedEarArtifactType());
+  public ArtifactType getAppEngineWebArtifactType() {
+    return WebArtifactUtil.getInstance().getExplodedWarArtifactType();
+  }
+
+  @Nullable
+  @Override
+  public ArtifactType getAppEngineApplicationArtifactType() {
+    return JavaeeArtifactUtil.getInstance().getExplodedEarArtifactType();
   }
 
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(@NotNull Module module, @NotNull ModifiableRootModel rootModel) {
@@ -133,5 +142,10 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
       }
     }
     return sdkList;
+  }
+
+  @Override
+  public void registerFrameworkInModel(FrameworkSupportModel model, AppEngineFacet appEngineFacet) {
+    JavaeeFrameworkSupportInfoCollector.getOrCreateCollector(model).setFacet(AppEngineFacet.ID, appEngineFacet);
   }
 }
