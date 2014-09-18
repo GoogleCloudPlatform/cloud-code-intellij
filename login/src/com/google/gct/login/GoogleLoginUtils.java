@@ -23,6 +23,7 @@ import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 
 import com.intellij.openapi.ui.Messages;
@@ -90,10 +91,10 @@ public class GoogleLoginUtils {
         try {
           userInfo = userInfoService.userinfo().get().execute();
         } catch (IOException e) {
-          Messages.showErrorDialog("An error occurred while retrieving user information.\n" +
+          LOG.error("Error retrieving user information.", e);
+          showErrorDialog("An error occurred while retrieving user information.\n" +
             e.getMessage() + "\nPlease check the error log for more detail.",
             "Error occurred while retrieving user information");
-          LOG.error("Error retrieving user information.", e);
         }
 
         if (userInfo != null && userInfo.getId() != null) {
@@ -103,6 +104,26 @@ public class GoogleLoginUtils {
         }
       }
     });
+  }
+
+  /**
+   * Opens an error dialog with the specified title.
+   * Ensures that the error dialog is opened on the UI thread.
+   *
+   * @param message The message to be displayed.
+   * @param title The title of the error dialog to be displayed
+   */
+  public static void showErrorDialog(final String message, @NotNull final String title) {
+    if (ApplicationManager.getApplication().isDispatchThread()) {
+      Messages.showErrorDialog(message, title);
+    } else {
+      ApplicationManager.getApplication().invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          Messages.showErrorDialog(message, title);
+        }
+      }, ModalityState.defaultModalityState());
+    }
   }
 
   /**

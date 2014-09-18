@@ -17,8 +17,6 @@ package com.google.gct.login;
 
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
 import com.google.api.client.http.HttpRequestFactory;
@@ -33,7 +31,6 @@ import com.google.gdt.eclipse.login.common.UiFacade;
 import com.google.gdt.eclipse.login.common.VerificationCodeHolder;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -52,8 +49,6 @@ import javax.swing.Icon;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
 
 
 /**
@@ -68,7 +63,7 @@ public class GoogleLogin {
   private CredentialedUserRoster users;
   private static GoogleLogin instance;
 
-  public static final Logger GOOGLE_LOGIN_LOG =  Logger.getInstance(GoogleLogin.class);
+  public static final Logger LOG =  Logger.getInstance(GoogleLogin.class);
 
   /**
    * Constructor
@@ -509,18 +504,8 @@ public class GoogleLogin {
 
   // TODO: update code to specify parent
   private void logErrorAndDisplayDialog(@NotNull final String title, @NotNull final Exception exception) {
-    if (ApplicationManager.getApplication().isDispatchThread()) {
-      Messages.showErrorDialog(exception.getMessage(), title);
-    } else {
-      ApplicationManager.getApplication().invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(exception.getMessage(), title);
-        }
-      }, ModalityState.defaultModalityState());
-    }
-
-    GOOGLE_LOGIN_LOG.error(exception.getMessage(), exception);
+    LOG.error(exception.getMessage(), exception);
+    GoogleLoginUtils.showErrorDialog(exception.getMessage(), title);
   }
 
   /**
@@ -698,7 +683,7 @@ public class GoogleLogin {
         try {
           users.setActiveUser(activeUserString);
         } catch (IllegalArgumentException ex) {
-          GOOGLE_LOGIN_LOG.error("Error while initiating users", ex);
+          LOG.error("Error while initiating users", ex);
           // Set no active user
           users.removeActiveUser();
         }
@@ -709,12 +694,12 @@ public class GoogleLogin {
   private static class AndroidLoggerFacade implements LoggerFacade {
     @Override
     public void logError(String msg, Throwable t) {
-      GOOGLE_LOGIN_LOG.error(msg, t);
+      LOG.error(msg, t);
     }
 
     @Override
     public void logWarning(String msg) {
-      GOOGLE_LOGIN_LOG.warn(msg);
+      LOG.warn(msg);
     }
   }
 }
