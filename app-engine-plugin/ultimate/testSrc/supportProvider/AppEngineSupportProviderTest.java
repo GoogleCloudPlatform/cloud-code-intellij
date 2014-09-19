@@ -2,14 +2,14 @@ package com.intellij.appengine.supportProvider;
 
 import com.intellij.appengine.AppEngineCodeInsightTestCase;
 import com.intellij.appengine.facet.AppEngineFacet;
+import com.intellij.appengine.facet.AppEngineFrameworkType;
 import com.intellij.appengine.facet.AppEngineSupportProvider;
 import com.intellij.appengine.server.run.AppEngineServerConfigurationType;
 import com.intellij.compiler.artifacts.ArtifactsTestUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.facet.FacetManager;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
-import com.intellij.ide.util.frameworkSupport.FrameworkSupportConfigurable;
-import com.intellij.ide.util.newProjectWizard.OldFrameworkSupportProviderWrapper;
 import com.intellij.javaee.JavaeeVersion;
 import com.intellij.javaee.application.facet.JavaeeApplicationFacet;
 import com.intellij.javaee.application.framework.JavaeeApplicationFrameworkType;
@@ -36,6 +36,7 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
     addSupport();
 
     final AppEngineFacet appEngineFacet = getFacet(AppEngineFacet.ID);
+    assertNull(FacetManager.getInstance(myModule).getFacetByType(WebFacet.ID));
     assertEmpty(appEngineFacet.getConfiguration().getFilesToEnhance());
     final String moduleName = myModule.getName();
     ArtifactsTestUtil.assertLayout(myProject, moduleName, "<root>\n" +
@@ -47,9 +48,8 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
   }
 
   private void setupAppEngine() {
-    FrameworkSupportInModuleConfigurable configurable = selectFramework(AppEngineFacet.ID);
-    FrameworkSupportConfigurable supportConfigurable = ((OldFrameworkSupportProviderWrapper.FrameworkSupportConfigurableWrapper)configurable).getConfigurable();
-    AppEngineSupportProvider.setSdkPath(supportConfigurable, AppEngineCodeInsightTestCase.getSdkPath());
+    FrameworkSupportInModuleConfigurable configurable = selectFramework(AppEngineFrameworkType.ID);
+    AppEngineSupportProvider.setSdkPath(configurable, AppEngineCodeInsightTestCase.getSdkPath());
   }
 
   private void assertRunConfigurationCreated(Artifact artifactToDeploy) {
