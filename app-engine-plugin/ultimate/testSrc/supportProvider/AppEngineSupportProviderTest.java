@@ -24,14 +24,13 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
  * @author nik
  */
 public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProviderTestCase {
-  public void testAppEngine() throws IOException {
+  public void testAppEngine() {
     setupAppEngine();
     addSupport();
 
@@ -58,7 +57,7 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
     assertSameElements(configuration.getDeployedArtifacts(), artifactToDeploy);
   }
 
-  public void testAppEngineWithWeb() throws IOException {
+  public void testAppEngineWithWeb() {
     setupAppEngine();
     selectFramework(WebFacet.ID);
     selectVersion(WebFrameworkType.getInstance(), new WebFrameworkVersion(WebAppVersion.WebAppVersion_2_5));
@@ -80,7 +79,7 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
     assertRunConfigurationCreated(artifact);
   }
 
-  public void testAppEngineWithEar() throws IOException {
+  public void testAppEngineWithEar() {
     setupAppEngine();
     selectFramework(WebFacet.ID);
     selectFramework(JavaeeApplicationFacet.ID);
