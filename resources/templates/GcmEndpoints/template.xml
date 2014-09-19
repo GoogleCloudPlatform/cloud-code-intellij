@@ -34,14 +34,7 @@
   <parameter id="appEngineVersion" name="AppEngine Version" type="string" default="1.9.11" />
   <parameter id="docUrl" name="Doc URL" type="string" visibility="false"
              default="https://github.com/GoogleCloudPlatform/gradle-appengine-templates/tree/master/GcmEndpoints"/>
-  <parameter id="sideIconPath" name="Side icon path" type="string" visibility="false"
-             default="/icons/background_gcm.png"/>
 
   <globals file="globals.xml.ftl"/>
   <execute file="recipe.xml.ftl"/>
-
-  <thumbs>
-    <thumb>background_gcm.png</thumb>
-  </thumbs>
-
 </template>

@@ -19,14 +19,18 @@ package com.google.gct.idea.appengine.wizard;
 import com.android.builder.model.SourceProvider;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.android.tools.idea.gradle.project.GradleSyncListener;
-import com.android.tools.idea.templates.*;
-import com.android.tools.idea.wizard.NewTemplateObjectWizard;
+import com.android.tools.idea.templates.KeystoreUtils;
+import com.android.tools.idea.templates.Template;
+import com.android.tools.idea.templates.TemplateMetadata;
+import com.android.tools.idea.templates.TemplateUtils;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -37,68 +41,48 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.ArrayUtil;
 import org.jetbrains.android.dom.manifest.Manifest;
 import org.jetbrains.android.facet.AndroidFacet;
 import org.jetbrains.android.facet.IdeaSourceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.gradle.settings.GradleSettings;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.android.tools.idea.templates.KeystoreUtils.getDebugKeystore;
 
 /**
- * Action to generate client libraries for an AppEngine endpoints project and copy them to an associated android project
- * TODO : No Longer in use, transition constants to WizardPath and remove this mechanism
+ * Utility class that generates a new Android Studio AppEngine module and copies the associated
+ * client libraries into the selected client Android module. This class also defines constants
+ * which are used to store state during the new module wizard workflow and are used as
+ * parameters in the templates.xml.
  */
-public class NewAppEngineModuleAction extends AnAction {
-
-  private static final String ERROR_MESSAGE_TITLE = "New App Engine Module";
-  private static final Logger LOG = Logger.getInstance(NewAppEngineModuleAction.class);
+public final class CloudModuleUtils {
   public static final String ATTR_MODULE_NAME = "moduleName";
-  public static final String ATTR_CLIENT_MODULE_NAME = "clientModuleName";
+  public static final String ATTR_PACKAGE_NAME = "packageName";
   public static final String ATTR_CLIENT_PACKAGE = "clientPackageName";
   public static final String ATTR_SERVER_MODULE_PATH = "serverModulePath";
+  public static final String ATTR_DOC_URL = "docUrl";
+  public static final String ATTR_ENDPOINTS_OWNER = "endpointOwnerDomain";
+  public static final String ATTR_ENDPOINTS_PACKAGE = "endpointPackagePath";
+  private static final String ERROR_MESSAGE_TITLE = "New App Engine Module";
+  private static final Logger LOG = Logger.getInstance(CloudModuleUtils.class);
 
-  @Override
-  public void actionPerformed(AnActionEvent e) {
-    final Project project = e.getProject();
-
-    // TODO : Make sure we can add to this project, we want to add to Android Gradle projects
-
-    AppEngineModuleWizard dialog = new AppEngineModuleWizard(project);
-    dialog.show();
-
-    if (dialog.isOK()) {
-      doAction(project, dialog);
-    }
-
-  }
-
-  void doAction(@NotNull final Project project, final AppEngineModuleWizard dialog) {
-    createModule(project, dialog.getTemplate(), dialog.getModuleName(), dialog.getPackageName(), "");
-  }
-
-  public static void createModule(final Project project, File templateFile, final String moduleName, String packageName,
-                                  final String clientModuleName) {
-    final Template template = Template.createFromPath(templateFile);
-    final Template clientTemplate = AppEngineTemplates.getClientModuleTemplate(templateFile.getName());
-    final Module clientModule = StringUtil.isEmpty(clientModuleName)
-                                ? null
-                                : ModuleManager.getInstance(project).findModuleByName(clientModuleName);
-
+  static void createModule(@NotNull final Project project,
+                           @NotNull File templateFile,
+                           @NotNull final String moduleName,
+                           @NotNull String packageName,
+                           @Nullable final String clientModuleName) {
     final File projectRoot = new File(project.getBasePath());
     final File moduleRoot = new File(projectRoot, moduleName);
     FileUtil.createDirectory(moduleRoot);
 
-    final Map<String, Object> replacementMap = new HashMap<String, Object>();
+    final Map<String, Object> replacementMap = Maps.newHashMap();
     try {
       replacementMap.put(TemplateMetadata.ATTR_PROJECT_OUT, moduleRoot.getCanonicalPath());
     }
@@ -108,17 +92,26 @@ public class NewAppEngineModuleAction extends AnAction {
       return;
     }
     replacementMap.put(ATTR_MODULE_NAME, moduleName);
-    replacementMap.put(TemplateMetadata.ATTR_PACKAGE_NAME, packageName);
+    replacementMap.put(ATTR_PACKAGE_NAME, packageName);
+
+    final Module clientModule;
+    if (Strings.isNullOrEmpty(clientModuleName)) {
+      clientModule = null;
+    } else {
+      clientModule = ModuleManager.getInstance(project).findModuleByName(clientModuleName);
+    }
     addPropertiesFromClientModule(clientModule, replacementMap);
 
-    if (AppEngineTemplates.LOCAL_ENDPOINTS_TEMPLATES.contains(templateFile.getName())) {
-      AppEngineTemplates.populateEndpointParameters(replacementMap, packageName);
+    if (CloudTemplateUtils.LOCAL_ENDPOINTS_TEMPLATES.contains(templateFile.getName())) {
+      populateEndpointParameters(replacementMap, packageName);
     }
 
+    final Template template = Template.createFromPath(templateFile);
+    final Template clientTemplate = CloudTemplateUtils.getClientModuleTemplate(templateFile.getName());
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
       @Override
       public void run() {
-        List<File> allFilesToOpen = new ArrayList<File>();
+        final List<File> allFilesToOpen = Lists.newArrayList();
         template.render(projectRoot, moduleRoot, replacementMap);
         allFilesToOpen.addAll(template.getFilesToOpen());
 
@@ -129,15 +122,14 @@ public class NewAppEngineModuleAction extends AnAction {
 
         TemplateUtils.openEditors(project, allFilesToOpen, true);
 
-        GradleProjectImporter projectImporter = GradleProjectImporter.getInstance();
-        projectImporter.requestProjectSync(project, new GradleSyncListener.Adapter() {
-
+        GradleProjectImporter.getInstance().requestProjectSync(project, new GradleSyncListener.Adapter() {
           @Override
           public void syncSucceeded(@NotNull final Project project) {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
               @Override
               public void run() {
-                Module module = ModuleManager.getInstance(project).findModuleByName(moduleName);
+                final Module module = ModuleManager.getInstance(project).findModuleByName(moduleName);
+                // 'module' will never be null here.
                 createRunConfiguration(project, module);
               }
             });
@@ -161,7 +153,7 @@ public class NewAppEngineModuleAction extends AnAction {
     replacementMap.put(TemplateMetadata.ATTR_DEBUG_KEYSTORE_SHA1, "");
     replacementMap.put(ATTR_CLIENT_PACKAGE, "");
     if (clientModule != null) {
-      AndroidFacet facet = AndroidFacet.getInstance(clientModule);
+      final AndroidFacet facet = AndroidFacet.getInstance(clientModule);
       if (facet != null) {
         try {
           replacementMap.put(TemplateMetadata.ATTR_DEBUG_KEYSTORE_SHA1, KeystoreUtils.sha1(getDebugKeystore(facet)));
@@ -178,37 +170,32 @@ public class NewAppEngineModuleAction extends AnAction {
   }
 
   private static void patchClientModule(Module clientModule, Template clientTemplate, Map<String, Object> replacementMap) {
-    AndroidFacet facet = AndroidFacet.getInstance(clientModule);
-
-    VirtualFile targetFolder = findTargetContentRoot(clientModule);
+    final AndroidFacet facet = AndroidFacet.getInstance(clientModule);
+    final VirtualFile targetFolder = findTargetContentRoot(clientModule);
     if (targetFolder != null && facet != null) {
-      String backendModulePath = (String) replacementMap.get(TemplateMetadata.ATTR_PROJECT_OUT);
+      final String backendModulePath = (String)replacementMap.get(TemplateMetadata.ATTR_PROJECT_OUT);
       replacementMap.put(ATTR_SERVER_MODULE_PATH, FileUtil.getRelativePath(targetFolder.getPath(), backendModulePath, '/'));
       replacementMap.put(TemplateMetadata.ATTR_PROJECT_OUT, targetFolder.getPath());
-      List<SourceProvider> sourceProviders = IdeaSourceProvider.getSourceProvidersForFile(facet, targetFolder, facet.getMainSourceProvider());
-      SourceProvider sourceProvider = sourceProviders.get(0);
-      File manifestDirectory = NewTemplateObjectWizard.findManifestDirectory(sourceProvider);
-      replacementMap.put(TemplateMetadata.ATTR_MANIFEST_DIR, manifestDirectory.getPath());
-      File clientContentRoot = new File(targetFolder.getPath());
+      final List<SourceProvider> sourceProviders =
+        IdeaSourceProvider.getSourceProvidersForFile(facet, targetFolder, facet.getMainSourceProvider());
+      replacementMap.put(TemplateMetadata.ATTR_MANIFEST_DIR, sourceProviders.get(0).getManifestFile().getParentFile().getPath());
+      final File clientContentRoot = new File(targetFolder.getPath());
       clientTemplate.render(clientContentRoot, clientContentRoot, replacementMap);
     }
   }
 
   @Nullable
   private static VirtualFile findTargetContentRoot(Module clientModule) {
-    VirtualFile[] contentRoots = ModuleRootManager.getInstance(clientModule).getContentRoots();
+    final VirtualFile[] contentRoots = ModuleRootManager.getInstance(clientModule).getContentRoots();
     for (VirtualFile contentRoot : contentRoots) {
       if (contentRoot.findChild(GradleConstants.DEFAULT_SCRIPT_NAME) != null) {
         return contentRoot;
       }
     }
-    if (contentRoots.length > 0) {
-      return contentRoots[0];
-    }
-    return null;
+    return contentRoots.length > 0 ? contentRoots[0] : null;
   }
 
-  private static void createRunConfiguration(Project project, Module module) {
+  private static void createRunConfiguration(@NotNull Project project, @NotNull Module module) {
     // Create a run configuration for this module
     final RunManagerEx runManager = RunManagerEx.getInstanceEx(project);
     final RunnerAndConfigurationSettings settings = runManager.
@@ -219,6 +206,20 @@ public class NewAppEngineModuleAction extends AnAction {
     // pull configuration out of gradle
     configuration.setSyncWithGradle(true);
     runManager.addConfiguration(settings, false);
+  }
+
+  /**
+   * Populate endpoints specific template parameters into the replacement map.
+   */
+  @VisibleForTesting
+  static void populateEndpointParameters(Map<String, Object> replacementMap, String rootPackage) {
+    // Owner Domain is the reverse of package path.
+    replacementMap.put(ATTR_ENDPOINTS_OWNER, StringUtil.join(ArrayUtil.reverseArray(rootPackage.split("\\.")), "."));
+    replacementMap.put(ATTR_ENDPOINTS_PACKAGE, "");
+  }
+
+  private CloudModuleUtils() {
+    // This utility class should not be instantiated.
   }
 }
 

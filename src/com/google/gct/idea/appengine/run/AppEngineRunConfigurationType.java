@@ -49,7 +49,7 @@ public class AppEngineRunConfigurationType implements ConfigurationType {
 
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.AppEngine;
+    return GoogleCloudToolsIcons.APP_ENGINE;
   }
 
   @NotNull

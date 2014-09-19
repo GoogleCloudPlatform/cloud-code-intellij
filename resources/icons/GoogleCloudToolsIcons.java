@@ -23,15 +23,14 @@ import javax.swing.*;
  * Note: This file should be auto generated once build/scripts/icons.gant is part of CE.
  * http://youtrack.jetbrains.com/issue/IDEA-103558
  */
-public class GoogleCloudToolsIcons {
+public final class GoogleCloudToolsIcons {
   private static final int STEPS_COUNT = 12;
 
-  public static final Icon AppEngine = load("/icons/appEngine.png"); // 16x16
-  public static final Icon Cloud = load("/icons/cloudPlatform.png"); // 16x16
-  public static final Icon GoogleTransparent = load("/icons/google.png");
-  public static final Icon Refresh = load("/icons/refresh.png");
-  public static final Icon SampleImport = load("/icons/sampleImport.png");
-  public static final Icon[] StepIcons = findStepIcons("/icons/step_");
+  public static final Icon APP_ENGINE = load("/icons/appEngine.png"); // 16x16
+  public static final Icon CLOUD_72x64 = load("/icons/cloudPlatform_72x64.png");
+  public static final Icon GOOGLE_TRANSPARENT = load("/icons/google.png");
+  public static final Icon REFRESH = load("/icons/refresh.png");
+  public static final Icon[] STEP_ICONS = findStepIcons("/icons/step_");
 
   private static Icon load(String path) {
     return IconLoader.getIcon(path, GoogleCloudToolsIcons.class);
@@ -39,9 +38,13 @@ public class GoogleCloudToolsIcons {
 
   private static Icon[] findStepIcons(String prefix) {
     Icon[] icons = new Icon[STEPS_COUNT];
-    for (int i = 0; i <= STEPS_COUNT - 1; i++) {
+    for (int i = 0; i < STEPS_COUNT; i++) {
       icons[i] = IconLoader.getIcon(prefix + (i + 1) + ".png");
     }
     return icons;
+  }
+
+  private GoogleCloudToolsIcons() {
+    // This utility class should not be instantiated.
   }
 }

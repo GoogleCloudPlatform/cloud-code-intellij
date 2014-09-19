@@ -37,9 +37,4 @@
 
   <globals file="globals.xml.ftl"/>
   <execute file="recipe.xml.ftl"/>
-
-  <thumbs>
-    <thumb>background_endpoints.png</thumb>
-  </thumbs>
-
 </template>

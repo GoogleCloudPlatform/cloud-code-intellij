@@ -390,7 +390,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
       getBottomPane().setLayout(new BorderLayout());
       JButton synchronizeButton = new JButton();
-      synchronizeButton.setIcon(GoogleCloudToolsIcons.Refresh);
+      synchronizeButton.setIcon(GoogleCloudToolsIcons.REFRESH);
       synchronizeButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {

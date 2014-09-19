@@ -15,31 +15,9 @@
  */
 package com.google.gct.idea.appengine.util;
 
-import com.android.tools.idea.gradle.parser.GradleBuildFile;
-import com.android.tools.idea.gradle.util.GradleUtil;
-import com.android.tools.idea.templates.Template;
-import com.android.tools.idea.templates.TemplateManager;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
-import com.google.gct.idea.appengine.wizard.AppEngineTemplates;
-
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.LangDataKeys;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.util.PathUtil;
-
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Utility methods for App Engine.

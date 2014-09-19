@@ -15,25 +15,24 @@
  */
 package com.google.gct.idea.appengine.wizard;
 
+import com.google.common.collect.Maps;
 import junit.framework.TestCase;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Tests for gradle templates
+ * Tests for cloud module templates.
  */
-public class AppEngineTemplatesTest extends TestCase {
+public class CloudTemplateUtilsTest extends TestCase {
 
   /** Ensure we are populating endpoints owner domain/package correctly */
   public void testOwnerDomainConversion() {
-
-    Map<String, Object> myMap = new HashMap<String, Object>();
+    Map<String, Object> myMap = Maps.newHashMap();
     assertEquals(myMap.size(),0);
-    AppEngineTemplates.populateEndpointParameters(myMap, "com.test.package.reverse");
+    CloudModuleUtils.populateEndpointParameters(myMap, "com.test.package.reverse");
 
     assertEquals(myMap.size(), 2);
-    assertEquals("reverse.package.test.com",myMap.get(AppEngineTemplates.ATTR_ENDPOINTS_OWNER));
-    assertEquals("", myMap.get(AppEngineTemplates.ATTR_ENDPOINTS_PACKAGE));
+    assertEquals("reverse.package.test.com",myMap.get(CloudModuleUtils.ATTR_ENDPOINTS_OWNER));
+    assertEquals("", myMap.get(CloudModuleUtils.ATTR_ENDPOINTS_PACKAGE));
   }
 }

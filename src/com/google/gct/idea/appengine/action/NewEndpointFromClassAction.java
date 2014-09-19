@@ -25,11 +25,14 @@ import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
 import com.android.tools.idea.templates.TemplateUtils;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gct.idea.appengine.dom.WebApp;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.util.AppEngineUtils;
 import com.google.gct.idea.appengine.util.PsiUtils;
-import com.google.gct.idea.appengine.wizard.AppEngineTemplates;
+import com.google.gct.idea.appengine.wizard.CloudModuleUtils;
+import com.google.gct.idea.appengine.wizard.CloudTemplateUtils;
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -50,14 +53,13 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
+import com.intellij.util.ArrayUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,16 +67,16 @@ import java.util.Map;
  * Action to generate an Endpoint class from a specified class.
  */
 public class NewEndpointFromClassAction extends AnAction {
+  private static final Logger LOG = Logger.getInstance(NewEndpointFromClassAction.class);
+
   public static final String ENTITY_NAME = "entityName";
   public static final String ENTITY_TYPE = "entityType";
   public static final String ENDPOINT_TEMPLATE = "EndpointFromClass";
-
   private static final String ENDPOINT_CLASS_SUFFIX = "Endpoint";
   private static final String ERROR_MESSAGE_TITLE = "Failed to Generate Endpoint Class";
   private static final String DEFAULT_ERROR_MESSAGE = "Error occurred while generating Endpoint class";
   private static final String ENDPOINTS_DEPENDENCY = "com.google.appengine:appengine-endpoints:";
   private static final String ENDPOINTS_DEPS_DEPENDENCY = "com.google.appengine:appengine-endpoints-deps:";
-  private static final Logger LOG = Logger.getInstance(NewEndpointFromClassAction.class);
   private static final String OBJECTIFY_ENTITY_ANNOTATION = "com.googlecode.objectify.annotation.Entity";
   private static final String OBJECTIFY_ID_ANNOTATION = "com.googlecode.objectify.annotation.Id";
   private static final String ENDPOINTS_SERVLET_CLASS = "com.google.api.server.spi.SystemServiceServlet";
@@ -88,7 +90,7 @@ public class NewEndpointFromClassAction extends AnAction {
     }
   }
 
-  private boolean shouldDisplayAction(AnActionEvent e) {
+  private static boolean shouldDisplayAction(AnActionEvent e) {
     if (!AppEngineUtils.isAppEngineModule(e.getData(LangDataKeys.MODULE))) {
       return false;
     }
@@ -184,7 +186,7 @@ public class NewEndpointFromClassAction extends AnAction {
    * Generates an endpoint class in the specified module and updates the gradle build file
    * to include endpoint dependencies if they don't already exist.
    */
-  private void doAction(Project project,
+  private static void doAction(Project project,
                         Module module,
                         String packageName,
                         String directory,
@@ -207,7 +209,7 @@ public class NewEndpointFromClassAction extends AnAction {
       return;
     }
 
-    AppEngineTemplates.TemplateInfo templateInfo = AppEngineTemplates.getAppEngineTemplate(ENDPOINT_TEMPLATE);
+    CloudTemplateUtils.TemplateInfo templateInfo = CloudTemplateUtils.getTemplate(ENDPOINT_TEMPLATE);
 
     if (templateInfo == null) {
       LOG.error("Failed to load endpoint template info: " + ENDPOINT_TEMPLATE);
@@ -216,12 +218,11 @@ public class NewEndpointFromClassAction extends AnAction {
     }
 
     final Template template = Template.createFromPath(templateInfo.getFile());
-
     final File projectRoot = new File(project.getBasePath());
     final File moduleRoot = new File(projectRoot, module.getName());
 
     // Create the replacement map
-    final Map<String, Object> replacementMap = new HashMap<String, Object>();
+    final Map<String, Object> replacementMap = Maps.newHashMap();
     try {
       replacementMap.put(TemplateMetadata.ATTR_PROJECT_OUT, moduleRoot.getCanonicalPath());
     }
@@ -244,7 +245,9 @@ public class NewEndpointFromClassAction extends AnAction {
     replacementMap.put(TemplateMetadata.ATTR_SRC_DIR, directory);
     replacementMap.put(TemplateMetadata.ATTR_PACKAGE_NAME, packageName);
 
-    AppEngineTemplates.populateEndpointParameters(replacementMap, packageName);
+    // Owner Domain is the reverse of package path.
+    replacementMap.put(CloudModuleUtils.ATTR_ENDPOINTS_OWNER, StringUtil.join(ArrayUtil.reverseArray(packageName.split("\\.")), "."));
+    replacementMap.put(CloudModuleUtils.ATTR_ENDPOINTS_PACKAGE, "");
 
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
       @Override
@@ -353,7 +356,7 @@ public class NewEndpointFromClassAction extends AnAction {
       new Dependency(Dependency.Scope.COMPILE, Dependency.Type.EXTERNAL, ENDPOINTS_DEPENDENCY + appEngineVersion);
     Dependency endpointDepsDependency =
       new Dependency(Dependency.Scope.COMPILE, Dependency.Type.EXTERNAL, ENDPOINTS_DEPS_DEPENDENCY + appEngineVersion);
-    List<Dependency> missingDependencies = new ArrayList<Dependency>();
+    List<Dependency> missingDependencies = Lists.newArrayList();
 
     // Check if the endpoint dependencies already exist in the gradle file
     if (!gradleBuildFile.hasDependency(endpointDependency)) {
@@ -365,7 +368,7 @@ public class NewEndpointFromClassAction extends AnAction {
     }
 
     // Add the missing dependencies to the gradle build file
-    if (missingDependencies.size() > 0) {
+    if (!missingDependencies.isEmpty()) {
       final List<BuildFileStatement> currentDependencies = gradleBuildFile.getDependencies();
       currentDependencies.addAll(missingDependencies);
 

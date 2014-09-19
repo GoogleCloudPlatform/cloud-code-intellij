@@ -39,7 +39,7 @@ class ProjectSelectorGoogleLogin extends JPanel {
     googleIcon.setHorizontalAlignment(SwingConstants.CENTER);
     googleIcon.setVerticalAlignment(SwingConstants.CENTER);
     googleIcon.setOpaque(false);
-    googleIcon.setIcon(GoogleCloudToolsIcons.GoogleTransparent);
+    googleIcon.setIcon(GoogleCloudToolsIcons.GOOGLE_TRANSPARENT);
     GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
     c.gridy = 0;

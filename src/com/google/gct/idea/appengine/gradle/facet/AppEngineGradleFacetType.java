@@ -62,6 +62,6 @@ public class AppEngineGradleFacetType extends FacetType<AppEngineGradleFacet, Ap
 
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.AppEngine;
+    return GoogleCloudToolsIcons.APP_ENGINE;
   }
 }
