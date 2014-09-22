@@ -600,7 +600,10 @@ public class GoogleLogin {
       try {
         verificationCode = receiver.waitForCode();
       }
-      catch (IOException e) {
+      catch (CancelledLoginRequestException e) {
+        GoogleLoginUtils.showErrorDialog(e.getMessage(), title == null? "Google Login" : title);
+        return null;
+      } catch (IOException e) {
         logErrorAndDisplayDialog(title == null? "Google Login" : title, e);
         return null;
       }

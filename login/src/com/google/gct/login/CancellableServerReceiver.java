@@ -36,6 +36,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 class CancellableServerReceiver implements VerificationCodeReceiver {
   private static final String CALLBACK_PATH = "/Callback";
+  private static final String LOGIN_CANCELLED = "Request cancelled.";
+  private static final String LOGIN_ACCESS_DENIED = "access_denied";
 
   /** Server or {@code null} before {@link #getRedirectUri()}. */
   private Server server;
@@ -107,7 +109,11 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
         gotAuthorizationResponse.awaitUninterruptibly();
       }
       if (error != null) {
-        throw new IOException("User authorization failed (" + error + ")");
+        if(error.equals(LOGIN_ACCESS_DENIED) || error.equals(LOGIN_CANCELLED)) {
+          throw new CancelledLoginRequestException(error);
+        } else {
+          throw new IOException("User authorization failed (" + error + ")");
+        }
       }
       return code;
     } finally {
@@ -126,7 +132,7 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
       }
       lock.lock();
       try {
-        error = "Request cancelled.";
+        error = LOGIN_CANCELLED;
         code = null;
         gotAuthorizationResponse.signal();
       }
