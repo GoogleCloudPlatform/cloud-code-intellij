@@ -24,6 +24,8 @@
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
   <idea-version since-build="107.105"/>
 
+  <depends>org.jetbrains.android</depends>
+
   <application-components>
   </application-components>
 

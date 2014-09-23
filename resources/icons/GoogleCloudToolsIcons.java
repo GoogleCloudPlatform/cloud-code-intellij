@@ -27,13 +27,10 @@ public class GoogleCloudToolsIcons {
   private static final int STEPS_COUNT = 12;
 
   public static final Icon AppEngine = load("/icons/appEngine.png"); // 16x16
-
   public static final Icon Cloud = load("/icons/cloudPlatform.png"); // 16x16
-
   public static final Icon GoogleTransparent = load("/icons/google.png");
-
   public static final Icon Refresh = load("/icons/refresh.png");
-
+  public static final Icon SampleImport = load("/icons/sampleImport.png");
   public static final Icon[] StepIcons = findStepIcons("/icons/step_");
 
   private static Icon load(String path) {

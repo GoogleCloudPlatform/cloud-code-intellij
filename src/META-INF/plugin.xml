@@ -122,6 +122,18 @@
       <add-to-group group-id="EditorPopupMenu" anchor="last"/>
       <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
     </group>
+
+    <action id="GoogleCloudTools.SampleImport"
+            class="com.google.gct.idea.samples.SampleImportAction"
+            text="Import Sample...">
+      <add-to-group group-id="OpenProjectGroup" relative-to-action="ImportModule" anchor="after"/>
+    </action>
+    <action id="WelcomeScreen.GoogleCloudTools.SampleImport"
+            class="com.google.gct.idea.samples.SampleImportAction"
+            text="Import an Android Code sample"
+            icon="/icons/sampleImport.png">
+      <add-to-group group-id="WelcomeScreen.QuickStart" relative-to-action="WelcomeScreen.GetFromVcs" anchor="before"/>
+    </action>
   </actions>
 
 </idea-plugin>
