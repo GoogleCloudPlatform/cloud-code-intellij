@@ -41,7 +41,7 @@ public class CloudWizardParameterFactory implements WizardParameterFactory {
     if (!GOOGLE_PROJECT_SELECTOR_TYPENAME.equals(type)) {
       throw new IllegalArgumentException("type");
     }
-    return new ProjectSelector();
+    return new ProjectSelector(true);
   }
 
   @Override

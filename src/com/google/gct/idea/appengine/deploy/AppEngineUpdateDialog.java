@@ -17,11 +17,11 @@ package com.google.gct.idea.appengine.deploy;
 
 import com.google.common.base.Strings;
 import com.google.gct.idea.appengine.dom.AppEngineWebApp;
-import com.google.gct.idea.appengine.dom.AppEngineWebFileDescription;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineConfigurationProperties;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
+import com.google.gct.idea.elysium.ProjectSelector;
+import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
-import com.google.gct.login.IGoogleLoginCompletedCallback;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -31,6 +31,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.SortedComboBoxModel;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.xml.util.XmlStringUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,16 +47,18 @@ import java.util.List;
  */
 public class AppEngineUpdateDialog extends DialogWrapper {
   private static final Logger LOG = Logger.getInstance(AppEngineUpdateDialog.class);
+  private static final String DEFAULT_APPID = "myApplicationId";
 
   private ModulesCombobox myModuleComboBox;
-  private JTextField myProjectId;
+  private ProjectSelector myElysiumProjectId;
   private JTextField myVersion;
   private JPanel myPanel;
+  private JBLabel moduleLabel;
   private List<Module> myDeployableModules;
   private Project myProject;
   private Module myInitiallySelectedModule;
 
-  private AppEngineUpdateDialog(Project project, List<Module> deployableModules, Module selectedModule) {
+  private AppEngineUpdateDialog(Project project, List<Module> deployableModules, @Nullable Module selectedModule) {
     super(project, true);
     myDeployableModules = deployableModules;
     myProject = project;
@@ -68,7 +71,7 @@ public class AppEngineUpdateDialog extends DialogWrapper {
 
     Window myWindow = getWindow();
     if (myWindow != null) {
-      myWindow.setPreferredSize(new Dimension(285, 135));
+      myWindow.setPreferredSize(new Dimension(310, 135));
     }
   }
 
@@ -115,30 +118,8 @@ public class AppEngineUpdateDialog extends DialogWrapper {
     // To invoke later, we need a final local.
     final Module passedSelectedModule = selectedModule;
 
-    // Login on demand and queue up the dialog to show after a successful login.
-    //if login fails, it already shows an error.
-    if (!GoogleLogin.getInstance().isLoggedIn()) {
-      // log in on demand...
-      GoogleLogin.getInstance().logIn(null, new IGoogleLoginCompletedCallback() {
-        @Override
-        public void onLoginCompleted() {
-          if (GoogleLogin.getInstance().isLoggedIn()) {
-            EventQueue.invokeLater(new Runnable() {
-              @Override
-              public void run() {
-                // Success!, lets run the deploy now.
-                AppEngineUpdateDialog dialog = new AppEngineUpdateDialog(project, modules, passedSelectedModule);
-                dialog.show();
-              }
-            });
-          }
-        }
-      });
-    }
-    else {
-      AppEngineUpdateDialog dialog = new AppEngineUpdateDialog(project, modules, passedSelectedModule);
-      dialog.show();
-    }
+    AppEngineUpdateDialog dialog = new AppEngineUpdateDialog(project, modules, passedSelectedModule);
+    dialog.show();
   }
 
   @Nullable
@@ -165,7 +146,7 @@ public class AppEngineUpdateDialog extends DialogWrapper {
   }
 
   private void populateFields() {
-    myProjectId.setText("");
+    myElysiumProjectId.setText("");
     myVersion.setText("");
 
     Module appEngineModule = myModuleComboBox.getSelectedModule();
@@ -182,7 +163,10 @@ public class AppEngineUpdateDialog extends DialogWrapper {
         return;
       }
 
-      myProjectId.setText(appEngineWebApp.getApplication().getRawText());
+      String newProjectId = appEngineWebApp.getApplication().getRawText();
+      if (!DEFAULT_APPID.equals(newProjectId)) {
+        myElysiumProjectId.setText(newProjectId);
+      }
       myVersion.setText(appEngineWebApp.getVersion().getRawText());
     }
   }
@@ -190,34 +174,42 @@ public class AppEngineUpdateDialog extends DialogWrapper {
   @Override
   protected void doOKAction() {
     if (getOKAction().isEnabled()) {
-      GoogleLogin login = GoogleLogin.getInstance();
       Module selectedModule = myModuleComboBox.getSelectedModule();
       String sdk = "";
       String war = "";
       AppEngineGradleFacet facet = AppEngineGradleFacet.getAppEngineFacetByModule(selectedModule);
       if (facet != null) {
         AppEngineConfigurationProperties model = facet.getConfiguration().getState();
-        sdk = model.APPENGINE_SDKROOT;
-        war = model.WAR_DIR;
+        if (model != null) {
+          sdk = model.APPENGINE_SDKROOT;
+          war = model.WAR_DIR;
+        }
       }
 
-      String client_secret = login.fetchOAuth2ClientSecret();
-      String client_id = login.fetchOAuth2ClientId();
-      String refresh_token = login.fetchOAuth2RefreshToken();
+      String client_secret = null;
+      String client_id = null;
+      String refresh_token = null;
+
+      CredentialedUser selectedUser = myElysiumProjectId.getSelectedUser();
+      if (selectedUser != null) {
+        client_secret = selectedUser.getGoogleLoginState().fetchOAuth2ClientSecret();
+        client_id = selectedUser.getGoogleLoginState().fetchOAuth2ClientId();
+        refresh_token = selectedUser.getGoogleLoginState().fetchOAuth2RefreshToken();
+      }
 
       if (Strings.isNullOrEmpty(client_secret) ||
           Strings.isNullOrEmpty(client_id) ||
           Strings.isNullOrEmpty(refresh_token)) {
         // The login is somehow invalid, bail -- this shouldn't happen.
         LOG.error("StartUploading while logged in, but it doesn't have full credentials.");
-        Messages.showErrorDialog(this.getPeer().getOwner(), "Login credentials are not valid.", "Login");
+        Messages.showErrorDialog(this.getPeer().getOwner(), "The project ID is not a valid Google Console Developer Project.", "Login");
         return;
       }
 
       // These should not fail as they are a part of the dialog validation.
       if (Strings.isNullOrEmpty(sdk) ||
           Strings.isNullOrEmpty(war) ||
-          Strings.isNullOrEmpty(myProjectId.getText()) ||
+          Strings.isNullOrEmpty(myElysiumProjectId.getText()) ||
           selectedModule == null) {
         Messages.showErrorDialog(this.getPeer().getOwner(), "Could not deploy due to missing information (sdk/war/projectid).", "Deploy");
         LOG.error("StartUploading was called with bad module/sdk/war");
@@ -227,7 +219,7 @@ public class AppEngineUpdateDialog extends DialogWrapper {
       close(OK_EXIT_CODE);  // We close before kicking off the update so it doesn't interfere with the output window coming to focus.
 
       // Kick off the upload.  detailed status will be shown in an output window.
-      new AppEngineUpdater(myProject, selectedModule, sdk, war, myProjectId.getText(), myVersion.getText(),
+      new AppEngineUpdater(myProject, selectedModule, sdk, war, myElysiumProjectId.getText(), myVersion.getText(),
                            client_secret, client_id, refresh_token).startUploading();
     }
   }
@@ -251,7 +243,7 @@ public class AppEngineUpdateDialog extends DialogWrapper {
 
     // We'll let AppCfg error if the project is wrong.  The user can see this in the console window.
     // Note that version can be blank to indicate current version.
-    if (Strings.isNullOrEmpty(myProjectId.getText())) {
+    if (Strings.isNullOrEmpty(myElysiumProjectId.getText())) {
       return new ValidationInfo("Please enter a Project ID.");
     }
 

@@ -55,13 +55,21 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   private static final String EMPTY_MARKER = "(empty)";
   private static final String EMPTY_VALUE = "";
   private static final int PREFERRED_HEIGHT = 240;
+  private static final int POPUP_HEIGHTFRAMESIZE = 50;
+  public static final int MIN_WIDTH = 450;
 
   private final DefaultMutableTreeNode myModelRoot;
   private final DefaultTreeModel myTreeModel;
+  private final boolean myQueryOnExpand;
   private JBPopup myJBPopup;
   private PopupPanel myPopupPanel;
 
   public ProjectSelector() {
+    this(false);
+  }
+
+  public ProjectSelector(final boolean queryOnExpand) {
+    myQueryOnExpand = queryOnExpand;
     myModelRoot = new DefaultMutableTreeNode("root");
     myTreeModel = new DefaultTreeModel(myModelRoot);
 
@@ -117,13 +125,62 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
     getTextField().setCursor(Cursor.getDefaultCursor());
     getTextField().getEmptyText().setText("Please select a project...");
+
+    // Instead of doing an initial synchronize, we wait until the ui hierarchy
+    // is about to be shown.  Then we only synchronize if we are visible.
+    // This will prevent superfluous calls into Elysium when the user uses
+    // the play services activity wizard, but never selects enable cloudsave.
+    // In cases outside of the wizard (such as deploy), we will be visible,
+    // so the call to elysium will happen immediately when the hierarchy is shown.
+    addHierarchyListener(new HierarchyListener() {
+      @Override
+      public void hierarchyChanged(HierarchyEvent e) {
+        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+          SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+              if (ProjectSelector.this.isVisible()) {
+                synchronize(false);
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  /**
+   * Returns the selected credentialed user for the project id represented by getText().
+   * Note that if the ProjectSelector is created with queryOnExpand, this value could be {@code null} even
+   * if {@link #getText()} represents a valid project because the user has not expanded the owning {@link GoogleLogin}.
+   */
+  @Nullable
+  public CredentialedUser getSelectedUser() {
+    if (Strings.isNullOrEmpty(getText())) {
+      return null;
+    }
+
+    // Look for the selected text in the model, which will give us the login.
+    for (int i = 0; i < myModelRoot.getChildCount(); i++) {
+      TreeNode node = myModelRoot.getChildAt(i);
+      if (node instanceof GoogleUserModelItem) {
+        for (int j = 0; j < node.getChildCount(); j++) {
+          TreeNode projectNode = node.getChildAt(j);
+          if (projectNode instanceof ElysiumProjectModelItem &&
+              getText().equals(((ElysiumProjectModelItem) projectNode).getProjectId())) {
+            return ((GoogleUserModelItem) node).getCredentialedUser();
+          }
+        }
+      }
+    }
+
+    return null;
   }
 
   @Override
   protected int getPreferredPopupHeight() {
-    return PREFERRED_HEIGHT;
+    return !needsToSignIn() ? PREFERRED_HEIGHT : ProjectSelectorGoogleLogin.PREFERRED_HEIGHT + POPUP_HEIGHTFRAMESIZE;
   }
-
 
   @Override
   protected CustomizableComboBoxPopup getPopup() {
@@ -201,7 +258,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
             if (forceUpdate) {
               node.setNeedsSynchronizing();
             }
-            if (myPopupPanel != null && myPopupPanel.myJTree.isExpanded(new TreePath(node.getPath()))) {
+            if (!myQueryOnExpand ||
+                myPopupPanel != null && myPopupPanel.myJTree.isExpanded(new TreePath(node.getPath()))) {
               node.synchronize();
             }
           }
@@ -290,19 +348,22 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
           }
         }
       });
-      myJTree.addTreeExpansionListener(new TreeExpansionListener() {
-        @Override
-        public void treeExpanded(TreeExpansionEvent event) {
-          TreePath expandedPath = event.getPath();
-          if (expandedPath != null && expandedPath.getLastPathComponent() instanceof GoogleUserModelItem) {
-            ((GoogleUserModelItem) expandedPath.getLastPathComponent()).synchronize();
-          }
-        }
 
-        @Override
-        public void treeCollapsed(TreeExpansionEvent event) {
-        }
-      });
+      if (myQueryOnExpand) {
+        myJTree.addTreeExpansionListener(new TreeExpansionListener() {
+          @Override
+          public void treeExpanded(TreeExpansionEvent event) {
+            TreePath expandedPath = event.getPath();
+            if (expandedPath != null && expandedPath.getLastPathComponent() instanceof GoogleUserModelItem) {
+              ((GoogleUserModelItem) expandedPath.getLastPathComponent()).synchronize();
+            }
+          }
+
+          @Override
+          public void treeCollapsed(TreeExpansionEvent event) {
+          }
+        });
+      }
 
       for (int i = 0; i < myJTree.getRowCount(); i++) {
         myJTree.expandRow(i);
@@ -325,7 +386,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
                            (contentInset != null ? (contentInset.left + contentInset.right) : 0) +
                            (treeInset != null ? (treeInset.left + treeInset.right) : 0);
 
-      this.setPreferredSize(new Dimension(Math.max(450, preferredWidth), getPreferredPopupHeight()));
+      this.setPreferredSize(new Dimension(Math.max(MIN_WIDTH, preferredWidth), getPreferredPopupHeight()));
 
       getBottomPane().setLayout(new BorderLayout());
       JButton synchronizeButton = new JButton();

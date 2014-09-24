@@ -16,6 +16,7 @@
 package com.google.gct.idea.elysium;
 
 import com.intellij.ui.components.JBLabel;
+import com.intellij.util.ui.UIUtil;
 import icons.GoogleCloudToolsIcons;
 
 import javax.swing.*;
@@ -25,10 +26,11 @@ import java.awt.*;
  * UI for the node that prompts for signin.
  */
 class ProjectSelectorGoogleLogin extends JPanel {
+  public static final int PREFERRED_HEIGHT = 150;
 
   public ProjectSelectorGoogleLogin() {
     this.setLayout(new GridBagLayout());
-    this.setPreferredSize(new Dimension(350, 150));
+    this.setPreferredSize(new Dimension(ProjectSelector.MIN_WIDTH, PREFERRED_HEIGHT));
     this.setOpaque(false);
 
     JLabel googleIcon = new JBLabel();
@@ -45,6 +47,7 @@ class ProjectSelectorGoogleLogin extends JPanel {
     this.add(googleIcon, c);
 
     JTextArea signinText = new JTextArea();
+    signinText.setFont(UIUtil.getLabelFont());
     signinText.setLineWrap(true);
     signinText.setWrapStyleWord(true);
     signinText.setOpaque(false);

@@ -68,6 +68,17 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="google-api-java-client" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/google.gdt.eclipse.login.common.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/google.gdt.eclipse.login.common.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>
 
