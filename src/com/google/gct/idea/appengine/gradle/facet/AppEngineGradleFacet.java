@@ -17,18 +17,19 @@ package com.google.gct.idea.appengine.gradle.facet;
 
 import com.google.common.base.Strings;
 import com.google.gct.idea.appengine.dom.AppEngineWebApp;
-import com.intellij.facet.Facet;
-import com.intellij.facet.FacetManager;
-import com.intellij.facet.FacetType;
-import com.intellij.facet.FacetTypeId;
-import com.intellij.facet.FacetTypeRegistry;
+import com.google.gct.idea.appengine.dom.AppEngineWebFileDescription;
+import com.google.gct.idea.appengine.dom.WebApp;
+import com.google.gct.idea.appengine.dom.WebAppFileDescription;
+import com.intellij.facet.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.ReadonlyStatusHandler;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
+import com.intellij.util.xml.DomElement;
 import com.intellij.util.xml.DomManager;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -64,12 +65,19 @@ public class AppEngineGradleFacet extends Facet<AppEngineGradleFacetConfiguratio
    * Returns an object holding information from the appengine-web.xml file.
    */
   public AppEngineWebApp getAppEngineWebXml() {
+    XmlFile appEngineXmlFile = getAppEngineXmlFile(AppEngineWebFileDescription.APP_ENGINE_WEB_XML_NAME);
+    final DomManager domManager = DomManager.getDomManager(getModule().getProject());
+    return domManager.getFileElement(appEngineXmlFile, AppEngineWebApp.class).getRootElement();
+  }
+
+  @Nullable
+  private XmlFile getAppEngineXmlFile(@NotNull String fileName) {
     AppEngineConfigurationProperties model = getConfiguration().getState();
     if (model == null || Strings.isNullOrEmpty(model.WEB_APP_DIR)) {
       return null;
     }
 
-    String path = model.WEB_APP_DIR + "/WEB-INF/appengine-web.xml";
+    String path = model.WEB_APP_DIR + "/WEB-INF/" + fileName;
     VirtualFile appEngineFile = LocalFileSystem.getInstance().findFileByPath(path.replace(File.separatorChar, '/'));
     if (appEngineFile == null) {
       return null;
@@ -79,9 +87,31 @@ public class AppEngineGradleFacet extends Facet<AppEngineGradleFacetConfiguratio
     if (psiFile == null || !(psiFile instanceof XmlFile)) {
       return null;
     }
+    return (XmlFile) psiFile;
+  }
 
+  /**
+   * Returns a model of this App Engine module's web.xml file.
+   */
+  @Nullable
+  public WebApp getWebXml() {
+    XmlFile webXmlFile = getAppEngineXmlFile(WebAppFileDescription.WEB_XML_FILE_NAME);
+    return getDomElement(webXmlFile, WebApp.class);
+  }
+
+  /**
+   * Returns a model of this App Engine module's web.xml that has been checked for writability. i.e. it's no longer read-only.
+   */
+  @NotNull
+  public WebApp getWebXmlForEdit() {
+    XmlFile webXmlFile = getAppEngineXmlFile(WebAppFileDescription.WEB_XML_FILE_NAME);
+    ReadonlyStatusHandler.getInstance(getModule().getProject()).ensureFilesWritable(webXmlFile.getVirtualFile());
+    return getDomElement(webXmlFile, WebApp.class);
+  }
+
+  private <T extends DomElement> T getDomElement(XmlFile xmlFile, Class<T> domClass) {
     final DomManager domManager = DomManager.getDomManager(getModule().getProject());
-    return domManager.getFileElement((XmlFile)psiFile, AppEngineWebApp.class).getRootElement();
+    return domManager.getFileElement(xmlFile, domClass).getRootElement();
   }
 
   public static FacetType<AppEngineGradleFacet, AppEngineGradleFacetConfiguration> getFacetType() {

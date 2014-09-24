@@ -44,8 +44,9 @@
     <runConfigurationProducer implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationProducer"/>
     -->
 
-    <!-- Dom for the App Engine config file -->
+    <!-- Dom for the App Engine config files -->
     <dom.fileDescription implementation="com.google.gct.idea.appengine.dom.AppEngineWebFileDescription"/>
+    <dom.fileDescription implementation="com.google.gct.idea.appengine.dom.WebAppFileDescription"/>
 
     <implicitUsageProvider implementation="com.google.gct.idea.appengine.validation.EndpointImplicitUsageProvider"/>
 
