@@ -18,9 +18,6 @@
       <implementation-class>com.google.gct.idea.appengine.synchronization.SampleSyncRegistration</implementation-class>
     </component>
     -->
-    <component>
-      <implementation-class>com.google.gct.idea.appengine.initialization.CloudPluginRegistration</implementation-class>
-    </component>
   </application-components>
 
   <project-components>
@@ -133,6 +130,12 @@
             text="Import an Android Code sample"
             icon="/icons/sampleImport.png">
       <add-to-group group-id="WelcomeScreen.QuickStart" relative-to-action="WelcomeScreen.GetFromVcs" anchor="before"/>
+    </action>
+
+    <action id="GoogleCloudTools.DeployToAppEngine"
+            class="com.google.gct.idea.appengine.deploy.AppEngineUpdateAction"
+            text="Deploy Module to App Engine...">
+      <add-to-group group-id="BuildMenu" anchor="after" relative-to-action="Android.GenerateSignedApk"/>
     </action>
   </actions>
 
