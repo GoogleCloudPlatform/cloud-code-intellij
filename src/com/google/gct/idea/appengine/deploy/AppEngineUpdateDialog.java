@@ -191,6 +191,24 @@ public class AppEngineUpdateDialog extends DialogWrapper {
       String refresh_token = null;
 
       CredentialedUser selectedUser = myElysiumProjectId.getSelectedUser();
+      if (selectedUser == null) {
+        selectedUser = GoogleLogin.getInstance().getActiveUser();
+        // Ask the user if he wants to continue using the active user credentials.
+        if (selectedUser != null) {
+          if (Messages.showYesNoDialog(this.getPeer().getOwner(),
+                                       "The Project ID you entered could not be found.  Do you want to deploy anyway using "
+                                       + GoogleLogin.getInstance().getActiveUser().getEmail()
+                                       + " for credentials?", "Deploy", Messages.getQuestionIcon()) != Messages.YES) {
+            return;
+          }
+        }
+        else {
+          // This should not happen as its validated.
+          Messages.showErrorDialog(this.getPeer().getOwner(), "You need to be logged in to deploy.", "Login");
+          return;
+        }
+      }
+
       if (selectedUser != null) {
         client_secret = selectedUser.getGoogleLoginState().fetchOAuth2ClientSecret();
         client_id = selectedUser.getGoogleLoginState().fetchOAuth2ClientId();
@@ -202,6 +220,15 @@ public class AppEngineUpdateDialog extends DialogWrapper {
           Strings.isNullOrEmpty(refresh_token)) {
         // The login is somehow invalid, bail -- this shouldn't happen.
         LOG.error("StartUploading while logged in, but it doesn't have full credentials.");
+        if (Strings.isNullOrEmpty(client_secret)) {
+          LOG.error("(null) client_secret");
+        }
+        if (Strings.isNullOrEmpty(client_id)) {
+          LOG.error("(null) client_id");
+        }
+        if (Strings.isNullOrEmpty(refresh_token)) {
+          LOG.error("(null) refresh_token");
+        }
         Messages.showErrorDialog(this.getPeer().getOwner(), "The project ID is not a valid Google Console Developer Project.", "Login");
         return;
       }
