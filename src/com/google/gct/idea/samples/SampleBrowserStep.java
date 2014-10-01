@@ -24,6 +24,7 @@ import com.appspot.gsamplesindex.samplesindex.model.Sample;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.appspot.gsamplesindex.samplesindex.model.Screenshot;
 import com.google.common.base.Strings;
+import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
@@ -31,6 +32,7 @@ import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.UIUtil;
 import icons.AndroidIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,9 +49,9 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.android.tools.idea.wizard.ScopedStateStore.*;
 import static com.google.gct.idea.samples.SampleImportWizardPath.SAMPLE_KEY;
 import static com.google.gct.idea.samples.SampleImportWizardPath.SAMPLE_URL;
-import static com.android.tools.idea.wizard.ScopedStateStore.*;
 
 /**
  * SampleBrowserStep is the first page in the Sample Import wizard that allows the user to select a sample to import
@@ -62,11 +64,12 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
   private JBLabel myDescriptionLabel;
   private JEditorPane myScreenshotHtmlPanel;
   private SearchTextField mySearchBox;
+  private JPanel myDescriptionPanel;
   private final SampleCollection mySampleList;
   static final Key<String> SAMPLE_SCREENSHOT = createKey("SampleScreenshot", Scope.STEP, String.class);
 
   public SampleBrowserStep(@NotNull SampleCollection sampleList, Disposable parentDisposable) {
-    super("Import a Sample into Android Studio", null, null, parentDisposable);
+    super(GctBundle.message("sample.browser.title"), GctBundle.message("sample.browser.subtitle"), null, parentDisposable);
     mySampleList = sampleList;
     setBodyComponent(myPanel);
   }
@@ -79,7 +82,7 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
       @Override
       public void setValue(@Nullable String newValue, @NotNull HyperlinkLabel component) {
         component.setHyperlinkTarget(newValue);
-        newValue = (StringUtil.isEmpty(newValue)) ? "" : "Browse Source";
+        newValue = (StringUtil.isEmpty(newValue)) ? "" : GctBundle.message("sample.browse.source");
         component.setHyperlinkText(newValue);
       }
     });
@@ -100,6 +103,7 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
       }
     });
     myUrlField.setOpaque(false);
+    myDescriptionPanel.setBackground(UIUtil.getTextFieldBackground());
   }
 
   @Override
@@ -110,13 +114,13 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
   @NotNull
   @Override
   public String getStepName() {
-    return "Choose a Sample";
+    return GctBundle.message("sample.browser.title");
   }
 
   @Override
   public boolean validate() {
     if (myState.get(SAMPLE_KEY) == null) {
-      setErrorHtml("Please select a sample");
+      setErrorHtml(GctBundle.message("sample.browser.please.select"));
       return false;
     }
     setErrorHtml("");
@@ -207,7 +211,7 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
         description.addHtml(sample.getDescription());
       }
       else {
-        description.add("No Description Available");
+        description.add(GctBundle.message("sample.browser.no.description"));
       }
       description.newlineIfNecessary().newline();
       description.add("Tags: ");
@@ -244,7 +248,7 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
       HtmlBuilder imagePage = new HtmlBuilder();
       imagePage.openHtmlBody();
       if (sample.getScreenshots() == null) {
-        return "No Preview Available";
+        return GctBundle.message("sample.browser.no.preview");
       }
       for (Screenshot screenshot : sample.getScreenshots()) {
         try {
@@ -267,8 +271,8 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
   @Nullable
   @Override
   protected JComponent getHeader() {
-    return DynamicWizardStep
-      .createWizardStepHeader(WizardConstants.ANDROID_NPW_HEADER_COLOR, AndroidIcons.Wizards.NewProjectMascotGreen, "Import Sample");
+    return DynamicWizardStep.createWizardStepHeader(WizardConstants.ANDROID_NPW_HEADER_COLOR, AndroidIcons.Wizards.NewProjectMascotGreen,
+                                                    GctBundle.message("sample.import.title"));
   }
 
 }

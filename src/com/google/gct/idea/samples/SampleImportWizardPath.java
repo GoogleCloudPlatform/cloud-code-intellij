@@ -20,6 +20,7 @@ import com.android.tools.idea.wizard.*;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.google.common.base.Strings;
+import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -31,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import static com.android.tools.idea.wizard.ScopedStateStore.Scope.PATH;
 import static com.android.tools.idea.wizard.ScopedStateStore.createKey;
@@ -41,7 +41,7 @@ import static com.android.tools.idea.wizard.ScopedStateStore.createKey;
  */
 public class SampleImportWizardPath extends DynamicWizardPath {
 
-  private Logger LOG = Logger.getInstance(SampleImportWizardPath.class);
+  private static final Logger LOG = Logger.getInstance(SampleImportWizardPath.class);
 
   @NotNull private final Disposable myParentDisposable;
   @NotNull private final SampleCollection mySampleList;
@@ -78,24 +78,24 @@ public class SampleImportWizardPath extends DynamicWizardPath {
     assert !sampleDir.exists();
 
     if (!FileUtilRt.createDirectory(sampleDir)) {
-      Messages.showErrorDialog("Failed to create project directory", "Sample Import Failed");
+      Messages.showErrorDialog(GctBundle.message("create.project.dir.failed"), GctBundle.message("sample.import.error.title"));
       return false;
     }
     Project project = ProjectManager.getInstance().createProject(sampleName, sampleDir.getAbsolutePath());
 
-    String url = sample.getCloneUrl();
+    String url = trimSlashes(sample.getCloneUrl());
 
     NewFromGithubWizard.GithubRepoContents downloadResult = NewFromGithubWizard.downloadGithubRepo(project, url , null, null);
 
     if (downloadResult.errorMessage != null) {
       LOG.error(downloadResult.errorMessage);
-      Messages.showErrorDialog(downloadResult.errorMessage, "Sample Download Failed");
+      Messages.showErrorDialog(downloadResult.errorMessage, GctBundle.message("sample.import.error.title"));
       return false;
     }
 
     // we don't care about the template folders (downloadResult.templateFolders), so only check if we find sampleRoots
     if (downloadResult.sampleRoots.size() == 0) {
-      Messages.showErrorDialog("Failed to find any projects in Git repository", "Sample Import Failed");
+      Messages.showErrorDialog(GctBundle.message("git.project.dir.empty"), GctBundle.message("sample.import.error.title"));
       return false;
     }
 
@@ -113,7 +113,8 @@ public class SampleImportWizardPath extends DynamicWizardPath {
             }
           }
           // we have a project that doesn't contain the sample root we're looking for... notify the user
-          Messages.showErrorDialog("Could not fine Sample Root '" + path + "' in Github Repo", "Sample Import Failed");
+          Messages.showErrorDialog(GctBundle.message("git.project.missing.sample.root", path),
+                                   GctBundle.message("sample.import.error.title"));
           return false;
         }
       }
@@ -124,7 +125,7 @@ public class SampleImportWizardPath extends DynamicWizardPath {
     }
     catch (IOException e) {
       LOG.error(e);
-      Messages.showErrorDialog("Unable to copy sample into project directory", "Sample Import Failed");
+      Messages.showErrorDialog(GctBundle.message("sample.copy.to.project.failed"), GctBundle.message("sample.import.error.title"));
       return false;
     }
 

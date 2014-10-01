@@ -41,6 +41,20 @@ public class SampleImportTreeManagerTest extends TestCase {
     mySampleManager = new SampleImportTreeManager(new Tree(), new SampleCollection().setItems(mySamples));
   }
 
+  public void testFormatName_emptyFormat() {
+    assertTrue(SampleImportTreeManager.formatName("  ").equals("Unnamed"));
+    assertTrue(SampleImportTreeManager.formatName("").equals("Unnamed"));
+    assertTrue(SampleImportTreeManager.formatName(null).equals("Unnamed"));
+  }
+
+  public void testFormatName_format() {
+    assertTrue(SampleImportTreeManager.formatName("GooseMoose").equals("Goose Moose"));
+    assertTrue(SampleImportTreeManager.formatName("goosemoose").equals("goosemoose"));
+    assertTrue(SampleImportTreeManager.formatName("GooseMoose-Juice").equals("Goose Moose - Juice"));
+    assertTrue(SampleImportTreeManager.formatName("GooseMoose - Juice").equals("Goose Moose - Juice"));
+    assertTrue(SampleImportTreeManager.formatName("Goose        Moose  - Juice         ").equals("Goose Moose - Juice"));
+  }
+
   public void testFilterSamples_emptySearch() {
     doFilterCheck("", 3);
     doFilterCheck("          ", 3);
@@ -88,7 +102,7 @@ public class SampleImportTreeManagerTest extends TestCase {
 
   private void initSamples() {
     mySamples.add(createSample("Test Goose", "A Sample of Geese", Arrays.asList("Animal", "Bird")));
-    mySamples.add(createSample("Test Moose", "A Sample of Moose", Arrays.asList("Animal", "Antlers")));
+    mySamples.add(createSample("TestMoose", "A Sample of Moose", Arrays.asList("Animal", "Antlers")));
     mySamples.add(createSample("Test House", "A Worrying Sample of Houses", Arrays.asList("Thing", "Roof")));
   }
 
