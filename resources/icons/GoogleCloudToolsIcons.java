@@ -30,6 +30,10 @@ public final class GoogleCloudToolsIcons {
   public static final Icon CLOUD_72x64 = load("/icons/cloudPlatform_72x64.png");
   public static final Icon REFRESH = load("/icons/refresh.png");
   public static final Icon[] STEP_ICONS = findStepIcons("/icons/step_");
+  public static final Icon CLOUD_PLATFORM_LOGO_BLACK = load("/icons/CloudPlatformLogo_black.png");
+  public static final Icon ENDPOINTS_CARD = load("/icons/background_endpoints.png");
+  public static final Icon SERVLET_CARD = load("/icons/background_servlet.png");
+  public static final Icon GCM_CARD = load("/icons/background_gcm.png");
 
   private static Icon load(String path) {
     return IconLoader.getIcon(path, GoogleCloudToolsIcons.class);

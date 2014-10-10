@@ -20,9 +20,8 @@ import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.TemplateMetadata;
 import com.android.tools.idea.wizard.*;
 import com.android.tools.idea.wizard.ScopedStateStore.Key;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.base.*;
+import com.google.gct.idea.util.GctBundle;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.module.Module;
@@ -36,6 +35,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.util.ui.UIUtil;
 import icons.GoogleCloudToolsIcons;
 import org.jetbrains.android.facet.AndroidFacet;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +45,10 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.io.File;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
+
+import static com.google.gct.idea.appengine.wizard.CloudTemplateUtils.TemplateInfo;
 
 /**
  * Represents a step in the "create a new AppEngine module" wizard process.
@@ -54,20 +57,22 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
   private static final JBColor CLOUD_HEADER_BACKGROUND_COLOR = new JBColor(0x254A89, 0x254A89);
   private static final JBColor CLOUD_HEADER_TEXT_COLOR = new JBColor(0xFFFFFF, 0xFFFFFF);
   private static final JBColor CLOUD_TITLE_TEXT_COLOR = new JBColor(0x254A89, 0xFFFFFF);
-  private static final String HEADER_TITLE_FORMAT = "New %s";
-  private static final String BODY_TITLE = "Configure your new AppEngine module";
+
+  @NonNls
   private static final String STEP_NAME = "New Cloud Module Step";
+  private static final List<TemplateInfo> CLOUD_TEMPLATES = CloudTemplateUtils.getTemplates();
 
   private final Project myProject;
-  private JLabel myHeaderTitleLabel;
   private JPanel myRootPane;
   private JTextField myPackageNameField;
   private JTextField myModuleNameField;
   private JComboBox myClientModuleCombo;
   private JEditorPane myModuleDescriptionText;
+  private JComboBox myModuleTypesCombo;
+  private JLabel myModuleTypeIcon;
 
   public NewCloudModuleDynamicWizardStep(@NotNull Project project, @Nullable Disposable parentDisposable) {
-    super(BODY_TITLE, null, null, parentDisposable);
+    super(GctBundle.message("appengine.wizard.step_body"), null, null, parentDisposable);
     setBodyComponent(myRootPane);
     myProject = project;
   }
@@ -75,13 +80,43 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
   @Override
   public void init() {
     super.init();
+    initModuleTypes();
     initClientModuleCombo();
     getMessageLabel().setForeground(JBColor.red);
+    myModuleDescriptionText.setContentType(UIUtil.HTML_MIME);
+    myModuleDescriptionText.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+    myModuleDescriptionText.setFont(UIManager.getFont("Label.font"));
+    myModuleDescriptionText.addHyperlinkListener(new HyperlinkListener() {
+      @Override
+      public void hyperlinkUpdate(HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+          assert e.getURL() != null;
+          BrowserUtil.browse(e.getURL().toString());
+        }
+      }
+    });
     register(NewCloudModuleDynamicWizardPath.KEY_MODULE_NAME, myModuleNameField);
     register(NewCloudModuleDynamicWizardPath.KEY_PACKAGE_NAME, myPackageNameField);
     register(NewCloudModuleDynamicWizardPath.KEY_CLIENT_MODULE_NAME, myClientModuleCombo);
+    register(NewCloudModuleDynamicWizardPath.KEY_SELECTED_TEMPLATE_FILE, myModuleTypesCombo);
+    myModuleTypesCombo.setSelectedIndex(0);
+    if (myClientModuleCombo.getItemCount() == 1) {
+      // Automatically select the client module if only one option exists. Otherwise
+      // force users to choose one for themselves.
+      myClientModuleCombo.setSelectedIndex(0);
+    }
   }
 
+  // Suppress unchecked call to 'addItem(E)'
+  @SuppressWarnings("unchecked")
+  private void initModuleTypes() {
+    for (TemplateInfo template : CLOUD_TEMPLATES) {
+      myModuleTypesCombo.addItem(new ComboBoxItem(template.getFile(), template.getMetadata().getTitle(), 1, 1));
+    }
+  }
+
+  // Suppress unchecked call to 'addItem(E)'
+  @SuppressWarnings("unchecked")
   private void initClientModuleCombo() {
     final Module[] modules = ModuleManager.getInstance(myProject).getModules();
     for (Module module : modules) {
@@ -99,77 +134,88 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
     }
   }
 
-  @Override
-  public void onEnterStep() {
-    super.onEnterStep();
-    // Update the module title and description text each time we enter/re-enter the step.
-    initHeaderTitleText();
-    initModuleDescriptionText();
-  }
-
-  private void initHeaderTitleText() {
-    final TemplateMetadata metadata = myState.get(NewCloudModuleDynamicWizardPath.KEY_TEMPLATE_METADATA);
+  private void setModuleDescriptionText(@NotNull File templateFile) {
+    Parameter docUrlParam = null;
+    TemplateMetadata metadata = null;
+    for (TemplateInfo templateInfo : CLOUD_TEMPLATES) {
+      if (templateFile == templateInfo.getFile()) {
+        metadata = templateInfo.getMetadata();
+        assert metadata != null;
+        docUrlParam = metadata.getParameter(CloudModuleUtils.ATTR_DOC_URL);
+      }
+    }
     assert metadata != null;
-    myHeaderTitleLabel.setText(String.format(HEADER_TITLE_FORMAT, metadata.getTitle()));
-  }
-
-  private void initModuleDescriptionText() {
-    final TemplateMetadata metadata = myState.get(NewCloudModuleDynamicWizardPath.KEY_TEMPLATE_METADATA);
-    assert metadata != null;
-    final Parameter docUrlParam = metadata.getParameter(CloudModuleUtils.ATTR_DOC_URL);
     assert docUrlParam != null;
-    myModuleDescriptionText.setContentType(UIUtil.HTML_MIME);
-    myModuleDescriptionText.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
-    myModuleDescriptionText.setFont(UIManager.getFont("Label.font"));
-    myModuleDescriptionText.addHyperlinkListener(new HyperlinkListener() {
-      @Override
-      public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-          BrowserUtil.browse(e.getURL().toString());
+    myModuleDescriptionText.setText(GctBundle.message("appengine.wizard.module_type_description", docUrlParam.initial, metadata.getTitle()));
+  }
+
+  private void setModuleTypeIcon(@NotNull File templateFile) {
+    for (TemplateInfo templateInfo : CLOUD_TEMPLATES) {
+      if (templateFile == templateInfo.getFile()) {
+        TemplateMetadata metadata = templateInfo.getMetadata();
+        Parameter docUrlParam = metadata.getParameter(CloudModuleUtils.ATTR_MODULE_TYPE);
+        if (docUrlParam != null && docUrlParam.initial != null) {
+          if (docUrlParam.initial.equals("Servlet")) {
+            myModuleTypeIcon.setIcon(GoogleCloudToolsIcons.SERVLET_CARD);
+          } else if (docUrlParam.initial.equals("Endpoints")) {
+            myModuleTypeIcon.setIcon(GoogleCloudToolsIcons.ENDPOINTS_CARD);
+          } else if (docUrlParam.initial.equals("Gcm")) {
+            myModuleTypeIcon.setIcon(GoogleCloudToolsIcons.GCM_CARD);
+          }
         }
       }
-    });
-    myModuleDescriptionText.setText(String.format("<html><body>Check the <a href='%s'>\"%s\"</a> documentation for more " +
-                                                  "information about the contents of this backend module, and for " +
-                                                  "detailed instructions about connecting your Android app to this " +
-                                                  "backend.</body></html>", docUrlParam.initial, metadata.getTitle()));
+    }
   }
 
+  // TODO: should we auto-fill the package name when the user starts typing in a module name? if so, then how?
   @Override
   public void deriveValues(Set<Key> modified) {
     super.deriveValues(modified);
-    // TODO: should we auto-fill the package name when the user starts typing in a module name? if so, then how?
+    for (Key key : modified) {
+      if (key == NewCloudModuleDynamicWizardPath.KEY_SELECTED_TEMPLATE_FILE) {
+        File templateFile = myState.get(NewCloudModuleDynamicWizardPath.KEY_SELECTED_TEMPLATE_FILE);
+        if (templateFile != null) {
+          setModuleDescriptionText(templateFile);
+          setModuleTypeIcon(templateFile);
+        }
+      }
+    }
   }
 
   @Override
   public boolean validate() {
+    final File templateFile = myState.get(NewCloudModuleDynamicWizardPath.KEY_SELECTED_TEMPLATE_FILE);
     final String moduleName = myState.get(NewCloudModuleDynamicWizardPath.KEY_MODULE_NAME);
     final String packageName = myState.get(NewCloudModuleDynamicWizardPath.KEY_PACKAGE_NAME);
     final String clientModuleName = myState.get(NewCloudModuleDynamicWizardPath.KEY_CLIENT_MODULE_NAME);
     assert moduleName != null && packageName != null;
+    if (templateFile == null) {
+      setErrorHtml(GctBundle.message("appengine.wizard.please_select_module_type"));
+      return false;
+    }
     if (moduleName.isEmpty()) {
-      setErrorHtml("Please enter a module name.");
+      setErrorHtml(GctBundle.message("appengine.wizard.please_select_module_name"));
       return false;
     }
     if (!isValidModuleName(moduleName)) {
-      setErrorHtml("Please enter a valid module name.");
+      setErrorHtml(GctBundle.message("appengine.wizard.please_enter_valid_module_name"));
       return false;
     }
     if (ModuleManager.getInstance(myProject).findModuleByName(moduleName) != null ||
         new File(myProject.getBasePath(), moduleName).exists()) {
-      setErrorHtml(String.format("Module %s already exists.", moduleName));
+      setErrorHtml(GctBundle.message("appengine.wizard.module_already_exists", moduleName));
       return false;
     }
     if (packageName.isEmpty()) {
-      setErrorHtml("Please enter a package name.");
+      setErrorHtml(GctBundle.message("appengine.wizard.please_enter_package_name"));
       return false;
     }
     if (!PsiNameHelper.getInstance(myProject).isQualifiedName(packageName)) {
-      setErrorHtml("Please enter a valid package name.");
+      setErrorHtml(GctBundle.message("appengine.wizard.please_enter_valid_package_name"));
       return false;
     }
     if (Strings.isNullOrEmpty(clientModuleName)) {
-      setErrorHtml("Please select a client module.");
+      setErrorHtml(GctBundle.message("appengine.wizard.please_select_client_module"));
       return false;
     }
     setErrorHtml("");
@@ -197,7 +243,7 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
 
   @Override
   public JComponent getPreferredFocusedComponent() {
-    return myModuleNameField;
+    return myModuleTypesCombo;
   }
 
   @Nullable
@@ -209,15 +255,14 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
   @Nullable
   @Override
   protected JComponent getHeader() {
-    // The third argument is the empty string intentionally... it will be set to its appropriate value in onEnterStep().
-    return createHeader(CLOUD_HEADER_BACKGROUND_COLOR, GoogleCloudToolsIcons.CLOUD_72x64, "");
+    return createHeader(CLOUD_HEADER_BACKGROUND_COLOR, GoogleCloudToolsIcons.CLOUD_72x64, GctBundle.message("appengine.wizard.step_title"));
   }
 
   /**
    * Copied from {@link DynamicWizardStep} and slightly modified so that we can keep a reference to
    * the title JLabel (which needs to be updated each time the user enters the step).
    */
-  private JPanel createHeader(JBColor headerColor, Icon icon, String title) {
+  private static JPanel createHeader(JBColor headerColor, Icon icon, String title) {
     final JPanel panel = new JPanel();
     panel.setBackground(headerColor);
     panel.setBorder(new EmptyBorder(WizardConstants.STUDIO_WIZARD_INSETS));
@@ -228,14 +273,14 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
     final GridConstraints constraints = new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_SOUTHWEST, GridConstraints.FILL_HORIZONTAL,
                                                             GridConstraints.SIZEPOLICY_CAN_GROW | GridConstraints.SIZEPOLICY_WANT_GROW,
                                                             GridConstraints.SIZEPOLICY_FIXED, null, null, null);
-    myHeaderTitleLabel = new JLabel(title);
-    myHeaderTitleLabel.setForeground(CLOUD_HEADER_TEXT_COLOR);
-    myHeaderTitleLabel.setFont(myHeaderTitleLabel.getFont().deriveFont(24f));
-    myHeaderTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
-    panel.add(myHeaderTitleLabel, constraints);
+    final JLabel headerTitleLabel = new JLabel(title);
+    headerTitleLabel.setForeground(CLOUD_HEADER_TEXT_COLOR);
+    headerTitleLabel.setFont(headerTitleLabel.getFont().deriveFont(24f));
+    headerTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
+    panel.add(headerTitleLabel, constraints);
     constraints.setRow(1);
     constraints.setAnchor(GridConstraints.ANCHOR_NORTHWEST);
-    final JLabel productLabel = new JLabel("Android Studio");
+    final JLabel productLabel = new JLabel(GctBundle.message("appengine.wizard.android_studio"));
     productLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
     productLabel.setForeground(CLOUD_HEADER_TEXT_COLOR);
     panel.add(productLabel, constraints);

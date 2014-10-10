@@ -15,9 +15,11 @@
  */
 package com.google.gct.idea.appengine.wizard;
 
-import com.android.tools.idea.templates.TemplateMetadata;
 import com.android.tools.idea.wizard.*;
 import com.google.common.collect.Lists;
+import com.google.gct.idea.util.GctBundle;
+import icons.GoogleCloudToolsIcons;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,26 +34,32 @@ import static com.android.tools.idea.wizard.ScopedStateStore.*;
  */
 public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implements NewModuleDynamicPath {
   static final Key<String> KEY_MODULE_NAME = createKey(CloudModuleUtils.ATTR_MODULE_NAME, Scope.PATH, String.class);
-  static final Key<String> KEY_PACKAGE_NAME = WizardConstants.PACKAGE_NAME_KEY;
+  static final Key<String> KEY_PACKAGE_NAME = createKey(CloudModuleUtils.ATTR_PACKAGE_NAME, Scope.PATH, String.class);
   static final Key<String> KEY_CLIENT_MODULE_NAME = createKey("myClientModuleName", Scope.PATH, String.class);
-  static final Key<File> KEY_TEMPLATE_FILE = createKey("myTemplateFile", Scope.WIZARD, File.class);
-  static final Key<TemplateMetadata> KEY_TEMPLATE_METADATA = createKey("myTemplateMetadata", Scope.WIZARD, TemplateMetadata.class);
+  static final Key<File> KEY_SELECTED_TEMPLATE_FILE = createKey("myTemplateFile", Scope.WIZARD, File.class);
+
+  @NonNls
   private static final String PATH_NAME = "New Cloud Module Path";
 
-  private List<CloudTemplateUtils.TemplateInfo> myTemplates;
   private List<ModuleTemplate> myModuleTemplates;
 
   @Override
   protected void init() {
     assert getProject() != null;
+    initPrefilledValues();
     addStep(new NewCloudModuleDynamicWizardStep(getProject(), myWizard.getDisposable()));
-    if (myState.get(KEY_MODULE_NAME) == null) {
-      myState.put(KEY_MODULE_NAME, "");
+  }
+
+  private void initPrefilledValues() {
+    final String examplePackageName;
+    final String userName = System.getProperty("user.name");
+    if (userName == null) {
+      examplePackageName = GctBundle.message("appengine.wizard.prefilled_package_name");
+    } else {
+      examplePackageName = GctBundle.message("appengine.wizard.prefilled_user_package_name", userName);
     }
-    if (myState.get(KEY_PACKAGE_NAME) == null) {
-      myState.put(KEY_PACKAGE_NAME, "");
-    }
-    myTemplates = CloudTemplateUtils.getTemplates();
+    myState.put(KEY_MODULE_NAME, GctBundle.message("appengine.wizard.prefilled_module_name"));
+    myState.put(KEY_PACKAGE_NAME, examplePackageName);
   }
 
   @NotNull
@@ -63,10 +71,7 @@ public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implement
   @NotNull
   @Override
   public Iterable<ModuleTemplate> getModuleTemplates() {
-    myModuleTemplates = Lists.newArrayList();
-    for (CloudTemplateUtils.TemplateInfo template : myTemplates) {
-      myModuleTemplates.add(new NewCloudModuleTemplate(template));
-    }
+    myModuleTemplates = Lists.newArrayList((ModuleTemplate)new NewCloudModuleTemplate());
     return myModuleTemplates;
   }
 
@@ -78,7 +83,7 @@ public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implement
 
   @Override
   public boolean performFinishingActions() {
-    final File templateFile = myState.get(KEY_TEMPLATE_FILE);
+    final File templateFile = myState.get(KEY_SELECTED_TEMPLATE_FILE);
     final String newModuleName = myState.get(KEY_MODULE_NAME);
     final String packageName = myState.get(KEY_PACKAGE_NAME);
     final String clientModuleName = myState.get(KEY_CLIENT_MODULE_NAME);
@@ -92,50 +97,43 @@ public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implement
    * New Module wizard.
    */
   private static class NewCloudModuleTemplate implements ModuleTemplate {
-    private final String myName;
-    private final String myDescription;
-    private final File myFile;
-    private final TemplateMetadata myMetadata;
-
-    public NewCloudModuleTemplate(@NotNull CloudTemplateUtils.TemplateInfo templateInfo) {
-      myName = templateInfo.getMetadata().getTitle();
-      myDescription = templateInfo.getMetadata().getDescription();
-      myFile = templateInfo.getFile();
-      myMetadata = templateInfo.getMetadata();
-    }
 
     @Override
     public String getName() {
-      return myName;
+      return GctBundle.message("appengine.wizard.gallery_title");
     }
 
     @Nullable
     @Override
     public String getDescription() {
-      return myDescription;
+      return null;
     }
 
     @Nullable
     @Override
     public Icon getIcon() {
-      return null;
+      return GoogleCloudToolsIcons.CLOUD_PLATFORM_LOGO_BLACK;
     }
 
     @Override
     public void updateWizardStateOnSelection(ScopedStateStore state) {
-      state.put(KEY_TEMPLATE_FILE, myFile);
-      state.put(KEY_TEMPLATE_METADATA, myMetadata);
+      // Do nothing.
     }
 
     @Override
     public boolean isGalleryModuleType() {
-      return false;
+      return true;
     }
 
     @Nullable
     @Override
     public FormFactorUtils.FormFactor getFormFactor() {
       return null;
+    }
+
+    @Override
+    public String toString() {
+      return getName();
     }
   }
 }

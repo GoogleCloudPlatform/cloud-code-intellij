@@ -68,11 +68,12 @@ import static com.android.tools.idea.templates.KeystoreUtils.getDebugKeystore;
  * parameters in the templates.xml.
  */
 public final class CloudModuleUtils {
-  public static final String ATTR_MODULE_NAME = "moduleName";
-  public static final String ATTR_PACKAGE_NAME = "packageName";
+  public static final String ATTR_MODULE_NAME = "backendModuleName";
+  public static final String ATTR_PACKAGE_NAME = "backendPackageName";
   public static final String ATTR_CLIENT_PACKAGE = "clientPackageName";
   public static final String ATTR_SERVER_MODULE_PATH = "serverModulePath";
   public static final String ATTR_DOC_URL = "docUrl";
+  public static final String ATTR_MODULE_TYPE = "moduleType";
   public static final String ATTR_ENDPOINTS_OWNER = "endpointOwnerDomain";
   public static final String ATTR_ENDPOINTS_PACKAGE = "endpointPackagePath";
   private static final String ERROR_MESSAGE_TITLE = "New App Engine Module";
