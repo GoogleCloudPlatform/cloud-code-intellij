@@ -16,6 +16,7 @@
 package com.google.gct.idea.appengine.wizard;
 
 import com.android.tools.idea.templates.AndroidGradleTestCase;
+import com.android.tools.idea.wizard.WizardConstants;
 
 public class NewCloudModuleDynamicWizardStepTest extends AndroidGradleTestCase {
 
@@ -24,7 +25,7 @@ public class NewCloudModuleDynamicWizardStepTest extends AndroidGradleTestCase {
     assertTrue(NewCloudModuleDynamicWizardStep.isValidModuleName("lib"));
     assertFalse(NewCloudModuleDynamicWizardStep.isValidModuleName("123:456"));
     assertFalse(NewCloudModuleDynamicWizardStep.isValidModuleName("$boot"));
-    for (String s : NewCloudModuleDynamicWizardStep.INVALID_MSFT_FILENAMES) {
+    for (String s : WizardConstants.INVALID_WINDOWS_FILENAMES) {
       assertFalse(NewCloudModuleDynamicWizardStep.isValidModuleName(s));
     }
   }

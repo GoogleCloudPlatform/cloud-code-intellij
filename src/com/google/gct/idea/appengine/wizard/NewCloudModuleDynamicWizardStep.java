@@ -66,18 +66,6 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
   private JComboBox myClientModuleCombo;
   private JEditorPane myModuleDescriptionText;
 
-  /** Copied from {@link ConfigureAndroidProjectStep}. */
-  @VisibleForTesting
-  static final String INVALID_FILENAME_CHARS = "[/\\\\?%*:|\"<>]";
-
-  /** Copied from {@link ConfigureAndroidProjectStep}. */
-  @VisibleForTesting
-  static final Set<String> INVALID_MSFT_FILENAMES = ImmutableSet
-    .of("con", "prn", "aux", "clock$", "nul", "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9", "lpt1", "lpt2",
-        "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9", "$mft", "$mftmirr", "$logfile", "$volume", "$attrdef", "$bitmap", "$boot",
-        "$badclus", "$secure", "$upcase", "$extend", "$quota", "$objid", "$reparse");
-
-
   public NewCloudModuleDynamicWizardStep(@NotNull Project project, @Nullable Disposable parentDisposable) {
     super(BODY_TITLE, null, null, parentDisposable);
     setBodyComponent(myRootPane);
@@ -190,11 +178,11 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
 
   @VisibleForTesting
   static boolean isValidModuleName(@NotNull String moduleName) {
-    if (!moduleName.replaceAll(INVALID_FILENAME_CHARS, "").equals(moduleName)) {
+    if (!moduleName.replaceAll(WizardConstants.INVALID_FILENAME_CHARS, "").equals(moduleName)) {
       return false;
     }
     for (String s : Splitter.on('.').split(moduleName)) {
-      if (INVALID_MSFT_FILENAMES.contains(s.toLowerCase())) {
+      if (WizardConstants.INVALID_WINDOWS_FILENAMES.contains(s.toLowerCase())) {
         return false;
       }
     }
