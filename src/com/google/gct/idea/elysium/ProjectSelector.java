@@ -386,6 +386,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
                            (contentInset != null ? (contentInset.left + contentInset.right) : 0) +
                            (treeInset != null ? (treeInset.left + treeInset.right) : 0);
 
+      preferredWidth = Math.max(preferredWidth, ProjectSelector.this.getWidth());
       this.setPreferredSize(new Dimension(Math.max(MIN_WIDTH, preferredWidth), getPreferredPopupHeight()));
 
       getBottomPane().setLayout(new BorderLayout());
