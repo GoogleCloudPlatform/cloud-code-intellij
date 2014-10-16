@@ -17,6 +17,7 @@
 package com.google.gct.idea.appengine.wizard;
 
 import com.android.builder.model.SourceProvider;
+import com.android.tools.idea.gradle.invoker.GradleInvoker;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.android.tools.idea.gradle.project.GradleSyncListener;
 import com.android.tools.idea.templates.KeystoreUtils;
@@ -27,6 +28,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gct.idea.appengine.gradle.facet.AppEngineConfigurationProperties;
+import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
+import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
 import com.intellij.execution.RunManagerEx;
@@ -51,6 +55,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -131,6 +136,13 @@ public final class CloudModuleUtils {
                 final Module module = ModuleManager.getInstance(project).findModuleByName(moduleName);
                 // 'module' will never be null here.
                 createRunConfiguration(project, module);
+                AppEngineGradleFacet facet = AppEngineGradleFacet.getInstance(module);
+                if(facet != null) {
+                  AppEngineConfigurationProperties prop = facet.getConfiguration().getState();
+                  if(prop != null && !new File(prop.APPENGINE_SDKROOT).exists()){
+                    GradleInvoker.getInstance(project).executeTasks(Arrays.asList("appengineDownloadSdk"));
+                  }
+                }
               }
             });
           }
