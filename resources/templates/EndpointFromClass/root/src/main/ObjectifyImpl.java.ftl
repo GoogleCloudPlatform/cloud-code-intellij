@@ -1,9 +1,17 @@
   private static final int DEFAULT_LIST_LIMIT = 20;
 
   static {
+    // Typically you would register this inside an OfyServive wrapper. See: https://code.google.com/p/objectify-appengine/wiki/BestPractices
     ObjectifyService.register(${entityType}.class);
   }
 
+  /**
+   * Returns the {@link ${entityType}} with the corresponding ID.
+   *
+   * @param ${idName} the ID of the entity to be retrieved
+   * @return the entity with the corresponding ID
+   * @throws NotFoundException if there is no {@code ${entityType}} with the provided ID.
+   */
   @ApiMethod(
     name = "get",
     path = "${entityName}/{${idName}}",
@@ -17,6 +25,9 @@
     return ${entityName};
   }
 
+  /**
+   * Inserts a new {@code ${entityType}}.
+   */
   @ApiMethod(
     name = "insert",
     path = "${entityName}",
@@ -37,6 +48,15 @@
     return ofy().load().entity(${entityName}).now();
   }
 
+  /**
+   * Updates an existing {@code ${entityType}}.
+   *
+   * @param ${idName} the ID of the entity to be updated
+   * @param ${entityName} the desired state of the entity
+   * @return the updated version of the entity
+   * @throws NotFoundException if the {@code ${idName}} does not correspond to an existing
+   *  {@code ${entityType}}
+   */
   @ApiMethod(
     name = "update",
     path = "${entityName}/{${idName}}",
@@ -49,6 +69,13 @@
     return ofy().load().entity(${entityName}).now();
   }
 
+  /**
+   * Deletes the specified {@code ${entityType}}.
+   *
+   * @param ${idName} the ID of the entity to delete
+   * @throws NotFoundException if the {@code ${idName}} does not correspond to an existing
+   *  {@code ${entityType}}
+   */
   @ApiMethod(
     name = "remove",
     path = "${entityName}/{${idName}}",
@@ -59,6 +86,13 @@
     logger.info("Deleted ${entityType} with ID: " + ${idName});
   }
 
+  /**
+   * List all entities.
+   *
+   * @param cursor used for pagination to determine which page to return
+   * @param limit the maximum number of entries to return
+   * @return a response that encapsulates the result list and the next page token/cursor
+   */
   @ApiMethod(
     name = "list",
     path = "${entityName}",

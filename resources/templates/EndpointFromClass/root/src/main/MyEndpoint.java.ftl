@@ -9,7 +9,7 @@ package ${packageName};
 
 <#if isObjectified>
 /**
- * WARNING: This generated code is intended as a sample for demonstrating the usage of
+ * WARNING: This generated code is intended as a sample or starting point for using a
  * Google Cloud Endpoints RESTful API with an Objectify entity. It provides no data access
  * restrictions and no data validation.
  *
@@ -29,7 +29,7 @@ package ${packageName};
   )
 )
 public class ${entityType}Endpoint {
-  // Make sure to add this endpoint to your web.xml file if this is a web application.
+
   private static final Logger logger = Logger.getLogger(${entityType}Endpoint.class.getName());
 
   <#if isObjectified>
