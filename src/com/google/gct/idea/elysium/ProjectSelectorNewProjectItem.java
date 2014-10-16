@@ -38,7 +38,7 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
   private JPanel myPanel1;
 
   public ProjectSelectorNewProjectItem(@NotNull JTree tree) {
-    this.setLayout(new FlowLayout(FlowLayout.LEFT));
+    this.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 5));
 
     myTree = tree;
     this.setOpaque(false);
@@ -48,6 +48,7 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
     myClickHere.setHorizontalAlignment(SwingConstants.LEFT);
     myClickHere.setForeground(UI.getColor("link.foreground"));
     myClickHere.setText("<HTML><U>Click here</U></HTML>");
+    myClickHere.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
     add(myClickHere);
 
