@@ -70,11 +70,11 @@
       query = query.startAt(Cursor.fromWebSafeString(cursor));
     }
     QueryResultIterator<${entityType}> queryIterator = query.iterator();
-    List<${entityType}> ${entityType}List = new ArrayList<${entityType}>(limit);
+    List<${entityType}> ${entityName}List = new ArrayList<${entityType}>(limit);
     while (queryIterator.hasNext()) {
-      ${entityType}List.add(queryIterator.next());
+      ${entityName}List.add(queryIterator.next());
     }
-    return CollectionResponse.<${entityType}>builder().setItems(${entityType}List).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
+    return CollectionResponse.<${entityType}>builder().setItems(${entityName}List).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
   }
 
   private void checkExists(${idType} ${idName}) throws NotFoundException {
