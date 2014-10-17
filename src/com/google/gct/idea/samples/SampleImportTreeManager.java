@@ -48,6 +48,7 @@ public class SampleImportTreeManager {
   private final SampleCollection mySamples;
   private final Tree myTree;
   private final Map<DefaultMutableTreeNode, Sample> mySampleMap = new HashMap<DefaultMutableTreeNode, Sample>();
+  private final Map<String, String> myFormattedNameMap = new HashMap<String, String>();
   private final Map<String, DefaultMutableTreeNode> myCategoryMap = new TreeMap<String, DefaultMutableTreeNode>();
   private final Map<String, List<DefaultMutableTreeNode>> myCategorySampleNodeMap = new HashMap<String, List<DefaultMutableTreeNode>>();
 
@@ -60,9 +61,13 @@ public class SampleImportTreeManager {
   private void init() {
     // populate our data structures for tree update and filtering
     for (Sample sample : mySamples.getItems()) {
+      if (StringUtil.isEmpty(sample.getTitle())) {
+        continue;
+      }
+      String formattedName = formatName(sample.getTitle());
+      myFormattedNameMap.put(sample.getTitle(),formattedName);
       for (String category : sample.getCategories()) {
-        DefaultMutableTreeNode sampleNode =
-            new DefaultMutableTreeNode(cleanupName(sample.getTitle()));
+        DefaultMutableTreeNode sampleNode = new DefaultMutableTreeNode(formattedName);
         mySampleMap.put(sampleNode, sample);
         if (!myCategoryMap.containsKey(category)) {
           DefaultMutableTreeNode categoryNode = new DefaultMutableTreeNode(StringUtil.capitalize(category));
@@ -84,13 +89,11 @@ public class SampleImportTreeManager {
     populateSamplesTree(mySamples.getItems(), true);
   }
 
-  private static String cleanupName(String name) {
-    if (StringUtil.isEmpty(name)) {
+  static String formatName(String name) {
+    if (StringUtil.isEmpty(name) || name.trim().isEmpty()) {
       return "Unnamed";
     }
-    // TODO : See if adding dependency on idea spellchecker module is feasible instead of implementing this ourselves
-    name = name.replaceAll("^Android | Sample$", "");
-
+    name = name.replace("-"," - ");
     StringBuilder sb = new StringBuilder(2 * name.length());
     int n = name.length();
     boolean lastWasUpperCase = Character.isUpperCase(name.charAt(0));
@@ -104,7 +107,7 @@ public class SampleImportTreeManager {
       sb.append(c);
     }
 
-    return sb.toString();
+    return sb.toString().replaceAll(" +", " ").trim();
   }
 
   /**
@@ -178,10 +181,10 @@ public class SampleImportTreeManager {
     return filteredSamples;
   }
 
-  private static boolean hasKeyword(Sample sample, String keyword) {
+  private boolean hasKeyword(Sample sample, String keyword) {
     if (sample.getTitle() != null &&
         (StringUtil.containsIgnoreCase(sample.getTitle(), keyword) ||
-         StringUtil.containsIgnoreCase(cleanupName(sample.getTitle()), keyword))) {
+         StringUtil.containsIgnoreCase(myFormattedNameMap.get(sample.getTitle()), keyword))) {
       return true;
     }
     if (sample.getDescription() != null && StringUtil.containsIgnoreCase(sample.getDescription(), keyword)) {

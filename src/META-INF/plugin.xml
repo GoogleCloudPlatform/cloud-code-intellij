@@ -128,7 +128,7 @@
     </action>
     <action id="WelcomeScreen.GoogleCloudTools.SampleImport"
             class="com.google.gct.idea.samples.SampleImportAction"
-            text="Import an Android Code sample"
+            text="Import an Android code sample"
             icon="/icons/sampleImport.png">
       <add-to-group group-id="WelcomeScreen.QuickStart" relative-to-action="WelcomeScreen.GetFromVcs" anchor="before"/>
     </action>

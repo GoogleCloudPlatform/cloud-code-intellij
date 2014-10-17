@@ -19,6 +19,7 @@ import com.appspot.gsamplesindex.samplesindex.SamplesIndex;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
@@ -36,8 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class SampleImportAction extends AnAction {
 
-
-  Logger LOG = Logger.getInstance(SampleImportAction.class);
+  private static final Logger LOG = Logger.getInstance(SampleImportAction.class);
 
   @Override
   public void actionPerformed(AnActionEvent e) {
@@ -48,22 +48,22 @@ public class SampleImportAction extends AnAction {
     samplesService = myBuilder.build();
 
     final AtomicReference<SampleCollection> sampleList = new AtomicReference<SampleCollection>(null);
-    new Task.Modal(null, "Import Sample", false) {
+    new Task.Modal(null, GctBundle.message("sample.import.title"), false) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
-        indicator.setText("Downloading samples list...");
+        indicator.setText(GctBundle.message("sample.index.downloading"));
         try {
           sampleList.set(samplesService.samples().listSamples().set("technology", "android").execute());
         }
         catch (IOException ex) {
-          LOG.error("Failed to download samples", ex.getMessage());
+          LOG.error(GctBundle.message("sample.index.download.failed"));
           sampleList.set(null);
         }
       }
     }.queue();
 
-    if(sampleList.get() == null || sampleList.get().size() == 0) {
-      Messages.showErrorDialog("Failed to download samples list from server", "Sample Import");
+    if (sampleList.get() == null || sampleList.get().size() == 0) {
+      Messages.showErrorDialog(GctBundle.message("sample.index.download.failed"), GctBundle.message("sample.import.error.title"));
       return;
     }
 

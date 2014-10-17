@@ -17,6 +17,7 @@ package com.google.gct.idea.samples;
 
 import com.android.tools.idea.wizard.DynamicWizard;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
+import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import org.jetbrains.android.sdk.AndroidSdkUtils;
@@ -31,7 +32,7 @@ public class SampleImportWizard extends DynamicWizard {
   private SampleCollection mySampleList;
 
   public SampleImportWizard(@Nullable Project project, @NotNull SampleCollection samples) {
-    super(project, null, "Import Sample");
+    super(project, null, GctBundle.message("sample.import.title"));
     mySampleList = samples;
     init();
 
@@ -45,7 +46,7 @@ public class SampleImportWizard extends DynamicWizard {
         "You can configure your SDK via <b>Configure | Project Defaults | Project Structure | SDKs</b></html>";
       super.init();
       Messages.showErrorDialog(msg, title);
-      throw new IllegalStateException(msg);
+      return;
     }
 
     addPath(new SampleImportWizardPath(mySampleList, getDisposable()));
@@ -59,6 +60,6 @@ public class SampleImportWizard extends DynamicWizard {
 
   @Override
   protected String getWizardActionDescription() {
-    return "Import Sample";
+    return GctBundle.message("sample.import.title");
   }
 }
