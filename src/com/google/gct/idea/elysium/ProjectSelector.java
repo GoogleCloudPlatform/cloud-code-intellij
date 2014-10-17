@@ -124,7 +124,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     });
 
     getTextField().setCursor(Cursor.getDefaultCursor());
-    getTextField().getEmptyText().setText("Please select a project...");
+    getTextField().getEmptyText().setText("Enter a cloud project ID...");
 
     // Instead of doing an initial synchronize, we wait until the ui hierarchy
     // is about to be shown.  Then we only synchronize if we are visible.
