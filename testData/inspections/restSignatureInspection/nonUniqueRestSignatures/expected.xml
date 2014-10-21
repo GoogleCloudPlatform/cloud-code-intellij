@@ -17,7 +17,74 @@
 <problems>
   <problem>
     <file>test.java</file>
-    <line>32</line>
+    <line>37</line>
     <description>Multiple methods with same rest path &quot;POST boo&quot;: &quot;boo&quot; and &quot;boo&quot;</description>
   </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>48</line>
+    <description>Multiple methods with same rest path &quot;GET function1/{}&quot;: &quot;function1&quot; and &quot;function1&quot;</description>
+  </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>60</line>
+    <description>Multiple methods with same rest path &quot;POST function2/{}&quot;: &quot;function2&quot; and &quot;function2&quot;</description>
+  </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>72</line>
+    <description>Multiple methods with same rest path &quot;GET foo/{}&quot;: &quot;list1&quot; and &quot;list1&quot;</description>
+  </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>84</line>
+    <description>Multiple methods with same rest path &quot;GET list2&quot;: &quot;list2&quot; and &quot;list2&quot;</description>
+  </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>96</line>
+    <description>Multiple methods with same rest path &quot;GET list3&quot;: &quot;list3&quot; and &quot;list3&quot;</description>
+  </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>108</line>
+    <description>Multiple methods with same rest path &quot;GET foocollection/{}&quot;: &quot;get1&quot; and &quot;get1&quot;</description>
+  </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>120</line>
+    <description>Multiple methods with same rest path &quot;GET foocollection&quot;: &quot;insert1&quot; and &quot;insert1&quot;</description>
+  </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>132</line>
+    <description>Multiple methods with same rest path &quot;POST foocollection&quot;: &quot;update1&quot; and &quot;update1&quot;</description>
+  </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>144</line>
+    <description>Multiple methods with same rest path &quot;GET 1&quot;: &quot;delete1&quot; and &quot;delete1&quot;</description>
+  </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>156</line>
+    <description>Multiple methods with same rest path &quot;DELETE 1&quot;: &quot;remove1&quot; and &quot;remove1&quot;</description>
+  </problem>
+
+  <problem>
+    <file>test.java</file>
+    <line>168</line>
+    <description>Multiple methods with same rest path &quot;PUT collectionresponse_foo&quot;: &quot;update2&quot; and &quot;update2&quot;</description>
+  </problem>
+
 </problems>

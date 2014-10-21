@@ -20,13 +20,18 @@ import com.google.common.collect.Maps;
 import com.google.gct.idea.appengine.GctConstants;
 import com.google.gct.idea.appengine.util.EndpointBundle;
 import com.google.gct.idea.appengine.util.EndpointUtilities;
+import com.google.gct.idea.appengine.util.PsiUtils;
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,21 +39,97 @@ import java.util.Map;
  */
 public class RestSignatureInspection extends EndpointInspectionBase {
   public enum RestMethod {
-    LIST("list", "GET"),
+    LIST("list", "GET") {
+      /**
+       * If the return type of {@code method} is a parameterized collection,
+       * this function constructs the resource name from the parameterized parameters
+       * of the return type else it returns {@code null}.
+       *
+       * @param method the method in which the resource name will be generated from
+       * @return the guessed resource name
+       */
+      @Override
+      @Nullable
+      public String guessResourceName(PsiMethod method) {
+        Project project = getProject(method);
+        if (project == null) {
+          return null;
+        }
+
+        PsiType returnType = method.getReturnType();
+        if(isValidCollectionType(project, returnType)) {
+          assert(returnType instanceof PsiClassType);
+          PsiClassType classType = (PsiClassType) returnType;
+          PsiType[] typeParams = classType.getParameters();
+
+          // TODO: Add inspection to verify that the the type parameter is specified
+          // for paramerterized types, since trying to generate client libs without one generates
+          // a : "Object type T not supported"
+          return typeParams.length > 0 ? getSimpleName(project, typeParams[0]).toLowerCase() : null;
+        }
+        return null;
+      }
+
+      private boolean isValidCollectionType (Project project, PsiType type) {
+        // Check if type is a Collection
+        if(PsiUtils.isParameterizedType(type)) {
+          PsiClassType collectionType =
+            JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
+          PsiClassType collectionResponseType = JavaPsiFacade.getElementFactory(project)
+            .createTypeByFQClassName("com.google.api.server.spi.response.CollectionResponse");
+
+          return collectionType.isAssignableFrom(type) || collectionResponseType.isAssignableFrom(type);
+        }
+        return false;
+      }
+    },
     GET("get", "GET"),
     INSERT("insert", "POST"),
     UPDATE("update", "PUT"),
-    DELETE("delete", "DELETE"),
-    REMOVE("remove", "DELETE"),
-    DEFAULT("", "POST");
+    DELETE("delete", "DELETE") {
+      /**
+       * Returns {@code null} if the length of the name of {@code method} is
+       * shorter or equal to the current RestMethod's prefix. Otherwise returns the substring
+       * of the name of {@code method} beginning at the length of the current RestMethod's
+       * prefix.
+       */
+      @Override
+      public String guessResourceName(PsiMethod method) {
+        String methodName = method.getName();
+        return methodNamePrefix.length() >= methodName.length() ? null :
+               methodName.substring(methodNamePrefix.length()).toLowerCase();
+      }
+    },
+    REMOVE("remove", "DELETE") {
+      /**
+       * Returns {@code null} if the length of the name of {@code method} is
+       * shorter or equal to the current RestMethod's prefix. Otherwise returns the substring
+       * of the name of {@code method} beginning at the length of the current RestMethod's
+       * prefix.
+       */
+      @Override
+      public String guessResourceName(PsiMethod method) {
+        String methodName = method.getName();
+        return methodNamePrefix.length() >= methodName.length() ? null :
+               methodName.substring(methodNamePrefix.length()).toLowerCase();
+      }
+    },
+    DEFAULT("", "POST"){
+      @Override
+      @Nullable
+      public String guessResourceName(PsiMethod method) {
+        return null;
+      }
+    };
 
     protected final String methodNamePrefix;
     private final String httpMethod;
 
     /**
      * Specifies a default REST method prefix, as well as what HTTP method it should use by default.
-     * @param methodNamePrefix A method name prefix.
-     * @param httpMethod The default HTTP method for this prefix.
+     *
+     * @param methodNamePrefix a method name prefix
+     * @param httpMethod the default HTTP method for this prefix
      */
     RestMethod(String methodNamePrefix, String httpMethod) {
       this.methodNamePrefix = methodNamePrefix;
@@ -57,7 +138,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
 
     /**
      * Gets the method name prefix for this instance.
-     * @return The method name prefix.
+     *
+     * @return the method name prefix
      */
     public String getMethodNamePrefix() {
       return this.methodNamePrefix;
@@ -69,6 +151,56 @@ public class RestSignatureInspection extends EndpointInspectionBase {
      */
     public String getHttpMethod() {
       return this.httpMethod;
+    }
+
+    /**
+     * Generates a resource name from either {@code method}'s name or its return type.
+     *
+     * @param method the method in which the resource name will be generated from
+     * @return the guessed resource name
+     */
+    @Nullable
+    public String guessResourceName(PsiMethod method) {
+      Project project = getProject(method);
+      if (project == null) {
+        return null;
+      }
+
+      return getSimpleName(project, method.getReturnType()).toLowerCase();
+    }
+
+    @Nullable
+    private static String getSimpleName(Project project, PsiType type) {
+      PsiClassType collectionType =
+        JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
+
+      if (type == null) {
+        return null;
+      } else if (type instanceof PsiArrayType) {
+        PsiType arrayComponentType = ((PsiArrayType) type).getComponentType();
+        return getSimpleName(project, arrayComponentType) + "collection";
+
+      } else if (collectionType.isAssignableFrom(type)) {
+        assert (type instanceof PsiClassType);
+        PsiClassType classType = (PsiClassType) type;
+        PsiType[] typeParams = classType.getParameters();
+        return typeParams.length > 0 ? getSimpleName(project, typeParams[0]) + "collection" : null;
+      } else if (PsiUtils.isParameterizedType(type)) {
+        assert (type instanceof PsiClassType);
+        StringBuilder builder = new StringBuilder();
+        PsiClassType classType = (PsiClassType) type;
+        builder.append(getSimpleName(project, classType.rawType()));
+
+        PsiType[] typeParams = classType.getParameters();
+        for(PsiType aType : typeParams) {
+          builder.append('_');
+          builder.append(getSimpleName(project, aType));
+        }
+        return builder.toString();
+
+      } else {
+        return type.getPresentableText();
+      }
     }
   }
 
@@ -100,6 +232,10 @@ public class RestSignatureInspection extends EndpointInspectionBase {
       @Override
       public void visitClass(PsiClass aClass){
         if (!EndpointUtilities.isEndpointClass(aClass)) {
+          return;
+        }
+
+        if(hasTransformer(aClass)) {
           return;
         }
 
@@ -136,10 +272,11 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   /**
    * Returns the REST signature of the specified method. The REST signature is derived from
    * a combination of httpMethod and path.
-   * @param psiMethod The method whose REST signature is to be determined
-   * @return  The Rest Signature of psiMethod
+   *
+   * @param psiMethod the method whose REST signature is to be determined
+   * @return  the Rest Signature of psiMethod
    */
-  public String getRestfulSignature(PsiMethod psiMethod)  {
+  public String getRestfulSignature(PsiMethod psiMethod) {
     return getHttpMethod(psiMethod) + " " + getPath(psiMethod).replaceAll("\\{([^\\}]*)\\}", "\\{\\}");
   }
 
@@ -147,8 +284,9 @@ public class RestSignatureInspection extends EndpointInspectionBase {
    * Returns the http method of the specified psiMethod. The httpMethod can be set by
    * the user by setting the httpMethod attribute in @ApiMethod. If the httpMethod attribute
    * of the @ApiMethod is not set, the default value of the method is used.
-   * @param psiMethod The method hose HTTP method is to be determined.
-   * @return The http Method pf psiMethod.
+   *
+   * @param psiMethod the method hose HTTP method is to be determined
+   * @return the http Method pf psiMethod
    */
   public String getHttpMethod(PsiMethod psiMethod) {
     PsiModifierList modifierList = psiMethod.getModifierList();
@@ -172,16 +310,17 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     }
 
     // Create httpMethod from method name
-    return getDefaultHttpMethod(psiMethod);
+    return getDefaultRestMethod(psiMethod).getHttpMethod();
   }
 
   /**
    * Returns the path for psiMethod. The path can be set by the user by setting the path
    * attribute of @ApiMethod. If the path attribute is not set, a default value will be returned.
-   * @param psiMethod The method whose path is to be determined.
-   * @return  The path for psiMethod.
+   *
+   * @param psiMethod the method whose path is to be determined
+   * @return the path for psiMethod
    */
-  public String getPath(PsiMethod psiMethod)  {
+  public String getPath(PsiMethod psiMethod) {
     PsiModifierList modifierList = psiMethod.getModifierList();
     String path = null;
 
@@ -211,36 +350,45 @@ public class RestSignatureInspection extends EndpointInspectionBase {
 
   /**
    * Returns the default path of psiMethod. The default path is determined in the following order
-   * 1. If the resource attribute of @ApiClass is set, the default value is this attribute
-   * 2. If the resource attribute of @Api is set, the default value is this attribute
-   * 3. Uses the method's name as the resource name.
-   * @param psiMethod The method whose default path is to be determined.
-   * @return The default path for psiMethod
+   * 1. If the resource attribute of @ApiClass is set, the default value is this attribute + the path parameters
+   * 2. If the resource attribute of @Api is set, the default value is this attribute + the path parameters
+   * 3. If the method return type is not void, we guess the resource value in
+   *    {@link RestSignatureInspection#guessResourceName(com.intellij.psi.PsiMethod)} and add the path parameters
+   * 4. Else use the method's name as the resource name + the path parameters.
+   *
+   * @param psiMethod the method whose default path is to be determined
+   * @return the default path for psiMethod
    */
   private String getDefaultPath(PsiMethod psiMethod) {
     // Get path from @ApiClass or @Api's resource attribute if it exists
     String apiDefaultResource = getResourceProperty(psiMethod);
     if(apiDefaultResource != null) {
-      return apiDefaultResource.toLowerCase();
+      return apiDefaultResource.toLowerCase() + getPathParameter(psiMethod);
+    }
+
+    // If the method return type is not void, use guessed resource type name
+    String guessedResourceName = guessResourceName(psiMethod);
+    if(guessedResourceName != null) {
+      return guessedResourceName + getPathParameter(psiMethod);
     }
 
     // Use the method name
-    return psiMethod.getName();
+    return psiMethod.getName() + getPathParameter(psiMethod);
   }
 
   /**
-   * Returns a default HTTP method for <code>psiMethod</code>. The default HTTP method is
+   * Returns the default REST method for {@code psiMethod}. The default REST method is
    * determined by parsing the method name. If the method name begins with any of the REST
-   * method's prefixes, the HTTP method of the respective RESTMethod is returned.
-   * If not, the HTTP method of the POST RestMethod is returned.
-   * @param psiMethod The method whose default HTTP method is to be determined
-   * @return
+   * method's prefixes, the REST method of the respective RESTMethod is returned.
+   * If not, the POST RestMethod is returned.
+   *
+   * @param psiMethod the method whose default HTTP method is to be determined
    */
-  private String getDefaultHttpMethod(PsiMethod psiMethod) {
+  private RestMethod getDefaultRestMethod(PsiMethod psiMethod) {
     String methodName = psiMethod.getName();
     for (RestMethod entry : RestMethod.values()) {
       if (methodName.startsWith(entry.getMethodNamePrefix())) {
-        return entry.getHttpMethod();
+        return entry;
       }
     }
     throw new AssertionError("It's impossible for method" + psiMethod.getName() + " to map to no REST path.");
@@ -251,6 +399,10 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     PsiClass psiClass = psiMethod.getContainingClass();
     PsiModifierList modifierList = psiClass.getModifierList();
     String resource = null;
+
+    if(modifierList == null) {
+      return null;
+    }
 
     // Get @ApiClass's resource attribute if it exists
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
@@ -314,4 +466,65 @@ public class RestSignatureInspection extends EndpointInspectionBase {
                          restSignature, method1, method2);
   }
 
+  /**
+   * Guesses a resource name based off the method name or return type.
+   */
+  @Nullable
+  private String guessResourceName(PsiMethod method) {
+    // Check if return type is void
+    if(method.getReturnType() == PsiType.VOID) {
+      return null;
+    }
+
+    // Determine a RestMethod based off the method name
+    RestMethod restMethod = getDefaultRestMethod(method);
+
+    // Guess the resource name using the RestMethod's guessResourceName function
+    return restMethod.guessResourceName(method);
+  }
+
+  /**
+   * Returns "/{}" for every parameter with a valid @Named annotation in {@code method}
+   * that does not have @Nullable/@Default.
+   */
+  private String getPathParameter(PsiMethod method) {
+    String path = "";
+    EndpointPsiElementVisitor elementVisitor = new EndpointPsiElementVisitor();
+    List<String> annotions =
+      Arrays.asList(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE, "javax.annotation.Nullable", GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
+
+    for(PsiParameter aParameter : method.getParameterList().getParameters()) {
+      // Check for @Nullable/@Default
+      PsiModifierList modifierList = aParameter.getModifierList();
+      if(modifierList == null) {
+        continue;
+      }
+
+      if (AnnotationUtil.isAnnotated(aParameter, annotions)) {
+        continue;
+      }
+
+      PsiAnnotationMemberValue namedValue = elementVisitor.getNamedAnnotationValue(aParameter);
+      if(namedValue != null) {
+        path += "/{}";
+      }
+    }
+
+    return path;
+  }
+
+  /**
+   * Returns the project associated with {@code method} or null if it cannot retrieve the project.
+   */
+  @Nullable
+  private static Project getProject(PsiMethod method) {
+    Project project;
+    try {
+      project = method.getContainingFile().getProject();
+    } catch (PsiInvalidElementAccessException e) {
+      LOG.error("Error getting project with parameter " + method.getText(), e);
+      return null;
+    }
+    return project;
+  }
 }

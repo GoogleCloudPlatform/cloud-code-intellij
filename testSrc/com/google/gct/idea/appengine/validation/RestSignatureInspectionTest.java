@@ -198,6 +198,13 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
     when(mockPsiMethod.getModifierList()).thenReturn(mockModifierList);
     when(mockPsiMethod.getName()).thenReturn(methodName);
     when(mockPsiMethod.getContainingClass()).thenReturn(mockPsiClass);
+
+    PsiFile file = myFixture.addFileToProject("/temp", "someFile");
+    when(mockPsiMethod.getContainingFile()).thenReturn(file);
+
+    PsiParameterList mockParameterList = mock(PsiParameterList.class);
+    when(mockParameterList.getParameters()).thenReturn(new PsiParameter[0]);
+    when(mockPsiMethod.getParameterList()).thenReturn(mockParameterList);
   }
 
   private void initializePsiClass(String apiResource, String apiClassResource) {

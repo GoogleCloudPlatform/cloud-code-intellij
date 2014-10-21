@@ -167,7 +167,7 @@ public class PsiUtils {
    * Returns the parent class of element. If element is a class, it returns element.
    * If element is null, it returns null.
    *
-   * @param element The PsiElement we want to know the class of.
+   * @param element the PsiElement we want to know the class of.
    * @return
    */
   public static PsiClass findClass(PsiElement element) {
@@ -176,8 +176,8 @@ public class PsiUtils {
 
   /**
    * Returns the PsiJavaFile associated with <code>actionEvent</code> and null if non exists.
-   * @param actionEvent The actionEvent to be evaluated.
-   * @return The PsiJavaFile associated with <code>actionEvent</code> and null if non exists.
+   * @param actionEvent the actionEvent to be evaluated.
+   * @return the PsiJavaFile associated with <code>actionEvent</code> and null if non exists.
    */
   @Nullable
   public static PsiJavaFile getPsiJavaFileFromContext(AnActionEvent actionEvent) {
@@ -188,5 +188,25 @@ public class PsiUtils {
     else {
       return (PsiJavaFile) psiFile;
     }
+  }
+
+  /**
+   * Returns {@code true} if {@code type} is a parameterized type and {@code false} otherwise.
+   *
+   * @param type the type to be evaluated
+   * @return {@code true} if {@code type} is a parameterized type and {@code false} otherwise
+   */
+  public static boolean isParameterizedType(PsiType type) {
+    if(!(type instanceof  PsiClassType)) {
+      return false;
+    }
+
+    return Boolean.TRUE == type.accept(new PsiTypeVisitor<Boolean>() {
+      @Nullable
+      @Override
+      public Boolean visitClassType(PsiClassType classType) {
+        return classType.getParameterCount() > 0;
+      }
+    });
   }
 }
