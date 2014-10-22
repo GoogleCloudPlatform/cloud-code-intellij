@@ -271,7 +271,6 @@ public class NewEndpointFromClassAction extends AnAction {
     WebApp webApp = facet.getWebXmlForEdit();
     String result = validateWebXml(webApp);
     if (result != null) {
-      LOG.error(result);
       Messages.showErrorDialog(result, ERROR_MESSAGE_TITLE);
       return;
     }
@@ -344,7 +343,7 @@ public class NewEndpointFromClassAction extends AnAction {
   private static void updateBuildFile(@NonNls Project project, @NotNull Module module, @NonNls Template template) {
     final VirtualFile buildFile = GradleUtil.getGradleBuildFile(module);
     if (buildFile == null) {
-      LOG.error("Cannot find gradle build file for module \"" + module.getName() + "\"");
+      Messages.showErrorDialog("Cannot find gradle build file for module \"" + module.getName() + "\"", ERROR_MESSAGE_TITLE);
       return;
     }
 
