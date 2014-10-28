@@ -18,6 +18,7 @@ package com.google.gct.idea.elysium;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
 import icons.GoogleCloudToolsIcons;
+import icons.GoogleLoginIcons;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,7 +40,8 @@ class ProjectSelectorGoogleLogin extends JPanel {
     googleIcon.setHorizontalAlignment(SwingConstants.CENTER);
     googleIcon.setVerticalAlignment(SwingConstants.CENTER);
     googleIcon.setOpaque(false);
-    googleIcon.setIcon(GoogleCloudToolsIcons.GOOGLE_TRANSPARENT);
+    googleIcon.setIcon(GoogleLoginIcons.GOOGLE_LOGO);
+    googleIcon.setBorder(BorderFactory.createEmptyBorder(5,0,5,0));
     GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
     c.gridy = 0;
