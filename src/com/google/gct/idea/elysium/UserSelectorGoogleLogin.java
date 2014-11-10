@@ -18,10 +18,10 @@ package com.google.gct.idea.elysium;
 import com.google.gct.idea.util.GctBundle;
 
 /**
- * UI for the node that prompts for signin in the {@link ProjectSelector}.
+ * UI for the node that prompts for signin in the {@link com.google.gct.idea.elysium.UserSelector}.
  */
-class ProjectSelectorGoogleLogin extends BaseGoogleLoginUI {
-  public ProjectSelectorGoogleLogin() {
-    super(GctBundle.message("select.project.signin"));
+class UserSelectorGoogleLogin extends BaseGoogleLoginUI {
+  public UserSelectorGoogleLogin() {
+    super(GctBundle.message("select.user.signin"));
   }
 }

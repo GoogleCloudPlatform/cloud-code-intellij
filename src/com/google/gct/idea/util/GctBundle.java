@@ -47,4 +47,8 @@ public class GctBundle {
   public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params) {
     return CommonBundle.message(getBundle(), key, params);
   }
+
+  public static String getString(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params) {
+    return message(key, params);
+  }
 }

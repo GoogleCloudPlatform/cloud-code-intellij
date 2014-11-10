@@ -56,7 +56,6 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   private static final String EMPTY_VALUE = "";
   private static final int PREFERRED_HEIGHT = 240;
   private static final int POPUP_HEIGHTFRAMESIZE = 50;
-  public static final int MIN_WIDTH = 450;
 
   private final DefaultMutableTreeNode myModelRoot;
   private final DefaultTreeModel myTreeModel;
@@ -150,8 +149,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   }
 
   /**
-   * Returns the selected credentialed user for the project id represented by getText().
-   * Note that if the ProjectSelector is created with queryOnExpand, this value could be {@code null} even
+   * Returns the selected credentialed user for the project id represented by {@link #getText()}.
+   *
+   * Note: if the ProjectSelector is created with queryOnExpand, this value could be {@code null} even
    * if {@link #getText()} represents a valid project because the user has not expanded the owning {@link GoogleLogin}.
    */
   @Nullable
@@ -177,9 +177,38 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     return null;
   }
 
+  /**
+   * Returns the selected project's description.
+   *
+   * This has the same limitations as {@link #getSelectedUser()}  in that it may be null even if getText represents a valid
+   * ID if queryOnExpand is true.
+   */
+  @Nullable
+  public String getProjectDescription() {
+    if (Strings.isNullOrEmpty(getText())) {
+      return null;
+    }
+
+    // Look for the selected text in the model, which will give us the login.
+    for (int i = 0; i < myModelRoot.getChildCount(); i++) {
+      TreeNode userNode = myModelRoot.getChildAt(i);
+      if (userNode instanceof GoogleUserModelItem) {
+        for (int j = 0; j < userNode.getChildCount(); j++) {
+          TreeNode projectNode = userNode.getChildAt(j);
+          if (projectNode instanceof ElysiumProjectModelItem &&
+              getText().equals(((ElysiumProjectModelItem) projectNode).getProjectId())) {
+            return ((ElysiumProjectModelItem) projectNode).getDescription();
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
   @Override
   protected int getPreferredPopupHeight() {
-    return !needsToSignIn() ? PREFERRED_HEIGHT : ProjectSelectorGoogleLogin.PREFERRED_HEIGHT + POPUP_HEIGHTFRAMESIZE;
+    return !needsToSignIn() ? PREFERRED_HEIGHT : BaseGoogleLoginUI.PREFERRED_HEIGHT + POPUP_HEIGHTFRAMESIZE;
   }
 
   @Override
@@ -211,9 +240,10 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   private static boolean needsToSignIn() {
     Map<String, CredentialedUser> users = GoogleLogin.getInstance().getAllUsers();
 
-    return users == null || users.isEmpty();
+    return users.isEmpty();
   }
 
+  @SuppressWarnings("AssignmentToForLoopParameter")
   private void synchronize(boolean forceUpdate) {
     // First, clear any users that went away.
 
@@ -387,7 +417,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
                            (treeInset != null ? (treeInset.left + treeInset.right) : 0);
 
       preferredWidth = Math.max(preferredWidth, ProjectSelector.this.getWidth());
-      this.setPreferredSize(new Dimension(Math.max(MIN_WIDTH, preferredWidth), getPreferredPopupHeight()));
+      this.setPreferredSize(new Dimension(Math.max(BaseGoogleLoginUI.MIN_WIDTH, preferredWidth), getPreferredPopupHeight()));
 
       getBottomPane().setLayout(new BorderLayout());
       JButton synchronizeButton = new JButton();

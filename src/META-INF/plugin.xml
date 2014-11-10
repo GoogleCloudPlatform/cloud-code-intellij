@@ -11,6 +11,7 @@
   <depends>org.jetbrains.android</depends>
   <depends>org.jetbrains.plugins.gradle</depends>
   <depends>com.google.gct.login</depends>
+  <depends>Git4Idea</depends>
 
   <application-components>
     <!-- Disable temporarily
@@ -49,6 +50,9 @@
     <dom.fileDescription implementation="com.google.gct.idea.appengine.dom.WebAppFileDescription"/>
 
     <implicitUsageProvider implementation="com.google.gct.idea.appengine.validation.EndpointImplicitUsageProvider"/>
+
+    <checkoutProvider implementation="com.google.gct.idea.git.GcpCheckoutProvider"/>
+    <vcsPopupProvider implementation="com.google.gct.idea.git.GcpQuickListContentProvider"/>
 
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
@@ -108,6 +112,10 @@
     <newModuleDynamicPathFactory implementation="com.google.gct.idea.appengine.wizard.NewCloudModuleDynamicWizardPathFactory"/>
   </extensions>
 
+  <extensions defaultExtensionNs="Git4Idea">
+    <GitHttpAuthDataProvider implementation="com.google.gct.idea.git.GcpHttpAuthDataProvider" />
+  </extensions>
+
   <actions>
     <action id="GoogleCloudTools.NewEndpointFromClass"
             class="com.google.gct.idea.appengine.action.NewEndpointFromClassAction"
@@ -137,6 +145,10 @@
             class="com.google.gct.idea.appengine.deploy.AppEngineUpdateAction"
             text="Deploy Module to App Engine...">
       <add-to-group group-id="BuildMenu" anchor="after" relative-to-action="Android.GenerateSignedApk"/>
+    </action>
+    <action id="GoogleCloudTools.UploadSourceToGCP"
+            class="com.google.gct.idea.git.UploadSourceAction">
+      <add-to-group group-id="Vcs.Import"/>
     </action>
   </actions>
 

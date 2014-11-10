@@ -33,6 +33,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.SortedComboBoxModel;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.xml.util.XmlStringUtil;
+import git4idea.DialogManager;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -119,7 +120,7 @@ public class AppEngineUpdateDialog extends DialogWrapper {
     final Module passedSelectedModule = selectedModule;
 
     AppEngineUpdateDialog dialog = new AppEngineUpdateDialog(project, modules, passedSelectedModule);
-    dialog.show();
+    DialogManager.show(dialog);
   }
 
   @Nullable
