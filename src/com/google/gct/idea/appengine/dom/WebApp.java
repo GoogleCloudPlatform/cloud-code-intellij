@@ -29,6 +29,14 @@ public interface WebApp extends DomElement {
 
   List<ServletMapping> getServletMappings();
 
+  List<Filter> getFilters();
+
+  Filter addFilter();
+
+  List<FilterMapping> getFilterMappings();
+
+  FilterMapping addFilterMapping();
+
   interface Servlet extends DomElement {
 
     ServletName getServletName();
@@ -64,6 +72,30 @@ public interface WebApp extends DomElement {
     UrlPattern getUrlPattern();
 
     interface ServletName extends GenericDomValue<String> {
+    }
+
+    interface UrlPattern extends GenericDomValue<String> {
+    }
+  }
+
+  interface Filter extends DomElement {
+    FilterName getFilterName();
+
+    FilterClass getFilterClass();
+
+    interface FilterName extends GenericDomValue<String> {
+    }
+
+    interface FilterClass extends GenericDomValue<String> {
+    }
+  }
+
+  interface FilterMapping extends DomElement {
+    FilterName getFilterName();
+
+    UrlPattern getUrlPattern();
+
+    interface FilterName extends GenericDomValue<String> {
     }
 
     interface UrlPattern extends GenericDomValue<String> {

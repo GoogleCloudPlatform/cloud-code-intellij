@@ -69,19 +69,21 @@ import java.util.Map;
 public class NewEndpointFromClassAction extends AnAction {
   private static final Logger LOG = Logger.getInstance(NewEndpointFromClassAction.class);
 
-  public static final String ENTITY_NAME = "entityName";
-  public static final String ENTITY_TYPE = "entityType";
-  public static final String ENDPOINT_TEMPLATE = "EndpointFromClass";
+  private static final String ENTITY_NAME = "entityName";
+  private static final String ENTITY_TYPE = "entityType";
+  private static final String ENDPOINT_TEMPLATE = "EndpointFromClass";
   private static final String ENDPOINT_CLASS_SUFFIX = "Endpoint";
   private static final String ERROR_MESSAGE_TITLE = "Failed to Generate Endpoint Class";
   private static final String DEFAULT_ERROR_MESSAGE = "Error occurred while generating Endpoint class";
   private static final String ENDPOINTS_DEPENDENCY = "com.google.appengine:appengine-endpoints:";
   private static final String ENDPOINTS_DEPS_DEPENDENCY = "com.google.appengine:appengine-endpoints-deps:";
-  private static final String OBJECTIFY_ENTITY_ANNOTATION = "com.googlecode.objectify.annotation.Entity";
-  private static final String OBJECTIFY_ID_ANNOTATION = "com.googlecode.objectify.annotation.Id";
   private static final String ENDPOINTS_SERVLET_CLASS = "com.google.api.server.spi.SystemServiceServlet";
   private static final String ENDOINTS_SERVLET_NAME = "SystemServiceServlet";
   private static final String ENDPOINTS_SERVICES_INIT_PARAM_NAME = "services";
+  private static final String OBJECTIFY_ENTITY_ANNOTATION = "com.googlecode.objectify.annotation.Entity";
+  private static final String OBJECTIFY_ID_ANNOTATION = "com.googlecode.objectify.annotation.Id";
+  private static final String OBJECTIFY_FILTER_NAME = "ObjectifyFilter";
+  private static final String OBJECTIFY_FQ_FILTER_CLASS = "com.googlecode.objectify.ObjectifyFilter";
 
   @Override
   public void update(AnActionEvent e) {
@@ -268,8 +270,27 @@ public class NewEndpointFromClassAction extends AnAction {
 
   private static void updateWebXml(Project project, Module module, final String endpointFQClassName) {
     AppEngineGradleFacet facet = AppEngineGradleFacet.getAppEngineFacetByModule(module);
-    WebApp webApp = facet.getWebXmlForEdit();
-    String result = validateWebXml(webApp);
+    final WebApp webApp = facet.getWebXmlForEdit();
+    if (!hasObjectifyFilter(webApp)) {
+      CommandProcessor.getInstance().executeCommand(project, new Runnable() {
+        @Override
+        public void run() {
+          ApplicationManager.getApplication().runWriteAction(new Runnable() {
+            @Override
+            public void run() {
+              WebApp.Filter objectifyFilter = webApp.addFilter();
+              WebApp.FilterMapping filterMapping = webApp.addFilterMapping();
+              objectifyFilter.getFilterName().setValue(OBJECTIFY_FILTER_NAME);
+              objectifyFilter.getFilterClass().setValue(OBJECTIFY_FQ_FILTER_CLASS);
+              filterMapping.getFilterName().setValue(OBJECTIFY_FILTER_NAME);
+              filterMapping.getUrlPattern().setValue("/*");
+            }
+          });
+        }
+      }, "Update App Engine web.xml", null);
+    }
+
+      String result = validateWebXml(webApp);
     if (result != null) {
       Messages.showErrorDialog(result, ERROR_MESSAGE_TITLE);
       return;
@@ -280,6 +301,15 @@ public class NewEndpointFromClassAction extends AnAction {
     } else {
       addEndpointClassToInitParam(project, endpointServletParamValue, endpointFQClassName);
     }
+  }
+
+  private static boolean hasObjectifyFilter(WebApp webApp) {
+    for (WebApp.Filter filter : webApp.getFilters()) {
+      if (filter.getFilterName().getStringValue().trim().equals(OBJECTIFY_FILTER_NAME)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Nullable
