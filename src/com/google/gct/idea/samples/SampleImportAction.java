@@ -70,9 +70,4 @@ public class SampleImportAction extends AnAction {
     SampleImportWizard wizard = new SampleImportWizard(null, sampleList.get());
     wizard.show();
   }
-
-  @Override
-  public void update(AnActionEvent e) {
-    e.getPresentation().setVisible(Boolean.getBoolean("enable.sample.import"));
-  }
 }
