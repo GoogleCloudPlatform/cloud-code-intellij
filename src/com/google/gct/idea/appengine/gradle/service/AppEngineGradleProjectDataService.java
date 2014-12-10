@@ -105,6 +105,7 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
       facet.getConfiguration().getState().APPENGINE_SDKROOT = ideaAppEngineProject.getDelegate().getAppEngineSdkRoot();
       facet.getConfiguration().getState().HTTP_ADDRESS = ideaAppEngineProject.getDelegate().getHttpAddress();
       facet.getConfiguration().getState().HTTP_PORT = ideaAppEngineProject.getDelegate().getHttpPort();
+      facet.getConfiguration().getState().JVM_FLAGS.clear();
       for (String flag : ideaAppEngineProject.getDelegate().getJvmFlags()) {
         facet.getConfiguration().getState().JVM_FLAGS.add(flag);
       }

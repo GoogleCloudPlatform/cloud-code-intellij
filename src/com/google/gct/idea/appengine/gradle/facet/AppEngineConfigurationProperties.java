@@ -15,6 +15,7 @@
  */
 package com.google.gct.idea.appengine.gradle.facet;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.xmlb.annotations.AbstractCollection;
 import org.jetbrains.android.util.AndroidCommonUtils;
 
@@ -33,4 +34,8 @@ public class AppEngineConfigurationProperties {
   public String WAR_DIR;
   public String WEB_APP_DIR;
   public String APPENGINE_SDKROOT;
+
+  public String getJvmFlags() {
+    return StringUtil.join(JVM_FLAGS, " ");
+  }
 }

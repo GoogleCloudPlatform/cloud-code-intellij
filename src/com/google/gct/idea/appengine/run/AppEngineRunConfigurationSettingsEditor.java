@@ -76,6 +76,7 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
     myServerAddressField.setEditable(!isSync);
     myServerPortField.setEditable(!isSync);
     myAppEngineSdkField.setEditable(!isSync);
+    myVmArgsField.setEditable(!isSync);
   }
 
   // Syncs a run configuration with information from build.gradle via the App Engine Gradle facet
@@ -92,6 +93,7 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
         myServerAddressField.setText(model.HTTP_ADDRESS);
         myAppEngineSdkField.setText(model.APPENGINE_SDKROOT);
         myWarPathField.setText(model.WAR_DIR);
+        myVmArgsField.setText(model.getJvmFlags());
       }
     }
   }
