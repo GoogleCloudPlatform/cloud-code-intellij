@@ -4,7 +4,7 @@
 buildscript {
     repositories {
         mavenLocal()
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'com.google.appengine:gradle-appengine-plugin:${appEngineVersion}'
@@ -12,7 +12,7 @@ buildscript {
 }
 
 repositories {
-    mavenCentral();
+    jcenter();
 }
 
 apply plugin: 'java'
