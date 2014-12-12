@@ -56,7 +56,7 @@ public class SampleImportAction extends AnAction {
           sampleList.set(samplesService.samples().listSamples().set("technology", "android").execute());
         }
         catch (IOException ex) {
-          LOG.error(GctBundle.message("sample.index.download.failed"));
+          LOG.warn(GctBundle.message("sample.index.download.failed"));
           sampleList.set(null);
         }
       }
