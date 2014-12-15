@@ -174,6 +174,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
           myServerAddress = model.HTTP_ADDRESS;
           mySdkPath = model.APPENGINE_SDKROOT;
           myWarPath = model.WAR_DIR;
+          myVmArgs = model.getJvmFlags();
         }
       }
     }
