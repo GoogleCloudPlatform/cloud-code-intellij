@@ -260,7 +260,7 @@ public class NewEndpointFromClassAction extends AnAction {
 
     // Add any missing Endpoint dependency to the build file and sync
     updateBuildFile(project, module, template);
-    updateWebXml(project, module, endpointFQClassName);
+    updateWebXml(project, module, endpointFQClassName, isObjectifyEntity);
 
     // Open the new Endpoint class in the editor
     VirtualFile endpointFile = LocalFileSystem.getInstance().findFileByPath(endpointFileName);
@@ -268,10 +268,10 @@ public class NewEndpointFromClassAction extends AnAction {
     TemplateUtils.openEditor(project, endpointFile);
   }
 
-  private static void updateWebXml(Project project, Module module, final String endpointFQClassName) {
+  private static void updateWebXml(Project project, Module module, final String endpointFQClassName, boolean isObjectifyEndpoint) {
     AppEngineGradleFacet facet = AppEngineGradleFacet.getAppEngineFacetByModule(module);
     final WebApp webApp = facet.getWebXmlForEdit();
-    if (!hasObjectifyFilter(webApp)) {
+    if (isObjectifyEndpoint && !hasObjectifyFilter(webApp)) {
       CommandProcessor.getInstance().executeCommand(project, new Runnable() {
         @Override
         public void run() {
