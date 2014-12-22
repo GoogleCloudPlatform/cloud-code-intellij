@@ -15,10 +15,12 @@
  */
 package com.google.gct.idea.appengine.run;
 
+import com.android.tools.idea.stats.UsageTracker;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineConfigurationProperties;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.sdk.AppEngineSdk;
 
+import com.google.gct.idea.util.GctTracking;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.ExternalizablePath;
@@ -282,6 +284,8 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
       //TODO : allow selectable alternate jre
       params.setJdk(JavaParameters.getModuleJdk(appEngineModule));
 
+      UsageTracker.getInstance()
+        .trackEvent(GctTracking.CATEGORY, GctTracking.RUN, configuration.getSyncWithGradle() ? "sync" : "custom", null);
       return params;
     }
   }

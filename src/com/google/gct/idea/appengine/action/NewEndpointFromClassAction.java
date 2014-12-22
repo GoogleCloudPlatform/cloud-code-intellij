@@ -21,6 +21,7 @@ import com.android.tools.idea.gradle.parser.Dependency;
 import com.android.tools.idea.gradle.parser.GradleBuildFile;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.android.tools.idea.gradle.util.GradleUtil;
+import com.android.tools.idea.stats.UsageTracker;
 import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
@@ -33,6 +34,7 @@ import com.google.gct.idea.appengine.util.AppEngineUtils;
 import com.google.gct.idea.appengine.util.PsiUtils;
 import com.google.gct.idea.appengine.wizard.CloudModuleUtils;
 import com.google.gct.idea.appengine.wizard.CloudTemplateUtils;
+import com.google.gct.idea.util.GctTracking;
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -266,6 +268,8 @@ public class NewEndpointFromClassAction extends AnAction {
     VirtualFile endpointFile = LocalFileSystem.getInstance().findFileByPath(endpointFileName);
     new ReformatCodeProcessor(project, PsiManager.getInstance(project).findFile(endpointFile), null, false).run();
     TemplateUtils.openEditor(project, endpointFile);
+
+    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.NEW_ENDPOINT, isObjectifyEntity ? "objectify" : "pojo", null);
   }
 
   private static void updateWebXml(Project project, Module module, final String endpointFQClassName, boolean isObjectifyEndpoint) {

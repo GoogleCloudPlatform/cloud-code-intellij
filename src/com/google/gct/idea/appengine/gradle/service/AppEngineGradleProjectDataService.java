@@ -17,10 +17,12 @@ package com.google.gct.idea.appengine.gradle.service;
 
 import com.android.tools.idea.gradle.AndroidProjectKeys;
 import com.android.tools.idea.gradle.GradleSyncState;
+import com.android.tools.idea.stats.UsageTracker;
 import com.google.common.collect.Maps;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.gradle.project.IdeaAppEngineProject;
 
+import com.google.gct.idea.util.GctTracking;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.ModifiableFacetModel;
 import com.intellij.openapi.application.RunResult;
@@ -69,6 +71,7 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
         for (Module module : ModuleManager.getInstance(project).getModules()) {
           if (importModulesMap.containsKey(module.getName())) {
             addAppEngineGradleFacet(importModulesMap.get(module.getName()), module);
+            UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.GRADLE_IMPORT, null, null);
           }
         }
       }

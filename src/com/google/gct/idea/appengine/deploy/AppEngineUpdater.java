@@ -17,8 +17,10 @@ package com.google.gct.idea.appengine.deploy;
 
 import com.android.tools.idea.gradle.invoker.GradleInvocationResult;
 import com.android.tools.idea.gradle.invoker.GradleInvoker;
+import com.android.tools.idea.stats.UsageTracker;
 import com.google.common.base.Strings;
 import com.google.gct.idea.appengine.sdk.AppEngineSdk;
+import com.google.gct.idea.util.GctTracking;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionManager;
 import com.intellij.execution.Executor;
@@ -191,6 +193,8 @@ class AppEngineUpdater {
 
       return;
     }
+
+    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.DEPLOY, "upload.app", null);
 
     final ProcessHandler processHandler = new FilteredOSProcessHandler(process, commandLine.getCommandLineString(),
                                                                        new String[]{myRefreshToken, myClientSecret, myClientId});

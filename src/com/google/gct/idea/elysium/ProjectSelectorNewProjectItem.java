@@ -15,6 +15,8 @@
  */
 package com.google.gct.idea.elysium;
 
+import com.android.tools.idea.stats.UsageTracker;
+import com.google.gct.idea.util.GctTracking;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ui.UI;
 import com.intellij.ui.components.JBLabel;
@@ -72,6 +74,7 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
   public void mousePressed(MouseEvent e) {
     if (isOverLink(e.getX(), e.getY())) {
       BrowserUtil.browse("https://console.developers.google.com/project");
+      UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.PROJECT_SELECTION, "create.new.project", null);
     }
   }
 

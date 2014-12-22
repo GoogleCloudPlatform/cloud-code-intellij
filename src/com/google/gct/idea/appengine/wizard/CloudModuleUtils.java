@@ -20,6 +20,7 @@ import com.android.builder.model.SourceProvider;
 import com.android.tools.idea.gradle.invoker.GradleInvoker;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.android.tools.idea.gradle.project.GradleSyncListener;
+import com.android.tools.idea.stats.UsageTracker;
 import com.android.tools.idea.templates.KeystoreUtils;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
@@ -33,6 +34,7 @@ import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
+import com.google.gct.idea.util.GctTracking;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.openapi.application.ApplicationManager;
@@ -80,7 +82,7 @@ public final class CloudModuleUtils {
   private static final Logger LOG = Logger.getInstance(CloudModuleUtils.class);
 
   static void createModule(@NotNull final Project project,
-                           @NotNull File templateFile,
+                           @NotNull final File templateFile,
                            @NotNull final String moduleName,
                            @NotNull String packageName,
                            @Nullable final String clientModuleName) {
@@ -119,6 +121,9 @@ public final class CloudModuleUtils {
       public void run() {
         final List<File> allFilesToOpen = Lists.newArrayList();
         template.render(projectRoot, moduleRoot, replacementMap);
+
+        UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.WIZARD, templateFile.getName(), null);
+
         allFilesToOpen.addAll(template.getFilesToOpen());
 
         if (clientModule != null) {

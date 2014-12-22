@@ -15,8 +15,10 @@
  */
 package com.google.gct.idea.git;
 
+import com.android.tools.idea.stats.UsageTracker;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.CredentialedUser;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationListener;
@@ -96,6 +98,8 @@ public class UploadSourceAction extends DumbAwareAction {
 
   @Override
   public void actionPerformed(final AnActionEvent e) {
+    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "upload", null);
+
     final Project project = e.getData(CommonDataKeys.PROJECT);
     final VirtualFile file = e.getData(CommonDataKeys.VIRTUAL_FILE);
 

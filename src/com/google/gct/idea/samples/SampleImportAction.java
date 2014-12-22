@@ -15,11 +15,13 @@
  */
 package com.google.gct.idea.samples;
 
+import com.android.tools.idea.stats.UsageTracker;
 import com.appspot.gsamplesindex.samplesindex.SamplesIndex;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctTracking;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
@@ -67,6 +69,7 @@ public class SampleImportAction extends AnAction {
       return;
     }
 
+    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.SAMPLES, "browse", null);
     SampleImportWizard wizard = new SampleImportWizard(null, sampleList.get());
     wizard.show();
   }

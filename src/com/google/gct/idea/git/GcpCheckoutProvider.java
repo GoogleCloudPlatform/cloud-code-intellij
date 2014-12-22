@@ -15,8 +15,10 @@
  */
 package com.google.gct.idea.git;
 
+import com.android.tools.idea.stats.UsageTracker;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctTracking;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -63,6 +65,8 @@ public class GcpCheckoutProvider implements CheckoutProvider {
 
   @Override
   public void doCheckout(@NotNull final Project project, @Nullable final Listener listener) {
+    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "checkout", null);
+
     BasicAction.saveAll();
     CloneGcpDialog dialog = new CloneGcpDialog(project);
     DialogManager.show(dialog);
