@@ -20,9 +20,12 @@ import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import icons.AndroidIcons;
 import org.jetbrains.android.sdk.AndroidSdkUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 /**
  * Presents a wizard to the user to import hosted samples
@@ -51,6 +54,15 @@ public class SampleImportWizard extends DynamicWizard {
 
     addPath(new SampleImportWizardPath(mySampleList, getDisposable()));
     super.init();
+  }
+
+  /**
+   * @return optional wizard icon that will be shown on every page title.
+   */
+  @Nullable
+  @Override
+  public Icon getIcon() {
+    return AndroidIcons.Wizards.NewProjectMascotGreen;
   }
 
   @Override

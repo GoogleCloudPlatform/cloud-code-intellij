@@ -23,7 +23,6 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.HyperlinkLabel;
-import icons.AndroidIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +52,7 @@ public class SampleSetupStep extends DynamicWizardStepWithHeaderAndDescription {
   private static final String DEFAULT_SAMPLE_NAME = GctBundle.message("sample.default.name");
 
   public SampleSetupStep(Disposable parentDisposable) {
-    super(GctBundle.message("sample.setup.title"), GctBundle.message("sample.setup.subtitle"), null, parentDisposable);
+    super(GctBundle.message("sample.setup.title"), GctBundle.message("sample.setup.subtitle"), parentDisposable);
     setBodyComponent(myPanel);
   }
 
@@ -160,11 +159,9 @@ public class SampleSetupStep extends DynamicWizardStepWithHeaderAndDescription {
     }
   }
 
-  @Nullable
+  @NotNull
   @Override
-  protected JComponent getHeader() {
-    return DynamicWizardStep
-      .createWizardStepHeader(WizardConstants.ANDROID_NPW_HEADER_COLOR, AndroidIcons.Wizards.NewProjectMascotGreen, GctBundle.message(
-        "sample.import.title"));
+  protected WizardStepHeaderSettings getStepHeader() {
+    return WizardStepHeaderSettings.createProductHeader(GctBundle.message("sample.import.title"));
   }
 }

@@ -18,9 +18,12 @@ package com.google.gct.idea.appengine.wizard;
 import com.android.annotations.VisibleForTesting;
 import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.TemplateMetadata;
-import com.android.tools.idea.wizard.*;
+import com.android.tools.idea.wizard.ComboBoxItem;
+import com.android.tools.idea.wizard.DynamicWizardStepWithHeaderAndDescription;
 import com.android.tools.idea.wizard.ScopedStateStore.Key;
-import com.google.common.base.*;
+import com.android.tools.idea.wizard.WizardConstants;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.Disposable;
@@ -30,8 +33,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.psi.PsiNameHelper;
 import com.intellij.ui.JBColor;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.util.ui.UIUtil;
 import icons.GoogleCloudToolsIcons;
 import org.jetbrains.android.facet.AndroidFacet;
@@ -40,13 +41,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import java.awt.*;
 import java.io.File;
-import java.util.*;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.gct.idea.appengine.wizard.CloudTemplateUtils.TemplateInfo;
 
@@ -55,8 +54,6 @@ import static com.google.gct.idea.appengine.wizard.CloudTemplateUtils.TemplateIn
  */
 public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeaderAndDescription {
   private static final JBColor CLOUD_HEADER_BACKGROUND_COLOR = new JBColor(0x254A89, 0x254A89);
-  private static final JBColor CLOUD_HEADER_TEXT_COLOR = new JBColor(0xFFFFFF, 0xFFFFFF);
-  private static final JBColor CLOUD_TITLE_TEXT_COLOR = new JBColor(0x254A89, 0xFFFFFF);
 
   @NonNls
   private static final String STEP_NAME = "New Cloud Module Step";
@@ -72,7 +69,7 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
   private JLabel myModuleTypeIcon;
 
   public NewCloudModuleDynamicWizardStep(@NotNull Project project, @Nullable Disposable parentDisposable) {
-    super(GctBundle.message("appengine.wizard.step_body"), null, null, parentDisposable);
+    super(GctBundle.message("appengine.wizard.step_body"), null, parentDisposable);
     setBodyComponent(myRootPane);
     myProject = project;
   }
@@ -246,44 +243,15 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
     return myModuleTypesCombo;
   }
 
-  @Nullable
+  @NotNull
   @Override
-  protected JBColor getTitleTextColor() {
-    return CLOUD_TITLE_TEXT_COLOR;
+  protected WizardStepHeaderSettings getStepHeader() {
+    return WizardStepHeaderSettings.createCustomColorHeader(CLOUD_HEADER_BACKGROUND_COLOR, GctBundle.message("appengine.wizard.step_title"));
   }
 
   @Nullable
   @Override
-  protected JComponent getHeader() {
-    return createHeader(CLOUD_HEADER_BACKGROUND_COLOR, GoogleCloudToolsIcons.CLOUD_72x64, GctBundle.message("appengine.wizard.step_title"));
-  }
-
-  /**
-   * Copied from {@link DynamicWizardStep} and slightly modified so that we can keep a reference to
-   * the title JLabel (which needs to be updated each time the user enters the step).
-   */
-  private static JPanel createHeader(JBColor headerColor, Icon icon, String title) {
-    final JPanel panel = new JPanel();
-    panel.setBackground(headerColor);
-    panel.setBorder(new EmptyBorder(WizardConstants.STUDIO_WIZARD_INSETS));
-    panel.setLayout(new GridLayoutManager(2, 2, new Insets(18, 0, 12, 0), 2, 2));
-    panel.add(new ImageComponent(icon),
-              new GridConstraints(0, 0, 2, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED,
-                                  GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(72, 64), null));
-    final GridConstraints constraints = new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_SOUTHWEST, GridConstraints.FILL_HORIZONTAL,
-                                                            GridConstraints.SIZEPOLICY_CAN_GROW | GridConstraints.SIZEPOLICY_WANT_GROW,
-                                                            GridConstraints.SIZEPOLICY_FIXED, null, null, null);
-    final JLabel headerTitleLabel = new JLabel(title);
-    headerTitleLabel.setForeground(CLOUD_HEADER_TEXT_COLOR);
-    headerTitleLabel.setFont(headerTitleLabel.getFont().deriveFont(24f));
-    headerTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
-    panel.add(headerTitleLabel, constraints);
-    constraints.setRow(1);
-    constraints.setAnchor(GridConstraints.ANCHOR_NORTHWEST);
-    final JLabel productLabel = new JLabel(GctBundle.message("appengine.wizard.android_studio"));
-    productLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
-    productLabel.setForeground(CLOUD_HEADER_TEXT_COLOR);
-    panel.add(productLabel, constraints);
-    return panel;
+  protected Icon getWizardIcon() {
+    return GoogleCloudToolsIcons.CLOUD_72x64;
   }
 }

@@ -15,10 +15,7 @@
  */
 package com.google.gct.idea.samples;
 
-import com.android.tools.idea.wizard.DynamicWizardStep;
-import com.android.tools.idea.wizard.DynamicWizardStepWithHeaderAndDescription;
-import com.android.tools.idea.wizard.ScopedStateStore;
-import com.android.tools.idea.wizard.WizardConstants;
+import com.android.tools.idea.wizard.*;
 import com.android.utils.HtmlBuilder;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
@@ -33,7 +30,6 @@ import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
-import icons.AndroidIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,7 +65,7 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
   static final Key<String> SAMPLE_SCREENSHOT = createKey("SampleScreenshot", Scope.STEP, String.class);
 
   public SampleBrowserStep(@NotNull SampleCollection sampleList, Disposable parentDisposable) {
-    super(GctBundle.message("sample.browser.title"), GctBundle.message("sample.browser.subtitle"), null, parentDisposable);
+    super(GctBundle.message("sample.browser.title"), GctBundle.message("sample.browser.subtitle"), parentDisposable);
     mySampleList = sampleList;
     setBodyComponent(myPanel);
   }
@@ -268,11 +264,9 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
     return myDescriptionLabel;
   }
 
-  @Nullable
+  @NotNull
   @Override
-  protected JComponent getHeader() {
-    return DynamicWizardStep.createWizardStepHeader(WizardConstants.ANDROID_NPW_HEADER_COLOR, AndroidIcons.Wizards.NewProjectMascotGreen,
-                                                    GctBundle.message("sample.import.title"));
+  protected WizardStepHeaderSettings getStepHeader() {
+    return WizardStepHeaderSettings.createProductHeader(GctBundle.message("sample.import.title"));
   }
-
 }
