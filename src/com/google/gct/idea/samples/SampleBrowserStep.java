@@ -19,7 +19,6 @@ import com.android.tools.idea.wizard.*;
 import com.android.utils.HtmlBuilder;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
-import com.appspot.gsamplesindex.samplesindex.model.Screenshot;
 import com.google.common.base.Strings;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.Disposable;
@@ -28,6 +27,7 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
@@ -40,8 +40,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.BadLocationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -58,11 +56,12 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
   private JPanel myPanel;
   private HyperlinkLabel myUrlField;
   private JBLabel myDescriptionLabel;
-  private JEditorPane myScreenshotHtmlPanel;
   private SearchTextField mySearchBox;
   private JPanel myDescriptionPanel;
+  private SamplePreviewPanel mySamplePreviewPanel;
+  private JBScrollPane mySamplePreviewScrollPanel;
   private final SampleCollection mySampleList;
-  static final Key<String> SAMPLE_SCREENSHOT = createKey("SampleScreenshot", Scope.STEP, String.class);
+  private static final Key<Sample> SAMPLE_SCREENSHOT = createKey("SampleScreenshot", Scope.STEP, Sample.class);
 
   public SampleBrowserStep(@NotNull SampleCollection sampleList, Disposable parentDisposable) {
     super(GctBundle.message("sample.browser.title"), GctBundle.message("sample.browser.subtitle"), parentDisposable);
@@ -82,9 +81,9 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
         component.setHyperlinkText(newValue);
       }
     });
-    register(SAMPLE_SCREENSHOT, myScreenshotHtmlPanel, new EditorPaneComponentBinding());
+    register(SAMPLE_SCREENSHOT, mySamplePreviewPanel, new SamplePreviewComponentBinding());
     registerValueDeriver(SAMPLE_URL, new SampleUrlValueDeriver());
-    registerValueDeriver(SAMPLE_SCREENSHOT, new ImageListToStringDeriver());
+    registerValueDeriver(SAMPLE_SCREENSHOT, new SamplePreviewDeriver());
     registerValueDeriver(KEY_DESCRIPTION, new DescriptionValueDeriver());
     mySearchBox.addDocumentListener(new DocumentAdapter() {
       @Override
@@ -100,6 +99,8 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
     });
     myUrlField.setOpaque(false);
     myDescriptionPanel.setBackground(UIUtil.getTextFieldBackground());
+    // for better mouse wheel scrolling
+    mySamplePreviewScrollPanel.getVerticalScrollBar().setUnitIncrement(16);
   }
 
   @Override
@@ -218,14 +219,14 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
     }
   }
 
-  private static class EditorPaneComponentBinding extends ComponentBinding<String, JEditorPane> {
+  private static class SamplePreviewComponentBinding extends ComponentBinding<Sample, SamplePreviewPanel> {
     @Override
-    public void setValue(@Nullable String newValue, @NotNull JEditorPane component) {
-      component.setText(newValue);
+    public void setValue(@Nullable Sample sample, @NotNull SamplePreviewPanel component) {
+      component.setSample(sample);
     }
   }
 
-  private static class ImageListToStringDeriver extends ValueDeriver<String> {
+  private static class SamplePreviewDeriver extends ValueDeriver<Sample> {
     @Nullable
     @Override
     public Set<Key<?>> getTriggerKeys() {
@@ -236,26 +237,8 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
 
     @Nullable
     @Override
-    public String deriveValue(@NotNull ScopedStateStore state, Key changedKey, @Nullable String currentValue) {
-      Sample sample = state.get(SAMPLE_KEY);
-      if (sample == null) {
-        return "";
-      }
-      HtmlBuilder imagePage = new HtmlBuilder();
-      imagePage.openHtmlBody();
-      if (sample.getScreenshots() == null) {
-        return GctBundle.message("sample.browser.no.preview");
-      }
-      for (Screenshot screenshot : sample.getScreenshots()) {
-        try {
-          imagePage.addImage(new URL(screenshot.getLink()), null);
-        }
-        catch (MalformedURLException e) {
-          // don't add image otherwise
-        }
-      }
-      imagePage.closeHtmlBody();
-      return imagePage.getHtml();
+    public Sample deriveValue(@NotNull ScopedStateStore state, Key changedKey, @Nullable Sample currentValue) {
+      return state.get(SAMPLE_KEY);
     }
   }
 
