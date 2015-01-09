@@ -252,6 +252,6 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
   @Nullable
   @Override
   protected Icon getWizardIcon() {
-    return GoogleCloudToolsIcons.CLOUD_72x64;
+    return GoogleCloudToolsIcons.CLOUD_60x60;
   }
 }

@@ -27,7 +27,7 @@ public final class GoogleCloudToolsIcons {
   private static final int STEPS_COUNT = 12;
 
   public static final Icon APP_ENGINE = load("/icons/appEngine.png"); // 16x16
-  public static final Icon CLOUD_72x64 = load("/icons/cloudPlatform_72x64.png");
+  public static final Icon CLOUD_60x60 = load("/icons/cloudPlatform_60x60.png");
   public static final Icon REFRESH = load("/icons/refresh.png");
   public static final Icon[] STEP_ICONS = findStepIcons("/icons/step_");
   public static final Icon CLOUD_PLATFORM_LOGO_BLACK = load("/icons/CloudPlatformLogo_black.png");
