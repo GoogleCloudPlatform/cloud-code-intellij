@@ -87,18 +87,19 @@
               </grid>
             </children>
           </scrollpane>
-          <scrollpane id="6c39c" class="com.intellij.ui.components.JBScrollPane">
+          <scrollpane id="6c39c" class="com.intellij.ui.components.JBScrollPane" binding="mySamplePreviewScrollPanel">
             <constraints>
               <tabbedpane title="Preview"/>
             </constraints>
-            <properties/>
+            <properties>
+              <horizontalScrollBarPolicy value="31"/>
+              <verticalScrollBarPolicy value="22"/>
+            </properties>
             <border type="none"/>
             <children>
-              <component id="31e65" class="javax.swing.JEditorPane" binding="myScreenshotHtmlPanel">
+              <component id="6d3ea" class="com.google.gct.idea.samples.SamplePreviewPanel" binding="mySamplePreviewPanel">
                 <constraints/>
-                <properties>
-                  <contentType value="text/html"/>
-                </properties>
+                <properties/>
               </component>
             </children>
           </scrollpane>
