@@ -67,11 +67,11 @@ public class SamplePreviewPanel extends JPanel implements ComponentListener {
     myImages.clear();
     myScaledImages.clear();
     myHeight = 0;
-    if(myBackgroundTask != null) {
+    if (myBackgroundTask != null) {
       myBackgroundTask.cancel(true);
       myBackgroundTask = null;
     }
-    if(sample == null || sample.getScreenshots() == null || sample.getScreenshots().size() == 0) {
+    if (sample == null || sample.getScreenshots() == null || sample.getScreenshots().size() == 0) {
       myHasPreview = false;
       revalidate();
       repaint();
@@ -95,7 +95,7 @@ public class SamplePreviewPanel extends JPanel implements ComponentListener {
       protected List<BufferedImage> doInBackground() throws Exception {
         final List<BufferedImage> images = Lists.newArrayList();
         for (Screenshot screenshot : sample.getScreenshots()) {
-          if(isCancelled()) {
+          if (isCancelled()) {
             return null;
           }
           try {
@@ -112,14 +112,14 @@ public class SamplePreviewPanel extends JPanel implements ComponentListener {
 
       @Override
       protected void done() {
-        if(isCancelled()) {
+        if (isCancelled()) {
           return;
         }
         try {
           List<BufferedImage> result = get();
-          if(result != null) {
+          if (result != null) {
             myImages = result;
-            if(myImages.size() == 0) {
+            if (myImages.size() == 0) {
               myHasPreview = false;
             }
             scaleImages();
@@ -142,7 +142,8 @@ public class SamplePreviewPanel extends JPanel implements ComponentListener {
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
     int yPos = 0;
-    if(myScaledImages.size() == 0) {
+    if (myScaledImages.size() == 0) {
+      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
       String text = GctBundle.message("sample.browser.no.preview");
       if (myHasPreview) {
         text = "Loading...";

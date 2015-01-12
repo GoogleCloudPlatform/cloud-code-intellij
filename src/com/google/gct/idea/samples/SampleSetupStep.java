@@ -119,6 +119,11 @@ public class SampleSetupStep extends DynamicWizardStepWithHeaderAndDescription {
   }
 
   private static class SampleNameValueDeriver extends ValueDeriver<String> {
+    @Override
+    public boolean respectUserEdits() {
+      return false;
+    }
+
     @Nullable
     @Override
     public Set<Key<?>> getTriggerKeys() {
