@@ -37,7 +37,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 import com.intellij.util.AuthData;
 import git4idea.DialogManager;
-import git4idea.jgit.GitHttpAuthDataProvider;
+import git4idea.remote.GitHttpAuthDataProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
