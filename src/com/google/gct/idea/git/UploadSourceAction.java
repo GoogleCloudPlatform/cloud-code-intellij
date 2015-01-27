@@ -19,6 +19,7 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.login.CredentialedUser;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.notification.NotificationListener;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
@@ -35,6 +36,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vcs.VcsDataKeys;
 import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vcs.VcsNotifier;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ui.SelectFilesDialog;
 import com.intellij.openapi.vcs.ui.CommitMessage;
@@ -201,9 +203,22 @@ public class UploadSourceAction extends DumbAwareAction {
           }
         }
 
-        indicator.setText(GctBundle.message("uploadtogcp.success"));
+        showInfoURL(project,
+            remoteName,
+            GctBundle.message("uploadtogcp.success"),
+            remoteUrl);
       }
     }.queue();
+  }
+
+  static void showInfoURL(@NotNull Project project, @NotNull String title,
+      @NotNull String message, @NotNull String url) {
+
+    LOG.info(title + "; " + message + "; " + url);
+
+    VcsNotifier.getInstance(project)
+        .notifyImportantInfo(title, "<a href='" + url + "'>" + message + "</a>",
+            NotificationListener.URL_OPENING_LISTENER);
   }
 
   @Nullable
