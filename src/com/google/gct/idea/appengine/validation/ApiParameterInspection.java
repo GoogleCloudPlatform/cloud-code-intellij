@@ -18,28 +18,16 @@ package com.google.gct.idea.appengine.validation;
 
 import com.google.gct.idea.appengine.GctConstants;
 import com.google.gct.idea.appengine.util.EndpointBundle;
-
 import com.google.gct.idea.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiInvalidElementAccessException;
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiModifierList;
-import com.intellij.psi.PsiParameter;
-import com.intellij.psi.PsiType;
-
+import com.intellij.psi.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.generate.tostring.psi.PsiAdapter;
+import org.jetbrains.java.generate.psi.PsiAdapter;
 
 /**
  * Inspection to check that API parameters of parameter type have an API parameter
