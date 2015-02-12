@@ -119,7 +119,8 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
                          user.getCredential()).setApplicationName("Android Studio")
         .build();
 
-    String calculatedUrl = null;
+    // Initialize the calculated Url to the fallback in case the api fails.
+    String calculatedUrl = "https://source.developers.google.com/p/" + projectId + "/";
     try {
       ListReposResponse response = sourceRepos.repos().list(projectId).execute();
       if (response != null && response.getRepos() != null) {
