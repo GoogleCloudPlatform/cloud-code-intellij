@@ -32,10 +32,10 @@ public class AppEngineSdk {
   private static final String TOOLS_API_JAR_PATH = "/lib/appengine-tools-api.jar";
   private static final String AGENT_JAR_PATH = "/lib/agent/appengine-agent.jar";
   private static final String OVERRIDES_JAR_PATH = "/lib/override/appengine-dev-jdk-overrides.jar";
+  private static final String APPENIGNE_WEB_XML_XSD = "/docs/appengine-web.xsd";
   public static final String DEV_APPSERVER_CLASS = "com.google.appengine.tools.development.DevAppServerMain";
 
   private final String mySdkPath;
-
 
   public AppEngineSdk(String sdkPath) {
     mySdkPath = sdkPath;
@@ -49,13 +49,13 @@ public class AppEngineSdk {
   }
 
   /**
-   * Find a jar in an SDK based on a path
-   * @param jarPath
+   * Find a file in an SDK based on a path
+   * @param filePath
    * @return File if it exists, null otherwise
    */
   @Nullable
-  public File getSdkJar(String jarPath) {
-    final String fullJarPath = mySdkPath + jarPath;
+  public File getSdkFile(String filePath) {
+    final String fullJarPath = mySdkPath + filePath;
     File sdkJar = new File(FileUtil.toSystemDependentName(fullJarPath));
     if (sdkJar.exists()) {
       return sdkJar;
@@ -66,12 +66,17 @@ public class AppEngineSdk {
   /** Get the App Engine tools api jar */
   @Nullable
   public File getToolsApiJarFile() {
-    return getSdkJar(TOOLS_API_JAR_PATH);
+    return getSdkFile(TOOLS_API_JAR_PATH);
+  }
+
+  @Nullable
+  public File getXmlDescriptorFile() {
+    return getSdkFile(APPENIGNE_WEB_XML_XSD);
   }
 
   /** When running dev app server and not using Kick Start, use these params to run DevAppServerMain directly */
   public void addServerVmParams(ParametersList vmParams) {
-    File agentJar = getSdkJar(AGENT_JAR_PATH);
+    File agentJar = getSdkFile(AGENT_JAR_PATH);
     if (agentJar != null) {
       vmParams.add("-javaagent:" + agentJar.getAbsolutePath());
     }
@@ -79,7 +84,7 @@ public class AppEngineSdk {
         LOG.warn("App Engine SDK Agent jar not found : " + AGENT_JAR_PATH);
     }
 
-    File overridesJar = getSdkJar(OVERRIDES_JAR_PATH);
+    File overridesJar = getSdkFile(OVERRIDES_JAR_PATH);
     if (overridesJar != null) {
       vmParams.add("-Xbootclasspath/p:" + overridesJar.getAbsolutePath());
     }

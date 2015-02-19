@@ -27,6 +27,8 @@
     <dom.fileDescription implementation="com.google.gct.idea.appengine.dom.AppEngineWebFileDescription"/>
     <dom.fileDescription implementation="com.google.gct.idea.appengine.dom.WebAppFileDescription"/>
 
+    <xml.schemaProvider implementation="com.google.gct.idea.appengine.sdk.AppEngineWebXmlSchemaProvider"/>
+
     <implicitUsageProvider implementation="com.google.gct.idea.appengine.validation.EndpointImplicitUsageProvider"/>
 
     <checkoutProvider implementation="com.google.gct.idea.git.GcpCheckoutProvider"/>

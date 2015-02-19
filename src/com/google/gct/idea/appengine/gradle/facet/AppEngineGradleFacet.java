@@ -20,6 +20,7 @@ import com.google.gct.idea.appengine.dom.AppEngineWebApp;
 import com.google.gct.idea.appengine.dom.AppEngineWebFileDescription;
 import com.google.gct.idea.appengine.dom.WebApp;
 import com.google.gct.idea.appengine.dom.WebAppFileDescription;
+import com.google.gct.idea.appengine.sdk.AppEngineSdk;
 import com.intellij.facet.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -68,6 +69,16 @@ public class AppEngineGradleFacet extends Facet<AppEngineGradleFacetConfiguratio
     XmlFile appEngineXmlFile = getAppEngineXmlFile(AppEngineWebFileDescription.APP_ENGINE_WEB_XML_NAME);
     final DomManager domManager = DomManager.getDomManager(getModule().getProject());
     return domManager.getFileElement(appEngineXmlFile, AppEngineWebApp.class).getRootElement();
+  }
+
+  @Nullable
+  public AppEngineSdk getAppEngineSdk() {
+    AppEngineConfigurationProperties state = getConfiguration().getState();
+    if (state != null) {
+      String sdkRoot = state.APPENGINE_SDKROOT;
+      return new AppEngineSdk(sdkRoot);
+    }
+    return null;
   }
 
   @Nullable
