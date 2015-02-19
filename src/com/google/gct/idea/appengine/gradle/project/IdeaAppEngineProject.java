@@ -22,21 +22,20 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  * Transient project wrapper for App Engine Gradle Projects during gradle imports
  */
-public class IdeaAppEngineProject {
-  @NotNull private final String myModuleName;
-  @NotNull private final VirtualFile myRootDir;
+public class IdeaAppEngineProject implements Serializable {
   @NotNull private final AppEngineModel myDelegate;
+  @NotNull private final String myModuleName;
+  @NotNull private final File myRootDirPath;
+  private transient VirtualFile myRootDir;
 
   public IdeaAppEngineProject(@NotNull String moduleName, @NotNull File rootDir, @NotNull AppEngineModel delegate) {
     myModuleName = moduleName;
-    VirtualFile found = VfsUtil.findFileByIoFile(rootDir, true);
-    // the module's root directory can never be null.
-    assert found != null;
-    myRootDir = found;
+    myRootDirPath = rootDir;
     myDelegate = delegate;
   }
 
@@ -46,8 +45,15 @@ public class IdeaAppEngineProject {
   }
 
   @NotNull
-  public VirtualFile getRootDir() {
-    return myRootDir;
+  // TODO : this can be useful when determining relative paths when populating the facet
+  public File getRootDirPath() {
+    if (myRootDir == null) {
+      VirtualFile found = VfsUtil.findFileByIoFile(myRootDirPath, true);
+      // the module's root directory can never be null.
+      assert found != null;
+      myRootDir = found;
+    }
+    return myRootDirPath;
   }
 
   @NotNull
