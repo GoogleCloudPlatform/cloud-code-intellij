@@ -25,7 +25,7 @@
   <parameter id="packageName" name="Package name" type="string" constraints="package|nonempty" default="com.mycompany.myapp"/>
   <parameter id="endpointOwnerDomain" name="Endpoint Owner Domain" type="string" constraints="package" default="mycompany.com"/>
   <parameter id="endpointPackagePath" name="Endpoint Package Path" type="string" constraints="package" default="myapp"/>
-  <parameter id="appEngineVersion" name="AppEngine Version" type="string" default="1.9.1" />
+  <parameter id="appEngineVersion" name="AppEngine Version" type="string" default="1.9.18" />
   <parameter id="entityName" name="Entity name" type="string" constraints="nonempty" default="myClass"/>
   <parameter id="entityType" name="Entity type" type="string" constraints="nonempty" default="MyClass"/>
 
