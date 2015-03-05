@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static com.android.tools.idea.wizard.ScopedStateStore.Scope.PATH;
 import static com.android.tools.idea.wizard.ScopedStateStore.createKey;
@@ -87,28 +88,30 @@ public class SampleImportWizardPath extends DynamicWizardPath {
 
     String url = trimSlashes(sample.getCloneUrl());
 
-    NewFromGithubWizard.GithubRepoContents downloadResult = NewFromGithubWizard.downloadGithubRepo(project, url , null, null);
+    GithubRepoContents downloadResult = GithubRepoContents.download(project, url, null, null);
 
-    if (downloadResult.errorMessage != null) {
-      LOG.error(downloadResult.errorMessage);
-      Messages.showErrorDialog(downloadResult.errorMessage, GctBundle.message("sample.import.error.title"));
+    String errorMessage = downloadResult.getErrorMessage();
+    if (errorMessage != null) {
+      LOG.error(errorMessage);
+      Messages.showErrorDialog(errorMessage, GctBundle.message("sample.import.error.title"));
       return false;
     }
 
-    // we don't care about the template folders (downloadResult.templateFolders), so only check if we find sampleRoots
-    if (downloadResult.sampleRoots.size() == 0) {
+    List<File> sampleRoots = downloadResult.getSampleRoots();
+    if (sampleRoots.size() == 0) {
       Messages.showErrorDialog(GctBundle.message("git.project.dir.empty"), GctBundle.message("sample.import.error.title"));
       return false;
     }
 
+    File rootFolder = downloadResult.getRootFolder();
     try {
       String path = sample.getPath();
       if (!Strings.isNullOrEmpty(path)) {
         // we have a path to work with, find the project that matches it
         path = trimSlashes(path);
         sampleSearch: {
-          for (File sampleRoot : downloadResult.sampleRoots) {
-            if (sampleRoot.getCanonicalPath().equals(new File(downloadResult.rootFolder, path).getCanonicalPath())) {
+          for (File sampleRoot : sampleRoots) {
+            if (sampleRoot.getCanonicalPath().equals(new File(rootFolder, path).getCanonicalPath())) {
               // we found our sample root
               FileUtil.copyDir(sampleRoot, new File(project.getBasePath()));
               break sampleSearch;
@@ -122,7 +125,7 @@ public class SampleImportWizardPath extends DynamicWizardPath {
       }
       else {
         // no root was specified, just grab the first root
-        FileUtil.copyDir(downloadResult.sampleRoots.get(0), new File(project.getBasePath()));
+        FileUtil.copyDir(sampleRoots.get(0), new File(project.getBasePath()));
       }
     }
     catch (IOException e) {
