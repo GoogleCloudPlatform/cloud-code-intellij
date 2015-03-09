@@ -33,11 +33,14 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 import com.intellij.util.AuthData;
 import git4idea.DialogManager;
 import git4idea.remote.GitHttpAuthDataProvider;
+import git4idea.repo.GitRemote;
+import git4idea.repo.GitRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,33 +116,29 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
       (StringUtil.startsWithIgnoreCase(url, GOOGLE_URL) || StringUtil.startsWithIgnoreCase(url, GOOGLE_URL_ALT)));
   }
 
-  public static String getGcpUrl(CredentialedUser user, String projectId) {
-    Source sourceRepos =
-      new Source.Builder(new NetHttpTransport(), new JacksonFactory(),
-                         user.getCredential()).setApplicationName("Android Studio")
-        .build();
+  public static String getGcpUrl(String projectId) {
+    return "https://source.developers.google.com/p/" + projectId + "/";
+  }
 
-    // Initialize the calculated Url to the fallback in case the api fails.
-    String calculatedUrl = "https://source.developers.google.com/p/" + projectId + "/";
-    try {
-      ListReposResponse response = sourceRepos.repos().list(projectId).execute();
-      if (response != null && response.getRepos() != null) {
-        for (Repo repo : response.getRepos()) {
-          if ("default".equalsIgnoreCase(repo.getRepoName())) { //TODO: support more than 1 repo.
-            calculatedUrl = repo.getCloneUrl();
-          }
+  @Nullable
+  public static String findGCPRemoteUrl(@NotNull GitRepository repository) {
+    Pair<GitRemote, String> remote = findGCPRemote(repository);
+    if (remote == null) {
+      return null;
+    }
+    return remote.getSecond();
+  }
+
+  @Nullable
+  public static Pair<GitRemote, String> findGCPRemote(@NotNull GitRepository repository) {
+    for (GitRemote gitRemote : repository.getRemotes()) {
+      for (String remoteUrl : gitRemote.getUrls()) {
+        if (isUrlGCP(remoteUrl)) {
+          return Pair.create(gitRemote, remoteUrl);
         }
       }
     }
-    catch (Exception e) {
-      LOG.error("Exception loading repo url for " + projectId, e);
-    }
-
-    if (Strings.isNullOrEmpty(calculatedUrl)) {
-      LOG.error("Exception loading repo url for " + projectId);
-    }
-
-    return calculatedUrl;
+    return null;
   }
 
   @NotNull

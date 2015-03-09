@@ -122,7 +122,7 @@ public class UploadSourceAction extends DumbAwareAction {
     // check for existing git repo
     boolean externalRemoteDetected = false;
     if (gitDetected) {
-      final String gcpRemote = findGCPRemoteUrl(gitRepository);
+      final String gcpRemote = GcpHttpAuthDataProvider.findGCPRemoteUrl(gitRepository);
       if (gcpRemote != null) {
         Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.alreadyexists"), "Google");
         return;
@@ -168,7 +168,7 @@ public class UploadSourceAction extends DumbAwareAction {
           return;
         }
 
-        final String remoteUrl = GcpHttpAuthDataProvider.getGcpUrl(user, projectId);
+        final String remoteUrl = GcpHttpAuthDataProvider.getGcpUrl(projectId);
         final String remoteName = finalExternalRemoteDetected ? "cloud-platform" : "origin";
 
         LOG.info("Adding Google as a remote host");
@@ -263,27 +263,6 @@ public class UploadSourceAction extends DumbAwareAction {
       return false;
     }
     return true;
-  }
-
-  @Nullable
-  private static String findGCPRemoteUrl(@NotNull GitRepository repository) {
-    Pair<GitRemote, String> remote = findGCPRemote(repository);
-    if (remote == null) {
-      return null;
-    }
-    return remote.getSecond();
-  }
-
-  @Nullable
-  private static Pair<GitRemote, String> findGCPRemote(@NotNull GitRepository repository) {
-    for (GitRemote gitRemote : repository.getRemotes()) {
-      for (String remoteUrl : gitRemote.getUrls()) {
-        if (GcpHttpAuthDataProvider.isUrlGCP(remoteUrl)) {
-          return Pair.create(gitRemote, remoteUrl);
-        }
-      }
-    }
-    return null;
   }
 
   private static boolean createEmptyGitRepository(@NotNull final Project project,

@@ -27,6 +27,7 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.StatusText;
 import com.intellij.util.ui.UIUtil;
 import icons.GoogleCloudToolsIcons;
 import org.jetbrains.annotations.Nullable;
@@ -148,6 +149,14 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     });
   }
 
+  public void addModelListener(TreeModelListener listener) {
+    myTreeModel.addTreeModelListener(listener);
+  }
+
+  public void removeModelListener(TreeModelListener listener) {
+    myTreeModel.removeTreeModelListener(listener);
+  }
+
   /**
    * Returns the selected credentialed user for the project id represented by {@link #getText()}.
    *
@@ -185,6 +194,24 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public String getProjectDescription() {
+    ElysiumProjectModelItem modelItem = getCurrentModelItem();
+    return modelItem != null ? modelItem.getDescription() : null;
+  }
+
+  /**
+   * Returns the selected project's numeric code.
+   *
+   * This has the same limitations as {@link #getSelectedUser()}  in that it may be null even if getText represents a valid
+   * ID if queryOnExpand is true.
+   */
+  @Nullable
+  public Long getProjectNumber() {
+    ElysiumProjectModelItem modelItem = getCurrentModelItem();
+    return modelItem != null ? modelItem.getNumber() : null;
+  }
+
+  @Nullable
+  private ElysiumProjectModelItem getCurrentModelItem() {
     if (Strings.isNullOrEmpty(getText())) {
       return null;
     }
@@ -197,7 +224,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
           TreeNode projectNode = userNode.getChildAt(j);
           if (projectNode instanceof ElysiumProjectModelItem &&
               getText().equals(((ElysiumProjectModelItem) projectNode).getProjectId())) {
-            return ((ElysiumProjectModelItem) projectNode).getDescription();
+            return ((ElysiumProjectModelItem) projectNode);
           }
         }
       }

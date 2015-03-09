@@ -13,7 +13,20 @@
   <depends>com.google.gct.login</depends>
   <depends>Git4Idea</depends>
 
-  <depends>org.jetbrains.plugins.gradle</depends>
+  <application-components>
+    <!-- Disable temporarily
+    <component>
+      <implementation-class>com.google.gct.idea.appengine.synchronization.SampleSyncRegistration</implementation-class>
+    </component>
+    -->
+    <component>
+      <implementation-class>com.google.gct.idea.debugger.DebuggerInitializationComponent</implementation-class>
+    </component>
+  </application-components>
+
+  <project-components>
+  </project-components>
+
   <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
      <projectResolve implementation="com.google.gct.idea.appengine.gradle.project.AppEngineGradleProjectResolver"/>
   </extensions>
@@ -35,6 +48,10 @@
 
     <checkoutProvider implementation="com.google.gct.idea.git.GcpCheckoutProvider"/>
     <vcsPopupProvider implementation="com.google.gct.idea.git.GcpQuickListContentProvider"/>
+
+    <programRunner implementation="com.google.gct.idea.debugger.CloudDebuggerRunner"/>
+    <xdebugger.breakpointType implementation="com.google.gct.idea.debugger.CloudLineBreakpointType"/>
+    <projectService serviceImplementation="com.google.gct.idea.debugger.CloudDebugProcessStateSerializer"/>
 
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
@@ -99,6 +116,14 @@
   </extensions>
 
   <actions>
+    <action id="AddSnapshotLocation" class="com.google.gct.idea.debugger.actions.ToggleSnapshotLocationAction"/>
+
+    <group id="EditorGutterCloudDebuggerMenu">
+      <separator/>
+      <reference ref="AddSnapshotLocation"/>
+      <add-to-group group-id="EditorGutterPopupMenu" anchor="last"/>
+    </group>
+
     <action id="GoogleCloudTools.NewEndpointFromClass"
             class="com.google.gct.idea.appengine.action.NewEndpointFromClassAction"
             text="Generate Cloud Endpoint from Java class"
@@ -109,6 +134,14 @@
       <separator/>
       <add-to-group group-id="EditorPopupMenu" anchor="last"/>
       <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+    </group>
+
+    <group id="GoogleCloudTools.BreakpointWatchContextMenu">
+      <reference ref="XDebugger.NewWatch"/>
+      <reference ref="XDebugger.EditWatch"/>
+      <reference ref="XDebugger.CopyWatch"/>
+      <reference ref="XDebugger.RemoveWatch"/>
+      <reference ref="XDebugger.RemoveAllWatches"/>
     </group>
 
     <action id="GoogleCloudTools.SampleImport"

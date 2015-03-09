@@ -35,6 +35,14 @@ public final class GoogleCloudToolsIcons {
   public static final Icon ENDPOINTS_CARD = load("/icons/background_endpoints.png");
   public static final Icon SERVLET_CARD = load("/icons/background_servlet.png");
   public static final Icon GCM_CARD = load("/icons/background_gcm.png");
+  public static final Icon CLOUD_BREAKPOINT_FINAL = load("/icons/cloudsnapshotfinal.png");
+  public static final Icon CLOUD_BREAKPOINT = load("/icons/cloudbreakpoint.png");
+  public static final Icon CLOUD_BREAKPOINT_CHECKED = load("/icons/cloudbreakpointchecked.png");
+  public static final Icon CLOUD_BREAKPOINT_ERROR = load("/icons/cloudbreakpointerror.png");
+  public static final Icon CLOUD_BREAKPOINT_DISABLED = load("/icons/cloudbreakpointdisabled.png");
+  public static final Icon CLOUD_DEBUG_SAVE_EXIT = load("/icons/debugsaveexit.png");
+  public static final Icon CLOUD_DEBUG_REACTIVATE_BREAKPOINT = load("/icons/debugreactivatebreakpoint.png");
+  public static final Icon CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS = load("/icons/debugdeleteall.png");
 
   private static Icon load(String path) {
     return IconLoader.getIcon(path, GoogleCloudToolsIcons.class);

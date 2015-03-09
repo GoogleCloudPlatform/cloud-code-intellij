@@ -168,7 +168,7 @@ public class CloneGcpDialog extends DialogWrapper {
       return null;
     }
 
-    return GcpHttpAuthDataProvider.getGcpUrl(selectedUser, myRepositoryURL.getText());
+    return GcpHttpAuthDataProvider.getGcpUrl(myRepositoryURL.getText());
   }
 
   private void createUIComponents() {

@@ -131,7 +131,9 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
       if (response != null && response.getProjects() != null) {
         for (Project pantheonProject : response.getProjects()) {
           if (!Strings.isNullOrEmpty(pantheonProject.getProjectId())) {
-            result.add(new ElysiumProjectModelItem(pantheonProject.getTitle(), pantheonProject.getProjectId()));
+            result.add(new ElysiumProjectModelItem(pantheonProject.getTitle(),
+                                                   pantheonProject.getProjectId(),
+                                                   pantheonProject.getProjectNumber()));
           }
         }
       }

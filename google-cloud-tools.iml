@@ -99,6 +99,19 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="debugger-impl" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/google-api-services-debugger.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$USER_HOME$/cdebugapi2" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module" module-name="xdebugger-impl" />
   </component>
 </module>
 

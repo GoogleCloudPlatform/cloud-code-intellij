@@ -26,8 +26,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 class ElysiumProjectModelItem extends DefaultMutableTreeNode {
   private String myDescription;
   private String myProjectId;
+  private Long myNumber;
 
-  public ElysiumProjectModelItem(@Nullable String description, @NotNull String id) {
+  public ElysiumProjectModelItem(@Nullable String description, @NotNull String id, Long number) {
+    myNumber = number;
     setDescription(description);
     setProjectId(id);
   }
@@ -46,5 +48,13 @@ class ElysiumProjectModelItem extends DefaultMutableTreeNode {
 
   public void setProjectId(String projectId) {
     myProjectId = projectId;
+  }
+
+  public Long getNumber() {
+    return myNumber;
+  }
+
+  public void setNumber(Long number) {
+    myNumber = number;
   }
 }
