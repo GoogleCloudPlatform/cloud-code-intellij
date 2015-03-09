@@ -41,7 +41,7 @@ public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implement
   @NonNls
   private static final String PATH_NAME = "New Cloud Module Path";
 
-  private List<ModuleTemplate> myModuleTemplates;
+  List<ModuleTemplate> myModuleTemplates;
 
   @Override
   protected void init() {

@@ -56,7 +56,7 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
   private static final JBColor CLOUD_HEADER_BACKGROUND_COLOR = new JBColor(0x254A89, 0x254A89);
 
   @NonNls
-  private static final String STEP_NAME = "New Cloud Module Step";
+  static final String STEP_NAME = "New Cloud Module Step";
   private static final List<TemplateInfo> CLOUD_TEMPLATES = CloudTemplateUtils.getTemplates();
 
   private final Project myProject;

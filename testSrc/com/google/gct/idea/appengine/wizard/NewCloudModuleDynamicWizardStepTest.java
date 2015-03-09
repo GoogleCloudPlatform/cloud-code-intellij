@@ -15,10 +15,19 @@
  */
 package com.google.gct.idea.appengine.wizard;
 
-import com.android.tools.idea.templates.AndroidGradleTestCase;
+import com.android.tools.idea.wizard.AndroidStudioWizardPath;
+import com.android.tools.idea.wizard.ModuleTemplate;
+import com.android.tools.idea.wizard.NewModuleWizardDynamic;
 import com.android.tools.idea.wizard.WizardConstants;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
+import org.jetbrains.android.AndroidTestCase;
+import org.jetbrains.annotations.Nullable;
 
-public class NewCloudModuleDynamicWizardStepTest extends AndroidGradleTestCase {
+import java.util.ArrayList;
+
+public class NewCloudModuleDynamicWizardStepTest extends AndroidTestCase {
 
   public void testIsValidModuleName() throws Exception {
     assertTrue(NewCloudModuleDynamicWizardStep.isValidModuleName("app"));
@@ -29,4 +38,61 @@ public class NewCloudModuleDynamicWizardStepTest extends AndroidGradleTestCase {
       assertFalse(NewCloudModuleDynamicWizardStep.isValidModuleName(s));
     }
   }
+
+  /**
+   * This tests that the Cloud module appears in new module for an existing project.
+   * TODO: add step through code (note that finishing would require an appengine sdk download)
+   */
+  public void testCloudOnAddModule() throws Exception {
+    TestableNewModuleWizardDynamic wizard = new TestableNewModuleWizardDynamic(myModule.getProject(), null);
+    try {
+      wizard.init();
+      NewCloudModuleDynamicWizardPath cloudPath = null;
+      for (AndroidStudioWizardPath path : wizard.getPaths()) {
+        if (path instanceof NewCloudModuleDynamicWizardPath) {
+          cloudPath = (NewCloudModuleDynamicWizardPath)path;
+          break;
+        }
+      }
+      assertNotNull(cloudPath);
+      ModuleTemplate template = cloudPath.myModuleTemplates.get(0);
+      assertNotNull(template);
+      wizard.getState().put(WizardConstants.SELECTED_MODULE_TYPE_KEY, template);
+
+      assertTrue(wizard.containsStep(NewCloudModuleDynamicWizardStep.STEP_NAME, true));
+    }
+    finally {
+      Disposer.dispose(wizard.getDisposable());
+    }
+  }
+
+  public void testCloudOnNewProject() throws Exception {
+    TestableNewModuleWizardDynamic wizard = new TestableNewModuleWizardDynamic(null, null);
+    try {
+      wizard.init();
+      NewCloudModuleDynamicWizardPath cloudPath = null;
+      for (AndroidStudioWizardPath path : wizard.getPaths()) {
+        if (path instanceof NewCloudModuleDynamicWizardPath) {
+          cloudPath = (NewCloudModuleDynamicWizardPath)path;
+          break;
+        }
+      }
+      assertNull(cloudPath);
+    }
+    finally {
+      Disposer.dispose(wizard.getDisposable());
+    }
+  }
+
+  static class TestableNewModuleWizardDynamic extends NewModuleWizardDynamic {
+
+    public TestableNewModuleWizardDynamic(@Nullable Project project, @Nullable Module module) {
+      super(project, module);
+    }
+
+    public ArrayList<AndroidStudioWizardPath> getPaths() {
+      return myPaths;
+    }
+  }
+
 }
