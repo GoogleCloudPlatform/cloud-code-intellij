@@ -17,12 +17,19 @@ package com.google.gct.idea.appengine.gradle.service;
 
 import com.android.tools.idea.gradle.AndroidProjectKeys;
 import com.android.tools.idea.gradle.GradleSyncState;
+import com.android.tools.idea.gradle.invoker.GradleInvoker;
 import com.android.tools.idea.stats.UsageTracker;
 import com.google.common.collect.Maps;
+import com.google.gct.idea.appengine.gradle.facet.AppEngineConfigurationProperties;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.gradle.project.IdeaAppEngineProject;
 
+import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
+import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
 import com.google.gct.idea.util.GctTracking;
+import com.intellij.execution.RunManagerEx;
+import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.ModifiableFacetModel;
 import com.intellij.openapi.application.RunResult;
@@ -36,7 +43,10 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -70,7 +80,8 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
         Map<String, IdeaAppEngineProject> importModulesMap = indexByModuleName(toImport);
         for (Module module : ModuleManager.getInstance(project).getModules()) {
           if (importModulesMap.containsKey(module.getName())) {
-            addAppEngineGradleFacet(importModulesMap.get(module.getName()), module);
+            AppEngineGradleFacet facet = addAppEngineGradleFacet(importModulesMap.get(module.getName()), module);
+            addAppEngineRunConfiguration(module, facet);
             UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.GRADLE_IMPORT, null, null);
           }
         }
@@ -88,12 +99,13 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
 
   }
 
-  private static void addAppEngineGradleFacet(IdeaAppEngineProject ideaAppEngineProject, Module appEngineModule) {
-    //Module does not have AppEngine-Gradle facet. Create one and add it.
+  @NotNull
+  private static AppEngineGradleFacet addAppEngineGradleFacet(IdeaAppEngineProject ideaAppEngineProject, Module appEngineModule) {
     FacetManager facetManager = FacetManager.getInstance(appEngineModule);
     ModifiableFacetModel model = facetManager.createModifiableModel();
     AppEngineGradleFacet facet = AppEngineGradleFacet.getInstance(appEngineModule);
     if (facet == null) {
+      //Module does not have AppEngine-Gradle facet. Create one and add it.
       try {
         facet = facetManager.createFacet(AppEngineGradleFacet.getFacetType(), AppEngineGradleFacet.NAME, null);
         model.addFacet(facet);
@@ -114,6 +126,31 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
       }
       facet.getConfiguration().getState().WAR_DIR = ideaAppEngineProject.getDelegate().getWarDir().getAbsolutePath();
       facet.getConfiguration().getState().WEB_APP_DIR = ideaAppEngineProject.getDelegate().getWebAppDir().getAbsolutePath();
+    }
+    return facet;
+  }
+
+  private static void addAppEngineRunConfiguration(@NotNull Module appEngineModule, @NotNull AppEngineGradleFacet facet) {
+    final RunManagerEx runManager = RunManagerEx.getInstanceEx(appEngineModule.getProject());
+    for (RunConfiguration configuration : runManager.getAllConfigurationsList()) {
+      if (configuration.getName().equals(appEngineModule.getName())) {
+        // TODO, we might want to check if this module already has a run configuration configured instead of the name
+        return;
+      }
+    }
+    final RunnerAndConfigurationSettings settings = runManager.
+      createRunConfiguration(appEngineModule.getName(), AppEngineRunConfigurationType.getInstance().getFactory());
+    settings.setSingleton(true);
+    final AppEngineRunConfiguration configuration = (AppEngineRunConfiguration)settings.getConfiguration();
+    configuration.setModule(appEngineModule);
+    // pull configuration out of gradle
+    configuration.setSyncWithGradle(true);
+    runManager.addConfiguration(settings, false);
+
+    // initiate SDK download in the background if necessary
+    AppEngineConfigurationProperties prop = facet.getConfiguration().getState();
+    if (prop != null && !new File(prop.APPENGINE_SDKROOT).exists()) {
+      GradleInvoker.getInstance(appEngineModule.getProject()).executeTasks(Collections.singletonList("appengineDownloadSdk"));
     }
   }
 
