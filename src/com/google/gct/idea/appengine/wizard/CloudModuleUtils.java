@@ -41,6 +41,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.Messages;
@@ -48,6 +49,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ArrayUtil;
+import com.intellij.util.indexing.IndexInfrastructure;
 import org.jetbrains.android.dom.manifest.Manifest;
 import org.jetbrains.android.facet.AndroidFacet;
 import org.jetbrains.android.facet.IdeaSourceProvider;
@@ -120,47 +122,22 @@ public final class CloudModuleUtils {
       @Override
       public void run() {
         final List<File> allFilesToOpen = Lists.newArrayList();
-        template.render(projectRoot, moduleRoot, replacementMap);
+        template.render(projectRoot, moduleRoot, replacementMap, project);
 
         UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.WIZARD, templateFile.getName(), null);
 
         allFilesToOpen.addAll(template.getFilesToOpen());
 
-        if (clientModule != null) {
-          patchClientModule(clientModule, clientTemplate, replacementMap);
-          allFilesToOpen.addAll(clientTemplate.getFilesToOpen());
-        }
-
-        TemplateUtils.openEditors(project, allFilesToOpen, true);
-
-        GradleProjectImporter.getInstance().requestProjectSync(project, new GradleSyncListener.Adapter() {
+        DumbService.getInstance(project).smartInvokeLater(new Runnable() {
+          // because the previous template render initiates some indexing, if we don't smart invoke later we might
+          // cause a IndexNotReadyException when starting this.
           @Override
-          public void syncSucceeded(@NotNull final Project project) {
-            ApplicationManager.getApplication().runWriteAction(new Runnable() {
-              @Override
-              public void run() {
-                final Module module = ModuleManager.getInstance(project).findModuleByName(moduleName);
-                // 'module' will never be null here.
-                createRunConfiguration(project, module);
-                AppEngineGradleFacet facet = AppEngineGradleFacet.getInstance(module);
-                if(facet != null) {
-                  AppEngineConfigurationProperties prop = facet.getConfiguration().getState();
-                  if(prop != null && !new File(prop.APPENGINE_SDKROOT).exists()){
-                    GradleInvoker.getInstance(project).executeTasks(Arrays.asList("appengineDownloadSdk"));
-                  }
-                }
-              }
-            });
-          }
-
-          @Override
-          public void syncFailed(@NotNull Project project, @NotNull final String errorMessage) {
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-              @Override
-              public void run() {
-                Messages.showErrorDialog("Error importing App Engine module : " + errorMessage, ERROR_MESSAGE_TITLE);
-              }
-            });
+          public void run() {
+            if (clientModule != null) {
+              patchClientModule(clientModule, clientTemplate, replacementMap, project);
+              allFilesToOpen.addAll(clientTemplate.getFilesToOpen());
+            }
+            TemplateUtils.openEditors(project, allFilesToOpen, true);
           }
         });
       }
@@ -187,7 +164,7 @@ public final class CloudModuleUtils {
     }
   }
 
-  private static void patchClientModule(Module clientModule, Template clientTemplate, Map<String, Object> replacementMap) {
+  private static void patchClientModule(Module clientModule, Template clientTemplate, Map<String, Object> replacementMap, Project project) {
     final AndroidFacet facet = AndroidFacet.getInstance(clientModule);
     final VirtualFile targetFolder = findTargetContentRoot(clientModule);
     if (targetFolder != null && facet != null) {
@@ -198,7 +175,7 @@ public final class CloudModuleUtils {
         IdeaSourceProvider.getSourceProvidersForFile(facet, targetFolder, facet.getMainSourceProvider());
       replacementMap.put(TemplateMetadata.ATTR_MANIFEST_DIR, sourceProviders.get(0).getManifestFile().getParentFile().getPath());
       final File clientContentRoot = new File(targetFolder.getPath());
-      clientTemplate.render(clientContentRoot, clientContentRoot, replacementMap);
+      clientTemplate.render(clientContentRoot, clientContentRoot, replacementMap, project);
     }
   }
 
