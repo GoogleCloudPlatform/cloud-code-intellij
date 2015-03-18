@@ -53,6 +53,7 @@ import git4idea.GitUtil;
 import git4idea.actions.BasicAction;
 import git4idea.actions.GitInit;
 import git4idea.commands.*;
+import git4idea.config.GitConfigUtil;
 import git4idea.config.GitVcsApplicationSettings;
 import git4idea.config.GitVersion;
 import git4idea.i18n.GitBundle;
@@ -295,6 +296,12 @@ public class UploadSourceAction extends DumbAwareAction {
       GitUIUtil.showOperationErrors(project, gitLineHandler.errors(), "git init");
       LOG.info("Failed to create empty git repo: " + gitLineHandler.errors());
       return false;
+    }
+    try {
+      GitConfigUtil.setValue(project, root, "credential.https://source.developers.google.com.useHttpPath", "true");
+    }
+    catch(VcsException ex) {
+      LOG.error("VcsException while setting up credential parameters (credentials will be not be cached per project url)" + ex.toString());
     }
     GitInit.refreshAndConfigureVcsMappings(project, root, root.getPath());
     try {
