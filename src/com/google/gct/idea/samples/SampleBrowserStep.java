@@ -243,7 +243,7 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
   }
 
   @Override
-  public JLabel getDescriptionText() {
+  protected JLabel getDescriptionLabel() {
     return myDescriptionLabel;
   }
 
