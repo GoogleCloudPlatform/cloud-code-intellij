@@ -29,9 +29,9 @@ public final class GoogleCloudToolsIcons {
   public static final Icon APP_ENGINE = load("/icons/appEngine.png"); // 16x16
   public static final Icon CLOUD_60x60 = load("/icons/cloudPlatform_60x60.png");
   public static final Icon CLOUD= load("/icons/cloudPlatform.png");
+  public static final Icon CLOUD_MODULE = load("/icons/google_cloud_module.png");
   public static final Icon REFRESH = load("/icons/refresh.png");
   public static final Icon[] STEP_ICONS = findStepIcons("/icons/step_");
-  public static final Icon CLOUD_PLATFORM_LOGO_BLACK = load("/icons/CloudPlatformLogo_black.png");
   public static final Icon ENDPOINTS_CARD = load("/icons/background_endpoints.png");
   public static final Icon SERVLET_CARD = load("/icons/background_servlet.png");
   public static final Icon GCM_CARD = load("/icons/background_gcm.png");

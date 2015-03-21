@@ -106,13 +106,13 @@ public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implement
     @Nullable
     @Override
     public String getDescription() {
-      return null;
+      return GctBundle.message("appengine.wizard.gallery_description");
     }
 
     @Nullable
     @Override
     public Icon getIcon() {
-      return GoogleCloudToolsIcons.CLOUD_PLATFORM_LOGO_BLACK;
+      return GoogleCloudToolsIcons.CLOUD_MODULE;
     }
 
     @Override
