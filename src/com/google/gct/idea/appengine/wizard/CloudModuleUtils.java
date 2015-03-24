@@ -60,6 +60,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -138,6 +139,14 @@ public final class CloudModuleUtils {
               allFilesToOpen.addAll(clientTemplate.getFilesToOpen());
             }
             TemplateUtils.openEditors(project, allFilesToOpen, true);
+          }
+        });
+
+        // download SDK, the appengine-gradle-plugin will know what to do
+        DumbService.getInstance(project).smartInvokeLater(new Runnable() {
+          @Override
+          public void run() {
+            GradleInvoker.getInstance(project).executeTasks(Collections.singletonList("appengineDownloadSdk"));
           }
         });
       }

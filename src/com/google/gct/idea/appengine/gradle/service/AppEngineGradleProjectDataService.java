@@ -146,12 +146,6 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
     // pull configuration out of gradle
     configuration.setSyncWithGradle(true);
     runManager.addConfiguration(settings, false);
-
-    // initiate SDK download in the background if necessary
-    AppEngineConfigurationProperties prop = facet.getConfiguration().getState();
-    if (prop != null && !new File(prop.APPENGINE_SDKROOT).exists()) {
-      GradleInvoker.getInstance(appEngineModule.getProject()).executeTasks(Collections.singletonList("appengineDownloadSdk"));
-    }
   }
 
   @NotNull
