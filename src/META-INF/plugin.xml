@@ -20,6 +20,7 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <facetType implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetType"/>
+    <editorNotificationProvider implementation="com.google.gct.idea.appengine.gradle.notification.AppEngineStatusNotificationProvider" />
     <externalProjectDataService implementation="com.google.gct.idea.appengine.gradle.service.AppEngineGradleProjectDataService" />
     <configurationType implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationType"/>
 
