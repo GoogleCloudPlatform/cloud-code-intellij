@@ -96,8 +96,8 @@ public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implement
    * Each instance of this class represents an item that can be selected in the first page of the
    * New Module wizard.
    */
-  private static class NewCloudModuleTemplate implements ModuleTemplate {
-
+  private static final class NewCloudModuleTemplate implements ModuleTemplate {
+    @NotNull
     @Override
     public String getName() {
       return GctBundle.message("appengine.wizard.gallery_title");
@@ -116,13 +116,8 @@ public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implement
     }
 
     @Override
-    public void updateWizardStateOnSelection(ScopedStateStore state) {
+    public void updateWizardState(@NotNull ScopedStateStore state) {
       // Do nothing.
-    }
-
-    @Override
-    public boolean isGalleryModuleType() {
-      return true;
     }
 
     @Nullable
