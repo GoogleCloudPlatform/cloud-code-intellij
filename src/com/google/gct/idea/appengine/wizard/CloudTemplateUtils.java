@@ -42,7 +42,7 @@ public final class CloudTemplateUtils {
 
   // Used by CloudModuleUtils.
   static final List<String> LOCAL_ENDPOINTS_TEMPLATES = ImmutableList.of(HELLO_ENDPOINTS, GCM_ENDPOINTS);
-  private static final List<String> LOCAL_TEMPLATES = ImmutableList.of(HELLO_WORLD, HELLO_ENDPOINTS, GCM_ENDPOINTS);
+  private static final List<String> LOCAL_TEMPLATES = ImmutableList.of(HELLO_ENDPOINTS, GCM_ENDPOINTS, HELLO_WORLD);
 
   /**
    * Returns a list of templates that are stored locally as part of the cloud tools plugin.
