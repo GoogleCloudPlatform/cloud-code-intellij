@@ -13,17 +13,6 @@
   <depends>com.google.gct.login</depends>
   <depends>Git4Idea</depends>
 
-  <application-components>
-    <!-- Disable temporarily
-    <component>
-      <implementation-class>com.google.gct.idea.appengine.synchronization.SampleSyncRegistration</implementation-class>
-    </component>
-    -->
-  </application-components>
-
-  <project-components>
-  </project-components>
-
   <depends>org.jetbrains.plugins.gradle</depends>
   <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
      <projectResolve implementation="com.google.gct.idea.appengine.gradle.project.AppEngineGradleProjectResolver"/>
@@ -31,19 +20,8 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <facetType implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetType"/>
-    <!-- facet detector disabled for now, use the gradle project importer to add the facet
-    <framework.detector implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineFrameworkDetector"/>
-    -->
     <externalProjectDataService implementation="com.google.gct.idea.appengine.gradle.service.AppEngineGradleProjectDataService" />
-
-    <!-- Temporarily disable
-    <applicationConfigurable instance="com.google.gct.idea.appengine.synchronization.SampleSyncConfigurable"></applicationConfigurable>
-    -->
-
     <configurationType implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationType"/>
-    <!-- hide this, it was causing context menus to pick appengine, fix and re-enable
-    <runConfigurationProducer implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationProducer"/>
-    -->
 
     <!-- Dom for the App Engine config files -->
     <dom.fileDescription implementation="com.google.gct.idea.appengine.dom.AppEngineWebFileDescription"/>
