@@ -526,6 +526,7 @@ public class UploadSourceAction extends DumbAwareAction {
     }
     GitCommandResult result = git.push(repository, remoteName, remoteUrl, currentBranch.getName(), true);
     if (!result.success()) {
+      LOG.error(result.getErrorOutputAsJoinedString());
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
