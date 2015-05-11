@@ -420,18 +420,19 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       this.setPreferredSize(new Dimension(Math.max(BaseGoogleLoginUI.MIN_WIDTH, preferredWidth), getPreferredPopupHeight()));
 
       getBottomPane().setLayout(new BorderLayout());
-      JButton synchronizeButton = new JButton();
-      synchronizeButton.setIcon(GoogleCloudToolsIcons.REFRESH);
-      synchronizeButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          if (!needsToSignIn()) {
+
+      if (!needsToSignIn()) {
+        JButton synchronizeButton = new JButton();
+        synchronizeButton.setIcon(GoogleCloudToolsIcons.REFRESH);
+        synchronizeButton.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
             synchronize(true);
           }
-        }
-      });
+        });
+        getBottomPane().add(synchronizeButton, BorderLayout.EAST);
+      }
 
-      getBottomPane().add(synchronizeButton, BorderLayout.EAST);
       if (myTreeModel.isModelNeedsRefresh()) {
         myTreeModel.setModelNeedsRefresh(false);
         synchronize(true);
