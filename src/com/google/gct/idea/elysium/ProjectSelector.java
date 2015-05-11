@@ -58,7 +58,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   private static final int POPUP_HEIGHTFRAMESIZE = 50;
 
   private final DefaultMutableTreeNode myModelRoot;
-  private final DefaultTreeModel myTreeModel;
+  private final SelectorTreeModel myTreeModel;
   private final boolean myQueryOnExpand;
   private JBPopup myJBPopup;
   private PopupPanel myPopupPanel;
@@ -70,7 +70,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   public ProjectSelector(final boolean queryOnExpand) {
     myQueryOnExpand = queryOnExpand;
     myModelRoot = new DefaultMutableTreeNode("root");
-    myTreeModel = new DefaultTreeModel(myModelRoot);
+    myTreeModel = new SelectorTreeModel(myModelRoot);
 
     // synchronize selection between the treemodel and current text.
     myTreeModel.addTreeModelListener(new TreeModelListener() {
@@ -432,6 +432,10 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       });
 
       getBottomPane().add(synchronizeButton, BorderLayout.EAST);
+      if (myTreeModel.isModelNeedsRefresh()) {
+        myTreeModel.setModelNeedsRefresh(false);
+        synchronize(true);
+      }
     }
 
     @Override
@@ -456,5 +460,21 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   @Override
   public boolean isPopupVisible() {
     return myJBPopup != null && !myJBPopup.isDisposed() && myJBPopup.isVisible();
+  }
+
+  static class SelectorTreeModel extends DefaultTreeModel {
+    private boolean myModelNeedsRefresh;
+
+    public SelectorTreeModel(TreeNode root) {
+      super(root);
+    }
+
+    public boolean isModelNeedsRefresh() {
+      return myModelNeedsRefresh;
+    }
+
+    public void setModelNeedsRefresh(boolean modelNeedsRefresh) {
+      this.myModelNeedsRefresh = modelNeedsRefresh;
+    }
   }
 }

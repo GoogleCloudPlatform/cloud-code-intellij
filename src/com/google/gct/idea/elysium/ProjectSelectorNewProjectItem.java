@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
+import javax.swing.tree.TreeModel;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -73,6 +74,10 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
   @Override
   public void mousePressed(MouseEvent e) {
     if (isOverLink(e.getX(), e.getY())) {
+      TreeModel model = myTree.getModel();
+      if (model instanceof ProjectSelector.SelectorTreeModel) {
+        ((ProjectSelector.SelectorTreeModel)model).setModelNeedsRefresh(true);
+      }
       BrowserUtil.browse("https://console.developers.google.com/project");
       UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.PROJECT_SELECTION, "create.new.project", null);
     }
