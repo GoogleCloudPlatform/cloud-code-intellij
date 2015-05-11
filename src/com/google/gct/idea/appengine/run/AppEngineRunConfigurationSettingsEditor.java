@@ -36,19 +36,20 @@ import java.awt.event.ActionListener;
 /** GUI for configuring App Engine Run Configurations */
 public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppEngineRunConfiguration> {
   private JTextField myServerPortField;
-  private JPanel mainPanel;
+  private JPanel myMainPanel;
   private JComboBox myModuleComboBox;
   private JTextField myVmArgsField;
   private TextFieldWithBrowseButton myWarPathField;
   private TextFieldWithBrowseButton myAppEngineSdkField;
   private JTextField myServerAddressField;
   private JCheckBox mySynchronizeWithBuildGradleCheckBox;
+  private JCheckBox myUpdateCheckCheckBox;
   private final Project myProject;
-  private final ConfigurationModuleSelector moduleSelector;
+  private final ConfigurationModuleSelector myModuleSelector;
 
   public AppEngineRunConfigurationSettingsEditor(Project project) {
     myProject = project;
-    moduleSelector = new ConfigurationModuleSelector(project, myModuleComboBox);
+    myModuleSelector = new ConfigurationModuleSelector(project, myModuleComboBox);
     myModuleComboBox.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -70,22 +71,28 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
   protected void updateSync() {
     boolean isSync = mySynchronizeWithBuildGradleCheckBox.isSelected();
     if (isSync) {
-      syncWithBuildFile();
+      syncWithBuildFileViaFacet();
     }
     myWarPathField.setEditable(!isSync);
     myServerAddressField.setEditable(!isSync);
     myServerPortField.setEditable(!isSync);
     myAppEngineSdkField.setEditable(!isSync);
     myVmArgsField.setEditable(!isSync);
+    myUpdateCheckCheckBox.setEnabled(!isSync);
   }
 
-  // Syncs a run configuration with information from build.gradle via the App Engine Gradle facet
-  // This is also a near-duplicate of the sync in AppEngineRunConfiguration, but this is required
-  // here to update the UI correctly when "sync" is checked and turned on, if we didn't reflect the
-  // configuration in the UI, we wouldn't need this.
-  protected void syncWithBuildFile() {
+  // This is also a duplicate of the sync in AppEngineRunConfiguration#syncWithBuildFileViaFacet,
+  // but this is required here to update the UI correctly when "sync" is checked and turned on,
+  // if we didn't reflect the configuration in the UI, we wouldn't need this.
+  protected void syncWithBuildFileViaFacet() {
+    myServerPortField.setText("");
+    myServerAddressField.setText("");
+    myAppEngineSdkField.setText("");
+    myWarPathField.setText("");
+    myVmArgsField.setText("");
+    myUpdateCheckCheckBox.setSelected(false);
 
-    AppEngineGradleFacet facet = AppEngineGradleFacet.getInstance(moduleSelector.getModule());
+    AppEngineGradleFacet facet = AppEngineGradleFacet.getAppEngineFacetByModule(myModuleSelector.getModule());
     if (facet != null) {
       AppEngineConfigurationProperties model = facet.getConfiguration().getState();
       if (model != null) {
@@ -94,6 +101,7 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
         myAppEngineSdkField.setText(model.APPENGINE_SDKROOT);
         myWarPathField.setText(model.WAR_DIR);
         myVmArgsField.setText(model.getJvmFlags());
+        myUpdateCheckCheckBox.setSelected(model.DISABLE_UPDATE_CHECK);
       }
     }
   }
@@ -109,26 +117,28 @@ public class AppEngineRunConfigurationSettingsEditor extends SettingsEditor<AppE
     myServerPortField.setText(configuration.getServerPort());
     myServerAddressField.setText(configuration.getServerAddress());
     myVmArgsField.setText(configuration.getVmArgs());
-    moduleSelector.reset(configuration);
-    mySynchronizeWithBuildGradleCheckBox.setSelected(configuration.getSyncWithGradle());
+    myModuleSelector.reset(configuration);
+    mySynchronizeWithBuildGradleCheckBox.setSelected(configuration.isSyncWithGradle());
+    myUpdateCheckCheckBox.setSelected(configuration.isDisableUpdateCheck());
     updateSync();
   }
 
   @Override
   protected void applyEditorTo(AppEngineRunConfiguration configuration) throws ConfigurationException {
-    moduleSelector.applyTo(configuration);
+    myModuleSelector.applyTo(configuration);
     configuration.setSdkPath(myAppEngineSdkField.getText());
     configuration.setServerAddress(myServerAddressField.getText());
     configuration.setServerPort(myServerPortField.getText());
     configuration.setVmArgs(myVmArgsField.getText());
     configuration.setWarPath(myWarPathField.getText());
     configuration.setSyncWithGradle(mySynchronizeWithBuildGradleCheckBox.isSelected());
+    configuration.setDisableUpdateCheck(myUpdateCheckCheckBox.isSelected());
   }
 
   @NotNull
   @Override
   protected JComponent createEditor() {
-    return mainPanel;
+    return myMainPanel;
   }
 
   @Override

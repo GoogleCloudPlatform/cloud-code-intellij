@@ -34,6 +34,7 @@ public class AppEngineConfigurationProperties {
   public String WAR_DIR;
   public String WEB_APP_DIR;
   public String APPENGINE_SDKROOT;
+  public boolean DISABLE_UPDATE_CHECK;
 
   public String getJvmFlags() {
     return StringUtil.join(JVM_FLAGS, " ");

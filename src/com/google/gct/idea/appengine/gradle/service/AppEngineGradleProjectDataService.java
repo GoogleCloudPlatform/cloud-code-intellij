@@ -126,6 +126,7 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
       }
       facet.getConfiguration().getState().WAR_DIR = ideaAppEngineProject.getDelegate().getWarDir().getAbsolutePath();
       facet.getConfiguration().getState().WEB_APP_DIR = ideaAppEngineProject.getDelegate().getWebAppDir().getAbsolutePath();
+      facet.getConfiguration().getState().DISABLE_UPDATE_CHECK = ideaAppEngineProject.getDelegate().isDisableUpdateCheck();
     }
     return facet;
   }

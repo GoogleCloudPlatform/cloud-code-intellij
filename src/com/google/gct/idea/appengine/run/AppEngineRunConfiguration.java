@@ -16,24 +16,16 @@
 package com.google.gct.idea.appengine.run;
 
 import com.android.tools.idea.stats.UsageTracker;
+import com.google.common.collect.Lists;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineConfigurationProperties;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.sdk.AppEngineSdk;
-
+import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.ExternalizablePath;
-import com.intellij.execution.configurations.ConfigurationFactory;
-import com.intellij.execution.configurations.JavaCommandLineState;
-import com.intellij.execution.configurations.JavaParameters;
-import com.intellij.execution.configurations.JavaRunConfigurationModule;
-import com.intellij.execution.configurations.ModuleBasedConfiguration;
-import com.intellij.execution.configurations.ParametersList;
-import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.execution.configurations.RunProfileState;
-import com.intellij.execution.configurations.RuntimeConfigurationError;
-import com.intellij.execution.configurations.RuntimeConfigurationException;
+import com.intellij.execution.configurations.*;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.components.PathMacroManager;
@@ -46,14 +38,12 @@ import com.intellij.openapi.util.JDOMExternalizer;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PathsList;
-
 import org.jdom.Element;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /** A run configuration for App Engine modules, calls DevAppServerMain directly from the sdk bypassing KickStart*/
 public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunConfigurationModule> {
@@ -66,6 +56,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
   private Boolean mySyncWithGradle = false;
   private String myVmArgs = "";
   private String myWarPath = "";
+  private Boolean myDisableUpdateCheck = false;
 
   private static final String KEY_SERVER_ADDRESS = "serverAddress";
   private static final String KEY_SERVER_PORT = "serverPort";
@@ -73,6 +64,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
   private static final String KEY_SDK_PATH = "sdkPath";
   private static final String KEY_VM_ARGS = "vmArgs";
   private static final String KEY_WAR_PATH = "warPath";
+  private static final String KEY_DISABLE_UPDATE_CHECK = "disableUpdateCheck";
 
   public String getWarPath() {
     return myWarPath;
@@ -106,7 +98,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     this.myServerPort = serverPort;
   }
 
-  public Boolean getSyncWithGradle() {
+  public Boolean isSyncWithGradle() {
     return mySyncWithGradle;
   }
 
@@ -123,26 +115,28 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
   }
 
 
+  public Boolean isDisableUpdateCheck() {
+    return myDisableUpdateCheck;
+  }
+
+  public void setDisableUpdateCheck(Boolean disableUpdateCheck) {
+    myDisableUpdateCheck = disableUpdateCheck;
+  }
+
+
   public AppEngineRunConfiguration(String name, Project project, ConfigurationFactory factory) {
     super(name, new JavaRunConfigurationModule(project, false), factory);
   }
 
   @Override
   public Collection<Module> getValidModules() {
-    Module[] modules = ModuleManager.getInstance(getProject()).getModules();
-
-    /* comment out for now since we don't have facet
-    ArrayList<Module> res = new ArrayList<Module>();
-    for (Module module : modules) {
-      Facet[] facetList = FacetManager.getInstance(module).getAllFacets();
-      for (Facet f : facetList) {
-        if (f.getTypeId() == AppEngineGradleFacet.TYPE_ID) {
-          res.add(module);
-          break;
-        }
+    List<Module> validModules = Lists.newArrayList();
+    for (Module module : ModuleManager.getInstance(getProject()).getModules()) {
+      if (AppEngineGradleFacet.getAppEngineFacetByModule(module) != null) {
+        validModules.add(module);
       }
-    }*/
-    return Arrays.asList(modules);
+    }
+    return validModules;
   }
 
   @Override
@@ -165,7 +159,12 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
   }
 
   // Syncs a run configuration with information from build.gradle via the App Engine Gradle facet
+  // See duplicate in AppEngineRunConfigurationSettingsEditor#syncWithBuildFileViaFacet
   protected void syncWithBuildFileViaFacet() {
+    // clear it out first
+    myServerPort = myServerAddress = mySdkPath = myWarPath = myVmArgs = "";
+    myDisableUpdateCheck = false;
+
     Module module = getConfigurationModule().getModule();
     if (module != null) {
       AppEngineGradleFacet facet = AppEngineGradleFacet.getInstance(module);
@@ -177,6 +176,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
           mySdkPath = model.APPENGINE_SDKROOT;
           myWarPath = model.WAR_DIR;
           myVmArgs = model.getJvmFlags();
+          myDisableUpdateCheck = model.DISABLE_UPDATE_CHECK;
         }
       }
     }
@@ -193,14 +193,12 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     }
     AppEngineGradleFacet facet = AppEngineGradleFacet.getAppEngineFacetByModule(module);
     if (facet == null) {
-      throw new RuntimeConfigurationError(
-        "App Engine Gradle configuration not detected on module, maybe you need to Sync Project with Gradle");
+      throw new RuntimeConfigurationError(GctBundle.message("appengine.run.no.facet"));
     }
-
-    if (mySyncWithGradle &&
-        (facet.getConfiguration().getState() == null || StringUtil.isEmpty(facet.getConfiguration().getState().WEB_APP_DIR))) {
-      throw new RuntimeConfigurationError(
-        "App Engine Gradle configuration does not appear to be loaded, please Sync Project with Gradle files before running");
+    if (mySyncWithGradle) {
+      if (facet.getConfiguration().getState() == null || StringUtil.isEmpty(facet.getConfiguration().getState().WEB_APP_DIR)) {
+        throw new RuntimeConfigurationError(GctBundle.message("appengine.run.no.gradle.state"));
+      }
     }
 
     if (mySyncWithGradle) {
@@ -208,25 +206,25 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     }
 
     if (mySdkPath == null || mySdkPath.trim().isEmpty() || !new AppEngineSdk(mySdkPath).canRunDevAppServer()) {
-      throw new RuntimeConfigurationError("Invalid App-Engine SDK Path");
+      throw new RuntimeConfigurationError(GctBundle.message("appengine.run.invalid.sdk"));
     }
 
     if (myWarPath == null || myWarPath.trim().isEmpty()) {
-      throw new RuntimeConfigurationError("No War Path Specified");
+      throw new RuntimeConfigurationError(GctBundle.message("appengine.run.invalid.war"));
     }
 
     if (StringUtil.containsWhitespaces(myServerAddress.trim())) {
-      throw new RuntimeConfigurationError("Server address must contain no spaces");
+      throw new RuntimeConfigurationError(GctBundle.message("appengine.run.invalid.server.address"));
     }
 
     if (!(myServerPort == null || myServerPort.trim().isEmpty())) {
       try {
         int value = Integer.parseInt(myServerPort);
         if (value < 1024 || value >  65535) {
-          throw new RuntimeConfigurationError("Invalid port number [valid range : 1024 - 65535]");
+          throw new RuntimeConfigurationError(GctBundle.message("appengine.run.invalid.server.port.range", 1024, 65535));
         }
       } catch (NumberFormatException nfe) {
-        throw new RuntimeConfigurationError("Non numeric/invalid port number [valid range : 1024 - 65535]");
+        throw new RuntimeConfigurationError(GctBundle.message("appengine.run.invalid.server.port", 1024, 65535));
       }
     }
   }
@@ -264,6 +262,9 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
       if (configuration.myServerPort != null && !configuration.myServerPort.trim().isEmpty()) {
         programParams.add("--port=" + configuration.myServerPort);
       }
+      if (configuration.myDisableUpdateCheck) {
+        programParams.add("--disable_update_check");
+      }
 
       String warPath = configuration.myWarPath;
       if (warPath == null) {
@@ -285,7 +286,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
       params.setJdk(JavaParameters.getModuleJdk(appEngineModule));
 
       UsageTracker.getInstance()
-        .trackEvent(GctTracking.CATEGORY, GctTracking.RUN, configuration.getSyncWithGradle() ? "sync" : "custom", null);
+        .trackEvent(GctTracking.CATEGORY, GctTracking.RUN, configuration.isSyncWithGradle() ? "sync" : "custom", null);
       return params;
     }
   }
@@ -301,6 +302,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     myVmArgs = StringUtil.notNullize(JDOMExternalizer.readString(element, KEY_VM_ARGS));
     myWarPath = StringUtil.notNullize(JDOMExternalizer.readString(element, KEY_WAR_PATH));
     mySyncWithGradle = JDOMExternalizer.readBoolean(element, KEY_SYNC);
+    myDisableUpdateCheck = JDOMExternalizer.readBoolean(element, KEY_DISABLE_UPDATE_CHECK);
   }
 
   @Override
@@ -313,6 +315,7 @@ public class AppEngineRunConfiguration extends ModuleBasedConfiguration<JavaRunC
     JDOMExternalizer.write(element, KEY_VM_ARGS, myVmArgs);
     JDOMExternalizer.write(element, KEY_WAR_PATH, myWarPath);
     JDOMExternalizer.write(element, KEY_SYNC, mySyncWithGradle);
+    JDOMExternalizer.write(element, KEY_DISABLE_UPDATE_CHECK, myDisableUpdateCheck);
     PathMacroManager.getInstance(getProject()).collapsePathsRecursively(element);
   }
 }
