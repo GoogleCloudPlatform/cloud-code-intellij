@@ -15,6 +15,8 @@
  */
 package com.google.gct.idea.appengine.run;
 
+import com.intellij.execution.BeforeRunTask;
+import com.intellij.openapi.util.Key;
 import icons.GoogleCloudToolsIcons;
 
 import com.intellij.execution.configurations.ConfigurationFactory;
@@ -80,6 +82,14 @@ public class AppEngineRunConfigurationType implements ConfigurationType {
     @Override
     public RunConfiguration createTemplateConfiguration(Project project) {
       return new AppEngineRunConfiguration(AppEngineRunConfiguration.NAME, project, this);
+    }
+
+    @Override
+    public void configureBeforeRunTaskDefaults(Key<? extends BeforeRunTask> providerID, BeforeRunTask task) {
+      // make the default provider the appengine before run task
+      if (providerID != AppEngineGradleBeforeRunTaskProvider.ID) {
+        task.setEnabled(false);
+      }
     }
 
   }
