@@ -70,6 +70,12 @@ public class SampleImportWizard extends DynamicWizard {
     // our single path is performing the finishing actions
   }
 
+  @NotNull
+  @Override
+  protected String getProgressTitle() {
+    return GctBundle.getString("sample.import.progress.title");
+  }
+
   @Override
   protected String getWizardActionDescription() {
     return GctBundle.message("sample.import.title");
