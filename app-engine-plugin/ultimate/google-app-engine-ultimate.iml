@@ -24,8 +24,6 @@
     <orderEntry type="module" module-name="testFramework-java" scope="TEST" />
     <orderEntry type="module" module-name="web-impl" scope="TEST" />
     <orderEntry type="library" scope="TEST" name="JUnit3" level="project" />
-    <orderEntry type="module" module-name="java-tests" scope="TEST" />
     <orderEntry type="module" module-name="javaee_tests" scope="TEST" />
   </component>
 </module>
-
