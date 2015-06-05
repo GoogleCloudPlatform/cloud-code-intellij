@@ -156,9 +156,12 @@ public class AppEngineGradleBeforeRunTaskProvider extends ExternalSystemBeforeRu
       LOG.info(GctBundle.message("appengine.gradle.before.run.no.path", TASK_NAME));
       return false;
     }
-    final String gradlePath = facetForPath.getConfiguration().GRADLE_PROJECT_PATH;
+    String gradlePath = facetForPath.getConfiguration().GRADLE_PROJECT_PATH;
+    // handle the root project case to avoid ::assemble
+    if (gradlePath.equals(":")) {
+      gradlePath = "";
+    }
 
-    // run the gradle task :<module>:assemble
     task.getTaskExecutionSettings().setTaskNames(Collections.singletonList(gradlePath + ":assemble"));
     task.getTaskExecutionSettings().setExternalProjectPath(myProject.getBasePath());
 
