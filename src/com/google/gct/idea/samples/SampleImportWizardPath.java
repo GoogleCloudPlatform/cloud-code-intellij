@@ -24,10 +24,13 @@ import com.google.common.base.Strings;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +76,17 @@ public class SampleImportWizardPath extends DynamicWizardPath {
 
   @Override
   public boolean performFinishingActions() {
+    final Ref<Boolean> result = Ref.create();
+    ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+      @Override
+      public void run() {
+        result.set(performFinishingActionsInternal());
+      }
+    }, ModalityState.any());
+    return result.get();
+  }
 
+  private boolean performFinishingActionsInternal() {
     Sample sample = myState.get(SAMPLE_KEY);
     String sampleName = myState.get(SAMPLE_NAME);
     File sampleDir = new File(myState.get(SAMPLE_DIR));
