@@ -105,30 +105,32 @@ public final class CloudModuleUtils {
     replacementMap.put(ATTR_MODULE_NAME, moduleName);
     replacementMap.put(ATTR_PACKAGE_NAME, packageName);
 
-    final Module clientModule;
-    if (Strings.isNullOrEmpty(clientModuleName)) {
-      clientModule = null;
-    } else {
-      clientModule = ModuleManager.getInstance(project).findModuleByName(clientModuleName);
-    }
-    addPropertiesFromClientModule(clientModule, replacementMap);
-
     if (CloudTemplateUtils.LOCAL_ENDPOINTS_TEMPLATES.contains(templateFile.getName())) {
       populateEndpointParameters(replacementMap, packageName);
     }
 
     final Template template = Template.createFromPath(templateFile);
-    final Template clientTemplate = CloudTemplateUtils.getClientModuleTemplate(templateFile.getName());
-    ApplicationManager.getApplication().runWriteAction(new Runnable() {
+
+    final List<File> allFilesToOpen = Lists.newArrayList();
+    template.render(projectRoot, moduleRoot, replacementMap, project);
+
+    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.WIZARD, templateFile.getName(), null);
+
+    allFilesToOpen.addAll(template.getFilesToOpen());
+
+    ApplicationManager.getApplication().runReadAction(new Runnable() {
       @Override
       public void run() {
-        final List<File> allFilesToOpen = Lists.newArrayList();
-        template.render(projectRoot, moduleRoot, replacementMap, project);
+        final Module clientModule;
+        if (Strings.isNullOrEmpty(clientModuleName)) {
+          clientModule = null;
+        } else {
+          // requires read action
+          clientModule = ModuleManager.getInstance(project).findModuleByName(clientModuleName);
+        }
+        final Template clientTemplate = CloudTemplateUtils.getClientModuleTemplate(templateFile.getName());
 
-        UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.WIZARD, templateFile.getName(), null);
-
-        allFilesToOpen.addAll(template.getFilesToOpen());
-
+        addPropertiesFromClientModule(clientModule, replacementMap);
         DumbService.getInstance(project).smartInvokeLater(new Runnable() {
           // because the previous template render initiates some indexing, if we don't smart invoke later we might
           // cause a IndexNotReadyException when starting this.
@@ -141,14 +143,14 @@ public final class CloudModuleUtils {
             TemplateUtils.openEditors(project, allFilesToOpen, true);
           }
         });
+      }
+    });
 
-        // download SDK, the appengine-gradle-plugin will know what to do
-        DumbService.getInstance(project).smartInvokeLater(new Runnable() {
-          @Override
-          public void run() {
-            GradleInvoker.getInstance(project).executeTasks(Collections.singletonList("appengineDownloadSdk"));
-          }
-        });
+    // download SDK, the appengine-gradle-plugin will know what to do
+    DumbService.getInstance(project).smartInvokeLater(new Runnable() {
+      @Override
+      public void run() {
+        GradleInvoker.getInstance(project).executeTasks(Collections.singletonList("appengineDownloadSdk"));
       }
     });
   }
