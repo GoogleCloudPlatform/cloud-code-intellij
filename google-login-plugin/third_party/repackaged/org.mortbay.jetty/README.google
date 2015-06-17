@@ -1,0 +1,14 @@
+URL: http://mvnrepository.com/artifact/org.mortbay.jetty/jetty/6.1.26
+Version: 6.1.26
+License: Apache 2.0
+License File: LICENSE
+
+Description:
+The Jetty Web Server provides an HTTP server and Servlet container capable of
+serving static and dynamic content either from a standalone or embedded
+instantiations.
+
+Local Modifications:
+We had to modify the original contents to place it under a different package.
+This was done because there were conflicts with related packages in the Android
+Open Source Project.

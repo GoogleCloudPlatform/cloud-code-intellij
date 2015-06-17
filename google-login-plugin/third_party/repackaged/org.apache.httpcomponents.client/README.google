@@ -1,0 +1,13 @@
+URL: http://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.0.1
+Version: 4.0.1
+License: Apache 2.0
+License File: LICENSE
+
+Description:
+The Apache HttpComponents™ project is responsible for creating and maintaining a
+toolset of low level Java components focused on HTTP and associated protocols.
+
+Local Modifications:
+We had to modify the original contents to place it under a different package.
+This was done because there were conflicts with related packages in the Android
+Open Source Project.

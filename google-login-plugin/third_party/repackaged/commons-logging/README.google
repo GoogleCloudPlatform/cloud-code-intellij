@@ -1,0 +1,16 @@
+URL: http://mvnrepository.com/artifact/commons-logging/commons-logging/1.1.1
+Version: 1.1.1
+License: Apache 2.0
+License File: LICENSE
+
+Description:
+The Logging package is an ultra-thin bridge between different logging
+implementations. A library that uses the commons-logging API can be used with
+any logging implementation at runtime. Commons-logging comes with support for a
+number of popular logging implementations, and writing adapters for others is a
+reasonably simple task.
+
+Local Modifications:
+We had to modify the original contents to place it under a different (combined) package.
+This was done because there were conflicts with related packages in the Android
+Open Source Project.

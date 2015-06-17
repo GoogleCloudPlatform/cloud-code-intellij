@@ -1,0 +1,11 @@
+URL: https://repo.eclipse.org/content/repositories/jgit-releases/org/eclipse/jgit/org.eclipse.jgit.junit/3.3.0.201403021825-r/
+Version: 3.3.0.201403021825
+License: ECLIPSE
+License File: LICENSE
+
+Description:
+unit test support for jgit.
+
+
+Local Modifications:
+No Modifications.

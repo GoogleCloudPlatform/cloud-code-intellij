@@ -1,0 +1,15 @@
+URL: http://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core/2.1.3
+Version: 2.1.3
+License: Apache 2.0
+License File: LICENSE
+
+Description:
+Inspired by the quality and variety of XML tooling available for the Java
+platform (StAX, JAXB, etc.), the Jackson is a multi-purpose Java library for
+processing JSON data format. Jackson aims to be the best possible combination of
+fast, correct, lightweight, and ergonomic for developers.
+
+Local Modifications:
+We had to modify the original contents to place it under a different (combined) package.
+This was done because there were conflicts with related packages in the Android
+Open Source Project.
