@@ -37,10 +37,7 @@ import com.google.gct.idea.appengine.wizard.CloudTemplateUtils;
 import com.google.gct.idea.util.GctTracking;
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
-import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -71,6 +68,7 @@ import java.util.Map;
 public class NewEndpointFromClassAction extends AnAction {
   private static final Logger LOG = Logger.getInstance(NewEndpointFromClassAction.class);
 
+  private static final String COMPILE_DIRTY_ACTION_ID = "CompileDirty";
   private static final String ENTITY_NAME = "entityName";
   private static final String ENTITY_TYPE = "entityType";
   private static final String ENDPOINT_TEMPLATE = "EndpointFromClass";
@@ -170,6 +168,11 @@ public class NewEndpointFromClassAction extends AnAction {
     String fileName = psiJavaFile.getName();
     String classType = fileName.substring(0, fileName.lastIndexOf('.'));
     doAction(project, module, packageName, directory, classType, isObjectifyEntity, idType, idName, idGetterName);
+
+    AnAction compileDirty = ActionManager.getInstance().getAction(COMPILE_DIRTY_ACTION_ID);
+    if(compileDirty != null) {
+      compileDirty.actionPerformed(e);
+    }
   }
 
   @Nullable
