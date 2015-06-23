@@ -80,7 +80,6 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
     initModuleTypes();
     initClientModuleCombo();
     getMessageLabel().setForeground(JBColor.red);
-    myModuleDescriptionText.setContentType(UIUtil.HTML_MIME);
     myModuleDescriptionText.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
     myModuleDescriptionText.setFont(UIManager.getFont("Label.font"));
     myModuleDescriptionText.addHyperlinkListener(new HyperlinkListener() {

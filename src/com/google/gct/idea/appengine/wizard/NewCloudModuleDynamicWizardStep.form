@@ -69,6 +69,7 @@
           </grid>
         </constraints>
         <properties>
+          <contentType value="text/html"/>
           <editable value="false"/>
           <margin top="4" left="0" bottom="0" right="0"/>
           <opaque value="false"/>
