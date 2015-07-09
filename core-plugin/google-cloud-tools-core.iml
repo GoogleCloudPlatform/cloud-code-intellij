@@ -9,8 +9,8 @@
       <sourceFolder url="file://$MODULE_DIR$/testSrc" isTestSource="true" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="inheritedJdk" />
-    <orderEntry type="library" scope="PROVIDED" name="gradle" level="application" />
+    <orderEntry type="jdk" jdkName="IntelliJ CE 141.1010.3" jdkType="IDEA JDK" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="gradle" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="git4idea" level="application" />
     <orderEntry type="module-library">
       <library>
@@ -45,7 +45,6 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="google-login" level="application" />
     <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
@@ -64,5 +63,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="google-login" scope="PROVIDED" />
   </component>
 </module>

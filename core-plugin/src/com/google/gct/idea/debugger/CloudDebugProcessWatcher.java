@@ -20,6 +20,7 @@ import com.intellij.execution.Executor;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroup;
@@ -87,7 +88,7 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
                                                  }
 
                                                  if (targetConfig != null) {
-                                                   Executor executor = DefaultRunExecutor.getRunExecutorInstance();
+                                                   Executor executor = DefaultDebugExecutor.getDebugExecutorInstance();
                                                    ProgramRunnerUtil
                                                      .executeConfiguration(state.getProject(), targetConfig, executor);
                                                  }

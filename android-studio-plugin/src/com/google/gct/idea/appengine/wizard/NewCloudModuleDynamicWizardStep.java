@@ -15,7 +15,6 @@
  */
 package com.google.gct.idea.appengine.wizard;
 
-import com.android.annotations.VisibleForTesting;
 import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.TemplateMetadata;
 import com.android.tools.idea.wizard.ComboBoxItem;
@@ -218,7 +217,6 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
     return true;
   }
 
-  @VisibleForTesting
   static boolean isValidModuleName(@NotNull String moduleName) {
     if (!moduleName.replaceAll(WizardConstants.INVALID_FILENAME_CHARS, "").equals(moduleName)) {
       return false;

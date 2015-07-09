@@ -329,14 +329,32 @@ public class CloudDebugProcessStateController {
   private static List<Breakpoint> queryServerForBreakpoints(CloudDebugProcessState state,
                                                             Debugger client,
                                                             String tokenToSend) throws IOException {
-    List<Breakpoint> currentList;
+    List<Breakpoint> currentList = null;
 
-    ListBreakpointsResponse response =
-      client.debuggees().breakpoints().list(state.getDebuggeeId()).setIncludeInactive(Boolean.TRUE).setAction("CAPTURE")
-        .setStripResults(Boolean.TRUE).setWaitToken(tokenToSend).execute();
+    String responseWaitToken = tokenToSend;
 
-    currentList = response.getBreakpoints();
-    String responseWaitToken = response.getWaitToken();
+    while(tokenToSend == null || tokenToSend.equals(responseWaitToken)) {
+      ListBreakpointsResponse response =
+          client.debuggees().breakpoints().list(state.getDebuggeeId())
+              .setIncludeInactive(Boolean.TRUE).setAction("CAPTURE")
+              .setStripResults(Boolean.TRUE)
+              .setWaitToken(CloudDebugConfigType.useWaitToken() ? tokenToSend : null).execute();
+
+      currentList = response.getBreakpoints();
+      responseWaitToken = response.getWaitToken();
+      if (tokenToSend == null) {
+        break;
+      }
+
+      if (!CloudDebugConfigType.useWaitToken() && tokenToSend.equals(responseWaitToken)) {
+        try {
+          //our fallback polling mode has a 1 second loop.
+          Thread.currentThread().sleep(1000);
+        } catch (InterruptedException ex) {
+          return null;
+        }
+      }
+    }
     state.setWaitToken(responseWaitToken);
 
     if (currentList != null) {
