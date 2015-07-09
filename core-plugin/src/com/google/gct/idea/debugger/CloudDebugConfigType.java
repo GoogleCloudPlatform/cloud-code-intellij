@@ -32,7 +32,17 @@ import javax.swing.*;
  */
 public class CloudDebugConfigType implements ConfigurationType {
   public static final String GCT_DEBUGGER_ENABLE = "enable.gct.debugger";
+  public static final String GCT_DEBUGGER_USETOKEN = "enable.gct.debugger.token";
+
   private final ConfigurationFactory myFactory;
+
+  public static boolean isFeatureEnabled() {
+    return Boolean.getBoolean(GCT_DEBUGGER_ENABLE);
+  }
+
+  public static boolean useWaitToken() {
+    return !Boolean.getBoolean(GCT_DEBUGGER_USETOKEN);
+  }
 
   public CloudDebugConfigType() {
     myFactory = new MyConfigurationFactory(this);

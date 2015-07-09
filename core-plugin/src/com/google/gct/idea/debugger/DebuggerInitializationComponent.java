@@ -37,7 +37,7 @@ public class DebuggerInitializationComponent implements ApplicationComponent {
 
   @Override
   public void initComponent() {
-    if (Boolean.getBoolean(CloudDebugConfigType.GCT_DEBUGGER_ENABLE)) {
+    if (CloudDebugConfigType.isFeatureEnabled()) {
       Extensions.getRootArea().getExtensionPoint(ConfigurationType.CONFIGURATION_TYPE_EP)
         .registerExtension(new CloudDebugConfigType());
     }

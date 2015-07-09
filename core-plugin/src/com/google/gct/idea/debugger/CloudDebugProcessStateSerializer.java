@@ -51,7 +51,7 @@ public class CloudDebugProcessStateSerializer
   private CloudDebugProcessStateSerializer(@NotNull Project project) {
     myProject = project;
 
-    if (Boolean.getBoolean(CloudDebugConfigType.GCT_DEBUGGER_ENABLE)) {
+    if (CloudDebugConfigType.isFeatureEnabled()) {
       // We listen on mouse events to calculate the line where we should add a cloud breakpoint
       // in our right click menu action.
       EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryListener() {
@@ -95,7 +95,7 @@ public class CloudDebugProcessStateSerializer
   @Override
   public CloudDebugProcessStateSerializer.ProjectState getState() {
     ProjectState projectState = new ProjectState();
-    if (Boolean.getBoolean(CloudDebugConfigType.GCT_DEBUGGER_ENABLE)) {
+    if (CloudDebugConfigType.isFeatureEnabled()) {
       RunManager manager = RunManager.getInstance(myProject);
       for (RunnerAndConfigurationSettings config : manager.getAllSettings()) {
         if (config.getConfiguration() == null) {
@@ -143,7 +143,7 @@ public class CloudDebugProcessStateSerializer
    */
   @Override
   public void loadState(CloudDebugProcessStateSerializer.ProjectState state) {
-    if (Boolean.getBoolean(CloudDebugConfigType.GCT_DEBUGGER_ENABLE) && state.CONFIG_STATES != null) {
+    if (CloudDebugConfigType.isFeatureEnabled() && state.CONFIG_STATES != null) {
       for (RunConfigState configState : state.CONFIG_STATES) {
         myStateMap.put(configState.CONFIG_NAME, configState.PROCESS_STATE);
       }
