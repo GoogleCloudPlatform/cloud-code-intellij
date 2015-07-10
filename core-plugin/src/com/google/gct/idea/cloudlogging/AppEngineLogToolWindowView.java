@@ -23,15 +23,23 @@ import com.google.api.services.logging.model.ListLogEntriesResponse;
 import com.google.api.services.logging.model.LogEntry;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
-import java.util.Calendar;
-import java.util.TimeZone;
+import java.awt.event.*;
+import java.util.ArrayList;
 
 /**
  * Controls the view (created via UI designer plugin) and calls the app engine logs
@@ -41,19 +49,19 @@ public class AppEngineLogToolWindowView {
 
   /**Key that identifies this view*/
   public static final Key<AppEngineLogToolWindowView> APP_ENG_LOG_TOOL_WINDOW_VIEW_KEY = Key.create
-    ("APP_ENG_TOOL_WINDOW_VIEW_KEY");
+          ("APP_ENG_TOOL_WINDOW_VIEW_KEY");
 
   /**
    * Components created by UI Designer*/
-  private JPanel mainInfoPanel;
+  private JBPanel mainInfoPanel;
   private JBScrollPane scrollPane;
-  private JTextArea logs;
+  private JTree logs;
 
   /**Panel for the Top Bar of the Tool Window*/
-  final JPanel toolWindowBarPanel= new JPanel();
+  final JBPanel toolWindowBarPanel= new JBPanel();
 
-  /**Button to get the project info (necessary due to Project Selector's touchy nature)*/
-  private JButton projectInfoButton = new JButton("Get Project Info");
+  ///**Button to get the project info (necessary due to Project Selector's touchy nature)*/
+  //private JButton projectInfoButton = new JButton("Get Project Info");
 
   /**Previous Project name*/
   private String prevProject;
@@ -76,9 +84,23 @@ public class AppEngineLogToolWindowView {
   /**name of current version */
   private String currVersion;
 
+  /**Versions Combo box to list versions for the project*/
+  private final ComboBox logLevelComboBox= new ComboBox();
+  /**Model for Versions combo box*/
+  private DefaultComboBoxModel defaultComboBoxModelLogLevel;
+
+  private JButton prevPageButton = new JButton(AppEngineIcons.PREV_PAGE_ICON);
+  private JButton nextPageButton = new JButton(AppEngineIcons.PREV_PAGE_ICON);
+
+  String[] logLevelList = {"Critical","Error","Warning","Info","Debug","Any Log Level"};
+
+  private enum LogLevel {CRITICAL, ERROR, WARNING, INFO, DEBUG, ANYLOGLEVEL}
+
+
   /**Need this manual width, else the combo box resizes with text*/
   private static final int MIN_COMBOBOX_WIDTH = 135;
 
+  private static final String DEFAULT_LOGLEVEL_STRING = "--Select Log Level--";
   /**Default text for modules combo box*/
   private static final String DEFAULT_MODULEBOX_STRING = "--Select Module--";
   /**Default Module text*/
@@ -99,23 +121,73 @@ public class AppEngineLogToolWindowView {
   private static final String ERROR_LOGS_LIST_NULL = "Error: Logs list recieved is empty.";
   /**Logs List is empty error message box title */
   private static final String ERROR_LOGS_LIST_TITLE= "Empty Logs List";
+  ///**Text to show for the tool tip for logs are not text wrapped*/
+  //private static final String WRAP_TOOL_TIP_TEXT = "Wrap Text";
+  ///**Text to show for the tool tip for logs are text wrapped*/
+  //private static final String UN_WRAP_TOOL_TIP_TEXT = "Un-Wrap Text";
+  ///**Text to show for the tool tip for logs are not expanded*/
+  //private static final String EXPAND_TOOL_TIP_TEXT = "Expand Logs";
+  ///**Text to show for the tool tip for logs are expanded*/
+  //private static final String UN_EXPAND_WRAP_TOOL_TIP_TEXT = "Un-Expand Logs";
+  /**Text to show for the tool tip for font change*/
+  private static final String FONT_TOOL_TIP_TEXT = "Font";
+
 
   /**Helps deal with combo box touchiness issues*/
   private boolean moduleALActive = true;
   /**Helps deal with combo box touchiness issues*/
   private boolean versionALActive = true;
 
+  /**Root of tree that is only visible in the initial screen*/
+  private TextAreaNode root = new TextAreaNode(DEFAULT_LOGSTEXT,true, AppEngineIcons.ROOT_ICON);
+  /**tree model for tree*/
+  private DefaultTreeModel treeModel = new DefaultTreeModel(root,true);
+
+  int fontSize = 12;
+  /**String representing tree wrapping*/
+  private String treeTextWrap = (""+false)+fontSize;
+  /**boolean value that indicates if logs are expanded or not*/
+  private boolean logsExpanded = false;
+
+  /**Holds the page numbers if we need to go to previous page*/
+  private ArrayList<String> pageTokens = new ArrayList<String>();
+  private int currPage = -1;
+
+  /**Label on which you hover to show the text change slider*/
+  private JBLabel fontSizeChange;
+
+  /**Font change slider */
+  private JSlider fontSlider;
+
+  /**Allows the font slider to show up as as pop up when you hover over fontSizeChange Label*/
+  private JBPopupMenu popUpSliderMenu;
+
+  /**Minimum font available to select on fontSlider menu*/
+  private int MIN_FONT =12;
+  /**Maximum font available to select on fontSlider menu*/
+  private int MAX_FONT =36;
+  /**Initial font selected on fontSlider menu*/
+  private int INIT_FONT =12;
+  /**Spacing for Large Ticks on slider menu*/
+  private int MAJOR_SPACING = 12;
+  /**Spacing for Small Ticks on slider menu*/
+  private int MINOR_SPACING = 6;
+
   /**Panel with the Search Box area*/
-  private JPanel searchBox = new JPanel();
+  private JBPanel searchBox = new JBPanel();
+
+  /**Boolean to represent if the logs are sorted asc time stamp order (true) else desc (false)*/
+  private boolean ascTimeOrder = true;
 
   /**Current app id*/
   private String currentAppID;
+
 
   /**
    * gets the panel with the UI tool window bar elements
    * @return JPanel with tool window bar elements
    */
-  public JPanel getMainInfoPanel(){
+  public JBPanel getMainInfoPanel(){
 
     return mainInfoPanel;
   }
@@ -124,12 +196,173 @@ public class AppEngineLogToolWindowView {
    * Constructor to get Tree to display properly.
    */
   public AppEngineLogToolWindowView(){
+    createPanelComponents();
+    // mainInfoPanel.remove(scrollPane);
 
+
+    //JBPanel treePanel = new JBPanel(new GridLayout(3,1));
+    //  treePanel.add(new JBLabel("Loading Previous Page of Logs ..."));
+
+    //this.scrollPane = new JBScrollPane(logs);
+    //mainInfoPanel.add(scrollPane);
+
+    logs.setModel(treeModel);
+    logs.setRootVisible(true);
+    logs.setShowsRootHandles(true);
     logs.setEditable(false);
-    logs.setLineWrap(true);
-    logs.setWrapStyleWord(true);
-    logs.setText(DEFAULT_LOGSTEXT);
+    registerUI();
+
+    mainInfoPanel.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        registerUI();
+      }
+    });
+
+    this.scrollPane.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+      @Override
+      public void adjustmentValueChanged(AdjustmentEvent e) {
+        logs.repaint();
+      }
+    });
+
+    logs.addTreeExpansionListener(new TreeExpansionListener() {
+      @Override
+      public void treeExpanded(TreeExpansionEvent event) {
+        registerUI();
+      }
+
+      @Override
+      public void treeCollapsed(TreeExpansionEvent event) {
+        registerUI();
+      }
+    });
+
   }
+
+  private void createPanelComponents() {
+    mainInfoPanel = new JBPanel();
+    mainInfoPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+
+
+    logs = new JTree(); //use JTree because Tree overwrites the customUI we want
+    logs.setName(treeTextWrap);
+    scrollPane = new JBScrollPane(logs);
+    mainInfoPanel.add(scrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH,
+                                                      GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                      GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null,
+                                                      null, null, 0, false));
+
+  }
+
+  public void changeTextWrapState(boolean value){
+    treeTextWrap = ""+value+fontSize;
+    logs.setName(treeTextWrap);
+
+  }
+
+  public void changeLogsExpandState(boolean value){
+    logsExpanded=value;
+  }
+
+  public void changeTimeOrder(boolean value){
+    ascTimeOrder=value;
+  }
+
+  public void expandLogs(){
+    for(int i = 0; i<logs.getRowCount(); i++) {
+      logs.expandRow(i);
+    }
+  }
+
+  public void collapseLogs(){
+    for(int j = 0; j<logs.getRowCount(); j++) {
+      logs.collapseRow(j);
+    }
+  }
+
+  private void addActionListeners() {
+    fontSizeChange.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseEntered(MouseEvent e) {
+        super.mouseEntered(e);
+        popUpSliderMenu.show(e.getComponent(),e.getX(),e.getY());
+      }
+
+      @Override
+      public void mousePressed(MouseEvent e){
+        super.mousePressed(e);
+        popUpSliderMenu.show(e.getComponent(),e.getX(),e.getY());
+      }
+    });
+
+
+
+    fontSlider.addMouseListener(new MouseAdapter() {
+      public int oldValue = INIT_FONT;
+      @Override
+      public void mouseReleased(MouseEvent e) {
+        if(!fontSlider.getValueIsAdjusting() && fontSlider.getValue()!=oldValue){
+          oldValue = fontSlider.getValue();
+          changeLogsTextSize(oldValue);
+        }
+      }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+        super.mouseExited(e);
+        popUpSliderMenu.setVisible(false);
+      }
+    });
+
+
+
+  }
+
+  private void changeLogsTextSize(int value) {
+    // System.out.println("value: "+value);
+    if(logs.getName().contains("false")){
+      logs.setName("false"+value);
+    }else{
+      logs.setName("true"+value);
+    }
+    registerUI();
+
+  }
+
+  /**
+   * Indicates whether logs are expanded or not
+   * @return Boolean value of whether logs are expanded (true) or not (false)
+   */
+  public boolean getLogsExpanded(){
+    return logsExpanded;
+  }
+
+  /**
+   * Gets the state of text wrapping in the logs tree
+   * @return true if the text is wrapped, else false
+   */
+  public boolean getTextWrap(){
+    if(logs.getName().contains("false")){
+      return false;
+    }else{
+      return true;
+    }
+  }
+
+
+  /**
+   * Resets the UI for tree to redraw properly
+   */
+  public void registerUI() {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        logs.setUI(new BasicWideNodeTreeUI());
+      }
+    });
+  }
+
 
   /**
    * Create the combo boxes and search bar elements that filter and search the logs
@@ -151,22 +384,84 @@ public class AppEngineLogToolWindowView {
     versionComboBox.setEditable(false);
     versionComboBox.setMinimumAndPreferredWidth(MIN_COMBOBOX_WIDTH);
 
+
+    //textWrapButton = new JToggleButton("NoWrap",AppEngineIcons.NO_WRAP_TOGGLE_ICON,false);
+    //textWrapButton.setSelectedIcon(AppEngineIcons.WRAP_TOGGLE_ICON);
+    //textWrapButton.setDisabledIcon(AppEngineIcons.NO_WRAP_TOGGLE_ICON);
+    //textWrapButton.setToolTipText(WRAP_TOOL_TIP_TEXT);
+
+    //expandAllLogs= new JToggleButton("not Expanded",AppEngineIcons.NO_WRAP_TOGGLE_ICON,false);
+    //expandAllLogs.setSelectedIcon(AppEngineIcons.WRAP_TOGGLE_ICON);
+    //expandAllLogs.setDisabledIcon(AppEngineIcons.NO_WRAP_TOGGLE_ICON);
+    //expandAllLogs.setToolTipText(EXPAND_TOOL_TIP_TEXT);
+
+
+    defaultComboBoxModelLogLevel = new DefaultComboBoxModel();
+    logLevelComboBox.setModel(defaultComboBoxModelLogLevel);
+    logLevelComboBox.setRenderer(new LogLevelComboBoxRenderer());
+    logLevelComboBox.setEditor(new LogLevelComboBoxEditor());
+
+
+    for(int h=0; h<logLevelList.length; h++){
+      Icon icon;
+      if(logLevelList[h].equals("Critical")) {
+        icon = AppEngineIcons.CRITICAL_LOG_ICON;
+      }else if(logLevelList[h].equals("Error")) {
+        icon = AppEngineIcons.ERROR_LOG_ICON;
+      }else if(logLevelList[h].equals("Warning")) {
+        icon = AppEngineIcons.WARNING_LOG_ICON;
+      }else if(logLevelList[h].equals("Info")) {
+        icon = AppEngineIcons.INFO_LOG_ICON;
+      }else if(logLevelList[h].equals("Debug")) {
+        icon = AppEngineIcons.DEBUG_LOG_ICON;
+      } else if(logLevelList[h].equals("Any Log Level")) {
+        icon = AppEngineIcons.ANY_LOG_ICON;
+      }else {
+        icon = AppEngineIcons.ANY_LOG_ICON;
+      }
+      JBLabel newLabel = new JBLabel(logLevelList[h],icon, JBLabel.RIGHT);
+      defaultComboBoxModelLogLevel.addElement(newLabel);
+      //logLevelComboBox.addItem(newLabel);
+    }
+
+
+    fontSizeChange = new JBLabel(AppEngineIcons.FONT_CHANGE_ICON);
+
+    fontSizeChange.setToolTipText(FONT_TOOL_TIP_TEXT);
+
+    fontSlider = new JSlider(JSlider.VERTICAL, MIN_FONT, MAX_FONT, INIT_FONT); //orientation, min, max,initial value
+    fontSlider.setPaintTicks(true);
+    fontSlider.setSnapToTicks(true);
+    fontSlider.setMajorTickSpacing(MAJOR_SPACING);
+    fontSlider.setMinorTickSpacing(MINOR_SPACING);
+    fontSlider.setPaintLabels(true);
+
+    popUpSliderMenu = new JBPopupMenu();
+    popUpSliderMenu.add(fontSlider);
+
+    addActionListeners();
+
     projectComboBox.setEnabled(true);
 
-    projectInfoButton.setEnabled(true);
-
-    toolWindowBarPanel.add(projectInfoButton);
+    //toolWindowBarPanel.add(fontSizeChange);
+    //toolWindowBarPanel.add(logLevelComboBox);
+    //toolWindowBarPanel.add(expandAllLogs);
+    // toolWindowBarPanel.add();
     toolWindowBarPanel.add(projectComboBox);
     toolWindowBarPanel.add(moduleComboBox);
     toolWindowBarPanel.add(versionComboBox);
 
-    final JPanel searchComponentPanel = new JPanel();
-    searchComponentPanel.setLayout(new BoxLayout(searchComponentPanel,BoxLayout.X_AXIS));
+    final JBPanel searchComponentPanel = new JBPanel();
+    searchComponentPanel.setLayout(new BoxLayout(searchComponentPanel, BoxLayout.X_AXIS));
+    searchComponentPanel.add(fontSizeChange);
+    searchComponentPanel.add(logLevelComboBox);
     searchComponentPanel.add(getSearchComponent()); //has the search bar!!
     searchComponentPanel.add(toolWindowBarPanel); //has only the combo boxes for module and version
 
     return searchComponentPanel;
   }
+
+
 
   /**
    * Resets the text area and search components to their original state
@@ -181,7 +476,19 @@ public class AppEngineLogToolWindowView {
     defaultComboBoxModelVersion.addElement(DEFAULT_VERSIONBOX_STRING);
     versionComboBox.setEnabled(false);
 
-    logs.setText(DEFAULT_LOGSTEXT);
+    root.setUserObject(DEFAULT_LOGSTEXT);
+    root.setAllowsChildren(false);
+    logs.setRootVisible(true);
+    treeModel.reload();
+  }
+
+  /**
+   * Sets the root visible/invisible
+   * @param treeRootVisible boolean value to set root visible (true) or invisible (false)
+   */
+  public void setTreeRootVisible(boolean treeRootVisible) {
+
+    logs.setRootVisible(treeRootVisible);
   }
 
   /**
@@ -200,7 +507,7 @@ public class AppEngineLogToolWindowView {
    */
   private static Component getTextFilterSearch() {
 
-    JLabel searchBox = new JLabel("Search Box goes here");
+    JBLabel searchBox = new JBLabel("Search Box goes here");
     return searchBox;
   }
 
@@ -228,6 +535,13 @@ public class AppEngineLogToolWindowView {
   public void setCurrProject(){
 
     currProject=projectComboBox.getProjectDescription();
+    //System.out.println("curre Project Desc: "+currProject); //gets TestAppEng2
+    //System.out.println("Curr project text: "+projectComboBox.getText()); //gets testappeng2
+
+  }
+
+  public boolean getTimeOrder(){
+    return ascTimeOrder;
   }
 
   /**
@@ -339,6 +653,15 @@ public class AppEngineLogToolWindowView {
   }
 
   /**
+   * Returns vertical scroll bar of tree
+   * @return JScrollBar which is vertical scroll bar of tree
+   */
+  public JScrollBar getVerticalScrollBar(){
+
+    return this.scrollPane.getVerticalScrollBar();
+  }
+
+  /**
    * clear the Combo boxes by removing all elements
    */
   public void clearComboBoxes(){
@@ -384,12 +707,18 @@ public class AppEngineLogToolWindowView {
   }
 
   /**
-   * Add Action Listener to the Get Project Info Button
-   * @param projectInfoButtonListener Project Info Button Listener
+   * Add Action Listener to Project Selector combo box
+   * @param projectSelectorListener Project Selector Listener
    */
-  public void addProjectInfoButtonListener(ProjectInfoButtonListener projectInfoButtonListener){
+  public void addProjectInfoButtonListener(ProjectSelectorListener projectSelectorListener){
 
-    projectInfoButton.addActionListener(projectInfoButtonListener);
+    projectComboBox.getDocument().addDocumentListener(projectSelectorListener);
+
+  }
+
+  public void addScrollActionListener(ScrollActionListener scrollActionListener){
+
+    this.scrollPane.getVerticalScrollBar().addAdjustmentListener(scrollActionListener);
   }
 
   /**
@@ -398,12 +727,13 @@ public class AppEngineLogToolWindowView {
    */
   public void setModulesList(ListModulesResponse listModulesResponse){
 
-    if(listModulesResponse==null){
+    if(listModulesResponse==null|| listModulesResponse.getModules()==null){
       Messages.showErrorDialog(ERROR_MODULES_LIST_NULL, ERROR_MODULES_LIST_TITLE);
       return;
     }
 
     setModuleALActive(false);
+    defaultComboBoxModelModule.removeAllElements();
 
     int defaultModuleIndex=0;
     Module defaultModule = null;
@@ -439,7 +769,7 @@ public class AppEngineLogToolWindowView {
    */
   public void setVersionsList(ListVersionsResponse listVersionsResponse){
 
-    if(listVersionsResponse==null){
+    if(listVersionsResponse==null || listVersionsResponse.getVersions()==null){
       Messages.showErrorDialog(ERROR_VERSIONS_LIST_NULL, ERROR_VERSIONS_LIST_TITLE);
       return;
     }
@@ -473,179 +803,101 @@ public class AppEngineLogToolWindowView {
       Messages.showErrorDialog(ERROR_LOGS_LIST_NULL, ERROR_LOGS_LIST_TITLE);
       return;
     }
+    root.setAllowsChildren(true);
+    root.removeAllChildren();
+
+    treeModel.reload();
+
+    String nextPageToken = logResp.getNextPageToken();
+    if(nextPageToken!=null && ((currPage==-1 && this.pageTokens.size()==0) || currPage+1==this.pageTokens.size())){//page numbers go 0+ and size goes 1 +
+      this.pageTokens.add(nextPageToken);
+    }
 
     LogTreeEntry logTreeEntry;
-    String toPrint = "";
+    TextAreaNode parent;
+    TextAreaNode child;
+
+    if(currPage!=-1) {
+      parent = new TextAreaNode("...Load Previous Page...", false, null);
+      treeModel.insertNodeInto(parent, root, root.getChildCount());
+    }
 
     //get logs and add them to the tree
     for(int logEntriesIter = 0; logEntriesIter< logResp.getEntries().size(); logEntriesIter++) {
-
       LogEntry log = logResp.getEntries().get(logEntriesIter);
-      logTreeEntry = printProperly(log);
+      logTreeEntry = new LogTreeEntry(log);
 
       if (!logTreeEntry.getLogMessage().trim().isEmpty()) { //has log message
 
-        toPrint += logTreeEntry.getLogInfo() + '\n' + '\t' + logTreeEntry.getLogMessage()+'\n';
+        parent = new TextAreaNode(logTreeEntry.getLogInfo(),true, logTreeEntry.getSeverityIcon());
+        child = new TextAreaNode(logTreeEntry.getLogMessage(),false, logTreeEntry.getSeverityIcon());
+        parent.add(child);
       }else {
 
-        toPrint += logTreeEntry.getLogInfo() + '\n';
+        parent = new TextAreaNode(logTreeEntry.getLogInfo(),false, logTreeEntry.getSeverityIcon());
       }
 
-      toPrint+="________________________________________________________________________________\n";
+      treeModel.insertNodeInto(parent,root,root.getChildCount()); //insert logs in order in bottom
     }
 
-    logs.setText(toPrint);
+    if(nextPageToken!=null){
+      parent = new TextAreaNode("...Load Next Page...", false, null);
+      treeModel.insertNodeInto(parent, root, root.getChildCount());
+    }
+
+    treeModel.reload();
+
+    if(logsExpanded){ //default is to not expand so need to specify this if the expanded toggle button is selected
+      expandLogs();
+    }
 
   }
 
   /**
-   * Get the information for each log entry and print it properly as App Engine does
-   * @param log Log Entry to get the information from.
+   * When refresh button is clicked, makes sure that the current module is set back the
+   * module combo box. If the module has been deleted, it will use the default module
+   * @param prevModule String previous Module that was the module selected before we reset
+   *                   the modules, versions and logs.
    */
-  private static LogTreeEntry printProperly(LogEntry log){
+  public void setCurrModuleToModuleComboBox(String prevModule) {
 
-    String t = "        ";
+    if(defaultComboBoxModelModule.getIndexOf(prevModule)>0){
 
-    String fullTimeUTC = log.getProtoPayload().get("endTime").toString();
-    String localTime = convertUTCToLocal(fullTimeUTC);
-    String year = fullTimeUTC.substring(0, 4);
-    String month = fullTimeUTC.substring(5, 7);
-    String  day = fullTimeUTC.substring(8, 10);
-    String status = log.getProtoPayload().get("status").toString();
-
-    String latency=log.getProtoPayload().get("latency").toString();
-    latency=latency.substring(0,latency.length()-1); //remove the s at end
-    Double latencyParsed = Double.parseDouble(latency);
-
-    if(latencyParsed.intValue()==0){
-
-      latencyParsed *= 1000; //convert to ms
-      long latencyParse = Math.round(latencyParsed);
-      latency=latencyParse+"ms";
+      defaultComboBoxModelModule.setSelectedItem(prevModule);
     }else{
 
-      latency = String.format("%.2f", latencyParsed)+"s"; //round to 2 decimal places
+      defaultComboBoxModelModule.setSelectedItem(DEFAULT_MODULE);
     }
-
-    String resource = log.getProtoPayload().get("resource").toString();
-    String HTTP = log.getProtoPayload().get("httpVersion").toString();
-    String ipAddress = log.getProtoPayload().get("ip").toString();
-    String host = log.getProtoPayload().get("host").toString();
-    String appEngRelease = "app_engine_release="+log.getProtoPayload().get("appEngineRelease");
-
-    String message = "";
-
-    if(log.getProtoPayload().get("line")!=null){
-
-      String line = log.getProtoPayload().get("line").toString();
-      String messageTime= line.substring(line.indexOf("time=")+5, line.indexOf(", severity="));
-      String finalMessageTime = convertUTCToLocal(messageTime);
-
-      message = finalMessageTime+"\t" + line.substring(line.indexOf("logMessage=") + 11,
-                                                       line.indexOf("}]"));
-    }
-    String method = log.getProtoPayload().get("method").toString();
-
-    String responseSize="";
-
-    if(log.getProtoPayload().get("responseSize")==null){
-
-      responseSize+="0";
-    }else{
-
-      responseSize+=log.getProtoPayload().get("responseSize").toString();
-    }
-
-    String userAgent = "";
-
-    if(log.getProtoPayload().get("userAgent")!=null){
-
-      userAgent+=" \""+log.getProtoPayload().get("userAgent").toString()+'\"';
-    }
-
-    String instance="instance="+log.getMetadata().getLabels().
-      get("appengine.googleapis.com/clone_id");
-
-
-    String logInfo =localTime+"    "+status+t+ "bytes stuff"+t+latency+t+resource+'\n'+ipAddress+
-                    " - - "+"["+day+"/"+month+"/"+year+"] "+" \""+method+" "+resource+" "+
-                    HTTP+"\" "+status+" "+responseSize+userAgent+" - - \""+host+"\" "+instance+" "+
-                    appEngRelease;
-    String logMessage = message;
-
-    return new LogTreeEntry(logInfo, logMessage);
 
   }
 
   /**
-   * Convert the UTC time we get from the server (formatted a certain way) to the local time
-   * @param fullTimeUTC the UTC datetime format we get from the server
-   * @return String with the hours:minutes:seconds.milliseconds formatted
+   *  When refresh button is clicked, makes sure that the current version is set back the
+   * version combo box. If the version has been deleted, it will use the last alphabetical version
+   * @param prevVersion  String previous version that was the version selected before we reset
+   *                   the modules, versions and logs.
    */
-  private static String convertUTCToLocal(String fullTimeUTC) {
+  public void setCurrVersionToVersionComboBox(String prevVersion){
 
-    //get individual components
-    int hour = Integer.parseInt(fullTimeUTC.substring(11, 13));
-    int minutes = Integer.parseInt(fullTimeUTC.substring(14, 16));
-    int seconds = Integer.parseInt(fullTimeUTC.substring(17, 19));
-    int milliseconds = Integer.parseInt(fullTimeUTC.substring(20, 23));
+    if(defaultComboBoxModelVersion.getIndexOf(prevVersion)>0){
 
-    //get the local one and find the offset difference in time
-    TimeZone tz = TimeZone.getDefault();
-    Calendar cal = Calendar.getInstance(tz);
-    int offsetInMillis = tz.getOffset(cal.getTimeInMillis());
-
-    int offsetHours = offsetInMillis/3600000;
-    int offsetMinutes =(offsetInMillis/60000)%60;
-
-    //mod back to the correct time = cloud = on 12 hour clock not 24 hour
-    int finalHours = (((hour+offsetHours)+11)  % 12) +1;
-    int finalMinutes = (((minutes+offsetMinutes)+59)%60)+1;
-
-    if(finalMinutes==60){
-
-      finalMinutes=finalMinutes%60;
+      defaultComboBoxModelVersion.setSelectedItem(prevVersion);
     }
-
-    //string to format properly
-    String timeToReturn = "";
-
-    if(finalHours<10){
-
-      timeToReturn+="0"+finalHours;
-    }else{
-
-      timeToReturn+=finalHours;
-    }
-
-    if(finalMinutes<0) {
-
-      timeToReturn+=":0"+(finalMinutes);
-    }else{
-
-      timeToReturn+=":"+(finalMinutes);
-    }
-
-    if(seconds<0){
-
-      timeToReturn+=":0"+seconds;
-    }else{
-
-      timeToReturn+=":"+seconds;
-    }
-
-    if(milliseconds<10){
-
-      timeToReturn+=".00"+milliseconds;
-    }else if(milliseconds<100){
-
-      timeToReturn+=".0"+milliseconds;
-    }else{
-
-      timeToReturn+="."+milliseconds;
-    }
-
-    return timeToReturn;
   }
 
+  public ArrayList<String> getPageTokens() {
+    return this.pageTokens;
+  }
+
+  public int getCurrPage() {
+    return this.currPage;
+  }
+
+  public void decreasePage(){
+    this.currPage--;
+  }
+
+  public void increasePage(){
+    this.currPage++;
+  }
 }

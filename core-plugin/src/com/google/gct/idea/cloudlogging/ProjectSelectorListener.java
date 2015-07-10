@@ -16,15 +16,14 @@
 package com.google.gct.idea.cloudlogging;
 
 import com.intellij.openapi.ui.Messages;
+import com.intellij.ui.DocumentAdapter;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.event.DocumentEvent;
 
 /**
- * Created by amulyau on 6/16/15.
+ * Created by amulyau on 6/24/15.
  */
-public class ProjectInfoButtonListener implements ActionListener {
-
+public class ProjectSelectorListener extends DocumentAdapter {
   /**Controller for App Engine Logs*/
   AppEngineLogging controller;
 
@@ -35,25 +34,15 @@ public class ProjectInfoButtonListener implements ActionListener {
                                            "please try again";
   private String ERROR_DIALOG_TITLE = "Error";
 
-  /**
-   * Constructor
-   * @param controller Controller for the App Engine Logs
-   * @param view View for the App Engine Logs with the Project Info Button
-   */
-  public ProjectInfoButtonListener(AppEngineLogging controller, AppEngineLogToolWindowView view){
+
+  public ProjectSelectorListener(AppEngineLogging controller, AppEngineLogToolWindowView view){
 
     this.controller=controller;
     this.view = view;
   }
 
-  /**
-   * Action Listener class that verifies project and gets modules list, versions list and logs
-   * based on that information
-   * @param e Even that occurs
-   */
   @Override
-  public void actionPerformed(ActionEvent e) {
-
+  protected void textChanged(DocumentEvent e) {
     //get the project ID of the app engine project
     view.setCurrProject();
     String currProject = view.getCurrProject();
@@ -80,13 +69,13 @@ public class ProjectInfoButtonListener implements ActionListener {
 
 
     }else if((currProject!=null) && (currProject.equals(view.getPrevProject()))){
-
       //same as previous selection
+    }else if(currProject==null && view.getPrevProject()==null){
+      //don't do anything because they had previously errored
     }else if(view.getCurrModule()==null){ //modules does not exist
-
       Messages.showErrorDialog(ERROR_PROJECT_NOT_EXIST, ERROR_DIALOG_TITLE);
     }else{ //not valid project name => error
-
+      view.setPrevProject();
       Messages.showErrorDialog(ERROR_PROJECT_NOT_EXIST, ERROR_DIALOG_TITLE);
       view.setModuleALActive(false);
       view.setVersionALActive(false);
@@ -95,5 +84,6 @@ public class ProjectInfoButtonListener implements ActionListener {
       view.setVersionALActive(true);
     }
   }
+
 
 }

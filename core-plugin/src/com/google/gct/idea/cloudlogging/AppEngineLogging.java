@@ -17,7 +17,6 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.components.JBLoadingPanel;
@@ -28,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 /**
@@ -44,17 +44,6 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
 
   /**Logs Containing Content ToolBar Text */
   public static final String APP_END_TOOLBAR_CONTENT_TEXT = "Logs";
-
-  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!GET NEW ICONS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  /**Icon for the Tool Window Content*/
-  public static Icon TOOL_WINDOW_CONTENT_ICON = IconLoader.getIcon("/icons/cloudPlatform.png",
-                                                              AppEngineLogging.class);;
-  /**Icon for the Tool Window*/
-  public static Icon TOOL_WINDOW_ICON = IconLoader.getIcon("/icons/cloudPlatform.png",
-                                                              AppEngineLogging.class);;
-  /**Refresh Button (in left side tool bar of tool window)'s Icon*/
-  public static Icon REFRESH_BUTTON_ICON = IconLoader.getIcon("/icons/refresh.png",
-                                                              AppEngineLogging.class);
 
   /**App Engine connection*/
   private Appengine myAppengine;
@@ -92,7 +81,7 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
     ContentManager contentManager= toolWindow.getContentManager();
     //content manager holds the content/tab info of the tool window
 
-    toolWindow.setIcon(TOOL_WINDOW_ICON);
+    toolWindow.setIcon(AppEngineIcons.TOOL_WINDOW_ICON);
     toolWindow.setTitle(APP_ENGINE_LOGS_ID);   //sets title to app engine logs
 
     //create content for ui elements
@@ -113,9 +102,7 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
     layoutUi.addContent(appEngLogContent,0, PlaceInGrid.center, false);
 
     // add refresh button to a side tool bar in the tool window
-
-    layoutUi.getOptions().setLeftToolbar(getSideToolbarActions(),
-                                         ActionPlaces.UNKNOWN);
+    layoutUi.getOptions().setLeftToolbar(getSideToolbarActions(),ActionPlaces.UNKNOWN);
 
     //holds all the tool info UI components
     final JBLoadingPanel mainPanel = new JBLoadingPanel(new BorderLayout(),project);
@@ -130,7 +117,7 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
     contentManager.addContent(content); //adds the main panel as content to the tool window
   }
 
-    /**
+  /**
    * Gets and sets the search bar component to the tool bar
    * @param layoutUi layout that contains the tool bar components
    * @return Content to add to the tool window
@@ -146,7 +133,7 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
     Content appEngLogContent = layoutUi.createContent(APP_ENGINE_CONTENT_ID,
                                                       appEngLogToolWindowViewPanel,
                                                       APP_END_TOOLBAR_CONTENT_TEXT ,
-                                                      TOOL_WINDOW_CONTENT_ICON, null);
+                                                      AppEngineIcons.TOOL_WINDOW_CONTENT_ICON, null);
 
     //need this to get info properly in place!
     appEngLogContent.putUserData(AppEngineLogToolWindowView.APP_ENG_LOG_TOOL_WINDOW_VIEW_KEY,
@@ -168,6 +155,9 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
     DefaultActionGroup group = new DefaultActionGroup();
 
     group.add(new RefreshButtonAction(this, myAppEngineLogToolWindowView));
+    group.add(new textWrapAction(myAppEngineLogToolWindowView));
+    group.add(new logsExpandAction(myAppEngineLogToolWindowView));
+    group.add(new timeOrderAction(myAppEngineLogToolWindowView));
 
     return group;
   }
@@ -180,11 +170,12 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
     myAppEngineLogToolWindowView
       .addModuleActionListener(new ModulesActionListener(this, myAppEngineLogToolWindowView));
 
-    myAppEngineLogToolWindowView
-      .addVersionActionListener(new VersionsActionListener(this, myAppEngineLogToolWindowView));
+    myAppEngineLogToolWindowView.addVersionActionListener(new VersionsActionListener(this, myAppEngineLogToolWindowView));
 
-    myAppEngineLogToolWindowView.addProjectInfoButtonListener(new ProjectInfoButtonListener(this,
-                                                                                            myAppEngineLogToolWindowView));
+    myAppEngineLogToolWindowView.addProjectInfoButtonListener(new ProjectSelectorListener(this, myAppEngineLogToolWindowView));
+
+    myAppEngineLogToolWindowView.addScrollActionListener(new ScrollActionListener(this,myAppEngineLogToolWindowView));
+
   }
 
   /**
@@ -198,6 +189,7 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
       selectedUser = GoogleLogin.getInstance().getActiveUser();
     }
 
+    assert selectedUser != null;
     Credential credential = selectedUser.getCredential();
 
     Appengine.Builder appEngBuilder = new Appengine.Builder(new NetHttpTransport(),
@@ -222,8 +214,8 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
 
     try {
 
-      Appengine.Apps.Modules.List moduleList = myAppengine.apps().modules().list("apps/"+
-                                                                                 currentAppID);
+      Appengine.Apps.Modules.List moduleList = myAppengine.apps().modules().list(
+        "apps/" + currentAppID);
       listModulesResponse = moduleList.execute();
     }catch (IOException e1) {
 
@@ -246,10 +238,10 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
     try {
 
       Appengine.Apps.Modules.Versions.List versionsList = myAppengine.apps().modules().versions().
-                                                 list("apps/" +
-                                                      currentAppID +
-                                                      "/modules/" +
-                                                      currModule);
+        list("apps/" +
+             currentAppID +
+             "/modules/" +
+             currModule);
       listVersionsResponse = versionsList.execute();
     }catch (IOException e1) {
 
@@ -270,20 +262,116 @@ public class AppEngineLogging implements ToolWindowFactory,Condition<Project> {
     String currVersion = myAppEngineLogToolWindowView.getCurrVersion();
     ListLogEntriesResponse logResp=null;
 
+    /* working original statement
+    logResp = myLogging.projects().logEntries().list("projects/" + currentAppID)
+        .setFilter("metadata.serviceName=appengine.googleapis.com metadata.labels." +
+                   "\"appengine.googleapis.com/module_id\"=" +
+                   currModule +" metadata.labels." +
+                   "\"appengine.googleapis.com/version_id\"=" +
+                   currVersion).execute();
+    */
+    //+"&orderBy=metadata.timestamp desc"
+
+    String filters = "metadata.serviceName=appengine.googleapis.com metadata.labels." +
+                     "\"appengine.googleapis.com/module_id\"=" +currModule +
+                     " metadata.labels." +"\"appengine.googleapis.com/version_id\"="
+                     +currVersion;
+
+    //filters+=" metadata.timestamp > \"2015-05-25T12:00:01Z\"";
+
+    String timeOrder;
+    boolean ascTimeOrder=myAppEngineLogToolWindowView.getTimeOrder();
+      if(ascTimeOrder) {
+      timeOrder= "metadata.timestamp asc";//"metadata.timestamp asc";
+    }else{
+      timeOrder = "metadata.timestamp desc";
+    }
     try {
+      //System.out.println(myLogging.projects().logEntries().list("projects/" + currentAppID)
+      //     .setFilter("metadata.serviceName=appengine.googleapis.com metadata.labels." +
+      //                "\"appengine.googleapis.com/module_id\"=" +
+      //                currModule +" metadata.labels." +
+      //                "\"appengine.googleapis.com/version_id\"=" +
+      //                currVersion).setOrderBy("metadata.timestamp desc").setPageSize(1).buildHttpRequestUsingHead().getUrl().toString());
 
       logResp = myLogging.projects().logEntries().list("projects/" + currentAppID)
-        .setFilter("metadata.serviceName=appengine.googleapis.com metadata.labels." +
-                                                 "\"appengine.googleapis.com/module_id\"=" +
-                                                           currModule +" metadata.labels." +
-                                                "\"appengine.googleapis.com/version_id\"=" +
-                                                                      currVersion).execute();
+        .setFilter(filters).setOrderBy(timeOrder).execute();
+
     }catch (IOException e1) {
 
       e1.printStackTrace();
     }
 
+
     return logResp;
   }
 
+
+
+  public ListLogEntriesResponse askForNextLog(int currPage, ArrayList<String> pageTokens) {
+    String currentAppID = myAppEngineLogToolWindowView.getCurrentAppID();
+    String currModule = myAppEngineLogToolWindowView.getCurrModule();
+    String currVersion = myAppEngineLogToolWindowView.getCurrVersion();
+    ListLogEntriesResponse logResp=null;
+    String filters = "metadata.serviceName=appengine.googleapis.com metadata.labels." +
+                     "\"appengine.googleapis.com/module_id\"=" +currModule +
+                     " metadata.labels." +"\"appengine.googleapis.com/version_id\"="
+                     +currVersion;
+    String timeOrder;
+    boolean ascTimeOrder=myAppEngineLogToolWindowView.getTimeOrder();
+    if(ascTimeOrder) {
+      timeOrder= "metadata.timestamp asc";
+    }else{
+      timeOrder = "metadata.timestamp desc";
+    }
+
+    if(currPage==-1 && 0==pageTokens.size()){//do this becaues 0th page = getLogs and 1st page is the 0th index in pageTokens (aka size 1)
+      //no next page
+      return null;
+    }else if(currPage+1==pageTokens.size()){ //no next page due to out of bounds
+      return null;
+    }else {
+      try {
+        String pageToken = pageTokens.get(currPage+1);
+        logResp =  myLogging.projects().logEntries().list("projects/" + currentAppID)
+          .setFilter(filters).setPageToken(pageToken).setOrderBy(timeOrder).setPageSize(50).execute();
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    return logResp;
+  }
+  public ListLogEntriesResponse askForPreviousLog(int currPage, ArrayList<String> pageTokens) {
+    String currentAppID = myAppEngineLogToolWindowView.getCurrentAppID();
+    String currModule = myAppEngineLogToolWindowView.getCurrModule();
+    String currVersion = myAppEngineLogToolWindowView.getCurrVersion();
+    ListLogEntriesResponse logResp=null;
+    String filters = "metadata.serviceName=appengine.googleapis.com metadata.labels." +
+                     "\"appengine.googleapis.com/module_id\"=" +currModule +
+                     " metadata.labels." +"\"appengine.googleapis.com/version_id\"="
+                     +currVersion;
+
+    String timeOrder;
+    boolean ascTimeOrder=myAppEngineLogToolWindowView.getTimeOrder();
+    if(ascTimeOrder) {
+      timeOrder= "metadata.timestamp asc";
+    }else{
+      timeOrder = "metadata.timestamp desc";
+    }
+    if(currPage<=0){ //means we need to get hte first page:
+      return getLogs();
+    }else{
+      try {
+        String pageToken = pageTokens.get(currPage-1);
+        logResp= myLogging.projects().logEntries().list("projects/" + currentAppID)
+          .setFilter(filters).setPageToken(pageToken).setOrderBy(timeOrder).setPageSize(50).execute();
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    return logResp;
+
+  }
 }

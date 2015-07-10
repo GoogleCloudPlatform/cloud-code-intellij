@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
  * Refresh Button to refresh the logs
  * Created by amulyau on 5/29/15.
  */
-public class RefreshButtonAction extends AnAction {
+public class RefreshButtonAction extends AnAction{
 
   /**Controller for App Engine Logs*/
   AppEngineLogging controller;
@@ -37,12 +37,11 @@ public class RefreshButtonAction extends AnAction {
    */
   public RefreshButtonAction(AppEngineLogging controller, AppEngineLogToolWindowView view) {
 
-    super("Refresh", "Refresh the App Engine Logs", AppEngineLogging.REFRESH_BUTTON_ICON);
+    super("Refresh", "Refresh the App Engine Logs", AppEngineIcons.REFRESH_BUTTON_ICON);
     this.controller = controller;
     this.view = view;
 
   }
-
 
   /**
    * Refreshes the logs as long as a project is selected (implies module and version are also set)
@@ -52,8 +51,13 @@ public class RefreshButtonAction extends AnAction {
   public void actionPerformed(AnActionEvent e){
 
     if(view.getCurrProject()!=null) {
-
+      String currModule = view.getCurrModule();
+      String currVersion = view.getCurrVersion();
+      view.setModulesList(controller.getModulesList());
+      view.setVersionsList(controller.getVersionsList());
       view.setLogs(controller.getLogs());
+      view.setCurrModuleToModuleComboBox(currModule);
+      view.setCurrVersionToVersionComboBox(currVersion);
     }
   }
 
@@ -67,5 +71,7 @@ public class RefreshButtonAction extends AnAction {
 
     e.getPresentation().setEnabled(true);
   }
+
+
 
 }
