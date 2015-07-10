@@ -6,7 +6,7 @@
   <id>com.google.gct.core</id>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="141.1532"/>
+  <idea-version since-build="107.105"/>
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
@@ -29,18 +29,6 @@
   <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
      <projectResolve implementation="com.google.gct.idea.appengine.gradle.project.AppEngineGradleProjectResolver"/>
   </extensions>
-
-
-     <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
-      <toolWindow id="App Engine Logs" anchor="bottom"
-                  factoryClass="com.google.gct.idea.cloudlogging.AppEngineLogging" conditionClass="com.google.gct.idea.cloudlogging.AppEngineLogging" icon="/icons/cloudPlatform.png">
-
-      </toolWindow>
-
-  </extensions>
-
-
 
   <extensions defaultExtensionNs="com.intellij">
     <facetType implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetType"/>
