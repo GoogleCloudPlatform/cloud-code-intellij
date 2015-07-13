@@ -15,7 +15,10 @@
  */
 package com.google.gct.idea.samples;
 
-import com.android.tools.idea.wizard.*;
+import com.android.tools.idea.npw.NewProjectWizardState;
+import com.android.tools.idea.npw.WizardUtils;
+import com.android.tools.idea.wizard.dynamic.DynamicWizardStepWithHeaderAndDescription;
+import com.android.tools.idea.wizard.dynamic.ScopedStateStore;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.Disposable;
@@ -37,7 +40,7 @@ import static com.google.gct.idea.samples.SampleImportWizardPath.SAMPLE_NAME;
 import static com.google.gct.idea.samples.SampleImportWizardPath.SAMPLE_DIR;
 import static com.google.gct.idea.samples.SampleImportWizardPath.SAMPLE_KEY;
 import static com.google.gct.idea.samples.SampleImportWizardPath.SAMPLE_URL;
-import static com.android.tools.idea.wizard.ScopedStateStore.Key;
+import static com.android.tools.idea.wizard.dynamic.ScopedStateStore.Key;
 
 /**
  * SampleSetupStep is the second/final page in the Sample Import wizard that sets project/module name, location, and other project-global

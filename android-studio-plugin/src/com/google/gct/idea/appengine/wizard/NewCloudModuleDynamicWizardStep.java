@@ -17,9 +17,9 @@ package com.google.gct.idea.appengine.wizard;
 
 import com.android.tools.idea.templates.Parameter;
 import com.android.tools.idea.templates.TemplateMetadata;
-import com.android.tools.idea.wizard.ComboBoxItem;
-import com.android.tools.idea.wizard.DynamicWizardStepWithHeaderAndDescription;
-import com.android.tools.idea.wizard.ScopedStateStore.Key;
+import com.android.tools.idea.ui.ComboBoxItemWithApiTag;
+import com.android.tools.idea.wizard.dynamic.DynamicWizardStepWithHeaderAndDescription;
+import com.android.tools.idea.wizard.dynamic.ScopedStateStore.Key;
 import com.android.tools.idea.wizard.WizardConstants;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -32,7 +32,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.psi.PsiNameHelper;
 import com.intellij.ui.JBColor;
-import com.intellij.util.ui.UIUtil;
 import icons.GoogleCloudToolsIcons;
 import org.jetbrains.android.facet.AndroidFacet;
 import org.jetbrains.annotations.NonNls;
@@ -106,7 +105,7 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
   @SuppressWarnings("unchecked")
   private void initModuleTypes() {
     for (TemplateInfo template : CLOUD_TEMPLATES) {
-      myModuleTypesCombo.addItem(new ComboBoxItem(template.getFile(), template.getMetadata().getTitle(), 1, 1));
+      myModuleTypesCombo.addItem(new ComboBoxItemWithApiTag(template.getFile(), template.getMetadata().getTitle(), 1, 1));
     }
   }
 
@@ -124,7 +123,7 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
             moduleNameLabel += String.format(" (%s)", packageName);
           }
         }
-        myClientModuleCombo.addItem(new ComboBoxItem(module.getName(), moduleNameLabel, 1, 1));
+        myClientModuleCombo.addItem(new ComboBoxItemWithApiTag(module.getName(), moduleNameLabel, 1, 1));
       }
     }
   }

@@ -15,8 +15,8 @@
  */
 package com.google.gct.idea.appengine.wizard;
 
-import com.android.tools.idea.wizard.NewModuleDynamicPath;
-import com.android.tools.idea.wizard.NewModuleDynamicPathFactory;
+import com.android.tools.idea.npw.NewModuleDynamicPath;
+import com.android.tools.idea.npw.NewModuleDynamicPathFactory;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
