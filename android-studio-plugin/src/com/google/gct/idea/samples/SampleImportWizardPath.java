@@ -17,7 +17,8 @@ package com.google.gct.idea.samples;
 
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.android.tools.idea.stats.UsageTracker;
-import com.android.tools.idea.wizard.*;
+import com.android.tools.idea.wizard.dynamic.DynamicWizardPath;
+import com.android.tools.idea.wizard.dynamic.ScopedStateStore;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.google.common.base.Strings;
@@ -39,8 +40,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static com.android.tools.idea.wizard.ScopedStateStore.Scope.PATH;
-import static com.android.tools.idea.wizard.ScopedStateStore.createKey;
+import static com.android.tools.idea.wizard.dynamic.ScopedStateStore.Scope.PATH;
+import static com.android.tools.idea.wizard.dynamic.ScopedStateStore.createKey;
 
 /**
  * Wizard path for importing a Sample as a Project
