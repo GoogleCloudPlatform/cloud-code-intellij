@@ -11,6 +11,7 @@
   <depends>org.jetbrains.android</depends>
   <depends>org.jetbrains.plugins.gradle</depends>
   <depends>com.google.gct.login</depends>
+  <depends>com.google.gct.core</depends>
   <depends>Git4Idea</depends>
 
   <extensions defaultExtensionNs="org.jetbrains.android">
