@@ -152,8 +152,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     myProcess.addListener(this);
 
     // This is the  click handler that does one of three things:
-    // 1. Double click on a final snapshot will load the debugger with that snapshot
-    // 2. Double click on a pending snapshot will show the line of code
+    // 1. Single click on a final snapshot will load the debugger with that snapshot
+    // 2. Single click on a pending snapshot will show the line of code
     // 3. Single click on "More" will show the breakpoint config dialog.
     myTable.addMouseListener(new MouseAdapter() {
       @Override
@@ -162,7 +162,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         Point p = me.getPoint();
         Breakpoint breakpoint = getBreakPoint(p);
         int col = table.columnAtPoint(p);
-        if (me.getClickCount() == 2 && breakpoint != null) {
+        if (me.getClickCount() == 1 && breakpoint != null && myTable.getSelectedRows().length == 1) {
           myProcess.navigateToSnapshot(breakpoint.getId());
         }
         else if (breakpoint != null && col == 4 && supportsMoreConfig(breakpoint)) {
