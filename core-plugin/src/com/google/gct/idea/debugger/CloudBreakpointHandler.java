@@ -92,7 +92,12 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
         continue;
       }
 
-      final VirtualFile file = JavaUtil.getFileFromCloudPath(currentProject, serverBreakpoint.getLocation().getPath());
+      String path = serverBreakpoint.getLocation().getPath();
+      if (Strings.isNullOrEmpty(path)) {
+        continue;
+      }
+
+      final VirtualFile file = JavaUtil.getFileFromCloudPath(currentProject, path);
       final int line = serverBreakpoint.getLocation().getLine() - 1;
       if (file == null) {
         LOG.warn("attempted to clone a breakpoint whose file doesn't exist locally: " +
@@ -151,7 +156,12 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
         continue;
       }
 
-      final VirtualFile file = JavaUtil.getFileFromCloudPath(currentProject, serverBreakpoint.getLocation().getPath());
+      String path = serverBreakpoint.getLocation().getPath();
+      if (Strings.isNullOrEmpty(path)) {
+        continue;
+      }
+
+      final VirtualFile file = JavaUtil.getFileFromCloudPath(currentProject, path);
       final int line = serverBreakpoint.getLocation().getLine() - 1;
       if (file == null) {
         continue;
