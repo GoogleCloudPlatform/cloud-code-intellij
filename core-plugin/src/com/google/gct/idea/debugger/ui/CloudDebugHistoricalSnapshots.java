@@ -162,7 +162,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         Point p = me.getPoint();
         Breakpoint breakpoint = getBreakPoint(p);
         int col = table.columnAtPoint(p);
-        if (me.getClickCount() == 2 && breakpoint != null) {
+        if (me.getClickCount() == 1 && breakpoint != null && myTable.getSelectedRows().length == 1) {
           myProcess.navigateToSnapshot(breakpoint.getId());
         }
         else if (breakpoint != null && col == 4 && supportsMoreConfig(breakpoint)) {
