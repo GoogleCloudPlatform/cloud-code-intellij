@@ -49,7 +49,7 @@ public class CloudDebugProcessStateController {
     new ArrayList<CloudBreakpointListener>();
   private final ConcurrentHashMap<String, Breakpoint> myFullFinalBreakpoints =
     new ConcurrentHashMap<String, Breakpoint>();
-  private Timer myListBreakpointsJob;
+  private volatile Timer myListBreakpointsJob;
   private CloudDebugProcessState myState;
 
   protected CloudDebugProcessStateController() {
@@ -273,6 +273,10 @@ public class CloudDebugProcessStateController {
     myListBreakpointsJob = null;
   }
 
+  boolean isBackgroundListening() {
+    return myListBreakpointsJob != null;
+  }
+
   /**
    * Package protected for test purposes only.
    */
@@ -318,6 +322,10 @@ public class CloudDebugProcessStateController {
       return;
     }
 
+    if (!isBackgroundListening()) {
+      return;
+    }
+
     //tokenToSend can be null on first initialization -- where we shouldn't fire events or need
     // to do pruning.
     if (!Strings.isNullOrEmpty(tokenToSend)) {
@@ -326,7 +334,7 @@ public class CloudDebugProcessStateController {
     }
   }
 
-  private static List<Breakpoint> queryServerForBreakpoints(CloudDebugProcessState state,
+  private List<Breakpoint> queryServerForBreakpoints(CloudDebugProcessState state,
                                                             Debugger client,
                                                             String tokenToSend) throws IOException {
     List<Breakpoint> currentList = null;
@@ -334,11 +342,23 @@ public class CloudDebugProcessStateController {
     String responseWaitToken = tokenToSend;
 
     while(tokenToSend == null || tokenToSend.equals(responseWaitToken)) {
+      if (tokenToSend != null && !isBackgroundListening()) {
+        return null;
+      }
+
       ListBreakpointsResponse response =
           client.debuggees().breakpoints().list(state.getDebuggeeId())
               .setIncludeInactive(Boolean.TRUE).setAction("CAPTURE")
               .setStripResults(Boolean.TRUE)
               .setWaitToken(CloudDebugConfigType.useWaitToken() ? tokenToSend : null).execute();
+
+      //We are running on a background thread and the cancel can happen any time triggered
+      //on the ui thread from the user.  We want to short circuit immediately and not change
+      //any state.  If we processed this result, it could incorrectly update the state and mess
+      //up the background watcher.
+      if (tokenToSend != null && !isBackgroundListening()) {
+        return null;
+      }
 
       currentList = response.getBreakpoints();
       responseWaitToken = response.getWaitToken();
