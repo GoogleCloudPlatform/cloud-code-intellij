@@ -122,7 +122,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
                          GoogleCloudToolsIcons.CLOUD, null);
         layout.addContent(snapshots, 0, PlaceInGrid.left, false);
 
-        layout.getDefaults().initFocusContent(DebuggerContentInfo.FRAME_CONTENT, LayoutViewOptions.STARTUP,
+        layout.getDefaults().initFocusContent(timeline.getTabTitle(), LayoutViewOptions.STARTUP,
                                               new LayoutAttractionPolicy.FocusOnce(false));
       }
     };

@@ -23,15 +23,22 @@ import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.runners.DefaultProgramRunner;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.execution.ui.RunnerLayoutUi;
+import com.intellij.execution.ui.layout.impl.RunnerContentUi;
+import com.intellij.openapi.actionSystem.DataProvider;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
-import git4idea.DialogManager;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import git4idea.DialogManager;
 
 /**
  * The CloudDebuggerRunner shows the attach dialog, creates a cloud process representation and returns a content
@@ -109,6 +116,24 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
           return process;
         }
       });
+
+    RunnerLayoutUi ui = debugSession.getUI();
+    if (ui instanceof DataProvider) {
+      final RunnerContentUi contentUi = (RunnerContentUi) ((DataProvider) ui)
+          .getData(RunnerContentUi.KEY.getName());
+      final Project project = debugSession.getProject();
+
+      if (contentUi != null) {
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            if (project.isOpen() && !project.isDisposed())
+              contentUi.restoreLayout();
+          }
+        });
+      }
+    }
+
     return debugSession.getRunContentDescriptor();
   }
 }

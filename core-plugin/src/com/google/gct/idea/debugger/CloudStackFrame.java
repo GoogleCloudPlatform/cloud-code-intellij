@@ -50,9 +50,15 @@ public class CloudStackFrame extends XStackFrame {
     myFrame = frame;
     myVariableTable = variableTable;
     myEvaluatedExpressions = evaluatedExpressions;
-    JavaUtil.initializeLocations(project, false);
-    VirtualFile file = JavaUtil.getFileFromCloudPath(project, frame.getLocation().getPath());
-    myXSourcePosition = XDebuggerUtil.getInstance().createPosition(file, frame.getLocation().getLine() - 1);
+    String path = frame.getLocation().getPath();
+    if (!Strings.isNullOrEmpty(path)) {
+      JavaUtil.initializeLocations(project, false);
+      VirtualFile file = JavaUtil.getFileFromCloudPath(project, frame.getLocation().getPath());
+      myXSourcePosition = XDebuggerUtil.getInstance().createPosition(file, frame.getLocation().getLine() - 1);
+    }
+    else {
+      myXSourcePosition = null;
+    }
   }
 
   @Override
