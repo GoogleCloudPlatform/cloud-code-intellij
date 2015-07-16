@@ -74,21 +74,10 @@ import java.util.List;
 public class BreakpointConfigurationPanel
   extends XBreakpointCustomPropertiesPanel<XLineBreakpoint<CloudLineBreakpointProperties>>
   implements Disposable, XWatchesView {
-  private static final String CONDITION_HISTORY_ID = "breakpointCondition";
   private static final Logger LOG = Logger.getInstance(BreakpointConfigurationPanel.class);
   private final CloudLineBreakpointType myCloudLineBreakpointType;
-  private XDebuggerExpressionComboBox myConditionComboBox;
-  private JBCheckBox myConditionEnabledCheckbox;
-  private JPanel myConditionEnabledPanel;
-  private JPanel myConditionExpressionPanel;
-  private JPanel myConditionPanel;
-  private JBCheckBox myEnabledCheckbox;
-  private JBLabel myErrorDescription;
-  private JBLabel myErrorLabel;
-  private JPanel myErrorPanel;
   private JPanel myMainPanel;
   private WatchesRootNode myRootNode;
-  private JSeparator mySeparator;
   private JBCheckBox mySuspendCheckbox;
   private XDebuggerTreePanel myTreePanel;
   private JBLabel myWatchLabel;
@@ -96,18 +85,6 @@ public class BreakpointConfigurationPanel
 
   public BreakpointConfigurationPanel(@NotNull CloudLineBreakpointType cloudLineBreakpointType) {
     myCloudLineBreakpointType = cloudLineBreakpointType;
-
-    // We listen on hierarchy changed to customize the full Jetbrains supplied UI.
-    myMainPanel.addHierarchyListener(new HierarchyListener() {
-      @Override
-      public void hierarchyChanged(HierarchyEvent e) {
-        if ((e.getChangeFlags() & HierarchyEvent.PARENT_CHANGED) != 0) {
-          if (myMainPanel.getParent() == e.getChangedParent() && myMainPanel.getParent() != null) {
-            trim(myMainPanel);
-          }
-        }
-      }
-    });
 
     // We conditionally show the "custom watches" panel only if we are shown in the dialog.
     myWatchPanel.addAncestorListener(new AncestorListener() {
@@ -203,41 +180,6 @@ public class BreakpointConfigurationPanel
                                                      SystemInfo.isMac ? 0 : 1, 0);
       decorator.setToolbarBorder(border);
       myWatchPanel.add(decorator.createPanel(), BorderLayout.CENTER);
-
-      myConditionEnabledCheckbox = new JBCheckBox(XDebuggerBundle.message("xbreakpoints.condition.checkbox"));
-      myConditionEnabledPanel.add(myConditionEnabledCheckbox, BorderLayout.CENTER);
-      myConditionComboBox =
-        new XDebuggerExpressionComboBox(cloudBreakpoint.getProject(), debuggerEditorsProvider, CONDITION_HISTORY_ID,
-                                        breakpoint.getSourcePosition());
-      JComponent conditionComponent = myConditionComboBox.getComponent();
-      myConditionExpressionPanel.add(conditionComponent, BorderLayout.CENTER);
-      myConditionEnabledCheckbox.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          onCheckboxChanged();
-        }
-      });
-      DebuggerUIUtil.focusEditorOnCheck(myConditionEnabledCheckbox, myConditionComboBox.getEditorComponent());
-    }
-    else {
-      myConditionPanel.setVisible(false);
-    }
-
-    if (myConditionComboBox != null) {
-      XExpression condition = lineBreakpointImpl.getConditionExpressionInt();
-      myConditionComboBox.setExpression(condition);
-      myConditionEnabledCheckbox.setSelected(lineBreakpointImpl.isConditionEnabled() && condition != null);
-
-      onCheckboxChanged();
-    }
-
-    myEnabledCheckbox.setSelected(breakpoint.isEnabled());
-    myEnabledCheckbox.setText(XBreakpointUtil.getShortText(breakpoint) + " enabled");
-
-    myErrorPanel.setVisible(cloudBreakpoint.hasError());
-    if (cloudBreakpoint.hasError()) {
-      myErrorLabel.setForeground(JBColor.RED);
-      myErrorDescription.setText(cloudBreakpoint.getErrorMessage());
     }
   }
 
@@ -282,25 +224,8 @@ public class BreakpointConfigurationPanel
 
     XBreakpointBase lineBreakpointImpl =
       xIdebreakpoint instanceof XBreakpointBase ? (XBreakpointBase)xIdebreakpoint : null;
-    if (myConditionComboBox != null && lineBreakpointImpl != null) {
-      XExpression expression = myConditionComboBox.getExpression();
-      XExpression condition = !XDebuggerUtilImpl.isEmptyExpression(expression) ? expression : null;
-      lineBreakpointImpl.setConditionEnabled(condition == null || myConditionEnabledCheckbox.isSelected());
-      lineBreakpointImpl.setConditionExpression(condition);
-      myConditionComboBox.saveTextInHistory();
-    }
 
-    if (xIdebreakpoint.isEnabled() != myEnabledCheckbox.isSelected()) {
-      // We should talk to JB as to why we need to invoke later here.
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          xIdebreakpoint.setEnabled(myEnabledCheckbox.isSelected());
-        }
-      });
-    }
-
-    if (myRootNode != null && lineBreakpointImpl != null) {
+     if (myRootNode != null && lineBreakpointImpl != null) {
       List<String> expressionsToSave = new ArrayList<String>();
       for (WatchNode node : myRootNode.getAllChildren()) {
         expressionsToSave.add(node.getExpression().getExpression());
@@ -322,23 +247,7 @@ public class BreakpointConfigurationPanel
     return null;
   }
 
-  // TODO: we currently make JB supplied UI not visible, but this should be done through a proper
-  // extensibility mechanism.
-  private static void trim(@NotNull Component onlyValidChild) {
-    Container container = onlyValidChild.getParent();
-    if (container != null) {
-      Component[] children = container.getComponents();
-      for (Component child : children) {
-        if (child != onlyValidChild) {
-          child.setVisible(false);
-        }
-      }
-      trim(container);
-    }
-  }
-
   private void createUIComponents() {
-    mySeparator = new JSeparator(SwingConstants.HORIZONTAL);
     myWatchPanel = new MyPanel();
   }
 
@@ -353,12 +262,6 @@ public class BreakpointConfigurationPanel
     AnActionEvent actionEvent =
       new AnActionEvent(null, context, ActionPlaces.DEBUGGER_TOOLBAR, presentation, ActionManager.getInstance(), 0);
     action.actionPerformed(actionEvent);
-  }
-
-  private void onCheckboxChanged() {
-    if (myConditionComboBox != null) {
-      myConditionComboBox.setEnabled(myConditionEnabledCheckbox.isSelected());
-    }
   }
 
   /**

@@ -17,6 +17,7 @@ package com.google.gct.idea.debugger.ui;
 
 import com.google.api.services.debugger.Debugger;
 import com.google.api.services.debugger.model.Debuggee;
+import com.google.api.services.debugger.model.DebuggeeLabelsEntry;
 import com.google.api.services.debugger.model.ListDebuggeesResponse;
 import com.google.common.base.Strings;
 import com.google.gct.idea.debugger.CloudDebugProcessState;
@@ -39,6 +40,8 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.util.containers.HashMap;
+
 import git4idea.actions.BasicAction;
 import git4idea.branch.GitBrancher;
 import git4idea.commands.GitCommand;
@@ -61,6 +64,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * CloudAttachDialog shows a dialog allowing the user to select a module and debug.
@@ -441,8 +445,24 @@ public class CloudAttachDialog extends DialogWrapper {
               .execute();
 
           if (debuggees != null && debuggees.getDebuggees() != null) {
+            Map<String, DebugTarget> perModuleCache = new HashMap<String, DebugTarget>();
+
             for (Debuggee debuggee : debuggees.getDebuggees()) {
               DebugTarget item = new DebugTarget(debuggee, myElysiumProjectId.getText());
+              if (!Strings.isNullOrEmpty(item.getModule()) &&
+                  !Strings.isNullOrEmpty(item.getVersion())) {
+                //If we already have an existing item for that module+version, compare the minor
+                // versions and only use the latest minor version.
+                String key = String.format("%s:%s",item.getModule(), item.getVersion());
+                DebugTarget existing = perModuleCache.get(key);
+                if (existing != null && existing.getMinorVersion() > item.getMinorVersion()) {
+                  continue;
+                }
+                if (existing != null) {
+                  myDebugeeTarget.removeItem(existing);
+                }
+                perModuleCache.put(key, item);
+              }
               if (myInputState != null && !Strings.isNullOrEmpty(myInputState.getDebuggeeId())) {
                 assert myInputState.getDebuggeeId() != null;
                 if (myInputState.getDebuggeeId().equals(item.getId())) {
@@ -463,16 +483,70 @@ public class CloudAttachDialog extends DialogWrapper {
     }
 
     public static class DebugTarget {
+      private static final String MODULE = "module";
+
       private final Debuggee myDebuggee;
       private String myDescription;
+      private long myMinorVersion = 0;
+      private String myModule;
+      private String myVersion;
 
       public DebugTarget(@NotNull Debuggee debuggee, @NotNull String projectName) {
         myDebuggee = debuggee;
-        myDescription = myDebuggee.getDescription();
-        if (myDescription != null &&
-            !Strings.isNullOrEmpty(projectName) &&
-            myDescription.startsWith(projectName + "-")) {
-          myDescription = myDescription.substring(projectName.length() + 1);
+        if (myDebuggee.getLabels() != null) {
+          myDescription = "";
+          myModule = "";
+          myVersion = "";
+          String minorVersion = "";
+
+          //Get the module name, major version and minor version strings.
+          for (DebuggeeLabelsEntry entry : myDebuggee.getLabels()) {
+            if (entry.getKey().equalsIgnoreCase(MODULE)) {
+              myModule = entry.getValue();
+            }
+            else if (entry.getKey().equalsIgnoreCase("minorversion")) {
+              minorVersion = entry.getValue();
+            }
+            else if (entry.getKey().equalsIgnoreCase("version")) {
+              myVersion = entry.getValue();
+            }
+            else {
+              //This is fallback logic where we dump the labels verbatim if they
+              //change from underneath us.
+              myDescription += String.format("%s:%s", entry.getKey(),entry.getValue());
+            }
+          }
+
+          //Build a description from the strings.
+          if (!Strings.isNullOrEmpty(myModule)) {
+            myDescription = GctBundle.getString("cloud.debug.version.with.module.format",
+                myModule, myVersion);
+          }
+          else if (!Strings.isNullOrEmpty(myVersion)) {
+            myDescription = GctBundle.getString("cloud.debug.versionformat", myVersion);
+          }
+
+          //Record the minor version.  We only show the latest minor version.
+          try {
+            if (!Strings.isNullOrEmpty(minorVersion)) {
+              myMinorVersion = Long.parseLong(minorVersion);
+            }
+          }
+          catch(NumberFormatException ex) {
+            LOG.warn("unable to parse minor version: " + minorVersion);
+          }
+        }
+
+        //Finally if nothing worked (maybe labels aren't enabled?), we fall
+        //back to the old logic of using description with the project name stripped out.
+        if (Strings.isNullOrEmpty(myDescription))
+        {
+          myDescription = myDebuggee.getDescription();
+          if (myDescription != null &&
+              !Strings.isNullOrEmpty(projectName) &&
+              myDescription.startsWith(projectName + "-")) {
+            myDescription = myDescription.substring(projectName.length() + 1);
+          }
         }
       }
 
@@ -483,6 +557,18 @@ public class CloudAttachDialog extends DialogWrapper {
       @Override
       public String toString() {
         return myDescription;
+      }
+
+      public long getMinorVersion() {
+        return myMinorVersion;
+      }
+
+      public String getModule() {
+        return myModule;
+      }
+
+      public String getVersion() {
+        return myVersion;
       }
     }
   }

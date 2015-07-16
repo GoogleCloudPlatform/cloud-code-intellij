@@ -17,6 +17,7 @@ package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.gct.idea.debugger.ui.BreakpointConfigurationPanel;
+import com.google.gct.idea.debugger.ui.BreakpointErrorStatusPanel;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.debugger.engine.DebuggerUtils;
 import com.intellij.debugger.ui.breakpoints.Breakpoint;
@@ -48,6 +49,7 @@ import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
 
 import javax.swing.*;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -135,6 +137,11 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     return result.get() == getClass();
   }
 
+  @Override
+  public EnumSet<StandardPanels> getVisibleStandardPanels() {
+    return EnumSet.noneOf(StandardPanels.class);
+  }
+
   @Nullable
   @Override
   public CloudLineBreakpointProperties createBreakpointProperties(@NotNull VirtualFile file, int line) {
@@ -147,6 +154,14 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     () {
     return new BreakpointConfigurationPanel(this);
   }
+
+  @Override
+  @Nullable
+  public XBreakpointCustomPropertiesPanel<XLineBreakpoint<CloudLineBreakpointProperties>> createCustomTopPropertiesPanel
+      (@NotNull Project project) {
+    return new BreakpointErrorStatusPanel();
+  }
+
 
   @NotNull
   @Override
