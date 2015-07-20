@@ -162,12 +162,12 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         Point p = me.getPoint();
         Breakpoint breakpoint = getBreakPoint(p);
         int col = table.columnAtPoint(p);
-        if (me.getClickCount() == 1 && breakpoint != null && myTable.getSelectedRows().length == 1) {
-          myProcess.navigateToSnapshot(breakpoint.getId());
-        }
-        else if (breakpoint != null && col == 4 && supportsMoreConfig(breakpoint)) {
+        if (breakpoint != null && col == 4 && supportsMoreConfig(breakpoint)) {
           BreakpointsDialogFactory.getInstance(myProcess.getXDebugSession().getProject())
             .showDialog(myProcess.getBreakpointHandler().getXBreakpoint(breakpoint));
+        }
+        else if (me.getClickCount() == 1 && breakpoint != null && myTable.getSelectedRows().length == 1) {
+          myProcess.navigateToSnapshot(breakpoint.getId());
         }
       }
     });

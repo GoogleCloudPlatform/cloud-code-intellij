@@ -76,7 +76,7 @@ public class CloudDebugProcessStateController {
     final Debugger client = CloudDebuggerClient.getCloudDebuggerClient(myState);
     if (client == null) {
       LOG.warn("no client available attempting to setBreakpoint");
-      Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad_login_message"),
+      Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
                                GctBundle.getString("clouddebug.errortitle"));
       return;
     }
@@ -131,7 +131,7 @@ public class CloudDebugProcessStateController {
     final Debugger client = CloudDebuggerClient.getCloudDebuggerClient(myState);
     if (client == null) {
       LOG.warn("no client available attempting to resolveBreakpointAsync");
-      Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad_login_message"),
+      Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
                                GctBundle.getString("clouddebug.errortitle"));
       return null;
     }
@@ -170,7 +170,7 @@ public class CloudDebugProcessStateController {
             }
           }
           catch (IOException e) {
-            LOG.error("IOException hydrating a final snapshot ", e);
+            LOG.warn("IOException hydrating a snapshot.  User may have deleted the snapshot", e);
             future.setException(e);
           }
         }
@@ -196,7 +196,7 @@ public class CloudDebugProcessStateController {
     final Debugger client = CloudDebuggerClient.getCloudDebuggerClient(myState);
     if (client == null) {
       LOG.warn("no client available attempting to setBreakpoint");
-      Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad_login_message"),
+      Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
                                GctBundle.getString("clouddebug.errortitle"));
       return null;
     }

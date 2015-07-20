@@ -160,9 +160,11 @@ public class CloudStackFrame extends XStackFrame {
 
     @Override
     public void computePresentation(@NotNull XValueNode node, @NotNull XValuePlace place) {
-      String value = myVariable.getValue();
+      String status = BreakpointUtil.getUserMessage(myVariable.getStatus());
+      String value = !Strings.isNullOrEmpty(status) ?
+          String.format("%s (%s)", myVariable.getValue(), status) : myVariable.getValue();
       node.setPresentation(null, myMembers != null && myMembers.size() > 0 ? "..." : null, value != null ? value : "",
-                           myMembers != null && myMembers.size() > 0);
+          myMembers != null && myMembers.size() > 0);
     }
 
     @Override

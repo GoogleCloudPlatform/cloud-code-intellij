@@ -32,8 +32,15 @@ public class BreakpointUtil {
     if (statusMessage == null || statusMessage.getIsError() != Boolean.TRUE) {
       return null;
     }
-    String errorDescription = GctBundle.getString("clouddebug.fallbackerrormessage");
-    if (statusMessage.getDescription() != null) {
+
+    String errorDescription = getUserMessage(statusMessage);
+    return !Strings.isNullOrEmpty(errorDescription) ? errorDescription
+        : GctBundle.getString("clouddebug.fallbackerrormessage");
+  }
+
+  @Nullable
+  public static String getUserMessage(@Nullable StatusMessage statusMessage) {
+    if (statusMessage != null && statusMessage.getDescription() != null) {
       String formatString = statusMessage.getDescription().getFormat();
       Integer i = 0;
       // Parameters in the server version are encoded script style with '$'.
@@ -43,11 +50,8 @@ public class BreakpointUtil {
         i++;
         argString = "$" + i.toString();
       }
-      errorDescription = String.format(formatString, statusMessage.getDescription().getParameters());
+      return String.format(formatString, statusMessage.getDescription().getParameters());
     }
-    if (!Strings.isNullOrEmpty(statusMessage.getRefersTo())) {
-      errorDescription += " in " + statusMessage.getRefersTo();
-    }
-    return errorDescription;
+    return null;
   }
 }
