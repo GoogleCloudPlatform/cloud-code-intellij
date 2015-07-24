@@ -15,8 +15,8 @@
  */
 package com.google.gct.idea.debugger;
 
-import com.google.api.services.debugger.Debugger;
-import com.google.api.services.debugger.model.*;
+import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.model.*;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
 import com.google.gct.login.MockGoogleLogin;
@@ -35,6 +35,8 @@ import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -71,7 +73,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
 
   private static Breakpoint createBreakpoint(String id,
                                              Boolean isFinal,
-                                             long finalTimeSeconds,
+                                             int finalTimeSeconds,
                                              String locationPath,
                                              Integer locationLine,
                                              Boolean isError,
@@ -80,9 +82,9 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     result.setId(id);
     result.setIsFinalState(isFinal);
     if (isFinal == Boolean.TRUE) {
-      Timestamp finalTime = new Timestamp();
-      finalTime.setSeconds(finalTimeSeconds);
-      result.setFinalTime(finalTime);
+      Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
+      calendar.add(Calendar.SECOND, finalTimeSeconds);
+      result.setFinalTime(BreakpointUtil.ISO8601_DATE_FORMAT.format(calendar.getTime()));
     }
     SourceLocation location = new SourceLocation();
     location.setPath(locationPath);
@@ -222,7 +224,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     when(debuggees.breakpoints()).thenReturn(breakpoints);
     when(breakpoints.list(DEBUGEE_ID)).thenReturn(list);
     when(list.setIncludeInactive(Boolean.TRUE)).thenReturn(list);
-    when(list.setAction("CAPTURE")).thenReturn(list);
+    when(list.setActionValue("CAPTURE")).thenReturn(list);
     when(list.setStripResults(Boolean.TRUE)).thenReturn(list);
     when(list.setWaitToken(null)).thenReturn(list);
     when(list.execute()).thenAnswer(new Answer<Object>() {

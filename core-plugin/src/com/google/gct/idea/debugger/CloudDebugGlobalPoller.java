@@ -16,9 +16,9 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.debugger.Debugger;
-import com.google.api.services.debugger.model.Breakpoint;
-import com.google.api.services.debugger.model.ListBreakpointsResponse;
+import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.model.ListBreakpointsResponse;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunProfile;
@@ -113,10 +113,10 @@ public class CloudDebugGlobalPoller {
   private static void queryServerForBreakpoints(CloudDebugProcessState state, Debugger client) throws IOException {
     List<Breakpoint> currentList;
     ListBreakpointsResponse response =
-      client.debuggees().breakpoints().list(state.getDebuggeeId()).setIncludeInactive(Boolean.TRUE).setAction("CAPTURE")
-        .setStripResults(Boolean.TRUE).setWaitToken(null).execute();
+      client.debuggees().breakpoints().list(state.getDebuggeeId()).setIncludeInactive(Boolean.TRUE)
+          .setActionValue("CAPTURE").setStripResults(Boolean.TRUE).setWaitToken(null).execute();
     currentList = response.getBreakpoints();
-    String responseWaitToken = response.getWaitToken();
+    String responseWaitToken = response.getNextWaitToken();
     state.setWaitToken(responseWaitToken);
 
     if (currentList != null) {

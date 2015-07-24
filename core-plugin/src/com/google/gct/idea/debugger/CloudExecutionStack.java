@@ -15,8 +15,8 @@
  */
 package com.google.gct.idea.debugger;
 
-import com.google.api.services.debugger.model.StackFrame;
-import com.google.api.services.debugger.model.Variable;
+import com.google.api.services.clouddebugger.model.StackFrame;
+import com.google.api.services.clouddebugger.model.Variable;
 import com.intellij.openapi.project.Project;
 import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XStackFrame;

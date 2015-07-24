@@ -23,7 +23,8 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.debugger.Debugger;
+import com.google.api.services.clouddebugger.Clouddebugger.Builder;
+import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
 import com.google.gct.login.GoogleLoginUtils;
@@ -44,7 +45,7 @@ public class CloudDebuggerClient {
   private static final int CONNECTION_TIMEOUT_MS = 120 * 1000;
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final Logger LOG = Logger.getInstance(CloudDebuggerClient.class);
-  private static final String ROOT_URL = "https://www.googleapis.com";
+  private static final String ROOT_URL = "https://clouddebugger.googleapis.com";
   private static final ConcurrentHashMap<String, Debugger> myDebuggerClientsFromUserEmail =
     new ConcurrentHashMap<String, Debugger>();
 
@@ -96,8 +97,8 @@ public class CloudDebuggerClient {
           };
 
           HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-          cloudDebuggerClient = new Debugger.Builder(httpTransport, JSON_FACTORY, initializer).setRootUrl(ROOT_URL)
-            .setApplicationName(GoogleLoginUtils.getCurrentPlatformName()).build();
+          cloudDebuggerClient = new Builder(httpTransport, JSON_FACTORY, initializer).setRootUrl(ROOT_URL)
+            .setApplicationName(GoogleLoginUtils.getCurrentPlatformName()).build().debugger();
         }
       }
       catch (IOException ex) {
