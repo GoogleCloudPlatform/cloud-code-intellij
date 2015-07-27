@@ -19,12 +19,22 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
+ * Each Node in the JTree is a Text Area Node
  * Created by amulyau on 6/23/15.
  */
-public class TextAreaNode extends DefaultMutableTreeNode{
-  String text;
-  Icon icon;
+public class TextAreaNode extends DefaultMutableTreeNode {
 
+  /**Text for the tree node*/
+  private final String text;
+  /**Icon for the tree node*/
+  private final Icon icon;
+
+  /**
+   * Constructor
+   * @param text Text to go in the tree node
+   * @param bool boolean value on whether it allows children or not
+   * @param severityIcon icon that represents the log level
+   */
   public TextAreaNode(String text, boolean bool, Icon severityIcon) {
 
     this.setAllowsChildren(bool);
@@ -32,8 +42,22 @@ public class TextAreaNode extends DefaultMutableTreeNode{
     this.icon = severityIcon;
   }
 
-  public String getText(){
+  /**
+   * Gets the Text of the Tree node
+   * @return String text
+   */
+  public String getText() {
 
     return text;
   }
+
+  /**
+   * Gets the Icon of the Tree Node
+   * @return Icon that represents the log level of the tree node.
+   */
+  public Icon getIcon() {
+
+    return icon;
+  }
+
 }

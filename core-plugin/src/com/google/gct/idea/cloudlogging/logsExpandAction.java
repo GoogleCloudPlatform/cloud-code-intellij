@@ -15,38 +15,48 @@
  */
 package com.google.gct.idea.cloudlogging;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 
 /**
+ * Left Side tool bar toggle button action that controls expanding/collapsing all logs.
  * Created by amulyau on 6/30/15.
  */
 public class logsExpandAction extends ToggleAction {
 
-  AppEngineLogToolWindowView view;
-  public logsExpandAction(AppEngineLogToolWindowView view){
-    super("Expand","Expand Logs",AppEngineIcons.EXPAND_TOGGLE_ICON);
-    this.view = view;
+  /**View that holds all the components of tool window*/
+  private AppEngineLogToolWindowView view;
 
+  /**Empty constructor */
+  public logsExpandAction() {}
+
+  /**
+   * Constructor for the logs expansion action
+   * @param view View that holds all components
+   */
+  public logsExpandAction(AppEngineLogToolWindowView view) {
+
+    super("Expand","Expand Logs", AllIcons.Actions.Expandall);
+    this.view = view;
   }
 
   @Override
   public boolean isSelected(AnActionEvent e) {
+
     return view.getLogsExpanded();
   }
 
   @Override
   public void setSelected(AnActionEvent e, boolean state) {
-    if(state==true){ //if selected, expand logs
+
+    if (state) { //if selected, expand logs
       view.changeLogsExpandState(true);
       view.expandLogs();
-    }else{
+    } else {
       view.changeLogsExpandState(false);
       view.collapseLogs();
     }
-
   }
-
-
 
 }

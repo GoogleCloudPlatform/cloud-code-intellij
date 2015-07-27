@@ -27,9 +27,11 @@ public final class GoogleCloudToolsIcons {
   private static final int STEPS_COUNT = 12;
 
   public static final Icon APP_ENGINE = load("/icons/appEngine.png"); // 16x16
+  public static final Icon ASCENDING_LOGS = load("/icons/AnalogClock.png");
   public static final Icon CLOUD_60x60 = load("/icons/cloudPlatform_60x60.png");
-  public static final Icon CLOUD= load("/icons/cloudPlatform.png");
+  public static final Icon CLOUD = load("/icons/cloudPlatform.png");
   public static final Icon CLOUD_MODULE = load("/icons/google_cloud_module.png");
+  public static final Icon CLOUD_TOOL_WINDOW = load("/icons/cloudPlatformToolWindow.png");
   public static final Icon REFRESH = load("/icons/refresh.png");
   public static final Icon[] STEP_ICONS = findStepIcons("/icons/step_");
   public static final Icon ENDPOINTS_CARD = load("/icons/background_endpoints.png");
@@ -43,6 +45,19 @@ public final class GoogleCloudToolsIcons {
   public static final Icon CLOUD_DEBUG_SAVE_EXIT = load("/icons/debugsaveexit.png");
   public static final Icon CLOUD_DEBUG_REACTIVATE_BREAKPOINT = load("/icons/debugreactivatebreakpoint.png");
   public static final Icon CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS = load("/icons/debugdeleteall.png");
+  public static final Icon CRITICAL_LOG_ICON = load("/icons/critical.png");
+  public static final Icon ERROR_LOG_ICON = load("/icons/error.png");
+  public static final Icon DISABLED_ERROR_LOG_ICON = load("/icons/disabledError.png");
+  public static final Icon WARNING_LOG_ICON = load ("/icons/warning.png");
+  public static final Icon DISABLED_WARNING_LOG_ICON = load ("/icons/disabledWarning.png");
+  public static final Icon INFO_LOG_ICON = load("/icons/info.png");
+  public static final Icon DISABLED_INFO_LOG_ICON = load("/icons/disabledInfo.png");
+  public static final Icon DEBUG_LOG_ICON = load("/icons/debug.png");
+  public static final Icon DISABLED_DEBUG_LOG_ICON = load("/icons/disabledDebug.png");
+  public static final Icon ANY_LOG_ICON = load("/icons/anyLogLevel.png");
+  public static final Icon DISABLED_ANY_LOG_ICON = load("/icons/disabledAnyLogLevel.png");
+
+
 
   private static Icon load(String path) {
     return IconLoader.getIcon(path, GoogleCloudToolsIcons.class);

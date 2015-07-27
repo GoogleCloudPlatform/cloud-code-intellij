@@ -15,11 +15,16 @@
  */
 package com.google.gct.idea.cloudlogging;
 
+import com.google.api.client.util.ArrayMap;
 import com.google.api.services.logging.model.LogEntry;
 
-import javax.swing.*;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
+
+import javax.swing.*;
+
+import icons.GoogleCloudToolsIcons;
 
 /**
  * This class is solely for making it easier to print the logs in tree form.
@@ -30,14 +35,25 @@ public class LogTreeEntry {
 
   /**Contains the log Info*/
   private String logInfo;
-
   /**Actual Message that is to be used as child for logInfo*/
   private String logMessage;
+  /**children nodes based on the log lines*/
+  private ArrayList<LogTreeEntry> children;
+  /**Icon each log message has for what level of log it is*/
+  private Icon severity;
 
   /**
-   * Icon each log message has for what level of log it is
+   * Constructor used for children logs that don't have Log Info only LogMessages
+   * @param severity Severity Icon for the LogTreeEntry
+   * @param logMessage LogMessage of the children logs.
    */
-  private Icon severity;
+  public LogTreeEntry(Icon severity, String logMessage) {
+
+    this.children=null;
+    this.severity = severity;
+    this.logInfo=null;
+    this.logMessage=logMessage;
+  }
 
   /**
    * Constructor to call parse the log
@@ -45,6 +61,7 @@ public class LogTreeEntry {
    */
   public LogTreeEntry(LogEntry log) {
 
+    this.children = new ArrayList<LogTreeEntry>();
     parseLog(log);
   }
 
@@ -52,85 +69,110 @@ public class LogTreeEntry {
    * Parse the log to create the proper messages as it is online
    * @param log Log Entry to get information from for the message
    */
-  public void parseLog(LogEntry log){
+  private void parseLog(LogEntry log) {
+
     String t = "        ";
 
     String fullTimeUTC = log.getProtoPayload().get("endTime").toString();
-    String localTime = convertUTCToLocal(fullTimeUTC);
+    TimeDayChange timeDayChange = convertUTCToLocal(fullTimeUTC);
+    String localTime = timeDayChange.getTime();
+
     String year = fullTimeUTC.substring(0, 4);
     String month = fullTimeUTC.substring(5, 7);
     String  day = fullTimeUTC.substring(8, 10);
+
+    Calendar date = Calendar.getInstance();
+    date.set(Calendar.YEAR, Integer.parseInt(year));
+
+    switch (Integer.parseInt(month)) { //doing this due to Magic Constants complaint from java.
+      case 1: date.set(Calendar.MONTH, Calendar.JANUARY); break;
+      case 2: date.set(Calendar.MONTH, Calendar.FEBRUARY); break;
+      case 3: date.set(Calendar.MONTH, Calendar.MARCH); break;
+      case 4: date.set(Calendar.MONTH, Calendar.APRIL); break;
+      case 5: date.set(Calendar.MONTH, Calendar.MAY); break;
+      case 6: date.set(Calendar.MONTH, Calendar.JUNE); break;
+      case 7: date.set(Calendar.MONTH, Calendar.JULY); break;
+      case 8: date.set(Calendar.MONTH, Calendar.AUGUST); break;
+      case 9: date.set(Calendar.MONTH, Calendar.SEPTEMBER); break;
+      case 10: date.set(Calendar.MONTH, Calendar.OCTOBER); break;
+      case 11: date.set(Calendar.MONTH, Calendar.NOVEMBER); break;
+      case 12: date.set(Calendar.MONTH, Calendar.DECEMBER); break;
+      default: date.set(Calendar.MONTH, Calendar.JANUARY); //just in case
+    }
+    date.set(Calendar.DATE, Integer.parseInt(day));
+
+    if(timeDayChange.getDayChange() == -1) { //subtract a day
+      date.add(Calendar.DATE, -1);
+    } else if (timeDayChange.getDayChange() == 1) {
+      date.add(Calendar.DATE, 1);
+    }
+
     String status = log.getProtoPayload().get("status").toString();
 
-    String latency=log.getProtoPayload().get("latency").toString();
-    latency=latency.substring(0,latency.length()-1); //remove the s at end
+    String latency = log.getProtoPayload().get("latency").toString();
+    latency = latency.substring(0, latency.length() -1); //remove the s at end
     Double latencyParsed = Double.parseDouble(latency);
 
-    if(latencyParsed.intValue()==0){
-
+    if (latencyParsed.intValue() == 0) {
       latencyParsed *= 1000; //convert to ms
       long latencyParse = Math.round(latencyParsed);
-      latency=latencyParse+"ms";
-    }else{
-
-      latency = String.format("%.2f", latencyParsed)+"s"; //round to 2 decimal places
+      latency = latencyParse + "ms";
+    } else {
+      latency = String.format("%.2f", latencyParsed) + "s"; //round to 2 decimal places
     }
 
     String resource = log.getProtoPayload().get("resource").toString();
     String HTTP = log.getProtoPayload().get("httpVersion").toString();
     String ipAddress = log.getProtoPayload().get("ip").toString();
     String host = log.getProtoPayload().get("host").toString();
-    String appEngRelease = "app_engine_release="+log.getProtoPayload().get("appEngineRelease");
+    String appEngRelease = "app_engine_release=" + log.getProtoPayload().get("appEngineRelease");
 
-    String message = "";
-
-    if(log.getProtoPayload().get("line")!=null){
-
-      String line = log.getProtoPayload().get("line").toString();
-      String messageTime= line.substring(line.indexOf("time=")+5, line.indexOf(", severity="));
-      String finalMessageTime = convertUTCToLocal(messageTime);
-
-      message = finalMessageTime+"\t" + line.substring(line.indexOf("logMessage=") + 11,
-                                                       line.indexOf("}]"));
+    String logMessageWithTime;
+    String childTime;
+    ArrayMap<String, String> logMess;
+    if (log.getProtoPayload().get("line") != null) {
+      ArrayList logMessages = ((ArrayList) log.getProtoPayload().get("line"));
+      for (int iterMessages = 0; iterMessages < logMessages.size(); iterMessages++) {
+        logMess = (ArrayMap<String, String>) logMessages.get(iterMessages);
+        childTime = convertUTCToLocal(logMess.get("time")).time;
+        logMessageWithTime = childTime + t + logMess.get("logMessage");
+        children.add(new LogTreeEntry(getSeverityIcon(logMess.get("severity")), logMessageWithTime.
+            substring(0, logMessageWithTime.length() - 1)));
+      }
     }
+
     String method = log.getProtoPayload().get("method").toString();
 
-    String responseSize="";
+    String responseSize = "";
 
-    if(log.getProtoPayload().get("responseSize")==null){
-
-      responseSize+="0";
-    }else{
-
-      responseSize+=log.getProtoPayload().get("responseSize").toString();
+    if (log.getProtoPayload().get("responseSize") == null) {
+      responseSize += "0";
+    } else {
+      responseSize += log.getProtoPayload().get("responseSize").toString();
     }
 
     String userAgent = "";
-
-    if(log.getProtoPayload().get("userAgent")!=null){
-
-      userAgent+=" \""+log.getProtoPayload().get("userAgent").toString()+'\"';
+    if (log.getProtoPayload().get("userAgent") != null) {
+      userAgent += " \"" + log.getProtoPayload().get("userAgent").toString() + '\"';
     }
 
-    String instance="instance="+log.getMetadata().getLabels().
-      get("appengine.googleapis.com/clone_id");
+    String instance = "instance=" + log.getMetadata().getLabels().
+        get("appengine.googleapis.com/clone_id");
 
-    String logInfo =localTime+"    "+status+t+ "bytes stuff"+t+latency+t+resource+'\n'+ipAddress+
-                    " - - "+"["+day+"/"+month+"/"+year+"] "+" \""+method+" "+resource+" "+
-                    HTTP+"\" "+status+" "+responseSize+userAgent+" - - \""+host+"\" "+instance+" "+
-                    appEngRelease;
-    String logMessage = message;
+    String logInfo = localTime + "    "+ status + t + "bytes stuff" + t + latency + t + resource;
+    String message = ipAddress + " - - " + "[" + date.get(Calendar.DATE) + "/" +
+        date.get(Calendar.MONTH) + "/" + date.get(Calendar.YEAR) + "] " + " \"" +
+        method + " " + resource + " " + HTTP + "\" " + status + " " + responseSize + userAgent +
+        " - - \"" + host + "\" " + instance + " " + appEngRelease;
 
     String severity = "";
-    if(log.getMetadata().get("severity")!=null){
-
+    if (log.getMetadata().get("severity") != null) {
       severity = log.getMetadata().get("severity").toString();
-
     }
-    setSeverityIcon(severity);
-    this.logInfo = logInfo;
-    this.logMessage = logMessage;
 
+    this.severity = getSeverityIcon(severity);
+    this.logInfo = logInfo;
+    this.logMessage = message;
   }
 
   /**
@@ -138,79 +180,78 @@ public class LogTreeEntry {
    * @param fullTimeUTC the UTC datetime format we get from the server
    * @return String with the hours:minutes:seconds.milliseconds formatted
    */
-  private static String convertUTCToLocal(String fullTimeUTC) {
-    //System.out.println("full timeUTC: "+fullTimeUTC);
+  private TimeDayChange convertUTCToLocal(String fullTimeUTC) {
+
     //get individual components
     int hour = Integer.parseInt(fullTimeUTC.substring(11, 13));
     int minutes = Integer.parseInt(fullTimeUTC.substring(14, 16));
     int seconds = Integer.parseInt(fullTimeUTC.substring(17, 19));
     int milliseconds = Integer.parseInt(fullTimeUTC.substring(20, 23));
 
+    char rMillis = fullTimeUTC.charAt(23);
+    if ((rMillis > 52) && (rMillis < 58)) { //rMillis is a number and greater than 4
+      milliseconds++;
+    }
     //get the local one and find the offset difference in time
     TimeZone tz = TimeZone.getDefault();
     Calendar cal = Calendar.getInstance(tz);
     int offsetInMillis = tz.getOffset(cal.getTimeInMillis());
-   // System.out.println("millis: "+cal.getTimeInMillis());
 
-    int offsetHours = offsetInMillis/3600000;
-    int offsetMinutes =(offsetInMillis/60000)%60;
+    int offsetHours = offsetInMillis / 3600000;
+    int offsetMinutes = (offsetInMillis / 60000) % 60;
 
     //mod back to the correct time = cloud = on 12 hour clock not 24 hour
-    int finalHours = (((hour+offsetHours)+11)  % 12) +1;
-    int finalMinutes = (((minutes+offsetMinutes)+59)%60)+1;
+    int finalHours = (((hour + offsetHours) + 23) % 24) + 1;
+    int finalMinutes = (((minutes + offsetMinutes) + 59) % 60) + 1;
 
-    if(finalMinutes==60){
+    if (finalMinutes == 60) {
 
-      finalMinutes=finalMinutes%60;
+      finalMinutes = finalMinutes % 60;
     }
-
     //string to format properly
-    String timeToReturn = "";
+    StringBuilder timeToReturn = new StringBuilder();
 
-    if(finalHours<10){
-
-      timeToReturn+="0"+finalHours;
-    }else{
-
-      timeToReturn+=finalHours;
+    if (finalHours < 10) {
+      timeToReturn.append("0").append(finalHours);
+    } else {
+      timeToReturn.append(finalHours);
     }
 
-    if(finalMinutes<10) {
-
-      timeToReturn+=":0"+(finalMinutes);
-    }else{
-
-      timeToReturn+=":"+(finalMinutes);
+    if (finalMinutes < 10) {
+      timeToReturn.append(":0").append(finalMinutes);
+    } else {
+      timeToReturn.append(":").append(finalMinutes);
     }
 
-    if(seconds<10){
-
-      timeToReturn+=":0"+seconds;
-    }else{
-
-      timeToReturn+=":"+seconds;
+    if (seconds < 10) {
+      timeToReturn.append(":0").append(seconds);
+    } else {
+      timeToReturn.append(":").append(seconds);
     }
 
-    if(milliseconds<10){
-
-      timeToReturn+=".00"+milliseconds;
-    }else if(milliseconds<100){
-
-      timeToReturn+=".0"+milliseconds;
-    }else{
-
-      timeToReturn+="."+milliseconds;
+    if (milliseconds < 10) {
+      timeToReturn.append(".00").append(milliseconds);
+    } else if (milliseconds < 100) {
+      timeToReturn.append(".0").append(milliseconds);
+    } else {
+      timeToReturn.append(".").append(milliseconds);
     }
-  //  System.out.println("good time: "+timeToReturn);
-    return timeToReturn;
+
+    int dayChanges = 0;
+    if (hour + offsetHours > 24) {
+      dayChanges = 1;
+    } else if (hour + offsetHours < 0) {
+      dayChanges = -1;
+    }
+
+    return new TimeDayChange(timeToReturn.toString(), dayChanges);
   }
-
 
   /**
    * Gets the log info
    * @return String log information
    */
-  public String getLogInfo(){
+  public String getLogInfo() {
 
     return this.logInfo;
   }
@@ -219,45 +260,85 @@ public class LogTreeEntry {
    * Get the log message
    * @return String log message
    */
-  public String getLogMessage(){
+  public String getLogMessage() {
 
     return this.logMessage;
   }
 
   /**
    * Gets the Icon used to represent severity of the log/ log level
-   * @return Icon for the Jtree
+   * @return Icon for the JTree
    */
-  public Icon getSeverityIcon(){
+  public Icon getIcon() {
 
     return this.severity;
+  }
+
+  /**
+   * Gets ArrayList of children nodes with log messages to add
+   * @return ArrayList<LogTreeEntry> of children nodes
+   */
+  public ArrayList<LogTreeEntry> getChildren() {
+
+    return children;
   }
 
   /**
    * Based on the severity string from the log entry, set the icon
    * @param severity String that explains log level
    */
-  private void setSeverityIcon(String severity) {
+  private Icon getSeverityIcon(String severity) {
 
-    if(severity.trim().equals("")){ //null severity => star = any log level
+    if (severity.trim().equals("")) { //null severity => star = any log level
+      return GoogleCloudToolsIcons.ANY_LOG_ICON;
+    } else if (severity.equals("CRITICAL")) { //!!!
+      return GoogleCloudToolsIcons.CRITICAL_LOG_ICON;
+    } else if (severity.equals("ERROR")) { //!!
+      return GoogleCloudToolsIcons.ERROR_LOG_ICON;
+    } else if (severity.equals("WARNING")) { //!
+      return GoogleCloudToolsIcons.WARNING_LOG_ICON;
+    } else if (severity.equals("INFO")) {//i
+      return GoogleCloudToolsIcons.INFO_LOG_ICON;
+    } else if (severity.equals("DEBUG")) {//lambda
+      return GoogleCloudToolsIcons.DEBUG_LOG_ICON;
+    } else {
+      return null;
+    }
+  }
 
-      this.severity = AppEngineIcons.ANY_LOG_ICON;
-    }else if(severity.equals("CRITICAL")){ //!!!
+  /**
+   * Allows a string and boolean to pass from method to method to indicate time and if the
+   * day also changes.
+   */
+  private class TimeDayChange {
+    /**UTC to current time zone converted time in string form*/
+    private String time;
+    /**Indicates whether the day changes or not*/
+    private int dayChange;
 
-      this.severity = AppEngineIcons.CRITICAL_LOG_ICON;
-    }else if(severity.equals("ERROR")){ //!!
+    /**
+     * Constructor
+     * @param time UTC to current time zone converted time in string format
+     * @param dayChange -1 if the day needs to go back a day, 0 if no change,
+     *                  else 1 if the day needs to go forward one
+     */
+    public TimeDayChange(String time, int dayChange) {
 
-      this.severity = AppEngineIcons.ERROR_LOG_ICON;
-    }else if(severity.equals("WARNING")){ //!
-
-      this.severity = AppEngineIcons.WARNING_LOG_ICON;
-    }else if(severity.equals("INFO")){//i
-
-      this.severity = AppEngineIcons.INFO_LOG_ICON;
-    }else if(severity.equals("DEBUG")){//lambda
-
-      this.severity = AppEngineIcons.DEBUG_LOG_ICON;
+      this.time = time;
+      this.dayChange = dayChange;
     }
 
+    public String getTime() {
+
+      return time;
+    }
+
+    public int getDayChange() {
+
+      return dayChange;
+    }
+
+
   }
+
 }

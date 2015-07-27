@@ -17,69 +17,83 @@ package com.google.gct.idea.cloudlogging;
 
 import com.intellij.ui.components.JBLabel;
 
+import java.awt.*;
+
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import java.awt.*;
+
+import static com.intellij.util.ui.UIUtil.getBoundsColor;
 
 /**
  * To animate the tree style logs in App Engine logs
  * Created by amulyau on 6/9/15.
  */
-public class LogsTreeCellRenderer extends DefaultTreeCellRenderer{
+public class LogsTreeCellRenderer extends DefaultTreeCellRenderer {
 
-  Color backgroundNonSelectionColor = getBackgroundNonSelectionColor();//get defaults from intellij
-  Color  backgroundSelectionColor = getBackgroundSelectionColor();
+  /**Color of the background when object is not selected*/
+  private final Color backgroundNonSelectionColor = getBackgroundNonSelectionColor();
+  /**Color of the background when object is selected*/
+  private final Color  backgroundSelectionColor = getBackgroundSelectionColor();
+  /**Color of the text when object is not selected*/
+  private final Color textNonSelectColor = getTextNonSelectionColor();
+  /**Color of the text when object is selected*/
+  private final Color textSelectColor = getTextSelectionColor();
+  /**The view that contains the tree that has the logs*/
+  private final AppEngineLogToolWindowView view;
 
-  Color textNonSelectColor = getTextNonSelectionColor();
-  Color textSelectColor = getTextSelectionColor();
+  /**
+   * Constructor for the renderer that takes in the view
+   * @param view The App Engine Log Tool Window view that provides the font size.
+   */
+  public LogsTreeCellRenderer(AppEngineLogToolWindowView view) {
 
+    this.view = view;
+  }
 
   @Override
-  public Component getTreeCellRendererComponent(JTree tree, Object value,boolean selected,
-                                                boolean expanded,boolean leaf, int row,
-                                                boolean hasFocus){
+  public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
+                                                boolean expanded, boolean leaf, int row,
+                                                boolean hasFocus) {
 
     TextAreaNode treeNode = (TextAreaNode)value;
-    //TextAreaNode node = (TextAreaNode)treeNode.getUserObject(); //put panel node in
     String text = treeNode.getText();
-    PanelExtend panel= new PanelExtend();
-    JBLabel iconLabel = panel.getLableIcon();
+    PanelExtend panel = new PanelExtend();
+    JBLabel iconLabel = panel.getLabelIcon();
     JTextArea textArea = panel.getLogText();
 
+    float fontSize;
+    fontSize = view.getFontSize();
     textArea.setText(text);
+    textArea.setFont(textArea.getFont().deriveFont(fontSize));
+
     textArea.setLineWrap(true);
     textArea.setWrapStyleWord(true);
+    textArea.setOpaque(false);
 
-
-    if(treeNode.isLeaf() && !treeNode.isRoot() && (!((TextAreaNode) treeNode.getParent()).isRoot())) {
-      // setIcon(AppEngineIcons.TREE_LEAF_ICON);
-      textArea.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY));
-    }else {
+    if (treeNode.getIcon() == null) {
+      textArea.setBorder(BorderFactory.createEmptyBorder());
+    } else if ((treeNode.isLeaf()) && (!treeNode.isRoot()) && (!((TextAreaNode) treeNode
+        .getParent()).isRoot())) {
+      textArea.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, getBoundsColor()));
+    } else {
       textArea.setBorder(BorderFactory.createEmptyBorder());
     }
 
-    if(selected){
-      setForeground(textSelectColor);
-      setBackground(backgroundSelectionColor);
-      textArea.setBackground(textSelectColor);
-      textArea.setBackground(backgroundSelectionColor);
+    if (selected) {
+      panel.setBackground(backgroundSelectionColor);
+      textArea.setForeground(textSelectColor);
 
-    }else{
-      setForeground(textNonSelectColor);
-      setBackground(backgroundNonSelectionColor);
-      textArea.setBackground(textNonSelectColor);
-      textArea.setBackground(backgroundNonSelectionColor);
-
+    } else {
+      panel.setBackground(backgroundNonSelectionColor);
+      textArea.setForeground(textNonSelectColor);
     }
 
-    iconLabel.setIcon(treeNode.icon);
-    panel.setLableIcon(iconLabel);
+    iconLabel.setIcon(treeNode.getIcon());
+    panel.setLabelIcon(iconLabel);
     panel.setTextArea(textArea);
 
     return panel;
-
   }
-
 
 }
 

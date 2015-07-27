@@ -15,158 +15,188 @@
  */
 package com.google.gct.idea.cloudlogging;
 
+import java.awt.*;
+
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.AbstractLayoutCache;
 import javax.swing.tree.TreeCellRenderer;
-import java.awt.*;
 
 /**
+ * UI for Tree Nodes.
+ * This is mainly to change Tree Node's Text Area size to properly fit all data
  * Created by amulyau on 6/23/15.
  */
 public class BasicWideNodeTreeUI extends BasicTreeUI {
+
+  /**JTree that holds the logs */
   private JTree tree;
+  /**View that manipulates the visual components of the plugin*/
+  private final AppEngineLogToolWindowView view;
+  /**Width of incents on icons to give padding*/
+  private final int iconInsets = 10;
+  /**Vertical height to add to each node to make more readable*/
+  private final int addHeight = 5;
 
+  /**
+   * Constructor
+   * @param appEngineLogToolWindowView View that ocntrols the visual components of the plugin
+   */
+  public BasicWideNodeTreeUI(AppEngineLogToolWindowView appEngineLogToolWindowView) {
 
-
-  public BasicWideNodeTreeUI(){
     super();
+    view = appEngineLogToolWindowView;
   }
 
+  /**
+   * As long as the component isnot null, it installs the UI to the tree
+   * @param c JTree Component passed in
+   */
   @Override
-  public void installUI(JComponent c){
-    if(c==null){
-      System.out.println("Oh no null");
-    }else{
+  public void installUI(JComponent c) {
+
+    if (c != null) {
       tree = (JTree)c;
       super.installUI(c);
     }
   }
 
+  /**
+   * Returns the Cell Renderer
+   * @return LogsTreeCellRenderer is a custom renderer
+   */
   @Override
-  protected void prepareForUIInstall(){
-    super.prepareForUIInstall();
-    //  lastWidth = tree.getParent().getWidth();
+  protected TreeCellRenderer createDefaultCellRenderer() {
+
+    return new LogsTreeCellRenderer(view);
   }
 
-
+  /**
+   * Returns a new Node Demensions Handler
+   * @return Node Dimentions Handler
+   */
   @Override
-  protected TreeCellRenderer createDefaultCellRenderer(){
-    return new LogsTreeCellRenderer();
-  }
+  protected AbstractLayoutCache.NodeDimensions createNodeDimensions() {
 
-  @Override
-  protected AbstractLayoutCache.NodeDimensions createNodeDimensions(){
     return new NodeDimensionsHandler();
   }
 
-  public class NodeDimensionsHandler extends AbstractLayoutCache.NodeDimensions{
+  /**
+   * Gets each node in tree and sets its dimensions properly
+   */
+  private class NodeDimensionsHandler extends AbstractLayoutCache.NodeDimensions {
     @Override
-    public Rectangle getNodeDimensions(Object value, int row, int depth, boolean expanded, Rectangle size) {
-      //using renderer not editor
-      if(currentCellRenderer!=null){
+    public Rectangle getNodeDimensions(Object value, int row, int depth, boolean expanded,
+                                       Rectangle size) {
+
+      if (currentCellRenderer != null) {
         Component comp;
-        comp = currentCellRenderer.getTreeCellRendererComponent(tree,value,tree.isRowSelected(row), expanded,treeModel.isLeaf(value), row, false);
-        if(tree!=null){
+        comp = currentCellRenderer.getTreeCellRendererComponent(tree, value,
+            tree.isRowSelected(row), expanded,treeModel.isLeaf(value), row, false);
+        if (tree != null) {
           rendererPane.add(comp);
           comp.validate();
         }
-        //we know comp = text area always =>
+
         JTextArea textArea = ((PanelExtend)comp).getLogText();
-        Icon icon = ((PanelExtend)comp).getLableIcon().getIcon();
+        Icon icon = ((PanelExtend)comp).getLabelIcon().getIcon();
 
         Dimension preferredSize = comp.getPreferredSize();
-        //   System.out.println("gets here?!");
-        if(size!=null){
+
+        if (size != null) {
           size.x = getRowX(row, depth);
-          // System.out.println("last width: "+lastWidth);
-          boolean textWrap;
-          float fontSize;
-          if(tree.getName().contains("true")){
-            textWrap = true;
+          Dimension dim = getTextDimensions(tree.getParent().getWidth(), size.x, textArea, icon,
+              view.getTextWrap());
 
-          }else{
-            textWrap = false;
-          }
-          fontSize = Integer.parseInt(tree.getName().substring(tree.getName().indexOf('e')+1));
-          //     System.out.println("font size: "+ fontSize);
-          textArea.setFont(textArea.getFont().deriveFont(fontSize));
-          //     System.out.println("font size after set: "+((PanelExtend)comp).getLogText().getFont().getSize());
-
-          FontMetrics fm = textArea.getFontMetrics(textArea.getFont());
-          if(textArea.getText().trim().equals("...Load Previous Page...") || textArea.getText().trim().equals("...Load Next Page...")) {
-            if(textWrap==true){
-              size.width = SwingUtilities.computeStringWidth(fm, textArea.getText());
-              size.height = fm.getHeight()*5;
-            }else{
-              size.width = tree.getParent().getWidth() + size.x + 3;
-              size.height = fm.getHeight()*5;
-            }
-
-          }else {
-
-            Dimension dim = getTextDimensions(tree.getParent().getWidth(), size.x, depth, textArea, icon, textWrap, textArea.getPreferredSize().getWidth());
-
-            size.width = ((int)dim.getWidth());
-            size.height = ((int)dim.getHeight());
-          }
-        }else{
-          size = new Rectangle(getRowX(row,depth),0,preferredSize.width,preferredSize.height);
+          size.width = ((int)dim.getWidth());
+          size.height = ((int)dim.getHeight());
+        } else {
+          size = new Rectangle(getRowX(row, depth), 0, preferredSize.width, preferredSize.height);
         }
         return size;
-
       }
       return null;
     }
   }
 
-  private static Dimension getTextDimensions(int currentWidth, int sizeX, int depth, JTextArea textArea, Icon icon, boolean textWrap, double defaultWidth) {
+  /**
+   *
+   * @param currentWidth Width of the scroll pane currently
+   * @param sizeX The row indentation based on depth of the node
+   * @param textArea The text area that has the text we want to display
+   * @param icon The icon in the node
+   * @param textWrap If the text is wrapped or not
+   * @return The dimension to best resize to.
+   */
+  private Dimension getTextDimensions(int currentWidth, int sizeX, JTextArea textArea, Icon icon,
+                                      boolean textWrap) {
+
     FontMetrics fm = textArea.getFontMetrics(textArea.getFont());
-    String text =textArea.getText();
+    String text = textArea.getText();
+
+    int lineCutOffset = SwingUtilities.computeStringWidth(fm, "-"); //prevents line cut off
 
 
-    int lines =0;
+    int lines = 0;
     int lastSpace = 0;
-    int x=0;
-    int lineWidth;// =0;
-    int y=0;
-    int newCurrWidth=currentWidth-sizeX-icon.getIconWidth()-3;//+SwingUtilities.computeStringWidth(fm,text.substring(text.length()-1, text.length()));//-(depth*3);
+    int x = 0;
+    int lineWidth = 0;
+    int y = 0;
+    int newCurrWidth;
+    int iconWidth = 0;
 
-    if(!textWrap){
+    if (icon != null) {
+      iconWidth = icon.getIconWidth();
+      newCurrWidth = currentWidth - sizeX - iconWidth- 3 - iconInsets;
+    } else {
+      newCurrWidth = currentWidth - sizeX - 3 - iconInsets;
+    }
+
+    if (!textWrap) {
       int largestWidth = 0;
-      for (; y < text.length(); y++) {
-        lineWidth = SwingUtilities.computeStringWidth(fm, text.substring(x, y));
+      for (y=0; y < text.length(); y++) {
+        lineWidth = SwingUtilities.computeStringWidth(fm, text.substring(x, y)) + lineCutOffset;
+        if((newCurrWidth < lineWidth) && (y - x == 1)){ //the letter we are one is too large for width
+          lines++;
+          x=y;
+          continue;
+        }
         char space = text.charAt(y);
-
         if (space == '\n') {
           x = y + 1;
           y++;
           lines++;
           continue;
         }
-        if(lineWidth>largestWidth){
-          largestWidth=lineWidth;
+
+        if (lineWidth > largestWidth) {
+          largestWidth = lineWidth;
         }
       }
       lines++;
-      if(lines<1){
+      if (lines < 1) {
         lines = 1;
       }
 
-      int height = fm.getHeight()*lines;
-      //     System.out.println("fm: "+fm.getHeight()+"\t\t lines: "+lines+"\t\t height: "+height);
-      return new Dimension(largestWidth+sizeX+icon.getIconWidth()+3,height);
+      int height = (fm.getHeight() * lines) + addHeight;
+      largestWidth = largestWidth + sizeX + iconWidth + 3;
+      if (largestWidth < currentWidth) {
+        largestWidth = currentWidth;
+      }
+      return new Dimension(largestWidth, height);
 
-    }else { //text wrap is true
-
-
-      for (; y < text.length(); y++) {
-        lineWidth = SwingUtilities.computeStringWidth(fm, text.substring(x, y));
-        char space = text.charAt(y);
-        if (space == ' ' || space == '\t') {
-          lastSpace = y;
+    } else { //text wrap is true
+      for (y=0; y < text.length(); y++) {
+        lineWidth = SwingUtilities.computeStringWidth(fm, text.substring(x, y)) + lineCutOffset;
+        if((newCurrWidth < lineWidth) && (y - x == 1)){ //the letter we are one is too large for width
+          lines++;
+          x=y;
+          continue;
         }
-        else if (space == '\n') {
+        char space = text.charAt(y);
+        if ((space == ' ') || (space == '\t')) {
+          lastSpace = y;
+        } else if (space == '\n') {
           x = y + 1;
           y++;
           lines++;
@@ -174,28 +204,31 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
         }
 
         if (lineWidth == newCurrWidth) {
-          //  x=lastSpace; //realistic word examples this works else x=y works...
-          if (lastSpace > x && lastSpace < y) {
+          if ((lastSpace > x) && (lastSpace < y)) {
             x = lastSpace;
             y = lastSpace;
-          }
-          else {
+          } else {
             x = y;
           }
           lines++;
-        }
-        else if (lineWidth > newCurrWidth) {//width too large => go back to when it was less than as it never equals
+        } else if (lineWidth > newCurrWidth) {
           int z = y;
           for (; z > 0; z--) {
-            lineWidth = SwingUtilities.computeStringWidth(fm, text.substring(x, z));
+            lineWidth = SwingUtilities.computeStringWidth(fm, text.substring(x, z)) +
+                lineCutOffset;
+            if((newCurrWidth < lineWidth) && (y -x == 0)){ //the letter we are one is too large for width
+              lines++;
+              x=z;
+              y=z;
+              break;
+            }
             if (lineWidth < newCurrWidth) {
-              if (lastSpace > x && lastSpace < y) {
+              if ((lastSpace > x) && (lastSpace < y)) {
                 x = lastSpace;
                 y = lastSpace;
                 lines++;
                 break;
-              }
-              else {
+              } else {
                 x = z;
                 y = z;
                 lines++;
@@ -203,26 +236,20 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
               }
             }
           }
-
         }
       }
 
-      if(x!=0 && x<y){ //still some left
+      if ((x != 0) && (x < y)) { //still some left
         lines++;
       }
-
     }
-
     // lines++;
-    if(lines<1){
-      lines=1;
+    if (lines < 1) {
+      lines = 1;
     }
+    int height = (fm.getHeight() * lines) + addHeight;
 
-
-    int height = fm.getHeight()*lines;
-    //     System.out.println("fm: "+fm.getHeight()+"\t\t lines: "+lines+"\t\t height: "+height);
-    return new Dimension(currentWidth-sizeX-3,height);
-
+    return new Dimension(currentWidth - sizeX - 3, height);
   }
 
 }

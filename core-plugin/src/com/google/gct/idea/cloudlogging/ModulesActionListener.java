@@ -15,8 +15,21 @@
  */
 package com.google.gct.idea.cloudlogging;
 
+import com.google.api.services.logging.model.ListLogEntriesResponse;
+
+import com.intellij.openapi.progress.PerformInBackgroundOption;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.progress.util.ProgressWindow;
+import com.intellij.openapi.project.Project;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.*;
 
 /**
  * Modules Combo Box Listener for AppEngineLogToolWindowView
@@ -25,20 +38,25 @@ import java.awt.event.ActionListener;
 public class ModulesActionListener implements ActionListener {
 
   /**Controller for App Engine Logs*/
-  AppEngineLogging controller;
+  private final AppEngineLogging controller;
 
   /**View for the App Engine Logs*/
-  AppEngineLogToolWindowView view;
+  private final AppEngineLogToolWindowView view;
+
+  /**Current application project (not app engine project)*/
+  private final Project project;
 
   /**
    * Constructor
    * @param controller Controller for the App Engine Logs
    * @param view View for the App Engine Logs with the Modules Combo Box
+   * @param project Current application project (not app engine project)
    */
-  public ModulesActionListener(AppEngineLogging controller, AppEngineLogToolWindowView view){
+  public ModulesActionListener(AppEngineLogging controller, AppEngineLogToolWindowView view, Project project) {
 
-    this.controller=controller;
+    this.controller = controller;
     this.view = view;
+    this.project = project;
   }
 
   /**
@@ -49,22 +67,71 @@ public class ModulesActionListener implements ActionListener {
   @Override
   public void actionPerformed(ActionEvent e) {
 
-    //gets previous module selection to compare with current module selection
     String prevModuleSelection = view.getCurrModule();
     view.setCurrModule();
-
     String currModule = view.getCurrModule();
 
-    if(currModule==null){ //do not do anything if nothing is there/selected
-
-    }else if((prevModuleSelection!=null) && (currModule.equals(prevModuleSelection))) {
+    if (currModule == null) { //do not do anything if nothing is there/selected
+    } else if ((prevModuleSelection != null) && (currModule.equals(prevModuleSelection))) {
       //same selection as previous selection
-    }else{
+    } else {
+      if (view.getModuleALActive()) { //solve combobox touchiness problems
+        Task.Backgroundable logTask = new Task.Backgroundable(project, "Getting Versions " +
+            "and Logs List", false, new PerformInBackgroundOption() {
 
-      if(view.getModuleALActive()) { //solve combobox touchiness problems
+          @Override
+          public boolean shouldStartInBackground() {
+            return true;
+          }
 
-        view.setVersionsList(controller.getVersionsList());
-        view.setLogs(controller.getLogs());
+          @Override
+          public void processSentToBackground() {}
+        }) {
+
+          @Override
+          public void run(@NotNull ProgressIndicator progressIndicator) {
+            progressIndicator.setFraction(0.10);
+            progressIndicator.setText("90% to finish");
+            final ArrayList<String> versionsList = view.processVersionsList(controller
+                .getVersionsList());
+
+            progressIndicator.setFraction(0.33);
+            progressIndicator.setText("66% to finish");
+            if (versionsList != null) {
+              progressIndicator.setFraction(0.45);
+              progressIndicator.setText("55% to finish");
+
+              SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  view.setVersionsList(versionsList);
+                }
+              });
+
+              view.clearPageTokens();
+              while (view.getCurrPage() != -1) { //get to first page when we get new logs
+                view.decreasePage();
+              }
+              progressIndicator.setFraction(0.66);
+              progressIndicator.setText("33% to finish");
+              ListLogEntriesResponse logResp = controller.getLogs();
+
+              view.threadProcessAndSetLogs(logResp);
+            } else {
+              progressIndicator.setFraction(0.90);
+              progressIndicator.setText("10% to finish");
+
+              SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  view.setRootText(view.NO_VERSIONS_LIST_STRING);
+                }
+              });
+            }
+          }
+        };
+        logTask.run(new ProgressWindow(false, project));
+
       }
     }
   }

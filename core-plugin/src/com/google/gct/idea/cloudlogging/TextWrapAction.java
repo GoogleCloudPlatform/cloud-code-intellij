@@ -15,6 +15,7 @@
  */
 package com.google.gct.idea.cloudlogging;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 
@@ -24,26 +25,35 @@ import com.intellij.openapi.actionSystem.ToggleAction;
  */
 public class TextWrapAction extends ToggleAction {
 
-  private final AppEngineLogToolWindowView view;
+  /**View for the App Engine Logs*/
+  private AppEngineLogToolWindowView view;
 
+  /**Empty Constructor*/
+  public TextWrapAction() {}
+
+  /**
+   * Constructor
+   * @param view View for the App Engine Logs that have the logs display
+   */
   public TextWrapAction(AppEngineLogToolWindowView view) {
-    super("Wrap","Text Wrap", AppEngineIconsAndStrings.WRAP_TOGGLE_ICON);
-    this.view = view;
 
+    super("Wrap", "Text Wrap", AllIcons.Actions.ToggleSoftWrap);
+    this.view = view;
   }
 
   @Override
   public boolean isSelected(AnActionEvent e) {
+
     return view.getTextWrap();
   }
 
   @Override
   public void setSelected(AnActionEvent e, boolean state) {
+
     if (state) { //selected => text wrap
       view.changeTextWrapState(true);
       view.registerUI();
-    }
-    else {
+    } else {
       view.changeTextWrapState(false);
       view.registerUI();
     }

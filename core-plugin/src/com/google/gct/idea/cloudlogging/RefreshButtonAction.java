@@ -15,32 +15,53 @@
  */
 package com.google.gct.idea.cloudlogging;
 
+import com.google.api.services.logging.model.ListLogEntriesResponse;
+
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.progress.PerformInBackgroundOption;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+
+import javax.swing.*;
 
 /**
  * Refresh Button to refresh the logs
  * Created by amulyau on 5/29/15.
  */
-public class RefreshButtonAction extends AnAction{
+public class RefreshButtonAction extends AnAction {
 
   /**Controller for App Engine Logs*/
-  AppEngineLogging controller;
+  private AppEngineLogging controller;
 
   /**View for the App Engine Logs*/
-  AppEngineLogToolWindowView view;
+  private AppEngineLogToolWindowView view;
+
+  /**Current application project (not app engine project)*/
+  private Project project;
+
+  /**Empty Constructor*/
+  public RefreshButtonAction() {}
 
   /**
-   * Constructor that creates the button with icon and sets project
+   * Constructor
    * @param controller Controller for the App Engine Logs
    * @param view View for the App Engine Logs that have the logs display
+   * @param project Current application project (not app engine project)
    */
-  public RefreshButtonAction(AppEngineLogging controller, AppEngineLogToolWindowView view) {
+  public RefreshButtonAction(AppEngineLogging controller, AppEngineLogToolWindowView view,
+                             Project project) {
 
-    super("Refresh", "Refresh the App Engine Logs", AppEngineIcons.REFRESH_BUTTON_ICON);
+    super("Refresh", "Refresh the App Engine Logs", AllIcons.Actions.Refresh);
     this.controller = controller;
     this.view = view;
-
+    this.project = project;
   }
 
   /**
@@ -48,16 +69,111 @@ public class RefreshButtonAction extends AnAction{
    * @param e Click event that occurs
    */
   @Override
-  public void actionPerformed(AnActionEvent e){
+  public void actionPerformed(AnActionEvent e) {
 
-    if(view.getCurrProject()!=null) {
-      String currModule = view.getCurrModule();
-      String currVersion = view.getCurrVersion();
-      view.setModulesList(controller.getModulesList());
-      view.setVersionsList(controller.getVersionsList());
-      view.setLogs(controller.getLogs());
-      view.setCurrModuleToModuleComboBox(currModule);
-      view.setCurrVersionToVersionComboBox(currVersion);
+    if (view.getCurrProject() != null) {
+      final String currModule = view.getCurrModule();
+      final String currVersion = view.getCurrVersion();
+      Task.Backgroundable logTask = new Task.Backgroundable(project, "Refreshing Modules, " +
+          "Versions and Logs List", false, new PerformInBackgroundOption() {
+
+        @Override
+        public boolean shouldStartInBackground() {
+          return true;
+        }
+
+        @Override
+        public void processSentToBackground() {}
+      }) {
+
+        @Override
+        public void run(@NotNull ProgressIndicator progressIndicator) {
+          progressIndicator.setFraction(0.10);
+          progressIndicator.setText("90% to finish");
+          final ArrayList<String> modulesList = view.processModulesList(controller
+              .getModulesList());
+
+          if (modulesList != null) {
+            progressIndicator.setFraction(0.20);
+            progressIndicator.setText("80% to finish");
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                view.setModulesList(modulesList);
+              }
+            });
+
+            progressIndicator.setFraction(0.33);
+            progressIndicator.setText("66% to finish");
+            final ArrayList<String> versionsList = view.processVersionsList(controller
+                .getVersionsList());
+
+            if (versionsList != null) {
+              progressIndicator.setFraction(0.45);
+              progressIndicator.setText("55% to finish");
+              SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  view.setVersionsList(versionsList);
+                }
+              });
+
+              progressIndicator.setFraction(0.66);
+              progressIndicator.setText("33% to finish");
+              ListLogEntriesResponse logResp = controller.getLogs();
+              view.clearPageTokens();
+
+              while (view.getCurrPage() != -1) { //get to first page when we refresh logs
+                view.decreasePage();
+              }
+              if ((logResp != null) && (logResp.getEntries() != null)) {
+                view.processLogs(logResp);
+
+                SwingUtilities.invokeLater(new Runnable() {
+                  @Override
+                  public void run() {
+                    view.setLogs();
+                    view.setCurrModuleToModuleComboBox(currModule);
+                    view.setCurrVersionToVersionComboBox(currVersion);
+                  }
+                });
+
+                progressIndicator.setFraction(0.90);
+                progressIndicator.setText("10% to finish");
+              } else {
+                progressIndicator.setFraction(0.90);
+                progressIndicator.setText("10% to finish");
+                SwingUtilities.invokeLater(new Runnable() {
+                  @Override
+                  public void run() {
+                    view.setRootText(view.NO_LOGS_LIST_STRING);
+                  }
+                });
+              }
+            } else {
+              progressIndicator.setFraction(0.90);
+              progressIndicator.setText("10% to finish");
+              SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  view.setRootText(view.NO_VERSIONS_LIST_STRING);
+                }
+              });
+            }
+          } else {
+            progressIndicator.setFraction(0.90);
+            progressIndicator.setText("10% to finish");
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                view.setRootText(view.NO_MODULES_LIST_STRING);
+              }
+            });
+
+          }
+        }
+      };
+      logTask.queue();
     }
   }
 
@@ -67,11 +183,9 @@ public class RefreshButtonAction extends AnAction{
    * @param e Action event
    */
   @Override
-  public void update(AnActionEvent e){
+  public void update(AnActionEvent e) {
 
     e.getPresentation().setEnabled(true);
   }
-
-
 
 }

@@ -15,6 +15,15 @@
  */
 package com.google.gct.idea.cloudlogging;
 
+import com.google.api.services.logging.model.ListLogEntriesResponse;
+
+import com.intellij.openapi.progress.PerformInBackgroundOption;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -25,20 +34,26 @@ import java.awt.event.ActionListener;
 public class VersionsActionListener implements ActionListener {
 
   /**Controller for App Engine Logs*/
-  AppEngineLogging controller;
+  private final AppEngineLogging controller;
 
   /**View for the App Engine Logs*/
-  AppEngineLogToolWindowView view;
+  private final AppEngineLogToolWindowView view;
+
+  /**Current application project (not app engine project)*/
+  private final Project project;
 
   /**
    * Constructor
    * @param controller Controller for the App Engine Logs
    * @param view View for the App Engine Logs with the versions combo box
+   * @param project Current application project (not app engine project)
    */
-  public VersionsActionListener(AppEngineLogging controller, AppEngineLogToolWindowView view){
+  public VersionsActionListener(AppEngineLogging controller, AppEngineLogToolWindowView view,
+                                Project project) {
 
-    this.controller=controller;
+    this.controller = controller;
     this.view = view;
+    this.project = project;
   }
 
   /**
@@ -53,19 +68,49 @@ public class VersionsActionListener implements ActionListener {
     String prevVersionSelection = view.getCurrVersion();
     view.setCurrVersion();
 
-    String currVersion= view.getCurrVersion();
+    String currVersion = view.getCurrVersion();
 
-    if(currVersion==null){//do not do anything if nothing is there
+    if (currVersion == null) {//do not do anything if nothing is there
+    } else if ((prevVersionSelection != null) && (currVersion.equals(prevVersionSelection))) {
+      //same selection as previous selection so do nothing
+    } else {
+      if (view.getVersionALActive()) { //solve combobox touchiness problems
+        Task.Backgroundable logTask = new Task.Backgroundable(project, "Getting Logs List",
+            false, new PerformInBackgroundOption() {
 
-    }else if((prevVersionSelection!=null) && (currVersion.equals(prevVersionSelection))){
+          @Override
+          public boolean shouldStartInBackground() {
 
-      //same selection as previous selection
-    }else{
+            return true;
+          }
 
-      if(view.getVersionALActive()) { //solve combobox touchiness problems
-        view.setLogs(controller.getLogs());
+          @Override
+          public void processSentToBackground() {}
+        }) {
+
+          @Override
+          public void run(@NotNull ProgressIndicator progressIndicator) {
+
+            progressIndicator.setFraction(0.10);
+            progressIndicator.setText("90% to finish");
+            view.clearPageTokens();
+
+            while (view.getCurrPage() != -1) { //get to first page when we refresh logs
+              view.decreasePage();
+            }
+            progressIndicator.setFraction(0.33);
+            progressIndicator.setText("66% to finish");
+
+            ListLogEntriesResponse logResp = controller.getLogs();
+            progressIndicator.setFraction(0.66);
+            progressIndicator.setText("33% to finish");
+
+            view.threadProcessAndSetLogs(logResp);
+          }
+        };
+        logTask.queue();
       }
     }
-
   }
+
 }

@@ -15,96 +15,91 @@
  */
 package com.google.gct.idea.cloudlogging;
 
-import com.google.api.services.logging.model.ListLogEntriesResponse;
-
-import javax.swing.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-
 /**
+ * Scroll Bar Listener for next page and previous page
  * Created by amulyau on 6/26/15.
  */
-public class ScrollActionListener implements AdjustmentListener {
-
-  JScrollBar vertical;
-  AppEngineLogging controller;
-  AppEngineLogToolWindowView view;
-  int prevValue = 0; //need to know if scrolling up or down. so that when scrolling up and get to min => get more logs
-  //makes sure not to fire when we first start basically
-
-  public ScrollActionListener(AppEngineLogging controller, AppEngineLogToolWindowView view){
-    this.controller= controller;
-    this.view = view;
-    this.vertical = view.getVerticalScrollBar();
-  }
-
-  @Override
-  public void adjustmentValueChanged(AdjustmentEvent e) {
-
-    boolean askForNext = (((vertical.getValue()+vertical.getModel().getExtent())==vertical.getMaximum()) && (prevValue!=0));
-    boolean ascTimeOrder = view.getTimeOrder();
-    boolean askForPrev = (vertical.getValue() ==vertical.getMinimum() && prevValue>vertical.getMinimum());
-
-    if (askForNext && ascTimeOrder){
-      //based on time macro, ask for later/earlier logs via logResponse
-      System.out.println("at bottom ascending");
-      System.out.println("view.getCurrpage: " + view.getCurrPage());
-      ListLogEntriesResponse logResp =
-        controller.askForNextLog(view.getCurrPage(), view.getPageTokens());
-
-      if(logResp!=null) {
-        view.increasePage();
-        view.setLogs(logResp);
-
-        prevValue=0;
-        vertical.setValue(0);
-        return;
-      }
-    }else if(askForPrev && ascTimeOrder){
-      //based on time macro, ask for earlier/later logs via logResponse
-      System.out.println("at top ascending");
-      System.out.println("view.getCurrpage: "+view.getCurrPage());
-
-      ListLogEntriesResponse logResp =
-        controller.askForPreviousLog(view.getCurrPage(), view.getPageTokens());
-      if (logResp != null) {
-        if(view.getCurrPage()>=0) {
-          view.decreasePage();
-        }
-        view.setLogs(logResp);
-
-      }
-
-    }else if(askForNext && !ascTimeOrder){ //descending logs and we ask for next
-      //based on time macro, ask for earlier/later logs via logResponse
-      System.out.println("at top descending");
-      System.out.println("view.getCurrpage: "+view.getCurrPage());
-
-      ListLogEntriesResponse logResp =
-        controller.askForPreviousLog(view.getCurrPage(), view.getPageTokens());
-      if (logResp != null) {
-        if(view.getCurrPage()>=0) {
-          view.decreasePage();
-        }
-        view.setLogs(logResp);
-
-      }
-    }else if(askForPrev && !ascTimeOrder){ //descending logs and we ask for prev
-      //based on time macro, ask for later/earlier logs via logResponse
-      System.out.println("at bottom descending");
-      System.out.println("view.getCurrpage: " + view.getCurrPage());
-      ListLogEntriesResponse logResp =
-        controller.askForNextLog(view.getCurrPage(), view.getPageTokens());
-
-      if(logResp!=null) {
-        view.increasePage();
-        view.setLogs(logResp);
-
-        prevValue=0;
-        vertical.setValue(0);
-        return;
-      }
-    }
-    prevValue = e.getValue();
-  }
+public class ScrollActionListener {//implements AdjustmentListener {
+//
+//  private final JScrollBar vertical;
+//  private final AppEngineLogging controller;
+//  private final AppEngineLogToolWindowView view;
+//  private int prevValue = 0; //need to know if scrolling up or down. so that when scrolling up and get to min => get more logs
+//  //makes sure not to fire when we first start basically
+//
+//  public ScrollActionListener(AppEngineLogging controller, AppEngineLogToolWindowView view){
+//    this.controller= controller;
+//    this.view = view;
+//    this.vertical = view.getVerticalScrollBar();
+//  }
+//
+//  @Override
+//  public void adjustmentValueChanged(AdjustmentEvent e) {
+//
+//    boolean askForNext = (((vertical.getValue()+vertical.getModel().getExtent())==vertical.getMaximum()) && (prevValue!=0));
+//    boolean ascTimeOrder = view.getTimeOrder();
+//    boolean askForPrev = (vertical.getValue() ==vertical.getMinimum() && prevValue>vertical.getMinimum());
+//
+//    if (askForNext && ascTimeOrder){
+//      //based on time macro, ask for later/earlier logs via logResponse
+//      System.out.println("at bottom ascending");
+//      System.out.println("view.getCurrpage: " + view.getCurrPage());
+//      ListLogEntriesResponse logResp =
+//          controller.askForNextLog(view.getCurrPage(), view.getPageTokens());
+//
+//      if(logResp!=null) {
+//        view.increasePage();
+//        view.setLogs(logResp);
+//
+//        prevValue=0;
+//        vertical.setValue(0);
+//        return;
+//      }
+//    }else if(askForPrev && ascTimeOrder){
+//      //based on time macro, ask for earlier/later logs via logResponse
+//      System.out.println("at top ascending");
+//      System.out.println("view.getCurrpage: "+view.getCurrPage());
+//
+//      ListLogEntriesResponse logResp =
+//          controller.askForPreviousLog(view.getCurrPage(), view.getPageTokens());
+//      if (logResp != null) {
+//        if(view.getCurrPage()>=0) {
+//          view.decreasePage();
+//        }
+//        view.setLogs(logResp);
+//
+//      }
+//
+//    }else if(askForNext && !ascTimeOrder){ //descending logs and we ask for next
+//      //based on time macro, ask for earlier/later logs via logResponse
+//      System.out.println("at top descending");
+//      System.out.println("view.getCurrpage: "+view.getCurrPage());
+//
+//      ListLogEntriesResponse logResp =
+//          controller.askForPreviousLog(view.getCurrPage(), view.getPageTokens());
+//      if (logResp != null) {
+//        if(view.getCurrPage()>=0) {
+//          view.decreasePage();
+//        }
+//        view.setLogs(logResp);
+//
+//      }
+//    }else if(askForPrev && !ascTimeOrder){ //descending logs and we ask for prev
+//      //based on time macro, ask for later/earlier logs via logResponse
+//      System.out.println("at bottom descending");
+//      System.out.println("view.getCurrpage: " + view.getCurrPage());
+//      ListLogEntriesResponse logResp =
+//          controller.askForNextLog(view.getCurrPage(), view.getPageTokens());
+//
+//      if(logResp!=null) {
+//        view.increasePage();
+//        view.setLogs(logResp);
+//
+//        prevValue=0;
+//        vertical.setValue(0);
+//        return;
+//      }
+//    }
+//    prevValue = e.getValue();
+//  }
 }

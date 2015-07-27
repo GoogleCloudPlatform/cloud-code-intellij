@@ -16,23 +16,58 @@
 package com.google.gct.idea.cloudlogging;
 
 import com.intellij.ui.components.JBLabel;
+import com.intellij.util.ui.UIUtil;
 
-import javax.swing.*;
 import java.awt.*;
 
+import javax.swing.*;
+
+
 /**
+ * Renderer to set the text and Icon for each element in the Combo Box for Log levels
  * Created by amulyau on 7/1/15.
  */
 public class LogLevelComboBoxRenderer extends JBLabel implements ListCellRenderer{
 
+  private final Color backgroundNonSelectionColor = UIUtil.getListBackground(false);
+  private final Color  backgroundSelectionColor = UIUtil.getListBackground(true);
 
+  private final Color textNonSelectColor = UIUtil.getListForeground(false);
+  private final Color textSelectColor = UIUtil.getListForeground(true);
+
+  AppEngineLogToolWindowView view;
+
+  public LogLevelComboBoxRenderer(AppEngineLogToolWindowView view) {
+
+    this.view = view;
+  }
+
+  /**
+   * Each element is a JLabel with text and an icon
+   * @param list The Jlist
+   * @param value Value of the object which is a JBLabel
+   * @param index Index of the object in the list
+   * @param isSelected Boolean value on whether the item is selected or not
+   * @param cellHasFocus Boolean value on whether the item has focus or not.
+   * @return JBLabel
+   */
   @Override
-  public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-    //value passed in is jb label
-    setText(((JBLabel)value).getText());
-    setIcon(((JBLabel)value).getIcon());
+  public Component getListCellRendererComponent(JList list, Object value, int index,
+                                                boolean isSelected, boolean cellHasFocus) {
+    JBLabel label = ((JBLabel)value); //value passed in is jb label
+    setOpaque(true);
 
+    setText(label.getText());
+    setIcon(label.getIcon());
+    if (isSelected) {
+      setBackground(backgroundSelectionColor);
+      setForeground(textSelectColor);
+    } else {
+      setBackground(backgroundNonSelectionColor);
+      setForeground(textNonSelectColor);
+    }
 
     return this;
   }
+
 }

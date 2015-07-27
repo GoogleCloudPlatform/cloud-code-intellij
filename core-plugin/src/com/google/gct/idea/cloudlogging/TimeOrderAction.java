@@ -15,8 +15,19 @@
  */
 package com.google.gct.idea.cloudlogging;
 
+import com.google.api.services.logging.model.ListLogEntriesResponse;
+
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.progress.PerformInBackgroundOption;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.progress.util.ProgressWindow;
+import com.intellij.openapi.project.Project;
+
+import org.jetbrains.annotations.NotNull;
+
+import icons.GoogleCloudToolsIcons;
 
 /**
  * Action on the left Side tool bar of the tool window that controls the time order of logs
@@ -24,32 +35,79 @@ import com.intellij.openapi.actionSystem.ToggleAction;
  */
 public class TimeOrderAction extends ToggleAction {
 
-  private final AppEngineLogToolWindowView view;
+  /**View for the App Engine Logs*/
+  private AppEngineLogToolWindowView view;
+  /**Controller for App Engine Logs*/
+  private AppEngineLogging controller;
+  /**Current application project (not app engine project)*/
+  private Project project;
 
-  public TimeOrderAction(AppEngineLogToolWindowView view) {
+  /**Empty Constructor*/
+  public TimeOrderAction() {}
 
-    super("Ascending","Ascending Logs", AppEngineIconsAndStrings.ASC_ORDER_ICON);
+  /**
+   * Constructor
+   * @param controller Controller for the App Engine Logs
+   * @param view View for the App Engine Logs that have the logs display
+   * @param project Current application project (not app engine project)
+   */
+  public TimeOrderAction(AppEngineLogging controller, AppEngineLogToolWindowView view,
+                         Project project) {
+
+    super("Ascending", "Ascending Logs", GoogleCloudToolsIcons.ASCENDING_LOGS);
     this.view = view;
-
+    this.controller = controller;
+    this.project = project;
   }
 
   @Override
   public boolean isSelected(AnActionEvent e) {
+
     return view.getTimeOrder();
   }
 
   @Override
   public void setSelected(AnActionEvent e, boolean state) {
-    if(state){ //if selected, time asc
+
+    if (state) { //if selected, time asc
       view.changeTimeOrder(true);
-      System.out.println("true");
-      // view.refreshTimeOrderLogs();
-    }else{
+    } else {
       view.changeTimeOrder(false);
-      System.out.println("false");
-      //view.refreshTimeOrderLogs();
     }
 
+    Task.Backgroundable logTask = new Task.Backgroundable(project, "Getting Logs List",
+        false, new PerformInBackgroundOption() {
+
+      @Override
+      public boolean shouldStartInBackground() {
+
+        return true;
+      }
+
+      @Override
+      public void processSentToBackground() {}
+    }) {
+
+      @Override
+      public void run(@NotNull ProgressIndicator progressIndicator) {
+        progressIndicator.setFraction(0.10);
+        progressIndicator.setText("90% to finish");
+        view.clearPageTokens();
+
+        while(view.getCurrPage() > -1) {
+          view.decreasePage();
+        }
+        progressIndicator.setFraction(0.33);
+        progressIndicator.setText("66% to finish");
+
+        ListLogEntriesResponse logResp = controller.getLogs();
+        progressIndicator.setFraction(0.66);
+        progressIndicator.setText("33% to finish");
+
+        view.threadProcessAndSetLogs(logResp);
+      }
+    };
+    logTask.run(new ProgressWindow(false, project));
   }
 
 }

@@ -15,68 +15,164 @@
  */
 package com.google.gct.idea.cloudlogging;
 
-import com.intellij.openapi.ui.Messages;
+import com.google.api.services.logging.model.ListLogEntriesResponse;
+
+import com.intellij.openapi.progress.PerformInBackgroundOption;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.DocumentAdapter;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 
 /**
+ * Project Selector listener to select project when project is clicked in Project Selector component
  * Created by amulyau on 6/24/15.
  */
 public class ProjectSelectorListener extends DocumentAdapter {
+
   /**Controller for App Engine Logs*/
-  AppEngineLogging controller;
-
+  private final AppEngineLogging controller;
   /**View for the App Engine Logs*/
-  AppEngineLogToolWindowView view;
+  private final AppEngineLogToolWindowView view;
+  /**Current application project (not app engine project)*/
+  private final Project project;
 
-  private String ERROR_PROJECT_NOT_EXIST = "Error: Project entered does not exist, " +
-                                           "please try again";
-  private String ERROR_DIALOG_TITLE = "Error";
+  /**
+   * Constructor
+   * @param controller Controller for the App Engine Logs
+   * @param view View for the App Engine Logs that have the logs display
+   * @param project Current application project (not app engine project)
+   */
+  public ProjectSelectorListener(AppEngineLogging controller, AppEngineLogToolWindowView view,
+                                 Project project) {
 
-
-  public ProjectSelectorListener(AppEngineLogging controller, AppEngineLogToolWindowView view){
-
-    this.controller=controller;
+    this.controller = controller;
     this.view = view;
+    this.project = project;
   }
 
   @Override
   protected void textChanged(DocumentEvent e) {
-    //get the project ID of the app engine project
-    view.setCurrProject();
+
+    view.setCurrProject(); //get the project ID of the app engine project
     String currProject = view.getCurrProject();
 
-    //proper project (in app engine) selected and not same as previous selection
-    if((currProject!=null)  && (!currProject.equals(view.getPrevProject()))){
-      view.setTreeRootVisible(false);
+    if ((currProject != null)  && (!currProject.equals(view.getPrevProject()))) { //gcp project
+      view.setTreeRootVisible();
+      view.clearComboBoxes();//remove previous filters
+      view.setPrevProject(); //sets new project as prev project
 
-      //remove previous filters
-      view.clearComboBoxes();
+      view.setEnabledModuleComboBox();
+      view.setEnabledVersionComboBox();
 
-      view.setPrevProject();
+      Task.Backgroundable logTask = new Task.Backgroundable(project, "Getting Modules, " +
+          "Versions and Logs List", false, new PerformInBackgroundOption() {
 
-      view.setEnabledModuleComboBox(true);
-      view.setEnabledVersionComboBox(true);
+        @Override
+        public boolean shouldStartInBackground() {
+          return true;
+        }
 
-      //make sure of proper user credentials and make connection
-      controller.createConnection();
-      view.setCurrentAppID();
+        @Override
+        public void processSentToBackground() {}
+      }) {
 
-      view.setModulesList(controller.getModulesList());
-      view.setVersionsList(controller.getVersionsList());
-      view.setLogs(controller.getLogs());
+        @Override
+        public void run(@NotNull ProgressIndicator progressIndicator) {
 
+          controller.createConnection(); //make sure of proper user credentials and make connection
+          view.setCurrentAppID();
 
-    }else if((currProject!=null) && (currProject.equals(view.getPrevProject()))){
+          if (controller.isNotConnected()) { //no current app set means error with create connection
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                view.resetComponents();
+                view.setRootText(view.ERROR_PROJECT_DID_NOT_CONNECT);
+              }
+            });
+
+          } else {
+
+            progressIndicator.setFraction(0.10);
+            progressIndicator.setText("90% to finish");
+            final ArrayList<String> modulesList = view.processModulesList(controller
+                .getModulesList());
+
+            if (modulesList != null) {
+              progressIndicator.setFraction(0.20);
+              progressIndicator.setText("80% to finish");
+              SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  view.setModulesList(modulesList);
+                }
+              });
+
+              progressIndicator.setFraction(0.33);
+              progressIndicator.setText("66% to finish");
+              final ArrayList<String> versionsList = view.processVersionsList(controller
+                  .getVersionsList());
+
+              if (versionsList != null) {
+                progressIndicator.setFraction(0.45);
+                progressIndicator.setText("55% to finish");
+                SwingUtilities.invokeLater(new Runnable() {
+                  @Override
+                  public void run() {
+                    view.setVersionsList(versionsList);
+                  }
+                });
+
+                while (view.getCurrPage() != -1) { //get to first page when we refresh logs
+                  view.decreasePage();
+                }
+                progressIndicator.setFraction(0.66);
+                progressIndicator.setText("33% to finish");
+                ListLogEntriesResponse logResp = controller.getLogs();
+
+                progressIndicator.setFraction(0.90);
+                progressIndicator.setText("10% to finish");
+                view.threadProcessAndSetLogs(logResp);
+              } else {
+                progressIndicator.setFraction(0.90);
+                progressIndicator.setText("10% to finish");
+                SwingUtilities.invokeLater(new Runnable() {
+                  @Override
+                  public void run() {
+                    view.setRootText(view.NO_VERSIONS_LIST_STRING);
+                  }
+                });
+              }
+            } else {
+              progressIndicator.setFraction(0.90);
+              progressIndicator.setText("10% to finish");
+              SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  view.setRootText(view.NO_MODULES_LIST_STRING);
+                }
+              });
+            }
+          }
+        }
+      };
+      logTask.queue();
+    } else if ((currProject != null) && (currProject.equals(view.getPrevProject()))) {
       //same as previous selection
-    }else if(currProject==null && view.getPrevProject()==null){
+    } else if ((currProject == null) && (view.getPrevProject() == null)){
       //don't do anything because they had previously errored
-    }else if(view.getCurrModule()==null){ //modules does not exist
-      Messages.showErrorDialog(ERROR_PROJECT_NOT_EXIST, ERROR_DIALOG_TITLE);
-    }else{ //not valid project name => error
+    } else if (currProject == null) {
+      //invalid current project
+    } else { //not valid project name => error
       view.setPrevProject();
-      Messages.showErrorDialog(ERROR_PROJECT_NOT_EXIST, ERROR_DIALOG_TITLE);
+      view.setRootText(view.ERROR_PROJECT_NOT_EXIST);
       view.setModuleALActive(false);
       view.setVersionALActive(false);
       view.resetComponents();
@@ -84,6 +180,5 @@ public class ProjectSelectorListener extends DocumentAdapter {
       view.setVersionALActive(true);
     }
   }
-
 
 }

@@ -15,25 +15,49 @@ package com.google.gct.idea.cloudlogging;/*
  */
 
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.UIUtil;
 
-import javax.swing.plaf.basic.BasicComboBoxEditor;
 import java.awt.*;
 
+import javax.swing.plaf.basic.BasicComboBoxEditor;
+
 /**
+ * Combo Box Editor to allow a ComboBox element to have a panel and label
  * Created by amulyau on 7/1/15.
  */
 public class LogLevelComboBoxEditor extends BasicComboBoxEditor {
-  JBPanel panel = new JBPanel();
-  JBLabel label = new JBLabel();
 
-  public LogLevelComboBoxEditor(){
-    panel.add(label);
+  private final Color backgroundNonSelectionColor = UIUtil.getListBackground(false); //white
+  private final Color backgroundSelectionColor = UIUtil.getListBackground(true); //blue
+
+  private final Color textNonSelectColor = UIUtil.getListForeground(false); //black
+  private final Color textSelectColor = UIUtil.getListForeground(true); //white
+
+  /**
+   * Every element in the combo box for log levels is a panel
+   */
+  //private final JBPanel panel = new JBPanel();
+  private final JBLabel label = new JBLabel();
+
+  /**
+   * The panel contains a label so constructor adds the label
+   */
+  public LogLevelComboBoxEditor() {
+
+    //JBLabel label = new JBLabel();
+  //  label.setOpaque(false);
+  //  panel.add(label);
   }
 
+  /**
+   * Gets the panel
+   * @return Panel
+   */
   @Override
-  public Component getEditorComponent(){
-    return this.panel;
+  public Component getEditorComponent() {
+
+    //return this.panel;
+    return this.label;
   }
 
 }
