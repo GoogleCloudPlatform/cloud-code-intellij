@@ -177,8 +177,6 @@ public class AppEngineLogToolWindowView {
   private int defaultModIndex = -1;
   /**Stores if there is a next page token so that we can process and then set the GUI for logs*/
   private boolean nextPageTokenExist;
-
-  /**Current app id*/
   private String currentAppID;
 
   /**

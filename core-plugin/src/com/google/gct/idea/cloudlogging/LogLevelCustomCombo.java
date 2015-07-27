@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 /**
+ * Custom Combo Box object to show the list for the combo box.
  * Created by amulyau on 7/26/15.
  */
 public class LogLevelCustomCombo extends CustomizableComboBox implements CustomizableComboBoxPopup {
