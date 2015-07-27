@@ -19,35 +19,37 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 
 /**
- * Created by amulyau on 6/30/15.
+ * Action on the left Side tool bar of the tool window that controls the time order of logs
+ * Created by amulyau on 7/10/15.
  */
-public class textWrapAction extends ToggleAction {
+public class TimeOrderAction extends ToggleAction {
 
-  AppEngineLogToolWindowView view;
-  public textWrapAction(AppEngineLogToolWindowView view){
-    super("Wrap","Text Wrap",AppEngineIcons.WRAP_TOGGLE_ICON);
+  private final AppEngineLogToolWindowView view;
+
+  public TimeOrderAction(AppEngineLogToolWindowView view) {
+
+    super("Ascending","Ascending Logs", AppEngineIconsAndStrings.ASC_ORDER_ICON);
     this.view = view;
 
   }
 
   @Override
   public boolean isSelected(AnActionEvent e) {
-    return view.getTextWrap();
+    return view.getTimeOrder();
   }
 
   @Override
   public void setSelected(AnActionEvent e, boolean state) {
-    if (state==true) { //selected => text wrap
-      view.changeTextWrapState(true);
-      view.registerUI();
+    if(state){ //if selected, time asc
+      view.changeTimeOrder(true);
+      System.out.println("true");
+      // view.refreshTimeOrderLogs();
+    }else{
+      view.changeTimeOrder(false);
+      System.out.println("false");
+      //view.refreshTimeOrderLogs();
     }
-    else {
-      view.changeTextWrapState(false);
-      view.registerUI();
-    }
-
 
   }
-
 
 }

@@ -19,35 +19,34 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 
 /**
- * Created by amulyau on 7/10/15.
+ * Action on the left Side tool bar of the tool window that controls the text wrapping
+ * Created by amulyau on 6/30/15.
  */
-public class timeOrderAction extends ToggleAction {
-   AppEngineLogToolWindowView view;
+public class TextWrapAction extends ToggleAction {
 
-  public timeOrderAction(AppEngineLogToolWindowView view) {
+  private final AppEngineLogToolWindowView view;
 
-    super("Ascending","Ascending Logs",AppEngineIcons.ASC_ORDER_ICON);
+  public TextWrapAction(AppEngineLogToolWindowView view) {
+    super("Wrap","Text Wrap", AppEngineIconsAndStrings.WRAP_TOGGLE_ICON);
     this.view = view;
 
   }
 
   @Override
   public boolean isSelected(AnActionEvent e) {
-    return view.getTimeOrder();
+    return view.getTextWrap();
   }
 
   @Override
   public void setSelected(AnActionEvent e, boolean state) {
-    if(state==true){ //if selected, time asc
-      view.changeTimeOrder(true);
-      System.out.println("true");
-      //view.expandLogs();
-    }else{
-      view.changeTimeOrder(false);
-      System.out.println("false");
-      //view.collapseLogs();
+    if (state) { //selected => text wrap
+      view.changeTextWrapState(true);
+      view.registerUI();
     }
-
+    else {
+      view.changeTextWrapState(false);
+      view.registerUI();
+    }
   }
 
 }
