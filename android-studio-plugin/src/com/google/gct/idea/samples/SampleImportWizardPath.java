@@ -16,14 +16,14 @@
 package com.google.gct.idea.samples;
 
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
-import com.android.tools.idea.stats.UsageTracker;
-import com.android.tools.idea.wizard.dynamic.DynamicWizardPath;
-import com.android.tools.idea.wizard.dynamic.ScopedStateStore;
+import com.android.tools.idea.wizard.dynamic.*;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.google.common.base.Strings;
+import com.google.gct.login.stats.UsageTrackerService;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
+
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -148,7 +148,7 @@ public class SampleImportWizardPath extends DynamicWizardPath {
       return false;
     }
 
-    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.SAMPLES, sampleName, null);
+    UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.SAMPLES, sampleName, null);
     GradleProjectImporter.getInstance().importProject(project.getBaseDir());
     // TODO : display the correct starting file for users
     return true;

@@ -19,13 +19,12 @@ import static com.intellij.openapi.ui.MessageType.ERROR;
 import static com.intellij.openapi.util.text.StringUtil.isNotEmpty;
 
 import com.google.common.collect.Maps;
-import com.google.gct.idea.appengine.gradle.facet.AppEngineConfigurationProperties;
 import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
 import com.google.gct.idea.appengine.gradle.project.IdeaAppEngineProject;
 
 import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
-import com.google.gct.idea.stats.UsageTracker;
+import com.google.gct.login.stats.UsageTrackerService;
 import com.google.gct.idea.util.GctTracking;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -47,10 +46,7 @@ import com.intellij.openapi.ui.MessageType;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -87,7 +83,7 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
           if (importModulesMap.containsKey(module.getName())) {
             AppEngineGradleFacet facet = addAppEngineGradleFacet(importModulesMap.get(module.getName()), module);
             addAppEngineRunConfiguration(module, facet);
-            UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.GRADLE_IMPORT, null, null);
+            UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.GRADLE_IMPORT, null, null);
           }
         }
       }

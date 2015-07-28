@@ -15,10 +15,11 @@
  */
 package com.google.gct.idea.git;
 
-import com.google.gct.idea.stats.UsageTracker;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.gct.login.stats.UsageTrackerService;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
+
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -38,8 +39,6 @@ import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
 import git4idea.commands.GitLineHandlerListener;
 import git4idea.commands.GitStandardProgressAnalyzer;
-import git4idea.update.GitFetchResult;
-import git4idea.update.GitFetcher;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,7 +64,7 @@ public class GcpCheckoutProvider implements CheckoutProvider {
 
   @Override
   public void doCheckout(@NotNull final Project project, @Nullable final Listener listener) {
-    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "checkout", null);
+    UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "checkout", null);
 
     BasicAction.saveAll();
     CloneGcpDialog dialog = new CloneGcpDialog(project);

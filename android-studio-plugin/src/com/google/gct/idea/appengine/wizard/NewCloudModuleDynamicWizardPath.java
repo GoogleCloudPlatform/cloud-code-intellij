@@ -120,7 +120,6 @@ public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implement
       return GoogleCloudToolsIcons.CLOUD_MODULE;
     }
 
-    @Override
     public void updateWizardState(@NotNull ScopedStateStore state) {
       // Do nothing.
     }
