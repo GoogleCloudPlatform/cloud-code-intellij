@@ -15,9 +15,9 @@
  */
 package com.google.gct.idea.appengine.wizard;
 
-import com.android.tools.idea.wizard.AndroidStudioWizardPath;
-import com.android.tools.idea.wizard.ModuleTemplate;
-import com.android.tools.idea.wizard.NewModuleWizardDynamic;
+import com.android.tools.idea.wizard.dynamic.AndroidStudioWizardPath;
+import com.android.tools.idea.npw.ModuleTemplate;
+import com.android.tools.idea.npw.NewModuleWizardDynamic;
 import com.android.tools.idea.wizard.WizardConstants;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
