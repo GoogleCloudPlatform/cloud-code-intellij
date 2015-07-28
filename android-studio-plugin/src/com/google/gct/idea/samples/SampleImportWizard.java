@@ -71,7 +71,6 @@ public class SampleImportWizard extends DynamicWizard {
   }
 
   @NotNull
-  @Override
   protected String getProgressTitle() {
     return GctBundle.getString("sample.import.progress.title");
   }

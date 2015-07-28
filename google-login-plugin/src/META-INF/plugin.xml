@@ -44,6 +44,9 @@
 
   <extensionPoints>
     <extensionPoint name="googleLoginListener" interface="com.google.gct.login.GoogleLoginListener"/>
+    <extensionPoint name="usageTracker" beanClass="com.google.gct.login.stats.UsageTrackerExtensionPointBean">
+      <with attribute="implementationClass" implements="com.google.gct.login.stats.UsageTrackerService.UsageTracker"/>
+    </extensionPoint>
   </extensionPoints>
 
 </idea-plugin>

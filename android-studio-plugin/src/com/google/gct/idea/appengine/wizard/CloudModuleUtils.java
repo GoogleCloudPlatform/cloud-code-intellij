@@ -18,9 +18,6 @@ package com.google.gct.idea.appengine.wizard;
 
 import com.android.builder.model.SourceProvider;
 import com.android.tools.idea.gradle.invoker.GradleInvoker;
-import com.android.tools.idea.gradle.project.GradleProjectImporter;
-import com.android.tools.idea.gradle.project.GradleSyncListener;
-import com.android.tools.idea.stats.UsageTracker;
 import com.android.tools.idea.templates.KeystoreUtils;
 import com.android.tools.idea.templates.Template;
 import com.android.tools.idea.templates.TemplateMetadata;
@@ -29,11 +26,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gct.idea.appengine.gradle.facet.AppEngineConfigurationProperties;
-import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
-import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
+import com.google.gct.login.stats.UsageTrackerService;
 import com.google.gct.idea.util.GctTracking;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -49,7 +44,6 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ArrayUtil;
-import com.intellij.util.indexing.IndexInfrastructure;
 import org.jetbrains.android.dom.manifest.Manifest;
 import org.jetbrains.android.facet.AndroidFacet;
 import org.jetbrains.android.facet.IdeaSourceProvider;
@@ -59,7 +53,6 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -114,7 +107,7 @@ public final class CloudModuleUtils {
     final List<File> allFilesToOpen = Lists.newArrayList();
     template.render(projectRoot, moduleRoot, replacementMap, project);
 
-    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.WIZARD, templateFile.getName(), null);
+    UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.WIZARD, templateFile.getName(), null);
 
     allFilesToOpen.addAll(template.getFilesToOpen());
 

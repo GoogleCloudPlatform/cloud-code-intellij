@@ -15,8 +15,8 @@
  */
 package com.google.gct.idea.git;
 
-import com.google.gct.idea.stats.UsageTracker;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.gct.login.stats.UsageTrackerService;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.CredentialedUser;
@@ -34,7 +34,6 @@ import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.openapi.util.Condition;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vcs.VcsDataKeys;
 import com.intellij.openapi.vcs.VcsException;
@@ -57,7 +56,6 @@ import git4idea.config.GitConfigUtil;
 import git4idea.config.GitVcsApplicationSettings;
 import git4idea.config.GitVersion;
 import git4idea.i18n.GitBundle;
-import git4idea.repo.GitRemote;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
 import git4idea.update.GitFetchResult;
@@ -99,7 +97,7 @@ public class UploadSourceAction extends DumbAwareAction {
 
   @Override
   public void actionPerformed(final AnActionEvent e) {
-    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "upload", null);
+    UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "upload", null);
 
     final Project project = e.getData(CommonDataKeys.PROJECT);
     final VirtualFile file = e.getData(CommonDataKeys.VIRTUAL_FILE);
