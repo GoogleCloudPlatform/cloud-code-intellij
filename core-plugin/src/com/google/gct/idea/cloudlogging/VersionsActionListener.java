@@ -33,13 +33,8 @@ import java.awt.event.ActionListener;
  */
 public class VersionsActionListener implements ActionListener {
 
-  /**Controller for App Engine Logs*/
   private final AppEngineLogging controller;
-
-  /**View for the App Engine Logs*/
   private final AppEngineLogToolWindowView view;
-
-  /**Current application project (not app engine project)*/
   private final Project project;
 
   /**
@@ -50,7 +45,6 @@ public class VersionsActionListener implements ActionListener {
    */
   public VersionsActionListener(AppEngineLogging controller, AppEngineLogToolWindowView view,
                                 Project project) {
-
     this.controller = controller;
     this.view = view;
     this.project = project;
@@ -63,7 +57,6 @@ public class VersionsActionListener implements ActionListener {
    */
   @Override
   public void actionPerformed(ActionEvent e) {
-
     //gets previous version selection to compare with current version selection
     String prevVersionSelection = view.getCurrVersion();
     view.setCurrVersion();
@@ -77,20 +70,16 @@ public class VersionsActionListener implements ActionListener {
       if (view.getVersionALActive()) { //solve combobox touchiness problems
         Task.Backgroundable logTask = new Task.Backgroundable(project, "Getting Logs List",
             false, new PerformInBackgroundOption() {
-
           @Override
           public boolean shouldStartInBackground() {
-
             return true;
           }
-
           @Override
           public void processSentToBackground() {}
         }) {
 
           @Override
           public void run(@NotNull ProgressIndicator progressIndicator) {
-
             progressIndicator.setFraction(0.10);
             progressIndicator.setText("90% to finish");
             view.clearPageTokens();

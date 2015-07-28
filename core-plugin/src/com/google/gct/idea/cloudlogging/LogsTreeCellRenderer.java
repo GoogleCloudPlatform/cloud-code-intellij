@@ -30,15 +30,10 @@ import static com.intellij.util.ui.UIUtil.getBoundsColor;
  */
 public class LogsTreeCellRenderer extends DefaultTreeCellRenderer {
 
-  /**Color of the background when object is not selected*/
   private final Color backgroundNonSelectionColor = getBackgroundNonSelectionColor();
-  /**Color of the background when object is selected*/
   private final Color  backgroundSelectionColor = getBackgroundSelectionColor();
-  /**Color of the text when object is not selected*/
   private final Color textNonSelectColor = getTextNonSelectionColor();
-  /**Color of the text when object is selected*/
   private final Color textSelectColor = getTextSelectionColor();
-  /**The view that contains the tree that has the logs*/
   private final AppEngineLogToolWindowView view;
 
   /**
@@ -46,7 +41,6 @@ public class LogsTreeCellRenderer extends DefaultTreeCellRenderer {
    * @param view The App Engine Log Tool Window view that provides the font size.
    */
   public LogsTreeCellRenderer(AppEngineLogToolWindowView view) {
-
     this.view = view;
   }
 
@@ -54,7 +48,6 @@ public class LogsTreeCellRenderer extends DefaultTreeCellRenderer {
   public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
                                                 boolean expanded, boolean leaf, int row,
                                                 boolean hasFocus) {
-
     TextAreaNode treeNode = (TextAreaNode)value;
     String text = treeNode.getText();
     PanelExtend panel = new PanelExtend();
@@ -82,7 +75,6 @@ public class LogsTreeCellRenderer extends DefaultTreeCellRenderer {
     if (selected) {
       panel.setBackground(backgroundSelectionColor);
       textArea.setForeground(textSelectColor);
-
     } else {
       panel.setBackground(backgroundNonSelectionColor);
       textArea.setForeground(textNonSelectColor);

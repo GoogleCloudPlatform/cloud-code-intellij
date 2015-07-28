@@ -24,9 +24,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class TextAreaNode extends DefaultMutableTreeNode {
 
-  /**Text for the tree node*/
   private final String text;
-  /**Icon for the tree node*/
   private final Icon icon;
 
   /**
@@ -36,7 +34,6 @@ public class TextAreaNode extends DefaultMutableTreeNode {
    * @param severityIcon icon that represents the log level
    */
   public TextAreaNode(String text, boolean bool, Icon severityIcon) {
-
     this.setAllowsChildren(bool);
     this.text = text;
     this.icon = severityIcon;
@@ -47,7 +44,6 @@ public class TextAreaNode extends DefaultMutableTreeNode {
    * @return String text
    */
   public String getText() {
-
     return text;
   }
 
@@ -56,7 +52,6 @@ public class TextAreaNode extends DefaultMutableTreeNode {
    * @return Icon that represents the log level of the tree node.
    */
   public Icon getIcon() {
-
     return icon;
   }
 

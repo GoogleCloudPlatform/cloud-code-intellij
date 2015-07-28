@@ -11,7 +11,6 @@ import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.UIUtil;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
@@ -23,12 +22,12 @@ import javax.swing.*;
  * Created by amulyau on 7/26/15.
  */
 public class LogLevelCustomCombo extends CustomizableComboBox implements CustomizableComboBoxPopup {
-
   private final AppEngineLogToolWindowView view;
   private JBPopup popup;
   private JBList list;
   private DefaultListModel listModel;
   private JBLabel label;
+  private boolean enabled;
 
   public LogLevelCustomCombo(final AppEngineLogToolWindowView view) {
     this.remove(1); //remove default text field and add label instead
@@ -47,6 +46,16 @@ public class LogLevelCustomCombo extends CustomizableComboBox implements Customi
     list.setBackground(UIUtil.getListBackground());
     list.setForeground(UIUtil.getListForeground());
 
+    this.list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+    this.list.setCellRenderer(new LogLevelComboBoxRenderer(view));
+    enabled = false;
+  }
+
+  /**
+   * Add mouse motion listeners to list
+   * @param listener Log level Combo Listener mouse listener
+   */
+  public void addMouseListeners(LogLevelComboListener listener) {
     list.addMouseMotionListener(new MouseMotionListener() {
       @Override
       public void mouseDragged(MouseEvent e) {
@@ -61,34 +70,51 @@ public class LogLevelCustomCombo extends CustomizableComboBox implements Customi
       }
     });
 
-    this.list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-    this.list.setCellRenderer(new LogLevelComboBoxRenderer(view));
+    list.addMouseListener(listener);
+  }
 
-    this.list.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        int index = list.locationToIndex(e.getPoint());
-        view.setCurrLogLevelSelected(index);
-        list.setSelectionInterval(0, index);
-        label.setText(((JBLabel) listModel.get(index)).getText());
-        label.setIcon(((JBLabel) listModel.get(index)).getIcon());
-        popup.dispose();
-      }
+  /**
+   * What to do when mouse clicks the combo box list
+   * @param p Point the mouse clicked
+   */
+  public void mouseClicked(Point p) {
+    int index = list.locationToIndex(p);
+    list.setSelectionInterval(0,index);
+    label.setText(((JBLabel) listModel.get(index)).getText());
+    label.setIcon(((JBLabel) listModel.get(index)).getIcon());
+    if ((popup!=null) && (popup.isVisible()) && (!popup.isDisposed())) {
+      popup.dispose();
+    }
+    view.setCurrLogLevelSelected(index);
+  }
 
-      @Override
-      public void mouseEntered(MouseEvent e) {
-        int index = list.locationToIndex(e.getPoint());
-        list.setSelectionInterval(0, index);
-      }
+  /**
+   * Based on mouse point, sets the selected interval on log levels
+   * @param p Point p form mouse event
+   */
+  public void setInterval(Point p) {
+    int index = list.locationToIndex(p);
+    list.setSelectionInterval(0, index);
+  }
 
-      @Override
-      public void mouseExited(MouseEvent e) {
-        int index = view.getCurrLogLevelSelected();
-        list.setSelectionInterval(0, index);
-        label.setText(((JBLabel) listModel.get(index)).getText());
-        label.setIcon(((JBLabel) listModel.get(index)).getIcon());
-      }
-    });
+  /**
+   * What to do when mouse exits the combo box list
+   * @param p Point the mouse exited
+   */
+  public void mouseExited(Point p) {
+    int index = view.getCurrLogLevelSelected();
+    list.setSelectionInterval(0, index);
+    label.setText(((JBLabel) listModel.get(index)).getText());
+    label.setIcon(((JBLabel) listModel.get(index)).getIcon());
+  }
+
+  /**
+   * Sets the label look as enabled to click
+   * @param bool boolean value, if true then label is enabled, else false.
+   */
+  public void setEnabledView(boolean bool) {
+    this.enabled = bool;
+    this.label.setEnabled(bool);
   }
 
   /**
@@ -100,9 +126,7 @@ public class LogLevelCustomCombo extends CustomizableComboBox implements Customi
       listModel.addElement(label);
     }
     JBLabel tempLabel = logLevelList.get(logLevelList.size()-1);
-
     label = new JBLabel(tempLabel.getText(), tempLabel.getIcon(), JBLabel.LEFT);
-
   }
 
   @Override
@@ -117,24 +141,28 @@ public class LogLevelCustomCombo extends CustomizableComboBox implements Customi
 
   @Override
   public void showPopup(RelativePoint showTarget) {
-    if ((popup == null) || (popup.isDisposed())) {
-      popup = JBPopupFactory.getInstance().createComponentPopupBuilder(list, null).createPopup();
+    if(enabled) {
+      if (((popup == null) || (popup.isDisposed())) && (enabled)) {
+        popup = JBPopupFactory.getInstance().createComponentPopupBuilder(list, null).createPopup();
+      }
+      if (!popup.isVisible()) {
+        popup.show(showTarget);
+      }
+      int logLevel = view.getCurrLogLevelSelected();
+      list.setSelectionInterval(0, logLevel);
     }
-    if(!popup.isVisible()){
-      popup.show(showTarget);
-    }
-    int logLevel = view.getCurrLogLevelSelected();
-    list.setSelectionInterval(0,logLevel);
   }
 
   @Override
   public void hidePopup() {
-
+    if(popup.isVisible()) {
+      popup.dispose();
+    }
   }
 
   @Override
   public boolean isPopupVisible() {
-    return false;
+    return popup !=null && !popup.isDisposed() && popup.isVisible();
   }
 
 }

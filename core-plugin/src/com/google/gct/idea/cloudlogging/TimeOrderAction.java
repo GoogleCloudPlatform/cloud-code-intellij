@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.progress.util.ProgressWindow;
 import com.intellij.openapi.project.Project;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,14 +34,13 @@ import icons.GoogleCloudToolsIcons;
  */
 public class TimeOrderAction extends ToggleAction {
 
-  /**View for the App Engine Logs*/
   private AppEngineLogToolWindowView view;
-  /**Controller for App Engine Logs*/
   private AppEngineLogging controller;
-  /**Current application project (not app engine project)*/
   private Project project;
 
-  /**Empty Constructor*/
+  /**
+   * Empty constructor to add as action to plugin.xml
+   */
   public TimeOrderAction() {}
 
   /**
@@ -53,7 +51,6 @@ public class TimeOrderAction extends ToggleAction {
    */
   public TimeOrderAction(AppEngineLogging controller, AppEngineLogToolWindowView view,
                          Project project) {
-
     super("Ascending", "Ascending Logs", GoogleCloudToolsIcons.ASCENDING_LOGS);
     this.view = view;
     this.controller = controller;
@@ -77,13 +74,10 @@ public class TimeOrderAction extends ToggleAction {
 
     Task.Backgroundable logTask = new Task.Backgroundable(project, "Getting Logs List",
         false, new PerformInBackgroundOption() {
-
       @Override
       public boolean shouldStartInBackground() {
-
         return true;
       }
-
       @Override
       public void processSentToBackground() {}
     }) {
@@ -107,7 +101,7 @@ public class TimeOrderAction extends ToggleAction {
         view.threadProcessAndSetLogs(logResp);
       }
     };
-    logTask.run(new ProgressWindow(false, project));
+    logTask.queue();
   }
 
 }

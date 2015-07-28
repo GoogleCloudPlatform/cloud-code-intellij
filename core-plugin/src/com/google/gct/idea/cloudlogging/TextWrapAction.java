@@ -25,10 +25,11 @@ import com.intellij.openapi.actionSystem.ToggleAction;
  */
 public class TextWrapAction extends ToggleAction {
 
-  /**View for the App Engine Logs*/
   private AppEngineLogToolWindowView view;
 
-  /**Empty Constructor*/
+  /**
+   * Empty constructor to add as action to plugin.xml
+   */
   public TextWrapAction() {}
 
   /**
@@ -36,20 +37,17 @@ public class TextWrapAction extends ToggleAction {
    * @param view View for the App Engine Logs that have the logs display
    */
   public TextWrapAction(AppEngineLogToolWindowView view) {
-
     super("Wrap", "Text Wrap", AllIcons.Actions.ToggleSoftWrap);
     this.view = view;
   }
 
   @Override
   public boolean isSelected(AnActionEvent e) {
-
     return view.getTextWrap();
   }
 
   @Override
   public void setSelected(AnActionEvent e, boolean state) {
-
     if (state) { //selected => text wrap
       view.changeTextWrapState(true);
       view.registerUI();

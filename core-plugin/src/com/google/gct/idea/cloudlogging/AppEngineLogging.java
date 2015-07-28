@@ -38,7 +38,6 @@ import javax.swing.*;
 
 import icons.GoogleCloudToolsIcons;
 
-
 /**
  * Tool Window controller/assembler for the App Engine Logs Viewer
  * Created by amulyau on 5/27/15.
@@ -47,37 +46,24 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
 
   /**Logs Exceptions and asserts as errors if bug else if network issue/ out of hands => warning*/
   private static final Logger LOG = Logger.getInstance(AppEngineLogging.class);
-  /**ID of App Engine Logs Tool Window*/
   private static final String APP_ENGINE_LOGS_ID = "App Engine Logs";
-  /**Content ID for the Content in the App Engine Logs Tool Window*/
   private static final String APP_ENGINE_CONTENT_ID = "App Engine Content";
-  /**Logs Containing Content ToolBar Text */
   private static final String APP_END_TOOLBAR_CONTENT_TEXT = "Logs";
-  /**String used in the layoutUI to hold the panels for the tool window*/
   private static final String APPENGINE_LOGS_STRING = "AppEngine Logs";
   /**App Engine Logs use*/
   private static final String INTELLIJ_STRING = "IntelliJ"; //changing this does not seem to matter
-  /**When no user is selected to get list of modules and versions*/
   private static final String NO_SELECTED_USER = "Error: No User has been Selected, Please Try " +
       "Again";
-  /**Error for Logger when Window could not be created*/
   private static final String ERROR_COULD_NOT_CREATE_WINDOW = "Could not create App Engine Logs " +
       "Viewer Window";
-  /**Error for Exceptions when getting modules*/
   private static final String ERROR_COULD_NOT_GET_MODULES = "Could not get Modules List";
-  /**Error for Exceptions when getting versions*/
   private static final String ERROR_COULD_NOT_GET_VERSIONS = "Could not get Versions List";
-  /**Error for Exceptions when getting logs*/
   private static final String ERROR_COULD_NOT_GET_LOGS = "Could not get Logs List";
 
-  /**App Engine connection*/
   private Appengine myAppengine;
-  /**Logging Connection*/
   private Logging myLogging;
 
-  /**View*/
   private AppEngineLogToolWindowView myAppEngineLogToolWindowView;
-  /**The Project in which the tool window appears*/
   private Project project;
 
   /**
@@ -88,7 +74,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    */
   @Override
   public boolean value(Project project) {
-
     Module[] modArray= ModuleManager.getInstance(project).getModules();
     for(Module mod: modArray){
       if(AppEngineGradleFacet.getInstance(mod)!=null){
@@ -105,48 +90,34 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    */
   @Override
   public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-
     this.project = project;
 
     //hold panels for tool window
     RunnerLayoutUi layoutUi = RunnerLayoutUi.Factory.getInstance(project)
         .create(APPENGINE_LOGS_STRING, APPENGINE_LOGS_STRING, APPENGINE_LOGS_STRING, project);
 
-    ContentManager contentManager = toolWindow.getContentManager();
-    //content manager holds the content/tab info of the tool window
+    ContentManager contentManager = toolWindow.getContentManager(); //holds tabs for tool window
 
     toolWindow.setIcon(GoogleCloudToolsIcons.CLOUD_TOOL_WINDOW);
     toolWindow.setTitle(APP_ENGINE_LOGS_ID);   //sets title to app engine logs
 
-    //create content for ui elements and AppEngineLogToolWindowView for GUi elements
-    ContentToolWindowView contentToolWindowView = createAppEngLogContent(layoutUi);
+    ContentToolWindowView contentToolWindowView = createAppEngLogContent(layoutUi); //create ui
     Content appEngLogContent = contentToolWindowView.getContent();
 
-    //View for tool window
     myAppEngineLogToolWindowView = contentToolWindowView.getToolWindowView();
-
-    if (myAppEngineLogToolWindowView == null) {  //makes sure this exists!
+    if (myAppEngineLogToolWindowView == null) {
       // when this is true, an unavoidable null pointer exception thrown when closing IDE window
       LOG.error(ERROR_COULD_NOT_CREATE_WINDOW);
       return;
     }
-
-    //create tool window bar with search, Project Selection, modules,and version
     appEngLogContent.setSearchComponent(myAppEngineLogToolWindowView.createSearchComponent());
     addActionListeners();
-
-    //Place panel in tool window
     layoutUi.addContent(appEngLogContent, 0, PlaceInGrid.center, false);
-
-    // add refresh button to a side tool bar in the tool window
     layoutUi.getOptions().setLeftToolbar(getSideToolbarActions(), ActionPlaces.UNKNOWN);
 
-    //holds all the tool info UI components
     final JBLoadingPanel mainPanel = new JBLoadingPanel(new BorderLayout(), project);
     mainPanel.add(layoutUi.getComponent(), BorderLayout.CENTER);
-
     Content content = contentManager.getFactory().createContent(mainPanel, "", true);
-
     contentManager.addContent(content); //adds the main panel as content to the tool window
   }
 
@@ -156,20 +127,16 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * @return Content and view to add to the tool window
    */
   private ContentToolWindowView createAppEngLogContent(RunnerLayoutUi layoutUi) {
-
     final AppEngineLogToolWindowView appEngineLogToolWindowView = new AppEngineLogToolWindowView();
-    //sets all of layout and contains other layout information!
 
     JPanel appEngLogToolWindowViewPanel = appEngineLogToolWindowView.getMainInfoPanel();
-    //gets the panel for the toolwindow content
 
     Content appEngLogContent = layoutUi.createContent(APP_ENGINE_CONTENT_ID,
         appEngLogToolWindowViewPanel, APP_END_TOOLBAR_CONTENT_TEXT, GoogleCloudToolsIcons
             .CLOUD_TOOL_WINDOW, null);
 
-    appEngLogContent.setCloseable(false);  //cannot close the content = good
-    appEngLogContent.setPreferredFocusableComponent(appEngLogToolWindowViewPanel); //focus on the
-    // panel info
+    appEngLogContent.setCloseable(false);  //cannot remove content
+    appEngLogContent.setPreferredFocusableComponent(appEngLogToolWindowViewPanel);
 
     return new ContentToolWindowView(appEngineLogToolWindowView, appEngLogContent);
   }
@@ -180,7 +147,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * @return An ActionGroup with the buttons that appear in the side tool bar.
    */
   private ActionGroup getSideToolbarActions() {
-
     DefaultActionGroup group = new DefaultActionGroup();
 
     group.add(new RefreshButtonAction(this, myAppEngineLogToolWindowView, project));
@@ -195,7 +161,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * Add Action Listeners to the objects in view
    */
   private void addActionListeners() {
-
     myAppEngineLogToolWindowView.addModuleActionListener(new ModulesActionListener(this,
         myAppEngineLogToolWindowView, project));
 
@@ -210,6 +175,9 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
 
     myAppEngineLogToolWindowView.addNextPageButtonListener(new NextPageButtonListener(this,
         myAppEngineLogToolWindowView, project));
+
+    myAppEngineLogToolWindowView.addLogLevelComboBoxListener(new LogLevelComboListener(this,
+        myAppEngineLogToolWindowView, project));
   }
 
   /**
@@ -217,7 +185,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * @return True if it was not created properly, else false
    */
   public boolean isNotConnected() {
-
     return myAppengine==null;
   }
 
@@ -225,14 +192,11 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * Make sure of proper user credentials and make connection to app engine using a new thread
    */
   public void createConnection() {
-
     CredentialedUser selectedUser = myAppEngineLogToolWindowView.getProjectComboBox().
         getSelectedUser();
-
     if (selectedUser == null) {
       selectedUser = GoogleLogin.getInstance().getActiveUser();
     }
-
     if (selectedUser == null) {
       SwingUtilities.invokeLater(new Runnable() {
         @Override
@@ -244,19 +208,13 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
     }
 
     Credential credential = selectedUser.getCredential();
-
     Appengine.Builder appEngBuilder = new Appengine.Builder(new NetHttpTransport(),
         new JacksonFactory(), credential);
     appEngBuilder = appEngBuilder.setApplicationName(INTELLIJ_STRING);
-
     myAppengine = appEngBuilder.build();
-
-    //progressIndicator.setFraction(0.66);
-    //progressIndicator.setText("33% to finish");
 
     myLogging = new Logging.Builder(new NetHttpTransport(), new JacksonFactory(), credential)
         .setApplicationName(INTELLIJ_STRING).build();
-
   }
 
   /**
@@ -264,7 +222,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * @return response with list of modules for the application
    */
   public ListModulesResponse getModulesList() {
-
     String currentAppID = myAppEngineLogToolWindowView.getCurrentAppID();
     ListModulesResponse listModulesResponse;
 
@@ -288,7 +245,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * @return response with list of versions for the application
    */
   public ListVersionsResponse getVersionsList() {
-
     String currentAppID = myAppEngineLogToolWindowView.getCurrentAppID();
     String currModule = myAppEngineLogToolWindowView.getCurrModule();
     ListVersionsResponse listVersionsResponse;
@@ -313,26 +269,22 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * @return Response with List of Log Entries
    */
   public ListLogEntriesResponse getLogs() {
-
     String currentAppID = myAppEngineLogToolWindowView.getCurrentAppID();
     String currModule = myAppEngineLogToolWindowView.getCurrModule();
     String currVersion = myAppEngineLogToolWindowView.getCurrVersion();
     ListLogEntriesResponse logResp;
 
-    /* working original statement
-    logResp = myLogging.projects().logEntries().list("projects/" + currentAppID)
-        .setFilter("metadata.serviceName=appengine.googleapis.com metadata.labels." +
-                   "\"appengine.googleapis.com/module_id\"=" +
-                   currModule +" metadata.labels." +
-                   "\"appengine.googleapis.com/version_id\"=" +
-                   currVersion).execute();
-    */
-    //+"&orderBy=metadata.timestamp desc"
-
     String filters = "metadata.serviceName=appengine.googleapis.com metadata.labels." +
         "\"appengine.googleapis.com/module_id\"=" + currModule + " metadata.labels." +
         "\"appengine.googleapis.com/version_id\"=" + currVersion;
-    //filters+=" metadata.timestamp > \"2015-05-25T12:00:01Z\"";
+
+    String logLevel = myAppEngineLogToolWindowView.getStringCurrLogLevelSelected();
+    String filterLogLevel = "";
+    if (!logLevel.trim().equals("")) {
+      filterLogLevel = " metadata.severity>="+logLevel;
+    }
+    filters+= filterLogLevel;
+
     String timeOrder;
     boolean ascTimeOrder = myAppEngineLogToolWindowView.getTimeOrder();
 
@@ -343,13 +295,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
     }
 
     try {
-      //System.out.println(myLogging.projects().logEntries().list("projects/" + currentAppID)
-      //     .setFilter("metadata.serviceName=appengine.googleapis.com metadata.labels." +
-      //                "\"appengine.googleapis.com/module_id\"=" +
-      //                currModule +" metadata.labels." +
-      //                "\"appengine.googleapis.com/version_id\"=" +
-      //                currVersion).setOrderBy("metadata.timestamp desc").setPageSize(1).buildHttpRequestUsingHead().getUrl().toString());
-
       logResp = myLogging.projects().logEntries().list("projects/" + currentAppID)
           .setFilter(filters).setOrderBy(timeOrder).execute();
     } catch (IOException e1) {
@@ -370,7 +315,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * @return Response with List of Log Entries
    */
   public ListLogEntriesResponse askForNextLog(int currPage, ArrayList<String> pageTokens) {
-
     String currentAppID = myAppEngineLogToolWindowView.getCurrentAppID();
     String currModule = myAppEngineLogToolWindowView.getCurrModule();
     String currVersion = myAppEngineLogToolWindowView.getCurrVersion();
@@ -378,6 +322,14 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
     String filters = "metadata.serviceName=appengine.googleapis.com metadata.labels." +
         "\"appengine.googleapis.com/module_id\"=" + currModule + " metadata.labels." +
         "\"appengine.googleapis.com/version_id\"=" + currVersion;
+
+    String logLevel = myAppEngineLogToolWindowView.getStringCurrLogLevelSelected();
+    String filterLogLevel = "";
+    if (!logLevel.trim().equals("")) {
+      filterLogLevel = " metadata.severity>="+logLevel;
+    }
+
+    filters+= filterLogLevel;
 
     String timeOrder;
     boolean ascTimeOrder = myAppEngineLogToolWindowView.getTimeOrder();
@@ -403,6 +355,9 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
       } catch (NullPointerException e1) {
         LOG.warn(ERROR_COULD_NOT_GET_LOGS);
         return null;
+      } catch (IndexOutOfBoundsException e3) {
+        LOG.warn(ERROR_COULD_NOT_GET_LOGS);
+        return null;
       }
     }
 
@@ -416,7 +371,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * @return Response with List of Log Entries
    */
   public ListLogEntriesResponse askForPreviousLog(int currPage, ArrayList<String> pageTokens) {
-
     String currentAppID = myAppEngineLogToolWindowView.getCurrentAppID();
     String currModule = myAppEngineLogToolWindowView.getCurrModule();
     String currVersion = myAppEngineLogToolWindowView.getCurrVersion();
@@ -425,6 +379,14 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
     String filters = "metadata.serviceName=appengine.googleapis.com metadata.labels." +
         "\"appengine.googleapis.com/module_id\"=" + currModule + " metadata.labels." +
         "\"appengine.googleapis.com/version_id\"=" + currVersion;
+
+    String logLevel = myAppEngineLogToolWindowView.getStringCurrLogLevelSelected();
+    String filterLogLevel = "";
+    if (!logLevel.trim().equals("")) {
+      filterLogLevel = " metadata.severity>="+logLevel;
+    }
+
+    filters+= filterLogLevel;
 
     String timeOrder;
     boolean ascTimeOrder = myAppEngineLogToolWindowView.getTimeOrder();
@@ -449,6 +411,9 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
       } catch (NullPointerException e1) {
         LOG.warn(ERROR_COULD_NOT_GET_LOGS);
         return null;
+      } catch (IndexOutOfBoundsException e3) {
+        LOG.warn(ERROR_COULD_NOT_GET_LOGS);
+        return null;
       }
     }
 
@@ -459,10 +424,7 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
    * Private inner class for getting Tool Window view and content from createAppEngLogContent
    */
   private class ContentToolWindowView {
-
-    /**View for the toolwindow*/
     private AppEngineLogToolWindowView toolWindowView;
-    /**Content to hold tool window*/
     private Content content;
 
     /**
@@ -471,7 +433,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
      * @param content Content to hold tool window
      */
     public ContentToolWindowView( AppEngineLogToolWindowView toolWindowView, Content content) {
-
       this.toolWindowView = toolWindowView;
       this.content = content;
     }
@@ -481,7 +442,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
      * @return AppEngineLogToolWindowView object
      */
     public AppEngineLogToolWindowView getToolWindowView() {
-
       return this.toolWindowView;
     }
 
@@ -490,7 +450,6 @@ public class AppEngineLogging implements ToolWindowFactory, Condition<Project> {
      * @return Content object
      */
     public Content getContent() {
-
       return this.content;
     }
 

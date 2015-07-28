@@ -39,7 +39,6 @@ public class LogTreeEntry {
   private String logMessage;
   /**children nodes based on the log lines*/
   private ArrayList<LogTreeEntry> children;
-  /**Icon each log message has for what level of log it is*/
   private Icon severity;
 
   /**
@@ -48,7 +47,6 @@ public class LogTreeEntry {
    * @param logMessage LogMessage of the children logs.
    */
   public LogTreeEntry(Icon severity, String logMessage) {
-
     this.children=null;
     this.severity = severity;
     this.logInfo=null;
@@ -60,7 +58,6 @@ public class LogTreeEntry {
    * @param log Log Entry to parse and create LogTreeEntry
    */
   public LogTreeEntry(LogEntry log) {
-
     this.children = new ArrayList<LogTreeEntry>();
     parseLog(log);
   }
@@ -70,7 +67,6 @@ public class LogTreeEntry {
    * @param log Log Entry to get information from for the message
    */
   private void parseLog(LogEntry log) {
-
     String t = "        ";
 
     String fullTimeUTC = log.getProtoPayload().get("endTime").toString();
@@ -181,7 +177,6 @@ public class LogTreeEntry {
    * @return String with the hours:minutes:seconds.milliseconds formatted
    */
   private TimeDayChange convertUTCToLocal(String fullTimeUTC) {
-
     //get individual components
     int hour = Integer.parseInt(fullTimeUTC.substring(11, 13));
     int minutes = Integer.parseInt(fullTimeUTC.substring(14, 16));
@@ -200,7 +195,7 @@ public class LogTreeEntry {
     int offsetHours = offsetInMillis / 3600000;
     int offsetMinutes = (offsetInMillis / 60000) % 60;
 
-    //mod back to the correct time = cloud = on 12 hour clock not 24 hour
+    //mod back to the correct time = clock = on 24 hour
     int finalHours = (((hour + offsetHours) + 23) % 24) + 1;
     int finalMinutes = (((minutes + offsetMinutes) + 59) % 60) + 1;
 
@@ -252,7 +247,6 @@ public class LogTreeEntry {
    * @return String log information
    */
   public String getLogInfo() {
-
     return this.logInfo;
   }
 
@@ -261,7 +255,6 @@ public class LogTreeEntry {
    * @return String log message
    */
   public String getLogMessage() {
-
     return this.logMessage;
   }
 
@@ -270,7 +263,6 @@ public class LogTreeEntry {
    * @return Icon for the JTree
    */
   public Icon getIcon() {
-
     return this.severity;
   }
 
@@ -279,7 +271,6 @@ public class LogTreeEntry {
    * @return ArrayList<LogTreeEntry> of children nodes
    */
   public ArrayList<LogTreeEntry> getChildren() {
-
     return children;
   }
 
@@ -288,7 +279,6 @@ public class LogTreeEntry {
    * @param severity String that explains log level
    */
   private Icon getSeverityIcon(String severity) {
-
     if (severity.trim().equals("")) { //null severity => star = any log level
       return GoogleCloudToolsIcons.ANY_LOG_ICON;
     } else if (severity.equals("CRITICAL")) { //!!!
@@ -323,21 +313,25 @@ public class LogTreeEntry {
      *                  else 1 if the day needs to go forward one
      */
     public TimeDayChange(String time, int dayChange) {
-
       this.time = time;
       this.dayChange = dayChange;
     }
 
+    /**
+     * Gets the time in string form
+     * @return String of time
+     */
     public String getTime() {
-
       return time;
     }
 
+    /**
+     * Get integer to indicate in which direction, the day changed
+     * @return -1 to subtract a day, 0 to keep it same, else, 1 to increase day
+     */
     public int getDayChange() {
-
       return dayChange;
     }
-
 
   }
 

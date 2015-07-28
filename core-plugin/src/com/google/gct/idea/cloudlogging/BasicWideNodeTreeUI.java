@@ -29,21 +29,18 @@ import javax.swing.tree.TreeCellRenderer;
  */
 public class BasicWideNodeTreeUI extends BasicTreeUI {
 
-  /**JTree that holds the logs */
   private JTree tree;
-  /**View that manipulates the visual components of the plugin*/
   private final AppEngineLogToolWindowView view;
-  /**Width of incents on icons to give padding*/
+  /**Width of insets on icons to give padding*/
   private final int iconInsets = 10;
   /**Vertical height to add to each node to make more readable*/
   private final int addHeight = 5;
 
   /**
    * Constructor
-   * @param appEngineLogToolWindowView View that ocntrols the visual components of the plugin
+   * @param appEngineLogToolWindowView View that controls the visual components of the plugin
    */
   public BasicWideNodeTreeUI(AppEngineLogToolWindowView appEngineLogToolWindowView) {
-
     super();
     view = appEngineLogToolWindowView;
   }
@@ -54,7 +51,6 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
    */
   @Override
   public void installUI(JComponent c) {
-
     if (c != null) {
       tree = (JTree)c;
       super.installUI(c);
@@ -67,7 +63,6 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
    */
   @Override
   protected TreeCellRenderer createDefaultCellRenderer() {
-
     return new LogsTreeCellRenderer(view);
   }
 
@@ -77,7 +72,6 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
    */
   @Override
   protected AbstractLayoutCache.NodeDimensions createNodeDimensions() {
-
     return new NodeDimensionsHandler();
   }
 
@@ -88,7 +82,6 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
     @Override
     public Rectangle getNodeDimensions(Object value, int row, int depth, boolean expanded,
                                        Rectangle size) {
-
       if (currentCellRenderer != null) {
         Component comp;
         comp = currentCellRenderer.getTreeCellRendererComponent(tree, value,
@@ -100,7 +93,6 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
 
         JTextArea textArea = ((PanelExtend)comp).getLogText();
         Icon icon = ((PanelExtend)comp).getLabelIcon().getIcon();
-
         Dimension preferredSize = comp.getPreferredSize();
 
         if (size != null) {
@@ -130,12 +122,10 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
    */
   private Dimension getTextDimensions(int currentWidth, int sizeX, JTextArea textArea, Icon icon,
                                       boolean textWrap) {
-
     FontMetrics fm = textArea.getFontMetrics(textArea.getFont());
     String text = textArea.getText();
 
     int lineCutOffset = SwingUtilities.computeStringWidth(fm, "-"); //prevents line cut off
-
 
     int lines = 0;
     int lastSpace = 0;
@@ -168,7 +158,6 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
           lines++;
           continue;
         }
-
         if (lineWidth > largestWidth) {
           largestWidth = lineWidth;
         }
@@ -177,7 +166,6 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
       if (lines < 1) {
         lines = 1;
       }
-
       int height = (fm.getHeight() * lines) + addHeight;
       largestWidth = largestWidth + sizeX + iconWidth + 3;
       if (largestWidth < currentWidth) {
@@ -202,7 +190,6 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
           lines++;
           continue;
         }
-
         if (lineWidth == newCurrWidth) {
           if ((lastSpace > x) && (lastSpace < y)) {
             x = lastSpace;
@@ -238,12 +225,10 @@ public class BasicWideNodeTreeUI extends BasicTreeUI {
           }
         }
       }
-
       if ((x != 0) && (x < y)) { //still some left
         lines++;
       }
     }
-    // lines++;
     if (lines < 1) {
       lines = 1;
     }

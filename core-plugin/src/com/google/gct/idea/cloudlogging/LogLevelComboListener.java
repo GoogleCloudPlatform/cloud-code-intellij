@@ -9,20 +9,20 @@ import com.intellij.openapi.project.Project;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.*;
 
 /**
- * Listener for the Prev Page Button
- * Created by amulyau on 7/14/15.
+ * Mouse Listener for the log level filtering combo box
+ * Created by amulyau on 7/27/15.
  */
-public class PrevPageButtonListener implements ActionListener {
+public class LogLevelComboListener extends MouseAdapter {
 
-  private final AppEngineLogging controller;
-  private final AppEngineLogToolWindowView view;
-  private final Project project;
+  private AppEngineLogging controller;
+  private AppEngineLogToolWindowView view;
+  private Project project;
 
   /**
    * Constructor
@@ -30,16 +30,43 @@ public class PrevPageButtonListener implements ActionListener {
    * @param view View for the App Engine Logs that have the logs display
    * @param project Current application project (not app engine project)
    */
-  public PrevPageButtonListener(AppEngineLogging controller, AppEngineLogToolWindowView view,
+  public LogLevelComboListener (AppEngineLogging controller, AppEngineLogToolWindowView view,
                                 Project project) {
     this.controller = controller;
     this.view = view;
     this.project = project;
   }
 
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    Task.Backgroundable logTask = new Task.Backgroundable(project, "Getting Previous Logs List",
+  /**
+   * What to do when mouse enters the combo box list
+   * @param e Mouse event
+   */
+  public void mouseEntered(MouseEvent e) {
+    view.setComboBoxLogLevel(e.getPoint());
+  }
+
+  /**
+   * What to do when mouse clicks the combo box list
+   * @param e Mouse event
+   */
+  public void mouseClicked(MouseEvent e) {
+    view.mouseClickedLogLevel(e.getPoint());
+    logLevelChange();
+  }
+
+  /**
+   * What to do when mouse exits the combo box list
+   * @param e Mouse event
+   */
+  public void mouseExited(MouseEvent e) {
+    view.mouseExited(e.getPoint());
+  }
+
+  /**
+   * When log Level changes, we need to get new logs with the filter
+   */
+  private void logLevelChange() {
+    Task.Backgroundable logTask = new Task.Backgroundable(project, "Getting Next page Logs List",
         false, new PerformInBackgroundOption() {
       @Override
       public boolean shouldStartInBackground() {
@@ -53,18 +80,17 @@ public class PrevPageButtonListener implements ActionListener {
       public void run(@NotNull ProgressIndicator progressIndicator) {
         progressIndicator.setFraction(0.10);
         progressIndicator.setText("90% to finish");
-        ListLogEntriesResponse logResp = controller
-            .askForPreviousLog(view.getCurrPage(), view.getPageTokens());
+
+        ListLogEntriesResponse logResp = controller.getLogs();
+        view.clearPageTokens();
 
         progressIndicator.setFraction(0.33);
         progressIndicator.setText("66% to finish");
+        while (view.getCurrPage() != -1) { //get to first page when we refresh logs
+          view.decreasePage();
+        }
         if ((logResp != null) && (logResp.getEntries() != null)) {
-          if (view.getCurrPage() > -1) {
-            view.decreasePage();
-          }
           view.processLogs(logResp);
-          progressIndicator.setFraction(0.66);
-          progressIndicator.setText("33% to finish");
 
           SwingUtilities.invokeLater(new Runnable() {
             @Override

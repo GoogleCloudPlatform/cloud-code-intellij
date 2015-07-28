@@ -29,16 +29,14 @@ import javax.swing.*;
  */
 public class PanelExtend extends JBPanel {
 
-  /**GridBag Constraints for placing objects*/
   private final GridBagConstraints gb;
-  /**Text Area that holds the log*/
   private JTextArea log = null;
-  /**Icon for the log*/
   private JBLabel labelIcon;
 
-  /**Constructor to properly create the JBPanel and the components for it*/
+  /**
+   * Constructor to properly create the JBPanel and the components for it
+   * */
   public PanelExtend() {
-
     gb = new GridBagConstraints();
     this.setLayout(new GridBagLayout());
     log = new JTextArea();
@@ -46,18 +44,27 @@ public class PanelExtend extends JBPanel {
     this.setBackground(JBColor.white);
   }
 
+  /**
+   * Gets the Log text area
+   * @return JTextArea of the log
+   */
   public JTextArea getLogText() {
-
     return log;
   }
 
+  /**
+   * Gets the label used to hold the icon
+   * @return JLabel for the icon
+   */
   public JBLabel getLabelIcon() {
-
     return labelIcon;
   }
 
+  /**
+   * Sets the label icon in proper place in panel
+   * @param label Label to set in panel
+   */
   public void setLabelIcon(JBLabel label) {
-
     this.labelIcon = label;
 
     gb.gridx = 0;
@@ -72,8 +79,11 @@ public class PanelExtend extends JBPanel {
     this.add(labelIcon,gb);
   }
 
+  /**
+   * Sets the text area in correct place in panel
+   * @param log Text area to set in panel
+   */
   public void setTextArea(JTextArea log) {
-
     this.log = log;
 
     gb.gridx = 1;

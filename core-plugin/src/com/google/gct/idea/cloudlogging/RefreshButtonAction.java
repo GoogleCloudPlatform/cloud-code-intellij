@@ -37,16 +37,13 @@ import javax.swing.*;
  */
 public class RefreshButtonAction extends AnAction {
 
-  /**Controller for App Engine Logs*/
   private AppEngineLogging controller;
-
-  /**View for the App Engine Logs*/
   private AppEngineLogToolWindowView view;
-
-  /**Current application project (not app engine project)*/
   private Project project;
 
-  /**Empty Constructor*/
+  /**
+   * Empty Constructor for adding as an action to plugin.xml
+   */
   public RefreshButtonAction() {}
 
   /**
@@ -57,7 +54,6 @@ public class RefreshButtonAction extends AnAction {
    */
   public RefreshButtonAction(AppEngineLogging controller, AppEngineLogToolWindowView view,
                              Project project) {
-
     super("Refresh", "Refresh the App Engine Logs", AllIcons.Actions.Refresh);
     this.controller = controller;
     this.view = view;
@@ -70,18 +66,16 @@ public class RefreshButtonAction extends AnAction {
    */
   @Override
   public void actionPerformed(AnActionEvent e) {
-
     if (view.getCurrProject() != null) {
       final String currModule = view.getCurrModule();
       final String currVersion = view.getCurrVersion();
+
       Task.Backgroundable logTask = new Task.Backgroundable(project, "Refreshing Modules, " +
           "Versions and Logs List", false, new PerformInBackgroundOption() {
-
         @Override
         public boolean shouldStartInBackground() {
           return true;
         }
-
         @Override
         public void processSentToBackground() {}
       }) {
@@ -177,14 +171,12 @@ public class RefreshButtonAction extends AnAction {
     }
   }
 
-
   /**
    * Makes sure the button is available to click
    * @param e Action event
    */
   @Override
   public void update(AnActionEvent e) {
-
     e.getPresentation().setEnabled(true);
   }
 

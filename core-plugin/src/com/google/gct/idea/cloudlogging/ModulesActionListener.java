@@ -20,7 +20,6 @@ import com.google.api.services.logging.model.ListLogEntriesResponse;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.progress.util.ProgressWindow;
 import com.intellij.openapi.project.Project;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,13 +36,8 @@ import javax.swing.*;
  */
 public class ModulesActionListener implements ActionListener {
 
-  /**Controller for App Engine Logs*/
   private final AppEngineLogging controller;
-
-  /**View for the App Engine Logs*/
   private final AppEngineLogToolWindowView view;
-
-  /**Current application project (not app engine project)*/
   private final Project project;
 
   /**
@@ -53,7 +47,6 @@ public class ModulesActionListener implements ActionListener {
    * @param project Current application project (not app engine project)
    */
   public ModulesActionListener(AppEngineLogging controller, AppEngineLogToolWindowView view, Project project) {
-
     this.controller = controller;
     this.view = view;
     this.project = project;
@@ -66,7 +59,6 @@ public class ModulesActionListener implements ActionListener {
    */
   @Override
   public void actionPerformed(ActionEvent e) {
-
     String prevModuleSelection = view.getCurrModule();
     view.setCurrModule();
     String currModule = view.getCurrModule();
@@ -130,8 +122,7 @@ public class ModulesActionListener implements ActionListener {
             }
           }
         };
-        logTask.run(new ProgressWindow(false, project));
-
+        logTask.queue();
       }
     }
   }

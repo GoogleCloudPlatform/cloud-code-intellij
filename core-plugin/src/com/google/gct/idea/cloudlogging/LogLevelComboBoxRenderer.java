@@ -22,12 +22,11 @@ import java.awt.*;
 
 import javax.swing.*;
 
-
 /**
  * Renderer to set the text and Icon for each element in the Combo Box for Log levels
  * Created by amulyau on 7/1/15.
  */
-public class LogLevelComboBoxRenderer extends JBLabel implements ListCellRenderer{
+public class LogLevelComboBoxRenderer extends JBLabel implements ListCellRenderer {
 
   private final Color backgroundNonSelectionColor = UIUtil.getListBackground(false);
   private final Color  backgroundSelectionColor = UIUtil.getListBackground(true);
@@ -38,7 +37,6 @@ public class LogLevelComboBoxRenderer extends JBLabel implements ListCellRendere
   AppEngineLogToolWindowView view;
 
   public LogLevelComboBoxRenderer(AppEngineLogToolWindowView view) {
-
     this.view = view;
   }
 

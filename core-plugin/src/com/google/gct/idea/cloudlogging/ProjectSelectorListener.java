@@ -36,11 +36,8 @@ import javax.swing.event.DocumentEvent;
  */
 public class ProjectSelectorListener extends DocumentAdapter {
 
-  /**Controller for App Engine Logs*/
   private final AppEngineLogging controller;
-  /**View for the App Engine Logs*/
   private final AppEngineLogToolWindowView view;
-  /**Current application project (not app engine project)*/
   private final Project project;
 
   /**
@@ -51,7 +48,6 @@ public class ProjectSelectorListener extends DocumentAdapter {
    */
   public ProjectSelectorListener(AppEngineLogging controller, AppEngineLogToolWindowView view,
                                  Project project) {
-
     this.controller = controller;
     this.view = view;
     this.project = project;
@@ -59,7 +55,6 @@ public class ProjectSelectorListener extends DocumentAdapter {
 
   @Override
   protected void textChanged(DocumentEvent e) {
-
     view.setCurrProject(); //get the project ID of the app engine project
     String currProject = view.getCurrProject();
 
@@ -73,12 +68,10 @@ public class ProjectSelectorListener extends DocumentAdapter {
 
       Task.Backgroundable logTask = new Task.Backgroundable(project, "Getting Modules, " +
           "Versions and Logs List", false, new PerformInBackgroundOption() {
-
         @Override
         public boolean shouldStartInBackground() {
           return true;
         }
-
         @Override
         public void processSentToBackground() {}
       }) {

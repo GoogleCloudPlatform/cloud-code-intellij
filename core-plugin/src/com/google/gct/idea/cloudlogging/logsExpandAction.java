@@ -25,10 +25,11 @@ import com.intellij.openapi.actionSystem.ToggleAction;
  */
 public class logsExpandAction extends ToggleAction {
 
-  /**View that holds all the components of tool window*/
   private AppEngineLogToolWindowView view;
 
-  /**Empty constructor */
+  /**
+   * Constructor used to add as action to plugin.xml
+   */
   public logsExpandAction() {}
 
   /**
@@ -36,20 +37,17 @@ public class logsExpandAction extends ToggleAction {
    * @param view View that holds all components
    */
   public logsExpandAction(AppEngineLogToolWindowView view) {
-
     super("Expand","Expand Logs", AllIcons.Actions.Expandall);
     this.view = view;
   }
 
   @Override
   public boolean isSelected(AnActionEvent e) {
-
     return view.getLogsExpanded();
   }
 
   @Override
   public void setSelected(AnActionEvent e, boolean state) {
-
     if (state) { //if selected, expand logs
       view.changeLogsExpandState(true);
       view.expandLogs();
