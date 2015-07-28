@@ -12,7 +12,7 @@
     <orderEntry type="jdk" jdkName="IntelliJ CE 141.1532" jdkType="IDEA JDK" />
     <orderEntry type="library" exported="" scope="PROVIDED" name="gradle" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="git4idea" level="application" />
-    <orderEntry type="module-library" exported="">
+    <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="file://$MODULE_DIR$/lib" />
