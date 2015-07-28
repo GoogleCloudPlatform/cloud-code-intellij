@@ -15,7 +15,8 @@
  */
 package com.google.gct.idea.samples;
 
-import com.android.tools.idea.wizard.*;
+import com.android.tools.idea.wizard.dynamic.DynamicWizardStepWithHeaderAndDescription;
+import com.android.tools.idea.wizard.dynamic.ScopedStateStore;
 import com.android.utils.HtmlBuilder;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
@@ -43,7 +44,7 @@ import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.android.tools.idea.wizard.ScopedStateStore.*;
+import static com.android.tools.idea.wizard.dynamic.ScopedStateStore.*;
 import static com.google.gct.idea.samples.SampleImportWizardPath.SAMPLE_KEY;
 import static com.google.gct.idea.samples.SampleImportWizardPath.SAMPLE_URL;
 

@@ -15,7 +15,12 @@
  */
 package com.google.gct.idea.appengine.wizard;
 
-import com.android.tools.idea.wizard.*;
+import com.android.tools.idea.npw.FormFactorUtils;
+import com.android.tools.idea.npw.ModuleTemplate;
+import com.android.tools.idea.npw.NewModuleDynamicPath;
+import com.android.tools.idea.wizard.WizardConstants;
+import com.android.tools.idea.wizard.dynamic.DynamicWizardPath;
+import com.android.tools.idea.wizard.dynamic.ScopedStateStore;
 import com.google.common.collect.Lists;
 import com.google.gct.idea.util.GctBundle;
 import icons.GoogleCloudToolsIcons;
@@ -27,7 +32,7 @@ import javax.swing.*;
 import java.io.File;
 import java.util.List;
 
-import static com.android.tools.idea.wizard.ScopedStateStore.*;
+import static com.android.tools.idea.wizard.dynamic.ScopedStateStore.*;
 
 /**
  * The global path used in the "create a new AppEngine module" wizard process.

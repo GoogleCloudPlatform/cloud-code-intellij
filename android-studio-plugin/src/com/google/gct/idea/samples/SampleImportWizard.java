@@ -15,7 +15,7 @@
  */
 package com.google.gct.idea.samples;
 
-import com.android.tools.idea.wizard.DynamicWizard;
+import com.android.tools.idea.wizard.dynamic.DynamicWizard;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.project.Project;
@@ -77,7 +77,7 @@ public class SampleImportWizard extends DynamicWizard {
   }
 
   @Override
-  protected String getWizardActionDescription() {
+  public String getWizardActionDescription() {
     return GctBundle.message("sample.import.title");
   }
 }
