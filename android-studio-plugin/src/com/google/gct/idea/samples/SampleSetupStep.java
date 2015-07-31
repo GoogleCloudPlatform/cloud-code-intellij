@@ -20,7 +20,7 @@ import com.android.tools.idea.npw.WizardUtils;
 import com.android.tools.idea.wizard.dynamic.DynamicWizardStepWithHeaderAndDescription;
 import com.android.tools.idea.wizard.dynamic.ScopedStateStore;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
-import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctStudioBundle;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -52,17 +52,17 @@ public class SampleSetupStep extends DynamicWizardStepWithHeaderAndDescription {
   private TextFieldWithBrowseButton myProjectLocationField;
   private JPanel myPanel;
 
-  private static final String DEFAULT_SAMPLE_NAME = GctBundle.message("sample.default.name");
+  private static final String DEFAULT_SAMPLE_NAME = GctStudioBundle.message("sample.default.name");
 
   public SampleSetupStep(Disposable parentDisposable) {
-    super(GctBundle.message("sample.setup.title"), GctBundle.message("sample.setup.subtitle"), parentDisposable);
+    super(GctStudioBundle.message("sample.setup.title"), GctStudioBundle.message("sample.setup.subtitle"), parentDisposable);
     setBodyComponent(myPanel);
   }
 
   @Override
   public void init() {
     super.init();
-    myProjectLocationField.addBrowseFolderListener(GctBundle.message("select.project.location"), null, null,
+    myProjectLocationField.addBrowseFolderListener(GctStudioBundle.message("select.project.location"), null, null,
                                                    FileChooserDescriptorFactory.createSingleFolderDescriptor());
     String sampleName = getUniqueName(DEFAULT_SAMPLE_NAME);
     myState.put(SAMPLE_NAME, sampleName);
@@ -101,7 +101,7 @@ public class SampleSetupStep extends DynamicWizardStepWithHeaderAndDescription {
   public boolean validate() {
     String applicationName = myState.get(SAMPLE_NAME);
     if (applicationName == null || applicationName.trim().isEmpty()) {
-      setErrorHtml(GctBundle.message("application.name.not.set"));
+      setErrorHtml(GctStudioBundle.message("application.name.not.set"));
       return false;
     }
     String sampleDir = myState.get(SAMPLE_DIR);
@@ -118,7 +118,7 @@ public class SampleSetupStep extends DynamicWizardStepWithHeaderAndDescription {
   @NotNull
   @Override
   public String getStepName() {
-    return GctBundle.message("sample.setup.title");
+    return GctStudioBundle.message("sample.setup.title");
   }
 
   private static class SampleNameValueDeriver extends ValueDeriver<String> {
@@ -170,6 +170,6 @@ public class SampleSetupStep extends DynamicWizardStepWithHeaderAndDescription {
   @NotNull
   @Override
   protected WizardStepHeaderSettings getStepHeader() {
-    return WizardStepHeaderSettings.createProductHeader(GctBundle.message("sample.import.title"));
+    return WizardStepHeaderSettings.createProductHeader(GctStudioBundle.message("sample.import.title"));
   }
 }

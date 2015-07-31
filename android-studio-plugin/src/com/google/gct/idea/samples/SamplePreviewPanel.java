@@ -21,7 +21,7 @@ import com.google.api.client.util.Lists;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctStudioBundle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -144,7 +144,7 @@ public class SamplePreviewPanel extends JPanel implements ComponentListener {
     int yPos = 0;
     if (myScaledImages.size() == 0) {
       ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-      String text = GctBundle.message("sample.browser.no.preview");
+      String text = GctStudioBundle.message("sample.browser.no.preview");
       if (myHasPreview) {
         text = "Loading...";
       }

@@ -22,7 +22,7 @@ import com.android.tools.idea.wizard.WizardConstants;
 import com.android.tools.idea.wizard.dynamic.DynamicWizardPath;
 import com.android.tools.idea.wizard.dynamic.ScopedStateStore;
 import com.google.common.collect.Lists;
-import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctStudioBundle;
 import icons.GoogleCloudToolsIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -59,11 +59,11 @@ public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implement
     final String examplePackageName;
     final String userName = System.getProperty("user.name");
     if (userName == null) {
-      examplePackageName = GctBundle.message("appengine.wizard.prefilled_package_name");
+      examplePackageName = GctStudioBundle.message("appengine.wizard.prefilled_package_name");
     } else {
-      examplePackageName = GctBundle.message("appengine.wizard.prefilled_user_package_name", userName);
+      examplePackageName = GctStudioBundle.message("appengine.wizard.prefilled_user_package_name", userName);
     }
-    myState.put(KEY_MODULE_NAME, GctBundle.message("appengine.wizard.prefilled_module_name"));
+    myState.put(KEY_MODULE_NAME, GctStudioBundle.message("appengine.wizard.prefilled_module_name"));
     myState.put(KEY_PACKAGE_NAME, examplePackageName);
   }
 
@@ -105,13 +105,13 @@ public class NewCloudModuleDynamicWizardPath extends DynamicWizardPath implement
     @NotNull
     @Override
     public String getName() {
-      return GctBundle.message("appengine.wizard.gallery_title");
+      return GctStudioBundle.message("appengine.wizard.gallery_title");
     }
 
     @Nullable
     @Override
     public String getDescription() {
-      return GctBundle.message("appengine.wizard.gallery_description");
+      return GctStudioBundle.message("appengine.wizard.gallery_description");
     }
 
     @Nullable

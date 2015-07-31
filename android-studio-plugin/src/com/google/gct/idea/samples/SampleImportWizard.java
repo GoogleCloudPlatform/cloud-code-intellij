@@ -17,7 +17,7 @@ package com.google.gct.idea.samples;
 
 import com.android.tools.idea.wizard.dynamic.DynamicWizard;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
-import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctStudioBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import icons.AndroidIcons;
@@ -35,7 +35,7 @@ public class SampleImportWizard extends DynamicWizard {
   private SampleCollection mySampleList;
 
   public SampleImportWizard(@Nullable Project project, @NotNull SampleCollection samples) {
-    super(project, null, GctBundle.message("sample.import.title"));
+    super(project, null, GctStudioBundle.message("sample.import.title"));
     mySampleList = samples;
     init();
 
@@ -72,11 +72,11 @@ public class SampleImportWizard extends DynamicWizard {
 
   @NotNull
   protected String getProgressTitle() {
-    return GctBundle.getString("sample.import.progress.title");
+    return GctStudioBundle.getString("sample.import.progress.title");
   }
 
   @Override
   public String getWizardActionDescription() {
-    return GctBundle.message("sample.import.title");
+    return GctStudioBundle.message("sample.import.title");
   }
 }

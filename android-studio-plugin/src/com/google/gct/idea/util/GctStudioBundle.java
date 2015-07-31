@@ -27,9 +27,9 @@ import java.util.ResourceBundle;
 /**
  * Bundle class to get cloud tools messages from resources/messages
  */
-public class GctBundle {
+public class GctStudioBundle {
   @NonNls
-  private static final String BUNDLE_NAME = "messages.CloudToolsBundle";
+  private static final String BUNDLE_NAME = "messages.CloudToolsStudioBundle";
   private static Reference<ResourceBundle> ourBundle;
 
   private static ResourceBundle getBundle() {
@@ -41,7 +41,7 @@ public class GctBundle {
     return bundle;
   }
 
-  private GctBundle() {
+  private GctStudioBundle() {
   }
 
   public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params) {
