@@ -26,6 +26,7 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.debugger.Debugger;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.GoogleLoginUtils;
 import com.google.gdt.eclipse.login.common.LoginListener;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -96,7 +97,7 @@ public class CloudDebuggerClient {
 
           HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
           cloudDebuggerClient = new Debugger.Builder(httpTransport, JSON_FACTORY, initializer).setRootUrl(ROOT_URL)
-            .setApplicationName("Android Studio").build();
+            .setApplicationName(GoogleLoginUtils.getCurrentPlatformName()).build();
         }
       }
       catch (IOException ex) {

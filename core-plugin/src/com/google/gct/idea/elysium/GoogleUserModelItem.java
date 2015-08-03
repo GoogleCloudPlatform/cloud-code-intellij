@@ -22,6 +22,8 @@ import com.google.api.services.developerprojects.Developerprojects;
 import com.google.api.services.developerprojects.model.ListProjectsResponse;
 import com.google.api.services.developerprojects.model.Project;
 import com.google.gct.login.CredentialedUser;
+import com.google.gct.login.GoogleLoginUtils;
+
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -123,7 +125,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
 
     Developerprojects developerprojects =
       new Developerprojects.Builder(new NetHttpTransport(), new JacksonFactory(),
-                                    user.getCredential()).setApplicationName("Android Studio")
+                                    user.getCredential()).setApplicationName(GoogleLoginUtils.getCurrentPlatformName())
         .build();
 
     try {

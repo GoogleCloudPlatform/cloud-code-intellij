@@ -25,6 +25,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.util.PlatformUtils;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -38,6 +40,16 @@ import java.net.URL;
 public class GoogleLoginUtils {
   public static final Logger LOG = Logger.getInstance(GoogleLoginUtils.class);
   public static final int DEFAULT_PICTURE_SIZE = 96;
+
+  @NotNull
+  public static IntelliJPlatform getCurrentPlatform() {
+    return IntelliJPlatform.fromPrefix(PlatformUtils.getPlatformPrefix());
+  }
+
+  @NotNull
+  public static String getCurrentPlatformName() {
+    return getCurrentPlatform().getName();
+  }
 
   /**
    * Gets the profile picture that corresponds to the {@code userInfo} and sets it on the provided
@@ -74,7 +86,7 @@ public class GoogleLoginUtils {
     final IUserPropertyCallback callback) {
     final Oauth2 userInfoService =
       new Oauth2.Builder(new NetHttpTransport(), new JacksonFactory(), credential)
-        .setApplicationName("Android Studio")
+        .setApplicationName(getCurrentPlatformName())
         .build();
 
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
