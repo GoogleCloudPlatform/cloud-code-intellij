@@ -15,7 +15,7 @@
  */
 package com.google.gct.idea.elysium;
 
-import com.google.gct.idea.stats.UsageTracker;
+import com.google.gct.login.stats.UsageTrackerService;
 import com.google.gct.idea.util.GctTracking;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ui.UI;
@@ -79,7 +79,8 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
         ((ProjectSelector.SelectorTreeModel)model).setModelNeedsRefresh(true);
       }
       BrowserUtil.browse("https://console.developers.google.com/project");
-      UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.PROJECT_SELECTION, "create.new.project", null);
+      UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.PROJECT_SELECTION,
+          "create.new.project", null);
     }
   }
 

@@ -15,13 +15,14 @@
  */
 package com.google.gct.idea.samples;
 
-import com.android.tools.idea.stats.UsageTracker;
 import com.appspot.gsamplesindex.samplesindex.SamplesIndex;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.gct.idea.util.GctBundle;
+import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.idea.util.GctStudioBundle;
 import com.google.gct.idea.util.GctTracking;
+
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
@@ -50,26 +51,28 @@ public class SampleImportAction extends AnAction {
     samplesService = myBuilder.build();
 
     final AtomicReference<SampleCollection> sampleList = new AtomicReference<SampleCollection>(null);
-    new Task.Modal(null, GctBundle.message("sample.import.title"), false) {
+    new Task.Modal(null, GctStudioBundle.message("sample.import.title"), false) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
-        indicator.setText(GctBundle.message("sample.index.downloading"));
+        indicator.setText(GctStudioBundle.message("sample.index.downloading"));
         try {
           sampleList.set(samplesService.samples().listSamples().set("technology", "android").execute());
         }
         catch (IOException ex) {
-          LOG.warn(GctBundle.message("sample.index.download.failed"));
+          LOG.warn(GctStudioBundle.message("sample.index.download.failed"));
           sampleList.set(null);
         }
       }
     }.queue();
 
     if (sampleList.get() == null || sampleList.get().size() == 0) {
-      Messages.showErrorDialog(GctBundle.message("sample.index.download.failed"), GctBundle.message("sample.import.error.title"));
+      Messages.showErrorDialog(
+          GctStudioBundle.message("sample.index.download.failed"), GctStudioBundle
+          .message("sample.import.error.title"));
       return;
     }
 
-    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.SAMPLES, "browse", null);
+    UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.SAMPLES, "browse", null);
     SampleImportWizard wizard = new SampleImportWizard(null, sampleList.get());
     wizard.show();
   }

@@ -18,6 +18,10 @@
     <newModuleDynamicPathFactory implementation="com.google.gct.idea.appengine.wizard.NewCloudModuleDynamicWizardPathFactory"/>
   </extensions>
 
+  <extensions defaultExtensionNs="com.google.gct">
+    <login.usageTracker implementationClass="com.google.gct.idea.stats.AndroidStudioForwardingUsageTracker" key="AndroidStudio" />
+  </extensions>
+
   <actions>
     <action id="GoogleCloudTools.NewEndpointFromClass"
             class="com.google.gct.idea.appengine.action.NewEndpointFromClassAction"

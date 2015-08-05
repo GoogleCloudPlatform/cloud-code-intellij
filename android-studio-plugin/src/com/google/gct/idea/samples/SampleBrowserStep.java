@@ -21,7 +21,7 @@ import com.android.utils.HtmlBuilder;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.google.common.base.Strings;
-import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctStudioBundle;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
@@ -65,7 +65,7 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
   private static final Key<Sample> SAMPLE_SCREENSHOT = createKey("SampleScreenshot", Scope.STEP, Sample.class);
 
   public SampleBrowserStep(@NotNull SampleCollection sampleList, Disposable parentDisposable) {
-    super(GctBundle.message("sample.browser.title"), GctBundle.message("sample.browser.subtitle"), parentDisposable);
+    super(GctStudioBundle.message("sample.browser.title"), GctStudioBundle.message("sample.browser.subtitle"), parentDisposable);
     mySampleList = sampleList;
     setBodyComponent(myPanel);
   }
@@ -78,7 +78,7 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
       @Override
       public void setValue(@Nullable String newValue, @NotNull HyperlinkLabel component) {
         component.setHyperlinkTarget(newValue);
-        newValue = (StringUtil.isEmpty(newValue)) ? "" : GctBundle.message("sample.browse.source");
+        newValue = (StringUtil.isEmpty(newValue)) ? "" : GctStudioBundle.message("sample.browse.source");
         component.setHyperlinkText(newValue);
       }
     });
@@ -112,13 +112,13 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
   @NotNull
   @Override
   public String getStepName() {
-    return GctBundle.message("sample.browser.title");
+    return GctStudioBundle.message("sample.browser.title");
   }
 
   @Override
   public boolean validate() {
     if (myState.get(SAMPLE_KEY) == null) {
-      setErrorHtml(GctBundle.message("sample.browser.please.select"));
+      setErrorHtml(GctStudioBundle.message("sample.browser.please.select"));
       return false;
     }
     setErrorHtml("");
@@ -209,7 +209,7 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
         description.addHtml(sample.getDescription());
       }
       else {
-        description.add(GctBundle.message("sample.browser.no.description"));
+        description.add(GctStudioBundle.message("sample.browser.no.description"));
       }
       description.newlineIfNecessary().newline();
       description.add("Tags: ");
@@ -243,7 +243,6 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
     }
   }
 
-  @Override
   protected JLabel getDescriptionLabel() {
     return myDescriptionLabel;
   }
@@ -251,6 +250,6 @@ public class SampleBrowserStep extends DynamicWizardStepWithHeaderAndDescription
   @NotNull
   @Override
   protected WizardStepHeaderSettings getStepHeader() {
-    return WizardStepHeaderSettings.createProductHeader(GctBundle.message("sample.import.title"));
+    return WizardStepHeaderSettings.createProductHeader(GctStudioBundle.message("sample.import.title"));
   }
 }

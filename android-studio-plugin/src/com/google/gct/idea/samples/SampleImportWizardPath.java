@@ -16,14 +16,14 @@
 package com.google.gct.idea.samples;
 
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
-import com.android.tools.idea.stats.UsageTracker;
-import com.android.tools.idea.wizard.dynamic.DynamicWizardPath;
-import com.android.tools.idea.wizard.dynamic.ScopedStateStore;
+import com.android.tools.idea.wizard.dynamic.*;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
 import com.appspot.gsamplesindex.samplesindex.model.SampleCollection;
 import com.google.common.base.Strings;
-import com.google.gct.idea.util.GctBundle;
+import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.idea.util.GctStudioBundle;
 import com.google.gct.idea.util.GctTracking;
+
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -95,7 +95,8 @@ public class SampleImportWizardPath extends DynamicWizardPath {
     assert !sampleDir.exists();
 
     if (!FileUtilRt.createDirectory(sampleDir)) {
-      Messages.showErrorDialog(GctBundle.message("create.project.dir.failed"), GctBundle.message("sample.import.error.title"));
+      Messages.showErrorDialog(
+          GctStudioBundle.message("create.project.dir.failed"), GctStudioBundle.message("sample.import.error.title"));
       return false;
     }
     Project project = ProjectManager.getInstance().createProject(sampleName, sampleDir.getAbsolutePath());
@@ -107,13 +108,14 @@ public class SampleImportWizardPath extends DynamicWizardPath {
     String errorMessage = downloadResult.getErrorMessage();
     if (errorMessage != null) {
       LOG.error(errorMessage);
-      Messages.showErrorDialog(errorMessage, GctBundle.message("sample.import.error.title"));
+      Messages.showErrorDialog(errorMessage, GctStudioBundle.message("sample.import.error.title"));
       return false;
     }
 
     List<File> sampleRoots = downloadResult.getSampleRoots();
     if (sampleRoots.size() == 0) {
-      Messages.showErrorDialog(GctBundle.message("git.project.dir.empty"), GctBundle.message("sample.import.error.title"));
+      Messages.showErrorDialog(
+          GctStudioBundle.message("git.project.dir.empty"), GctStudioBundle.message("sample.import.error.title"));
       return false;
     }
 
@@ -132,8 +134,8 @@ public class SampleImportWizardPath extends DynamicWizardPath {
             }
           }
           // we have a project that doesn't contain the sample root we're looking for... notify the user
-          Messages.showErrorDialog(GctBundle.message("git.project.missing.sample.root", path),
-                                   GctBundle.message("sample.import.error.title"));
+          Messages.showErrorDialog(GctStudioBundle.message("git.project.missing.sample.root", path),
+                                   GctStudioBundle.message("sample.import.error.title"));
           return false;
         }
       }
@@ -144,11 +146,13 @@ public class SampleImportWizardPath extends DynamicWizardPath {
     }
     catch (IOException e) {
       LOG.error(e);
-      Messages.showErrorDialog(GctBundle.message("sample.copy.to.project.failed"), GctBundle.message("sample.import.error.title"));
+      Messages.showErrorDialog(
+          GctStudioBundle.message("sample.copy.to.project.failed"), GctStudioBundle
+          .message("sample.import.error.title"));
       return false;
     }
 
-    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.SAMPLES, sampleName, null);
+    UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.SAMPLES, sampleName, null);
     GradleProjectImporter.getInstance().importProject(project.getBaseDir());
     // TODO : display the correct starting file for users
     return true;

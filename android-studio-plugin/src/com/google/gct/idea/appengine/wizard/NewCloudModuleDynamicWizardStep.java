@@ -23,7 +23,7 @@ import com.android.tools.idea.wizard.dynamic.ScopedStateStore.Key;
 import com.android.tools.idea.wizard.WizardConstants;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctStudioBundle;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.module.Module;
@@ -67,7 +67,7 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
   private JLabel myModuleTypeIcon;
 
   public NewCloudModuleDynamicWizardStep(@NotNull Project project, @Nullable Disposable parentDisposable) {
-    super(GctBundle.message("appengine.wizard.step_body"), null, parentDisposable);
+    super(GctStudioBundle.message("appengine.wizard.step_body"), null, parentDisposable);
     setBodyComponent(myRootPane);
     myProject = project;
   }
@@ -140,7 +140,8 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
     }
     assert metadata != null;
     assert docUrlParam != null;
-    myModuleDescriptionText.setText(GctBundle.message("appengine.wizard.module_type_description", docUrlParam.initial, metadata.getTitle()));
+    myModuleDescriptionText.setText(
+        GctStudioBundle.message("appengine.wizard.module_type_description", docUrlParam.initial, metadata.getTitle()));
   }
 
   private void setModuleTypeIcon(@NotNull File templateFile) {
@@ -184,32 +185,32 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
     final String clientModuleName = myState.get(NewCloudModuleDynamicWizardPath.KEY_CLIENT_MODULE_NAME);
     assert moduleName != null && packageName != null;
     if (templateFile == null) {
-      setErrorHtml(GctBundle.message("appengine.wizard.please_select_module_type"));
+      setErrorHtml(GctStudioBundle.message("appengine.wizard.please_select_module_type"));
       return false;
     }
     if (moduleName.isEmpty()) {
-      setErrorHtml(GctBundle.message("appengine.wizard.please_select_module_name"));
+      setErrorHtml(GctStudioBundle.message("appengine.wizard.please_select_module_name"));
       return false;
     }
     if (!isValidModuleName(moduleName)) {
-      setErrorHtml(GctBundle.message("appengine.wizard.please_enter_valid_module_name"));
+      setErrorHtml(GctStudioBundle.message("appengine.wizard.please_enter_valid_module_name"));
       return false;
     }
     if (ModuleManager.getInstance(myProject).findModuleByName(moduleName) != null ||
         new File(myProject.getBasePath(), moduleName).exists()) {
-      setErrorHtml(GctBundle.message("appengine.wizard.module_already_exists", moduleName));
+      setErrorHtml(GctStudioBundle.message("appengine.wizard.module_already_exists", moduleName));
       return false;
     }
     if (packageName.isEmpty()) {
-      setErrorHtml(GctBundle.message("appengine.wizard.please_enter_package_name"));
+      setErrorHtml(GctStudioBundle.message("appengine.wizard.please_enter_package_name"));
       return false;
     }
     if (!PsiNameHelper.getInstance(myProject).isQualifiedName(packageName)) {
-      setErrorHtml(GctBundle.message("appengine.wizard.please_enter_valid_package_name"));
+      setErrorHtml(GctStudioBundle.message("appengine.wizard.please_enter_valid_package_name"));
       return false;
     }
     if (Strings.isNullOrEmpty(clientModuleName)) {
-      setErrorHtml(GctBundle.message("appengine.wizard.please_select_client_module"));
+      setErrorHtml(GctStudioBundle.message("appengine.wizard.please_select_client_module"));
       return false;
     }
     setErrorHtml("");
@@ -242,7 +243,8 @@ public class NewCloudModuleDynamicWizardStep extends DynamicWizardStepWithHeader
   @NotNull
   @Override
   protected WizardStepHeaderSettings getStepHeader() {
-    return WizardStepHeaderSettings.createCustomColorHeader(CLOUD_HEADER_BACKGROUND_COLOR, GctBundle.message("appengine.wizard.step_title"));
+    return WizardStepHeaderSettings.createCustomColorHeader(CLOUD_HEADER_BACKGROUND_COLOR, GctStudioBundle
+        .message("appengine.wizard.step_title"));
   }
 
   @Nullable

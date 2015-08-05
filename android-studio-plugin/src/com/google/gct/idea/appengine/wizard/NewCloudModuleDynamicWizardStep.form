@@ -13,8 +13,8 @@
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="messages/CloudToolsBundle" key="appengine.wizard.module_name_label"/>
-          <toolTipText resource-bundle="messages/CloudToolsBundle" key="appengine.wizard.module_name_label_hint"/>
+          <text resource-bundle="messages/CloudToolsStudioBundle" key="appengine.wizard.module_name_label"/>
+          <toolTipText resource-bundle="messages/CloudToolsStudioBundle" key="appengine.wizard.module_name_label_hint"/>
         </properties>
       </component>
       <vspacer id="81f87">
@@ -35,8 +35,8 @@
           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="messages/CloudToolsBundle" key="appengine.wizard.package_name_label"/>
-          <toolTipText resource-bundle="messages/CloudToolsBundle" key="appengine.wizard.package_name_label_hint"/>
+          <text resource-bundle="messages/CloudToolsStudioBundle" key="appengine.wizard.package_name_label"/>
+          <toolTipText resource-bundle="messages/CloudToolsStudioBundle" key="appengine.wizard.package_name_label_hint"/>
         </properties>
       </component>
       <component id="9dbe5" class="javax.swing.JTextField" binding="myPackageNameField">
@@ -52,8 +52,8 @@
           <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="messages/CloudToolsBundle" key="appengine.wizard.client_module_label"/>
-          <toolTipText resource-bundle="messages/CloudToolsBundle" key="appengine.wizard.client_module_label_hint"/>
+          <text resource-bundle="messages/CloudToolsStudioBundle" key="appengine.wizard.client_module_label"/>
+          <toolTipText resource-bundle="messages/CloudToolsStudioBundle" key="appengine.wizard.client_module_label_hint"/>
         </properties>
       </component>
       <component id="6a131" class="javax.swing.JComboBox" binding="myClientModuleCombo">
@@ -86,8 +86,8 @@
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="messages/CloudToolsBundle" key="appengine.wizard.module_type_label"/>
-          <toolTipText resource-bundle="messages/CloudToolsBundle" key="appengine.wizard.module_type_label_hint"/>
+          <text resource-bundle="messages/CloudToolsStudioBundle" key="appengine.wizard.module_type_label"/>
+          <toolTipText resource-bundle="messages/CloudToolsStudioBundle" key="appengine.wizard.module_type_label_hint"/>
         </properties>
       </component>
       <component id="399ab" class="javax.swing.JLabel" binding="myModuleTypeIcon">

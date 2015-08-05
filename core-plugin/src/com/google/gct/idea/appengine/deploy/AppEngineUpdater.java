@@ -18,8 +18,9 @@ package com.google.gct.idea.appengine.deploy;
 import com.google.common.base.Strings;
 import com.google.gct.idea.appengine.gradle.GradleInvoker;
 import com.google.gct.idea.appengine.sdk.AppEngineSdk;
-import com.google.gct.idea.stats.UsageTracker;
+import com.google.gct.login.stats.UsageTrackerService;
 import com.google.gct.idea.util.GctTracking;
+
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionManager;
 import com.intellij.execution.Executor;
@@ -40,7 +41,6 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.externalSystem.service.execution.ExternalSystemBeforeRunTask;
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode;
 import com.intellij.openapi.externalSystem.task.TaskCallback;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -187,7 +187,7 @@ class AppEngineUpdater {
       return;
     }
 
-    UsageTracker.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.DEPLOY, "upload.app", null);
+    UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.DEPLOY, "upload.app", null);
 
     final ProcessHandler processHandler = new FilteredOSProcessHandler(process, commandLine.getCommandLineString(),
                                                                        new String[]{myRefreshToken, myClientSecret, myClientId});
