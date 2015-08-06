@@ -16,6 +16,7 @@
 package com.google.gct.login;
 
 import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.repackaged.com.google.common.base.Throwables;
 import com.google.api.client.repackaged.org.mortbay.jetty.Connector;
 import com.google.api.client.repackaged.org.mortbay.jetty.Request;
@@ -212,9 +213,6 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
    * where {@link #waitForCode} will find it.
    */
   class CallbackHandler extends AbstractHandler {
-    private static final String AUTH_SUCCESS_LANDING_PAGE = "https://developers.google.com/cloud/mobile/auth_success";
-    private static final String AUTH_FAILURE_LANDING_PAGE = "https://developers.google.com/cloud/mobile/auth_failure";
-
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) throws IOException {
       if (!CALLBACK_PATH.equals(target)) {
@@ -232,7 +230,8 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
         lock.unlock();
       }
 
-      response.sendRedirect(error == null ? AUTH_SUCCESS_LANDING_PAGE : AUTH_FAILURE_LANDING_PAGE);
+      response.sendRedirect(error == null ? GoogleLoginUtils.getCurrentPlatform().getSuccessfulLandingPage()
+          : GoogleLoginUtils.getCurrentPlatform().getFailureLandingPage());
       response.flushBuffer();
     }
   }
