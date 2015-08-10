@@ -15,10 +15,9 @@
  */
 package com.google.gct.idea.debugger.ui;
 
-import com.google.api.services.debugger.Debugger;
-import com.google.api.services.debugger.model.Debuggee;
-import com.google.api.services.debugger.model.DebuggeeLabelsEntry;
-import com.google.api.services.debugger.model.ListDebuggeesResponse;
+import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.model.Debuggee;
+import com.google.api.services.clouddebugger.model.ListDebuggeesResponse;
 import com.google.common.base.Strings;
 import com.google.gct.idea.debugger.CloudDebugProcessState;
 import com.google.gct.idea.debugger.CloudDebuggerClient;
@@ -30,6 +29,7 @@ import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.openapi.application.AccessToken;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -435,51 +435,61 @@ public class CloudAttachDialog extends DialogWrapper {
      */
     @SuppressWarnings("unchecked")
     private void refreshDebugTargetList() {
-      try {
-        myDebugeeTarget.removeAllItems();
-        DebugTarget targetSelection = null;
-        if (myElysiumProjectId.getProjectNumber() != null && getCloudDebuggerClient() != null) {
+      myDebugeeTarget.removeAllItems();
+      ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            if (myElysiumProjectId.getProjectNumber() != null && getCloudDebuggerClient() != null) {
+              final ListDebuggeesResponse debuggees =
+                  getCloudDebuggerClient().debuggees().list()
+                      .setProject(myElysiumProjectId.getProjectNumber().toString())
+                      .execute();
 
-          ListDebuggeesResponse debuggees =
-            getCloudDebuggerClient().debuggees().list().setProject(myElysiumProjectId.getProjectNumber().toString())
-              .execute();
+              SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  DebugTarget targetSelection = null;
 
-          if (debuggees != null && debuggees.getDebuggees() != null) {
-            Map<String, DebugTarget> perModuleCache = new HashMap<String, DebugTarget>();
+                  if (debuggees != null && debuggees.getDebuggees() != null) {
+                    Map<String, DebugTarget> perModuleCache = new HashMap<String, DebugTarget>();
 
-            for (Debuggee debuggee : debuggees.getDebuggees()) {
-              DebugTarget item = new DebugTarget(debuggee, myElysiumProjectId.getText());
-              if (!Strings.isNullOrEmpty(item.getModule()) &&
-                  !Strings.isNullOrEmpty(item.getVersion())) {
-                //If we already have an existing item for that module+version, compare the minor
-                // versions and only use the latest minor version.
-                String key = String.format("%s:%s",item.getModule(), item.getVersion());
-                DebugTarget existing = perModuleCache.get(key);
-                if (existing != null && existing.getMinorVersion() > item.getMinorVersion()) {
-                  continue;
+                    for (Debuggee debuggee : debuggees.getDebuggees()) {
+                      DebugTarget item = new DebugTarget(debuggee, myElysiumProjectId.getText());
+                      if (!Strings.isNullOrEmpty(item.getModule()) &&
+                          !Strings.isNullOrEmpty(item.getVersion())) {
+                        //If we already have an existing item for that module+version, compare the minor
+                        // versions and only use the latest minor version.
+                        String key = String.format("%s:%s", item.getModule(), item.getVersion());
+                        DebugTarget existing = perModuleCache.get(key);
+                        if (existing != null && existing.getMinorVersion() > item.getMinorVersion()) {
+                          continue;
+                        }
+                        if (existing != null) {
+                          myDebugeeTarget.removeItem(existing);
+                        }
+                        perModuleCache.put(key, item);
+                      }
+                      if (myInputState != null && !Strings.isNullOrEmpty(myInputState.getDebuggeeId())) {
+                        assert myInputState.getDebuggeeId() != null;
+                        if (myInputState.getDebuggeeId().equals(item.getId())) {
+                          targetSelection = item;
+                        }
+                      }
+                      myDebugeeTarget.addItem(item);
+                    }
+                  }
+                  if (targetSelection != null) {
+                    myDebugeeTarget.setSelectedItem(targetSelection);
+                  }
                 }
-                if (existing != null) {
-                  myDebugeeTarget.removeItem(existing);
-                }
-                perModuleCache.put(key, item);
-              }
-              if (myInputState != null && !Strings.isNullOrEmpty(myInputState.getDebuggeeId())) {
-                assert myInputState.getDebuggeeId() != null;
-                if (myInputState.getDebuggeeId().equals(item.getId())) {
-                  targetSelection = item;
-                }
-              }
-              myDebugeeTarget.addItem(item);
+              });
             }
-          }
-          if (targetSelection != null) {
-            myDebugeeTarget.setSelectedItem(targetSelection);
+          } catch (IOException ex) {
+            LOG.error("Error listing debuggees from Cloud Debugger API", ex);
           }
         }
-      }
-      catch (IOException ex) {
-        LOG.error("Error listing debuggees from Cloud Debugger API", ex);
-      }
+      });
     }
 
     public static class DebugTarget {
@@ -500,7 +510,7 @@ public class CloudAttachDialog extends DialogWrapper {
           String minorVersion = "";
 
           //Get the module name, major version and minor version strings.
-          for (DebuggeeLabelsEntry entry : myDebuggee.getLabels()) {
+          for (Map.Entry<String, String> entry : myDebuggee.getLabels().entrySet()) {
             if (entry.getKey().equalsIgnoreCase(MODULE)) {
               myModule = entry.getValue();
             }
@@ -519,11 +529,11 @@ public class CloudAttachDialog extends DialogWrapper {
 
           //Build a description from the strings.
           if (!Strings.isNullOrEmpty(myModule)) {
-            myDescription = GctBundle.getString("cloud.debug.version.with.module.format",
+            myDescription = GctBundle.getString("clouddebug.version.with.module.format",
                 myModule, myVersion);
           }
           else if (!Strings.isNullOrEmpty(myVersion)) {
-            myDescription = GctBundle.getString("cloud.debug.versionformat", myVersion);
+            myDescription = GctBundle.getString("clouddebug.versionformat", myVersion);
           }
 
           //Record the minor version.  We only show the latest minor version.

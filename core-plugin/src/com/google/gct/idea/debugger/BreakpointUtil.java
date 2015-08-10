@@ -16,14 +16,27 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.debugger.model.StatusMessage;
+import com.google.api.services.clouddebugger.model.StatusMessage;
 import com.google.gct.idea.util.GctBundle;
+
+import com.intellij.openapi.diagnostic.Logger;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Utility functions for cloud debug data.
  */
 public class BreakpointUtil {
+  private static final Logger LOG = Logger.getInstance(BreakpointUtil.class);
+
+  // 2015-07-23T16:37:33.000Z
+  public static final SimpleDateFormat ISO8601_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+
   /**
    * This is a helper routine that converts a server {@link StatusMessage} to descriptive text.
    */
@@ -52,6 +65,22 @@ public class BreakpointUtil {
       }
       return String.format(formatString, statusMessage.getDescription().getParameters());
     }
+    return null;
+  }
+
+  @Nullable
+  public static Date parseDateTime(@Nullable String dateString) {
+    if (dateString == null) {
+      return null;
+    }
+
+    dateString = dateString.replaceAll("Z$", "-0000");
+    try {
+      return ISO8601_DATE_FORMAT.parse(dateString);
+    } catch (ParseException e) {
+      LOG.error("error parsing datetime " + dateString, e);
+    }
+
     return null;
   }
 }

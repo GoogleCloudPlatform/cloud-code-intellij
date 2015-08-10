@@ -15,8 +15,10 @@
  */
 package com.google.gct.idea.debugger;
 
-import com.google.api.services.debugger.model.Breakpoint;
-import com.google.api.services.debugger.model.SourceLocation;
+import com.google.api.services.clouddebugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.model.SourceLocation;
+import com.google.gct.idea.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
+
 import com.intellij.mock.MockProjectEx;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -89,14 +91,15 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     CloudDebugProcessStateController stateController = Mockito.mock(CloudDebugProcessStateController.class);
     when(myProcess.getStateController()).thenReturn(stateController);
 
-    when(stateController.setBreakpoint(any(Breakpoint.class), any(CloudDebugProcessStateController.BreakpointErrorHandler.class)))
-      .then(new Answer<Object>() {
-        @Override
-        public Object answer(InvocationOnMock invocation) throws Throwable {
-          myAddedBp.set((Breakpoint)invocation.getArguments()[0]);
-          return myDesiredresultId;
-        }
-      });
+    doAnswer(new Answer() {
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        myAddedBp.set((Breakpoint)invocation.getArguments()[0]);
+        SetBreakpointHandler handler = (SetBreakpointHandler)invocation.getArguments()[1];
+        handler.onSuccess(myDesiredresultId);
+        return null;
+      }
+    }).when(stateController).setBreakpointAsync(any(Breakpoint.class), any(SetBreakpointHandler.class));
 
     doAnswer(new Answer() {
       @Override
@@ -104,7 +107,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
         myRemovedBp.set((String)invocation.getArguments()[0]);
         return null;
       }
-    }).when(stateController).deleteBreakpoint(anyString());
+    }).when(stateController).deleteBreakpointAsync(anyString());
 
   }
 

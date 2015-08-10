@@ -16,11 +16,11 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.debugger.Debugger;
-import com.google.api.services.debugger.model.CloudRepoSourceContext;
-import com.google.api.services.debugger.model.Debuggee;
-import com.google.api.services.debugger.model.ListDebuggeesResponse;
-import com.google.api.services.debugger.model.SourceContext;
+import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.model.CloudRepoSourceContext;
+import com.google.api.services.clouddebugger.model.Debuggee;
+import com.google.api.services.clouddebugger.model.ListDebuggeesResponse;
+import com.google.api.services.clouddebugger.model.SourceContext;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.execution.configurations.GeneralCommandLine;

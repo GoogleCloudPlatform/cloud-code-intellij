@@ -16,8 +16,8 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.debugger.model.StackFrame;
-import com.google.api.services.debugger.model.Variable;
+import com.google.api.services.clouddebugger.model.StackFrame;
+import com.google.api.services.clouddebugger.model.Variable;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
@@ -136,7 +136,8 @@ public class CloudStackFrame extends XStackFrame {
       //Note that we have to examine the variable table for some cases depending on how the
       // server compressed results.
       myVariableTable = variableTable;
-      myVariable = variable.getVarIndex() != null ? variableTable.get(variable.getVarIndex().intValue()) : variable;
+      myVariable = variable.getVarTableIndex() != null ? variableTable.get(variable.getVarTableIndex().intValue())
+          : variable;
       myMembers = myVariable.getMembers();
     }
 

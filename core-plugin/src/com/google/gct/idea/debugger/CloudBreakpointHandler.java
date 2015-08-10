@@ -16,8 +16,9 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.debugger.model.Breakpoint;
-import com.google.api.services.debugger.model.SourceLocation;
+import com.google.api.services.clouddebugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.model.SourceLocation;
+import com.google.gct.idea.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.openapi.application.ApplicationManager;
@@ -54,7 +55,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * these are {@link XBreakpoint} types that intelliJ defines and are sealed. cloudIdeBreakpoint: these are our IDE
  * defined customized breakpoints {@link com.google.gct.idea.debugger.CloudLineBreakpointType.CloudLineBreakpoint} with
  * custom properties, etc. It's confusing that there are two hierarchies for IDE breakpoints, but intelliJ does this to
- * control some base behavior. serverBreakpoint: these are the {@link com.google.api.services.debugger.model.Breakpoint}
+ * control some base behavior. serverBreakpoint: these are the {@link Breakpoint}
  * breakpoints our server gives us via the apiary api.
  */
 public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<CloudLineBreakpointProperties>> {
@@ -237,7 +238,7 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
     if (serverBreakpoint.getIsFinalState() != Boolean.TRUE) {
       setStateToDisabled(serverBreakpoint);
     }
-    myProcess.getStateController().deleteBreakpoint(serverBreakpoint.getId());
+    myProcess.getStateController().deleteBreakpointAsync(serverBreakpoint.getId());
   }
 
   /**
@@ -286,7 +287,7 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
    * @param xIdeBreakpoint breakpoint to register
    */
   @Override
-  public void registerBreakpoint(@NotNull XLineBreakpoint<CloudLineBreakpointProperties> xIdeBreakpoint) {
+  public void registerBreakpoint(@NotNull final XLineBreakpoint<CloudLineBreakpointProperties> xIdeBreakpoint) {
     if (xIdeBreakpoint.getSourcePosition() == null ||
         !xIdeBreakpoint.isEnabled() ||
         !(xIdeBreakpoint.getType() instanceof CloudLineBreakpointType)) {
@@ -331,31 +332,49 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
     }
 
     // The breakpoint will enter error state asynchronously.  For now, we state that its verified.
-    String id = myProcess.getStateController()
-      .setBreakpoint(serverNewBreakpoint, new CloudDebugProcessStateController.BreakpointErrorHandler() {
-                       @Override
-                       public void handleError(String errorMessage) {
-                         cloudIdeLineBreakpoint.setErrorMessage(errorMessage);
-                       }
-                     });
-    if (!Strings.isNullOrEmpty(id)) {
-      cloudIdeLineBreakpoint.setVerified(true);
-      cloudIdeLineBreakpoint.setErrorMessage(null);
-    }
-    else {
-      cloudIdeLineBreakpoint.setErrorMessage(GctBundle.getString("clouddebug.errorset"));
-    }
-    cloudIdeLineBreakpoint.updateUI();
-    if (!Strings.isNullOrEmpty(id)) {
-      xIdeBreakpoint.getProperties().setDisabledByServer(false);
-      String oldId = xIdeBreakpoint.getUserData(CLOUD_ID);
-      if (!Strings.isNullOrEmpty(oldId)) {
-        myIdeBreakpoints.remove(oldId);
-      }
+    myProcess.getStateController()
+        .setBreakpointAsync(serverNewBreakpoint, new SetBreakpointHandler() {
+          @Override
+          public void onSuccess(@NotNull final String id) {
+            Runnable r = new Runnable() {
+              @Override
+              public void run() {
+                if (!Strings.isNullOrEmpty(id)) {
+                  if (!cloudIdeLineBreakpoint.isEnabled()) {
+                    myProcess.getStateController().deleteBreakpointAsync(id); //race condition
+                  } else {
+                    cloudIdeLineBreakpoint.setVerified(true);
+                    cloudIdeLineBreakpoint.setErrorMessage(null);
+                  }
+                } else {
+                  cloudIdeLineBreakpoint.setErrorMessage(GctBundle.getString("clouddebug.errorset"));
+                }
+                cloudIdeLineBreakpoint.updateUI();
+                if (!Strings.isNullOrEmpty(id)) {
+                  xIdeBreakpoint.getProperties().setDisabledByServer(false);
+                  String oldId = xIdeBreakpoint.getUserData(CLOUD_ID);
+                  if (!Strings.isNullOrEmpty(oldId)) {
+                    myIdeBreakpoints.remove(oldId);
+                  }
 
-      xIdeBreakpoint.putUserData(CLOUD_ID, id);
-      myIdeBreakpoints.put(id, xIdeBreakpoint);
-    }
+                  xIdeBreakpoint.putUserData(CLOUD_ID, id);
+                  myIdeBreakpoints.put(id, xIdeBreakpoint);
+                }
+              }
+            };
+            if (ApplicationManager.getApplication().isUnitTestMode()) {
+              r.run();
+            }
+            else {
+              SwingUtilities.invokeLater(r);
+            }
+          }
+
+          @Override
+          public void onError(String errorMessage) {
+            cloudIdeLineBreakpoint.setErrorMessage(errorMessage);
+          }
+        });
   }
 
   void setPsiManager(PsiManager psiManager) {
@@ -392,7 +411,7 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
     String breakpointId = xIdeBreakpoint.getUserData(CLOUD_ID);
     if (!Strings.isNullOrEmpty(breakpointId)) {
       assert breakpointId != null;
-      myProcess.getStateController().deleteBreakpoint(breakpointId);
+      myProcess.getStateController().deleteBreakpointAsync(breakpointId);
     }
     else {
       LOG.warn("could not delete breakpoint because it was not added through the cloud handler.");

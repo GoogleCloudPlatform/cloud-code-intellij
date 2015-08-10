@@ -64,17 +64,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/google-api-services-debugger.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$USER_HOME$/cdebugapi2" />
-        </SOURCES>
-      </library>
-    </orderEntry>
     <orderEntry type="module" module-name="google-cloud-tools-core" scope="PROVIDED" />
     <orderEntry type="module" module-name="google-login" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="android" level="application" />

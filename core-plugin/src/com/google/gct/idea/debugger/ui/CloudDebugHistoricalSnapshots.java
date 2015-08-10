@@ -15,7 +15,7 @@
  */
 package com.google.gct.idea.debugger.ui;
 
-import com.google.api.services.debugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.gct.idea.debugger.*;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.diagnostic.logging.AdditionalTabComponent;
@@ -46,6 +46,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.font.TextAttribute;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.List;
@@ -276,17 +277,14 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   /**
-   * Deletes breakpoints on a threadpool thread.  The user will see these breakpoints gradually disappear
+   * Deletes breakpoints asynchronously on a threadpool thread.  The user will see these breakpoints gradually disappear
    */
   private void fireDeleteBreakpoints(@NotNull final List<Breakpoint> breakpointsToDelete) {
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        for (Breakpoint aBreakpointsToDelete : breakpointsToDelete) {
-          myProcess.getBreakpointHandler().deleteBreakpoint(aBreakpointsToDelete);
-        }
-      }
-    });
+    for (Breakpoint breakpoint : breakpointsToDelete) {
+      getModel().markForDelete(breakpoint.getId());
+      myProcess.getBreakpointHandler().deleteBreakpoint(breakpoint);
+    }
+    getModel().fireTableDataChanged();
   }
 
   @Nullable
@@ -386,9 +384,9 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     return myProcess.getBreakpointHandler().getXBreakpoint(breakpoint) != null;
   }
 
-  final static class SnapshotTimeCellRenderer extends DefaultTableCellRenderer {
-    private static final DateFormat ourDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-    private static final DateFormat ourDateFormatToday = DateFormat.getTimeInstance(DateFormat.SHORT);
+  final class SnapshotTimeCellRenderer extends DefaultTableCellRenderer {
+    private final DateFormat ourDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    private final DateFormat ourDateFormatToday = DateFormat.getTimeInstance(DateFormat.SHORT);
     private final Date myTodayDate;
 
     public SnapshotTimeCellRenderer() {
@@ -410,36 +408,45 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       setBorder(noFocusBorder);
 
-      boolean isToday = false;
       if (value instanceof Date) {
         Date finalDate = (Date)value;
         if (finalDate.after(myTodayDate)) {
           setText(ourDateFormatToday.format(finalDate));
-          isToday = true;
         }
         else {
           setText(ourDateFormat.format(finalDate));
         }
       }
-      else {
+      else if (value != null) {
         setText(value.toString());
+      }
+      else {
+        setText("");
       }
 
       if (GctBundle.getString("clouddebug.pendingstatus").equals(value)) {
         Font font = getFont();
         Font boldFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
         setFont(boldFont);
-        if (!isSelected) {
-          setForeground(UIUtil.getActiveTextColor());
-        }
       }
       else {
         Font font = getFont();
         Font boldFont = new Font(font.getFontName(), Font.PLAIN, font.getSize());
         setFont(boldFont);
+      }
+
+      if (getModel().isMarkedForDelete(row)) {
         if (!isSelected) {
-          setForeground(isToday ? UIUtil.getActiveTextColor() : UIUtil.getInactiveTextColor());
+          setForeground(UIUtil.getInactiveTextColor());
         }
+        Font font = getFont();
+        Map attributes = font.getAttributes();
+        attributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+        attributes.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
+        setFont(new Font(attributes));
+      }
+      else if (!isSelected) {
+        setForeground(UIUtil.getActiveTextColor());
       }
 
       return this;
@@ -468,7 +475,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     }
   }
 
-  private static class DefaultRenderer extends DefaultTableCellRenderer {
+  private class DefaultRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table,
                                                    Object value,
@@ -478,6 +485,19 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
                                                    int column) {
       super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       setBorder(noFocusBorder);
+      if (getModel().isMarkedForDelete(row)) {
+        if (!isSelected) {
+          setForeground(UIUtil.getInactiveTextColor());
+        }
+        Font font = getFont();
+        Map attributes = font.getAttributes();
+        attributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+        attributes.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
+        setFont(new Font(attributes));
+      }
+      else if (!isSelected) {
+        setForeground(UIUtil.getActiveTextColor());
+      }
       return this;
     }
   }
@@ -486,6 +506,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     private static final int ourColumnCount = 5;
     private final List<Breakpoint> myBreakpoints;
+    private final Set<String> myPendingDeletes = new HashSet<String>();
 
     public MyModel(List<Breakpoint> breakpoints) {
       myBreakpoints = breakpoints != null ? breakpoints : new ArrayList<Breakpoint>();
@@ -504,6 +525,18 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     @Override
     public int getRowCount() {
       return myBreakpoints.size();
+    }
+
+    public void markForDelete(String id) {
+      myPendingDeletes.add(id);
+    }
+
+    public boolean isMarkedForDelete(int row) {
+      Breakpoint breakpoint = null;
+      if (row >=0 && row < myBreakpoints.size()) {
+        breakpoint = myBreakpoints.get(row);
+      }
+      return breakpoint != null && myPendingDeletes.contains(breakpoint.getId());
     }
 
     @Override
@@ -526,7 +559,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
           if (breakpoint.getIsFinalState() != Boolean.TRUE) {
             return GctBundle.getString("clouddebug.pendingstatus");
           }
-          return new Date(breakpoint.getFinalTime().getSeconds() * 1000);
+          return BreakpointUtil.parseDateTime(breakpoint.getFinalTime());
         case 2:
           String path = breakpoint.getLocation().getPath();
           int startIndex = path.lastIndexOf('/');

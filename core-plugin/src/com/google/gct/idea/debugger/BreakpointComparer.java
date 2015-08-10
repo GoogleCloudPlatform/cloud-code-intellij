@@ -16,17 +16,18 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.debugger.model.Breakpoint;
-import com.google.api.services.debugger.model.SourceLocation;
+import com.google.api.services.clouddebugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.model.SourceLocation;
 
 import java.util.Comparator;
+import java.util.Date;
 
 /**
  * BreakpointComparer is a comparer used to sort breakpoints in the historical snapshot list.
  */
 public class BreakpointComparer implements Comparator<Breakpoint> {
   private static final BreakpointComparer DEFAULT_INSTANCE = new BreakpointComparer();
-
+  private static final Date MINIMUM_DATE = new Date(Long.MIN_VALUE);
   private BreakpointComparer() {
   }
 
@@ -71,17 +72,15 @@ public class BreakpointComparer implements Comparator<Breakpoint> {
       }
       return s1.getPath().compareTo(s2.getPath());
     }
-    long s1Seconds = toLongValue(o1.getFinalTime().getSeconds());
-    long s2Seconds = toLongValue(o2.getFinalTime().getSeconds());
-    if (s1Seconds == s2Seconds) {
-      int s1Nanos = toIntValue(o1.getFinalTime().getNanos());
-      int s2Nanos = toIntValue(o2.getFinalTime().getNanos());
-      if (s1Nanos == s2Nanos) {
-        return 0;
-      }
-      return s1Nanos < s2Nanos ? 1 : -1;
+    Date d1 = BreakpointUtil.parseDateTime(o1.getFinalTime());
+    Date d2 = BreakpointUtil.parseDateTime(o2.getFinalTime());
+    if (d1 == null) {
+      d1 = MINIMUM_DATE;
     }
-    return s1Seconds < s2Seconds ? 1 : -1;
+    if (d2 == null) {
+      d2 = MINIMUM_DATE;
+    }
+    return d2.compareTo(d1);
   }
 
   private static boolean isSourceLocationValid(SourceLocation sourceLocation) {

@@ -17,19 +17,16 @@ package com.google.gct.idea.debugger;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.debugger.Debugger;
-import com.google.api.services.debugger.model.*;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.model.*;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.Ref;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.HashSet;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -64,12 +61,20 @@ public class CloudDebugProcessStateController {
     myBreakpointListChangedListeners.add(listener);
   }
 
+  void deleteBreakpoint(@NotNull final String breakpointId) {
+    deleteBreakpoint(breakpointId, false);
+  }
+
+  void deleteBreakpointAsync(@NotNull final String breakpointId) {
+    deleteBreakpoint(breakpointId, true);
+  }
+
   /**
    * Called from the {@link CloudBreakpointHandler} to remove breakpoints from the server.
    *
-   * @param breakpointId the {@link com.google.api.services.debugger.model.Breakpoint} Id to delete
+   * @param breakpointId the {@link Breakpoint} Id to delete
    */
-  void deleteBreakpoint(@NotNull String breakpointId) {
+  private void deleteBreakpoint(@NotNull final String breakpointId, boolean performAsync) {
     if (myState == null) {
       throw new IllegalStateException();
     }
@@ -80,11 +85,25 @@ public class CloudDebugProcessStateController {
                                GctBundle.getString("clouddebug.errortitle"));
       return;
     }
-    try {
-      client.debuggees().breakpoints().delete(myState.getDebuggeeId(), breakpointId).execute();
+    final String debuggeeId = myState.getDebuggeeId();
+    assert debuggeeId != null;
+
+    Runnable performDelete = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          client.debuggees().breakpoints().delete(debuggeeId, breakpointId).execute();
+        } catch (IOException ex) {
+          LOG.warn("exception deleting breakpoint " + breakpointId, ex);
+        }
+      }
+    };
+
+    if (performAsync) {
+      ApplicationManager.getApplication().executeOnPooledThread(performDelete);
     }
-    catch (IOException ex) {
-      LOG.warn("exception deleting breakpoint " + breakpointId, ex);
+    else {
+      performDelete.run();
     }
   }
 
@@ -120,120 +139,114 @@ public class CloudDebugProcessStateController {
   /**
    * Returns a fully realized {@link Breakpoint} with all results possibly asynchronously
    *
-   * @param id the breakpoint id to resolve
-   * @return a {@link ListenableFuture} that is set once the full breakpoint is loaded
    */
-  @Nullable
-  public ListenableFuture<Breakpoint> resolveBreakpoint(@NotNull final String id) {
+  public void resolveBreakpointAsync(@NotNull final String id,
+      @NotNull final ResolveBreakpointHandler handler) {
+
     if (myState == null) {
-      return null;
+      handler.onError(GctBundle.getString("clouddebug.invalid.state"));
+      return;
     }
     final Debugger client = CloudDebuggerClient.getCloudDebuggerClient(myState);
     if (client == null) {
       LOG.warn("no client available attempting to resolveBreakpointAsync");
-      Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
-                               GctBundle.getString("clouddebug.errortitle"));
-      return null;
+      handler.onError(GctBundle.getString("clouddebug.bad.login.message"));
+      return;
     }
     List<Breakpoint> currentList = myState.getCurrentServerBreakpointList();
     final SettableFuture<Breakpoint> future = SettableFuture.create();
-    final Ref<Breakpoint> resultingBreakpointRef = new Ref<Breakpoint>();
     for (Breakpoint serverBreakpointCandidate : currentList) {
-      if (serverBreakpointCandidate.getId().equals(id)) {
-        resultingBreakpointRef.set(serverBreakpointCandidate);
-        break;
+      if (serverBreakpointCandidate.getId().equals(id)
+          && serverBreakpointCandidate.getIsFinalState() != Boolean.TRUE) {
+        handler.onSuccess(serverBreakpointCandidate);
+        return;
       }
     }
 
-    if (!resultingBreakpointRef.isNull()) {
-      // If our breakpoint isn't final, they we do not need extra information and
-      // can return the result immediately.
-      if (resultingBreakpointRef.get().getIsFinalState() != Boolean.TRUE) {
-        future.set(resultingBreakpointRef.get());
-        return future;
-      }
-
-      ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-        @Override
-        public void run() {
-          //At this point, the user has selected a final state breakpoint which is not yet hydrated.
-          //So we query the server to get this final on a worker thread and then run the runnable
-          // back on ui
-          GetBreakpointResponse response;
-          try {
-            response = client.debuggees().breakpoints().get(myState.getDebuggeeId(), id).execute();
-            Breakpoint result = response.getBreakpoint();
-            if (result != null) {
-              resultingBreakpointRef.set(result);
-              myFullFinalBreakpoints.put(id, result);
-              future.set(resultingBreakpointRef.get());
-            }
+    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+      @Override
+      public void run() {
+        //At this point, the user has selected a final state breakpoint which is not yet hydrated.
+        //So we query the server to get this final on a worker thread and then run the runnable
+        // back on ui
+        GetBreakpointResponse response;
+        try {
+          response = client.debuggees().breakpoints().get(myState.getDebuggeeId(), id).execute();
+          Breakpoint result = response.getBreakpoint();
+          if (result != null) {
+            myFullFinalBreakpoints.put(id, result);
+            handler.onSuccess(result);
           }
-          catch (IOException e) {
-            LOG.warn("IOException hydrating a snapshot.  User may have deleted the snapshot", e);
-            future.setException(e);
+          else {
+            handler.onError(GctBundle.getString("clouddebug.no.response"));
           }
         }
-      });
-      return future;
-    }
-    LOG.warn("could not resolve breakpoint " + id);
-
-    return null;
+        catch (IOException e) {
+          LOG.warn("IOException hydrating a snapshot.  User may have deleted the snapshot", e);
+          handler.onError(e.toString());
+        }
+      }
+    });
   }
 
   /**
    * Called from the {@link CloudDebugProcessHandler} to set a breakpoint.
-   *
-   * @param serverBreakpoint the breakpoint being added
-   * @param errorHandler     the handler that gets called if an error occurs during the add call
-   * @return the ID of the newly added breakpoint, if successful
    */
-  String setBreakpoint(@NotNull Breakpoint serverBreakpoint, @Nullable BreakpointErrorHandler errorHandler) {
+  void setBreakpointAsync(@NotNull final Breakpoint serverBreakpoint,
+      @NotNull final SetBreakpointHandler handler) {
+
     if (myState == null) {
-      return null;
+      handler.onError(GctBundle.getString("clouddebug.invalid.state"));
+      return;
     }
     final Debugger client = CloudDebuggerClient.getCloudDebuggerClient(myState);
     if (client == null) {
       LOG.warn("no client available attempting to setBreakpoint");
-      Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
-                               GctBundle.getString("clouddebug.errortitle"));
-      return null;
+      handler.onError(GctBundle.getString("clouddebug.bad.login.message"));
+      return;
     }
 
-    try {
-      // Delete old breakpoints at this location.
-      List<Breakpoint> currentList = myState.getCurrentServerBreakpointList();
-      SourceLocation location = serverBreakpoint.getLocation();
-      for (Breakpoint serverBp : currentList) {
-        if (serverBp.getIsFinalState() != Boolean.TRUE &&
-            serverBp.getLocation().getLine() != null &&
-            serverBp.getLocation().getLine().equals(location.getLine()) &&
-            !Strings.isNullOrEmpty(serverBp.getLocation().getPath()) &&
-            serverBp.getLocation().getPath().equals(location.getPath())) {
-          deleteBreakpoint(serverBp.getId());
+    final String debuggeeId = myState.getDebuggeeId();
+    assert debuggeeId != null;
+
+    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          // Delete old breakpoints at this location.
+          List<Breakpoint> currentList = myState.getCurrentServerBreakpointList();
+          SourceLocation location = serverBreakpoint.getLocation();
+          for (Breakpoint serverBp : currentList) {
+            if (serverBp.getIsFinalState() != Boolean.TRUE &&
+                serverBp.getLocation().getLine() != null &&
+                serverBp.getLocation().getLine().equals(location.getLine()) &&
+                !Strings.isNullOrEmpty(serverBp.getLocation().getPath()) &&
+                serverBp.getLocation().getPath().equals(location.getPath())) {
+              deleteBreakpoint(serverBp.getId()); //should not be async here.
+            }
+          }
+
+          SetBreakpointResponse addResponse =
+              client.debuggees().breakpoints().set(debuggeeId, serverBreakpoint).execute();
+
+          if (addResponse != null && addResponse.getBreakpoint() != null) {
+            Breakpoint result = addResponse.getBreakpoint();
+            if (result.getStatus() != null &&
+                result.getStatus().getIsError() == Boolean.TRUE &&
+                handler != null &&
+                result.getStatus().getDescription() != null) {
+              handler.onError(BreakpointUtil.getUserErrorMessage(result.getStatus()));
+            }
+            handler.onSuccess(addResponse.getBreakpoint().getId());
+          } else {
+            handler.onError(GctBundle.getString("clouddebug.no.response"));
+          }
+        } catch (IOException ex) {
+          LOG.error("exception setting a breakpoint", ex);
+          handler.onError(ex.toString());
         }
       }
-
-      SetBreakpointResponse addResponse =
-        client.debuggees().breakpoints().set(myState.getDebuggeeId(), serverBreakpoint).execute();
-
-      if (addResponse != null && addResponse.getBreakpoint() != null) {
-        Breakpoint result = addResponse.getBreakpoint();
-        if (result.getStatus() != null &&
-            result.getStatus().getIsError() == Boolean.TRUE &&
-            errorHandler != null &&
-            result.getStatus().getDescription() != null) {
-          errorHandler.handleError(BreakpointUtil.getUserErrorMessage(result.getStatus()));
-        }
-        return addResponse.getBreakpoint().getId();
-      }
-    }
-    catch (IOException ex) {
-      LOG.error("exception setting a breakpoint", ex);
-    }
-
-    return null;
+    });
   }
 
   /**
@@ -348,7 +361,7 @@ public class CloudDebugProcessStateController {
 
       ListBreakpointsResponse response =
           client.debuggees().breakpoints().list(state.getDebuggeeId())
-              .setIncludeInactive(Boolean.TRUE).setAction("CAPTURE")
+              .setIncludeInactive(Boolean.TRUE).setActionValue("CAPTURE")
               .setStripResults(Boolean.TRUE)
               .setWaitToken(CloudDebugConfigType.useWaitToken() ? tokenToSend : null).execute();
 
@@ -361,7 +374,7 @@ public class CloudDebugProcessStateController {
       }
 
       currentList = response.getBreakpoints();
-      responseWaitToken = response.getWaitToken();
+      responseWaitToken = response.getNextWaitToken();
       if (tokenToSend == null) {
         break;
       }
@@ -403,8 +416,14 @@ public class CloudDebugProcessStateController {
     }
   }
 
-  public static interface BreakpointErrorHandler {
-    void handleError(String errorMessage);
+  interface SetBreakpointHandler {
+    void onSuccess(@NotNull String newBreakpointId);
+    void onError(String errorMessage);
+  }
+
+  interface ResolveBreakpointHandler {
+    void onSuccess(@NotNull Breakpoint newBreakpoint);
+    void onError(String errorMessage);
   }
 
   static class RunnableTimerTask extends TimerTask {

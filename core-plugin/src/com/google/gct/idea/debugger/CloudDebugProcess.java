@@ -15,10 +15,11 @@
  */
 package com.google.gct.idea.debugger;
 
-import com.google.api.services.debugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gct.idea.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
 import com.google.gct.idea.debugger.ui.CloudDebugHistoricalSnapshots;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.debugger.ui.DebuggerContentInfo;
@@ -230,40 +231,45 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
    * Finds the snapshot associated with the given id and sets it as the active snapshot in the current debug session.
    */
   public void navigateToSnapshot(@NotNull String id) {
-    ListenableFuture<Breakpoint> future = getStateController().resolveBreakpoint(id);
-    if (future != null) {
-      Futures.addCallback(future, new FutureCallback<Breakpoint>() {
-        @Override
-        public void onSuccess(final Breakpoint result) {
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              if (result.getIsFinalState() != Boolean.TRUE || result.getStackFrames() == null) {
-                getBreakpointHandler().navigateTo(result);
-                return;
-              }
+    getStateController().resolveBreakpointAsync(id,
+        new ResolveBreakpointHandler() {
+          @Override
+          public void onSuccess(@NotNull final Breakpoint result) {
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                if (result.getIsFinalState() != Boolean.TRUE || result.getStackFrames() == null) {
+                  getBreakpointHandler().navigateTo(result);
+                  return;
+                }
 
-              if (myCurrentSnapshot == null || !myCurrentSnapshot.getId().equals(result.getId())) {
-                Date brokenTime = new Date(result.getFinalTime().getSeconds() * 1000);
-                DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-                myCurrentSnapshot = result;
-                if (!getXDebugSession().isStopped()) {
-                  getXDebugSession().positionReached(new MySuspendContext(
-                    new CloudExecutionStack(getXDebugSession().getProject(),
-                                            GctBundle.getString("clouddebug.stackat", df.format(brokenTime)),
-                                            result.getStackFrames(), result.getVariableTable(),
-                                            result.getEvaluatedExpressions())));
+                if (myCurrentSnapshot == null || !myCurrentSnapshot.getId().equals(result.getId())) {
+                  navigateToBreakpoint(result);
                 }
               }
-            }
-          });
-        }
+            });
+          }
 
-        @Override
-        public void onFailure(@NotNull Throwable t) {
-          LOG.warn("Could not navigate to breakpoint:", t);
-        }
-      });
+          @Override
+          public void onError(String errorMessage) {
+            LOG.warn("Could not navigate to breakpoint:" + errorMessage);
+          }
+        });
+  }
+
+  private void navigateToBreakpoint(@NotNull Breakpoint target) {
+    Date snapshotTime = BreakpointUtil.parseDateTime(target.getFinalTime());
+    if (snapshotTime == null) {
+      snapshotTime = new Date();
+    }
+    DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    myCurrentSnapshot = target;
+    if (!getXDebugSession().isStopped()) {
+      getXDebugSession().positionReached(new MySuspendContext(
+          new CloudExecutionStack(getXDebugSession().getProject(),
+              GctBundle.getString("clouddebug.stackat", df.format(snapshotTime)),
+              target.getStackFrames(), target.getVariableTable(),
+              target.getEvaluatedExpressions())));
     }
   }
 
@@ -294,37 +300,24 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
           // and if the user hasn't selected a snapshot, we navigate to the first snapshot
           // received during the session.
           if (myCurrentSnapshot == null) {
-            ListenableFuture<Breakpoint> future = getStateController().resolveBreakpoint(breakpoint.getId());
-            if (future != null) {
-              Futures.addCallback(future, new FutureCallback<Breakpoint>() {
-                @Override
-                public void onSuccess(final Breakpoint result) {
-                  SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                      //time to break!
-                      Date brokenTime = new Date(result.getFinalTime().getSeconds() * 1000);
-                      DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-                      myCurrentSnapshot = result;
-
-                      if (!getXDebugSession().isStopped()) {
-                        getXDebugSession().positionReached(new MySuspendContext(
-                          new CloudExecutionStack(getXDebugSession().getProject(),
-                                                  GctBundle.getString("clouddebug.stackat", df.format(brokenTime)),
-                                                  result.getStackFrames(), result.getVariableTable(),
-                                                  result.getEvaluatedExpressions())));
+            getStateController().resolveBreakpointAsync(breakpoint.getId(),
+                new ResolveBreakpointHandler() {
+                  @Override
+                  public void onSuccess(@NotNull final Breakpoint result) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                      @Override
+                      public void run() {
+                        //time to break!
+                        navigateToBreakpoint(result);
                       }
-                    }
-                  });
-                }
+                    });
+                  }
 
-                @Override
-                public void onFailure(@NotNull Throwable t) {
-                  LOG.warn("was unable to hydrate breakpoint on ListChanged", t);
-                }
-
-              });
-            }
+                  @Override
+                  public void onError(String errorMessage) {
+                    LOG.warn("was unable to hydrate breakpoint on ListChanged");
+                  }
+                });
           }
           if (!getXDebugSession().isStopped()) {
             getBreakpointHandler().setStateToDisabled(breakpoint);
