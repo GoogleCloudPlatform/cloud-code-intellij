@@ -55,3 +55,10 @@ sourceSets {
         }
     }
 }
+
+// because plugin.xml doesn;t live in resources
+jar {
+    from ('./src') {
+        include 'META-INF/plugin.xml'
+    }
+}
