@@ -56,6 +56,7 @@ sourceSets {
 
 // because plugin.xml doesn't live in resources
 jar {
+    baseName = 'google-login'
     from ('./src') {
         include 'META-INF/plugin.xml'
     }
