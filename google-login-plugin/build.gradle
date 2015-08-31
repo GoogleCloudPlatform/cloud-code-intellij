@@ -25,11 +25,11 @@ dependencies {
     compile files(ideaLib + 'idea.jar')
     compile files(ideaLib + 'util.jar')
 
-    // todo(elharo): do we need to bundle these in zip as well?
     compile (
         [group: 'com.google.guava', name: 'guava', version: '18.0'],
-        [group: 'com.google.collections', name: 'google-collections', version: '1.0'],
         [group: 'net.jcip', name: 'jcip-annotations', version: '1.0'],
+        // todo(elharo): we need to bundle these next two in zip as well
+        [group: 'com.google.collections', name: 'google-collections', version: '1.0'],
         [group: 'javax.servlet', name: 'servlet-api', version: '2.5'],
     )
     testCompile (
@@ -64,10 +64,14 @@ jar {
 
 task plugin(type: Zip,  dependsOn: jar) {
     baseName = 'google-login'
+    include '*.jar'
     from('lib/') {
         into('lib')
     }
     from('build/libs') {
+        into('lib')
+    }
+    from('third_party/repackaged') {
         into('lib')
     }
 }
