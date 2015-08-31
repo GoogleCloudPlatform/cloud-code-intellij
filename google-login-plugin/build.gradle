@@ -62,6 +62,7 @@ jar {
 }
 
 task plugin(type: Zip,  dependsOn: jar) {
+    baseName = 'google-login'
     from('lib/') {
         into('lib')
     }
