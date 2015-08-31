@@ -65,15 +65,15 @@ task plugin(type: Zip,  dependsOn: jar) {
     baseName = 'google-login'
     include '*.jar'
     from('build/libs') {
-        into('lib')
+        into('google-login/lib')
     }
     from('lib/') {
-        into('lib')
+        into('google-login/lib')
     }
     from('third_party/repackaged') {
-        into('lib')
+        into('google-login/lib')
     }
     from('third_party/javax-servlet-api') {
-        into('lib')
+        into('google-login/lib')
     }
 }
