@@ -665,7 +665,7 @@ public class GoogleLogin {
     /**
      * Sets the login menu item.
      *
-     * @param button The login menu item.
+     * @param trim the login menu item
      */
     public void setLoginMenuItemContribution(GoogleLoginActionButton trim) {
       this.myButton = trim;
