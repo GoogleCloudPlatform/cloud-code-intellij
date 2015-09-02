@@ -1,0 +1,86 @@
+apply plugin: 'java'
+
+// see https://github.com/JetBrains/gradle-intellij-plugin
+
+repositories {
+    mavenCentral()
+}
+
+// set IDEA_HOME in gradle.properties in $GRADLE_HOME (~/.gradle/gradle.properties by default)
+// to point to the local installation of IDEA; e.g.
+// IDEA_HOME=/opt/share/IntelliJ/idea-IC-141.1532.4
+
+def pluginName = 'google-cloud-tools-core'
+
+dependencies {
+    compile files('lib/google-api-services-clouddebugger-v2-rev20150710-1.20.0.jar')
+    compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
+    compile files('lib/google-api-services-source.jar')
+    compile files('third_party/org-eclipse-jgit/org.eclipse.jgit-3.3.0.201403021825-r.jar')
+    compile files('third_party/gradle-appengine-builder-model/gradle-appengine-builder-model-0.1.0.jar')
+
+    compile project(':google-login-plugin')
+    compile files(IDEA_HOME + '/lib/bootstrap.jar')
+    compile files(IDEA_HOME + '/plugins/git4idea/lib/git4idea.jar')
+    compile files(IDEA_HOME + '/plugins/git4idea/lib/remote-servers-git.jar')
+    compile files(IDEA_HOME + '/plugins/gradle/lib/gradle.jar')
+    compile files(IDEA_HOME + '/plugins/gradle/lib/gradle-tooling-api-2.2.jar')
+
+    compile (
+            // todo(elharo): we shouldn't need Apache commons; Guava will suffice
+            ['commons-io:commons-io:2.4'],
+            ['org.jdom:jdom:1.1.3'],
+    )
+
+    testCompile files(IDEA_HOME + '/lib/openapi.jar')
+    testCompile (
+            ['junit:junit:4.+'],
+            ['org.eclipse.jgit:org.eclipse.jgit.junit:3.0.+'],
+            ['org.mockito:mockito-all:1.9.5'],
+    )
+
+    testRuntime files(IDEA_HOME + '/lib/idea_rt.jar')
+    testRuntime files(IDEA_HOME + '/lib/trove4j.jar')
+    testRuntime files(IDEA_HOME + '/lib/util.jar')
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'src', 'resources'
+        }
+        resources {
+            srcDir 'resources'
+        }
+    }
+    test {
+        java {
+            srcDirs 'testSrc'
+            exclude '**/validation/**' // todo(elharo): why are these tests broken?
+            exclude '**/debugger/**' // todo(elharo): why are these tests broken?
+        }
+    }
+}
+
+// because plugin.xml doesn't live in resources
+jar {
+    baseName = pluginName
+    version = ''
+    from ('./src') {
+        include 'META-INF/plugin.xml'
+    }
+}
+
+task plugin(type: Zip,  dependsOn: jar) {
+    baseName = pluginName
+    include '*.jar'
+    from('build/libs') {
+        into(pluginName + '/lib')
+    }
+    from('lib/') {
+        into(pluginName + '/lib')
+    }
+    from('third_party/gradle-appengine-builder-model') {
+        into(pluginName + '/lib')
+    }
+}
