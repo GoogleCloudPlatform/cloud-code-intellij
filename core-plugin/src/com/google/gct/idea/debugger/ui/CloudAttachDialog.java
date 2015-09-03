@@ -412,7 +412,7 @@ public class CloudAttachDialog extends DialogWrapper {
 
       myCredentialedUser = credentialedUser;
       myCloudDebuggerClient =
-        myCredentialedUser != null ? CloudDebuggerClient.getCloudDebuggerClient(myCredentialedUser.getEmail()) : null;
+        myCredentialedUser != null ? CloudDebuggerClient.getLongTimeoutClient(myCredentialedUser.getEmail()) : null;
 
 
       return myCloudDebuggerClient;

@@ -177,7 +177,7 @@ public class ProjectRepositoryValidator {
   @Nullable
   protected Debugger getCloudDebuggerClient() {
     if (myCloudDebuggerClient == null) {
-      myCloudDebuggerClient = CloudDebuggerClient.getCloudDebuggerClient(myProcessState);
+      myCloudDebuggerClient = CloudDebuggerClient.getLongTimeoutClient(myProcessState);
     }
     return myCloudDebuggerClient;
   }
