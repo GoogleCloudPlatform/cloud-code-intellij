@@ -26,14 +26,14 @@ dependencies {
     compile files(ideaLib + 'util.jar')
 
     compile (
-        [group: 'com.google.guava', name: 'guava', version: '18.0'],
-        [group: 'net.jcip', name: 'jcip-annotations', version: '1.0'],
-        [group: 'com.google.collections', name: 'google-collections', version: '1.0'],
-        [group: 'javax.servlet', name: 'servlet-api', version: '2.5'],
+        ['com.google.guava:guava:18.0'],
+        ['net.jcip:jcip-annotations:1.0'],
+        ['com.google.collections:google-collections:1.0'],
+        ['javax.servlet:servlet-api:2.5'],
     )
     testCompile (
-        [group: 'junit', name: 'junit', version: '4.+'],
-        [group: 'org.mockito', name: 'mockito-all', version: '1.9.5'],
+        ['junit:junit:4.+'],
+        ['org.mockito:mockito-all:1.9.5'],
     )
 }
 
