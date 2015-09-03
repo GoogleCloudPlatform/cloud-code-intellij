@@ -51,12 +51,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p/>
  * This class is threadsafe in that all operations can be called by multiple threads.
  * <p/>
- * Note there are three breakpoint types managed in the debugger and are named to avoid confusion: xIdeBreakpoint :
- * these are {@link XBreakpoint} types that intelliJ defines and are sealed. cloudIdeBreakpoint: these are our IDE
- * defined customized breakpoints {@link com.google.gct.idea.debugger.CloudLineBreakpointType.CloudLineBreakpoint} with
- * custom properties, etc. It's confusing that there are two hierarchies for IDE breakpoints, but intelliJ does this to
- * control some base behavior. serverBreakpoint: these are the {@link Breakpoint}
- * breakpoints our server gives us via the apiary api.
+ * Note there are three breakpoint types managed in the debugger and are named to avoid confusion:
+ * xIdeBreakpoint : these are {@link XBreakpoint} types that intelliJ defines and are sealed.
+ * cloudIdeBreakpoint: these are our IDE defined customized breakpoints
+ *                 {@link com.google.gct.idea.debugger.CloudLineBreakpointType.CloudLineBreakpoint} with
+ *                 custom properties, etc. It's confusing that there are two hierarchies for IDE breakpoints,
+ *                 but intelliJ does this to control some base behavior.
+ * serverBreakpoint: these are the {@link Breakpoint} breakpoints our server gives us via the apiary api.
  */
 public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<CloudLineBreakpointProperties>> {
   private static final Key<String> CLOUD_ID = Key.create("CloudId");
@@ -145,8 +146,22 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
   public void createIdeRepresentationsIfNecessary(@NotNull final List<Breakpoint> serverBreakpoints) {
     boolean addedBreakpoint = false;
     for (final Breakpoint serverBreakpoint : serverBreakpoints) {
-      if (serverBreakpoint.getIsFinalState() == Boolean.TRUE ||
-          myIdeBreakpoints.containsKey(serverBreakpoint.getId())) {
+      if (serverBreakpoint.getIsFinalState() == Boolean.TRUE) {
+        continue;
+      }
+
+      if (myIdeBreakpoints.containsKey(serverBreakpoint.getId())) {
+        final XBreakpoint xIdeBreakpoint = myIdeBreakpoints.get(serverBreakpoint.getId());
+        com.intellij.debugger.ui.breakpoints.Breakpoint cloudIdeBreakpoint =
+            BreakpointManager.getJavaBreakpoint(xIdeBreakpoint);
+
+        if (cloudIdeBreakpoint instanceof CloudLineBreakpointType.CloudLineBreakpoint) {
+          CloudLineBreakpointType.CloudLineBreakpoint cloudIdeLineBreakpoint =
+              (CloudLineBreakpointType.CloudLineBreakpoint) cloudIdeBreakpoint;
+          cloudIdeLineBreakpoint.setVerified(true);
+          cloudIdeLineBreakpoint.setErrorMessage(null);
+          cloudIdeLineBreakpoint.updateUI();
+        }
         continue;
       }
 
@@ -343,7 +358,6 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
                   if (!cloudIdeLineBreakpoint.isEnabled()) {
                     myProcess.getStateController().deleteBreakpointAsync(id); //race condition
                   } else {
-                    cloudIdeLineBreakpoint.setVerified(true);
                     cloudIdeLineBreakpoint.setErrorMessage(null);
                   }
                 } else {

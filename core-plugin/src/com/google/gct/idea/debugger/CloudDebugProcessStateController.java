@@ -78,7 +78,7 @@ public class CloudDebugProcessStateController {
     if (myState == null) {
       throw new IllegalStateException();
     }
-    final Debugger client = CloudDebuggerClient.getCloudDebuggerClient(myState);
+    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(myState);
     if (client == null) {
       LOG.warn("no client available attempting to setBreakpoint");
       Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
@@ -143,11 +143,15 @@ public class CloudDebugProcessStateController {
   public void resolveBreakpointAsync(@NotNull final String id,
       @NotNull final ResolveBreakpointHandler handler) {
 
+    if (myFullFinalBreakpoints.containsKey(id)) {
+      handler.onSuccess(myFullFinalBreakpoints.get(id));
+      return;
+    }
     if (myState == null) {
       handler.onError(GctBundle.getString("clouddebug.invalid.state"));
       return;
     }
-    final Debugger client = CloudDebuggerClient.getCloudDebuggerClient(myState);
+    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(myState);
     if (client == null) {
       LOG.warn("no client available attempting to resolveBreakpointAsync");
       handler.onError(GctBundle.getString("clouddebug.bad.login.message"));
@@ -199,7 +203,7 @@ public class CloudDebugProcessStateController {
       handler.onError(GctBundle.getString("clouddebug.invalid.state"));
       return;
     }
-    final Debugger client = CloudDebuggerClient.getCloudDebuggerClient(myState);
+    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(myState);
     if (client == null) {
       LOG.warn("no client available attempting to setBreakpoint");
       handler.onError(GctBundle.getString("clouddebug.bad.login.message"));
@@ -298,7 +302,7 @@ public class CloudDebugProcessStateController {
       LOG.error("no state available attempting to checkForChanges");
       return;
     }
-    final Debugger client = CloudDebuggerClient.getCloudDebuggerClient(myState);
+    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(myState);
     if (client == null) {
       LOG.info("no client available attempting to checkForChanges");
       return;

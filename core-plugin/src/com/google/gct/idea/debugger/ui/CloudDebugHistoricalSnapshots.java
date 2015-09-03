@@ -24,11 +24,17 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.ui.popup.Balloon.Position;
+import com.intellij.openapi.ui.popup.BalloonBuilder;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.AnActionButtonRunnable;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.UI;
+import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.xdebugger.XDebugSessionListener;
@@ -65,6 +71,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   private static final int WINDOW_WIDTH_PX = 200;
   private final JBTable myTable;
   private CloudDebugProcess myProcess;
+  private Balloon myBalloon = null;
 
   public CloudDebugHistoricalSnapshots(@NotNull CloudDebugProcessHandler processHandler) {
     super(new BorderLayout());
@@ -95,7 +102,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       }
     };
 
-    myTable.setModel(new MyModel(null));
+    myTable.setModel(new MyModel(null, null));
 
     myTable.setTableHeader(null);
     myTable.setShowGrid(false);
@@ -168,6 +175,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
             .showDialog(myProcess.getBreakpointHandler().getXBreakpoint(breakpoint));
         }
         else if (me.getClickCount() == 1 && breakpoint != null && myTable.getSelectedRows().length == 1) {
+          getModel().unMarkAsNewlyReceived(breakpoint.getId());
           myProcess.navigateToSnapshot(breakpoint.getId());
         }
       }
@@ -267,7 +275,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        myTable.setModel(new MyModel(null));
+        myTable.setModel(new MyModel(null, null));
       }
     });
   }
@@ -344,11 +352,37 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        myTable.setModel(new MyModel(breakpointList));
+        MyModel oldModel = getModel();
+        myTable.setModel(new MyModel(breakpointList, oldModel));
         if (finalSelection != -1) {
           myTable.setRowSelectionInterval(finalSelection, finalSelection);
         }
         resizeColumnWidth();
+        int rowForPopup = -1;
+        for (int row = 0; row < getModel().getRowCount(); row++) {
+          Breakpoint bp = getModel().getBreakpoints().get(row);
+          if (bp.getIsFinalState() != Boolean.TRUE) {
+            continue;
+          }
+          if (getModel().isNewlyReceived(bp.getId())
+              && !oldModel.isNewlyReceived(bp.getId())) {
+            rowForPopup = row;
+          }
+          break;
+        }
+        if (rowForPopup != -1) {
+          //Show a popup indicating a new item has appeared.
+          if (myBalloon != null) {
+            myBalloon.hide();
+          }
+          Rectangle rectangle = myTable.getCellRect(rowForPopup, 0, true);
+          BalloonBuilder builder = JBPopupFactory.getInstance()
+              .createHtmlTextBalloonBuilder(GctBundle.getString("clouddebug.new.snapshot.received"), MessageType.INFO, null)
+              .setFadeoutTime(3000)
+              .setDisposable(myProcess.getXDebugSession().getProject());
+          myBalloon = builder.createBalloon();
+          myBalloon.show(new RelativePoint(myTable, new Point(myTable.getWidth() / 2, rectangle.y)), Position.above);
+        }
       }
     });
   }
@@ -424,15 +458,15 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         setText("");
       }
 
-      if (GctBundle.getString("clouddebug.pendingstatus").equals(value)) {
+      if (getModel().isNewlyReceived(row)) {
         Font font = getFont();
         Font boldFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
         setFont(boldFont);
       }
       else {
         Font font = getFont();
-        Font boldFont = new Font(font.getFontName(), Font.PLAIN, font.getSize());
-        setFont(boldFont);
+        Font plainFont = new Font(font.getFontName(), Font.PLAIN, font.getSize());
+        setFont(plainFont);
       }
 
       if (getModel().isMarkedForDelete(row)) {
@@ -497,6 +531,17 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       }
       else if (!isSelected) {
         setForeground(UIUtil.getActiveTextColor());
+
+        if (getModel().isNewlyReceived(row)) {
+          Font font = getFont();
+          Font plainFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
+          setFont(plainFont);
+        }
+        else {
+          Font font = getFont();
+          Font boldFont = new Font(font.getFontName(), Font.PLAIN, font.getSize());
+          setFont(boldFont);
+        }
       }
       return this;
     }
@@ -507,8 +552,37 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     private static final int ourColumnCount = 5;
     private final List<Breakpoint> myBreakpoints;
     private final Set<String> myPendingDeletes = new HashSet<String>();
+    private final Set<String> myNewlyReceived = new HashSet<String>();
 
-    public MyModel(List<Breakpoint> breakpoints) {
+    public MyModel(List<Breakpoint> breakpoints, MyModel oldModel) {
+      HashMap<String, Breakpoint> tempHashMap = new HashMap<String, Breakpoint>();
+      if (oldModel != null && oldModel.getBreakpoints().size() > 0) {
+        for(Breakpoint previousBreakpoint : oldModel.getBreakpoints()) {
+          tempHashMap.put(previousBreakpoint.getId(), previousBreakpoint);
+        }
+
+        if (breakpoints != null) {
+          for (Breakpoint newBreakpoint : breakpoints) {
+            //We loop through new breakpoints.
+            //If a new breakpoint is in final state *and*
+            // the old model didnt know about that breakpoint as being final (and not new)
+            // then we mark it.
+            if (newBreakpoint.getIsFinalState() != Boolean.TRUE) {
+              continue;
+            }
+            if (tempHashMap.containsKey(newBreakpoint.getId())) {
+              Breakpoint previousBreakpoint = tempHashMap.get(newBreakpoint.getId());
+              if (previousBreakpoint.getIsFinalState() == Boolean.TRUE) {
+                if (!oldModel.isNewlyReceived(previousBreakpoint.getId())) {
+                  continue;
+                }
+              }
+            }
+            myNewlyReceived.add(newBreakpoint.getId());
+          }
+        }
+      }
+
       myBreakpoints = breakpoints != null ? breakpoints : new ArrayList<Breakpoint>();
     }
 
@@ -531,12 +605,28 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       myPendingDeletes.add(id);
     }
 
+    public void unMarkAsNewlyReceived(String id) {
+      myNewlyReceived.remove(id);
+    }
+
     public boolean isMarkedForDelete(int row) {
       Breakpoint breakpoint = null;
-      if (row >=0 && row < myBreakpoints.size()) {
+      if (row >= 0 && row < myBreakpoints.size()) {
         breakpoint = myBreakpoints.get(row);
       }
       return breakpoint != null && myPendingDeletes.contains(breakpoint.getId());
+    }
+
+    public boolean isNewlyReceived(String id) {
+      return myNewlyReceived.contains(id);
+    }
+
+    public boolean isNewlyReceived(int row) {
+      Breakpoint breakpoint = null;
+      if (row >= 0 && row < myBreakpoints.size()) {
+        breakpoint = myBreakpoints.get(row);
+      }
+      return breakpoint != null && isNewlyReceived(breakpoint.getId());
     }
 
     @Override

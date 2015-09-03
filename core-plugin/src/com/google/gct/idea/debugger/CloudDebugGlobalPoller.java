@@ -33,6 +33,7 @@ import com.intellij.xdebugger.XDebuggerManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.*;
 
 /**
@@ -40,7 +41,7 @@ import java.util.*;
  * when updates occur.
  */
 public class CloudDebugGlobalPoller {
-  private static final int DELAY_MS = 10000;
+  private static final int DELAY_MS = 5000;
   private static final Logger LOG = Logger.getInstance(CloudDebugGlobalPoller.class);
   private final List<CloudBreakpointListener> myBreakpointListChangedListeners =
     new ArrayList<CloudBreakpointListener>();
@@ -59,7 +60,7 @@ public class CloudDebugGlobalPoller {
    */
   public synchronized void startBackgroundListening() {
     if (myWatchTimer == null) {
-      myWatchTimer = new Timer("cloud debug watcher");
+      myWatchTimer = new Timer("cloud debug watcher", true /* isDaemon */);
       myWatchTimer.schedule(new TimerTask() {
         @Override
         public void run() {
@@ -114,7 +115,7 @@ public class CloudDebugGlobalPoller {
     List<Breakpoint> currentList;
     ListBreakpointsResponse response =
       client.debuggees().breakpoints().list(state.getDebuggeeId()).setIncludeInactive(Boolean.TRUE)
-          .setActionValue("CAPTURE").setStripResults(Boolean.TRUE).setWaitToken(null).execute();
+          .setActionValue("CAPTURE").setStripResults(Boolean.TRUE).setWaitToken(state.getWaitToken()).execute();
     currentList = response.getBreakpoints();
     String responseWaitToken = response.getNextWaitToken();
     state.setWaitToken(responseWaitToken);
@@ -141,7 +142,7 @@ public class CloudDebugGlobalPoller {
    * @param state represents the target debuggee to query
    */
   private void pollForChanges(@NotNull final CloudDebugProcessState state) {
-    final Debugger client = CloudDebuggerClient.getCloudDebuggerClient(state);
+    final Debugger client = CloudDebuggerClient.getShortTimeoutClient(state);
     if (client == null) {
       // It is ok if there is no client.  We may want to consider notifying the user that
       // background polling is disabled until they login, but for now, we can just doc it.
@@ -149,7 +150,7 @@ public class CloudDebugGlobalPoller {
       return;
     }
 
-    boolean changed;
+    boolean changed = false;
     try {
       String oldToken = state.getWaitToken();
 
@@ -163,6 +164,9 @@ public class CloudDebugGlobalPoller {
       else {
         changed = !Strings.isNullOrEmpty(oldToken);
       }
+    }
+    catch(SocketTimeoutException sto) {
+      //noop, this is expected behavior.
     }
     catch (IOException ex) {
       LOG.warn("exception listing breakpoints", ex);

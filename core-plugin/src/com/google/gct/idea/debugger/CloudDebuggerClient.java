@@ -42,7 +42,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Helper class to return clients on a per user email basis.
  */
 public class CloudDebuggerClient {
-  private static final int CONNECTION_TIMEOUT_MS = 120 * 1000;
+  private static final int LONG_CONNECTION_TIMEOUT_MS = 120 * 1000;
+  private static final int SHORT_CONNECTION_TIMEOUT_MS = 10 * 1000;
+
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final Logger LOG = Logger.getInstance(CloudDebuggerClient.class);
   private static final String ROOT_URL = "https://clouddebugger.googleapis.com";
@@ -59,8 +61,20 @@ public class CloudDebuggerClient {
    * TODO: Handle cases where the user logs out in the middle of a debug session.
    */
   @Nullable
-  public static Debugger getCloudDebuggerClient(final @NotNull CloudDebugProcessState state) {
-    return getCloudDebuggerClient(state.getUserEmail());
+  public static Debugger getLongTimeoutClient(final @NotNull CloudDebugProcessState state) {
+    return getClient(state.getUserEmail(), LONG_CONNECTION_TIMEOUT_MS);
+  }
+
+  public static Debugger getShortTimeoutClient(final @NotNull CloudDebugProcessState state) {
+    return getClient(state.getUserEmail(), SHORT_CONNECTION_TIMEOUT_MS);
+  }
+
+  public static Debugger getLongTimeoutClient(final @Nullable String userEmail) {
+    return getClient(userEmail, LONG_CONNECTION_TIMEOUT_MS);
+  }
+
+  public static Debugger getShortTimeoutClient(final @Nullable String userEmail) {
+    return getClient(userEmail, SHORT_CONNECTION_TIMEOUT_MS);
   }
 
   /**
@@ -68,12 +82,13 @@ public class CloudDebuggerClient {
    * null if the user is not logged in.
    */
   @Nullable
-  public static Debugger getCloudDebuggerClient(final @Nullable String userEmail) {
+  private static Debugger getClient(final @Nullable String userEmail, final int timeout) {
     if (Strings.isNullOrEmpty(userEmail)) {
       LOG.warn("unexpected null email in controller initialize.");
       return null;
     }
-    Debugger cloudDebuggerClient = myDebuggerClientsFromUserEmail.get(userEmail);
+    final String hashkey = userEmail + timeout;
+    Debugger cloudDebuggerClient = myDebuggerClientsFromUserEmail.get(hashkey);
 
     if (cloudDebuggerClient == null) {
       try {
@@ -84,14 +99,14 @@ public class CloudDebuggerClient {
             @Override
             public void statusChanged(boolean login) {
               //aggresively remove the cached item on any status change.
-              myDebuggerClientsFromUserEmail.remove(userEmail);
+              myDebuggerClientsFromUserEmail.remove(hashkey);
             }
           });
           HttpRequestInitializer initializer = new HttpRequestInitializer() {
             @Override
             public void initialize(HttpRequest httpRequest) throws IOException {
-              httpRequest.setConnectTimeout(CONNECTION_TIMEOUT_MS);
-              httpRequest.setReadTimeout(CONNECTION_TIMEOUT_MS);
+              httpRequest.setConnectTimeout(timeout);
+              httpRequest.setReadTimeout(timeout);
               credential.initialize(httpRequest);
             }
           };
@@ -109,7 +124,7 @@ public class CloudDebuggerClient {
       }
 
       if (cloudDebuggerClient != null) {
-        myDebuggerClientsFromUserEmail.put(userEmail, cloudDebuggerClient);
+        myDebuggerClientsFromUserEmail.put(hashkey, cloudDebuggerClient);
       }
     }
     return cloudDebuggerClient;

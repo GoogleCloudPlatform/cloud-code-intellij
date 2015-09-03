@@ -15,6 +15,7 @@
  */
 package com.google.gct.idea.debugger;
 
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -79,6 +80,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   private ProjectRepositoryValidator myRepoValidator;
   private CloudDebugProcessStateController myStateController;
   private XBreakpointHandler<?>[] myXBreakpointHandlers;
+  private volatile String myNavigatedSnapshotId;
 
   CloudDebugProcess(@NotNull XDebugSession session) {
     super(session);
@@ -230,7 +232,12 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   /**
    * Finds the snapshot associated with the given id and sets it as the active snapshot in the current debug session.
    */
-  public void navigateToSnapshot(@NotNull String id) {
+  public void navigateToSnapshot(@NotNull final String id) {
+    if (Strings.isNullOrEmpty(id)) {
+      LOG.error("unexpected navigation to empty breakpoint id");
+      return;
+    }
+    myNavigatedSnapshotId = id;
     getStateController().resolveBreakpointAsync(id,
         new ResolveBreakpointHandler() {
           @Override
@@ -238,13 +245,18 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
             SwingUtilities.invokeLater(new Runnable() {
               @Override
               public void run() {
-                if (result.getIsFinalState() != Boolean.TRUE || result.getStackFrames() == null) {
-                  getBreakpointHandler().navigateTo(result);
-                  return;
-                }
+                //We will only do the selection if the id for this async task matches the latest
+                // user clicked item.  This prevents multiple (and possibly out of order) selections
+                // getting queued up.
+                if (id.equals(myNavigatedSnapshotId)) {
+                  if (result.getIsFinalState() != Boolean.TRUE || result.getStackFrames() == null) {
+                    getBreakpointHandler().navigateTo(result);
+                    return;
+                  }
 
-                if (myCurrentSnapshot == null || !myCurrentSnapshot.getId().equals(result.getId())) {
-                  navigateToBreakpoint(result);
+                  if (myCurrentSnapshot == null || !myCurrentSnapshot.getId().equals(result.getId())) {
+                    navigateToBreakpoint(result);
+                  }
                 }
               }
             });
@@ -296,29 +308,6 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
         if (breakpoint.getIsFinalState() == Boolean.TRUE &&
             (breakpoint.getStatus() == null || breakpoint.getStatus().getIsError() != Boolean.TRUE)) {
-          //if we have a final state breakpoint, we disable the ide breakpoint
-          // and if the user hasn't selected a snapshot, we navigate to the first snapshot
-          // received during the session.
-          if (myCurrentSnapshot == null) {
-            getStateController().resolveBreakpointAsync(breakpoint.getId(),
-                new ResolveBreakpointHandler() {
-                  @Override
-                  public void onSuccess(@NotNull final Breakpoint result) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                      @Override
-                      public void run() {
-                        //time to break!
-                        navigateToBreakpoint(result);
-                      }
-                    });
-                  }
-
-                  @Override
-                  public void onError(String errorMessage) {
-                    LOG.warn("was unable to hydrate breakpoint on ListChanged");
-                  }
-                });
-          }
           if (!getXDebugSession().isStopped()) {
             getBreakpointHandler().setStateToDisabled(breakpoint);
           }
