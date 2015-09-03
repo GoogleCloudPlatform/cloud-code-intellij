@@ -6,10 +6,7 @@ repositories {
     mavenCentral()
 }
 
-// set IDEA_HOME in gradle.properties in $GRADLE_HOME (~/.gradle/gradle.properties by default)
-// to point to the local installation of IDEA; e.g.
-// IDEA_HOME=/opt/share/IntelliJ/idea-IC-141.1532.4
-
+def ideaHome = '../idea-IC/'
 def pluginName = 'google-cloud-tools-core'
 
 dependencies {
@@ -17,11 +14,11 @@ dependencies {
     compile files('lib/google-api-services-source.jar')
 
     compile project(':google-login-plugin')
-    compile files(IDEA_HOME + '/lib/bootstrap.jar')
-    compile files(IDEA_HOME + '/plugins/git4idea/lib/git4idea.jar')
-    compile files(IDEA_HOME + '/plugins/git4idea/lib/remote-servers-git.jar')
-    compile files(IDEA_HOME + '/plugins/gradle/lib/gradle.jar')
-    compile files(IDEA_HOME + '/plugins/gradle/lib/gradle-tooling-api-2.2.jar')
+    compile files(ideaHome + '/lib/bootstrap.jar')
+    compile files(ideaHome + '/plugins/git4idea/lib/git4idea.jar')
+    compile files(ideaHome + '/plugins/git4idea/lib/remote-servers-git.jar')
+    compile files(ideaHome + '/plugins/gradle/lib/gradle.jar')
+    compile files(ideaHome + '/plugins/gradle/lib/gradle-tooling-api-2.2.jar')
 
     compile (
             ['com.google.appengine:gradle-appengine-builder-model:0.1.0'],
@@ -39,9 +36,9 @@ dependencies {
             ['org.mockito:mockito-all:1.9.5'],
     )
 
-    testRuntime files(IDEA_HOME + '/lib/idea_rt.jar')
-    testRuntime files(IDEA_HOME + '/lib/trove4j.jar')
-    testRuntime files(IDEA_HOME + '/lib/util.jar')
+    testRuntime files(ideaHome + '/lib/idea_rt.jar')
+    testRuntime files(ideaHome + '/lib/trove4j.jar')
+    testRuntime files(ideaHome + '/lib/util.jar')
 }
 
 sourceSets {
@@ -84,3 +81,11 @@ task plugin(type: Zip,  dependsOn: jar) {
         into(pluginName + '/lib')
     }
 }
+
+task loadIdea(type:Exec) {
+    workingDir '..'
+
+    commandLine './fetchIdea.sh'
+}
+
+compileJava.dependsOn("loadIdea")

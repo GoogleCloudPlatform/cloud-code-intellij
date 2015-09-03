@@ -6,10 +6,7 @@ repositories {
     mavenCentral()
 }
 
-// set IDEA_HOME in gradle.properties in $GRADLE_HOME (~/.gradle/gradle.properties by default)
-// to point to the local installation of IDEA; e.g.
-// IDEA_HOME=/opt/share/IntelliJ/idea-IC-141.1532.4
-def ideaLib = IDEA_HOME + '/lib/'
+def ideaLib = '../idea-IC/lib/'
 
 dependencies {
     compile files('lib/google.gdt.eclipse.login.common.jar')
@@ -78,3 +75,11 @@ task plugin(type: Zip,  dependsOn: jar) {
         into('google-login/lib')
     }
 }
+
+task loadIdea(type:Exec) {
+    workingDir '..'
+
+    commandLine './fetchIdea.sh'
+}
+
+compileJava.dependsOn("loadIdea")
