@@ -73,6 +73,7 @@ jar {
 
 task plugin(type: Zip,  dependsOn: jar) {
     baseName = pluginName
+    destinationDir = file('build')
     include '*.jar'
     from('build/libs') {
         into(pluginName + '/lib')

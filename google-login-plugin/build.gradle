@@ -64,6 +64,7 @@ jar {
 
 task plugin(type: Zip,  dependsOn: jar) {
     baseName = 'google-login'
+    destinationDir = file('build')
     include '*.jar'
     from('build/libs') {
         into('google-login/lib')
