@@ -1,2 +1,9 @@
 /out
 .idea/workspace.xml
+.gradle/
+core-plugin/.gradle/
+core-plugin/build/
+google-login-plugin/.gradle/
+google-login-plugin/.idea/inspectionProfiles/
+google-login-plugin/build/
+idea-IC/
