@@ -29,7 +29,7 @@ dependencies {
             ['org.jdom:jdom:1.1.3'],
     )
 
-    testCompile files(IDEA_HOME + '/lib/openapi.jar')
+    testCompile files(ideaHome + '/lib/openapi.jar')
     testCompile (
             ['junit:junit:4.+'],
             ['org.eclipse.jgit:org.eclipse.jgit.junit:3.0.+'],
