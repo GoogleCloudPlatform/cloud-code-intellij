@@ -1,7 +1,5 @@
 #!/bin/bash
 
-./fetchIdea.sh
-
 # Run the tests
 gradle test
 
