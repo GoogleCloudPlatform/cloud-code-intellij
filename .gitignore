@@ -3,7 +3,6 @@
 .gradle/
 core-plugin/.gradle/
 core-plugin/build/
-core-plugin/google-cloud-tools-core.zip
 google-login-plugin/.gradle/
 google-login-plugin/.idea/inspectionProfiles/
 google-login-plugin/build/
