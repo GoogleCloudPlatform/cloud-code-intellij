@@ -11,6 +11,7 @@ if [ ! -d ./idea-IC/lib ]; then
 
     # Move the versioned IDEA folder to a known location
     ideaPath=$(find . -name 'idea-IC*' | head -n 1)
+    echo ${ideaPath}
     mv ${ideaPath} ./idea-IC
 fi
 
