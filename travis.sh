@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Debug
+ls .
+ls ./idea-IC
+
 # Run the tests
 gradle test
 
