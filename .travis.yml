@@ -1,7 +1,7 @@
 language: java
 jdk:
   - openjdk6
-install: ./fetch-idea.sh
+install: ./fetchIdea.sh
 script: "./travis.sh"
 cache:
   directories:
