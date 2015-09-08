@@ -8,6 +8,7 @@ if [ ! -d ./idea-IC/lib ]; then
     # Unzip IDEA
     tar zxf ideaIC-${ideaVersion}.tar.gz
     rm -rf ideaIC-${ideaVersion}.tar.gz
+    ls
 
     # Move the versioned IDEA folder to a known location
     ideaPath=$(find . -name 'idea-IC*' | head -n 1)
