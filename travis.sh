@@ -7,7 +7,7 @@ echo "listing idea"
 ls ./idea-IC
 
 # Run the tests
-gradle test
+gradle --info test
 
 # Was our build successful?
 stat=$?
