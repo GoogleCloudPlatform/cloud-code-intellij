@@ -3,7 +3,3 @@ jdk:
   - openjdk6
 install: ./fetchIdea.sh
 script: "./travis.sh"
-cache:
-  directories:
-  - idea-IC
-
