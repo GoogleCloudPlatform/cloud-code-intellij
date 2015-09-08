@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Debug
+echo "listing"
+ls .
+echo "listing idea"
+ls ./idea-IC
+
 # Run the tests
 gradle --info test
 
