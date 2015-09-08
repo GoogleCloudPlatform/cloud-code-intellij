@@ -2,7 +2,7 @@
 
 ideaVersion="14.1.4"
 
-if [ ! -d ./idea-IC ]; then
+if [ ! -d ./idea-IC/lib ]; then
     wget http://download.jetbrains.com/idea/ideaIC-${ideaVersion}.tar.gz
 
     # Unzip IDEA
