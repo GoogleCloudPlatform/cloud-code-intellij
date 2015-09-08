@@ -3,7 +3,7 @@
 # Debug
 echo "listing"
 ls .
-echod "listing idea"
+echo "listing idea"
 ls ./idea-IC
 
 # Run the tests
