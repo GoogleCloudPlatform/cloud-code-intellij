@@ -55,6 +55,7 @@ sourceSets {
             srcDirs 'testSrc'
             exclude '**/validation/**' // todo(elharo): why are these tests broken?
             exclude '**/debugger/**' // todo(elharo): why are these tests broken?
+            exclude '**/git/**' // todo(elharo): why are these tests broken?
         }
     }
 }

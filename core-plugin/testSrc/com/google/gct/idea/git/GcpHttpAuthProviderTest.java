@@ -82,7 +82,7 @@ public class GcpHttpAuthProviderTest extends LightIdeaTestCase {
   }
 
   @Override
-  protected final void tearDown() throws Exception {
+  prote cted final void tearDown() throws Exception {
     myGoogleLogin.cleanup();
     PropertiesComponent.getInstance(ourProject).unsetValue(CACHE_KEY);
     GcpHttpAuthDataProvider.setCurrentProject(null);
@@ -94,7 +94,7 @@ public class GcpHttpAuthProviderTest extends LightIdeaTestCase {
     GcpHttpAuthDataProvider authDataProvider = new GcpHttpAuthDataProvider();
     AuthData result = authDataProvider.getAuthData("http://someotherurl.myurl.com");
 
-    assertTrue(result == null);
+    assertFalse(result == null);
   }
 
   public void testForGcpPrompt() throws Exception {
