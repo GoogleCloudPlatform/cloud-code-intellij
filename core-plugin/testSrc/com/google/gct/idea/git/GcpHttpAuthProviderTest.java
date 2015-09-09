@@ -52,7 +52,7 @@ public class GcpHttpAuthProviderTest extends LightIdeaTestCase {
   @Override
   protected final void setUp() throws Exception {
     super.setUp();
-    myDialogManager = (TestDialogManager)ServiceManager.getService(DialogManager.class);
+    myDialogManager = (TestDialogManager) ServiceManager.getService(DialogManager.class);
 
     myGoogleLogin = new MockGoogleLogin();
     myGoogleLogin.install();
@@ -82,7 +82,7 @@ public class GcpHttpAuthProviderTest extends LightIdeaTestCase {
   }
 
   @Override
-  prote cted final void tearDown() throws Exception {
+  protected final void tearDown() throws Exception {
     myGoogleLogin.cleanup();
     PropertiesComponent.getInstance(ourProject).unsetValue(CACHE_KEY);
     GcpHttpAuthDataProvider.setCurrentProject(null);
