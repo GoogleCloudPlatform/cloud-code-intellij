@@ -49,7 +49,7 @@ public class CredentialedUserRosterTest {
    */
   @Test
   public void testAddUser() {
-    Assert.assertEquals(1, users.numberOfUsers());
+    Assert.assertEquals(0, users.numberOfUsers());
 
     users.addUser(user1);
     Assert.assertEquals(user1.getEmail(), users.getActiveUser().getEmail());
