@@ -42,6 +42,13 @@
   <extensions defaultExtensionNs="com.intellij">
   </extensions>
 
+  <extensions defaultExtensionNs="com.google.gct">
+    <!-- For IJ Community Edition -->
+    <login.usageTracker implementationClass="com.google.gct.login.stats.GoogleUsageTracker" key="Idea" />
+    <!-- For IJ Ultimate Edition -->
+    <login.usageTracker implementationClass="com.google.gct.login.stats.GoogleUsageTracker" key="idea" />
+  </extensions>
+
   <extensionPoints>
     <extensionPoint name="googleLoginListener" interface="com.google.gct.login.GoogleLoginListener"/>
     <extensionPoint name="usageTracker" beanClass="com.google.gct.login.stats.UsageTrackerExtensionPointBean">
