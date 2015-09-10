@@ -1,7 +1,5 @@
 apply plugin: 'java'
 
-// see https://github.com/JetBrains/gradle-intellij-plugin
-
 repositories {
     mavenCentral()
 }
@@ -14,7 +12,6 @@ dependencies {
     compile files('lib/google-api-services-source.jar')
 
     compile project(':google-login-plugin')
-    compile files(ideaHome + '/lib/bootstrap.jar')
     compile files(ideaHome + '/plugins/git4idea/lib/git4idea.jar')
     compile files(ideaHome + '/plugins/git4idea/lib/remote-servers-git.jar')
     compile files(ideaHome + '/plugins/gradle/lib/gradle.jar')
@@ -29,7 +26,9 @@ dependencies {
             ['org.jdom:jdom:1.1.3'],
     )
 
-    testCompile files(ideaHome + '/lib/openapi.jar')
+    compile files(ideaHome + '/lib/bootstrap.jar')
+    compile files(ideaHome + '/lib/util.jar')
+
     testCompile (
             ['junit:junit:4.+'],
             ['org.eclipse.jgit:org.eclipse.jgit.junit:3.0.+'],
@@ -38,7 +37,6 @@ dependencies {
 
     testRuntime files(ideaHome + '/lib/idea_rt.jar')
     testRuntime files(ideaHome + '/lib/trove4j.jar')
-    testRuntime files(ideaHome + '/lib/util.jar')
 }
 
 sourceSets {
@@ -53,7 +51,9 @@ sourceSets {
     test {
         java {
             srcDirs 'testSrc'
-            exclude '**/validation/**' // todo(elharo): why are these tests broken?
+            include '**/EndpointPsiElementVisitorTest.java'
+            include '**/EndpointUtilitiesTest.java'
+            exclude '**/validation/**' // todo(elharo): why are most of these tests broken?
             exclude '**/debugger/**' // todo(elharo): why are these tests broken?
         }
     }
