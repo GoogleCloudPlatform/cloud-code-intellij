@@ -29,10 +29,10 @@ public class GoogleUsageTrackerTest extends LightPlatformTestCase {
     }
 
     public void testGetGoogleTracker() {
-        UsageTrackerService.UsageTracker ceTracker = UsageTrackerService.getInstance("Idea");
-        assertInstanceOf(ceTracker, GoogleUsageTracker.class);
+        UsageTrackerService.UsageTracker communityEditionTracker = UsageTrackerService.getInstance("Idea");
+        assertInstanceOf(communityEditionTracker, GoogleUsageTracker.class);
 
-        UsageTrackerService.UsageTracker ueTracker = UsageTrackerService.getInstance("idea");
-        assertInstanceOf(ueTracker, GoogleUsageTracker.class);
+        UsageTrackerService.UsageTracker ultimateEditionTracker = UsageTrackerService.getInstance("idea");
+        assertInstanceOf(ultimateEditionTracker, GoogleUsageTracker.class);
     }
 }

@@ -15,6 +15,7 @@
  */
 package com.google.gct.login.stats;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gct.login.stats.UsageTrackerService.UsageTracker;
@@ -24,9 +25,7 @@ import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.updateSettings.impl.UpdateChecker;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PlatformUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -52,7 +51,7 @@ public class GoogleUsageTracker implements UsageTracker {
     @NonNls
     private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
     @NonNls
-    private static final String ANAYLTICS_ID = "UA-67138797-1";
+    private static final String ANALYTICS_ID = "UA-67138797-1";
     @NonNls
     private static final String ANALYTICS_APP = "Cloud Tools for IntelliJ";
     @NonNls
@@ -60,12 +59,12 @@ public class GoogleUsageTracker implements UsageTracker {
 
     private static final List<? extends NameValuePair> analyticsBaseData = ImmutableList
             .of(new BasicNameValuePair("v", "1"),
-                    new BasicNameValuePair("tid", ANAYLTICS_ID),
+                    new BasicNameValuePair("tid", ANALYTICS_ID),
                     new BasicNameValuePair("t", "event"),
                     new BasicNameValuePair("an", ANALYTICS_APP),
                     new BasicNameValuePair("av", ApplicationInfo.getInstance().getFullVersion()),
                     new BasicNameValuePair("cid", UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
-
+    @Override
     public void trackEvent(@NotNull String eventCategory,
                            @NotNull String eventAction,
                            @Nullable String eventLabel,
@@ -76,7 +75,7 @@ public class GoogleUsageTracker implements UsageTracker {
                 postData.add(new BasicNameValuePair(INTELLIJ_EDITION, PlatformUtils.isCommunityEdition() ? "community" :"ultimate"));
                 postData.add(new BasicNameValuePair("ec", eventCategory));
                 postData.add(new BasicNameValuePair("ea", eventAction));
-                if(!StringUtil.isEmpty(eventLabel)) {
+                if(!Strings.isNullOrEmpty(eventLabel)) {
                     postData.add(new BasicNameValuePair("el", eventLabel));
                 }
 
@@ -101,14 +100,13 @@ public class GoogleUsageTracker implements UsageTracker {
 
                 try {
                     request.setEntity(new UrlEncodedFormEntity(postData));
-                    CloseableHttpResponse e = client.execute(request);
-                    StatusLine status = e.getStatusLine();
-                    HttpEntity entity = e.getEntity(); // throw it away, don't care, not sure if we need to read in the response?
+                    CloseableHttpResponse response = client.execute(request);
+                    StatusLine status = response.getStatusLine();
                     if(status.getStatusCode() >= 300) {
                         GoogleUsageTracker.LOG.debug("Non 200 status code : " + status.getStatusCode() + " - " + status.getReasonPhrase());
                     }
-                } catch (IOException var9) {
-                    GoogleUsageTracker.LOG.debug("IOException during Analytics Ping", new Object[]{var9.getMessage()});
+                } catch (IOException ex) {
+                    GoogleUsageTracker.LOG.debug("IOException during Analytics Ping", new Object[]{ex.getMessage()});
                 } finally {
                     HttpClientUtils.closeQuietly(client);
                 }
