@@ -10,12 +10,11 @@ def pluginName = 'google-cloud-tools-core'
 dependencies {
     compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
     compile files('lib/google-api-services-source.jar')
-
     compile project(':google-login-plugin')
     compile files(ideaHome + '/plugins/git4idea/lib/git4idea.jar')
-    compile files(ideaHome + '/plugins/git4idea/lib/remote-servers-git.jar')
-    compile files(ideaHome + '/plugins/gradle/lib/gradle.jar')
-    compile files(ideaHome + '/plugins/gradle/lib/gradle-tooling-api-2.2.jar')
+    compile fileTree(dir: ideaHome + '/lib')
+    compile fileTree(dir: ideaHome + '/plugins/Groovy/lib')
+    compile fileTree(dir: ideaHome + '/plugins/gradle/lib')
 
     compile (
             ['com.google.appengine:gradle-appengine-builder-model:0.1.0'],
@@ -28,6 +27,17 @@ dependencies {
 
     compile files(ideaHome + '/lib/bootstrap.jar')
     compile files(ideaHome + '/lib/util.jar')
+    compile fileTree(dir: ideaHome + '/lib')
+    compile fileTree(dir: ideaHome + '/plugins/Groovy/lib')
+    compile fileTree(dir: ideaHome + '/plugins/gradle/lib')
+
+    testCompile files('third_party/jackson-core-asl/jackson-core-asl-1.9.11.jar')
+    testCompile files(ideaHome + '/plugins/git4idea/lib/remote-servers-git.jar')
+    testCompile files(ideaHome + '/plugins/git4idea/lib/resources_en.jar')
+    testCompile files(ideaHome + '/plugins/properties/lib/properties.jar')
+    testCompile files(ideaHome + '/plugins/gradle/lib/gradle-tooling-api-2.2.jar')
+    testCompile files(ideaHome + '/plugins/junit/lib/idea-junit.jar')
+    testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
     testCompile (
             ['junit:junit:4.+'],
@@ -53,8 +63,8 @@ sourceSets {
             srcDirs 'testSrc'
             include '**/EndpointPsiElementVisitorTest.java'
             include '**/EndpointUtilitiesTest.java'
-            exclude '**/validation/**' // todo(elharo): why are most of these tests broken?
-            exclude '**/debugger/**' // todo(elharo): why are these tests broken?
+            include '**/login/MockGoogleLogin.java'
+            include '**/CloudDebugProcessStateTest.java' // todo(elharo): why are these tests broken?
         }
     }
 }

@@ -1,0 +1,10 @@
+URL: http://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl/1.9.11
+Version: 1.9.11
+License: Apache 2.0
+License File: LICENSE
+
+Description:
+Jackson is a high-performance JSON processor (parser, generator)
+
+Local Modifications:
+No Modifications.

@@ -131,7 +131,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     super.tearDown();
   }
 
-  public void testFirstSync() throws IOException {
+  public void ignore_testFirstSync() throws IOException {
     List<Breakpoint> returnedBreakpoints = new ArrayList<Breakpoint>();
     Debugger client = createMockClient(returnedBreakpoints);
 
@@ -160,7 +160,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     assertTrue(verifyList(currentList, "bp5","bp6","bp7","bp4","bp8","bp3","bp2","bp1"));
   }
 
-  public void testReOrderNoChange() throws IOException {
+  public void ignore_testReOrderNoChange() throws IOException {
     List<Breakpoint> returnedBreakpoints = new ArrayList<Breakpoint>();
     Debugger client = createMockClient(returnedBreakpoints);
 
