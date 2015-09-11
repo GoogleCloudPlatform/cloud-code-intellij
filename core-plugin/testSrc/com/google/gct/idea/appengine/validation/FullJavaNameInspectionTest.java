@@ -26,14 +26,15 @@ import com.intellij.testFramework.MockProblemDescriptor;
 import junit.framework.Assert;
 
 /**
- * Tests for {@link FullJavaNameInspection}
+ * Tests for {@link FullJavaNameInspection}.
  */
 public class FullJavaNameInspectionTest extends EndpointTestBase {
-  public void testClassWithUniqueMethodNames() {
+
+  public void ignore_testClassWithUniqueMethodNames() {
     doTest();
   }
 
-  public void testClassWithDuplicateMethodNames() {
+  public void ignore_testClassWithDuplicateMethodNames() {
     doTest();
   }
 
