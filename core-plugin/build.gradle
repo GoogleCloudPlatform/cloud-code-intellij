@@ -64,7 +64,9 @@ sourceSets {
             include '**/EndpointPsiElementVisitorTest.java'
             include '**/EndpointUtilitiesTest.java'
             include '**/login/MockGoogleLogin.java'
-            include '**/CloudDebugProcessStateTest.java' // todo(elharo): why are these tests broken?
+            include '**/CloudDebugProcessStateTest.java'
+            include '**/ApiNameInspectionTest.java'
+            include '**/EndpointTestBase.java'
         }
     }
 }
