@@ -7,9 +7,7 @@ google-login-plugin/.gradle/
 google-login-plugin/.idea/inspectionProfiles/
 google-login-plugin/build/
 idea-IC/
-*.iml
 .idea/gradle.xml
 .idea/codeStyleSettings.xml
 .idea/libraries/*
-.idea/misc.xml
 
