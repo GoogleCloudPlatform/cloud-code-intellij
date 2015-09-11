@@ -12,10 +12,15 @@ dependencies {
     compile files('lib/google-api-services-source.jar')
 
     compile project(':google-login-plugin')
+    // todo(elharo): looks like this can move into cloud-login-plugin
+    compile files('../google-login-plugin/third_party/jackson-core-asl/jackson-core-asl-1.9.11.jar')
     compile files(ideaHome + '/plugins/git4idea/lib/git4idea.jar')
     compile files(ideaHome + '/plugins/git4idea/lib/remote-servers-git.jar')
-    compile files(ideaHome + '/plugins/gradle/lib/gradle.jar')
+    compile files(ideaHome + '/plugins/git4idea/lib/resources_en.jar')
+    compile files(ideaHome + '/plugins/properties/lib/properties.jar')
     compile files(ideaHome + '/plugins/gradle/lib/gradle-tooling-api-2.2.jar')
+    compile files(ideaHome + '/plugins/junit/lib/idea-junit.jar')
+    compile files("${System.properties['java.home']}/../lib/tools.jar")
 
     compile (
             ['com.google.appengine:gradle-appengine-builder-model:0.1.0'],
@@ -28,6 +33,9 @@ dependencies {
 
     compile files(ideaHome + '/lib/bootstrap.jar')
     compile files(ideaHome + '/lib/util.jar')
+    compile fileTree(dir: ideaHome + '/lib')
+    compile fileTree(dir: ideaHome + '/plugins/Groovy/lib')
+    compile fileTree(dir: ideaHome + '/plugins/gradle/lib')
 
     testCompile (
             ['junit:junit:4.+'],
@@ -53,8 +61,9 @@ sourceSets {
             srcDirs 'testSrc'
             include '**/EndpointPsiElementVisitorTest.java'
             include '**/EndpointUtilitiesTest.java'
-            exclude '**/validation/**' // todo(elharo): why are most of these tests broken?
-            exclude '**/debugger/**' // todo(elharo): why are these tests broken?
+            include '**/login/MockGoogleLogin.java'
+         //   exclude '**/validation/**' // todo(elharo): why are most of these tests broken?
+            include '**/CloudDebugProcessStateTest.java' // todo(elharo): why are these tests broken?
         }
     }
 }
