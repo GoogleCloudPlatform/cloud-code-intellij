@@ -16,7 +16,11 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
-import com.google.api.services.clouddebugger.model.*;
+import com.google.api.services.clouddebugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.model.FormatMessage;
+import com.google.api.services.clouddebugger.model.ListBreakpointsResponse;
+import com.google.api.services.clouddebugger.model.SourceLocation;
+import com.google.api.services.clouddebugger.model.StatusMessage;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
 import com.google.gct.login.MockGoogleLogin;
@@ -36,11 +40,12 @@ import org.mockito.stubbing.Answer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link com.google.gct.idea.debugger.CloudDebugProcessState}
@@ -131,10 +136,8 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     super.tearDown();
   }
 
-  public void ignore_testFirstSync() throws IOException {
+  public void testFirstSync() throws IOException {
     List<Breakpoint> returnedBreakpoints = new ArrayList<Breakpoint>();
-    Debugger client = createMockClient(returnedBreakpoints);
-
     returnedBreakpoints.add(createBreakpoint("bp1", Boolean.TRUE, 1000, "com/google/ex1.java", 15, null, null));
     returnedBreakpoints.add(createBreakpoint("bp2", Boolean.TRUE, 2000, "com/google/ex1.java", 15, null, null));
     returnedBreakpoints.add(createBreakpoint("bp3", Boolean.TRUE, 2200, "com/google/ex1.java", 15, Boolean.TRUE, "foo!"));
@@ -143,10 +146,12 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     returnedBreakpoints.add(createBreakpoint("bp6", null, 0, "com/google/ex1.java", 16, null, null));
     returnedBreakpoints.add(createBreakpoint("bp7", Boolean.FALSE, 0, "com/google/ex1.java", 17, null, null));
     returnedBreakpoints.add(createBreakpoint("bp8", Boolean.FALSE, 0, "com/google/ex3.java", 18, null, null));
+    Debugger client = createMockClient(returnedBreakpoints);
 
-    final CloudDebugProcessState state = new CloudDebugProcessState(USER, DEBUGEE_ID, PROJECT_NAME, PROJECT_NUMBER, null);
-    assertTrue(state.getUserEmail() != null);
-    CloudDebuggerClient.setClient(state.getUserEmail(), client);
+    CloudDebugProcessState state = new CloudDebugProcessState(USER, DEBUGEE_ID, PROJECT_NAME, PROJECT_NUMBER, null);
+    assertEquals(USER, state.getUserEmail());
+    // Danger: static global state
+    CloudDebuggerClient.setClient(state.getUserEmail()+120000, client);
 
     CloudDebugProcessStateController controller = new CloudDebugProcessStateController();
     controller.initialize(state);
@@ -160,44 +165,45 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     assertTrue(verifyList(currentList, "bp5","bp6","bp7","bp4","bp8","bp3","bp2","bp1"));
   }
 
-  public void ignore_testReOrderNoChange() throws IOException {
+  public void testReOrderNoChange() throws IOException {
     List<Breakpoint> returnedBreakpoints = new ArrayList<Breakpoint>();
+
+    returnedBreakpoints.add(createBreakpoint("p1", Boolean.TRUE, 1000, "com/google/ex1.java", 15, null, null));
+    returnedBreakpoints.add(createBreakpoint("p2", Boolean.TRUE, 2000, "com/google/ex1.java", 15, null, null));
+    returnedBreakpoints.add(createBreakpoint("p3", Boolean.TRUE, 2200, "com/google/ex1.java", 15, Boolean.TRUE, "foo!"));
+    returnedBreakpoints.add(createBreakpoint("p4", Boolean.FALSE, 0, "com/google/ex2.java", 12, null, null));
+    returnedBreakpoints.add(createBreakpoint("p5", Boolean.FALSE, 0, "com/google/ex1.java", 15, null, null));
+    returnedBreakpoints.add(createBreakpoint("p6", null, 0, "com/google/ex1.java", 16, null, null));
+    returnedBreakpoints.add(createBreakpoint("p7", Boolean.FALSE, 0, "com/google/ex1.java", 17, null, null));
+    returnedBreakpoints.add(createBreakpoint("p8", Boolean.FALSE, 0, "com/google/ex3.java", 18, null, null));
     Debugger client = createMockClient(returnedBreakpoints);
 
-    returnedBreakpoints.add(createBreakpoint("bp1", Boolean.TRUE, 1000, "com/google/ex1.java", 15, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp2", Boolean.TRUE, 2000, "com/google/ex1.java", 15, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp3", Boolean.TRUE, 2200, "com/google/ex1.java", 15, Boolean.TRUE, "foo!"));
-    returnedBreakpoints.add(createBreakpoint("bp4", Boolean.FALSE, 0, "com/google/ex2.java", 12, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp5", Boolean.FALSE, 0, "com/google/ex1.java", 15, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp6", null, 0, "com/google/ex1.java", 16, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp7", Boolean.FALSE, 0, "com/google/ex1.java", 17, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp8", Boolean.FALSE, 0, "com/google/ex3.java", 18, null, null));
-
     CloudDebugProcessState state = new CloudDebugProcessState(USER, DEBUGEE_ID, PROJECT_NAME, PROJECT_NUMBER, null);
-    assertTrue(state.getUserEmail() != null);
-    CloudDebuggerClient.setClient(state.getUserEmail(), client);
+    assertEquals(USER, state.getUserEmail());
+    // danger: static global state shared between tests
+    CloudDebuggerClient.setClient(state.getUserEmail()+120000, client);
 
     CloudDebugProcessStateController controller = new CloudDebugProcessStateController();
     controller.initialize(state);
 
     List<Breakpoint> currentList = state.getCurrentServerBreakpointList();
     assertNotEmpty(currentList);
-    assertTrue(verifyList(currentList, "bp5","bp6","bp7","bp4","bp8","bp3","bp2","bp1"));
+    assertTrue(verifyList(currentList, "p5", "p6", "p7", "p4", "p8", "p3", "p2", "p1"));
 
     returnedBreakpoints.clear();
-    returnedBreakpoints.add(createBreakpoint("bp8", Boolean.FALSE, 0, "com/google/ex3.java", 18, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp7", Boolean.FALSE, 0, "com/google/ex1.java", 17, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp6", null, 0, "com/google/ex1.java", 16, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp5", Boolean.FALSE, 0, "com/google/ex1.java", 15, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp4", Boolean.FALSE, 0, "com/google/ex2.java", 12, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp3", Boolean.TRUE, 2200, "com/google/ex1.java", 15, Boolean.TRUE, "foo!"));
-    returnedBreakpoints.add(createBreakpoint("bp2", Boolean.TRUE, 2000, "com/google/ex1.java", 15, null, null));
-    returnedBreakpoints.add(createBreakpoint("bp1", Boolean.TRUE, 1000, "com/google/ex1.java", 15, null, null));
+    returnedBreakpoints.add(createBreakpoint("b8", Boolean.FALSE, 0, "com/google/ex3.java", 18, null, null));
+    returnedBreakpoints.add(createBreakpoint("b7", Boolean.FALSE, 0, "com/google/ex1.java", 17, null, null));
+    returnedBreakpoints.add(createBreakpoint("b6", null, 0, "com/google/ex1.java", 16, null, null));
+    returnedBreakpoints.add(createBreakpoint("b5", Boolean.FALSE, 0, "com/google/ex1.java", 15, null, null));
+    returnedBreakpoints.add(createBreakpoint("b4", Boolean.FALSE, 0, "com/google/ex2.java", 12, null, null));
+    returnedBreakpoints.add(createBreakpoint("b3", Boolean.TRUE, 2200, "com/google/ex1.java", 15, Boolean.TRUE, "foo!"));
+    returnedBreakpoints.add(createBreakpoint("b2", Boolean.TRUE, 2000, "com/google/ex1.java", 15, null, null));
+    returnedBreakpoints.add(createBreakpoint("b1", Boolean.TRUE, 1000, "com/google/ex1.java", 15, null, null));
 
     controller.waitForChanges();
-    currentList = state.getCurrentServerBreakpointList();
-    assertNotEmpty(currentList);
-    assertTrue(verifyList(currentList, "bp5","bp6","bp7","bp4","bp8","bp3","bp2","bp1"));
+    List<Breakpoint> changedList = state.getCurrentServerBreakpointList();
+    assertNotEmpty(changedList);
+    assertTrue(verifyList(changedList, "b5","b6","b7","b4","b8","b3","b2","b1"));
   }
 
   public void testSerialization() throws IOException {

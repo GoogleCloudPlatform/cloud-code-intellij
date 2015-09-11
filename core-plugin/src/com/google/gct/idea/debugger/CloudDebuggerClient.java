@@ -98,7 +98,7 @@ public class CloudDebuggerClient {
           user.getGoogleLoginState().addLoginListener(new LoginListener() {
             @Override
             public void statusChanged(boolean login) {
-              //aggresively remove the cached item on any status change.
+              //aggressively remove the cached item on any status change.
               myDebuggerClientsFromUserEmail.remove(hashkey);
             }
           });
