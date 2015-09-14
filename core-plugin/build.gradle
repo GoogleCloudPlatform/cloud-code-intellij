@@ -64,8 +64,9 @@ sourceSets {
             include '**/EndpointPsiElementVisitorTest.java'
             include '**/EndpointUtilitiesTest.java'
             include '**/login/MockGoogleLogin.java'
-            exclude '**/validation/**'
             include '**/CloudDebugProcessStateTest.java'
+            include '**/ApiNameInspectionTest.java'
+            include '**/EndpointTestBase.java'
         }
     }
 }
