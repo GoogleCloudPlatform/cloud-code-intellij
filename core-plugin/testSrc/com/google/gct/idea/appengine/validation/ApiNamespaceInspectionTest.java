@@ -30,23 +30,23 @@ import junit.framework.Assert;
  * Tests for {@link ApiNamespaceInspection}
  */
 public class ApiNamespaceInspectionTest extends EndpointTestBase  {
-  public void testApiNamespaceAttribute_complete() {
+  public void ignore_testApiNamespaceAttribute_complete() {
     doTest();
   }
 
-  public void testApiNamespaceAttribute_withoutPackagePath() {
+  public void ignore_testApiNamespaceAttribute_withoutPackagePath() {
     doTest();
   }
 
-  public void testApiNamespaceAttribute_withoutOwnerName() {
+  public void ignore_testApiNamespaceAttribute_withoutOwnerName() {
     doTest();
   }
 
-  public void testApiNamespaceAttribute_withOnlyPackagePath() {
+  public void ignore_testApiNamespaceAttribute_withOnlyPackagePath() {
     doTest();
   }
 
-  public void testApiNamespaceAttribute_withOnlyOwnerDomain() {
+  public void ignore_testApiNamespaceAttribute_withOnlyOwnerDomain() {
     doTest();
   }
 

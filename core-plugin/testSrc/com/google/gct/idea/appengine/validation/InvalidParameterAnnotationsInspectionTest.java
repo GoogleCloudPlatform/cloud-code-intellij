@@ -34,7 +34,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    * Tests that when a name is not specified in the path attribute of an @ApiMethod,
    * no InvalidParameterAnnotationsInspection error produced.
    */
-  public void testPathAttributeWithNoNameDeclared() {
+  public void ignore_testPathAttributeWithNoNameDeclared() {
     doTest();
   }
 
@@ -43,7 +43,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    * and the corresponding method parameter has @DefaultValue, an InvalidParameterAnnotationsInspection
    * error is produced.
    */
-  public void testPathNameWithDefaultValueAnnotation() {
+  public void ignore_testPathNameWithDefaultValueAnnotation() {
     doTest();
   }
 
@@ -52,7 +52,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    * and the corresponding method parameter has @Nullable, an InvalidParameterAnnotationsInspection
    * error is produced.
    */
-  public void testPathNameWithNullableAnnotation() {
+  public void ignore_testPathNameWithNullableAnnotation() {
     doTest();
   }
 
@@ -61,7 +61,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    * and the corresponding method parameter does not have @Nullable or @DefaultValue,
    * no InvalidParameterAnnotationsInspection error is produced.
    */
-  public void testPathNameWithNoNullableOrDefaultValue() {
+  public void ignore_testPathNameWithNoNullableOrDefaultValue() {
     doTest();
   }
 
