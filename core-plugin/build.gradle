@@ -61,12 +61,10 @@ sourceSets {
     test {
         java {
             srcDirs 'testSrc'
-            include '**/EndpointPsiElementVisitorTest.java'
-            include '**/EndpointUtilitiesTest.java'
-            include '**/login/MockGoogleLogin.java'
-            include '**/CloudDebugProcessStateTest.java'
-            include '**/ApiNameInspectionTest.java'
-            include '**/EndpointTestBase.java'
+            include '**/login/**.java'
+            include '**/validation/**.java'
+            include '**/debugger/CloudDebugProcessStateTest.java'
+            exclude '**/synchronization/**.java'
         }
     }
 }
