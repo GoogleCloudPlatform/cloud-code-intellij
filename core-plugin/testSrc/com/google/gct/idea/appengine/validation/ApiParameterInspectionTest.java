@@ -30,11 +30,11 @@ import junit.framework.Assert;
  */
 public class ApiParameterInspectionTest extends EndpointTestBase {
 
-  public void testMethodsWithNamedParameters() {
+  public void ignore_testMethodsWithNamedParameters() {
     doTest();
   }
 
-  public void testMethodsWithUnnamedParameters() {
+  public void ignore_testMethodsWithUnnamedParameters() {
     doTest();
   }
 
@@ -42,7 +42,7 @@ public class ApiParameterInspectionTest extends EndpointTestBase {
    * Tests that no ApiParameterInspection errors are generated for constructors with parameters
    * that are of API parameter type.
    */
-  public void testConstructors() {
+  public void ignore_testConstructors() {
     doTest();
   }
 
