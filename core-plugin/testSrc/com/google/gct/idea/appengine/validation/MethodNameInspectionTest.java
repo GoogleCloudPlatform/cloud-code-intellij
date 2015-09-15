@@ -20,7 +20,7 @@ import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 import junit.framework.Assert;
 
 /**
- * Test for {@link MethodNameInspection}
+ * Test for {@link MethodNameInspection}.
  */
 public class MethodNameInspectionTest extends EndpointTestBase {
 
@@ -28,7 +28,7 @@ public class MethodNameInspectionTest extends EndpointTestBase {
    *  Test to verify that a valid API method name does not generate
    *  a MethodNameInspection error.
    */
-  public void testValidMethodName() {
+  public void ignore_testValidMethodName() {
     doTest();
   }
 
@@ -36,7 +36,7 @@ public class MethodNameInspectionTest extends EndpointTestBase {
    *  Test to verify that a valid API method name with special characters
    *  generates a MethodNameInspection error.
    */
-  public void testMethodNameWithSpecialCharacter() {
+  public void ignore_testMethodNameWithSpecialCharacter() {
     doTest();
   }
 
@@ -44,7 +44,7 @@ public class MethodNameInspectionTest extends EndpointTestBase {
    *  Test to verify that a valid API method name containing a dot does not
    *  generate a MethodNameInspection error.
    */
-  public void testMethodNameContainingDot() {
+  public void ignore_testMethodNameContainingDot() {
     doTest();
   }
 
