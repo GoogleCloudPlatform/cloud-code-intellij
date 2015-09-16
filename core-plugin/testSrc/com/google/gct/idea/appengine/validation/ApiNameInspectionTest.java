@@ -18,18 +18,17 @@ package com.google.gct.idea.appengine.validation;
 
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
-
 import junit.framework.Assert;
 
 /**
- *  Tests for {@link ApiNameInspection}
+ * Tests for {@link ApiNameInspection}.
  */
 public class ApiNameInspectionTest extends EndpointTestBase {
   /**
    *  Test to verify that when the API name attribute is an empty string,
    *  an ApiNameInspection error is not generated.
    */
-  public void ignore_testEmptyApiNameAttribute() {
+  public void testEmptyApiNameAttribute() {
     doTest();
   }
 
@@ -37,7 +36,7 @@ public class ApiNameInspectionTest extends EndpointTestBase {
    *  Test to verify that when the API name attribute is not specified,
    *  an ApiNameInspection error is not generated.
    */
-  public void ignore_testNoApiNameAttribute() {
+  public void testNoApiNameAttribute() {
     doTest();
   }
 
@@ -45,7 +44,7 @@ public class ApiNameInspectionTest extends EndpointTestBase {
    * Test to verify that an API name that matches "^[a-z]+[A-Za-z0-9]*$"
    * pattern does not generate an ApiNameInspection error.
    */
-  public void ignore_testValidApiNameAttribute() {
+  public void testValidApiNameAttribute() {
     doTest();
   }
 
@@ -53,7 +52,7 @@ public class ApiNameInspectionTest extends EndpointTestBase {
    * Test to verify that an API name beginning with a digit causes an ApiNameInspection
    * error to be generated.
    */
-  public void ignore_testApiNameAttribute_startWithNumber() {
+  public void testApiNameAttribute_startWithNumber() {
     doTest();
   }
 
@@ -61,7 +60,7 @@ public class ApiNameInspectionTest extends EndpointTestBase {
    * Test to verify that an Api name with a special character causes an
    * ApiNameInspection error to be generated.
    */
-  public void ignore_testApiNameAttribute_withSpecialCharacter() {
+  public void testApiNameAttribute_withSpecialCharacter() {
     doTest();
   }
 
@@ -84,7 +83,6 @@ public class ApiNameInspectionTest extends EndpointTestBase {
     Assert.assertEquals("invalidCharacters", localQuickFix.getNameSuggestions("@Invalid&()Characters#"));
     Assert.assertEquals("invalidCharacters", localQuickFix.getNameSuggestions("@23Inval&*idChara(cters#"));
   }
-
   /**
    * Tests that {@link ApiNameInspection.MyQuickFix} provides the correct suggestion for an
    * API names beginning with digits.
@@ -111,7 +109,7 @@ public class ApiNameInspectionTest extends EndpointTestBase {
     String testName = getTestName(true);
     final String testDataPath = getTestDataPath();
     myFixture.setTestDataPath(testDataPath);
-    myFixture.testInspection("inspections/apiNameInspection/" + testName,
-                             new LocalInspectionToolWrapper(localInspectionTool));
+    LocalInspectionToolWrapper toolWrapper = new LocalInspectionToolWrapper(localInspectionTool);
+    myFixture.testInspection("inspections/apiNameInspection/" + testName, toolWrapper);
   }
 }

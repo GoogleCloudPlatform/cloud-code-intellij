@@ -17,7 +17,6 @@
 package com.google.gct.idea.appengine.validation;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ex.PathManagerEx;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.libraries.Library;
@@ -28,12 +27,14 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 
+import java.io.File;
+
 public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
   @Override
   protected String getTestDataPath() {
-    String homePath = PathManagerEx.getHomePath(getClass());
+    String homePath = new File(".").getAbsolutePath();
     String homePathParent = homePath.substring(0, homePath.lastIndexOf('/'));
-    return homePathParent + FileUtil.toSystemDependentName("/core-plugin/testData/");
+    return homePathParent + FileUtil.toSystemDependentName("/testData/");
   }
 
   @Override
@@ -55,8 +56,8 @@ public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
           @Override
           public void run() {
-            final LibraryTable table =
-              LibraryTablesRegistrar.getInstance().getLibraryTableByLevel(LibraryTablesRegistrar.APPLICATION_LEVEL, myModule.getProject());
+            final LibraryTable table = LibraryTablesRegistrar.getInstance()
+                .getLibraryTableByLevel(LibraryTablesRegistrar.APPLICATION_LEVEL, myModule.getProject());
             assert table != null;
             final LibraryTable.ModifiableModel tableModel = table.getModifiableModel();
             final Library library = tableModel.createLibrary("lib");
@@ -66,7 +67,8 @@ public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
             tableModel.commit();
 
             ModifiableRootModel rootModel = ModuleRootManager.getInstance(myModule).getModifiableModel();
-            rootModel.addLibraryEntry(table.getLibraries()[0]); // Endpoint is the only jar added
+            Library jar = table.getLibraries()[0];
+            rootModel.addLibraryEntry(jar); // Endpoint is the only jar added
             rootModel.commit();
           }
         });
