@@ -62,9 +62,8 @@ sourceSets {
         java {
             srcDirs 'testSrc'
             include '**/login/**.java'
-            include '**/validation/**.java'
+            include '**/appengine/**.java'
             include '**/debugger/CloudDebugProcessStateTest.java'
-            exclude '**/synchronization/**.java'
         }
     }
 }
