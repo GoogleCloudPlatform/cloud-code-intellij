@@ -251,10 +251,10 @@ public abstract class CustomizableComboBox extends JPanel {
   * arrow button with different sizes.  For example, in Mac, the arrow button is
   * drawn with a border (the responsibility of the border
   * near the arrow button belongs to the button).  However in IntelliJ and Darcula,
-  * the arrow button is drawn without a border and its  the responsibility of the
+  * the arrow button is drawn without a border and it's the responsibility of the
   * outer control to draw a border.  In addition, darcula renders part of the arrow
-  * button outside the button.  That is, the arrow button looks like its about 20x20,
-  * but actually, its only 16x16, with part of the rendering done via paint on the combobox itself.
+  * button outside the button.  That is, the arrow button looks like it's about 20x20,
+  * but actually, it's only 16x16, with part of the rendering done via paint on the combobox itself.
   * So while this creates some small inconsistencies,
   * it reduces the chance of a major UI issue such as a completely poorly drawn button with a double border.
   */
@@ -276,8 +276,8 @@ public abstract class CustomizableComboBox extends JPanel {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
         g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
-        final int midx = (int)Math.ceil((w - 1) / 2) + 1;
-        final int midy = (int)Math.ceil(h / 2);
+        final int midx = (int) Math.ceil((w - 1) / 2.0) + 1;
+        final int midy = (int) Math.ceil(h / 2.0);
         final Path2D.Double path = new Path2D.Double();
         path.moveTo(midx - 4, midy - 2);
         path.lineTo(midx + 4, midy - 2);
