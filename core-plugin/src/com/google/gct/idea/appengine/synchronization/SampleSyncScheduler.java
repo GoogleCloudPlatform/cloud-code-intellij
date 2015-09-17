@@ -32,7 +32,7 @@ public class SampleSyncScheduler {
   // ToDo: This delay is being discussed and might change
   private final long DELAY_IN_MINUTES = 120;
 
-  public static SampleSyncScheduler getInstance() {
+  public static synchronized SampleSyncScheduler getInstance() {
     if(instance == null) {
       instance = new SampleSyncScheduler();
     }
