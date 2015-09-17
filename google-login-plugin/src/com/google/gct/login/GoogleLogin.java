@@ -61,9 +61,10 @@ public class GoogleLogin {
   private AndroidUiFacade uiFacade;
   private AndroidPreferencesOAuthDataStore dataStore;
   private CredentialedUserRoster users;
-  private static GoogleLogin instance;
 
-  public static final Logger LOG =  Logger.getInstance(GoogleLogin.class);
+  private static volatile GoogleLogin instance;
+
+  private static final Logger LOG =  Logger.getInstance(GoogleLogin.class);
 
   private GoogleLogin() {
     this.clientInfo = getClientInfo();
@@ -75,10 +76,11 @@ public class GoogleLogin {
 
   /**
    * Gets the {@link GoogleLogin} object.
-   * @return the {@link GoogleLogin} object.
+   * 
+   * @return the {@link GoogleLogin} object
    */
   @NotNull
-  public static GoogleLogin getInstance() {
+  public static synchronized GoogleLogin getInstance() {
     if (instance == null) {
       instance = new GoogleLogin();
       instance.dataStore.initializeUsers();
