@@ -69,18 +69,18 @@ public class GoogleUsageTracker implements UsageTracker {
                            @NotNull String eventAction,
                            @Nullable String eventLabel,
                            @Nullable Integer eventValue) {
-        if(!ApplicationManager.getApplication().isUnitTestMode()) {
-            if(PlatformUtils.isIntelliJ()) {
+        if (!ApplicationManager.getApplication().isUnitTestMode()) {
+            if (PlatformUtils.isIntelliJ()) {
                 ArrayList postData = Lists.newArrayList(analyticsBaseData);
-                postData.add(new BasicNameValuePair(INTELLIJ_EDITION, PlatformUtils.isCommunityEdition() ? "community" :"ultimate"));
+                postData.add(new BasicNameValuePair(INTELLIJ_EDITION, PlatformUtils.isCommunityEdition() ? "community" : "ultimate"));
                 postData.add(new BasicNameValuePair("ec", eventCategory));
                 postData.add(new BasicNameValuePair("ea", eventAction));
-                if(!Strings.isNullOrEmpty(eventLabel)) {
+                if (!Strings.isNullOrEmpty(eventLabel)) {
                     postData.add(new BasicNameValuePair("el", eventLabel));
                 }
 
-                if(eventValue != null) {
-                    if(eventValue.intValue() < 0) {
+                if (eventValue != null) {
+                    if (eventValue.intValue() < 0) {
                         LOG.debug("Attempting to send negative event value to the analytics server");
                     }
 
@@ -102,7 +102,7 @@ public class GoogleUsageTracker implements UsageTracker {
                     request.setEntity(new UrlEncodedFormEntity(postData));
                     CloseableHttpResponse response = client.execute(request);
                     StatusLine status = response.getStatusLine();
-                    if(status.getStatusCode() >= 300) {
+                    if (status.getStatusCode() >= 300) {
                         GoogleUsageTracker.LOG.debug("Non 200 status code : " + status.getStatusCode() + " - " + status.getReasonPhrase());
                     }
                 } catch (IOException ex) {
