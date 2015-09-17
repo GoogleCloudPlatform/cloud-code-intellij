@@ -24,15 +24,20 @@ import java.util.concurrent.TimeUnit;
 /**
  * Schedules the synchronization of sample templates in a hidden repo every X minutes.
  */
-public class SampleSyncScheduler {
-  private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+class SampleSyncScheduler {
   private static volatile SampleSyncScheduler instance;
+
+  private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
   private ScheduledFuture<?> taskHandle;
 
   // ToDo: This delay is being discussed and might change
-  private final long DELAY_IN_MINUTES = 120;
+  private static final long DELAY_IN_MINUTES = 120;
 
-  public static synchronized SampleSyncScheduler getInstance() {
+  private SampleSyncScheduler() {
+    // singleton
+  }
+
+  static synchronized SampleSyncScheduler getInstance() {
     if(instance == null) {
       instance = new SampleSyncScheduler();
     }
@@ -40,7 +45,7 @@ public class SampleSyncScheduler {
     return instance;
   }
 
-  public void startScheduleTask() {
+  synchronized void startScheduleTask() {
     if (taskHandle == null) {
       taskHandle =
           scheduler.scheduleAtFixedRate(SampleSyncTask.getInstance(), 0, DELAY_IN_MINUTES, TimeUnit.MINUTES);
