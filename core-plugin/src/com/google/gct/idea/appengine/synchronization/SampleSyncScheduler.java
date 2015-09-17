@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SampleSyncScheduler {
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-  private static SampleSyncScheduler instance;
+  private static volatile SampleSyncScheduler instance;
   private ScheduledFuture<?> taskHandle;
 
   // ToDo: This delay is being discussed and might change
@@ -43,7 +43,7 @@ public class SampleSyncScheduler {
   public void startScheduleTask() {
     if (taskHandle == null) {
       taskHandle =
-        scheduler.scheduleAtFixedRate(SampleSyncTask.getInstance(), 0, DELAY_IN_MINUTES, TimeUnit.MINUTES);
+          scheduler.scheduleAtFixedRate(SampleSyncTask.getInstance(), 0, DELAY_IN_MINUTES, TimeUnit.MINUTES);
     }
   }
 }
