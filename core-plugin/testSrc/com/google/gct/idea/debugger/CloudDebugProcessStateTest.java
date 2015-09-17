@@ -90,8 +90,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     if (isFinal == Boolean.TRUE) {
       Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
       calendar.add(Calendar.SECOND, finalTimeSeconds);
-      // 2015-07-23T16:37:33.000Z
-      SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+      SimpleDateFormat iso8601 = new SimpleDateFormat(BreakpointUtil.ISO_8601_FORMAT);
       result.setFinalTime(iso8601.format(calendar.getTime()));
     }
     SourceLocation location = new SourceLocation();
