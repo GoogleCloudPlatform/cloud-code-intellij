@@ -38,6 +38,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
@@ -89,7 +90,9 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     if (isFinal == Boolean.TRUE) {
       Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
       calendar.add(Calendar.SECOND, finalTimeSeconds);
-      result.setFinalTime(BreakpointUtil.ISO8601_DATE_FORMAT.format(calendar.getTime()));
+      // 2015-07-23T16:37:33.000Z
+      SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+      result.setFinalTime(iso8601.format(calendar.getTime()));
     }
     SourceLocation location = new SourceLocation();
     location.setPath(locationPath);
