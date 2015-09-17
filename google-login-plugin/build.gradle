@@ -84,3 +84,22 @@ task loadIdea(type:Exec) {
 }
 
 compileJava.dependsOn("loadIdea")
+
+findbugs {
+    ignoreFailures = true
+    sourceSets = [sourceSets.main]
+    effort = "max"
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+pmd {
+    ignoreFailures = true
+    sourceSets = [sourceSets.main]
+}
+
