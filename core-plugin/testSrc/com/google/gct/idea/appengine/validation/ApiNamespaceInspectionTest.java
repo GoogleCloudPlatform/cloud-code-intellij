@@ -27,7 +27,7 @@ import com.intellij.testFramework.MockProblemDescriptor;
 import junit.framework.Assert;
 
 /**
- * Tests for {@link ApiNamespaceInspection}
+ * Tests for {@link ApiNamespaceInspection}.
  */
 public class ApiNamespaceInspectionTest extends EndpointTestBase  {
   public void ignore_testApiNamespaceAttribute_complete() {
@@ -102,7 +102,7 @@ public class ApiNamespaceInspectionTest extends EndpointTestBase  {
    final Project myProject = myFixture.getProject();
     PsiAnnotation annotation = JavaPsiFacade.getInstance(myProject).getElementFactory()
       .createAnnotationFromText(annotationString, null);
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
 
     ApiNamespaceInspection.MyQuickFix myQuickFix = new ApiNamespaceInspection().new  MyQuickFix();
     myQuickFix.applyFix(myProject, problemDescriptor);

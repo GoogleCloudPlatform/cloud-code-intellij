@@ -27,7 +27,7 @@ import com.intellij.testFramework.MockProblemDescriptor;
 import junit.framework.Assert;
 
 /**
- * Tests for {@link InvalidParameterAnnotationsInspection}
+ * Tests for {@link InvalidParameterAnnotationsInspection}.
  */
 public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase {
   /**
@@ -138,7 +138,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
 
   private void runQuickFixTest(PsiParameter parameter, String expectedString) {
     InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection().new MyQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR);
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);
     Assert.assertEquals(expectedString, parameter.getText());
   }

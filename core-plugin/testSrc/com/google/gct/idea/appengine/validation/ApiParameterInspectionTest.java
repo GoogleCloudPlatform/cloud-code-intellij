@@ -71,7 +71,7 @@ public class ApiParameterInspectionTest extends EndpointTestBase {
       JavaPsiFacade.getInstance(myProject).getElementFactory().createParameterFromText(parameterText, null);
     ApiParameterInspection.MyQuickFix myQuickFix =
       new ApiParameterInspection().new MyQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR);
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);
     Assert.assertEquals(expectedString, parameter.getText());
   }

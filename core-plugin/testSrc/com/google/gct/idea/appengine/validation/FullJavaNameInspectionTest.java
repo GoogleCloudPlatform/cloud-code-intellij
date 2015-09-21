@@ -41,7 +41,7 @@ public class FullJavaNameInspectionTest extends EndpointTestBase {
   public void testQuickFix() {
     PsiMethod someFunction =
       JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory().createMethod("someFunction", PsiType.VOID);
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(someFunction, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(someFunction, "", ProblemHighlightType.ERROR);
 
     FullJavaNameInspection.MyQuickFix myQuickFix = new FullJavaNameInspection().new MyQuickFix();
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);

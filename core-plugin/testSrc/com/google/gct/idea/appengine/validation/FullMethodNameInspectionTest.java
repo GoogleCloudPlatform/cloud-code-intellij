@@ -59,7 +59,7 @@ public class FullMethodNameInspectionTest extends EndpointTestBase {
     PsiAnnotation annotation =
       JavaPsiFacade.getInstance(myProject).getElementFactory().createAnnotationFromText(annotationString, null);
     FullMethodNameInspection.MyQuickFix myQuickFix = new FullMethodNameInspection().new MyQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
 
     myQuickFix.applyFix(myProject, problemDescriptor);
     Assert.assertEquals("@" + GctConstants.APP_ENGINE_ANNOTATION_API_METHOD + "(name = \"someName_1\")", annotation.getText());
@@ -75,7 +75,7 @@ public class FullMethodNameInspectionTest extends EndpointTestBase {
     PsiAnnotation annotation =
       JavaPsiFacade.getInstance(myProject).getElementFactory().createAnnotationFromText(annotationString, null);
     FullMethodNameInspection.MyQuickFix myQuickFix = new FullMethodNameInspection().new MyQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
 
     myQuickFix.applyFix(myProject, problemDescriptor);
     Assert.assertEquals(annotationString, annotation.getText());
