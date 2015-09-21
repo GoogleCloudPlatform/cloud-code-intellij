@@ -21,7 +21,6 @@ import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.openapi.diagnostic.Logger;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.ParseException;
@@ -35,7 +34,7 @@ public class BreakpointUtil {
   private static final Logger LOG = Logger.getInstance(BreakpointUtil.class);
 
   // 2015-07-23T16:37:33.000Z
-  public static final SimpleDateFormat ISO8601_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+  public static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
   /**
    * This is a helper routine that converts a server {@link StatusMessage} to descriptive text.
@@ -75,8 +74,11 @@ public class BreakpointUtil {
     }
 
     dateString = dateString.replaceAll("Z$", "-0000");
+
+    SimpleDateFormat iso8601Format = new SimpleDateFormat(ISO_8601_FORMAT);
+
     try {
-      return ISO8601_DATE_FORMAT.parse(dateString);
+      return iso8601Format.parse(dateString);
     } catch (ParseException e) {
       LOG.error("error parsing datetime " + dateString, e);
     }
