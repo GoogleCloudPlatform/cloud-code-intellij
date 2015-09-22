@@ -16,18 +16,16 @@
 package com.google.gct.idea.appengine.gradle.project;
 
 import com.google.appengine.gradle.model.AppEngineModel;
-
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.Serializable;
 
 /**
  * Transient project wrapper for App Engine Gradle Projects during gradle imports
  */
-public class IdeaAppEngineProject implements Serializable {
+public class IdeaAppEngineProject {
   @NotNull private final AppEngineModel myDelegate;
   @NotNull private final String myModuleName;
   @NotNull private final File myRootDirPath;
