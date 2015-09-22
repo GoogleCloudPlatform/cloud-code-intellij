@@ -23,15 +23,15 @@ import java.util.Comparator;
 import java.util.Date;
 
 /**
- * BreakpointComparer is a comparer used to sort breakpoints in the historical snapshot list.
+ * BreakpointComparator is a comparator used to sort breakpoints in the historical snapshot list.
  */
-public class BreakpointComparer implements Comparator<Breakpoint> {
-  private static final BreakpointComparer DEFAULT_INSTANCE = new BreakpointComparer();
+ class BreakpointComparator implements Comparator<Breakpoint> {
+  private static final BreakpointComparator DEFAULT_INSTANCE = new BreakpointComparator();
   private static final Date MINIMUM_DATE = new Date(Long.MIN_VALUE);
-  private BreakpointComparer() {
+  private BreakpointComparator() {
   }
 
-  public static BreakpointComparer getDefaultInstance() {
+  static BreakpointComparator getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
@@ -94,10 +94,6 @@ public class BreakpointComparer implements Comparator<Breakpoint> {
       return false;
     }
     return true;
-  }
-
-  private static int toIntValue(Integer integer) {
-    return integer != null ? integer.intValue() : 0;
   }
 
   private static long toLongValue(Long longValue) {
