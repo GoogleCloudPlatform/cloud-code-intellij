@@ -82,7 +82,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   private XBreakpointHandler<?>[] myXBreakpointHandlers;
   private volatile String myNavigatedSnapshotId;
 
-  CloudDebugProcess(@NotNull XDebugSession session) {
+  public CloudDebugProcess(@NotNull XDebugSession session) {
     super(session);
   }
 

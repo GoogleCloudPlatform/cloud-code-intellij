@@ -15,6 +15,7 @@
  */
 package com.google.gct.idea.debugger.ui;
 
+import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.gct.idea.debugger.*;
 import com.google.gct.idea.util.GctBundle;
@@ -23,7 +24,6 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -69,9 +69,12 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   private static final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
   private static final int WINDOW_HEIGHT_PX = 8 * JBTable.PREFERRED_SCROLLABLE_VIEWPORT_HEIGHT_IN_ROWS;
   private static final int WINDOW_WIDTH_PX = 200;
-  private final JBTable myTable;
   private CloudDebugProcess myProcess;
-  private Balloon myBalloon = null;
+
+  @VisibleForTesting
+  final JBTable myTable;
+  @VisibleForTesting
+  Balloon myBalloon = null;
 
   public CloudDebugHistoricalSnapshots(@NotNull CloudDebugProcessHandler processHandler) {
     super(new BorderLayout());
