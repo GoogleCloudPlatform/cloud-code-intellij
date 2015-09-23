@@ -121,7 +121,7 @@ public class CloudDebugGlobalPoller {
     state.setWaitToken(responseWaitToken);
 
     if (currentList != null) {
-      Collections.sort(currentList, BreakpointComparer.getDefaultInstance());
+      Collections.sort(currentList, BreakpointComparator.getDefaultInstance());
     }
 
     state.setCurrentServerBreakpointList(currentList != null
