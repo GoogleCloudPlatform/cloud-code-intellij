@@ -49,6 +49,9 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   private IdeaProjectTestFixture myFixture;
   private CloudBreakpointHandler myHandler;
 
+  public void testFoo() {
+  }
+
 // todo(elharo): understand why this code throws a NullPointerException and fix
 /*
   @SuppressWarnings("JUnitTestCaseWithNonTrivialConstructors")
