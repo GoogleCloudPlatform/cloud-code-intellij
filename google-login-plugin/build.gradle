@@ -16,10 +16,16 @@ dependencies {
     compile fileTree(dir: 'third_party/repackaged', include: '*.jar')
     // Where should we load these from? The versions bundled with IDEA contain
     // classes that are not in the versions loaded from Maven central; e.g. PlatformUtils
-    compile files(ideaLib + 'openapi.jar')
     compile files(ideaLib + 'annotations.jar')
+    compile files(ideaLib + 'bootstrap.jar')
     compile files(ideaLib + 'extensions.jar')
     compile files(ideaLib + 'idea.jar')
+    compile files(ideaLib + 'idea_rt.jar')
+    compile files(ideaLib + 'jdom.jar')
+    compile files(ideaLib + 'log4j.jar')
+    compile files(ideaLib + 'openapi.jar')
+    compile files(ideaLib + 'picocontainer.jar')
+    compile files(ideaLib + 'trove4j.jar')
     compile files(ideaLib + 'util.jar')
 
     compile (
@@ -84,3 +90,22 @@ task loadIdea(type:Exec) {
 }
 
 compileJava.dependsOn("loadIdea")
+
+findbugs {
+    ignoreFailures = true
+    sourceSets = [sourceSets.main]
+    effort = "max"
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+pmd {
+    ignoreFailures = true
+    sourceSets = [sourceSets.main]
+}
+

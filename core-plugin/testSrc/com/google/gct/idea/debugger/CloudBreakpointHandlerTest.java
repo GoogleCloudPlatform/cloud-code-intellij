@@ -112,7 +112,9 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     super.tearDown();
   } */
 
-  public void ignore_testSimpleBreakpointRegister() {
+  public void testSimpleBreakpointRegister() {
+    // todo(elharo): until we figure out how to fix this
+  /*
     registerMockBreakpoint(new String[]{"foowatch1"}, "condition == true", 123, "foo.java", "com.google", false, "b_id");
 
     assertNull(myRemovedBp.get());
@@ -121,6 +123,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     assertTrue(myAddedBp.get().getLocation().getLine() == 124);
     assertTrue(myAddedBp.get().getLocation().getPath().equals("com/google/foo.java"));
     assertTrue(myAddedBp.get().getCondition().equals("condition == true"));
+    */
   }
 
   public void ignore_testRegisterGetAndDelete() {

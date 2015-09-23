@@ -2,16 +2,22 @@
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'findbugs'
+    apply plugin: 'pmd'
+    apply plugin: 'jdepend'
     group = 'com.google.gct'
     version = '1.0'
     repositories {
         mavenCentral()
     }
     dependencies {
+        compile (
+            [group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.+'],
+            [group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5']
+	)
 	testCompile (
             [group: 'junit', name: 'junit', version: '4.+'],
             [group: 'org.mockito', name: 'mockito-all', version: '1.9.5'],
 	)
     }
 }
-

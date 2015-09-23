@@ -17,9 +17,6 @@ package com.google.gct.idea.appengine.synchronization;
 
 
 import com.google.common.collect.Lists;
-
-import junit.framework.Assert;
-
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -29,9 +26,8 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
-
 import org.eclipse.jgit.util.FileUtils;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -41,18 +37,19 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 /**
- * Tests for {@link SampleSyncTask}
+ * Tests for {@link SampleSyncTask}.
  */
 public class SampleSyncTaskTest extends RepositoryTestCase {
   private Git mockGitHubRepo;
   private String mockAndroidRepoPath;
-  private  String mockGitHubRepoPath;
+  private String mockGitHubRepoPath;
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
 
-    mockAndroidRepoPath = System.getProperty("java.io.tmpdir") + "/android/mockAndroidRepo";
+    // todo(elharo): use tmp directory functionality in Java 7
+    mockAndroidRepoPath = System.getProperty("java.io.tmpdir") + "/android/mockAndroidRepo" + Math.random();
     String mockGitHubRepoGitPath = db.getDirectory().getPath();
     mockGitHubRepoPath = mockGitHubRepoGitPath.substring(0, mockGitHubRepoGitPath.lastIndexOf('/'));
 
@@ -75,15 +72,14 @@ public class SampleSyncTaskTest extends RepositoryTestCase {
     mockGitHubRepo.add().addFilepattern("Test.txt").call();
     mockGitHubRepo.commit().setMessage("Initial commit").call();
     mockGitHubRepo.tag().setName("tag-initial").setMessage("Tag initial").call();
-
   }
 
   @Override
   public void tearDown() throws IOException {
-    FileUtils.delete(new File(mockAndroidRepoPath));
+    // todo(elharo): use directory deleting functionality in Java 7
+    FileUtils.delete(new File(mockAndroidRepoPath), FileUtils.RECURSIVE);
   }
 
-  @Ignore
   @Test
   public void testSync_noLocalRepo() throws IOException, GitAPIException {
     // Sync files from mock Git Hub repo to mock local Android sample template repo
@@ -113,7 +109,6 @@ public class SampleSyncTaskTest extends RepositoryTestCase {
     }
   }
 
-  @Ignore
   @Test
   public void testSync_singleCommit() throws GitAPIException, IOException, URISyntaxException {
     // Sync files from mock Git Hub repo to mock local Android sample template repo
@@ -144,7 +139,6 @@ public class SampleSyncTaskTest extends RepositoryTestCase {
     Assert.assertTrue(hasCommits);
   }
 
-  @Ignore
   @Test
   public void testSync_multipleCommits() throws GitAPIException, IOException {
     // Sync files from mock Git Hub repo to mock local Android sample template repo
@@ -191,8 +185,8 @@ public class SampleSyncTaskTest extends RepositoryTestCase {
     mockGitHubRepo.add().addFilepattern(fileName).call();
 
     RevCommit commit = mockGitHubRepo.commit()
-      .setMessage(commitMessage)
-      .call();
+            .setMessage(commitMessage)
+            .call();
     Assert.assertNotNull(commit);
 
     mockGitHubRepo.push().call();
@@ -202,12 +196,12 @@ public class SampleSyncTaskTest extends RepositoryTestCase {
 
   private RevCommit removeFileFromMockGitHubRepo(String fileName, String commitMessage) throws GitAPIException {
     mockGitHubRepo.rm()
-      .addFilepattern(fileName)
-      .call();
+            .addFilepattern(fileName)
+            .call();
 
     RevCommit commit = mockGitHubRepo.commit()
-      .setMessage(commitMessage)
-      .call();
+            .setMessage(commitMessage)
+            .call();
     Assert.assertNotNull(commit);
 
     mockGitHubRepo.push().call();
