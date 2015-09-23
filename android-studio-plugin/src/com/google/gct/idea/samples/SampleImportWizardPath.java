@@ -15,6 +15,7 @@
  */
 package com.google.gct.idea.samples;
 
+import com.android.SdkConstants;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.android.tools.idea.wizard.dynamic.*;
 import com.appspot.gsamplesindex.samplesindex.model.Sample;
@@ -32,8 +33,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -150,6 +153,21 @@ public class SampleImportWizardPath extends DynamicWizardPath {
           GctStudioBundle.message("sample.copy.to.project.failed"), GctStudioBundle
           .message("sample.import.error.title"));
       return false;
+    }
+    // TODO : eventually refactor this out with common code from Android wizard Util
+    if (SystemInfo.isUnix) {
+      File gradlewFile = new File(project.getBasePath(), SdkConstants.FN_GRADLE_WRAPPER_UNIX);
+      if (!gradlewFile.isFile()) {
+        LOG.error("Could not find gradle wrapper for sample: " + sampleName + ". Command line builds may not work properly.");
+      }
+      else {
+        try {
+          FileUtil.setExecutableAttribute(gradlewFile.getPath(), true);
+        } catch (IOException e) {
+          Messages.showWarningDialog(GctStudioBundle.message("sample.import.no.gradlew.exec", sampleName),
+                                     GctStudioBundle.message("sample.import.warning.title"));
+        }
+      }
     }
 
     UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.SAMPLES, sampleName, null);

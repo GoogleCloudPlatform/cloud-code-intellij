@@ -101,5 +101,6 @@
     </orderEntry>
     <orderEntry type="module" module-name="xdebugger-impl" />
     <orderEntry type="module" module-name="google-cloud-tools-core-as" />
+    <orderEntry type="module" module-name="google-login-as" />
   </component>
 </module>
