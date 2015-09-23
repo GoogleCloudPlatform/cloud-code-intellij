@@ -40,7 +40,7 @@ public class ConstructorInspectionTest extends EndpointTestBase {
    * Tests that a ConstructorInspection error is generated for a class with only a constructor
    * with arguments.
    */
-  public void ignore_testClassWithConstructorWithArgument() {
+  public void testClassWithConstructorWithArgument() {
     doTest();
   }
 
@@ -48,7 +48,7 @@ public class ConstructorInspectionTest extends EndpointTestBase {
    * Tests that a ConstructorInspection error is not generated for a class with
    * with no user provided constructor.
    */
-  public void ignore_testClassWithNoConstructor() {
+  public void testClassWithNoConstructor() {
     doTest();
   }
 
@@ -56,7 +56,7 @@ public class ConstructorInspectionTest extends EndpointTestBase {
    * Tests that a ConstructorInspection error is generated for a class with only a
    * private constructor.
    */
-  public void ignore_testClassWithPrivateConstructor() {
+  public void testClassWithPrivateConstructor() {
     doTest();
   }
 
@@ -64,7 +64,7 @@ public class ConstructorInspectionTest extends EndpointTestBase {
    * Tests that a ConstructorInspection error is not generated for a class with only a constructor
    * without arguments.
    */
-  public void ignore_testClassWithPublicNullaryConstructor() {
+  public void testClassWithPublicNullaryConstructor() {
     doTest();
   }
 
@@ -72,7 +72,7 @@ public class ConstructorInspectionTest extends EndpointTestBase {
    *  Tests that a ConstructorInspection error is not generated for a class with multiple
    *  constructors including a public nullary constructor.
    */
-  public void ignore_testMultipleConstructorsIncludingPublicNullary() {
+  public void testMultipleConstructorsIncludingPublicNullary() {
     doTest();
   }
 
@@ -80,7 +80,7 @@ public class ConstructorInspectionTest extends EndpointTestBase {
    *  Tests that a ConstructorInspection error is generated for a class with multiple
    *  constructors that does not include a public nullary constructor.
    */
-  public void ignore_testMultipleConstructorsWithoutPublicNullary() {
+  public void testMultipleConstructorsWithoutPublicNullary() {
     doTest();
   }
 

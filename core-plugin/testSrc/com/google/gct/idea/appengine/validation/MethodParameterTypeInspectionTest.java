@@ -30,7 +30,7 @@ public class MethodParameterTypeInspectionTest extends EndpointTestBase {
    * Also tests that method parameters of types byte arrays, primitive types, sets and maps do
    * not cause MethodParameterTypeInspection error
    */
-  public void ignore_testMultipleParameterTypes() {
+  public void fixme_testMultipleParameterTypes() {
     doTest();
   }
 

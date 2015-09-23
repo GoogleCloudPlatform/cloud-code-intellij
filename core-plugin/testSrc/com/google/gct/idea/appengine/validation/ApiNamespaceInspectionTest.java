@@ -30,23 +30,23 @@ import junit.framework.Assert;
  * Tests for {@link ApiNamespaceInspection}
  */
 public class ApiNamespaceInspectionTest extends EndpointTestBase  {
-  public void ignore_testApiNamespaceAttribute_complete() {
+  public void testApiNamespaceAttribute_complete() {
     doTest();
   }
 
-  public void ignore_testApiNamespaceAttribute_withoutPackagePath() {
+  public void testApiNamespaceAttribute_withoutPackagePath() {
     doTest();
   }
 
-  public void ignore_testApiNamespaceAttribute_withoutOwnerName() {
+  public void testApiNamespaceAttribute_withoutOwnerName() {
     doTest();
   }
 
-  public void ignore_testApiNamespaceAttribute_withOnlyPackagePath() {
+  public void testApiNamespaceAttribute_withOnlyPackagePath() {
     doTest();
   }
 
-  public void ignore_testApiNamespaceAttribute_withOnlyOwnerDomain() {
+  public void testApiNamespaceAttribute_withOnlyOwnerDomain() {
     doTest();
   }
 
@@ -102,7 +102,7 @@ public class ApiNamespaceInspectionTest extends EndpointTestBase  {
    final Project myProject = myFixture.getProject();
     PsiAnnotation annotation = JavaPsiFacade.getInstance(myProject).getElementFactory()
       .createAnnotationFromText(annotationString, null);
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
 
     ApiNamespaceInspection.MyQuickFix myQuickFix = new ApiNamespaceInspection().new  MyQuickFix();
     myQuickFix.applyFix(myProject, problemDescriptor);

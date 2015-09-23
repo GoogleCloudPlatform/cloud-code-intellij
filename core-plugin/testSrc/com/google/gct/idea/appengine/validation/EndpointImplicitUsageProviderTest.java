@@ -20,20 +20,16 @@ package com.google.gct.idea.appengine.validation;
  */
 public class EndpointImplicitUsageProviderTest  extends EndpointTestBase {
 
-  public void ignore_testUnusedHighlighting_ClassWithoutApi() {
+  public void testUnusedHighlighting_ClassWithoutApi() {
     doTest();
   }
 
-  public void ignore_testUnusedHighlighting_ClassWithApi() {
+  public void fixme_testUnusedHighlighting_ClassWithApi() {
     doTest();
   }
 
-  public void ignore_testUnusedHighlighting_ClassWithApiClass() {
+  public void fixme_testUnusedHighlighting_ClassWithApiClass() {
     doTest();
-  }
-
-  public void testThisClassTestsNothing() {
-    // purely to avoid a no tests warning until we fix the real test
   }
 
   private void doTest() {

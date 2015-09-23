@@ -34,7 +34,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    * Tests that when a name is not specified in the path attribute of an @ApiMethod,
    * no InvalidParameterAnnotationsInspection error produced.
    */
-  public void ignore_testPathAttributeWithNoNameDeclared() {
+  public void testPathAttributeWithNoNameDeclared() {
     doTest();
   }
 
@@ -43,7 +43,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    * and the corresponding method parameter has @DefaultValue, an InvalidParameterAnnotationsInspection
    * error is produced.
    */
-  public void ignore_testPathNameWithDefaultValueAnnotation() {
+  public void testPathNameWithDefaultValueAnnotation() {
     doTest();
   }
 
@@ -52,7 +52,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    * and the corresponding method parameter has @Nullable, an InvalidParameterAnnotationsInspection
    * error is produced.
    */
-  public void ignore_testPathNameWithNullableAnnotation() {
+  public void testPathNameWithNullableAnnotation() {
     doTest();
   }
 
@@ -61,7 +61,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    * and the corresponding method parameter does not have @Nullable or @DefaultValue,
    * no InvalidParameterAnnotationsInspection error is produced.
    */
-  public void ignore_testPathNameWithNoNullableOrDefaultValue() {
+  public void testPathNameWithNoNullableOrDefaultValue() {
     doTest();
   }
 
@@ -138,7 +138,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
 
   private void runQuickFixTest(PsiParameter parameter, String expectedString) {
     InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection().new MyQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR);
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);
     Assert.assertEquals(expectedString, parameter.getText());
   }
@@ -147,6 +147,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
     LocalInspectionTool localInspectionTool = new InvalidParameterAnnotationsInspection();
     String testName = getTestName(true);
     myFixture.setTestDataPath(getTestDataPath());
-    myFixture.testInspection("inspections/invalidParameterAnnotationsInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    LocalInspectionToolWrapper toolWrapper = new LocalInspectionToolWrapper(localInspectionTool);
+    myFixture.testInspection("inspections/invalidParameterAnnotationsInspection/" + testName, toolWrapper);
   }
 }

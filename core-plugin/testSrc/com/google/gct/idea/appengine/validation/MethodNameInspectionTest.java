@@ -28,7 +28,7 @@ public class MethodNameInspectionTest extends EndpointTestBase {
    *  Test to verify that a valid API method name does not generate
    *  a MethodNameInspection error.
    */
-  public void ignore_testValidMethodName() {
+  public void testValidMethodName() {
     doTest();
   }
 
@@ -36,7 +36,7 @@ public class MethodNameInspectionTest extends EndpointTestBase {
    *  Test to verify that a valid API method name with special characters
    *  generates a MethodNameInspection error.
    */
-  public void ignore_testMethodNameWithSpecialCharacter() {
+  public void testMethodNameWithSpecialCharacter() {
     doTest();
   }
 
@@ -44,7 +44,7 @@ public class MethodNameInspectionTest extends EndpointTestBase {
    *  Test to verify that a valid API method name containing a dot does not
    *  generate a MethodNameInspection error.
    */
-  public void ignore_testMethodNameContainingDot() {
+  public void testMethodNameContainingDot() {
     doTest();
   }
 
