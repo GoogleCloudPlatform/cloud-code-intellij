@@ -30,11 +30,11 @@ import junit.framework.Assert;
  */
 public class ApiParameterInspectionTest extends EndpointTestBase {
 
-  public void ignore_testMethodsWithNamedParameters() {
+  public void testMethodsWithNamedParameters() {
     doTest();
   }
 
-  public void ignore_testMethodsWithUnnamedParameters() {
+  public void testMethodsWithUnnamedParameters() {
     doTest();
   }
 
@@ -42,7 +42,7 @@ public class ApiParameterInspectionTest extends EndpointTestBase {
    * Tests that no ApiParameterInspection errors are generated for constructors with parameters
    * that are of API parameter type.
    */
-  public void ignore_testConstructors() {
+  public void testConstructors() {
     doTest();
   }
 
@@ -71,7 +71,7 @@ public class ApiParameterInspectionTest extends EndpointTestBase {
       JavaPsiFacade.getInstance(myProject).getElementFactory().createParameterFromText(parameterText, null);
     ApiParameterInspection.MyQuickFix myQuickFix =
       new ApiParameterInspection().new MyQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR);
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);
     Assert.assertEquals(expectedString, parameter.getText());
   }

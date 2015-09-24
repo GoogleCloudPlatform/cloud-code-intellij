@@ -166,15 +166,15 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
     Assert.assertEquals("boo", path);
   }
 
-  public void ignore_testNonUniqueRestSignatures() {
+  public void fixme_testNonUniqueRestSignatures() {
     doTest();
   }
 
-  public void ignore_testNonUniqueSigWithPathNameSet() {
+  public void testNonUniqueSigWithPathNameSet() {
     doTest();
   }
 
-  public void ignore_testMultipleConstructors() {
+  public void testMultipleConstructors() {
     doTest();
   }
 

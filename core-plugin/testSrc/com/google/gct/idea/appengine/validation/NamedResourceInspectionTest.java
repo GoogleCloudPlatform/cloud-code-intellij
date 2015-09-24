@@ -36,7 +36,7 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
    * Tests that NamedResourceInspection problems are generated for @Named parameters
    * that have duplicate query names as other @Named parameters within the same method.
    */
-  public void ignore_testMethodsWithNamedResources() {
+  public void testMethodsWithNamedResources() {
     doTest();
   }
 
@@ -44,7 +44,7 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
    * Tests that NamedResourceInspection problems are generated for @Named parameters
    * that do not have specified query names.
    */
-  public void ignore_testMethodsWithUnnamedResources() {
+  public void fixme_testMethodsWithUnnamedResources() {
     doTest();
   }
 
@@ -60,7 +60,7 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
       JavaPsiFacade.getInstance(myProject).getElementFactory().createAnnotationFromText(annotationString, null);
     NamedResourceInspection.DuplicateNameQuickFix myQuickFix =
       new NamedResourceInspection().new DuplicateNameQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
 
     myQuickFix.applyFix(myProject, problemDescriptor);
     Assert.assertEquals("@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED + "(\"someName_1\")", annotation.getText());
@@ -78,7 +78,7 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
       JavaPsiFacade.getInstance(myProject).getElementFactory().createAnnotationFromText(annotationString, null);
     NamedResourceInspection.MissingNameQuickFix myQuickFix =
       new NamedResourceInspection().new MissingNameQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
 
     myQuickFix.applyFix(myProject, problemDescriptor);
     Assert.assertEquals("@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED + "(\"myName\")", annotation.getText());
@@ -98,7 +98,7 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
     assert (annotationsList.length == 1);
     NamedResourceInspection.MissingNameQuickFix myQuickFix =
       new NamedResourceInspection().new MissingNameQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotationsList[0], "", ProblemHighlightType.ERROR, null);
+    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotationsList[0], "", ProblemHighlightType.ERROR);
 
     myQuickFix.applyFix(myProject, problemDescriptor);
     Assert.assertEquals("@javax.inject.Named(\"foobar\")", annotationsList[0].getText());
