@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <problems>
-  <problem>
-    <file>test.java</file>
-    <line>25</line>
-    <description>Illegal parameter type ('Boo[]'). Arrays or collections of entity types are not allowed.</description>
-  </problem>
+    <problem>
+        <file>test.java</file>
+        <line>25</line>
+        <description>Illegal parameter type ('List&lt;Boo&gt;'). Arrays or collections of entity types are not allowed.</description>
+    </problem>
 </problems>

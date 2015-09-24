@@ -37,6 +37,8 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.regex.Pattern;
+
 
 /**
  *  Inspection to check that resource or entity parameters are not a collection or an array and
@@ -117,9 +119,7 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
         resourceParameterCount++;
 
         // Check that parameter is not a collection or an array
-        PsiClassType collectionType =
-          JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
-        if ((type instanceof PsiArrayType) || (collectionType.isAssignableFrom(type))){
+        if (type instanceof PsiArrayType || isCollectionType(type, project)){
           holder.registerProblem(psiParameter, "Illegal parameter type (\'"  + psiParameter.getType().getPresentableText() +
                                                "\'). Arrays or collections of entity types are not allowed.", LocalQuickFix.EMPTY_ARRAY);
 
@@ -139,5 +139,22 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
                                              " type and should not be named.", LocalQuickFix.EMPTY_ARRAY);
       }
     };
+  }
+
+  private boolean isCollectionType(PsiType type, Project project) {
+    PsiClassType collectionType =
+            JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
+
+    if (collectionType.isAssignableFrom(type)) {
+      return true;
+    }
+    // hack because isAssignableFrom is broken
+    // todo(elharo): cover other collection types and non-generic collections
+    // todo(elharo): better regex on Java class names
+    String name = type.getCanonicalText();
+    if (name.matches("List<.+>")) {
+      return true;
+    };
+    return false;
   }
 }
