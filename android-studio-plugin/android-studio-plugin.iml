@@ -64,8 +64,8 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="google-cloud-tools-core" scope="PROVIDED" />
-    <orderEntry type="module" module-name="google-login" scope="PROVIDED" />
+    <orderEntry type="module" module-name="core-plugin" scope="PROVIDED" />
+    <orderEntry type="module" module-name="google-login-plugin" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="android" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="groovy" level="application" />
   </component>
