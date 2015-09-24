@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/android-studio-plugin/android-studio-plugin.iml" filepath="$PROJECT_DIR$/android-studio-plugin/android-studio-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/core-plugin/core-plugin.iml" filepath="$PROJECT_DIR$/core-plugin/core-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/google-login-plugin/google-login-plugin.iml" filepath="$PROJECT_DIR$/google-login-plugin/google-login-plugin.iml" />
     </modules>
