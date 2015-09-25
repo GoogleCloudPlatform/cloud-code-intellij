@@ -44,7 +44,15 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
    * Tests that NamedResourceInspection problems are generated for @Named parameters
    * that do not have specified query names.
    */
-  public void fixme_testMethodsWithUnnamedResources() {
+  public void testMethodsWithUnnamedResources() {
+    doTest();
+  }
+
+  public void testMethodsWithUnnamedResourcesNoArg() {
+    doTest();
+  }
+
+  public void testMethodsWithUnnamedResourcesEmptyString() {
     doTest();
   }
 
