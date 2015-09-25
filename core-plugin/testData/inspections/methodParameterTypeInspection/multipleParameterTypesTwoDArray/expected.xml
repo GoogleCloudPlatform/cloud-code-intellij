@@ -18,24 +18,6 @@
   <problem>
     <file>test.java</file>
     <line>36</line>
-    <description>Illegal nested collection type List&lt;String[]&gt;.</description>
-  </problem>
-
-  <problem>
-    <file>test.java</file>
-    <line>40</line>
-    <description>Illegal nested collection type List&lt;String&gt;[].</description>
-  </problem>
-
-  <problem>
-    <file>test.java</file>
-    <line>44</line>
-    <description>Illegal nested collection type List&lt;List&lt;String&gt;&gt;.</description>
-  </problem>
-
-  <problem>
-    <file>test.java</file>
-    <line>48</line>
     <description>Illegal nested collection type Integer[][].</description>
   </problem>
 </problems>
