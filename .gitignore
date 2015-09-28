@@ -1,5 +1,6 @@
 /out
 .idea/workspace.xml
+.idea/libraries/Gradle*
 .gradle/
 core-plugin/.gradle/
 core-plugin/build/
