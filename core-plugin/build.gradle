@@ -1,35 +1,24 @@
-apply plugin: 'java'
-
-repositories {
-    mavenCentral()
-}
-
 def ideaHome = '../idea-IC/'
 def pluginName = 'google-cloud-tools-core'
 
 dependencies {
+    compile project(':google-login-plugin')
+
     compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
     compile files('lib/google-api-services-source.jar')
-    compile project(':google-login-plugin')
     compile files(ideaHome + '/plugins/git4idea/lib/git4idea.jar')
-    compile fileTree(dir: ideaHome + '/lib')
-    compile fileTree(dir: ideaHome + '/plugins/Groovy/lib')
-    compile fileTree(dir: ideaHome + '/plugins/gradle/lib')
-
-    compile (
-            ['com.google.appengine:gradle-appengine-builder-model:0.1.0'],
-            ['org.eclipse.jgit:org.eclipse.jgit:3.3.0.201403021825-r'],
-            ['com.google.apis:google-api-services-clouddebugger:v2-rev4-1.20.0'],
-            // todo(elharo): we shouldn't need Apache commons; Guava will suffice
-            ['commons-io:commons-io:2.4'],
-            ['org.jdom:jdom:2.0.2'],
-    )
-
     compile files(ideaHome + '/lib/bootstrap.jar')
     compile files(ideaHome + '/lib/util.jar')
     compile fileTree(dir: ideaHome + '/lib')
     compile fileTree(dir: ideaHome + '/plugins/Groovy/lib')
     compile fileTree(dir: ideaHome + '/plugins/gradle/lib')
+
+    compile 'com.google.appengine:gradle-appengine-builder-model:0.1.0'
+    compile 'org.eclipse.jgit:org.eclipse.jgit:3.3.0.201403021825-r'
+    compile 'com.google.apis:google-api-services-clouddebugger:v2-rev4-1.20.0'
+    // todo(elharo): we shouldn't need Apache commons; Guava will suffice
+    compile 'commons-io:commons-io:2.4'
+    compile 'org.jdom:jdom:2.0.2'
 
     testCompile files('third_party/jackson-core-asl/jackson-core-asl-1.9.11.jar')
     testCompile files(ideaHome + '/plugins/git4idea/lib/remote-servers-git.jar')
@@ -39,11 +28,10 @@ dependencies {
     testCompile files(ideaHome + '/plugins/junit/lib/idea-junit.jar')
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
-    testCompile (
-            ['junit:junit:4.+'],
-            ['org.eclipse.jgit:org.eclipse.jgit.junit:3.0.+'],
-            ['org.mockito:mockito-all:1.9.5'],
-    )
+    // todo(appu): Should we be using + values here? Will that lead to a mismatch with what intellij is configuring?
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.eclipse.jgit:org.eclipse.jgit.junit:3.0.+'
+    testCompile 'org.mockito:mockito-all:1.9.5'
 
     testRuntime files(ideaHome + '/lib/idea_rt.jar')
     testRuntime files(ideaHome + '/lib/trove4j.jar')
@@ -94,14 +82,6 @@ task plugin(type: Zip,  dependsOn: jar) {
         into(pluginName + '/lib')
     }
 }
-
-task loadIdea(type:Exec) {
-    workingDir '..'
-
-    commandLine './fetchIdea.sh'
-}
-
-compileJava.dependsOn("loadIdea")
 
 findbugs {
     ignoreFailures = true
