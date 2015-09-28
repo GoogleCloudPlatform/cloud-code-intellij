@@ -41,15 +41,23 @@ public class ResourceParameterInspectionTest extends EndpointTestBase {
 
   /**
    * Tests that a ResourceParameterInspection error is generated for a resource parameter
-   * with that is of array type.
+   * of array type.
    */
-  public void fixme_testResourceParameterOfArrayType() {
+  public void testResourceParameterOfArrayType() {
+    doTest();
+  }
+
+  /**
+   * Tests that a ResourceParameterInspection error is generated for a resource parameter
+   * of List type.
+   */
+  public void testResourceParameterOfListType() {
     doTest();
   }
 
   /**
    * Tests that a ResourceParameterInspection error is not generated for a resource parameter
-   * with that is not of array or collection type and does not have @Named.
+   * that is not of array or collection type and does not have @Named.
    */
   public void testValidResourceParameterConfiguration() {
     doTest();
@@ -62,7 +70,6 @@ public class ResourceParameterInspectionTest extends EndpointTestBase {
   public void testMultipleResourceParameters() {
     doTest();
   }
-
   /**
    * Tests that a ResourceParameterInspection error is not generated for constructor
    * with a resource parameter.

@@ -9,5 +9,3 @@ google-login-plugin/build/
 idea-IC/
 .idea/gradle.xml
 .idea/codeStyleSettings.xml
-.idea/libraries/*
-

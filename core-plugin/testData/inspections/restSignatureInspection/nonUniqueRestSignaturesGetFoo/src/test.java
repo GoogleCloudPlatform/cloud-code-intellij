@@ -16,15 +16,29 @@
 package com.example.app;
 
 import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.ApiMethod;
+import com.google.api.server.spi.config.DefaultValue;
 import com.google.api.server.spi.config.Named;
+import com.google.api.server.spi.response.CollectionResponse;
 
+import java.lang.Boolean;
+import java.lang.String;
+import java.util.ArrayList;
 import java.util.List;
 
+
 @Api
-public class Foo {
-  public void aMethod(Boo[] boo) {
-    // do nothing
+public class MyClass {
+  // "GET foo/{}"
+  @ApiMethod(path="", httpMethod = "GET")
+  public List<Foo> list1(@Named("id") int id){
+    return  null;
   }
 
-  class  Boo{}
+  // "GET foo/{}"
+  @ApiMethod(path="", httpMethod = "GET")
+  public List<Foo> list1(@Named("id") double id){
+    return  null;
+  }
+  public class Foo{}
 }

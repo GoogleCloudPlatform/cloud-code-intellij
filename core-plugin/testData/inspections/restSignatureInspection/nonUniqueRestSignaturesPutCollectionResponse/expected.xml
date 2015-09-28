@@ -17,7 +17,8 @@
 <problems>
   <problem>
     <file>test.java</file>
-    <line>25</line>
-    <description>Illegal parameter type ('Boo[]'). Arrays or collections of entity types are not allowed.</description>
+    <line>38</line>
+    <description>Multiple methods with same rest path &quot;PUT collectionresponse_foo&quot;: &quot;update2&quot; and &quot;update2&quot;</description>
   </problem>
+
 </problems>
