@@ -23,8 +23,6 @@ That is, clone the repository with HTTPS or SSH:
 ```
 $ git clone https://github.com/GoogleCloudPlatform/gcloud-intellij.git
 Cloning into 'gcloud-intellij'...
-Username for 'https://github.com': your_username 
-Password for 'https://elharo@github.com': 
 remote: Counting objects: 6441, done.
 remote: Compressing objects: 100% (256/256), done.
 remote: Total 6441 (delta 112), reused 0 (delta 0), pack-reused 6121
@@ -49,41 +47,21 @@ Other useful targets while developing include:
 * $ ./gradlew clean: remove all build artifacts
 
 
-## Configuring and Debugging in IntelliJ 
-
-
-### Set up the Global libraries. 
-
-Assuming you have installed IDEA in your home directory:
-
-1. Project Defaults/Project Structure
-2. Click “Platform Settings/Global Libraries”
-3. Click the plus icon and add a new library named “android” pointing to
-   “~/IntelliJ/AndroidStudio141/plugins/android/lib”
-4. Click the plus icon and add a new library named “groovy” 
-   pointing to “~/IntelliJ/AndroidStudio141/plugins/Groovy/lib”
-5. Click the plus icon and add a new library named “git4idea” 
-   pointing to “~/IntelliJ/Idea-IC-141.1532/plugins/git4idea/lib”
-6. Click the plus icon and add a new library named “gradle” 
-   pointing to “~/IntelliJ/Idea-IC-141.1532/plugins/gradle/lib”
-
-Of course, change the path to your IDEA installation as necessary.
-
-*Important!*  If you create these global libraries with the project open, do *not* add them to any projects. (IDEA will ask you if you want to add them).  Doing so will create duplicate, incorrect entries.
+## Configuring and Debugging in IntelliJ
 
 ### Import Project 
 
-To work in IDEA, select "Import  Project" from the IDEA opening screen and 
-choose the root build.gradle file. 
+To work in IDEA, just "Open" the cloud-tools-for-intellij directory 
+(the root directory cloned from Github) from the IDEA opening screen.
 
-You can do this without setting up the global libraries as above. However
-when you attempt to run the tests from inside IDEA, they will likely
-fail with strange errors about missing Groovy plaugins and the like.
+Alternately you can select "Import  Project" from the IDEA opening screen and 
+choose the root build.gradle file. 
 
 
 ### Optional:  Downloading source for IDEA to debug.
 
-Download IDEA source into your home (or any other convenient) directory:
+[Download IDEA source from JetBrains](http://www.jetbrains.org/intellij/sdk/docs/basics/checkout_and_build_community.html) 
+into your home (or any other convenient) directory:
 
 ```
 $ mkdir ~/IntelliJ-Src
@@ -111,4 +89,12 @@ TBD: where is the correct source?
 
 Unless otherwise noted, our source files are distributed under
 the Apache license found in the LICENSE file.
+
+## FAQ
+
+### java.lang.OutOfMemoryError: PermGen space when running the tests inside IDEA
+
+????
+
+
 
