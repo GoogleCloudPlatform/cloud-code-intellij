@@ -21,7 +21,7 @@ import com.google.api.server.spi.config.Named;
 
 @Api
 public class Foo {
-  public void function1(@Named String param) {
+  public void function2(@Named() String param) {
     // do nothing
   }
 }

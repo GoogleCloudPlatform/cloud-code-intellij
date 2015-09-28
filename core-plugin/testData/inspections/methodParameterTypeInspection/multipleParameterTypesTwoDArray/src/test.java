@@ -16,12 +16,24 @@
 package com.example.app;
 
 import com.google.api.server.spi.config.Api;
-import com.google.api.server.spi.config.Named;
+
+import java.lang.Boolean;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 @Api
 public class Foo {
-  public void function1(@Named String param) {
+  public void function1(Byte[] param) {
+    // do nothing
+  }
+
+  public void function2(Boolean param) {
+    // do nothing
+  }
+
+  public void function6(Integer[][] param) {
     // do nothing
   }
 }

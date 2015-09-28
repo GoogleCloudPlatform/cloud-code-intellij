@@ -25,39 +25,7 @@ import java.util.Set;
 
 @Api
 public class Foo {
-  public void function1(Byte[] param) {
-    // do nothing
-  }
-
-  public void function2(Boolean param) {
-    // do nothing
-  }
-
   public void function3(List<String[]> param) {
-    // do nothing
-  }
-
-  public void function4(List<String>[] param) {
-    // do nothing
-  }
-
-  public void function5(List<List<String>> param) {
-    // do nothing
-  }
-
-  public void function6(Integer[][] param) {
-    // do nothing
-  }
-
-  public void function7(Set<Integer> param) {
-    // do nothing
-  }
-
-  public void function8(Map<String, String> param) {
-    // do nothing
-  }
-
-  private void function9(List<String>[] param) {
     // do nothing
   }
 }
