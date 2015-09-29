@@ -49,8 +49,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.annotation.concurrent.GuardedBy;
-
 /**
  * Add necessary configuration information to an appengine modules identified by
  * {@link com.google.gct.idea.appengine.gradle.project.AppEngineGradleProjectResolver}
@@ -61,9 +59,7 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
   @NotNull public static final Key<IdeaAppEngineProject> IDE_APP_ENGINE_PROJECT =
     Key.create(IdeaAppEngineProject.class, ProjectKeys.PROJECT.getProcessingWeight() + 25);
 
-  @GuardedBy("myLoggingNotificationInitializationLock")
   private NotificationGroup myLoggingNotification;
-  private final Object myLoggingNotificationLazyInitializationLock = new Object();
 
   @NotNull
   @Override
@@ -109,17 +105,16 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
   }
 
   private void addToEventLog( @NotNull final Project project, @NotNull String message, @NotNull MessageType type) {
+    getLoggingNotification().createNotification(message, type).notify(project);
+  }
+
+  private synchronized NotificationGroup getLoggingNotification() {
     if (myLoggingNotification == null) {
-      synchronized (myLoggingNotificationLazyInitializationLock) {
-        if (myLoggingNotification == null) {
-          // In android studio, this group already exists, so use it if we can
-          NotificationGroup registeredGroup = NotificationGroup.findRegisteredGroup("Gradle sync");
-          myLoggingNotification =
-              registeredGroup != null ? registeredGroup : NotificationGroup.logOnlyGroup("Gradle sync");
-        }
-      }
+      NotificationGroup registeredGroup = NotificationGroup.findRegisteredGroup("Gradle sync");
+      myLoggingNotification =
+          registeredGroup != null ? registeredGroup : NotificationGroup.logOnlyGroup("Gradle sync");
     }
-    myLoggingNotification.createNotification(message, type).notify(project);
+    return myLoggingNotification;
   }
 
   @Override
