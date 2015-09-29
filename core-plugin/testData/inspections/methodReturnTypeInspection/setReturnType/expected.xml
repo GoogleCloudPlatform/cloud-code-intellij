@@ -17,7 +17,7 @@
 <problems>
   <problem>
     <file>test.java</file>
-    <line>33</line>
-    <description>Invalid return type: String. Primitives and enums are not allowed.</description>
+    <line>30</line>
+    <description>Invalid return type: Set&lt;String&gt;. Primitives and enums are not allowed.</description>
   </problem>
 </problems>
