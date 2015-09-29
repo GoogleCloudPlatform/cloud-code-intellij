@@ -50,7 +50,9 @@ To work in IDEA, just "Open" the cloud-tools-for-intellij directory
 (the root directory cloned from Github) from the IDEA opening screen.
 
 Alternately you can select "Import  Project" from the IDEA opening screen and 
-choose the root build.gradle file. 
+choose the root build.gradle file. In this case, IDE features for IDEA plugin
+development may not work; and run and debug configurations will not
+be available from within the IDE. However, you can run and debug unit tests.
 
 
 ### Optional:  Downloading source for IDEA to debug.
@@ -71,10 +73,10 @@ In the IntelliJ CE 141.1532 SDK, add ~/IntelliJ-Src in the Sourcepath tab or Pro
 
 ## Contributing code
 
-1. Is there a contributor license to sign????
+1. First, please [sign either individual or corporate contributor license agreement](https://cla.developers.google.com/), whichever is applicable.
 2. Fork the repository into your own Github account.
-3. Please include at least minimal unit tests for all new code. (Yes, we know not all 
-   the existing code has tests. We're slowly fixing that, and contributions of tests
+3. Please include unit tests for all new code. (Yes, we know not all 
+   existing code has tests. We're slowly fixing that, and contributions of tests
    for existing code are much appreciated.
 4. Make sure all existing tests pass. (gradlew test)
 5. Associate the change with an existing issue or file a new issue. 
@@ -88,7 +90,6 @@ the Apache license found in the LICENSE file.
 
 ### java.lang.OutOfMemoryError: PermGen space when running the tests inside IDEA
 
-????
-
+From the Run menu select “Edit Configurations...” In the "VM options" field add -XX:MaxPermSize=256m (and if that doesn't work try 512m instead).
 
 
