@@ -65,6 +65,7 @@ jar {
     version = ''
     from ('./src') {
         include 'META-INF/plugin.xml'
+        include 'META-INF/android-studio-features.xml'
     }
 }
 

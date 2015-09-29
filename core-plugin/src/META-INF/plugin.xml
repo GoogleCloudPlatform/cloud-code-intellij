@@ -16,6 +16,9 @@
   <depends>org.jetbrains.plugins.gradle</depends>
   <depends>com.google.gct.login</depends>
   <depends>Git4Idea</depends>
+  <depends optional="true" config-file="android-studio-features.xml">
+	com.intellij.modules.androidstudio
+  </depends>
 
   <application-components>
     <component>
