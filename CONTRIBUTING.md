@@ -80,7 +80,7 @@ In the IntelliJ CE 141.1532 SDK, add ~/IntelliJ-Src in the Sourcepath tab or Pro
    for existing code are much appreciated.
 4. Make sure all existing tests pass. (gradlew test)
 5. Associate the change with an existing issue or file a new issue. 
-6. Create a pull request and send it to who????. 
+6. Create a pull request and send it to gcloud-intellij:master. 
 
 
 Unless otherwise noted, our source files are distributed under
