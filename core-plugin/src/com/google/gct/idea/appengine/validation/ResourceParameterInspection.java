@@ -37,8 +37,6 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.regex.Pattern;
-
 
 /**
  *  Inspection to check that resource or entity parameters are not a collection or an array and
