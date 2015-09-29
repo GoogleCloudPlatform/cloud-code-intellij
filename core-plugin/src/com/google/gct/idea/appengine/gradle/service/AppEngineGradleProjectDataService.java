@@ -49,17 +49,21 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.annotation.concurrent.GuardedBy;
+
 /**
  * Add necessary configuration information to an appengine modules identified by
  * {@link com.google.gct.idea.appengine.gradle.project.AppEngineGradleProjectResolver}
  */
 public class AppEngineGradleProjectDataService implements ProjectDataService<IdeaAppEngineProject, Void> {
-  private static final NotificationGroup LOGGING_NOTIFICATION = NotificationGroup.logOnlyGroup("Gradle sync");
-
   private static final Logger LOG = Logger.getInstance(AppEngineGradleProjectDataService.class);
   // TODO: move this somewhere else, maybe a keys file
   @NotNull public static final Key<IdeaAppEngineProject> IDE_APP_ENGINE_PROJECT =
     Key.create(IdeaAppEngineProject.class, ProjectKeys.PROJECT.getProcessingWeight() + 25);
+
+  @GuardedBy("myLoggingNotificationInitializationLock")
+  private NotificationGroup myLoggingNotification;
+  private final Object myLoggingNotificationLazyInitializationLock = new Object();
 
   @NotNull
   @Override
@@ -90,7 +94,7 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
     }.execute();
     Throwable error = result.getThrowable();
     if (error != null) {
-      LOG.error(String.format("Failed to set up App Engine Gradle Modules"));
+      LOG.warn("Failed to set up App Engine Gradle Modules");
       syncFailed(project, error.getMessage());
     }
   }
@@ -105,7 +109,17 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
   }
 
   private void addToEventLog( @NotNull final Project project, @NotNull String message, @NotNull MessageType type) {
-    LOGGING_NOTIFICATION.createNotification(message, type).notify(project);
+    if (myLoggingNotification == null) {
+      synchronized (myLoggingNotificationLazyInitializationLock) {
+        if (myLoggingNotification == null) {
+          // In android studio, this group already exists, so use it if we can
+          NotificationGroup registeredGroup = NotificationGroup.findRegisteredGroup("Gradle sync");
+          myLoggingNotification =
+              registeredGroup != null ? registeredGroup : NotificationGroup.logOnlyGroup("Gradle sync");
+        }
+      }
+    }
+    myLoggingNotification.createNotification(message, type).notify(project);
   }
 
   @Override
