@@ -18,17 +18,12 @@ When filing an issue, please answer these questions:
 ## Building
 
 All code can be checked out from our Github repository in the usual way.
-That is, clone the repository with HTTPS or SSH: 
+That is, clone the repository with HTTPS or SSH:
+
 
 ```
 $ git clone https://github.com/GoogleCloudPlatform/gcloud-intellij.git
 Cloning into 'gcloud-intellij'...
-remote: Counting objects: 6441, done.
-remote: Compressing objects: 100% (256/256), done.
-remote: Total 6441 (delta 112), reused 0 (delta 0), pack-reused 6121
-Receiving objects: 100% (6441/6441), 9.04 MiB | 17.41 MiB/s, done.
-Resolving deltas: 100% (2915/2915), done.
-Checking connectivity... done.
 ```
 
 There are two subprojects, google-login-plugin and core-plugin.
@@ -71,8 +66,7 @@ $ git clone git://git.jetbrains.org/idea/community.git idea
 
 In the IntelliJ CE 141.1532 SDK, add ~/IntelliJ-Src in the Sourcepath tab or Project Structure > SDKs.
 
-*Warning*: this code is from HEAD and is not exactly the same version that the actual release was cut from. In the debugger line numbers will be off in some classes. 
-TBD: where is the correct source?
+*Warning*: Code from HEAD is not usually exactly the same code the release was cut from. In the debugger line numbers will be off in some classes.
 
 
 ## Contributing code
