@@ -26,7 +26,7 @@ $ git clone https://github.com/GoogleCloudPlatform/gcloud-intellij.git
 Cloning into 'gcloud-intellij'...
 ```
 
-There are two subprojects, google-login-plugin and core-plugin.
+There are three modules: google-login-plugin, core-plugin, and common-lib.
 
 We use gradle as our build system. Gradle is self-installing. This one command
 
@@ -57,18 +57,10 @@ be available from within the IDE. However, you can run and debug unit tests.
 
 ### Optional:  Downloading source for IDEA to debug.
 
-[Download IDEA source from JetBrains](http://www.jetbrains.org/intellij/sdk/docs/basics/checkout_and_build_community.html) 
-into your home (or any other convenient) directory:
-
-```
-$ mkdir ~/IntelliJ-Src
-$ cd ~/IntelliJ-Src
-$ git clone git://git.jetbrains.org/idea/community.git idea
-```
-
-In the IntelliJ CE 141.1532 SDK, add ~/IntelliJ-Src in the Sourcepath tab or Project Structure > SDKs.
-
-*Warning*: Code from HEAD is not usually exactly the same code the release was cut from. In the debugger line numbers will be off in some classes.
+[Download the IDEA source tarball from JetBrains](http://www.jetbrains.org/display/IJOS/Download) 
+into your home (or any other convenient) directory. Extract it and 
+add the resulting directory (usually something like ideaIC-141.1532.4) 
+in the Sourcepath tab of Project Structure > SDKs for the IntelliJ CE 141.1532 SDK.
 
 
 ## Contributing code
