@@ -40,6 +40,10 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
+    <!-- Nested under "Other Settings" -->
+    <applicationConfigurable provider="com.google.gct.login.stats.GctConfigurableProvider"/>
+    <!-- Nested under specifed groupid -->
+    <!--applicationConfigurable  groupId="tools" instance="com.google.gct.login.stats.GctConfigurable" /-->
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct">
