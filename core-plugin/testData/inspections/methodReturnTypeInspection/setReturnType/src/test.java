@@ -26,15 +26,9 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 @Api
 public class Foo {
-  public void function1() {
-    // do nothing
+
+  public Set<String> function4() {
+    return new HashSet<String>();
   }
 
-  public String function2() {
-    return "";
-  }
-
-  public HttpServletRequestWrapper function3() {
-    return new HttpServletRequestWrapper(null);
-  }
 }
