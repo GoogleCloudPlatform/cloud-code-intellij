@@ -59,6 +59,7 @@ jar {
 }
 
 task plugin(type: Zip,  dependsOn: jar) {
+    // by default uses version = 1.0
     baseName = 'google-login'
     destinationDir = file('build')
     include '*.jar'

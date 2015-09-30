@@ -1,3 +1,5 @@
+apply plugin: 'base'
+
 task loadIdea(type:Exec) {
     commandLine './fetchIdea.sh'
 }
@@ -22,4 +24,47 @@ subprojects {
     }
 
     compileJava.dependsOn ':loadIdea'
+
+}
+
+
+// Configuration to package IDEA with our plugins pre-installed in 
+// the root project build directory
+
+ext.devBuildDir = "${buildDir}/idea-IC-gcloud"
+ext.devConfigDir = "${buildDir}/idea-IC-gcloud-config"
+
+task devBuild(type:Copy) {
+    dependsOn cleanDevBuild
+    from ('idea-IC') 
+    into project.devBuildDir
+    doLast {
+        def ideaConfigFile = new File(devBuildDir, 'bin/idea.properties')
+        assert ideaConfigFile.exists()
+        ideaConfigFile.withWriterAppend('UTF-8') { writer ->
+            writer.writeLine('\n# CHANGES FOR TEST BUILDS OF PLUGIN');
+            writer.writeLine("idea.config.path=${devConfigDir}/config");
+            writer.writeLine("idea.system.path=${devConfigDir}/system");
+            writer.writeLine('idea.plugins.path=${idea.config.path}/plugins');
+            writer.writeLine('idea.log.path=${idea.system.path}/log');
+        }
+        def jvmConfigFile = new File(devBuildDir, 'bin/idea64.vmoptions')
+        assert jvmConfigFile.exists()
+        jvmConfigFile.withWriterAppend('UTF-8') { writer ->
+          writer.writeLine('-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005');
+        }
+    }
+}
+
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty("plugin") && (project.plugin instanceof Zip)) {
+            rootProject.devBuild {
+                dependsOn project.plugin
+                from (zipTree(project.plugin.archivePath)) {
+                    into 'plugins'
+                }
+            }
+        }
+    }
 }
