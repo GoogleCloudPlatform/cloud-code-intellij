@@ -3,6 +3,8 @@
 def ideaLib = '../idea-IC/lib/'
 
 dependencies {
+    compile project(':common-lib')
+
     compile files('lib/google.gdt.eclipse.login.common.jar')
     compile files('lib/google-gct-login-context-ij-pg.jar')
     compile files('lib/google-api-services-oauth2-v2-rev70-1.18.0-rc.jar')
@@ -61,6 +63,12 @@ task plugin(type: Zip,  dependsOn: jar) {
     destinationDir = file('build')
     include '*.jar'
     from('build/libs') {
+        into('google-login/lib')
+    }
+    from('../common-lib/build/libs') {
+        into('google-login/lib')
+    }
+    from('../common-lib/lib') {
         into('google-login/lib')
     }
     from('lib/') {

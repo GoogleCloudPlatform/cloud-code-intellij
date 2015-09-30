@@ -3,6 +3,7 @@ def pluginName = 'google-cloud-tools-core'
 
 dependencies {
     compile project(':google-login-plugin')
+    compile project(':common-lib')
 
     compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
     compile files('lib/google-api-services-source.jar')
@@ -73,6 +74,12 @@ task plugin(type: Zip,  dependsOn: jar) {
     destinationDir = file('build')
     include '*.jar'
     from('build/libs') {
+        into(pluginName + '/lib')
+    }
+    from('../common-lib/build/libs') {
+        into(pluginName + '/lib')
+    }
+    from('../common-lib/lib') {
         into(pluginName + '/lib')
     }
     from('lib/') {
