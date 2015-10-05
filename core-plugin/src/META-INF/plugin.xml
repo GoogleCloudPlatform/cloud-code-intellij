@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <name>Google Cloud Tools Core</name>
   <description>Cloud Tools Core</description>
-  <version>0.2.8</version>
+  <version>v0.9-alpha-SNAPSHOT</version>
   <vendor>Google</vendor>
   <id>com.google.gct.core</id>
 
