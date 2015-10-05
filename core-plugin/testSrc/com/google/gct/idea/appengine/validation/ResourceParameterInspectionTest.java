@@ -27,7 +27,7 @@ public class ResourceParameterInspectionTest extends EndpointTestBase {
    * Tests that ResourceParameterInspection error is not generated for a method parameter
    * of parameter type.
    */
-  public void fixme_testNonResourceParameter() {
+  public void testNonResourceParameter() {
     doTest();
   }
 

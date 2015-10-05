@@ -20,11 +20,4 @@
     <line>33</line>
     <description>Invalid return type: String. Primitives and enums are not allowed.</description>
   </problem>
-
-  <problem>
-    <file>test.java</file>
-    <line>41</line>
-    <description>Invalid return type: Set&lt;String&gt;. Primitives and enums are not allowed.</description>
-  </problem>
-
 </problems>

@@ -18,6 +18,8 @@ package com.google.gct.idea.debugger;
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.extensions.Extensions;
+import com.intellij.util.PlatformUtils;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -37,9 +39,17 @@ public class DebuggerInitializationComponent implements ApplicationComponent {
 
   @Override
   public void initComponent() {
-    if (CloudDebugConfigType.isFeatureEnabled()) {
-      Extensions.getRootArea().getExtensionPoint(ConfigurationType.CONFIGURATION_TYPE_EP)
-        .registerExtension(new CloudDebugConfigType());
+    if ("AndroidStudio".equals(PlatformUtils.getPlatformPrefix())) {
+      if (CloudDebugConfigType.isFeatureEnabled()) {
+        enableCloudDebugger();
+      }
+    } else {
+      enableCloudDebugger();
     }
+  }
+
+  private void enableCloudDebugger() {
+    Extensions.getRootArea().getExtensionPoint(ConfigurationType.CONFIGURATION_TYPE_EP)
+        .registerExtension(new CloudDebugConfigType());
   }
 }

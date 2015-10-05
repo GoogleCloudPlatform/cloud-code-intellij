@@ -37,9 +37,4 @@ public class Foo {
   public HttpServletRequestWrapper function3() {
     return new HttpServletRequestWrapper(null);
   }
-
-  public Set<String> function4() {
-    return new HashSet<String>();
-  }
-
 }

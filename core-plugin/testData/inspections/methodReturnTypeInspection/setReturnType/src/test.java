@@ -16,48 +16,19 @@
 package com.example.app;
 
 import com.google.api.server.spi.config.Api;
+import com.google.appengine.api.users.User;
 
-import java.lang.Boolean;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequestWrapper;
 
 
 @Api
 public class Foo {
-  public void function1(Byte[] param) {
-    // do nothing
+
+  public Set<String> function4() {
+    return new HashSet<String>();
   }
 
-  public void function2(Boolean param) {
-    // do nothing
-  }
-
-  public void function3(List<String[]> param) {
-    // do nothing
-  }
-
-  public void function4(List<String>[] param) {
-    // do nothing
-  }
-
-  public void function5(List<List<String>> param) {
-    // do nothing
-  }
-
-  public void function6(Integer[][] param) {
-    // do nothing
-  }
-
-  public void function7(Set<Integer> param) {
-    // do nothing
-  }
-
-  public void function8(Map<String, String> param) {
-    // do nothing
-  }
-
-  private void function9(List<String>[] param) {
-    // do nothing
-  }
 }

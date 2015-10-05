@@ -16,26 +16,28 @@
 package com.google.gct.idea.appengine.validation;
 
 /**
- * Tests for {@link EndpointImplicitUsageProvider}
+ * Tests for {@link EndpointImplicitUsageProvider}.
+ * See http://www.jetbrains.org/intellij/sdk/docs/basics/testing_plugins/testing_highlighting.html
  */
-public class EndpointImplicitUsageProviderTest  extends EndpointTestBase {
+public class EndpointImplicitUsageProviderTest extends EndpointTestBase {
 
   public void testUnusedHighlighting_ClassWithoutApi() {
     doTest();
   }
 
-  public void fixme_testUnusedHighlighting_ClassWithApi() {
+  public void testUnusedHighlighting_ClassWithApi() {
     doTest();
   }
 
-  public void fixme_testUnusedHighlighting_ClassWithApiClass() {
+  public void testUnusedHighlighting_ClassWithApiClass() {
     doTest();
   }
 
   private void doTest() {
     final String testDataPath = getTestDataPath();
     myFixture.setTestDataPath(testDataPath);
-    myFixture.testHighlighting(true, false, false, "inspections/highlighting/" + getTestName(false) + ".java");
+    String path = "inspections/highlighting/" + getTestName(false) + ".java";
+    myFixture.testHighlighting(true, false, false, path);
   }
 
 }

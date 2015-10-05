@@ -23,18 +23,19 @@ import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
  * Tests for {@link MethodReturnTypeInspection},
  */
 public class MethodReturnTypeInspectionTest extends EndpointTestBase {
-  public void ignore_testMultipleReturnTypes() {
+  public void testMultipleReturnTypes() {
     doTest();
   }
 
-  public void testThisClassTestsNothing() {
-    // purely to avoid a no tests warning until we fix the real test
+  public void fixme_testSetReturnType() {
+    doTest();
   }
 
   private void doTest() {
     LocalInspectionTool localInspectionTool = new MethodReturnTypeInspection();
     String testName = getTestName(true);
     myFixture.setTestDataPath(getTestDataPath());
-    myFixture.testInspection("inspections/methodReturnTypeInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    LocalInspectionToolWrapper toolWrapper = new LocalInspectionToolWrapper(localInspectionTool);
+    myFixture.testInspection("inspections/methodReturnTypeInspection/" + testName, toolWrapper);
   }
 }
