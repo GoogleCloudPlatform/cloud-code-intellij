@@ -8,7 +8,7 @@ into the IntelliJ IDEA UI. Currently this includes:
 * [Google Cloud Source Repositories](https://cloud.google.com/tools/cloud-repositories/) 
   Fully-featured private Git repositories hosted on Google Cloud Platform.
 * The [Google Cloud Debugger](https://cloud.google.com/tools/cloud-debugger/) 
-  The Cloud Debugger can inspecti the state of a Java application running on 
+  The Cloud Debugger can inspect the state of a Java application running on 
   [Google App Engine](https://cloud.google.com/appengine/)
   at any code location without stopping the application. 
 
