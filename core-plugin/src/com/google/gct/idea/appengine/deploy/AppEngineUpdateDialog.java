@@ -32,6 +32,9 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.SortedComboBoxModel;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import com.intellij.xml.util.XmlStringUtil;
 import git4idea.DialogManager;
 import org.jetbrains.annotations.Nullable;
@@ -47,6 +50,7 @@ import java.util.List;
  * AppEngineUpdateDialog shows a dialog allowing the user to select a module and deploy.
  */
 public class AppEngineUpdateDialog extends DialogWrapper {
+
   private static final Logger LOG = Logger.getInstance(AppEngineUpdateDialog.class);
   private static final String DEFAULT_APPID = "myApplicationId";
 
@@ -77,17 +81,16 @@ public class AppEngineUpdateDialog extends DialogWrapper {
   }
 
   /**
-   * Shows a dialog to deploy a module to AppEngine.  Will force a login if required
-   * If either the login fails or there are no valid modules to upload, it will return  after
-   * displaying an error.
+   * Shows a dialog to deploy a module to AppEngine.  Will force a login if required If either the login fails or there
+   * are no valid modules to upload, it will return  after displaying an error.
    *
    * @param project The project whose modules will be uploaded.
-   * @param selectedModule The module selected by default in the deploy dialog.  Can be null.  If null or not a valid app engine module,
-   *                       no module will be selected by default.
+   * @param selectedModule The module selected by default in the deploy dialog.  Can be null.  If null or not a valid app
+   * engine module, no module will be selected by default.
    */
   static void show(final Project project, Module selectedModule) {
 
-    final java.util.List<Module> modules = new ArrayList<Module>();
+    final List<Module> modules = new ArrayList<Module>();
 
     // Filter the module list by whether we can actually deploy them to appengine.
     for (Module module : ModuleManager.getInstance(project).getModules()) {
@@ -102,9 +105,9 @@ public class AppEngineUpdateDialog extends DialogWrapper {
       //there are no modules to upload -- or we hit a bug due to gradle sync.
       //TODO do we need to use the mainwindow as owner?
       Messages.showErrorDialog(
-        XmlStringUtil.wrapInHtml(
-          "This project does not contain any App Engine modules. To add an App Engine module for your project, <br> open “File > New Module…” menu and choose one of App Engine modules.")
-        , "Error");
+          XmlStringUtil.wrapInHtml(
+              "This project does not contain any App Engine modules. To add an App Engine module for your project, <br> open “File > New Module…” menu and choose one of App Engine modules.")
+          , "Error");
       return;
     }
 
@@ -127,7 +130,7 @@ public class AppEngineUpdateDialog extends DialogWrapper {
   @Override
   protected JComponent createCenterPanel() {
     @SuppressWarnings("unchecked")
-    final SortedComboBoxModel<Module> model = (SortedComboBoxModel<Module>)myModuleComboBox.getModel();
+    final SortedComboBoxModel<Module> model = (SortedComboBoxModel<Module>) myModuleComboBox.getModel();
     model.clear();
     model.addAll(myDeployableModules);
 
@@ -154,13 +157,15 @@ public class AppEngineUpdateDialog extends DialogWrapper {
     if (appEngineModule != null) {
       AppEngineGradleFacet facet = AppEngineGradleFacet.getAppEngineFacetByModule(appEngineModule);
       if (facet == null) {
-        Messages.showErrorDialog(this.getPeer().getOwner(), "Could not acquire App Engine module information.", "Deploy");
+        Messages
+            .showErrorDialog(this.getPeer().getOwner(), "Could not acquire App Engine module information.", "Deploy");
         return;
       }
 
       final AppEngineWebApp appEngineWebApp = facet.getAppEngineWebXml();
       if (appEngineWebApp == null) {
-        Messages.showErrorDialog(this.getPeer().getOwner(), "Could not locate or parse the appengine-web.xml fle.", "Deploy");
+        Messages.showErrorDialog(this.getPeer().getOwner(), "Could not locate or parse the appengine-web.xml fle.",
+            "Deploy");
         return;
       }
 
@@ -197,13 +202,12 @@ public class AppEngineUpdateDialog extends DialogWrapper {
         // Ask the user if he wants to continue using the active user credentials.
         if (selectedUser != null) {
           if (Messages.showYesNoDialog(this.getPeer().getOwner(),
-                                       "The Project ID you entered could not be found.  Do you want to deploy anyway using "
-                                       + GoogleLogin.getInstance().getActiveUser().getEmail()
-                                       + " for credentials?", "Deploy", Messages.getQuestionIcon()) != Messages.YES) {
+              "The Project ID you entered could not be found.  Do you want to deploy anyway using "
+                  + GoogleLogin.getInstance().getActiveUser().getEmail()
+                  + " for credentials?", "Deploy", Messages.getQuestionIcon()) != Messages.YES) {
             return;
           }
-        }
-        else {
+        } else {
           // This should not happen as its validated.
           Messages.showErrorDialog(this.getPeer().getOwner(), "You need to be logged in to deploy.", "Login");
           return;
@@ -230,7 +234,8 @@ public class AppEngineUpdateDialog extends DialogWrapper {
         if (Strings.isNullOrEmpty(refresh_token)) {
           LOG.error("(null) refresh_token");
         }
-        Messages.showErrorDialog(this.getPeer().getOwner(), "The project ID is not a valid Google Console Developer Project.", "Login");
+        Messages.showErrorDialog(this.getPeer().getOwner(),
+            "The project ID is not a valid Google Console Developer Project.", "Login");
         return;
       }
 
@@ -239,16 +244,18 @@ public class AppEngineUpdateDialog extends DialogWrapper {
           Strings.isNullOrEmpty(war) ||
           Strings.isNullOrEmpty(myElysiumProjectId.getText()) ||
           selectedModule == null) {
-        Messages.showErrorDialog(this.getPeer().getOwner(), "Could not deploy due to missing information (sdk/war/projectid).", "Deploy");
+        Messages.showErrorDialog(this.getPeer().getOwner(),
+            "Could not deploy due to missing information (sdk/war/projectid).", "Deploy");
         LOG.error("StartUploading was called with bad module/sdk/war");
         return;
       }
 
-      close(OK_EXIT_CODE);  // We close before kicking off the update so it doesn't interfere with the output window coming to focus.
+      close(
+          OK_EXIT_CODE);  // We close before kicking off the update so it doesn't interfere with the output window coming to focus.
 
       // Kick off the upload.  detailed status will be shown in an output window.
       new AppEngineUpdater(myProject, selectedModule, sdk, war, myElysiumProjectId.getText(), myVersion.getText(),
-                           client_secret, client_id, refresh_token).startUploading();
+          client_secret, client_id, refresh_token).startUploading();
     }
   }
 
@@ -278,4 +285,60 @@ public class AppEngineUpdateDialog extends DialogWrapper {
     return null;
   }
 
+  {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+    $$$setupUI$$$();
+  }
+
+  /**
+   * Method generated by IntelliJ IDEA GUI Designer >>> IMPORTANT!! <<< DO NOT edit this method OR call it in your code!
+   *
+   * @noinspection ALL
+   */
+  private void $$$setupUI$$$() {
+    myPanel = new JPanel();
+    myPanel.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), 2, 2));
+    myPanel.setPreferredSize(new Dimension(275, 135));
+    moduleLabel = new JBLabel();
+    moduleLabel.setText("Module:");
+    myPanel.add(moduleLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE,
+        GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    final Spacer spacer1 = new Spacer();
+    myPanel.add(spacer1,
+        new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1,
+            GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+    myModuleComboBox = new ModulesCombobox();
+    myPanel.add(myModuleComboBox,
+        new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL,
+            GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    final JBLabel jBLabel1 = new JBLabel();
+    jBLabel1.setText("Deploy to:");
+    myPanel.add(jBLabel1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE,
+        GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    final JBLabel jBLabel2 = new JBLabel();
+    jBLabel2.setText("Version:");
+    myPanel.add(jBLabel2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE,
+        GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    myVersion = new JTextField();
+    myVersion.setEditable(true);
+    myVersion.setEnabled(true);
+    myVersion.setHorizontalAlignment(2);
+    myPanel.add(myVersion, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL,
+        GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0,
+        false));
+    myElysiumProjectId = new ProjectSelector();
+    myPanel.add(myElysiumProjectId,
+        new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL,
+            GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+            GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+  }
+
+  /**
+   * @noinspection ALL
+   */
+  public JComponent $$$getRootComponent$$$() {
+    return myPanel;
+  }
 }

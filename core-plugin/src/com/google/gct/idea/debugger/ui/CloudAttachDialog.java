@@ -23,6 +23,7 @@ import com.google.gct.idea.debugger.CloudDebugProcessState;
 import com.google.gct.idea.debugger.CloudDebuggerClient;
 import com.google.gct.idea.debugger.ProjectRepositoryState;
 import com.google.gct.idea.debugger.ProjectRepositoryValidator;
+import com.google.gct.idea.debugger.ProjectRepositoryValidator.SyncResult;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.login.CredentialedUser;
@@ -40,6 +41,9 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import com.intellij.util.containers.HashMap;
 
 import git4idea.actions.BasicAction;
@@ -65,11 +69,14 @@ import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.ResourceBundle;
 
 /**
  * CloudAttachDialog shows a dialog allowing the user to select a module and debug.
  */
 public class CloudAttachDialog extends DialogWrapper {
+
   private static final Logger LOG = Logger.getInstance(CloudAttachDialog.class);
 
   private final Project myProject;
@@ -82,7 +89,7 @@ public class CloudAttachDialog extends DialogWrapper {
   private CloudDebugProcessState myProcessResultState;
   private GitRepository mySourceRepository;
   private String myStashMessage = null;
-  private ProjectRepositoryValidator.SyncResult mySyncResult;
+  private SyncResult mySyncResult;
   private JBCheckBox mySyncStashCheckbox;
   private JBLabel myWarningLabel;
   private JBLabel myWarningLabel2;
@@ -105,13 +112,12 @@ public class CloudAttachDialog extends DialogWrapper {
           myInfoPanel.setVisible(mySyncStashCheckbox.isSelected());
           if (mySyncStashCheckbox.isSelected()) {
             setOKButtonText(getIsContinued()
-                            ? GctBundle.getString("clouddebug.continuesession")
-                            : GctBundle.getString("clouddebug.attach"));
-          }
-          else {
+                ? GctBundle.getString("clouddebug.continuesession")
+                : GctBundle.getString("clouddebug.attach"));
+          } else {
             setOKButtonText(getIsContinued()
-                            ? GctBundle.getString("clouddebug.continueanyway")
-                            : GctBundle.getString("clouddebug.attach.anyway"));
+                ? GctBundle.getString("clouddebug.continueanyway")
+                : GctBundle.getString("clouddebug.attach.anyway"));
           }
         }
       }
@@ -119,15 +125,15 @@ public class CloudAttachDialog extends DialogWrapper {
 
     myWarningLabel.setVisible(false);
     myWarningLabel.setFont(new Font(myWarningLabel.getFont().getName(), Font.BOLD,
-                                    myWarningLabel.getFont().getSize() - 1));
+        myWarningLabel.getFont().getSize() - 1));
     myWarningLabel.setForeground(JBColor.RED);
     myWarningLabel2.setVisible(false);
     myWarningLabel2.setFont(new Font(myWarningLabel2.getFont().getName(), Font.PLAIN,
-                                     myWarningLabel.getFont().getSize() - 1));
+        myWarningLabel.getFont().getSize() - 1));
     myWarningLabel2.setText(GctBundle.getString("clouddebug.sourcedoesnotmatch"));
 
     myInfoPanel.setFont(new Font(myWarningLabel2.getFont().getName(), Font.PLAIN,
-                                 myWarningLabel.getFont().getSize() - 1));
+        myWarningLabel.getFont().getSize() - 1));
     Border paddingBorder = BorderFactory.createEmptyBorder(2, 0, 2, 0);
     myInfoPanel.setBorder(paddingBorder);
 
@@ -158,8 +164,7 @@ public class CloudAttachDialog extends DialogWrapper {
     if (getOKAction().isEnabled()) {
       if (mySyncStashCheckbox.isSelected()) {
         syncOrStash();
-      }
-      else {
+      } else {
         buildResult();
         close(OK_EXIT_CODE);  // We close before kicking off the update so it doesn't interfere with
         // the output window coming to focus.
@@ -221,8 +226,7 @@ public class CloudAttachDialog extends DialogWrapper {
       myWarningLabel.setVisible(false);
       myWarningLabel2.setVisible(false);
       myInfoPanel.setVisible(true);
-    }
-    else if (mySyncResult.needsStash()) {
+    } else if (mySyncResult.needsStash()) {
       setOKButtonText(getIsContinued() ? "Continue Session" : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(true);
       mySyncStashCheckbox.setText(GctBundle.getString("clouddebug.stashbuttontext"));
@@ -230,8 +234,7 @@ public class CloudAttachDialog extends DialogWrapper {
       myWarningLabel.setVisible(false);
       myWarningLabel2.setVisible(false);
       myInfoPanel.setVisible(true);
-    }
-    else if (mySyncResult.needsSync()) {
+    } else if (mySyncResult.needsSync()) {
       setOKButtonText(getIsContinued() ? "Continue Session" : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(true);
       assert mySyncResult.getTargetSyncSHA() != null;
@@ -240,15 +243,13 @@ public class CloudAttachDialog extends DialogWrapper {
       myWarningLabel.setVisible(false);
       myWarningLabel2.setVisible(false);
       myInfoPanel.setVisible(true);
-    }
-    else if (!mySyncResult.isDeterminable()) {
+    } else if (!mySyncResult.isDeterminable()) {
       setOKButtonText(getIsContinued() ? "Continue Anyway" : GctBundle.getString("clouddebug.attach.anyway"));
       myWarningLabel.setVisible(true);
       myWarningLabel2.setVisible(true);
       myInfoPanel.setVisible(true);
       myWarningLabel2.setText("Could not verify that current source matches module.");
-    }
-    else {
+    } else {
       setOKButtonText(getIsContinued() ? "Continue Session" : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(false);
       myWarningLabel.setVisible(false);
@@ -278,7 +279,9 @@ public class CloudAttachDialog extends DialogWrapper {
     }
 
     final ChangeListManager changeListManager = ChangeListManager.getInstance(myProject);
-    if (changeListManager.isFreezedWithNotification("Can not stash changes now")) return false;
+    if (changeListManager.isFreezedWithNotification("Can not stash changes now")) {
+      return false;
+    }
 
     final GitLineHandler handler = new GitLineHandler(myProject, mySourceRepository.getRoot(), GitCommand.STASH);
     handler.addParameters("save");
@@ -289,8 +292,7 @@ public class CloudAttachDialog extends DialogWrapper {
     AccessToken token = DvcsUtil.workingTreeChangeStarted(myProject);
     try {
       GitHandlerUtil.doSynchronously(handler, GitBundle.getString("stashing.title"), handler.printableCommandLine());
-    }
-    finally {
+    } finally {
       DvcsUtil.workingTreeChangeFinished(myProject, token);
     }
     return true;
@@ -313,8 +315,7 @@ public class CloudAttachDialog extends DialogWrapper {
     if (mySyncResult.needsStash() || mySyncResult.needsSync()) {
       if (mySourceRepository.getCurrentBranch() != null) {
         myOriginalBranchName = mySourceRepository.getCurrentBranch().getName();
-      }
-      else {
+      } else {
         myOriginalBranchName = mySourceRepository.getCurrentRevision();
       }
     }
@@ -334,21 +335,143 @@ public class CloudAttachDialog extends DialogWrapper {
       }
       assert mySyncResult.getTargetSyncSHA() != null;
       brancher.checkout(mySyncResult.getTargetSyncSHA(), Collections.singletonList(mySourceRepository), new Runnable() {
-                          @Override
-                          public void run() {
-                            refreshAndClose();
-                          }
-                        });
-    }
-    else {
+        @Override
+        public void run() {
+          refreshAndClose();
+        }
+      });
+    } else {
       refreshAndClose();
     }
+  }
+
+  {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+    $$$setupUI$$$();
+  }
+
+  /**
+   * Method generated by IntelliJ IDEA GUI Designer >>> IMPORTANT!! <<< DO NOT edit this method OR call it in your code!
+   *
+   * @noinspection ALL
+   */
+  private void $$$setupUI$$$() {
+    myPanel = new JPanel();
+    myPanel.setLayout(new GridLayoutManager(6, 2, new Insets(0, 0, 0, 0), 2, 2));
+    myPanel.setPreferredSize(new Dimension(275, 135));
+    final JBLabel jBLabel1 = new JBLabel();
+    this.$$$loadLabelText$$$(jBLabel1,
+        ResourceBundle.getBundle("messages/CloudToolsBundle").getString("clouddebug.projectlabel"));
+    myPanel.add(jBLabel1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE,
+        GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    final JBLabel jBLabel2 = new JBLabel();
+    jBLabel2.setInheritsPopupMenu(true);
+    this.$$$loadLabelText$$$(jBLabel2,
+        ResourceBundle.getBundle("messages/CloudToolsBundle").getString("clouddebug.module"));
+    myPanel.add(jBLabel2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE,
+        GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    myElysiumProjectId = new ProjectSelector();
+    myPanel.add(myElysiumProjectId,
+        new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL,
+            GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+            GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    myDebuggeeTarget = new JComboBox();
+    myPanel.add(myDebuggeeTarget,
+        new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL,
+            GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    myWarningLabel = new JBLabel();
+    myWarningLabel.setFont(new Font(myWarningLabel.getFont().getName(), Font.BOLD, myWarningLabel.getFont().getSize()));
+    myWarningLabel.setForeground(new Color(-65536));
+    this.$$$loadLabelText$$$(myWarningLabel,
+        ResourceBundle.getBundle("messages/CloudToolsBundle").getString("clouddebug.warninglabel"));
+    myWarningLabel.setVerticalAlignment(0);
+    myWarningLabel.setVerticalTextPosition(0);
+    myPanel.add(myWarningLabel,
+        new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_SOUTHEAST, GridConstraints.FILL_NONE,
+            GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    myWarningLabel2 = new JBLabel();
+    this.$$$loadLabelText$$$(myWarningLabel2,
+        ResourceBundle.getBundle("messages/CloudToolsBundle").getString("clouddebug.sourcedoesnotmatch"));
+    myWarningLabel2.setVerticalAlignment(0);
+    myWarningLabel2.setVerticalTextPosition(0);
+    myPanel.add(myWarningLabel2,
+        new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_SOUTHWEST, GridConstraints.FILL_NONE,
+            GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    mySyncStashCheckbox = new JBCheckBox();
+    mySyncStashCheckbox.setHorizontalAlignment(10);
+    mySyncStashCheckbox.setSelected(true);
+    mySyncStashCheckbox.setText("Sync and Stash");
+    mySyncStashCheckbox.setMnemonic('Y');
+    mySyncStashCheckbox.setDisplayedMnemonicIndex(1);
+    myPanel.add(mySyncStashCheckbox,
+        new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
+            GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+            GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+    final JPanel panel1 = new JPanel();
+    panel1.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+    myPanel.add(panel1, new GridConstraints(5, 0, 1, 2, GridConstraints.ANCHOR_SOUTH, GridConstraints.FILL_HORIZONTAL,
+        GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+        GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+    final Spacer spacer1 = new Spacer();
+    panel1.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1,
+        GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+    myInfoPanel = new JBLabel();
+    this.$$$loadLabelText$$$(myInfoPanel,
+        ResourceBundle.getBundle("messages/CloudToolsBundle").getString("clouddebug.readonly"));
+    myInfoPanel.setVerticalAlignment(0);
+    myInfoPanel.setVerticalTextPosition(0);
+    panel1.add(myInfoPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_SOUTHWEST, GridConstraints.FILL_NONE,
+        GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    final Spacer spacer2 = new Spacer();
+    myPanel.add(spacer2,
+        new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1,
+            GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+    jBLabel2.setLabelFor(myDebuggeeTarget);
+  }
+
+  /**
+   * @noinspection ALL
+   */
+  private void $$$loadLabelText$$$(JLabel component, String text) {
+    StringBuffer result = new StringBuffer();
+    boolean haveMnemonic = false;
+    char mnemonic = '\0';
+    int mnemonicIndex = -1;
+    for (int i = 0; i < text.length(); i++) {
+      if (text.charAt(i) == '&') {
+        i++;
+        if (i == text.length()) {
+          break;
+        }
+        if (!haveMnemonic && text.charAt(i) != '&') {
+          haveMnemonic = true;
+          mnemonic = text.charAt(i);
+          mnemonicIndex = result.length();
+        }
+      }
+      result.append(text.charAt(i));
+    }
+    component.setText(result.toString());
+    if (haveMnemonic) {
+      component.setDisplayedMnemonic(mnemonic);
+      component.setDisplayedMnemonicIndex(mnemonicIndex);
+    }
+  }
+
+  /**
+   * @noinspection ALL
+   */
+  public JComponent $$$getRootComponent$$$() {
+    return myPanel;
   }
 
   /**
    * This binding between the project and debuggee is refactored out to make it reusable in the future.
    */
   private static class ProjectDebuggeeBinding {
+
     private static final Logger LOG = Logger.getInstance(ProjectDebuggeeBinding.class);
     private final JComboBox myDebugeeTarget;
     private final ProjectSelector myElysiumProjectId;
@@ -391,16 +514,16 @@ public class CloudAttachDialog extends DialogWrapper {
     public CloudDebugProcessState buildResult(Project project) {
       Long number = myElysiumProjectId.getProjectNumber();
       String projectNumberString = number != null ? number.toString() : null;
-      ProjectDebuggeeBinding.DebugTarget selectedItem =
-        (ProjectDebuggeeBinding.DebugTarget)myDebugeeTarget.getSelectedItem();
+      DebugTarget selectedItem =
+          (DebugTarget) myDebugeeTarget.getSelectedItem();
       String savedDebuggeeId = selectedItem != null ? selectedItem.getId() : null;
       String savedProjectDescription = myElysiumProjectId.getText();
 
       return new CloudDebugProcessState(myCredentialedUser != null ? myCredentialedUser.getEmail() : null,
-                                        savedDebuggeeId,
-                                        savedProjectDescription,
-                                        projectNumberString,
-                                        project);
+          savedDebuggeeId,
+          savedProjectDescription,
+          projectNumberString,
+          project);
     }
 
     @Nullable
@@ -412,8 +535,7 @@ public class CloudAttachDialog extends DialogWrapper {
 
       myCredentialedUser = credentialedUser;
       myCloudDebuggerClient =
-        myCredentialedUser != null ? CloudDebuggerClient.getLongTimeoutClient(myCredentialedUser.getEmail()) : null;
-
+          myCredentialedUser != null ? CloudDebuggerClient.getLongTimeoutClient(myCredentialedUser.getEmail()) : null;
 
       return myCloudDebuggerClient;
     }
@@ -493,6 +615,7 @@ public class CloudAttachDialog extends DialogWrapper {
     }
 
     public static class DebugTarget {
+
       private static final String MODULE = "module";
 
       private final Debuggee myDebuggee;
@@ -510,20 +633,17 @@ public class CloudAttachDialog extends DialogWrapper {
           String minorVersion = "";
 
           //Get the module name, major version and minor version strings.
-          for (Map.Entry<String, String> entry : myDebuggee.getLabels().entrySet()) {
+          for (Entry<String, String> entry : myDebuggee.getLabels().entrySet()) {
             if (entry.getKey().equalsIgnoreCase(MODULE)) {
               myModule = entry.getValue();
-            }
-            else if (entry.getKey().equalsIgnoreCase("minorversion")) {
+            } else if (entry.getKey().equalsIgnoreCase("minorversion")) {
               minorVersion = entry.getValue();
-            }
-            else if (entry.getKey().equalsIgnoreCase("version")) {
+            } else if (entry.getKey().equalsIgnoreCase("version")) {
               myVersion = entry.getValue();
-            }
-            else {
+            } else {
               //This is fallback logic where we dump the labels verbatim if they
               //change from underneath us.
-              myDescription += String.format("%s:%s", entry.getKey(),entry.getValue());
+              myDescription += String.format("%s:%s", entry.getKey(), entry.getValue());
             }
           }
 
@@ -531,8 +651,7 @@ public class CloudAttachDialog extends DialogWrapper {
           if (!Strings.isNullOrEmpty(myModule)) {
             myDescription = GctBundle.getString("clouddebug.version.with.module.format",
                 myModule, myVersion);
-          }
-          else if (!Strings.isNullOrEmpty(myVersion)) {
+          } else if (!Strings.isNullOrEmpty(myVersion)) {
             myDescription = GctBundle.getString("clouddebug.versionformat", myVersion);
           }
 
@@ -541,16 +660,14 @@ public class CloudAttachDialog extends DialogWrapper {
             if (!Strings.isNullOrEmpty(minorVersion)) {
               myMinorVersion = Long.parseLong(minorVersion);
             }
-          }
-          catch(NumberFormatException ex) {
+          } catch (NumberFormatException ex) {
             LOG.warn("unable to parse minor version: " + minorVersion);
           }
         }
 
         //Finally if nothing worked (maybe labels aren't enabled?), we fall
         //back to the old logic of using description with the project name stripped out.
-        if (Strings.isNullOrEmpty(myDescription))
-        {
+        if (Strings.isNullOrEmpty(myDescription)) {
           myDescription = myDebuggee.getDescription();
           if (myDescription != null &&
               !Strings.isNullOrEmpty(projectName) &&
