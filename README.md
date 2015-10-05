@@ -20,8 +20,10 @@ into the IntelliJ IDEA UI. Currently this includes:
 
 ## Installation
 
+<!-- Commented out until we get this set up.
 The easiest way to install the plugin is by accessing
-the [plugin repository](https://plugins.jetbrains.com/?idea_ce) from inside IDEA.
+the [plugin repository](https://plugins.jetbrains.com/?idea_ce) from inside IDEA. 
+-->
 
 If you wish to build this plugin from source, please see the
 [contributor instructions](https://github.com/GoogleCloudPlatform/gcloud-intellij/blob/master/CONTRIBUTING.md).
