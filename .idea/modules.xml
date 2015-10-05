@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/common-lib/common-lib.iml" filepath="$PROJECT_DIR$/common-lib/common-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/core-plugin/core-plugin.iml" filepath="$PROJECT_DIR$/core-plugin/core-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gcloud-intellij.iml" filepath="$PROJECT_DIR$/gcloud-intellij.iml" />
       <module fileurl="file://$PROJECT_DIR$/google-login-plugin/google-login-plugin.iml" filepath="$PROJECT_DIR$/google-login-plugin/google-login-plugin.iml" />
     </modules>
   </component>

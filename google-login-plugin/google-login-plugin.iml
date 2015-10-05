@@ -1,48 +1,1483 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module type="PLUGIN_MODULE" version="4">
-  <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/src/META-INF/plugin.xml" />
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+<module external.linked.project.id=":google-login-plugin" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="com.google.gct" external.system.module.version="v0.9-alpha-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/build/classes/main" />
+    <output-test url="file://$MODULE_DIR$/build/classes/test" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/testSrc" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
-    <orderEntry type="jdk" jdkName="IntelliJ IDEA Community Edition IC-141.1532.4" jdkType="IDEA JDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/lib" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/lib" />
-        </SOURCES>
-        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" type="SOURCES" />
-      </library>
-    </orderEntry>
+    <orderEntry type="module" module-name="common-lib" />
+    <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpcore:4.4.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpclient:4.5" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:18.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.jcip:jcip-annotations:1.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.collections:google-collections:1.0" level="project" />
+    <orderEntry type="library" name="Gradle: javax.servlet:servlet-api:2.5" level="project" />
+    <orderEntry type="library" name="Gradle: org.mockito:mockito-all:1.9.5" level="project" />
+    <orderEntry type="library" name="Gradle: commons-logging:commons-logging:1.2" level="project" />
+    <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.9" level="project" />
     <orderEntry type="module-library">
-      <library>
+      <library name="Gradle: GoogleFeedback">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/third_party/jackson-core-asl/jackson-core-asl-1.9.11.jar!/" />
+          <root url="jar://$MODULE_DIR$/../common-lib/lib/GoogleFeedback.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library>
+      <library name="Gradle: guava-17.0">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/third_party/javax-servlet-api/javax.servlet-api-3.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/guava-17.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
+    <orderEntry type="module-library">
+      <library name="Gradle: cglib-2.2.2">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/cglib-2.2.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jgoodies-common-1.2.1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jgoodies-common-1.2.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: sanselan-0.98-snapshot">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/sanselan-0.98-snapshot.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: log4j">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/log4j.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: hamcrest-library-1.3">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/hamcrest-library-1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: nekohtml-1.9.14">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/nekohtml-1.9.14.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: picocontainer">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/picocontainer.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jh">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jh.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jdom">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jdom.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: asm4-all">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/asm4-all.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: nanoxml-2.2.3">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/nanoxml-2.2.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jsch.agentproxy.sshagent">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jsch.agentproxy.sshagent.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: pty4j-0.4.15">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/pty4j-0.4.15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: purejavacomm">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/purejavacomm.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jaxen-1.1.3">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jaxen-1.1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: commons-codec-1.8">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/commons-codec-1.8.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: bootstrap">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/bootstrap.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: fluent-hc-4.3.6">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/fluent-hc-4.3.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: snappy-in-java-0.3.1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/snappy-in-java-0.3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: rngom-20051226-patched">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/rngom-20051226-patched.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: slf4j-api-1.7.10">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/slf4j-api-1.7.10.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: gson-2.3">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/gson-2.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: forms_rt">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/forms_rt.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: icons">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/icons.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jsch.agentproxy.core">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jsch.agentproxy.core.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: httpclient-4.3.6">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/httpclient-4.3.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: microba">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/microba.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: resources_en">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/resources_en.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: xpp3-1.1.4-min">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/xpp3-1.1.4-min.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jdkAnnotations">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jdkAnnotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: commons-logging-1.1.3">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/commons-logging-1.1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: markdown4j-2.2">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/markdown4j-2.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: util">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/util.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: proxy-vole_20131209">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/proxy-vole_20131209.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: xstream-1.4.3">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/xstream-1.4.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jps-server">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jps-server.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: swingx-core-1.6.2">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/swingx-core-1.6.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: automaton">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/automaton.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: asm-commons">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/asm-commons.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jsr173_1.0_api">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jsr173_1.0_api.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: trove4j_src">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/trove4j_src.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: trove4j">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/trove4j.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: xerces">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/xerces.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: idea">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/idea.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: junit">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/junit.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: commons-httpclient-3.1-patched">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/commons-httpclient-3.1-patched.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jps-model">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jps-model.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: oromatcher">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/oromatcher.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: httpmime-4.3.6">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/httpmime-4.3.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: resources">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/resources.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: protobuf-2.5.0">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/protobuf-2.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: boot">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/boot.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jgoodies-looks-2.4.2">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jgoodies-looks-2.4.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: extensions">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/extensions.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: idea_rt">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/idea_rt.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: commons-net-3.3">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/commons-net-3.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: optimizedFileManager">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/optimizedFileManager.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: javac2">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/javac2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: httpcore-4.3.3">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/httpcore-4.3.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: hamcrest-core-1.3">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/hamcrest-core-1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jsch-0.1.51">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jsch-0.1.51.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: xmlrpc-2.0">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/xmlrpc-2.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jayatana-1.2.4">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jayatana-1.2.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: junit-4.11">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/junit-4.11.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jsch.agentproxy.pageant">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jsch.agentproxy.pageant.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: trang-core">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/trang-core.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: markdownj-core-0.4.2-SNAPSHOT">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/markdownj-core-0.4.2-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: asm-all">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/asm-all.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jcip-annotations">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jcip-annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: serviceMessages">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/serviceMessages.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jzlib-1.1.1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jzlib-1.1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: openapi">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/openapi.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: freemarker">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/freemarker.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jsch.agentproxy.usocket-jna">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jsch.agentproxy.usocket-jna.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: velocity">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/velocity.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: netty-all-4.1.0.Beta4">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/netty-all-4.1.0.Beta4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ecj-4.4">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ecj-4.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: miglayout-swing">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/miglayout-swing.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jgoodies-forms">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jgoodies-forms.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jsr166e">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jsr166e.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jps-launcher">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jps-launcher.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jna">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jna.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: asm">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/asm.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: annotations">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: resolver">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/resolver.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: groovy-all-2.3.9">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/groovy-all-2.3.9.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jna-utils">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jna-utils.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: xbean">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/xbean.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jsch.agentproxy.usocket-nc">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jsch.agentproxy.usocket-nc.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: winp-1.21-patched">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/winp-1.21-patched.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: slf4j-log4j12-1.7.10">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/slf4j-log4j12-1.7.10.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jsch.agentproxy.connector-factory">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jsch.agentproxy.connector-factory.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: rhino-js-1_7R4">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/rhino-js-1_7R4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: cli-parser-1.1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/cli-parser-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: isorelax">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/isorelax.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jing">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/jing.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: get-m2">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: NOTICE">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: KEYS">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: docs">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/docs.zip!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: LICENSE">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: WHATSNEW">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: INSTALL">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: fetch">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: README">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-oro">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-launcher">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-bsf">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-javamail">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-resolver">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-apache-resolver.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-log4j">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-log4j">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-apache-log4j.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-swing">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-swing.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-junit">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-junit.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-antlr">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-antlr.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-jmf">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-jmf.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-swing">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-jai">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-jdepend">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-testutil">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-resolver">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-bcel">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-apache-bcel.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-commons-net">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-oro">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-apache-oro.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-jdepend">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-jdepend.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-commons-logging">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-jsch">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-parent">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-antlr">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-launcher">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-launcher.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-commons-net">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-commons-net.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-bcel">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-junit4">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-jsch">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-jsch.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-regexp">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-apache-regexp.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-jai">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-jai.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-jmf">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-xalan2">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-apache-xalan2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-netrexx">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-netrexx.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-junit4">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-junit4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: libraries">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-regexp">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-junit">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-bsf">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-apache-bsf.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-apache-xalan2">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: README">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-commons-logging">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-commons-logging.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-testutil">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-testutil.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-javamail">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/ant/lib/ant-javamail.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: ant-netrexx">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: libpty">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: libpty">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: winpty-agent">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: libwinpty">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: winpty-agent">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: libwinpty">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: winpty-agent">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: libwinpty">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: cyglaunch">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: libpty">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: libpty">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: jps-plugin-system">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../idea-IC/lib/rt/jps-plugin-system.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: required_for_dist">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: google.gdt.eclipse.login.common">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/google.gdt.eclipse.login.common.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: google-gct-login-context-ij-pg">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/google-gct-login-context-ij-pg.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: google-api-services-oauth2-v2-rev70-1.18.0-rc">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/google-api-services-oauth2-v2-rev70-1.18.0-rc.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: google-http-client-jackson-1.18.0-rc">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/google-http-client-jackson-1.18.0-rc.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Gradle: google-api-java-client-min-repackaged-1.20.0">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/third_party/repackaged/google-api-java-client-min-repackaged-1.20.0.jar!/" />
         </CLASSES>
@@ -50,17 +1485,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/third_party/mockito/mockito-all-1.9.5.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/third_party/mockito/mockito-all-1.9.5.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module" module-name="common-lib" />
+    <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
   </component>
 </module>
