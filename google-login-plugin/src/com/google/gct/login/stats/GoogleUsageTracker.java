@@ -69,6 +69,10 @@ public class GoogleUsageTracker implements UsageTracker {
                            @NotNull String eventAction,
                            @Nullable String eventLabel,
                            @Nullable Integer eventValue) {
+        if (!UsageTrackerManager.getOptIn()) {
+            return;
+        }
+
         if (!ApplicationManager.getApplication().isUnitTestMode()) {
             if (PlatformUtils.isIntelliJ()) {
                 ArrayList postData = Lists.newArrayList(analyticsBaseData);

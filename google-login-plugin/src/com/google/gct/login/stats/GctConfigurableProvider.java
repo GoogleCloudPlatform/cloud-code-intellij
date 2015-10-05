@@ -6,7 +6,8 @@ import com.intellij.util.PlatformUtils;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by nbashirbello on 9/30/15.
+ * Registers an implementation of {@code applicationConfigurable} extension to provide a
+ * Google Cloud Tools tab in the "Settings" dialog if current application is IntelliJ.
  */
 public class GctConfigurableProvider extends ConfigurableProvider {
     @Nullable

@@ -12,13 +12,13 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 /**
- * Created by nbashirbello on 9/29/15.
+ * Implementation of {@code applicationConfigurable} extension that provides a
+ * Google Cloud Tools tab in the "Settings" dialog.
  */
 public class GctConfigurable implements SearchableConfigurable {
-
-    // EXample CloudTestingConfigurable
-
     private JCheckBox enableUsageTrackerBox;
+    private static String ENABLE_TRACKER_TEXT =
+            "Would you like to help Google improve the Cloud Tools for IntelliJ plug-in?";
 
     public GctConfigurable() {
     }
@@ -61,17 +61,17 @@ public class GctConfigurable implements SearchableConfigurable {
 
     @Override
     public boolean isModified() {
-        return false;
+        return UsageTrackerManager.getOptIn() != enableUsageTrackerBox.isSelected();
     }
 
     @Override
     public void apply() throws ConfigurationException {
-
+        UsageTrackerManager.setOptIn(enableUsageTrackerBox.isSelected());
     }
 
     @Override
     public void reset() {
-
+        enableUsageTrackerBox.setSelected(UsageTrackerManager.getOptIn());
     }
 
     @Override
@@ -80,7 +80,9 @@ public class GctConfigurable implements SearchableConfigurable {
     }
 
     private JPanel creatUsageTrackerComponent() {
-        enableUsageTrackerBox = new JCheckBox("Would you like to help Google improve the Cloud Tools for IntelliJ plug-in?");
+        enableUsageTrackerBox = new JCheckBox(ENABLE_TRACKER_TEXT);
+        enableUsageTrackerBox.setSelected(UsageTrackerManager.getOptIn());
+
         JPanel usageTrackerGroup = new JPanel(new BorderLayout());
         usageTrackerGroup.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Usage Tracker"));
         usageTrackerGroup.add(enableUsageTrackerBox, BorderLayout.NORTH);
