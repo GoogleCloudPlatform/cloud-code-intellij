@@ -18,4 +18,11 @@ public class UsageTrackerManager {
         return PropertiesComponent.getInstance().getBoolean(USAGE_TRACKER_KEY, false);
     }
 
+    /**
+     * @return true if the user has opted in/out of usage tracking; false otherwise
+     */
+    public static boolean isTrackingConfigured() {
+        return PropertiesComponent.getInstance().getValue(USAGE_TRACKER_KEY) != null;
+    }
+
 }

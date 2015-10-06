@@ -25,6 +25,9 @@
   <idea-version since-build="107.105"/>
 
   <application-components>
+    <component>
+      <implementation-class>com.google.gct.login.stats.UsageTrackerLoader</implementation-class>
+    </component>
   </application-components>
 
   <project-components>
