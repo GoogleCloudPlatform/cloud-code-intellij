@@ -26,7 +26,6 @@ import com.intellij.openapi.actionSystem.TimerListener;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.actionSystem.ex.AnActionListener;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -94,13 +93,13 @@ public class CloudDebugHistoricalSnapshotsTest {
     try {
       snapshots = new CloudDebugHistoricalSnapshots(null);
       Assert.fail("allowed null handler");
-    } catch (IllegalArgumentException ex) {
+    } catch (NullPointerException ex) {
       Assert.assertNotNull(ex.getMessage());
     }
   }
 
   @Test
-  public void testOnBreakpointListChanged_notReally() {
+  public void testOnBreakpointListChanged_noChanges() {
     CloudDebugProcessState state = new CloudDebugProcessState();
     snapshots.onBreakpointListChanged(state);
 
@@ -138,11 +137,11 @@ public class CloudDebugHistoricalSnapshotsTest {
   }
 
   @Test
-  public void testOnBreakpointListChanged_2() throws InterruptedException {
+  public void testOnBreakpointListChanged_twoBreakPoints() throws InterruptedException {
     CloudDebugProcessState state = new CloudDebugProcessState();
 
     Breakpoint bp1 = new Breakpoint();
-    bp1.setId("an ID");
+    bp1.setId("bp1");
     bp1.setFinalTime("2015-08-22T05:23:34.123Z");
     bp1.setIsFinalState(true);
     SourceLocation location = new SourceLocation();
@@ -151,7 +150,7 @@ public class CloudDebugHistoricalSnapshotsTest {
     bp1.setLocation(location);
 
     Breakpoint bp2 = new Breakpoint();
-    bp2.setId("another ID");
+    bp2.setId("bp2");
     bp2.setFinalTime("2016-08-22T05:23:34.123Z");
     bp2.setIsFinalState(true);
     SourceLocation location2 = new SourceLocation();
@@ -159,7 +158,6 @@ public class CloudDebugHistoricalSnapshotsTest {
     location2.setLine(14);
     bp2.setLocation(location);
 
-    List<Breakpoint> breakpoints0 = new ArrayList<Breakpoint>();
     List<Breakpoint> breakpoints1 = new ArrayList<Breakpoint>();
     breakpoints1.add(bp1);
 
@@ -168,11 +166,12 @@ public class CloudDebugHistoricalSnapshotsTest {
     breakpoints2.add(bp2);
 
     Mockito.when(mockProcess.getCurrentBreakpointList()).thenReturn(breakpoints1, breakpoints2);
-    Mockito.when(mockProcess.getCurrentSnapshot()).thenReturn(bp1);
+    Mockito.when(mockProcess.getCurrentSnapshot()).thenReturn(bp1, bp2);
     CloudBreakpointHandler breakpointHandler = Mockito.mock(CloudBreakpointHandler.class);
     Mockito.when(mockProcess.getBreakpointHandler()).thenReturn(breakpointHandler);
 
     Assert.assertEquals(-1, snapshots.myTable.getSelectedRow());
+
     snapshots.onBreakpointListChanged(state);
 
     // wait for swing thread to run asynchronously; ugly and flaky;
@@ -180,13 +179,12 @@ public class CloudDebugHistoricalSnapshotsTest {
     Thread.sleep(1000);
     Assert.assertEquals(0, snapshots.myTable.getSelectedRow());
 
-    snapshots.myTable.getModel();
-
     snapshots.onBreakpointListChanged(state);
 
     // wait for swing thread to run asynchronously; ugly and flaky;
     // is there a better way?
     Thread.sleep(1000);
+
     Assert.assertEquals(1, snapshots.myTable.getSelectedRow());
   }
 

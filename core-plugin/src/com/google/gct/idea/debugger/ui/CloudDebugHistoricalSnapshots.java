@@ -15,9 +15,13 @@
  */
 package com.google.gct.idea.debugger.ui;
 
-import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.api.services.clouddebugger.model.Breakpoint;
-import com.google.gct.idea.debugger.*;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.gct.idea.debugger.BreakpointUtil;
+import com.google.gct.idea.debugger.CloudBreakpointListener;
+import com.google.gct.idea.debugger.CloudDebugProcess;
+import com.google.gct.idea.debugger.CloudDebugProcessHandler;
+import com.google.gct.idea.debugger.CloudDebugProcessState;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.diagnostic.logging.AdditionalTabComponent;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -43,19 +47,36 @@ import icons.GoogleCloudToolsIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.font.TextAttribute;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This panel shows a list of historical and pending snapshots. The user can navigate to them by double clicking on
@@ -78,6 +99,10 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
   public CloudDebugHistoricalSnapshots(@NotNull CloudDebugProcessHandler processHandler) {
     super(new BorderLayout());
+
+    if (processHandler == null) {
+      throw new NullPointerException("null CloudDebugProcessHandler");
+    }
 
     myTable = new JBTable() {
       //  Returning the Class of each column will allow different
@@ -288,7 +313,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   /**
-   * Deletes breakpoints asynchronously on a threadpool thread.  The user will see these breakpoints gradually disappear
+   * Deletes breakpoints asynchronously on a threadpool thread. The user will see these breakpoints gradually disappear.
    */
   private void fireDeleteBreakpoints(@NotNull final List<Breakpoint> breakpointsToDelete) {
     for (Breakpoint breakpoint : breakpointsToDelete) {
@@ -332,7 +357,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
    * breakpoint object -- because we never know when the server instance will get replaced.
    */
   private void onBreakpointsChanged() {
-    // Read the list of bps and show them.
+    // Read the list of breakpoints and show them.
     // We always snap the current breakpoint list into a local to eliminate threading issues.
     final List<Breakpoint> breakpointList = myProcess.getCurrentBreakpointList();
     int selection = -1;
@@ -340,8 +365,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     if (breakpointList != null) {
       for (int i = 0; i < breakpointList.size(); i++) {
         if (breakpointList.get(i).getFinalTime() == null) continue;
-        if (myProcess.getCurrentSnapshot() != null &&
-            breakpointList.get(i).getId().equals(myProcess.getCurrentSnapshot().getId())) {
+        Breakpoint snapshot = myProcess.getCurrentSnapshot();
+        if (snapshot != null && breakpointList.get(i).getId().equals(snapshot.getId())) {
           selection = i;
           break;
         }
@@ -356,7 +381,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       @Override
       public void run() {
         MyModel oldModel = getModel();
-        myTable.setModel(new MyModel(breakpointList, oldModel));
+        MyModel newModel = new MyModel(breakpointList, oldModel);
+        myTable.setModel(newModel);
         if (finalSelection != -1) {
           myTable.setRowSelectionInterval(finalSelection, finalSelection);
         }
@@ -367,8 +393,13 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
           if (bp.getIsFinalState() != Boolean.TRUE) {
             continue;
           }
-          if (getModel().isNewlyReceived(bp.getId())
-              && !oldModel.isNewlyReceived(bp.getId())) {
+          if (bp.getStatus().getIsError() == Boolean.TRUE) {
+            continue;
+          }
+          String id = bp.getId();
+          boolean newModelNewlyReceived = getModel().isNewlyReceived(id);
+          boolean oldModelNewlyReceived = oldModel.isNewlyReceived(id);
+          if (newModelNewlyReceived && !oldModelNewlyReceived) {
             rowForPopup = row;
           }
           break;
@@ -391,7 +422,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   /**
-   * Re-sizes the table to respect the contents of each column.
+   * Resizes the table to respect the contents of each column.
    */
   private void resizeColumnWidth() {
     final TableColumnModel columnModel = myTable.getColumnModel();
@@ -568,7 +599,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
           for (Breakpoint newBreakpoint : breakpoints) {
             //We loop through new breakpoints.
             //If a new breakpoint is in final state *and*
-            // the old model didnt know about that breakpoint as being final (and not new)
+            // the old model didn't know about that breakpoint as being final (and not new)
             // then we mark it.
             if (newBreakpoint.getIsFinalState() != Boolean.TRUE) {
               continue;
@@ -669,4 +700,5 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       return null;
     }
   }
+
 }
