@@ -1,0 +1,43 @@
+/**
+ * Script that replaces javac with javac2 by removing all actions in compileJava
+ * and drops in a single action that calls the javac2 ant task defined by JetBrains
+ */
+def javac2Lib = '../idea-IC/lib'
+
+configurations {
+    javac2
+}
+
+dependencies {
+    javac2 files(javac2Lib + '/javac2.jar')
+    javac2 files(javac2Lib + '/jdom.jar')
+    javac2 files(javac2Lib + '/asm.jar')
+    javac2 files(javac2Lib + '/asm-all.jar')
+    javac2 files(javac2Lib + '/asm-commons.jar')
+    javac2 files(javac2Lib + '/jgoodies-forms.jar')
+}
+
+// overwrite compileJava to use intellij javac2
+// https://grahamedgecombe.com/blog/2013/04/03/using-intellij-ideas-javac2-in-gradle
+// https://discuss.gradle.org/t/replacing-tasks-overwrite-true-does-not-work-in-1-5/2148/3
+compileJava {
+    actions = []
+    doLast {
+        project.sourceSets.main.output.classesDir.mkdirs()
+        ant.taskdef name: 'javac2', 
+                    classname: 'com.intellij.ant.Javac2', 
+                    classpath: configurations.javac2.asPath
+        ant.javac2 srcDir: project.sourceSets.main.java.srcDirs.join(':'),
+                   classpath: project.sourceSets.main.compileClasspath.asPath,
+                   destDir: project.sourceSets.main.output.classesDir,
+                   source: sourceCompatibility,
+                   target: targetCompatibility,
+                   includeAntRuntime: false
+                   /** other flags
+                    * optimize = "on/off"
+                    * deprecation = "on/off"
+                    * debugLevel = "something"
+                    * debug = "on/off"
+                    */
+    }
+}

@@ -1,3 +1,4 @@
+apply from: '../scripts/javac2.gradle'
 def ideaHome = '../idea-IC/'
 def pluginName = 'google-cloud-tools-core'
 
@@ -38,21 +39,10 @@ dependencies {
     testRuntime files(ideaHome + '/lib/trove4j.jar')
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs 'src', 'resources'
-        }
-        resources {
-            srcDir 'resources'
-        }
-    }
-    test {
-        java {
-            srcDirs 'testSrc'
-        }
-    }
-}
+// **replace** default sourceSets with idea layout
+sourceSets.main.java.srcDirs = ['src', 'resources']
+sourceSets.main.resources.srcDirs = ['resources']
+sourceSets.test.java.srcDirs = ['testSrc']
 
 test {
     testLogging {
