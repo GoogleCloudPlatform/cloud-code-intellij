@@ -25,17 +25,25 @@ import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 public class MethodParameterTypeInspectionTest extends EndpointTestBase {
 
   /**
-   * Tests that method parameters of types collections of arrays, arrays of collections,
-   * collections of collections and array of arrays cause MethodParameterTypeInspection errors.
-   * Also tests that method parameters of types byte arrays, primitive types, sets and maps do
-   * not cause MethodParameterTypeInspection error
+   * Tests that method parameters of arrays of arrays cause MethodParameterTypeInspection errors.
    */
-  public void ignore_testMultipleParameterTypes() {
+  public void testMultipleParameterTypesTwoDArray() {
     doTest();
   }
 
-  public void testThisClassTestsNothing() {
-    // purely to avoid a no tests warning until we fix the real test
+  // todo(elharo): seems non-functioning
+  public void fixme_testMultipleParameterTypesArrayOfLists() {
+    doTest();
+  }
+
+  // todo(elharo): seems non-functioning
+  public void fixme_testMultipleParameterTypesListOfArrays() {
+    doTest();
+  }
+
+  // todo(elharo): seems non-functioning
+  public void fixme_testMultipleParameterTypesListOfLists() {
+    doTest();
   }
 
   private void doTest() {

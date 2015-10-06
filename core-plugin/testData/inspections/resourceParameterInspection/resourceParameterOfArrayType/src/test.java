@@ -22,7 +22,7 @@ import java.util.List;
 
 @Api
 public class Foo {
-  public void aMethod(List<Boo> boo) {
+  public void aMethod(Boo[] boo) {
     // do nothing
   }
 

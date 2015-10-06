@@ -19,7 +19,6 @@ package com.google.gct.idea.appengine.validation;
 import com.google.gct.idea.appengine.GctConstants;
 import com.google.gct.idea.appengine.util.PsiUtils;
 
-import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.JavaPsiFacade;

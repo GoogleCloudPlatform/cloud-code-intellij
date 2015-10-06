@@ -20,11 +20,9 @@ import com.google.gct.login.GoogleLogin;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
-import com.intellij.openapi.util.IconLoader;
 import icons.GoogleLoginIcons;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import java.awt.Dimension;
 import java.awt.Image;

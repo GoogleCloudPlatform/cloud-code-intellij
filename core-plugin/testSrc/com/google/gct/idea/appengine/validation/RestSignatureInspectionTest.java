@@ -166,15 +166,49 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
     Assert.assertEquals("boo", path);
   }
 
-  public void ignore_testNonUniqueRestSignatures() {
+  public void testNonUniqueRestSignaturesPostBoo() {
     doTest();
   }
 
-  public void ignore_testNonUniqueSigWithPathNameSet() {
+  public void testNonUniqueRestSignaturesPostFunction2() {
     doTest();
   }
 
-  public void ignore_testMultipleConstructors() {
+  public void testNonUniqueRestSignaturesPutCollectionResponse() {
+    doTest();
+  }
+
+  public void testNonUniqueRestSignaturesGet1() {
+    doTest();
+  }
+
+  // todo(elharo): this one may be a bug; research
+  public void fixme_testNonUniqueRestSignaturesGetFoo() {
+    doTest();
+  }
+
+  // todo(elharo): this one may be a bug; research
+  public void fixme_testNonUniqueRestSignaturesGetFooCollection() {
+    doTest();
+  }
+
+  public void testNonUniqueRestSignaturesGetFunction1() {
+    doTest();
+  }
+
+  public void testNonUniqueRestSignaturesGetList2() {
+    doTest();
+  }
+
+  public void testNonUniqueRestSignaturesGetList3() {
+    doTest();
+  }
+
+  public void testNonUniqueSigWithPathNameSet() {
+    doTest();
+  }
+
+  public void testMultipleConstructors() {
     doTest();
   }
 
@@ -182,7 +216,8 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
     LocalInspectionTool localInspectionTool = new RestSignatureInspection();
     String testName = getTestName(true);
     myFixture.setTestDataPath(getTestDataPath());
-    myFixture.testInspection("inspections/restSignatureInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    LocalInspectionToolWrapper wrapper = new LocalInspectionToolWrapper(localInspectionTool);
+    myFixture.testInspection("inspections/restSignatureInspection/" + testName, wrapper);
   }
 
   private void initializePsiMethod(String methodName, String httpMethodValue, String pathValue) {

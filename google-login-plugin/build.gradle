@@ -1,14 +1,10 @@
-apply plugin: 'java'
-
 // see https://github.com/JetBrains/gradle-intellij-plugin
-
-repositories {
-    mavenCentral()
-}
 
 def ideaLib = '../idea-IC/lib/'
 
 dependencies {
+    compile project(':common-lib')
+
     compile files('lib/google.gdt.eclipse.login.common.jar')
     compile files('lib/google-gct-login-context-ij-pg.jar')
     compile files('lib/google-api-services-oauth2-v2-rev70-1.18.0-rc.jar')
@@ -28,16 +24,13 @@ dependencies {
     compile files(ideaLib + 'trove4j.jar')
     compile files(ideaLib + 'util.jar')
 
-    compile (
-        ['com.google.guava:guava:18.0'],
-        ['net.jcip:jcip-annotations:1.0'],
-        ['com.google.collections:google-collections:1.0'],
-        ['javax.servlet:servlet-api:2.5'],
-    )
-    testCompile (
-        ['junit:junit:4.+'],
-        ['org.mockito:mockito-all:1.9.5'],
-    )
+    compile 'com.google.guava:guava:18.0'
+    compile 'net.jcip:jcip-annotations:1.0'
+    compile 'com.google.collections:google-collections:1.0'
+    compile 'javax.servlet:servlet-api:2.5'
+
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.mockito:mockito-all:1.9.5'
 }
 
 sourceSets {
@@ -66,10 +59,17 @@ jar {
 }
 
 task plugin(type: Zip,  dependsOn: jar) {
+    // by default uses version = 1.0
     baseName = 'google-login'
     destinationDir = file('build')
     include '*.jar'
     from('build/libs') {
+        into('google-login/lib')
+    }
+    from('../common-lib/build/libs') {
+        into('google-login/lib')
+    }
+    from('../common-lib/lib') {
         into('google-login/lib')
     }
     from('lib/') {
@@ -82,14 +82,6 @@ task plugin(type: Zip,  dependsOn: jar) {
         into('google-login/lib')
     }
 }
-
-task loadIdea(type:Exec) {
-    workingDir '..'
-
-    commandLine './fetchIdea.sh'
-}
-
-compileJava.dependsOn("loadIdea")
 
 findbugs {
     ignoreFailures = true

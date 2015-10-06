@@ -24,12 +24,4 @@ public class Foo {
   public void function1(@Named String param) {
     // do nothing
   }
-
-  public void function2(@Named() String param) {
-    // do nothing
-  }
-
-  public void function3(@Named("") String param) {
-    // do nothing
-  }
 }
