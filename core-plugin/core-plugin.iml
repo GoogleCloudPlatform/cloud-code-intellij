@@ -65,5 +65,8 @@
     <orderEntry type="library" scope="PROVIDED" name="git4idea" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="gradle" level="project" />
     <orderEntry type="module" module-name="common-lib" />
+    <orderEntry type="library" name="properties" level="project" />
+    <orderEntry type="library" name="groovy-jps-plugin" level="project" />
+    <orderEntry type="library" name="idea-junit" level="project" />
   </component>
 </module>

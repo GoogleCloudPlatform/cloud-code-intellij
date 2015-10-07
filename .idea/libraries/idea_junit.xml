@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="idea-junit">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/idea-IC/plugins/junit/lib/idea-junit.jar!/" />
+      <root url="jar://$PROJECT_DIR$/idea-IC/plugins/junit/lib/junit-rt.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
