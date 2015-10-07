@@ -30,11 +30,16 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
+import com.intellij.openapi.ui.ComponentWithBrowseButton.BrowseFolderActionListener;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,11 +48,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.File;
+import java.util.ResourceBundle;
 
 /**
  * The dialog that prompts the user to download (git clone) from a GCP project
  */
 public class CloneGcpDialog extends DialogWrapper {
+
   private static final Logger LOG = Logger.getInstance(CloneGcpDialog.class);
   public static final String INVALID_FILENAME_CHARS = "[/\\\\?%*:|\"<>]";
 
@@ -57,12 +64,15 @@ public class CloneGcpDialog extends DialogWrapper {
   private TextFieldWithBrowseButton myParentDirectory;
   private JTextField myDirectoryName;
 
-  @NotNull private String myDefaultDirectoryName = "";
-  @NotNull private final Project myProject;
+  @NotNull
+  private String myDefaultDirectoryName = "";
+  @NotNull
+  private final Project myProject;
 
   public CloneGcpDialog(@NotNull Project project) {
     super(project, true);
     myProject = project;
+    $$$setupUI$$$();
     init();
     initComponents();
     setTitle(GctBundle.message("clonefromgcp.title"));
@@ -97,20 +107,20 @@ public class CloneGcpDialog extends DialogWrapper {
     fcd.setDescription(GctBundle.message("clonefromgcp.destination.directory.description"));
     fcd.setHideIgnored(false);
     myParentDirectory.addActionListener(
-      new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(), myParentDirectory,
-                                                                           myProject, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) {
-        @Override
-        protected VirtualFile getInitialFile() {
-          String text = getComponentText();
-          if (text.length() == 0) {
-            VirtualFile file = myProject.getBaseDir();
-            if (file != null) {
-              return file;
+        new BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(), myParentDirectory,
+            myProject, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) {
+          @Override
+          protected VirtualFile getInitialFile() {
+            String text = getComponentText();
+            if (text.length() == 0) {
+              VirtualFile file = myProject.getBaseDir();
+              if (file != null) {
+                return file;
+              }
             }
+            return super.getInitialFile();
           }
-          return super.getInitialFile();
         }
-      }
     );
 
     final DocumentListener updateOkButtonListener = new DocumentAdapter() {
@@ -150,8 +160,7 @@ public class CloneGcpDialog extends DialogWrapper {
       setErrorText(GctBundle.message("clonefromgcp.destination.exists.error", file));
       setOKActionEnabled(false);
       return;
-    }
-    else if (!file.getParentFile().exists()) {
+    } else if (!file.getParentFile().exists()) {
       setErrorText(GctBundle.message("clonefromgcp.parent.missing.error", file.getParent()));
       setOKActionEnabled(false);
       return;
@@ -175,7 +184,8 @@ public class CloneGcpDialog extends DialogWrapper {
     myRepositoryURL = new ProjectSelector();
     myRepositoryURL.setMinimumSize(new Dimension(300, 0));
     myRepositoryURL.getDocument().addDocumentListener(new DocumentAdapter() {
-      @SuppressWarnings("ConstantConditions") // This suppresses an invalid nullref warning for projectDescription.replaceAll.
+      @SuppressWarnings("ConstantConditions")
+      // This suppresses an invalid nullref warning for projectDescription.replaceAll.
       @Override
       protected void textChanged(DocumentEvent e) {
         if (myDefaultDirectoryName.equals(myDirectoryName.getText()) || myDirectoryName.getText().length() == 0) {
@@ -184,8 +194,7 @@ public class CloneGcpDialog extends DialogWrapper {
           if (!Strings.isNullOrEmpty(projectDescription)) {
             myDefaultDirectoryName = projectDescription.replaceAll(INVALID_FILENAME_CHARS, "");
             myDefaultDirectoryName = myDefaultDirectoryName.replaceAll("\\s", "");
-          }
-          else {
+          } else {
             myDefaultDirectoryName = "";
           }
 
@@ -204,6 +213,90 @@ public class CloneGcpDialog extends DialogWrapper {
 
   @Override
   protected JComponent createCenterPanel() {
+    return myRootPanel;
+  }
+
+  /**
+   * Method generated by IntelliJ IDEA GUI Designer >>> IMPORTANT!! <<< DO NOT edit this method OR call it in your code!
+   *
+   * @noinspection ALL
+   */
+  private void $$$setupUI$$$() {
+    createUIComponents();
+    myRootPanel = new JPanel();
+    myRootPanel.setLayout(new GridLayoutManager(4, 4, new Insets(0, 0, 0, 0), -1, -1));
+    final JLabel label1 = new JLabel();
+    this.$$$loadLabelText$$$(label1,
+        ResourceBundle.getBundle("messages/CloudToolsBundle").getString("clonefromgcp.projectid"));
+    myRootPanel.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
+        GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    final Spacer spacer1 = new Spacer();
+    myRootPanel.add(spacer1,
+        new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1,
+            GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+    final Spacer spacer2 = new Spacer();
+    myRootPanel.add(spacer2,
+        new GridConstraints(3, 1, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL,
+            GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+    final JLabel label2 = new JLabel();
+    this.$$$loadLabelText$$$(label2,
+        ResourceBundle.getBundle("com/intellij/dvcs/ui/DvcsBundle").getString("clone.parent.dir"));
+    myRootPanel.add(label2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
+        GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    myParentDirectory = new TextFieldWithBrowseButton();
+    myRootPanel.add(myParentDirectory,
+        new GridConstraints(1, 1, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL,
+            GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    final JLabel label3 = new JLabel();
+    this.$$$loadLabelText$$$(label3,
+        ResourceBundle.getBundle("com/intellij/dvcs/ui/DvcsBundle").getString("clone.dir.name"));
+    myRootPanel.add(label3, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
+        GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    myDirectoryName = new JTextField();
+    myRootPanel.add(myDirectoryName,
+        new GridConstraints(2, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL,
+            GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null,
+            0, false));
+    myRootPanel.add(myRepositoryURL,
+        new GridConstraints(0, 1, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH,
+            GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(200, -1), null,
+            null, 0, false));
+    label3.setLabelFor(myDirectoryName);
+  }
+
+  /**
+   * @noinspection ALL
+   */
+  private void $$$loadLabelText$$$(JLabel component, String text) {
+    StringBuffer result = new StringBuffer();
+    boolean haveMnemonic = false;
+    char mnemonic = '\0';
+    int mnemonicIndex = -1;
+    for (int i = 0; i < text.length(); i++) {
+      if (text.charAt(i) == '&') {
+        i++;
+        if (i == text.length()) {
+          break;
+        }
+        if (!haveMnemonic && text.charAt(i) != '&') {
+          haveMnemonic = true;
+          mnemonic = text.charAt(i);
+          mnemonicIndex = result.length();
+        }
+      }
+      result.append(text.charAt(i));
+    }
+    component.setText(result.toString());
+    if (haveMnemonic) {
+      component.setDisplayedMnemonic(mnemonic);
+      component.setDisplayedMnemonicIndex(mnemonicIndex);
+    }
+  }
+
+  /**
+   * @noinspection ALL
+   */
+  public JComponent $$$getRootComponent$$$() {
     return myRootPanel;
   }
 }
