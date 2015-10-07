@@ -100,10 +100,6 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   public CloudDebugHistoricalSnapshots(@NotNull CloudDebugProcessHandler processHandler) {
     super(new BorderLayout());
 
-    if (processHandler == null) {
-      throw new NullPointerException("null CloudDebugProcessHandler");
-    }
-
     myTable = new JBTable() {
       //  Returning the Class of each column will allow different
       //  renderers to be used based on Class

@@ -89,16 +89,6 @@ public class CloudDebugHistoricalSnapshotsTest {
   }
 
   @Test
-  public void testNullHandler() {
-    try {
-      snapshots = new CloudDebugHistoricalSnapshots(null);
-      Assert.fail("allowed null handler");
-    } catch (NullPointerException ex) {
-      Assert.assertNotNull(ex.getMessage());
-    }
-  }
-
-  @Test
   public void testOnBreakpointListChanged_noChanges() {
     CloudDebugProcessState state = new CloudDebugProcessState();
     snapshots.onBreakpointListChanged(state);
