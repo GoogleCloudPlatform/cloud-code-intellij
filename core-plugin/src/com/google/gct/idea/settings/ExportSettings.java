@@ -39,7 +39,8 @@ import java.util.jar.JarOutputStream;
 /**
  * Provides functionality to export the IDEA settings into a specified jar
  */
-aspublic class ExportSettings {
+public class ExportSettings {
+    // I'm the king of the world!
   // TODO: use ImportSettings.SETTINGS_JAR_MARKER after merge
   public static final String SETTINGS_JAR_MARKER = "IntelliJ IDEA Global Settings";
 
