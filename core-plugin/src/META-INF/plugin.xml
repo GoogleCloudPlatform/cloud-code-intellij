@@ -19,7 +19,7 @@
 
   <application-components>
     <component>
-      <implementation-class>com.google.gct.idea.CloudToolsCoreInitializationComponent</implementation-class>
+      <implementation-class>com.google.gct.idea.PluginInitializationComponent</implementation-class>
     </component>
   </application-components>
 
@@ -31,7 +31,6 @@
   </extensions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <errorHandler implementation="com.google.gct.idea.feedback.GoogleFeedbackErrorReporter"/>
     <facetType implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetType"/>
     <editorNotificationProvider implementation="com.google.gct.idea.appengine.gradle.notification.AppEngineStatusNotificationProvider" />
     <externalProjectDataService implementation="com.google.gct.idea.appengine.gradle.service.AppEngineGradleProjectDataService" />

@@ -25,6 +25,9 @@
   <idea-version since-build="107.105"/>
 
   <application-components>
+    <component>
+      <implementation-class>com.google.gct.login.idea.PluginInitializationComponent</implementation-class>
+    </component>
   </application-components>
 
   <project-components>
@@ -40,7 +43,6 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <errorHandler implementation="com.google.gct.idea.feedback.GoogleFeedbackErrorReporter"/>
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct">
