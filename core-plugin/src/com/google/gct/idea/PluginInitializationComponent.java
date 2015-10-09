@@ -16,7 +16,7 @@
 package com.google.gct.idea;
 
 import com.google.gct.idea.debugger.CloudDebugConfigType;
-import com.google.gct.idea.debugger.CloudDebugRunConfiguration;
+import com.google.gct.idea.feedback.FeedbackUtil;
 
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.openapi.components.ApplicationComponent;
@@ -28,7 +28,10 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Performs runtime initialization for the GCT plugin.
  */
-public class CloudToolsCoreInitializationComponent implements ApplicationComponent {
+public class PluginInitializationComponent implements ApplicationComponent {
+
+  private static final String PLUGIN_ID = "com.google.gct.core";
+
   @Override
   public void disposeComponent() {
 
@@ -37,7 +40,7 @@ public class CloudToolsCoreInitializationComponent implements ApplicationCompone
   @NotNull
   @Override
   public String getComponentName() {
-    return "CloudToolsCoreInitializationComponent";
+    return "GoogleCloudToolsCore.InitializationComponent";
   }
 
   @Override
@@ -47,6 +50,7 @@ public class CloudToolsCoreInitializationComponent implements ApplicationCompone
         enableCloudDebugger();
       }
     } else {
+      FeedbackUtil.enableGoogleFeedbackErrorReporting(PLUGIN_ID);
       enableCloudDebugger();
     }
   }
