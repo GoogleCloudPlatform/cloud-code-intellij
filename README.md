@@ -1,6 +1,6 @@
 ![Google Cloud Platform Logo](https://cloud.google.com/_static/images/gcp-logo.png)
 # Google Cloud Platform IntelliJ IDEA plugin 
-[![Build Status](https://magnum.travis-ci.com/GoogleCloudPlatform/gcloud-intellij.svg?token=uq9wg6yiUnTAekBpQKrR&branch=master)](https://magnum.travis-ci.com/GoogleCloudPlatform/gcloud-intellij)
+[![Build Status](https://travis-ci.org/GoogleCloudPlatform/gcloud-intellij.svg?branch=master)](https://travis-ci.org/GoogleCloudPlatform/gcloud-intellij)
 
 **Alpha. For development only. Documentation incomplete. You will encounter bugs.**
 
