@@ -23,11 +23,20 @@ import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
  * Tests for {@link MethodReturnTypeInspection},
  */
 public class MethodReturnTypeInspectionTest extends EndpointTestBase {
+
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+
+    myFixture.addClass("package java.util; public interface Collection {}");
+    myFixture.addClass("package java.util; public interface Set extends Collection {}");
+  }
+
   public void testMultipleReturnTypes() {
     doTest();
   }
 
-  public void fixme_testSetReturnType() {
+  public void testSetReturnType() {
     doTest();
   }
 
