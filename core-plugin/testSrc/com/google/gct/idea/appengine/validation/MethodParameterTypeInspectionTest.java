@@ -24,6 +24,14 @@ import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
  */
 public class MethodParameterTypeInspectionTest extends EndpointTestBase {
 
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+
+    myFixture.addClass("package java.util; public interface Collection {}");
+    myFixture.addClass("package java.util; public interface List extends Collection {}");
+  }
+
   /**
    * Tests that method parameters of arrays of arrays cause MethodParameterTypeInspection errors.
    */
@@ -31,18 +39,17 @@ public class MethodParameterTypeInspectionTest extends EndpointTestBase {
     doTest();
   }
 
-  // todo(elharo): seems non-functioning
-  public void fixme_testMultipleParameterTypesArrayOfLists() {
+  public void testMultipleParameterTypesArrayOfLists() {
     doTest();
   }
 
   // todo(elharo): seems non-functioning
-  public void fixme_testMultipleParameterTypesListOfArrays() {
+  public void testMultipleParameterTypesListOfArrays() {
     doTest();
   }
 
   // todo(elharo): seems non-functioning
-  public void fixme_testMultipleParameterTypesListOfLists() {
+  public void testMultipleParameterTypesListOfLists() {
     doTest();
   }
 
