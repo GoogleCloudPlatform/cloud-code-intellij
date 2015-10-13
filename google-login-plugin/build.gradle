@@ -90,3 +90,11 @@ pmd {
     sourceSets = [sourceSets.main]
 }
 
+processResources {
+    def trackerProperty =  System.getProperty("usageTrackerProperty");
+    if (trackerProperty) {
+        filter (org.apache.tools.ant.filters.ReplaceTokens, tokens: [
+                "usage.tracker.property": trackerProperty
+        ])
+    }
+}

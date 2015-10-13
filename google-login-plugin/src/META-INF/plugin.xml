@@ -43,14 +43,14 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
+    <applicationConfigurable provider="com.google.gct.login.stats.GoogleSettingsConfigurableProvider"/>
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct">
-    <!-- Temporarily disabling IJ usage tracking pending TOS/Legal approval -->
     <!-- For IJ Community Edition -->
-    <!--<login.usageTracker implementationClass="com.google.gct.login.stats.GoogleUsageTracker" key="Idea" />-->
+    <login.usageTracker implementationClass="com.google.gct.login.stats.GoogleUsageTracker" key="Idea" />
     <!-- For IJ Ultimate Edition -->
-    <!--<login.usageTracker implementationClass="com.google.gct.login.stats.GoogleUsageTracker" key="idea" />-->
+    <login.usageTracker implementationClass="com.google.gct.login.stats.GoogleUsageTracker" key="idea" />
   </extensions>
 
   <extensionPoints>
