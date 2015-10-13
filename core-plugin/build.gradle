@@ -46,7 +46,10 @@ sourceSets.test.java.srcDirs = ['testSrc']
 
 test {
     testLogging {
-        events "passed", "skipped", "failed", "standardOut", "standardError"
+        events "skipped", "failed"
+    }
+    doLast{
+       println "View report at file://$buildDir/reports/tests/index.html"
     }
 }
 
