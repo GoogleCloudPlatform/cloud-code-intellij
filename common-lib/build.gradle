@@ -11,7 +11,7 @@ def ideaHome = '../idea-IC/'
 dependencies {
     compile files('lib/GoogleFeedback.jar')
     compile fileTree(dir: ideaHome + '/lib')
-    compile "org.mockito:mockito-all:1.9.5"
+    compile files('third_party/mockito/mockito-all-1.9.5.jar')
 
     testCompile group: 'junit', name: 'junit', version: '4.11+'
 }
