@@ -36,6 +36,14 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
   private PsiMethod mockPsiMethod;
   private PsiClass mockPsiClass;
 
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+
+    myFixture.addClass("package java.util; public interface Collection {}");
+    myFixture.addClass("package java.util; public interface List extends Collection {}");
+  }
+
   public void testGetRestfulSignature() {
     initializePsiClass("\"\"", "\"\"");
     initializePsiMethod("methodName", "\"\"", "\"\"");
@@ -182,13 +190,11 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
     doTest();
   }
 
-  // todo(elharo): this one may be a bug; research
-  public void fixme_testNonUniqueRestSignaturesGetFoo() {
+  public void testNonUniqueRestSignaturesGetFoo() {
     doTest();
   }
 
-  // todo(elharo): this one may be a bug; research
-  public void fixme_testNonUniqueRestSignaturesGetFooCollection() {
+  public void testNonUniqueRestSignaturesGetFooCollection() {
     doTest();
   }
 
