@@ -164,9 +164,8 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
   }
 
   /**
-   * Returns true if the raw or base type of <code>psiParameter</code> is
-   * one of endpoint parameter type.
-   * @return
+   * @return true if the raw or base type of <code>psiType</code> is
+   * one of the endpoint parameter types.
    */
   public boolean isApiParameter(PsiType psiType, Project project) {
     PsiType baseType = psiType;
@@ -214,12 +213,13 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
   }
 
   /**
-   * Returns true if the raw or base type of <code>psiType</code> is
-   * one a entity(resource) type i.e. not of parameter type nor of entity type
-   * @return
+   * @return true if the raw or base type of <code>psiType</code> is
+   * an entity(resource) type; i.e. not of parameter type nor of entity type
    */
   public boolean isEntityParameter(PsiType psiType, Project project) {
-    if(!isApiParameter(psiType, project) && !isInjectedParameter(psiType, project)) {
+    boolean isApiParameter = isApiParameter(psiType, project);
+    boolean isInjectedParameter = isInjectedParameter(psiType, project);
+    if(!isApiParameter && !isInjectedParameter) {
       return true;
     } else {
       return false;

@@ -21,11 +21,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiInvalidElementAccessException;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiModifier;
-import com.intellij.psi.PsiModifierList;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * The base class for all endpoint inspections.
@@ -33,6 +28,11 @@ import org.jetbrains.annotations.NotNull;
 public class EndpointInspectionBase extends LocalInspectionTool {
   public static final Logger LOG =
     Logger.getInstance(EndpointInspectionBase.class);
+
+  @Override
+  public String getGroupDisplayName() {
+    return "Google Cloud Platform";
+  }
 
   public Project getProject(PsiElement element ) {
     Project project;

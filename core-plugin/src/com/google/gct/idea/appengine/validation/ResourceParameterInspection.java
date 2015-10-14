@@ -99,7 +99,7 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
           validateMethodParameters(aParameter, project);
         }
 
-        // Check that there is no more than one resource (entity) parameter for this methof
+        // Check that there is no more than one resource (entity) parameter for this method.
         if(resourceParameterCount > 1) {
           holder.registerProblem(method, "Multiple entity parameters. There can only be a single entity parameter per method.",
             LocalQuickFix.EMPTY_ARRAY);
@@ -107,7 +107,7 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
       }
 
       private void validateMethodParameters(PsiParameter psiParameter, Project project) {
-        // Check if parameter is of entity (resource) type which is not of parameter type or injected type
+        // Check if parameter is of entity (resource) type which is not of parameter type or injected type.
         PsiType type = psiParameter.getType();
         if(!isEntityParameter(type, project)) {
           return;
