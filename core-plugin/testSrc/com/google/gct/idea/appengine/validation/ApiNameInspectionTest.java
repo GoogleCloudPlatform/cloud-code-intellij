@@ -18,12 +18,17 @@ package com.google.gct.idea.appengine.validation;
 
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
-import junit.framework.Assert;
 
 /**
  * Tests for {@link ApiNameInspection}.
  */
 public class ApiNameInspectionTest extends EndpointTestBase {
+
+  public void testGetGroupDisplayName() {
+    LocalInspectionTool localInspectionTool = new ApiNameInspection();
+    assertEquals("Google Cloud Platform", localInspectionTool.getGroupDisplayName());
+  }
+
   /**
    *  Test to verify that when the API name attribute is an empty string,
    *  an ApiNameInspection error is not generated.
@@ -70,7 +75,7 @@ public class ApiNameInspectionTest extends EndpointTestBase {
    */
   public void testQuickFix_withValidApiName() {
     ApiNameInspection.MyQuickFix localQuickFix =  new ApiNameInspection().new MyQuickFix();
-    Assert.assertEquals("foo", localQuickFix.getNameSuggestions("foo"));
+    assertEquals("foo", localQuickFix.getNameSuggestions("foo"));
   }
 
   /**
@@ -79,9 +84,9 @@ public class ApiNameInspectionTest extends EndpointTestBase {
    */
   public void testQuickFix_withInvalidCharacters() {
     ApiNameInspection.MyQuickFix localQuickFix =  new ApiNameInspection().new MyQuickFix();
-    Assert.assertEquals("invalidcharacters", localQuickFix.getNameSuggestions("@invalid&characters#"));
-    Assert.assertEquals("invalidCharacters", localQuickFix.getNameSuggestions("@Invalid&()Characters#"));
-    Assert.assertEquals("invalidCharacters", localQuickFix.getNameSuggestions("@23Inval&*idChara(cters#"));
+    assertEquals("invalidcharacters", localQuickFix.getNameSuggestions("@invalid&characters#"));
+    assertEquals("invalidCharacters", localQuickFix.getNameSuggestions("@Invalid&()Characters#"));
+    assertEquals("invalidCharacters", localQuickFix.getNameSuggestions("@23Inval&*idChara(cters#"));
   }
   /**
    * Tests that {@link ApiNameInspection.MyQuickFix} provides the correct suggestion for an
@@ -89,9 +94,9 @@ public class ApiNameInspectionTest extends EndpointTestBase {
    */
   public void testQuickFix_withStartingDigits() {
     ApiNameInspection.MyQuickFix localQuickFix =  new ApiNameInspection().new MyQuickFix();
-    Assert.assertEquals("digit", localQuickFix.getNameSuggestions("1digit"));
-    Assert.assertEquals("digit", localQuickFix.getNameSuggestions("123digit"));
-    Assert.assertEquals("api12345", localQuickFix.getNameSuggestions("12345"));
+    assertEquals("digit", localQuickFix.getNameSuggestions("1digit"));
+    assertEquals("digit", localQuickFix.getNameSuggestions("123digit"));
+    assertEquals("api12345", localQuickFix.getNameSuggestions("12345"));
   }
 
   /**
@@ -100,8 +105,8 @@ public class ApiNameInspectionTest extends EndpointTestBase {
    */
   public void testQuickFix_withUppercaseLetters() {
     ApiNameInspection.MyQuickFix localQuickFix = new ApiNameInspection().new MyQuickFix();
-    Assert.assertEquals("foo", localQuickFix.getNameSuggestions("Foo"));
-    Assert.assertEquals("fOO", localQuickFix.getNameSuggestions("FOO"));
+    assertEquals("foo", localQuickFix.getNameSuggestions("Foo"));
+    assertEquals("fOO", localQuickFix.getNameSuggestions("FOO"));
   }
 
   private void doTest() {

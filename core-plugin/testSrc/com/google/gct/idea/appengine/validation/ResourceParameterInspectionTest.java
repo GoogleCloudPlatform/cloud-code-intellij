@@ -23,6 +23,14 @@ import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
  */
 public class ResourceParameterInspectionTest extends EndpointTestBase {
 
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+
+    myFixture.addClass("package java.util; public interface Collection {}");
+    myFixture.addClass("package java.util; public interface List extends Collection {}");
+  }
+
   /**
    * Tests that ResourceParameterInspection error is not generated for a method parameter
    * of parameter type.
@@ -83,6 +91,7 @@ public class ResourceParameterInspectionTest extends EndpointTestBase {
     String testName = getTestName(true);
     final String testDataPath = getTestDataPath();
     myFixture.setTestDataPath(testDataPath);
-    myFixture.testInspection("inspections/resourceParameterInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    LocalInspectionToolWrapper toolWrapper = new LocalInspectionToolWrapper(localInspectionTool);
+    myFixture.testInspection("inspections/resourceParameterInspection/" + testName, toolWrapper);
   }
 }
