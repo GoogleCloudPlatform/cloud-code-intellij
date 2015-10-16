@@ -30,8 +30,6 @@ dependencies {
     testCompile files(ideaHome + '/plugins/junit/lib/idea-junit.jar')
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
-    // todo(appu): Should we be using + values here? Will that lead to a mismatch with what intellij is configuring?
-    testCompile 'junit:junit:4.+'
     testCompile files('third_party/org-eclipse-jgit/org.eclipse.jgit-3.3.0.201403021825-r.jar')
     testCompile files('third_party/org-eclipse-jgit-junit/org.eclipse.jgit.junit-3.0.0.201306101825-r.jar')
     testCompile files('third_party/mockito/mockito-all-1.9.5.jar')
