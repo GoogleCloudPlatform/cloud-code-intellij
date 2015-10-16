@@ -28,7 +28,7 @@ dependencies {
     compile 'net.jcip:jcip-annotations:1.0'
     compile 'com.google.collections:google-collections:1.0'
 
-    testCompile 'junit:junit:4.+'
+    testCompile files(ideaLib + 'junit-4.11.jar')
     testCompile files('third_party/mockito/mockito-all-1.9.5.jar')
 }
 
