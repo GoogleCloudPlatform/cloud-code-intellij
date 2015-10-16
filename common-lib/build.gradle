@@ -7,11 +7,25 @@ repositories {
 }
 
 def ideaHome = '../idea-IC/'
+def ideaLib = ideaHome + 'lib/'
 
 dependencies {
     compile files('lib/GoogleFeedback.jar')
-    compile fileTree(dir: ideaHome + '/lib')
-    compile files('third_party/mockito/mockito-all-1.9.5.jar')
+    compile files(ideaLib + 'annotations.jar')
+    compile files(ideaLib + 'extensions.jar')
+    compile files(ideaLib + 'idea.jar')
+    compile files(ideaLib + 'openapi.jar')
+    compile files(ideaLib + 'picocontainer.jar')
+    compile files(ideaLib + 'resources_en.jar')
+    compile files(ideaLib + 'util.jar')
 
-    testCompile group: 'junit', name: 'junit', version: '4.11+'
+    // todo(elharo): install these in third_party
+    compile files(ideaLib + 'jdom.jar')
+
+    compile files('third_party/guava/guava-18.0.jar')
+
+    // todo(elharo): these two are only here for MockitoTestCase.
+    // Move that to testSrc and this becomes a testCompile dependency
+    compile files(ideaLib + 'junit-4.11.jar')
+    compile files('third_party/mockito/mockito-all-1.9.5.jar')
 }
