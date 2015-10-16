@@ -22,22 +22,22 @@ import com.google.gct.login.GoogleLogin;
 import com.google.gct.login.MockGoogleLogin;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.mock.MockProject;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.testFramework.LightIdeaTestCase;
 import com.intellij.util.AuthData;
 import git4idea.DialogManager;
-import git4idea.test.TestDialogHandler;
-import git4idea.test.TestDialogManager;
-import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
+import org.picocontainer.MutablePicoContainer;
 
 import java.util.LinkedHashMap;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link com.google.gct.idea.git.GcpHttpAuthDataProvider}
+ * Tests for {@link com.google.gct.idea.git.GcpHttpAuthDataProvider}.
  */
 public class GcpHttpAuthProviderTest extends LightIdeaTestCase {
   public static final String GOOGLE_URL = "https://source.developers.google.com";
@@ -45,32 +45,41 @@ public class GcpHttpAuthProviderTest extends LightIdeaTestCase {
   private static final String PASSWORD = "123";
   private static final String CACHE_KEY = "com.google.gct.idea.git.username";
 
-  @NotNull private TestDialogManager myDialogManager;
+  private TestDialogManager myDialogManager;
   private MockGoogleLogin myGoogleLogin;
   private boolean myDialogShown;
+  private MockProject myProject;
+  private DialogManager originalDialogManager;
 
   @Override
   protected final void setUp() throws Exception {
     super.setUp();
-    myDialogManager = (TestDialogManager)ServiceManager.getService(DialogManager.class);
+
+    originalDialogManager = ServiceManager.getService(DialogManager.class);
+
+    MutablePicoContainer container = registerDialogManager(TestDialogManager.class);
+    myProject = new MockProject(container, Mockito.mock(Disposable.class));
+
+    myDialogManager = (TestDialogManager) ServiceManager.getService(DialogManager.class);
 
     myGoogleLogin = new MockGoogleLogin();
     myGoogleLogin.install();
 
     GoogleLoginState googleLoginState = Mockito.mock(GoogleLoginState.class);
     CredentialedUser user = Mockito.mock(CredentialedUser.class);
-    LinkedHashMap<String, CredentialedUser> allusers = new LinkedHashMap();
+    LinkedHashMap<String, CredentialedUser> allUsers = new LinkedHashMap();
 
     when(user.getEmail()).thenReturn(USER);
     when(user.getGoogleLoginState()).thenReturn(googleLoginState);
     when(googleLoginState.fetchAccessToken()).thenReturn(PASSWORD);
-    when(GoogleLogin.getInstance().getAllUsers()).thenReturn(allusers);
-    allusers.put(USER, user);
+    when(GoogleLogin.getInstance().getAllUsers()).thenReturn(allUsers);
+    allUsers.put(USER, user);
 
-    PropertiesComponent.getInstance(ourProject).unsetValue(CACHE_KEY);
-    GcpHttpAuthDataProvider.setCurrentProject(ourProject);
+    PropertiesComponent.getInstance(myProject).unsetValue(CACHE_KEY);
+    GcpHttpAuthDataProvider.setCurrentProject(myProject);
 
     myDialogShown = false;
+
     myDialogManager.registerDialogHandler(SelectUserDialog.class, new TestDialogHandler<SelectUserDialog>() {
       @Override
       public int handleDialog(SelectUserDialog dialog) {
@@ -81,12 +90,20 @@ public class GcpHttpAuthProviderTest extends LightIdeaTestCase {
     });
   }
 
+  private MutablePicoContainer registerDialogManager(Class<? extends DialogManager> clazz) {
+    MutablePicoContainer container = (MutablePicoContainer) ApplicationManager.getApplication().getPicoContainer();
+    container.unregisterComponent(DialogManager.class.getName());
+    container.registerComponentImplementation(DialogManager.class.getName(), clazz);
+    return container;
+  }
+
   @Override
   protected final void tearDown() throws Exception {
     myGoogleLogin.cleanup();
-    PropertiesComponent.getInstance(ourProject).unsetValue(CACHE_KEY);
+    PropertiesComponent.getInstance(myProject).unsetValue(CACHE_KEY);
     GcpHttpAuthDataProvider.setCurrentProject(null);
     myDialogManager.cleanup();
+    registerDialogManager(originalDialogManager.getClass());
     super.tearDown();
   }
 
@@ -94,40 +111,42 @@ public class GcpHttpAuthProviderTest extends LightIdeaTestCase {
     GcpHttpAuthDataProvider authDataProvider = new GcpHttpAuthDataProvider();
     AuthData result = authDataProvider.getAuthData("http://someotherurl.myurl.com");
 
-    assertTrue(result == null);
+    assertNull(result);
   }
 
-  public void testForGcpPrompt() throws Exception {
+  public void testForGcpPrompt() {
     GcpHttpAuthDataProvider authDataProvider = new GcpHttpAuthDataProvider();
     AuthData result = authDataProvider.getAuthData(GOOGLE_URL);
 
     assertTrue(myDialogShown);
-    assertTrue(result.getLogin() == USER);
-    assertTrue(result.getPassword() == PASSWORD);
-    assertTrue(PropertiesComponent.getInstance(ourProject).getValue(CACHE_KEY) == USER);
+    assertEquals(USER, result.getLogin());
+    assertEquals(PASSWORD, result.getPassword());
+    assertEquals(USER, PropertiesComponent.getInstance(myProject).getValue(CACHE_KEY));
   }
 
-  public void testForCachedState() throws Exception {
-    PropertiesComponent.getInstance(ourProject).setValue(CACHE_KEY, USER);
+  public void testForCachedState() {
+    PropertiesComponent.getInstance(myProject).setValue(CACHE_KEY, USER);
 
     GcpHttpAuthDataProvider authDataProvider = new GcpHttpAuthDataProvider();
     AuthData result = authDataProvider.getAuthData(GOOGLE_URL);
 
-    assertTrue(!myDialogShown);
-    assertTrue(result.getLogin() == USER);
-    assertTrue(result.getPassword() == PASSWORD);
-    assertTrue(PropertiesComponent.getInstance(ourProject).getValue(CACHE_KEY) == USER);
+    assertFalse(myDialogShown);
+    assertEquals(USER, result.getLogin());
+    assertEquals(PASSWORD, result.getPassword());
+    assertEquals(USER, PropertiesComponent.getInstance(myProject).getValue(CACHE_KEY));
   }
 
-  public void testForInvalidCachedState() throws Exception {
-    PropertiesComponent.getInstance(ourProject).setValue(CACHE_KEY, "invalidusername");
+  public void testForInvalidCachedState() {
+    PropertiesComponent.getInstance(myProject).setValue(CACHE_KEY, "invalidusername");
 
     GcpHttpAuthDataProvider authDataProvider = new GcpHttpAuthDataProvider();
     AuthData result = authDataProvider.getAuthData(GOOGLE_URL);
 
     assertTrue(myDialogShown);
-    assertTrue(result.getLogin() == USER);
-    assertTrue(result.getPassword() == PASSWORD);
-    assertTrue(PropertiesComponent.getInstance(ourProject).getValue(CACHE_KEY) == USER);
+    assertEquals(USER, result.getLogin());
+    assertEquals(PASSWORD, result.getPassword());
+    assertEquals(USER, PropertiesComponent.getInstance(myProject).getValue(CACHE_KEY));
   }
+
 }
+
