@@ -4,7 +4,10 @@ apply from: '../scripts/javac2.gradle'
 def ideaLib = '../idea-IC/lib/'
 
 dependencies {
-    compile project(':common-lib')
+
+    compile(project(':common-lib')) {
+        transitive = false
+    }
 
     compile files('lib/google.gdt.eclipse.login.common.jar')
     compile files('lib/google-gct-login-context-ij-pg.jar')
@@ -12,21 +15,14 @@ dependencies {
     compile files('lib/google-http-client-jackson-1.18.0-rc.jar')
     compile fileTree(dir: 'third_party/repackaged', include: '*.jar')
     compile files(ideaLib + 'annotations.jar')
-    compile files(ideaLib + 'bootstrap.jar')
     compile files(ideaLib + 'extensions.jar')
     compile files(ideaLib + 'idea.jar')
-    compile files(ideaLib + 'idea_rt.jar')
-    compile files(ideaLib + 'jdom.jar')
-    compile files(ideaLib + 'log4j.jar')
     compile files(ideaLib + 'openapi.jar')
-    compile files(ideaLib + 'picocontainer.jar')
-    compile files(ideaLib + 'trove4j.jar')
     compile files(ideaLib + 'util.jar')
     compile files('third_party/javax-servlet-api/javax.servlet-api-3.0.1.jar')
 
     compile 'com.google.guava:guava:18.0'
     compile 'net.jcip:jcip-annotations:1.0'
-    compile 'com.google.collections:google-collections:1.0'
 
     testCompile files(ideaLib + 'junit-4.11.jar')
     testCompile files('third_party/mockito/mockito-all-1.9.5.jar')
