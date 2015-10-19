@@ -15,42 +15,34 @@
  */
 package com.google.gct.login;
 
-import junit.framework.TestCase;
-
-import java.io.*;
-
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * Tests for {@link GoogleLoginPrefs}
+ * Tests for {@link GoogleLoginPrefs}.
  */
-
-//public class GoogleLoginPrefsTest extends TestCase {
 public class GoogleLoginPrefsTest {
-  // The required permission for the preference file
-  private static final String PREFERENCE_FILE_PERMISSION = "-rw-r-----";
 
-  /**
-   * Tests that the Google Login credentials file is only accessible by the user.
-   */
-  // TODO: when upgraded to Java7, use java.nio.file.Files.getPosixFilePermissions
-  public void testPreferenceFileAccessibility() throws IOException {
-    String preferencesPath = GoogleLoginPrefs.getPreferencesPath();
-    File userRootDir = new File(System.getProperty("java.util.prefs.userRoot",
-      System.getProperty("user.home")), ".java/.userPrefs");
-    String absolutePrefPath = userRootDir.getAbsolutePath() + preferencesPath + "/prefs.xml";
+  private String oldPreferencesPath;
 
-    // Get the preference file's permissions
-    Process process = Runtime.getRuntime().exec("ls -al " + absolutePrefPath);
+  @Before
+  public void setUp() {
+    oldPreferencesPath = GoogleLoginPrefs.getPreferencesPath();
+    GoogleLoginPrefs.setPreferencesPath("/com/google/gct/login/test");
+  }
 
-    // Parse the output from the process
-    InputStream inputStream = process.getInputStream();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-    String line = reader.readLine();
-    inputStream.close();
-    String[] splitOutput = line.split(" ");
+  @After
+  public void tearDown() {
+    GoogleLoginPrefs.setPreferencesPath(oldPreferencesPath);
+  }
 
-    // Check the output
-    //assertTrue(splitOutput.length > 1);
-    //assertEquals(PREFERENCE_FILE_PERMISSION, splitOutput[0]);
+  @Test
+  public void testActiveUser() {
+    GoogleLoginPrefs.saveActiveUser("cheese");
+    Assert.assertEquals("cheese", GoogleLoginPrefs.getActiveUser());
+    GoogleLoginPrefs.removeActiveUser();
+    Assert.assertNull(GoogleLoginPrefs.getActiveUser());
   }
 }

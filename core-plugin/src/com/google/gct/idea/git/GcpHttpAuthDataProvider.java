@@ -15,12 +15,7 @@
  */
 package com.google.gct.idea.git;
 
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.source.Source;
-import com.google.api.services.source.model.ListReposResponse;
-import com.google.api.services.source.model.Repo;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.elysium.SelectUserDialog;
 import com.google.gct.idea.util.GctBundle;
@@ -44,13 +39,11 @@ import git4idea.repo.GitRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Window;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 /**
- * Provides credential information for urls pointing to Google's cloud source.
+ * Provides credential information for URLs pointing to Google's cloud source.
  */
 public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
   private static final Logger LOG = Logger.getInstance(GcpHttpAuthDataProvider.class);
