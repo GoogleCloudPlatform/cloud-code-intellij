@@ -16,6 +16,7 @@
 package com.google.gct.idea.debugger.ui;
 
 import com.google.api.services.clouddebugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.model.StatusMessage;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.debugger.BreakpointUtil;
 import com.google.gct.idea.debugger.CloudBreakpointListener;
@@ -389,8 +390,11 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
           if (bp.getIsFinalState() != Boolean.TRUE) {
             continue;
           }
-          if (bp.getStatus().getIsError() == Boolean.TRUE) {
-            continue;
+          StatusMessage status = bp.getStatus();
+          if (status != null) {
+            if (Boolean.TRUE.equals(status.getIsError())) {
+              continue;
+            }
           }
           String id = bp.getId();
           boolean newModelNewlyReceived = getModel().isNewlyReceived(id);
