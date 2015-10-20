@@ -17,9 +17,6 @@ package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.model.Breakpoint;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
 import com.google.gct.idea.debugger.ui.CloudDebugHistoricalSnapshots;
 import com.google.gct.idea.util.GctBundle;
@@ -31,7 +28,13 @@ import com.intellij.execution.ui.RunnerLayoutUi;
 import com.intellij.execution.ui.layout.LayoutAttractionPolicy;
 import com.intellij.execution.ui.layout.LayoutViewOptions;
 import com.intellij.execution.ui.layout.PlaceInGrid;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Anchor;
+import com.intellij.openapi.actionSystem.Constraints;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -55,7 +58,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -337,6 +340,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
     leftToolbar.remove(manager.getAction(IdeActions.ACTION_RERUN));
     leftToolbar.remove(manager.getAction(IdeActions.ACTION_STOP_PROGRAM));
+    leftToolbar.remove(manager.getAction(IdeActions.ACTION_CLOSE));
     leftToolbar.remove(manager.getAction(XDebuggerActions.RESUME));
     leftToolbar.remove(manager.getAction(XDebuggerActions.PAUSE));
     leftToolbar.remove(manager.getAction(XDebuggerActions.MUTE_BREAKPOINTS));
