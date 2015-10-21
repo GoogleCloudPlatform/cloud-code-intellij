@@ -1,19 +1,56 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.util.Lists;
+import com.intellij.debugger.ui.DebuggerContentInfo;
+import com.intellij.execution.ui.RunnerLayoutUi;
+import com.intellij.execution.ui.layout.LayoutStateDefaults;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.ui.content.Content;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.impl.actions.XDebuggerActions;
+import com.intellij.xdebugger.ui.XDebugTabLayouter;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
 
 public class CloudDebugProcessTest extends PlatformTestCase {
+
+    private CloudDebugProcess process;
+
+    @Before
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        XDebugSession session = Mockito.mock(XDebugSession.class);
+        Mockito.when(session.getProject()).thenReturn(this.getProject());
+        process = new CloudDebugProcess(session);
+    }
+
+    @Test
+    public void testRemoveConsolePane() {
+        XDebugTabLayouter layouter = process.createTabLayouter();
+        RunnerLayoutUi ui = Mockito.mock(RunnerLayoutUi.class);
+
+        Content console = Mockito.mock(Content.class);
+        Mockito.when(ui.findContent(DebuggerContentInfo.CONSOLE_CONTENT)).thenReturn(console);
+        ui.removeContent(console, false);
+        LayoutStateDefaults defaults = Mockito.mock(LayoutStateDefaults.class);
+        Mockito.when(ui.getDefaults()).thenReturn(defaults);
+
+        CloudDebugProcessState state = new CloudDebugProcessState(); //Mockito.mock(CloudDebugProcessState.class);
+        process.initialize(state);
+
+        layouter.registerAdditionalContent(ui);
+
+        Mockito.verify(ui, Mockito.atLeast(1)).removeContent(console, false);
+    }
 
     @Test
     public void testRegisterAdditionalActions_close() {
@@ -77,8 +114,6 @@ public class CloudDebugProcessTest extends PlatformTestCase {
 
     private void assertRemoveFromLeftToolbar(String actionId) {
         ActionManager manager = ActionManager.getInstance();
-        XDebugSession session = Mockito.mock(XDebugSession.class);
-        CloudDebugProcess process = new CloudDebugProcess(session);
         AnAction action = manager.getAction(actionId);
         List<AnAction> leftToolbarActions = Lists.newArrayList();
         leftToolbarActions.add(action);
@@ -99,8 +134,6 @@ public class CloudDebugProcessTest extends PlatformTestCase {
 
     private void assertRemoveFromTopToolbar(String actionId) {
         ActionManager manager = ActionManager.getInstance();
-        XDebugSession session = Mockito.mock(XDebugSession.class);
-        CloudDebugProcess process = new CloudDebugProcess(session);
         AnAction action = manager.getAction(actionId);
         List<AnAction> topToolbarActions = Lists.newArrayList();
         topToolbarActions.add(action);

@@ -95,8 +95,8 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
   @Override
   public boolean checkCanPerformCommands() {
-    Messages.showErrorDialog("The Cloud Debugger does not pause execution.  Therefore, this feature is unavailable.",
-                             "Not Supported");
+    Messages.showErrorDialog("The Cloud Debugger does not pause execution. Therefore, this feature is unavailable.",
+            "Not Supported");
     return false;
   }
 
@@ -110,16 +110,23 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       public void registerAdditionalContent(@NotNull RunnerLayoutUi layout) {
         layout.removeContent(layout.findContent(DebuggerContentInfo.WATCHES_CONTENT), false);
 
-        Content content = layout.findContent(DebuggerContentInfo.FRAME_CONTENT);
-        if (content != null) {
-          layout.removeContent(content, false);
-          layout.addContent(content, 0, PlaceInGrid.center, false);
+        // remove console since the cloud debugger doesn't use it
+        // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/141
+        Content consoleContent = layout.findContent(DebuggerContentInfo.CONSOLE_CONTENT);
+        if (consoleContent != null) {
+          layout.removeContent(consoleContent, false);
         }
 
-        content = layout.findContent(DebuggerContentInfo.VARIABLES_CONTENT);
-        if (content != null) {
-          layout.removeContent(content, false);
-          layout.addContent(content, 0, PlaceInGrid.right, false);
+        Content frameContent = layout.findContent(DebuggerContentInfo.FRAME_CONTENT);
+        if (frameContent != null) {
+          layout.removeContent(frameContent, false);
+          layout.addContent(frameContent, 0, PlaceInGrid.center, false);
+        }
+
+        Content variablesContent = layout.findContent(DebuggerContentInfo.VARIABLES_CONTENT);
+        if (variablesContent != null) {
+          layout.removeContent(variablesContent, false);
+          layout.addContent(variablesContent, 0, PlaceInGrid.right, false);
         }
 
         CloudDebugHistoricalSnapshots timeline = new CloudDebugHistoricalSnapshots(handler);
