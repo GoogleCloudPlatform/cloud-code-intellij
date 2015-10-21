@@ -17,9 +17,6 @@ package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.model.Breakpoint;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
 import com.google.gct.idea.debugger.ui.CloudDebugHistoricalSnapshots;
 import com.google.gct.idea.util.GctBundle;
@@ -31,7 +28,13 @@ import com.intellij.execution.ui.RunnerLayoutUi;
 import com.intellij.execution.ui.layout.LayoutAttractionPolicy;
 import com.intellij.execution.ui.layout.LayoutViewOptions;
 import com.intellij.execution.ui.layout.PlaceInGrid;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Anchor;
+import com.intellij.openapi.actionSystem.Constraints;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -55,7 +58,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -92,8 +95,8 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
   @Override
   public boolean checkCanPerformCommands() {
-    Messages.showErrorDialog("The Cloud Debugger does not pause execution.  Therefore, this feature is unavailable.",
-                             "Not Supported");
+    Messages.showErrorDialog("The Cloud Debugger does not pause execution. Therefore, this feature is unavailable.",
+            "Not Supported");
     return false;
   }
 
@@ -107,16 +110,23 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       public void registerAdditionalContent(@NotNull RunnerLayoutUi layout) {
         layout.removeContent(layout.findContent(DebuggerContentInfo.WATCHES_CONTENT), false);
 
-        Content content = layout.findContent(DebuggerContentInfo.FRAME_CONTENT);
-        if (content != null) {
-          layout.removeContent(content, false);
-          layout.addContent(content, 0, PlaceInGrid.center, false);
+        // remove console since the cloud debugger doesn't use it
+        // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/141
+        Content consoleContent = layout.findContent(DebuggerContentInfo.CONSOLE_CONTENT);
+        if (consoleContent != null) {
+          layout.removeContent(consoleContent, false);
         }
 
-        content = layout.findContent(DebuggerContentInfo.VARIABLES_CONTENT);
-        if (content != null) {
-          layout.removeContent(content, false);
-          layout.addContent(content, 0, PlaceInGrid.right, false);
+        Content frameContent = layout.findContent(DebuggerContentInfo.FRAME_CONTENT);
+        if (frameContent != null) {
+          layout.removeContent(frameContent, false);
+          layout.addContent(frameContent, 0, PlaceInGrid.center, false);
+        }
+
+        Content variablesContent = layout.findContent(DebuggerContentInfo.VARIABLES_CONTENT);
+        if (variablesContent != null) {
+          layout.removeContent(variablesContent, false);
+          layout.addContent(variablesContent, 0, PlaceInGrid.right, false);
         }
 
         CloudDebugHistoricalSnapshots timeline = new CloudDebugHistoricalSnapshots(handler);
@@ -337,6 +347,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
     leftToolbar.remove(manager.getAction(IdeActions.ACTION_RERUN));
     leftToolbar.remove(manager.getAction(IdeActions.ACTION_STOP_PROGRAM));
+    leftToolbar.remove(manager.getAction(IdeActions.ACTION_CLOSE));
     leftToolbar.remove(manager.getAction(XDebuggerActions.RESUME));
     leftToolbar.remove(manager.getAction(XDebuggerActions.PAUSE));
     leftToolbar.remove(manager.getAction(XDebuggerActions.MUTE_BREAKPOINTS));
