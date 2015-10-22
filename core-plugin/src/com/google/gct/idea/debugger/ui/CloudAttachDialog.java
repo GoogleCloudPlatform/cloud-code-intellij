@@ -25,8 +25,11 @@ import com.google.gct.idea.debugger.ProjectRepositoryState;
 import com.google.gct.idea.debugger.ProjectRepositoryValidator;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.stats.UsageTrackerService;
+
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.ApplicationManager;
@@ -156,6 +159,9 @@ public class CloudAttachDialog extends DialogWrapper {
   @Override
   protected void doOKAction() {
     if (getOKAction().isEnabled()) {
+      UsageTrackerService.getInstance()
+          .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "start.session", null);
+      // TODO : add source context tracking info
       if (mySyncStashCheckbox.isSelected()) {
         syncOrStash();
       }
@@ -582,5 +588,4 @@ public class CloudAttachDialog extends DialogWrapper {
       }
     }
   }
-
 }
