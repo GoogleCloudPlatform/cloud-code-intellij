@@ -21,7 +21,7 @@ import java.io.OutputStream;
 
 /**
  * The CloudDebugProcessHandler handles attach and detach actions. It also acts as the container of the process and
- * returns its outputstream.
+ * returns its output stream.
  */
 public class CloudDebugProcessHandler extends ProcessHandler {
   private final CloudDebugProcess myProcess;
@@ -43,6 +43,11 @@ public class CloudDebugProcessHandler extends ProcessHandler {
   @Override
   protected void detachProcessImpl() {
     notifyProcessDetached();
+  }
+
+  @Override
+  public boolean isSilentlyDestroyOnClose() {
+    return true;
   }
 
   public CloudDebugProcess getProcess() {
