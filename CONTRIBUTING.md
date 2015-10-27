@@ -71,12 +71,17 @@ in the Sourcepath tab of Project Structure > SDKs for the IntelliJ CE 141.1532 S
    existing code has tests. We're slowly fixing that, and contributions of tests
    for existing code are much appreciated.
 4. Make sure all existing tests pass. (gradlew test)
-5. Associate the change with an existing issue or file a new issue. 
+5. Associate the change with an existing issue or [file a new issue](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/new). 
 6. Create a pull request and send it to gcloud-intellij:master. 
 
 
 Unless otherwise noted, our source files are distributed under
 the Apache license found in the LICENSE file.
+
+A number of issues in the 
+[issue tracker](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/new)
+have been tagged as "[Help Wanted](https://github.com/GoogleCloudPlatform/gcloud-intellij/labels/help%20wanted)." 
+These are relatively small, self-contained changes that are good places to start. 
 
 ## FAQ
 
