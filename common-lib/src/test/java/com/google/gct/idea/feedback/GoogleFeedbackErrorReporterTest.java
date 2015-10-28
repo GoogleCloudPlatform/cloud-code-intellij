@@ -4,8 +4,6 @@ import static com.google.gct.idea.feedback.GoogleFeedbackErrorReporter.NONE_STRI
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.google.gct.idea.testing.MockitoTestCase;
-
 import com.intellij.errorreport.bean.ErrorBean;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationNamesInfo;
@@ -13,14 +11,17 @@ import com.intellij.openapi.application.ex.ApplicationInfoEx;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Map;
 
 /**
  * Test cases for {@link GoogleFeedbackErrorReporter}.
  */
-public class GoogleFeedbackErrorReporterTest extends MockitoTestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class GoogleFeedbackErrorReporterTest {
 
   private static final String TEST_MESSAGE = "Test message";
   private static final String LAST_ACTION = "last action";
