@@ -24,8 +24,6 @@ dependencies {
 
     compile files('third_party/guava/guava-18.0.jar')
 
-    // todo(elharo): these two are only here for MockitoTestCase.
-    // Move that to testSrc and this becomes a testCompile dependency
-    compile files(ideaLib + 'junit-4.11.jar')
-    compile files('third_party/mockito/mockito-all-1.9.5.jar')
+    testCompile files(ideaLib + 'junit-4.11.jar')
+    testCompile files('third_party/mockito/mockito-all-1.9.5.jar')
 }
