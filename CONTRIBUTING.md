@@ -28,7 +28,8 @@ Cloning into 'gcloud-intellij'...
 
 There are three modules: google-login-plugin, core-plugin, and common-lib.
 
-We use gradle as our build system. Gradle is self-installing. This one command
+On Linux/Mac OS X we use gradle as our build system. 
+Gradle is self-installing. This one command
 
 $ ./gradlew plugin
 
@@ -41,6 +42,15 @@ Other useful targets while developing include:
 * $ ./gradlew check: run static analysis tools
 * $ ./gradlew clean: remove all build artifacts
 
+Gradle builds fail on Windows due to reliance on the fetchIdea.sh shell script.
+This script simply downloads and installs IntelliJ IDEA code for building against
+and shouldn't be too hard to port to Windows. See 
+[Issue 167](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/167).
+As a quick workaround you can manually download and install the relevant 
+IDEA distribution and comment out the loadIdea task in 
+[build.gradle](https://github.com/GoogleCloudPlatform/gcloud-intellij/blob/master/build.gradle).
+
+On Windows you should be able to build the plugins inside IntelliJ as described below.
 
 ## Configuring and Debugging in IntelliJ
 
