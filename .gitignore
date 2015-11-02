@@ -7,9 +7,11 @@ common-lib/.gradle/
 common-lib/build/
 core-plugin/.gradle/
 core-plugin/build/
+core-plugin/core-plugin.zip
 google-login-plugin/.gradle/
 google-login-plugin/.idea/inspectionProfiles/
 google-login-plugin/build/
+google-login-plugin/google-login-plugin.zip
 idea-IC/
 .idea/gradle.xml
 .idea/codeStyleSettings.xml
