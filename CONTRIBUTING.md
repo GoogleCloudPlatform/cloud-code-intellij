@@ -50,7 +50,8 @@ As a quick workaround you can manually download and install the relevant
 IDEA distribution and comment out the loadIdea task in 
 [build.gradle](https://github.com/GoogleCloudPlatform/gcloud-intellij/blob/master/build.gradle).
 
-On Windows you should be able to build the plugins inside IntelliJ as described below.
+On Windows you should be able to build the plugins inside IntelliJ by
+selecting "Prepare All Plugin Modules For Deployment" from the Build menu.
 
 ## Configuring and Debugging in IntelliJ
 
@@ -63,7 +64,6 @@ Alternately you can select "Import  Project" from the IDEA opening screen and
 choose the root build.gradle file. In this case, IDE features for IDEA plugin
 development may not work; and run and debug configurations will not
 be available from within the IDE. However, you can run and debug unit tests.
-
 
 ### Optional:  Downloading source for IDEA to debug.
 
