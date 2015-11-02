@@ -24,6 +24,8 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
     compile 'net.jcip:jcip-annotations:1.0'
 
+    runtime files('third_party/jackson-core-asl/jackson-core-asl-1.9.11.jar')
+
     testCompile files(ideaLib + 'junit-4.11.jar')
     testCompile files('third_party/mockito/mockito-all-1.9.5.jar')
 }
@@ -63,6 +65,9 @@ task plugin(type: Zip,  dependsOn: jar) {
         into('google-login/lib')
     }
     from('third_party/javax-servlet-api') {
+        into('google-login/lib')
+    }
+    from('third_party/jackson-core-asl') {
         into('google-login/lib')
     }
 }
