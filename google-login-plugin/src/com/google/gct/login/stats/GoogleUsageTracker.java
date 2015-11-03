@@ -103,10 +103,10 @@ public class GoogleUsageTracker implements UsageTracker {
                     CloseableHttpResponse response = client.execute(request);
                     StatusLine status = response.getStatusLine();
                     if (status.getStatusCode() >= 300) {
-                        GoogleUsageTracker.LOG.debug("Non 200 status code : " + status.getStatusCode() + " - " + status.getReasonPhrase());
+                        LOG.debug("Non 200 status code : " + status.getStatusCode() + " - " + status.getReasonPhrase());
                     }
                 } catch (IOException ex) {
-                    GoogleUsageTracker.LOG.debug("IOException during Analytics Ping", new Object[]{ex.getMessage()});
+                    LOG.debug("IOException during Analytics Ping", new Object[]{ex.getMessage()});
                 } finally {
                     HttpClientUtils.closeQuietly(client);
                 }
