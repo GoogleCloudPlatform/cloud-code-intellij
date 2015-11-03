@@ -1,36 +1,42 @@
 
-plugins {
-    id 'net.researchgate.release' version '2.3.4'
-}
-
-apply plugin: 'base'
-
-task loadIdea(type:Exec) {
-    commandLine './fetchIdea.sh'
+buildscript {
+    repositories {
+        maven { url 'http://repo.spring.io/plugins-release' }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+        classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.0.29'
+    }
 }
 
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'findbugs'
-    apply plugin: 'pmd'
-    apply plugin: 'jdepend'
-    group = 'com.google.gct'
-    version = '0.9-alpha.1-SNAPSHOT'
-
     repositories {
         mavenCentral()
     }
 
-    dependencies {
-        compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.+'
-        compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
-        testCompile group: 'junit', name: 'junit', version: '4.+'
-        testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+    apply plugin: 'propdeps'
+    apply plugin: 'propdeps-idea'
+
+    apply plugin: 'java'
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    group = 'com.google.gct'
+    version = '0.9-alpha.1-SNAPSHOT'
+
+    apply plugin: 'org.jetbrains.intellij'
+    intellij {
+        version = ideaVersion
+        downloadSources = true
+        sandboxDirectory = "${rootProject.buildDir}/idea-sandbox"
     }
 
-    compileJava.dependsOn ':loadIdea'
-    sourceCompatibility = 1.6
-    targetCompatibility = 1.6
+    dependencies {
+        compile 'com.google.guava:guava:18.0'
+
+        testCompile 'junit:junit:4.+'
+        testCompile 'org.mockito:mockito-all:1.9.5'
+    }
 
     processResources {
         filesMatching("**/plugin.xml") {
@@ -38,46 +44,29 @@ subprojects {
         }
     }
 
-}
+    apply plugin: 'findbugs'
+    findbugs {
+        ignoreFailures = true
+        sourceSets = [sourceSets.main]
+        effort = "max"
+    }
 
-
-// Configuration to package IDEA with our plugins pre-installed in 
-// the root project build directory
-
-ext.devBuildDir = "${buildDir}/idea-IC-gcloud"
-ext.devConfigDir = "${buildDir}/idea-IC-gcloud-config"
-
-task devBuild(type:Copy) {
-    dependsOn cleanDevBuild
-    from ('idea-IC') 
-    into project.devBuildDir
-    doLast {
-        def ideaConfigFile = new File(devBuildDir, 'bin/idea.properties')
-        assert ideaConfigFile.exists()
-        ideaConfigFile.withWriterAppend('UTF-8') { writer ->
-            writer.writeLine('\n# CHANGES FOR TEST BUILDS OF PLUGIN');
-            writer.writeLine("idea.config.path=${devConfigDir}/config");
-            writer.writeLine("idea.system.path=${devConfigDir}/system");
-            writer.writeLine('idea.plugins.path=${idea.config.path}/plugins');
-            writer.writeLine('idea.log.path=${idea.system.path}/log');
-        }
-        def jvmConfigFile = new File(devBuildDir, 'bin/idea64.vmoptions')
-        assert jvmConfigFile.exists()
-        jvmConfigFile.withWriterAppend('UTF-8') { writer ->
-          writer.writeLine('-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005');
+    tasks.withType(FindBugs) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
         }
     }
+
+    apply plugin: 'pmd'
+    pmd {
+        ignoreFailures = true
+        sourceSets = [sourceSets.main]
+    }
+
+    apply plugin: 'jdepend'
 }
 
-subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty("plugin") && (project.plugin instanceof Zip)) {
-            rootProject.devBuild {
-                dependsOn project.plugin
-                from (zipTree(project.plugin.archivePath)) {
-                    into 'plugins'
-                }
-            }
-        }
-    }
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

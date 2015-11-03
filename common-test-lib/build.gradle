@@ -1,10 +1,4 @@
-apply plugin: 'java'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    compile files('third_party/junit/junit-4.11.jar')
-    compile files('third_party/mockito/mockito-all-1.9.5.jar')
+    compile 'junit:junit:4.+'
+    compile 'org.mockito:mockito-all:1.9.5'
 }

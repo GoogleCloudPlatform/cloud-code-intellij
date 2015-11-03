@@ -1,84 +1,30 @@
-// see https://github.com/JetBrains/gradle-intellij-plugin
+// Use IntelliJ src structure for now
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.main.resources.srcDirs = ['resources']
+sourceSets.test.java.srcDirs = ['testSrc']
+sourceSets.test.resources.srcDirs = ['testResources']
 
-apply from: '../scripts/javac2.gradle'
-def ideaLib = '../idea-IC/lib/'
+intellij {
+    pluginName = 'google-account'
+}
 
 dependencies {
-
     compile(project(':common-lib')) {
         transitive = false
     }
 
     compile files('lib/google.gdt.eclipse.login.common.jar')
     compile files('lib/google-gct-login-context-ij-pg.jar')
-    compile files('lib/google-api-services-oauth2-v2-rev70-1.18.0-rc.jar')
-    compile files('lib/google-http-client-jackson-1.18.0-rc.jar')
     compile fileTree(dir: 'third_party/repackaged', include: '*.jar')
-    compile files(ideaLib + 'annotations.jar')
-    compile files(ideaLib + 'extensions.jar')
-    compile files(ideaLib + 'idea.jar')
-    compile files(ideaLib + 'openapi.jar')
-    compile files(ideaLib + 'util.jar')
-    compile files('third_party/javax-servlet-api/javax.servlet-api-3.0.1.jar')
 
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.apis:google-api-services-oauth2:v2-rev70-1.18.0-rc'
+    compile 'com.google.http-client:google-http-client-jackson:1.18.0-rc'
+    compile 'javax.servlet:javax.servlet-api:3.0.1'
     compile 'net.jcip:jcip-annotations:1.0'
+    runtime 'org.codehaus.jackson:jackson-core-asl:1.9.11'
 
-    runtime files('third_party/jackson-core-asl/jackson-core-asl-1.9.11.jar')
-
-    testCompile files(ideaLib + 'junit-4.11.jar')
-    testCompile files('third_party/mockito/mockito-all-1.9.5.jar')
-}
-
-// **replace** default sourceSets with idea layout
-sourceSets.main.java.srcDirs = ['src', 'resources']
-sourceSets.main.resources.srcDirs = ['resources']
-sourceSets.test.java.srcDirs = ['testSrc']
-
-task plugin(type: Zip,  dependsOn: jar) {
-    // by default uses version = 1.0
-    baseName = 'google-account'
-    destinationDir = file('build')
-    include '*.jar'
-    from('build/libs') {
-        into('google-account/lib')
-    }
-    from('../common-lib/build/libs') {
-        into('google-account/lib')
-    }
-    from('../common-lib/lib') {
-        into('google-account/lib')
-    }
-    from('lib/') {
-        into('google-account/lib')
-    }
-    from('third_party/repackaged') {
-        into('google-account/lib')
-    }
-    from('third_party/javax-servlet-api') {
-        into('google-account/lib')
-    }
-    from('third_party/jackson-core-asl') {
-        into('google-account/lib')
-    }
-}
-
-findbugs {
-    ignoreFailures = true
-    sourceSets = [sourceSets.main]
-    effort = "max"
-}
-
-tasks.withType(FindBugs) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-}
-
-pmd {
-    ignoreFailures = true
-    sourceSets = [sourceSets.main]
+    testCompile 'xalan:serializer:2.7.1'
+    testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 }
 
 processResources {

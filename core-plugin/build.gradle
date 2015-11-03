@@ -1,63 +1,44 @@
-apply from: '../scripts/javac2.gradle'
-def ideaHome = '../idea-IC/'
-def pluginName = 'google-cloud-tools-core'
+// Use IntelliJ src structure for now
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.main.resources.srcDirs = ['resources']
+sourceSets.test.java.srcDirs = ['testSrc']
+sourceSets.test.resources.srcDirs = ['testResources']
+
+intellij {
+    pluginName = 'google-cloud-tools-core'
+    plugins 'Groovy','gradle', 'git4idea', 'properties', 'junit'
+}
+
+project.afterEvaluate {
+    project.tasks.getByPath(':core-plugin:prepareSandbox').dependsOn ':google-account-plugin:prepareSandbox'
+    project.configurations.provided.each {
+        intellij.intellijFiles.add(it)
+    }
+}
 
 dependencies {
-    compile(project(':google-account-plugin')) {
+    provided(project(':google-account-plugin')) {
         transitive = false
     }
     compile(project(':common-lib')) {
         transitive = false
     }
 
-    compile files('lib/google-api-services-clouddebugger-v2-rev4-1.20.0.jar')
-    compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
-    compile files('lib/google-api-services-source.jar')
-    compile files(ideaHome + '/plugins/git4idea/lib/git4idea.jar')
-    compile files(ideaHome + '/lib/annotations.jar')
-    compile files(ideaHome + '/lib/bootstrap.jar')
-    compile files(ideaHome + '/lib/extensions.jar')
-    compile files(ideaHome + '/lib/forms_rt.jar')
-    compile files(ideaHome + '/lib/jdom.jar')
-    compile files(ideaHome + '/lib/idea.jar')
-    compile files(ideaHome + '/lib/openapi.jar')
-    compile files(ideaHome + '/lib/util.jar')
-    compile fileTree(dir: ideaHome + '/plugins/Groovy/lib')
-    compile fileTree(dir: ideaHome + '/plugins/gradle/lib')
-    compile files('../google-account-plugin/lib/google.gdt.eclipse.login.common.jar')
-    compile files('../google-account-plugin/third_party/repackaged/google-api-java-client-min-repackaged-1.20.0.jar')
-
     compile 'com.google.appengine:gradle-appengine-builder-model:0.1.0'
     compile 'org.eclipse.jgit:org.eclipse.jgit:3.3.0.201403021825-r'
     // todo(elharo): we shouldn't need Apache commons; Guava will suffice
     compile 'commons-io:commons-io:2.4'
+    provided files('../google-account-plugin/lib/google.gdt.eclipse.login.common.jar')
+    provided files('../google-account-plugin/third_party/repackaged/google-api-java-client-min-repackaged-1.20.0.jar')
+    compile files('lib/google-api-services-clouddebugger-v2-rev4-1.20.0.jar')
+    compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
+    compile files('lib/google-api-services-source.jar')
 
-    testCompile files(ideaHome + '/lib/picocontainer.jar')
-    testCompile files(ideaHome + '/lib/trove4j.jar')
-    testCompile files('third_party/jackson-core-asl/jackson-core-asl-1.9.11.jar')
-    testCompile files(ideaHome + '/plugins/git4idea/lib/remote-servers-git.jar')
-    testCompile files(ideaHome + '/plugins/git4idea/lib/resources_en.jar')
-    testCompile files(ideaHome + '/plugins/properties/lib/properties.jar')
-    testCompile files(ideaHome + '/plugins/gradle/lib/gradle-tooling-api-2.2.jar')
-    testCompile files(ideaHome + '/plugins/junit/lib/idea-junit.jar')
-    testCompile files("${System.properties['java.home']}/../lib/tools.jar")
-
-    testCompile files('third_party/org-eclipse-jgit/org.eclipse.jgit-3.3.0.201403021825-r.jar')
-    testCompile files('third_party/org-eclipse-jgit-junit/org.eclipse.jgit.junit-3.0.0.201306101825-r.jar')
-    testCompile files('third_party/mockito/mockito-all-1.9.5.jar')
-
-    testRuntime files('../google-account-plugin/lib/google-api-services-oauth2-v2-rev70-1.18.0-rc.jar')
-    testRuntime files('../google-account-plugin/lib/google-http-client-jackson-1.18.0-rc.jar')
+    testCompile 'org.eclipse.jgit:org.eclipse.jgit.junit:3.3.0.201403021825-r'
+    testRuntime 'com.google.apis:google-api-services-oauth2:v2-rev70-1.18.0-rc'
+    testRuntime 'com.google.http-client:google-http-client-jackson:1.18.0-rc'
     testRuntime files('../google-account-plugin/lib/google-gct-login-context-ij-pg.jar')
-    testRuntime files(ideaHome + '/lib/log4j.jar')
-    testRuntime files(ideaHome + '/lib/idea_rt.jar')
-    testRuntime fileTree(dir: ideaHome + '/lib', include: '*.jar')
 }
-
-// **replace** default sourceSets with idea layout
-sourceSets.main.java.srcDirs = ['src', 'resources']
-sourceSets.main.resources.srcDirs = ['resources']
-sourceSets.test.java.srcDirs = ['testSrc']
 
 test {
     testLogging {
@@ -68,41 +49,3 @@ test {
     }
 }
 
-task plugin(type: Zip,  dependsOn: jar) {
-    baseName = pluginName
-    destinationDir = file('build')
-    include '*.jar'
-    from('build/libs') {
-        into(pluginName + '/lib')
-    }
-    from('../common-lib/build/libs') {
-        into(pluginName + '/lib')
-    }
-    from('../common-lib/lib') {
-        into(pluginName + '/lib')
-    }
-    from('lib/') {
-        into(pluginName + '/lib')
-    }
-    from('third_party/gradle-appengine-builder-model') {
-        into(pluginName + '/lib')
-    }
-}
-
-findbugs {
-    ignoreFailures = true
-    sourceSets = [sourceSets.main]
-    effort = "max"
-}
-
-tasks.withType(FindBugs) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-}
-
-pmd {
-    ignoreFailures = true
-    sourceSets = [sourceSets.main]
-}
