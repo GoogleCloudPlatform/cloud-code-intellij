@@ -22,6 +22,7 @@ import com.google.gct.idea.debugger.ui.CloudDebugHistoricalSnapshots;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.debugger.ui.DebuggerContentInfo;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
+import com.intellij.execution.ExecutionBundle;
 import com.intellij.execution.configurations.RunProfile;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.ui.RunnerLayoutUi;
@@ -288,10 +289,10 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     myCurrentSnapshot = target;
     if (!getXDebugSession().isStopped()) {
       getXDebugSession().positionReached(new MySuspendContext(
-          new CloudExecutionStack(getXDebugSession().getProject(),
-              GctBundle.getString("clouddebug.stackat", df.format(snapshotTime)),
-              target.getStackFrames(), target.getVariableTable(),
-              target.getEvaluatedExpressions())));
+              new CloudExecutionStack(getXDebugSession().getProject(),
+                      GctBundle.getString("clouddebug.stackat", df.format(snapshotTime)),
+                      target.getStackFrames(), target.getVariableTable(),
+                      target.getEvaluatedExpressions())));
     }
   }
 
@@ -347,7 +348,17 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
     leftToolbar.remove(manager.getAction(IdeActions.ACTION_RERUN));
     leftToolbar.remove(manager.getAction(IdeActions.ACTION_STOP_PROGRAM));
-    leftToolbar.remove(manager.getAction(IdeActions.ACTION_CLOSE));
+
+    // XDebugSessionTab puts this action second from end.
+    AnAction[] actions = leftToolbar.getChildActionsOrStubs();
+    for (AnAction action : actions) {
+      String text = action.getTemplatePresentation().getText();
+      if (ExecutionBundle.message("close.tab.action.name").equals(text)) {
+        leftToolbar.remove(action);
+        break;
+      }
+    }
+
     leftToolbar.remove(manager.getAction(XDebuggerActions.RESUME));
     leftToolbar.remove(manager.getAction(XDebuggerActions.PAUSE));
     leftToolbar.remove(manager.getAction(XDebuggerActions.MUTE_BREAKPOINTS));

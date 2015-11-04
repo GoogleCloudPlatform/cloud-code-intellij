@@ -54,7 +54,25 @@ public class CloudDebugProcessTest extends PlatformTestCase {
 
     @Test
     public void testRegisterAdditionalActions_close() {
-        assertRemoveFromLeftToolbar(IdeActions.ACTION_CLOSE);
+        ActionManager manager = ActionManager.getInstance();
+        AnAction action0 = manager.getAction(IdeActions.ACTION_PIN_ACTIVE_TAB);
+        AnAction action1 = manager.getAction(IdeActions.ACTION_CLOSE);
+        action1.getTemplatePresentation().setText("Close");
+        AnAction action2 = manager.getAction(IdeActions.ACTION_CONTEXT_HELP);
+        List<AnAction> leftToolbarActions = Lists.newArrayList();
+        leftToolbarActions.add(action0);
+        leftToolbarActions.add(action1);
+        leftToolbarActions.add(action2);
+        DefaultActionGroup leftToolbar = new DefaultActionGroup(leftToolbarActions);
+        List actions = Lists.newArrayList();
+        DefaultActionGroup topToolbar = new DefaultActionGroup(actions);
+        DefaultActionGroup settings = new DefaultActionGroup(actions);
+
+        process.registerAdditionalActions(leftToolbar, topToolbar, settings);
+
+        assertEquals(3, leftToolbar.getChildrenCount());
+        assertEquals(action0, leftToolbar.getChildActionsOrStubs()[0]);
+        assertEquals(action2, leftToolbar.getChildActionsOrStubs()[1]);
     }
 
     @Test
