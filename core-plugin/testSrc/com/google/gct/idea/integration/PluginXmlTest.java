@@ -15,7 +15,7 @@ public class PluginXmlTest {
     @Test
     public void testWellFormed() throws SAXException, IOException {
         XMLReader reader = XMLReaderFactory.createXMLReader();
-        reader.parse("src/META-INF/plugin.xml");
+        reader.parse("resources/META-INF/plugin.xml");
         // throws exception if file is malformed
     }
 
