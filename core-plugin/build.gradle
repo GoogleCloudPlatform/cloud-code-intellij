@@ -67,15 +67,6 @@ test {
     }
 }
 
-// because plugin.xml doesn't live in resources
-jar {
-    baseName = pluginName
-    version = ''
-    from ('./src') {
-        include 'META-INF/plugin.xml'
-    }
-}
-
 task plugin(type: Zip,  dependsOn: jar) {
     baseName = pluginName
     destinationDir = file('build')
