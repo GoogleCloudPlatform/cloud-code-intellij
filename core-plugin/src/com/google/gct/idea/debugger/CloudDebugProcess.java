@@ -23,7 +23,7 @@ import com.google.gct.idea.debugger.ui.ExitDialog;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
-import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.stats.UsageTrackerProvider;
 
 import com.intellij.debugger.ui.DebuggerContentInfo;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
@@ -478,7 +478,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       exitDialog.showAndGetOk();
       ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM).actionPerformed(event);
       ActionManager.getInstance().getAction(IdeActions.ACTION_CLOSE).actionPerformed(event);
-      UsageTrackerService.getInstance()
+      UsageTrackerProvider.getInstance()
           .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "stop.session", null);
     }
 

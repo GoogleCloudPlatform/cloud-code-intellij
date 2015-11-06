@@ -2,8 +2,8 @@ package com.google.gct.login.idea;
 
 import com.google.gct.idea.feedback.FeedbackUtil;
 
-import com.google.gct.login.stats.UsageTrackerManager;
-import com.google.gct.login.stats.UsageTrackerNotification;
+import com.google.gct.stats.UsageTrackerManager;
+import com.google.gct.stats.UsageTrackerNotification;
 import com.google.gct.login.util.TrackerMessageBundle;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationsConfiguration;

@@ -20,7 +20,7 @@ import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.stats.UsageTrackerProvider;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationListener;
@@ -111,7 +111,7 @@ public class UploadSourceAction extends DumbAwareAction {
 
   @Override
   public void actionPerformed(final AnActionEvent e) {
-    UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "upload", null);
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "upload", null);
 
     final Project project = e.getData(CommonDataKeys.PROJECT);
     final VirtualFile file = e.getData(CommonDataKeys.VIRTUAL_FILE);

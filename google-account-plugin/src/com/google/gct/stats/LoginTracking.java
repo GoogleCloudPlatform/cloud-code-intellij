@@ -1,4 +1,4 @@
-package com.google.gct.login.stats;
+package com.google.gct.stats;
 
 /**
  * For usage tracker of the Google Login actions.

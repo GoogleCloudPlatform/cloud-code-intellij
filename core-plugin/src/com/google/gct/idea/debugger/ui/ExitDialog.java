@@ -3,7 +3,8 @@ package com.google.gct.idea.debugger.ui;
 import com.google.gct.idea.debugger.CloudDebugProcessWatcher;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
-import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.stats.UsageTrackerProvider;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +39,7 @@ public class ExitDialog extends DialogWrapper {
   public void doOKAction() {
     super.doOKAction();
 
-    UsageTrackerService.getInstance().trackEvent(
+    UsageTrackerProvider.getInstance().trackEvent(
         GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.continuelistening", null);
   }
 
@@ -49,7 +50,7 @@ public class ExitDialog extends DialogWrapper {
 
     if (getCancelAction().isEnabled()) {
       close(CANCEL_EXIT_CODE);
-      UsageTrackerService.getInstance().trackEvent(
+      UsageTrackerProvider.getInstance().trackEvent(
           GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.stoplistening", null);
     }
   }

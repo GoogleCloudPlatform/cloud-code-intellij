@@ -21,7 +21,7 @@ import com.google.api.services.clouddebugger.model.SourceLocation;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
-import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.stats.UsageTrackerProvider;
 
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.openapi.application.ApplicationManager;
@@ -138,7 +138,7 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
             newxIdeBreakpoint.setCondition(finalserverBreakpoint.getCondition());
           }
 
-          UsageTrackerService.getInstance()
+          UsageTrackerProvider.getInstance()
               .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "create.breakpoint.clone", null);
         }
       });

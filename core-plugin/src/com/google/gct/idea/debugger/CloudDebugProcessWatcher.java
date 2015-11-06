@@ -17,7 +17,7 @@ package com.google.gct.idea.debugger;
 
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
-import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.stats.UsageTrackerProvider;
 
 import com.intellij.execution.Executor;
 import com.intellij.execution.ProgramRunnerUtil;
@@ -79,7 +79,7 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
       public void run() {
         NotificationGroup notificationGroup = NotificationGroup.balloonGroup("Cloud Debugger watcher");
         String message = GctBundle.getString("clouddebug.balloonnotification.message", state.getProjectName());
-        UsageTrackerService.getInstance()
+        UsageTrackerProvider.getInstance()
             .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "notify.background.bubble", null);
         notificationGroup.createNotification("", message, NotificationType.INFORMATION, new NotificationListener() {
           @Override

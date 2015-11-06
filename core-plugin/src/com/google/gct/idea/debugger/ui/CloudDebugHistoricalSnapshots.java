@@ -26,7 +26,7 @@ import com.google.gct.idea.debugger.CloudDebugProcessState;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
-import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.stats.UsageTrackerProvider;
 
 import com.intellij.diagnostic.logging.AdditionalTabComponent;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -410,7 +410,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
           break;
         }
         if (rowForPopup != -1) {
-          UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "snapshot.received", null);
+          UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "snapshot.received", null);
           //Show a popup indicating a new item has appeared.
           if (myBalloon != null) {
             myBalloon.hide();
