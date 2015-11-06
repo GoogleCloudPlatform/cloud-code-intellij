@@ -77,8 +77,8 @@ public class CloudAttachDialog extends DialogWrapper {
 
   private final Project myProject;
   private final ProjectDebuggeeBinding myWireup;
-  private JComboBox myDebuggeeTarget;
-  private ProjectSelector myElysiumProjectId;
+  private JComboBox myDebuggeeTarget; // Module selector
+  private ProjectSelector myElysiumProjectId; // Project combo box
   private JBLabel myInfoPanel;
   private String myOriginalBranchName;
   private JPanel myPanel;
@@ -146,8 +146,11 @@ public class CloudAttachDialog extends DialogWrapper {
       public void actionPerformed(ActionEvent e) {
         buildResult();
         checkSyncStashState();
+        setOKActionEnabled(doValidate() == null);
       }
     });
+
+    setOKActionEnabled(getIsContinued() || doValidate() == null);
   }
 
   @Nullable
@@ -175,7 +178,7 @@ public class CloudAttachDialog extends DialogWrapper {
 
   @Override
   protected ValidationInfo doValidate() {
-    // These should not normally occur..
+    // These should not normally occur.
     if (!GoogleLogin.getInstance().isLoggedIn()) {
       return new ValidationInfo(GctBundle.getString("clouddebug.nologin"));
     }
@@ -219,7 +222,7 @@ public class CloudAttachDialog extends DialogWrapper {
     mySyncResult = new ProjectRepositoryValidator(myProcessResultState).checkSyncStashState();
 
     if (mySyncResult.needsStash() && mySyncResult.needsSync()) {
-      setOKButtonText(getIsContinued() ? "Continue Session" : GctBundle.getString("clouddebug.attach"));
+      setOKButtonText(getIsContinued() ? GctBundle.getString("clouddebug.continuesession") : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(true);
       assert mySyncResult.getTargetSyncSHA() != null;
       mySyncStashCheckbox.setText("Stash local changes and Sync to " + mySyncResult.getTargetSyncSHA().substring(0, 7));
@@ -229,7 +232,7 @@ public class CloudAttachDialog extends DialogWrapper {
       myInfoPanel.setVisible(true);
     }
     else if (mySyncResult.needsStash()) {
-      setOKButtonText(getIsContinued() ? "Continue Session" : GctBundle.getString("clouddebug.attach"));
+      setOKButtonText(getIsContinued() ? GctBundle.getString("clouddebug.continuesession") : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(true);
       mySyncStashCheckbox.setText(GctBundle.getString("clouddebug.stashbuttontext"));
       mySyncStashCheckbox.setSelected(true);
@@ -238,7 +241,7 @@ public class CloudAttachDialog extends DialogWrapper {
       myInfoPanel.setVisible(true);
     }
     else if (mySyncResult.needsSync()) {
-      setOKButtonText(getIsContinued() ? "Continue Session" : GctBundle.getString("clouddebug.attach"));
+      setOKButtonText(getIsContinued() ? GctBundle.getString("clouddebug.continuesession") : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(true);
       assert mySyncResult.getTargetSyncSHA() != null;
       mySyncStashCheckbox.setText("Sync to " + mySyncResult.getTargetSyncSHA().substring(0, 7));
@@ -248,14 +251,14 @@ public class CloudAttachDialog extends DialogWrapper {
       myInfoPanel.setVisible(true);
     }
     else if (!mySyncResult.isDeterminable()) {
-      setOKButtonText(getIsContinued() ? "Continue Anyway" : GctBundle.getString("clouddebug.attach.anyway"));
+      setOKButtonText(getIsContinued() ? GctBundle.getString("clouddebug.continueanyway") : GctBundle.getString("clouddebug.attach.anyway"));
       myWarningLabel.setVisible(true);
       myWarningLabel2.setVisible(true);
       myInfoPanel.setVisible(true);
       myWarningLabel2.setText("Could not verify that current source matches module.");
     }
     else {
-      setOKButtonText(getIsContinued() ? "Continue Session" : GctBundle.getString("clouddebug.attach"));
+      setOKButtonText(getIsContinued() ? GctBundle.getString("clouddebug.continuesession") : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(false);
       myWarningLabel.setVisible(false);
       myWarningLabel2.setVisible(false);
@@ -266,10 +269,6 @@ public class CloudAttachDialog extends DialogWrapper {
   private boolean getIsContinued() {
     CloudDebugProcessState state = myWireup.getInputState();
     return state != null && state.getCurrentServerBreakpointList().size() > 0;
-  }
-
-  private void populateFields() {
-    myElysiumProjectId.setText("");
   }
 
   private void refreshAndClose() {
