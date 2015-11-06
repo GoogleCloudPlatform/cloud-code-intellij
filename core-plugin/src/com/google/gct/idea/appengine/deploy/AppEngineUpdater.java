@@ -145,12 +145,15 @@ class AppEngineUpdater {
       parameters.getClassPath().add(mySdk.getToolsApiJarFile().getAbsolutePath());
 
       final List<KeyValue<String, String>> list = HttpConfigurable.getJvmPropertiesList(false, null);
+      final ParametersList vmParametersList = parameters.getVMParametersList();
       if (!list.isEmpty()) {
-        final ParametersList parametersList = parameters.getVMParametersList();
         for (KeyValue<String, String> value : list) {
-          parametersList.defineProperty(value.getKey(), value.getValue());
+          vmParametersList.defineProperty(value.getKey(), value.getValue());
         }
       }
+
+      // Set user-agent for appcfg
+      vmParametersList.defineProperty(UserAgentStrings.USER_AGENT_KEY, UserAgentStrings.CT4AS);
 
       final ParametersList programParameters = parameters.getProgramParametersList();
       programParameters.add("--application=" + myAppEngineProject);
