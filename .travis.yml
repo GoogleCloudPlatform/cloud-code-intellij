@@ -1,5 +1,4 @@
 language: java
 jdk:
   - openjdk6
-install: ./fetchIdea.sh
 script: "./travis.sh"
