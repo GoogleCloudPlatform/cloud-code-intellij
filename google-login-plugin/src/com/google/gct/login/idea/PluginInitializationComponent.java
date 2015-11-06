@@ -23,7 +23,7 @@ public class PluginInitializationComponent implements ApplicationComponent {
   private UsageTrackerManager usageTrackerManager;
 
   public PluginInitializationComponent() {
-    usageTrackerManager = new UsageTrackerManager();
+    usageTrackerManager = UsageTrackerManager.getInstance();
   }
 
   public PluginInitializationComponent(UsageTrackerManager trackerManager) {
@@ -56,7 +56,7 @@ public class PluginInitializationComponent implements ApplicationComponent {
             TrackerMessageBundle.message("notification.group.display.id"),
             NotificationDisplayType.STICKY_BALLOON);
     if (usageTrackerManager.isUsageTrackingAvailable() && !usageTrackerManager.hasUserRecordedTrackingPreference()) {
-      UsageTrackerNotification.showNotification();
+      UsageTrackerNotification.getInstance().showNotification();
     }
   }
 

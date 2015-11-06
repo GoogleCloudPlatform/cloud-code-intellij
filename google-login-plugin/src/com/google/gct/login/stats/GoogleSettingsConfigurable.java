@@ -33,7 +33,7 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable {
     private UsageTrackerManager usageTrackerManager;
 
     public GoogleSettingsConfigurable() {
-        usageTrackerManager = new UsageTrackerManager();
+        usageTrackerManager = UsageTrackerManager.getInstance();
     }
 
     public GoogleSettingsConfigurable(UsageTrackerManager trackerManager) {
@@ -78,7 +78,7 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable {
 
     @Override
     public boolean isModified() {
-        return usageTrackerManager.getTrackingPreference() != enableUsageTrackerBox.isSelected();
+        return usageTrackerManager.hasUserOptedIn() != enableUsageTrackerBox.isSelected();
     }
 
     @Override
@@ -88,7 +88,7 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable {
 
     @Override
     public void reset() {
-        enableUsageTrackerBox.setSelected(usageTrackerManager.getTrackingPreference());
+        enableUsageTrackerBox.setSelected(usageTrackerManager.hasUserOptedIn());
     }
 
     @Override
@@ -98,7 +98,7 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable {
 
     private JPanel creatUsageTrackerComponent() {
         enableUsageTrackerBox = new JCheckBox(TrackerMessageBundle.message("settings.enable.tracker.text"));
-        enableUsageTrackerBox.setSelected(usageTrackerManager.getTrackingPreference());
+        enableUsageTrackerBox.setSelected(usageTrackerManager.hasUserOptedIn());
 
         // Disable checkbox if usage tracker property has not been configured------
         if (!usageTrackerManager.isUsageTrackingAvailable()) {

@@ -51,15 +51,18 @@ public class GoogleUsageTracker implements UsageTracker {
     @NonNls
     private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
     @NonNls
-    private static final String ANALYTICS_ID = "UA-67138797-1";
-    @NonNls
     private static final String ANALYTICS_APP = "Cloud Tools for IntelliJ";
     @NonNls
     private static final String INTELLIJ_EDITION = "intellij.edition";
 
+    private final String analyticsId;
+
+    public GoogleUsageTracker() {
+        this.analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
+    }
+
     private static final List<? extends NameValuePair> analyticsBaseData = ImmutableList
             .of(new BasicNameValuePair("v", "1"),
-                    new BasicNameValuePair("tid", ANALYTICS_ID),
                     new BasicNameValuePair("t", "event"),
                     new BasicNameValuePair("an", ANALYTICS_APP),
                     new BasicNameValuePair("av", ApplicationInfo.getInstance().getFullVersion()),
@@ -70,8 +73,9 @@ public class GoogleUsageTracker implements UsageTracker {
                            @Nullable String eventLabel,
                            @Nullable Integer eventValue) {
         if (!ApplicationManager.getApplication().isUnitTestMode()) {
-            if (PlatformUtils.isIntelliJ()) {
+            if (UsageTrackerManager.getInstance().isTrackingEnabled()) {
                 ArrayList postData = Lists.newArrayList(analyticsBaseData);
+                postData.add(new BasicNameValuePair("tid", analyticsId));
                 postData.add(new BasicNameValuePair(INTELLIJ_EDITION, PlatformUtils.isCommunityEdition() ? "community" : "ultimate"));
                 postData.add(new BasicNameValuePair("ec", eventCategory));
                 postData.add(new BasicNameValuePair("ea", eventAction));

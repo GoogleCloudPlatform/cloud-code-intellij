@@ -18,21 +18,24 @@ import java.net.URL;
  */
 public class UsageTrackerNotification {
     private static final Logger LOG = Logger.getInstance(UsageTrackerNotification.class);
+    private static final UsageTrackerNotification INSTANCE = new UsageTrackerNotification();
+    private final UsageTrackerManager usageTrackerManager;
 
     private  UsageTrackerNotification () {
+        usageTrackerManager = UsageTrackerManager.getInstance();
     }
 
-    /**
-     * Displays the notification to allow user to opt in/out to usage tracking
-     */
-    public static void showNotification() {
+    public static UsageTrackerNotification getInstance() {
+        return INSTANCE;
+    }
+
+    public void showNotification() {
         NotificationListener listener = new NotificationListener() {
             @Override
             public void hyperlinkUpdate(Notification notification, HyperlinkEvent event) {
                 if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     final String description = event.getDescription();
                     if ("allow".equals(description)) {
-                        UsageTrackerManager usageTrackerManager = new UsageTrackerManager();
                         usageTrackerManager.setTrackingPreference(true);
                         notification.expire();
                     }
@@ -61,9 +64,9 @@ public class UsageTrackerNotification {
         };
 
         Notification notification = new Notification(TrackerMessageBundle.message("notification.group.display.id"),
-                TrackerMessageBundle.message("notification.popup.title"),
-                TrackerMessageBundle.message("notification.popup.content"),
-                NotificationType.INFORMATION, listener);
+            TrackerMessageBundle.message("notification.popup.title"),
+            TrackerMessageBundle.message("notification.popup.content"),
+            NotificationType.INFORMATION, listener);
         Notifications.Bus.notify(notification);
     }
 }
