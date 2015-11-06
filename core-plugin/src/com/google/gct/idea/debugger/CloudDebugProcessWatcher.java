@@ -16,12 +16,14 @@
 package com.google.gct.idea.debugger;
 
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctTracking;
+import com.google.gct.login.stats.UsageTrackerService;
+
 import com.intellij.execution.Executor;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.executors.DefaultDebugExecutor;
-import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
@@ -70,30 +72,28 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
       public void run() {
         NotificationGroup notificationGroup = NotificationGroup.balloonGroup("Cloud Debugger watcher");
         String message = GctBundle.getString("clouddebug.balloonnotification.message", state.getProjectName());
+        UsageTrackerService.getInstance()
+            .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "notify.background.bubble", null);
         notificationGroup.createNotification("", message, NotificationType.INFORMATION, new NotificationListener() {
-                                               @Override
-                                               public void hyperlinkUpdate(@NotNull Notification notification,
-                                                                           @NotNull HyperlinkEvent event) {
-                                                 notification.expire();
-                                                 RunnerAndConfigurationSettings targetConfig = null;
-                                                 RunManager manager = RunManager.getInstance(state.getProject());
-                                                 for (final RunnerAndConfigurationSettings config : manager
-                                                   .getAllSettings()) {
-                                                   if (config
-                                                         .getConfiguration() instanceof CloudDebugRunConfiguration &&
-                                                       ((CloudDebugRunConfiguration)config.getConfiguration())
-                                                         .getProcessState() == state) {
-                                                     targetConfig = config;
-                                                   }
-                                                 }
+          @Override
+          public void hyperlinkUpdate(@NotNull Notification notification,
+              @NotNull HyperlinkEvent event) {
+            notification.expire();
+            RunnerAndConfigurationSettings targetConfig = null;
+            RunManager manager = RunManager.getInstance(state.getProject());
+            for (final RunnerAndConfigurationSettings config : manager.getAllSettings()) {
+              if (config.getConfiguration() instanceof CloudDebugRunConfiguration &&
+                  ((CloudDebugRunConfiguration) config.getConfiguration()).getProcessState() == state) {
+                targetConfig = config;
+              }
+            }
 
-                                                 if (targetConfig != null) {
-                                                   Executor executor = DefaultDebugExecutor.getDebugExecutorInstance();
-                                                   ProgramRunnerUtil
-                                                     .executeConfiguration(state.getProject(), targetConfig, executor);
-                                                 }
-                                               }
-                                             }).notify(state.getProject());
+            if (targetConfig != null) {
+              Executor executor = DefaultDebugExecutor.getDebugExecutorInstance();
+              ProgramRunnerUtil.executeConfiguration(state.getProject(), targetConfig, executor);
+            }
+          }
+        }).notify(state.getProject());
       }
     });
   }

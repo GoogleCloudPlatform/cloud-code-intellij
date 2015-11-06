@@ -19,6 +19,9 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.gct.idea.debugger.ui.BreakpointConfigurationPanel;
 import com.google.gct.idea.debugger.ui.BreakpointErrorStatusPanel;
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctTracking;
+import com.google.gct.login.stats.UsageTrackerService;
+
 import com.intellij.debugger.engine.DebuggerUtils;
 import com.intellij.debugger.ui.breakpoints.Breakpoint;
 import com.intellij.debugger.ui.breakpoints.JavaBreakpointType;
@@ -134,6 +137,9 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
         return true;
       }
     });
+
+    UsageTrackerService.getInstance()
+        .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "create.breakpoint", null);
     return result.get() == getClass();
   }
 

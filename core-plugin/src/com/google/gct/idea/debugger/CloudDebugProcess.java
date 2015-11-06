@@ -20,6 +20,9 @@ import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
 import com.google.gct.idea.debugger.ui.CloudDebugHistoricalSnapshots;
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.GctTracking;
+import com.google.gct.login.stats.UsageTrackerService;
+
 import com.intellij.debugger.ui.DebuggerContentInfo;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.execution.ExecutionBundle;
@@ -469,6 +472,8 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     @Override
     public void actionPerformed(AnActionEvent e) {
       ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM).actionPerformed(e);
+      UsageTrackerService.getInstance()
+          .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "stop.session", null);
     }
 
     @Override

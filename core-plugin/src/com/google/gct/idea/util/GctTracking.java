@@ -23,13 +23,11 @@ public class GctTracking {
   public static final String CATEGORY = "com.google.cloud.tools";
 
   // actions
+  public static final String CLOUD_DEBUGGER = "cloud.debugger";
   public static final String DEPLOY = "appengine.update";
   public static final String GRADLE_IMPORT = "appengine.gradle.import";
-  public static final String NEW_ENDPOINT = "new.endpoint";
   public static final String PROJECT_SELECTION = "project.selection";
   public static final String RUN = "appengine.run";
-  public static final String SAMPLES = "sample.importer";
   public static final String VCS = "vcs";
-  public static final String WIZARD = "appengine.wizard";
 
 }

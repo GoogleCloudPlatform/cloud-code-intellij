@@ -16,8 +16,12 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.gct.idea.util.GctTracking;
+import com.google.gct.login.stats.UsageTrackerService;
+
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
+import com.intellij.execution.RunManager;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAction;
@@ -58,7 +62,13 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
 
   @Override
   public final RunConfiguration clone() {
-    final CloudDebugRunConfiguration configuration = (CloudDebugRunConfiguration)super.clone();
+    // clone is called for both creation of run configuration and duplication. New run configurations are cloned
+    // from the configuration factory's instance
+    if (this == RunManager.getInstance(getProject()).getConfigurationTemplate(this.getFactory()).getConfiguration()) {
+      UsageTrackerService.getInstance()
+          .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "new.run.config", null);
+    }
+    final CloudDebugRunConfiguration configuration = (CloudDebugRunConfiguration) super.clone();
     configuration.setCloudProjectName(getCloudProjectName());
     configuration.setShowNotifications(isShowNotifications());
     return configuration;
