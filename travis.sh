@@ -15,13 +15,13 @@
 # limitations under the License.
 
 # Run the tests
-gradle --info test
+./gradlew --info test
 
 # Was our build successful?
 stat=$?
 
 if [ "${TRAVIS}" != true ]; then
-    gradle clean
+    ./gradlew clean
     rm -rf idea-IC
 fi
 
