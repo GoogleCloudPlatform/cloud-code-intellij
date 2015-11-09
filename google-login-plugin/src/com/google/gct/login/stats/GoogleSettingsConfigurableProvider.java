@@ -1,5 +1,7 @@
 package com.google.gct.login.stats;
 
+import com.google.gct.login.stats.UsageTrackerService.UsageTracker;
+
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurableProvider;
 import com.intellij.util.PlatformUtils;
@@ -21,7 +23,9 @@ public class GoogleSettingsConfigurableProvider extends ConfigurableProvider {
      */
     @Override
     public boolean canCreateConfigurable() {
-        if (PlatformUtils.isIntelliJ()) {
+        // For now we can hide Google entirely if usage tracking isn't available as there are no
+        // other Google related account settings in the IJ UI.
+        if (PlatformUtils.isIntelliJ() && UsageTrackerManager.getInstance().isUsageTrackingAvailable()) {
             return true;
         } else {
             return false;
