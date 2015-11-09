@@ -68,11 +68,11 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable {
     @Override
     public JComponent createComponent() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-
-        // Add the Usage Tracker Box
-        JPanel usageTrackerGroup = creatUsageTrackerComponent();
-        mainPanel.add(usageTrackerGroup, BorderLayout.NORTH);
-
+        if (usageTrackerManager.isUsageTrackingAvailable()) {
+            // Add the Usage Tracker Box
+            JPanel usageTrackerGroup = creatUsageTrackerComponent();
+            mainPanel.add(usageTrackerGroup, BorderLayout.NORTH);
+        }
         return mainPanel;
     }
 
