@@ -153,7 +153,7 @@ class AppEngineUpdater {
       }
 
       // Set user-agent for appcfg
-      vmParametersList.defineProperty(UserAgentStrings.USER_AGENT_KEY, UserAgentStrings.CT4AS);
+      vmParametersList.defineProperty(UserAgentStrings.USER_AGENT_KEY, UserAgentStrings.ANDROID_STUDIO);
 
       final ParametersList programParameters = parameters.getProgramParametersList();
       programParameters.add("--application=" + myAppEngineProject);
