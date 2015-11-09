@@ -18,7 +18,11 @@ package com.google.gct.idea.debugger;
 import com.google.gct.idea.debugger.actions.ToggleSnapshotLocationAction;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
@@ -29,7 +33,7 @@ import com.intellij.util.containers.HashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -37,14 +41,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CloudDebugProcessStateSerializer stores process state to workspace.xml. This allows us to continue watching the
+ * Stores process state to workspace.xml. This allows us to continue watching the
  * process after a restart.
  */
 @State(
   name = "CloudDebugProcessStateSerializer",
   storages = {@Storage(file = StoragePathMacros.WORKSPACE_FILE)})
 public class CloudDebugProcessStateSerializer
-  implements PersistentStateComponent<CloudDebugProcessStateSerializer.ProjectState> {
+   implements PersistentStateComponent<CloudDebugProcessStateSerializer.ProjectState> {
   private final Project myProject;
   private final Map<String, CloudDebugProcessState> myStateMap = new HashMap<String, CloudDebugProcessState>();
 
@@ -104,11 +108,9 @@ public class CloudDebugProcessStateSerializer
 
         if (config.getConfiguration() instanceof CloudDebugRunConfiguration) {
           final CloudDebugRunConfiguration cloudConfig = (CloudDebugRunConfiguration)config.getConfiguration();
-          if (cloudConfig.isShowNotifications()) {
-            final CloudDebugProcessState state = cloudConfig.getProcessState();
-            if (state != null) {
-              projectState.CONFIG_STATES.add(new RunConfigState(cloudConfig.getName(), state));
-            }
+          final CloudDebugProcessState state = cloudConfig.getProcessState();
+          if (state != null) {
+            projectState.CONFIG_STATES.add(new RunConfigState(cloudConfig.getName(), state));
           }
         }
       }

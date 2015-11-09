@@ -16,9 +16,8 @@
 package com.google.gct.idea.debugger.ui;
 
 import com.google.gct.idea.elysium.ProjectSelector;
-import com.intellij.ui.components.JBCheckBox;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 
 /**
  * This is the config UI for cloud debug run configs.
@@ -26,7 +25,6 @@ import javax.swing.*;
 public class CloudDebugRunConfigurationPanel {
   private ProjectSelector myElysiumProjectId;
   private JPanel myPanel;
-  private JBCheckBox myShowNotifications;
 
   public CloudDebugRunConfigurationPanel() {
   }
@@ -41,13 +39,5 @@ public class CloudDebugRunConfigurationPanel {
 
   public void setProjectName(String name) {
     myElysiumProjectId.setText(name);
-  }
-
-  public boolean getShowNotifications() {
-    return myShowNotifications.isSelected();
-  }
-
-  public void setShowNotifications(boolean shouldShowNotifications) {
-    myShowNotifications.setSelected(shouldShowNotifications);
   }
 }
