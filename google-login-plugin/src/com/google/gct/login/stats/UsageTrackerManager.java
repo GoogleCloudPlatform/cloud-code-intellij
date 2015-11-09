@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public final class UsageTrackerManager {
   public static final String USAGE_TRACKER_KEY = "GOOGLE_CLOUD_TOOLS_USAGE_TRACKER_OPT_IN";
   @VisibleForTesting
-  protected static final String USAGE_TRACKER_PROPERTY_PLACEHOLDER = "@usage.tracker.property@";
+  protected static final String USAGE_TRACKER_PROPERTY_PLACEHOLDER = "${usageTrackerProperty}";
   private static UsageTrackerManager instance;
   private PropertiesComponent datastore;
   private PluginFlags flags;

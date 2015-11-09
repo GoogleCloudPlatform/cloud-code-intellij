@@ -84,8 +84,9 @@ pmd {
 processResources {
     def trackerProperty =  System.getProperty("usageTrackerProperty");
     if (trackerProperty) {
-        filter (org.apache.tools.ant.filters.ReplaceTokens, tokens: [
-                "usage.tracker.property": trackerProperty
-        ])
+        inputs.property("usageTrackerProperty", trackerProperty)
+        filesMatching("**/config.properties") {
+            expand "usageTrackerProperty": trackerProperty
+        }
     }
 }
