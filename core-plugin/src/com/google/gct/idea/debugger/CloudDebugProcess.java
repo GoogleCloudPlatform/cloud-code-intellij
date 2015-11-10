@@ -20,6 +20,7 @@ import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
 import com.google.gct.idea.debugger.ui.CloudDebugHistoricalSnapshots;
 import com.google.gct.idea.debugger.ui.ExitDialog;
+import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.stats.UsageTrackerService;
@@ -57,16 +58,17 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.intellij.xdebugger.ui.XDebugTabLayouter;
-import icons.GoogleCloudToolsIcons;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
 
-import javax.swing.SwingUtilities;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+
+import javax.swing.SwingUtilities;
 
 /**
  * CloudDebugProcess is the controller that represents our attached state to the server. It provides the breakpoint

@@ -18,28 +18,53 @@ package com.google.gct.idea.elysium;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.gct.idea.ui.CustomizableComboBox;
 import com.google.gct.idea.ui.CustomizableComboBoxPopup;
+import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
 import com.google.gct.login.IGoogleLoginCompletedCallback;
 import com.google.gct.login.ui.GoogleLoginEmptyPanel;
+
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
-import icons.GoogleCloudToolsIcons;
+
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.tree.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JTree;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  * ProjectSelector allows the user to select an Elysium project id.

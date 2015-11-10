@@ -17,15 +17,17 @@ package com.google.gct.login.ui;
 
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
+
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
-import icons.GoogleLoginIcons;
+
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.ImageIcon;
 import java.awt.Dimension;
 import java.awt.Image;
+
+import javax.swing.ImageIcon;
 
 /**
  * The Google Login button that appears on the main toolbar.

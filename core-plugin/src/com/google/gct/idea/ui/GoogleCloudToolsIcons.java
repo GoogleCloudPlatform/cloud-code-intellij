@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package icons;
+package com.google.gct.idea.ui;
 
 import com.intellij.openapi.util.IconLoader;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 /**
  * Note: This file should be auto generated once build/scripts/icons.gant is part of CE.

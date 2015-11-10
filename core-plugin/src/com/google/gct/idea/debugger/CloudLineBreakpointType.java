@@ -18,6 +18,7 @@ package com.google.gct.idea.debugger;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.gct.idea.debugger.ui.BreakpointConfigurationPanel;
 import com.google.gct.idea.debugger.ui.BreakpointErrorStatusPanel;
+import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.stats.UsageTrackerService;
@@ -34,7 +35,15 @@ import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiCodeBlock;
+import com.intellij.psi.PsiComment;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiStatement;
+import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
 import com.intellij.xdebugger.XDebuggerUtil;
@@ -45,15 +54,16 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpointType;
 import com.intellij.xdebugger.breakpoints.ui.XBreakpointCustomPropertiesPanel;
 import com.intellij.xdebugger.breakpoints.ui.XBreakpointGroupingRule;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
-import icons.GoogleCloudToolsIcons;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
 
-import javax.swing.*;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+
+import javax.swing.Icon;
 
 /**
  * CloudLineBreakpointType defines our custom line breakpoint.  It adds properties for custom watches and controls when

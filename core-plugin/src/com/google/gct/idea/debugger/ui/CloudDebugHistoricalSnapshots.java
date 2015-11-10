@@ -23,6 +23,7 @@ import com.google.gct.idea.debugger.CloudBreakpointListener;
 import com.google.gct.idea.debugger.CloudDebugProcess;
 import com.google.gct.idea.debugger.CloudDebugProcessHandler;
 import com.google.gct.idea.debugger.CloudDebugProcessState;
+import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.stats.UsageTrackerService;
@@ -47,19 +48,10 @@ import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.xdebugger.XDebugSessionListener;
 import com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory;
-import icons.GoogleCloudToolsIcons;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -81,6 +73,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 /**
  * This panel shows a list of historical and pending snapshots. The user can navigate to them by double clicking on

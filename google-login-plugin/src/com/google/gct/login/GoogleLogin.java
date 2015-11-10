@@ -26,7 +26,14 @@ import com.google.gct.login.stats.LoginTracking;
 import com.google.gct.login.stats.UsageTrackerService;
 import com.google.gct.login.ui.GoogleLoginActionButton;
 import com.google.gct.login.ui.GoogleLoginCopyAndPasteDialog;
-import com.google.gdt.eclipse.login.common.*;
+import com.google.gct.login.ui.GoogleLoginIcons;
+import com.google.gdt.eclipse.login.common.GoogleLoginState;
+import com.google.gdt.eclipse.login.common.LoggerFacade;
+import com.google.gdt.eclipse.login.common.OAuthData;
+import com.google.gdt.eclipse.login.common.OAuthDataStore;
+import com.google.gdt.eclipse.login.common.UiFacade;
+import com.google.gdt.eclipse.login.common.VerificationCodeHolder;
+
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -41,12 +48,13 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ex.ProgressIndicatorEx;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
-import icons.GoogleLoginIcons;
+
 import net.jcip.annotations.Immutable;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.awt.Window;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;

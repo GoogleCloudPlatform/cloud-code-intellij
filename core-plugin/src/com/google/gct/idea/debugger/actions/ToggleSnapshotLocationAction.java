@@ -15,9 +15,13 @@
  */
 package com.google.gct.idea.debugger.actions;
 
+import static com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR;
+
 import com.google.gct.idea.debugger.CloudDebugRunConfiguration;
 import com.google.gct.idea.debugger.CloudLineBreakpointType;
+import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
+
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -28,11 +32,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.util.Key;
 import com.intellij.xdebugger.XDebuggerUtil;
-import icons.GoogleCloudToolsIcons;
 
 import java.awt.event.MouseEvent;
-
-import static com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR;
 
 /**
  * This action sets a cloud breakpoint (snapshot location) at the line of code the user right clicked on. Right now, we

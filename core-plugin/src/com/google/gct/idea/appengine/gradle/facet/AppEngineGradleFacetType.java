@@ -15,17 +15,18 @@
  */
 package com.google.gct.idea.appengine.gradle.facet;
 
-import icons.GoogleCloudToolsIcons;
+import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 /**
  * The App Engine Gradle facet type for App Engine projects with a Gradle build file
