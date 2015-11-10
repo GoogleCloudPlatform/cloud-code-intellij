@@ -1,0 +1,76 @@
+package com.google.gct.idea.testing;
+/*
+ * Copyright (C) 2015 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import com.intellij.mock.MockProject;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
+
+import org.jetbrains.annotations.NotNull;
+import org.junit.After;
+import org.junit.Before;
+import org.picocontainer.MutablePicoContainer;
+
+/**
+ * Test base class that provides a mock Intellij application and project.
+ */
+public class BasePluginTestCase {
+
+  protected Project project;
+
+  public static class Container {
+
+    private final MutablePicoContainer container;
+
+    Container(@NotNull MutablePicoContainer container) {
+      this.container = container;
+    }
+
+    public <T> Container register(Class<T> clazz, T instance) {
+      this.container.registerComponentInstance(clazz.getName(), instance);
+      return this;
+    }
+  }
+
+  @Before
+  public final void setup() {
+    TestUtils.createMockApplication();
+    MutablePicoContainer applicationContainer = (MutablePicoContainer)
+        ApplicationManager.getApplication().getPicoContainer();
+    MockProject mockProject = TestUtils.mockProject(applicationContainer);
+
+    this.project = mockProject;
+
+    initTest(
+        new Container(applicationContainer),
+        new Container(mockProject.getPicoContainer())
+    );
+  }
+
+  @After
+  public final void tearDown() {
+    TestUtils.disposeMockApplication();
+  }
+
+  public final Project getProject() {
+    return project;
+  }
+
+  protected void initTest(
+      @NotNull Container applicationServices,
+      @NotNull Container projectServices) {
+  }
+}

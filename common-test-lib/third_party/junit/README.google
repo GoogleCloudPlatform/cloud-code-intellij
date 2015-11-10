@@ -1,0 +1,10 @@
+URL: http://central.maven.org/maven2/junit/junit/4.11/junit-4.11.jar
+Version: 4.11
+License: CPL 1.0
+License File: LICENSE
+
+Description:
+JUnit is a unit testing framework for Java, created by Erich Gamma and Kent Beck.
+
+Local Modifications:
+No Modifications.
