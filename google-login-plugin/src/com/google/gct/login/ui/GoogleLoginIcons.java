@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package icons;
+package com.google.gct.login.ui;
 
 import com.intellij.openapi.util.IconLoader;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 /**
  * A utility class that loads the icons that are used by the Google Login plugin.

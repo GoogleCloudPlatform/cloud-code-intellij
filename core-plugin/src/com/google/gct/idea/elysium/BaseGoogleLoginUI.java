@@ -15,13 +15,22 @@
  */
 package com.google.gct.idea.elysium;
 
+import com.google.gct.login.ui.GoogleLoginIcons;
+
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
-import icons.GoogleLoginIcons;
+
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 /**
  * UI for the node that prompts for Google Login.

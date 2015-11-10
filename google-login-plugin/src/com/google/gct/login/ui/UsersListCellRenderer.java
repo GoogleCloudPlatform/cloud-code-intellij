@@ -18,12 +18,11 @@ package com.google.gct.login.ui;
 import com.google.api.client.util.Maps;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
+
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
-import icons.GoogleLoginIcons;
-import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -37,6 +36,17 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
 
 /**
  * A custom cell render for {@link GoogleLoginUsersPanel#list} that manages

@@ -16,9 +16,9 @@
 package com.google.gct.idea.appengine.run;
 
 
-import com.google.gct.idea.appengine.gradle.GradleInvoker;
-import com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacet;
+import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
+
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -29,15 +29,14 @@ import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
-import com.intellij.util.ThreeState;
-import icons.GoogleCloudToolsIcons;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 
-import javax.swing.Icon;
 import java.util.Collections;
-import java.util.concurrent.atomic.AtomicReference;
+
+import javax.swing.Icon;
 
 /**
  * Task provider that creates task to sync and build App Engine Gradle projects before they're run.

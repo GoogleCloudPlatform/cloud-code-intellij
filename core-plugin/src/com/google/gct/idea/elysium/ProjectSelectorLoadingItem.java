@@ -15,12 +15,19 @@
  */
 package com.google.gct.idea.elysium;
 
+import com.google.gct.idea.ui.GoogleCloudToolsIcons;
+
 import com.intellij.ui.components.JBLabel;
-import icons.GoogleCloudToolsIcons;
+
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.FlowLayout;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 /**
  * Displays UI similar to "loading..." when an elysium call is in progress.
