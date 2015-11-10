@@ -15,7 +15,7 @@ subprojects {
     apply plugin: 'pmd'
     apply plugin: 'jdepend'
     group = 'com.google.gct'
-    version = '0.9-alpha'
+    version = '0.9-alpha.1-SNAPSHOT'
 
     repositories {
         mavenCentral()
