@@ -387,27 +387,6 @@ public class GoogleLogin {
   }
 
   /**
-   * Logs out the active user by popping up a question dialog asking if the active user really
-   * wants to quit. If the active user chooses to sign out, signs out the active user and all other
-   * signed in users.
-   *
-   * @return true if the user logged out, false otherwise
-   */
-  public boolean logOut() {
-    CredentialedUser activeUser = users.getActiveUser();
-    if (activeUser == null) {
-      return false;
-    }
-
-    boolean loggedOut = activeUser.getGoogleLoginState().logOut();
-    if(loggedOut) {
-      logOutAllUsers();
-    }
-
-    return loggedOut;
-  }
-
-  /**
    * Logs out the active user and all other signed in users.
    *
    * @param showPrompt if true, opens a prompt asking if the user really wants
@@ -424,9 +403,9 @@ public class GoogleLogin {
     boolean loggedOut = activeUser.getGoogleLoginState().logOut(showPrompt);
     if(loggedOut) {
       logOutAllUsers();
+      UsageTrackerService.getInstance().trackEvent(LoginTracking.CATEGORY, LoginTracking.LOGIN, "logout.complete", null);
     }
 
-    UsageTrackerService.getInstance().trackEvent(LoginTracking.CATEGORY, LoginTracking.LOGIN, "logout.complete", null);
     return loggedOut;
   }
 
