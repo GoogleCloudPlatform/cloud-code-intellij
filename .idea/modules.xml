@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/common-lib/common-lib.iml" filepath="$PROJECT_DIR$/common-lib/common-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common-test-lib/common-test-lib.iml" filepath="$PROJECT_DIR$/common-test-lib/common-test-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/core-plugin/core-plugin.iml" filepath="$PROJECT_DIR$/core-plugin/core-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/google-login-plugin/google-login-plugin.iml" filepath="$PROJECT_DIR$/google-login-plugin/google-login-plugin.iml" />
     </modules>
