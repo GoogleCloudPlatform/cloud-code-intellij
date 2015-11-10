@@ -1,0 +1,12 @@
+URL: http://central.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar
+Version: 18.0
+License: Apache 2.0
+License File: LICENSE
+
+Description:
+Guava is a suite of core and expanded libraries that include utility classes, google's collections,
+io classes, and much much more. Guava has only one code dependency - javax.annotation, per the
+JSR-305 spec.
+
+Local Modifications:
+No Modifications.
