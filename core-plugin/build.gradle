@@ -10,6 +10,7 @@ dependencies {
         transitive = false
     }
 
+    compile files('lib/google-api-services-clouddebugger-v2-rev4-1.20.0.jar')
     compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
     compile files('lib/google-api-services-source.jar')
     compile files(ideaHome + '/plugins/git4idea/lib/git4idea.jar')
@@ -24,10 +25,10 @@ dependencies {
     compile fileTree(dir: ideaHome + '/plugins/Groovy/lib')
     compile fileTree(dir: ideaHome + '/plugins/gradle/lib')
     compile files('../google-login-plugin/lib/google.gdt.eclipse.login.common.jar')
+    compile files('../google-login-plugin/third_party/repackaged/google-api-java-client-min-repackaged-1.20.0.jar')
 
     compile 'com.google.appengine:gradle-appengine-builder-model:0.1.0'
     compile 'org.eclipse.jgit:org.eclipse.jgit:3.3.0.201403021825-r'
-    compile 'com.google.apis:google-api-services-clouddebugger:v2-rev4-1.20.0'
     // todo(elharo): we shouldn't need Apache commons; Guava will suffice
     compile 'commons-io:commons-io:2.4'
 
