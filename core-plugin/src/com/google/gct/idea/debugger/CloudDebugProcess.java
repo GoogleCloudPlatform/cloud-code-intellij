@@ -475,6 +475,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       ExitDialog exitDialog = new ExitDialog(getXDebugSession().getProject());
       exitDialog.showAndGetOk();
       ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM).actionPerformed(event);
+      ActionManager.getInstance().getAction(IdeActions.ACTION_CLOSE).actionPerformed(event);
       UsageTrackerService.getInstance()
           .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "stop.session", null);
     }
