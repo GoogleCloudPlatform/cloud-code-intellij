@@ -185,7 +185,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     mySignOutButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        GoogleLogin.getInstance().logOut();
+        GoogleLogin.getInstance().logOut(true);
       }
     });
 
