@@ -22,33 +22,22 @@ import org.jetbrains.annotations.NotNull;
  * Identifies the current platform based on platform prefix.
  */
 public enum IntelliJPlatform {
-
-  IDEA("IntelliJ IDEA", null, LandingPage.AUTH_SUCCESS, LandingPage.AUTH_FAILURE),
-  IDEA_IC("IntelliJ IDEA Community Edition", PlatformUtils.IDEA_CE_PREFIX, LandingPage.AUTH_SUCCESS,
-      LandingPage.AUTH_FAILURE),
-  RUBYMINE("RubyMine", PlatformUtils.RUBY_PREFIX, LandingPage.AUTH_SUCCESS, LandingPage.AUTH_FAILURE),
-  PYCHARM("PyCharm", PlatformUtils.PYCHARM_PREFIX, LandingPage.AUTH_SUCCESS, LandingPage.AUTH_FAILURE),
-  PYCHARM_PC("PyCharm Community Edition", PlatformUtils.PYCHARM_CE_PREFIX, LandingPage.AUTH_SUCCESS,
-      LandingPage.AUTH_FAILURE),
-  PYCHARM_EDU("PyCharm Educational Edition", PlatformUtils.PYCHARM_EDU_PREFIX, LandingPage.AUTH_SUCCESS,
-      LandingPage.AUTH_FAILURE),
-  PHPSTORM("PhpStorm", PlatformUtils.PHP_PREFIX, LandingPage.AUTH_SUCCESS, LandingPage.AUTH_FAILURE),
-  WEBSTORM("WebStorm", PlatformUtils.WEB_PREFIX, LandingPage.AUTH_SUCCESS, LandingPage.AUTH_FAILURE),
-  APPCODE("AppCode", PlatformUtils.APPCODE_PREFIX, LandingPage.AUTH_SUCCESS, LandingPage.AUTH_FAILURE),
-  CLION("CLion", PlatformUtils.CLION_PREFIX, LandingPage.AUTH_SUCCESS, LandingPage.AUTH_FAILURE),
-  DBE("0xDBE", PlatformUtils.DBE_PREFIX, LandingPage.AUTH_SUCCESS, LandingPage.AUTH_FAILURE),
-  ANDROID_STUDIO("Android Studio", "AndroidStudio", LandingPage.AUTH_SUCCESS,
-      LandingPage.AUTH_FAILURE); //there is no constant in PlatformUtils for AS.
-
-  private interface LandingPage {
-    String AUTH_SUCCESS = "https://developers.google.com/cloud/mobile/auth_success";
-    String AUTH_FAILURE = "https://developers.google.com/cloud/mobile/auth_failure";
-  }
+  IDEA("IntelliJ IDEA", PlatformUtils.IDEA_PREFIX, LandingPages.INTELLIJ),
+  IDEA_IC("IntelliJ IDEA Community Edition", PlatformUtils.IDEA_CE_PREFIX, LandingPages.INTELLIJ),
+  RUBYMINE("RubyMine", PlatformUtils.RUBY_PREFIX, LandingPages.INTELLIJ),
+  PYCHARM("PyCharm", PlatformUtils.PYCHARM_PREFIX, LandingPages.INTELLIJ),
+  PYCHARM_PC("PyCharm Community Edition", PlatformUtils.PYCHARM_CE_PREFIX, LandingPages.INTELLIJ),
+  PYCHARM_EDU("PyCharm Educational Edition", PlatformUtils.PYCHARM_EDU_PREFIX, LandingPages.INTELLIJ),
+  PHPSTORM("PhpStorm", PlatformUtils.PHP_PREFIX, LandingPages.INTELLIJ),
+  WEBSTORM("WebStorm", PlatformUtils.WEB_PREFIX, LandingPages.INTELLIJ),
+  APPCODE("AppCode", PlatformUtils.APPCODE_PREFIX, LandingPages.INTELLIJ),
+  CLION("CLion", PlatformUtils.CLION_PREFIX, LandingPages.INTELLIJ),
+  DBE("0xDBE", PlatformUtils.DBE_PREFIX, LandingPages.INTELLIJ),
+  ANDROID_STUDIO("Android Studio", "AndroidStudio", LandingPages.ANDROID_STUDIO);
 
   private final String myName;
   private final String myPlatformPrefix;
-  private final String mySuccessfulLandingPage;
-  private final String myFailureLandingPage;
+  private final LandingPages landingPages;
 
   public String getName() {
     return myName;
@@ -58,11 +47,10 @@ public enum IntelliJPlatform {
     return myPlatformPrefix;
   }
 
-  IntelliJPlatform(String name, String platformPrefix, String successfulLandingPage, String failureLandingPage) {
+  IntelliJPlatform(String name, String platformPrefix, LandingPages landingPages) {
     myName = name;
     myPlatformPrefix = platformPrefix;
-    mySuccessfulLandingPage = successfulLandingPage;
-    myFailureLandingPage = failureLandingPage;
+    this.landingPages = landingPages;
   }
 
   public static IntelliJPlatform fromPrefix(String prefix) {
@@ -76,11 +64,11 @@ public enum IntelliJPlatform {
 
   @NotNull
   public String getSuccessfulLandingPage() {
-    return mySuccessfulLandingPage;
+    return landingPages.getSuccessPage();
   }
 
   @NotNull
   public String getFailureLandingPage() {
-    return myFailureLandingPage;
+    return landingPages.getFailurePage();
   }
 }

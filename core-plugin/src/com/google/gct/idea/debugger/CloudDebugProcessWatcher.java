@@ -30,11 +30,11 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 
 /**
- * CloudDebugProcessWatcher checks for updates on Cloud Debugger targets in the background. When it detects a change (a
+ * Checks for updates on Cloud Debugger targets in the background. When it detects a change (a
  * new breakpoint has entered final state), it shows a notification.
  * <p/>
  * It enumerates all open projects and their run configurations looking for {@link CloudDebugRunConfiguration} objects.
@@ -62,6 +62,13 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
       myPoller = new CloudDebugGlobalPoller();
       myPoller.addListener(this);
       myPoller.startBackgroundListening();
+    }
+  }
+
+  public synchronized void removeWatcher() {
+    if (myPoller != null) {
+      myPoller.stopBackgroundListening();
+      myPoller = null;
     }
   }
 

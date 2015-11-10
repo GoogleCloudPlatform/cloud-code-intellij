@@ -20,35 +20,33 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 /**
- * The CloudDebugSettingsEditor creates the UI to change Run Configuration settings and applies those to our {@link
- * com.google.gct.idea.debugger.CloudDebugRunConfiguration}
+ * Creates the UI to change Run Configuration settings and applies those to our
+ * {@link com.google.gct.idea.debugger.CloudDebugRunConfiguration}.
  */
 public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfiguration> {
-  private final CloudDebugRunConfigurationPanel mySettingPanel;
+  private final CloudDebugRunConfigurationPanel mySettingsPanel;
 
   public CloudDebugSettingsEditor() {
-    mySettingPanel = new CloudDebugRunConfigurationPanel();
+    mySettingsPanel = new CloudDebugRunConfigurationPanel();
   }
 
   @Override
-  protected void applyEditorTo(CloudDebugRunConfiguration s) throws ConfigurationException {
-    s.setCloudProjectName(mySettingPanel.getProjectName());
-    s.setShowNotifications(mySettingPanel.getShowNotifications());
+  protected void applyEditorTo(CloudDebugRunConfiguration runConfiguration) throws ConfigurationException {
+    runConfiguration.setCloudProjectName(mySettingsPanel.getProjectName());
 
   }
 
   @NotNull
   @Override
   protected JComponent createEditor() {
-    return mySettingPanel.getMainPanel();
+    return mySettingsPanel.getMainPanel();
   }
 
   @Override
-  protected void resetEditorFrom(CloudDebugRunConfiguration s) {
-    mySettingPanel.setProjectName(s.getCloudProjectName());
-    mySettingPanel.setShowNotifications(s.isShowNotifications());
+  protected void resetEditorFrom(CloudDebugRunConfiguration runConfiguration) {
+    mySettingsPanel.setProjectName(runConfiguration.getCloudProjectName());
   }
 }

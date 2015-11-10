@@ -37,14 +37,14 @@ import java.net.SocketTimeoutException;
 import java.util.*;
 
 /**
- * The {@link CloudDebugGlobalPoller} queries multiple states on a fixed interval for updates. It notifies listeners
+ * Queries multiple states on a fixed interval for updates. It notifies listeners
  * when updates occur.
  */
 public class CloudDebugGlobalPoller {
   private static final int DELAY_MS = 5000;
   private static final Logger LOG = Logger.getInstance(CloudDebugGlobalPoller.class);
   private final List<CloudBreakpointListener> myBreakpointListChangedListeners =
-    new ArrayList<CloudBreakpointListener>();
+      new ArrayList<CloudBreakpointListener>();
   private Timer myWatchTimer = null;
 
   public void addListener(@NotNull CloudBreakpointListener listener) {
@@ -73,11 +73,21 @@ public class CloudDebugGlobalPoller {
       ApplicationManager.getApplication().addApplicationListener(new ApplicationAdapter() {
         @Override
         public void applicationExiting() {
-          myWatchTimer.cancel();
+          if (myWatchTimer != null) {
+            myWatchTimer.cancel();
+          }
         }
       });
     }
   }
+
+  public synchronized void stopBackgroundListening() {
+    if (myWatchTimer != null) {
+      myWatchTimer.cancel();
+      myWatchTimer = null;
+    }
+  }
+
 
   private static List<CloudDebugProcessState> getStates() {
     List<CloudDebugProcessState> states = new ArrayList<CloudDebugProcessState>();
@@ -99,11 +109,9 @@ public class CloudDebugGlobalPoller {
 
         if (config.getConfiguration() instanceof CloudDebugRunConfiguration) {
           final CloudDebugRunConfiguration cloudConfig = (CloudDebugRunConfiguration)config.getConfiguration();
-          if (cloudConfig.isShowNotifications()) {
-            CloudDebugProcessState state = cloudConfig.getProcessState();
-            if (state != null) {
-              states.add(state);
-            }
+          CloudDebugProcessState state = cloudConfig.getProcessState();
+          if (state != null) {
+            states.add(state);
           }
         }
       }

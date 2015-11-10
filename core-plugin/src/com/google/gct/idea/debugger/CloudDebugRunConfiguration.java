@@ -46,14 +46,12 @@ import org.jetbrains.annotations.Nullable;
  * selected "Shared".
  */
 public class CloudDebugRunConfiguration extends LocatableConfigurationBase
-  implements ModuleRunConfiguration, RunConfigurationWithSuppressedDefaultDebugAction,
-             RunConfigurationWithSuppressedDefaultRunAction, RemoteRunProfile {
+    implements ModuleRunConfiguration, RunConfigurationWithSuppressedDefaultDebugAction,
+               RunConfigurationWithSuppressedDefaultRunAction, RemoteRunProfile {
   private static final String NAME = "Cloud Debug Configuration";
   private static final String PROJECT_NAME_TAG = "CloudProjectName";
-  private static final String SHOW_NOTIFICATIONS = "CloudShowNotify";
   private String myCloudProjectName;
   private volatile CloudDebugProcessState myProcessState = null;
-  private boolean myShowNotifications = true;
 
   protected CloudDebugRunConfiguration(Project project, @NotNull ConfigurationFactory factory) {
     super(project, factory, NAME);
@@ -70,7 +68,6 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
     }
     final CloudDebugRunConfiguration configuration = (CloudDebugRunConfiguration) super.clone();
     configuration.setCloudProjectName(getCloudProjectName());
-    configuration.setShowNotifications(isShowNotifications());
     return configuration;
   }
 
@@ -142,24 +139,12 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
     return myProcessState;
   }
 
-  public boolean isShowNotifications() {
-    return myShowNotifications;
-  }
-
-  public void setShowNotifications(boolean showNotifications) {
-    myShowNotifications = showNotifications;
-  }
-
   @Override
   public void readExternal(Element element) throws InvalidDataException {
     super.readExternal(element);
     Attribute projectNameAttribute = element.getAttribute(PROJECT_NAME_TAG);
     if (projectNameAttribute != null) {
       myCloudProjectName = projectNameAttribute.getValue();
-    }
-    Attribute showNotificationsAttribute = element.getAttribute(SHOW_NOTIFICATIONS);
-    if (showNotificationsAttribute != null) {
-      myShowNotifications = Boolean.valueOf(showNotificationsAttribute.getValue());
     }
     // Call out to the state serializer to get process state out of workspace.xml.
     if (!Strings.isNullOrEmpty(myCloudProjectName) && !Strings.isNullOrEmpty(getName())) {
@@ -173,7 +158,6 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   public void writeExternal(Element element) throws WriteExternalException {
     super.writeExternal(element);
     element.setAttribute(PROJECT_NAME_TAG, myCloudProjectName == null ? "" : myCloudProjectName);
-    element.setAttribute(SHOW_NOTIFICATIONS, Boolean.toString(myShowNotifications));
     // IJ handles serialization of the the state serializer since its a project service.
   }
 }

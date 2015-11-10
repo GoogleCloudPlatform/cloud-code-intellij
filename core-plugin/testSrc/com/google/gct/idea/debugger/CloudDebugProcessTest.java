@@ -145,8 +145,7 @@ public class CloudDebugProcessTest extends PlatformTestCase {
         assertEquals(1, leftToolbar.getChildrenCount());
         AnAction actual = leftToolbar.getChildActionsOrStubs()[0];
         assertEquals(
-          "Stop IDE Debugging. The server will continue to watch for breakpoints. " +
-                  "(Exit debug mode and continue the debug session later.)",
+          "Stop IDE Debugging. (Exit debug mode and continue the debug session later.)",
           actual.toString());
     }
 
