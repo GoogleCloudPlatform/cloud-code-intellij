@@ -15,11 +15,9 @@ package com.google.gct.idea.testing;
  * limitations under the License.
  */
 
-import com.intellij.mock.MockProject;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.picocontainer.MutablePicoContainer;
@@ -30,34 +28,21 @@ import org.picocontainer.MutablePicoContainer;
 public class BasePluginTestCase {
 
   protected Project project;
-
-  public static class Container {
-
-    private final MutablePicoContainer container;
-
-    Container(@NotNull MutablePicoContainer container) {
-      this.container = container;
-    }
-
-    public <T> Container register(Class<T> clazz, T instance) {
-      this.container.registerComponentInstance(clazz.getName(), instance);
-      return this;
-    }
-  }
+  protected MutablePicoContainer applicationContainer;
 
   @Before
   public final void setup() {
     TestUtils.createMockApplication();
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
+    applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
-    MockProject mockProject = TestUtils.mockProject(applicationContainer);
+    project = TestUtils.mockProject(applicationContainer);
+  }
 
-    this.project = mockProject;
-
-    initTest(
-        new Container(applicationContainer),
-        new Container(mockProject.getPicoContainer())
-    );
+  /**
+   * Register your mock implementations here before executing your test cases.
+   */
+  public <T> void register(Class<T> clazz, T instance) {
+    applicationContainer.registerComponentInstance(clazz.getName(), instance);
   }
 
   @After
@@ -67,10 +52,5 @@ public class BasePluginTestCase {
 
   public final Project getProject() {
     return project;
-  }
-
-  protected void initTest(
-      @NotNull Container applicationServices,
-      @NotNull Container projectServices) {
   }
 }
