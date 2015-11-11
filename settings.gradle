@@ -1,1 +1,1 @@
-include 'google-login-plugin', 'core-plugin', 'common-lib'
+include 'google-account-plugin', 'core-plugin', 'common-lib'

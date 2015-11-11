@@ -8,10 +8,10 @@ common-lib/build/
 core-plugin/.gradle/
 core-plugin/build/
 core-plugin/core-plugin.zip
-google-login-plugin/.gradle/
-google-login-plugin/.idea/inspectionProfiles/
-google-login-plugin/build/
-google-login-plugin/google-login-plugin.zip
+google-account-plugin/.gradle/
+google-account-plugin/.idea/inspectionProfiles/
+google-account-plugin/build/
+google-account-plugin/google-account-plugin.zip
 idea-IC/
 .idea/gradle.xml
 .idea/codeStyleSettings.xml
