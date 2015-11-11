@@ -18,6 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import javax.annotation.Nullable;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.awt.Container;
 import java.lang.reflect.InvocationTargetException;
@@ -32,7 +33,7 @@ public class ExitDialogTest {
 
   @Before
   public void setUp() throws InvocationTargetException, InterruptedException {
-    IdeEventQueue.invokeAndWait(new Runnable() {
+    SwingUtilities.invokeAndWait(new Runnable() {
       @Override
       public void run() {
         dialog = new ExitDialog(null, tracker);
@@ -42,7 +43,7 @@ public class ExitDialogTest {
 
   @After
   public void tearDown() throws InvocationTargetException, InterruptedException {
-    IdeEventQueue.invokeAndWait(new Runnable() {
+    SwingUtilities.invokeAndWait(new Runnable() {
       @Override
       public void run() {
         dialog.close(DialogWrapper.CANCEL_EXIT_CODE);
@@ -86,7 +87,7 @@ public class ExitDialogTest {
   @Test
   public void testDoCancelAction() throws InvocationTargetException, InterruptedException {
     try {
-      IdeEventQueue.invokeAndWait(new Runnable() {
+      SwingUtilities.invokeAndWait(new Runnable() {
         @Override
         public void run() {
           dialog.show();
@@ -114,7 +115,7 @@ public class ExitDialogTest {
   @Test
   public void testDoOKAction() throws InvocationTargetException, InterruptedException {
     try {
-      IdeEventQueue.invokeAndWait(new Runnable() {
+      SwingUtilities.invokeAndWait(new Runnable() {
         @Override
         public void run() {
           dialog.show();
@@ -126,7 +127,7 @@ public class ExitDialogTest {
       Assume.assumeFalse(ex.getCause() instanceof NullPointerException);
     }
 
-    IdeEventQueue.invokeAndWait(new Runnable() {
+    SwingUtilities.invokeAndWait(new Runnable() {
       @Override
       public void run() {
         dialog.doOKAction();
