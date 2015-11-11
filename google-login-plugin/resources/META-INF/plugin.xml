@@ -16,7 +16,7 @@
 <idea-plugin version="2">
   <id>com.google.gct.login</id>
   <name>Google Login</name>
-  <version>1.0</version>
+  <version>${pluginVersionPlaceholder}</version>
   <vendor>Google</vendor>
 
   <description>Provides Google authentication support.</description>

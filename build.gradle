@@ -32,6 +32,12 @@ subprojects {
     sourceCompatibility = 1.6
     targetCompatibility = 1.6
 
+    processResources {
+        filesMatching("**/plugin.xml") {
+            expand "pluginVersionPlaceholder": version
+        }
+    }
+
 }
 
 

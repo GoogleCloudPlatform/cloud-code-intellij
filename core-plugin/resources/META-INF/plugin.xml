@@ -2,7 +2,7 @@
   <name>Google Cloud Tools Core</name>
   <description>Debug Java applications running in the Google cloud from inside IDEA.
 Code inspections for AppEngine Java code.</description>
-  <version>v0.9-alpha-SNAPSHOT</version>
+  <version>${pluginVersionPlaceholder}</version>
   <vendor>Google</vendor>
   <id>com.google.gct.core</id>
 
