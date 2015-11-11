@@ -15,9 +15,20 @@ package com.google.gct.idea.testing;
  * limitations under the License.
  */
 
+import static org.mockito.Mockito.mock;
+
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.extensions.DefaultPluginDescriptor;
+import com.intellij.openapi.extensions.ExtensionPoint;
+import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.extensions.Extensions;
+import com.intellij.openapi.extensions.PluginId;
+import com.intellij.openapi.extensions.impl.ExtensionPointImpl;
+import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl;
 import com.intellij.openapi.project.Project;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.picocontainer.MutablePicoContainer;
@@ -30,24 +41,46 @@ public class BasePluginTestCase {
   protected Project project;
   protected MutablePicoContainer applicationContainer;
 
+  private ExtensionsAreaImpl extensionsArea;
+
   @Before
   public final void setup() {
     TestUtils.createMockApplication();
     applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
     project = TestUtils.mockProject(applicationContainer);
+    extensionsArea = (ExtensionsAreaImpl) Extensions.getRootArea();
   }
 
   /**
    * Register your mock implementations here before executing your test cases.
    */
-  public <T> void register(Class<T> clazz, T instance) {
+  protected <T> void registerService(Class<T> clazz, T instance) {
     applicationContainer.registerComponentInstance(clazz.getName(), instance);
+  }
+
+  /**
+   * Register your extenstion points for test here!
+   */
+  protected <T> ExtensionPointImpl<T> registerExtensionPoint(@NotNull ExtensionPointName<T> name,
+      @NotNull Class<T> type) {
+    ExtensionPointImpl<T> extensionPoint = new ExtensionPointImpl<T>(
+        name.getName(),
+        type.getName(),
+        ExtensionPoint.Kind.INTERFACE,
+        extensionsArea,
+        null,
+        new Extensions.SimpleLogProvider(),
+        new DefaultPluginDescriptor(PluginId.getId(type.getName()), type.getClassLoader())
+    );
+    extensionsArea.registerExtensionPoint(extensionPoint);
+    return extensionPoint;
   }
 
   @After
   public final void tearDown() {
     TestUtils.disposeMockApplication();
+    Extensions.cleanRootArea(mock(Disposable.class));;
   }
 
   public final Project getProject() {
