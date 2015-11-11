@@ -1,11 +1,19 @@
 package com.google.gct.idea.debugger.ui;
 
+import com.google.gct.idea.util.GctTracking;
+import com.google.gct.login.stats.UsageTrackerService.UsageTracker;
 import com.intellij.ide.IdeEventQueue;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.DialogWrapperPeer;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.annotation.Nullable;
 import javax.swing.JButton;
@@ -14,17 +22,30 @@ import java.awt.Component;
 import java.awt.Container;
 import java.lang.reflect.InvocationTargetException;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ExitDialogTest {
 
   private ExitDialog dialog;
 
+  @Mock
+  private UsageTracker tracker;
+
   @Before
   public void setUp() throws InvocationTargetException, InterruptedException {
-
     IdeEventQueue.invokeAndWait(new Runnable() {
       @Override
       public void run() {
-        dialog = new ExitDialog(null);
+        dialog = new ExitDialog(null, tracker);
+      }
+    });
+  }
+
+  @After
+  public void tearDown() throws InvocationTargetException, InterruptedException {
+    IdeEventQueue.invokeAndWait(new Runnable() {
+      @Override
+      public void run() {
+        dialog.close(DialogWrapper.CANCEL_EXIT_CODE);
       }
     });
   }
@@ -41,18 +62,19 @@ public class ExitDialogTest {
     Container contentPane = peer.getContentPane();
 
     JButton continueButton = findButtonWithText(contentPane, "Continue");
-    // test fails on gradle for inobvious reasons; for now skip there
-
     Assume.assumeNotNull(continueButton);
+
     Assert.assertEquals("Continue", continueButton.getText());
   }
 
   @Test
   public void testStopListeningButton() {
+
     DialogWrapperPeer peer = dialog.getPeer();
     Container contentPane = peer.getContentPane();
     JButton button = findButtonWithText(contentPane, "Stop Listening");
     Assume.assumeNotNull(button);
+
     Assert.assertEquals("Stop Listening", button.getText());
   }
 
@@ -62,7 +84,7 @@ public class ExitDialogTest {
   }
 
   @Test
-  public void testStopListeningButtonClosesDialog() throws InvocationTargetException, InterruptedException {
+  public void testDoCancelAction() throws InvocationTargetException, InterruptedException {
     try {
       IdeEventQueue.invokeAndWait(new Runnable() {
         @Override
@@ -83,13 +105,42 @@ public class ExitDialogTest {
         Assert.assertFalse(dialog.getPeer().isVisible());
       }
     });
+
+
+    Mockito.verify(tracker).trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.stoplistening", null);
+  }
+
+
+  @Test
+  public void testDoOKAction() throws InvocationTargetException, InterruptedException {
+    try {
+      IdeEventQueue.invokeAndWait(new Runnable() {
+        @Override
+        public void run() {
+          dialog.show();
+          Assert.assertTrue(dialog.getPeer().isVisible());
+        }
+      });
+    } catch (InvocationTargetException ex) {
+      // for unclear reasons this test fails when not run inside IDEA.
+      Assume.assumeFalse(ex.getCause() instanceof NullPointerException);
+    }
+
+    IdeEventQueue.invokeAndWait(new Runnable() {
+      @Override
+      public void run() {
+        dialog.doOKAction();
+        Assert.assertFalse(dialog.getPeer().isVisible());
+      }
+    });
+
+    Mockito.verify(tracker).trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.continuelistening", null);
   }
 
   @Nullable
   private JButton findButtonWithText(Component component, String text) {
     if (component instanceof JButton) {
       JButton button = (JButton) component;
-      System.err.println(button.getText());
       if (text.equals(button.getText())) {
         return button;
       }
