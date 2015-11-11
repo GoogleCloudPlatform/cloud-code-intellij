@@ -37,29 +37,29 @@ sourceSets.test.java.srcDirs = ['testSrc']
 
 task plugin(type: Zip,  dependsOn: jar) {
     // by default uses version = 1.0
-    baseName = 'google-login'
+    baseName = 'google-account'
     destinationDir = file('build')
     include '*.jar'
     from('build/libs') {
-        into('google-login/lib')
+        into('google-account/lib')
     }
     from('../common-lib/build/libs') {
-        into('google-login/lib')
+        into('google-account/lib')
     }
     from('../common-lib/lib') {
-        into('google-login/lib')
+        into('google-account/lib')
     }
     from('lib/') {
-        into('google-login/lib')
+        into('google-account/lib')
     }
     from('third_party/repackaged') {
-        into('google-login/lib')
+        into('google-account/lib')
     }
     from('third_party/javax-servlet-api') {
-        into('google-login/lib')
+        into('google-account/lib')
     }
     from('third_party/jackson-core-asl') {
-        into('google-login/lib')
+        into('google-account/lib')
     }
 }
 
