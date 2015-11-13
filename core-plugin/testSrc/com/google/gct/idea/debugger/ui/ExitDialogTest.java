@@ -17,6 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.annotation.Nullable;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import java.awt.Component;
@@ -37,6 +38,8 @@ public class ExitDialogTest {
       @Override
       public void run() {
         dialog = new ExitDialog(null, tracker);
+
+        dialog.show();
       }
     });
   }
@@ -60,7 +63,7 @@ public class ExitDialogTest {
   @Test
   public void testContinueButton() {
     DialogWrapperPeer peer = dialog.getPeer();
-    Container contentPane = peer.getContentPane();
+    JComponent contentPane = dialog.getContentPanel();
 
     JButton continueButton = findButtonWithText(contentPane, "Continue");
     Assume.assumeNotNull(continueButton);

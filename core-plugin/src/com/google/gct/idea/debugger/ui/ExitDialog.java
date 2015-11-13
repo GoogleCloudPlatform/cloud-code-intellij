@@ -6,6 +6,7 @@ import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.stats.UsageTrackerService.UsageTracker;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.wm.IdeFocusManager;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
@@ -19,6 +20,7 @@ public class ExitDialog extends DialogWrapper {
 
   private final JLabel myLabel = new JLabel(GctBundle.getString("clouddebug.continuelistening"));
   private final UsageTracker myTracker;
+  private IdeFocusManager focusManager;
 
   public ExitDialog(@Nullable Project project, UsageTracker tracker) {
     super(project, false, IdeModalityType.MODELESS);
@@ -55,4 +57,5 @@ public class ExitDialog extends DialogWrapper {
           GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.stoplistening", null);
     }
   }
+
 }
