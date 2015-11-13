@@ -6,7 +6,7 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/common-lib" />
     <file type="web" url="file://$PROJECT_DIR$/core-plugin" />
-    <file type="web" url="file://$PROJECT_DIR$/google-login-plugin" />
+    <file type="web" url="file://$PROJECT_DIR$/google-account-plugin" />
   </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />

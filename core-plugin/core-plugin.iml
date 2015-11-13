@@ -61,7 +61,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="google-login-plugin" scope="PROVIDED" />
+    <orderEntry type="module" module-name="google-account-plugin" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="git4idea" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="gradle" level="project" />
     <orderEntry type="module" module-name="common-lib" />

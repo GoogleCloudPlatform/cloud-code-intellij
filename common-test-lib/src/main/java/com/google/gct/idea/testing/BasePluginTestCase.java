@@ -15,8 +15,17 @@ package com.google.gct.idea.testing;
  * limitations under the License.
  */
 
-import com.intellij.mock.MockProject;
+import static org.mockito.Mockito.mock;
+
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.extensions.DefaultPluginDescriptor;
+import com.intellij.openapi.extensions.ExtensionPoint;
+import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.extensions.Extensions;
+import com.intellij.openapi.extensions.PluginId;
+import com.intellij.openapi.extensions.impl.ExtensionPointImpl;
+import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl;
 import com.intellij.openapi.project.Project;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,47 +39,51 @@ import org.picocontainer.MutablePicoContainer;
 public class BasePluginTestCase {
 
   protected Project project;
+  protected MutablePicoContainer applicationContainer;
 
-  public static class Container {
-
-    private final MutablePicoContainer container;
-
-    Container(@NotNull MutablePicoContainer container) {
-      this.container = container;
-    }
-
-    public <T> Container register(Class<T> clazz, T instance) {
-      this.container.registerComponentInstance(clazz.getName(), instance);
-      return this;
-    }
-  }
+  private ExtensionsAreaImpl extensionsArea;
 
   @Before
   public final void setup() {
     TestUtils.createMockApplication();
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
+    applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
-    MockProject mockProject = TestUtils.mockProject(applicationContainer);
+    project = TestUtils.mockProject(applicationContainer);
+    extensionsArea = (ExtensionsAreaImpl) Extensions.getRootArea();
+  }
 
-    this.project = mockProject;
+  /**
+   * Register your mock implementations here before executing your test cases.
+   */
+  protected <T> void registerService(Class<T> clazz, T instance) {
+    applicationContainer.registerComponentInstance(clazz.getName(), instance);
+  }
 
-    initTest(
-        new Container(applicationContainer),
-        new Container(mockProject.getPicoContainer())
+  /**
+   * Register your extenstion points for test here!
+   */
+  protected <T> ExtensionPointImpl<T> registerExtensionPoint(@NotNull ExtensionPointName<T> name,
+      @NotNull Class<T> type) {
+    ExtensionPointImpl<T> extensionPoint = new ExtensionPointImpl<T>(
+        name.getName(),
+        type.getName(),
+        ExtensionPoint.Kind.INTERFACE,
+        extensionsArea,
+        null,
+        new Extensions.SimpleLogProvider(),
+        new DefaultPluginDescriptor(PluginId.getId(type.getName()), type.getClassLoader())
     );
+    extensionsArea.registerExtensionPoint(extensionPoint);
+    return extensionPoint;
   }
 
   @After
   public final void tearDown() {
     TestUtils.disposeMockApplication();
+    Extensions.cleanRootArea(mock(Disposable.class));;
   }
 
   public final Project getProject() {
     return project;
-  }
-
-  protected void initTest(
-      @NotNull Container applicationServices,
-      @NotNull Container projectServices) {
   }
 }

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/google-login.iml" filepath="$PROJECT_DIR$/google-login.iml" />
+      <module fileurl="file://$PROJECT_DIR$/google-account.iml" filepath="$PROJECT_DIR$/google-account.iml" />
     </modules>
   </component>
 </project>

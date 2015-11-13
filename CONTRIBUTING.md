@@ -26,14 +26,14 @@ $ git clone https://github.com/GoogleCloudPlatform/gcloud-intellij.git
 Cloning into 'gcloud-intellij'...
 ```
 
-There are three modules: google-login-plugin, core-plugin, and common-lib.
+There are three modules: google-account-plugin, core-plugin, and common-lib.
 
 On Linux/Mac OS X we use gradle as our build system. 
 Gradle is self-installing. This one command
 
 $ ./gradlew plugin
 
-compiles everything, runs the test, and builds the plugins. The output appears in google-login-plugin/build and core-plugin/build.
+compiles everything, runs the test, and builds the plugins. The output appears in google-account-plugin/build and core-plugin/build.
 
 Other useful targets while developing include:
 
