@@ -23,13 +23,13 @@ import com.google.gct.idea.debugger.CloudDebugProcessState;
 import com.google.gct.idea.debugger.CloudDebuggerClient;
 import com.google.gct.idea.debugger.ProjectRepositoryState;
 import com.google.gct.idea.debugger.ProjectRepositoryValidator;
+import com.google.gct.idea.debugger.SyncResult;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
 import com.google.gct.login.stats.UsageTrackerService;
-
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.ApplicationManager;
@@ -44,7 +44,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.HashMap;
-
 import git4idea.actions.BasicAction;
 import git4idea.branch.GitBrancher;
 import git4idea.commands.GitCommand;
@@ -55,12 +54,18 @@ import git4idea.repo.GitRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -85,7 +90,7 @@ public class CloudAttachDialog extends DialogWrapper {
   private CloudDebugProcessState myProcessResultState;
   private GitRepository mySourceRepository;
   private String myStashMessage = null;
-  private ProjectRepositoryValidator.SyncResult mySyncResult;
+  private SyncResult mySyncResult;
   private JBCheckBox mySyncStashCheckbox;
   private JBLabel myWarningLabel;
   private JBLabel myWarningLabel2;
@@ -107,12 +112,12 @@ public class CloudAttachDialog extends DialogWrapper {
           myWarningLabel2.setVisible(!mySyncStashCheckbox.isSelected());
           myInfoPanel.setVisible(mySyncStashCheckbox.isSelected());
           if (mySyncStashCheckbox.isSelected()) {
-            setOKButtonText(getIsContinued()
+            setOKButtonText(isContinued()
                             ? GctBundle.getString("clouddebug.continuesession")
                             : GctBundle.getString("clouddebug.attach"));
           }
           else {
-            setOKButtonText(getIsContinued()
+            setOKButtonText(isContinued()
                             ? GctBundle.getString("clouddebug.continueanyway")
                             : GctBundle.getString("clouddebug.attach.anyway"));
           }
@@ -150,7 +155,7 @@ public class CloudAttachDialog extends DialogWrapper {
       }
     });
 
-    setOKActionEnabled(getIsContinued() || doValidate() == null);
+    setOKActionEnabled(isContinued() || doValidate() == null);
   }
 
   @Nullable
@@ -222,17 +227,22 @@ public class CloudAttachDialog extends DialogWrapper {
     mySyncResult = new ProjectRepositoryValidator(myProcessResultState).checkSyncStashState();
 
     if (mySyncResult.needsStash() && mySyncResult.needsSync()) {
-      setOKButtonText(getIsContinued() ? GctBundle.getString("clouddebug.continuesession") : GctBundle.getString("clouddebug.attach"));
+      setOKButtonText(isContinued()
+          ? GctBundle.getString("clouddebug.continuesession")
+          : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(true);
       assert mySyncResult.getTargetSyncSHA() != null;
-      mySyncStashCheckbox.setText("Stash local changes and Sync to " + mySyncResult.getTargetSyncSHA().substring(0, 7));
+      mySyncStashCheckbox.setText(
+          GctBundle.getString("clouddebug.stash.local.changes.and.sync", mySyncResult.getTargetSyncSHA().substring(0, 7)));
       mySyncStashCheckbox.setSelected(true);
       myWarningLabel.setVisible(false);
       myWarningLabel2.setVisible(false);
       myInfoPanel.setVisible(true);
     }
     else if (mySyncResult.needsStash()) {
-      setOKButtonText(getIsContinued() ? GctBundle.getString("clouddebug.continuesession") : GctBundle.getString("clouddebug.attach"));
+      setOKButtonText(isContinued()
+          ? GctBundle.getString("clouddebug.continuesession")
+          : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(true);
       mySyncStashCheckbox.setText(GctBundle.getString("clouddebug.stashbuttontext"));
       mySyncStashCheckbox.setSelected(true);
@@ -241,7 +251,9 @@ public class CloudAttachDialog extends DialogWrapper {
       myInfoPanel.setVisible(true);
     }
     else if (mySyncResult.needsSync()) {
-      setOKButtonText(getIsContinued() ? GctBundle.getString("clouddebug.continuesession") : GctBundle.getString("clouddebug.attach"));
+      setOKButtonText(isContinued()
+          ? GctBundle.getString("clouddebug.continuesession")
+          : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(true);
       assert mySyncResult.getTargetSyncSHA() != null;
       mySyncStashCheckbox.setText("Sync to " + mySyncResult.getTargetSyncSHA().substring(0, 7));
@@ -250,15 +262,34 @@ public class CloudAttachDialog extends DialogWrapper {
       myWarningLabel2.setVisible(false);
       myInfoPanel.setVisible(true);
     }
-    else if (!mySyncResult.isDeterminable()) {
-      setOKButtonText(getIsContinued() ? GctBundle.getString("clouddebug.continueanyway") : GctBundle.getString("clouddebug.attach.anyway"));
+    else if (mySyncResult.needsSync() && mySyncResult.getTargetSyncSHA() == null) {
+      setOKButtonText(isContinued()
+          ? GctBundle.getString("clouddebug.continueanyway")
+          : GctBundle.getString("clouddebug.attach.anyway"));
       myWarningLabel.setVisible(true);
       myWarningLabel2.setVisible(true);
       myInfoPanel.setVisible(true);
-      myWarningLabel2.setText("Could not verify that current source matches module.");
+      myWarningLabel2.setText(GctBundle.getString("clouddebug.no.matching.sha"));
+    }
+    else if (!mySyncResult.hasRemoteRepository()) {
+      setOKButtonText(isContinued()
+          ? GctBundle.getString("clouddebug.continueanyway")
+          : GctBundle.getString("clouddebug.attach.anyway"));
+      myWarningLabel.setVisible(true);
+      myWarningLabel2.setVisible(true);
+      myInfoPanel.setVisible(true);
+      if (mySyncResult.getRepositoryType() != null) {
+        myWarningLabel2.setText(GctBundle.getString("clouddebug.repositories.are.not.supported",
+            mySyncResult.getRepositoryType()));
+      }
+      else {
+        myWarningLabel2.setText(GctBundle.getString("clouddebug.no.remote.repository"));
+      }
     }
     else {
-      setOKButtonText(getIsContinued() ? GctBundle.getString("clouddebug.continuesession") : GctBundle.getString("clouddebug.attach"));
+      setOKButtonText(isContinued()
+          ? GctBundle.getString("clouddebug.continuesession")
+          : GctBundle.getString("clouddebug.attach"));
       mySyncStashCheckbox.setVisible(false);
       myWarningLabel.setVisible(false);
       myWarningLabel2.setVisible(false);
@@ -266,7 +297,7 @@ public class CloudAttachDialog extends DialogWrapper {
     }
   }
 
-  private boolean getIsContinued() {
+  private boolean isContinued() {
     CloudDebugProcessState state = myWireup.getInputState();
     return state != null && state.getCurrentServerBreakpointList().size() > 0;
   }
@@ -277,7 +308,7 @@ public class CloudAttachDialog extends DialogWrapper {
   }
 
   private boolean stash() {
-    if (mySyncResult.getTargetRepository() == null) {
+    if (!mySyncResult.hasLocalRepository()) {
       LOG.error("unexpected null local repro in call to stash");
       return false;
     }
@@ -306,14 +337,13 @@ public class CloudAttachDialog extends DialogWrapper {
    */
   private void syncOrStash() {
     // When the user edits a document in intelliJ, there are spurious updates to the timestamp of
-    // the document
-    // for an unspecified amount of time (even though there are no real edits).
+    // the document for an unspecified amount of time (even though there are no real edits).
     // So, we save-all right before we stash to (help) ensure we don't get a conflict dialog.
     // The conflict dialog happens when the timestamps of the document and file are mismatched.
     // So when we do the git operations, we want the document and file timestamps to match exactly.
     BasicAction.saveAll();
 
-    mySourceRepository = mySyncResult.getTargetRepository();
+    mySourceRepository = mySyncResult.getLocalRepository();
 
     if (mySyncResult.needsStash() || mySyncResult.needsSync()) {
       if (mySourceRepository.getCurrentBranch() != null) {
@@ -417,8 +447,7 @@ public class CloudAttachDialog extends DialogWrapper {
 
       myCredentialedUser = credentialedUser;
       myCloudDebuggerClient =
-        myCredentialedUser != null ? CloudDebuggerClient.getLongTimeoutClient(myCredentialedUser.getEmail()) : null;
-
+          myCredentialedUser != null ? CloudDebuggerClient.getLongTimeoutClient(myCredentialedUser.getEmail()) : null;
 
       return myCloudDebuggerClient;
     }
