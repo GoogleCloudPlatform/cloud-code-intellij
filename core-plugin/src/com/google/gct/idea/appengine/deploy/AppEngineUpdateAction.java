@@ -15,7 +15,7 @@
  */
 package com.google.gct.idea.appengine.deploy;
 
-import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.stats.UsageTrackerProvider;
 import com.google.gct.idea.util.GctTracking;
 
 import com.intellij.openapi.actionSystem.AnAction;
@@ -31,7 +31,7 @@ public class AppEngineUpdateAction extends AnAction {
   public void actionPerformed(AnActionEvent e) {
     final Module selectedModule = LangDataKeys.MODULE.getData(e.getDataContext());
 
-    UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.DEPLOY, "show.dialog", null);
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.DEPLOY, "show.dialog", null);
     AppEngineUpdateDialog.show(e.getProject(), selectedModule);
   }
 }

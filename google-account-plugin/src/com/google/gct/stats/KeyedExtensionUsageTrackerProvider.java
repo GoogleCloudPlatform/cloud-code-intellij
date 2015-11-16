@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.gct.login.stats;
+package com.google.gct.stats;
 
 import com.intellij.openapi.util.KeyedExtensionCollector;
 import com.intellij.util.PlatformUtils;
@@ -22,65 +22,50 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Usage Tracker Service for obtaining extensions declared in plugin.xml with {@link
- * UsageTrackerExtensionPointBean}
+ * Implementation of {@link UsageTrackerProvider} for obtaining {@link UsageTracker} implementations
+ * declared in plugin.xml with {@link UsageTrackerExtensionPointBean}.
  */
-public final class UsageTrackerService {
-
+public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvider {
   private static final KeyedExtensionCollector<UsageTracker, String> COLLECTOR =
-      new KeyedExtensionCollector<UsageTracker, String>(
-          UsageTrackerExtensionPointBean.EP_NAME.getName());
-  private static final UsageTrackerManager usageTrackerManager = UsageTrackerManager.getInstance();
+      new KeyedExtensionCollector<UsageTracker, String>(UsageTrackerExtensionPointBean.EP_NAME.getName());
 
   /**
    * When using the usage tracker, do NOT include any information that can identify the user
-   *
-   * @return the usage tracker for the current platform
+   * @return the usage tracker for the current platform.
    */
   @NotNull
-  public static UsageTracker getInstance() {
+  @Override
+  protected UsageTracker getTracker() {
     String key = PlatformUtils.getPlatformPrefix();
-    return getInstance(key);
+    return getTracker(key);
   }
 
   /**
-   * For usage tracking in the Cloud Tools family of plugins, we only want one tracker pinging an
-   * analytics backend for a given platform. New platform specific trackers can register with their
-   * platform prefix key and the UsageTrackerService will select them.  Otherwise, the no-op usage
-   * tracker will be used.
+   * For usage tracking in the Cloud Tools family of plugins, we only want one tracker pinging an analytics backend
+   * for a given platform. New platform specific trackers can register with their platform prefix key and the
+   * UsageTrackerProvider will select them.  Otherwise, the no-op usage tracker will be used.
    *
    * @param key A string search key associated with an extension
    * @return the first implementation of UsageTracker associated with {@param key}
+   *
    */
-  static UsageTracker getInstance(@Nullable String key) {
+  static UsageTracker getTracker(@Nullable String key) {
     UsageTracker instance = (key == null) ? null : COLLECTOR.findSingle(key);
     if (instance != null) {
       return instance;
     }
+
     return new NoOpUsageTracker();
-  }
 
-  // Interface for UsageTracker implementations defined in other plugins
-  public interface UsageTracker {
-
-    /**
-     * When tracking events, do NOT include any information that can identify the user
-     */
-    void trackEvent(@NotNull String eventCategory,
-        @NotNull String eventAction,
-        @Nullable String eventLabel,
-        @Nullable Integer eventValue);
   }
 
   // Default no-op implementation of the UsageTracker
   public static class NoOpUsageTracker implements UsageTracker {
 
     @Override
-    public void trackEvent(@NotNull String eventCategory, @NotNull String eventAction,
-        @Nullable String eventLabel,
+    public void trackEvent(@NotNull String eventCategory, @NotNull String eventAction, @Nullable String eventLabel,
         @Nullable Integer eventValue) {
       // Do nothing
     }
   }
-
 }

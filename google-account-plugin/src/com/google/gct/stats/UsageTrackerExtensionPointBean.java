@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.gct.login.stats;
-
-import com.google.gct.login.stats.UsageTrackerService.UsageTracker;
+package com.google.gct.stats;
 
 import com.intellij.openapi.extensions.AbstractExtensionPointBean;
 import com.intellij.openapi.extensions.ExtensionPointName;
@@ -26,12 +24,13 @@ import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Class that defines extensions points in plugin.xml, extensions point will implement
- * {@link UsageTrackerService.UsageTracker}
+ * Class that defines extensions points in plugin.xml, Extensions point will implement
+ * {@link UsageTrackerProvider}
  */
 public class UsageTrackerExtensionPointBean extends AbstractExtensionPointBean implements
     KeyedLazyInstance<UsageTracker> {
 
+  // TODO : when changing the package root for this plugin, update this
   static final ExtensionPointName<UsageTracker> EP_NAME =
       new ExtensionPointName<UsageTracker>("com.google.gct.login.usageTracker");
 

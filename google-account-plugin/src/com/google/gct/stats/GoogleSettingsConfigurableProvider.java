@@ -1,6 +1,4 @@
-package com.google.gct.login.stats;
-
-import com.google.gct.login.stats.UsageTrackerService.UsageTracker;
+package com.google.gct.stats;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurableProvider;

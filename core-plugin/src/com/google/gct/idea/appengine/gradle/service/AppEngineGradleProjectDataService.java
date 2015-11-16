@@ -24,7 +24,7 @@ import com.google.gct.idea.appengine.gradle.project.IdeaAppEngineProject;
 
 import com.google.gct.idea.appengine.run.AppEngineRunConfiguration;
 import com.google.gct.idea.appengine.run.AppEngineRunConfigurationType;
-import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.stats.UsageTrackerProvider;
 import com.google.gct.idea.util.GctTracking;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -83,7 +83,7 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
           if (importModulesMap.containsKey(module.getName())) {
             AppEngineGradleFacet facet = addAppEngineGradleFacet(importModulesMap.get(module.getName()), module);
             addAppEngineRunConfiguration(module, facet);
-            UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.GRADLE_IMPORT, null, null);
+            UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.GRADLE_IMPORT, null, null);
           }
         }
       }

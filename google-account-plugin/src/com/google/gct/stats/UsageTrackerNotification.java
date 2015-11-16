@@ -1,4 +1,4 @@
-package com.google.gct.login.stats;
+package com.google.gct.stats;
 
 import com.google.gct.login.util.TrackerMessageBundle;
 import com.intellij.ide.BrowserUtil;
@@ -40,7 +40,7 @@ public class UsageTrackerNotification {
                         notification.expire();
                     }
                     else if ("decline".equals(description)) {
-                        UsageTrackerManager usageTrackerManager = new UsageTrackerManager();
+                        UsageTrackerManager usageTrackerManager = UsageTrackerManager.getInstance();
                         usageTrackerManager.setTrackingPreference(false);
                         notification.expire();
                     }

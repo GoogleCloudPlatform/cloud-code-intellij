@@ -1,8 +1,9 @@
-package com.google.gct.login.stats;
+package com.google.gct.stats;
 
 import static org.mockito.Mockito.when;
 
 import com.google.gct.login.PluginFlags;
+import com.google.gct.stats.UsageTrackerManager;
 
 import com.intellij.ide.util.PropertiesComponent;
 

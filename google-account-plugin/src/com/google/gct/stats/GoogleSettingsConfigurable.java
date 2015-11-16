@@ -1,4 +1,4 @@
-package com.google.gct.login.stats;
+package com.google.gct.stats;
 
 import com.google.gct.login.util.TrackerMessageBundle;
 import com.intellij.ide.BrowserUtil;

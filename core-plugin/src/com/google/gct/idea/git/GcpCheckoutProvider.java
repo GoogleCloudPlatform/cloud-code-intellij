@@ -16,7 +16,7 @@
 package com.google.gct.idea.git;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.gct.login.stats.UsageTrackerService;
+import com.google.gct.stats.UsageTrackerProvider;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 
@@ -64,7 +64,7 @@ public class GcpCheckoutProvider implements CheckoutProvider {
 
   @Override
   public void doCheckout(@NotNull final Project project, @Nullable final Listener listener) {
-    UsageTrackerService.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "checkout", null);
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "checkout", null);
 
     BasicAction.saveAll();
     CloneGcpDialog dialog = new CloneGcpDialog(project);
