@@ -5,6 +5,7 @@ import com.intellij.openapi.ui.DialogWrapperPeer;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.annotation.Nullable;
@@ -14,6 +15,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.lang.reflect.InvocationTargetException;
 
+@Ignore
 public class ExitDialogTest {
 
   private ExitDialog dialog;
