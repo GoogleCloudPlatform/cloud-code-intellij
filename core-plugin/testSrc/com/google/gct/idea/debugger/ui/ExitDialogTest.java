@@ -2,7 +2,6 @@ package com.google.gct.idea.debugger.ui;
 
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.stats.UsageTrackerService.UsageTracker;
-import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.DialogWrapperPeer;
 import org.junit.After;
@@ -102,7 +101,7 @@ public class ExitDialogTest {
       Assume.assumeFalse(ex.getCause() instanceof NullPointerException);
     }
 
-    IdeEventQueue.invokeAndWait(new Runnable() {
+    SwingUtilities.invokeAndWait(new Runnable() {
       @Override
       public void run() {
         dialog.doCancelAction();
@@ -127,7 +126,7 @@ public class ExitDialogTest {
       });
     } catch (InvocationTargetException ex) {
       // for unclear reasons this test fails when not run inside IDEA.
-      Assume.assumeFalse(ex.getCause() instanceof NullPointerException);
+      Assert.assertTrue(ex.getCause().getClass().getCanonicalName(), ex.getCause() instanceof NullPointerException);
     }
 
     SwingUtilities.invokeAndWait(new Runnable() {
