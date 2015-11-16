@@ -19,6 +19,8 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.model.CloudRepoSourceContext;
 import com.google.api.services.clouddebugger.model.Debuggee;
+import com.google.api.services.clouddebugger.model.GerritSourceContext;
+import com.google.api.services.clouddebugger.model.GitSourceContext;
 import com.google.api.services.clouddebugger.model.ListDebuggeesResponse;
 import com.google.api.services.clouddebugger.model.SourceContext;
 import com.google.gct.idea.util.GctBundle;
@@ -47,7 +49,16 @@ import git4idea.GitUtil;
 import git4idea.GitVcs;
 import git4idea.branch.GitBrancher;
 import git4idea.changes.GitChangeUtils;
-import git4idea.commands.*;
+import git4idea.commands.Git;
+import git4idea.commands.GitCommand;
+import git4idea.commands.GitCommandResult;
+import git4idea.commands.GitHandler;
+import git4idea.commands.GitHandlerUtil;
+import git4idea.commands.GitLineHandler;
+import git4idea.commands.GitLineHandlerAdapter;
+import git4idea.commands.GitLocalChangesWouldBeOverwrittenDetector;
+import git4idea.commands.GitSimpleHandler;
+import git4idea.commands.GitUntrackedFilesOverwrittenByOperationDetector;
 import git4idea.config.GitVersionSpecialty;
 import git4idea.i18n.GitBundle;
 import git4idea.repo.GitRepository;
@@ -82,19 +93,22 @@ public class ProjectRepositoryValidator {
   }
 
   /**
-   * Compares the current source tree with the state described by the Cloud Debugger api. Only Git is currently
-   * supported.
+   * Compares the current source tree with the state described by the Cloud Debugger api.
+   * Only local and cloud repo Git repositories are supported.
    */
   @NotNull
   @Transient
   public SyncResult checkSyncStashState() {
     if (myProcessState.getProject() == null) {
-      return new SyncResult(/*isinvalid*/true, /*needsstash*/ false, /*needssync*/ false,
-                            /*isdeterminable*/ true, /*target SHA*/ null, /*target repo*/ null);
+      return new SyncResult(/*isInvalid*/ true, /*needsStash*/ false, /*needsSync*/ false,
+                            /*target SHA*/ null, /*target repo*/ null, /* cloud repo */ false, /* repoType */ null);
     }
     GitRepositoryManager manager = GitUtil.getRepositoryManager(myProcessState.getProject());
     List<GitRepository> repositories = manager.getRepositories();
     CloudRepoSourceContext cloudRepo = null;
+    GerritSourceContext gerritRepo = null;
+    GitSourceContext otherGitRepo = null;
+    String repoType = null;
 
     boolean foundDebuggee = false;
     if (getCloudDebuggerClient() != null &&
@@ -104,13 +118,20 @@ public class ProjectRepositoryValidator {
         debuggees = getCloudDebuggerClient().debuggees().list().setProject(myProcessState.getProjectNumber()).execute();
         for (Debuggee debuggee : debuggees.getDebuggees()) {
           if (myProcessState.getDebuggeeId() != null && myProcessState.getDebuggeeId().equals(debuggee.getId())) {
+            // implicit assumption this doesn't happen more than once
             foundDebuggee = true;
             List<SourceContext> contexts = debuggee.getSourceContexts();
             if (contexts != null) {
               for (SourceContext sourceContext : contexts) {
                 cloudRepo = sourceContext.getCloudRepo();
+                gerritRepo = sourceContext.getGerrit();
+                otherGitRepo = sourceContext.getGit();
                 if (cloudRepo != null) {
+                  // shouldn't be more than one repo but if there is, we'll prefer cloud repos
                   break;
+                }
+                else if (sourceContext.getCloudWorkspace() != null) {
+                  repoType = GctBundle.getString("clouddebug.workspace");
                 }
               }
             }
@@ -123,19 +144,36 @@ public class ProjectRepositoryValidator {
     }
 
     if (!foundDebuggee) {
-      return new SyncResult(/*isinvalid*/true,
+      return new SyncResult(/*isinvalid*/ true,
                             /*needsstash*/ false,
                             /*needssync*/ false,
-                            /*isdeterminable*/ true,
                             /*target SHA*/ null,
-                            /*target repo*/ null);
+                            /*target repo*/ null,
+                            /* hasCloudRepository */ false,
+                            /* repoType */ GctBundle.getString("clouddebug.unknown.repository.type"));
     }
 
     GitRepository targetLocalRepo = null;
+    String revisionId = null;
+
+    // shouldn't be more than one repo but if there is, we pick cloud repos
     if (cloudRepo != null) {
+      revisionId = cloudRepo.getRevisionId();
+      repoType = GctBundle.getString("clouddebug.cloud.repository");
+    }
+    else if (gerritRepo != null) {
+      revisionId = gerritRepo.getRevisionId();
+      repoType = GctBundle.getString("clouddebug.gerrit");
+    }
+    else if (otherGitRepo != null) {
+      revisionId = otherGitRepo.getRevisionId();
+      repoType = GctBundle.getString("clouddebug.nongoogle.git");
+    }
+
+    if (revisionId != null) {
       for (GitRepository repository : repositories) {
         try {
-          GitChangeUtils.resolveReference(myProcessState.getProject(), repository.getRoot(), cloudRepo.getRevisionId());
+          GitChangeUtils.resolveReference(myProcessState.getProject(), repository.getRoot(), revisionId);
           targetLocalRepo = repository;
           break;
         }
@@ -157,10 +195,10 @@ public class ProjectRepositoryValidator {
           needsStash = true;
         }
         if (!Strings.isNullOrEmpty(targetLocalRepo.getCurrentRevision()) &&
-            !Strings.isNullOrEmpty(cloudRepo.getRevisionId()) &&
+            !Strings.isNullOrEmpty(revisionId) &&
             targetLocalRepo.getCurrentRevision() != null &&
-            !targetLocalRepo.getCurrentRevision().equals(cloudRepo.getRevisionId())) {
-          syncSHA = cloudRepo.getRevisionId();
+            !targetLocalRepo.getCurrentRevision().equals(revisionId)) {
+          syncSHA = revisionId;
           needsSync = true;
         }
 
@@ -170,8 +208,8 @@ public class ProjectRepositoryValidator {
       }
     }
 
-    return new SyncResult(/*isinvalid*/ false, needsStash, needsSync, targetLocalRepo != null, syncSHA,
-                          targetLocalRepo);
+    boolean hasRemoteRepository = cloudRepo != null || gerritRepo != null || otherGitRepo != null;
+    return new SyncResult(/*isinvalid*/ false, needsStash, needsSync, syncSHA, targetLocalRepo, hasRemoteRepository, repoType);
   }
 
   @Nullable
@@ -283,9 +321,9 @@ public class ProjectRepositoryValidator {
       }
     });
     GitUntrackedFilesOverwrittenByOperationDetector untrackedFilesDetector =
-      new GitUntrackedFilesOverwrittenByOperationDetector(root);
+        new GitUntrackedFilesOverwrittenByOperationDetector(root);
     GitLocalChangesWouldBeOverwrittenDetector localChangesDetector =
-      new GitLocalChangesWouldBeOverwrittenDetector(root, MERGE);
+        new GitLocalChangesWouldBeOverwrittenDetector(root, MERGE);
     handler.addLineListener(untrackedFilesDetector);
     handler.addLineListener(localChangesDetector);
 
@@ -293,14 +331,14 @@ public class ProjectRepositoryValidator {
     try {
       final Ref<GitCommandResult> result = Ref.create();
       ProgressManager.getInstance()
-        .run(new Task.Modal(handler.project(), GitBundle.getString("unstash.unstashing"), false) {
-          @Override
-          public void run(@NotNull final ProgressIndicator indicator) {
-            indicator.setIndeterminate(true);
-            handler
-              .addLineListener(new GitHandlerUtil.GitLineHandlerListenerProgress(indicator, handler, "stash", false));
-            Git git = ServiceManager.getService(Git.class);
-            result.set(git.runCommand(new Computable.PredefinedValueComputable<GitLineHandler>(handler)));
+          .run(new Task.Modal(handler.project(), GitBundle.getString("unstash.unstashing"), false) {
+            @Override
+            public void run(@NotNull final ProgressIndicator indicator) {
+              indicator.setIndeterminate(true);
+              handler
+                  .addLineListener(new GitHandlerUtil.GitLineHandlerListenerProgress(indicator, handler, "stash", false));
+              Git git = ServiceManager.getService(Git.class);
+              result.set(git.runCommand(new Computable.PredefinedValueComputable<GitLineHandler>(handler)));
           }
         });
 
@@ -357,60 +395,4 @@ public class ProjectRepositoryValidator {
     }
   }
 
-  /**
-   * The SyncResult fully describes the result from checking the current users' source with what the cloud debugger is
-   * attached to on the server.
-   */
-  public static class SyncResult {
-    private final boolean myInvalidDebuggee;
-    private final boolean myIsDeterminable;
-    private final boolean myNeedsStash;
-    private final boolean myNeedsSync;
-    private final GitRepository myTargetRepository;
-    private final String myTargetSyncSHA;
-
-    private SyncResult(boolean invalidDebuggee,
-                       boolean needsStash,
-                       boolean needsSync,
-                       boolean isDeterminable,
-                       @Nullable String targetSyncSHA,
-                       @Nullable GitRepository targetRepository) {
-      myInvalidDebuggee = invalidDebuggee;
-      myNeedsStash = needsStash;
-      myNeedsSync = needsSync;
-      myIsDeterminable = isDeterminable;
-      myTargetSyncSHA = targetSyncSHA;
-      myTargetRepository = targetRepository;
-    }
-
-    @Nullable
-    public GitRepository getTargetRepository() {
-      return myTargetRepository;
-    }
-
-    @Nullable
-    public String getTargetSyncSHA() {
-      return myTargetSyncSHA;
-    }
-
-    public boolean isDeterminable() {
-      return myIsDeterminable;
-    }
-
-    public boolean isValidDebuggee() {
-      return !myInvalidDebuggee;
-    }
-
-    public boolean isValidSource() {
-      return !myInvalidDebuggee && !myNeedsStash && !myNeedsSync;
-    }
-
-    public boolean needsStash() {
-      return myNeedsStash;
-    }
-
-    public boolean needsSync() {
-      return myNeedsSync;
-    }
-  }
 }
