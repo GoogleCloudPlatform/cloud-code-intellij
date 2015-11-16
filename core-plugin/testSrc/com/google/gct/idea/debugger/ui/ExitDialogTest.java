@@ -3,10 +3,8 @@ package com.google.gct.idea.debugger.ui;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.login.stats.UsageTrackerService.UsageTracker;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.DialogWrapperPeer;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,13 +12,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.annotation.Nullable;
-import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-import java.awt.Component;
-import java.awt.Container;
 import java.lang.reflect.InvocationTargetException;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -60,28 +53,6 @@ public class ExitDialogTest {
   }
 
   @Test
-  public void testContinueButton() {
-    DialogWrapperPeer peer = dialog.getPeer();
-    JComponent contentPane = dialog.getContentPanel();
-
-    JButton continueButton = findButtonWithText(contentPane, "Continue");
-    Assume.assumeNotNull(continueButton);
-
-    Assert.assertEquals("Continue", continueButton.getText());
-  }
-
-  @Test
-  public void testStopListeningButton() {
-
-    DialogWrapperPeer peer = dialog.getPeer();
-    Container contentPane = peer.getContentPane();
-    JButton button = findButtonWithText(contentPane, "Stop Listening");
-    Assume.assumeNotNull(button);
-
-    Assert.assertEquals("Stop Listening", button.getText());
-  }
-
-  @Test
   public void testDialogNonModal() {
     Assert.assertFalse(dialog.isModal());
   }
@@ -97,8 +68,6 @@ public class ExitDialogTest {
         }
       });
     } catch (InvocationTargetException ex) {
-      // for unclear reasons this test fails when not run inside IDEA.
-      Assume.assumeFalse(ex.getCause() instanceof NullPointerException);
     }
 
     SwingUtilities.invokeAndWait(new Runnable() {
@@ -125,8 +94,6 @@ public class ExitDialogTest {
         }
       });
     } catch (InvocationTargetException ex) {
-      // for unclear reasons this test fails when not run inside IDEA.
-      Assert.assertTrue(ex.getCause().getClass().getCanonicalName(), ex.getCause() instanceof NullPointerException);
     }
 
     SwingUtilities.invokeAndWait(new Runnable() {
@@ -137,25 +104,8 @@ public class ExitDialogTest {
       }
     });
 
-    Mockito.verify(tracker).trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.continuelistening", null);
+    Mockito.verify(tracker)
+        .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.continuelistening", null);
   }
 
-  @Nullable
-  private JButton findButtonWithText(Component component, String text) {
-    if (component instanceof JButton) {
-      JButton button = (JButton) component;
-      if (text.equals(button.getText())) {
-        return button;
-      }
-    } else if (component instanceof Container) {
-      Container container = (Container) component;
-      for (Component child : container.getComponents()) {
-        JButton button = findButtonWithText(child, text);
-        if (button != null) {
-          return button;
-        }
-      }
-    }
-    return null;
-  }
 }

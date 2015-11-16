@@ -471,7 +471,7 @@ public class DialogWrapperPeerImpl extends DialogWrapperPeer implements FocusTra
       }
 
       IdeFocusManager focusManager = myDialog.getFocusManager();
-      if (focusManager != null) { // for tests
+      if (focusManager != null) { // null in unit tests
         focusManager.doWhenFocusSettlesDown(result.createSetDoneRunnable());
       }
     }
