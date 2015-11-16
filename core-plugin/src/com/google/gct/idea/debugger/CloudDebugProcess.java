@@ -474,12 +474,12 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-      ExitDialog exitDialog = new ExitDialog(getXDebugSession().getProject());
+      UsageTrackerService.UsageTracker tracker = UsageTrackerService.getInstance();
+      ExitDialog exitDialog = new ExitDialog(getXDebugSession().getProject(), tracker);
       exitDialog.showAndGetOk();
       ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM).actionPerformed(event);
       ActionManager.getInstance().getAction(IdeActions.ACTION_CLOSE).actionPerformed(event);
-      UsageTrackerService.getInstance()
-          .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "stop.session", null);
+      tracker.trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "stop.session", null);
     }
 
     @Override
