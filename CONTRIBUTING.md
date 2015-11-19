@@ -41,37 +41,17 @@ Other useful targets while developing include:
 * $ ./gradlew test: run tests
 * $ ./gradlew check: run static analysis tools
 * $ ./gradlew clean: remove all build artifacts
-
-Gradle builds fail on Windows due to reliance on the fetchIdea.sh shell script.
-This script simply downloads and installs IntelliJ IDEA code for building against
-and shouldn't be too hard to port to Windows. See 
-[Issue 167](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/167).
-As a quick workaround you can manually download and install the relevant 
-IDEA distribution and comment out the loadIdea task in 
-[build.gradle](https://github.com/GoogleCloudPlatform/gcloud-intellij/blob/master/build.gradle).
-
-On Windows you should be able to build the plugins inside IntelliJ by
-selecting "Prepare All Plugin Modules For Deployment" from the Build menu.
+* $ ./gradlew runIdea: run IntelliJ preconfigured with the plugins from this project.
 
 ## Configuring and Debugging in IntelliJ
 
 ### Import Project 
 
-To work in IDEA, just "Open" the cloud-tools-for-intellij directory 
-(the root directory cloned from Github) from the IDEA opening screen.
-
-Alternately you can select "Import  Project" from the IDEA opening screen and 
-choose the root build.gradle file. In this case, IDE features for IDEA plugin
-development may not work; and run and debug configurations will not
-be available from within the IDE. However, you can run and debug unit tests.
-
-### Optional:  Downloading source for IDEA to debug.
-
-[Download the IDEA source tarball from JetBrains](http://www.jetbrains.org/display/IJOS/Download) 
-into your home (or any other convenient) directory. Extract it and 
-add the resulting directory (usually something like ideaIC-141.1532.4) 
-in the Sourcepath tab of Project Structure > SDKs for the IntelliJ CE 141.1532 SDK.
-
+1. 'New project from existing sources'
+1. Select the root build.gradle file to import
+1. Git revert changes to the .idea folder because IDEA Gradle import blows it away
+ (https://youtrack.jetbrains.com/issue/IDEA-146295)
+1. Run or debug the **Cloud Tools on IntelliJ** run configuration
 
 ## Contributing code
 

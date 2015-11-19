@@ -15,7 +15,6 @@
  */
 package com.google.gct.idea.appengine.synchronization;
 
-
 import com.google.common.collect.Lists;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;

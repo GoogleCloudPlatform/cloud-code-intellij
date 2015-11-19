@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="properties">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/idea-IC/plugins/properties/lib/properties.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
