@@ -70,9 +70,9 @@ public class CloudDebugProcessTest extends PlatformTestCase {
 
         process.registerAdditionalActions(leftToolbar, topToolbar, settings);
 
-        assertEquals(3, leftToolbar.getChildrenCount());
+        assertEquals(2, leftToolbar.getChildrenCount());
         assertEquals(action0, leftToolbar.getChildActionsOrStubs()[0]);
-        assertEquals(action2, leftToolbar.getChildActionsOrStubs()[1]);
+        assertEquals(action1, leftToolbar.getChildActionsOrStubs()[1]);
     }
 
     @Test
