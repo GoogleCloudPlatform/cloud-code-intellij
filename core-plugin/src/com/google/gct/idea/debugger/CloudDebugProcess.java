@@ -365,6 +365,19 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       }
     }
 
+    // remove help button since it points to the IntelliJ help by default and we don't have
+    // a help page yet.
+    // for some reason, the help button's key in leftToolbar is null, so we need to remove it
+    // by class name.
+    // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/149
+    for (AnAction child : leftToolbar.getChildActionsOrStubs()) {
+      if (child.getClass().getCanonicalName().equalsIgnoreCase(
+          "com.intellij.ide.actions.ContextHelpAction")) {
+        leftToolbar.remove(child);
+        break;
+      }
+    }
+
     leftToolbar.remove(manager.getAction(XDebuggerActions.RESUME));
     leftToolbar.remove(manager.getAction(XDebuggerActions.PAUSE));
     leftToolbar.remove(manager.getAction(XDebuggerActions.MUTE_BREAKPOINTS));
