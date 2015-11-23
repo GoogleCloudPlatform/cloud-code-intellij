@@ -59,10 +59,12 @@ public class CloudDebugProcessTest extends PlatformTestCase {
         AnAction action1 = manager.getAction(IdeActions.ACTION_CLOSE);
         action1.getTemplatePresentation().setText("Close");
         AnAction action2 = manager.getAction(IdeActions.ACTION_CONTEXT_HELP);
+        AnAction action3 = manager.getAction(IdeActions.ACTION_CALL_HIERARCHY);
         List<AnAction> leftToolbarActions = Lists.newArrayList();
         leftToolbarActions.add(action0);
         leftToolbarActions.add(action1);
         leftToolbarActions.add(action2);
+        leftToolbarActions.add(action3);
         DefaultActionGroup leftToolbar = new DefaultActionGroup(leftToolbarActions);
         List actions = Lists.newArrayList();
         DefaultActionGroup topToolbar = new DefaultActionGroup(actions);
@@ -70,9 +72,9 @@ public class CloudDebugProcessTest extends PlatformTestCase {
 
         process.registerAdditionalActions(leftToolbar, topToolbar, settings);
 
-        assertEquals(2, leftToolbar.getChildrenCount());
+        assertEquals(3, leftToolbar.getChildrenCount());
         assertEquals(action0, leftToolbar.getChildActionsOrStubs()[0]);
-        assertEquals(action1, leftToolbar.getChildActionsOrStubs()[1]);
+        assertEquals(action3, leftToolbar.getChildActionsOrStubs()[1]);
     }
 
     @Test
