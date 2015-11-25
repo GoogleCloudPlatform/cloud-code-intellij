@@ -67,7 +67,7 @@ import git4idea.stash.GitStashUtils;
 import git4idea.ui.StashInfo;
 import git4idea.util.GitUIUtil;
 import git4idea.util.LocalChangesWouldBeOverwrittenHelper;
-import git4idea.util.UntrackedFilesNotifier;
+import git4idea.util.GitUntrackedFilesHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -270,7 +270,7 @@ public class ProjectRepositoryValidator {
                                      Messages.getInformationIcon()) == Messages.YES) {
           final GitBrancher brancher = ServiceManager.getService(project, GitBrancher.class);
           brancher
-            .checkout(myRepoState.getOriginalBranchName(), Collections.singletonList(myRepoState.getSourceRepository()),
+            .checkout(myRepoState.getOriginalBranchName(), false, Collections.singletonList(myRepoState.getSourceRepository()),
                       new Runnable() {
                         @Override
                         public void run() {
@@ -351,7 +351,7 @@ public class ProjectRepositoryValidator {
 
       }
       else if (untrackedFilesDetector.wasMessageDetected()) {
-        UntrackedFilesNotifier
+        GitUntrackedFilesHelper
           .notifyUntrackedFilesOverwrittenBy(project, root, untrackedFilesDetector.getRelativeFilePaths(), "unstash",
                                              null);
       }

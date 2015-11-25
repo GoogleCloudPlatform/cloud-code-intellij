@@ -38,6 +38,9 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
 import com.intellij.openapi.externalSystem.model.ProjectKeys;
+import com.intellij.openapi.externalSystem.model.project.ProjectData;
+import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
+import com.intellij.openapi.externalSystem.service.project.manage.AbstractProjectDataService;
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataService;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -45,6 +48,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -53,7 +57,7 @@ import java.util.Map;
  * Add necessary configuration information to an appengine modules identified by
  * {@link com.google.gct.idea.appengine.gradle.project.AppEngineGradleProjectResolver}
  */
-public class AppEngineGradleProjectDataService implements ProjectDataService<IdeaAppEngineProject, Void> {
+public class AppEngineGradleProjectDataService extends AbstractProjectDataService<IdeaAppEngineProject, Void> {
   private static final Logger LOG = Logger.getInstance(AppEngineGradleProjectDataService.class);
   // TODO: move this somewhere else, maybe a keys file
   @NotNull public static final Key<IdeaAppEngineProject> IDE_APP_ENGINE_PROJECT =
@@ -70,7 +74,9 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
   /** Add facet to App Engine module on imported modules */
   @Override
   public void importData(@NotNull final Collection<DataNode<IdeaAppEngineProject>> toImport,
-                         @NotNull final Project project, boolean synchronous) {
+      @Nullable ProjectData projectData,
+      @NotNull final Project project,
+      @NotNull IdeModifiableModelsProvider modelsProvider) {
     if (toImport.isEmpty()) {
       return;
     }
@@ -115,11 +121,6 @@ public class AppEngineGradleProjectDataService implements ProjectDataService<Ide
           registeredGroup != null ? registeredGroup : NotificationGroup.logOnlyGroup("Gradle sync");
     }
     return myLoggingNotification;
-  }
-
-  @Override
-  public void removeData(@NotNull Collection<? extends Void> toRemove, @NotNull Project project, boolean synchronous) {
-
   }
 
   @NotNull
