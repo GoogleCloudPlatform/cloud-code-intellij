@@ -35,7 +35,6 @@ import com.intellij.execution.ui.RunnerLayoutUi;
 import com.intellij.execution.ui.layout.LayoutAttractionPolicy;
 import com.intellij.execution.ui.layout.LayoutViewOptions;
 import com.intellij.execution.ui.layout.PlaceInGrid;
-import com.intellij.ide.actions.ContextHelpAction;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
