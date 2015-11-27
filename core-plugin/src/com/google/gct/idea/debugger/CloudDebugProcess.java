@@ -18,6 +18,7 @@ package com.google.gct.idea.debugger;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
+import com.google.gct.idea.debugger.actions.CloudDebugHelpAction;
 import com.google.gct.idea.debugger.ui.CloudDebugHistoricalSnapshots;
 import com.google.gct.idea.debugger.ui.ExitDialog;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
@@ -34,6 +35,7 @@ import com.intellij.execution.ui.RunnerLayoutUi;
 import com.intellij.execution.ui.layout.LayoutAttractionPolicy;
 import com.intellij.execution.ui.layout.LayoutViewOptions;
 import com.intellij.execution.ui.layout.PlaceInGrid;
+import com.intellij.ide.actions.ContextHelpAction;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -373,7 +375,14 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     for (AnAction child : leftToolbar.getChildActionsOrStubs()) {
       if (child.getClass().getCanonicalName().equalsIgnoreCase(
           "com.intellij.ide.actions.ContextHelpAction")) {
+        // we never want to show IDEA's help.
         leftToolbar.remove(child);
+
+        // show our help if we have it.
+        String helpUrl = GctBundle.getString("clouddebug.helpurl");
+        if (!helpUrl.equalsIgnoreCase("")) {
+          leftToolbar.add(new CloudDebugHelpAction(helpUrl));
+        }
         break;
       }
     }
