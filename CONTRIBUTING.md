@@ -31,7 +31,7 @@ There are three modules: google-account-plugin, core-plugin, and common-lib.
 On Linux/Mac OS X we use gradle as our build system. 
 Gradle is self-installing. This one command
 
-$ ./gradlew plugin
+$ ./gradlew buildPlugin
 
 compiles everything, runs the test, and builds the plugins. The output appears in google-account-plugin/build and core-plugin/build.
 
