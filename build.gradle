@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
-        classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.0.29'
+        classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.0.31'
     }
 }
 

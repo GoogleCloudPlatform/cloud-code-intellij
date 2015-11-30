@@ -14,7 +14,6 @@ project.afterEvaluate {
     project.configurations.provided.each {
         intellij.intellijFiles.add(it)
     }
-    project.tasks.runIdea.outputs.upToDateWhen { false }
 }
 
 dependencies {
