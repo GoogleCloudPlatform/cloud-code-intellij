@@ -21,6 +21,7 @@ subprojects {
     apply plugin: 'java'
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
+    tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
     group = 'com.google.gct'
     version = '0.9-alpha.1-SNAPSHOT'
 
