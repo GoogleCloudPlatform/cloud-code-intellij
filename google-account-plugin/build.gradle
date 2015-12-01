@@ -28,7 +28,7 @@ dependencies {
 }
 
 processResources {
-    def trackerProperty =  System.getProperty("usageTrackerProperty");
+    def trackerProperty =  System.getenv("ANALYTICS_ID");
     if (trackerProperty) {
         inputs.property("usageTrackerProperty", trackerProperty)
         filesMatching("**/config.properties") {
