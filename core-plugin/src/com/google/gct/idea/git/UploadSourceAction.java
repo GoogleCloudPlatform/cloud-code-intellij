@@ -469,7 +469,7 @@ public class UploadSourceAction extends DumbAwareAction {
       handler.endOptions();
       handler.run();
 
-      VcsFileUtil.refreshFiles(project, modified);
+      VcsFileUtil.markFilesDirty(project, modified);
     }
     catch (final VcsException e) {
       LOG.warn(e);

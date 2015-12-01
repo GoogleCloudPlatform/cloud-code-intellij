@@ -5,7 +5,6 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.externalSystem.model.ExternalProject;
 import com.intellij.openapi.externalSystem.model.execution.ExternalSystemTaskExecutionSettings;
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode;
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager;
@@ -17,6 +16,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.util.containers.FactoryMap;
 
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.plugins.gradle.model.ExternalProject;
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataService;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 
