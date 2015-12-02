@@ -24,8 +24,7 @@
     Not to be installed independently.
   </description>
 
-  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="107.105"/>
+  <!-- "idea-version since-build" is set by the gradle intellij plugin -->
 
   <application-components>
     <component>
