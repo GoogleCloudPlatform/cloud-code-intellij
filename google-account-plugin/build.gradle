@@ -9,10 +9,7 @@ intellij {
 }
 
 dependencies {
-    compile(project(':common-lib')) {
-        transitive = true
-    }
-
+    compile(project(':common-lib'))
     compile files('lib/google.gdt.eclipse.login.common.jar')
     compile files('lib/google-gct-login-context-ij-pg.jar')
     compile fileTree(dir: 'third_party/repackaged', include: '*.jar')
