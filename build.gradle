@@ -32,8 +32,16 @@ subprojects {
         sandboxDirectory = "${rootProject.buildDir}/idea-sandbox"
     }
 
+    configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
+            // Force the IDEA SDK provided version of these dependencies to avoid classloading issues.
+            force 'org.apache.httpcomponents:httpclient:4.4.1', 'com.google.guava:guava:17.0'
+        }
+    }
+
     dependencies {
-        compile 'com.google.guava:guava:18.0'
+        compile 'com.google.guava:guava:17.0'
 
         testCompile 'junit:junit:4.+'
         testCompile 'org.mockito:mockito-all:1.9.5'
@@ -67,6 +75,12 @@ subprojects {
     }
 
     apply plugin: 'jdepend'
+    configurations.all {
+        resolutionStrategy {
+            // JDepend manages to include a different version of itself in its own transitive closure.
+            force "jdepend:jdepend:${project.jdepend.toolVersion}"
+        }
+    }
 }
 
 task clean(type: Delete) {
