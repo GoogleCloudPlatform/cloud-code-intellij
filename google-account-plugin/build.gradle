@@ -10,7 +10,7 @@ intellij {
 
 dependencies {
     compile(project(':common-lib')) {
-        transitive = false
+        transitive = true
     }
 
     compile files('lib/google.gdt.eclipse.login.common.jar')
