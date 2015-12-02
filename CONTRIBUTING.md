@@ -26,14 +26,24 @@ $ git clone https://github.com/GoogleCloudPlatform/gcloud-intellij.git
 Cloning into 'gcloud-intellij'...
 ```
 
-There are three modules: google-account-plugin, core-plugin, and common-lib.
+There are four modules:
+
+* google-account-plugin:
+* core-plugin: Cloud debugger and code inspections
+* common-lib: Code shared between the above two
+* common-test-lib: test infrastructure code
+
+When adding new dependencies, the jar files are loaded from Maven Central
+when available. If Maven Central doesn't have the necessary version,
+the jar is placed in the third_party directory.
 
 On Linux/Mac OS X we use gradle as our build system. 
 Gradle is self-installing. This one command
 
 $ ./gradlew buildPlugin
 
-compiles everything, runs the test, and builds the plugins. The output appears in google-account-plugin/build and core-plugin/build.
+compiles everything, runs the tests, and builds the plugins. The output appears in
+google-account-plugin/build/distributions and core-plugin/build/distributions.
 
 Other useful targets while developing include:
 
