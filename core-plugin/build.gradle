@@ -21,7 +21,7 @@ dependencies {
         transitive = false
     }
     compile(project(':common-lib')) {
-        transitive = false
+        transitive = true
     }
 
     compile 'com.google.appengine:gradle-appengine-builder-model:0.1.0'
