@@ -40,12 +40,11 @@ import com.intellij.openapi.wm.impl.WindowManagerImpl;
 import com.intellij.ui.AppUIUtil;
 import com.intellij.util.PlatformUtils;
 import com.intellij.util.ui.UIUtil;
+import org.fest.reflect.core.Reflection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JOptionPane;
-
-import static org.fest.reflect.core.Reflection.method;
 
 public class IdeTestApplication implements Disposable {
   private static final Logger LOG = Logger.getInstance(IdeTestApplication.class);
@@ -88,9 +87,9 @@ public class IdeTestApplication implements Disposable {
     mainImplStart();
 
     // duplicates what IdeaApplication#IdeaApplication does (this whole block.)
-    method("patchSystem").withParameterTypes(boolean.class).in(IdeaApplication.class).invoke(false);
+    Reflection.method("patchSystem").withParameterTypes(boolean.class).in(IdeaApplication.class).invoke(false);
     ApplicationManagerEx.createApplication(true, false, false, true, ApplicationManagerEx.IDEA_APPLICATION, null);
-    method("initLAF").in(IdeaApplication.class).invoke();
+    Reflection.method("initLAF").in(IdeaApplication.class).invoke();
 
     ideaApplicationMain(args);
   }
@@ -103,7 +102,7 @@ public class IdeTestApplication implements Disposable {
 
   private static void mainMain() {
     // Duplicates what Main#main does.
-    method("installPatch").in(Main.class).invoke();
+    Reflection.method("installPatch").in(Main.class).invoke();
   }
 
   private static void bootstrapMain() throws Exception {
@@ -114,14 +113,14 @@ public class IdeTestApplication implements Disposable {
 
   private static void startupUtilPrepareAndStart(@NotNull String[] args) {
     // Duplicates what StartupUtil#prepareAndStart does.
-    method("checkSystemFolders").withReturnType(Boolean.class).in(StartupUtil.class).invoke();
-    method("lockSystemFolders")
+    Reflection.method("checkSystemFolders").withReturnType(Boolean.class).in(StartupUtil.class).invoke();
+    Reflection. method("lockSystemFolders")
         .withReturnType(Boolean.class)
         .withParameterTypes(String[].class)
         .in(StartupUtil.class)
         .invoke(new Object[] {args});
     Logger log = Logger.getInstance(IdeTestApplication.class);
-    method("fixProcessEnvironment").withParameterTypes(Logger.class).in(StartupUtil.class).invoke(log);
+    Reflection.method("fixProcessEnvironment").withParameterTypes(Logger.class).in(StartupUtil.class).invoke(log);
     AppUIUtil.updateFrameClass();
     AppUIUtil.updateWindowIcon(JOptionPane.getRootFrame());
     AppUIUtil.registerBundledFonts();
