@@ -23,7 +23,7 @@ subprojects {
     targetCompatibility = javaVersion
     tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
     group = 'com.google.gct'
-    version = '0.9-alpha.3-SNAPSHOT'
+    version = '0.9-alpha.3'
 
     apply plugin: 'org.jetbrains.intellij'
     intellij {
