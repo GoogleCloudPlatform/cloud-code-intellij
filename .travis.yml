@@ -18,3 +18,5 @@ deploy:
     - ${HOME}/build/${TRAVIS_REPO_SLUG}/core-plugin/build/distributions/google-cloud-tools-core-*.zip
   on:
     tags: true
+after_deploy:
+  - ./gradlew publishPlugin
