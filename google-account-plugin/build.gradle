@@ -6,6 +6,10 @@ sourceSets.test.resources.srcDirs = ['testResources']
 
 intellij {
     pluginName = 'google-account'
+
+    publish {
+        pluginId '8078'
+    }
 }
 
 dependencies {
