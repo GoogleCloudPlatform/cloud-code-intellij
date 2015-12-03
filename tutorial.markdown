@@ -151,7 +151,7 @@ You can use the right click context menu to copy values, inspect variables, and 
 When you're finished debugging, click the red square in the upper right corner 
 of the debug pane. You'll be asked whether to continue listening for snapshots in the background:
 
-![](images/restartintellij.png)
+![](images/continuelistening.png)
 
 
 If you choose to continue listening, then ????.
