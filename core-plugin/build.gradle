@@ -7,6 +7,10 @@ sourceSets.test.resources.srcDirs = ['testResources']
 intellij {
     pluginName = 'google-cloud-tools-core'
     plugins 'Groovy','gradle', 'git4idea', 'properties', 'junit'
+
+    publish {
+        pluginId '8079'
+    }
 }
 
 project.afterEvaluate {
