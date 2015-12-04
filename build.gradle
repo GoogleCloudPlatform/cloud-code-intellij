@@ -53,12 +53,6 @@ subprojects {
         testCompile 'org.mockito:mockito-all:1.9.5'
     }
 
-    processResources {
-        filesMatching("**/plugin.xml") {
-            expand "pluginVersionPlaceholder": version
-        }
-    }
-
     apply plugin: 'findbugs'
     findbugs {
         ignoreFailures = true

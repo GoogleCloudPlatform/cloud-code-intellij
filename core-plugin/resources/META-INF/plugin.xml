@@ -1,12 +1,11 @@
 <idea-plugin version="2">
+  <id>com.google.gct.core</id>
   <name>Google Cloud Tools Core</name>
   <description>Debug Java applications running in the Google cloud from inside IDEA.
 Code inspections for AppEngine Java code.</description>
-  <version>${pluginVersionPlaceholder}</version>
   <vendor>Google</vendor>
-  <id>com.google.gct.core</id>
-
-  <!-- "idea-version since-build" is set by the gradle intellij plugin -->
+  <!-- "version" set by gradle-intellij-plugin -->
+  <!-- "idea-version since-build" set by gradle-intellij-plugin -->
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
