@@ -18,25 +18,6 @@ The Cloud Debugger is enabled automatically for Java
 applications running on [Google App Engine](https://cloud.google.com/appengine/docs) and
 [Managed VMs]https://cloud.google.com/appengine/docs/managed-vms/).
 
-## Prerequisites:
-
-1.  Commit and push the source code of the application to a Git repository (a
-    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) or connected
-    Github or Bitbucket repository). 
-
-2.  Deploy your application using the
-    [`appcfg`](https://cloud.google.com/appengine/docs/java/tools/uploadinganapp)
-    command:
-
-        $ appcfg.sh update <war-location>
-
-    For example:
-
-        $ appcfg.sh update ./target/myapp
-
-
-TBD: can we deploy from the tool????
-
 ## Installing the Plugins
 
 Note: these instructions don't work yet. They will soon. meanwhile you'll need to 
@@ -64,6 +45,34 @@ From inside IDEA:
 8. Click Restart (or you can click Postpone, but the plugins will not be available until you do restart IDEA.)
 
  ![](images/restartintellij.png)
+
+
+
+## Setting up the app:
+
+For purposes of this tutorial we'll debug a simple servlet that detects the
+user's browser and says "Hello Firefox", "Hello Chrome", and so forth, depending on the browser.
+You can find this code in the Github project ????. You can clone it to your own repository.
+
+(If you happen to spot the bug by eye before running it, pretend you don't and just read along.)
+
+
+
+1.  Commit and push the source code of the application to a Git repository (a
+    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) or connected
+    Github or Bitbucket repository). 
+
+2.  Deploy your application using the
+    [`appcfg`](https://cloud.google.com/appengine/docs/java/tools/uploadinganapp)
+    command:
+
+        $ appcfg.sh update <war-location>
+
+    For example:
+
+        $ appcfg.sh update ./target/myapp
+
+
 
 
 ## Using the Debugger
@@ -109,13 +118,27 @@ Once you've attached  to a running application, you can set breakpoints in the
 source code by clicking at the line you want to snapshot in the left hand bar,
 just as you would when debugging a local application using the regular IDEA debugger.
 
+Here set a breakpoint at ????.
+
+Since you can't single step through an aplicaiton in the cloud debugger,
+it's more common to put the breakpoint at the end of the relevant block
+of code rather than at the beginning. That way all variables have been set and can
+be inspected. 
+
+If you're interested in variables in multiple scopes, (e.g. inside and 
+outside a loop) you'll need to set multiple breakpoints.
+
+If you're interested in variables at particular points in time,
+(e.g. on the last iteration of a loop) then you'll want to set a 
+conditional breakpoint.
+
 
 ### Run the application
 
 1. Run > Debug 'My First Debugging Session'
 
-If some other configuration happens to apopear in the Run menu instead, 
-then select "Debug.." and choose "My First Debugging Session" in the dialog that appears.
+ If some other configuration happens to appear in the Run menu instead, 
+ then select "Debug.." and choose "My First Debugging Session" in the dialog that appears.
 
 2. A dialog will appear. TBD: set the Module? Click the blue Attach button.
 
@@ -139,6 +162,14 @@ Fields are also available by expanding the "this" variable. For instance here
 Here we can see ????
 
 You can use the right click context menu to copy values, inspect variables, and more. 
+
+
+Admittedly this is a very simple example. You probably spotted at least one of the two 
+bugs immediately. If not, you could have found and debugged them using a locally running instance.
+However, in more complex applications that interact with backend data stores and 
+other live network services, local tests may not be able to reproduce the exact problems
+you see in production. For these scenarios, the cloud debugger is invaluable. 
+
 
 
 ### Conditional breakpoints
