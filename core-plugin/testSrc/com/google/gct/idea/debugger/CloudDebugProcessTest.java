@@ -1,6 +1,7 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.util.Lists;
+import com.intellij.debugger.actions.DebuggerActions;
 import com.intellij.debugger.ui.DebuggerContentInfo;
 import com.intellij.execution.ui.RunnerLayoutUi;
 import com.intellij.execution.ui.layout.LayoutStateDefaults;
@@ -128,6 +129,12 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     @Test
     public void testRegisterAdditionalActions_evaluate() {
         assertRemoveFromTopToolbar(XDebuggerActions.EVALUATE_EXPRESSION);
+    }
+
+    @Test
+    public void testRegisterAdditionalActions_dropFrame() {
+        // name of constant "POP_FRAME" and UI label "Drop Frame" are inconsistent
+        assertRemoveFromTopToolbar(DebuggerActions.POP_FRAME);
     }
 
     private void assertRemoveFromLeftToolbar(String actionId) {
