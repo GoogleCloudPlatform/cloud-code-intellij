@@ -16,16 +16,15 @@
 <idea-plugin version="2">
   <id>com.google.gct.login</id>
   <name>Google Account</name>
-  <version>${pluginVersionPlaceholder}</version>
   <vendor>Google</vendor>
+  <!-- "version" set by gradle-intellij-plugin -->
+  <!-- "idea-version since-build" set by gradle-intellij-plugin -->
 
   <description>
     Provides Google account setting and authentication for IntelliJ plugins that need it.
     Not to be installed independently.
   </description>
 
-  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="107.105"/>
 
   <application-components>
     <component>

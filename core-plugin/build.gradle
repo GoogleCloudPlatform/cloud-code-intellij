@@ -7,29 +7,24 @@ sourceSets.test.resources.srcDirs = ['testResources']
 intellij {
     pluginName = 'google-cloud-tools-core'
     plugins 'Groovy','gradle', 'git4idea', 'properties', 'junit'
+
+    publish {
+        pluginId '8079'
+    }
 }
 
 project.afterEvaluate {
     project.tasks.getByPath(':core-plugin:prepareSandbox').dependsOn ':google-account-plugin:prepareSandbox'
-    project.configurations.provided.each {
-        intellij.intellijFiles.add(it)
-    }
 }
 
 dependencies {
-    provided(project(':google-account-plugin')) {
-        transitive = false
-    }
-    compile(project(':common-lib')) {
-        transitive = false
-    }
+    compile(project(':google-account-plugin'))
+    compile(project(':common-lib'))
 
     compile 'com.google.appengine:gradle-appengine-builder-model:0.1.0'
     compile 'org.eclipse.jgit:org.eclipse.jgit:3.3.0.201403021825-r'
     // todo(elharo): we shouldn't need Apache commons; Guava will suffice
     compile 'commons-io:commons-io:2.4'
-    provided files('../google-account-plugin/lib/google.gdt.eclipse.login.common.jar')
-    provided files('../google-account-plugin/third_party/repackaged/google-api-java-client-min-repackaged-1.20.0.jar')
     compile files('lib/google-api-services-clouddebugger-v2-rev4-1.20.0.jar')
     compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
     compile files('lib/google-api-services-source.jar')
