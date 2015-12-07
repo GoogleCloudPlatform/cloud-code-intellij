@@ -15,24 +15,21 @@ import com.intellij.openapi.util.IconLoader;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.lang.Override;
 
+@RunWith(MockitoJUnitRunner.class)
 public class CloudDebugHelpActionTest {
-  protected static final String URL = "http://helps!";
   @Mock protected AnActionEvent event;
-
-  @Before
-  public void setup() {
-    MockitoAnnotations.initMocks(this);
-  }
 
   @Test
   public void testActionPerformed() {
-    CloudDebugHelpAction action = Mockito.spy(new CloudDebugHelpAction(URL));
+    CloudDebugHelpAction action = Mockito.spy(new CloudDebugHelpAction("http://helps!"));
     // Don't actually open a browser window when we're testing.
     Mockito.doNothing().when(action).openUrl();
     action.actionPerformed(event);
@@ -45,10 +42,10 @@ public class CloudDebugHelpActionTest {
     Presentation presentation = new Presentation();
     when(event.getPresentation()).thenReturn(presentation);
 
-    CloudDebugHelpAction action = new CloudDebugHelpAction(URL);
+    CloudDebugHelpAction action = new CloudDebugHelpAction("http://helps!");
     action.update(event);
 
-    assertEquals(presentation.getIcon(), IconLoader.getIcon("/actions/help.png"));
-    assertEquals(presentation.getText(), CommonBundle.getHelpButtonText());
+    assertEquals(IconLoader.getIcon("/actions/help.png"), presentation.getIcon());
+    assertEquals(CommonBundle.getHelpButtonText(), presentation.getText());
   }
 }
