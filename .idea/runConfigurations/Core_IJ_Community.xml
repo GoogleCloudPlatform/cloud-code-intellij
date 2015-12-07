@@ -3,6 +3,7 @@
     <module name="core-plugin" />
     <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
     <option name="PROGRAM_PARAMETERS" value="" />
+    <log_file path="$USER_HOME$/.IdeaIC14/system/plugins-sandbox/system/log/idea.log" checked="false" skipped="true" show_all="false" alias="IDEA LOG" />
     <method>
       <option name="Make" enabled="false" />
       <option name="MakeProject" enabled="true" />

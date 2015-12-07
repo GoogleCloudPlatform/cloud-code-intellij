@@ -1,0 +1,36 @@
+<idea-plugin version="2">
+  <id>com.google.gct.idea.gae.cloud</id>
+  <name>Google App Engine Integration Plugin</name>
+  <version>1.0</version>
+  <vendor>Google</vendor>
+
+  <description>Provides Google App Engine Integration plugin.</description>
+
+
+  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="131"/>
+
+  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- For creating the GAE deploy Configuration -->
+    <remoteServer.type implementation="com.google.gct.idea.gae.cloud.AppEngineCloudType"/>
+  </extensions>
+
+  <application-components>
+    <!-- Add your application components here -->
+  </application-components>
+
+  <project-components>
+    <!-- Add your project components here -->
+  </project-components>
+
+  <actions>
+    <!-- Add your actions here -->
+  </actions>
+
+</idea-plugin>
