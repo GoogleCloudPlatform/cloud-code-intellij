@@ -7,6 +7,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.util.IconLoader;
 
+import org.jetbrains.annotations.Nullable;
+
 import javax.swing.Icon;
 
 /**
@@ -21,9 +23,19 @@ public class CloudDebugHelpAction extends AnAction {
   }
 
   public void actionPerformed(AnActionEvent event) {
+    openUrl();
+  }
+
+  /**
+   * Opens the URL in a browser with BrowserUtil.
+   */
+  protected void openUrl() {
     BrowserUtil.browse(url);
   }
 
+  /**
+   * Sets the help button's icon and label text.
+   */
   public void update(AnActionEvent event) {
     Presentation presentation = event.getPresentation();
     presentation.setIcon(icon);
