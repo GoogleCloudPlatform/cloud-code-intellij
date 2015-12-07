@@ -18,6 +18,7 @@ package com.google.gct.login.ui;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -30,7 +31,7 @@ import java.awt.Point;
 /**
  * Action to open the Google Login panel.
  */
-public class GoogleLoginAction extends AnAction implements CustomComponentAction, RightAlignedToolbarAction {
+public class GoogleLoginAction extends AnAction implements DumbAware, CustomComponentAction, RightAlignedToolbarAction {
 
   @Override
   public void actionPerformed(AnActionEvent e) {
