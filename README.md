@@ -21,7 +21,7 @@ into the IntelliJ IDEA UI. Currently this includes:
 * IntelliJ IDEA Ultimate Edition 14.1 or later
 
 ## Installation
-
+BLAH BLAH BLAH
 <!-- Commented out until we get this set up.
 The easiest way to install the plugin is by accessing
 the [plugin repository](https://plugins.jetbrains.com/?idea_ce) from inside IDEA. 
