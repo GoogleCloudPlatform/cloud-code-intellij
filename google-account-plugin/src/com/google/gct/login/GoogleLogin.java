@@ -616,7 +616,6 @@ public class GoogleLogin {
       }
       catch (RequestCancelledException e) {
         UsageTrackerProvider.getInstance().trackEvent(LoginTracking.CATEGORY, LoginTracking.LOGIN, "login.cancelled", null);
-        GoogleLoginUtils.showErrorDialog("Login cancelled.", "Google Login");
         return null;
       }
       catch (IOException e) {
