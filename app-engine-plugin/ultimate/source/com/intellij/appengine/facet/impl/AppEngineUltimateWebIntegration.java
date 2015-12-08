@@ -1,6 +1,7 @@
 package com.intellij.appengine.facet.impl;
 
 import com.intellij.appengine.facet.AppEngineFacet;
+import com.intellij.appengine.facet.AppEngineSupportProvider;
 import com.intellij.appengine.facet.AppEngineWebIntegration;
 import com.intellij.appengine.sdk.AppEngineSdk;
 import com.intellij.appengine.server.instance.AppEngineServerModel;
@@ -10,6 +11,7 @@ import com.intellij.appengine.server.run.AppEngineServerConfigurationType;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.facet.FacetManager;
+import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider.FrameworkDependency;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.javaee.JavaeePersistenceDescriptorsConstants;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
@@ -39,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -147,5 +150,11 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
   @Override
   public void registerFrameworkInModel(FrameworkSupportModel model, AppEngineFacet appEngineFacet) {
     JavaeeFrameworkSupportInfoCollector.getOrCreateCollector(model).setFacet(AppEngineFacet.ID, appEngineFacet);
+  }
+
+  @Override
+  @NotNull
+  public List<FrameworkDependency> getAppEngineFrameworkDependencies() {
+    return Arrays.asList(FrameworkDependency.required("web"), FrameworkDependency.optional(AppEngineSupportProvider.JPA_FRAMEWORK_ID));
   }
 }
