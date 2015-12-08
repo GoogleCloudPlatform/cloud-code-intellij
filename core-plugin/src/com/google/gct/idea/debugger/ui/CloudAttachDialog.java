@@ -147,12 +147,18 @@ public class CloudAttachDialog extends DialogWrapper {
     BasicAction.saveAll();
 
     myWireup = new ProjectDebuggeeBinding(myElysiumProjectId, myDebuggeeTarget);
+    myDebuggeeTarget.setEnabled(false);
     myDebuggeeTarget.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        buildResult();
-        checkSyncStashState();
-        setOKActionEnabled(doValidate() == null);
+        if(myDebuggeeTarget.isEnabled()) {
+          buildResult();
+          checkSyncStashState();
+        }
+        else {
+          myWarningLabel.setVisible(false);
+          myWarningLabel2.setVisible(false);
+        }
       }
     });
 
@@ -190,11 +196,15 @@ public class CloudAttachDialog extends DialogWrapper {
     }
 
     if (Strings.isNullOrEmpty(myElysiumProjectId.getText())) {
-      return new ValidationInfo(GctBundle.getString("clouddebug.noprojectid"));
+      return new ValidationInfo(GctBundle.getString("clouddebug.noprojectid"), myElysiumProjectId);
+    }
+
+    if (!myDebuggeeTarget.isEnabled()) {
+      return new ValidationInfo(GctBundle.getString("clouddebug.selectvalidproject"), myElysiumProjectId);
     }
 
     if (myDebuggeeTarget.getSelectedItem() == null) {
-      return new ValidationInfo(GctBundle.getString("clouddebug.nomodule"));
+      return new ValidationInfo(GctBundle.getString("clouddebug.nomoduleselected"), myDebuggeeTarget);
     }
 
     return null;
@@ -486,7 +496,12 @@ public class CloudAttachDialog extends DialogWrapper {
                 public void run() {
                   DebugTarget targetSelection = null;
 
-                  if (debuggees != null && debuggees.getDebuggees() != null) {
+                  if (debuggees == null || debuggees.getDebuggees() == null || debuggees.getDebuggees().isEmpty()) {
+                    myDebugeeTarget.setEnabled(false);
+                    myDebugeeTarget.addItem(GctBundle.getString("clouddebug.nomodulesfound"));
+                  }
+                  else {
+                    myDebugeeTarget.setEnabled(true);
                     Map<String, DebugTarget> perModuleCache = new HashMap<String, DebugTarget>();
 
                     for (Debuggee debuggee : debuggees.getDebuggees()) {
