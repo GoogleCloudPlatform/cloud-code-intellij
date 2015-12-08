@@ -369,7 +369,7 @@ public class CloudAttachDialog extends DialogWrapper {
         return;
       }
       assert mySyncResult.getTargetSyncSHA() != null;
-      brancher.checkout(mySyncResult.getTargetSyncSHA(), Collections.singletonList(mySourceRepository), new Runnable() {
+      brancher.checkout(mySyncResult.getTargetSyncSHA(), false, Collections.singletonList(mySourceRepository), new Runnable() {
                           @Override
                           public void run() {
                             refreshAndClose();

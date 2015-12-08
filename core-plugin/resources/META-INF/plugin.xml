@@ -1,13 +1,11 @@
 <idea-plugin version="2">
+  <id>com.google.gct.core</id>
   <name>Google Cloud Tools Core</name>
   <description>Debug Java applications running in the Google cloud from inside IDEA.
 Code inspections for AppEngine Java code.</description>
-  <version>${pluginVersionPlaceholder}</version>
   <vendor>Google</vendor>
-  <id>com.google.gct.core</id>
-
-  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="141.1532"/>
+  <!-- "version" set by gradle-intellij-plugin -->
+  <!-- "idea-version since-build" set by gradle-intellij-plugin -->
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
@@ -27,23 +25,7 @@ Code inspections for AppEngine Java code.</description>
   <project-components>
   </project-components>
 
-  <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
-    <projectResolve implementation="com.google.gct.idea.appengine.gradle.project.AppEngineGradleProjectResolver"/>
-  </extensions>
-
   <extensions defaultExtensionNs="com.intellij">
-    <facetType implementation="com.google.gct.idea.appengine.gradle.facet.AppEngineGradleFacetType"/>
-    <editorNotificationProvider implementation="com.google.gct.idea.appengine.gradle.notification.AppEngineStatusNotificationProvider" />
-    <externalProjectDataService implementation="com.google.gct.idea.appengine.gradle.service.AppEngineGradleProjectDataService" />
-    <configurationType implementation="com.google.gct.idea.appengine.run.AppEngineRunConfigurationType"/>
-    <stepsBeforeRunProvider implementation="com.google.gct.idea.appengine.run.AppEngineGradleBeforeRunTaskProvider" />
-
-    <!-- Dom for the App Engine config files -->
-    <dom.fileDescription implementation="com.google.gct.idea.appengine.dom.AppEngineWebFileDescription"/>
-    <dom.fileDescription implementation="com.google.gct.idea.appengine.dom.WebAppFileDescription"/>
-
-    <xml.schemaProvider implementation="com.google.gct.idea.appengine.sdk.AppEngineWebXmlSchemaProvider"/>
-
     <implicitUsageProvider implementation="com.google.gct.idea.appengine.validation.EndpointImplicitUsageProvider"/>
 
     <checkoutProvider implementation="com.google.gct.idea.git.GcpCheckoutProvider"/>

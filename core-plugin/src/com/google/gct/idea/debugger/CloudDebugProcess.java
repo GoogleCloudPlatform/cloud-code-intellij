@@ -25,7 +25,7 @@ import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.stats.UsageTrackerProvider;
-
+import com.intellij.debugger.actions.DebuggerActions;
 import com.intellij.debugger.ui.DebuggerContentInfo;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.execution.ExecutionBundle;
@@ -59,17 +59,15 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.intellij.xdebugger.ui.XDebugTabLayouter;
-
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
 
+import javax.swing.SwingUtilities;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-
-import javax.swing.SwingUtilities;
 
 /**
  * CloudDebugProcess is the controller that represents our attached state to the server. It provides the breakpoint
@@ -396,6 +394,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     topToolbar.remove(manager.getAction(XDebuggerActions.STEP_OUT));
     topToolbar.remove(manager.getAction(XDebuggerActions.RUN_TO_CURSOR));
     topToolbar.remove(manager.getAction(XDebuggerActions.EVALUATE_EXPRESSION));
+    topToolbar.remove(manager.getAction(DebuggerActions.POP_FRAME));
   }
 
   public void removeListener(@NotNull CloudBreakpointListener listener) {

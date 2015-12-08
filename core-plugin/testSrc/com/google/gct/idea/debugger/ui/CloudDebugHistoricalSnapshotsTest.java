@@ -302,16 +302,6 @@ public class CloudDebugHistoricalSnapshotsTest {
       return null;
     }
 
-    @Override
-    public void initComponent() {
-
-    }
-
-    @Override
-    public void disposeComponent() {
-
-    }
-
     @NotNull
     @Override
     public String getComponentName() {

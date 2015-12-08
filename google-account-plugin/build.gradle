@@ -6,13 +6,14 @@ sourceSets.test.resources.srcDirs = ['testResources']
 
 intellij {
     pluginName = 'google-account'
+
+    publish {
+        pluginId '8078'
+    }
 }
 
 dependencies {
-    compile(project(':common-lib')) {
-        transitive = false
-    }
-
+    compile(project(':common-lib'))
     compile files('lib/google.gdt.eclipse.login.common.jar')
     compile files('lib/google-gct-login-context-ij-pg.jar')
     compile fileTree(dir: 'third_party/repackaged', include: '*.jar')
@@ -28,7 +29,7 @@ dependencies {
 }
 
 processResources {
-    def trackerProperty =  System.getProperty("usageTrackerProperty");
+    def trackerProperty =  System.getenv("ANALYTICS_ID");
     if (trackerProperty) {
         inputs.property("usageTrackerProperty", trackerProperty)
         filesMatching("**/config.properties") {
