@@ -377,7 +377,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
         // show our help if we have it.
         String helpUrl = GctBundle.getString("clouddebug.helpurl");
-        if (!helpUrl.equalsIgnoreCase("")) {
+        if (!"".equals(helpUrl)) {
           leftToolbar.add(new CloudDebugHelpAction(helpUrl));
         }
         break;

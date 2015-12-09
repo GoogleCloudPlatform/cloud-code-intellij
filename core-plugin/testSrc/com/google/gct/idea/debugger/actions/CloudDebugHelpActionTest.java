@@ -25,11 +25,11 @@ import java.lang.Override;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CloudDebugHelpActionTest {
-  @Mock protected AnActionEvent event;
+  @Mock private AnActionEvent event;
 
   @Test
   public void testActionPerformed() {
-    CloudDebugHelpAction action = Mockito.spy(new CloudDebugHelpAction("http://helps!"));
+    CloudDebugHelpAction action = Mockito.spy(new CloudDebugHelpAction("http://www.example.com"));
     // Don't actually open a browser window when we're testing.
     Mockito.doNothing().when(action).openUrl();
     action.actionPerformed(event);
@@ -42,7 +42,7 @@ public class CloudDebugHelpActionTest {
     Presentation presentation = new Presentation();
     when(event.getPresentation()).thenReturn(presentation);
 
-    CloudDebugHelpAction action = new CloudDebugHelpAction("http://helps!");
+    CloudDebugHelpAction action = new CloudDebugHelpAction("http://www.example.com");
     action.update(event);
 
     assertEquals(IconLoader.getIcon("/actions/help.png"), presentation.getIcon());
