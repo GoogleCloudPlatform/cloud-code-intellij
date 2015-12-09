@@ -18,6 +18,7 @@ package com.google.gct.idea.debugger;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
+import com.google.gct.idea.debugger.actions.CloudDebugHelpAction;
 import com.google.gct.idea.debugger.ui.CloudDebugHistoricalSnapshots;
 import com.google.gct.idea.debugger.ui.ExitDialog;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
@@ -359,6 +360,26 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       String text = action.getTemplatePresentation().getText();
       if (ExecutionBundle.message("close.tab.action.name").equals(text)) {
         leftToolbar.remove(action);
+        break;
+      }
+    }
+
+    // remove help button since it points to the IntelliJ help by default and we don't have
+    // a help page yet.
+    // for some reason, the help button's key in leftToolbar is null, so we need to remove it
+    // by class name.
+    // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/149
+    for (AnAction child : leftToolbar.getChildActionsOrStubs()) {
+      if (child.getClass().getCanonicalName().equalsIgnoreCase(
+          "com.intellij.ide.actions.ContextHelpAction")) {
+        // we never want to show IDEA's help.
+        leftToolbar.remove(child);
+
+        // show our help if we have it.
+        String helpUrl = GctBundle.getString("clouddebug.helpurl");
+        if (!"".equals(helpUrl)) {
+          leftToolbar.add(new CloudDebugHelpAction(helpUrl));
+        }
         break;
       }
     }
