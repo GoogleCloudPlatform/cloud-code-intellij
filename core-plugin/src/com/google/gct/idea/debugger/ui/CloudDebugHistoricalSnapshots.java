@@ -27,7 +27,6 @@ import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.stats.UsageTrackerProvider;
-
 import com.intellij.diagnostic.logging.AdditionalTabComponent;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -48,10 +47,18 @@ import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.xdebugger.XDebugSessionListener;
 import com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -74,28 +81,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-
 /**
- * This panel shows a list of historical and pending snapshots. The user can navigate to them by double clicking on
- * them, which synchronizes the debugger state to that snapshot.
+ * This panel shows the list of cloud debugger snapshots.
+ * It contains one Swing table which is divided into four columns:
+ *
+ * 0. An icon
+ * 1. A date-time for received snapshots or the word "Pending" otherwise.
+ * 2. The file and line number of the snapshot; e.g. "GeneratorServlet.java:40"
+ * 3. For pending snapshots only, the word "More" which is a link to the Breakpoints dialog.
  */
 public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
-  implements XDebugSessionListener, CloudBreakpointListener {
+    implements XDebugSessionListener, CloudBreakpointListener {
 
   private static final int COLUMN_MARGIN_PX = 3;
   private static final Cursor DEFAULT_CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
   private static final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
   private static final int WINDOW_HEIGHT_PX = 8 * JBTable.PREFERRED_SCROLLABLE_VIEWPORT_HEIGHT_IN_ROWS;
   private static final int WINDOW_WIDTH_PX = 200;
+
   private CloudDebugProcess myProcess;
 
   @VisibleForTesting
@@ -106,34 +109,11 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   public CloudDebugHistoricalSnapshots(@NotNull CloudDebugProcessHandler processHandler) {
     super(new BorderLayout());
 
-    myTable = new JBTable() {
-      //  Returning the Class of each column will allow different
-      //  renderers to be used based on Class
-      @Override
-      public Class getColumnClass(int column) {
-        if (column == 0) {
-          return Icon.class;
-        }
-        Object value = getValueAt(0, column);
-        return value != null ? getValueAt(0, column).getClass() : String.class;
-      }
+    myTable = new CloudDebuggerTable();
 
-      // We override prepareRenderer to supply a tooltip in the case of an error.
-      @NotNull
-      @Override
-      public Component prepareRenderer(@NotNull TableCellRenderer renderer, int row, int column) {
-        Component c = super.prepareRenderer(renderer, row, column);
-        if (c instanceof JComponent) {
-          JComponent jc = (JComponent)c;
-          Breakpoint breakpoint = CloudDebugHistoricalSnapshots.this.getModel().getBreakpoints().get(row);
-          jc.setToolTipText(BreakpointUtil.getUserErrorMessage(breakpoint.getStatus()));
-        }
-        return c;
-      }
-    };
-
+    // todo: I think all of this can be pushed into CloudDebuggerTable unless there's some weird
+    // Swing reason these methods shouldn't be called from the constructor
     myTable.setModel(new MyModel(null, null));
-
     myTable.setTableHeader(null);
     myTable.setShowGrid(false);
     myTable.setRowMargin(0);
@@ -148,92 +128,33 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     myTable.setAutoCreateColumnsFromModel(false);
     myTable.getEmptyText().setText(GctBundle.getString("clouddebug.nosnapshots"));
 
-    final ToolbarDecorator decorator =
-      ToolbarDecorator.createDecorator(myTable).disableUpDownActions().disableAddAction();
+    configureToolbar();
 
-    decorator.setToolbarPosition(ActionToolbarPosition.TOP);
-    decorator.setRemoveAction(new AnActionButtonRunnable() {
-      @Override
-      public void run(AnActionButton button) {
-        fireDeleteBreakpoints(getSelectedBreakpoints());
-      }
-    });
-
-    decorator.addExtraAction(new AnActionButton(GctBundle.getString("clouddebug.delete.all"),
-                                                GoogleCloudToolsIcons.CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS) {
-      @Override
-      public void actionPerformed(AnActionEvent e) {
-        if (Messages.showDialog(GctBundle.getString("clouddebug.remove.all"),
-                                GctBundle.getString("clouddebug.delete.snapshots"),
-                                new String[]{GctBundle.getString("clouddebug.buttondelete"),
-                                  GctBundle.getString("clouddebug.cancelbutton")}, 1, Messages.getQuestionIcon()) ==
-            0) {
-          MyModel model = (MyModel)myTable.getModel();
-          fireDeleteBreakpoints(model.getBreakpoints());
-        }
-      }
-    });
-
-    decorator.addExtraAction(new AnActionButton(GctBundle.getString("clouddebug.reactivatesnapshotlocation"),
-                                                GoogleCloudToolsIcons.CLOUD_DEBUG_REACTIVATE_BREAKPOINT) {
-                               @Override
-                               public void actionPerformed(AnActionEvent e) {
-                                 myProcess.getBreakpointHandler().cloneToNewBreakpoints(getSelectedBreakpoints());
-                               }
-                             });
-
-    this.add(decorator.createPanel());
     myProcess = processHandler.getProcess();
+
     onBreakpointsChanged();
 
     myProcess.getXDebugSession().addSessionListener(this);
     myProcess.addListener(this);
 
-    // This is the  click handler that does one of three things:
-    // 1. Single click on a final snapshot will load the debugger with that snapshot
-    // 2. Single click on a pending snapshot will show the line of code
-    // 3. Single click on "More" will show the breakpoint config dialog.
-    myTable.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mousePressed(MouseEvent me) {
-        JTable table = (JTable)me.getSource();
-        Point p = me.getPoint();
-        Breakpoint breakpoint = getBreakPoint(p);
-        int col = table.columnAtPoint(p);
-        if (breakpoint != null && col == 4 && supportsMoreConfig(breakpoint)) {
-          BreakpointsDialogFactory.getInstance(myProcess.getXDebugSession().getProject())
-            .showDialog(myProcess.getBreakpointHandler().getXBreakpoint(breakpoint));
-        }
-        else if (me.getClickCount() == 1 && breakpoint != null && myTable.getSelectedRows().length == 1) {
-          getModel().unMarkAsNewlyReceived(breakpoint.getId());
-          myProcess.navigateToSnapshot(breakpoint.getId());
-        }
-      }
-    });
+    myTable.addMouseListener(new SnapshotClicker());
+    myTable.addMouseMotionListener(new CursorSwitcher());
+  }
 
-    // we use a motion listener to create a hand cursor over a link within a table.
-    myTable.addMouseMotionListener(new MouseMotionListener() {
-      @Override
-      public void mouseDragged(MouseEvent me) {
-      }
+  /**
+   * Sets up the the toolbar that appears in the cloud debugger snapshots panel.
+   */
+  private void configureToolbar() {
+    final ToolbarDecorator decorator = ToolbarDecorator.createDecorator(myTable)
+        .disableUpDownActions()
+        .disableAddAction()
+        .setToolbarPosition(ActionToolbarPosition.TOP);
 
-      @Override
-      public void mouseMoved(MouseEvent me) {
-        JTable table = (JTable)me.getSource();
-        Point p = me.getPoint();
-        int column = table.columnAtPoint(p);
-        Breakpoint breakpoint = getBreakPoint(p);
-        if (column == 4 && breakpoint != null && supportsMoreConfig(breakpoint)) {
-          if (myTable.getCursor() != HAND_CURSOR) {
-            myTable.setCursor(HAND_CURSOR);
-          }
-          return;
-        }
-        if (myTable.getCursor() != DEFAULT_CURSOR) {
-          myTable.setCursor(DEFAULT_CURSOR);
-        }
-      }
-    });
+    decorator.setRemoveAction(new RemoveSelectedBreakpointsAction());
+    decorator.addExtraAction(new RemoveAllBreakpointsAction());
+    decorator.addExtraAction(new ReactivateBreakpointAction());
+
+    this.add(decorator.createPanel());
   }
 
   @Override
@@ -242,6 +163,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
   @Override
   public void dispose() {
+    // todo: can we clear pending snapshots here to keep them from getting duped on reconnect?
+    // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/142
   }
 
   @Override
@@ -286,6 +209,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
   @Override
   public void onBreakpointListChanged(CloudDebugProcessState state) {
+    // todo: I don't think anyone else implements this or uses CloudDebugProcessState here.
+    // verify and if so, remove that argument
     onBreakpointsChanged();
   }
 
@@ -336,16 +261,16 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
   @NotNull
   private MyModel getModel() {
-    return (MyModel)myTable.getModel();
+    return (MyModel) myTable.getModel();
   }
 
   /**
-   * Used by delete and clone, this returns which lines the user currently has selected in the snapshot list.
+   * Used by delete and clone, this returns the lines the user currently has selected in the snapshot list.
    */
   @NotNull
   private List<Breakpoint> getSelectedBreakpoints() {
     List<Breakpoint> selectedBreakpoints = new ArrayList<Breakpoint>();
-    MyModel model = (MyModel)myTable.getModel();
+    MyModel model = (MyModel) myTable.getModel();
     int[] selectedRows = myTable.getSelectedRows();
     for (int selectedRow : selectedRows) {
       selectedBreakpoints.add(model.getBreakpoints().get(selectedRow));
@@ -366,7 +291,9 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     if (breakpointList != null) {
       for (int i = 0; i < breakpointList.size(); i++) {
-        if (breakpointList.get(i).getFinalTime() == null) continue;
+        if (breakpointList.get(i).getFinalTime() == null) { // todo: what does this mean?
+          continue;
+        }
         Breakpoint snapshot = myProcess.getCurrentSnapshot();
         if (snapshot != null && breakpointList.get(i).getId().equals(snapshot.getId())) {
           selection = i;
@@ -379,52 +306,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     // Setting the model must happen on the UI thread, while most of this method executes on the
     // background.
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        MyModel oldModel = getModel();
-        MyModel newModel = new MyModel(breakpointList, oldModel);
-        myTable.setModel(newModel);
-        if (finalSelection != -1) {
-          myTable.setRowSelectionInterval(finalSelection, finalSelection);
-        }
-        resizeColumnWidth();
-        int rowForPopup = -1;
-        for (int row = 0; row < getModel().getRowCount(); row++) {
-          Breakpoint bp = getModel().getBreakpoints().get(row);
-          if (bp.getIsFinalState() != Boolean.TRUE) {
-            continue;
-          }
-          StatusMessage status = bp.getStatus();
-          if (status != null) {
-            if (Boolean.TRUE.equals(status.getIsError())) {
-              continue;
-            }
-          }
-          String id = bp.getId();
-          boolean newModelNewlyReceived = getModel().isNewlyReceived(id);
-          boolean oldModelNewlyReceived = oldModel.isNewlyReceived(id);
-          if (newModelNewlyReceived && !oldModelNewlyReceived) {
-            rowForPopup = row;
-          }
-          break;
-        }
-        if (rowForPopup != -1) {
-          UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "snapshot.received", null);
-          //Show a popup indicating a new item has appeared.
-          if (myBalloon != null) {
-            myBalloon.hide();
-          }
-          Rectangle rectangle = myTable.getCellRect(rowForPopup, 0, true);
-          BalloonBuilder builder = JBPopupFactory.getInstance()
-              .createHtmlTextBalloonBuilder(GctBundle.getString("clouddebug.new.snapshot.received"), MessageType.INFO, null)
-              .setFadeoutTime(3000)
-              .setDisposable(myProcess.getXDebugSession().getProject());
-          myBalloon = builder.createBalloon();
-          myBalloon.show(new RelativePoint(myTable, new Point(myTable.getWidth() / 2, rectangle.y)), Position.above);
-        }
-      }
-    });
+    SwingUtilities.invokeLater(new ModelSetter(breakpointList, finalSelection));
   }
 
   /**
@@ -458,7 +340,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     return myProcess.getBreakpointHandler().getXBreakpoint(breakpoint) != null;
   }
 
-  final class SnapshotTimeCellRenderer extends DefaultTableCellRenderer {
+  private final class SnapshotTimeCellRenderer extends DefaultTableCellRenderer {
     private final DateFormat ourDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     private final DateFormat ourDateFormatToday = DateFormat.getTimeInstance(DateFormat.SHORT);
     private final Date myTodayDate;
@@ -483,7 +365,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       setBorder(noFocusBorder);
 
       if (value instanceof Date) {
-        Date finalDate = (Date)value;
+        Date finalDate = (Date) value;
         if (finalDate.after(myTodayDate)) {
           setText(ourDateFormatToday.format(finalDate));
         }
@@ -527,8 +409,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     }
   }
 
-  final static class MoreCellRenderer extends DefaultTableCellRenderer {
-    public MoreCellRenderer() {
+  private final static class MoreCellRenderer extends DefaultTableCellRenderer {
+    MoreCellRenderer() {
       setHorizontalAlignment(SwingConstants.LEFT);
       setForeground(UI.getColor("link.foreground"));
     }
@@ -587,6 +469,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     }
   }
 
+  // todo: this class desperately needs to be pulled out to an outer class and tested
   private class MyModel extends AbstractTableModel {
 
     private static final int ourColumnCount = 5;
@@ -603,8 +486,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
         if (breakpoints != null) {
           for (Breakpoint newBreakpoint : breakpoints) {
-            //We loop through new breakpoints.
-            //If a new breakpoint is in final state *and*
+            // We loop through new breakpoints.
+            // If a new breakpoint is in final state *and*
             // the old model didn't know about that breakpoint as being final (and not new)
             // then we mark it.
             if (newBreakpoint.getIsFinalState() != Boolean.TRUE) {
@@ -699,6 +582,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         case 3:
           return breakpoint.getCondition();
         case 4:
+          // todo: this is one call keeping this class from being static/outer
           if (supportsMoreConfig(breakpoint)) {
             return GctBundle.getString("clouddebug.moreHTML");
           }
@@ -707,4 +591,185 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     }
   }
 
+  private class RemoveSelectedBreakpointsAction implements AnActionButtonRunnable {
+    @Override
+    public void run(AnActionButton button) {
+      // todo(elharo): inject a pointer to the parent class, and we can make this class static
+      List<Breakpoint> selectedBreakpoints = getSelectedBreakpoints();
+      fireDeleteBreakpoints(selectedBreakpoints);
+    }
+  }
+
+  private class RemoveAllBreakpointsAction extends AnActionButton {
+    RemoveAllBreakpointsAction() {
+      super(GctBundle.getString("clouddebug.delete.all"), GoogleCloudToolsIcons.CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS);
+    }
+
+    @Override
+    public void actionPerformed(AnActionEvent event) {
+      // todo(elharo): this is the wrong dialog type. This intended for multiple options.
+      // Here we should use an OK Cancel dialog.
+      String[] options = {GctBundle.getString("clouddebug.buttondelete"),
+          GctBundle.getString("clouddebug.cancelbutton")};
+      int buttonPressed = Messages.showDialog(
+          GctBundle.getString("clouddebug.remove.all"),
+          GctBundle.getString("clouddebug.delete.snapshots"),
+          options,
+          1, // cancel is the default
+          Messages.getQuestionIcon());
+      if (buttonPressed == 0) { // pressed remove all
+        // todo(elharo): assuming the table doesn't change its model, we can inject this instead
+        MyModel model = (MyModel) myTable.getModel();
+        fireDeleteBreakpoints(model.getBreakpoints());
+      }
+    }
+  }
+
+  private class ReactivateBreakpointAction extends AnActionButton {
+    public ReactivateBreakpointAction() {
+      super(GctBundle.getString("clouddebug.reactivatesnapshotlocation"), GoogleCloudToolsIcons.CLOUD_DEBUG_REACTIVATE_BREAKPOINT);
+    }
+
+    @Override
+    public void actionPerformed(AnActionEvent event) {
+      myProcess.getBreakpointHandler().cloneToNewBreakpoints(getSelectedBreakpoints());
+    }
+  }
+
+  private class CloudDebuggerTable extends JBTable {
+    //  Returning the Class of each column allows different renderers to be used based on Class
+    @Override
+    public Class getColumnClass(int column) {
+      if (column == 0) {
+        return Icon.class;
+      }
+      Object value = getValueAt(0, column);
+      return value != null ? getValueAt(0, column).getClass() : String.class;
+    }
+
+    // We override prepareRenderer to supply a tooltip in the case of an error.
+    @NotNull
+    @Override
+    public Component prepareRenderer(@NotNull TableCellRenderer renderer, int row, int column) {
+      Component c = super.prepareRenderer(renderer, row, column);
+      if (c instanceof JComponent) {
+        JComponent jc = (JComponent) c;
+        // todo(elharo): this seems unnecessary. This should be the model of this very table.
+        MyModel model = CloudDebugHistoricalSnapshots.this.getModel();
+        Breakpoint breakpoint = model.getBreakpoints().get(row);
+        jc.setToolTipText(BreakpointUtil.getUserErrorMessage(breakpoint.getStatus()));
+      }
+      return c;
+    }
+  }
+
+  /**
+   * This click handler that does one of three things:
+   * 1. Single click on a final snapshot will load the debugger with that snapshot
+   * 2. Single click on a pending snapshot will show the line of code
+   * 3. Single click on "More" will show the breakpoint config dialog.
+   * todo: single click on a pending snapshot clears the debugger with the previous snapshot
+   * https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/143
+   */
+  private class SnapshotClicker extends MouseAdapter {
+    @Override
+    public void mousePressed(MouseEvent event) {
+      JTable table = (JTable) event.getSource();
+      Point point = event.getPoint();
+      Breakpoint breakpoint = getBreakPoint(point);
+      int column = table.columnAtPoint(point);
+      if (breakpoint != null && column == 4 && supportsMoreConfig(breakpoint)) {
+        BreakpointsDialogFactory.getInstance(myProcess.getXDebugSession().getProject())
+            .showDialog(myProcess.getBreakpointHandler().getXBreakpoint(breakpoint));
+      }
+      else if (event.getClickCount() == 1 && breakpoint != null && myTable.getSelectedRows().length == 1) {
+        getModel().unMarkAsNewlyReceived(breakpoint.getId());
+        myProcess.navigateToSnapshot(breakpoint.getId());
+      }
+    }
+  }
+
+  /**
+   * Create a hand cursor over a link within a table.
+   */
+  private class CursorSwitcher implements MouseMotionListener {
+    @Override
+    public void mouseDragged(MouseEvent me) {
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent event) {
+      JTable table = (JTable) event.getSource();
+      Point p = event.getPoint();
+      int column = table.columnAtPoint(p);
+      Breakpoint breakpoint = getBreakPoint(p);
+      // todo: we should be able to use table here; myTable isn't needed
+      if (column == 4 && breakpoint != null && supportsMoreConfig(breakpoint)) {
+        if (myTable.getCursor() != HAND_CURSOR) {
+          myTable.setCursor(HAND_CURSOR);
+        }
+        return;
+      }
+      if (myTable.getCursor() != DEFAULT_CURSOR) {
+        myTable.setCursor(DEFAULT_CURSOR);
+      }
+    }
+  }
+
+  private class ModelSetter implements Runnable {
+    private final List<Breakpoint> breakpointList;
+    private final int finalSelection;
+
+    public ModelSetter(List<Breakpoint> breakpointList, int finalSelection) {
+      this.breakpointList = breakpointList;
+      this.finalSelection = finalSelection;
+    }
+
+    @Override
+    public void run() {
+      MyModel oldModel = getModel();
+      MyModel newModel = new MyModel(breakpointList, oldModel);
+      myTable.setModel(newModel);
+      if (finalSelection != -1) {
+        myTable.setRowSelectionInterval(finalSelection, finalSelection);
+      }
+      resizeColumnWidth();
+      int rowForPopup = -1;
+      for (int row = 0; row < getModel().getRowCount(); row++) {
+        // todo: getModel should be newModel
+        Breakpoint bp = getModel().getBreakpoints().get(row);
+        if (bp.getIsFinalState() != Boolean.TRUE) {
+          continue;
+        }
+        StatusMessage status = bp.getStatus();
+        if (status != null) {
+          if (Boolean.TRUE.equals(status.getIsError())) {
+            continue;
+          }
+        }
+        String id = bp.getId();
+        // todo: getModel should be newModel
+        boolean newModelNewlyReceived = getModel().isNewlyReceived(id);
+        boolean oldModelNewlyReceived = oldModel.isNewlyReceived(id);
+        if (newModelNewlyReceived && !oldModelNewlyReceived) {
+          rowForPopup = row;
+        }
+        break;
+      }
+      if (rowForPopup != -1) {
+        UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "snapshot.received", null);
+        // Show a popup indicating a new item has appeared.
+        if (myBalloon != null) {
+          myBalloon.hide();
+        }
+        Rectangle rectangle = myTable.getCellRect(rowForPopup, 0, true);
+        BalloonBuilder builder = JBPopupFactory.getInstance()
+            .createHtmlTextBalloonBuilder(GctBundle.getString("clouddebug.new.snapshot.received"), MessageType.INFO, null)
+            .setFadeoutTime(3000)
+            .setDisposable(myProcess.getXDebugSession().getProject());
+        myBalloon = builder.createBalloon();
+        myBalloon.show(new RelativePoint(myTable, new Point(myTable.getWidth() / 2, rectangle.y)), Position.above);
+      }
+    }
+  }
 }

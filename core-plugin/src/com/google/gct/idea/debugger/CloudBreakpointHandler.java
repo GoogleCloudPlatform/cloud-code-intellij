@@ -52,7 +52,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * the local IDE representation and the server breakpoint and provides methods for getting one given the other. {@link
  * XBreakpointHandler} is often called by intelliJ when the user enables or disables breakpoints.
  * <p/>
- * This class is threadsafe in that all operations can be called by multiple threads.
+ * This class is threadsafe. All operations can be called by multiple threads.
  * <p/>
  * Note there are three breakpoint types managed in the debugger and are named to avoid confusion:
  * xIdeBreakpoint : these are {@link XBreakpoint} types that intelliJ defines and are sealed.
@@ -79,8 +79,10 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
    * Called when the user "reactivates" an existing snapshot to create a new breakpoint, this clones state into a new
    * breakpoint. It is different from "createIdeRepresentationsIfNecessary" in the following respects:
    * <p/>
-   * 1. it only operates on final state breakpoints. 2. it always clones them into a new IDE breakpoint 3. it does not
-   * set "created by server = true", so when control flow comes back into register, it will register with the server.
+   * 1. It only operates on final state breakpoints.
+   * 2. It always clones them into a new IDE breakpoint
+   * 3. It does not set "created by server = true", so when control flow comes back into register,
+   *    it will register with the server.
    */
   public void cloneToNewBreakpoints(@NotNull final List<Breakpoint> serverBreakpoints) {
     for (Breakpoint serverBreakpoint : serverBreakpoints) {
