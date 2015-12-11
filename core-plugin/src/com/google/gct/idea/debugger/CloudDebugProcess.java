@@ -261,7 +261,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
             SwingUtilities.invokeLater(new Runnable() {
               @Override
               public void run() {
-                //We will only do the selection if the id for this async task matches the latest
+                // We will only do the selection if the id for this async task matches the latest
                 // user clicked item.  This prevents multiple (and possibly out of order) selections
                 // getting queued up.
                 if (id.equals(myNavigatedSnapshotId)) {
