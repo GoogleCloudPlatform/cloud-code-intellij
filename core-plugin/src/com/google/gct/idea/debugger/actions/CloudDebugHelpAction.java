@@ -7,8 +7,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.util.IconLoader;
 
-import org.jetbrains.annotations.Nullable;
-
 import javax.swing.Icon;
 
 /**
