@@ -62,26 +62,23 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 /**
  * This panel shows the list of cloud debugger snapshots.
- * It contains one Swing table which is divided into four columns:
+ * It contains one Swing table which is divided into five columns:
  *
- * 0. An icon
+ * 0. An icon indicating the state of the breakpoint
  * 1. A date-time for received snapshots or the word "Pending" otherwise.
  * 2. The file and line number of the snapshot; e.g. "GeneratorServlet.java:40"
- * 3. For pending snapshots only, the word "More" which is a link to the Breakpoints dialog.
+ * 3. The breakpoint condition, if any
+ * 4. For pending snapshots only, the word "More" which is a link to the Breakpoints dialog.
  */
  // todo: why *historical* snapshots? Isn't this just all snapshots?
 public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
@@ -204,7 +201,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        myTable.setModel(new MyModel(null, null));
+        myTable.setModel(new SnapshotsModel(CloudDebugHistoricalSnapshots.this, null, null));
       }
     });
   }
@@ -234,8 +231,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   @NotNull
-  private MyModel getModel() {
-    return (MyModel) myTable.getModel();
+  private SnapshotsModel getModel() {
+    return (SnapshotsModel) myTable.getModel();
   }
 
   /**
@@ -244,7 +241,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   @NotNull
   private List<Breakpoint> getSelectedBreakpoints() {
     List<Breakpoint> selectedBreakpoints = new ArrayList<Breakpoint>();
-    MyModel model = (MyModel) myTable.getModel();
+    SnapshotsModel model = (SnapshotsModel) myTable.getModel();
     int[] selectedRows = myTable.getSelectedRows();
     for (int selectedRow : selectedRows) {
       selectedBreakpoints.add(model.getBreakpoints().get(selectedRow));
@@ -286,6 +283,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   /**
    * Resizes the table to respect the contents of each column.
    */
+  // todo: arguably belongs inside ColumnDebuggerTable class
   private void resizeColumnWidth() {
     final TableColumnModel columnModel = myTable.getColumnModel();
     for (int column = 0; column < myTable.getColumnCount(); column++) {
@@ -314,7 +312,9 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
    *
    * Snapshots that support more config show a "More..." link in the rightmost column of the table.
    */
-  private boolean supportsMoreConfig(@Nullable Breakpoint breakpoint) {
+  // todo: is there any feasible way to push this into the breakpoint class itself?
+  // i.e. breakpoint.supportsMoreConfig()?
+  boolean supportsMoreConfig(@Nullable Breakpoint breakpoint) {
     return myProcess.getBreakpointHandler().getXBreakpoint(breakpoint) != null;
   }
 
@@ -447,129 +447,6 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     }
   }
 
-  // todo: this class desperately needs to be pulled out to an outer class and tested
-  // while we're at it, rename something like BreakpointsModel or SnapshotsModel
-  private class MyModel extends AbstractTableModel {
-
-    private static final int ourColumnCount = 5;
-    private final List<Breakpoint> myBreakpoints;
-    private final Set<String> myPendingDeletes = new HashSet<String>();
-    private final Set<String> myNewlyReceived = new HashSet<String>();
-
-    public MyModel(List<Breakpoint> breakpoints, MyModel oldModel) {
-      HashMap<String, Breakpoint> tempHashMap = new HashMap<String, Breakpoint>();
-      if (oldModel != null && oldModel.getBreakpoints().size() > 0) {
-        for(Breakpoint previousBreakpoint : oldModel.getBreakpoints()) {
-          tempHashMap.put(previousBreakpoint.getId(), previousBreakpoint);
-        }
-
-        if (breakpoints != null) {
-          for (Breakpoint newBreakpoint : breakpoints) {
-            // We loop through new breakpoints.
-            // If a new breakpoint is in final state *and*
-            // the old model didn't know about that breakpoint as being final (and not new)
-            // then we mark it.
-            if (newBreakpoint.getIsFinalState() != Boolean.TRUE) {
-              continue;
-            }
-            if (tempHashMap.containsKey(newBreakpoint.getId())) {
-              Breakpoint previousBreakpoint = tempHashMap.get(newBreakpoint.getId());
-              if (previousBreakpoint.getIsFinalState() == Boolean.TRUE) {
-                if (!oldModel.isNewlyReceived(previousBreakpoint.getId())) {
-                  continue;
-                }
-              }
-            }
-            myNewlyReceived.add(newBreakpoint.getId());
-          }
-        }
-      }
-
-      myBreakpoints = breakpoints != null ? breakpoints : new ArrayList<Breakpoint>();
-    }
-
-    @NotNull
-    public List<Breakpoint> getBreakpoints() {
-      return myBreakpoints;
-    }
-
-    @Override
-    public int getColumnCount() {
-      return ourColumnCount;
-    }
-
-    @Override
-    public int getRowCount() {
-      return myBreakpoints.size();
-    }
-
-    public void markForDelete(String id) {
-      myPendingDeletes.add(id);
-    }
-
-    public void unMarkAsNewlyReceived(String id) {
-      myNewlyReceived.remove(id);
-    }
-
-    public boolean isMarkedForDelete(int row) {
-      Breakpoint breakpoint = null;
-      if (row >= 0 && row < myBreakpoints.size()) {
-        breakpoint = myBreakpoints.get(row);
-      }
-      return breakpoint != null && myPendingDeletes.contains(breakpoint.getId());
-    }
-
-    public boolean isNewlyReceived(String id) {
-      return myNewlyReceived.contains(id);
-    }
-
-    public boolean isNewlyReceived(int row) {
-      Breakpoint breakpoint = null;
-      if (row >= 0 && row < myBreakpoints.size()) {
-        breakpoint = myBreakpoints.get(row);
-      }
-      return breakpoint != null && isNewlyReceived(breakpoint.getId());
-    }
-
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-      if (rowIndex < 0 || rowIndex >= myBreakpoints.size()) {
-        return null;
-      }
-      Breakpoint breakpoint = myBreakpoints.get(rowIndex);
-
-      switch (columnIndex) {
-        case 0:
-          if (breakpoint.getStatus() != null && breakpoint.getStatus().getIsError() == Boolean.TRUE) {
-            return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_ERROR;
-          }
-          if (breakpoint.getIsFinalState() != Boolean.TRUE) {
-            return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_CHECKED;
-          }
-          return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_FINAL;
-        case 1:
-          if (breakpoint.getIsFinalState() != Boolean.TRUE) {
-            return GctBundle.getString("clouddebug.pendingstatus");
-          }
-          return BreakpointUtil.parseDateTime(breakpoint.getFinalTime());
-        case 2:
-          String path = breakpoint.getLocation().getPath();
-          int startIndex = path.lastIndexOf('/');
-          return path.substring(startIndex >= 0 ? startIndex + 1 : 0) +
-                 ":" +
-                 breakpoint.getLocation().getLine().toString();
-        case 3:
-          return breakpoint.getCondition();
-        case 4:
-          // todo: this is one call keeping this class from being static/outer
-          if (supportsMoreConfig(breakpoint)) {
-            return GctBundle.getString("clouddebug.moreHTML");
-          }
-      }
-      return null;
-    }
-  }
-
   private class RemoveSelectedBreakpointsAction implements AnActionButtonRunnable {
     @Override
     public void run(AnActionButton button) {
@@ -598,7 +475,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
           Messages.getQuestionIcon());
       if (buttonPressed == 0) { // pressed remove all
         // todo(elharo): assuming the table doesn't change its model, we can inject this instead
-        MyModel model = (MyModel) myTable.getModel();
+        SnapshotsModel model = (SnapshotsModel) myTable.getModel();
         fireDeleteBreakpoints(model.getBreakpoints());
       }
     }
@@ -618,7 +495,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   private class CloudDebuggerTable extends JBTable {
 
     CloudDebuggerTable() {
-      setModel(new MyModel(null, null));
+      setModel(new SnapshotsModel(CloudDebugHistoricalSnapshots.this, null, null));
       setTableHeader(null);
       setShowGrid(false);
       setRowMargin(0);
@@ -654,7 +531,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       Component c = super.prepareRenderer(renderer, row, column);
       if (c instanceof JComponent) {
         JComponent jc = (JComponent) c;
-        MyModel model = (MyModel) getModel();
+        SnapshotsModel model = (SnapshotsModel) getModel();
         Breakpoint breakpoint = model.getBreakpoints().get(row);
         jc.setToolTipText(BreakpointUtil.getUserErrorMessage(breakpoint.getStatus()));
       }
@@ -725,8 +602,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     @Override
     public void run() {
-      MyModel oldModel = getModel();
-      MyModel newModel = new MyModel(breakpointList, oldModel);
+      SnapshotsModel oldModel = getModel();
+      SnapshotsModel newModel = new SnapshotsModel(CloudDebugHistoricalSnapshots.this, breakpointList, oldModel);
       myTable.setModel(newModel);
       if (finalSelection != -1) {
         myTable.setRowSelectionInterval(finalSelection, finalSelection);
