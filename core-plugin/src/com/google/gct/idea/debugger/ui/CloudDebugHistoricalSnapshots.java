@@ -83,6 +83,7 @@ import javax.swing.table.TableColumnModel;
  * 2. The file and line number of the snapshot; e.g. "GeneratorServlet.java:40"
  * 3. For pending snapshots only, the word "More" which is a link to the Breakpoints dialog.
  */
+ // todo: why *historical* snapshots? Isn't this just all snapshots?
 public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     implements XDebugSessionListener, CloudBreakpointListener {
 
@@ -154,7 +155,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   @NotNull
   @Override
   public String getTabTitle() {
-    return "Cloud Debugger Snapshots";
+    return GctBundle.getString("clouddebug.snapshots");
   }
 
   @Nullable
@@ -305,9 +306,13 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   /**
-   * Returns true if we have a local representation of the snapshot. The snapshot may be pending or in final state.  If
-   * in final state, then the local representation will be disabled (not enabled).  The user can re-enable the local
-   * state and it will create a new pending snapshot and de-link the old snapshot from the local representation.
+   * Returns true if we have a local representation of the snapshot.
+   * The snapshot may be pending or in final state.  If in final state,
+   * then the local representation will be disabled (not enabled).
+   * The user can re-enable the local state and it will create a new pending snapshot
+   * and de-link the old snapshot from the local representation.
+   *
+   * Snapshots that support more config show a "More..." link in the rightmost column of the table.
    */
   private boolean supportsMoreConfig(@Nullable Breakpoint breakpoint) {
     return myProcess.getBreakpointHandler().getXBreakpoint(breakpoint) != null;
@@ -697,15 +702,14 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       Point p = event.getPoint();
       int column = table.columnAtPoint(p);
       Breakpoint breakpoint = getBreakPoint(p);
-      // todo: we should be able to use table here; myTable isn't needed
       if (column == 4 && breakpoint != null && supportsMoreConfig(breakpoint)) {
-        if (myTable.getCursor() != HAND_CURSOR) {
-          myTable.setCursor(HAND_CURSOR);
+        if (table.getCursor() != HAND_CURSOR) {
+          table.setCursor(HAND_CURSOR);
         }
         return;
       }
-      if (myTable.getCursor() != DEFAULT_CURSOR) {
-        myTable.setCursor(DEFAULT_CURSOR);
+      if (table.getCursor() != DEFAULT_CURSOR) {
+        table.setCursor(DEFAULT_CURSOR);
       }
     }
   }
