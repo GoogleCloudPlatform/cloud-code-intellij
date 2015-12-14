@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * CloudExecutionStack represents an entire stack for a {@link com.google.api.services.debugger .model.Breakpoint} It
+ * CloudExecutionStack represents an entire stack for a {@link com.google.api.services.debugger.model.BreakPoint} It
  * stores the individual frames, and also the variables and custom watch expressions.
  */
 public class CloudExecutionStack extends XExecutionStack {
