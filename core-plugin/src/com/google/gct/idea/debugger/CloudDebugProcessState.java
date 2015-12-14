@@ -50,7 +50,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   private String myProjectName;
   // The project number for the target debuggee
   private String myProjectNumber;
-  // The email of the user associated with the debugee of this state.
+  // The email of the user associated with the debuggee of this state.
   private String myUserEmail;
   // A WaitToken is defined by the cloud debugger service to represent the entirety of the
   // service state.
@@ -179,7 +179,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * Sets the project number that identifies the debugee target. It's similar to project name.  We store both because
+   * Sets the project number that identifies the debuggee target. It's similar to project name.  We store both because
    * locally we resolve project via name, but the server takes a project number. We don't want to have to call elysium
    * to resolve between the two if we don't have to.
    *

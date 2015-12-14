@@ -15,6 +15,7 @@
  */
 package com.google.gct.idea.debugger;
 
+import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
@@ -79,7 +80,7 @@ import java.util.List;
  * <p/>
  * CloudDebugProcess only exists for the duration of the IDE debug session.
  * <p/>
- * It also contains within it state {@link CloudDebugProcessState} which can live beyond the lifetime of the debug
+ * It also contains state {@link CloudDebugProcessState} which can live beyond the lifetime of the debug
  * session and be serialized into workspace.xml state.
  */
 public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointListener {
@@ -109,7 +110,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   @Override
   @NotNull
   public XDebugTabLayouter createTabLayouter() {
-    final CloudDebugProcessHandler handler = (CloudDebugProcessHandler)getProcessHandler();
+    final CloudDebugProcessHandler handler = (CloudDebugProcessHandler) getProcessHandler();
 
     return new XDebugTabLayouter() {
       @Override
@@ -136,9 +137,8 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
         }
 
         CloudDebugHistoricalSnapshots timeline = new CloudDebugHistoricalSnapshots(handler);
-        Content snapshots = layout
-          .createContent(timeline.getTabTitle(), (ComponentWithActions)timeline, timeline.getTabTitle(),
-                         GoogleCloudToolsIcons.CLOUD, null);
+        Content snapshots = layout.createContent(
+            timeline.getTabTitle(), (ComponentWithActions) timeline, timeline.getTabTitle(), GoogleCloudToolsIcons.CLOUD, null);
         layout.addContent(snapshots, 0, PlaceInGrid.left, false);
 
         layout.getDefaults().initFocusContent(timeline.getTabTitle(), LayoutViewOptions.STARTUP,
@@ -221,7 +221,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
    * to poll for changes.
    */
   public void initialize(@NotNull CloudDebugProcessState processState) {
-    myProcessState = processState;
+    setProcessState(processState);
     myCurrentSnapshot = null;
 
     new Task.Modal(getXDebugSession().getProject(), GctBundle.getString("clouddebug.attachingtext"), false) {
@@ -243,6 +243,11 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
         getBreakpointHandler().createIdeRepresentationsIfNecessary(getCurrentBreakpointList());
       }
     });
+  }
+
+  @VisibleForTesting
+  void setProcessState(@NotNull CloudDebugProcessState processState) {
+    myProcessState = processState;
   }
 
   /**
@@ -395,6 +400,8 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     topToolbar.remove(manager.getAction(XDebuggerActions.RUN_TO_CURSOR));
     topToolbar.remove(manager.getAction(XDebuggerActions.EVALUATE_EXPRESSION));
     topToolbar.remove(manager.getAction(DebuggerActions.POP_FRAME));
+
+    topToolbar.add(new LabelAction(myProcessState.getProjectName()));
   }
 
   public void removeListener(@NotNull CloudBreakpointListener listener) {

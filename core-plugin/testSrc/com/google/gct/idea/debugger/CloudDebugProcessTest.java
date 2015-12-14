@@ -32,6 +32,8 @@ public class CloudDebugProcessTest extends PlatformTestCase {
         XDebugSession session = Mockito.mock(XDebugSession.class);
         Mockito.when(session.getProject()).thenReturn(this.getProject());
         process = new CloudDebugProcess(session);
+        CloudDebugProcessState state = new CloudDebugProcessState(null, null, "project name", null, null);
+        process.setProcessState(state);
     }
 
     @Test
@@ -170,7 +172,11 @@ public class CloudDebugProcessTest extends PlatformTestCase {
 
         process.registerAdditionalActions(leftToolbar, topToolbar, settings);
 
-        assertEmpty(topToolbar.getChildActionsOrStubs());
+        // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/234
+        AnAction[] childActionsOrStubs = topToolbar.getChildActionsOrStubs();
+        assertEquals(1, childActionsOrStubs.length);
+        assertTrue(childActionsOrStubs[0] instanceof LabelAction);
+        assertTrue(childActionsOrStubs[0].displayTextInToolbar());
     }
 
 }
