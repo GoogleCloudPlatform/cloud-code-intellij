@@ -27,6 +27,7 @@ import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.stats.UsageTrackerProvider;
+
 import com.intellij.diagnostic.logging.AdditionalTabComponent;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -47,25 +48,11 @@ import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.xdebugger.XDebugSessionListener;
 import com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -80,6 +67,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 /**
  * This panel shows the list of cloud debugger snapshots.
@@ -111,23 +104,6 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     myTable = new CloudDebuggerTable();
 
-    // todo: I think all of this can be pushed into CloudDebuggerTable unless there's some weird
-    // Swing reason these methods shouldn't be called from the constructor
-    myTable.setModel(new MyModel(null, null));
-    myTable.setTableHeader(null);
-    myTable.setShowGrid(false);
-    myTable.setRowMargin(0);
-    myTable.getColumnModel().setColumnMargin(0);
-    myTable.getColumnModel().getColumn(1).setCellRenderer(new SnapshotTimeCellRenderer());
-    myTable.getColumnModel().getColumn(2).setCellRenderer(new DefaultRenderer());
-    myTable.getColumnModel().getColumn(3).setCellRenderer(new DefaultRenderer());
-    myTable.getColumnModel().getColumn(4).setCellRenderer(new MoreCellRenderer());
-    myTable.resetDefaultFocusTraversalKeys();
-    myTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-    myTable.setPreferredScrollableViewportSize(new Dimension(WINDOW_WIDTH_PX, WINDOW_HEIGHT_PX));
-    myTable.setAutoCreateColumnsFromModel(false);
-    myTable.getEmptyText().setText(GctBundle.getString("clouddebug.nosnapshots"));
-
     configureToolbar();
 
     myProcess = processHandler.getProcess();
@@ -136,9 +112,6 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     myProcess.getXDebugSession().addSessionListener(this);
     myProcess.addListener(this);
-
-    myTable.addMouseListener(new SnapshotClicker());
-    myTable.addMouseMotionListener(new CursorSwitcher());
   }
 
   /**
@@ -470,6 +443,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   // todo: this class desperately needs to be pulled out to an outer class and tested
+  // while we're at it, rename something like BreakpointsModel or SnapshotsModel
   private class MyModel extends AbstractTableModel {
 
     private static final int ourColumnCount = 5;
@@ -637,6 +611,27 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   private class CloudDebuggerTable extends JBTable {
+
+    CloudDebuggerTable() {
+      setModel(new MyModel(null, null));
+      setTableHeader(null);
+      setShowGrid(false);
+      setRowMargin(0);
+      getColumnModel().setColumnMargin(0);
+      getColumnModel().getColumn(1).setCellRenderer(new SnapshotTimeCellRenderer());
+      getColumnModel().getColumn(2).setCellRenderer(new DefaultRenderer());
+      getColumnModel().getColumn(3).setCellRenderer(new DefaultRenderer());
+      getColumnModel().getColumn(4).setCellRenderer(new MoreCellRenderer());
+      resetDefaultFocusTraversalKeys();
+      setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+      setPreferredScrollableViewportSize(new Dimension(WINDOW_WIDTH_PX, WINDOW_HEIGHT_PX));
+      setAutoCreateColumnsFromModel(false);
+      getEmptyText().setText(GctBundle.getString("clouddebug.nosnapshots"));
+
+      addMouseListener(new SnapshotClicker());
+      addMouseMotionListener(new CursorSwitcher());
+    }
+
     //  Returning the Class of each column allows different renderers to be used based on Class
     @Override
     public Class getColumnClass(int column) {
@@ -654,8 +649,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       Component c = super.prepareRenderer(renderer, row, column);
       if (c instanceof JComponent) {
         JComponent jc = (JComponent) c;
-        // todo(elharo): this seems unnecessary. This should be the model of this very table.
-        MyModel model = CloudDebugHistoricalSnapshots.this.getModel();
+        MyModel model = (MyModel) getModel();
         Breakpoint breakpoint = model.getBreakpoints().get(row);
         jc.setToolTipText(BreakpointUtil.getUserErrorMessage(breakpoint.getStatus()));
       }
