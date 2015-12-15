@@ -38,13 +38,15 @@ import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XBreakpointManager;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.swing.SwingUtilities;
 
 /**
  * The Cloud Debugger breakpoint handler is responsible for creating or deleting the breakpoints on the server. It is
@@ -291,8 +293,8 @@ public class CloudBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<C
   }
 
   /**
-   * Called when the user double clicks a pending breakpoint.  We find the local IDE representation and navigate to its
-   * line of code.
+   * Called when the user clicks a pending breakpoint. We find the local IDE representation and
+   * navigate to its line of code.
    */
   public void navigateTo(@NotNull Breakpoint serverBreakpoint) {
     final XBreakpoint xIdeBreakpoint = myIdeBreakpoints.get(serverBreakpoint.getId());
