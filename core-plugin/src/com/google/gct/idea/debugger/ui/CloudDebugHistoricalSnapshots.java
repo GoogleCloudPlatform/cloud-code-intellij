@@ -262,9 +262,6 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     if (breakpointList != null) {
       for (int i = 0; i < breakpointList.size(); i++) {
-        if (breakpointList.get(i).getFinalTime() == null) { // todo: what does this mean?
-          continue;
-        }
         Breakpoint snapshot = myProcess.getCurrentSnapshot();
         if (snapshot != null && breakpointList.get(i).getId().equals(snapshot.getId())) {
           selection = i;
@@ -273,11 +270,9 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       }
     }
 
-    final int finalSelection = selection;
-
     // Setting the model must happen on the UI thread, while most of this method executes on the
     // background.
-    SwingUtilities.invokeLater(new ModelSetter(breakpointList, finalSelection));
+    SwingUtilities.invokeLater(new ModelSetter(breakpointList, selection));
   }
 
   /**
@@ -595,7 +590,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     private final List<Breakpoint> breakpointList;
     private final int finalSelection;
 
-    public ModelSetter(List<Breakpoint> breakpointList, int finalSelection) {
+    ModelSetter(List<Breakpoint> breakpointList, int finalSelection) {
       this.breakpointList = breakpointList;
       this.finalSelection = finalSelection;
     }
