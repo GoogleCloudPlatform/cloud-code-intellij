@@ -36,14 +36,21 @@ public class CloudExecutionStack extends XExecutionStack {
 
   public CloudExecutionStack(@NotNull Project project,
                              @NotNull String name,
-                             @NotNull List<StackFrame> frames,
-                             @NotNull List<Variable> variableTable,
+                             @Nullable List<StackFrame> frames,
+                             @Nullable List<Variable> variableTable,
                              @Nullable List<Variable> evaluatedExpressions) {
     super(name);
-    for (StackFrame nativeFrame : frames) {
-      myFrames.add(new CloudStackFrame(project, nativeFrame, variableTable, evaluatedExpressions));
-      // We only show custom watches on the top frame.
-      evaluatedExpressions = null;
+
+    if (frames != null) {
+      if (variableTable == null) {
+        variableTable = Collections.emptyList();
+      }
+      for (StackFrame nativeFrame : frames) {
+        myFrames
+            .add(new CloudStackFrame(project, nativeFrame, variableTable, evaluatedExpressions));
+          // We only show custom watches on the top frame.
+          evaluatedExpressions = null;
+      }
     }
   }
 

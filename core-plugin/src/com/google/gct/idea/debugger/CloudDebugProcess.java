@@ -25,6 +25,7 @@ import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.stats.UsageTrackerProvider;
+
 import com.intellij.debugger.actions.DebuggerActions;
 import com.intellij.debugger.ui.DebuggerContentInfo;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
@@ -59,15 +60,17 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.intellij.xdebugger.ui.XDebugTabLayouter;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
 
-import javax.swing.SwingUtilities;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+
+import javax.swing.SwingUtilities;
 
 /**
  * CloudDebugProcess is the controller that represents our attached state to the server. It provides the breakpoint
@@ -79,7 +82,7 @@ import java.util.List;
  * <p/>
  * CloudDebugProcess only exists for the duration of the IDE debug session.
  * <p/>
- * It also contains within it state {@link CloudDebugProcessState} which can live beyond the lifetime of the debug
+ * It also contains state {@link CloudDebugProcessState} that can live beyond the lifetime of the debug
  * session and be serialized into workspace.xml state.
  */
 public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointListener {
@@ -177,6 +180,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
    * However, multiple successive calls to this method may return a different list. Therefore, callers must store the
    * return value locally to operate on it and should not call this method repeatedly expecting the same list.
    */
+  // todo: can we declare this as ImmutableList?
   public List<Breakpoint> getCurrentBreakpointList() {
     return getProcessState().getCurrentServerBreakpointList();
   }
@@ -267,6 +271,9 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
                 if (id.equals(myNavigatedSnapshotId)) {
                   if (result.getIsFinalState() != Boolean.TRUE || result.getStackFrames() == null) {
                     getBreakpointHandler().navigateTo(result);
+                    if (result.getStackFrames() == null) {
+                      navigateToBreakpoint(result);
+                    }
                     return;
                   }
 
