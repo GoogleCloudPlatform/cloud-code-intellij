@@ -20,7 +20,6 @@ import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
 import com.google.gct.idea.debugger.actions.CloudDebugHelpAction;
 import com.google.gct.idea.debugger.ui.CloudDebugHistoricalSnapshots;
-import com.google.gct.idea.debugger.ui.ExitDialog;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
@@ -434,7 +433,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
     RunProfile profile = getXDebugSession().getRunProfile();
     if (profile instanceof CloudDebugRunConfiguration) {
-      ((CloudDebugRunConfiguration)profile).setProcessState(myProcessState);
+      ((CloudDebugRunConfiguration) profile).setProcessState(myProcessState);
     }
 
     getRepositoryValidator().restoreToOriginalState(getXDebugSession().getProject());
@@ -501,8 +500,22 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-      ExitDialog exitDialog = new ExitDialog(getXDebugSession().getProject());
-      exitDialog.showAndGetOk();
+      int result = Messages.showOkCancelDialog(event.getProject(),
+          GctBundle.getString("clouddebug.continue.listening"),
+          GctBundle.getString("clouddebug.message.title"),
+          GctBundle.getString("clouddebug.continue"),
+          GctBundle.getString("clouddebug.stop.listening"),
+          Messages.getQuestionIcon());
+      if (result == Messages.OK) { // continue
+        myProcessState.setListenInBackground(true);
+        UsageTrackerProvider.getInstance().trackEvent(
+            GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.continue.listening", null);
+      }
+      else {
+        myProcessState.setListenInBackground(false);
+        UsageTrackerProvider.getInstance().trackEvent(
+            GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.stop.listening", null);
+      }
       ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM).actionPerformed(event);
       ActionManager.getInstance().getAction(IdeActions.ACTION_CLOSE).actionPerformed(event);
       UsageTrackerProvider.getInstance()
