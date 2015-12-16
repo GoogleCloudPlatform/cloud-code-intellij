@@ -110,7 +110,7 @@ public class CloudDebugGlobalPoller {
         if (config.getConfiguration() instanceof CloudDebugRunConfiguration) {
           final CloudDebugRunConfiguration cloudConfig = (CloudDebugRunConfiguration)config.getConfiguration();
           CloudDebugProcessState state = cloudConfig.getProcessState();
-          if (state != null) {
+          if (state != null && state.isListenInBackground()) {
             states.add(state);
           }
         }
