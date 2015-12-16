@@ -463,19 +463,14 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-      // todo(elharo): this is the wrong dialog type. This intended for multiple options.
-      // Here we should use an OK Cancel dialog.
-      String[] options = {GctBundle.getString("clouddebug.buttondelete"),
-          GctBundle.getString("clouddebug.cancelbutton")};
-      int buttonPressed = Messages.showDialog(
-          GctBundle.getString("clouddebug.remove.all"),
-          GctBundle.getString("clouddebug.delete.snapshots"),
-          options,
-          1, // cancel is the default
-          Messages.getQuestionIcon());
-      if (buttonPressed == 0) { // pressed remove all
-        // todo(elharo): assuming the table doesn't change its model, we can inject this instead
-        SnapshotsModel model = (SnapshotsModel) myTable.getModel();
+      int result = Messages.showOkCancelDialog(GctBundle.getString("clouddebug.remove.all"),
+              GctBundle.getString("clouddebug.delete.snapshots"),
+              GctBundle.getString("clouddebug.buttondelete"),
+              GctBundle.getString("clouddebug.cancelbutton"),
+              Messages.getQuestionIcon());
+
+      if (result == Messages.OK) { // pressed remove all
+        SnapshotsModel model = getModel();
         fireDeleteBreakpoints(model.getBreakpoints());
       }
     }
@@ -540,9 +535,10 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   /**
-   * This click handler that does one of three things:
-   * 1. Single click on a final snapshot will load the debugger with that snapshot
-   * 2. Single click on a pending snapshot will show the line of code
+   * This click handler does one of three things:
+   *
+   * 1. Single click on a final snapshot will load the debugger with that snapshot.
+   * 2. Single click on a pending snapshot will show the line of code.
    * 3. Single click on "More" will show the breakpoint config dialog.
    * todo: single click on a pending snapshot clears the debugger with the previous snapshot
    * https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/143
@@ -554,6 +550,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       Point point = event.getPoint();
       Breakpoint breakpoint = getBreakPoint(point);
       int column = table.columnAtPoint(point);
+      // todo: 4 and 1 here are magic numbers; use named constants for columns; maybe define
+      // in CloudDebuggerTable class
       if (breakpoint != null && column == 4 && supportsMoreConfig(breakpoint)) {
         BreakpointsDialogFactory.getInstance(myProcess.getXDebugSession().getProject())
             .showDialog(myProcess.getBreakpointHandler().getXBreakpoint(breakpoint));
@@ -602,6 +600,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     @Override
     public void run() {
+      // todo: why are we switching out the model instead of simply updating the old model?
+      // todo: a lot of this code might be pushed into CloudDebuggerTable.setBrekpoints or equivalent
       SnapshotsModel oldModel = getModel();
       SnapshotsModel newModel = new SnapshotsModel(CloudDebugHistoricalSnapshots.this, breakpointList, oldModel);
       myTable.setModel(newModel);
