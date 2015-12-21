@@ -8,11 +8,14 @@ title: Gcloud IntelliJ Tutorial
 You can use the Cloud Debugger to capture and inspect the call stack 
 and local variables of an application at specified breakpoints.
  
-There are two key differences between the cloud debugger and a traditional debugger:
+It works much like the IntelliJ IDEA debugger you're already used to,
+and provides the same user interface, with two key differences:
 
 * The cloud debugger does not pause execution of the running application.
 
 * You cannot step through an application in the cloud debugger.
+
+In other words, the Cloud Debugger is a *forensic* debugger, not an *interactive* debugger.
 
 The Cloud Debugger is enabled automatically for Java 
 applications running on [Google App Engine](https://cloud.google.com/appengine/docs) and
@@ -20,8 +23,8 @@ applications running on [Google App Engine](https://cloud.google.com/appengine/d
 
 ## Installing the Plugins
 
-Note: these instructions don't work yet. They will soon. meanwhile you'll need to 
-download the plugin from Github and install it from disk. 
+*Note: these instructions don't work yet. They will soon. Meanwhile you'll need to 
+download the plugin from Github and install it from disk.* 
 
 The plugin can be installed from the 
 [IntelliJ IDEA Plugin Repository](https://www.jetbrains.com/idea/plugins/).
