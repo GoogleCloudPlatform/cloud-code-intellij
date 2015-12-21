@@ -3,7 +3,8 @@ title: Gcloud IntelliJ Tutorial
 ---
 
 # Gcloud IntelliJ IDEA Tutorial
-# Warning: Work in Progress. Definitely incomplete and sometimes incorrect.
+
+**<span style="color:red">Warning: Work in Progress. Definitely incomplete and sometimes incorrect.</span>**
 
 You can use the Cloud Debugger to capture and inspect the call stack 
 and local variables of an application at specified breakpoints.
@@ -23,8 +24,7 @@ applications running on [Google App Engine](https://cloud.google.com/appengine/d
 
 ## Installing the Plugins
 
-*Note: these instructions don't work yet. They will soon. Meanwhile you'll need to 
-download the plugin from Github and install it from disk.* 
+*<span style="color:red">Note: these instructions don't work yet. They will soon. Meanwhile you'll need to  download the plugin from Github and install it from disk.</span>* 
 
 The plugin can be installed from the 
 [IntelliJ IDEA Plugin Repository](https://www.jetbrains.com/idea/plugins/).
