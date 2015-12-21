@@ -65,7 +65,9 @@ You can find this code in the Github project ????. You can clone it to your own 
     [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) or connected
     Github or Bitbucket repository). 
 
-2.  Deploy your application using the
+2. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
+
+3.  Deploy your application using the
     [`appcfg`](https://cloud.google.com/appengine/docs/java/tools/uploadinganapp)
     command:
 
@@ -75,7 +77,7 @@ You can find this code in the Github project ????. You can clone it to your own 
 
         $ appcfg.sh update ./target/myapp
 
-3. Visit the application at ????. You'll see it say:
+4. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
  
  Aha! That's a bug. It's supposed to say "Hello Firefox" (or "Hello Chrome", etc.) Why doesn't it? Let's debug. 
 
