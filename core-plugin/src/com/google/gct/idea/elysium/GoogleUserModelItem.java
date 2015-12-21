@@ -21,20 +21,24 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.developerprojects.Developerprojects;
 import com.google.api.services.developerprojects.model.ListProjectsResponse;
 import com.google.api.services.developerprojects.model.Project;
+import com.google.gct.idea.util.GctBundle;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLoginUtils;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import java.awt.*;
+import java.awt.Image;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  * This model item represents a {@link com.google.gct.login.GoogleLogin} credentialed user
@@ -109,12 +113,12 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
   }
 
   // If an error occurs during the elysium call, we load a model that shows the error.
-  private void loadErrorState(@NotNull final Exception ex) {
+  private void loadErrorState(@NotNull final String errorMessage) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         GoogleUserModelItem.this.removeAllChildren();
-        GoogleUserModelItem.this.add(new ElysiumErrorModelItem("Error: " + ex.toString()));
+        GoogleUserModelItem.this.add(new ElysiumErrorModelItem("Error: " + errorMessage));
         myTreeModel.reload(GoogleUserModelItem.this);
       }
     });
@@ -140,9 +144,14 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
         }
       }
     }
-    catch (Exception e) {
-      LOG.error("Exception loading projects for " + myUser.getName(), e);
-      loadErrorState(e);
+    catch (IOException ex) {
+      // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/323
+      loadErrorState(GctBundle.getString("clouddebug.couldnotconnect"));
+      return;
+    }
+    catch (RuntimeException ex) {
+      LOG.error("Exception loading projects for " + myUser.getName(), ex);
+      loadErrorState(ex.getMessage());
       return;
     }
 
@@ -165,12 +174,12 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     }
     catch (InterruptedException ex) {
       LOG.error("InterruptedException loading projects for " + myUser.getName(), ex);
-      loadErrorState(ex);
+      loadErrorState(ex.getMessage());
       Thread.currentThread().interrupt();
     }
     catch (InvocationTargetException ex) {
       LOG.error("InvocationTargetException loading projects for " + myUser.getName(), ex);
-      loadErrorState(ex);
+      loadErrorState(ex.getMessage());
     }
   }
 }
