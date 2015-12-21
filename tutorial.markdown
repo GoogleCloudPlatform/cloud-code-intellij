@@ -87,7 +87,7 @@ You can find this code in the Github project ????. You can clone it to your own 
 ### Setting up a Cloud Debug Configuration
 
 
-1. Set up a new Java project from the local copy of the source you pushed to git. (reference IntelliJ instructions for doing this? Anything special to note here?)
+1. Set up a new Java project from the Github repository you cloned. (reference IntelliJ instructions for doing this? Anything special to note here?)
 
 2. Run > Edit Configurations...
 
