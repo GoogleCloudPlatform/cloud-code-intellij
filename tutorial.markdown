@@ -75,7 +75,9 @@ You can find this code in the Github project ????. You can clone it to your own 
 
         $ appcfg.sh update ./target/myapp
 
-
+3. Visit the application at ????. You'll see it say:
+ 
+ Aha! That's a bug. It's supposed to say "Hello Firefox" (or "Hello Chrome", etc.) Why doesn't it? Let's debug. 
 
 
 ## Using the Debugger
@@ -110,7 +112,7 @@ account that can manage the application.
 
 10. You will see a window saying "IntelliJ is now authorized to access your account." Close the browser window and return to IntelliJ.
 
-11. At the right-hand side of the Project popup, click the little arrow again. This time you'll see a list of applications managed by your account. Select "????"
+11. At the right-hand side of the Project popup, click the little arrow again. This time you'll see a list of applications managed by your account. Select "Sample Project".
 
 12. Click the OK button.
  
@@ -123,7 +125,7 @@ just as you would when debugging a local application using the regular IDEA debu
 
 Here set a breakpoint at ????.
 
-Since you can't single step through an aplicaiton in the cloud debugger,
+Since you can't single step through an application in the cloud debugger,
 it's more common to put the breakpoint at the end of the relevant block
 of code rather than at the beginning. That way all variables have been set and can
 be inspected. 
