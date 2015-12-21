@@ -20,7 +20,7 @@ In other words, the Cloud Debugger is a *forensic* debugger, not an *interactive
 
 The Cloud Debugger is enabled automatically for Java 
 applications running on [Google App Engine](https://cloud.google.com/appengine/docs) and
-[Managed VMs]https://cloud.google.com/appengine/docs/managed-vms/).
+[Managed VMs](https://cloud.google.com/appengine/docs/managed-vms/).
 
 ## Installing the Plugins
 
