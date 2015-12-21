@@ -84,7 +84,15 @@ You can find this code in the Github project ????. You can clone it to your own 
 
 ## Using the Debugger
 
+### Enabling the application for the Cloud Debugger
+
+First you need to connect your Github repository to the Google Cloud Source Repository
+so that the Cloud Debu8gger can see your source code. This happens inside a web browser.
+
+
 ### Setting up a Cloud Debug Configuration
+
+This is done inside IDEA.
 
 
 1. Set up a new Java project from the Github repository you cloned. (reference IntelliJ instructions for doing this? Anything special to note here?)
