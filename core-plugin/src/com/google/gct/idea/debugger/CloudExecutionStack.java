@@ -32,7 +32,7 @@ import java.util.List;
  * stores the individual frames, and also the variables and custom watch expressions.
  */
 public class CloudExecutionStack extends XExecutionStack {
-  private final List<XStackFrame> myFrames = new ArrayList<XStackFrame>();
+  private final List<CloudStackFrame> myFrames = new ArrayList<CloudStackFrame>();
 
   public CloudExecutionStack(@NotNull Project project,
                              @NotNull String name,
@@ -60,12 +60,12 @@ public class CloudExecutionStack extends XExecutionStack {
       container.addStackFrames(myFrames.subList(firstFrameIndex, myFrames.size()), true);
     }
     else {
-      container.addStackFrames(Collections.<XStackFrame>emptyList(), true);
+      container.addStackFrames(Collections.<CloudStackFrame>emptyList(), true);
     }
   }
 
   @Override
-  public XStackFrame getTopFrame() {
+  public CloudStackFrame getTopFrame() {
     return myFrames.size() > 0 ? myFrames.get(0) : null;
   }
 }
