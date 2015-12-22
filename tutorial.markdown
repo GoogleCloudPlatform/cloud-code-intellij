@@ -91,7 +91,7 @@ You can clone the project to your own repository.
 ### Enabling the application for the Cloud Debugger
 
 First you need to connect your Github repository to the Google Cloud Source Repository
-so that the Cloud Debu8gger can see your source code. This happens inside a web browser.
+so that the Cloud Debugger can see your source code. This happens inside a web browser.
 
 
 ### Setting up a Cloud Debug Configuration
