@@ -55,10 +55,13 @@ From inside IDEA:
 
 For purposes of this tutorial we'll debug a simple servlet that detects the
 user's browser and says "Hello Firefox", "Hello Chrome", and so forth, depending on the browser.
-You can find this code in the Github project ????. You can clone it to your own repository.
+You can find this code in the Github project ????. It is built with Maven version 3.1 or later. 
 
 (If you happen to spot the bug by eye before running it, pretend you don't and just read along.)
 
+You can clone the project to your own repository.
+
+*TBD: can someone run the debugger without being able to commit to the repository?*
 
 
 1.  Commit and push the source code of the application to a Git repository (a
@@ -67,17 +70,18 @@ You can find this code in the Github project ????. You can clone it to your own 
 
 2. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
 
-3.  Deploy your application using the
-    [`appcfg`](https://cloud.google.com/appengine/docs/java/tools/uploadinganapp)
-    command:
+3. In your local copy of the source, open the file pom.xml in a text editor and change 
+   the `artifactId` element from `hellobrowser` to the project name you registered in the developer console.
 
-        $ appcfg.sh update <war-location>
+4. Build and test the application using`mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
 
-    For example:
+5.  Deploy your application using
+    [maven](https://cloud.google.com/appengine/docs/java/tools/maven#uploading_your_app_to_production_app_engine):
 
-        $ appcfg.sh update ./target/myapp
+        $ mvn appengine:update
 
-4. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
+
+6. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
  
  Aha! That's a bug. It's supposed to say "Hello Firefox" (or "Hello Chrome", etc.) Why doesn't it? Let's debug. 
 
