@@ -15,15 +15,12 @@
  */
 package com.google.gct.idea.git;
 
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.source.Source;
-import com.google.api.services.source.model.ListReposResponse;
-import com.google.api.services.source.model.Repo;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.login.CredentialedUser;
+
+import com.intellij.dvcs.ui.DvcsBundle;
 import com.intellij.ide.impl.ProjectUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -56,6 +53,7 @@ public class CloneGcpDialog extends DialogWrapper {
   private ProjectSelector myRepositoryURL;
   private TextFieldWithBrowseButton myParentDirectory;
   private JTextField myDirectoryName;
+  private JLabel parentDirectoryLabel;
 
   @NotNull private String myDefaultDirectoryName = "";
   @NotNull private final Project myProject;
@@ -63,6 +61,7 @@ public class CloneGcpDialog extends DialogWrapper {
   public CloneGcpDialog(@NotNull Project project) {
     super(project, true);
     myProject = project;
+    parentDirectoryLabel.setText(DvcsBundle.message("clone.parent.dir"));
     init();
     initComponents();
     setTitle(GctBundle.message("clonefromgcp.title"));
@@ -147,15 +146,18 @@ public class CloneGcpDialog extends DialogWrapper {
     }
     File file = new File(myParentDirectory.getText(), myDirectoryName.getText());
     if (file.exists()) {
-      setErrorText(GctBundle.message("clonefromgcp.destination.exists.error", file));
+      setErrorText(GctBundle.message("clonefromgcp.destination.exists.error"));
       setOKActionEnabled(false);
+      paintSelectionError();
       return;
     }
     else if (!file.getParentFile().exists()) {
-      setErrorText(GctBundle.message("clonefromgcp.parent.missing.error", file.getParent()));
+      setErrorText(GctBundle.message("clonefromgcp.parent.missing.error"));
       setOKActionEnabled(false);
+      paintSelectionError();
       return;
     }
+    paintSelectionOK();
     setErrorText(null);
     setOKActionEnabled(true);
   }
@@ -205,5 +207,23 @@ public class CloneGcpDialog extends DialogWrapper {
   @Override
   protected JComponent createCenterPanel() {
     return myRootPanel;
+  }
+
+  /**
+   * Default dialog state.
+   */
+  private void paintSelectionOK() {
+    myParentDirectory.setBackground(Color.getColor("ECECEC"));
+    parentDirectoryLabel.setForeground(Color.BLACK);
+  }
+
+  /**
+   * Activates when a user selection is incorrect.
+   *
+   * Paints the "Parent Directory" label and textbox background red.
+   */
+  private void paintSelectionError() {
+    myParentDirectory.setBackground(Color.RED);
+    parentDirectoryLabel.setForeground(Color.RED);
   }
 }
