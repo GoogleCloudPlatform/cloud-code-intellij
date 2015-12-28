@@ -66,13 +66,19 @@ Other useful targets while developing include:
 ## Contributing code
 
 1. First, please [sign either individual or corporate contributor license agreement](https://cla.developers.google.com/), whichever is applicable.
-2. Fork the repository into your own Github account.
-3. Please include unit tests for all new code. (Yes, we know not all 
+2. Set your git user.email property to the address used for step 1. E.g.
+   ```
+   git config --global user.email "janedoe@google.com"
+   ```
+   If you're a Googler or other corporate contributor, 
+   use your corporate email address here, not your personal address. 
+3. Fork the repository into your own Github account.
+4. Please include unit tests for all new code. (Yes, we know not all 
    existing code has tests. We're slowly fixing that, and contributions of tests
    for existing code are much appreciated.
-4. Make sure all existing tests pass. (gradlew test)
-5. Associate the change with an existing issue or [file a new issue](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/new). 
-6. Create a pull request and send it to gcloud-intellij:master. 
+5. Make sure all existing tests pass. (gradlew test)
+6. Associate the change with an existing issue or [file a new issue](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/new). 
+7. Create a pull request and send it to gcloud-intellij:master. 
 
 
 Unless otherwise noted, our source files are distributed under
