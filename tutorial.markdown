@@ -6,8 +6,9 @@ title: Gcloud IntelliJ Tutorial
 
 **<span style="color:red">Warning: Work in Progress. Definitely incomplete and sometimes incorrect.</span>**
 
-You can use the Cloud Debugger to capture and inspect the call stack 
-and local variables of an application at specified breakpoints.
+You can use the Google Cloud Debugger to capture and inspect the call stack 
+and local variables of a live application running in the cloud
+(more specifically App Engine or the Google Compute Engine.)
  
 It works much like the IntelliJ IDEA debugger you're already used to,
 and provides the same user interface, with two key differences:
