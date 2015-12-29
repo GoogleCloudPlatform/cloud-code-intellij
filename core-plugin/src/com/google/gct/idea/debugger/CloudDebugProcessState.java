@@ -56,6 +56,8 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   // service state.
   // The state is defined by any combination of snapshots and their values.
   private String myWaitToken;
+  // Whether this state listens in background or not
+  private boolean myListenInBackground;
 
   /**
    * This constructor is used by deserialization of the {@link CloudDebugProcessStateSerializer}. We use a separate
@@ -86,6 +88,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
     setProjectName(projectName);
     setProjectNumber(projectNumber);
     setProject(project);
+    setListenInBackground(false);
   }
 
   @Nullable
@@ -226,5 +229,19 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    */
   public void setWaitToken(@Nullable String waitToken) {
     myWaitToken = waitToken;
+  }
+
+  /**
+   * Returns whether this state is configured to allow background listening
+   */
+  public boolean isListenInBackground() {
+    return myListenInBackground;
+  }
+
+  /**
+   * Set whether a service should look for events in the background for this state
+   */
+  public void setListenInBackground(boolean myListenInBackground) {
+    this.myListenInBackground = myListenInBackground;
   }
 }
