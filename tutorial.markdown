@@ -76,16 +76,13 @@ You can clone the project to your own repository.
 
 4. Build and test the application using`mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
 
-5. *TBD: How to set up source-context.json so the debugger knows where the source is.* 
-   appcfg does this automatically, but gcloud doesn't and maven doesn't seem to.
-
-6.  Deploy your application using
+5.  Deploy your application using
     [maven](https://cloud.google.com/appengine/docs/java/tools/maven#uploading_your_app_to_production_app_engine):
 
         $ mvn appengine:update
 
 
-7. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
+6. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
  
  Aha! That's a bug. It's supposed to say "Hello Firefox" (or "Hello Chrome", etc.) Why doesn't it? Let's debug. 
 
