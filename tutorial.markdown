@@ -144,6 +144,9 @@ account that can manage the application.
 
 10. You will see a window saying "IntelliJ is now authorized to access your account." Close the browser window and return to IntelliJ.
 
+  ![](images/IntelliJIsNowAuthorized.png)
+
+
 11. At the right-hand side of the Project popup, click the little arrow again. This time you'll see a list of applications managed by your account. Select "Sample Project".
 
 12. Click the OK button.
