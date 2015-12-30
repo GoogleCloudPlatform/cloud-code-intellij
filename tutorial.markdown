@@ -113,15 +113,19 @@ so that the Cloud Debugger can see your source code. This happens inside a web b
 This is done inside IDEA.
 
 
-1. Set up a new Java project from the Github repository you cloned. (reference IntelliJ instructions for doing this? Anything special to note here?)
+1. Set up a new Java project from the Github repository you cloned. 
+   In the "Welcome to IntelliJ IDEA" window, pick "Import Project" and choose the pom.xml
+   file.
 
 2. Run > Edit Configurations...
 
-3. Click the Green + icon on the upper right hand side. Select "Cloud Debug" from the popup menu. (If this option doesn't appear, check whether the plugin is installed and activated.)
+3. Click the + icon on the upper left hand side. Select "Cloud Debug" from the popup menu. (If this option doesn't appear, check whether the plugin is installed and activated.)
 
 4. Set the name of the configuration to "My First Debugging Session."
 
 5. At the right-hand side of the Project popup, click the little arrow. You'll see a sign in pane.
+
+  ![](images/MyFirstDebuggingSession.png)
 
 6. Click the "Sign In" button.
 
