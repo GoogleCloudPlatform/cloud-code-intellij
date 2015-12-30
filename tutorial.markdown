@@ -147,7 +147,10 @@ account that can manage the application.
   ![](images/IntelliJIsNowAuthorized.png)
 
 
-11. At the right-hand side of the Project popup, click the little arrow again. This time you'll see a list of applications managed by your account. Select "Sample Project".
+11. At the right-hand side of the Project popup, click the little arrow again. This time you'll see a list of applications managed by your account. Select the one you just created.
+
+  ![](images/devconsoleprojects.png)
+
 
 12. Click the OK button.
  
