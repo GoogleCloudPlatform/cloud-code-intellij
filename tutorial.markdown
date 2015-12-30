@@ -23,9 +23,19 @@ The Cloud Debugger is enabled automatically for Java
 applications running on [Google App Engine](https://cloud.google.com/appengine/docs) and
 [Managed VMs](https://cloud.google.com/appengine/docs/managed-vms/).
 
+## Prerequisites
+
+In order to follow along with this tutotial, you need the fllowing software installed:
+
+* IntelliJ IDEA 14 or later
+* Java 1.7 or later
+* maven
+* git
+
+
 ## Installing the Plugins
 
-*<span style="color:red">Note: these instructions don't work yet. They will soon. Meanwhile you'll need to follow [these instrucitons](https://github.com/GoogleCloudPlatform/gcloud-intellij/blob/master/README.md#installation).</span>* 
+*<span style="color:red">Note: these instructions don't work yet. They will soon. Meanwhile you'll need to follow [these instructions](https://github.com/GoogleCloudPlatform/gcloud-intellij/blob/master/README.md#installation).</span>* 
 
 The plugin can be installed from the 
 [IntelliJ IDEA Plugin Repository](https://www.jetbrains.com/idea/plugins/).
