@@ -25,7 +25,7 @@ applications running on [Google App Engine](https://cloud.google.com/appengine/d
 
 ## Installing the Plugins
 
-*<span style="color:red">Note: these instructions don't work yet. They will soon. Meanwhile you'll need to  download the plugin from Github and install it from disk.</span>* 
+*<span style="color:red">Note: these instructions don't work yet. They will soon. Meanwhile you'll need to follow [these instrucitons](https://github.com/GoogleCloudPlatform/gcloud-intellij/blob/master/README.md#installation).</span>* 
 
 The plugin can be installed from the 
 [IntelliJ IDEA Plugin Repository](https://www.jetbrains.com/idea/plugins/).
