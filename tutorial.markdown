@@ -94,7 +94,10 @@ You can clone the project to your own repository.
 
 6. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
  
- Aha! That's a bug. It's supposed to say "Hello Firefox" (or "Hello Chrome", etc.) Why doesn't it? Let's debug. 
+  ![](images/HelloBrowser.png)
+ 
+ Aha! That's a bug. It's supposed to say "Hello Chrome" (or "Hello Firefox", "Hello Safari", etc.)
+ Why doesn't it? Let's debug. 
 
 
 ## Using the Debugger
