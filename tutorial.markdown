@@ -88,11 +88,16 @@ You can clone the project to your own repository.
 
 5. Commit your changes.
 
+        $ git commit -a -m "set project ID"
+
 6. Push your changes to Github. 
+
+        $ git push origin master
 
 7. Mirror your Github repository to a 
    [Google Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/cloud-repositories-hosted-repository). (You don't actually have to use Github. You can also keep the files in a local
-   repository and push that to a Google Cloud Source Repository.)
+   repository and push that to a Google Cloud Source Repository.) The Cloud Debugger
+   reads the source code from the Cloud Source Repository rather than directly from Github.
 
 8.  Deploy your application using
     [maven](https://cloud.google.com/appengine/docs/java/tools/maven#uploading_your_app_to_production_app_engine):
