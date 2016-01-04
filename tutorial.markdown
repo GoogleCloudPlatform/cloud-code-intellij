@@ -115,18 +115,10 @@ You can clone the project to your own repository.
 
 ## Using the Debugger
 
-### Enabling the application for the Cloud Debugger
-
-First you need to connect your Github repository to the Google Cloud Source Repository
-so that the Cloud Debugger can see your source code. This happens inside a web browser.
-
-
 ### Setting up a Cloud Debug Configuration
 
-This is done inside IDEA.
 
-
-1. Set up a new Java project from the Github repository you cloned. 
+1. Inside IDEA, set up a new Java project from the Github repository you cloned. 
    In the "Welcome to IntelliJ IDEA" window, pick "Import Project" and choose the pom.xml
    file.
 
@@ -142,14 +134,16 @@ This is done inside IDEA.
 
 6. Click the "Sign In" button.
 
-7. A browser window will open outside of IntelliJ.
+7. A browser window will open outside of IDEA.
 
-8. (May not happen.) If you have more than one Google account logged into the browser, 
+8. If you have more than one Google account logged into the browser, 
 select the one that has access to the application you want to debug. 
 If that account is not shown, click "Add Account" and login to the 
 account that can manage the application.
 
 9. You'll be asked to grant a list of permissions to IDEA. After waiting a few seconds for the button to activate, click "Allow".
+
+  ![](images/permissions.png)
 
  (Yes, the list of permissions requested is overly long. 
  The Cloud Debugger doesn't actually need or use all of them.
