@@ -43,6 +43,17 @@ public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
     addEndpointSdkToProject();
   }
 
+  @Override
+  protected void tearDown() throws Exception {
+    try {
+      removeEndpointsSdkFromProject();
+    }
+    finally {
+      super.tearDown();
+    }
+  }
+
+
   /**
    * Adds the App Engine - Endpoint SDK to the test project's library
    */
@@ -60,7 +71,7 @@ public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
                 .getLibraryTableByLevel(LibraryTablesRegistrar.APPLICATION_LEVEL, myModule.getProject());
             assert table != null;
             final LibraryTable.ModifiableModel tableModel = table.getModifiableModel();
-            final Library library = tableModel.createLibrary("lib");
+            final Library library = tableModel.createLibrary("endpoints-lib");
             final Library.ModifiableModel libraryModel = library.getModifiableModel();
             libraryModel.addJarDirectory(pluginsDir, true);
             libraryModel.commit();
@@ -75,4 +86,24 @@ public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
       }
     }
   }
+
+  private void removeEndpointsSdkFromProject() {
+    ApplicationManager.getApplication().runWriteAction(new Runnable() {
+      @Override
+      public void run() {
+        LibraryTable table = LibraryTablesRegistrar.getInstance()
+            .getLibraryTableByLevel(LibraryTablesRegistrar.APPLICATION_LEVEL,
+                myModule.getProject());
+        if (table != null) {
+          LibraryTable.ModifiableModel tableModel = table.getModifiableModel();
+          Library library = tableModel.getLibraryByName("endpoints-lib");
+          if (library != null) {
+            tableModel.removeLibrary(library);
+            tableModel.commit();
+          }
+        }
+      }
+    });
+  }
+
 }
