@@ -160,6 +160,12 @@ account that can manage the application.
 
 
 12. Click the OK button.
+
+13. Run > Debug 'My First Debugging Session'
+
+14. Select the module in the dialog that pops up. 
+You may have to wait a few seocnds for this to populate.
+There may be only one of these.
  
 
 ### Set a breakpoint
@@ -168,7 +174,22 @@ Once you've attached  to a running application, you can set breakpoints in the
 source code by clicking at the line you want to snapshot in the left hand bar,
 just as you would when debugging a local application using the regular IDEA debugger.
 
-Here set a breakpoint at ????.
+Here set a breakpoint at the line.
+
+        if (userAgent != null) {
+
+This way we can see what the userAgent variable is.
+
+Go to the browser and reload the page.
+
+Return to IDEA and you should see that a snapshot has appeared in the lower lefthand panel:
+
+
+Click it and inspect the variables:
+
+Oh look, userAgent is null. That's not right. Why? Let's expand the request variable and find out:
+
+
 
 Since you can't single step through an application in the cloud debugger,
 it's more common to put the breakpoint at the end of the relevant block
