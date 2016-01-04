@@ -25,7 +25,7 @@ applications running on [Google App Engine](https://cloud.google.com/appengine/d
 
 ## Prerequisites
 
-In order to follow along with this tutotial, you need the fllowing software installed:
+In order to follow along with this tutorial, you need the following software installed:
 
 * IntelliJ IDEA 14 or later
 * Java 1.7 or later
