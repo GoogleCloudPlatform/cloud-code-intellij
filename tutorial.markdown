@@ -84,15 +84,23 @@ You can clone the project to your own repository.
 3. In your local copy of the source, open the file pom.xml in a text editor and change 
    the `artifactId` element from `hellobrowser` to the project name you registered in the developer console.
 
-4. Build and test the application using`mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
+4. Build and test the application using `mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
 
-5.  Deploy your application using
+5. Commit your changes.
+
+6. Push your changes to Github. 
+
+7. Mirror your Github repository to a 
+   [Google Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/cloud-repositories-hosted-repository). (You don't actually have to use Github. You can also keep the files in a local
+   repository and push that to a Google Cloud Source Repository.)
+
+8.  Deploy your application using
     [maven](https://cloud.google.com/appengine/docs/java/tools/maven#uploading_your_app_to_production_app_engine):
 
         $ mvn appengine:update
 
 
-6. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
+9. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
  
   ![](images/HelloBrowser.png)
  
