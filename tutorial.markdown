@@ -1,8 +1,8 @@
 ---
-title: Gcloud IntelliJ Tutorial
+title: IntelliJ IDEA Google Cloud Debugger Tutorial
 ---
 
-# Gcloud IntelliJ IDEA Tutorial
+# IntelliJ IDEA Google Cloud Debugger Tutorial
 
 **<span style="color:red">Warning: Work in Progress. Definitely incomplete and sometimes incorrect.</span>**
 
