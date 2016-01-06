@@ -8,7 +8,7 @@ title: IntelliJ IDEA Google Cloud Debugger Tutorial
 
 You can use the Google Cloud Debugger to capture and inspect the call stack 
 and local variables of a live application running in the cloud
-(more specifically App Engine or the Google Compute Engine.)
+(more specifically on [Google App Engine](https://cloud.google.com/appengine/docs), [Managed VMs](https://cloud.google.com/appengine/docs/managed-vms/), or the Google Compute Engine.)
  
 It works much like the IntelliJ IDEA debugger you're already used to,
 and provides the same user interface, with two key differences:
@@ -20,8 +20,7 @@ and provides the same user interface, with two key differences:
 In other words, the Cloud Debugger is a *forensic* debugger, not an *interactive* debugger.
 
 The Cloud Debugger is enabled automatically for Java 
-applications running on [Google App Engine](https://cloud.google.com/appengine/docs) and
-[Managed VMs](https://cloud.google.com/appengine/docs/managed-vms/).
+applications running on App Engine and MVMs.
 
 ## Prerequisites
 
@@ -193,7 +192,11 @@ Oh look, userAgent is null. That's not right. Why? Let's expand the request vari
 It takes a little hunting to figure out where this is coming from, especially since we
 can't step into the `getHeader()` method as you would in a traditional debugger,
 but after a few minutes of exploring you should find that if you click on the 
-`request` object its toString() method helpfully shows you the HTTP headers. 
+`request` object its `toString()` method helpfully shows you the HTTP headers. 
+
+Note that this will work when the servlet is running on a managed VM (MVM) or on Google Compute Engine (GCE). If the servlet is running on AppEngine, the AppEngine sandbox prevents 
+the debugger from seeing into the private fields of system classes. It's a bit hackish,
+but you can try to copy the relevant info out into local variables in your code.
 
 
 Since you can't single step through an application in the cloud debugger,
