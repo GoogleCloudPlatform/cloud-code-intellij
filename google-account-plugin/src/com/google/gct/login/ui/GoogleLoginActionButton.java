@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.MediaTracker;
 
 import javax.swing.ImageIcon;
 
@@ -58,8 +59,22 @@ public final class GoogleLoginActionButton extends ActionButton {
       if(image == null) {
         myPresentation.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
       } else {
-        Image scaledImage = image.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        myPresentation.setIcon(new ImageIcon(scaledImage));
+        int side = 16;
+        Image scaledImage = image.getScaledInstance(side, side, Image.SCALE_SMOOTH);
+        ImageIcon icon = new ImageIcon(scaledImage);
+
+        MediaTracker tracker = new MediaTracker(this);
+        tracker.addImage(image, 0);
+        tracker.addImage(scaledImage, 1, side, side);
+        // Wait until images load
+        try {
+          tracker.waitForAll(5000);
+          // If this takes more than 5 seconds something has gone seriously wrong
+        }
+        catch (InterruptedException ex) {
+        }
+
+        myPresentation.setIcon(icon);
       }
     }
   }
