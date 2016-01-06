@@ -190,6 +190,11 @@ Click it and inspect the variables:
 Oh look, userAgent is null. That's not right. Why? Let's expand the request variable and find out:
 
 
+It takes a little hunting to figure out where this is coming from, especially since we
+can't step into the `getHeader()` method as you would in a traditional debugger,
+but after a few minutes of exploring you should find that if you click on the 
+`request` object its toString() method helpfully shows you the HTTP headers. 
+
 
 Since you can't single step through an application in the cloud debugger,
 it's more common to put the breakpoint at the end of the relevant block
