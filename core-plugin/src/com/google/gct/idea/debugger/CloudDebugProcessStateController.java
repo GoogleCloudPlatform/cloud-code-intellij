@@ -82,7 +82,7 @@ public class CloudDebugProcessStateController {
     if (client == null) {
       LOG.warn("no client available attempting to setBreakpoint");
       Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
-                               GctBundle.getString("clouddebug.errortitle"));
+                               GctBundle.getString("clouddebug.message.title"));
       return;
     }
     final String debuggeeId = myState.getDebuggeeId();
