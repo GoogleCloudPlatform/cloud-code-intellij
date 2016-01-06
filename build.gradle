@@ -1,11 +1,9 @@
 
 buildscript {
     repositories {
-        maven { url 'http://repo.spring.io/plugins-release' }
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
         classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.0.35'
     }
 }
@@ -14,9 +12,6 @@ subprojects {
     repositories {
         mavenCentral()
     }
-
-    apply plugin: 'propdeps'
-    apply plugin: 'propdeps-idea'
 
     apply plugin: 'java'
     sourceCompatibility = javaVersion
