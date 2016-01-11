@@ -127,9 +127,9 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
   private void loadUserProjects(CredentialedUser user) {
     final List<DefaultMutableTreeNode> result = new ArrayList<DefaultMutableTreeNode>();
 
-    Developerprojects developerprojects =
-      new Developerprojects.Builder(new NetHttpTransport(), new JacksonFactory(),
-                                    user.getCredential()).setApplicationName(PlatformInfo.getUserAgent())
+    Developerprojects developerprojects = new Developerprojects.Builder(
+        new NetHttpTransport(), new JacksonFactory(), user.getCredential())
+        .setApplicationName(PlatformInfo.getUserAgent())
         .build();
 
     try {
