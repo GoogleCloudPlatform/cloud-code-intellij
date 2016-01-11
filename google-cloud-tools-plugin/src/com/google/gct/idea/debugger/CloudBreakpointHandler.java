@@ -55,7 +55,7 @@ import javax.swing.SwingUtilities;
  * breakpoint and provides methods for getting one given the other. {@link XBreakpointHandler} is
  * often called by IntelliJ when the user enables or disables breakpoints.
  *
- * <p/>This class is threadsafe. All operations can be called by multiple threads.
+ * <p>This class is threadsafe. All operations can be called by multiple threads.
  *
  * <p>Note there are three breakpoint types managed in the debugger and are named to avoid
  * confusion:
@@ -75,11 +75,14 @@ public class CloudBreakpointHandler
   private final Map<String, XBreakpoint> myIdeBreakpoints = new ConcurrentHashMap<String, XBreakpoint>();
   private final CloudDebugProcess myProcess;
   private PsiManager myPsiManager;
+  private ServerToIDEFileResolver fileResolver;
 
-  public CloudBreakpointHandler(@NotNull CloudDebugProcess process) {
+  public CloudBreakpointHandler(@NotNull CloudDebugProcess process,
+      ServerToIDEFileResolver fileResolver) {
     super(CloudLineBreakpointType.class);
     myProcess = process;
     setPsiManager(PsiManager.getInstance(myProcess.getXDebugSession().getProject()));
+    this.fileResolver = fileResolver;
   }
 
   /**
@@ -115,7 +118,7 @@ public class CloudBreakpointHandler
         continue;
       }
 
-      final VirtualFile file = JavaUtil.getFileFromCloudPath(currentProject, path);
+      final VirtualFile file = fileResolver.getFileFromPath(currentProject, path);
       final int line = serverBreakpoint.getLocation().getLine() - 1;
       if (file == null) {
         LOG.warn("attempted to clone a breakpoint whose file doesn't exist locally: " +
@@ -201,7 +204,7 @@ public class CloudBreakpointHandler
         continue;
       }
 
-      final VirtualFile file = JavaUtil.getFileFromCloudPath(currentProject, path);
+      final VirtualFile file = fileResolver.getFileFromPath(currentProject, path);
       final int line = serverBreakpoint.getLocation().getLine() - 1;
       if (file == null) {
         continue;
@@ -366,7 +369,9 @@ public class CloudBreakpointHandler
       return;
     }
     SourceLocation location = new SourceLocation();
-    location.setPath(JavaUtil.getCloudPathFromJavaFile((PsiJavaFile)javaFile));
+    // Sending the file as com/package/example/Class.java to Cloud Debugger because it plays nice
+    // with the CDB plugin. See ServerToIDEFileResolver.
+    location.setPath(ServerToIDEFileResolver.getCloudPathFromJavaFile((PsiJavaFile) javaFile));
     location.setLine(xIdeBreakpoint.getSourcePosition().getLine() + 1);
 
     Breakpoint serverNewBreakpoint = new Breakpoint();

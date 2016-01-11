@@ -22,7 +22,6 @@ import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredTextContainer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.XDebuggerUtil;
@@ -41,8 +40,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * CloudStackFrame represents a single frame in a {@link CloudExecutionStack}. It returns the set of variables and if
- * appropriate, the set of watch expressions at that location.
+ * CloudStackFrame represents a single frame in a {@link CloudExecutionStack}. It returns the set of
+ * variables and if appropriate, the set of watch expressions at that location.
  */
 public class CloudStackFrame extends XStackFrame {
   @Nullable private final List<Variable> myEvaluatedExpressions;
@@ -51,17 +50,18 @@ public class CloudStackFrame extends XStackFrame {
   private final XSourcePosition myXSourcePosition;
 
   public CloudStackFrame(@NotNull Project project,
-                         @NotNull StackFrame frame,
-                         @NotNull List<Variable> variableTable,
-                         @Nullable List<Variable> evaluatedExpressions) {
+      @NotNull StackFrame frame,
+      @NotNull List<Variable> variableTable,
+      @Nullable List<Variable> evaluatedExpressions,
+      @NotNull ServerToIDEFileResolver fileResolver) {
     myFrame = frame;
     myVariableTable = variableTable;
     myEvaluatedExpressions = evaluatedExpressions;
     String path = frame.getLocation().getPath();
     if (!Strings.isNullOrEmpty(path)) {
-      JavaUtil.initializeLocations(project, false);
-      VirtualFile file = JavaUtil.getFileFromCloudPath(project, frame.getLocation().getPath());
-      myXSourcePosition = XDebuggerUtil.getInstance().createPosition(file, frame.getLocation().getLine() - 1);
+      myXSourcePosition = XDebuggerUtil.getInstance().createPosition(
+          fileResolver.getFileFromPath(project, path),
+          frame.getLocation().getLine() - 1);
     }
     else {
       myXSourcePosition = null;
