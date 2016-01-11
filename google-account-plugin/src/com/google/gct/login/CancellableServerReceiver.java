@@ -22,14 +22,19 @@ import com.google.api.client.repackaged.org.mortbay.jetty.Connector;
 import com.google.api.client.repackaged.org.mortbay.jetty.Request;
 import com.google.api.client.repackaged.org.mortbay.jetty.Server;
 import com.google.api.client.repackaged.org.mortbay.jetty.handler.AbstractHandler;
+import com.google.gct.idea.util.IntelliJPlatform;
+import com.google.gct.idea.util.PlatformInfo;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * A cancellable Server Receiver.
@@ -230,9 +235,26 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
         lock.unlock();
       }
 
-      response.sendRedirect(error == null ? GoogleLoginUtils.getCurrentPlatform().getSuccessfulLandingPage()
-          : GoogleLoginUtils.getCurrentPlatform().getFailureLandingPage());
+      response.sendRedirect(error == null ? getSuccessLandingPage() : getFailureLandingPage());
       response.flushBuffer();
+    }
+
+    @NotNull
+    private String getFailureLandingPage() {
+      IntelliJPlatform currentPlatform = PlatformInfo.getCurrentPlatform();
+      if (currentPlatform == IntelliJPlatform.ANDROID_STUDIO) {
+        return LandingPages.ANDROID_STUDIO.getFailurePage();
+      }
+      return LandingPages.INTELLIJ.getFailurePage();
+    }
+
+    @NotNull
+    private String getSuccessLandingPage() {
+      IntelliJPlatform currentPlatform = PlatformInfo.getCurrentPlatform();
+      if (currentPlatform == IntelliJPlatform.ANDROID_STUDIO) {
+        return LandingPages.ANDROID_STUDIO.getSuccessPage();
+      }
+      return LandingPages.INTELLIJ.getSuccessPage();
     }
   }
 }
