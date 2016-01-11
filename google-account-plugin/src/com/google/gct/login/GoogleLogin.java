@@ -73,7 +73,7 @@ public class GoogleLogin {
 
   private static volatile GoogleLogin instance;
 
-  private static final Logger LOG =  Logger.getInstance(GoogleLogin.class);
+  private static final Logger LOG = Logger.getInstance(GoogleLogin.class);
 
   private GoogleLogin() {
     this.clientInfo = getClientInfo();
