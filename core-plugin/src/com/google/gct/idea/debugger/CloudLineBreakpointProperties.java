@@ -29,6 +29,9 @@ public class CloudLineBreakpointProperties extends XBreakpointProperties<CloudLi
   private static final String[] EMPTY_ARRAY = new String[0];
   private boolean myCreatedByServer = false;
   private boolean myDisabledByServer = false;
+  // Prevents adding duplicate breakpoints when a breakpoint is added, debug session closed and
+  // breakpoint is hit offline.
+  private boolean addedOnServer = false;
   private String[] myWatchExpressions;
 
   @Nullable
@@ -74,5 +77,13 @@ public class CloudLineBreakpointProperties extends XBreakpointProperties<CloudLi
       return true;
     }
     return Comparing.equal(a, b);
+  }
+
+  public boolean isAddedOnServer() {
+    return addedOnServer;
+  }
+
+  public void setAddedOnServer(boolean addedOnServer) {
+    this.addedOnServer = addedOnServer;
   }
 }
