@@ -65,7 +65,8 @@ From inside IDEA:
 
 For purposes of this tutorial we'll debug a simple servlet that detects the
 user's browser and says "Hello Firefox", "Hello Chrome", and so forth, depending on the browser.
-You can find this code in the Github project ????. It is built with Maven version 3.1 or later. 
+You can find this code in the Github project [cloud-debugger-idea-sample](https://github.com/GoogleCloudPlatform/cloud-debugger-idea-sample). 
+It is built with Maven version 3.1 or later. 
 
 (If you happen to spot the bug by eye before running it, pretend you don't and just read along.)
 
