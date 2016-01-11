@@ -98,7 +98,7 @@ public class GoogleLogin {
   }
 
   @VisibleForTesting
-  static void setInstance(GoogleLogin newInstance) {
+  public static void setInstance(GoogleLogin newInstance) {
     instance = newInstance;
   }
 
@@ -484,7 +484,7 @@ public class GoogleLogin {
   }
 
   /**
-   * Gets all the implementations of  {@link GoogleLoginListener} and registers them to
+   * Gets all the implementations of {@link GoogleLoginListener} and registers them to
    * <code>state</code>.
    */
   private void addLoginListenersFromExtensionPoints() {

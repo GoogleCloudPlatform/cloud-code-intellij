@@ -15,11 +15,14 @@
  */
 package com.google.gct.login;
 
+import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
+
 import org.mockito.Mockito;
 
 /**
  * Helper to install a mock googleLogin
  */
+@VisibleForTesting
 public class MockGoogleLogin {
   GoogleLogin myGoogleLogin;
 

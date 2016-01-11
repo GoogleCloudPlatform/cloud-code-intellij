@@ -17,8 +17,11 @@ package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.Clouddebugger.Debugger.Debuggees;
+import com.google.api.services.clouddebugger.Clouddebugger.Debugger.Debuggees.Breakpoints;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.api.services.clouddebugger.model.ListBreakpointsResponse;
+
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunProfile;
@@ -30,11 +33,18 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Queries multiple states on a fixed interval for updates. It notifies listeners
@@ -119,12 +129,19 @@ public class CloudDebugGlobalPoller {
     return states;
   }
 
-  private static void queryServerForBreakpoints(CloudDebugProcessState state, Debugger client) throws IOException {
-    List<Breakpoint> currentList;
-    ListBreakpointsResponse response =
-      client.debuggees().breakpoints().list(state.getDebuggeeId()).setIncludeInactive(Boolean.TRUE)
-          .setActionValue("CAPTURE").setStripResults(Boolean.TRUE).setWaitToken(state.getWaitToken()).execute();
-    currentList = response.getBreakpoints();
+  private static void queryServerForBreakpoints(CloudDebugProcessState state, Debugger client)
+      throws IOException {
+
+    Debuggees debuggees = client.debuggees();
+    Breakpoints breakpoints = debuggees.breakpoints();
+    Breakpoints.List listRequest = breakpoints.list(state.getDebuggeeId())
+        .setIncludeInactive(Boolean.TRUE)
+        .setActionValue("CAPTURE")
+        .setStripResults(Boolean.TRUE)
+        .setWaitToken(state.getWaitToken());
+
+    ListBreakpointsResponse response = listRequest.execute();
+    List<Breakpoint> currentList = response.getBreakpoints();
     String responseWaitToken = response.getNextWaitToken();
     state.setWaitToken(responseWaitToken);
 
@@ -144,8 +161,8 @@ public class CloudDebugGlobalPoller {
   }
 
   /**
-   * pollForChanges does a synchronous, nonhanging query to the server and compares the result to see if there are
-   * changes from the current state.
+   * pollForChanges sends a synchronous, non-hanging query to the server and compares the result to
+   * see if there are changes from the current state.
    *
    * @param state represents the target debuggee to query
    */

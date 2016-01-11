@@ -17,6 +17,7 @@ package com.google.gct.idea.debugger;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
@@ -25,11 +26,13 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.Clouddebugger.Builder;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
+import com.google.gct.idea.util.PlatformInfo;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
-import com.google.gct.login.GoogleLoginUtils;
 import com.google.gdt.eclipse.login.common.LoginListener;
+
 import com.intellij.openapi.diagnostic.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
@@ -42,6 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Helper class to return clients on a per user email basis.
  */
 public class CloudDebuggerClient {
+
   private static final int LONG_CONNECTION_TIMEOUT_MS = 120 * 1000;
   private static final int SHORT_CONNECTION_TIMEOUT_MS = 10 * 1000;
 
@@ -49,14 +53,14 @@ public class CloudDebuggerClient {
   private static final Logger LOG = Logger.getInstance(CloudDebuggerClient.class);
   private static final String ROOT_URL = "https://clouddebugger.googleapis.com";
   private static final ConcurrentHashMap<String, Debugger> myDebuggerClientsFromUserEmail =
-    new ConcurrentHashMap<String, Debugger>();
+      new ConcurrentHashMap<String, Debugger>();
 
   private CloudDebuggerClient() {
   }
 
   /**
-   * Returns a cloud debugger connection given {@link CloudDebugProcessState} to indicate the credentials to use. The
-   * function may return null if the user is not logged in.
+   * Returns a cloud debugger connection given {@link CloudDebugProcessState} to indicate the
+   * credentials to use. The function may return null if the user is not logged in.
    * TODO: Create a better experience attaching when not logged in
    * TODO: Handle cases where the user logs out in the middle of a debug session.
    */
@@ -78,8 +82,8 @@ public class CloudDebuggerClient {
   }
 
   /**
-   * Returns a cloud debugger connection given a user email to indicate the credentials to use. The function may return
-   * null if the user is not logged in.
+   * Returns a cloud debugger connection given a user email to indicate the credentials to use.
+   * The function may return null if the user is not logged in.
    */
   @Nullable
   private static Debugger getClient(final @Nullable String userEmail, final int timeout) {
@@ -89,7 +93,6 @@ public class CloudDebuggerClient {
     }
     final String hashkey = userEmail + timeout;
     Debugger cloudDebuggerClient = myDebuggerClientsFromUserEmail.get(hashkey);
-
     if (cloudDebuggerClient == null) {
       try {
         final CredentialedUser user = GoogleLogin.getInstance().getAllUsers().get(userEmail);
@@ -105,15 +108,21 @@ public class CloudDebuggerClient {
           HttpRequestInitializer initializer = new HttpRequestInitializer() {
             @Override
             public void initialize(HttpRequest httpRequest) throws IOException {
+              HttpHeaders headers = new HttpHeaders();
               httpRequest.setConnectTimeout(timeout);
               httpRequest.setReadTimeout(timeout);
+              httpRequest.setHeaders(headers);
               credential.initialize(httpRequest);
             }
           };
 
           HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-          cloudDebuggerClient = new Builder(httpTransport, JSON_FACTORY, initializer).setRootUrl(ROOT_URL)
-            .setApplicationName(GoogleLoginUtils.getCurrentPlatformName()).build().debugger();
+          String userAgent = PlatformInfo.getUserAgent();
+          cloudDebuggerClient = new Builder(httpTransport, JSON_FACTORY, initializer)
+              .setRootUrl(ROOT_URL)
+              // this ends up prefixed to user agent
+              .setApplicationName(userAgent)
+              .build().debugger();
         }
       }
       catch (IOException ex) {
@@ -127,6 +136,7 @@ public class CloudDebuggerClient {
         myDebuggerClientsFromUserEmail.put(hashkey, cloudDebuggerClient);
       }
     }
+
     return cloudDebuggerClient;
   }
 
