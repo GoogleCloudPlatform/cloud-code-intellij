@@ -77,7 +77,7 @@ public class GoogleLoginUtils {
     final IUserPropertyCallback callback) {
     final Oauth2 userInfoService =
       new Oauth2.Builder(new NetHttpTransport(), new JacksonFactory(), credential)
-        .setApplicationName(PlatformInfo.getCurrentPlatformName())
+        .setApplicationName(PlatformInfo.getUserAgent())
         .build();
 
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
