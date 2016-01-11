@@ -129,7 +129,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
 
     Developerprojects developerprojects =
       new Developerprojects.Builder(new NetHttpTransport(), new JacksonFactory(),
-                                    user.getCredential()).setApplicationName(PlatformInfo.getCurrentPlatformName())
+                                    user.getCredential()).setApplicationName(PlatformInfo.getUserAgent())
         .build();
 
     try {
