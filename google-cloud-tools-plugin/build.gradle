@@ -21,17 +21,12 @@ dependencies {
     compile(project(':google-account-plugin'))
     compile(project(':common-lib'))
 
-    compile 'com.google.appengine:gradle-appengine-builder-model:0.1.0'
-    compile 'org.eclipse.jgit:org.eclipse.jgit:3.3.0.201403021825-r'
-    // todo(elharo): we shouldn't need Apache commons; Guava will suffice
-    compile 'commons-io:commons-io:2.4'
     compile files('lib/google-api-services-clouddebugger-v2-rev4-1.20.0.jar')
     compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
     compile files('lib/google-api-services-source.jar')
 
-    testCompile 'org.eclipse.jgit:org.eclipse.jgit.junit:3.3.0.201403021825-r'
-    testRuntime 'com.google.apis:google-api-services-oauth2:v2-rev70-1.18.0-rc'
-    testRuntime 'com.google.http-client:google-http-client-jackson:1.18.0-rc'
+    //testRuntime 'com.google.apis:google-api-services-oauth2:v2-rev70-1.18.0-rc'
+    //testRuntime 'com.google.http-client:google-http-client-jackson:1.18.0-rc'
     testRuntime files('../google-account-plugin/lib/google-gct-login-context-ij-pg.jar')
 }
 

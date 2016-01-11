@@ -38,14 +38,10 @@ subprojects {
     configurations.all {
         resolutionStrategy {
             failOnVersionConflict()
-            // Force the IDEA SDK provided version of these dependencies to avoid classloading issues.
-            force 'org.apache.httpcomponents:httpclient:4.4.1', 'com.google.guava:guava:17.0'
         }
     }
 
     dependencies {
-        compile 'com.google.guava:guava:17.0'
-
         testCompile 'junit:junit:4.+'
         testCompile 'org.mockito:mockito-all:1.9.5'
     }
