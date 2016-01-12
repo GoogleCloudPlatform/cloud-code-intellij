@@ -77,7 +77,7 @@ You can clone the project to your own repository.
 1. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
 
 2. In your local copy of the source, open the file pom.xml in a text editor and change 
-   the `artifactId` element from `hellobrowser` to the project name you registered in the developer console. Do the same with the `app.id` element. 
+   the `artifactId` and  `app.id` elements from `hellobrowser` to the project name you registered in the developer console.
 
 3. Build and test the application using `mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
 
