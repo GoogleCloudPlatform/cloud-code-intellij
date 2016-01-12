@@ -72,8 +72,6 @@ It is built with Maven version 3.1 or later.
 
 You can clone the project to your own repository.
 
-*TBD: can someone run the debugger without being able to commit to the repository?*
-
 
 1. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
 
@@ -87,7 +85,12 @@ You can clone the project to your own repository.
         $ git commit -a -m "set project ID"
 
 5.  Commit and push the source code of the application to the
-    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created. 
+    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created. *TBD: need more complete instructions here*
+
+        $ gcloud init
+        $ git config credential.helper gcloud.sh
+        $ git remote add google https://source.developers.google.com/p/projectname/
+        $ git push --all google
 
 6.  Deploy your application using
     [maven](https://cloud.google.com/appengine/docs/java/tools/maven#uploading_your_app_to_production_app_engine):
