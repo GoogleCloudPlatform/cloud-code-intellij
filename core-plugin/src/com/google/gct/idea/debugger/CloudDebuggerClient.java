@@ -126,10 +126,10 @@ public class CloudDebuggerClient {
         }
       }
       catch (IOException ex) {
-        LOG.warn("Error connecting to Cloud Debugger API", ex);
+        LOG.warn("Could not load Google root certificates", ex);
       }
       catch (GeneralSecurityException ex) {
-        LOG.warn("Error connecting to Cloud Debugger API", ex);
+        LOG.warn("Could not load Google root certificates", ex);
       }
 
       if (cloudDebuggerClient != null) {

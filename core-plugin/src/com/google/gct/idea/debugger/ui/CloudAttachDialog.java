@@ -320,7 +320,7 @@ public class CloudAttachDialog extends DialogWrapper {
 
   private boolean stash() {
     if (!mySyncResult.hasLocalRepository()) {
-      LOG.error("unexpected null local repro in call to stash");
+      LOG.error("unexpected null local repository in call to stash");
       return false;
     }
 

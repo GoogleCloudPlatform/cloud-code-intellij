@@ -15,6 +15,8 @@
  */
 package com.google.gct.idea.debugger;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.model.CloudRepoSourceContext;
@@ -66,8 +68,8 @@ import git4idea.repo.GitRepositoryManager;
 import git4idea.stash.GitStashUtils;
 import git4idea.ui.StashInfo;
 import git4idea.util.GitUIUtil;
-import git4idea.util.LocalChangesWouldBeOverwrittenHelper;
 import git4idea.util.GitUntrackedFilesHelper;
+import git4idea.util.LocalChangesWouldBeOverwrittenHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -137,6 +139,15 @@ public class ProjectRepositoryValidator {
             }
           }
         }
+      }
+      catch (GoogleJsonResponseException ex) {
+        LOG.warn("Error detecting server side source context", ex);
+        UserErrorNotification.warn("Error detecting server side source context", ex);
+      } catch (HttpResponseException ex) {
+        // No JSON body was returned by the API.
+        LOG.warn("Error detecting server side source context", ex);
+        LOG.warn("HTTP Status code: " + ex.getStatusCode());
+        LOG.warn("HTTP Reason: " + ex.getMessage());
       }
       catch (IOException ex) {
         LOG.warn("Error detecting server side source context", ex);
