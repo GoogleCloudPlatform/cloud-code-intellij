@@ -30,6 +30,7 @@ In order to follow along with this tutorial, you need the following software ins
 * Java 1.7 or later
 * maven
 * git
+* [Google Cloud SDK](https://cloud.google.com/sdk/)
 
 
 ## Installing the Plugins
@@ -85,7 +86,9 @@ You can clone the project to your own repository.
         $ git commit -a -m "set project ID"
 
 5.  Commit and push the source code of the application to the
-    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created. *TBD: need more complete instructions here*
+    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created. 
+    *TBD: need more complete instructions here*
+    *TBD: is there a way to do this with a maven command?*
 
         $ gcloud init
         $ git config credential.helper gcloud.sh
