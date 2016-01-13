@@ -20,8 +20,8 @@ and provides the same user interface, with two key differences:
 In other words, the Cloud Debugger is a *forensic* debugger, not an *interactive* debugger.
 
 The Cloud Debugger is enabled automatically for Java 
-applications running on App Engine and MVMs. On GCE, you'll need
-to [turn it on by running a bootstrap script](https://cloud.google.com/tools/cloud-debugger/setting-up-on-compute-engine#enable_the_cloud_debugger_agent).
+applications running on App Engine and MVMs. On GCE, you'll need to 
+[turn it on by running a bootstrap script](https://cloud.google.com/tools/cloud-debugger/setting-up-on-compute-engine#enable_the_cloud_debugger_agent).
 
 ## Prerequisites
 
@@ -31,6 +31,7 @@ In order to follow along with this tutorial, you need the following software ins
 * Java 1.7 or later
 * maven
 * git
+* [Google Cloud SDK](https://cloud.google.com/sdk/)
 
 
 ## Installing the Plugins
@@ -66,46 +67,42 @@ From inside IDEA:
 
 For purposes of this tutorial we'll debug a simple servlet that detects the
 user's browser and says "Hello Firefox", "Hello Chrome", and so forth, depending on the browser.
-You can find this code in the Github project ????. It is built with Maven version 3.1 or later. 
+You can find this code in the Github project [cloud-debugger-idea-sample](https://github.com/GoogleCloudPlatform/cloud-debugger-idea-sample). 
+It is built with Maven version 3.1 or later. 
 
 (If you happen to spot the bug by eye before running it, pretend you don't and just read along.)
 
 You can clone the project to your own repository.
 
-*TBD: can someone run the debugger without being able to commit to the repository?*
 
+1. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
 
-1.  Commit and push the source code of the application to a Git repository (a
-    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) or connected
-    Github or Bitbucket repository). 
+2. In your local copy of the source, open the file pom.xml in a text editor and change 
+   the `artifactId` and  `app.id` elements from `hellobrowser` to the project name you registered in the developer console.
 
-2. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
+3. Build and test the application using `mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
 
-3. In your local copy of the source, open the file pom.xml in a text editor and change 
-   the `artifactId` element from `hellobrowser` to the project name you registered in the developer console.
-
-4. Build and test the application using `mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
-
-5. Commit your changes.
+4. Commit your changes.
 
         $ git commit -a -m "set project ID"
 
-6. Push your changes to Github. 
+5.  Commit and push the source code of the application to the
+    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created. 
+    *TBD: need more complete instructions here*
+    *TBD: is there a way to do this with a maven command?*
 
-        $ git push origin master
+        $ gcloud init
+        $ git config credential.helper gcloud.sh
+        $ git remote add google https://source.developers.google.com/p/projectname/
+        $ git push --all google
 
-7. Mirror your Github repository to a 
-   [Google Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/cloud-repositories-hosted-repository). (You don't actually have to use Github. You can also keep the files in a local
-   repository and push that to a Google Cloud Source Repository.) The Cloud Debugger
-   reads the source code from the Cloud Source Repository rather than directly from Github.
-
-8.  Deploy your application using
+6.  Deploy your application using
     [maven](https://cloud.google.com/appengine/docs/java/tools/maven#uploading_your_app_to_production_app_engine):
 
         $ mvn appengine:update
 
 
-9. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
+7. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
  
   ![](images/HelloBrowser.png)
  
@@ -118,7 +115,7 @@ You can clone the project to your own repository.
 ### Setting up a Cloud Debug Configuration
 
 
-1. Inside IDEA, set up a new Java project from the Github repository you cloned. 
+1. Inside IDEA, set up a new Java project from the project you cloned. 
    In the "Welcome to IntelliJ IDEA" window, pick "Import Project" and choose the pom.xml
    file.
 
