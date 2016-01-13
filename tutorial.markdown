@@ -72,37 +72,53 @@ It is built with Maven version 3.1 or later.
 
 (If you happen to spot the bug by eye before running it, pretend you don't and just read along.)
 
-You can clone the project to your own repository.
+1. Clone the project to your own local repository:
 
+        $ git clone https://github.com/GoogleCloudPlatform/cloud-debugger-idea-sample.git
+        Cloning into 'cloud-debugger-idea-sample'...
+        remote: Counting objects: 88, done.
+        remote: Compressing objects: 100% (8/8), done.
+        remote: Total 88 (delta 0), reused 0 (delta 0), pack-reused 71
+        Unpacking objects: 100% (88/88), done.
+        Checking connectivity... done.
 
-1. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
+2. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
 
-2. In your local copy of the source, open the file pom.xml in a text editor and change 
+3. In your local copy of the source, open the file pom.xml in a text editor and change 
    the `artifactId` and  `app.id` elements from `hellobrowser` to the project name you registered in the developer console.
 
-3. Build and test the application using `mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
+4. Build and test the application using `mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
 
-4. Commit your changes.
+5. Commit your changes.
 
         $ git commit -a -m "set project ID"
 
-5.  Commit and push the source code of the application to the
+6.  Commit and push the source code of the application to the
     [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created. 
     *TBD: need more complete instructions here*
     *TBD: is there a way to do this with a maven command?*
 
         $ gcloud init
         $ git config credential.helper gcloud.sh
-        $ git remote add google https://source.developers.google.com/p/projectname/
+        $ git remote add google https://source.developers.google.com/p/*projectname*/
         $ git push --all google
+        Counting objects: 30, done.
+        Delta compression using up to 4 threads.
+        Compressing objects: 100% (17/17), done.
+        Writing objects: 100% (30/30), 2.11 KiB | 0 bytes/s, done.
+        Total 30 (delta 7), reused 0 (delta 0)
+        remote: Storing objects: 100% (30/30), done.
+        remote: Processing commits: 100% (3/3), done.
+        To https://source.developers.google.com/p/hellobrowser/
+           530f08f..a5e90b0  master -> master
 
-6.  Deploy your application using
+7.  Deploy your application using
     [maven](https://cloud.google.com/appengine/docs/java/tools/maven#uploading_your_app_to_production_app_engine):
 
         $ mvn appengine:update
 
 
-7. Visit the application at http://*projectname*.appspot.com/hellobrowser using Chrome. You'll see it say:
+8. Visit the application at http://*projectname*.appspot.com/hellobrowser using Chrome. You'll see it say:
  
   ![](images/HelloBrowser.png)
  
@@ -119,8 +135,10 @@ You can clone the project to your own repository.
 1. Inside IDEA, set up a new Java project from the project you cloned. 
    In the "Welcome to IntelliJ IDEA" window, pick "Import Project" and choose the pom.xml
    file.
+   
+2. If not already checked, check the box for import maven projects automatically.
 
-2. Run > Edit Configurations...
+3. Run > Edit Configurations...
 
 3. Click the + icon on the upper left hand side. Select "Cloud Debug" from the popup menu. (If this option doesn't appear, check whether the plugin is installed and activated.)
 
@@ -162,7 +180,7 @@ account that can manage the application.
 13. Run > Debug 'My First Debugging Session'
 
 14. Select the module in the dialog that pops up. 
-You may have to wait a few seocnds for this to populate.
+You may have to wait a few seconds for this to populate.
 There may be only one of these.
  
 
@@ -176,7 +194,7 @@ Here set a breakpoint at the line.
 
         if (userAgent != null) {
 
-This way we can see what the userAgent variable is.
+This way we can see what the `userAgent` variable is.
 
 Go to the browser and reload the page.
 
@@ -185,17 +203,15 @@ Return to IDEA and you should see that a snapshot has appeared in the lower left
 
 Click it and inspect the variables:
 
-Oh look, userAgent is null. That's not right. Why? Let's expand the request variable and find out:
+  ![](images/inspectuseragent.png)
 
+Now you see that userAgent is "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36". 
 
-It takes a little hunting to figure out where this is coming from, especially since we
-can't step into the `getHeader()` method as you would in a traditional debugger,
-but after a few minutes of exploring you should find that if you click on the 
-`request` object its `toString()` method helpfully shows you the HTTP headers. 
+Guess what? Chrome is sending a user agent string that contains the word Mozilla, even though 
+Chrome has almost nothing to do with the Mozilla project. (Believe it or not, this brain 
+damage goes back two decades, well before Chrome was conceived. Chrome isn't actually pretending to be Firefox here. It's pretending to be Netscape, but I digress.)
 
-Note that this will work when the servlet is running on a managed VM (MVM) or on Google Compute Engine (GCE). If the servlet is running on AppEngine, the AppEngine sandbox prevents 
-the debugger from seeing into the private fields of system classes. It's a bit hackish,
-but you can try to copy the relevant info out into local variables in your code.
+Now that we see what's going on, let's fix it.
 
 
 Since you can't single step through an application in the cloud debugger,
