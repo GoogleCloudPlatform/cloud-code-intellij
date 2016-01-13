@@ -20,7 +20,8 @@ and provides the same user interface, with two key differences:
 In other words, the Cloud Debugger is a *forensic* debugger, not an *interactive* debugger.
 
 The Cloud Debugger is enabled automatically for Java 
-applications running on App Engine and MVMs.
+applications running on App Engine and MVMs. On GCE, you'll need
+to [turn it on by running a bootstrap script](https://cloud.google.com/tools/cloud-debugger/setting-up-on-compute-engine#enable_the_cloud_debugger_agent).
 
 ## Prerequisites
 
