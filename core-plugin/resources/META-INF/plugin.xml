@@ -1,6 +1,6 @@
 <idea-plugin version="2">
   <id>com.google.gct.core</id>
-  <name>Google Cloud Tools Core</name>
+  <name>Google Cloud Tools</name>
   <description>Debug Java applications running in the Google cloud from inside IDEA.
 Code inspections for AppEngine Java code.</description>
   <vendor>Google</vendor>
