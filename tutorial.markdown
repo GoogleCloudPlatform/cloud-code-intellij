@@ -32,6 +32,7 @@ In order to follow along with this tutorial, you need the following software ins
 * maven
 * git
 * [Google Cloud SDK](https://cloud.google.com/sdk/)
+* Chrome browser
 
 
 ## Installing the Plugins
