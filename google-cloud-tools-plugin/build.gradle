@@ -14,7 +14,7 @@ intellij {
 }
 
 project.afterEvaluate {
-    project.tasks.getByPath(':core-plugin:prepareSandbox').dependsOn ':google-account-plugin:prepareSandbox'
+    prepareSandbox.dependsOn ':google-account-plugin:prepareSandbox'
 }
 
 dependencies {
