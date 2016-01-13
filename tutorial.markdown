@@ -102,13 +102,14 @@ You can clone the project to your own repository.
         $ mvn appengine:update
 
 
-7. Visit the application at http://*projectname*.appspot.com/hellobrowser. You'll see it say:
+7. Visit the application at http://*projectname*.appspot.com/hellobrowser using Chrome. You'll see it say:
  
   ![](images/HelloBrowser.png)
  
- Aha! That's a bug. It's supposed to say "Hello Chrome" (or "Hello Firefox", "Hello Safari", etc.)
- Why doesn't it? Let's debug. 
-
+ Aha! That's a bug. It's supposed to say "Hello Chrome" when you visit in Chrome.
+ If you like, try it in Safari or Opera. In fact, it almost always says "Hello Firefox."
+ If you can find a case where it doesn't say that, that would give you a big clue
+ as to the bug, but it's easier to use the cloud debugger.
 
 ## Using the Debugger
 
