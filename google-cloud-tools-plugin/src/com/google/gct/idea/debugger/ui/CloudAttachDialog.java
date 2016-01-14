@@ -273,7 +273,7 @@ public class CloudAttachDialog extends DialogWrapper {
       myWarningLabel2.setVisible(false);
       myInfoPanel.setVisible(true);
     }
-    else if (mySyncResult.needsSync() && mySyncResult.getTargetSyncSHA() == null) {
+    else if (mySyncResult.getTargetSyncSHA() == null) {
       setOKButtonText(isContinued()
           ? GctBundle.getString("clouddebug.continueanyway")
           : GctBundle.getString("clouddebug.attach.anyway"));
