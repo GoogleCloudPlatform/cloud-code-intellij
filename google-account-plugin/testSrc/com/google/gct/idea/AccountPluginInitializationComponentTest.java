@@ -1,5 +1,7 @@
 package com.google.gct.idea;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -21,8 +23,24 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.util.PlatformUtils;
 
 import java.util.List;
+import java.util.Properties;
 
+/**
+ * Tests to validate initialization on supported platforms
+ */
 public class AccountPluginInitializationComponentTest {
+
+  private Properties properties;
+
+  @Before
+  public void setUp() {
+    properties = System.getProperties();
+  }
+
+  @After
+  public void tearDown() {
+    System.setProperties(properties);
+  }
 
   @Test
   public void testInitComponent_Idea() {

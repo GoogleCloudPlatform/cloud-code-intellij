@@ -12,14 +12,29 @@ import com.google.gct.idea.util.PlatformInfo;
 
 import com.intellij.util.PlatformUtils;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
- * Created by appu on 1/13/16.
+ * Tests to validate initialization on supported platforms
  */
 public class CloudToolsPluginInitializationComponentTest {
+
+  private Properties properties;
+
+  @Before
+  public void setUp() {
+    properties = System.getProperties();
+  }
+
+  @After
+  public void tearDown() {
+    System.setProperties(properties);
+  }
 
   @Test
   public void testInitComponent_AndroidStudio() {
