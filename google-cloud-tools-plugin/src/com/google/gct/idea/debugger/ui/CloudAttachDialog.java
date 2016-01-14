@@ -176,7 +176,7 @@ public class CloudAttachDialog extends DialogWrapper {
       UsageTrackerProvider.getInstance()
           .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "start.session", null);
       // TODO : add source context tracking info
-      if (mySyncStashCheckbox.isVisible() && mySyncStashCheckbox.isSelected()) {
+      if (mySyncStashCheckbox.isSelected()) {
         syncOrStash();
       }
       else {
