@@ -31,13 +31,17 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
 
   @Override
   public void initComponent() {
-    if (PlatformInfo.SUPPORTED_PLATFORMS.contains(PlatformUtils.getPlatformPrefix())) {
+    initComponent(PlatformUtils.getPlatformPrefix());
+  }
+
+  @VisibleForTesting
+  void initComponent(String platformPrefix) {
+    if (PlatformInfo.SUPPORTED_PLATFORMS.contains(platformPrefix)) {
       enableFeedbackUtil();
       if (!ApplicationManager.getApplication().isUnitTestMode()) {
         enableUsageTracking();
       }
     }
-
 
   }
 

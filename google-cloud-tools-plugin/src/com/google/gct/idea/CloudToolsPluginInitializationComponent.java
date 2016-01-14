@@ -50,11 +50,16 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
 
   @Override
   public void initComponent() {
-    if ("AndroidStudio".equals(PlatformUtils.getPlatformPrefix())) {
-      if (CloudDebugConfigType.isFeatureEnabled()) {
+    initComponent(PlatformUtils.getPlatformPrefix(), CloudDebugConfigType.isFeatureEnabled());
+  }
+
+  @VisibleForTesting
+  void initComponent(String platformPrefix, Boolean enableDebugger) {
+    if ("AndroidStudio".equals(platformPrefix)) {
+      if (enableDebugger) {
         enableCloudDebugger();
       }
-    } else if (PlatformInfo.SUPPORTED_PLATFORMS.contains(PlatformUtils.getPlatformPrefix())) {
+    } else if (PlatformInfo.SUPPORTED_PLATFORMS.contains(platformPrefix)) {
       enableFeedbackUtil();
       enableCloudDebugger();
     }

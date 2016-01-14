@@ -24,58 +24,42 @@ import java.util.Properties;
  */
 public class CloudToolsPluginInitializationComponentTest {
 
-  private Properties properties;
-
-  @Before
-  public void setUp() {
-    properties = System.getProperties();
-  }
-
-  @After
-  public void tearDown() {
-    System.setProperties(properties);
-  }
-
   @Test
   public void testInitComponent_AndroidStudio() {
-    System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, "AndroidStudio");
-    System.setProperty(CloudDebugConfigType.GCT_DEBUGGER_ENABLE, "false");
-
     CloudToolsPluginInitializationComponent spy = spy(new CloudToolsPluginInitializationComponent());
 
-    spy.initComponent();
-    verify(spy).initComponent();
+    spy.initComponent("AndroidStudio", false);
+    verify(spy).initComponent("AndroidStudio", false);
     verifyNoMoreInteractions(spy);
   }
 
   @Test
   public void testInitComponent_AndroidStudioWithDebugger() {
-    System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, "AndroidStudio");
-    System.setProperty(CloudDebugConfigType.GCT_DEBUGGER_ENABLE, "true");
-
     CloudToolsPluginInitializationComponent spy = spy(new CloudToolsPluginInitializationComponent());
     doNothing().when(spy).enableCloudDebugger();
 
-    spy.initComponent();
-    verify(spy).initComponent();
+    spy.initComponent("AndroidStudio", true);
+    verify(spy).initComponent("AndroidStudio", true);
     verify(spy).enableCloudDebugger();
     verifyNoMoreInteractions(spy);
   }
 
   @Test
   public void testInitComponent_IdeaPlatforms() {
-    for (String platform : PlatformInfo.SUPPORTED_PLATFORMS) {
-      System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, platform);
+    for (boolean enableCdb : new boolean[]{true, false}) {
+      for (String platform : PlatformInfo.SUPPORTED_PLATFORMS) {
 
-      CloudToolsPluginInitializationComponent spy = spy(new CloudToolsPluginInitializationComponent());
-      doNothing().when(spy).enableCloudDebugger();
-      doNothing().when(spy).enableFeedbackUtil();
+        CloudToolsPluginInitializationComponent spy = spy(
+            new CloudToolsPluginInitializationComponent());
+        doNothing().when(spy).enableCloudDebugger();
+        doNothing().when(spy).enableFeedbackUtil();
 
-      spy.initComponent();
-      verify(spy).initComponent();
-      verify(spy).enableCloudDebugger();
-      verify(spy).enableFeedbackUtil();
-      verifyNoMoreInteractions(spy);
+        spy.initComponent(platform, enableCdb);
+        verify(spy).initComponent(platform, enableCdb);
+        verify(spy).enableCloudDebugger();
+        verify(spy).enableFeedbackUtil();
+        verifyNoMoreInteractions(spy);
+      }
     }
   }
 
@@ -86,16 +70,14 @@ public class CloudToolsPluginInitializationComponentTest {
       platforms.add(platform.getPlatformPrefix());
     }
 
+    platforms.add("SomeGibberishPlatformASDF1234");
     platforms.removeAll(PlatformInfo.SUPPORTED_PLATFORMS);
 
     for (String platform : platforms) {
-      System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, platform);
-      System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, "HopefullyAGibberishPlatform");
-
       CloudToolsPluginInitializationComponent spy = spy(new CloudToolsPluginInitializationComponent());
 
-      spy.initComponent();
-      verify(spy).initComponent();
+      spy.initComponent(platform, false);
+      verify(spy).initComponent(platform, false);
       verifyNoMoreInteractions(spy);
     }
   }
