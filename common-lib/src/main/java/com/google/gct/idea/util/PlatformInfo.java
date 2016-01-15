@@ -1,13 +1,21 @@
 package com.google.gct.idea.util;
 
+import com.google.common.collect.ImmutableSet;
+
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.util.PlatformUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Set;
+
 public class PlatformInfo {
 
   private static volatile String userAgent = null;
+
+  public static final Set<String> SUPPORTED_PLATFORMS =
+      ImmutableSet.of(PlatformUtils.IDEA_CE_PREFIX, PlatformUtils.IDEA_PREFIX);
 
   @NotNull
   public static IntelliJPlatform getCurrentPlatform() {

@@ -15,8 +15,10 @@
  */
 package com.google.gct.idea;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.debugger.CloudDebugConfigType;
 import com.google.gct.idea.feedback.FeedbackUtil;
+import com.google.gct.idea.util.PlatformInfo;
 
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.openapi.components.ApplicationComponent;
@@ -25,10 +27,13 @@ import com.intellij.util.PlatformUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Performs runtime initialization for the GCT plugin.
  */
-public class PluginInitializationComponent implements ApplicationComponent {
+public class CloudToolsPluginInitializationComponent implements ApplicationComponent {
 
   private static final String PLUGIN_ID = "com.google.gct.core";
 
@@ -45,18 +50,29 @@ public class PluginInitializationComponent implements ApplicationComponent {
 
   @Override
   public void initComponent() {
-    if ("AndroidStudio".equals(PlatformUtils.getPlatformPrefix())) {
-      if (CloudDebugConfigType.isFeatureEnabled()) {
+    initComponent(PlatformUtils.getPlatformPrefix(), CloudDebugConfigType.isFeatureEnabled());
+  }
+
+  @VisibleForTesting
+  void initComponent(String platformPrefix, Boolean enableDebugger) {
+    if ("AndroidStudio".equals(platformPrefix)) {
+      if (enableDebugger) {
         enableCloudDebugger();
       }
-    } else {
-      FeedbackUtil.enableGoogleFeedbackErrorReporting(PLUGIN_ID);
+    } else if (PlatformInfo.SUPPORTED_PLATFORMS.contains(platformPrefix)) {
+      enableFeedbackUtil();
       enableCloudDebugger();
     }
   }
 
-  private void enableCloudDebugger() {
+  @VisibleForTesting
+  void enableCloudDebugger() {
     Extensions.getRootArea().getExtensionPoint(ConfigurationType.CONFIGURATION_TYPE_EP)
         .registerExtension(new CloudDebugConfigType());
+  }
+
+  @VisibleForTesting
+  void enableFeedbackUtil() {
+    FeedbackUtil.enableGoogleFeedbackErrorReporting(PLUGIN_ID);
   }
 }
