@@ -45,25 +45,10 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.HashMap;
-import git4idea.actions.BasicAction;
-import git4idea.branch.GitBrancher;
-import git4idea.commands.GitCommand;
-import git4idea.commands.GitHandlerUtil;
-import git4idea.commands.GitLineHandler;
-import git4idea.i18n.GitBundle;
-import git4idea.repo.GitRepository;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Window;
@@ -74,6 +59,24 @@ import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+
+import git4idea.actions.BasicAction;
+import git4idea.branch.GitBrancher;
+import git4idea.commands.GitCommand;
+import git4idea.commands.GitHandlerUtil;
+import git4idea.commands.GitLineHandler;
+import git4idea.i18n.GitBundle;
+import git4idea.repo.GitRepository;
 
 /**
  * CloudAttachDialog shows a dialog allowing the user to select a module and debug.
@@ -204,7 +207,7 @@ public class CloudAttachDialog extends DialogWrapper {
     }
 
     if (myDebuggeeTarget.getSelectedItem() == null) {
-      return new ValidationInfo(GctBundle.getString("clouddebug.nomoduleselected"), myDebuggeeTarget);
+      return new ValidationInfo(GctBundle.getString("clouddebug.selectvalidproject"), myDebuggeeTarget);
     }
 
     return null;
