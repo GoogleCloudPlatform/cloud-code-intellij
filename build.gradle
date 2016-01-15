@@ -22,6 +22,12 @@ subprojects {
     tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
     group = 'com.google.gct'
 
+    task jarSources(type:Jar) {
+      from sourceSets.main.allSource
+      classifier = 'source'
+    }
+    assemble.dependsOn jarSources
+
     apply plugin: 'org.jetbrains.intellij'
     intellij {
         version = ideaVersion
