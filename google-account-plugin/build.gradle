@@ -18,8 +18,7 @@ dependencies {
     compile files('lib/google-gct-login-context-ij-pg.jar')
     compile files('third_party/repackaged/google-api-java-client-min-repackaged-1.20.0.jar')
 
-    // TODO : remove jackson1 when we update com.google.gdt.eclipse.login.common.GoogleLoginState
-    // to accept json factory and http transport as parameters
+    // TODO : see #350
     compile 'com.google.http-client:google-http-client-jackson:1.20.0'
     compile 'org.codehaus.jackson:jackson-core-asl:1.9.11'
 

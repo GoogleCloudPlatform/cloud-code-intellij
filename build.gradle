@@ -38,6 +38,15 @@ subprojects {
     configurations.all {
         resolutionStrategy {
             failOnVersionConflict()
+
+            def provided = [["org.apache.httpcomponents", "httpclient"],
+                            ["com.google.guava", "guava"]]
+            eachDependency { DependencyResolveDetails dependency ->
+                if (provided.contains([dependency.requested.group, dependency.requested.name])) {
+                    throw new GradleException('Dependency "' + dependency.requested.name +
+                            '" should not be included in your build')
+                }
+            }
         }
     }
 
