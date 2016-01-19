@@ -16,16 +16,23 @@ dependencies {
     compile(project(':common-lib'))
     compile files('lib/google.gdt.eclipse.login.common.jar')
     compile files('lib/google-gct-login-context-ij-pg.jar')
-    compile fileTree(dir: 'third_party/repackaged', include: '*.jar')
+    compile files('third_party/repackaged/google-api-java-client-min-repackaged-1.20.0.jar')
 
-    compile 'com.google.apis:google-api-services-oauth2:v2-rev70-1.18.0-rc'
-    compile 'com.google.http-client:google-http-client-jackson:1.18.0-rc'
+    // TODO : see #350
+    compile 'com.google.http-client:google-http-client-jackson:1.20.0'
+    compile 'org.codehaus.jackson:jackson-core-asl:1.9.11'
+
+    compile 'com.google.apis:google-api-services-oauth2:v2-rev98-1.20.0'
     compile 'javax.servlet:javax.servlet-api:3.0.1'
-    compile 'net.jcip:jcip-annotations:1.0'
-    runtime 'org.codehaus.jackson:jackson-core-asl:1.9.11'
 
     testCompile 'xalan:serializer:2.7.1'
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
+}
+
+configurations {
+    // these are already obtained from google-api-java-client-min-repackaged
+    compile.exclude group: 'com.google.api-client', module: 'google-api-client'
+    compile.exclude group: 'com.google.http-client', module: 'google-http-client'
 }
 
 processResources {
