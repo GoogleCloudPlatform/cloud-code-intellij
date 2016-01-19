@@ -264,6 +264,15 @@ public class CloudAttachDialog extends DialogWrapper {
       myWarningLabel2.setVisible(false);
       myInfoPanel.setVisible(true);
     }
+    else if (mySyncResult.needsSync() && mySyncResult.getTargetSyncSHA() == null) {
+      setOKButtonText(isContinued()
+              ? GctBundle.getString("clouddebug.continueanyway")
+              : GctBundle.getString("clouddebug.attach.anyway"));
+      myWarningLabel.setVisible(true);
+      myWarningLabel2.setVisible(true);
+      myInfoPanel.setVisible(true);
+      myWarningLabel2.setText(GctBundle.getString("clouddebug.no.matching.sha"));
+    }
     else if (mySyncResult.needsSync()) {
       setOKButtonText(isContinued()
           ? GctBundle.getString("clouddebug.continuesession")
@@ -275,15 +284,6 @@ public class CloudAttachDialog extends DialogWrapper {
       myWarningLabel.setVisible(false);
       myWarningLabel2.setVisible(false);
       myInfoPanel.setVisible(true);
-    }
-    else if (mySyncResult.getTargetSyncSHA() == null) {
-      setOKButtonText(isContinued()
-          ? GctBundle.getString("clouddebug.continueanyway")
-          : GctBundle.getString("clouddebug.attach.anyway"));
-      myWarningLabel.setVisible(true);
-      myWarningLabel2.setVisible(true);
-      myInfoPanel.setVisible(true);
-      myWarningLabel2.setText(GctBundle.getString("clouddebug.no.matching.sha"));
     }
     else if (!mySyncResult.hasRemoteRepository()) {
       setOKButtonText(isContinued()
