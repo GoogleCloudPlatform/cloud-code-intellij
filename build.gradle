@@ -61,7 +61,7 @@ subprojects {
         ignoreFailures = true
         sourceSets = [sourceSets.main]
         effort = "max"
-        toolVersion = '2.0.3'
+        toolVersion = '3.0.0'
     }
 
     tasks.withType(FindBugs) {
