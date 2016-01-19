@@ -24,7 +24,7 @@ subprojects {
 
     task jarSources(type:Jar) {
       from sourceSets.main.allSource
-      classifier = 'source'
+      classifier = 'sources'
     }
     assemble.dependsOn jarSources
 
