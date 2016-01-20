@@ -15,36 +15,29 @@
  */
 package com.google.gct.idea.debugger.ui;
 
-import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
-import com.google.api.services.clouddebugger.model.Debuggee;
-import com.google.api.services.clouddebugger.model.ListDebuggeesResponse;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.gct.idea.debugger.CloudDebugProcessState;
-import com.google.gct.idea.debugger.CloudDebuggerClient;
 import com.google.gct.idea.debugger.ProjectRepositoryState;
 import com.google.gct.idea.debugger.ProjectRepositoryValidator;
 import com.google.gct.idea.debugger.SyncResult;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
-import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
 import com.google.gct.stats.UsageTrackerProvider;
 
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.openapi.application.AccessToken;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
-import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.util.containers.HashMap;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,21 +47,16 @@ import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 
 import git4idea.actions.BasicAction;
 import git4idea.branch.GitBrancher;
@@ -223,6 +211,26 @@ public class CloudAttachDialog extends DialogWrapper {
 
   public void setInputState(@Nullable CloudDebugProcessState inputState) {
     wireup.setInputState(inputState);
+  }
+
+  @VisibleForTesting
+  ProjectSelector getElysiumProjectSelector() {
+    return elysiumProjectSelector;
+  }
+
+  @VisibleForTesting
+  JComboBox getDebuggeeTarget() {
+    return debuggeeTarget;
+  }
+
+  @VisibleForTesting
+  JLabel getWarningHeader() {
+    return warningHeader;
+  }
+
+  @VisibleForTesting
+  JLabel getWarningMessage() {
+    return warningMessage;
   }
 
   private void buildResult() {
@@ -396,248 +404,6 @@ public class CloudAttachDialog extends DialogWrapper {
     }
     else {
       refreshAndClose();
-    }
-  }
-
-  /**
-   * This binding between the project and debuggee is refactored out to make it reusable in the future.
-   */
-  private static class ProjectDebuggeeBinding {
-    private static final Logger LOG = Logger.getInstance(ProjectDebuggeeBinding.class);
-    private final JComboBox myDebugeeTarget;
-    private final ProjectSelector myElysiumProjectId;
-    private Debugger myCloudDebuggerClient = null;
-    private CredentialedUser myCredentialedUser = null;
-    private CloudDebugProcessState myInputState;
-
-    public ProjectDebuggeeBinding(@NotNull ProjectSelector elysiumProjectId, @NotNull JComboBox debugeeTarget) {
-      myElysiumProjectId = elysiumProjectId;
-      myDebugeeTarget = debugeeTarget;
-
-      myElysiumProjectId.getDocument().addDocumentListener(new DocumentAdapter() {
-        @Override
-        protected void textChanged(DocumentEvent e) {
-          refreshDebugTargetList();
-        }
-      });
-
-      myElysiumProjectId.addModelListener(new TreeModelListener() {
-        @Override
-        public void treeNodesChanged(TreeModelEvent e) {
-        }
-
-        @Override
-        public void treeNodesInserted(TreeModelEvent e) {
-        }
-
-        @Override
-        public void treeNodesRemoved(TreeModelEvent e) {
-        }
-
-        @Override
-        public void treeStructureChanged(TreeModelEvent e) {
-          refreshDebugTargetList();
-        }
-      });
-    }
-
-    @NotNull
-    public CloudDebugProcessState buildResult(Project project) {
-      Long number = myElysiumProjectId.getProjectNumber();
-      String projectNumberString = number != null ? number.toString() : null;
-      ProjectDebuggeeBinding.DebugTarget selectedItem =
-        (ProjectDebuggeeBinding.DebugTarget)myDebugeeTarget.getSelectedItem();
-      String savedDebuggeeId = selectedItem != null ? selectedItem.getId() : null;
-      String savedProjectDescription = myElysiumProjectId.getText();
-
-      return new CloudDebugProcessState(myCredentialedUser != null ? myCredentialedUser.getEmail() : null,
-                                        savedDebuggeeId,
-                                        savedProjectDescription,
-                                        projectNumberString,
-                                        project);
-    }
-
-    @Nullable
-    public Debugger getCloudDebuggerClient() {
-      CredentialedUser credentialedUser = myElysiumProjectId.getSelectedUser();
-      if (myCredentialedUser == credentialedUser) {
-        return myCloudDebuggerClient;
-      }
-
-      myCredentialedUser = credentialedUser;
-      myCloudDebuggerClient =
-          myCredentialedUser != null ? CloudDebuggerClient.getLongTimeoutClient(myCredentialedUser.getEmail()) : null;
-
-      return myCloudDebuggerClient;
-    }
-
-    @Nullable
-    public CloudDebugProcessState getInputState() {
-      return myInputState;
-    }
-
-    public void setInputState(@Nullable CloudDebugProcessState inputState) {
-      myInputState = inputState;
-      if (myInputState != null) {
-        myElysiumProjectId.setText(myInputState.getProjectName());
-      }
-    }
-
-    /**
-     * Refreshes the list of attachable debug targets based on the project selection.
-     */
-    @SuppressWarnings("unchecked")
-    private void refreshDebugTargetList() {
-      myDebugeeTarget.removeAllItems();
-      ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            if (myElysiumProjectId.getProjectNumber() != null && getCloudDebuggerClient() != null) {
-              final ListDebuggeesResponse debuggees =
-                  getCloudDebuggerClient().debuggees().list()
-                      .setProject(myElysiumProjectId.getProjectNumber().toString())
-                      .execute();
-
-              SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                  DebugTarget targetSelection = null;
-
-                  if (debuggees == null || debuggees.getDebuggees() == null || debuggees.getDebuggees().isEmpty()) {
-                    myDebugeeTarget.setEnabled(false);
-                    myDebugeeTarget.addItem(GctBundle.getString("clouddebug.nomodulesfound"));
-                  }
-                  else {
-                    myDebugeeTarget.setEnabled(true);
-                    Map<String, DebugTarget> perModuleCache = new HashMap<String, DebugTarget>();
-
-                    for (Debuggee debuggee : debuggees.getDebuggees()) {
-                      DebugTarget item = new DebugTarget(debuggee, myElysiumProjectId.getText());
-                      if (!Strings.isNullOrEmpty(item.getModule()) &&
-                          !Strings.isNullOrEmpty(item.getVersion())) {
-                        //If we already have an existing item for that module+version, compare the minor
-                        // versions and only use the latest minor version.
-                        String key = String.format("%s:%s", item.getModule(), item.getVersion());
-                        DebugTarget existing = perModuleCache.get(key);
-                        if (existing != null && existing.getMinorVersion() > item.getMinorVersion()) {
-                          continue;
-                        }
-                        if (existing != null) {
-                          myDebugeeTarget.removeItem(existing);
-                        }
-                        perModuleCache.put(key, item);
-                      }
-                      if (myInputState != null && !Strings.isNullOrEmpty(myInputState.getDebuggeeId())) {
-                        assert myInputState.getDebuggeeId() != null;
-                        if (myInputState.getDebuggeeId().equals(item.getId())) {
-                          targetSelection = item;
-                        }
-                      }
-                      myDebugeeTarget.addItem(item);
-                    }
-                  }
-                  if (targetSelection != null) {
-                    myDebugeeTarget.setSelectedItem(targetSelection);
-                  }
-                }
-              });
-            }
-          } catch (IOException ex) {
-            LOG.error("Error listing debuggees from Cloud Debugger API", ex);
-          }
-        }
-      });
-    }
-
-    public static class DebugTarget {
-      private static final String MODULE = "module";
-
-      private final Debuggee myDebuggee;
-      private String myDescription;
-      private long myMinorVersion = 0;
-      private String myModule;
-      private String myVersion;
-
-      public DebugTarget(@NotNull Debuggee debuggee, @NotNull String projectName) {
-        myDebuggee = debuggee;
-        if (myDebuggee.getLabels() != null) {
-          myDescription = "";
-          myModule = "";
-          myVersion = "";
-          String minorVersion = "";
-
-          //Get the module name, major version and minor version strings.
-          for (Map.Entry<String, String> entry : myDebuggee.getLabels().entrySet()) {
-            if (entry.getKey().equalsIgnoreCase(MODULE)) {
-              myModule = entry.getValue();
-            }
-            else if (entry.getKey().equalsIgnoreCase("minorversion")) {
-              minorVersion = entry.getValue();
-            }
-            else if (entry.getKey().equalsIgnoreCase("version")) {
-              myVersion = entry.getValue();
-            }
-            else {
-              //This is fallback logic where we dump the labels verbatim if they
-              //change from underneath us.
-              myDescription += String.format("%s:%s", entry.getKey(),entry.getValue());
-            }
-          }
-
-          //Build a description from the strings.
-          if (!Strings.isNullOrEmpty(myModule)) {
-            myDescription = GctBundle.getString("clouddebug.version.with.module.format",
-                myModule, myVersion);
-          }
-          else if (!Strings.isNullOrEmpty(myVersion)) {
-            myDescription = GctBundle.getString("clouddebug.versionformat", myVersion);
-          }
-
-          //Record the minor version.  We only show the latest minor version.
-          try {
-            if (!Strings.isNullOrEmpty(minorVersion)) {
-              myMinorVersion = Long.parseLong(minorVersion);
-            }
-          }
-          catch(NumberFormatException ex) {
-            LOG.warn("unable to parse minor version: " + minorVersion);
-          }
-        }
-
-        //Finally if nothing worked (maybe labels aren't enabled?), we fall
-        //back to the old logic of using description with the project name stripped out.
-        if (Strings.isNullOrEmpty(myDescription))
-        {
-          myDescription = myDebuggee.getDescription();
-          if (myDescription != null &&
-              !Strings.isNullOrEmpty(projectName) &&
-              myDescription.startsWith(projectName + "-")) {
-            myDescription = myDescription.substring(projectName.length() + 1);
-          }
-        }
-      }
-
-      public String getId() {
-        return myDebuggee.getId();
-      }
-
-      @Override
-      public String toString() {
-        return myDescription;
-      }
-
-      public long getMinorVersion() {
-        return myMinorVersion;
-      }
-
-      public String getModule() {
-        return myModule;
-      }
-
-      public String getVersion() {
-        return myVersion;
-      }
     }
   }
 }
