@@ -1,37 +1,3 @@
-package com.google.gct.idea.testing;
-
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-
-import com.intellij.mock.MockApplicationEx;
-import com.intellij.mock.MockProject;
-import com.intellij.openapi.Disposable;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.extensions.Extensions;
-import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.fileTypes.FileTypeRegistry;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Getter;
-import com.intellij.openapi.vfs.encoding.EncodingManager;
-import com.intellij.openapi.vfs.encoding.EncodingManagerImpl;
-import com.intellij.util.pico.DefaultPicoContainer;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.mockito.Mockito;
-import org.picocontainer.PicoContainer;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-
 /*
  * Copyright (C) 2015 The Android Open Source Project
  *
@@ -48,15 +14,35 @@ import java.util.concurrent.Future;
  * limitations under the License.
  */
 
+package com.google.gct.idea.testing;
+
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+
+import com.intellij.mock.MockApplicationEx;
+import com.intellij.mock.MockProject;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.extensions.Extensions;
+import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.openapi.fileTypes.FileTypeRegistry;
+import com.intellij.openapi.util.Getter;
+import com.intellij.openapi.vfs.encoding.EncodingManager;
+import com.intellij.openapi.vfs.encoding.EncodingManagerImpl;
+import com.intellij.util.pico.DefaultPicoContainer;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.mockito.Mockito;
+import org.picocontainer.PicoContainer;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+
 /**
  * Test utilities.
  */
 public class TestUtils {
-
-  @NotNull
-  public static Project mockProject() {
-    return mockProject(null);
-  }
 
   static class PluginMockApplication extends MockApplicationEx {
 
@@ -122,24 +108,4 @@ public class TestUtils {
     return new MockProject(container, Mockito.mock(Disposable.class));
   }
 
-  public static void assertIsSerializable(@NotNull Serializable object) {
-    ObjectOutputStream out = null;
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    try {
-      out = new ObjectOutputStream(byteArrayOutputStream);
-      out.writeObject(object);
-    } catch (NotSerializableException e) {
-      fail("An object is not serializable: " + e.getMessage());
-    } catch (IOException e) {
-      fail("Could not serialize object: " + e.getMessage());
-    } finally {
-      if (out != null) {
-        try {
-          out.close();
-        } catch (IOException e) {
-          // ignore
-        }
-      }
-    }
-  }
 }
