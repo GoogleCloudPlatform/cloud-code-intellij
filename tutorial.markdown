@@ -8,7 +8,7 @@ title: IntelliJ IDEA Google Cloud Debugger Tutorial
 
 You can use the Google Cloud Debugger to capture and inspect the call stack 
 and local variables of a live application running in the cloud
-(more specifically on [Google App Engine](https://cloud.google.com/appengine/docs), [Managed VMs](https://cloud.google.com/appengine/docs/managed-vms/), or the Google Compute Engine.)
+(more specifically on [Google App Engine](https://cloud.google.com/appengine/docs), Google [Compute Engine](https://cloud.google.com/compute/), or, with some additional configuration, [Managed VMs](https://cloud.google.com/appengine/docs/managed-vms/).)
  
 It works much like the IntelliJ IDEA debugger you're already used to,
 and provides the same user interface, with two key differences:
