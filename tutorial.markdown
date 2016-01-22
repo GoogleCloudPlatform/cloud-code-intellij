@@ -190,7 +190,7 @@ Here set a snapshot location at the line.
 
         if (userAgent != null) {
 
-This way we can see what the userAgent variable is.
+This way we can see the value of the `userAgent` variable.
 
 Go to the browser and reload the page.
 
