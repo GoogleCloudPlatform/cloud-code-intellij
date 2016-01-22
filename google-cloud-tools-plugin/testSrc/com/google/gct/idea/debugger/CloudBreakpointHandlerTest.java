@@ -195,7 +195,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     assertThat(breakpointArgumentCaptor.getValue().getErrorMessage(), equalTo("The snapshot location could not be set."));
   }
 
-  public void ignore_testRegisterGetAndDelete() {
+  public void testRegisterGetAndDelete() {
     registerMockBreakpoint(new String[]{"foowatch1"}, "condition == true", 123,
         "foo.java", "com.google", false, "b_id");
 
@@ -216,14 +216,14 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     assertTrue(myRemovedBp.get() == myAddedBp.get().getId());
   }
 
-  public void ignore_testServerCreation() {
+  public void testServerCreation() {
     registerMockBreakpoint(new String[]{"foowatch1"}, "condition == true", 123,
         "foo.java", "com.google", true, "b_id");
 
     assertNull(myAddedBp.get());
   }
 
-  public void ignore_testConflictingRegister() {
+  public void testConflictingRegister() {
     Breakpoint existingServerBp = new Breakpoint();
     SourceLocation location = new SourceLocation();
     location.setPath("com/google/foo.java");
