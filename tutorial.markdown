@@ -28,8 +28,8 @@ applications running on App Engine and MVMs. On GCE, you'll need to
 In order to follow along with this tutorial, you need the following software installed:
 
 * IntelliJ IDEA 14 or later, either Community or Ultimate Edition
-* Java 1.7 or later
-* maven
+* [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html). (Java 6 won't work with the sample. Java 8 cannot yet be deployed on App Engine.)
+* [maven](https://maven.apache.org/download.cgi) 3.1 or later
 * git
 * [Google Cloud SDK](https://cloud.google.com/sdk/)
 * Chrome browser
