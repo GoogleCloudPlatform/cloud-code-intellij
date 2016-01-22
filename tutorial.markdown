@@ -213,6 +213,24 @@ damage goes back two decades, well before Chrome was conceived. Chrome isn't act
 
 Now that we see what's going on, let's fix it.
 
+1. Change the line
+
+        if (userAgent.contains("Mozilla")) {
+
+    to
+            
+        if (userAgent.contains("Firefox")) {
+
+2. Deploy your application using
+
+        $ mvn appengine:update
+
+3. Visit the web page again:
+
+
+Success!
+
+Some notes:
 
 Since you can't single step through an application in the cloud debugger,
 it's more common to put the breakpoint at the end of the relevant block
