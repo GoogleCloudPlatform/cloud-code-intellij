@@ -166,17 +166,18 @@ account that can manage the application.
 13. Run > Debug 'My First Debugging Session'
 
 14. Select the module in the dialog that pops up. 
-You may have to wait a few seocnds for this to populate.
+You may have to wait a few seconds for this to populate.
 There may be only one of these.
  
 
-### Set a breakpoint
+### Set a snapshot location
 
-Once you've attached  to a running application, you can set breakpoints in the 
+Once you've attached  to a running application, you can set snapshot locations in the 
 source code by clicking at the line you want to snapshot in the left hand bar,
-just as you would when debugging a local application using the regular IDEA debugger.
+just as you would when setting a breakpoint for a local application using 
+the regular IDEA debugger.
 
-Here set a breakpoint at the line.
+Here set a snapshot location at the line.
 
         if (userAgent != null) {
 
@@ -203,16 +204,16 @@ but you can try to copy the relevant info out into local variables in your code.
 
 
 Since you can't single step through an application in the cloud debugger,
-it's more common to put the breakpoint at the end of the relevant block
+it's more common to put the snapshot location at the end of the relevant block
 of code rather than at the beginning. That way all variables have been set and can
 be inspected. 
 
 If you're interested in variables in multiple scopes, (e.g. inside and 
-outside a loop) you'll need to set multiple breakpoints.
+outside a loop) you'll need to set multiple snapshot locations.
 
 If you're interested in variables at particular points in time,
 (e.g. on the last iteration of a loop) then you'll want to set a 
-conditional breakpoint.
+conditional snapshot location.
 
 
 ### Run the application
@@ -227,7 +228,7 @@ conditional breakpoint.
 3. The debugger pane will appear at the bottom of the screen. 
 
 4. In your web browser, visit the application (e.g. ????) and exercise its functionality 
-such that the code at the breakpoint will execute.
+such that the code at the snapshot location will execute.
 
 5. In IDEA you will see a brief popup saying "New snapshot received." 
 (Don't blink or you'll miss it.) The new snapshot appears in the lower lefthand pane. 
@@ -253,12 +254,12 @@ you see in production. Furthermore, you can configure a live
 production instance to alert you to a problem that you don't immediatley know how to reproduce. 
 For example, imagine that you knew the servlet was sending incorrect data but you didn't
 know the problem was triggered by a particular browser. This is normally accomplished with
-a conditional breakpoint, the subject we'll take up next.
+a conditional snapshot location, the subject we'll take up next.
 
-### Conditional breakpoints
+### Conditional Snapshot Locations
 
 
-### Watch expressions
+### Watch Expressions
 
 ### Closing the debugger
 
