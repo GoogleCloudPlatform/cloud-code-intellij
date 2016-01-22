@@ -76,6 +76,8 @@ It is built with Maven version 3.1 or later.
 
 (If you happen to spot the bug by eye before running it, pretend you don't and just read along.)
 
+*TODO: make this all work in IntelliJ without using the command line*
+
 1. Clone the project to a local repository:
  
         $ git clone https://github.com/GoogleCloudPlatform/cloud-debugger-idea-sample.git
