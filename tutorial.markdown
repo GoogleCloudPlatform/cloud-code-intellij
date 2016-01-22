@@ -8,7 +8,7 @@ title: IntelliJ IDEA Google Cloud Debugger Tutorial
 
 You can use the Google Cloud Debugger to capture and inspect the call stack 
 and local variables of a live application running in the cloud
-(more specifically on [Google App Engine](https://cloud.google.com/appengine/docs), [Managed VMs](https://cloud.google.com/appengine/docs/managed-vms/), or the Google Compute Engine.)
+(more specifically on [Google App Engine](https://cloud.google.com/appengine/docs), Google [Compute Engine](https://cloud.google.com/compute/), or, with some additional configuration, [Managed VMs](https://cloud.google.com/appengine/docs/managed-vms/).)
  
 It works much like the IntelliJ IDEA debugger you're already used to,
 and provides the same user interface, with two key differences:
@@ -27,11 +27,15 @@ applications running on App Engine and MVMs. On GCE, you'll need to
 
 In order to follow along with this tutorial, you need the following software installed:
 
-* IntelliJ IDEA 14 or later
-* Java 1.7 or later
-* maven
+* IntelliJ IDEA 14 or later, either Community or Ultimate Edition
+* [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html). (Java 6 won't work with the sample. Java 8 cannot yet be deployed on App Engine.)
+* [Apache maven](https://maven.apache.org/download.cgi) 3.1 or later
 * git
 * [Google Cloud SDK](https://cloud.google.com/sdk/)
+* Chrome browser
+* A Google account that can deploy AppEngine apps. (Personal accounts, 
+  i.e. gmail.com accounts work. Users with Google Apps for Work accounts may
+  need to contact their administrator to enable GCP on their account.)
 
 
 ## Installing the Plugins
@@ -49,7 +53,7 @@ From inside IDEA:
 
 3. Click the "Browse repositories..." button.
 
-4. In the dialog that opens, select "Google Core Plugin" (exact name TBD????). 
+4. In the dialog that opens, select "Google Cloud Tools." 
 
 5. Click the Green Install button.
 
@@ -72,6 +76,7 @@ It is built with Maven version 3.1 or later.
 
 (If you happen to spot the bug by eye before running it, pretend you don't and just read along.)
 
+<<<<<<< HEAD
 1. Clone the project to your own local repository:
 
         $ git clone https://github.com/GoogleCloudPlatform/cloud-debugger-idea-sample.git
@@ -80,6 +85,18 @@ It is built with Maven version 3.1 or later.
         remote: Compressing objects: 100% (8/8), done.
         remote: Total 88 (delta 0), reused 0 (delta 0), pack-reused 71
         Unpacking objects: 100% (88/88), done.
+=======
+*TODO: make this all work in IntelliJ without using the command line*
+
+1. Clone the project to a local repository:
+ 
+        $ git clone https://github.com/GoogleCloudPlatform/cloud-debugger-idea-sample.git
+        Cloning into 'cloud-debugger-idea-sample'...
+        remote: Counting objects: 108, done.
+        remote: Total 108 (delta 0), reused 0 (delta 0), pack-reused 108
+        Receiving objects: 100% (108/108), 31.41 KiB | 0 bytes/s, done.
+        Resolving deltas: 100% (30/30), done.
+>>>>>>> fea259cb308f91fa5c85f71ccffa31728154c697
         Checking connectivity... done.
 
 2. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
@@ -184,17 +201,18 @@ You may have to wait a few seconds for this to populate.
 There may be only one of these.
  
 
-### Set a breakpoint
+### Set a snapshot location
 
-Once you've attached  to a running application, you can set breakpoints in the 
+Once you've attached to a running application, you can set snapshot locations in the 
 source code by clicking at the line you want to snapshot in the left hand bar,
-just as you would when debugging a local application using the regular IDEA debugger.
+just as you would when setting a breakpoint for a local application using 
+the regular IDEA debugger.
 
-Here set a breakpoint at the line.
+Here set a snapshot location at the line.
 
         if (userAgent != null) {
 
-This way we can see what the `userAgent` variable is.
+This way we can see the value of the `userAgent` variable.
 
 Go to the browser and reload the page.
 
@@ -233,16 +251,16 @@ Success!
 Some notes:
 
 Since you can't single step through an application in the cloud debugger,
-it's more common to put the breakpoint at the end of the relevant block
+it's more common to put the snapshot location at the end of the relevant block
 of code rather than at the beginning. That way all variables have been set and can
 be inspected. 
 
 If you're interested in variables in multiple scopes, (e.g. inside and 
-outside a loop) you'll need to set multiple breakpoints.
+outside a loop) you'll need to set multiple snapshot locations.
 
 If you're interested in variables at particular points in time,
 (e.g. on the last iteration of a loop) then you'll want to set a 
-conditional breakpoint.
+conditional snapshot location.
 
 
 ### Run the application
@@ -257,7 +275,7 @@ conditional breakpoint.
 3. The debugger pane will appear at the bottom of the screen. 
 
 4. In your web browser, visit the application (e.g. ????) and exercise its functionality 
-such that the code at the breakpoint will execute.
+such that the code at the snapshot location will execute.
 
 5. In IDEA you will see a brief popup saying "New snapshot received." 
 (Don't blink or you'll miss it.) The new snapshot appears in the lower lefthand pane. 
@@ -275,19 +293,20 @@ Here we can see ????
 
 You can use the right click context menu to copy values, inspect variables, and more. 
 
-
-Admittedly this is a very simple example. You probably spotted at least one of the two 
-bugs immediately. If not, you could have found and debugged them using a locally running instance.
+Admittedly this is a very simple example. This particular bug could 
+have been found in a locally running instance on the development server.
 However, in more complex applications that interact with backend data stores and 
 other live network services, local tests may not be able to reproduce the exact problems
-you see in production. For these scenarios, the cloud debugger is invaluable. 
+you see in production. Furthermore, you can configure a live
+production instance to alert you to a problem that you don't immediatley know how to reproduce. 
+For example, imagine that you knew the servlet was sending incorrect data but you didn't
+know the problem was triggered by a particular browser. This is normally accomplished with
+a conditional snapshot location, the subject we'll take up next.
+
+### Conditional Snapshot Locations
 
 
-
-### Conditional breakpoints
-
-
-### Watch expressions
+### Watch Expressions
 
 ### Closing the debugger
 
