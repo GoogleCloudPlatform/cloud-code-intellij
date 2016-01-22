@@ -29,7 +29,7 @@ In order to follow along with this tutorial, you need the following software ins
 
 * IntelliJ IDEA 14 or later, either Community or Ultimate Edition
 * [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html). (Java 6 won't work with the sample. Java 8 cannot yet be deployed on App Engine.)
-* [maven](https://maven.apache.org/download.cgi) 3.1 or later
+* [Apache maven](https://maven.apache.org/download.cgi) 3.1 or later
 * git
 * [Google Cloud SDK](https://cloud.google.com/sdk/)
 * Chrome browser
@@ -53,7 +53,7 @@ From inside IDEA:
 
 3. Click the "Browse repositories..." button.
 
-4. In the dialog that opens, select "Google Core Plugin" (exact name TBD????). 
+4. In the dialog that opens, select "Google Cloud Tools." 
 
 5. Click the Green Install button.
 
