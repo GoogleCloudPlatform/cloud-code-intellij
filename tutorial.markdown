@@ -76,16 +76,7 @@ It is built with Maven version 3.1 or later.
 
 (If you happen to spot the bug by eye before running it, pretend you don't and just read along.)
 
-<<<<<<< HEAD
-1. Clone the project to your own local repository:
 
-        $ git clone https://github.com/GoogleCloudPlatform/cloud-debugger-idea-sample.git
-        Cloning into 'cloud-debugger-idea-sample'...
-        remote: Counting objects: 88, done.
-        remote: Compressing objects: 100% (8/8), done.
-        remote: Total 88 (delta 0), reused 0 (delta 0), pack-reused 71
-        Unpacking objects: 100% (88/88), done.
-=======
 *TODO: make this all work in IntelliJ without using the command line*
 
 1. Clone the project to a local repository:
@@ -96,8 +87,7 @@ It is built with Maven version 3.1 or later.
         remote: Total 108 (delta 0), reused 0 (delta 0), pack-reused 108
         Receiving objects: 100% (108/108), 31.41 KiB | 0 bytes/s, done.
         Resolving deltas: 100% (30/30), done.
->>>>>>> fea259cb308f91fa5c85f71ccffa31728154c697
-        Checking connectivity... done.
+
 
 2. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
 
