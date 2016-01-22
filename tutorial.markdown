@@ -76,21 +76,28 @@ It is built with Maven version 3.1 or later.
 
 (If you happen to spot the bug by eye before running it, pretend you don't and just read along.)
 
-You can clone the project to your own repository.
+1. Clone the project to a local repository:
+ 
+        $ git clone https://github.com/GoogleCloudPlatform/cloud-debugger-idea-sample.git
+        Cloning into 'cloud-debugger-idea-sample'...
+        remote: Counting objects: 108, done.
+        remote: Total 108 (delta 0), reused 0 (delta 0), pack-reused 108
+        Receiving objects: 100% (108/108), 31.41 KiB | 0 bytes/s, done.
+        Resolving deltas: 100% (30/30), done.
+        Checking connectivity... done.
 
+2. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
 
-1. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
-
-2. In your local copy of the source, open the file pom.xml in a text editor and change 
+3. In your local copy of the source, open the file pom.xml in a text editor and change 
    the `artifactId` and  `app.id` elements from `hellobrowser` to the project name you registered in the developer console.
 
-3. Build and test the application using `mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
+4. Build and test the application using `mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
 
-4. Commit your changes.
+5. Commit your changes.
 
         $ git commit -a -m "set project ID"
 
-5.  Commit and push the source code of the application to the
+6.  Commit and push the source code of the application to the
     [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created. 
     *TBD: need more complete instructions here*
     *TBD: is there a way to do this with a maven command?*
@@ -100,13 +107,13 @@ You can clone the project to your own repository.
         $ git remote add google https://source.developers.google.com/p/projectname/
         $ git push --all google
 
-6.  Deploy your application using
+7.  Deploy your application using
     [maven](https://cloud.google.com/appengine/docs/java/tools/maven#uploading_your_app_to_production_app_engine):
 
         $ mvn appengine:update
 
 
-7. Visit the application at http://*projectname*.appspot.com/hellobrowser using Chrome. You'll see it say:
+8. Visit the application at http://*projectname*.appspot.com/hellobrowser using Chrome. You'll see it say:
  
   ![](images/HelloBrowser.png)
  
