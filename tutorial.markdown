@@ -147,24 +147,24 @@ It is built with Maven version 3.1 or later.
 
 3. Run > Edit Configurations...
 
-3. Click the + icon on the upper left hand side. Select "Cloud Debug" from the popup menu. (If this option doesn't appear, check whether the plugin is installed and activated.)
+4. Click the + icon on the upper left hand side. Select "Cloud Debug" from the popup menu. (If this option doesn't appear, check whether the plugin is installed and activated.)
 
-4. Set the name of the configuration to "My First Debugging Session."
+5. Set the name of the configuration to "My First Debugging Session."
 
-5. At the right-hand side of the Project popup, click the little arrow. You'll see a sign in pane.
+6. At the right-hand side of the Project popup, click the little arrow. You'll see a sign in pane.
 
   ![](images/MyFirstDebuggingSession.png)
 
-6. Click the "Sign In" button.
+7. Click the "Sign In" button.
 
-7. A browser window will open outside of IDEA.
+8. A browser window will open outside of IDEA.
 
-8. If you have more than one Google account logged into the browser, 
+9. If you have more than one Google account logged into the browser, 
 select the one that has access to the application you want to debug. 
 If that account is not shown, click "Add Account" and login to the 
 account that can manage the application.
 
-9. You'll be asked to grant a list of permissions to IDEA. After waiting a few seconds for the button to activate, click "Allow".
+10. You'll be asked to grant a list of permissions to IDEA. After waiting a few seconds for the button to activate, click "Allow".
 
   ![](images/permissions.png)
 
@@ -172,37 +172,51 @@ account that can manage the application.
  The Cloud Debugger doesn't actually need or use all of them.
  We're working on fixing that.)
 
-10. You will see a window saying "IntelliJ is now authorized to access your account." Close the browser window and return to IntelliJ.
+11. You will see a window saying "IntelliJ is now authorized to access your account." Close the browser window and return to IntelliJ.
 
   ![](images/IntelliJIsNowAuthorized.png)
 
 
-11. At the right-hand side of the Project popup, click the little arrow again. This time you'll see a list of applications managed by your account. Select the one you just created.
+12. At the right-hand side of the Project popup, click the little arrow again. This time you'll see a list of applications managed by your account. Select the one you just created.
 
   ![](images/devconsoleprojects.png)
 
 
-12. Click the OK button.
+13. Click the OK button.
 
-13. Run > Debug 'My First Debugging Session'
+14. Run > Debug 'My First Debugging Session'
 
-14. Select the module in the dialog that pops up. 
+15. Select the module in the dialog that pops up. 
 You may have to wait a few seconds for this to populate.
 There may be only one of these.
- 
+
+*TBD: screenshot*
+
 
 ### Set a snapshot location
 
 Once you've attached to a running application, you can set snapshot locations in the 
-source code by clicking at the line you want to snapshot in the left hand bar,
-just as you would when setting a breakpoint for a local application using 
+source code by clicking at the line you want to snapshot in the left gutter area,
+just as you would when setting a line breakpoint for a local application using 
 the regular IDEA debugger.
+
+The little blue circle represents the snapshot location.
+When you mouse over it, a tooltip will show you exactly where it's set.
+Clicking the blue circle a second time removes the snapshot location.
 
 Here set a snapshot location at the line.
 
         if (userAgent != null) {
+            
+  ![](images/snapshotlocation.png)
+            
 
 This way we can see the value of the `userAgent` variable.
+
+
+You can set snapshot locations on executable lines. 
+You cannot set snapshot locations on non-executable lines such as
+comments, declarations and empty lines.
 
 ### Run the application
 
