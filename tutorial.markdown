@@ -214,22 +214,38 @@ Here set a snapshot location at the line.
 
 This way we can see the value of the `userAgent` variable.
 
+### Run the application
+
 Go to the browser and reload the page.
+If you the IDEA window is visible at the same time, 
+you'll see a brief popup saying "New snapshot received." 
+(Don't blink or you'll miss it.) 
 
 Return to IDEA and you should see that a snapshot has appeared in the lower lefthand panel:
 
+*TBD: screenshot*
 
-Click it and inspect the variables:
+Click it. The middle frame loads the stack trace and
+the right hand frame loads local variables and method arguments 
+in scope at that point in the code and their values at that point in time. 
+Fields are also available by expanding the "this" variable. Inspect 
+the ???? variable in the right hand frame:
+
+*TBD: screenshot*
+
 
   ![](images/inspectuseragent.png)
 
 Now you see that userAgent is "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36". 
 
-Guess what? Chrome is sending a user agent string that contains the word Mozilla, even though 
+Guess what? Chrome is sending a user agent string that contains the word "Mozilla," even though 
 Chrome has almost nothing to do with the Mozilla project. (Believe it or not, this brain 
-damage goes back two decades, well before Chrome was conceived. Chrome isn't actually pretending to be Firefox here. It's pretending to be Netscape, but I digress.)
+damage goes back two decades, well before Chrome was conceived. Chrome isn't actually pretending to be Firefox. It's pretending to be Netscape, a browser that hasn't been updated since 2008; 
+but I digress.)
 
-Now that we see what's going on, let's fix it.
+### Fix the bug
+
+Now that you see what's going on, let's fix it.
 
 1. Change the line
 
@@ -245,10 +261,21 @@ Now that we see what's going on, let's fix it.
 
 3. Visit the web page again:
 
+*TBD: screenshot*
 
 Success!
 
-Some notes:
+Admittedly this is a simple example. This particular bug could 
+have been found in a locally running instance on the development server.
+However, in more complex applications that interact with backend data stores and 
+other live network services, local tests may not be able to reproduce the exact problems
+you see in production. Furthermore, you can configure a live
+production instance to alert you to a problem that you don't immediatley know how to reproduce. 
+For example, imagine that you knew the servlet was sending incorrect data but you didn't
+know the problem was triggered by a particular browser. This is normally accomplished with
+a conditional snapshot location, the subject we'll take up next.
+
+####Some notes:
 
 Since you can't single step through an application in the cloud debugger,
 it's more common to put the snapshot location at the end of the relevant block
@@ -261,47 +288,6 @@ outside a loop) you'll need to set multiple snapshot locations.
 If you're interested in variables at particular points in time,
 (e.g. on the last iteration of a loop) then you'll want to set a 
 conditional snapshot location.
-
-
-### Run the application
-
-1. Run > Debug 'My First Debugging Session'
-
- If some other configuration happens to appear in the Run menu instead, 
- then select "Debug.." and choose "My First Debugging Session" in the dialog that appears.
-
-2. A dialog will appear. TBD: set the Module? Click the blue Attach button.
-
-3. The debugger pane will appear at the bottom of the screen. 
-
-4. In your web browser, visit the application (e.g. ????) and exercise its functionality 
-such that the code at the snapshot location will execute.
-
-5. In IDEA you will see a brief popup saying "New snapshot received." 
-(Don't blink or you'll miss it.) The new snapshot appears in the lower lefthand pane. 
-Click it.
-
-
-In the middle frame you'll see the stack trace:
-
-In the right hand frame you can all local variables and method arguments 
-in scope at that point in the code and their values at that point in time. 
-Fields are also available by expanding the "this" variable. For instance here
-
-
-Here we can see ????
-
-You can use the right click context menu to copy values, inspect variables, and more. 
-
-Admittedly this is a very simple example. This particular bug could 
-have been found in a locally running instance on the development server.
-However, in more complex applications that interact with backend data stores and 
-other live network services, local tests may not be able to reproduce the exact problems
-you see in production. Furthermore, you can configure a live
-production instance to alert you to a problem that you don't immediatley know how to reproduce. 
-For example, imagine that you knew the servlet was sending incorrect data but you didn't
-know the problem was triggered by a particular browser. This is normally accomplished with
-a conditional snapshot location, the subject we'll take up next.
 
 ### Conditional Snapshot Locations
 
