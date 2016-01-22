@@ -27,7 +27,7 @@ applications running on App Engine and MVMs. On GCE, you'll need to
 
 In order to follow along with this tutorial, you need the following software installed:
 
-* IntelliJ IDEA 14 or later
+* IntelliJ IDEA 14 or later, either Community or Ultimate Edition
 * Java 1.7 or later
 * maven
 * git
