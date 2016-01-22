@@ -168,7 +168,9 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   @Override
   public XBreakpointHandler<?>[] getBreakpointHandlers() {
     if (myXBreakpointHandlers == null) {
-      myXBreakpointHandlers = new XBreakpointHandler<?>[]{new CloudBreakpointHandler(this)};
+      myXBreakpointHandlers = new XBreakpointHandler<?>[]{
+          new CloudBreakpointHandler(this, new ServerToIDEFileResolver())
+      };
     }
     return myXBreakpointHandlers;
   }
@@ -236,7 +238,6 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       }
     }.queue();
 
-    JavaUtil.initializeLocations(getXDebugSession().getProject(), true);
     // Start breakpoints refresh job on first use.
     getStateController().addListener(this);
     getStateController().startBackgroundListening();
@@ -300,10 +301,10 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     myCurrentSnapshot = target;
     if (!getXDebugSession().isStopped()) {
       getXDebugSession().positionReached(new MySuspendContext(
-              new CloudExecutionStack(getXDebugSession().getProject(),
-                      GctBundle.getString("clouddebug.stackat", df.format(snapshotTime)),
-                      target.getStackFrames(), target.getVariableTable(),
-                      target.getEvaluatedExpressions())));
+          new CloudExecutionStack(getXDebugSession().getProject(),
+              GctBundle.getString("clouddebug.stackat", df.format(snapshotTime)),
+              target.getStackFrames(), target.getVariableTable(),
+              target.getEvaluatedExpressions())));
     }
   }
 

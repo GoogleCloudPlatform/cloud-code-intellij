@@ -19,7 +19,6 @@ import com.google.api.services.clouddebugger.model.StackFrame;
 import com.google.api.services.clouddebugger.model.Variable;
 import com.intellij.openapi.project.Project;
 import com.intellij.xdebugger.frame.XExecutionStack;
-import com.intellij.xdebugger.frame.XStackFrame;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,17 +27,19 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * CloudExecutionStack represents an entire stack for a {@link com.google.api.services.debugger.model.BreakPoint} It
- * stores the individual frames, and also the variables and custom watch expressions.
+ * CloudExecutionStack represents an entire stack for a
+ * {@link com.google.api.services.clouddebugger.model.Breakpoint}. It stores the individual frames,
+ * and also the variables and custom watch expressions.
  */
 public class CloudExecutionStack extends XExecutionStack {
   private final List<CloudStackFrame> myFrames = new ArrayList<CloudStackFrame>();
 
-  public CloudExecutionStack(@NotNull Project project,
-                             @NotNull String name,
-                             @Nullable List<StackFrame> frames,
-                             @Nullable List<Variable> variableTable,
-                             @Nullable List<Variable> evaluatedExpressions) {
+  public CloudExecutionStack(
+      @NotNull Project project,
+      @NotNull String name,
+      @Nullable List<StackFrame> frames,
+      @Nullable List<Variable> variableTable,
+      @Nullable List<Variable> evaluatedExpressions) {
     super(name);
 
     if (frames != null) {
@@ -47,7 +48,8 @@ public class CloudExecutionStack extends XExecutionStack {
       }
       for (StackFrame nativeFrame : frames) {
         myFrames
-            .add(new CloudStackFrame(project, nativeFrame, variableTable, evaluatedExpressions));
+            .add(new CloudStackFrame(project, nativeFrame, variableTable, evaluatedExpressions,
+                new ServerToIDEFileResolver()));
           // We only show custom watches on the top frame.
           evaluatedExpressions = null;
       }
