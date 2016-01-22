@@ -210,7 +210,6 @@ Here set a snapshot location at the line.
             
   ![](images/snapshotlocation.png)
             
-
 This way we can see the value of the `userAgent` variable.
 
 
@@ -295,8 +294,25 @@ conditional snapshot location.
 
 ### Conditional Snapshot Locations
 
+A snapshot condition is a simple boolean Java expression 
+that tells the Cloud Debugger to take a snapshot only when it evaluates to true. 
+For example, `x > 3` or `userAgent.contains("Mozilla")`.
+You can only define one condition per snapshot location.
 
 ### Watch Expressions
+
+Sometimes the information you need to debug a problem is 
+not immediately apparent in the application's local variables and fields.
+In particular, when running on App Engine, the security manager 
+prevents you from delving too deeply into the private members of 
+system classes such as `java.util.Hashmap.` In cases like this,
+a watch expression serves as an effective temporary local variable
+to expose additional information. 
+Watch expressions can evaluate complex expressions
+and traverse object hierarchies when a snapshot is taken. 
+
+You can specify a watch expression after you have set the snapshot location. To specify the watch expression:
+
 
 ### Closing the debugger
 
