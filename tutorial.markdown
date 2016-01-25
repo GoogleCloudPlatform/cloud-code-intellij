@@ -335,6 +335,14 @@ If you're interested in variables at particular points in time,
 (e.g. on the last iteration of a loop) then you'll want to set a 
 conditional snapshot location.
 
+You can generally inspect the values of variables in your own code.
+(In this example, that's code in the `com.google.gct.tutorial package`.)
+However, due to security restrictions in the App Engine sandbox,
+you won't be able to delve as deeply into system classes such as 
+`java.util.HashMap` or `javax.servlet.http.HttpServletRequest`
+as you would in a local debugger. These restrictions are reduced,
+though not completely eliminated, when running on MVMs or GCE.
+
 
 ### Close the debugger
 
