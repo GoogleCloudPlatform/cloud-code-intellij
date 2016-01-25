@@ -222,17 +222,19 @@ You may have to wait a few seconds for this to populate.
 
   ![](images/attachtoanapplication.png)
 
+The Debug pane will open, usually at the bottom of the window.
 
 ### Set a snapshot location
 
 Once you've attached to a running application, you can set snapshot locations in the 
-source code by clicking at the line you want to snapshot in the left gutter area,
+source code. 
+
+First open the class you want to debug in the IDEA editor.
+In this case that's HelloBrowserServlet.java. 
+
+Now click the line you want to snapshot in the left gutter area,
 just as you would when setting a line breakpoint for a local application using 
 the regular IDEA debugger.
-
-The little blue circle represents the snapshot location.
-When you mouse over it, a tooltip will show you exactly where it's set.
-Clicking the blue circle a second time removes the snapshot location.
 
 Here set a snapshot location at the line.
 
@@ -240,9 +242,17 @@ Here set a snapshot location at the line.
             
   ![](images/snapshotlocation.png)
 
+The little blue circle that appears in the gutter when you click represents the snapshot location.
+When you mouse over it, a tooltip will show you exactly where it's set.
+Clicking the blue circle a second time removes the snapshot location.
+
+Once you've set a snapshot location, you will also see a pending snapshot in the lower left hand pane. In this example, it's set at line 31. 
+
 You can set snapshot locations on executable lines. 
 You cannot set snapshot locations on non-executable lines such as
 comments, declarations, and empty lines.
+You can set multiple snapshot locations at once, in one or more classes. 
+
 
 ### Run the application
 
