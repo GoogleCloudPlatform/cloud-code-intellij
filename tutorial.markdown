@@ -30,7 +30,7 @@ In order to follow along with this tutorial, you need the following software ins
 * [Apache maven](https://maven.apache.org/download.cgi) 3.1 or later
 * git
 * [Google Cloud SDK](https://cloud.google.com/sdk/)
-* Chrome browser
+* Chrome browser (since the bug we're looking for is browser specific)
 * A Google account that can deploy AppEngine apps. (Personal accounts, 
   i.e. gmail.com accounts work. Users with Google Apps for Work accounts may
   need to contact their administrator to enable GCP on their account.)
