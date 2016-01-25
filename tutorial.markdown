@@ -92,12 +92,12 @@ It is built with Maven version 3.1 or later.
 
 4. Build and test the application using `mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
 
-5. Commit your changes.
+5. Commit your changes:
 
         $ git commit -a -m "set project ID"
 
 6. Run gcloud init to initialize the Google Cloud SDK with the project ID 
-   you registered in the developer console.
+   you registered in the developer console:
 
         $ gcloud init
         ...
@@ -120,7 +120,7 @@ It is built with Maven version 3.1 or later.
         $ git remote add google https://source.developers.google.com/p/*projectname*/
 
 9.  Commit and push the source code of the application to the
-    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created.
+    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created:
 
         $ git push --all google
         Counting objects: 30, done.
