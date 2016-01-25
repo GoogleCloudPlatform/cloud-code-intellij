@@ -4,7 +4,7 @@ title: IntelliJ IDEA Google Cloud Debugger Tutorial
 
 # IntelliJ IDEA Google Cloud Debugger Tutorial
 
-**<span style="color:red">Warning: Work in Progress. Definitely incomplete and sometimes incorrect.</span>**
+**<span style="color:red">Warning: Incomplete Work in Progress.</span>**
 
 The Google Cloud Debugger enables you to capture and inspect the call stack 
 and local variables of a live application running in the cloud
@@ -232,8 +232,11 @@ Return to IDEA and you should see that a snapshot has appeared in the lower left
 Click it. The middle frame loads the stack trace and
 the right hand frame loads local variables and method arguments 
 in scope at that point in the code and their values at that point in time. 
-Fields are also available by expanding the "this" variable. Inspect 
-the `userAgent` variable in the right hand frame:
+Fields are also available by expanding the "this" variable.
+
+*TBD: screenshot*
+
+Inspect the `userAgent` variable in the right hand frame:
 
 *TBD: screenshot*
 
@@ -262,9 +265,12 @@ Now that you see what's going on, let's fix it.
 
 3. Visit the web page again:
 
-*TBD: screenshot*
+  ![](images/hellosafari.png)
 
-Success!
+Surprise! It's another bug. 
+Try using the Cloud Debugger to find it. 
+This bug is related to the first, and has a similar cause; though the fix is a little
+different. 
 
 Admittedly this is a simple example. This particular bug could 
 have been found in a locally running instance on the development server.
