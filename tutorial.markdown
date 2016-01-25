@@ -6,7 +6,7 @@ title: IntelliJ IDEA Google Cloud Debugger Tutorial
 
 **<span style="color:red">Warning: Work in Progress. Definitely incomplete and sometimes incorrect.</span>**
 
-You can use the Google Cloud Debugger to capture and inspect the call stack 
+The Google Cloud Debugger enables you to capture and inspect the call stack 
 and local variables of a live application running in the cloud
 (more specifically on [Google App Engine](https://cloud.google.com/appengine/docs), Google [Compute Engine](https://cloud.google.com/compute/), or, with some additional configuration, [Managed VMs](https://cloud.google.com/appengine/docs/managed-vms/).)
  
@@ -69,7 +69,7 @@ From inside IDEA:
 
 ## Setting up the app:
 
-For purposes of this tutorial we'll debug a simple servlet that detects the
+For purposes of this tutorial you'll debug a simple servlet that detects the
 user's browser and says "Hello Firefox", "Hello Chrome", and so forth, depending on the browser.
 You can find this code in the Github project [cloud-debugger-idea-sample](https://github.com/GoogleCloudPlatform/cloud-debugger-idea-sample). 
 It is built with Maven version 3.1 or later. 
@@ -188,9 +188,8 @@ account that can manage the application.
 
 15. Select the module in the dialog that pops up. 
 You may have to wait a few seconds for this to populate.
-There may be only one of these.
 
-*TBD: screenshot*
+  ![](images/attachtoanapplication.png)
 
 
 ### Set a snapshot location
