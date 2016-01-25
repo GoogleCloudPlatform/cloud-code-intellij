@@ -145,7 +145,7 @@ It is built with Maven version 3.1 or later.
    
 2. If not already checked, check the box for import maven projects automatically.
 
-3. Run > Edit Configurations...
+3. From the Run menu select Edit Configurations... (Run > Edit Configurations...)
 
 4. Click the + icon on the upper left hand side. Select "Cloud Debug" from the popup menu. (If this option doesn't appear, check whether the plugin is installed and activated.)
 
@@ -184,7 +184,7 @@ account that can manage the application.
 
 13. Click the OK button.
 
-14. Run > Debug 'My First Debugging Session'
+14. From the Run menu select Debug 'My First Debugging Session' (Run > Debug 'My First Debugging Session')
 
 15. Select the module in the dialog that pops up. 
 You may have to wait a few seconds for this to populate.
@@ -216,9 +216,14 @@ comments, declarations, and empty lines.
 ### Run the application
 
 Go to the browser and reload the page.
-If you the IDEA window is visible at the same time, 
+If the IDEA window is visible at the same time, 
 you'll see a brief popup saying "New snapshot received." 
-(Don't blink or you'll miss it.) 
+(Don't blink or you'll miss it. If your browser occupies your entire display,
+this popup will probably disappear before you switch back to IDEA. 
+Don't worry. It's not especially important.) 
+
+*TBD: screenshot*
+
 
 Return to IDEA and you should see that a snapshot has appeared in the lower lefthand panel:
 
@@ -228,12 +233,9 @@ Click it. The middle frame loads the stack trace and
 the right hand frame loads local variables and method arguments 
 in scope at that point in the code and their values at that point in time. 
 Fields are also available by expanding the "this" variable. Inspect 
-the ???? variable in the right hand frame:
+the `userAgent` variable in the right hand frame:
 
 *TBD: screenshot*
-
-
-  ![](images/inspectuseragent.png)
 
 Now you see that userAgent is "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36". 
 
