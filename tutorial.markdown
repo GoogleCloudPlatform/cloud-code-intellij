@@ -208,13 +208,10 @@ Here set a snapshot location at the line.
         if (userAgent != null) {
             
   ![](images/snapshotlocation.png)
-            
-This way we can see the value of the `userAgent` variable.
-
 
 You can set snapshot locations on executable lines. 
 You cannot set snapshot locations on non-executable lines such as
-comments, declarations and empty lines.
+comments, declarations, and empty lines.
 
 ### Run the application
 
