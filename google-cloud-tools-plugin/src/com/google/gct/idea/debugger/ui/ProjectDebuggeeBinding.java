@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -48,24 +49,28 @@ import javax.swing.event.TreeModelListener;
  */
 class ProjectDebuggeeBinding {
   private static final Logger LOG = Logger.getInstance(ProjectDebuggeeBinding.class);
-  private final JComboBox myDebugeeTarget;
-  private final ProjectSelector myElysiumProjectId;
-  private Debugger myCloudDebuggerClient = null;
-  private CredentialedUser myCredentialedUser = null;
-  private CloudDebugProcessState myInputState;
+  private final JComboBox moduleSelector;
+  private final ProjectSelector projectSelector;
+  private final Action okAction;
+  private Debugger cloudDebuggerClient = null;
+  private CredentialedUser credentialedUser = null;
+  private CloudDebugProcessState inputState;
 
-  public ProjectDebuggeeBinding(@NotNull ProjectSelector elysiumProjectId, @NotNull JComboBox debugeeTarget) {
-    myElysiumProjectId = elysiumProjectId;
-    myDebugeeTarget = debugeeTarget;
+  public ProjectDebuggeeBinding(@NotNull ProjectSelector projectSelector,
+                                @NotNull JComboBox moduleSelector,
+                                @NotNull Action okAction) {
+    this.projectSelector = projectSelector;
+    this.moduleSelector = moduleSelector;
+    this.okAction = okAction;
 
-    myElysiumProjectId.getDocument().addDocumentListener(new DocumentAdapter() {
+    this.projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent e) {
         refreshDebugTargetList();
       }
     });
 
-    myElysiumProjectId.addModelListener(new TreeModelListener() {
+    this.projectSelector.addModelListener(new TreeModelListener() {
       @Override
       public void treeNodesChanged(TreeModelEvent e) {
       }
@@ -87,13 +92,13 @@ class ProjectDebuggeeBinding {
 
   @NotNull
   public CloudDebugProcessState buildResult(Project project) {
-    Long number = myElysiumProjectId.getProjectNumber();
+    Long number = projectSelector.getProjectNumber();
     String projectNumberString = number != null ? number.toString() : null;
-    DebugTarget selectedItem = (DebugTarget)myDebugeeTarget.getSelectedItem();
+    DebugTarget selectedItem = (DebugTarget) moduleSelector.getSelectedItem();
     String savedDebuggeeId = selectedItem != null ? selectedItem.getId() : null;
-    String savedProjectDescription = myElysiumProjectId.getText();
+    String savedProjectDescription = projectSelector.getText();
 
-    return new CloudDebugProcessState(myCredentialedUser != null ? myCredentialedUser.getEmail() : null,
+    return new CloudDebugProcessState(credentialedUser != null ? credentialedUser.getEmail() : null,
         savedDebuggeeId,
         savedProjectDescription,
         projectNumberString,
@@ -102,27 +107,28 @@ class ProjectDebuggeeBinding {
 
   @Nullable
   public Debugger getCloudDebuggerClient() {
-    CredentialedUser credentialedUser = myElysiumProjectId.getSelectedUser();
-    if (myCredentialedUser == credentialedUser) {
-      return myCloudDebuggerClient;
+    CredentialedUser credentialedUser = projectSelector.getSelectedUser();
+    if (this.credentialedUser == credentialedUser) {
+      return cloudDebuggerClient;
     }
 
-    myCredentialedUser = credentialedUser;
-    myCloudDebuggerClient =
-        myCredentialedUser != null ? CloudDebuggerClient.getLongTimeoutClient(myCredentialedUser.getEmail()) : null;
+    this.credentialedUser = credentialedUser;
+    cloudDebuggerClient =
+        this.credentialedUser != null ? CloudDebuggerClient.getLongTimeoutClient(
+            this.credentialedUser.getEmail()) : null;
 
-    return myCloudDebuggerClient;
+    return cloudDebuggerClient;
   }
 
   @Nullable
   public CloudDebugProcessState getInputState() {
-    return myInputState;
+    return inputState;
   }
 
   public void setInputState(@Nullable CloudDebugProcessState inputState) {
-    myInputState = inputState;
-    if (myInputState != null) {
-      myElysiumProjectId.setText(myInputState.getProjectName());
+    this.inputState = inputState;
+    if (this.inputState != null) {
+      projectSelector.setText(this.inputState.getProjectName());
     }
   }
 
@@ -131,15 +137,15 @@ class ProjectDebuggeeBinding {
    */
   @SuppressWarnings("unchecked")
   private void refreshDebugTargetList() {
-    myDebugeeTarget.removeAllItems();
+    moduleSelector.removeAllItems();
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
       @Override
       public void run() {
         try {
-          if (myElysiumProjectId.getProjectNumber() != null && getCloudDebuggerClient() != null) {
+          if (projectSelector.getProjectNumber() != null && getCloudDebuggerClient() != null) {
               final ListDebuggeesResponse debuggees =
                   getCloudDebuggerClient().debuggees().list()
-                      .setProject(myElysiumProjectId.getProjectNumber().toString())
+                      .setProject(projectSelector.getProjectNumber().toString())
                       .execute();
 
             SwingUtilities.invokeLater(new Runnable() {
@@ -148,15 +154,14 @@ class ProjectDebuggeeBinding {
                 DebugTarget targetSelection = null;
 
                 if (debuggees == null || debuggees.getDebuggees() == null || debuggees.getDebuggees().isEmpty()) {
-                  myDebugeeTarget.setEnabled(false);
-                  myDebugeeTarget.addItem(GctBundle.getString("clouddebug.nomodulesfound"));
+                  disableModuleSelector();
                 }
                 else {
-                  myDebugeeTarget.setEnabled(true);
+                  moduleSelector.setEnabled(true);
                   Map<String, DebugTarget> perModuleCache = new HashMap<String, DebugTarget>();
 
                   for (Debuggee debuggee : debuggees.getDebuggees()) {
-                    DebugTarget item = new DebugTarget(debuggee, myElysiumProjectId.getText());
+                    DebugTarget item = new DebugTarget(debuggee, projectSelector.getText());
                     if (!Strings.isNullOrEmpty(item.getModule()) &&
                         !Strings.isNullOrEmpty(item.getVersion())) {
                       //If we already have an existing item for that module+version, compare the minor
@@ -167,29 +172,46 @@ class ProjectDebuggeeBinding {
                         continue;
                       }
                       if (existing != null) {
-                        myDebugeeTarget.removeItem(existing);
+                        moduleSelector.removeItem(existing);
                       }
                       perModuleCache.put(key, item);
                     }
-                    if (myInputState != null && !Strings.isNullOrEmpty(myInputState.getDebuggeeId())) {
-                      assert myInputState.getDebuggeeId() != null;
-                      if (myInputState.getDebuggeeId().equals(item.getId())) {
+                    if (inputState != null && !Strings.isNullOrEmpty(inputState.getDebuggeeId())) {
+                      if (inputState.getDebuggeeId().equals(item.getId())) {
                         targetSelection = item;
                       }
                     }
-                    myDebugeeTarget.addItem(item);
+                    moduleSelector.addItem(item);
+                    okAction.setEnabled(true);
                   }
                 }
                 if (targetSelection != null) {
-                  myDebugeeTarget.setSelectedItem(targetSelection);
+                  moduleSelector.setSelectedItem(targetSelection);
                 }
               }
             });
           }
         } catch (IOException ex) {
+          SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+              disableModuleSelector();
+            }
+          });
+
           LOG.error("Error listing debuggees from Cloud Debugger API", ex);
         }
       }
     });
+  }
+
+  @SuppressWarnings("unchecked")
+  private void disableModuleSelector() {
+    moduleSelector.setEnabled(false);
+
+    String moduleWarning = GctBundle.getString("clouddebug.selectvalidproject");
+    if(!moduleWarning.equals(moduleSelector.getSelectedItem())) {
+      moduleSelector.addItem(moduleWarning);
+    }
   }
 }

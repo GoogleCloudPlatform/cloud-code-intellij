@@ -74,7 +74,8 @@ public class CloudAttachDialog extends DialogWrapper {
 
   private final Project project;
   private final ProjectDebuggeeBinding wireup;
-  private JComboBox debuggeeTarget; // Module selector
+  private ProjectRepositoryValidator projectRepositoryValidator;
+  private JComboBox moduleSelector;
   private ProjectSelector elysiumProjectSelector; // Project combo box
   private JBLabel infoMessage;
   private String originalBranchName;
@@ -87,7 +88,8 @@ public class CloudAttachDialog extends DialogWrapper {
   private JBLabel warningHeader;
   private JBLabel warningMessage;
 
-  public CloudAttachDialog(@NotNull Project project) {
+  public CloudAttachDialog(@NotNull Project project,
+                           @VisibleForTesting ProjectDebuggeeBinding wireup) {
     super(project, true);
 
     this.project = project;
@@ -137,12 +139,13 @@ public class CloudAttachDialog extends DialogWrapper {
     }
     BasicAction.saveAll();
 
-    wireup = new ProjectDebuggeeBinding(elysiumProjectSelector, debuggeeTarget);
-    debuggeeTarget.setEnabled(false);
-    debuggeeTarget.addActionListener(new ActionListener() {
+    this.wireup = wireup == null ?
+        new ProjectDebuggeeBinding(elysiumProjectSelector, moduleSelector, getOKAction()) : wireup;
+    moduleSelector.setEnabled(false);
+    moduleSelector.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if(debuggeeTarget.isEnabled()) {
+        if(moduleSelector.isEnabled()) {
           buildResult();
           checkSyncStashState();
         }
@@ -191,14 +194,14 @@ public class CloudAttachDialog extends DialogWrapper {
           elysiumProjectSelector);
     }
 
-    if (!debuggeeTarget.isEnabled()) {
+    if (!moduleSelector.isEnabled() && moduleSelector.getItemCount() > 0) {
       return new ValidationInfo(GctBundle.getString("clouddebug.selectvalidproject"),
           elysiumProjectSelector);
     }
 
-    if (debuggeeTarget.getSelectedItem() == null) {
+    if (moduleSelector.getSelectedItem() == null && moduleSelector.getItemCount() > 0) {
       return new ValidationInfo(GctBundle.getString("clouddebug.selectvalidproject"),
-          debuggeeTarget);
+          moduleSelector);
     }
 
     return null;
@@ -219,8 +222,8 @@ public class CloudAttachDialog extends DialogWrapper {
   }
 
   @VisibleForTesting
-  JComboBox getDebuggeeTarget() {
-    return debuggeeTarget;
+  JComboBox getModuleSelector() {
+    return moduleSelector;
   }
 
   @VisibleForTesting
@@ -231,6 +234,11 @@ public class CloudAttachDialog extends DialogWrapper {
   @VisibleForTesting
   JLabel getWarningMessage() {
     return warningMessage;
+  }
+
+  @VisibleForTesting
+  void setProjectRepositoryValidator(ProjectRepositoryValidator projectRepositoryValidator) {
+    this.projectRepositoryValidator = projectRepositoryValidator;
   }
 
   private void buildResult() {
@@ -250,7 +258,10 @@ public class CloudAttachDialog extends DialogWrapper {
       LOG.error("unexpected result state during a check sync stash state");
       return;
     }
-    syncResult = new ProjectRepositoryValidator(processResultState).checkSyncStashState();
+
+    syncResult = projectRepositoryValidator == null ?
+        new ProjectRepositoryValidator(processResultState).checkSyncStashState() :
+          projectRepositoryValidator.checkSyncStashState();
 
     if (syncResult.needsStash() && syncResult.needsSync()) {
       setOKButtonText(isContinued()

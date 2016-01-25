@@ -11,6 +11,7 @@ import com.intellij.xdebugger.frame.XDebuggerTreeNodeHyperlink;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import javax.swing.Icon;
 
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class CloudExecutionStackTest {
 
