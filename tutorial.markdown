@@ -146,7 +146,7 @@ It is built with Maven version 3.1 or later.
  Aha! That's a bug. It's supposed to say "Hello Chrome" when you visit in Chrome.
  If you like, try it in Safari or Opera. In fact, it almost always says "Hello Firefox."
  If you can find a case where it doesn't say that, that would give you a big clue
- as to the bug, but it's easier to use the Cloud Debugger.
+ as to the bug; but it's easier to use the Cloud Debugger.
 
 ## Using the Debugger
 
@@ -187,14 +187,14 @@ It is built with Maven version 3.1 or later.
 
 7. Click the "Sign In" button.
 
-8. A browser window will open outside of IDEA.
+8. A browser window opens outside of IDEA.
 
 9. If you have more than one Google account logged into the browser, 
 select the one that has access to the application you want to debug. 
 If that account is not shown, click "Add Account" and login to the 
 account that can manage the application.
 
-10. You'll be asked to grant a list of permissions to IDEA. After waiting a few seconds for the button to activate, click "Allow".
+10. You are now asked to grant a list of permissions to IDEA. After waiting a few seconds for the button to activate, click "Allow".
 
   ![](images/permissions.png)
 
@@ -245,7 +245,8 @@ The little blue circle that appears in the gutter when you click represents the 
 When you mouse over it, a tooltip will show you exactly where it's set.
 Clicking the blue circle a second time removes the snapshot location.
 
-Once you've set a snapshot location, you will also see a pending snapshot in the lower left hand pane. In this example, it's set at line 31. 
+Once you've set a snapshot location, a pending snapshot appears in the lower left hand pane. 
+In this example, it's set at line 31. 
 
 You can set snapshot locations on executable lines. 
 You cannot set snapshot locations on non-executable lines such as
@@ -320,7 +321,7 @@ you see in production. Furthermore, you can configure a live
 production instance to alert you to a problem that you don't immediatley know how to reproduce. 
 For example, imagine that you knew the servlet was sending incorrect data but you didn't
 know the problem was triggered by a particular browser. This is normally accomplished with
-a conditional snapshot location, the subject we'll take up next.
+a conditional snapshot location.
 
 ####Some notes:
 
@@ -330,14 +331,14 @@ of code rather than at the beginning. That way all variables have been set and c
 be inspected. 
 
 If you're interested in variables in multiple scopes, (e.g. inside and 
-outside a loop) you'll need to set multiple snapshot locations.
+outside a loop) you need to set multiple snapshot locations.
 
 If you're interested in variables at particular points in time,
-(e.g. on the last iteration of a loop), then you'll want to set a 
+(e.g. on the last iteration of a loop), you can set a 
 conditional snapshot location.
 
 You can generally inspect the values of variables in your own code.
-(In this example, that's code in the `com.google.gct.tutorial package`.)
+(In this example, that's code in the `com.google.gct.tutorial` package.)
 However, due to security restrictions in the App Engine sandbox,
 you won't be able to delve as deeply into system classes such as 
 `java.util.HashMap` or `javax.servlet.http.HttpServletRequest`
@@ -348,7 +349,7 @@ though not completely eliminated, when running on MVMs or GCE.
 ### Close the debugger
 
 When you're finished debugging, click the red square in the upper right corner 
-of the debug pane. You'll be asked whether to continue listening for snapshots in the background:
+of the debug pane. IntelliJ asks whether to continue listening for snapshots in the background:
 
 ![](images/continuelistening.png)
 
