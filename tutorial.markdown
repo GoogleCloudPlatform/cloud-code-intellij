@@ -158,11 +158,23 @@ It is built with Maven version 3.1 or later.
    In the "Welcome to IntelliJ IDEA" window, pick "Import Project" and choose the pom.xml
    file.
    
-2. If not already checked, check the box for import maven projects automatically.
+  ![](images/choosepom.png)
+   
+2. If not already checked, check the box for "Import Maven projects automatically."
 
-3. From the Run menu select Edit Configurations... (Run > Edit Configurations...)
+  ![](images/importproject.png)
+  
+  From this point the default options in the rest of the wizard should be fine,
+  though you may need to set up a Java 1.7 SDK.
+
+3. Once IntelliJ has loaded the project, pull down the Run menu 
+   and select Edit Configurations... (Run > Edit Configurations...)
+   
+     ![](images/rundebugconfigurations.png)
 
 4. Click the + icon on the upper left hand side. Select "Cloud Debug" from the popup menu. (If this option doesn't appear, check whether the plugin is installed and activated.)
+
+
 
 5. Set the name of the configuration to "My First Debugging Session."
 
