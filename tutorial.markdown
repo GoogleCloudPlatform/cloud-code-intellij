@@ -11,9 +11,9 @@ and local variables of a live application running in the cloud
 It works much like the IntelliJ IDEA debugger you're already used to,
 and provides the same user interface, with two key differences:
 
-* The cloud debugger does not pause execution of the running application.
+* The Cloud Debugger does not pause execution of the running application.
 
-* You cannot step through an application in the cloud debugger.
+* You cannot step through an application in the Cloud Debugger.
 
 In other words, the Cloud Debugger is a *forensic* debugger, not an *interactive* debugger.
 
@@ -145,7 +145,7 @@ It is built with Maven version 3.1 or later.
  Aha! That's a bug. It's supposed to say "Hello Chrome" when you visit in Chrome.
  If you like, try it in Safari or Opera. In fact, it almost always says "Hello Firefox."
  If you can find a case where it doesn't say that, that would give you a big clue
- as to the bug, but it's easier to use the cloud debugger.
+ as to the bug, but it's easier to use the Cloud Debugger.
 
 ## Using the Debugger
 
@@ -323,7 +323,7 @@ a conditional snapshot location, the subject we'll take up next.
 
 ####Some notes:
 
-Since you can't single step through an application in the cloud debugger,
+Since you can't single step through an application in the Cloud Debugger,
 it's more common to put the snapshot location at the end of the relevant block
 of code rather than at the beginning. That way all variables have been set and can
 be inspected. 
