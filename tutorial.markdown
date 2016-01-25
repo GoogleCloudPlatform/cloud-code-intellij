@@ -65,8 +65,6 @@ From inside IDEA:
 
  ![](images/restartintellij.png)
 
-
-
 ## Setting up the app:
 
 For purposes of this tutorial you'll debug a simple servlet that detects the
@@ -75,7 +73,6 @@ You can find this code in the Github project [cloud-debugger-idea-sample](https:
 It is built with Maven version 3.1 or later. 
 
 (If you happen to spot the bug by eye before running it, pretend you don't and just read along.)
-
 
 *TODO: make this all work in IntelliJ without using the command line*
 
@@ -100,14 +97,32 @@ It is built with Maven version 3.1 or later.
 
         $ git commit -a -m "set project ID"
 
-6.  Commit and push the source code of the application to the
-    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created. 
-    *TBD: need more complete instructions here*
-    *TBD: is there a way to do this with a maven command?*
+6. Run gcloud init to initialize the Google Cloud SDK with the project ID 
+   you registered in the developer console.
 
         $ gcloud init
+        ...
+        Enter project id you would like to use:  *projectname*
+        Your current project has been set to: [*projectname*].
+        
+   Depending on local configuration, you may also have to choose a specific 
+   Google account and perform a few other initialization steps. 
+
+7. Authorize with the credential helper script. On Linux and Mac OS X:
+        
         $ git config credential.helper gcloud.sh
+        
+   On Windows:
+   
+        C:\> git config credential.helper gcloud.cmd
+        
+8. Add Cloud Source Repositories as a remote for the project:
+
         $ git remote add google https://source.developers.google.com/p/*projectname*/
+
+9.  Commit and push the source code of the application to the
+    [Cloud Source Repository](https://cloud.google.com/tools/cloud-repositories/docs/) associated with the project you just created.
+
         $ git push --all google
         Counting objects: 30, done.
         Delta compression using up to 4 threads.
@@ -119,13 +134,13 @@ It is built with Maven version 3.1 or later.
         To https://source.developers.google.com/p/hellobrowser/
            530f08f..a5e90b0  master -> master
 
-7.  Deploy your application using
+10.  Deploy your application using
     [maven](https://cloud.google.com/appengine/docs/java/tools/maven#uploading_your_app_to_production_app_engine):
 
         $ mvn appengine:update
 
 
-8. Visit the application at http://*projectname*.appspot.com/hellobrowser using Chrome. You'll see it say:
+11. Visit the application at http://*projectname*.appspot.com/hellobrowser using Chrome. You'll see it say:
  
   ![](images/HelloBrowser.png)
  
