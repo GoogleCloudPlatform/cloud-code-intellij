@@ -291,19 +291,19 @@ but I digress.)
 
 Now that you see what's going on, let's fix it.
 
-1. Change the line
+1. Change the line:
 
         if (userAgent.contains("Mozilla")) {
 
-    to
+    to:
             
         if (userAgent.contains("Firefox")) {
 
-2. Deploy your application using
+2. Deploy your application using:
 
         $ mvn appengine:update
 
-3. Visit the web page again:
+3. Visit the web page again.
 
   ![](images/hellosafari.png)
 
@@ -333,7 +333,7 @@ If you're interested in variables in multiple scopes, (e.g. inside and
 outside a loop) you'll need to set multiple snapshot locations.
 
 If you're interested in variables at particular points in time,
-(e.g. on the last iteration of a loop) then you'll want to set a 
+(e.g. on the last iteration of a loop), then you'll want to set a 
 conditional snapshot location.
 
 You can generally inspect the values of variables in your own code.
