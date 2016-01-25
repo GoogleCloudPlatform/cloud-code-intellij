@@ -172,11 +172,15 @@ It is built with Maven version 3.1 or later.
    
      ![](images/rundebugconfigurations.png)
 
-4. Click the + icon on the upper left hand side. Select "Cloud Debug" from the popup menu. (If this option doesn't appear, check whether the plugin is installed and activated.)
+4. Click the + icon on the upper left hand side. Select "Cloud Debug" from the popup menu. 
 
+     ![](images/clouddebugconfiguration.png)
 
+  (If this option doesn't appear, check whether the plugin is installed and activated.)
 
 5. Set the name of the configuration to "My First Debugging Session."
+
+     ![](images/entersessionname.png)
 
 6. At the right-hand side of the Project popup, click the little arrow. You'll see a sign in pane.
 
