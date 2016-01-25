@@ -4,8 +4,6 @@ title: IntelliJ IDEA Google Cloud Debugger Tutorial
 
 # IntelliJ IDEA Google Cloud Debugger Tutorial
 
-**<span style="color:red">Warning: Incomplete Work in Progress.</span>**
-
 The Google Cloud Debugger enables you to capture and inspect the call stack 
 and local variables of a live application running in the cloud
 (more specifically on [Google App Engine](https://cloud.google.com/appengine/docs), Google [Compute Engine](https://cloud.google.com/compute/), or, with some additional configuration, [Managed VMs](https://cloud.google.com/appengine/docs/managed-vms/).)
@@ -263,23 +261,23 @@ you'll see a brief popup saying "New snapshot received."
 this popup will probably disappear before you switch back to IDEA. 
 Don't worry. It's not especially important.) 
 
-*TBD: screenshot*
+Return to IDEA and you should see that the snapshot in the lower lefthand panel
+is no longer pending:
 
+  ![](images/receivedsnapshot.png)
 
-Return to IDEA and you should see that a snapshot has appeared in the lower lefthand panel:
-
-*TBD: screenshot*
-
-Click it. The middle frame loads the stack trace and
-the right hand frame loads local variables and method arguments 
+Click it. The bottom middle frame loads the stack trace and
+the bottom right hand frame loads local variables and method arguments 
 in scope at that point in the code and their values at that point in time. 
 Fields are also available by expanding the "this" variable.
 
-*TBD: screenshot*
+  ![](images/expandedsnapshot.png)
 
-Inspect the `userAgent` variable in the right hand frame:
+Inspect the `userAgent` variable in the right hand frame. You 
+can either make the frame wider or use the context menu and select
+"Inspect..."
 
-*TBD: screenshot*
+  ![](images/inspectvariable.png)
 
 Now you see that userAgent is "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36". 
 
