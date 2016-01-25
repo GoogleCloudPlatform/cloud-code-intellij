@@ -272,7 +272,7 @@ Try using the Cloud Debugger to find it.
 This bug is related to the first, and has a similar cause; though the fix is a little
 different. 
 
-Admittedly this is a simple example. This particular bug could 
+Admittedly this is a simple example. These particular bugs could 
 have been found in a locally running instance on the development server.
 However, in more complex applications that interact with backend data stores and 
 other live network services, local tests may not be able to reproduce the exact problems
@@ -296,14 +296,29 @@ If you're interested in variables at particular points in time,
 (e.g. on the last iteration of a loop) then you'll want to set a 
 conditional snapshot location.
 
-### Conditional Snapshot Locations
+
+### Close the debugger
+
+When you're finished debugging, click the red square in the upper right corner 
+of the debug pane. You'll be asked whether to continue listening for snapshots in the background:
+
+![](images/continuelistening.png)
+
+
+If you continue listening, then additional snapshots will be delivered to
+IDEA and displayed in the Debug panel as your application executes.
+
+### Advanced features
+
+
+#### Conditional Snapshot Locations
 
 A snapshot condition is a simple boolean Java expression 
 that tells the Cloud Debugger to take a snapshot only when it evaluates to true. 
 For example, `x > 3` or `userAgent.contains("Mozilla")`.
 You can only define one condition per snapshot location.
 
-### Watch Expressions
+#### Watch Expressions
 
 Sometimes the information you need to debug a problem is 
 not immediately apparent in the application's local variables and fields.
@@ -318,15 +333,6 @@ and traverse object hierarchies when a snapshot is taken.
 You can specify a watch expression after you have set the snapshot location. To specify the watch expression:
 
 
-### Closing the debugger
-
-When you're finished debugging, click the red square in the upper right corner 
-of the debug pane. You'll be asked whether to continue listening for snapshots in the background:
-
-![](images/continuelistening.png)
-
-
-If you choose to continue listening, then ????.
 
 
 
