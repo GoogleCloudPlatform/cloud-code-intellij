@@ -63,7 +63,7 @@ From inside IDEA:
 
  ![](images/restartintellij.png)
 
-## Setting up the app:
+## Setting up the app
 
 For purposes of this tutorial you'll debug a simple servlet that detects the
 user's browser and says "Hello Firefox", "Hello Chrome", and so forth, depending on the browser.
