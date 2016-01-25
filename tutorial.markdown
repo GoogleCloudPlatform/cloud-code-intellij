@@ -84,7 +84,8 @@ It is built with Maven version 3.1 or later.
         Resolving deltas: 100% (30/30), done.
 
 
-2. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. In this tutorial, I use hellobrowser, but you'll need to choose something else since that's now taken.
+2. Register your project on the [Google Developer's Console](https://console.developers.google.com/). You'll need to pick a project name. The sample code uses the project id "hellobrowser," 
+   but you'll need to choose something else since that's now taken.
 
 3. In your local copy of the source, open the file pom.xml in a text editor and change 
    the `artifactId` and  `app.id` elements from `hellobrowser` to the project name you registered in the developer console.
