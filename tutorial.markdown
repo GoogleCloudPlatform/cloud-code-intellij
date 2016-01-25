@@ -88,7 +88,7 @@ It is built with Maven version 3.1 or later.
    but you'll need to choose something else since that's now taken.
 
 3. In your local copy of the source, open the file pom.xml in a text editor and change 
-   the `artifactId` and  `app.id` elements from `hellobrowser` to the project name you registered in the developer console.
+   the `artifactId` and  `app.id` elements from `hellobrowser` to the project name you registered in the Developer Console.
 
 4. Build and test the application using `mvn clean install`. Note that all unit tests pass. (And if you're feeling really ambitious, check the code coverage.)
 
@@ -97,7 +97,7 @@ It is built with Maven version 3.1 or later.
         $ git commit -a -m "set project ID"
 
 6. Run gcloud init to initialize the Google Cloud SDK with the project ID 
-   you registered in the developer console:
+   you registered in the Developer Console:
 
         $ gcloud init
         ...
