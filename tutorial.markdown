@@ -318,7 +318,7 @@ have been found in a locally running instance on the development server.
 However, in more complex applications that interact with backend data stores and 
 other live network services, local tests may not be able to reproduce the exact problems
 you see in production. Furthermore, you can configure a live
-production instance to alert you to a problem that you don't immediatley know how to reproduce. 
+production instance to alert you to a problem that you don't immediately know how to reproduce. 
 For example, imagine that you knew the servlet was sending incorrect data but you didn't
 know the problem was triggered by a particular browser. This is normally accomplished with
 a conditional snapshot location.
