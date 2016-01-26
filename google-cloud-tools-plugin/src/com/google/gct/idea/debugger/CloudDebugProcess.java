@@ -15,9 +15,11 @@
  */
 package com.google.gct.idea.debugger;
 
+import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
+import com.google.gct.idea.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.gct.idea.debugger.actions.CloudDebugHelpAction;
 import com.google.gct.idea.debugger.ui.CloudDebugHistoricalSnapshots;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
@@ -55,6 +57,7 @@ import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XBreakpointManager;
+import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XSuspendContext;
@@ -173,6 +176,11 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       };
     }
     return myXBreakpointHandlers;
+  }
+
+  @VisibleForTesting
+  void setBreakpointHandler(CloudBreakpointHandler handler) {
+    myXBreakpointHandlers = new XBreakpointHandler<?>[]{handler};
   }
 
   /**
@@ -342,13 +350,27 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
           if (breakpoint.getStatus() != null &&
               breakpoint.getStatus().getIsError() == Boolean.TRUE &&
               cloudBreakpoint instanceof CloudLineBreakpointType.CloudLineBreakpoint) {
-            ((CloudLineBreakpointType.CloudLineBreakpoint)cloudBreakpoint)
+            CloudLineBreakpoint cloudLineBreakpoint = (CloudLineBreakpoint) cloudBreakpoint;
+            cloudLineBreakpoint
               .setErrorMessage(BreakpointUtil.getUserErrorMessage(breakpoint.getStatus()));
-            cloudBreakpoint.updateUI();
+            updateBreakpointPresentation(cloudLineBreakpoint);
           }
         }
       }
     }
+  }
+
+  void updateBreakpointPresentation(CloudLineBreakpoint cloudLineBreakpoint) {
+    final XBreakpointManager manager = XDebuggerManager
+        .getInstance(getXDebugSession().getProject()).getBreakpointManager();
+    manager.updateBreakpointPresentation(
+        (XLineBreakpoint<?>) cloudLineBreakpoint.getXBreakpoint(),
+        cloudLineBreakpoint.getSetIcon(areBreakpointsMuted()),
+        cloudLineBreakpoint.getErrorMessage());
+  }
+
+  private boolean areBreakpointsMuted() {
+    return getXDebugSession() != null && getXDebugSession().areBreakpointsMuted();
   }
 
   @Override
@@ -450,12 +472,12 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
         (CloudLineBreakpointType.CloudLineBreakpoint)cloudBreakpoint;
       cloudLineBreakpoint.setVerified(false);
       cloudLineBreakpoint.setErrorMessage(null);
-      cloudLineBreakpoint.updateUI();
+      updateBreakpointPresentation(cloudLineBreakpoint);
     }
   }
 
   // These are used to hide unsupported actions.
-  static interface XDebuggerActions {
+  interface XDebuggerActions {
     @NonNls String EVALUATE_EXPRESSION = "EvaluateExpression";
     @NonNls String FORCE_STEP_INTO = "ForceStepInto";
     @NonNls String MUTE_BREAKPOINTS = "XDebugger.MuteBreakpoints";

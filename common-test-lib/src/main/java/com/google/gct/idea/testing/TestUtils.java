@@ -1,7 +1,6 @@
 package com.google.gct.idea.testing;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -14,6 +13,7 @@ import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.fileTypes.FileTypeRegistry;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Getter;
 import com.intellij.openapi.vfs.encoding.EncodingManager;
 import com.intellij.openapi.vfs.encoding.EncodingManagerImpl;
@@ -53,6 +53,8 @@ import java.util.concurrent.Future;
  */
 public class TestUtils {
 
+  private static Disposable parentDisposableForCleanup;
+
   @NotNull
   public static Project mockProject() {
     return mockProject(null);
@@ -81,10 +83,10 @@ public class TestUtils {
 
   // For every #createMockApplication there needs to be a corresponding call to
   // #disposeMockApplication when the test is complete
-  public static void createMockApplication() {
-    Disposable disposable = Mockito.mock(Disposable.class);
+  public static Disposable createMockApplication() {
+    Disposable parentDisposable = getParentDisposableForCleanup();
 
-    final PluginMockApplication instance = new PluginMockApplication(disposable);
+    final PluginMockApplication instance = new PluginMockApplication(parentDisposable);
 
     ApplicationManager.setApplication(instance,
         new Getter<FileTypeRegistry>() {
@@ -93,24 +95,27 @@ public class TestUtils {
             return FileTypeManager.getInstance();
           }
         },
-        disposable);
+        parentDisposable);
     instance.registerService(EncodingManager.class, EncodingManagerImpl.class);
+    return parentDisposable;
   }
 
   public static void disposeMockApplication() {
-    // Disposer.dispose(MockApplicationEx) does not do anything and setApplication takes a
-    // @NotNull, so we just set the application to an empty mock. That should cause all future
-    // tests to fail if they need an Application but did not set one up.
-    Disposable disposable = Mockito.mock(Disposable.class);
-    final MockApplicationEx instance = new MockApplicationEx(disposable);
-    ApplicationManager.setApplication(instance,
-        new Getter<FileTypeRegistry>() {
-          @Override
-          public FileTypeRegistry get() {
-            return FileTypeManager.getInstance();
-          }
-        },
-        disposable);
+    // Originally the application was replaced with an empty mock application to make any subsequent
+    // test cases fail that do not setup their own application. However having quite many legacy
+    // tests that do rely on the application object created by IntelliJ when starting the tests
+    // we'll just restore the application used previously this test.
+    Disposer.dispose(getParentDisposableForCleanup());
+    parentDisposableForCleanup = null;
+  }
+
+  private static Disposable getParentDisposableForCleanup() {
+    synchronized (BasePluginTestCase.class) {
+      if (parentDisposableForCleanup == null) {
+        parentDisposableForCleanup = Mockito.mock(Disposable.class);
+      }
+      return parentDisposableForCleanup;
+    }
   }
 
   @NotNull
@@ -119,7 +124,7 @@ public class TestUtils {
     container = container != null
         ? container
         : new DefaultPicoContainer();
-    return new MockProject(container, Mockito.mock(Disposable.class));
+    return new MockProject(container, getParentDisposableForCleanup());
   }
 
   public static void assertIsSerializable(@NotNull Serializable object) {
