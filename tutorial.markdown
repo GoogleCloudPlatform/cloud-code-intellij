@@ -369,6 +369,12 @@ that tells the Cloud Debugger to take a snapshot only when it evaluates to true.
 For example, `x > 3` or `userAgent.contains("Mozilla")`.
 You can only define one condition per snapshot location.
 
+To set a condition, right click on the blue circle indicating the snapshot location
+and fill in a boolean expression that is valid at that line.
+
+![](images/conditionalsnapshotlocation.png)
+
+
 #### Watch Expressions
 
 Sometimes the information you need to debug a problem is 
