@@ -17,9 +17,20 @@ package com.google.gct.login.ui;
 
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
+
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
+
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.util.LinkedHashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -32,23 +43,13 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import java.awt.BorderLayout;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.util.LinkedHashMap;
-
 /**
  * The Google Login Panel that displays the currently logged in users and buttons to
  * add a new user and sign out a logged in user.
  */
 public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListener {
   private static final String PLAY_CONSOLE_URL = "https://play.google.com/apps/publish/#ProfilePlace";
-  private static final String CLOUD_CONSOLE_URL = "https://console.developers.google.com/accountsettings";
+  private static final String CLOUD_CONSOLE_URL = "https://console.developers.google.com/";
   private static final String LEARN_MORE_URL = "https://developers.google.com/cloud/devtools/android_studio_templates/";
   private static final String ADD_ACCOUNT = "Add Account";
   private static final String SIGN_IN = "Sign In";
