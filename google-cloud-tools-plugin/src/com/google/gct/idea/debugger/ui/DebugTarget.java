@@ -26,57 +26,57 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 /**
- * The class models out the details for a target dubuggable module.
+ * The class models out the details for a target debuggable module.
  */
 class DebugTarget {
   private static final Logger LOG = Logger.getInstance(DebugTarget.class);
   private static final String MODULE = "module";
 
-  private final Debuggee myDebuggee;
-  private String myDescription;
-  private long myMinorVersion = 0;
-  private String myModule;
-  private String myVersion;
+  private final Debuggee debuggee;
+  private String description;
+  private long minorVersion = 0;
+  private String module;
+  private String version;
 
   public DebugTarget(@NotNull Debuggee debuggee, @NotNull String projectName) {
-    myDebuggee = debuggee;
-    if (myDebuggee.getLabels() != null) {
-      myDescription = "";
-      myModule = "";
-      myVersion = "";
+    this.debuggee = debuggee;
+    if (this.debuggee.getLabels() != null) {
+      description = "";
+      module = "";
+      version = "";
       String minorVersion = "";
 
       //Get the module name, major version and minor version strings.
-      for (Map.Entry<String, String> entry : myDebuggee.getLabels().entrySet()) {
+      for (Map.Entry<String, String> entry : this.debuggee.getLabels().entrySet()) {
         if (entry.getKey().equalsIgnoreCase(MODULE)) {
-          myModule = entry.getValue();
+          module = entry.getValue();
         }
         else if (entry.getKey().equalsIgnoreCase("minorversion")) {
           minorVersion = entry.getValue();
         }
         else if (entry.getKey().equalsIgnoreCase("version")) {
-          myVersion = entry.getValue();
+          version = entry.getValue();
         }
         else {
           //This is fallback logic where we dump the labels verbatim if they
           //change from underneath us.
-          myDescription += String.format("%s:%s", entry.getKey(), entry.getValue());
+          description += String.format("%s:%s", entry.getKey(), entry.getValue());
         }
       }
 
       //Build a description from the strings.
-      if (!Strings.isNullOrEmpty(myModule)) {
-        myDescription = GctBundle.getString("clouddebug.version.with.module.format",
-            myModule, myVersion);
+      if (!Strings.isNullOrEmpty(module)) {
+        description = GctBundle.getString("clouddebug.version.with.module.format",
+            module, version);
       }
-      else if (!Strings.isNullOrEmpty(myVersion)) {
-        myDescription = GctBundle.getString("clouddebug.versionformat", myVersion);
+      else if (!Strings.isNullOrEmpty(version)) {
+        description = GctBundle.getString("clouddebug.versionformat", version);
       }
 
       //Record the minor version.  We only show the latest minor version.
       try {
         if (!Strings.isNullOrEmpty(minorVersion)) {
-          myMinorVersion = Long.parseLong(minorVersion);
+          this.minorVersion = Long.parseLong(minorVersion);
         }
       }
       catch(NumberFormatException ex) {
@@ -86,34 +86,34 @@ class DebugTarget {
 
     //Finally if nothing worked (maybe labels aren't enabled?), we fall
     //back to the old logic of using description with the project name stripped out.
-    if (Strings.isNullOrEmpty(myDescription)) {
-      myDescription = myDebuggee.getDescription();
-      if (myDescription != null &&
+    if (Strings.isNullOrEmpty(description)) {
+      description = this.debuggee.getDescription();
+      if (description != null &&
           !Strings.isNullOrEmpty(projectName) &&
-          myDescription.startsWith(projectName + "-")) {
-        myDescription = myDescription.substring(projectName.length() + 1);
+          description.startsWith(projectName + "-")) {
+        description = description.substring(projectName.length() + 1);
       }
     }
   }
 
   public String getId() {
-    return myDebuggee.getId();
+    return debuggee.getId();
   }
 
   @Override
   public String toString() {
-    return myDescription;
+    return description;
   }
 
   public long getMinorVersion() {
-    return myMinorVersion;
+    return minorVersion;
   }
 
   public String getModule() {
-    return myModule;
+    return module;
   }
 
   public String getVersion() {
-    return myVersion;
+    return version;
   }
 }

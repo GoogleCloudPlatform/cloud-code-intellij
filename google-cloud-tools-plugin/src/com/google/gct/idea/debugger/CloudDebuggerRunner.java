@@ -101,7 +101,7 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
             }
 
             CloudDebugProcessState state = processState;
-            CloudAttachDialog attachDialog = new CloudAttachDialog(session.getProject());
+            CloudAttachDialog attachDialog = new CloudAttachDialog(session.getProject(), null);
             attachDialog.setInputState(state);
             DialogManager.show(attachDialog);
             state = attachDialog.getResultState();
