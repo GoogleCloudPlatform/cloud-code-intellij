@@ -18,7 +18,7 @@ and provides the same user interface, with two key differences:
 In other words, the Cloud Debugger is a *forensic* debugger, not an *interactive* debugger.
 
 The Cloud Debugger is enabled automatically for Java 
-applications running on App Engine and MVMs. On GCE, you'll need to 
+applications running on App Engine and Managed VMs. On GCE, you'll need to 
 [turn it on by running a bootstrap script](https://cloud.google.com/tools/cloud-debugger/setting-up-on-compute-engine#enable_the_cloud_debugger_agent).
 
 ## Prerequisites
@@ -343,7 +343,7 @@ However, due to security restrictions in the App Engine sandbox,
 you won't be able to delve as deeply into system classes such as 
 `java.util.HashMap` or `javax.servlet.http.HttpServletRequest`
 as you would in a local debugger. These restrictions are reduced,
-though not completely eliminated, when running on MVMs or GCE.
+though not completely eliminated, when running on Managed VMs or GCE.
 
 
 ### Close the debugger
