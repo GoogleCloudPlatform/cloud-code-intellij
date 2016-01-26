@@ -294,5 +294,9 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     public void setVerified(boolean isVerified) {
       myIsVerified = isVerified;
     }
+
+    public boolean isVerified() {
+      return myIsVerified;
+    }
   }
 }

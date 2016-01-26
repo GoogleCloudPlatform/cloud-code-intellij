@@ -25,6 +25,7 @@ dependencies {
     compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
     compile files('lib/google-api-services-source.jar')
 
+    testCompile(project(':common-test-lib'))
     testRuntime files('../google-account-plugin/lib/google-gct-login-context-ij-pg.jar')
 }
 

@@ -15,8 +15,6 @@ package com.google.gct.idea.testing;
  * limitations under the License.
  */
 
-import static org.mockito.Mockito.mock;
-
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.DefaultPluginDescriptor;
@@ -45,10 +43,11 @@ public class BasePluginTestCase {
 
   @Before
   public final void setup() {
-    TestUtils.createMockApplication();
+    Disposable disposableParent = TestUtils.createMockApplication();
     applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
     project = TestUtils.mockProject(applicationContainer);
+    Extensions.cleanRootArea(disposableParent);
     extensionsArea = (ExtensionsAreaImpl) Extensions.getRootArea();
   }
 
@@ -62,7 +61,7 @@ public class BasePluginTestCase {
   /**
    * Register your extenstion points for test here!
    */
-  protected <T> ExtensionPointImpl<T> registerExtensionPoint(@NotNull ExtensionPointName<T> name,
+  protected <N, T extends N> ExtensionPointImpl<T> registerExtensionPoint(@NotNull ExtensionPointName<N> name,
       @NotNull Class<T> type) {
     ExtensionPointImpl<T> extensionPoint = new ExtensionPointImpl<T>(
         name.getName(),
@@ -80,7 +79,6 @@ public class BasePluginTestCase {
   @After
   public final void tearDown() {
     TestUtils.disposeMockApplication();
-    Extensions.cleanRootArea(mock(Disposable.class));;
   }
 
   public final Project getProject() {

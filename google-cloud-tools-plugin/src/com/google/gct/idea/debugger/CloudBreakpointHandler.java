@@ -70,7 +70,8 @@ import javax.swing.SwingUtilities;
  */
 public class CloudBreakpointHandler
     extends XBreakpointHandler<XLineBreakpoint<CloudLineBreakpointProperties>> {
-  private static final Key<String> CLOUD_ID = Key.create("CloudId");
+  public static final Key<String> CLOUD_ID = Key.create("CloudId");
+
   private static final Logger LOG = Logger.getInstance(CloudBreakpointHandler.class);
   private final Map<String, XBreakpoint> myIdeBreakpoints = new ConcurrentHashMap<String, XBreakpoint>();
   private final CloudDebugProcess myProcess;
@@ -187,7 +188,7 @@ public class CloudBreakpointHandler
               (CloudLineBreakpointType.CloudLineBreakpoint) cloudIdeBreakpoint;
           cloudIdeLineBreakpoint.setVerified(true);
           cloudIdeLineBreakpoint.setErrorMessage(null);
-          cloudIdeLineBreakpoint.updateUI();
+          myProcess.updateBreakpointPresentation(cloudIdeLineBreakpoint);
         }
         continue;
       }
@@ -226,41 +227,14 @@ public class CloudBreakpointHandler
       final CloudLineBreakpointProperties properties = new CloudLineBreakpointProperties();
       properties.setCreatedByServer(true);
       addedBreakpoint = true;
-      ApplicationManager.getApplication().runWriteAction(new Runnable() {
-        @Override
-        public void run() {
-          XLineBreakpoint<CloudLineBreakpointProperties> newXIdeBreakpoint =
-            manager.addLineBreakpoint(
-                CloudLineBreakpointType.getInstance(), file.getUrl(), line, properties);
-
-          newXIdeBreakpoint.putUserData(CLOUD_ID, serverBreakpoint.getId());
-          myIdeBreakpoints.put(serverBreakpoint.getId(), newXIdeBreakpoint);
-
-          //condition, watches
-          if (!Strings.isNullOrEmpty(serverBreakpoint.getCondition())) {
-            newXIdeBreakpoint.setCondition(serverBreakpoint.getCondition());
-          }
-
-          if (serverBreakpoint.getExpressions() != null
-              && serverBreakpoint.getExpressions().size() > 0) {
-            newXIdeBreakpoint.getProperties().setWatchExpressions(
-              serverBreakpoint.getExpressions().toArray(
-                  new String[serverBreakpoint.getExpressions().size()]));
-          }
-
-          // after this, changes in the UI will cause a re-register on the server.
-          newXIdeBreakpoint.getProperties().setCreatedByServer(false);
-          com.intellij.debugger.ui.breakpoints.Breakpoint cloudIdeBreakpoint =
-            BreakpointManager.getJavaBreakpoint(newXIdeBreakpoint);
-          if (cloudIdeBreakpoint instanceof CloudLineBreakpointType.CloudLineBreakpoint) {
-            CloudLineBreakpointType.CloudLineBreakpoint cloudIdeLineBreakpoint =
-              (CloudLineBreakpointType.CloudLineBreakpoint)cloudIdeBreakpoint;
-            cloudIdeLineBreakpoint.setVerified(true);
-            cloudIdeLineBreakpoint.setErrorMessage(null);
-            cloudIdeLineBreakpoint.updateUI();
-          }
-        }
-      });
+      ApplicationManager.getApplication()
+          .runWriteAction(new DoUpdateIdeWithBreakpoint(manager,
+                                                            file,
+                                                            line,
+                                                            properties,
+                                                            serverBreakpoint,
+                                                            myIdeBreakpoints,
+                                                            myProcess));
     }
 
     if (addedBreakpoint) {
@@ -400,12 +374,13 @@ public class CloudBreakpointHandler
                     // Mark as added so we don't add it again.
                     xIdeBreakpoint.getProperties().setAddedOnServer(true);
                     cloudIdeLineBreakpoint.setErrorMessage(null);
+                    myProcess.updateBreakpointPresentation(cloudIdeLineBreakpoint);
                   }
                 } else {
                   // TODO(joaomartins): Why couldn't the breakpoint be set? Improve this message.
                   cloudIdeLineBreakpoint.setErrorMessage(GctBundle.getString("clouddebug.errorset"));
+                  myProcess.updateBreakpointPresentation(cloudIdeLineBreakpoint);
                 }
-                cloudIdeLineBreakpoint.updateUI();
                 if (!Strings.isNullOrEmpty(id)) {
                   xIdeBreakpoint.getProperties().setDisabledByServer(false);
                   String oldId = xIdeBreakpoint.getUserData(CLOUD_ID);
@@ -429,6 +404,7 @@ public class CloudBreakpointHandler
           @Override
           public void onError(String errorMessage) {
             cloudIdeLineBreakpoint.setErrorMessage(errorMessage);
+            myProcess.updateBreakpointPresentation(cloudIdeLineBreakpoint);
           }
         });
   }
