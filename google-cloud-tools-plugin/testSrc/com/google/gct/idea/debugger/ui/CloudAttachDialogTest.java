@@ -33,6 +33,7 @@ import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.ui.components.JBCheckBox;
 
 import java.util.LinkedHashMap;
 
@@ -52,6 +53,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   private ProjectSelector projectSelector;
   private ProjectDebuggeeBinding binding;
   private JComboBox moduleSelector;
+  private JBCheckBox syncStashCheckbox;
   private JLabel warningHeader;
   private JLabel warningMessage;
 
@@ -106,7 +108,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     when(binding.buildResult(any(Project.class))).thenReturn(new CloudDebugProcessState());
 
     ProjectRepositoryValidator repositoryValidator = mock(ProjectRepositoryValidator.class);
-    SyncResult syncResult = mockDebuggableSyncResult();
+    SyncResult syncResult = mockSyncResult(false, true);
     when(repositoryValidator.checkSyncStashState()).thenReturn(syncResult);
 
     CloudAttachDialog dialog = initDialog();
@@ -120,16 +122,18 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     assertFalse(warningMessage.isVisible());
     assertFalse(warningHeader.isVisible());
 
+    assertFalse(syncStashCheckbox.isVisible());
+
     assertTrue(moduleSelector.isEnabled());
 
     dialog.close(0);
   }
 
   /**
-   * Issue #309 - if there is no module loaded (including no default module)
+   * If there is no module loaded (including no default module)
    * then this indicates that the async module loading is still in progress. We do not
-   * want to display an error to the user until the thread completes is complete to avoid
-   * the flashing error message
+   * want to display an error to the user until the thread completes to avoid
+   * flashing error messages
    */
   public void testUnknownProjectSelected() {
     CloudAttachDialog dialog = initDialog();
@@ -145,12 +149,54 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     dialog.close(0);
   }
 
+  /**
+   * After selecting a module that requires sync/stash, any subsequent module that is
+   * selected that has no remote repository is shown the sync/stash checkbox regardless of its state.
+   * The visibility of this option needs to be properly reset.
+   *
+   */
+  public void testSyncStashReset() {
+    mockLoggedInUser();
+
+    binding = mock(ProjectDebuggeeBinding.class);
+    when(binding.buildResult(any(Project.class))).thenReturn(new CloudDebugProcessState());
+
+    // Step 1 - select a debuggable module that requires stashing
+    // The stash checkbox should be visible to the user
+
+    boolean needsStash = true;
+    boolean hasRemoteRepository = true;
+    ProjectRepositoryValidator repositoryValidator = mock(ProjectRepositoryValidator.class);
+    SyncResult syncResult = mockSyncResult(needsStash, hasRemoteRepository);
+    when(repositoryValidator.checkSyncStashState()).thenReturn(syncResult);
+
+    CloudAttachDialog dialog = initDialog();
+    dialog.setProjectRepositoryValidator(repositoryValidator);
+    selectProjectWithDebuggableModules();
+
+    assertTrue(syncStashCheckbox.isVisible());
+
+    // Step 2 - select a project with no remote repo that does NOT require stashing
+    // The stash checkbox should now be hidden from the user
+
+    needsStash = false;
+    hasRemoteRepository = false;
+    syncResult = mockSyncResult(needsStash, hasRemoteRepository);
+    when(repositoryValidator.checkSyncStashState()).thenReturn(syncResult);
+    selectEmptyProject();
+
+    assertFalse(syncStashCheckbox.isVisible());
+
+    dialog.close(0);
+  }
+
   private CloudAttachDialog initDialog() {
     CloudAttachDialog dialog = new CloudAttachDialog(this.getProject(), binding);
     projectSelector = dialog.getElysiumProjectSelector();
     moduleSelector = dialog.getModuleSelector();
     warningHeader = dialog.getWarningHeader();
     warningMessage = dialog.getWarningMessage();
+    syncStashCheckbox = dialog.getSyncStashCheckbox();
 
     return dialog;
   }
@@ -158,6 +204,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   @SuppressWarnings("unchecked")
   private void selectEmptyProject() {
     projectSelector.setText("emptyProject");
+    moduleSelector.removeAllItems();
     moduleSelector.setEnabled(false);
     moduleSelector.addItem(NO_MODULES_WARNING);
   }
@@ -166,6 +213,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   private void selectProjectWithDebuggableModules() {
     String projectName = "projectWithDebuggableModules";
     projectSelector.setText(projectName);
+    moduleSelector.removeAllItems();
     moduleSelector.setEnabled(true);
 
     DebugTarget debugTarget = new DebugTarget(new Debuggee(), projectName);
@@ -206,12 +254,12 @@ public class CloudAttachDialogTest extends PlatformTestCase {
    * Creates a mock sync result representing a debuggable module selection
    * that doesn't need stash or sync
    */
-  private SyncResult mockDebuggableSyncResult() {
+  private SyncResult mockSyncResult(boolean needsStash, boolean hasRemoteRepository) {
     SyncResult syncResult = mock(SyncResult.class);
-    when(syncResult.needsStash()).thenReturn(false);
+    when(syncResult.needsStash()).thenReturn(needsStash);
     when(syncResult.needsSync()).thenReturn(false);
     when(syncResult.getTargetSyncSHA()).thenReturn(null);
-    when(syncResult.hasRemoteRepository()).thenReturn(true);
+    when(syncResult.hasRemoteRepository()).thenReturn(hasRemoteRepository);
 
     return syncResult;
   }

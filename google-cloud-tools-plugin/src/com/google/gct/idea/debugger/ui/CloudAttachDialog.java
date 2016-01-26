@@ -97,6 +97,7 @@ public class CloudAttachDialog extends DialogWrapper {
     initValidation();
     setTitle(GctBundle.getString("clouddebug.attachtitle"));
     setOKButtonText(GctBundle.getString("clouddebug.attach"));
+    infoMessage.setVisible(true);
     syncStashCheckbox.setVisible(false);
     syncStashCheckbox.addActionListener(new ActionListener() {
       @Override
@@ -104,7 +105,6 @@ public class CloudAttachDialog extends DialogWrapper {
         if (syncStashCheckbox.isVisible()) {
           warningHeader.setVisible(!syncStashCheckbox.isSelected());
           warningMessage.setVisible(!syncStashCheckbox.isSelected());
-          infoMessage.setVisible(syncStashCheckbox.isSelected());
           if (syncStashCheckbox.isSelected()) {
             setOKButtonText(isContinued()
                             ? GctBundle.getString("clouddebug.continuesession")
@@ -237,6 +237,11 @@ public class CloudAttachDialog extends DialogWrapper {
   }
 
   @VisibleForTesting
+  JBCheckBox getSyncStashCheckbox() {
+    return syncStashCheckbox;
+  }
+
+  @VisibleForTesting
   void setProjectRepositoryValidator(ProjectRepositoryValidator projectRepositoryValidator) {
     this.projectRepositoryValidator = projectRepositoryValidator;
   }
@@ -263,6 +268,12 @@ public class CloudAttachDialog extends DialogWrapper {
         new ProjectRepositoryValidator(processResultState).checkSyncStashState() :
           projectRepositoryValidator.checkSyncStashState();
 
+    // reset state
+    syncStashCheckbox.setVisible(false);
+    syncStashCheckbox.setSelected(false);
+    warningHeader.setVisible(false);
+    warningMessage.setVisible(false);
+
     if (syncResult.needsStash() && syncResult.needsSync()) {
       setOKButtonText(isContinued()
           ? GctBundle.getString("clouddebug.continuesession")
@@ -272,9 +283,6 @@ public class CloudAttachDialog extends DialogWrapper {
       syncStashCheckbox.setText(
           GctBundle.getString("clouddebug.stash.local.changes.and.sync", syncResult.getTargetSyncSHA().substring(0, 7)));
       syncStashCheckbox.setSelected(true);
-      warningHeader.setVisible(false);
-      warningMessage.setVisible(false);
-      infoMessage.setVisible(true);
     }
     else if (syncResult.needsStash()) {
       setOKButtonText(isContinued()
@@ -283,9 +291,6 @@ public class CloudAttachDialog extends DialogWrapper {
       syncStashCheckbox.setVisible(true);
       syncStashCheckbox.setText(GctBundle.getString("clouddebug.stashbuttontext"));
       syncStashCheckbox.setSelected(true);
-      warningHeader.setVisible(false);
-      warningMessage.setVisible(false);
-      infoMessage.setVisible(true);
     }
     else if (syncResult.needsSync() && syncResult.getTargetSyncSHA() == null) {
       setOKButtonText(isContinued()
@@ -293,7 +298,6 @@ public class CloudAttachDialog extends DialogWrapper {
               : GctBundle.getString("clouddebug.attach.anyway"));
       warningHeader.setVisible(true);
       warningMessage.setVisible(true);
-      infoMessage.setVisible(true);
       warningMessage.setText(GctBundle.getString("clouddebug.no.matching.sha"));
     }
     else if (syncResult.needsSync()) {
@@ -304,9 +308,6 @@ public class CloudAttachDialog extends DialogWrapper {
       assert syncResult.getTargetSyncSHA() != null;
       syncStashCheckbox.setText("Sync to " + syncResult.getTargetSyncSHA().substring(0, 7));
       syncStashCheckbox.setSelected(true);
-      warningHeader.setVisible(false);
-      warningMessage.setVisible(false);
-      infoMessage.setVisible(true);
     }
     else if (!syncResult.hasRemoteRepository()) {
       setOKButtonText(isContinued()
@@ -314,7 +315,6 @@ public class CloudAttachDialog extends DialogWrapper {
           : GctBundle.getString("clouddebug.attach.anyway"));
       warningHeader.setVisible(true);
       warningMessage.setVisible(true);
-      infoMessage.setVisible(true);
       if (syncResult.getRepositoryType() != null) {
         warningMessage.setText(GctBundle.getString("clouddebug.repositories.are.not.supported",
             syncResult.getRepositoryType()));
@@ -327,10 +327,6 @@ public class CloudAttachDialog extends DialogWrapper {
       setOKButtonText(isContinued()
           ? GctBundle.getString("clouddebug.continuesession")
           : GctBundle.getString("clouddebug.attach"));
-      syncStashCheckbox.setVisible(false);
-      warningHeader.setVisible(false);
-      warningMessage.setVisible(false);
-      infoMessage.setVisible(true);
     }
   }
 
