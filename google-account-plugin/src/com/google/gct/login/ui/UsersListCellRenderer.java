@@ -56,8 +56,8 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   private final static String CLOUD_LABEL_TEXT = "Open Google Developers Console";
   private final static String PLAY_LABEL_TEXT = "Open Play Developer Console";
   private final static String DEFAULT_AVATAR = "/icons/loginAvatar@2x.png";
-  private final static String SIGN_IN_TEXT = "<HTML> Sign in with your Google account to start <br> adding "
-    + "Cloud functionality to your <br> Android applications from Android Studio. </HTML>";
+  private final static String SIGN_IN_TEXT = "<HTML> Sign in with your Google account to start "
+      + "adding <br> Cloud functionality to your applications. </HTML>";
   private static final String LEARN_MORE_TEXT = "Learn more";
   private static final int PLAIN_USER_IMAGE_WIDTH = 48;
   private static final int PLAIN_USER_IMAGE_HEIGHT = 48;
@@ -189,9 +189,9 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   }
 
   public boolean inLearnMoreUrl(Point point) {
-    // 3 is for the number of labels and row of texts
+    // 2 is for the number of labels and row of texts
     double urlYStart = GOOGLE_IMAGE_NORTH + myGoogleImageLabel.getIcon().getIconHeight() + WELCOME_LABEL_NORTH
-      + (myGeneralFontHeight * 3) + 3;
+      + (myGeneralFontHeight * 2) + 3;
     double urlYEnd = urlYStart + myLearnMoreLabelDimension.getHeight();
     double urlXStart = GOOGLE_IMAGE_WEST;
     double urlXEnd = urlXStart + myLearnMoreLabelDimension.getWidth();
@@ -290,6 +290,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     urlLabel.setFont(myGeneralFont);
     urlLabel.setForeground(JBColor.BLUE);
     urlLabel.setPreferredSize(myLearnMoreLabelDimension);
+    urlLabel.setBorder(BorderFactory.createEtchedBorder());
 
     mainPanel.add(Box.createVerticalStrut(GOOGLE_IMAGE_NORTH));
     mainPanel.add(myGoogleImageLabel);

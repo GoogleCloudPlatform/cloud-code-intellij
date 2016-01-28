@@ -50,7 +50,7 @@ import javax.swing.event.ListSelectionListener;
 public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListener {
   private static final String PLAY_CONSOLE_URL = "https://play.google.com/apps/publish/#ProfilePlace";
   private static final String CLOUD_CONSOLE_URL = "https://console.developers.google.com/";
-  private static final String LEARN_MORE_URL = "https://developers.google.com/cloud/devtools/android_studio_templates/";
+  private static final String LEARN_MORE_URL = "https://cloud.google.com/docs/overview/developer-and-admin-tools";
   private static final String ADD_ACCOUNT = "Add Account";
   private static final String SIGN_IN = "Sign In";
   private static final String SIGN_OUT = "Sign Out";
