@@ -290,7 +290,6 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     urlLabel.setFont(myGeneralFont);
     urlLabel.setForeground(JBColor.BLUE);
     urlLabel.setPreferredSize(myLearnMoreLabelDimension);
-    urlLabel.setBorder(BorderFactory.createEtchedBorder());
 
     mainPanel.add(Box.createVerticalStrut(GOOGLE_IMAGE_NORTH));
     mainPanel.add(myGoogleImageLabel);
