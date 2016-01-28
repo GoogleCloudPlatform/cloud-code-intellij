@@ -166,7 +166,7 @@ It is built with Maven version 3.1 or later.
   ![](images/importproject.png)
   
   From this point the default options in the rest of the wizard should be fine,
-  though you may need to set up a Java 1.7 SDK.
+  though you may need to set up a Java 1.7 SDK if you have not already done so.
 
 3. Once IntelliJ has loaded the project, pull down the Run menu 
    and select Edit Configurations... (Run > Edit Configurations...)
@@ -339,6 +339,10 @@ If you're interested in variables at particular points in time,
 (e.g. on the last iteration of a loop), you can set a 
 conditional snapshot location.
 
+The server only sends a single snapshot per location. This keeps you from being 
+inundated with snapshots from a high volume application. 
+If you want to take another snapshot, 
+
 You can generally inspect the values of variables in your own code.
 (In this example, that's code in the `com.google.gct.tutorial` package.)
 However, due to security restrictions in the App Engine sandbox,
@@ -389,10 +393,15 @@ and traverse object hierarchies when a snapshot is taken.
 
 You can specify a watch expression after you have set the snapshot location. To specify the watch expression:
 
+1. Right click (Open the context menu) on the blue circle that represents the snapshot location.
 
+2. Click the "More" link.
 
+3. Click the + sign.
 
+4. Type the expression you want evaluated and hit return.
 
+![](images/watchexpressions.png)
 
 
 
