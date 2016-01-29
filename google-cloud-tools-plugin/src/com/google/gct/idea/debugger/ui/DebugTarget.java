@@ -16,6 +16,7 @@
 package com.google.gct.idea.debugger.ui;
 
 import com.google.api.services.clouddebugger.model.Debuggee;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.gct.idea.util.GctBundle;
 
@@ -31,6 +32,8 @@ import java.util.Map;
 class DebugTarget {
   private static final Logger LOG = Logger.getInstance(DebugTarget.class);
   private static final String MODULE = "module";
+  private static final String VERSION = "version";
+  private static final String MINOR_VERSION = "minorversion";
 
   private final Debuggee debuggee;
   private String description;
@@ -51,10 +54,10 @@ class DebugTarget {
         if (entry.getKey().equalsIgnoreCase(MODULE)) {
           module = entry.getValue();
         }
-        else if (entry.getKey().equalsIgnoreCase("minorversion")) {
+        else if (entry.getKey().equalsIgnoreCase(MINOR_VERSION)) {
           minorVersion = entry.getValue();
         }
-        else if (entry.getKey().equalsIgnoreCase("version")) {
+        else if (entry.getKey().equalsIgnoreCase(VERSION)) {
           version = entry.getValue();
         }
         else {
@@ -65,12 +68,13 @@ class DebugTarget {
       }
 
       //Build a description from the strings.
-      if (!Strings.isNullOrEmpty(module)) {
+      if (!Strings.isNullOrEmpty(module) && !Strings.isNullOrEmpty(version)) {
         description = GctBundle.getString("clouddebug.version.with.module.format",
             module, version);
       }
       else if (!Strings.isNullOrEmpty(version)) {
-        description = GctBundle.getString("clouddebug.versionformat", version);
+        description = GctBundle.getString("clouddebug.version.with.module.format",
+            GctBundle.getString("clouddebug.default.module.name"), version);
       }
 
       //Record the minor version.  We only show the latest minor version.
@@ -115,5 +119,10 @@ class DebugTarget {
 
   public String getVersion() {
     return version;
+  }
+
+  @VisibleForTesting
+  String getDescription() {
+    return description;
   }
 }

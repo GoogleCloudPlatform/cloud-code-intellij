@@ -25,7 +25,7 @@
         <properties>
           <inheritsPopupMenu value="true"/>
           <labelFor value="bdb09"/>
-          <text resource-bundle="messages/CloudToolsBundle" key="clouddebug.module"/>
+          <text resource-bundle="messages/CloudToolsBundle" key="clouddebug.target"/>
         </properties>
       </component>
       <component id="30c54" class="com.google.gct.idea.elysium.ProjectSelector" binding="elysiumProjectSelector">
@@ -34,7 +34,7 @@
         </constraints>
         <properties/>
       </component>
-      <component id="bdb09" class="javax.swing.JComboBox" binding="moduleSelector">
+      <component id="bdb09" class="javax.swing.JComboBox" binding="targetSelector">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>

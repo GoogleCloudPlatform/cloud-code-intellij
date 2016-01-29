@@ -67,7 +67,7 @@ import git4idea.i18n.GitBundle;
 import git4idea.repo.GitRepository;
 
 /**
- * CloudAttachDialog shows a dialog allowing the user to select a module and debug.
+ * CloudAttachDialog shows a dialog allowing the user to select a target (module & version) and debug.
  */
 public class CloudAttachDialog extends DialogWrapper {
   private static final Logger LOG = Logger.getInstance(CloudAttachDialog.class);
@@ -75,7 +75,7 @@ public class CloudAttachDialog extends DialogWrapper {
   private final Project project;
   private final ProjectDebuggeeBinding wireup;
   private ProjectRepositoryValidator projectRepositoryValidator;
-  private JComboBox moduleSelector;
+  private JComboBox targetSelector; // Module & version combo box
   private ProjectSelector elysiumProjectSelector; // Project combo box
   private JBLabel infoMessage;
   private String originalBranchName;
@@ -140,12 +140,12 @@ public class CloudAttachDialog extends DialogWrapper {
     BasicAction.saveAll();
 
     this.wireup = wireup == null ?
-        new ProjectDebuggeeBinding(elysiumProjectSelector, moduleSelector, getOKAction()) : wireup;
-    moduleSelector.setEnabled(false);
-    moduleSelector.addActionListener(new ActionListener() {
+        new ProjectDebuggeeBinding(elysiumProjectSelector, targetSelector, getOKAction()) : wireup;
+    targetSelector.setEnabled(false);
+    targetSelector.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if(moduleSelector.isEnabled()) {
+        if(targetSelector.isEnabled()) {
           buildResult();
           checkSyncStashState();
         }
@@ -194,14 +194,14 @@ public class CloudAttachDialog extends DialogWrapper {
           elysiumProjectSelector);
     }
 
-    if (!moduleSelector.isEnabled() && moduleSelector.getItemCount() > 0) {
+    if (!targetSelector.isEnabled() && targetSelector.getItemCount() > 0) {
       return new ValidationInfo(GctBundle.getString("clouddebug.selectvalidproject"),
           elysiumProjectSelector);
     }
 
-    if (moduleSelector.getSelectedItem() == null && moduleSelector.getItemCount() > 0) {
+    if (targetSelector.getSelectedItem() == null && targetSelector.getItemCount() > 0) {
       return new ValidationInfo(GctBundle.getString("clouddebug.selectvalidproject"),
-          moduleSelector);
+          targetSelector);
     }
 
     return null;
@@ -222,8 +222,8 @@ public class CloudAttachDialog extends DialogWrapper {
   }
 
   @VisibleForTesting
-  JComboBox getModuleSelector() {
-    return moduleSelector;
+  JComboBox getTargetSelector() {
+    return targetSelector;
   }
 
   @VisibleForTesting
