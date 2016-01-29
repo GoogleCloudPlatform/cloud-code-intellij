@@ -49,7 +49,7 @@ import javax.swing.event.TreeModelListener;
  */
 class ProjectDebuggeeBinding {
   private static final Logger LOG = Logger.getInstance(ProjectDebuggeeBinding.class);
-  private final JComboBox moduleSelector;
+  private final JComboBox targetSelector;
   private final ProjectSelector projectSelector;
   private final Action okAction;
   private Debugger cloudDebuggerClient = null;
@@ -57,10 +57,10 @@ class ProjectDebuggeeBinding {
   private CloudDebugProcessState inputState;
 
   public ProjectDebuggeeBinding(@NotNull ProjectSelector projectSelector,
-                                @NotNull JComboBox moduleSelector,
+                                @NotNull JComboBox targetSelector,
                                 @NotNull Action okAction) {
     this.projectSelector = projectSelector;
-    this.moduleSelector = moduleSelector;
+    this.targetSelector = targetSelector;
     this.okAction = okAction;
 
     this.projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -94,7 +94,7 @@ class ProjectDebuggeeBinding {
   public CloudDebugProcessState buildResult(Project project) {
     Long number = projectSelector.getProjectNumber();
     String projectNumberString = number != null ? number.toString() : null;
-    DebugTarget selectedItem = (DebugTarget) moduleSelector.getSelectedItem();
+    DebugTarget selectedItem = (DebugTarget) targetSelector.getSelectedItem();
     String savedDebuggeeId = selectedItem != null ? selectedItem.getId() : null;
     String savedProjectDescription = projectSelector.getText();
 
@@ -137,7 +137,7 @@ class ProjectDebuggeeBinding {
    */
   @SuppressWarnings("unchecked")
   private void refreshDebugTargetList() {
-    moduleSelector.removeAllItems();
+    targetSelector.removeAllItems();
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
       @Override
       public void run() {
@@ -154,10 +154,10 @@ class ProjectDebuggeeBinding {
                 DebugTarget targetSelection = null;
 
                 if (debuggees == null || debuggees.getDebuggees() == null || debuggees.getDebuggees().isEmpty()) {
-                  disableModuleSelector();
+                  disableTargetSelector();
                 }
                 else {
-                  moduleSelector.setEnabled(true);
+                  targetSelector.setEnabled(true);
                   Map<String, DebugTarget> perModuleCache = new HashMap<String, DebugTarget>();
 
                   for (Debuggee debuggee : debuggees.getDebuggees()) {
@@ -172,7 +172,7 @@ class ProjectDebuggeeBinding {
                         continue;
                       }
                       if (existing != null) {
-                        moduleSelector.removeItem(existing);
+                        targetSelector.removeItem(existing);
                       }
                       perModuleCache.put(key, item);
                     }
@@ -181,12 +181,12 @@ class ProjectDebuggeeBinding {
                         targetSelection = item;
                       }
                     }
-                    moduleSelector.addItem(item);
+                    targetSelector.addItem(item);
                     okAction.setEnabled(true);
                   }
                 }
                 if (targetSelection != null) {
-                  moduleSelector.setSelectedItem(targetSelection);
+                  targetSelector.setSelectedItem(targetSelection);
                 }
               }
             });
@@ -195,7 +195,7 @@ class ProjectDebuggeeBinding {
           SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-              disableModuleSelector();
+              disableTargetSelector();
             }
           });
 
@@ -206,12 +206,12 @@ class ProjectDebuggeeBinding {
   }
 
   @SuppressWarnings("unchecked")
-  private void disableModuleSelector() {
-    moduleSelector.setEnabled(false);
+  private void disableTargetSelector() {
+    targetSelector.setEnabled(false);
 
     String moduleWarning = GctBundle.getString("clouddebug.selectvalidproject");
-    if(!moduleWarning.equals(moduleSelector.getSelectedItem())) {
-      moduleSelector.addItem(moduleWarning);
+    if(!moduleWarning.equals(targetSelector.getSelectedItem())) {
+      targetSelector.addItem(moduleWarning);
     }
   }
 }

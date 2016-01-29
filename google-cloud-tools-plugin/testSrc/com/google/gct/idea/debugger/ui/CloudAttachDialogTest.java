@@ -52,7 +52,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
 
   private ProjectSelector projectSelector;
   private ProjectDebuggeeBinding binding;
-  private JComboBox moduleSelector;
+  private JComboBox targetSelector;
   private JBCheckBox syncStashCheckbox;
   private JLabel warningHeader;
   private JLabel warningMessage;
@@ -96,7 +96,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     assertFalse(warningMessage.isVisible());
     assertFalse(warningHeader.isVisible());
 
-    assertFalse(moduleSelector.isEnabled());
+    assertFalse(targetSelector.isEnabled());
 
     dialog.close(0);
   }
@@ -124,7 +124,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
 
     assertFalse(syncStashCheckbox.isVisible());
 
-    assertTrue(moduleSelector.isEnabled());
+    assertTrue(targetSelector.isEnabled());
 
     dialog.close(0);
   }
@@ -143,8 +143,8 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     ValidationInfo error = dialog.doValidate();
 
     assertNull(error);
-    assertFalse(moduleSelector.isEnabled());
-    assertNull(moduleSelector.getSelectedItem());
+    assertFalse(targetSelector.isEnabled());
+    assertNull(targetSelector.getSelectedItem());
 
     dialog.close(0);
   }
@@ -193,7 +193,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   private CloudAttachDialog initDialog() {
     CloudAttachDialog dialog = new CloudAttachDialog(this.getProject(), binding);
     projectSelector = dialog.getElysiumProjectSelector();
-    moduleSelector = dialog.getModuleSelector();
+    targetSelector = dialog.getTargetSelector();
     warningHeader = dialog.getWarningHeader();
     warningMessage = dialog.getWarningMessage();
     syncStashCheckbox = dialog.getSyncStashCheckbox();
@@ -204,20 +204,20 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   @SuppressWarnings("unchecked")
   private void selectEmptyProject() {
     projectSelector.setText("emptyProject");
-    moduleSelector.removeAllItems();
-    moduleSelector.setEnabled(false);
-    moduleSelector.addItem(NO_MODULES_WARNING);
+    targetSelector.removeAllItems();
+    targetSelector.setEnabled(false);
+    targetSelector.addItem(NO_MODULES_WARNING);
   }
 
   @SuppressWarnings("unchecked")
   private void selectProjectWithDebuggableModules() {
     String projectName = "projectWithDebuggableModules";
     projectSelector.setText(projectName);
-    moduleSelector.removeAllItems();
-    moduleSelector.setEnabled(true);
+    targetSelector.removeAllItems();
+    targetSelector.setEnabled(true);
 
     DebugTarget debugTarget = new DebugTarget(new Debuggee(), projectName);
-    moduleSelector.addItem(debugTarget);
+    targetSelector.addItem(debugTarget);
   }
 
   private void selectInProgressProject() {
