@@ -21,10 +21,14 @@ import com.google.api.services.clouddebugger.Clouddebugger.Debugger.Debuggees;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger.Debuggees.Breakpoints;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.api.services.clouddebugger.model.ListBreakpointsResponse;
+import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunProfile;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationAdapter;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -44,15 +48,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Queries multiple states on a fixed interval for updates. It notifies listeners
  * when updates occur.
  */
 public class CloudDebugGlobalPoller {
+
   private static final int DELAY_MS = 5000;
   private static final Logger LOG = Logger.getInstance(CloudDebugGlobalPoller.class);
+
+  /**
+   * Display group used to display notifications in the IDE
+   */
+  public static final String CLOUD_DEBUGGER_ERROR_NOTIFICATIONS_DISPLAY_GROUP =
+      "Cloud Debugger Error Notifications";
+
   private final List<CloudBreakpointListener> myBreakpointListChangedListeners =
       new ArrayList<CloudBreakpointListener>();
   private Timer myWatchTimer = null;
@@ -71,14 +82,7 @@ public class CloudDebugGlobalPoller {
   public synchronized void startBackgroundListening() {
     if (myWatchTimer == null) {
       myWatchTimer = new Timer("cloud debug watcher", true /* isDaemon */);
-      myWatchTimer.schedule(new TimerTask() {
-        @Override
-        public void run() {
-          for (CloudDebugProcessState state : getStates()) {
-            pollForChanges(state);
-          }
-        }
-      }, DELAY_MS, DELAY_MS);
+      myWatchTimer.schedule(new CloudDebugGlobalPollerTimerTask(this), DELAY_MS, DELAY_MS);
 
       ApplicationManager.getApplication().addApplicationListener(new ApplicationAdapter() {
         @Override
@@ -99,7 +103,7 @@ public class CloudDebugGlobalPoller {
   }
 
 
-  private static List<CloudDebugProcessState> getStates() {
+  List<CloudDebugProcessState> getStates() {
     List<CloudDebugProcessState> states = new ArrayList<CloudDebugProcessState>();
 
     for (Project project : ProjectManager.getInstance().getOpenProjects()) {
@@ -129,7 +133,7 @@ public class CloudDebugGlobalPoller {
     return states;
   }
 
-  private static void queryServerForBreakpoints(CloudDebugProcessState state, Debugger client)
+  private void queryServerForBreakpoints(CloudDebugProcessState state, Debugger client)
       throws IOException {
 
     Debuggees debuggees = client.debuggees();
@@ -166,13 +170,27 @@ public class CloudDebugGlobalPoller {
    *
    * @param state represents the target debuggee to query
    */
-  private void pollForChanges(@NotNull final CloudDebugProcessState state) {
+  void pollForChanges(@NotNull final CloudDebugProcessState state) {
     final Debugger client = CloudDebuggerClient.getShortTimeoutClient(state);
     if (client == null) {
-      // It is ok if there is no client.  We may want to consider notifying the user that
-      // background polling is disabled until they login, but for now, we can just doc it.
-      LOG.info("no client available attempting to checkForChanges");
-      return;
+      if (state.isListenInBackground()) {
+        // state is supposed to listen, but does not have access to the backend
+        LOG.warn("CloudDebugProcessState is listening in the background but no debugger client "
+            + "could be retrieved => stop listening");
+        state.setListenInBackground(false);
+        Notification notification =
+            new Notification(CLOUD_DEBUGGER_ERROR_NOTIFICATIONS_DISPLAY_GROUP,
+                             GctBundle.message("clouddebug.background.listener.error.title"),
+                             GctBundle.message("clouddebug.background.listener.error.message"),
+                             NotificationType.ERROR);
+        Notifications.Bus.notify(notification,  state.getProject());
+        return;
+      } else {
+        // It is ok if there is no client.  We may want to consider notifying the user that
+        // background polling is disabled until they login, but for now, we can just doc it.
+        LOG.info("no client available attempting to checkForChanges");
+        return;
+      }
     }
 
     boolean changed = false;
