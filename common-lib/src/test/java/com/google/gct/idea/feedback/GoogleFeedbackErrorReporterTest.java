@@ -30,6 +30,7 @@ public class GoogleFeedbackErrorReporterTest {
   private static final String VERSION_NAME = "version name";
   private static final String MAJOR_VERSION = "major version";
   private static final String MINOR_VERSION = "minor version";
+  private static final String PLUGIN_VERSION = "plugin version";
 
   @Mock
   private ApplicationNamesInfo mockAppNameInfo;
@@ -44,6 +45,7 @@ public class GoogleFeedbackErrorReporterTest {
   @Before
   public void setUp() {
     error = new ErrorBean(new Throwable(TEST_MESSAGE), LAST_ACTION);
+    error.setPluginVersion(PLUGIN_VERSION);
     when(mockAppNameInfo.getFullProductName()).thenReturn(FULL_PRODUCT_NAME);
     when(mockAppInfoEx.getPackageCode()).thenReturn(PACKAGE_CODE);
     when(mockAppInfoEx.getVersionName()).thenReturn(VERSION_NAME);
@@ -65,6 +67,7 @@ public class GoogleFeedbackErrorReporterTest {
     assertEquals(Boolean.TRUE.toString(), result.get(GoogleFeedbackErrorReporter.APP_INTERNAL_KEY));
     assertEquals(MAJOR_VERSION, result.get(GoogleFeedbackErrorReporter.APP_VERSION_MAJOR_KEY));
     assertEquals(MINOR_VERSION, result.get(GoogleFeedbackErrorReporter.APP_VERSION_MINOR_KEY));
+    assertEquals(PLUGIN_VERSION, result.get(GoogleFeedbackErrorReporter.PLUGIN_VERSION));
   }
 
   @Test

@@ -73,6 +73,8 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
   static final String APP_VERSION_MAJOR_KEY = "app.version.major";
   @VisibleForTesting
   static final String APP_VERSION_MINOR_KEY = "app.version.minor";
+  @VisibleForTesting
+  static final String PLUGIN_VERSION = "plugin.version";
 
   @Override
   public String getReportActionText() {
@@ -172,7 +174,7 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
         // required parameters
         .put(ERROR_MESSAGE_KEY, nullToNone(error.getMessage()))
         .put(ERROR_STACKTRACE_KEY, nullToNone(error.getStackTrace()))
-            // end or required parameters
+        // end or required parameters
         .put(ERROR_DESCRIPTION_KEY, nullToNone(error.getDescription()))
         .put(LAST_ACTION_KEY, nullToNone(error.getLastAction()))
         .put(OS_NAME_KEY, SystemProperties.getOsName())
@@ -185,7 +187,9 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
         .put(APP_INTERNAL_KEY, Boolean.toString(application.isInternal()))
         .put(APP_VERSION_MAJOR_KEY, intelliJAppExtendedInfo.getMajorVersion())
         .put(APP_VERSION_MINOR_KEY, intelliJAppExtendedInfo.getMinorVersion())
+        .put(PLUGIN_VERSION, error.getPluginVersion())
         .build();
+
     return params;
   }
 
