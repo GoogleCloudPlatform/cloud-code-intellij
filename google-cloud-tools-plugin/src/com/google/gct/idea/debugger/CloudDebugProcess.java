@@ -141,6 +141,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
         }
 
         CloudDebugHistoricalSnapshots timeline = new CloudDebugHistoricalSnapshots(handler);
+        timeline.onBreakpointListChanged(getProcessState());
         Content snapshots = layout
           .createContent(timeline.getTabTitle(), (ComponentWithActions)timeline, timeline.getTabTitle(),
                          GoogleCloudToolsIcons.CLOUD, null);
