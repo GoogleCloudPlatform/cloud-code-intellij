@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * The class models out the details for a target debuggable module.
  */
-class DebugTarget {
+class DebugTarget implements DebugTargetSelectorItem {
   private static final Logger LOG = Logger.getInstance(DebugTarget.class);
   private static final String MODULE = "module";
   private static final String VERSION = "version";
