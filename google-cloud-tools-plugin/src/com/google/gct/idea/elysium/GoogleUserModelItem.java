@@ -34,7 +34,10 @@ import java.awt.Image;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -46,16 +49,22 @@ import javax.swing.tree.DefaultTreeModel;
  */
 class GoogleUserModelItem extends DefaultMutableTreeNode {
   private static final Logger LOG = Logger.getInstance(GoogleUserModelItem.class);
+  private static final int PROJECTS_MAX_PAGE_SIZE = 300;
 
   private final CredentialedUser myUser;
   private final DefaultTreeModel myTreeModel;
   private volatile boolean myIsSynchronizing;
   private volatile boolean myNeedsSynchronizing;
+  private Developerprojects developerProjectsClient;
 
   GoogleUserModelItem(@NotNull CredentialedUser user, @NotNull DefaultTreeModel treeModel) {
     myUser = user;
     myTreeModel = treeModel;
     setNeedsSynchronizing();
+    developerProjectsClient = new Developerprojects.Builder(
+        new NetHttpTransport(), new JacksonFactory(), myUser.getCredential())
+        .setApplicationName(PlatformInfo.getUserAgent())
+        .build();
   }
 
   public CredentialedUser getCredentialedUser() {
@@ -98,7 +107,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
       @Override
       public void run() {
         try {
-          loadUserProjects(myUser);
+          loadUserProjects();
           myNeedsSynchronizing = false;
         }
         finally {
@@ -124,18 +133,29 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     });
   }
 
-  private void loadUserProjects(CredentialedUser user) {
+  private void loadUserProjects() {
     final List<DefaultMutableTreeNode> result = new ArrayList<DefaultMutableTreeNode>();
 
-    Developerprojects developerprojects = new Developerprojects.Builder(
-        new NetHttpTransport(), new JacksonFactory(), user.getCredential())
-        .setApplicationName(PlatformInfo.getUserAgent())
-        .build();
-
     try {
-      ListProjectsResponse response = developerprojects.projects().list().execute();
+      ListProjectsResponse response = developerProjectsClient.projects().list()
+          .setPageSize(PROJECTS_MAX_PAGE_SIZE).execute();
       if (response != null && response.getProjects() != null) {
-        for (Project pantheonProject : response.getProjects()) {
+        // Sorts the projects list by project ID.
+        Set<Project> allProjects = new TreeSet<Project>(new Comparator<Project>() {
+          @Override
+          public int compare(Project p1, Project p2) {
+            return p1.getTitle().toLowerCase().compareTo(p2.getTitle().toLowerCase());
+          }
+        });
+        allProjects.addAll(response.getProjects());
+        while(!Strings.isNullOrEmpty(response.getNextPageToken())) {
+          response = developerProjectsClient.projects().list()
+              .setPageToken(response.getNextPageToken())
+              .setPageSize(PROJECTS_MAX_PAGE_SIZE)
+              .execute();
+          allProjects.addAll(response.getProjects());
+        }
+        for (Project pantheonProject : allProjects) {
           if (!Strings.isNullOrEmpty(pantheonProject.getProjectId())) {
             result.add(new ElysiumProjectModelItem(pantheonProject.getTitle(),
                                                    pantheonProject.getProjectId(),
