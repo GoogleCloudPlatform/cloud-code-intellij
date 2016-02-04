@@ -15,6 +15,7 @@
  */
 package com.google.gct.idea.debugger.ui;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.model.Debuggee;
 import com.google.api.services.clouddebugger.model.ListDebuggeesResponse;
@@ -154,7 +155,7 @@ class ProjectDebuggeeBinding {
                 DebugTarget targetSelection = null;
 
                 if (debuggees == null || debuggees.getDebuggees() == null || debuggees.getDebuggees().isEmpty()) {
-                  disableTargetSelector();
+                  disableTargetSelector(GctBundle.getString("clouddebug.selectvalidproject"));
                 }
                 else {
                   targetSelector.setEnabled(true);
@@ -191,27 +192,52 @@ class ProjectDebuggeeBinding {
               }
             });
           }
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
           SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-              disableTargetSelector();
+              disableTargetSelector(ex);
             }
           });
 
-          LOG.error("Error listing debuggees from Cloud Debugger API", ex);
+          LOG.warn("Error listing debuggees from Cloud Debugger API", ex);
         }
       }
     });
   }
 
-  @SuppressWarnings("unchecked")
-  private void disableTargetSelector() {
+  private void disableTargetSelector(Throwable reason) {
     targetSelector.setEnabled(false);
 
-    String moduleWarning = GctBundle.getString("clouddebug.selectvalidproject");
-    if(!moduleWarning.equals(targetSelector.getSelectedItem())) {
-      targetSelector.addItem(moduleWarning);
+    String errorMessage = resolveErrorToMessage(reason);
+    disableTargetSelector(errorMessage);
+  }
+
+  @SuppressWarnings("unchecked")
+  private void disableTargetSelector(String reason) {
+    targetSelector.setEnabled(false);
+
+    if(targetSelector.getSelectedItem() instanceof ErrorHolder) {
+      ((ErrorHolder) targetSelector.getSelectedItem()).setErrorMessage(reason);
+    } else {
+      targetSelector.addItem(new ErrorHolder(reason));
+    }
+  }
+
+  private static String resolveErrorToMessage(Throwable reason) {
+    if (reason instanceof GoogleJsonResponseException) {
+      return resolveJsonResponseToMessage((GoogleJsonResponseException) reason);
+    } else {
+      return GctBundle.getString("clouddebug.debug.targets.error", reason.getLocalizedMessage());
+    }
+  }
+
+  private static String resolveJsonResponseToMessage(GoogleJsonResponseException reason) {
+    switch (reason.getStatusCode()) {
+      case 403:
+        return GctBundle.message("clouddebug.debug.targets.accessdenied");
+      default:
+        return GctBundle.getString("clouddebug.debug.targets.error", reason.getDetails().getMessage());
     }
   }
 }
