@@ -5,7 +5,6 @@ import com.google.api.services.clouddebugger.model.SourceLocation;
 import com.google.gct.idea.debugger.CloudBreakpointHandler;
 import com.google.gct.idea.debugger.CloudDebugProcess;
 import com.google.gct.idea.debugger.CloudDebugProcessHandler;
-import com.google.gct.idea.debugger.CloudDebugProcessState;
 
 import com.intellij.mock.MockApplication;
 import com.intellij.mock.MockApplicationEx;
@@ -24,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -33,14 +31,8 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-
-// TODO: This test hangs when run as part of the full suite.
-// More generally we have a testing infrastructure problem. There's shared state across test
-// suites that's causing unpredictable failures.
-@Ignore
 public class CloudDebugHistoricalSnapshotsTest {
 
-  private CloudDebugHistoricalSnapshots snapshots;
   private Disposable parent = new MockDisposable();
   private CloudDebugProcess mockProcess = Mockito.mock(CloudDebugProcess.class);
   private CloudDebugProcessHandler handler = Mockito.mock(CloudDebugProcessHandler.class);
@@ -59,8 +51,6 @@ public class CloudDebugHistoricalSnapshotsTest {
     XDebugSession session = Mockito.mock(XDebugSession.class);
     Mockito.when(handler.getProcess()).thenReturn(mockProcess);
     Mockito.when(mockProcess.getXDebugSession()).thenReturn(session);
-
-    snapshots = new CloudDebugHistoricalSnapshots(handler);
   }
 
   @After
@@ -70,15 +60,15 @@ public class CloudDebugHistoricalSnapshotsTest {
 
   @Test
   public void testOnBreakpointListChanged_noChanges() {
-    CloudDebugProcessState state = new CloudDebugProcessState();
-    snapshots.onBreakpointListChanged(state);
+    CloudDebugHistoricalSnapshots snapshots = new CloudDebugHistoricalSnapshots(handler);
+    runModelSetter(snapshots);
 
     Assert.assertNull(snapshots.myBalloon);
   }
 
   @Test
   public void testOnBreakpointListChanged() throws InterruptedException {
-    CloudDebugProcessState state = new CloudDebugProcessState();
+    CloudDebugHistoricalSnapshots snapshots = new CloudDebugHistoricalSnapshots(handler);
 
     Breakpoint bp1 = new Breakpoint();
     bp1.setId("an ID");
@@ -97,18 +87,14 @@ public class CloudDebugHistoricalSnapshotsTest {
     CloudBreakpointHandler breakpointHandler = Mockito.mock(CloudBreakpointHandler.class);
     Mockito.when(mockProcess.getBreakpointHandler()).thenReturn(breakpointHandler);
 
-    snapshots.onBreakpointListChanged(state);
-
-    // wait for swing thread to run asynchronously; ugly and flaky;
-    // is there a better way?
-    Thread.sleep(1000);
+    runModelSetter(snapshots);
 
     Assert.assertEquals(0, snapshots.myTable.getSelectedRow());
   }
 
   @Test
   public void testOnBreakpointListChanged_twoBreakPoints() throws InterruptedException {
-    CloudDebugProcessState state = new CloudDebugProcessState();
+    CloudDebugHistoricalSnapshots snapshots = new CloudDebugHistoricalSnapshots(handler);
 
     Breakpoint bp1 = new Breakpoint();
     bp1.setId("bp1");
@@ -135,27 +121,27 @@ public class CloudDebugHistoricalSnapshotsTest {
     breakpoints2.add(bp1);
     breakpoints2.add(bp2);
 
-    Mockito.when(mockProcess.getCurrentBreakpointList()).thenReturn(breakpoints1, breakpoints2);
-    Mockito.when(mockProcess.getCurrentSnapshot()).thenReturn(bp1, bp2);
     CloudBreakpointHandler breakpointHandler = Mockito.mock(CloudBreakpointHandler.class);
     Mockito.when(mockProcess.getBreakpointHandler()).thenReturn(breakpointHandler);
 
     Assert.assertEquals(-1, snapshots.myTable.getSelectedRow());
 
-    snapshots.onBreakpointListChanged(state);
-
-    // wait for swing thread to run asynchronously; ugly and flaky;
-    // is there a better way?
-    Thread.sleep(1000);
+    // BP1
+    Mockito.when(mockProcess.getCurrentBreakpointList()).thenReturn(breakpoints1);
+    Mockito.when(mockProcess.getCurrentSnapshot()).thenReturn(bp1);
+    runModelSetter(snapshots);
     Assert.assertEquals(0, snapshots.myTable.getSelectedRow());
 
-    snapshots.onBreakpointListChanged(state);
-
-    // wait for swing thread to run asynchronously; ugly and flaky;
-    // is there a better way?
-    Thread.sleep(1000);
-
+    // BP2
+    Mockito.when(mockProcess.getCurrentBreakpointList()).thenReturn(breakpoints2);
+    Mockito.when(mockProcess.getCurrentSnapshot()).thenReturn(bp2);
+    runModelSetter(snapshots);
     Assert.assertEquals(1, snapshots.myTable.getSelectedRow());
+  }
+
+  private void runModelSetter(CloudDebugHistoricalSnapshots snapshots) {
+    (snapshots.new ModelSetter(mockProcess.getCurrentBreakpointList(),
+        snapshots.getSelection())).run();
   }
 
   private static class MockDisposable implements Disposable {

@@ -106,8 +106,6 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     myProcess = processHandler.getProcess();
 
-    onBreakpointsChanged();
-
     myProcess.getXDebugSession().addSessionListener(this);
     myProcess.addListener(this);
   }
@@ -210,6 +208,24 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   public void stackFrameChanged() {
   }
 
+  @VisibleForTesting
+  int getSelection() {
+    final List<Breakpoint> breakpointList = myProcess.getCurrentBreakpointList();
+    int selection = -1;
+
+    if (breakpointList != null) {
+      for (int i = 0; i < breakpointList.size(); i++) {
+        Breakpoint snapshot = myProcess.getCurrentSnapshot();
+        if (snapshot != null && breakpointList.get(i).getId().equals(snapshot.getId())) {
+          selection = i;
+          break;
+        }
+      }
+    }
+
+    return selection;
+  }
+
   /**
    * Deletes breakpoints asynchronously on a threadpool thread. The user will see these breakpoints gradually disappear.
    */
@@ -258,21 +274,10 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     // Read the list of breakpoints and show them.
     // We always snap the current breakpoint list into a local to eliminate threading issues.
     final List<Breakpoint> breakpointList = myProcess.getCurrentBreakpointList();
-    int selection = -1;
-
-    if (breakpointList != null) {
-      for (int i = 0; i < breakpointList.size(); i++) {
-        Breakpoint snapshot = myProcess.getCurrentSnapshot();
-        if (snapshot != null && breakpointList.get(i).getId().equals(snapshot.getId())) {
-          selection = i;
-          break;
-        }
-      }
-    }
 
     // Setting the model must happen on the UI thread, while most of this method executes on the
     // background.
-    SwingUtilities.invokeLater(new ModelSetter(breakpointList, selection));
+    SwingUtilities.invokeLater(new ModelSetter(breakpointList, getSelection()));
   }
 
   /**
@@ -584,7 +589,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     }
   }
 
-  private class ModelSetter implements Runnable {
+  @VisibleForTesting
+  class ModelSetter implements Runnable {
     private final List<Breakpoint> breakpointList;
     private final int finalSelection;
 
