@@ -14,6 +14,9 @@ import com.google.api.client.util.Lists;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.api.services.clouddebugger.model.StatusMessage;
 import com.google.gct.idea.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
+import com.google.gct.login.CredentialedUser;
+import com.google.gct.login.GoogleLogin;
+import com.google.gdt.eclipse.login.common.GoogleLoginState;
 
 import com.intellij.debugger.actions.DebuggerActions;
 import com.intellij.debugger.ui.DebuggerContentInfo;
@@ -43,6 +46,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -63,6 +67,24 @@ public class CloudDebugProcessTest extends PlatformTestCase {
 
     @Test
     public void testRemoveConsolePane() {
+        // if this was a JUnit4 test case, we could set the LoggedErrorProcessor to a mock that does
+        // not fail the test if an error is logged using @BeforeClass. Since this is a JUnit3 test
+        // case, we need to elaborately initialize a user in GoogleLogin
+        CloudDebugProcessState state = new CloudDebugProcessState(); //Mockito.mock(CloudDebugProcessState.class);
+        state.setUserEmail("mockUser@foo.com");
+
+        CredentialedUser credentialedUser = mock(CredentialedUser.class);
+        when(credentialedUser.getGoogleLoginState()).thenReturn(mock(GoogleLoginState.class));
+
+        LinkedHashMap<String, CredentialedUser> users = new LinkedHashMap<String, CredentialedUser>();
+        users.put(state.getUserEmail(), credentialedUser);
+
+        GoogleLogin googleLogin = mock(GoogleLogin.class);
+        when(googleLogin.getAllUsers()).thenReturn(users);
+
+        GoogleLogin.setInstance(googleLogin);
+        process.initialize(state);
+
         XDebugTabLayouter layouter = process.createTabLayouter();
         RunnerLayoutUi ui = mock(RunnerLayoutUi.class);
 
@@ -72,8 +94,6 @@ public class CloudDebugProcessTest extends PlatformTestCase {
         LayoutStateDefaults defaults = mock(LayoutStateDefaults.class);
         when(ui.getDefaults()).thenReturn(defaults);
 
-        CloudDebugProcessState state = new CloudDebugProcessState(); //Mockito.mock(CloudDebugProcessState.class);
-        process.initialize(state);
 
         layouter.registerAdditionalContent(ui);
 

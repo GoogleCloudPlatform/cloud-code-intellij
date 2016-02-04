@@ -92,6 +92,11 @@ Code inspections for AppEngine Java code.</description>
     <GitHttpAuthDataProvider implementation="com.google.gct.idea.git.GcpHttpAuthDataProvider" />
   </extensions>
 
+  <extensions defaultExtensionNs="com.google.gct.login">
+    <googleLoginMessageExtender
+            implementation="com.google.gct.login.IntelliJGoogleLoginMessageExtender"/>
+  </extensions>
+
   <actions>
     <action id="AddSnapshotLocation" class="com.google.gct.idea.debugger.actions.ToggleSnapshotLocationAction"/>
 

@@ -15,7 +15,12 @@
  */
 package com.google.gct.idea.debugger;
 
+import com.google.gct.idea.debugger.ui.LogoutDebugProcessDetacher;
+import com.google.gct.login.CredentialedUser;
+import com.google.gct.login.GoogleLogin;
+
 import com.intellij.execution.process.ProcessHandler;
+import com.intellij.openapi.diagnostic.Logger;
 
 import java.io.OutputStream;
 
@@ -24,10 +29,29 @@ import java.io.OutputStream;
  * returns its output stream.
  */
 public class CloudDebugProcessHandler extends ProcessHandler {
+
+  private static final Logger LOG = Logger.getInstance(CloudDebugProcessHandler.class);
+
   private final CloudDebugProcess myProcess;
 
   public CloudDebugProcessHandler(CloudDebugProcess process) {
     myProcess = process;
+    if (myProcess != null && myProcess.getProcessState() != null) {
+      String userEmail = myProcess.getProcessState().getUserEmail();
+      if (userEmail != null) {
+        final CredentialedUser user = GoogleLogin.getInstance().getAllUsers().get(userEmail);
+        if (user.getGoogleLoginState() != null) {
+          user.getGoogleLoginState()
+              .addLoginListener(new LogoutDebugProcessDetacher<CloudDebugProcessHandler>(this));
+        } else {
+          LOG.error("GoogleLoginState is null. To launch a debug session user needs to be logged in");
+        }
+      } else {
+        LOG.error("userEmail is null. To launch a debug session user needs to be logged in");
+      }
+    } else {
+      LOG.error("process or process state is null. This should only happen in tests");
+    }
   }
 
   @Override

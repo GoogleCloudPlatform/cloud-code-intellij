@@ -22,11 +22,11 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import com.google.gct.stats.LoginTracking;
-import com.google.gct.stats.UsageTrackerProvider;
 import com.google.gct.login.ui.GoogleLoginActionButton;
 import com.google.gct.login.ui.GoogleLoginCopyAndPasteDialog;
 import com.google.gct.login.ui.GoogleLoginIcons;
+import com.google.gct.stats.LoginTracking;
+import com.google.gct.stats.UsageTrackerProvider;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gdt.eclipse.login.common.LoggerFacade;
 import com.google.gdt.eclipse.login.common.OAuthData;
@@ -51,6 +51,7 @@ import com.intellij.openapi.wm.ex.WindowManagerEx;
 
 import net.jcip.annotations.Immutable;
 
+import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -565,8 +566,18 @@ public class GoogleLogin {
    * An implementation of {@link UiFacade} using Swing dialogs and external browsers.
    */
   private class AndroidUiFacade implements UiFacade {
+
+    /**
+     * number of characters to wrap lines after in the logout message
+     */
+    public static final int WRAP_LENGTH = 60;
     private GoogleLoginActionButton myButton;
     private volatile CancellableServerReceiver receiver = null;
+    private GoogleLoginMessageExtender[] messageExtenders;
+
+    public AndroidUiFacade() {
+      this.messageExtenders = Extensions.getExtensions(GoogleLoginMessageExtender.EP_NAME);
+    }
 
     @Override
     public String obtainVerificationCodeFromUserInteraction(String title, GoogleAuthorizationCodeRequestUrl authCodeRequestUrl) {
@@ -640,7 +651,14 @@ public class GoogleLogin {
       String updatedMessage = message;
       if (message.equals("Are you sure you want to sign out?")) {
         updatedMessage += " This will sign out all logged in users.";
+        for (GoogleLoginMessageExtender messageExtender : messageExtenders) {
+          String additionalLogoutMessage = messageExtender.additionalLogoutMessage();
+          if (!Strings.isNullOrEmpty(additionalLogoutMessage)) {
+            updatedMessage += " " + additionalLogoutMessage;
+          }
+        }
       }
+      updatedMessage = WordUtils.wrap(updatedMessage, WRAP_LENGTH, /* newLinestr */ null, /* wrapLongWords */ false);
       return (Messages.showYesNoDialog(updatedMessage, title, GoogleLoginIcons.GOOGLE_FAVICON) == Messages.YES);
     }
 

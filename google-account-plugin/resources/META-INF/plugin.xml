@@ -59,6 +59,7 @@
 
   <extensionPoints>
     <extensionPoint name="googleLoginListener" interface="com.google.gct.login.GoogleLoginListener"/>
+    <extensionPoint name="googleLoginMessageExtender" interface="com.google.gct.login.GoogleLoginMessageExtender"/>
     <extensionPoint name="usageTracker" beanClass="com.google.gct.stats.UsageTrackerExtensionPointBean">
       <with attribute="implementationClass" implements="com.google.gct.stats.UsageTracker"/>
     </extensionPoint>
