@@ -341,7 +341,8 @@ conditional snapshot location.
 
 The server only sends a single snapshot per location. This keeps you from being 
 inundated with snapshots from a high volume application. 
-If you want to take another snapshot, 
+If you want to take another snapshot, click on the Clone button above the list
+of snapshots in the debug pane.
 
 You can generally inspect the values of variables in your own code.
 (In this example, that's code in the `com.google.gct.tutorial` package.)
@@ -354,7 +355,7 @@ though not completely eliminated, when running on Managed VMs or GCE.
 
 ### Close the debugger
 
-When you're finished debugging, click the red square in the upper right corner 
+When you're finished debugging, click the red square in the upper left corner 
 of the debug pane. IntelliJ asks whether to continue listening for snapshots in the background:
 
 ![](images/continuelistening.png)
