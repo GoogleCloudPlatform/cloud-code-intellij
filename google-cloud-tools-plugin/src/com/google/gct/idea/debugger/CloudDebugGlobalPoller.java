@@ -15,6 +15,8 @@
  */
 package com.google.gct.idea.debugger;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger.Debuggees;
@@ -103,7 +105,7 @@ public class CloudDebugGlobalPoller {
   }
 
 
-  List<CloudDebugProcessState> getStates() {
+  List<CloudDebugProcessState> getBackgroundListeningStates() {
     List<CloudDebugProcessState> states = new ArrayList<CloudDebugProcessState>();
 
     for (Project project : ProjectManager.getInstance().getOpenProjects()) {
@@ -135,7 +137,9 @@ public class CloudDebugGlobalPoller {
 
   private void queryServerForBreakpoints(CloudDebugProcessState state, Debugger client)
       throws IOException {
-
+    if (state.getDebuggeeId() == null) {
+      throw new IllegalStateException("CloudDebugProcessState.getDebuggeeId() was null");
+    }
     Debuggees debuggees = client.debuggees();
     Breakpoints breakpoints = debuggees.breakpoints();
     Breakpoints.List listRequest = breakpoints.list(state.getDebuggeeId())
@@ -177,18 +181,14 @@ public class CloudDebugGlobalPoller {
         // state is supposed to listen, but does not have access to the backend
         LOG.warn("CloudDebugProcessState is listening in the background but no debugger client "
             + "could be retrieved => stop listening");
-        state.setListenInBackground(false);
-        Notification notification =
-            new Notification(CLOUD_DEBUGGER_ERROR_NOTIFICATIONS_DISPLAY_GROUP,
-                             GctBundle.message("clouddebug.background.listener.error.title"),
-                             GctBundle.message("clouddebug.background.listener.error.message"),
-                             NotificationType.ERROR);
-        Notifications.Bus.notify(notification,  state.getProject());
+        handleBreakpointQueryError(state,
+                                   GctBundle.message("clouddebug.background.listener.access.error.message",
+                                                     state.getProject().getName()));
         return;
       } else {
-        // It is ok if there is no client.  We may want to consider notifying the user that
-        // background polling is disabled until they login, but for now, we can just doc it.
-        LOG.info("no client available attempting to checkForChanges");
+        // We should poll only states that listen in the background, reaching this branch is
+        // unexpected
+        LOG.error("Polling changes for a debug state that is not set to listen in the background");
         return;
       }
     }
@@ -201,7 +201,6 @@ public class CloudDebugGlobalPoller {
 
       String responseWaitToken = state.getWaitToken();
       if (!Strings.isNullOrEmpty(responseWaitToken)) {
-        assert responseWaitToken != null;
         changed = oldToken == null || !responseWaitToken.equals(oldToken);
       }
       else {
@@ -213,6 +212,11 @@ public class CloudDebugGlobalPoller {
     }
     catch (IOException ex) {
       LOG.warn("exception listing breakpoints", ex);
+      handleBreakpointQueryError(state, ex);
+      return;
+    } catch (Exception e) {
+      LOG.error("exception listing breakpoints", e);
+      handleBreakpointQueryError(state, e);
       return;
     }
 
@@ -221,4 +225,36 @@ public class CloudDebugGlobalPoller {
     }
   }
 
+  private void handleBreakpointQueryError(@NotNull CloudDebugProcessState state, @NotNull Exception e) {
+    String message;
+    String projectName = state.getProject().getName();
+    if (e instanceof GoogleJsonResponseException) {
+      GoogleJsonResponseException jsonResponseException = (GoogleJsonResponseException) e;
+      if (jsonResponseException.getStatusCode() == HttpStatusCodes.STATUS_CODE_FORBIDDEN
+          || jsonResponseException.getStatusCode() == HttpStatusCodes.STATUS_CODE_UNAUTHORIZED) {
+        message = GctBundle.message("clouddebug.background.listener.access.error.message",
+                                    projectName);
+      } else {
+        message = GctBundle.message("clouddebug.background.listener.general.error.message",
+                                    projectName,
+                                    jsonResponseException.getDetails().getMessage());
+      }
+    } else {
+      message = GctBundle.message("clouddebug.background.listener.general.error.message",
+                                  projectName,
+                                  e.getLocalizedMessage());
+    }
+    handleBreakpointQueryError(state, message);
+  }
+
+  private void handleBreakpointQueryError(@NotNull CloudDebugProcessState state, String message) {
+    state.setListenInBackground(false);
+    String title = GctBundle.message("clouddebug.background.listener.error.title");
+    Notification notification =
+        new Notification(CLOUD_DEBUGGER_ERROR_NOTIFICATIONS_DISPLAY_GROUP,
+                         title,
+                         message,
+                         NotificationType.ERROR);
+    Notifications.Bus.notify(notification, state.getProject());
+  }
 }

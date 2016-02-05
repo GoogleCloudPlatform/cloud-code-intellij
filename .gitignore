@@ -3,6 +3,8 @@
 .idea/misc.xml
 .idea/gradle.xml
 .idea/compiler.xml
+.idea/findbugs-idea.xml
+.idea/qaplug_profiles.xml
 .idea/shelf/
 .idea/libraries/
 .idea/.name
