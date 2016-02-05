@@ -26,6 +26,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.Clouddebugger.Builder;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.util.PlatformInfo;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
@@ -46,8 +47,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CloudDebuggerClient {
 
-  private static final int LONG_CONNECTION_TIMEOUT_MS = 120 * 1000;
-  private static final int SHORT_CONNECTION_TIMEOUT_MS = 10 * 1000;
+  @VisibleForTesting
+  static final int LONG_CONNECTION_TIMEOUT_MS = 120 * 1000;
+  @VisibleForTesting
+  static final int SHORT_CONNECTION_TIMEOUT_MS = 10 * 1000;
 
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final Logger LOG = Logger.getInstance(CloudDebuggerClient.class);

@@ -27,7 +27,7 @@ public class CloudDebugGlobalPollerTimerTaskTest {
     List<CloudDebugProcessState> states = new ArrayList<CloudDebugProcessState>();
     states.add(mock(CloudDebugProcessState.class));
     states.add(mock(CloudDebugProcessState.class));
-    when(cloudDebugGlobalPoller.getStates()).thenReturn(states);
+    when(cloudDebugGlobalPoller.getBackgroundListeningStates()).thenReturn(states);
 
     new CloudDebugGlobalPollerTimerTask(cloudDebugGlobalPoller).run();
 

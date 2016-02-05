@@ -15,7 +15,7 @@ class CloudDebugGlobalPollerTimerTask extends TimerTask {
 
   @Override
   public void run() {
-    for (CloudDebugProcessState state : cloudDebugGlobalPoller.getStates()) {
+    for (CloudDebugProcessState state : cloudDebugGlobalPoller.getBackgroundListeningStates()) {
       cloudDebugGlobalPoller.pollForChanges(state);
     }
   }
