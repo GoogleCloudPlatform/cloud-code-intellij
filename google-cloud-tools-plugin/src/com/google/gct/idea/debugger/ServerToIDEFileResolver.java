@@ -27,6 +27,7 @@ import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiJavaFile;
+import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
@@ -75,11 +76,15 @@ public class ServerToIDEFileResolver {
     VirtualFile file = FILE_SYSTEM.findFileByPath(project.getBasePath() + "/" + path);
     // Try class name with package and class file name.
     if (file == null) {
-      PsiClass[] matchingClasses = JavaPsiFacade.getInstance(project)
-          .findPackage(getPackageFromPath(path))
-          .findClassByShortName(getClassNameFromPath(path), GlobalSearchScope.allScope(project));
-      if (matchingClasses.length > 0) {
-        file = matchingClasses[0].getContainingFile().getVirtualFile();
+      PsiPackage psiPackage = JavaPsiFacade.getInstance(project)
+          .findPackage(getPackageFromPath(path));
+      // If a class isn't in a project's classpath, psiPackage will be null.
+      if (psiPackage != null) {
+        PsiClass[] matchingClasses = psiPackage.findClassByShortName(
+            getClassNameFromPath(path), GlobalSearchScope.allScope(project));
+        if (matchingClasses.length > 0) {
+          file = matchingClasses[0].getContainingFile().getVirtualFile();
+        }
       }
     }
     // If we still couldn't find the file, search for possible file name matches and return the
