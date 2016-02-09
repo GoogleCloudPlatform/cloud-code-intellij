@@ -31,7 +31,7 @@ public class DebugTargetTest {
 
   private static final String DEFAULT_MODULE_NAME = "Default";
 
-  private static final String MODULE_VERSION_FORMAT = "%s Version:%s";
+  private static final String MODULE_VERSION_FORMAT = "%s (Version:%s)";
 
   @Test
   public void testDefaultModuleTargetLabel() {
