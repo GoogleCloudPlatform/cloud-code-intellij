@@ -557,10 +557,22 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
             .showDialog(myProcess.getBreakpointHandler().getXBreakpoint(breakpoint));
       }
       else if (event.getClickCount() == 1 && breakpoint != null && myTable.getSelectedRows().length == 1) {
-        getModel().unMarkAsNewlyReceived(breakpoint.getId());
-        myProcess.navigateToSnapshot(breakpoint.getId());
+        selectSnapshot(breakpoint, false);
       }
     }
+  }
+
+  private void selectSnapshot(Breakpoint breakpoint, boolean isSelectedBeforeTrigger) {
+    getModel().unMarkAsNewlyReceived(breakpoint.getId());
+
+    if(isSelectedBeforeTrigger || isNewlySelected(breakpoint)) {
+      myProcess.navigateToSnapshot(breakpoint.getId());
+    }
+  }
+
+  private boolean isNewlySelected(Breakpoint breakpoint) {
+      return myProcess.getCurrentSnapshot() == null
+          || !myProcess.getCurrentSnapshot().getId().equals(breakpoint.getId());
   }
 
   /**
@@ -645,6 +657,27 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
             .setDisposable(myProcess.getXDebugSession().getProject());
         myBalloon = builder.createBalloon();
         myBalloon.show(new RelativePoint(myTable, new Point(myTable.getWidth() / 2, rectangle.y)), Position.above);
+
+        reloadSnapshot();
+      }
+    }
+
+    /**
+     * If the snapshot was already selected prior to being triggered,
+     * e.g. the user selected it while in a pending state,
+     * we need to force trigger its selection so that the new results are drawn
+     */
+    private void reloadSnapshot() {
+      int selectedRow = myTable.getSelectedRow();
+
+      if(selectedRow != -1
+          && selectedRow < getModel().getBreakpoints().size()
+          && getModel().isNewlyReceived(selectedRow)) {
+        Breakpoint breakpoint = getModel().getBreakpoints().get(selectedRow);
+
+        if(breakpoint != null && myTable.getSelectedRows().length == 1) {
+          selectSnapshot(breakpoint, true);
+        }
       }
     }
   }

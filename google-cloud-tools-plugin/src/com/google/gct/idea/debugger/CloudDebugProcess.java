@@ -286,9 +286,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
                     return;
                   }
 
-                  if (myCurrentSnapshot == null || !myCurrentSnapshot.getId().equals(result.getId())) {
-                    navigateToBreakpoint(result);
-                  }
+                  navigateToBreakpoint(result);
                 }
               }
             });
