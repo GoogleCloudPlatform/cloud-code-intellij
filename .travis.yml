@@ -15,7 +15,7 @@ deploy:
   file_glob: true
   file:
     - ${HOME}/build/${TRAVIS_REPO_SLUG}/google-account-plugin/build/distributions/google-account-*.zip
-    - ${HOME}/build/${TRAVIS_REPO_SLUG}/core-plugin/build/distributions/google-cloud-tools-core-*.zip
+    - ${HOME}/build/${TRAVIS_REPO_SLUG}/google-cloud-tools-plugin/build/distributions/google-cloud-tools-*.zip
   on:
     tags: true
     condition: "$TRAVIS_TAG =~ ^v[0-9]+.*$"
