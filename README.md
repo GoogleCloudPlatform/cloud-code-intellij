@@ -22,6 +22,11 @@ into the IntelliJ IDEA UI. Currently this includes:
 
 ## Installation
 
+You can find our plugin in the Jetbrains plugin repository by going to IntelliJ -> Settings -> Browse Repositories, and search for 'Google Cloud Tools'. 
+You will see a prompt to install the 'Google Account' plugin which provides common Google settings to the plugin.
+
+### Pre-releases 
+
 The pre-release alpha binaries are being deployed to the Jetbrains plugin repository on an alpha
 channel. To install them please perform the following steps:
 
