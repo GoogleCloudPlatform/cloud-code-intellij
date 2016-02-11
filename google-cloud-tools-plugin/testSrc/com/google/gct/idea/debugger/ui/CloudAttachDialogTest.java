@@ -145,6 +145,8 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     assertNull(error);
     assertFalse(targetSelector.isEnabled());
     assertNull(targetSelector.getSelectedItem());
+    // We want to make sure that the OK button is disabled, though.
+    assertFalse(dialog.isOKActionEnabled());
 
     dialog.close(0);
   }

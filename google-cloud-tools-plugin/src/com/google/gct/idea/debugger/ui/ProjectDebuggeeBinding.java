@@ -56,6 +56,11 @@ class ProjectDebuggeeBinding {
   private Debugger cloudDebuggerClient = null;
   private CredentialedUser credentialedUser = null;
   private CloudDebugProcessState inputState;
+  // Avoids attach dialog starting with an error message that goes away shortly.
+  // We should only say a user doesn't have access to a project after querying CDB for debuggees.
+  // TODO(joaomartins,eshaul): understand why the first invocation of refreshDebugTargetList
+  //   has projectSelector.getProjectNumber() set to null.
+  private boolean isCdbQueried = false;
 
   public ProjectDebuggeeBinding(@NotNull ProjectSelector projectSelector,
                                 @NotNull JComboBox targetSelector,
@@ -144,10 +149,10 @@ class ProjectDebuggeeBinding {
       public void run() {
         try {
           if (projectSelector.getProjectNumber() != null && getCloudDebuggerClient() != null) {
-              final ListDebuggeesResponse debuggees =
-                  getCloudDebuggerClient().debuggees().list()
-                      .setProject(projectSelector.getProjectNumber().toString())
-                      .execute();
+            final ListDebuggeesResponse debuggees = getCloudDebuggerClient().debuggees().list()
+                .setProject(projectSelector.getProjectNumber().toString())
+                .execute();
+            isCdbQueried = true;
 
             SwingUtilities.invokeLater(new Runnable() {
               @Override
@@ -213,7 +218,6 @@ class ProjectDebuggeeBinding {
     disableTargetSelector(errorMessage);
   }
 
-  @SuppressWarnings("unchecked")
   private void disableTargetSelector(String reason) {
     targetSelector.setEnabled(false);
 
@@ -239,5 +243,9 @@ class ProjectDebuggeeBinding {
       default:
         return GctBundle.getString("clouddebug.debug.targets.error", reason.getDetails().getMessage());
     }
+  }
+
+  public boolean isCdbQueried() {
+    return isCdbQueried;
   }
 }

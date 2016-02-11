@@ -197,12 +197,19 @@ public class CloudAttachDialog extends DialogWrapper {
     // validation should run only after the query for debug targets has results
     // assumption: either an ErrorHolder or one or more DebugTargets are added to the selector when
     //             the result is available
-    if (!targetSelector.isEnabled() && targetSelector.getItemCount() > 0) {
-      if (targetSelector.getSelectedItem() instanceof ErrorHolder) {
-        return new ValidationInfo(((ErrorHolder) targetSelector.getSelectedItem()).getErrorMessage(),
-            elysiumProjectSelector);
-      } else {
-        return new ValidationInfo(GctBundle.getString("clouddebug.selectvalidproject"),
+    if (!targetSelector.isEnabled()) {
+      if (targetSelector.getItemCount() > 0) {
+        if (targetSelector.getSelectedItem() instanceof ErrorHolder) {
+          return new ValidationInfo(
+              ((ErrorHolder) targetSelector.getSelectedItem()).getErrorMessage(),
+              elysiumProjectSelector);
+        } else {
+          return new ValidationInfo(GctBundle.getString("clouddebug.selectvalidproject"),
+              elysiumProjectSelector);
+        }
+      } else if (wireup.isCdbQueried()) {
+        // We went to CDB and detected no debuggees.
+        return new ValidationInfo(GctBundle.getString("clouddebug.debug.targets.accessdenied"),
             elysiumProjectSelector);
       }
     }
