@@ -25,20 +25,13 @@ import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.api.services.clouddebugger.model.ListBreakpointsResponse;
 import com.google.gct.idea.util.GctBundle;
 
-import com.intellij.execution.RunManager;
-import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.execution.configurations.RunProfile;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationAdapter;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.util.containers.ContainerUtil;
-import com.intellij.xdebugger.XDebugSession;
-import com.intellij.xdebugger.XDebuggerManager;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,9 +39,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
 
 /**
@@ -102,37 +93,6 @@ public class CloudDebugGlobalPoller {
       myWatchTimer.cancel();
       myWatchTimer = null;
     }
-  }
-
-
-  List<CloudDebugProcessState> getBackgroundListeningStates() {
-    List<CloudDebugProcessState> states = new ArrayList<CloudDebugProcessState>();
-
-    for (Project project : ProjectManager.getInstance().getOpenProjects()) {
-      Set<RunProfile> debuggingProfiles = new HashSet<RunProfile>();
-      XDebuggerManager debugManager = XDebuggerManager.getInstance(project);
-      for (XDebugSession session : debugManager.getDebugSessions()) {
-        if (!session.isStopped() && session.getRunProfile() != null) {
-          debuggingProfiles.add(session.getRunProfile());
-        }
-      }
-
-      RunManager manager = RunManager.getInstance(project);
-      for (final RunnerAndConfigurationSettings config : manager.getAllSettings()) {
-        if (config.getConfiguration() == null || debuggingProfiles.contains(config.getConfiguration())) {
-          continue;
-        }
-
-        if (config.getConfiguration() instanceof CloudDebugRunConfiguration) {
-          final CloudDebugRunConfiguration cloudConfig = (CloudDebugRunConfiguration)config.getConfiguration();
-          CloudDebugProcessState state = cloudConfig.getProcessState();
-          if (state != null && state.isListenInBackground()) {
-            states.add(state);
-          }
-        }
-      }
-    }
-    return states;
   }
 
   private void queryServerForBreakpoints(CloudDebugProcessState state, Debugger client)

@@ -7,15 +7,17 @@ import java.util.TimerTask;
  */
 class CloudDebugGlobalPollerTimerTask extends TimerTask {
 
+  private final CloudDebugProcessStateCollector stateCollector;
   private CloudDebugGlobalPoller cloudDebugGlobalPoller;
 
   public CloudDebugGlobalPollerTimerTask(CloudDebugGlobalPoller cloudDebugGlobalPoller) {
     this.cloudDebugGlobalPoller = cloudDebugGlobalPoller;
+    stateCollector = CloudDebugProcessStateCollector.getInstance();
   }
 
   @Override
   public void run() {
-    for (CloudDebugProcessState state : cloudDebugGlobalPoller.getBackgroundListeningStates()) {
+    for (CloudDebugProcessState state : stateCollector.getBackgroundListeningStates()) {
       cloudDebugGlobalPoller.pollForChanges(state);
     }
   }
