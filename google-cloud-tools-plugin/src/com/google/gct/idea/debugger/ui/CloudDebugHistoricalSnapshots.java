@@ -659,6 +659,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         myBalloon.show(new RelativePoint(myTable, new Point(myTable.getWidth() / 2, rectangle.y)), Position.above);
 
         reloadSnapshot();
+      } else if (oldModel.hasPendingDeletes() && oldModel.getBreakpoints().size() > newModel.getBreakpoints().size()) {
+          myProcess.clearExecutionStack();
       }
     }
 

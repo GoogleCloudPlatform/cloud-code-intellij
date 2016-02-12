@@ -259,6 +259,24 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   }
 
   /**
+   * Clears out the current execution stack while keeping the debug session alive.
+   * Useful for breakpoint delete operations which result in no selected snapshots, requiring us
+   * to display an empty stack in the UI, while keeping the debug session alive.
+   */
+  public void clearExecutionStack() {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        if (!getXDebugSession().isStopped()) {
+          // Since there is no equivalent metaphor in traditional debug sessions, this simulates the desired
+          // behavior of clearing the current context by setting the current position to an empty context
+          getXDebugSession().positionReached(new XSuspendContext() {});
+        }
+      }
+    });
+  }
+
+  /**
    * Finds the snapshot associated with the given id and sets it as the active snapshot in the current debug session.
    */
   public void navigateToSnapshot(@NotNull final String id) {
