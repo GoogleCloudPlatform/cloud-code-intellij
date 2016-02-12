@@ -97,6 +97,10 @@ Code inspections for AppEngine Java code.</description>
             implementation="com.google.gct.login.IntelliJGoogleLoginMessageExtender"/>
   </extensions>
 
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="com.google.gct.idea.debugger.CloudDebugProcessStateCollector" />
+  </extensions>
+
   <actions>
     <action id="AddSnapshotLocation" class="com.google.gct.idea.debugger.actions.ToggleSnapshotLocationAction"/>
 
