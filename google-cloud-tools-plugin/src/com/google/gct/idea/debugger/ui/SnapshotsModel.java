@@ -116,6 +116,10 @@ class SnapshotsModel extends AbstractTableModel {
     return breakpoint != null && myPendingDeletes.contains(breakpoint.getId());
   }
 
+  boolean hasPendingDeletes() {
+    return !myPendingDeletes.isEmpty();
+  }
+
   boolean isNewlyReceived(String id) {
     return myNewlyReceived.contains(id);
   }
