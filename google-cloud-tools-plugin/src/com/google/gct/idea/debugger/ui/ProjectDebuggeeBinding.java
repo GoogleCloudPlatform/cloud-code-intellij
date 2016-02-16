@@ -160,7 +160,7 @@ class ProjectDebuggeeBinding {
                 DebugTarget targetSelection = null;
 
                 if (debuggees == null || debuggees.getDebuggees() == null || debuggees.getDebuggees().isEmpty()) {
-                  disableTargetSelector(GctBundle.getString("clouddebug.selectvalidproject"));
+                  disableTargetSelector(GctBundle.getString("clouddebug.nomodulesfound"));
                 }
                 else {
                   targetSelector.setEnabled(true);

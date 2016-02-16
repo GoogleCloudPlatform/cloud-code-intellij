@@ -43,8 +43,7 @@ import javax.swing.JLabel;
 public class CloudAttachDialogTest extends PlatformTestCase {
   private static final String NO_LOGIN_WARNING = "You must be logged in to perform this action.";
   private static final String NO_PROJECT_ID_WARNING = "Please enter a Project ID.";
-  private static final String NO_MODULES_WARNING = "No debuggable modules found.";
-  private static final String SELECT_VALID_PROJECT_WARNING = "Please select a project with debuggable modules.";
+  private static final String NO_MODULES_FOUND_WARNING = "No debuggable modules found. Please ensure that your application has live instances.";
 
   private static final String USER = "test@user.com";
   private static final String PASSWORD = "123";
@@ -92,7 +91,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     ValidationInfo error = dialog.doValidate();
 
     assertNotNull(error);
-    assertEquals(SELECT_VALID_PROJECT_WARNING, error.message);
+    assertEquals(NO_MODULES_FOUND_WARNING, error.message);
     assertFalse(warningMessage.isVisible());
     assertFalse(warningHeader.isVisible());
 
@@ -208,7 +207,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     projectSelector.setText("emptyProject");
     targetSelector.removeAllItems();
     targetSelector.setEnabled(false);
-    targetSelector.addItem(NO_MODULES_WARNING);
+    targetSelector.addItem(NO_MODULES_FOUND_WARNING);
   }
 
   @SuppressWarnings("unchecked")

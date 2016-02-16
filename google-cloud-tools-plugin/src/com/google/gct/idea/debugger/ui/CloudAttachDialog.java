@@ -204,7 +204,7 @@ public class CloudAttachDialog extends DialogWrapper {
               ((ErrorHolder) targetSelector.getSelectedItem()).getErrorMessage(),
               elysiumProjectSelector);
         } else {
-          return new ValidationInfo(GctBundle.getString("clouddebug.selectvalidproject"),
+          return new ValidationInfo(GctBundle.getString("clouddebug.nomodulesfound"),
               elysiumProjectSelector);
         }
       } else if (wireup.isCdbQueried()) {
@@ -218,7 +218,7 @@ public class CloudAttachDialog extends DialogWrapper {
     // assumption: either an ErrorHolder or one or more DebugTargets are added to the selector when
     //             the result is available
     if (targetSelector.getSelectedItem() == null && targetSelector.getItemCount() > 0) {
-      return new ValidationInfo(GctBundle.getString("clouddebug.selectvalidproject"),
+      return new ValidationInfo(GctBundle.getString("clouddebug.nomodulesfound"),
           targetSelector);
     }
 
