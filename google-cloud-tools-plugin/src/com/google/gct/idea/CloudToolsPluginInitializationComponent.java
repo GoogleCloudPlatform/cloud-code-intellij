@@ -15,31 +15,22 @@
  */
 package com.google.gct.idea;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.debugger.CloudDebugConfigType;
-import com.google.gct.idea.feedback.FeedbackUtil;
-import com.google.gct.idea.util.PlatformInfo;
 
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.openapi.components.ApplicationComponent;
-import com.intellij.openapi.extensions.Extensions;
-import com.intellij.util.PlatformUtils;
+import com.intellij.openapi.components.ServiceManager;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Performs runtime initialization for the GCT plugin.
  */
 public class CloudToolsPluginInitializationComponent implements ApplicationComponent {
 
-  private static final String PLUGIN_ID = "com.google.gct.core";
-
   @Override
   public void disposeComponent() {
-
+    // Do nothing.
   }
 
   @NotNull
@@ -50,29 +41,18 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
 
   @Override
   public void initComponent() {
-    initComponent(PlatformUtils.getPlatformPrefix(), CloudDebugConfigType.isFeatureEnabled());
-  }
-
-  @VisibleForTesting
-  void initComponent(String platformPrefix, Boolean enableDebugger) {
-    if ("AndroidStudio".equals(platformPrefix)) {
-      if (enableDebugger) {
-        enableCloudDebugger();
-      }
-    } else if (PlatformInfo.SUPPORTED_PLATFORMS.contains(platformPrefix)) {
-      enableFeedbackUtil();
-      enableCloudDebugger();
+    CloudToolsPluginInfoService pluginInfoService = ServiceManager
+        .getService(CloudToolsPluginInfoService.class);
+    CloudToolsPluginConfigurationService pluginConfigurationService = ServiceManager
+        .getService(CloudToolsPluginConfigurationService.class);
+    if (pluginInfoService.shouldEnable(GctFeature.DEBUGGER)) {
+      pluginConfigurationService
+          .registerExtension(
+              ConfigurationType.CONFIGURATION_TYPE_EP, new CloudDebugConfigType());
     }
-  }
-
-  @VisibleForTesting
-  void enableCloudDebugger() {
-    Extensions.getRootArea().getExtensionPoint(ConfigurationType.CONFIGURATION_TYPE_EP)
-        .registerExtension(new CloudDebugConfigType());
-  }
-
-  @VisibleForTesting
-  void enableFeedbackUtil() {
-    FeedbackUtil.enableGoogleFeedbackErrorReporting(PLUGIN_ID);
+    if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
+      pluginConfigurationService
+          .enabledGoogleFeedbackErrorReporting(pluginInfoService.getPluginId());
+    }
   }
 }

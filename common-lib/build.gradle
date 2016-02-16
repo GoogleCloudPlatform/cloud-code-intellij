@@ -1,3 +1,4 @@
 dependencies {
     compile files('lib/GoogleFeedback.jar')
+    testCompile project(":common-test-lib")
 }

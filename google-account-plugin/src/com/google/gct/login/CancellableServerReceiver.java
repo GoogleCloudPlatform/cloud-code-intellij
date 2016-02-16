@@ -23,7 +23,8 @@ import com.google.api.client.repackaged.org.mortbay.jetty.Request;
 import com.google.api.client.repackaged.org.mortbay.jetty.Server;
 import com.google.api.client.repackaged.org.mortbay.jetty.handler.AbstractHandler;
 import com.google.gct.idea.util.IntelliJPlatform;
-import com.google.gct.idea.util.PlatformInfo;
+
+import com.intellij.util.PlatformUtils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -241,7 +242,8 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
 
     @NotNull
     private String getFailureLandingPage() {
-      IntelliJPlatform currentPlatform = PlatformInfo.getCurrentPlatform();
+      IntelliJPlatform currentPlatform = IntelliJPlatform
+          .fromPrefix(PlatformUtils.getPlatformPrefix());
       if (currentPlatform == IntelliJPlatform.ANDROID_STUDIO) {
         return LandingPages.ANDROID_STUDIO.getFailurePage();
       }
@@ -250,7 +252,8 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
 
     @NotNull
     private String getSuccessLandingPage() {
-      IntelliJPlatform currentPlatform = PlatformInfo.getCurrentPlatform();
+      IntelliJPlatform currentPlatform = IntelliJPlatform
+          .fromPrefix(PlatformUtils.getPlatformPrefix());
       if (currentPlatform == IntelliJPlatform.ANDROID_STUDIO) {
         return LandingPages.ANDROID_STUDIO.getSuccessPage();
       }

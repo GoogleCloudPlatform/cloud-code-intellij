@@ -27,11 +27,12 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.Clouddebugger.Builder;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.gct.idea.util.PlatformInfo;
+import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
 import com.google.gdt.eclipse.login.common.LoginListener;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -124,7 +125,8 @@ public class CloudDebuggerClient {
           };
 
           HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-          String userAgent = PlatformInfo.getUserAgent();
+          String userAgent = ServiceManager
+              .getService(CloudToolsPluginInfoService.class).getUserAgent();
           cloudDebuggerClient = new Builder(httpTransport, JSON_FACTORY, initializer)
               .setRootUrl(ROOT_URL)
               // this ends up prefixed to user agent

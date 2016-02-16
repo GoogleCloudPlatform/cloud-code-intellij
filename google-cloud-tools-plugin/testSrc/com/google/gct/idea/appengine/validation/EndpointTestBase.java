@@ -32,8 +32,8 @@ import java.io.File;
 public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
   @Override
   protected String getTestDataPath() {
-    String homePath = new File(".").getAbsolutePath();
-    String homePathParent = homePath.substring(0, homePath.lastIndexOf('/'));
+    File currentWorkingDirectory = new File("");
+    String homePathParent = currentWorkingDirectory.getAbsolutePath();
     return homePathParent + FileUtil.toSystemDependentName("/testData/");
   }
 

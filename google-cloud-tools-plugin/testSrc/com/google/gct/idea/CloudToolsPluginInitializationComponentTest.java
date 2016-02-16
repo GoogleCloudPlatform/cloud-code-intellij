@@ -1,85 +1,73 @@
 package com.google.gct.idea;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-import com.google.api.client.util.Lists;
 import com.google.gct.idea.debugger.CloudDebugConfigType;
-import com.google.gct.idea.util.IntelliJPlatform;
-import com.google.gct.idea.util.PlatformInfo;
+import com.google.gct.idea.testing.BasePluginTestCase;
 
-import com.intellij.util.PlatformUtils;
+import com.intellij.openapi.extensions.ExtensionPointName;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
-import java.util.Properties;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * Tests to validate initialization on supported platforms
  */
-public class CloudToolsPluginInitializationComponentTest {
 
-  @Test
-  public void testInitComponent_AndroidStudio() {
-    CloudToolsPluginInitializationComponent spy = spy(new CloudToolsPluginInitializationComponent());
+@RunWith(MockitoJUnitRunner.class)
+public class CloudToolsPluginInitializationComponentTest extends BasePluginTestCase {
 
-    spy.initComponent("AndroidStudio", false);
-    verify(spy).initComponent("AndroidStudio", false);
-    verifyNoMoreInteractions(spy);
+  private static final String PLUGIN_ID_STRING = "com.google.gct.core";
+  @Mock
+  CloudToolsPluginInfoService pluginInfoService;
+  @Mock
+  CloudToolsPluginConfigurationService pluginConfigurationService;
+  CloudToolsPluginInitializationComponent testComponent;
+
+  @Before
+  public void registerMockServices() {
+    registerService(CloudToolsPluginInfoService.class, pluginInfoService);
+    registerService(CloudToolsPluginConfigurationService.class, pluginConfigurationService);
+    testComponent = new CloudToolsPluginInitializationComponent();
   }
 
   @Test
-  public void testInitComponent_AndroidStudioWithDebugger() {
-    CloudToolsPluginInitializationComponent spy = spy(new CloudToolsPluginInitializationComponent());
-    doNothing().when(spy).enableCloudDebugger();
+  public void testInitComponent_debuggerIsEnabled() {
+    when(pluginInfoService.shouldEnable(GctFeature.DEBUGGER)).thenReturn(true);
+    testComponent.initComponent();
+    verify(pluginConfigurationService).registerExtension(isA(ExtensionPointName.class),
+        isA(CloudDebugConfigType.class));
+  }
 
-    spy.initComponent("AndroidStudio", true);
-    verify(spy).initComponent("AndroidStudio", true);
-    verify(spy).enableCloudDebugger();
-    verifyNoMoreInteractions(spy);
+
+  @Test
+  public void testInitComponent_debuggerIsDisabled() {
+    when(pluginInfoService.shouldEnable(GctFeature.DEBUGGER)).thenReturn(false);
+    testComponent.initComponent();
+    verify(pluginConfigurationService, never())
+        .registerExtension(isA(ExtensionPointName.class),
+            isA(CloudDebugConfigType.class));
   }
 
   @Test
-  public void testInitComponent_IdeaPlatforms() {
-    for (boolean enableCdb : new boolean[]{true, false}) {
-      for (String platform : PlatformInfo.SUPPORTED_PLATFORMS) {
-
-        CloudToolsPluginInitializationComponent spy = spy(
-            new CloudToolsPluginInitializationComponent());
-        doNothing().when(spy).enableCloudDebugger();
-        doNothing().when(spy).enableFeedbackUtil();
-
-        spy.initComponent(platform, enableCdb);
-        verify(spy).initComponent(platform, enableCdb);
-        verify(spy).enableCloudDebugger();
-        verify(spy).enableFeedbackUtil();
-        verifyNoMoreInteractions(spy);
-      }
-    }
+  public void testInitComponent_feedbackIsEnabled() {
+    when(pluginInfoService.shouldEnableErrorFeedbackReporting()).thenReturn(true);
+    when(pluginInfoService.getPluginId()).thenReturn(PLUGIN_ID_STRING);
+    testComponent.initComponent();
+    verify(pluginConfigurationService).enabledGoogleFeedbackErrorReporting(PLUGIN_ID_STRING);
   }
 
   @Test
-  public void testInitComponent_OtherPlatforms() {
-    List<String> platforms = Lists.newArrayList();
-    for (IntelliJPlatform platform : IntelliJPlatform.values()) {
-      platforms.add(platform.getPlatformPrefix());
-    }
-
-    platforms.add("SomeGibberishPlatformASDF1234");
-    platforms.removeAll(PlatformInfo.SUPPORTED_PLATFORMS);
-
-    for (String platform : platforms) {
-      CloudToolsPluginInitializationComponent spy = spy(new CloudToolsPluginInitializationComponent());
-
-      spy.initComponent(platform, false);
-      verify(spy).initComponent(platform, false);
-      verifyNoMoreInteractions(spy);
-    }
+  public void testInitComponent_feedbackIsDisabled() {
+    when(pluginInfoService.shouldEnableErrorFeedbackReporting()).thenReturn(false);
+    testComponent.initComponent();
+    verify(pluginConfigurationService, never()).enabledGoogleFeedbackErrorReporting(anyString());
   }
-
 }

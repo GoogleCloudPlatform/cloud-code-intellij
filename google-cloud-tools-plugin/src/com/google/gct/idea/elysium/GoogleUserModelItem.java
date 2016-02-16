@@ -21,11 +21,12 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.developerprojects.Developerprojects;
 import com.google.api.services.developerprojects.model.ListProjectsResponse;
 import com.google.api.services.developerprojects.model.Project;
+import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.idea.util.GctBundle;
-import com.google.gct.idea.util.PlatformInfo;
 import com.google.gct.login.CredentialedUser;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +64,8 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     setNeedsSynchronizing();
     developerProjectsClient = new Developerprojects.Builder(
         new NetHttpTransport(), new JacksonFactory(), myUser.getCredential())
-        .setApplicationName(PlatformInfo.getUserAgent())
+        .setApplicationName(
+            ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent())
         .build();
   }
 
