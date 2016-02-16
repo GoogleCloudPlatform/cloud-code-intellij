@@ -27,6 +27,7 @@ dependencies {
 
     testCompile 'xalan:serializer:2.7.1'
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
+    testCompile(project(':common-test-lib'))
 }
 
 configurations {

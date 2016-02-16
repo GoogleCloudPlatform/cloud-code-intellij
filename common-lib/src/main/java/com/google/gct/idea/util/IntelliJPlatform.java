@@ -21,7 +21,7 @@ import com.intellij.util.PlatformUtils;
  * Identifies the current platform based on platform prefix.
  */
 public enum IntelliJPlatform {
-  IDEA("IntelliJ IDEA", PlatformUtils.IDEA_PREFIX),
+  IDEA("IntelliJ IDEA Ultimate Edition", PlatformUtils.IDEA_PREFIX),
   IDEA_IC("IntelliJ IDEA Community Edition", PlatformUtils.IDEA_CE_PREFIX),
   RUBYMINE("RubyMine", PlatformUtils.RUBY_PREFIX),
   PYCHARM("PyCharm", PlatformUtils.PYCHARM_PREFIX),
@@ -37,7 +37,8 @@ public enum IntelliJPlatform {
   private final String myName;
   private final String myPlatformPrefix;
 
-  public String getName() {
+  @Override
+  public String toString() {
     return myName;
   }
 

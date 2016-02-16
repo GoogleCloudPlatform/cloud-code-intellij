@@ -51,6 +51,10 @@
     <applicationConfigurable provider="com.google.gct.stats.GoogleSettingsConfigurableProvider"/>
     <applicationService serviceInterface="com.google.gct.stats.UsageTrackerProvider"
                         serviceImplementation="com.google.gct.stats.KeyedExtensionUsageTrackerProvider"/>
+    <applicationService serviceInterface="com.google.gct.idea.AccountPluginInfoService"
+                        serviceImplementation="com.google.gct.idea.IdeaAccountPluginInfoService"/>
+    <applicationService serviceInterface="com.google.gct.idea.AccountPluginConfigurationService"
+                        serviceImplementation="com.google.gct.idea.DefaultAccountPluginConfigurationService"/>
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct">

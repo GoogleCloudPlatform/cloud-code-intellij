@@ -1,18 +1,16 @@
 package com.google.gct.idea;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.gct.idea.feedback.FeedbackUtil;
-
-import com.google.gct.idea.util.PlatformInfo;
+import com.google.gct.login.util.TrackerMessageBundle;
 import com.google.gct.stats.UsageTrackerManager;
 import com.google.gct.stats.UsageTrackerNotification;
-import com.google.gct.login.util.TrackerMessageBundle;
+
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationsConfiguration;
 import com.intellij.notification.NotificationsManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
-import com.intellij.util.PlatformUtils;
+import com.intellij.openapi.components.ServiceManager;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,8 +18,6 @@ import org.jetbrains.annotations.NotNull;
  * Performs runtime initialization for the Google Login plugin.
  */
 public class AccountPluginInitializationComponent implements ApplicationComponent {
-
-  private static final String PLUGIN_ID = "com.google.gct.login";
 
   @NotNull
   @Override
@@ -31,18 +27,16 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
 
   @Override
   public void initComponent() {
-    initComponent(PlatformUtils.getPlatformPrefix());
-  }
-
-  @VisibleForTesting
-  void initComponent(String platformPrefix) {
-    if (PlatformInfo.SUPPORTED_PLATFORMS.contains(platformPrefix)) {
-      enableFeedbackUtil();
-      if (!ApplicationManager.getApplication().isUnitTestMode()) {
-        enableUsageTracking();
-      }
+    AccountPluginInfoService pluginInfoService =
+        ServiceManager.getService(AccountPluginInfoService.class);
+    AccountPluginConfigurationService pluginConfigurationService = ServiceManager
+        .getService(AccountPluginConfigurationService.class);
+    if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
+      pluginConfigurationService.enabledGoogleFeedbackErrorReporting(pluginInfoService.getPluginId());
     }
-
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      configureUsageTracking();
+    }
   }
 
   @Override
@@ -50,10 +44,6 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
     // no-op
   }
 
-  @VisibleForTesting
-  void enableFeedbackUtil() {
-    FeedbackUtil.enableGoogleFeedbackErrorReporting(PLUGIN_ID);
-  }
 
   /**
    * For Google Usage Tracker
@@ -63,15 +53,15 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
    * and is therefore not subscribed and listening.
    */
   @VisibleForTesting
-  void enableUsageTracking() {
+  void configureUsageTracking() {
     UsageTrackerManager usageTrackerManager = UsageTrackerManager.getInstance();
-    NotificationsManager.getNotificationsManager();
-    NotificationsConfiguration.getNotificationsConfiguration().register(
-        TrackerMessageBundle.message("notification.group.display.id"),
-        NotificationDisplayType.STICKY_BALLOON);
-    if (usageTrackerManager.isUsageTrackingAvailable() && !usageTrackerManager.hasUserRecordedTrackingPreference()) {
+    if (usageTrackerManager.isUsageTrackingAvailable()
+        && !usageTrackerManager.hasUserRecordedTrackingPreference()) {
+      NotificationsManager.getNotificationsManager();
+      NotificationsConfiguration.getNotificationsConfiguration().register(
+          TrackerMessageBundle.message("notification.group.display.id"),
+          NotificationDisplayType.STICKY_BALLOON);
       UsageTrackerNotification.getInstance().showNotification();
     }
-
   }
 }

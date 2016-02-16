@@ -37,7 +37,10 @@ Code inspections for AppEngine Java code.</description>
     <programRunner implementation="com.google.gct.idea.debugger.CloudDebuggerRunner"/>
     <xdebugger.breakpointType implementation="com.google.gct.idea.debugger.CloudLineBreakpointType"/>
     <projectService serviceImplementation="com.google.gct.idea.debugger.CloudDebugProcessStateSerializer"/>
-
+    <applicationService serviceInterface="com.google.gct.idea.CloudToolsPluginInfoService"
+                        serviceImplementation="com.google.gct.idea.IdeaCloudToolsPluginInfoService"/>
+    <applicationService serviceInterface="com.google.gct.idea.CloudToolsPluginConfigurationService"
+                        serviceImplementation="com.google.gct.idea.DefaultCloudToolsPluginConfigurationService"/>
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
                      implementationClass="com.google.gct.idea.appengine.validation.ApiNameInspection"/>

@@ -1,5 +1,7 @@
 package com.google.gct.idea.elysium;
 
+import com.google.gct.idea.CloudToolsPluginInfoService;
+import com.google.gct.idea.testing.BasePluginTestCase;
 import com.google.gct.login.CredentialedUser;
 
 import org.junit.Assert;
@@ -17,10 +19,11 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 @RunWith(MockitoJUnitRunner.class)
-public class GoogleUserModelItemTest {
+public class GoogleUserModelItemTest extends BasePluginTestCase {
 
   @Mock private CredentialedUser user;
   @Mock private Image image;
+  @Mock private CloudToolsPluginInfoService mockPluginInfoService;
 
   private DefaultTreeModel model;
 
@@ -36,6 +39,7 @@ public class GoogleUserModelItemTest {
 
   @Test
   public void testGetters() {
+    registerService(CloudToolsPluginInfoService.class, mockPluginInfoService);
     GoogleUserModelItem item = new GoogleUserModelItem(user, model);
     Assert.assertEquals(user, item.getCredentialedUser());
     Assert.assertEquals("foo@example.com", item.getEmail());

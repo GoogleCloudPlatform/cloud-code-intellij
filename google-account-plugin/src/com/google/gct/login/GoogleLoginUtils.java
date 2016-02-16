@@ -21,16 +21,18 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
-import com.google.gct.idea.util.PlatformInfo;
+import com.google.gct.idea.AccountPluginInfoService;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.Messages;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -77,7 +79,8 @@ public class GoogleLoginUtils {
     final IUserPropertyCallback callback) {
     final Oauth2 userInfoService =
       new Oauth2.Builder(new NetHttpTransport(), new JacksonFactory(), credential)
-        .setApplicationName(PlatformInfo.getUserAgent())
+        .setApplicationName(
+            ServiceManager.getService(AccountPluginInfoService.class).getUserAgent())
         .build();
 
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {

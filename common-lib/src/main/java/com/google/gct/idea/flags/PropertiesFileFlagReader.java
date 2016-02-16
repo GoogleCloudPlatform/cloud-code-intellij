@@ -6,6 +6,7 @@ import com.intellij.openapi.diagnostic.Logger;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -16,7 +17,7 @@ import java.util.Properties;
  */
 public class PropertiesFileFlagReader implements FlagReader {
   private static final Logger LOGGER = Logger.getInstance(PropertiesFileFlagReader.class);
-  private static final String DEFAULT_PROPERTIES_FILE_PATH = "/config.properties";
+  private static final String DEFAULT_PROPERTIES_FILE_PATH = "config.properties";
   private final Properties properties;
 
   public PropertiesFileFlagReader() {
