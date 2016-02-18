@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.gct.idea.appengine.cloud.ManagedVmCloudType;
 import com.google.gct.idea.debugger.CloudDebugConfigType;
 import com.google.gct.idea.testing.BasePluginTestCase;
 
@@ -54,6 +55,24 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
     verify(pluginConfigurationService, never())
         .registerExtension(isA(ExtensionPointName.class),
             isA(CloudDebugConfigType.class));
+  }
+
+  @Test
+  public void testInitComponent_managedVmIsEnabled() {
+    when(pluginInfoService.shouldEnable(GctFeature.MANAGEDVM)).thenReturn(true);
+    testComponent.initComponent();
+    verify(pluginConfigurationService).registerExtension(isA(ExtensionPointName.class),
+        isA(ManagedVmCloudType.class));
+  }
+
+
+  @Test
+  public void testInitComponent_managedVmIsDisabled() {
+    when(pluginInfoService.shouldEnable(GctFeature.DEBUGGER)).thenReturn(false);
+    testComponent.initComponent();
+    verify(pluginConfigurationService, never())
+        .registerExtension(isA(ExtensionPointName.class),
+            isA(ManagedVmCloudType.class));
   }
 
   @Test

@@ -10,14 +10,6 @@
     </properties>
     <border type="none"/>
     <children>
-      <component id="b23a6" class="com.intellij.ui.components.JBLabel">
-        <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Project:"/>
-        </properties>
-      </component>
       <component id="30c54" class="com.google.gct.idea.elysium.ProjectSelector" binding="myElysiumProjectId">
         <constraints>
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -34,6 +26,14 @@
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
       </hspacer>
+      <component id="b23a6" class="com.intellij.ui.components.JBLabel">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Project:"/>
+        </properties>
+      </component>
     </children>
   </grid>
 </form>
