@@ -16,7 +16,6 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger.Debuggees;
@@ -36,6 +35,7 @@ import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -129,8 +129,9 @@ public class CloudDebugGlobalPoller {
   }
 
   /**
-   * pollForChanges sends a synchronous, non-hanging query to the server and compares the result to
-   * see if there are changes from the current state.
+   * pollForChanges sends a synchronous, hanging query to the server and compares the result to
+   * see if there are changes from the current state. Explanation of
+   * <a href="https://en.wikipedia.org/wiki/Push_technology#Long_polling">hanging query (a.k.a. long poll)</a>
    *
    * @param state represents the target debuggee to query
    */
@@ -169,6 +170,12 @@ public class CloudDebugGlobalPoller {
     }
     catch(SocketTimeoutException sto) {
       //noop, this is expected behavior.
+    } catch (GoogleJsonResponseException e) {
+      // HTTP 409 is expected when backend responds to "hanging query" either for timeout or because
+      // a result is available (which will be retrieved via the subsequent query)
+      if (e.getStatusCode() != HttpURLConnection.HTTP_CONFLICT) {
+        handleBreakpointQueryError(state, e);
+      }
     }
     catch (IOException ex) {
       LOG.warn("exception listing breakpoints", ex);
@@ -190,8 +197,8 @@ public class CloudDebugGlobalPoller {
     String projectName = state.getProject().getName();
     if (e instanceof GoogleJsonResponseException) {
       GoogleJsonResponseException jsonResponseException = (GoogleJsonResponseException) e;
-      if (jsonResponseException.getStatusCode() == HttpStatusCodes.STATUS_CODE_FORBIDDEN
-          || jsonResponseException.getStatusCode() == HttpStatusCodes.STATUS_CODE_UNAUTHORIZED) {
+      if (jsonResponseException.getStatusCode() == HttpURLConnection.HTTP_FORBIDDEN
+          || jsonResponseException.getStatusCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
         message = GctBundle.message("clouddebug.background.listener.access.error.message",
                                     projectName);
       } else {
