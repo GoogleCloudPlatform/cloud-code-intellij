@@ -25,6 +25,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -254,6 +255,15 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
         isA(Breakpoint.class), isA(SetBreakpointHandler.class));
   }
 
+  public void testRegisterRegisteredButDisabledBreakpoint() {
+    XLineBreakpointImpl<CloudLineBreakpointProperties> breakpoint = registerMockBreakpoint(
+        NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
+    myHandler.setStateToDisabled(new Breakpoint().setId("12abc"));
+    myHandler.registerBreakpoint(breakpoint);
+    verify(stateController, times(2)).setBreakpointAsync(
+        isA(Breakpoint.class), isA(SetBreakpointHandler.class));
+  }
+
   public void testCreateIdeRepresentationsIfNecessaryVerifiesNonFinalIdeBreakpoint()
       throws Exception {
     XLineBreakpointImpl breakpoint = registerMockBreakpoint(NO_WATCHES, NO_CONDITION, 13,
@@ -270,6 +280,32 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     Assert.assertTrue(cloudLineBreakpoint.isVerified());
   }
 
+  @SuppressWarnings("unchecked")
+  public void testUnregisterBreakpoint_shouldSetAddedOnServerToFalseAfterHitOnBackend() throws Exception {
+    XLineBreakpointImpl breakpoint = registerMockBreakpoint(NO_WATCHES, NO_CONDITION, 13,
+        "fileName", "packageName", false, "12abc");
+    myHandler.setStateToDisabled(new Breakpoint().setId("12abc"));
+    assertNotNull(breakpoint.getProperties());
+    assertTrue(((CloudLineBreakpointProperties) breakpoint.getProperties()).isAddedOnServer());
+
+    myHandler.unregisterBreakpoint(breakpoint, false);
+
+    assertFalse(((CloudLineBreakpointProperties) breakpoint.getProperties()).isAddedOnServer());
+    verify(stateController, never()).deleteBreakpointAsync("12abc");
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testUnregisterBreakpoint_shouldSetAddedOnServerToFalseAfterClientDisablesBp() throws Exception {
+    XLineBreakpointImpl breakpoint = registerMockBreakpoint(NO_WATCHES, NO_CONDITION, 13,
+        "fileName", "packageName", false, "12abc");
+    assertNotNull(breakpoint.getProperties());
+    assertTrue(((CloudLineBreakpointProperties) breakpoint.getProperties()).isAddedOnServer());
+
+    myHandler.unregisterBreakpoint(breakpoint, false);
+
+    assertFalse(((CloudLineBreakpointProperties) breakpoint.getProperties()).isAddedOnServer());
+    verify(stateController).deleteBreakpointAsync("12abc");
+  }
 
   @SuppressWarnings("unchecked")
   private XLineBreakpointImpl<CloudLineBreakpointProperties> registerMockBreakpoint(String[] watches,
@@ -310,10 +346,11 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     myHandler.setPsiManager(myPsiManager);
 
     CloudLineBreakpointType.CloudLineBreakpoint javaBreakpoint =
-      (CloudLineBreakpointType.CloudLineBreakpoint) CloudLineBreakpointType
-          .getInstance().createJavaBreakpoint(myProject, lineBreakpoint);
+        (CloudLineBreakpointType.CloudLineBreakpoint) CloudLineBreakpointType
+            .getInstance().createJavaBreakpoint(myProject, lineBreakpoint);
     when(lineBreakpoint.getUserData(
         com.intellij.debugger.ui.breakpoints.Breakpoint.DATA_KEY)).thenReturn(javaBreakpoint);
+    when(lineBreakpoint.getUserData(CloudBreakpointHandler.CLOUD_ID)).thenReturn(desiredResultId);
 
     myHandler.registerBreakpoint(lineBreakpoint);
     return lineBreakpoint;

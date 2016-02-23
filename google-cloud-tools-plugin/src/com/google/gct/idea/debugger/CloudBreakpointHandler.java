@@ -331,10 +331,10 @@ public class CloudBreakpointHandler
       // gets called during construction.
       return;
     }
-
-    if (xIdeBreakpoint.getProperties().isAddedOnServer()) {
+    if (xIdeBreakpoint.getProperties().isAddedOnServer() && !xIdeBreakpoint.getProperties().isDisabledByServer()) {
       // If this breakpoint was already added, but was hit offline, let's not add it again once we
-      // resume a debug session.
+      // resume a debug session. unless this reigster request comes from re-enabling a previously disabled
+      // breakpoint
       return;
     }
 
@@ -440,16 +440,16 @@ public class CloudBreakpointHandler
       boolean temporary) {
     // If the state was set to disabled as a result of a server update,
     // then we do not need to update the server side.
-    if (xIdeBreakpoint.getProperties().isDisabledByServer()) {
-      return;
+    if (!xIdeBreakpoint.getProperties().isDisabledByServer()) {
+      String breakpointId = xIdeBreakpoint.getUserData(CLOUD_ID);
+      if (!Strings.isNullOrEmpty(breakpointId)) {
+        myProcess.getStateController().deleteBreakpointAsync(breakpointId);
+      } else {
+        LOG.warn("could not delete breakpoint because it was not added through the cloud handler.");
+      }
     }
-    String breakpointId = xIdeBreakpoint.getUserData(CLOUD_ID);
-    if (!Strings.isNullOrEmpty(breakpointId)) {
-      assert breakpointId != null;
-      myProcess.getStateController().deleteBreakpointAsync(breakpointId);
-    }
-    else {
-      LOG.warn("could not delete breakpoint because it was not added through the cloud handler.");
-    }
+    // reset this flag: either it has been disabled by the server or the client has deleted it, in
+    // both cases we need to add it again, if it is re-enabled
+    xIdeBreakpoint.getProperties().setAddedOnServer(false);
   }
 }
