@@ -27,12 +27,12 @@ import com.intellij.util.xmlb.annotations.Attribute;
 public class ManagedVmServerConfiguration extends
     ServerConfigurationBase<ManagedVmServerConfiguration> {
 
-  private String cloudSdkPath;
+  private String cloudSdkExecutablePath;
   private String cloudProjectName;
 
-  @Attribute("cloudSdkPath")
-  public String getCloudSdkPath() {
-    return cloudSdkPath;
+  @Attribute("cloudSdkExecutablePath")
+  public String getCloudSdkExecutablePath() {
+    return cloudSdkExecutablePath;
   }
 
   @Attribute("cloudProjectName")
@@ -40,8 +40,8 @@ public class ManagedVmServerConfiguration extends
     return cloudProjectName;
   }
 
-  public void setCloudSdkPath(String cloudSdkPath) {
-    this.cloudSdkPath = cloudSdkPath;
+  public void setCloudSdkExecutablePath(String cloudSdkExecutablePath) {
+    this.cloudSdkExecutablePath = cloudSdkExecutablePath;
   }
 
   public void setCloudProjectName(String cloudProjectName) {

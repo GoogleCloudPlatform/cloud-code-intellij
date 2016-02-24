@@ -16,9 +16,11 @@
 
 package com.google.gct.idea.appengine.cloud;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.appengine.util.CloudSdkUtil;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.idea.util.SystemEnvironmentProvider;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
@@ -28,11 +30,13 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.remoteServer.RemoteServerConfigurable;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.JBColor;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 
@@ -42,31 +46,63 @@ import javax.swing.event.DocumentEvent;
 public class ManagedVmCloudConfigurable extends RemoteServerConfigurable implements Configurable {
 
   private final ManagedVmServerConfiguration configuration;
-  @Nullable
-  private final Project project;
+  private final SystemEnvironmentProvider environmentProvider;
 
   private String displayName = GctBundle.message("appengine.managedvm.name");
   private JPanel myMainPanel;
-  private TextFieldWithBrowseButton cloudSdkLocationField;
+  private TextFieldWithBrowseButton cloudSdkDirectoryField;
   private ProjectSelector projectSelector;
+  private JLabel warningMessage;
 
   public ManagedVmCloudConfigurable(ManagedVmServerConfiguration configuration,
       @Nullable Project project) {
     this.configuration = configuration;
-    this.project = project;
+    environmentProvider = SystemEnvironmentProvider.getInstance();
 
-    String cloudSdkPath = CloudSdkUtil.findCloudSdkPath();
-    if (cloudSdkPath != null && configuration.getCloudSdkPath() == null) {
-      configuration.setCloudSdkPath(cloudSdkPath);
-      cloudSdkLocationField.setText(cloudSdkPath);
+    warningMessage.setVisible(false);
+
+    final String cloudSdkExecutablePath = CloudSdkUtil.findCloudSdkExecutablePath(environmentProvider);
+    final String cloudSdkDirectoryPath = CloudSdkUtil.findCloudSdkDirectoryPath(environmentProvider);
+
+    if (cloudSdkExecutablePath != null
+        && cloudSdkDirectoryPath != null
+        && configuration.getCloudSdkExecutablePath() == null) {
+      configuration.setCloudSdkExecutablePath(cloudSdkExecutablePath);
+      cloudSdkDirectoryField.setText(cloudSdkDirectoryPath);
     }
-    cloudSdkLocationField.addBrowseFolderListener(
+
+    cloudSdkDirectoryField.addBrowseFolderListener(
         GctBundle.message("appengine.cloudsdk.location.browse.window.title"),
         null,
         project,
-        FileChooserDescriptorFactory.createSingleFileDescriptor()
+        FileChooserDescriptorFactory.createSingleFolderDescriptor()
     );
-    projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
+
+    cloudSdkDirectoryField.getTextField().getDocument()
+        .addDocumentListener(getSdkDirectoryFieldListener());
+    projectSelector.getDocument().addDocumentListener(getProjectSelectorListener());
+  }
+
+  private DocumentAdapter getSdkDirectoryFieldListener() {
+    return new DocumentAdapter() {
+      @Override
+      protected void textChanged(DocumentEvent e) {
+        String path = cloudSdkDirectoryField.getText();
+        boolean isValid = CloudSdkUtil.containsCloudSdkExecutable(path);
+        if (isValid) {
+          cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
+          warningMessage.setVisible(false);
+        } else {
+          cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
+          warningMessage.setVisible(true);
+          warningMessage.setText(GctBundle.message("appengine.cloudsdk.location.warning.message"));
+        }
+      }
+    };
+  }
+
+  private DocumentAdapter getProjectSelectorListener() {
+    return new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent e) {
         if (projectSelector != null) {
@@ -74,8 +110,17 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
         }
 
       }
-    });
+    };
+  }
 
+  @VisibleForTesting
+  JLabel getWarningMessage() {
+    return warningMessage;
+  }
+
+  @VisibleForTesting
+  TextFieldWithBrowseButton getCloudSdkDirectoryField() {
+    return cloudSdkDirectoryField;
   }
 
   @Nls
@@ -98,19 +143,25 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
 
   @Override
   public boolean isModified() {
-    return !Comparing.strEqual(getCloudSdkLocation(), configuration.getCloudSdkPath()) ||
-        !Comparing.strEqual(getCloudProjectName(), configuration.getCloudProjectName());
+    boolean isSdkDirModified = !Comparing.strEqual(getCloudSdkDirectory(),
+        CloudSdkUtil.toParentDirectory(configuration.getCloudSdkExecutablePath()));
+    boolean isProjectModified = !Comparing.strEqual(getCloudProjectName(),
+        configuration.getCloudProjectName());
+
+    return isSdkDirModified || isProjectModified;
   }
 
   @Override
   public void apply() throws ConfigurationException {
     configuration.setCloudProjectName(projectSelector.getText());
-    configuration.setCloudSdkPath(cloudSdkLocationField.getText());
+    configuration.setCloudSdkExecutablePath(
+        CloudSdkUtil.toExecutablePath(cloudSdkDirectoryField.getText()));
   }
 
   @Override
   public void reset() {
-    cloudSdkLocationField.setText(configuration.getCloudSdkPath());
+    cloudSdkDirectoryField.setText(
+        CloudSdkUtil.toParentDirectory(configuration.getCloudSdkExecutablePath()));
     projectSelector.setText(configuration.getCloudProjectName());
   }
 
@@ -122,8 +173,8 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
     return false;
   }
 
-  public String getCloudSdkLocation() {
-    return cloudSdkLocationField.getText();
+  public String getCloudSdkDirectory() {
+    return cloudSdkDirectoryField.getText();
   }
 
   public String getCloudProjectName() {

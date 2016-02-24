@@ -17,11 +17,11 @@
 package com.google.gct.idea.appengine.cloud;
 
 import com.google.gct.idea.appengine.cloud.ManagedVmDeploymentConfiguration.ConfigType;
+import com.google.gct.idea.appengine.util.CloudSdkUtil;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -145,7 +145,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
         @NotNull DeploymentSource source,
         @NotNull RemoteServer<ManagedVmServerConfiguration> server) {
       return new ManagedVmDeploymentRunConfigurationEditor(project, source,
-          new CloudSdkAppEngineHelper(new File(server.getConfiguration().getCloudSdkPath()),
+          new CloudSdkAppEngineHelper(new File(server.getConfiguration().getCloudSdkExecutablePath()),
               server.getConfiguration().getCloudProjectName()));
     }
   }
@@ -161,8 +161,15 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
 
     @Override
     public void connect(@NotNull ConnectionCallback<ManagedVmDeploymentConfiguration> callback) {
-      callback.connected(new ManagedVmRuntimeInstance(configuration));
+      if (CloudSdkUtil.isCloudSdkExecutable(configuration.getCloudSdkExecutablePath())) {
+        callback.connected(new ManagedVmRuntimeInstance(configuration));
+      }
+      else {
+        callback.errorOccurred("Invalid Cloud SDK directory path configured.");
+        // TODO Consider auto opening configuration panel
+      }
     }
+
   }
 
   private static class ManagedVmRuntimeInstance extends
@@ -180,11 +187,11 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
         @NotNull final DeploymentLogManager logManager,
         @NotNull final DeploymentOperationCallback callback) {
       FileDocumentManager.getInstance().saveAllDocuments();
+
       AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
-          getFileFromFilePath(configuration.getCloudSdkPath()),
+          getFileFromFilePath(configuration.getCloudSdkExecutablePath()),
           configuration.getCloudProjectName()
       );
-
 
       final Runnable doDeployment;
       ManagedVmDeploymentConfiguration deploymentConfig = task.getConfiguration();
