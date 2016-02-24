@@ -16,9 +16,13 @@
 
 package com.google.gct.idea.appengine.util;
 
-import com.intellij.execution.configurations.PathEnvironmentVariableUtil;
-import com.intellij.openapi.util.SystemInfo;
+import com.google.gct.idea.util.SystemEnvironmentProvider;
 
+import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -37,17 +41,80 @@ public final class CloudSdkUtil {
   private static final String WIN_COMMAND = "gcloud.cmd";
 
   /**
-   * Finds the Cloud SDK path on the local file system.
+   * Finds the path to the Cloud SDK binary on the local file system.
    *
-   * @return a {@link String} path to the Cloud SDK or {@code null} if it could not be found.
+   * @return a {@link String} path to the Cloud SDK binary or {@code null}
+   * if it could not be found.
    */
   @Nullable
-  public static String findCloudSdkPath() {
-    File gcloudPath = PathEnvironmentVariableUtil
-        .findInPath(SystemInfo.isWindows ? WIN_COMMAND : UNIX_COMMAND);
+  public static String findCloudSdkExecutablePath(
+      @NotNull SystemEnvironmentProvider environmentProvider) {
+    File cloudSdkExecutable = findCloudSdkExecutable(environmentProvider);
+    return cloudSdkExecutable != null ? cloudSdkExecutable.getAbsolutePath() : null;
+  }
+
+  /**
+   * Finds the path to the Cloud SDK binary parent directory on the local file system.
+   *
+   * @return a {@link String} path to the Cloud SDK directory or {@code null}
+   * if it could not be found.
+   */
+  @Nullable
+  public static String findCloudSdkDirectoryPath(
+      @NotNull SystemEnvironmentProvider environmentProvider) {
+    File cloudSdkExecutable = findCloudSdkExecutable(environmentProvider);
+    return cloudSdkExecutable != null ? cloudSdkExecutable.getParent() : null;
+  }
+
+  /**
+   * Checks if an appropriately named binary exists on the local file system for the given
+   * parent directory path.
+   *
+   * @param path @link String} to Cloud SDK binary parent directory on local file system.
+   * @return a boolean indicating if the file was found.
+   */
+  public static boolean containsCloudSdkExecutable(@NotNull String path) {
+    return isCloudSdkExecutable(toExecutablePath(path));
+  }
+
+  /**
+   * Checks if an appropriately named binary exists on the local file system at the given path.
+   *
+   * @param path @link String} to Cloud SDK binary on local file system.
+   * @return a boolean indicating if the file was found.
+   */
+  public static boolean isCloudSdkExecutable(@NotNull String path) {
+    VirtualFile vfile = LocalFileSystem.getInstance().findFileByPath(path);
+    return vfile != null && vfile.exists();
+  }
+
+  /**
+   * Converts from a parent directory path to the Cloud SDK executable path
+   *
+   */
+  public static String toExecutablePath(@NotNull String sdkDirectoryPath) {
+    File executablePath = new File(sdkDirectoryPath, getSystemCommand());
+    return executablePath.getAbsolutePath();
+  }
+
+  /**
+   * Converts from a Cloud SDK executable path to its parent directory path
+   *
+   */
+  public static String toParentDirectory(@NotNull String sdkExecutablePath) {
+    return new File(sdkExecutablePath).getParent();
+  }
+
+  private static File findCloudSdkExecutable(
+      @NotNull SystemEnvironmentProvider environmentProvider) {
+    File gcloudPath = environmentProvider.findInPath(getSystemCommand());
     if (gcloudPath != null) {
-      return gcloudPath.getAbsolutePath();
+      return gcloudPath;
     }
     return null;
+  }
+
+  private static String getSystemCommand() {
+    return SystemInfo.isWindows ? WIN_COMMAND : UNIX_COMMAND;
   }
 }
