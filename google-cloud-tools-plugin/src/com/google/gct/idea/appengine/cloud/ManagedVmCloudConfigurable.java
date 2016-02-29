@@ -22,12 +22,14 @@ import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.SystemEnvironmentProvider;
 
+import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Comparing;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.RemoteServerConfigurable;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
@@ -80,7 +82,6 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
 
     cloudSdkDirectoryField.getTextField().getDocument()
         .addDocumentListener(getSdkDirectoryFieldListener());
-    projectSelector.getDocument().addDocumentListener(getProjectSelectorListener());
   }
 
   private DocumentAdapter getSdkDirectoryFieldListener() {
@@ -95,22 +96,16 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
         } else {
           cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
           warningMessage.setVisible(true);
-          warningMessage.setText(GctBundle.message("appengine.cloudsdk.location.warning.message"));
+          warningMessage.setText(
+              GctBundle.message("appengine.cloudsdk.location.missing.message"));
         }
       }
     };
   }
 
-  private DocumentAdapter getProjectSelectorListener() {
-    return new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent e) {
-        if (projectSelector != null) {
-          displayName = projectSelector.getText() + " Deployment";
-        }
-
-      }
-    };
+  @VisibleForTesting
+  ProjectSelector getProjectSelector() {
+    return projectSelector;
   }
 
   @VisibleForTesting
@@ -153,9 +148,20 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
 
   @Override
   public void apply() throws ConfigurationException {
-    configuration.setCloudProjectName(projectSelector.getText());
-    configuration.setCloudSdkExecutablePath(
-        CloudSdkUtil.toExecutablePath(cloudSdkDirectoryField.getText()));
+    if (StringUtil.isEmpty(cloudSdkDirectoryField.getText())
+        || !CloudSdkUtil.containsCloudSdkExecutable(cloudSdkDirectoryField.getText())) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.cloudsdk.location.missing.message"));
+    }
+    else if (StringUtil.isEmpty(projectSelector.getText())) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.cloudsdk.project.missing.message"));
+    }
+    else {
+      configuration.setCloudProjectName(projectSelector.getText());
+      configuration.setCloudSdkExecutablePath(
+          CloudSdkUtil.toExecutablePath(cloudSdkDirectoryField.getText()));
+    }
   }
 
   @Override

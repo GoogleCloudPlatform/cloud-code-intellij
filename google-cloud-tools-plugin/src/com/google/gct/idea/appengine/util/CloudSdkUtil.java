@@ -73,7 +73,7 @@ public final class CloudSdkUtil {
    * @param path @link String} to Cloud SDK binary parent directory on local file system.
    * @return a boolean indicating if the file was found.
    */
-  public static boolean containsCloudSdkExecutable(@NotNull String path) {
+  public static boolean containsCloudSdkExecutable(String path) {
     return isCloudSdkExecutable(toExecutablePath(path));
   }
 
@@ -83,26 +83,38 @@ public final class CloudSdkUtil {
    * @param path @link String} to Cloud SDK binary on local file system.
    * @return a boolean indicating if the file was found.
    */
-  public static boolean isCloudSdkExecutable(@NotNull String path) {
-    VirtualFile vfile = LocalFileSystem.getInstance().findFileByPath(path);
-    return vfile != null && vfile.exists();
+  public static boolean isCloudSdkExecutable(String path) {
+    if (path != null) {
+      VirtualFile vfile = LocalFileSystem.getInstance().findFileByPath(path);
+      return vfile != null && vfile.exists();
+    }
+
+    return false;
   }
 
   /**
    * Converts from a parent directory path to the Cloud SDK executable path
    *
    */
-  public static String toExecutablePath(@NotNull String sdkDirectoryPath) {
-    File executablePath = new File(sdkDirectoryPath, getSystemCommand());
-    return executablePath.getAbsolutePath();
+  public static String toExecutablePath(String sdkDirectoryPath) {
+    if (sdkDirectoryPath != null) {
+      File executablePath = new File(sdkDirectoryPath, getSystemCommand());
+      return executablePath.getAbsolutePath();
+    }
+
+    return null;
   }
 
   /**
    * Converts from a Cloud SDK executable path to its parent directory path
    *
    */
-  public static String toParentDirectory(@NotNull String sdkExecutablePath) {
-    return new File(sdkExecutablePath).getParent();
+  public static String toParentDirectory(String sdkExecutablePath) {
+    if (sdkExecutablePath != null) {
+      return new File(sdkExecutablePath).getParent();
+    }
+
+    return null;
   }
 
   private static File findCloudSdkExecutable(
