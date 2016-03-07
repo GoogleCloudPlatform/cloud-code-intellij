@@ -59,7 +59,7 @@ class ProjectSelectorLoadingItem extends JPanel {
   // This is called to animate the spinner.  It snaps a frame of the spinner based on current timer ticks.
   public void snap() {
     long currentMilliseconds = System.nanoTime() / 1000000;
-    int frame = (int)(currentMilliseconds / 100) % GoogleCloudToolsIcons.STEP_ICONS.length;
-    myProgressIcon.setIcon(GoogleCloudToolsIcons.STEP_ICONS[frame]);
+    int frame = (int)(currentMilliseconds / 100) % GoogleCloudToolsIcons.STEP_ICONS.size();
+    myProgressIcon.setIcon(GoogleCloudToolsIcons.STEP_ICONS.get(frame));
   }
 }

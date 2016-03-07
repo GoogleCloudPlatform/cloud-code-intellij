@@ -17,6 +17,10 @@ package com.google.gct.idea.ui;
 
 import com.intellij.openapi.util.IconLoader;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javax.swing.Icon;
 
 /**
@@ -31,7 +35,7 @@ public final class GoogleCloudToolsIcons {
   public static final Icon CLOUD= load("/icons/cloudPlatform.png");
   public static final Icon CLOUD_MODULE = load("/icons/google_cloud_module.png");
   public static final Icon REFRESH = load("/icons/refresh.png");
-  public static final Icon[] STEP_ICONS = findStepIcons("/icons/step_");
+  public static final List<Icon> STEP_ICONS = findStepIcons("/icons/step_");
   public static final Icon ENDPOINTS_CARD = load("/icons/background_endpoints.png");
   public static final Icon SERVLET_CARD = load("/icons/background_servlet.png");
   public static final Icon GCM_CARD = load("/icons/background_gcm.png");
@@ -48,12 +52,12 @@ public final class GoogleCloudToolsIcons {
     return IconLoader.getIcon(path, GoogleCloudToolsIcons.class);
   }
 
-  private static Icon[] findStepIcons(String prefix) {
-    Icon[] icons = new Icon[STEPS_COUNT];
+  private static List<Icon> findStepIcons(String prefix) {
+    List<Icon> icons = new ArrayList(STEPS_COUNT);
     for (int i = 0; i < STEPS_COUNT; i++) {
-      icons[i] = IconLoader.getIcon(prefix + (i + 1) + ".png");
+      icons.add(IconLoader.getIcon(prefix + (i + 1) + ".png"));
     }
-    return icons;
+    return Collections.unmodifiableList(icons);
   }
 
   private GoogleCloudToolsIcons() {
