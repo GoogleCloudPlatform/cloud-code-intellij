@@ -165,7 +165,7 @@ public class CloudDebugProcessStateSerializer
         // We should see if we can get JB to make this information public from the Gutter so we
         // don't have to calculate it.
         myEditor.putUserData(ToggleSnapshotLocationAction.POPUP_LINE,
-                             new Integer(EditorUtil.yPositionToLogicalLine(myEditor, e.getPoint())));
+                             Integer.valueOf(EditorUtil.yPositionToLogicalLine(myEditor, e.getPoint())));
       }
       else {
         myEditor.putUserData(ToggleSnapshotLocationAction.POPUP_LINE, null);
