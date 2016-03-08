@@ -137,7 +137,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
   }
 
   private void runQuickFixTest(PsiParameter parameter, String expectedString) {
-    InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection().new MyQuickFix();
+    InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection.MyQuickFix();
     MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR);
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);
     Assert.assertEquals(expectedString, parameter.getText());
