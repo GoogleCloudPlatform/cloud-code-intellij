@@ -22,6 +22,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiInvalidElementAccessException;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * The base class for all endpoint inspections.
  */
@@ -34,6 +36,7 @@ public class EndpointInspectionBase extends LocalInspectionTool {
     return "Google Cloud Platform";
   }
 
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   public Project getProject(PsiElement element ) {
     Project project;
     try {

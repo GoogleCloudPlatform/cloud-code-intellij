@@ -4,6 +4,8 @@ import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.diagnostic.Logger;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -25,6 +27,7 @@ public class PropertiesFileFlagReader implements FlagReader {
   }
 
   @VisibleForTesting
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   protected PropertiesFileFlagReader(String propertiesFilePath) {
     properties = new Properties();
     InputStream in = null;

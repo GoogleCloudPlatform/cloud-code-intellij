@@ -27,6 +27,8 @@ import com.intellij.psi.PsiInvalidElementAccessException;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiType;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,6 +61,7 @@ public class MethodReturnTypeInspection extends EndpointInspectionBase{
   public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
     return new EndpointPsiElementVisitor() {
       @Override
+      @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
       public void visitMethod(PsiMethod method) {
         if (!EndpointUtilities.isEndpointClass(method)) {
           return;

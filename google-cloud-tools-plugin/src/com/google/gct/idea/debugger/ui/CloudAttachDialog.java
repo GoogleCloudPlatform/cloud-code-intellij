@@ -39,6 +39,8 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -276,6 +278,7 @@ public class CloudAttachDialog extends DialogWrapper {
   /**
    * Checks whether a stash or sync is needed based on the chosen target and local state.
    */
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   private void checkSyncStashState() {
     if (processResultState == null) {
       LOG.error("unexpected result state during a check sync stash state");

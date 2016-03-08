@@ -21,6 +21,8 @@ import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.openapi.diagnostic.Logger;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.text.ParseException;
@@ -51,6 +53,7 @@ public class BreakpointUtil {
   }
 
   @Nullable
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   public static String getUserMessage(@Nullable StatusMessage statusMessage) {
     if (statusMessage != null && statusMessage.getDescription() != null) {
       String formatString = statusMessage.getDescription().getFormat();
@@ -68,6 +71,7 @@ public class BreakpointUtil {
   }
 
   @Nullable
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   public static Date parseDateTime(@Nullable String dateString) {
     if (dateString == null) {
       return null;

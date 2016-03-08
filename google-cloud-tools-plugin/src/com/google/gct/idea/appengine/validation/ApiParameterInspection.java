@@ -24,6 +24,9 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,6 +61,7 @@ public class ApiParameterInspection extends EndpointInspectionBase {
   public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
     return new EndpointPsiElementVisitor() {
       @Override
+      @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
       public void visitParameter(PsiParameter psiParameter){
         if (!EndpointUtilities.isEndpointClass(psiParameter)) {
           return;

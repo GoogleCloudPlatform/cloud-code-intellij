@@ -26,6 +26,9 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.HashSet;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -90,6 +93,7 @@ public class CloudDebugProcessStateController {
 
     Runnable performDelete = new Runnable() {
       @Override
+      @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
       public void run() {
         try {
           client.debuggees().breakpoints().delete(debuggeeId, breakpointId).execute();

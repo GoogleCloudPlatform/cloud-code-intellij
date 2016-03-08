@@ -22,6 +22,8 @@ import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.openapi.diagnostic.Logger;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -41,6 +43,7 @@ class DebugTarget implements DebugTargetSelectorItem {
   private String module;
   private String version;
 
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   public DebugTarget(@NotNull Debuggee debuggee, @NotNull String projectName) {
     this.debuggee = debuggee;
     if (this.debuggee.getLabels() != null) {

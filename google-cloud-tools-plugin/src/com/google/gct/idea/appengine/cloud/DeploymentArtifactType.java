@@ -16,6 +16,8 @@
 
 package com.google.gct.idea.appengine.cloud;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -42,6 +44,7 @@ public enum DeploymentArtifactType {
 
 
   @Override
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   public String toString() {
     return "." + name().toLowerCase(Locale.US);
   }

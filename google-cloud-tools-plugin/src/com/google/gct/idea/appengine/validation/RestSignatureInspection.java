@@ -26,6 +26,9 @@ import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -359,6 +362,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
    * @param psiMethod the method whose default path is to be determined
    * @return the default path for psiMethod
    */
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   private String getDefaultPath(PsiMethod psiMethod) {
     // Get path from @ApiClass or @Api's resource attribute if it exists
     String apiDefaultResource = getResourceProperty(psiMethod);
@@ -517,6 +521,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
    * Returns the project associated with {@code method} or null if it cannot retrieve the project.
    */
   @Nullable
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   private static Project getProject(PsiMethod method) {
     Project project;
     try {

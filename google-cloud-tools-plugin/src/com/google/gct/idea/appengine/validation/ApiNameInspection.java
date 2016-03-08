@@ -37,6 +37,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiUtilBase;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -163,6 +165,7 @@ public class ApiNameInspection extends EndpointInspectionBase {
     }
 
     @VisibleForTesting
+    @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
     public String getNameSuggestions(String baseString) {
       if(baseString.isEmpty()) {
         return DEFAULT_API_NAME;
