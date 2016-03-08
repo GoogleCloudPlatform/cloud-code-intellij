@@ -139,7 +139,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
   /**
    * A somewhat generic way of generating a file for a {@link TextFieldWithBrowseButton}.
    */
-  private class GenerateConfigActionListener implements ActionListener {
+  private static class GenerateConfigActionListener implements ActionListener {
 
     private final Project project;
     private final String fileName;
