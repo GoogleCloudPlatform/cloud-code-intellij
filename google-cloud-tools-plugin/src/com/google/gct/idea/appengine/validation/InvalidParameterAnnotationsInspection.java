@@ -149,7 +149,7 @@ public class InvalidParameterAnnotationsInspection extends EndpointInspectionBas
   /**
    * Quick fix for {@link InvalidParameterAnnotationsInspection} problems.
    */
-  public class MyQuickFix implements LocalQuickFix {
+  public static class MyQuickFix implements LocalQuickFix {
     public MyQuickFix() {
 
     }

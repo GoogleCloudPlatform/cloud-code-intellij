@@ -150,7 +150,8 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
     }
   }
 
-  private class ManagedVmServerConnector extends ServerConnector<ManagedVmDeploymentConfiguration> {
+  private static class ManagedVmServerConnector extends
+      ServerConnector<ManagedVmDeploymentConfiguration> {
 
     private ManagedVmServerConfiguration configuration;
 
@@ -169,7 +170,6 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
         // TODO Consider auto opening configuration panel
       }
     }
-
   }
 
   private static class ManagedVmRuntimeInstance extends
