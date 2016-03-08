@@ -76,7 +76,7 @@ Other useful targets while developing include:
 1. Fork the repository into your own Github account.
 1. Please include unit tests for all new code. (Yes, we know not all
    existing code has tests. We're slowly fixing that, and contributions of tests
-   for existing code are much appreciated.
+   for existing code are much appreciated.)
 1. Make sure all existing tests pass. (gradlew test)
 1. Associate the change with an existing issue or [file a new issue](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/new).
 1. Create a pull request and send it to gcloud-intellij:master.
