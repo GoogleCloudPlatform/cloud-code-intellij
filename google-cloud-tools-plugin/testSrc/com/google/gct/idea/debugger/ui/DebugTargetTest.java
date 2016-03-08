@@ -35,12 +35,12 @@ public class DebugTargetTest {
 
   @Test
   public void testDefaultModuleTargetLabel() {
-    String module = null;
     String version = "1";
-    DebugTarget target = new DebugTarget(createDebuggee(module, version), "projectname");
+    DebugTarget target = new DebugTarget(createDebuggee(/* module */ null, version), "projectname");
 
     assertEquals(String.format(MODULE_VERSION_FORMAT, DEFAULT_MODULE_NAME, version),
         target.getDescription());
+    assertEquals(DEFAULT_MODULE_NAME, target.getModule());
   }
 
   @Test
@@ -51,6 +51,7 @@ public class DebugTargetTest {
 
     assertEquals(String.format(MODULE_VERSION_FORMAT, module, version),
         target.getDescription());
+    assertEquals(module, target.getModule());
   }
 
   private Debuggee createDebuggee(String module, String version) {

@@ -67,14 +67,15 @@ class DebugTarget implements DebugTargetSelectorItem {
         }
       }
 
+      // The backend does not send a module name for the default module, let's name it explicitly
+      if (Strings.isNullOrEmpty(module)) {
+        module = GctBundle.getString("clouddebug.default.module.name");
+      }
+
       //Build a description from the strings.
-      if (!Strings.isNullOrEmpty(module) && !Strings.isNullOrEmpty(version)) {
+      if (!Strings.isNullOrEmpty(version)) {
         description = GctBundle.getString("clouddebug.version.with.module.format",
             module, version);
-      }
-      else if (!Strings.isNullOrEmpty(version)) {
-        description = GctBundle.getString("clouddebug.version.with.module.format",
-            GctBundle.getString("clouddebug.default.module.name"), version);
       }
 
       //Record the minor version.  We only show the latest minor version.
