@@ -109,7 +109,7 @@ public class GcpCheckoutProvider implements CheckoutProvider {
           cloneResult.set(doClone(project, indicator, git, directoryName, parentDirectory, sourceRepositoryURL));
         }
         finally {
-          context.Close();
+          context.close();
         }
       }
 

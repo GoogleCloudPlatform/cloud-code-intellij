@@ -16,6 +16,7 @@
 package com.google.gct.idea.settings;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.gct.idea.util.GctBundle;
 import com.intellij.ide.IdeBundle;
 import com.intellij.ide.actions.ImportSettingsFilenameFilter;
 import com.intellij.ide.plugins.PluginManager;
@@ -55,6 +56,7 @@ public class ImportSettings {
    */
   public static void doImport(String path) {
     final File saveFile = new File(path);
+    ZipFile saveZipFile = null;
     try {
       if (!saveFile.exists()) {
         Messages.showErrorDialog(IdeBundle.message("error.cannot.find.file", presentableFileName(saveFile)), DIALOG_TITLE);
@@ -62,7 +64,8 @@ public class ImportSettings {
       }
 
       // What is this file used for?
-      final ZipEntry magicEntry = new ZipFile(saveFile).getEntry(SETTINGS_JAR_MARKER);
+      saveZipFile = new ZipFile(saveFile);
+      final ZipEntry magicEntry = saveZipFile.getEntry(SETTINGS_JAR_MARKER);
       if (magicEntry == null) {
         Messages.showErrorDialog("The file " + presentableFileName(saveFile) + " contains no settings to import",
           DIALOG_TITLE);
@@ -121,6 +124,16 @@ public class ImportSettings {
     catch (IOException e1) {
       Messages.showErrorDialog(IdeBundle.message("error.reading.settings.file.2", presentableFileName(saveFile), e1.getMessage()),
                                DIALOG_TITLE);
+    } finally {
+      try {
+        if (saveZipFile != null) {
+          saveZipFile.close();
+        }
+      } catch (IOException e1) {
+        Messages.showErrorDialog(
+          GctBundle.message("settings.error.closing.file", presentableFileName(saveFile), e1.getMessage()),
+                            DIALOG_TITLE);
+      }
     }
   }
 

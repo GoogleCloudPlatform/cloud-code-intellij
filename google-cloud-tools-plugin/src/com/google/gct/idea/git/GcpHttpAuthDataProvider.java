@@ -136,7 +136,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
 
   @NotNull
   public static Context createContext(@Nullable String userName) {
-    return Context.Create(userName);
+    return Context.create(userName);
   }
 
   @Nullable
@@ -192,14 +192,14 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
       myUserName = userName;
     }
 
-    public static Context Create(@Nullable String userName) {
+    public static Context create(@Nullable String userName) {
       Context newContext = new Context(userName);
       assert ourCurrentContext == null;
       ourCurrentContext = newContext;
       return newContext;
     }
 
-    public void Close() {
+    public void close() {
       if (ourCurrentContext == this) {
         ourCurrentContext = null;
       }
