@@ -58,13 +58,11 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
   private TextFieldWithBrowseButton dockerFilePathField;
   private JButton generateAppYamlButton;
   private JButton generateDockerfileButton;
-  private AppEngineHelper appEngineHelper;
 
 
   public ManagedVmDeploymentRunConfigurationEditor(final Project project,
       final DeploymentSource source, final AppEngineHelper appEngineHelper) {
     this.project = project;
-    this.appEngineHelper = appEngineHelper;
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
     mvmConfigFilesPanel.setVisible(false);

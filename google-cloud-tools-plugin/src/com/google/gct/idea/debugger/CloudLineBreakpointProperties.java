@@ -20,6 +20,8 @@ import com.intellij.util.xmlb.annotations.Tag;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 /**
  * CloudLineBreakpointProperties holds custom properties not normally set on a java line breakpoint. Right now, this is
  * just watch expressions.  Custom conditions are supported by default as is the enabled state and other attributes such
@@ -68,7 +70,9 @@ public class CloudLineBreakpointProperties extends XBreakpointProperties<CloudLi
 
   public final boolean setWatchExpressions(@Nullable String[] watchExpressions) {
     boolean changed = !arrayEqual(myWatchExpressions, watchExpressions);
-    myWatchExpressions = watchExpressions;
+    if (changed) {
+      myWatchExpressions = watchExpressions == null ? null : Arrays.copyOf(watchExpressions, watchExpressions.length);
+    }
     return changed;
   }
 
