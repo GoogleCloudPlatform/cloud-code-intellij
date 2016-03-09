@@ -50,8 +50,8 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
                RunConfigurationWithSuppressedDefaultRunAction, RemoteRunProfile {
   private static final String NAME = "Cloud Debug Configuration";
   private static final String PROJECT_NAME_TAG = "CloudProjectName";
-  private String myCloudProjectName;
-  private volatile CloudDebugProcessState myProcessState = null;
+  private String cloudProjectName;
+  private volatile CloudDebugProcessState processState = null;
 
   protected CloudDebugRunConfiguration(Project project, @NotNull ConfigurationFactory factory) {
     super(project, factory, NAME);
@@ -78,7 +78,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
    */
   @Nullable
   public String getCloudProjectName() {
-    return myCloudProjectName;
+    return cloudProjectName;
   }
 
   /**
@@ -87,7 +87,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
    * @param cloudProjectName the name of the GCP project that owns the target debuggee
    */
   public void setCloudProjectName(@Nullable String cloudProjectName) {
-    myCloudProjectName = cloudProjectName;
+    this.cloudProjectName = cloudProjectName;
   }
 
   @NotNull
@@ -109,7 +109,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
    */
   @Nullable
   public CloudDebugProcessState getProcessState() {
-    return myProcessState;
+    return processState;
   }
 
   /**
@@ -118,7 +118,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
    * @param processState the state to associate with this {@link CloudDebugRunConfiguration}
    */
   public void setProcessState(@Nullable CloudDebugProcessState processState) {
-    myProcessState = processState;
+    this.processState = processState;
   }
 
   /**
@@ -133,10 +133,10 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   @Override
   public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment environment)
     throws ExecutionException {
-    if (myProcessState == null) {
-      return new CloudDebugProcessState(null, null, myCloudProjectName, null, getProject());
+    if (processState == null) {
+      return new CloudDebugProcessState(null, null, cloudProjectName, null, getProject());
     }
-    return myProcessState;
+    return processState;
   }
 
   @Override
@@ -144,12 +144,12 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
     super.readExternal(element);
     Attribute projectNameAttribute = element.getAttribute(PROJECT_NAME_TAG);
     if (projectNameAttribute != null) {
-      myCloudProjectName = projectNameAttribute.getValue();
+      cloudProjectName = projectNameAttribute.getValue();
     }
     // Call out to the state serializer to get process state out of workspace.xml.
-    if (!Strings.isNullOrEmpty(myCloudProjectName) && !Strings.isNullOrEmpty(getName())) {
-      myProcessState =
-        CloudDebugProcessStateSerializer.getInstance(getProject()).getState(getName(), myCloudProjectName);
+    if (!Strings.isNullOrEmpty(cloudProjectName) && !Strings.isNullOrEmpty(getName())) {
+      processState =
+        CloudDebugProcessStateSerializer.getInstance(getProject()).getState(getName(), cloudProjectName);
     }
     CloudDebugProcessWatcher.getInstance().ensureWatcher();
   }
@@ -157,7 +157,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   @Override
   public void writeExternal(Element element) throws WriteExternalException {
     super.writeExternal(element);
-    element.setAttribute(PROJECT_NAME_TAG, myCloudProjectName == null ? "" : myCloudProjectName);
+    element.setAttribute(PROJECT_NAME_TAG, cloudProjectName == null ? "" : cloudProjectName);
     // IJ handles serialization of the the state serializer since its a project service.
   }
 }

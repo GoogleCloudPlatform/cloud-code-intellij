@@ -23,25 +23,25 @@ import java.awt.Image;
  * A single user item in the Google Login panel.
  */
 public class UsersListItem {
-  private final CredentialedUser myUser;
+  private final CredentialedUser user;
 
   public UsersListItem(CredentialedUser aUser) {
-    myUser = aUser;
+    user = aUser;
   }
 
   public String getUserEmail() {
-    return myUser.getEmail();
+    return user.getEmail();
   }
 
   public boolean isActiveUser() {
-    return myUser.isActive();
+    return user.isActive();
   }
 
   public String getUserName() {
-    return myUser.getName();
+    return user.getName();
   }
 
   public Image getUserPicture() {
-    return myUser.getPicture();
+    return user.getPicture();
   }
 }

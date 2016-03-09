@@ -90,31 +90,31 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   private static final int WINDOW_HEIGHT_PX = 8 * JBTable.PREFERRED_SCROLLABLE_VIEWPORT_HEIGHT_IN_ROWS;
   private static final int WINDOW_WIDTH_PX = 200;
 
-  private CloudDebugProcess myProcess;
+  private CloudDebugProcess process;
 
   @VisibleForTesting
-  final JBTable myTable;
+  final JBTable table;
   @VisibleForTesting
-  Balloon myBalloon = null;
+  Balloon balloon = null;
 
   public CloudDebugHistoricalSnapshots(@NotNull CloudDebugProcessHandler processHandler) {
     super(new BorderLayout());
 
-    myTable = new CloudDebuggerTable();
+    table = new CloudDebuggerTable();
 
     configureToolbar();
 
-    myProcess = processHandler.getProcess();
+    process = processHandler.getProcess();
 
-    myProcess.getXDebugSession().addSessionListener(this);
-    myProcess.addListener(this);
+    process.getXDebugSession().addSessionListener(this);
+    process.addListener(this);
   }
 
   /**
    * Sets up the the toolbar that appears in the cloud debugger snapshots panel.
    */
   private void configureToolbar() {
-    final ToolbarDecorator decorator = ToolbarDecorator.createDecorator(myTable)
+    final ToolbarDecorator decorator = ToolbarDecorator.createDecorator(table)
         .disableUpDownActions()
         .disableAddAction()
         .setToolbarPosition(ActionToolbarPosition.TOP);
@@ -138,7 +138,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
   @Override
   public JComponent getPreferredFocusableComponent() {
-    return myTable;
+    return table;
   }
 
   @Nullable
@@ -194,12 +194,12 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
   @Override
   public void sessionStopped() {
-    myProcess.removeListener(this);
+    process.removeListener(this);
 
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        myTable.setModel(new SnapshotsModel(CloudDebugHistoricalSnapshots.this, null, null));
+        table.setModel(new SnapshotsModel(CloudDebugHistoricalSnapshots.this, null, null));
       }
     });
   }
@@ -210,12 +210,12 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
   @VisibleForTesting
   int getSelection() {
-    final List<Breakpoint> breakpointList = myProcess.getCurrentBreakpointList();
+    final List<Breakpoint> breakpointList = process.getCurrentBreakpointList();
     int selection = -1;
 
     if (breakpointList != null) {
       for (int i = 0; i < breakpointList.size(); i++) {
-        Breakpoint snapshot = myProcess.getCurrentSnapshot();
+        Breakpoint snapshot = process.getCurrentSnapshot();
         if (snapshot != null && breakpointList.get(i).getId().equals(snapshot.getId())) {
           selection = i;
           break;
@@ -232,14 +232,14 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   private void fireDeleteBreakpoints(@NotNull final List<Breakpoint> breakpointsToDelete) {
     for (Breakpoint breakpoint : breakpointsToDelete) {
       getModel().markForDelete(breakpoint.getId());
-      myProcess.getBreakpointHandler().deleteBreakpoint(breakpoint);
+      process.getBreakpointHandler().deleteBreakpoint(breakpoint);
     }
     getModel().fireTableDataChanged();
   }
 
   @Nullable
   private Breakpoint getBreakPoint(@NotNull Point p) {
-    int row = myTable.rowAtPoint(p);
+    int row = table.rowAtPoint(p);
     if (row >= 0 && row < getModel().getBreakpoints().size()) {
       return getModel().getBreakpoints().get(row);
     }
@@ -248,7 +248,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
   @NotNull
   private SnapshotsModel getModel() {
-    return (SnapshotsModel) myTable.getModel();
+    return (SnapshotsModel) table.getModel();
   }
 
   /**
@@ -257,8 +257,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   @NotNull
   private List<Breakpoint> getSelectedBreakpoints() {
     List<Breakpoint> selectedBreakpoints = new ArrayList<Breakpoint>();
-    SnapshotsModel model = (SnapshotsModel) myTable.getModel();
-    int[] selectedRows = myTable.getSelectedRows();
+    SnapshotsModel model = (SnapshotsModel) table.getModel();
+    int[] selectedRows = table.getSelectedRows();
     for (int selectedRow : selectedRows) {
       selectedBreakpoints.add(model.getBreakpoints().get(selectedRow));
     }
@@ -273,7 +273,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   private void onBreakpointsChanged() {
     // Read the list of breakpoints and show them.
     // We always snap the current breakpoint list into a local to eliminate threading issues.
-    final List<Breakpoint> breakpointList = myProcess.getCurrentBreakpointList();
+    final List<Breakpoint> breakpointList = process.getCurrentBreakpointList();
 
     // Setting the model must happen on the UI thread, while most of this method executes on the
     // background.
@@ -285,12 +285,12 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
    */
   // todo: arguably belongs inside ColumnDebuggerTable class
   private void resizeColumnWidth() {
-    final TableColumnModel columnModel = myTable.getColumnModel();
-    for (int column = 0; column < myTable.getColumnCount(); column++) {
+    final TableColumnModel columnModel = table.getColumnModel();
+    for (int column = 0; column < table.getColumnCount(); column++) {
       int width = 2; // Min width
-      for (int row = 0; row < myTable.getRowCount(); row++) {
-        TableCellRenderer renderer = myTable.getCellRenderer(row, column);
-        Component comp = myTable.prepareRenderer(renderer, row, column);
+      for (int row = 0; row < table.getRowCount(); row++) {
+        TableCellRenderer renderer = table.getCellRenderer(row, column);
+        Component comp = table.prepareRenderer(renderer, row, column);
         width = Math.max(comp.getPreferredSize().width, width);
       }
       width += COLUMN_MARGIN_PX;
@@ -315,13 +315,13 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   // todo: is there any feasible way to push this into the breakpoint class itself?
   // i.e. breakpoint.supportsMoreConfig()?
   boolean supportsMoreConfig(@Nullable Breakpoint breakpoint) {
-    return myProcess.getBreakpointHandler().getXBreakpoint(breakpoint) != null;
+    return process.getBreakpointHandler().getXBreakpoint(breakpoint) != null;
   }
 
   private final class SnapshotTimeCellRenderer extends DefaultTableCellRenderer {
     private final DateFormat ourDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     private final DateFormat ourDateFormatToday = DateFormat.getTimeInstance(DateFormat.SHORT);
-    private final Date myTodayDate;
+    private final Date todayDate;
 
     public SnapshotTimeCellRenderer() {
       setHorizontalAlignment(SwingConstants.LEFT);
@@ -329,7 +329,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       c.set(Calendar.HOUR_OF_DAY, 0);
       c.set(Calendar.MINUTE, 0);
       c.set(Calendar.SECOND, 0);
-      myTodayDate = c.getTime();
+      todayDate = c.getTime();
     }
 
     @Override
@@ -344,7 +344,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
       if (value instanceof Date) {
         Date finalDate = (Date) value;
-        if (finalDate.after(myTodayDate)) {
+        if (finalDate.after(todayDate)) {
           setText(ourDateFormatToday.format(finalDate));
         }
         else {
@@ -483,7 +483,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-      myProcess.getBreakpointHandler().cloneToNewBreakpoints(getSelectedBreakpoints());
+      process.getBreakpointHandler().cloneToNewBreakpoints(getSelectedBreakpoints());
     }
   }
 
@@ -553,10 +553,10 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       // todo: 4 and 1 here are magic numbers; use named constants for columns; maybe define
       // in CloudDebuggerTable class
       if (breakpoint != null && column == 4 && supportsMoreConfig(breakpoint)) {
-        BreakpointsDialogFactory.getInstance(myProcess.getXDebugSession().getProject())
-            .showDialog(myProcess.getBreakpointHandler().getXBreakpoint(breakpoint));
+        BreakpointsDialogFactory.getInstance(process.getXDebugSession().getProject())
+            .showDialog(process.getBreakpointHandler().getXBreakpoint(breakpoint));
       }
-      else if (event.getClickCount() == 1 && breakpoint != null && myTable.getSelectedRows().length == 1) {
+      else if (event.getClickCount() == 1 && breakpoint != null && table.getSelectedRows().length == 1) {
         selectSnapshot(breakpoint, false);
       }
     }
@@ -566,13 +566,13 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     getModel().unMarkAsNewlyReceived(breakpoint.getId());
 
     if(isSelectedBeforeTrigger || isNewlySelected(breakpoint)) {
-      myProcess.navigateToSnapshot(breakpoint.getId());
+      process.navigateToSnapshot(breakpoint.getId());
     }
   }
 
   private boolean isNewlySelected(Breakpoint breakpoint) {
-      return myProcess.getCurrentSnapshot() == null
-          || !myProcess.getCurrentSnapshot().getId().equals(breakpoint.getId());
+      return process.getCurrentSnapshot() == null
+          || !process.getCurrentSnapshot().getId().equals(breakpoint.getId());
   }
 
   /**
@@ -617,9 +617,9 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       // todo: a lot of this code might be pushed into CloudDebuggerTable.setBrekpoints or equivalent
       SnapshotsModel oldModel = getModel();
       SnapshotsModel newModel = new SnapshotsModel(CloudDebugHistoricalSnapshots.this, breakpointList, oldModel);
-      myTable.setModel(newModel);
+      table.setModel(newModel);
       if (finalSelection != -1) {
-        myTable.setRowSelectionInterval(finalSelection, finalSelection);
+        table.setRowSelectionInterval(finalSelection, finalSelection);
       }
       resizeColumnWidth();
       int rowForPopup = -1;
@@ -647,20 +647,20 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       if (rowForPopup != -1) {
         UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "snapshot.received", null);
         // Show a popup indicating a new item has appeared.
-        if (myBalloon != null) {
-          myBalloon.hide();
+        if (balloon != null) {
+          balloon.hide();
         }
-        Rectangle rectangle = myTable.getCellRect(rowForPopup, 0, true);
+        Rectangle rectangle = table.getCellRect(rowForPopup, 0, true);
         BalloonBuilder builder = JBPopupFactory.getInstance()
             .createHtmlTextBalloonBuilder(GctBundle.getString("clouddebug.new.snapshot.received"), MessageType.INFO, null)
             .setFadeoutTime(3000)
-            .setDisposable(myProcess.getXDebugSession().getProject());
-        myBalloon = builder.createBalloon();
-        myBalloon.show(new RelativePoint(myTable, new Point(myTable.getWidth() / 2, rectangle.y)), Position.above);
+            .setDisposable(process.getXDebugSession().getProject());
+        balloon = builder.createBalloon();
+        balloon.show(new RelativePoint(table, new Point(table.getWidth() / 2, rectangle.y)), Position.above);
 
         reloadSnapshot();
       } else if (oldModel.hasPendingDeletes() && oldModel.getBreakpoints().size() > newModel.getBreakpoints().size()) {
-          myProcess.clearExecutionStack();
+          process.clearExecutionStack();
       }
     }
 
@@ -670,14 +670,14 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
      * we need to force trigger its selection so that the new results are drawn
      */
     private void reloadSnapshot() {
-      int selectedRow = myTable.getSelectedRow();
+      int selectedRow = table.getSelectedRow();
 
       if(selectedRow != -1
           && selectedRow < getModel().getBreakpoints().size()
           && getModel().isNewlyReceived(selectedRow)) {
         Breakpoint breakpoint = getModel().getBreakpoints().get(selectedRow);
 
-        if(breakpoint != null && myTable.getSelectedRows().length == 1) {
+        if(breakpoint != null && table.getSelectedRows().length == 1) {
           selectSnapshot(breakpoint, true);
         }
       }

@@ -27,26 +27,26 @@ import javax.swing.JComponent;
  * {@link com.google.gct.idea.debugger.CloudDebugRunConfiguration}.
  */
 public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfiguration> {
-  private final CloudDebugRunConfigurationPanel mySettingsPanel;
+  private final CloudDebugRunConfigurationPanel settingsPanel;
 
   public CloudDebugSettingsEditor() {
-    mySettingsPanel = new CloudDebugRunConfigurationPanel();
+    settingsPanel = new CloudDebugRunConfigurationPanel();
   }
 
   @Override
   protected void applyEditorTo(CloudDebugRunConfiguration runConfiguration) throws ConfigurationException {
-    runConfiguration.setCloudProjectName(mySettingsPanel.getProjectName());
+    runConfiguration.setCloudProjectName(settingsPanel.getProjectName());
 
   }
 
   @NotNull
   @Override
   protected JComponent createEditor() {
-    return mySettingsPanel.getMainPanel();
+    return settingsPanel.getMainPanel();
   }
 
   @Override
   protected void resetEditorFrom(CloudDebugRunConfiguration runConfiguration) {
-    mySettingsPanel.setProjectName(runConfiguration.getCloudProjectName());
+    settingsPanel.setProjectName(runConfiguration.getCloudProjectName());
   }
 }

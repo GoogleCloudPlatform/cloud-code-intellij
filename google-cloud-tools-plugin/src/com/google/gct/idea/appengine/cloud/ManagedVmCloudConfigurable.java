@@ -51,7 +51,7 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
   private final SystemEnvironmentProvider environmentProvider;
 
   private String displayName = GctBundle.message("appengine.managedvm.name");
-  private JPanel myMainPanel;
+  private JPanel mainPanel;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
   private ProjectSelector projectSelector;
   private JLabel warningMessage;
@@ -133,7 +133,7 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
   @Nullable
   @Override
   public JComponent createComponent() {
-    return myMainPanel;
+    return mainPanel;
   }
 
   @Override

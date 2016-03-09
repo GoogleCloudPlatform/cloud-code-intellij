@@ -51,10 +51,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GcpCheckoutProvider implements CheckoutProvider {
   private static final Logger LOG = Logger.getInstance(GcpCheckoutProvider.class);
 
-  private final Git myGit;
+  private final Git git;
 
   public GcpCheckoutProvider(@NotNull Git git) {
-    myGit = git;
+    this.git = git;
   }
 
   @Override
@@ -92,7 +92,7 @@ public class GcpCheckoutProvider implements CheckoutProvider {
       LOG.error("unexpected blank username during checkout");
       return;
     }
-    clone(project, myGit, listener, destinationParent, sourceRepositoryURL, directoryName, parentDirectory, gcpUserName);
+    clone(project, git, listener, destinationParent, sourceRepositoryURL, directoryName, parentDirectory, gcpUserName);
   }
 
   private static void clone(@NotNull final Project project, @NotNull final Git git, @Nullable final Listener listener,

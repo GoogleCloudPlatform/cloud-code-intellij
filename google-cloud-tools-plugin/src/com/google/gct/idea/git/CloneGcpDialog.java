@@ -49,18 +49,18 @@ public class CloneGcpDialog extends DialogWrapper {
   public static final String INVALID_FILENAME_CHARS = "[/\\\\?%*:|\"<>]";
 
   // Form controls
-  private JPanel myRootPanel;
-  private ProjectSelector myRepositoryURL;
-  private TextFieldWithBrowseButton myParentDirectory;
-  private JTextField myDirectoryName;
+  private JPanel rootPanel;
+  private ProjectSelector repositoryURL;
+  private TextFieldWithBrowseButton parentDirectory;
+  private JTextField directoryName;
   private JLabel parentDirectoryLabel;
 
-  @NotNull private String myDefaultDirectoryName = "";
-  @NotNull private final Project myProject;
+  @NotNull private String defaultDirectoryName = "";
+  @NotNull private final Project project;
 
   public CloneGcpDialog(@NotNull Project project) {
     super(project, true);
-    myProject = project;
+    this.project = project;
     parentDirectoryLabel.setText(DvcsBundle.message("clone.parent.dir"));
     init();
     initComponents();
@@ -75,17 +75,17 @@ public class CloneGcpDialog extends DialogWrapper {
 
   @Nullable
   public String getParentDirectory() {
-    return myParentDirectory.getText();
+    return parentDirectory.getText();
   }
 
   @Nullable
   public String getDirectoryName() {
-    return myDirectoryName.getText();
+    return directoryName.getText();
   }
 
   @Nullable
   public String getGCPUserName() {
-    CredentialedUser selectedUser = myRepositoryURL.getSelectedUser();
+    CredentialedUser selectedUser = repositoryURL.getSelectedUser();
     return selectedUser != null ? selectedUser.getEmail() : null;
   }
 
@@ -95,14 +95,14 @@ public class CloneGcpDialog extends DialogWrapper {
     fcd.setTitle(GctBundle.message("clonefromgcp.destination.directory.title"));
     fcd.setDescription(GctBundle.message("clonefromgcp.destination.directory.description"));
     fcd.setHideIgnored(false);
-    myParentDirectory.addActionListener(
-      new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(), myParentDirectory,
-                                                                           myProject, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) {
+    parentDirectory.addActionListener(
+      new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(), parentDirectory,
+                                                                           project, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) {
         @Override
         protected VirtualFile getInitialFile() {
           String text = getComponentText();
           if (text.length() == 0) {
-            VirtualFile file = myProject.getBaseDir();
+            VirtualFile file = project.getBaseDir();
             if (file != null) {
               return file;
             }
@@ -118,9 +118,9 @@ public class CloneGcpDialog extends DialogWrapper {
         updateButtons();
       }
     };
-    myParentDirectory.getChildComponent().getDocument().addDocumentListener(updateOkButtonListener);
-    myParentDirectory.setText(ProjectUtil.getBaseDir());
-    myDirectoryName.getDocument().addDocumentListener(updateOkButtonListener);
+    parentDirectory.getChildComponent().getDocument().addDocumentListener(updateOkButtonListener);
+    parentDirectory.setText(ProjectUtil.getBaseDir());
+    directoryName.getDocument().addDocumentListener(updateOkButtonListener);
 
     setOKActionEnabled(false);
   }
@@ -139,12 +139,12 @@ public class CloneGcpDialog extends DialogWrapper {
    * Check fields and display error in the wrapper if there is a problem
    */
   private void updateButtons() {
-    if (myParentDirectory.getText().length() == 0 || myDirectoryName.getText().length() == 0) {
+    if (parentDirectory.getText().length() == 0 || directoryName.getText().length() == 0) {
       setErrorText(null);
       setOKActionEnabled(false);
       return;
     }
-    File file = new File(myParentDirectory.getText(), myDirectoryName.getText());
+    File file = new File(parentDirectory.getText(), directoryName.getText());
     if (file.exists()) {
       setErrorText(GctBundle.message("clonefromgcp.destination.exists.error"));
       setOKActionEnabled(false);
@@ -164,34 +164,34 @@ public class CloneGcpDialog extends DialogWrapper {
 
   @Nullable
   private String getCurrentUrlText() {
-    CredentialedUser selectedUser = myRepositoryURL.getSelectedUser();
+    CredentialedUser selectedUser = repositoryURL.getSelectedUser();
 
-    if (selectedUser == null || Strings.isNullOrEmpty(myRepositoryURL.getText())) {
+    if (selectedUser == null || Strings.isNullOrEmpty(repositoryURL.getText())) {
       return null;
     }
 
-    return GcpHttpAuthDataProvider.getGcpUrl(myRepositoryURL.getText());
+    return GcpHttpAuthDataProvider.getGcpUrl(repositoryURL.getText());
   }
 
   private void createUIComponents() {
-    myRepositoryURL = new ProjectSelector();
-    myRepositoryURL.setMinimumSize(new Dimension(300, 0));
-    myRepositoryURL.getDocument().addDocumentListener(new DocumentAdapter() {
+    repositoryURL = new ProjectSelector();
+    repositoryURL.setMinimumSize(new Dimension(300, 0));
+    repositoryURL.getDocument().addDocumentListener(new DocumentAdapter() {
       @SuppressWarnings("ConstantConditions") // This suppresses an invalid nullref warning for projectDescription.replaceAll.
       @Override
       protected void textChanged(DocumentEvent e) {
-        if (myDefaultDirectoryName.equals(myDirectoryName.getText()) || myDirectoryName.getText().length() == 0) {
+        if (defaultDirectoryName.equals(directoryName.getText()) || directoryName.getText().length() == 0) {
           // modify field if it was unmodified or blank
-          String projectDescription = myRepositoryURL.getProjectDescription();
+          String projectDescription = repositoryURL.getProjectDescription();
           if (!Strings.isNullOrEmpty(projectDescription)) {
-            myDefaultDirectoryName = projectDescription.replaceAll(INVALID_FILENAME_CHARS, "");
-            myDefaultDirectoryName = myDefaultDirectoryName.replaceAll("\\s", "");
+            defaultDirectoryName = projectDescription.replaceAll(INVALID_FILENAME_CHARS, "");
+            defaultDirectoryName = defaultDirectoryName.replaceAll("\\s", "");
           }
           else {
-            myDefaultDirectoryName = "";
+            defaultDirectoryName = "";
           }
 
-          myDirectoryName.setText(myDefaultDirectoryName);
+          directoryName.setText(defaultDirectoryName);
         }
         updateButtons();
       }
@@ -201,19 +201,19 @@ public class CloneGcpDialog extends DialogWrapper {
   @Nullable
   @Override
   public JComponent getPreferredFocusedComponent() {
-    return myRepositoryURL;
+    return repositoryURL;
   }
 
   @Override
   protected JComponent createCenterPanel() {
-    return myRootPanel;
+    return rootPanel;
   }
 
   /**
    * Default dialog state.
    */
   private void paintSelectionOK() {
-    myParentDirectory.setBackground(Color.getColor("ECECEC"));
+    parentDirectory.setBackground(Color.getColor("ECECEC"));
     parentDirectoryLabel.setForeground(Color.BLACK);
   }
 
@@ -223,7 +223,7 @@ public class CloneGcpDialog extends DialogWrapper {
    * Paints the "Parent Directory" label and textbox background red.
    */
   private void paintSelectionError() {
-    myParentDirectory.setBackground(Color.RED);
+    parentDirectory.setBackground(Color.RED);
     parentDirectoryLabel.setForeground(Color.RED);
   }
 }

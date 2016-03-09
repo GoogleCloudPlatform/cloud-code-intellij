@@ -45,9 +45,9 @@ class SnapshotsModel extends AbstractTableModel {
 
   private static final int ourColumnCount = 5;
 
-  private final List<Breakpoint> myBreakpoints;
-  private final Set<String> myPendingDeletes = new HashSet<String>();
-  private final Set<String> myNewlyReceived = new HashSet<String>();
+  private final List<Breakpoint> breakpoints;
+  private final Set<String> pendingDeletes = new HashSet<String>();
+  private final Set<String> newlyReceived = new HashSet<String>();
   private CloudDebugHistoricalSnapshots snapshots;
 
   SnapshotsModel(CloudDebugHistoricalSnapshots snapshots,
@@ -75,19 +75,19 @@ class SnapshotsModel extends AbstractTableModel {
               }
             }
           }
-          myNewlyReceived.add(newBreakpoint.getId());
+          newlyReceived.add(newBreakpoint.getId());
         }
       }
     }
 
-    myBreakpoints = breakpoints != null ? breakpoints : new ArrayList<Breakpoint>();
+    this.breakpoints = breakpoints != null ? breakpoints : new ArrayList<Breakpoint>();
     this.snapshots = snapshots;
   }
 
   @NotNull
   // todo: seem to be exposing mutable private stat here, though not too broadly so it may be OK
   List<Breakpoint> getBreakpoints() {
-    return myBreakpoints;
+    return breakpoints;
   }
 
   @Override
@@ -97,47 +97,47 @@ class SnapshotsModel extends AbstractTableModel {
 
   @Override
   public int getRowCount() {
-    return myBreakpoints.size();
+    return breakpoints.size();
   }
 
   void markForDelete(String id) {
-    myPendingDeletes.add(id);
+    pendingDeletes.add(id);
   }
 
   void unMarkAsNewlyReceived(String id) {
-    myNewlyReceived.remove(id);
+    newlyReceived.remove(id);
   }
 
   boolean isMarkedForDelete(int row) {
     Breakpoint breakpoint = null;
-    if (row >= 0 && row < myBreakpoints.size()) {
-      breakpoint = myBreakpoints.get(row);
+    if (row >= 0 && row < breakpoints.size()) {
+      breakpoint = breakpoints.get(row);
     }
-    return breakpoint != null && myPendingDeletes.contains(breakpoint.getId());
+    return breakpoint != null && pendingDeletes.contains(breakpoint.getId());
   }
 
   boolean hasPendingDeletes() {
-    return !myPendingDeletes.isEmpty();
+    return !pendingDeletes.isEmpty();
   }
 
   boolean isNewlyReceived(String id) {
-    return myNewlyReceived.contains(id);
+    return newlyReceived.contains(id);
   }
 
   boolean isNewlyReceived(int row) {
     Breakpoint breakpoint = null;
-    if (row >= 0 && row < myBreakpoints.size()) {
-      breakpoint = myBreakpoints.get(row);
+    if (row >= 0 && row < breakpoints.size()) {
+      breakpoint = breakpoints.get(row);
     }
     return breakpoint != null && isNewlyReceived(breakpoint.getId());
   }
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
-    if (rowIndex < 0 || rowIndex >= myBreakpoints.size()) {
+    if (rowIndex < 0 || rowIndex >= breakpoints.size()) {
       return null;
     }
-    Breakpoint breakpoint = myBreakpoints.get(rowIndex);
+    Breakpoint breakpoint = breakpoints.get(rowIndex);
 
     switch (columnIndex) {
       case 0:

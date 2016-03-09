@@ -571,7 +571,7 @@ public class GoogleLogin {
      * number of characters to wrap lines after in the logout message
      */
     public static final int WRAP_LENGTH = 60;
-    private GoogleLoginActionButton myButton;
+    private GoogleLoginActionButton button;
     private volatile CancellableServerReceiver receiver = null;
     private GoogleLoginMessageExtender[] messageExtenders;
 
@@ -581,7 +581,7 @@ public class GoogleLogin {
 
     @Override
     public String obtainVerificationCodeFromUserInteraction(String title, GoogleAuthorizationCodeRequestUrl authCodeRequestUrl) {
-      GoogleLoginCopyAndPasteDialog dialog = new GoogleLoginCopyAndPasteDialog(myButton, authCodeRequestUrl, "Google Login");
+      GoogleLoginCopyAndPasteDialog dialog = new GoogleLoginCopyAndPasteDialog(button, authCodeRequestUrl, "Google Login");
       dialog.show();
       if (dialog.getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
         return null;
@@ -664,11 +664,11 @@ public class GoogleLogin {
 
     @Override
     public void notifyStatusIndicator() {
-      if (myButton != null) {
+      if (button != null) {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
           @Override
           public void run() {
-            myButton.updateUi();
+            button.updateUi();
           }
         });
       }
@@ -680,7 +680,7 @@ public class GoogleLogin {
      * @param trim the login menu item
      */
     public void setLoginMenuItemContribution(GoogleLoginActionButton trim) {
-      this.myButton = trim;
+      this.button = trim;
     }
   }
 

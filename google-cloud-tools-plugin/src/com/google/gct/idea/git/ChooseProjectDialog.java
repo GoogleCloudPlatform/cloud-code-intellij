@@ -33,10 +33,10 @@ import java.awt.*;
  */
 public class ChooseProjectDialog extends DialogWrapper {
 
-  private JPanel myRootPanel;
-  private ProjectSelector myProjectSelector;
-  private String myProjectId;
-  private CredentialedUser myCredentialedUser;
+  private JPanel rootPanel;
+  private ProjectSelector projectSelector;
+  private String projectId;
+  private CredentialedUser credentialedUser;
 
   public ChooseProjectDialog(@NotNull Project project, @NotNull String title, @NotNull String okText) {
     super(project, true);
@@ -51,7 +51,7 @@ public class ChooseProjectDialog extends DialogWrapper {
    */
   @NotNull
   public String getProjectId() {
-    return myProjectId;
+    return projectId;
   }
 
   /**
@@ -59,7 +59,7 @@ public class ChooseProjectDialog extends DialogWrapper {
    */
   @Nullable
   public CredentialedUser getCredentialedUser() {
-    return myCredentialedUser;
+    return credentialedUser;
   }
 
   @Override
@@ -68,12 +68,12 @@ public class ChooseProjectDialog extends DialogWrapper {
   }
 
   private void createUIComponents() {
-    myProjectSelector = new ProjectSelector();
-    myProjectSelector.setMinimumSize(new Dimension(300, 0));
-    myProjectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
+    projectSelector = new ProjectSelector();
+    projectSelector.setMinimumSize(new Dimension(300, 0));
+    projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent e) {
-        setOKActionEnabled(myProjectSelector.getSelectedUser() != null);
+        setOKActionEnabled(projectSelector.getSelectedUser() != null);
       }
     });
   }
@@ -81,18 +81,18 @@ public class ChooseProjectDialog extends DialogWrapper {
   @Nullable
   @Override
   public JComponent getPreferredFocusedComponent() {
-    return myProjectSelector;
+    return projectSelector;
   }
 
   @Override
   protected JComponent createCenterPanel() {
-    return myRootPanel;
+    return rootPanel;
   }
 
   @Override
   protected void doOKAction() {
-    myProjectId = myProjectSelector.getText();
-    myCredentialedUser = myProjectSelector.getSelectedUser();
+    projectId = projectSelector.getText();
+    credentialedUser = projectSelector.getSelectedUser();
     super.doOKAction();
   }
 

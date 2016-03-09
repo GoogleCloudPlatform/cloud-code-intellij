@@ -56,7 +56,7 @@ public class CloudDebuggerClient {
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final Logger LOG = Logger.getInstance(CloudDebuggerClient.class);
   private static final String ROOT_URL = "https://clouddebugger.googleapis.com";
-  private static final ConcurrentHashMap<String, Debugger> myDebuggerClientsFromUserEmail =
+  private static final ConcurrentHashMap<String, Debugger> debuggerClientsFromUserEmail =
       new ConcurrentHashMap<String, Debugger>();
 
   private CloudDebuggerClient() {
@@ -96,7 +96,7 @@ public class CloudDebuggerClient {
       return null;
     }
     final String hashkey = userEmail + timeout;
-    Debugger cloudDebuggerClient = myDebuggerClientsFromUserEmail.get(hashkey);
+    Debugger cloudDebuggerClient = debuggerClientsFromUserEmail.get(hashkey);
     if (cloudDebuggerClient == null) {
       try {
         final CredentialedUser user = GoogleLogin.getInstance().getAllUsers().get(userEmail);
@@ -107,7 +107,7 @@ public class CloudDebuggerClient {
             public void statusChanged(boolean login) {
               if (!login) {
                 // aggressively remove the cached item on any status change.
-                myDebuggerClientsFromUserEmail.remove(hashkey);
+                debuggerClientsFromUserEmail.remove(hashkey);
               } else {
                 // user logged in, should we do something?
               }
@@ -142,7 +142,7 @@ public class CloudDebuggerClient {
       }
 
       if (cloudDebuggerClient != null) {
-        myDebuggerClientsFromUserEmail.put(hashkey, cloudDebuggerClient);
+        debuggerClientsFromUserEmail.put(hashkey, cloudDebuggerClient);
       }
     }
 
@@ -151,6 +151,6 @@ public class CloudDebuggerClient {
 
   @TestOnly
   static void setClient(@NotNull String userEmail, @NotNull Debugger mockClient) {
-    myDebuggerClientsFromUserEmail.put(userEmail, mockClient);
+    debuggerClientsFromUserEmail.put(userEmail, mockClient);
   }
 }

@@ -58,8 +58,8 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
   private static final String PROJECT_NAME = "cloud-debugger-sample-project";
   private static final String PROJECT_NUMBER = "146354237";
 
-  private MockProjectEx myProject;
-  private IdeaProjectTestFixture myFixture;
+  private MockProjectEx project;
+  private IdeaProjectTestFixture fixture;
 
   @SuppressWarnings("JUnitTestCaseWithNonTrivialConstructors")
   public CloudDebugProcessStateTest() {
@@ -109,13 +109,13 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    myFixture = IdeaTestFixtureFactory.getFixtureFactory().createFixtureBuilder(getTestName(true)).getFixture();
-    myFixture.setUp();
+    fixture = IdeaTestFixtureFactory.getFixtureFactory().createFixtureBuilder(getTestName(true)).getFixture();
+    fixture.setUp();
 
-    myProject = new MockProjectEx(getTestRootDisposable());
+    project = new MockProjectEx(getTestRootDisposable());
 
     PsiManager psiManager = Mockito.mock(PsiManager.class);
-    myProject.registerService(PsiManager.class, psiManager);
+    project.registerService(PsiManager.class, psiManager);
 
     MockGoogleLogin googleLogin = new MockGoogleLogin();
     googleLogin.install();
@@ -133,8 +133,8 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
 
   @Override
   protected void tearDown() throws Exception {
-    myFixture.tearDown();
-    myFixture = null;
+    fixture.tearDown();
+    fixture = null;
     super.tearDown();
   }
 

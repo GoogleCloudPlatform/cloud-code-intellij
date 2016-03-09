@@ -39,28 +39,28 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
   private static final Cursor NORMAL_CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
   private static final Color ERROR_COLOR = JBColor.RED;
 
-  private final ScheduledExecutorService myLoadingAnimationScheduler = ConcurrencyUtil.newSingleScheduledThreadExecutor("Animations");
+  private final ScheduledExecutorService loadingAnimationScheduler = ConcurrencyUtil.newSingleScheduledThreadExecutor("Animations");
 
-  private ScheduledFuture<?> myTicker;
-  private JTree myTree;
-  private DefaultTreeCellRenderer myDefaultRenderer = new DefaultTreeCellRenderer();
-  private ProjectSelectorGoogleLogin myProjectSelectorGoogleLogin = new ProjectSelectorGoogleLogin();
-  private ProjectSelectorNewProjectItem myProjectSelectorNewProjectItem;
-  private ProjectSelectorItem myProjectSelectorItem;
-  private ProjectSelectorCredentialedUser myProjectSelectorCredentialedUser = new ProjectSelectorCredentialedUser();
-  private ProjectSelectorLoadingItem myProjectSelectorLoadingItem;
-  private ProjectSelectorErrorItem mySelectorErrorItem;
-  private DefaultMutableTreeNode myLastHoveredNode;
+  private ScheduledFuture<?> ticker;
+  private JTree tree;
+  private DefaultTreeCellRenderer defaultRenderer = new DefaultTreeCellRenderer();
+  private ProjectSelectorGoogleLogin projectSelectorGoogleLogin = new ProjectSelectorGoogleLogin();
+  private ProjectSelectorNewProjectItem projectSelectorNewProjectItem;
+  private ProjectSelectorItem projectSelectorItem;
+  private ProjectSelectorCredentialedUser projectSelectorCredentialedUser = new ProjectSelectorCredentialedUser();
+  private ProjectSelectorLoadingItem projectSelectorLoadingItem;
+  private ProjectSelectorErrorItem selectorErrorItem;
+  private DefaultMutableTreeNode lastHoveredNode;
 
   public ProjectSelectorRenderer(@NotNull JTree tree) {
-    myTree = tree;
-    Color backgroundNonSelectionColor = myDefaultRenderer.getBackgroundNonSelectionColor();
-    Color textNonSelectionColor = myDefaultRenderer.getTextNonSelectionColor();
-    myProjectSelectorItem = new ProjectSelectorItem(backgroundNonSelectionColor,
-                                                    myDefaultRenderer.getTextSelectionColor(), textNonSelectionColor);
-    myProjectSelectorLoadingItem = new ProjectSelectorLoadingItem(backgroundNonSelectionColor, textNonSelectionColor);
-    myProjectSelectorNewProjectItem = new ProjectSelectorNewProjectItem(myTree);
-    mySelectorErrorItem = new ProjectSelectorErrorItem(ERROR_COLOR);
+    this.tree = tree;
+    Color backgroundNonSelectionColor = defaultRenderer.getBackgroundNonSelectionColor();
+    Color textNonSelectionColor = defaultRenderer.getTextNonSelectionColor();
+    projectSelectorItem = new ProjectSelectorItem(backgroundNonSelectionColor,
+                                                    defaultRenderer.getTextSelectionColor(), textNonSelectionColor);
+    projectSelectorLoadingItem = new ProjectSelectorLoadingItem(backgroundNonSelectionColor, textNonSelectionColor);
+    projectSelectorNewProjectItem = new ProjectSelectorNewProjectItem(tree);
+    selectorErrorItem = new ProjectSelectorErrorItem(ERROR_COLOR);
   }
 
   @Override
@@ -71,89 +71,89 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
       returnValue = getComponentForNode(value, selected);
     }
     if (returnValue == null) {
-      returnValue = myDefaultRenderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+      returnValue = defaultRenderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
     }
     return returnValue;
   }
 
   public int getMaximumWidth() {
-    return myProjectSelectorNewProjectItem.getPreferredSize().width;
+    return projectSelectorNewProjectItem.getPreferredSize().width;
   }
 
   // This method causes all loading nodes to repaint (for animation purposes)
   // If there are no further loading nodes to paint, it turns off the ticker.
   private void repaintLoadingNodes() {
     boolean hasLoadingNode = false;
-    DefaultTreeModel model = (DefaultTreeModel)myTree.getModel();
+    DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
     DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode)model.getRoot();
     for(int index = 0; index < rootNode.getChildCount(); index++ ) {
       GoogleUserModelItem userModelItem = (GoogleUserModelItem)rootNode.getChildAt(index);
       if (userModelItem.isSynchronizing() &&
           userModelItem.getChildCount() == 1 && userModelItem.getChildAt(0) instanceof ElysiumLoadingModelItem) {
         TreePath path = new TreePath(model.getPathToRoot(userModelItem.getChildAt(0)));
-        Rectangle rect = myTree.getPathBounds(path);
+        Rectangle rect = tree.getPathBounds(path);
         if (rect != null) {
-          myTree.repaint(rect);
+          tree.repaint(rect);
           hasLoadingNode = true;
         }
       }
     }
 
     if (!hasLoadingNode) {
-      myTicker.cancel(false);
-      myTicker = null;
+      ticker.cancel(false);
+      ticker = null;
     }
   }
 
   @Nullable
   private Component getComponentForNode(Object userObject, boolean selected) {
     if (userObject instanceof GoogleSignOnModelItem) {
-      return myProjectSelectorGoogleLogin;
+      return projectSelectorGoogleLogin;
     }
     else if (userObject instanceof ElysiumNewProjectModelItem) {
-      return myProjectSelectorNewProjectItem;
+      return projectSelectorNewProjectItem;
     }
     else if (userObject instanceof  ElysiumLoadingModelItem) {
-      if (myTicker == null) {
-        myTicker = myLoadingAnimationScheduler.scheduleWithFixedDelay(new Runnable() {
+      if (ticker == null) {
+        ticker = loadingAnimationScheduler.scheduleWithFixedDelay(new Runnable() {
           @Override
           public void run() {
             repaintLoadingNodes();
           }
         }, 100, 100, TimeUnit.MILLISECONDS);
       }
-      myProjectSelectorLoadingItem.snap();
-      return myProjectSelectorLoadingItem;
+      projectSelectorLoadingItem.snap();
+      return projectSelectorLoadingItem;
     }
     else if (userObject instanceof  ElysiumErrorModelItem) {
-      mySelectorErrorItem.setText( ((ElysiumErrorModelItem)userObject).getErrorMessage());
-      return mySelectorErrorItem;
+      selectorErrorItem.setText( ((ElysiumErrorModelItem)userObject).getErrorMessage());
+      return selectorErrorItem;
     }
     else if (userObject instanceof ElysiumProjectModelItem) {
-      myProjectSelectorItem
+      projectSelectorItem
         .initialize(((ElysiumProjectModelItem)userObject).getDescription(),
                     ((ElysiumProjectModelItem)userObject).getProjectId(), selected,
-                    myLastHoveredNode == userObject);
+                    lastHoveredNode == userObject);
 
-      return myProjectSelectorItem;
+      return projectSelectorItem;
     }
     else if (userObject instanceof GoogleUserModelItem) {
       GoogleUserModelItem userModelItem = (GoogleUserModelItem)userObject;
-      myProjectSelectorCredentialedUser.initialize(userModelItem.getImage(), userModelItem.getName(), userModelItem.getEmail());
-      return myProjectSelectorCredentialedUser;
+      projectSelectorCredentialedUser.initialize(userModelItem.getImage(), userModelItem.getName(), userModelItem.getEmail());
+      return projectSelectorCredentialedUser;
     }
     return null;
   }
 
   @Override
   public void mouseClicked(MouseEvent e) {
-    TreePath path = myTree.getPathForLocation(e.getX(), e.getY());
+    TreePath path = tree.getPathForLocation(e.getX(), e.getY());
     if (path != null && path.getLastPathComponent() instanceof GoogleUserModelItem) {
-      if (myTree.isCollapsed(path)) {
-        myTree.expandPath(path);
+      if (tree.isCollapsed(path)) {
+        tree.expandPath(path);
       }
       else {
-        myTree.collapsePath(path);
+        tree.collapsePath(path);
       }
     }
   }
@@ -188,21 +188,21 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
   @Override
   public void mouseMoved(MouseEvent e) {
     boolean mouseMovedHandled = false;
-    TreePath path = myTree.getPathForLocation(e.getX(), e.getY());
+    TreePath path = tree.getPathForLocation(e.getX(), e.getY());
     if (path != null && path.getLastPathComponent() instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode newHoveredNode = (DefaultMutableTreeNode)path.getLastPathComponent();
-      if (newHoveredNode != myLastHoveredNode) {
+      if (newHoveredNode != lastHoveredNode) {
         Rectangle rect;
-        if (myLastHoveredNode != null) {
-          rect = myTree.getPathBounds(new TreePath(myLastHoveredNode.getPath()));
+        if (lastHoveredNode != null) {
+          rect = tree.getPathBounds(new TreePath(lastHoveredNode.getPath()));
           if (rect != null) {
-            myTree.repaint(rect);
+            tree.repaint(rect);
           }
         }
-        myLastHoveredNode = newHoveredNode;
-        rect = myTree.getPathBounds(new TreePath(myLastHoveredNode.getPath()));
+        lastHoveredNode = newHoveredNode;
+        rect = tree.getPathBounds(new TreePath(lastHoveredNode.getPath()));
         if (rect != null) {
-          myTree.repaint(rect);
+          tree.repaint(rect);
         }
       }
       Component component = getComponentForNode(newHoveredNode, false);
@@ -216,13 +216,13 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
       }
     }
     if (!mouseMovedHandled) {
-      myTree.setCursor(NORMAL_CURSOR);
+      tree.setCursor(NORMAL_CURSOR);
     }
   }
 
   @Nullable
   private Component getComponentFromXY(int x, int y, boolean selected) {
-    TreePath path = myTree.getPathForLocation(x, y);
+    TreePath path = tree.getPathForLocation(x, y);
     if (path != null) {
       Object node = path.getLastPathComponent();
       if (node instanceof DefaultMutableTreeNode) {
@@ -233,14 +233,14 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
   }
 
   private int getXTranslation(int x, int y) {
-    TreePath path = myTree.getPathForLocation(x, y);
-    Rectangle nodeBounds = myTree.getPathBounds(path);
+    TreePath path = tree.getPathForLocation(x, y);
+    Rectangle nodeBounds = tree.getPathBounds(path);
     return x - (nodeBounds != null ? nodeBounds.x : 0);
   }
 
   private int getYTranslation(int x, int y) {
-    TreePath path = myTree.getPathForLocation(x, y);
-    Rectangle nodeBounds = myTree.getPathBounds(path);
+    TreePath path = tree.getPathForLocation(x, y);
+    Rectangle nodeBounds = tree.getPathBounds(path);
     return y - (nodeBounds != null ? nodeBounds.y : 0);
   }
 }

@@ -247,8 +247,8 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
   }
 
   public static class CloudLineBreakpoint extends LineBreakpoint {
-    private String myErrorMessage = null;
-    private boolean myIsVerified = false;
+    private String errorMessage = null;
+    private boolean isVerified = false;
 
     public CloudLineBreakpoint(Project project, XBreakpoint xBreakpoint) {
       super(project, xBreakpoint);
@@ -260,19 +260,19 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     }
 
     public String getErrorMessage() {
-      return myErrorMessage;
+      return errorMessage;
     }
 
     public void setErrorMessage(String errorMessage) {
-      myErrorMessage = errorMessage;
+      this.errorMessage = errorMessage;
     }
 
     @Override
     protected Icon getSetIcon(boolean isMuted) {
-      if (!Strings.isNullOrEmpty(myErrorMessage)) {
+      if (!Strings.isNullOrEmpty(errorMessage)) {
         return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_ERROR;
       }
-      if (myIsVerified) {
+      if (isVerified) {
         return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_CHECKED;
       }
       return GoogleCloudToolsIcons.CLOUD_BREAKPOINT;
@@ -292,11 +292,11 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     }
 
     public void setVerified(boolean isVerified) {
-      myIsVerified = isVerified;
+      this.isVerified = isVerified;
     }
 
     public boolean isVerified() {
-      return myIsVerified;
+      return isVerified;
     }
   }
 }

@@ -44,51 +44,51 @@ import java.util.List;
  * variables and if appropriate, the set of watch expressions at that location.
  */
 public class CloudStackFrame extends XStackFrame {
-  @Nullable private final List<Variable> myEvaluatedExpressions;
-  private final StackFrame myFrame;
-  private final List<Variable> myVariableTable;
-  private final XSourcePosition myXSourcePosition;
+  @Nullable private final List<Variable> evaluatedExpressions;
+  private final StackFrame frame;
+  private final List<Variable> variableTable;
+  private final XSourcePosition xSourcePosition;
 
   public CloudStackFrame(@NotNull Project project,
       @NotNull StackFrame frame,
       @NotNull List<Variable> variableTable,
       @Nullable List<Variable> evaluatedExpressions,
       @NotNull ServerToIDEFileResolver fileResolver) {
-    myFrame = frame;
-    myVariableTable = variableTable;
-    myEvaluatedExpressions = evaluatedExpressions;
+    this.frame = frame;
+    this.variableTable = variableTable;
+    this.evaluatedExpressions = evaluatedExpressions;
     String path = frame.getLocation().getPath();
     if (!Strings.isNullOrEmpty(path)) {
-      myXSourcePosition = XDebuggerUtil.getInstance().createPosition(
+      xSourcePosition = XDebuggerUtil.getInstance().createPosition(
           fileResolver.getFileFromPath(project, path),
           frame.getLocation().getLine() - 1);
     }
     else {
-      myXSourcePosition = null;
+      xSourcePosition = null;
     }
   }
 
   @Override
   public void computeChildren(@NotNull XCompositeNode node) {
     final XValueChildrenList list = new XValueChildrenList();
-    List<Variable> arguments = myFrame.getArguments();
+    List<Variable> arguments = frame.getArguments();
     if (arguments != null && arguments.size() > 0) {
       for (Variable variable : arguments) {
         if (!Strings.isNullOrEmpty(variable.getName())) {
-          list.add(variable.getName(), new MyValue(variable, myVariableTable));
+          list.add(variable.getName(), new MyValue(variable, variableTable));
         }
       }
     }
-    List<Variable> locals = myFrame.getLocals();
+    List<Variable> locals = frame.getLocals();
     if (locals != null && locals.size() > 0) {
       for (Variable variable : locals) {
         if (!Strings.isNullOrEmpty(variable.getName())) {
-          list.add(variable.getName(), new MyValue(variable, myVariableTable));
+          list.add(variable.getName(), new MyValue(variable, variableTable));
         }
       }
     }
 
-    if (myEvaluatedExpressions != null && myEvaluatedExpressions.size() > 0) {
+    if (evaluatedExpressions != null && evaluatedExpressions.size() > 0) {
       list.addTopGroup(new CustomWatchGroup());
     }
     node.addChildren(list, true);
@@ -97,22 +97,22 @@ public class CloudStackFrame extends XStackFrame {
   @Override
   public void customizePresentation(@NotNull ColoredTextContainer component) {
     component.setIcon(AllIcons.Debugger.StackFrame);
-    String functionName = myFrame.getFunction();
+    String functionName = frame.getFunction();
     String className = "";
     String packageName = "";
 
-    int lastDot = myFrame.getFunction().lastIndexOf('.');
+    int lastDot = frame.getFunction().lastIndexOf('.');
     if (lastDot > 0 && lastDot < functionName.length() - 1) {
       functionName = functionName.substring(lastDot + 1);
-      className = myFrame.getFunction().substring(0, lastDot);
+      className = frame.getFunction().substring(0, lastDot);
       int classNameDot = className.lastIndexOf('.');
       if (classNameDot > 0 && classNameDot < className.length() - 1) {
         className = className.substring(classNameDot + 1);
-        packageName = myFrame.getFunction().substring(0, classNameDot);
+        packageName = frame.getFunction().substring(0, classNameDot);
       }
     }
-    component.append(functionName + "():" + myFrame.getLocation().getLine().toString() + ", " + className,
-                     myXSourcePosition != null
+    component.append(functionName + "():" + frame.getLocation().getLine().toString() + ", " + className,
+                     xSourcePosition != null
                      ? SimpleTextAttributes.REGULAR_ATTRIBUTES
                      : SimpleTextAttributes.GRAYED_ATTRIBUTES);
     component.append(" (" + packageName + ")", SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES);
@@ -126,21 +126,21 @@ public class CloudStackFrame extends XStackFrame {
 
   @Override
   public XSourcePosition getSourcePosition() {
-    return myXSourcePosition;
+    return xSourcePosition;
   }
 
   private static class MyValue extends XValue {
-    private final List<Variable> myMembers;
-    private final Variable myVariable;
-    private final List<Variable> myVariableTable;
+    private final List<Variable> members;
+    private final Variable variable;
+    private final List<Variable> variableTable;
 
     public MyValue(@NotNull Variable variable, @NotNull List<Variable> variableTable) {
       //Note that we have to examine the variable table for some cases depending on how the
       // server compressed results.
-      myVariableTable = variableTable;
-      myVariable = variable.getVarTableIndex() != null ? variableTable.get(variable.getVarTableIndex().intValue())
+      this.variableTable = variableTable;
+      this.variable = variable.getVarTableIndex() != null ? variableTable.get(variable.getVarTableIndex().intValue())
           : variable;
-      myMembers = myVariable.getMembers();
+      members = variable.getMembers();
     }
 
     @Override
@@ -151,10 +151,10 @@ public class CloudStackFrame extends XStackFrame {
     @Override
     public void computeChildren(@NotNull XCompositeNode node) {
       final XValueChildrenList list = new XValueChildrenList();
-      if (myMembers != null && myMembers.size() > 0) {
-        for (Variable variable : myMembers) {
+      if (members != null && members.size() > 0) {
+        for (Variable variable : members) {
           if (!Strings.isNullOrEmpty(variable.getName())) {
-            list.add(variable.getName(), new MyValue(variable, myVariableTable));
+            list.add(variable.getName(), new MyValue(variable, variableTable));
           }
         }
       }
@@ -163,16 +163,16 @@ public class CloudStackFrame extends XStackFrame {
 
     @Override
     public void computePresentation(@NotNull XValueNode node, @NotNull XValuePlace place) {
-      String status = BreakpointUtil.getUserMessage(myVariable.getStatus());
+      String status = BreakpointUtil.getUserMessage(variable.getStatus());
       String value = !Strings.isNullOrEmpty(status) ?
-          String.format("%s (%s)", myVariable.getValue(), status) : myVariable.getValue();
-      node.setPresentation(null, myMembers != null && myMembers.size() > 0 ? "..." : null, value != null ? value : "",
-          myMembers != null && myMembers.size() > 0);
+          String.format("%s (%s)", variable.getValue(), status) : variable.getValue();
+      node.setPresentation(null, members != null && members.size() > 0 ? "..." : null, value != null ? value : "",
+          members != null && members.size() > 0);
     }
 
     @Override
     public String getEvaluationExpression() {
-      return myVariable.getName();
+      return variable.getName();
     }
   }
 
@@ -185,10 +185,10 @@ public class CloudStackFrame extends XStackFrame {
     public void computeChildren(@NotNull XCompositeNode node) {
       final XValueChildrenList list = new XValueChildrenList();
 
-      if (myEvaluatedExpressions != null && myEvaluatedExpressions.size() > 0) {
-        for (Variable variable : myEvaluatedExpressions) {
+      if (evaluatedExpressions != null && evaluatedExpressions.size() > 0) {
+        for (Variable variable : evaluatedExpressions) {
           if (!Strings.isNullOrEmpty(variable.getName())) {
-            list.add(variable.getName(), new MyValue(variable, myVariableTable));
+            list.add(variable.getName(), new MyValue(variable, variableTable));
           }
         }
       }

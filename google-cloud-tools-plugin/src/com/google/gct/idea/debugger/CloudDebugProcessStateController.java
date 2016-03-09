@@ -42,12 +42,12 @@ public class CloudDebugProcessStateController {
   private static final int INITIAL_DELAY_MS = 2000;
   private static final Logger LOG = Logger.getInstance(CloudDebugProcessStateController.class);
   private static final int PERIOD_MS = 500;
-  private final List<CloudBreakpointListener> myBreakpointListChangedListeners =
+  private final List<CloudBreakpointListener> breakpointListChangedListeners =
     new ArrayList<CloudBreakpointListener>();
-  private final ConcurrentHashMap<String, Breakpoint> myFullFinalBreakpoints =
+  private final ConcurrentHashMap<String, Breakpoint> fullFinalBreakpoints =
     new ConcurrentHashMap<String, Breakpoint>();
-  private volatile Timer myListBreakpointsJob;
-  private CloudDebugProcessState myState;
+  private volatile Timer listBreakpointsJob;
+  private CloudDebugProcessState state;
 
   protected CloudDebugProcessStateController() {
   }
@@ -58,7 +58,7 @@ public class CloudDebugProcessStateController {
    * @param listener the subscriber to receive events
    */
   public void addListener(@NotNull CloudBreakpointListener listener) {
-    myBreakpointListChangedListeners.add(listener);
+    breakpointListChangedListeners.add(listener);
   }
 
   void deleteBreakpoint(@NotNull final String breakpointId) {
@@ -75,17 +75,17 @@ public class CloudDebugProcessStateController {
    * @param breakpointId the {@link Breakpoint} Id to delete
    */
   private void deleteBreakpoint(@NotNull final String breakpointId, boolean performAsync) {
-    if (myState == null) {
+    if (state == null) {
       throw new IllegalStateException();
     }
-    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(myState);
+    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(state);
     if (client == null) {
       LOG.warn("no client available attempting to setBreakpoint");
-      Messages.showErrorDialog(myState.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
+      Messages.showErrorDialog(state.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
                                GctBundle.getString("clouddebug.message.title"));
       return;
     }
-    final String debuggeeId = myState.getDebuggeeId();
+    final String debuggeeId = state.getDebuggeeId();
     assert debuggeeId != null;
 
     Runnable performDelete = new Runnable() {
@@ -111,8 +111,8 @@ public class CloudDebugProcessStateController {
    * Fires a change notification to all subscribers.
    */
   public void fireBreakpointsChanged() {
-    for (CloudBreakpointListener listener : myBreakpointListChangedListeners) {
-      listener.onBreakpointListChanged(myState);
+    for (CloudBreakpointListener listener : breakpointListChangedListeners) {
+      listener.onBreakpointListChanged(state);
     }
   }
 
@@ -122,8 +122,8 @@ public class CloudDebugProcessStateController {
    * @param state the {@link CloudDebugProcessState} the controller will be bound to
    */
   public void initialize(@NotNull CloudDebugProcessState state) {
-    myState = state;
-    myState.setWaitToken(null);
+    this.state = state;
+    state.setWaitToken(null);
     waitForChanges();
   }
 
@@ -133,7 +133,7 @@ public class CloudDebugProcessStateController {
    * @param listener the subscriber to remove
    */
   public void removeListener(@NotNull CloudBreakpointListener listener) {
-    myBreakpointListChangedListeners.remove(listener);
+    breakpointListChangedListeners.remove(listener);
   }
 
   /**
@@ -143,21 +143,21 @@ public class CloudDebugProcessStateController {
   public void resolveBreakpointAsync(@NotNull final String id,
       @NotNull final ResolveBreakpointHandler handler) {
 
-    if (myFullFinalBreakpoints.containsKey(id)) {
-      handler.onSuccess(myFullFinalBreakpoints.get(id));
+    if (fullFinalBreakpoints.containsKey(id)) {
+      handler.onSuccess(fullFinalBreakpoints.get(id));
       return;
     }
-    if (myState == null) {
+    if (state == null) {
       handler.onError(GctBundle.getString("clouddebug.invalid.state"));
       return;
     }
-    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(myState);
+    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(state);
     if (client == null) {
       LOG.warn("no client available attempting to resolveBreakpointAsync");
       handler.onError(GctBundle.getString("clouddebug.bad.login.message"));
       return;
     }
-    List<Breakpoint> currentList = myState.getCurrentServerBreakpointList();
+    List<Breakpoint> currentList = state.getCurrentServerBreakpointList();
     final SettableFuture<Breakpoint> future = SettableFuture.create();
     for (Breakpoint serverBreakpointCandidate : currentList) {
       if (serverBreakpointCandidate.getId().equals(id)
@@ -175,10 +175,10 @@ public class CloudDebugProcessStateController {
         // back on ui
         GetBreakpointResponse response;
         try {
-          response = client.debuggees().breakpoints().get(myState.getDebuggeeId(), id).execute();
+          response = client.debuggees().breakpoints().get(state.getDebuggeeId(), id).execute();
           Breakpoint result = response.getBreakpoint();
           if (result != null) {
-            myFullFinalBreakpoints.put(id, result);
+            fullFinalBreakpoints.put(id, result);
             handler.onSuccess(result);
           }
           else {
@@ -199,18 +199,18 @@ public class CloudDebugProcessStateController {
   void setBreakpointAsync(@NotNull final Breakpoint serverBreakpoint,
       @NotNull final SetBreakpointHandler handler) {
 
-    if (myState == null) {
+    if (state == null) {
       handler.onError(GctBundle.getString("clouddebug.invalid.state"));
       return;
     }
-    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(myState);
+    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(state);
     if (client == null) {
       LOG.warn("no client available attempting to setBreakpoint");
       handler.onError(GctBundle.getString("clouddebug.bad.login.message"));
       return;
     }
 
-    final String debuggeeId = myState.getDebuggeeId();
+    final String debuggeeId = state.getDebuggeeId();
     assert debuggeeId != null;
 
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
@@ -218,7 +218,7 @@ public class CloudDebugProcessStateController {
       public void run() {
         try {
           // Delete old breakpoints at this location.
-          List<Breakpoint> currentList = myState.getCurrentServerBreakpointList();
+          List<Breakpoint> currentList = state.getCurrentServerBreakpointList();
           SourceLocation location = serverBreakpoint.getLocation();
           for (Breakpoint serverBp : currentList) {
             if (serverBp.getIsFinalState() != Boolean.TRUE &&
@@ -257,14 +257,14 @@ public class CloudDebugProcessStateController {
    * Begins background listening from the server.  When changes occur, listeners are notified.
    */
   public void startBackgroundListening() {
-    assert myState != null;
-    if (myListBreakpointsJob == null) {
-      myListBreakpointsJob = new Timer("list breakpoints");
+    assert state != null;
+    if (listBreakpointsJob == null) {
+      listBreakpointsJob = new Timer("list breakpoints");
       final Runnable runnable = new Runnable() {
         @Override
         public void run() {
           waitForChanges();
-          Timer timer = myListBreakpointsJob;
+          Timer timer = listBreakpointsJob;
           if (timer != null) {
             try {
               // We run after a short period to act as a throttle.
@@ -276,7 +276,7 @@ public class CloudDebugProcessStateController {
           }
         }
       };
-      myListBreakpointsJob.schedule(new RunnableTimerTask(runnable), INITIAL_DELAY_MS);
+      listBreakpointsJob.schedule(new RunnableTimerTask(runnable), INITIAL_DELAY_MS);
     }
   }
 
@@ -284,34 +284,34 @@ public class CloudDebugProcessStateController {
    * Stops background listening.
    */
   public void stopBackgroundListening() {
-    if (myListBreakpointsJob != null) {
-      myListBreakpointsJob.cancel();
+    if (listBreakpointsJob != null) {
+      listBreakpointsJob.cancel();
     }
-    myListBreakpointsJob = null;
+    listBreakpointsJob = null;
   }
 
   boolean isBackgroundListening() {
-    return myListBreakpointsJob != null;
+    return listBreakpointsJob != null;
   }
 
   /**
    * Package protected for test purposes only.
    */
   void waitForChanges() {
-    if (myState == null) {
+    if (state == null) {
       LOG.error("no state available attempting to checkForChanges");
       return;
     }
-    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(myState);
+    final Debugger client = CloudDebuggerClient.getLongTimeoutClient(state);
     if (client == null) {
       LOG.info("no client available attempting to checkForChanges");
       return;
     }
 
-    String tokenToSend = myState.getWaitToken();
+    String tokenToSend = state.getWaitToken();
     List<Breakpoint> currentList;
     try {
-      currentList = queryServerForBreakpoints(myState, client, tokenToSend);
+      currentList = queryServerForBreakpoints(state, client, tokenToSend);
     }
     catch (SocketTimeoutException ex) {
       // Timeout is expected on a hanging get.
@@ -322,7 +322,7 @@ public class CloudDebugProcessStateController {
       // we need to requery.
       if (ex.getDetails().getCode() == 409) {
         try {
-          currentList = queryServerForBreakpoints(myState, client, tokenToSend);
+          currentList = queryServerForBreakpoints(state, client, tokenToSend);
         }
         catch (IOException ioException) {
           LOG.warn("exception listing breakpoints", ioException);
@@ -408,7 +408,7 @@ public class CloudDebugProcessStateController {
   private void pruneBreakpointCache(List<Breakpoint> currentList) {
     //Clear out the obsolete breakpoint cache for old items.
     HashSet<String> toRemoveSet = new HashSet<String>();
-    toRemoveSet.addAll(myFullFinalBreakpoints.keySet());
+    toRemoveSet.addAll(fullFinalBreakpoints.keySet());
     if (!toRemoveSet.isEmpty() && currentList != null) {
       for (Breakpoint bp : currentList) {
         toRemoveSet.remove(bp.getId());
@@ -416,7 +416,7 @@ public class CloudDebugProcessStateController {
     }
 
     for (String idToRemove : toRemoveSet) {
-      myFullFinalBreakpoints.remove(idToRemove);
+      fullFinalBreakpoints.remove(idToRemove);
     }
   }
 
@@ -431,15 +431,15 @@ public class CloudDebugProcessStateController {
   }
 
   static class RunnableTimerTask extends TimerTask {
-    private final Runnable myRunnable;
+    private final Runnable runnable;
 
     public RunnableTimerTask(@NotNull Runnable runnable) {
-      myRunnable = runnable;
+      this.runnable = runnable;
     }
 
     @Override
     public void run() {
-      myRunnable.run();
+      runnable.run();
     }
   }
 }

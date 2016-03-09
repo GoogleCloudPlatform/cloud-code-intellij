@@ -23,21 +23,21 @@ import javax.swing.JPanel;
  * This is the config UI for cloud debug run configs.
  */
 public class CloudDebugRunConfigurationPanel {
-  private ProjectSelector myElysiumProjectId;
-  private JPanel myPanel;
+  private ProjectSelector elysiumProjectId;
+  private JPanel panel;
 
   public CloudDebugRunConfigurationPanel() {
   }
 
   public JPanel getMainPanel() {
-    return myPanel;
+    return panel;
   }
 
   public String getProjectName() {
-    return myElysiumProjectId.getText();
+    return elysiumProjectId.getText();
   }
 
   public void setProjectName(String name) {
-    myElysiumProjectId.setText(name);
+    elysiumProjectId.setText(name);
   }
 }

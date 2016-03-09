@@ -46,7 +46,7 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
   private static final int POPUP_HEIGHTFRAMESIZE = 50;
   private static final int MIN_WIDTH = 450;
 
-  private JBPopup myPopup;
+  private JBPopup popup;
 
   public UserSelector() {
     getTextField().setCursor(Cursor.getDefaultCursor());
@@ -91,16 +91,16 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
 
   @Override
   public void showPopup(RelativePoint showTarget) {
-    if (myPopup == null || myPopup.isDisposed()) {
+    if (popup == null || popup.isDisposed()) {
       PopupPanel popupPanel = new PopupPanel();
 
       popupPanel.initializeContent(getText());
       ComponentPopupBuilder popup = JBPopupFactory.getInstance().
         createComponentPopupBuilder(popupPanel, popupPanel.getInitialFocus());
-      myPopup = popup.createPopup();
+      this.popup = popup.createPopup();
     }
-    if (!myPopup.isVisible()) {
-      myPopup.show(showTarget);
+    if (!popup.isVisible()) {
+      popup.show(showTarget);
     }
   }
 
@@ -109,32 +109,32 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
    * to add an account.
    */
   private class PopupPanel extends GoogleLoginEmptyPanel implements ListCellRenderer {
-    private JBList myJList;
-    private ProjectSelectorCredentialedUser myProjectSelectorCredentialedUser;
-    private UserSelectorGoogleLogin myUserSelectorGoogleLogin;
-    private int myHoverIndex = -1;
+    private JBList jList;
+    private ProjectSelectorCredentialedUser projectSelectorCredentialedUser;
+    private UserSelectorGoogleLogin userSelectorGoogleLogin;
+    private int hoverIndex = -1;
 
     public PopupPanel() {
-      myProjectSelectorCredentialedUser = new ProjectSelectorCredentialedUser();
-      myProjectSelectorCredentialedUser.setOpaque(true);
-      myUserSelectorGoogleLogin = new UserSelectorGoogleLogin();
+      projectSelectorCredentialedUser = new ProjectSelectorCredentialedUser();
+      projectSelectorCredentialedUser.setOpaque(true);
+      userSelectorGoogleLogin = new UserSelectorGoogleLogin();
     }
 
     public JComponent getInitialFocus() {
-      return myJList;
+      return jList;
     }
 
     public void initializeContent(@Nullable String selectedItem) {
       DefaultListModel model = new DefaultListModel();
-      myJList = new JBList(model);
+      jList = new JBList(model);
 
-      myJList.setOpaque(false);
-      myJList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      myJList.setCellRenderer(this);
+      jList.setOpaque(false);
+      jList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      jList.setCellRenderer(this);
       for(CredentialedUser user : GoogleLogin.getInstance().getAllUsers().values()) {
         model.addElement(user);
         if (user.getEmail() != null && user.getEmail().equalsIgnoreCase(selectedItem)) {
-          myJList.setSelectedValue(user, true);
+          jList.setSelectedValue(user, true);
         }
       }
 
@@ -143,11 +143,11 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
       }
 
       getContentPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-      getContentPane().setViewportView(myJList);
-      myJList.addListSelectionListener(new ListSelectionListener() {
+      getContentPane().setViewportView(jList);
+      jList.addListSelectionListener(new ListSelectionListener() {
         @Override
         public void valueChanged(ListSelectionEvent e) {
-          Object user = myJList.getSelectedValue();
+          Object user = jList.getSelectedValue();
           if (user != null && user instanceof CredentialedUser) {
               UserSelector.this.setText(((CredentialedUser)user).getEmail());
               SwingUtilities.invokeLater(new Runnable() {
@@ -160,28 +160,28 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
         }
       });
 
-      myJList.addMouseMotionListener(new MouseAdapter() {
+      jList.addMouseMotionListener(new MouseAdapter() {
         @Override
         public void mouseMoved(MouseEvent me) {
           Point p = new Point(me.getX(),me.getY());
-          int index = myJList.locationToIndex(p);
-          if (index != myHoverIndex) {
-            int oldIndex = myHoverIndex;
-            myHoverIndex = index;
+          int index = jList.locationToIndex(p);
+          if (index != hoverIndex) {
+            int oldIndex = hoverIndex;
+            hoverIndex = index;
             if (oldIndex >= 0) {
-              myJList.repaint(myJList.getUI().getCellBounds(myJList, oldIndex, oldIndex));
+              jList.repaint(jList.getUI().getCellBounds(jList, oldIndex, oldIndex));
             }
-            if (myHoverIndex >= 0) {
-              if (myJList.getSelectedIndex() >= 0) {
-                myJList.clearSelection();
+            if (hoverIndex >= 0) {
+              if (jList.getSelectedIndex() >= 0) {
+                jList.clearSelection();
               }
-              myJList.repaint(myJList.getUI().getCellBounds(myJList, myHoverIndex, myHoverIndex));
+              jList.repaint(jList.getUI().getCellBounds(jList, hoverIndex, hoverIndex));
             }
           }
         }
       });
 
-      myJList.requestFocusInWindow();
+      jList.requestFocusInWindow();
       int preferredWidth =  UserSelector.this.getWidth();
       setPreferredSize(new Dimension(Math.max(MIN_WIDTH, preferredWidth), getPreferredPopupHeight()));
     }
@@ -207,27 +207,27 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
     @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
       if (value instanceof EmptyMarker) {
-        return myUserSelectorGoogleLogin;
+        return userSelectorGoogleLogin;
       }
 
       CredentialedUser targetUser = (CredentialedUser)value;
       if (targetUser != null) {
-        myProjectSelectorCredentialedUser.initialize(targetUser.getPicture(), targetUser.getName(), targetUser.getEmail());
+        projectSelectorCredentialedUser.initialize(targetUser.getPicture(), targetUser.getName(), targetUser.getEmail());
       }
       else {
-        myProjectSelectorCredentialedUser.initialize(null, "", null);
+        projectSelectorCredentialedUser.initialize(null, "", null);
       }
 
-      if (isSelected || cellHasFocus || index == myHoverIndex) {
-        myProjectSelectorCredentialedUser.setBackground(list.getSelectionBackground());
-        myProjectSelectorCredentialedUser.setForeground(list.getSelectionForeground());
+      if (isSelected || cellHasFocus || index == hoverIndex) {
+        projectSelectorCredentialedUser.setBackground(list.getSelectionBackground());
+        projectSelectorCredentialedUser.setForeground(list.getSelectionForeground());
       }
       else {
-        myProjectSelectorCredentialedUser.setBackground(list.getBackground());
-        myProjectSelectorCredentialedUser.setForeground(list.getForeground());
+        projectSelectorCredentialedUser.setBackground(list.getBackground());
+        projectSelectorCredentialedUser.setForeground(list.getForeground());
       }
 
-      return myProjectSelectorCredentialedUser;
+      return projectSelectorCredentialedUser;
     }
 
     /**
@@ -240,12 +240,12 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
   @Override
   public void hidePopup() {
     if (isPopupVisible()) {
-      myPopup.closeOk(null);
+      popup.closeOk(null);
     }
   }
 
   @Override
   public boolean isPopupVisible() {
-    return myPopup != null && !myPopup.isDisposed() && myPopup.isVisible();
+    return popup != null && !popup.isDisposed() && popup.isVisible();
   }
 }

@@ -72,17 +72,17 @@ import java.util.List;
  */
 public class CloudBreakpointHandlerTest extends UsefulTestCase {
 
-  private final Ref<Breakpoint> myAddedBp = new Ref<Breakpoint>();
-  private final Ref<String> myRemovedBp = new Ref<String>();
+  private final Ref<Breakpoint> addedBp = new Ref<Breakpoint>();
+  private final Ref<String> removedBp = new Ref<String>();
   private final String NO_CONDITION = null;
   private final String[] NO_WATCHES = null;
-  private MockProjectEx myProject;
-  private CloudDebugProcess myProcess;
-  private ArrayList<Breakpoint> myExistingBreakpoints;
-  private PsiManager myPsiManager;
-  private String myDesiredResultId;
-  private IdeaProjectTestFixture myFixture;
-  private CloudBreakpointHandler myHandler;
+  private MockProjectEx project;
+  private CloudDebugProcess process;
+  private ArrayList<Breakpoint> existingBreakpoints;
+  private PsiManager psiManager;
+  private String desiredResultId;
+  private IdeaProjectTestFixture fixture;
+  private CloudBreakpointHandler handler;
   private CloudDebugProcessStateController stateController;
   private boolean registrationShouldSucceed;
 
@@ -97,38 +97,38 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    myFixture = IdeaTestFixtureFactory.getFixtureFactory().createFixtureBuilder(
+    fixture = IdeaTestFixtureFactory.getFixtureFactory().createFixtureBuilder(
         getTestName(true)).getFixture();
-    myFixture.setUp();
+    fixture.setUp();
 
-    myProject = new MockProjectEx(getTestRootDisposable());
+    project = new MockProjectEx(getTestRootDisposable());
 
-    myPsiManager = mock(PsiManager.class);
-    myProject.registerService(PsiManager.class, myPsiManager);
+    psiManager = mock(PsiManager.class);
+    project.registerService(PsiManager.class, psiManager);
 
     XDebugSession session = mock(XDebugSession.class);
-    when(session.getProject()).thenReturn(myProject);
+    when(session.getProject()).thenReturn(project);
 
-    myProcess = mock(CloudDebugProcess.class);
-    when(myProcess.getXDebugSession()).thenReturn(session);
+    process = mock(CloudDebugProcess.class);
+    when(process.getXDebugSession()).thenReturn(session);
     CloudDebugProcessState processState = mock(CloudDebugProcessState.class);
-    myExistingBreakpoints = new ArrayList<Breakpoint>();
+    existingBreakpoints = new ArrayList<Breakpoint>();
     when(processState.getCurrentServerBreakpointList()).thenReturn(
-      ContainerUtil.immutableList(myExistingBreakpoints));
-    when(myProcess.getProcessState()).thenReturn(processState);
+      ContainerUtil.immutableList(existingBreakpoints));
+    when(process.getProcessState()).thenReturn(processState);
 
     stateController = mock(CloudDebugProcessStateController.class);
-    when(myProcess.getStateController()).thenReturn(stateController);
+    when(process.getStateController()).thenReturn(stateController);
 
     registrationShouldSucceed = true;
 
     doAnswer(new Answer() {
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable {
-        myAddedBp.set((Breakpoint)invocation.getArguments()[0]);
+        addedBp.set((Breakpoint)invocation.getArguments()[0]);
         SetBreakpointHandler handler = (SetBreakpointHandler)invocation.getArguments()[1];
         if (registrationShouldSucceed) {
-          handler.onSuccess(myDesiredResultId);
+          handler.onSuccess(desiredResultId);
         } else {
           handler.onError("Registration failed");
         }
@@ -140,24 +140,24 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     doAnswer(new Answer() {
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable {
-        myRemovedBp.set((String)invocation.getArguments()[0]);
+        removedBp.set((String)invocation.getArguments()[0]);
         return null;
       }
     }).when(stateController).deleteBreakpointAsync(anyString());
 
     fileResolver = mock(ServerToIDEFileResolver.class);
-    myHandler = new CloudBreakpointHandler(myProcess, fileResolver);
+    handler = new CloudBreakpointHandler(process, fileResolver);
 
     XDebuggerManager debuggerManager = mock(XDebuggerManager.class);
-    myProject.addComponent(XDebuggerManager.class, debuggerManager);
+    project.addComponent(XDebuggerManager.class, debuggerManager);
     breakpointManager = mock(XBreakpointManager.class);
     when(debuggerManager.getBreakpointManager()).thenReturn(breakpointManager);
   }
 
   @Override
   protected void tearDown() throws Exception {
-    myFixture.tearDown();
-    myFixture = null;
+    fixture.tearDown();
+    fixture = null;
     super.tearDown();
   }
 
@@ -165,15 +165,15 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     registerMockBreakpoint(new String[]{"foowatch1"}, "condition == true", 123,
         "foo.java", "com.google", false, "b_id");
 
-    assertNull(myRemovedBp.get());
-    assertNotNull(myAddedBp.get());
-    assertContainsElements(myAddedBp.get().getExpressions(), "foowatch1");
-    assertTrue(myAddedBp.get().getLocation().getLine() == 124);
-    assertTrue(myAddedBp.get().getLocation().getPath().equals("com/google/foo.java"));
-    assertTrue(myAddedBp.get().getCondition().equals("condition == true"));
+    assertNull(removedBp.get());
+    assertNotNull(addedBp.get());
+    assertContainsElements(addedBp.get().getExpressions(), "foowatch1");
+    assertTrue(addedBp.get().getLocation().getLine() == 124);
+    assertTrue(addedBp.get().getLocation().getPath().equals("com/google/foo.java"));
+    assertTrue(addedBp.get().getCondition().equals("condition == true"));
 
     ArgumentCaptor<CloudLineBreakpoint> breakpointArgumentCaptor = ArgumentCaptor.forClass(CloudLineBreakpoint.class);
-    verify(myProcess).updateBreakpointPresentation(breakpointArgumentCaptor.capture());
+    verify(process).updateBreakpointPresentation(breakpointArgumentCaptor.capture());
     assertThat(breakpointArgumentCaptor.getValue().getErrorMessage(), nullValue());
   }
 
@@ -183,7 +183,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
         "foo.java", "com.google", false, "b_id");
 
     ArgumentCaptor<CloudLineBreakpoint> breakpointArgumentCaptor = ArgumentCaptor.forClass(CloudLineBreakpoint.class);
-    verify(myProcess).updateBreakpointPresentation(breakpointArgumentCaptor.capture());
+    verify(process).updateBreakpointPresentation(breakpointArgumentCaptor.capture());
     assertThat(breakpointArgumentCaptor.getValue().getErrorMessage(), equalTo("Registration failed"));
   }
 
@@ -192,7 +192,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
         "foo.java", "com.google", false, "");
 
     ArgumentCaptor<CloudLineBreakpoint> breakpointArgumentCaptor = ArgumentCaptor.forClass(CloudLineBreakpoint.class);
-    verify(myProcess).updateBreakpointPresentation(breakpointArgumentCaptor.capture());
+    verify(process).updateBreakpointPresentation(breakpointArgumentCaptor.capture());
     assertThat(breakpointArgumentCaptor.getValue().getErrorMessage(), equalTo("The snapshot location could not be set."));
   }
 
@@ -200,28 +200,28 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     registerMockBreakpoint(new String[]{"foowatch1"}, "condition == true", 123,
         "foo.java", "com.google", false, "b_id");
 
-    assertNull(myRemovedBp.get());
-    assertNotNull(myAddedBp.get());
-    assertContainsElements(myAddedBp.get().getExpressions(), "foowatch1");
-    assertTrue(myAddedBp.get().getLocation().getLine() == 124);
-    assertTrue(myAddedBp.get().getLocation().getPath().equals("com/google/foo.java"));
-    assertTrue(myAddedBp.get().getCondition().equals("condition == true"));
+    assertNull(removedBp.get());
+    assertNotNull(addedBp.get());
+    assertContainsElements(addedBp.get().getExpressions(), "foowatch1");
+    assertTrue(addedBp.get().getLocation().getLine() == 124);
+    assertTrue(addedBp.get().getLocation().getPath().equals("com/google/foo.java"));
+    assertTrue(addedBp.get().getCondition().equals("condition == true"));
 
-    myAddedBp.get().setId("b_id");
+    addedBp.get().setId("b_id");
 
-    XBreakpoint xideBreakpoint = myHandler.getXBreakpoint(myAddedBp.get());
+    XBreakpoint xideBreakpoint = handler.getXBreakpoint(addedBp.get());
     assertNotNull(xideBreakpoint);
-    myHandler.deleteBreakpoint(myAddedBp.get());
+    handler.deleteBreakpoint(addedBp.get());
 
-    assertNotNull(myRemovedBp.get());
-    assertTrue(myRemovedBp.get() == myAddedBp.get().getId());
+    assertNotNull(removedBp.get());
+    assertTrue(removedBp.get() == addedBp.get().getId());
   }
 
   public void testServerCreation() {
     registerMockBreakpoint(new String[]{"foowatch1"}, "condition == true", 123,
         "foo.java", "com.google", true, "b_id");
 
-    assertNull(myAddedBp.get());
+    assertNull(addedBp.get());
   }
 
   public void testConflictingRegister() {
@@ -231,18 +231,18 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     location.setLine(124);
     existingServerBp.setLocation(location);
     existingServerBp.setId("todelete");
-    myExistingBreakpoints.add(existingServerBp);
+    existingBreakpoints.add(existingServerBp);
 
     registerMockBreakpoint(new String[]{"foowatch1"}, "condition == true", 123,
         "foo.java", "com.google", false, "b_id");
 
-    myExistingBreakpoints.clear();
+    existingBreakpoints.clear();
 
-    assertNotNull(myAddedBp.get());
-    assertContainsElements(myAddedBp.get().getExpressions(), "foowatch1");
-    assertTrue(myAddedBp.get().getLocation().getLine() == 124);
-    assertTrue(myAddedBp.get().getLocation().getPath().equals("com/google/foo.java"));
-    assertTrue(myAddedBp.get().getCondition().equals("condition == true"));
+    assertNotNull(addedBp.get());
+    assertContainsElements(addedBp.get().getExpressions(), "foowatch1");
+    assertTrue(addedBp.get().getLocation().getLine() == 124);
+    assertTrue(addedBp.get().getLocation().getPath().equals("com/google/foo.java"));
+    assertTrue(addedBp.get().getCondition().equals("condition == true"));
   }
 
   // Tries to register an already registered breakpoint and only first registration goes through.
@@ -250,7 +250,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   public void testRegisterRegisteredBreakpoint() {
     XLineBreakpointImpl<CloudLineBreakpointProperties> breakpoint = registerMockBreakpoint(
         NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
-    myHandler.registerBreakpoint(breakpoint);
+    handler.registerBreakpoint(breakpoint);
     verify(stateController, times(1)).setBreakpointAsync(
         isA(Breakpoint.class), isA(SetBreakpointHandler.class));
   }
@@ -258,8 +258,8 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   public void testRegisterRegisteredButDisabledBreakpoint() {
     XLineBreakpointImpl<CloudLineBreakpointProperties> breakpoint = registerMockBreakpoint(
         NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
-    myHandler.setStateToDisabled(new Breakpoint().setId("12abc"));
-    myHandler.registerBreakpoint(breakpoint);
+    handler.setStateToDisabled(new Breakpoint().setId("12abc"));
+    handler.registerBreakpoint(breakpoint);
     verify(stateController, times(2)).setBreakpointAsync(
         isA(Breakpoint.class), isA(SetBreakpointHandler.class));
   }
@@ -274,7 +274,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     assertNotNull(cloudLineBreakpoint);
     Assert.assertFalse(cloudLineBreakpoint.isVerified());
 
-    myHandler.createIdeRepresentationsIfNecessary(Lists.newArrayList(new Breakpoint().setId("12abc")));
+    handler.createIdeRepresentationsIfNecessary(Lists.newArrayList(new Breakpoint().setId("12abc")));
 
     assertThat(cloudLineBreakpoint.getErrorMessage(), nullValue());
     Assert.assertTrue(cloudLineBreakpoint.isVerified());
@@ -284,11 +284,11 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   public void testUnregisterBreakpoint_shouldSetAddedOnServerToFalseAfterHitOnBackend() throws Exception {
     XLineBreakpointImpl breakpoint = registerMockBreakpoint(NO_WATCHES, NO_CONDITION, 13,
         "fileName", "packageName", false, "12abc");
-    myHandler.setStateToDisabled(new Breakpoint().setId("12abc"));
+    handler.setStateToDisabled(new Breakpoint().setId("12abc"));
     assertNotNull(breakpoint.getProperties());
     assertTrue(((CloudLineBreakpointProperties) breakpoint.getProperties()).isAddedOnServer());
 
-    myHandler.unregisterBreakpoint(breakpoint, false);
+    handler.unregisterBreakpoint(breakpoint, false);
 
     assertFalse(((CloudLineBreakpointProperties) breakpoint.getProperties()).isAddedOnServer());
     verify(stateController, never()).deleteBreakpointAsync("12abc");
@@ -301,7 +301,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     assertNotNull(breakpoint.getProperties());
     assertTrue(((CloudLineBreakpointProperties) breakpoint.getProperties()).isAddedOnServer());
 
-    myHandler.unregisterBreakpoint(breakpoint, false);
+    handler.unregisterBreakpoint(breakpoint, false);
 
     assertFalse(((CloudLineBreakpointProperties) breakpoint.getProperties()).isAddedOnServer());
     verify(stateController).deleteBreakpointAsync("12abc");
@@ -315,9 +315,9 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
                                       String packageName,
                                       boolean createdByServer,
                                       String desiredResultId) {
-    myDesiredResultId = desiredResultId;
-    myAddedBp.set(null);
-    myRemovedBp.set(null);
+    this.desiredResultId = desiredResultId;
+    addedBp.set(null);
+    removedBp.set(null);
 
     CloudLineBreakpointProperties properties = new CloudLineBreakpointProperties();
     properties.setWatchExpressions(watches);
@@ -342,17 +342,17 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     PsiJavaFile psiJavaFile = mock(PsiJavaFile.class);
     when(psiJavaFile.getPackageName()).thenReturn(packageName);
     when(psiJavaFile.getName()).thenReturn(shortFileName);
-    when(myPsiManager.findFile(mockFile)).thenReturn(psiJavaFile);
-    myHandler.setPsiManager(myPsiManager);
+    when(psiManager.findFile(mockFile)).thenReturn(psiJavaFile);
+    handler.setPsiManager(psiManager);
 
     CloudLineBreakpointType.CloudLineBreakpoint javaBreakpoint =
         (CloudLineBreakpointType.CloudLineBreakpoint) CloudLineBreakpointType
-            .getInstance().createJavaBreakpoint(myProject, lineBreakpoint);
+            .getInstance().createJavaBreakpoint(project, lineBreakpoint);
     when(lineBreakpoint.getUserData(
         com.intellij.debugger.ui.breakpoints.Breakpoint.DATA_KEY)).thenReturn(javaBreakpoint);
     when(lineBreakpoint.getUserData(CloudBreakpointHandler.CLOUD_ID)).thenReturn(desiredResultId);
 
-    myHandler.registerBreakpoint(lineBreakpoint);
+    handler.registerBreakpoint(lineBreakpoint);
     return lineBreakpoint;
   }
 
@@ -373,14 +373,14 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     when(mockLineBreakpoint.getProperties()).thenReturn(new CloudLineBreakpointProperties());
     VirtualFile projectDir = mock(VirtualFile.class);
     when(projectDir.getPath()).thenReturn("/project/dir");
-    myProject.setBaseDir(projectDir);
+    project.setBaseDir(projectDir);
     VirtualFile classFile = mock(VirtualFile.class);
     when(classFile.getUrl()).thenReturn("file:///URL");
     when(fileResolver.getFileFromPath(
         isA(Project.class), eq("app/mod/src/main/java/b/f/pkg/Class.java")))
         .thenReturn(classFile);
 
-    myHandler.createIdeRepresentationsIfNecessary(breakpoints);
+    handler.createIdeRepresentationsIfNecessary(breakpoints);
 
     verify(breakpointManager, times(1)).addLineBreakpoint(isA(XLineBreakpointType.class),
         anyString(), anyInt(), isA(XBreakpointProperties.class));

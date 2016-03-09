@@ -49,40 +49,41 @@ import java.util.Map;
   storages = {@Storage(file = StoragePathMacros.WORKSPACE_FILE)})
 public class CloudDebugProcessStateSerializer
    implements PersistentStateComponent<CloudDebugProcessStateSerializer.ProjectState> {
-  private final Project myProject;
-  private final Map<String, CloudDebugProcessState> myStateMap = new HashMap<String, CloudDebugProcessState>();
+  private final Project project;
+  private final Map<String, CloudDebugProcessState> stateMap = new HashMap<String, CloudDebugProcessState>();
 
   private CloudDebugProcessStateSerializer(@NotNull Project project) {
-    myProject = project;
+    this.project = project;
 
     if (CloudDebugConfigType.isFeatureEnabled()) {
       // We listen on mouse events to calculate the line where we should add a cloud breakpoint
       // in our right click menu action.
       EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryListener() {
-        private final Map<Editor, TargetLineMouseAdapter> myMouseAdapterMap =
+        private final Map<Editor, TargetLineMouseAdapter> mouseAdapterMap =
           new HashMap<Editor, TargetLineMouseAdapter>();
 
         @Override
         public void editorCreated(@NotNull EditorFactoryEvent event) {
-          if (event.getEditor().getProject() == myProject && event.getEditor().getGutter() instanceof Component) {
+          if (event.getEditor().getProject() == CloudDebugProcessStateSerializer.this.project
+              && event.getEditor().getGutter() instanceof Component) {
             Component gutterComponent = (Component)event.getEditor().getGutter();
             TargetLineMouseAdapter adapter = new TargetLineMouseAdapter(event.getEditor());
-            assert !myMouseAdapterMap.containsKey(event.getEditor());
-            myMouseAdapterMap.put(event.getEditor(), adapter);
+            assert !mouseAdapterMap.containsKey(event.getEditor());
+            mouseAdapterMap.put(event.getEditor(), adapter);
             gutterComponent.addMouseListener(adapter);
           }
         }
 
         @Override
         public void editorReleased(@NotNull EditorFactoryEvent event) {
-          TargetLineMouseAdapter adapter = myMouseAdapterMap.get(event.getEditor());
+          TargetLineMouseAdapter adapter = mouseAdapterMap.get(event.getEditor());
           if (adapter != null && event.getEditor().getGutter() instanceof Component) {
             Component gutterComponent = (Component)event.getEditor().getGutter();
             gutterComponent.removeMouseListener(adapter);
-            myMouseAdapterMap.remove(event.getEditor());
+            mouseAdapterMap.remove(event.getEditor());
           }
         }
-      }, myProject);
+      }, project);
     }
   }
 
@@ -100,7 +101,7 @@ public class CloudDebugProcessStateSerializer
   public CloudDebugProcessStateSerializer.ProjectState getState() {
     ProjectState projectState = new ProjectState();
     if (CloudDebugConfigType.isFeatureEnabled()) {
-      RunManager manager = RunManager.getInstance(myProject);
+      RunManager manager = RunManager.getInstance(project);
       for (RunnerAndConfigurationSettings config : manager.getAllSettings()) {
         if (config.getConfiguration() == null) {
           continue;
@@ -128,11 +129,11 @@ public class CloudDebugProcessStateSerializer
    * @return deserialized state that may have been cached in workspace.xml
    */
   public CloudDebugProcessState getState(@NotNull String runConfig, @NotNull String projectName) {
-    CloudDebugProcessState state = myStateMap.get(runConfig);
+    CloudDebugProcessState state = stateMap.get(runConfig);
     if (state != null &&
         state.getProjectName() != null &&
         state.getProjectName().equals(projectName)) {
-      state.setProject(myProject);
+      state.setProject(project);
       return state;
     }
     return null;
@@ -147,16 +148,16 @@ public class CloudDebugProcessStateSerializer
   public void loadState(CloudDebugProcessStateSerializer.ProjectState state) {
     if (CloudDebugConfigType.isFeatureEnabled() && state.CONFIG_STATES != null) {
       for (RunConfigState configState : state.CONFIG_STATES) {
-        myStateMap.put(configState.CONFIG_NAME, configState.PROCESS_STATE);
+        stateMap.put(configState.CONFIG_NAME, configState.PROCESS_STATE);
       }
     }
   }
 
   static class TargetLineMouseAdapter extends MouseAdapter {
-    private final Editor myEditor;
+    private final Editor editor;
 
     public TargetLineMouseAdapter(Editor editor) {
-      myEditor = editor;
+      this.editor = editor;
     }
 
     @Override
@@ -164,11 +165,11 @@ public class CloudDebugProcessStateSerializer
       if (e.isPopupTrigger()) {
         // We should see if we can get JB to make this information public from the Gutter so we
         // don't have to calculate it.
-        myEditor.putUserData(ToggleSnapshotLocationAction.POPUP_LINE,
-                             Integer.valueOf(EditorUtil.yPositionToLogicalLine(myEditor, e.getPoint())));
+        editor.putUserData(ToggleSnapshotLocationAction.POPUP_LINE,
+                             Integer.valueOf(EditorUtil.yPositionToLogicalLine(editor, e.getPoint())));
       }
       else {
-        myEditor.putUserData(ToggleSnapshotLocationAction.POPUP_LINE, null);
+        editor.putUserData(ToggleSnapshotLocationAction.POPUP_LINE, null);
       }
     }
   }

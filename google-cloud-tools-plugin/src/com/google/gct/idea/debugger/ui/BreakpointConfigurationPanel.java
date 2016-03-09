@@ -78,23 +78,23 @@ public class BreakpointConfigurationPanel
     implements Disposable, XWatchesView {
 
   private static final Logger LOG = Logger.getInstance(BreakpointConfigurationPanel.class);
-  private final CloudLineBreakpointType myCloudLineBreakpointType;
-  private JPanel myMainPanel;
-  private WatchesRootNode myRootNode;
-  private XDebuggerTreePanel myTreePanel;
-  private JBLabel myWatchLabel;
-  private JPanel myWatchPanel;
+  private final CloudLineBreakpointType cloudLineBreakpointType;
+  private JPanel mainPanel;
+  private WatchesRootNode rootNode;
+  private XDebuggerTreePanel treePanel;
+  private JBLabel watchLabel;
+  private JPanel watchPanel;
 
   public BreakpointConfigurationPanel(@NotNull CloudLineBreakpointType cloudLineBreakpointType) {
-    myCloudLineBreakpointType = cloudLineBreakpointType;
+    this.cloudLineBreakpointType = cloudLineBreakpointType;
 
     // We conditionally show the "custom watches" panel only if we are shown in the dialog.
-    myWatchPanel.addAncestorListener(new AncestorListener() {
+    watchPanel.addAncestorListener(new AncestorListener() {
       @Override
       public void ancestorAdded(AncestorEvent event) {
-        JRootPane pane = myWatchPanel.getRootPane();
+        JRootPane pane = watchPanel.getRootPane();
         if (pane != null) {
-          myWatchPanel.setVisible(UIUtil.isDialogRootPane(pane));
+          watchPanel.setVisible(UIUtil.isDialogRootPane(pane));
         }
       }
 
@@ -110,20 +110,20 @@ public class BreakpointConfigurationPanel
 
   @Override
   public void addWatchExpression(@NotNull XExpression expression, int index, boolean navigateToWatchNode) {
-    myRootNode.addWatchExpression(null, expression, index, navigateToWatchNode);
+    rootNode.addWatchExpression(null, expression, index, navigateToWatchNode);
   }
 
   @Override
   public void dispose() {
-    if (myTreePanel != null && myTreePanel.getTree() != null) {
-      myTreePanel.getTree().dispose();
+    if (treePanel != null && treePanel.getTree() != null) {
+      treePanel.getTree().dispose();
     }
   }
 
   @NotNull
   @Override
   public JComponent getComponent() {
-    return myMainPanel;
+    return mainPanel;
   }
 
   @Override
@@ -140,10 +140,10 @@ public class BreakpointConfigurationPanel
     }
 
     XDebuggerEditorsProvider debuggerEditorsProvider =
-      myCloudLineBreakpointType.getEditorsProvider(breakpoint, cloudBreakpoint.getProject());
+      cloudLineBreakpointType.getEditorsProvider(breakpoint, cloudBreakpoint.getProject());
 
     if (debuggerEditorsProvider != null) {
-      myTreePanel = new XDebuggerTreePanel(cloudBreakpoint.getProject(),
+      treePanel = new XDebuggerTreePanel(cloudBreakpoint.getProject(),
                                            debuggerEditorsProvider,
                                            this,
                                            breakpoint.getSourcePosition(),
@@ -158,13 +158,13 @@ public class BreakpointConfigurationPanel
                                         EvaluationMode.EXPRESSION));
       }
 
-      myRootNode = new WatchesRootNode(myTreePanel.getTree(), this, watches.toArray(new XExpression[watches.size()]));
-      myTreePanel.getTree().setRoot(myRootNode, false);
+      rootNode = new WatchesRootNode(treePanel.getTree(), this, watches.toArray(new XExpression[watches.size()]));
+      treePanel.getTree().setRoot(rootNode, false);
 
-      myWatchPanel.removeAll();
-      myWatchPanel.add(myWatchLabel, BorderLayout.NORTH);
-      myTreePanel.getTree().getEmptyText().setText("There are no custom watches for this snapshot location.");
-      final ToolbarDecorator decorator = ToolbarDecorator.createDecorator(myTreePanel.getTree()).disableUpDownActions();
+      watchPanel.removeAll();
+      watchPanel.add(watchLabel, BorderLayout.NORTH);
+      treePanel.getTree().getEmptyText().setText("There are no custom watches for this snapshot location.");
+      final ToolbarDecorator decorator = ToolbarDecorator.createDecorator(treePanel.getTree()).disableUpDownActions();
       decorator.setToolbarPosition(ActionToolbarPosition.RIGHT);
       decorator.setAddAction(new AnActionButtonRunnable() {
         @Override
@@ -181,18 +181,18 @@ public class BreakpointConfigurationPanel
       CustomLineBorder border = new CustomLineBorder(CaptionPanel.CNT_ACTIVE_BORDER_COLOR, SystemInfo.isMac ? 1 : 0, 0,
                                                      SystemInfo.isMac ? 0 : 1, 0);
       decorator.setToolbarBorder(border);
-      myWatchPanel.add(decorator.createPanel(), BorderLayout.CENTER);
+      watchPanel.add(decorator.createPanel(), BorderLayout.CENTER);
     }
   }
 
   @Override
   public void removeAllWatches() {
-    myRootNode.removeAllChildren();
+    rootNode.removeAllChildren();
   }
 
   @Override
   public void removeWatches(List<? extends XDebuggerTreeNode> nodes) {
-    List<? extends WatchNode> children = myRootNode.getAllChildren();
+    List<? extends WatchNode> children = rootNode.getAllChildren();
     int minIndex = Integer.MAX_VALUE;
     List<XDebuggerTreeNode> toRemove = new ArrayList<XDebuggerTreeNode>();
     if (children != null) {
@@ -204,13 +204,13 @@ public class BreakpointConfigurationPanel
         }
       }
     }
-    myRootNode.removeChildren(toRemove);
+    rootNode.removeChildren(toRemove);
 
-    List<? extends WatchNode> newChildren = myRootNode.getAllChildren();
+    List<? extends WatchNode> newChildren = rootNode.getAllChildren();
     if (newChildren != null && !newChildren.isEmpty()) {
       WatchNode node =
         minIndex < newChildren.size() ? newChildren.get(minIndex) : newChildren.get(newChildren.size() - 1);
-      TreeUtil.selectNode(myTreePanel.getTree(), node);
+      TreeUtil.selectNode(treePanel.getTree(), node);
     }
   }
 
@@ -227,9 +227,9 @@ public class BreakpointConfigurationPanel
     XBreakpointBase lineBreakpointImpl =
       xIdebreakpoint instanceof XBreakpointBase ? (XBreakpointBase)xIdebreakpoint : null;
 
-     if (myRootNode != null && lineBreakpointImpl != null) {
+     if (rootNode != null && lineBreakpointImpl != null) {
       List<String> expressionsToSave = new ArrayList<String>();
-      for (WatchNode node : myRootNode.getAllChildren()) {
+      for (WatchNode node : rootNode.getAllChildren()) {
         expressionsToSave.add(node.getExpression().getExpression());
       }
       if (properties.setWatchExpressions(expressionsToSave.toArray(new String[expressionsToSave.size()]))) {
@@ -250,7 +250,7 @@ public class BreakpointConfigurationPanel
   }
 
   private void createUIComponents() {
-    myWatchPanel = new MyPanel();
+    watchPanel = new MyPanel();
   }
 
   /**
@@ -259,7 +259,7 @@ public class BreakpointConfigurationPanel
   private void executeAction(@NotNull String watch) {
     AnAction action = ActionManager.getInstance().getAction(watch);
     Presentation presentation = action.getTemplatePresentation().clone();
-    DataContext context = DataManager.getInstance().getDataContext(myTreePanel.getTree());
+    DataContext context = DataManager.getInstance().getDataContext(treePanel.getTree());
 
     AnActionEvent actionEvent =
       new AnActionEvent(null, context, ActionPlaces.DEBUGGER_TOOLBAR, presentation, ActionManager.getInstance(), 0);

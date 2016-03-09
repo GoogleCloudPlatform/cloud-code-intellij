@@ -23,14 +23,14 @@ import java.io.*;
  * Helper to install a mock googleLogin
  */
 public class MockGoogleLogin {
-  GoogleLogin myGoogleLogin;
+  GoogleLogin googleLogin;
 
   public void install() {
-    myGoogleLogin = GoogleLogin.getInstance();
+    googleLogin = GoogleLogin.getInstance();
     GoogleLogin.setInstance(Mockito.mock(GoogleLogin.class));
   }
 
   public void cleanup() {
-    GoogleLogin.setInstance(myGoogleLogin);
+    GoogleLogin.setInstance(googleLogin);
   }
 }

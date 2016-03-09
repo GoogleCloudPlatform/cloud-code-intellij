@@ -39,14 +39,14 @@ import java.awt.geom.Path2D;
  * The popup returns the currently selected text as well as an event when the selection change.
  */
 public abstract class CustomizableComboBox extends JPanel {
-  private JBTextField myTextField;
-  private JComboBox myThemedCombo = new ComboBox();
-  private boolean myPopupVisible;
+  private JBTextField textField;
+  private JComboBox themedCombo = new ComboBox();
+  private boolean popupVisible;
 
   public CustomizableComboBox() {
     super(new BorderLayout());
 
-    myThemedCombo.setEditable(true);
+    themedCombo.setEditable(true);
 
     PopupMouseListener listener = new PopupMouseListener();
     // GTK always draws a border on the textbox.  It cannot be removed,
@@ -60,18 +60,18 @@ public abstract class CustomizableComboBox extends JPanel {
     }
 
     // Try to turn off the border on the JTextField.
-    myTextField = new JBTextField() {
+    textField = new JBTextField() {
       @Override
       public void setBorder(Border border) {
         super.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
       }
     };
-    myTextField.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
-    myTextField.addMouseListener(listener);
-    myTextField.addFocusListener(new FocusListener() {
+    textField.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
+    textField.addMouseListener(listener);
+    textField.addFocusListener(new FocusListener() {
       @Override
       public void focusGained(FocusEvent e) {
-        myTextField.selectAll();
+        textField.selectAll();
       }
 
       @Override
@@ -84,12 +84,12 @@ public abstract class CustomizableComboBox extends JPanel {
     popupButton.addMouseListener(listener);
 
     this.add(popupButton, BorderLayout.EAST);
-    this.add(myTextField, BorderLayout.CENTER);
+    this.add(textField, BorderLayout.CENTER);
   }
 
   @Override
   public Dimension getPreferredSize() {
-    return myThemedCombo.getPreferredSize();
+    return themedCombo.getPreferredSize();
   }
 
   class PopupMouseListener implements MouseListener {
@@ -100,16 +100,16 @@ public abstract class CustomizableComboBox extends JPanel {
 
     @Override
     public void mousePressed(MouseEvent e) {
-      if (myPopupVisible) {
+      if (popupVisible) {
         if (getPopup() != null && getPopup().isPopupVisible()) {
           getPopup().hidePopup();
         }
-        myPopupVisible = false;
+        popupVisible = false;
       }
       else {
-        myTextField.grabFocus();
+        textField.grabFocus();
         showPopup();
-        myPopupVisible = true;
+        popupVisible = true;
       }
     }
 
@@ -120,7 +120,7 @@ public abstract class CustomizableComboBox extends JPanel {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-      myPopupVisible = getPopup() != null && getPopup().isPopupVisible();
+      popupVisible = getPopup() != null && getPopup().isPopupVisible();
     }
 
     @Override
@@ -134,7 +134,7 @@ public abstract class CustomizableComboBox extends JPanel {
   protected abstract int getPreferredPopupHeight();
 
   protected JBTextField getTextField() {
-    return myTextField;
+    return textField;
   }
 
   public Document getDocument() {
@@ -142,11 +142,11 @@ public abstract class CustomizableComboBox extends JPanel {
   }
 
   public void setText(@Nullable String text) {
-    myTextField.setText(text);
+    textField.setText(text);
   }
 
   public String getText() {
-    return myTextField.getText();
+    return textField.getText();
   }
 
   private void showPopup() {
@@ -190,7 +190,7 @@ public abstract class CustomizableComboBox extends JPanel {
   @Override
   public void paint(Graphics g) {
     super.paint(g);
-    if (myTextField.isFocusOwner() || (getPopup() != null && getPopup().isPopupVisible())) {
+    if (textField.isFocusOwner() || (getPopup() != null && getPopup().isPopupVisible())) {
       if (isUsingDarculaUIFlavor()) {
         DarculaUIUtil.paintFocusRing(g, 3, 3, getWidth() - 4, getHeight() - 4);
       }
@@ -201,7 +201,7 @@ public abstract class CustomizableComboBox extends JPanel {
   public void addNotify() {
     super.addNotify();
 
-    myTextField.addFocusListener(new FocusAdapter() {
+    textField.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(FocusEvent e) {
         CustomizableComboBox.this.repaint();

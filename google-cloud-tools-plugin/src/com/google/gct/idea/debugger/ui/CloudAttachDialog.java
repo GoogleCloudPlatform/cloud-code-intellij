@@ -126,9 +126,9 @@ public class CloudAttachDialog extends DialogWrapper {
     Border paddingBorder = BorderFactory.createEmptyBorder(2, 0, 2, 0);
     infoMessage.setBorder(paddingBorder);
 
-    Window myWindow = getWindow();
-    if (myWindow != null) {
-      myWindow.setPreferredSize(new Dimension(355, 175));
+    Window window = getWindow();
+    if (window != null) {
+      window.setPreferredSize(new Dimension(355, 175));
     }
     BasicAction.saveAll();
 

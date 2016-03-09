@@ -29,11 +29,11 @@ import java.util.Map;
  * It displays an image of the user with his or her email.
  */
 class ProjectSelectorCredentialedUser extends JPanel {
-  private JLabel myUserIcon = new JBLabel();
-  private JLabel myName = new JBLabel();
-  private JLabel myEmailLabel = new JBLabel();
+  private JLabel userIcon = new JBLabel();
+  private JLabel name = new JBLabel();
+  private JLabel emailLabel = new JBLabel();
   // We use an image cache because multiple image creates causes a performance hit.
-  private Map<Image, Icon> myImageCache = new HashMap<Image, Icon>();
+  private Map<Image, Icon> imageCache = new HashMap<Image, Icon>();
 
   public ProjectSelectorCredentialedUser() {
     setLayout(new GridBagLayout());
@@ -43,21 +43,21 @@ class ProjectSelectorCredentialedUser extends JPanel {
 
     GridBagConstraints c = new GridBagConstraints();
 
-    myUserIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 15));
-    myUserIcon.setOpaque(false);
-    myUserIcon.setHorizontalAlignment(SwingConstants.CENTER);
-    myUserIcon.setVerticalAlignment(SwingConstants.CENTER);
+    userIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 15));
+    userIcon.setOpaque(false);
+    userIcon.setHorizontalAlignment(SwingConstants.CENTER);
+    userIcon.setVerticalAlignment(SwingConstants.CENTER);
     c.gridx = 0;
     c.gridy = 0;
     c.gridheight = 3;
     c.weightx = 0;
     c.weighty = 0;
-    add(myUserIcon, c);
+    add(userIcon, c);
 
-    Font originalFont = myName.getFont();
-    myName.setOpaque(false);
+    Font originalFont = name.getFont();
+    name.setOpaque(false);
     Font boldFont = new Font(originalFont.getFontName(), Font.BOLD, originalFont.getSize() + 1);
-    myName.setFont(boldFont);
+    name.setFont(boldFont);
 
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 1;
@@ -65,11 +65,11 @@ class ProjectSelectorCredentialedUser extends JPanel {
     c.gridheight = 1;
     c.weightx = 1;
     c.weighty = 0;
-    add(myName, c);
+    add(name, c);
 
-    myEmailLabel.setOpaque(false);
+    emailLabel.setOpaque(false);
     Font plainFont = new Font(originalFont.getFontName(), Font.ITALIC, originalFont.getSize() - 1);
-    myEmailLabel.setFont(plainFont);
+    emailLabel.setFont(plainFont);
 
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 1;
@@ -77,7 +77,7 @@ class ProjectSelectorCredentialedUser extends JPanel {
     c.gridheight = 1;
     c.weightx = 1;
     c.weighty = 0;
-    add(myEmailLabel, c);
+    add(emailLabel, c);
   }
 
   public void initialize(@Nullable Image image, @Nullable String userName, @Nullable String email) {
@@ -85,21 +85,21 @@ class ProjectSelectorCredentialedUser extends JPanel {
     if (image == null) {
       scaledIcon = null;
     }
-    else if (!myImageCache.containsKey(image)) {
+    else if (!imageCache.containsKey(image)) {
       scaledIcon = new ImageIcon(image.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
-      myImageCache.put(image, scaledIcon);
+      imageCache.put(image, scaledIcon);
     }
     else {
-      scaledIcon = myImageCache.get(image);
+      scaledIcon = imageCache.get(image);
     }
 
-    myUserIcon.setIcon(scaledIcon);
-    myName.setText(userName);
-    myEmailLabel.setText(email);
+    userIcon.setIcon(scaledIcon);
+    name.setText(userName);
+    emailLabel.setText(email);
 
     this.setPreferredSize(
-      new Dimension(myUserIcon.getPreferredSize().width + myName.getPreferredSize().width + myEmailLabel.getPreferredSize().width,
-                    Math.max(scaledIcon != null ? scaledIcon.getIconHeight() + 2 : 0, myEmailLabel.getPreferredSize().height +
-                                                             myName.getPreferredSize().height + 4)));
+      new Dimension(userIcon.getPreferredSize().width + name.getPreferredSize().width + emailLabel.getPreferredSize().width,
+                    Math.max(scaledIcon != null ? scaledIcon.getIconHeight() + 2 : 0, emailLabel.getPreferredSize().height +
+                                                             name.getPreferredSize().height + 4)));
   }
 }

@@ -49,14 +49,14 @@ public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
   private static final String ERROR_MESSAGE = "Please log in using the Google Login url above, "
     + "and copy and paste the generated verification code.";
 
-  private String myVerificationCode = "";
-  private String myUrlString;
-  private JTextField myCodeTextField;
+  private String verificationCode = "";
+  private String urlString;
+  private JTextField codeTextField;
 
   public GoogleLoginCopyAndPasteDialog(JComponent parent, GoogleAuthorizationCodeRequestUrl requestUrl, String message)
   {
     super(parent, true);
-    myUrlString = requestUrl.build();
+    urlString = requestUrl.build();
 
     if (message != null) {
       setTitle(message);
@@ -96,9 +96,9 @@ public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
     urlPanel.add(urlLabel);
     urlPanel.add(urlTextField);
 
-    codeLabel.setLabelFor(myCodeTextField);
+    codeLabel.setLabelFor(codeTextField);
     codePanel.add(codeLabel);
-    codePanel.add(myCodeTextField);
+    codePanel.add(codeTextField);
 
     // Add to main panel
     mainPanel.add(Box.createVerticalStrut(10));
@@ -117,7 +117,7 @@ public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
       @Override
       public void actionPerformed(ActionEvent e) {
         super.actionPerformed(e);
-        myVerificationCode = myCodeTextField.getText();
+        verificationCode = codeTextField.getText();
       }
     };
     return myOKAction;
@@ -126,8 +126,8 @@ public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
   @Override
   @Nullable
   protected ValidationInfo doValidate() {
-    if(myCodeTextField.getText().isEmpty()) {
-      return new ValidationInfo(ERROR_MESSAGE, myCodeTextField);
+    if(codeTextField.getText().isEmpty()) {
+      return new ValidationInfo(ERROR_MESSAGE, codeTextField);
     }
     return null;
   }
@@ -135,12 +135,12 @@ public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
 
   @NotNull
   public String getVerificationCode() {
-    return myVerificationCode;
+    return verificationCode;
   }
 
 
   private JTextField createUrlText() {
-    final JTextField urlTextField = new JTextField(myUrlString);
+    final JTextField urlTextField = new JTextField(urlString);
     urlTextField.setBorder(null);
     urlTextField.setEditable(false);
     urlTextField.setBackground(UIUtil.getLabelBackground());
@@ -164,18 +164,18 @@ public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
 
 
   private void createCodeText() {
-    myCodeTextField = new JTextField();
+    codeTextField = new JTextField();
 
     // Add context menu to Url String
     JPopupMenu popup = new JPopupMenu();
-    myCodeTextField.add(popup);
-    myCodeTextField.setComponentPopupMenu(popup);
+    codeTextField.add(popup);
+    codeTextField.setComponentPopupMenu(popup);
 
     JMenuItem copyMenu = new JMenuItem("Paste");
     copyMenu.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        myCodeTextField.paste();
+        codeTextField.paste();
       }
     });
 

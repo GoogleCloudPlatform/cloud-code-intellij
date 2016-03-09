@@ -63,7 +63,7 @@ public class CloudDebugHistoricalSnapshotsTest {
     CloudDebugHistoricalSnapshots snapshots = new CloudDebugHistoricalSnapshots(handler);
     runModelSetter(snapshots);
 
-    Assert.assertNull(snapshots.myBalloon);
+    Assert.assertNull(snapshots.balloon);
   }
 
   @Test
@@ -89,7 +89,7 @@ public class CloudDebugHistoricalSnapshotsTest {
 
     runModelSetter(snapshots);
 
-    Assert.assertEquals(0, snapshots.myTable.getSelectedRow());
+    Assert.assertEquals(0, snapshots.table.getSelectedRow());
   }
 
   @Test
@@ -124,19 +124,19 @@ public class CloudDebugHistoricalSnapshotsTest {
     CloudBreakpointHandler breakpointHandler = Mockito.mock(CloudBreakpointHandler.class);
     Mockito.when(mockProcess.getBreakpointHandler()).thenReturn(breakpointHandler);
 
-    Assert.assertEquals(-1, snapshots.myTable.getSelectedRow());
+    Assert.assertEquals(-1, snapshots.table.getSelectedRow());
 
     // BP1
     Mockito.when(mockProcess.getCurrentBreakpointList()).thenReturn(breakpoints1);
     Mockito.when(mockProcess.getCurrentSnapshot()).thenReturn(bp1);
     runModelSetter(snapshots);
-    Assert.assertEquals(0, snapshots.myTable.getSelectedRow());
+    Assert.assertEquals(0, snapshots.table.getSelectedRow());
 
     // BP2
     Mockito.when(mockProcess.getCurrentBreakpointList()).thenReturn(breakpoints2);
     Mockito.when(mockProcess.getCurrentSnapshot()).thenReturn(bp2);
     runModelSetter(snapshots);
-    Assert.assertEquals(1, snapshots.myTable.getSelectedRow());
+    Assert.assertEquals(1, snapshots.table.getSelectedRow());
   }
 
   private void runModelSetter(CloudDebugHistoricalSnapshots snapshots) {

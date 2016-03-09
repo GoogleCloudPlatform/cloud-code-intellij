@@ -29,12 +29,12 @@ import java.util.Arrays;
  */
 public class CloudLineBreakpointProperties extends XBreakpointProperties<CloudLineBreakpointProperties> {
   private static final String[] EMPTY_ARRAY = new String[0];
-  private boolean myCreatedByServer = false;
-  private boolean myDisabledByServer = false;
+  private boolean createdByServer = false;
+  private boolean disabledByServer = false;
   // Prevents adding duplicate breakpoints when a breakpoint is added, debug session closed and
   // breakpoint is hit offline.
   private boolean addedOnServer = false;
-  private String[] myWatchExpressions;
+  private String[] watchExpressions;
 
   @Nullable
   @Override
@@ -44,34 +44,34 @@ public class CloudLineBreakpointProperties extends XBreakpointProperties<CloudLi
 
   @Tag("watch-expressions")
   public final String[] getWatchExpressions() {
-    return myWatchExpressions != null ? myWatchExpressions : EMPTY_ARRAY;
+    return watchExpressions != null ? watchExpressions : EMPTY_ARRAY;
   }
 
   public boolean isCreatedByServer() {
-    return myCreatedByServer;
+    return createdByServer;
   }
 
   public void setCreatedByServer(boolean createdByServer) {
-    myCreatedByServer = createdByServer;
+    this.createdByServer = createdByServer;
   }
 
   public boolean isDisabledByServer() {
-    return myDisabledByServer;
+    return disabledByServer;
   }
 
   public void setDisabledByServer(boolean disabledByServer) {
-    myDisabledByServer = disabledByServer;
+    this.disabledByServer = disabledByServer;
   }
 
   @Override
   public void loadState(CloudLineBreakpointProperties state) {
-    myWatchExpressions = state.getWatchExpressions();
+    watchExpressions = state.getWatchExpressions();
   }
 
   public final boolean setWatchExpressions(@Nullable String[] watchExpressions) {
-    boolean changed = !arrayEqual(myWatchExpressions, watchExpressions);
+    boolean changed = !arrayEqual(this.watchExpressions, watchExpressions);
     if (changed) {
-      myWatchExpressions = watchExpressions == null ? null : Arrays.copyOf(watchExpressions, watchExpressions.length);
+      this.watchExpressions = watchExpressions == null ? null : Arrays.copyOf(watchExpressions, watchExpressions.length);
     }
     return changed;
   }

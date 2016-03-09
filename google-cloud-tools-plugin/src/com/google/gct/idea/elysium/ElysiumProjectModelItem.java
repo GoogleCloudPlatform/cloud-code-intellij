@@ -24,37 +24,37 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * This model item represents a single elysium project.
  */
 class ElysiumProjectModelItem extends DefaultMutableTreeNode {
-  private String myDescription;
-  private String myProjectId;
-  private Long myNumber;
+  private String description;
+  private String projectId;
+  private Long number;
 
   public ElysiumProjectModelItem(@Nullable String description, @NotNull String id, Long number) {
-    myNumber = number;
+    this.number = number;
     setDescription(description);
     setProjectId(id);
   }
 
   public String getDescription() {
-    return myDescription;
+    return description;
   }
 
   public void setDescription(String description) {
-    myDescription = description;
+    this.description = description;
   }
 
   public String getProjectId() {
-    return myProjectId;
+    return projectId;
   }
 
   public void setProjectId(String projectId) {
-    myProjectId = projectId;
+    this.projectId = projectId;
   }
 
   public Long getNumber() {
-    return myNumber;
+    return number;
   }
 
   public void setNumber(Long number) {
-    myNumber = number;
+    this.number = number;
   }
 }

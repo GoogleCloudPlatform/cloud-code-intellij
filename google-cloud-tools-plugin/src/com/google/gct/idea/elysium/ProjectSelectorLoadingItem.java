@@ -33,7 +33,7 @@ import javax.swing.SwingConstants;
  * Displays UI similar to "loading..." when an elysium call is in progress.
  */
 class ProjectSelectorLoadingItem extends JPanel {
-  private JLabel myProgressIcon;
+  private JLabel progressIcon;
 
   public ProjectSelectorLoadingItem(@NotNull Color backgroundNonSelectionColor, @NotNull Color textNonSelectionColor) {
     this.setLayout(new FlowLayout());
@@ -50,9 +50,9 @@ class ProjectSelectorLoadingItem extends JPanel {
     loadText.setForeground(textNonSelectionColor);
     loadText.setText("Loading...");
 
-    myProgressIcon = new JBLabel();
-    myProgressIcon.setOpaque(false);
-    this.add(myProgressIcon);
+    progressIcon = new JBLabel();
+    progressIcon.setOpaque(false);
+    this.add(progressIcon);
     this.add(loadText);
   }
 
@@ -60,6 +60,6 @@ class ProjectSelectorLoadingItem extends JPanel {
   public void snap() {
     long currentMilliseconds = System.nanoTime() / 1000000;
     int frame = (int)(currentMilliseconds / 100) % GoogleCloudToolsIcons.STEP_ICONS.size();
-    myProgressIcon.setIcon(GoogleCloudToolsIcons.STEP_ICONS.get(frame));
+    progressIcon.setIcon(GoogleCloudToolsIcons.STEP_ICONS.get(frame));
   }
 }

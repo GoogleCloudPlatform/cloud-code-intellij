@@ -40,7 +40,7 @@ public class UsageTrackerExtensionPointBean extends AbstractExtensionPointBean i
   @Attribute("implementationClass")
   public String implementationClass;
 
-  private final LazyInstance<UsageTracker> myHandler = new LazyInstance<UsageTracker>() {
+  private final LazyInstance<UsageTracker> handler = new LazyInstance<UsageTracker>() {
     @Override
     protected Class<UsageTracker> getInstanceClass() throws ClassNotFoundException {
       return findClass(implementationClass);
@@ -50,7 +50,7 @@ public class UsageTrackerExtensionPointBean extends AbstractExtensionPointBean i
   @NotNull
   @Override
   public UsageTracker getInstance() {
-    return myHandler.getValue();
+    return handler.getValue();
   }
 
   @Override

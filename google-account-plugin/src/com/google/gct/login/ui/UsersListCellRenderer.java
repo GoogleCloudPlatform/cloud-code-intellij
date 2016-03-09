@@ -71,36 +71,36 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   private static final int USER_LABEL_VERTICAL_STRUT = 3;
   private static final int HGAP = 10;
   private static final int VGAP = 10;
-  private final Color myActiveColor;
-  private final Color myInactiveColor;
-  private final int myGeneralFontHeight;
-  private final Font myNameFont;
-  private final Font myGeneralFont;
-  private final Dimension myMainPanelDimension;
-  private final Dimension myActiveMainPanelDimension;
-  private final Dimension myCloudLabelDimension;
-  private final Dimension myPlayLabelDimension;
-  private final Dimension myLearnMoreLabelDimension;
-  private JLabel myGoogleImageLabel;
+  private final Color activeColor;
+  private final Color inactiveColor;
+  private final int generalFontHeight;
+  private final Font nameFont;
+  private final Font generalFont;
+  private final Dimension mainPanelDimension;
+  private final Dimension activeMainPanelDimension;
+  private final Dimension cloudLabelDimension;
+  private final Dimension playLabelDimension;
+  private final Dimension learnMoreLabelDimension;
+  private JLabel googleImageLabel;
 
   /** Maps user emails to large user image icons. */
-  private final Map<String, Image> myUserLargeImageCache = Maps.newHashMap();
+  private final Map<String, Image> userLargeImageCache = Maps.newHashMap();
   /** Maps user emails to small user image icons. */
-  private final Map<String, Image> myUserSmallImageCache = Maps.newHashMap();
+  private final Map<String, Image> userSmallImageCache = Maps.newHashMap();
 
   public UsersListCellRenderer() {
-    myNameFont = new Font("Helvetica", Font.BOLD, 13);
-    myGeneralFont = new Font("Helvetica", Font.PLAIN, 13);
-    myMainPanelDimension = new Dimension(250, 68);
-    myActiveMainPanelDimension = new Dimension(250, 116);
-    myActiveColor = UIUtil.isUnderDarcula() ? UIManager.getColor("TextField.background") : Color.WHITE;
-    myInactiveColor = UIUtil.isUnderDarcula() ? UIManager.getColor("darcula.inactiveBackground") : new Color(0xf5f5f5);
+    nameFont = new Font("Helvetica", Font.BOLD, 13);
+    generalFont = new Font("Helvetica", Font.PLAIN, 13);
+    mainPanelDimension = new Dimension(250, 68);
+    activeMainPanelDimension = new Dimension(250, 116);
+    activeColor = UIUtil.isUnderDarcula() ? UIManager.getColor("TextField.background") : Color.WHITE;
+    inactiveColor = UIUtil.isUnderDarcula() ? UIManager.getColor("darcula.inactiveBackground") : new Color(0xf5f5f5);
 
-    FontMetrics fontMetrics = getFontMetrics(myGeneralFont);
-    myGeneralFontHeight = fontMetrics.getHeight();
-    myCloudLabelDimension = new Dimension(fontMetrics.stringWidth(CLOUD_LABEL_TEXT), myGeneralFontHeight);
-    myPlayLabelDimension = new Dimension(fontMetrics.stringWidth(PLAY_LABEL_TEXT), myGeneralFontHeight);
-    myLearnMoreLabelDimension = new Dimension(fontMetrics.stringWidth(LEARN_MORE_TEXT), myGeneralFontHeight);
+    FontMetrics fontMetrics = getFontMetrics(generalFont);
+    generalFontHeight = fontMetrics.getHeight();
+    cloudLabelDimension = new Dimension(fontMetrics.stringWidth(CLOUD_LABEL_TEXT), generalFontHeight);
+    playLabelDimension = new Dimension(fontMetrics.stringWidth(PLAY_LABEL_TEXT), generalFontHeight);
+    learnMoreLabelDimension = new Dimension(fontMetrics.stringWidth(LEARN_MORE_TEXT), generalFontHeight);
   }
 
   @Nullable
@@ -118,11 +118,11 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     final boolean isActiveUserSelected = activeUser != null && usersListItem.getUserEmail().equals(activeUser.getEmail());
 
     JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, HGAP, VGAP));
-    mainPanel.setMinimumSize(isActiveUserSelected ? myActiveMainPanelDimension : myMainPanelDimension);
+    mainPanel.setMinimumSize(isActiveUserSelected ? activeMainPanelDimension : mainPanelDimension);
     mainPanel.setAlignmentX(LEFT_ALIGNMENT);
 
     // Update colors
-    final Color bg = isActiveUserSelected ? myActiveColor : myInactiveColor;
+    final Color bg = isActiveUserSelected ? activeColor : inactiveColor;
     final Color fg = isActiveUserSelected ? UIUtil.getListSelectionForeground() : UIUtil.getListForeground();
     mainPanel.setBackground(bg);
     mainPanel.setForeground(fg);
@@ -138,11 +138,11 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     if (isActiveUserSelected) {
       imageWidth = ACTIVE_USER_IMAGE_WIDTH;
       imageHeight = ACTIVE_USER_IMAGE_HEIGHT;
-      userImageCache = myUserLargeImageCache;
+      userImageCache = userLargeImageCache;
     } else {
       imageWidth = PLAIN_USER_IMAGE_WIDTH;
       imageHeight = PLAIN_USER_IMAGE_HEIGHT;
-      userImageCache = myUserSmallImageCache;
+      userImageCache = userSmallImageCache;
     }
 
     final Image scaledImage;
@@ -169,59 +169,59 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
 
   public boolean inPlayConsoleUrl(Point point, int activeIndex) {
     // 2 is for the number of labels before this one
-    double playYStart = VGAP + ACTIVE_USER_IMAGE_HEIGHT - myPlayLabelDimension.getHeight()
-      - myCloudLabelDimension.getHeight() - 2 + (myMainPanelDimension.getHeight() * activeIndex)
+    double playYStart = VGAP + ACTIVE_USER_IMAGE_HEIGHT - playLabelDimension.getHeight()
+      - cloudLabelDimension.getHeight() - 2 + (mainPanelDimension.getHeight() * activeIndex)
       + USER_LABEL_VERTICAL_STRUT;
-    double playYEnd = playYStart + myPlayLabelDimension.getHeight();
+    double playYEnd = playYStart + playLabelDimension.getHeight();
     double playXStart = ACTIVE_USER_IMAGE_WIDTH + HGAP + VGAP;
-    double playXEnd = playXStart + myPlayLabelDimension.getWidth();
+    double playXEnd = playXStart + playLabelDimension.getWidth();
     return (point.getX() > playXStart) && (point.getX() < playXEnd) && (point.getY() > playYStart) && (point.getY() < playYEnd);
   }
 
   public boolean inCloudConsoleUrl(Point point, int activeIndex) {
     // 3 is for the number of labels before this one
-    double playYStart = VGAP + ACTIVE_USER_IMAGE_HEIGHT - myCloudLabelDimension.getHeight()
-      - 3 + (myMainPanelDimension.getHeight() * activeIndex) + (USER_LABEL_VERTICAL_STRUT * 2);
-    double playYEnd = playYStart + myCloudLabelDimension.getHeight();
+    double playYStart = VGAP + ACTIVE_USER_IMAGE_HEIGHT - cloudLabelDimension.getHeight()
+      - 3 + (mainPanelDimension.getHeight() * activeIndex) + (USER_LABEL_VERTICAL_STRUT * 2);
+    double playYEnd = playYStart + cloudLabelDimension.getHeight();
     double playXStart = ACTIVE_USER_IMAGE_WIDTH + HGAP + VGAP;
-    double playXEnd = playXStart + myCloudLabelDimension.getWidth();
+    double playXEnd = playXStart + cloudLabelDimension.getWidth();
     return (point.getX() > playXStart) && (point.getX() < playXEnd) && (point.getY() > playYStart) && (point.getY() < playYEnd);
   }
 
   public boolean inLearnMoreUrl(Point point) {
     // 2 is for the number of labels and row of texts
-    double urlYStart = GOOGLE_IMAGE_NORTH + myGoogleImageLabel.getIcon().getIconHeight() + WELCOME_LABEL_NORTH
-      + (myGeneralFontHeight * 2) + 3;
-    double urlYEnd = urlYStart + myLearnMoreLabelDimension.getHeight();
+    double urlYStart = GOOGLE_IMAGE_NORTH + googleImageLabel.getIcon().getIconHeight() + WELCOME_LABEL_NORTH
+      + (generalFontHeight * 2) + 3;
+    double urlYEnd = urlYStart + learnMoreLabelDimension.getHeight();
     double urlXStart = GOOGLE_IMAGE_WEST;
-    double urlXEnd = urlXStart + myLearnMoreLabelDimension.getWidth();
+    double urlXEnd = urlXStart + learnMoreLabelDimension.getWidth();
     return (point.getX() > urlXStart) && (point.getX() < urlXEnd) && (point.getY() > urlYStart) && (point.getY() < urlYEnd);
   }
 
   public int getMainPanelHeight() {
-    return (int)myMainPanelDimension.getHeight();
+    return (int)mainPanelDimension.getHeight();
   }
 
   public int getActivePanelHeight() {
-    return (int)myActiveMainPanelDimension.getHeight();
+    return (int)activeMainPanelDimension.getHeight();
   }
 
   private JComponent createTextDisplay(boolean isSelected, UsersListItem usersListItem) {
     final JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-    final Color bg = isSelected ? myActiveColor : myInactiveColor;
+    final Color bg = isSelected ? activeColor : inactiveColor;
     final Color fg = isSelected ? UIUtil.getListSelectionForeground() : UIUtil.getListForeground();
     panel.setBackground(bg);
     panel.setForeground(fg);
 
     JLabel nameLabel = new JLabel( usersListItem.getUserName());
-    nameLabel.setFont(myNameFont);
+    nameLabel.setFont(nameFont);
     panel.add(nameLabel);
     panel.add(Box.createVerticalStrut(USER_LABEL_VERTICAL_STRUT));
 
     JLabel emailLabel = new JLabel(usersListItem.getUserEmail());
-    emailLabel.setFont(myGeneralFont);
+    emailLabel.setFont(generalFont);
     panel.add(emailLabel);
 
     return panel;
@@ -231,27 +231,27 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     JPanel mainPanel = new JPanel();
     mainPanel.setLayout(new GridBagLayout());
 
-    mainPanel.setBackground(myActiveColor);
+    mainPanel.setBackground(activeColor);
     mainPanel.setForeground(UIUtil.getListSelectionForeground());
     mainPanel.setPreferredSize(new Dimension(220, ACTIVE_USER_IMAGE_HEIGHT));
 
     JPanel bottomPanel = new JPanel();
     bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.PAGE_AXIS));
-    bottomPanel.setBackground(myActiveColor);
+    bottomPanel.setBackground(activeColor);
     bottomPanel.setForeground(UIUtil.getListSelectionForeground());
-    bottomPanel.setPreferredSize(new Dimension(220, (myGeneralFontHeight * 2) + USER_LABEL_VERTICAL_STRUT));
+    bottomPanel.setPreferredSize(new Dimension(220, (generalFontHeight * 2) + USER_LABEL_VERTICAL_STRUT));
 
     JLabel playLabel = new JLabel(PLAY_LABEL_TEXT);
-    playLabel.setFont(myGeneralFont);
+    playLabel.setFont(generalFont);
     playLabel.setForeground(JBColor.BLUE);
-    playLabel.setPreferredSize(myPlayLabelDimension);
+    playLabel.setPreferredSize(playLabelDimension);
     bottomPanel.add(playLabel, BOTTOM_ALIGNMENT);
     bottomPanel.add(Box.createVerticalStrut(USER_LABEL_VERTICAL_STRUT));
 
     JLabel cloudLabel = new JLabel(CLOUD_LABEL_TEXT);
-    cloudLabel.setFont(myGeneralFont);
+    cloudLabel.setFont(generalFont);
     cloudLabel.setForeground(JBColor.BLUE);
-    cloudLabel.setPreferredSize(myCloudLabelDimension);
+    cloudLabel.setPreferredSize(cloudLabelDimension);
     bottomPanel.add(cloudLabel, BOTTOM_ALIGNMENT);
 
     GridBagConstraints topConstraints = new GridBagConstraints();
@@ -279,20 +279,20 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     mainPanel.setBackground(JBColor.WHITE);
     mainPanel.setBorder(BorderFactory.createEmptyBorder(0, GOOGLE_IMAGE_WEST, 0, 0));
 
-    myGoogleImageLabel = new JLabel(GoogleLoginIcons.GOOGLE_LOGO);
+    googleImageLabel = new JLabel(GoogleLoginIcons.GOOGLE_LOGO);
 
     JLabel signInLabel = new JLabel(SIGN_IN_TEXT);
-    signInLabel.setFont(myGeneralFont);
+    signInLabel.setFont(generalFont);
     Dimension textSize = signInLabel.getPreferredSize();
     signInLabel.setPreferredSize(new Dimension((int)textSize.getWidth() + WELCOME_LABEL_EAST, (int)textSize.getHeight()));
 
     JLabel urlLabel = new JLabel(LEARN_MORE_TEXT);
-    urlLabel.setFont(myGeneralFont);
+    urlLabel.setFont(generalFont);
     urlLabel.setForeground(JBColor.BLUE);
-    urlLabel.setPreferredSize(myLearnMoreLabelDimension);
+    urlLabel.setPreferredSize(learnMoreLabelDimension);
 
     mainPanel.add(Box.createVerticalStrut(GOOGLE_IMAGE_NORTH));
-    mainPanel.add(myGoogleImageLabel);
+    mainPanel.add(googleImageLabel);
     mainPanel.add(Box.createVerticalStrut(WELCOME_LABEL_NORTH));
     mainPanel.add(signInLabel);
     mainPanel.add(urlLabel);

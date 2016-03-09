@@ -533,13 +533,13 @@ public class UploadSourceAction extends DumbAwareAction {
   private static class GCPUntrackedFilesDialog extends SelectFilesDialog implements TypeSafeDataProvider {
     private static final float SPLIT_PROPORTION = 0.7f;
 
-    @NotNull private final Project myProject;
-    private CommitMessage myCommitMessagePanel;
+    @NotNull private final Project project;
+    private CommitMessage commitMessagePanel;
 
     @SuppressWarnings("ConstantConditions") // This suppresses an invalid null warning for calling the super with null params.
     public GCPUntrackedFilesDialog(@NotNull Project project, @NotNull List<VirtualFile> untrackedFiles) {
       super(project, untrackedFiles, null, null, true, false, false);
-      myProject = project;
+      this.project = project;
       setTitle(GctBundle.getString("uploadsourceaction.addfilestitle"));
       init();
     }
@@ -553,13 +553,13 @@ public class UploadSourceAction extends DumbAwareAction {
     protected JComponent createCenterPanel() {
       final JComponent tree = super.createCenterPanel();
 
-      myCommitMessagePanel = new CommitMessage(myProject);
-      myCommitMessagePanel.setCommitMessage("Initial commit");
+      commitMessagePanel = new CommitMessage(project);
+      commitMessagePanel.setCommitMessage("Initial commit");
 
       Splitter splitter = new Splitter(true);
       splitter.setHonorComponentsMinimumSize(true);
       splitter.setFirstComponent(tree);
-      splitter.setSecondComponent(myCommitMessagePanel);
+      splitter.setSecondComponent(commitMessagePanel);
       splitter.setProportion(SPLIT_PROPORTION);
 
       return splitter;
@@ -567,13 +567,13 @@ public class UploadSourceAction extends DumbAwareAction {
 
     @NotNull
     public String getCommitMessage() {
-      return myCommitMessagePanel.getComment();
+      return commitMessagePanel.getComment();
     }
 
     @Override
     public void calcData(DataKey key, DataSink sink) {
       if (key == VcsDataKeys.COMMIT_MESSAGE_CONTROL) {
-        sink.put(VcsDataKeys.COMMIT_MESSAGE_CONTROL, myCommitMessagePanel);
+        sink.put(VcsDataKeys.COMMIT_MESSAGE_CONTROL, commitMessagePanel);
       }
     }
 

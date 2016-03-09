@@ -24,14 +24,14 @@ import org.mockito.Mockito;
  */
 @VisibleForTesting
 public class MockGoogleLogin {
-  GoogleLogin myGoogleLogin;
+  GoogleLogin googleLogin;
 
   public void install() {
-    myGoogleLogin = GoogleLogin.getInstance();
+    googleLogin = GoogleLogin.getInstance();
     GoogleLogin.setInstance(Mockito.mock(GoogleLogin.class));
   }
 
   public void cleanup() {
-    GoogleLogin.setInstance(myGoogleLogin);
+    GoogleLogin.setInstance(googleLogin);
   }
 }

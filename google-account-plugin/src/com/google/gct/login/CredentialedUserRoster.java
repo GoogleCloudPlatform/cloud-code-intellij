@@ -29,9 +29,9 @@ import java.util.Map;
  * {@link CredentialedUser} objects.
  */
 public class CredentialedUserRoster {
-  private final LinkedHashMap<String, CredentialedUser> myAllUsers = new LinkedHashMap<String, CredentialedUser>();
-  private final Collection<GoogleLoginListener> myListeners = Lists.newLinkedList();
-  private CredentialedUser myActiveUser;
+  private final LinkedHashMap<String, CredentialedUser> allUsers = new LinkedHashMap<String, CredentialedUser>();
+  private final Collection<GoogleLoginListener> listeners = Lists.newLinkedList();
+  private CredentialedUser activeUser;
 
   /**
    * Returns a copy of the map of the current logged in users.
@@ -41,7 +41,7 @@ public class CredentialedUserRoster {
   public LinkedHashMap<String, CredentialedUser> getAllUsers() {
     synchronized (this) {
       LinkedHashMap<String, CredentialedUser> clone = new LinkedHashMap<String, CredentialedUser>();
-      clone.putAll(myAllUsers);
+      clone.putAll(allUsers);
       return clone;
     }
   }
@@ -52,8 +52,8 @@ public class CredentialedUserRoster {
    */
   public void setAllUsers(Map<String, CredentialedUser> users) {
     synchronized (this) {
-      myAllUsers.clear();
-      myAllUsers.putAll(users);
+      allUsers.clear();
+      allUsers.putAll(users);
     }
   }
 
@@ -64,7 +64,7 @@ public class CredentialedUserRoster {
   @Nullable
   public CredentialedUser getActiveUser() {
     synchronized (this) {
-      return myActiveUser;
+      return activeUser;
     }
   }
 
@@ -77,16 +77,16 @@ public class CredentialedUserRoster {
    */
   public void setActiveUser(@NotNull String userEmail) throws IllegalArgumentException {
     synchronized (this) {
-      if (!myAllUsers.containsKey(userEmail)) {
+      if (!allUsers.containsKey(userEmail)) {
         throw new IllegalArgumentException(userEmail + " is not a logged in user.");
       }
 
-      if (myActiveUser != null) {
-        myActiveUser.setActive(false);
+      if (activeUser != null) {
+        activeUser.setActive(false);
       }
 
-      myActiveUser = myAllUsers.get(userEmail);
-      myActiveUser.setActive(true);
+      activeUser = allUsers.get(userEmail);
+      activeUser.setActive(true);
       GoogleLoginPrefs.saveActiveUser(userEmail);
       notifyLoginStatusChange();
     }
@@ -97,9 +97,9 @@ public class CredentialedUserRoster {
    */
   public void removeActiveUser() {
     synchronized (this) {
-      if (myActiveUser != null) {
-        myActiveUser.setActive(false);
-        myActiveUser = null;
+      if (activeUser != null) {
+        activeUser.setActive(false);
+        activeUser = null;
         GoogleLoginPrefs.removeActiveUser();
         notifyLoginStatusChange();
       }
@@ -112,7 +112,7 @@ public class CredentialedUserRoster {
    */
   public int numberOfUsers() {
     synchronized (this) {
-      return myAllUsers.size();
+      return allUsers.size();
     }
   }
 
@@ -122,7 +122,7 @@ public class CredentialedUserRoster {
    */
   public boolean isActiveUserAvailable() {
     synchronized (this) {
-      return myActiveUser != null;
+      return activeUser != null;
     }
   }
 
@@ -135,7 +135,7 @@ public class CredentialedUserRoster {
    */
   public void addUser(CredentialedUser user) {
     synchronized (this) {
-      myAllUsers.put(user.getEmail(), user);
+      allUsers.put(user.getEmail(), user);
       setActiveUser(user.getEmail());
     }
   }
@@ -151,16 +151,16 @@ public class CredentialedUserRoster {
    */
   public boolean removeUser(String userEmail) {
     synchronized (this) {
-      if (!myAllUsers.containsKey(userEmail)) {
+      if (!allUsers.containsKey(userEmail)) {
         return false;
       }
 
-      if (myActiveUser.getEmail().equals(userEmail)) {
-        myActiveUser = null;
+      if (activeUser.getEmail().equals(userEmail)) {
+        activeUser = null;
         GoogleLoginPrefs.removeActiveUser();
       }
 
-      myAllUsers.remove(userEmail);
+      allUsers.remove(userEmail);
       notifyLoginStatusChange();
       return true;
     }
@@ -171,8 +171,8 @@ public class CredentialedUserRoster {
    */
   public void removeAllUsers() {
     synchronized (this) {
-      myAllUsers.clear();
-      myActiveUser = null;
+      allUsers.clear();
+      activeUser = null;
       GoogleLoginPrefs.removeAllUsers();
       notifyLoginStatusChange();
     }
@@ -185,14 +185,14 @@ public class CredentialedUserRoster {
    * @param listener the specified {@code GoogleLoginListener}
    */
   void addLoginListener(GoogleLoginListener listener) {
-    synchronized(myListeners) {
-      myListeners.add(listener);
+    synchronized(listeners) {
+      listeners.add(listener);
     }
   }
 
   private void notifyLoginStatusChange() {
-    synchronized(myListeners) {
-      for (GoogleLoginListener listener : myListeners) {
+    synchronized(listeners) {
+      for (GoogleLoginListener listener : listeners) {
         listener.statusChanged();
       }
     }
