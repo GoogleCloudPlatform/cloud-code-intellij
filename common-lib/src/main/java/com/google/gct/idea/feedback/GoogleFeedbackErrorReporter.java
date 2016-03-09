@@ -30,6 +30,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.Consumer;
 import com.intellij.util.SystemProperties;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,6 +111,7 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
 
     Consumer<String> successCallback = new Consumer<String>() {
       @Override
+      @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
       public void consume(String token) {
         final SubmittedReportInfo reportInfo = new SubmittedReportInfo(
             null, "Issue " + token, SubmittedReportInfo.SubmissionStatus.NEW_ISSUE);

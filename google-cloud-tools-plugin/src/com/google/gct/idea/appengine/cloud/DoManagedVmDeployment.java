@@ -28,6 +28,8 @@ import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -62,6 +64,7 @@ class DoManagedVmDeployment implements Runnable {
     this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
   }
 
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   public void run() {
     File stagingDirectory;
     try {

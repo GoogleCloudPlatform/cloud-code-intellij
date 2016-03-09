@@ -52,6 +52,8 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.HashSet;
 import com.intellij.vcsUtil.VcsFileUtil;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -277,6 +279,7 @@ public class UploadSourceAction extends DumbAwareAction {
     return true;
   }
 
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   private static boolean createEmptyGitRepository(@NotNull final Project project,
                                                   @NotNull VirtualFile root,
                                                   @NotNull ProgressIndicator indicator) {
@@ -393,6 +396,7 @@ public class UploadSourceAction extends DumbAwareAction {
     }
   }
 
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   private static void removeGitRemote(final @NotNull Project project, @NotNull GitRepository repository, @NotNull String remote) {
     final GitSimpleHandler handler = new GitSimpleHandler(project, repository.getRoot(), GitCommand.REMOTE);
     handler.setSilent(true);

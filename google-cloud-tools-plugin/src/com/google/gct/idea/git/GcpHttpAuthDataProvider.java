@@ -32,6 +32,9 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 import com.intellij.util.AuthData;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import git4idea.DialogManager;
 import git4idea.remote.GitHttpAuthDataProvider;
 import git4idea.repo.GitRemote;
@@ -58,6 +61,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
 
   @Nullable
   @Override
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   public AuthData getAuthData(@NotNull String url) {
     final Project currentProject = getCurrentProject();
     if ((currentProject != null || Context.ourCurrentContext != null) && isUrlGCP(url)) {

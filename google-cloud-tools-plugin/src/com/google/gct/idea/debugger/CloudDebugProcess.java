@@ -63,6 +63,8 @@ import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.intellij.xdebugger.ui.XDebugTabLayouter;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -311,6 +313,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
           }
 
           @Override
+          @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
           public void onError(String errorMessage) {
             LOG.warn("Could not navigate to breakpoint:" + errorMessage);
           }

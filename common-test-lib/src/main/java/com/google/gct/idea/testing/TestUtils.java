@@ -19,6 +19,8 @@ import com.intellij.openapi.vfs.encoding.EncodingManager;
 import com.intellij.openapi.vfs.encoding.EncodingManagerImpl;
 import com.intellij.util.pico.DefaultPicoContainer;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mockito.Mockito;
@@ -127,6 +129,7 @@ public class TestUtils {
     return new MockProject(container, getParentDisposableForCleanup());
   }
 
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   public static void assertIsSerializable(@NotNull Serializable object) {
     ObjectOutputStream out = null;
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

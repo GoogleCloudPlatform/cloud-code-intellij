@@ -29,6 +29,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Image;
@@ -127,6 +129,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
   private void loadErrorState(@NotNull final String errorMessage) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
+      @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
       public void run() {
         GoogleUserModelItem.this.removeAllChildren();
         GoogleUserModelItem.this.add(new ElysiumErrorModelItem("Error: " + errorMessage));
@@ -135,6 +138,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     });
   }
 
+  @SuppressFBWarnings(value="DM_STRING_CTOR", justification="Warning due to string concatenation")
   private void loadUserProjects() {
     final List<DefaultMutableTreeNode> result = new ArrayList<DefaultMutableTreeNode>();
 
