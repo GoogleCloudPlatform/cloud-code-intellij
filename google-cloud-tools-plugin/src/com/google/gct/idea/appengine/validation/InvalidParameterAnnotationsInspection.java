@@ -31,6 +31,9 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,6 +73,10 @@ public class InvalidParameterAnnotationsInspection extends EndpointInspectionBas
   public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
     return new EndpointPsiElementVisitor() {
       @Override
+      @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                          justification = "1. PsiMethod.getModifierList() is @NotNull;"
+                                        + "2. PsiAnnotation.findAttributeValue() will not return null in our case;"
+                                        + "3. PsiParameter.getModifierList() will not return null in our case")
       public void visitMethod (PsiMethod method){
         if (!EndpointUtilities.isEndpointClass(method)) {
           return;
@@ -170,6 +177,8 @@ public class InvalidParameterAnnotationsInspection extends EndpointInspectionBas
      * Remove @Default and @Nullable from the method parameter if they exist.
      */
     @Override
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                        justification = "PsiMethod.getModifierList() is @NotNull")
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
       PsiElement element = descriptor.getPsiElement();
       if (element == null) {

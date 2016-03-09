@@ -97,15 +97,23 @@ public class FullJavaNameInspection extends EndpointInspectionBase {
           return;
         }
 
-        String javaName = psiMethod.getContainingClass().getQualifiedName() + "." + psiMethod.getName();
+        PsiClass containingClass = psiMethod.getContainingClass();
+        String containingClassQualifiedName = containingClass == null ? "null" : containingClass.getQualifiedName();
+        String javaName = containingClassQualifiedName + "." + psiMethod.getName();
+
         PsiMethod seenMethod = javaMethodNames.get(javaName);
         if (seenMethod == null) {
           javaMethodNames.put(javaName, psiMethod);
         } else {
-          String psiMethodName = psiMethod.getContainingClass().getName() + "." + psiMethod.getName() +
+          String containingClassName = containingClass == null ? "null" : containingClass.getName();
+          String psiMethodName = containingClassName + "." + psiMethod.getName() +
             psiMethod.getParameterList().getText();
-          String seenMethodName = seenMethod.getContainingClass().getName() + "." + seenMethod.getName() +
-            seenMethod.getParameterList().getText();;
+
+          PsiClass seenContainingClass = seenMethod.getContainingClass();
+          String seenContainingClassName = seenContainingClass == null ? "null" : seenContainingClass.getName();
+          String seenMethodName = seenContainingClassName + "." + seenMethod.getName() +
+            seenMethod.getParameterList().getText();
+
           holder.registerProblem(psiMethod, "Overloaded methods are not supported. " +  javaName +
             " has at least one overload: " + psiMethodName + " and " + seenMethodName,
             new MyQuickFix());

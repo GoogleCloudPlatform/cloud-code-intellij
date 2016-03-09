@@ -179,8 +179,13 @@ public class NamedResourceInspection extends EndpointInspectionBase {
       }
 
       PsiAnnotation annotation = (PsiAnnotation)element;
-      if((!annotation.getQualifiedName().equals("javax.inject.Named"))  &&
-        (!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_NAMED))) {
+      String annotationQualifiedName = annotation.getQualifiedName();
+      if (annotationQualifiedName == null) {
+        return;
+      }
+
+      if((!annotationQualifiedName.equals("javax.inject.Named"))  &&
+        (!annotationQualifiedName.equals(GctConstants.APP_ENGINE_ANNOTATION_NAMED))) {
           return;
       }
 
@@ -242,8 +247,13 @@ public class NamedResourceInspection extends EndpointInspectionBase {
       }
 
       PsiAnnotation annotation = (PsiAnnotation)element;
-      if((!annotation.getQualifiedName().equals("javax.inject.Named"))  &&
-         (!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_NAMED))) {
+      String annotationQualifiedName = annotation.getQualifiedName();
+      if (annotationQualifiedName == null) {
+        return;
+      }
+
+      if((!annotationQualifiedName.equals("javax.inject.Named"))  &&
+         (!annotationQualifiedName.equals(GctConstants.APP_ENGINE_ANNOTATION_NAMED))) {
         return;
       }
 

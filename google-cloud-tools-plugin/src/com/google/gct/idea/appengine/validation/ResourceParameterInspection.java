@@ -33,6 +33,9 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -106,6 +109,8 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
         }
       }
 
+      @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                          justification = "PsiParameter.getModifierList() will not return null in our case")
       private void validateMethodParameters(PsiParameter psiParameter, Project project) {
         // Check if parameter is of entity (resource) type which is not of parameter type or injected type.
         PsiType type = psiParameter.getType();

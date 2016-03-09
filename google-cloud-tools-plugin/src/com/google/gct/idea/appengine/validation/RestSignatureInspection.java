@@ -26,6 +26,9 @@ import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -94,6 +97,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
        * prefix.
        */
       @Override
+      @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                          justification = "PsiMethod.getName() is @NotNull")
       public String guessResourceName(PsiMethod method) {
         String methodName = method.getName();
         return methodNamePrefix.length() >= methodName.length() ? null :
@@ -108,6 +113,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
        * prefix.
        */
       @Override
+      @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                          justification = "PsiMethod.getName() is @NotNull")
       public String guessResourceName(PsiMethod method) {
         String methodName = method.getName();
         return methodNamePrefix.length() >= methodName.length() ? null :
@@ -166,7 +173,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         return null;
       }
 
-      return getSimpleName(project, method.getReturnType()).toLowerCase();
+      String simpleName = getSimpleName(project, method.getReturnType());
+      return simpleName == null ? null : simpleName.toLowerCase();
     }
 
     @Nullable
@@ -288,6 +296,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
    * @param psiMethod the method hose HTTP method is to be determined
    * @return the http Method pf psiMethod
    */
+  @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                      justification = "PsiMethod.getModifierList() is @NotNull")
   public String getHttpMethod(PsiMethod psiMethod) {
     PsiModifierList modifierList = psiMethod.getModifierList();
     String httpMethod = null;
@@ -320,6 +330,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
    * @param psiMethod the method whose path is to be determined
    * @return the path for psiMethod
    */
+  @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                      justification = "PsiMethod.getModifierList() is @NotNull")
   public String getPath(PsiMethod psiMethod) {
     PsiModifierList modifierList = psiMethod.getModifierList();
     String path = null;
@@ -397,6 +409,10 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   @Nullable
   private String getResourceProperty(PsiMethod psiMethod) {
     PsiClass psiClass = psiMethod.getContainingClass();
+    if (psiClass == null) {
+      return null;
+    }
+
     PsiModifierList modifierList = psiClass.getModifierList();
     String resource = null;
 
@@ -448,7 +464,12 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   private String getAttributeFromAnnotation (PsiAnnotation annotation, String annotationType,
     final String attribute) throws InvalidAnnotationException, MissingAttributeException {
 
-    if(annotation.getQualifiedName().equals(annotationType)) {
+    String annotationQualifiedName = annotation.getQualifiedName();
+    if (annotationQualifiedName == null) {
+      throw new InvalidAnnotationException(annotation, annotationType);
+    }
+
+    if(annotationQualifiedName.equals(annotationType)) {
       PsiAnnotationMemberValue annotationMemberValue =  annotation.findAttributeValue(attribute);
       if(annotationMemberValue == null) {
         throw new MissingAttributeException(annotation, attribute);
