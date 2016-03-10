@@ -161,7 +161,7 @@ public class CloudDebugProcessStateController {
     final SettableFuture<Breakpoint> future = SettableFuture.create();
     for (Breakpoint serverBreakpointCandidate : currentList) {
       if (serverBreakpointCandidate.getId().equals(id)
-          && serverBreakpointCandidate.getIsFinalState() != Boolean.TRUE) {
+          && !Boolean.TRUE.equals(serverBreakpointCandidate.getIsFinalState())) {
         handler.onSuccess(serverBreakpointCandidate);
         return;
       }
@@ -221,7 +221,7 @@ public class CloudDebugProcessStateController {
           List<Breakpoint> currentList = state.getCurrentServerBreakpointList();
           SourceLocation location = serverBreakpoint.getLocation();
           for (Breakpoint serverBp : currentList) {
-            if (serverBp.getIsFinalState() != Boolean.TRUE &&
+            if (!Boolean.TRUE.equals(serverBp.getIsFinalState()) &&
                 serverBp.getLocation().getLine() != null &&
                 serverBp.getLocation().getLine().equals(location.getLine()) &&
                 !Strings.isNullOrEmpty(serverBp.getLocation().getPath()) &&
@@ -236,7 +236,7 @@ public class CloudDebugProcessStateController {
           if (addResponse != null && addResponse.getBreakpoint() != null) {
             Breakpoint result = addResponse.getBreakpoint();
             if (result.getStatus() != null &&
-                result.getStatus().getIsError() == Boolean.TRUE &&
+                Boolean.TRUE.equals(result.getStatus().getIsError()) &&
                 handler != null &&
                 result.getStatus().getDescription() != null) {
               handler.onError(BreakpointUtil.getUserErrorMessage(result.getStatus()));

@@ -64,12 +64,12 @@ class SnapshotsModel extends AbstractTableModel {
           // If a new breakpoint is in final state *and*
           // the old model didn't know about that breakpoint as being final (and not new)
           // then we mark it.
-          if (newBreakpoint.getIsFinalState() != Boolean.TRUE) {
+          if (!Boolean.TRUE.equals(newBreakpoint.getIsFinalState())) {
             continue;
           }
           if (tempHashMap.containsKey(newBreakpoint.getId())) {
             Breakpoint previousBreakpoint = tempHashMap.get(newBreakpoint.getId());
-            if (previousBreakpoint.getIsFinalState() == Boolean.TRUE) {
+            if (Boolean.TRUE.equals(previousBreakpoint.getIsFinalState())) {
               if (!oldModel.isNewlyReceived(previousBreakpoint.getId())) {
                 continue;
               }
@@ -141,15 +141,15 @@ class SnapshotsModel extends AbstractTableModel {
 
     switch (columnIndex) {
       case 0:
-        if (breakpoint.getStatus() != null && breakpoint.getStatus().getIsError() == Boolean.TRUE) {
+        if (breakpoint.getStatus() != null && Boolean.TRUE.equals(breakpoint.getStatus().getIsError())) {
           return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_ERROR;
         }
-        if (breakpoint.getIsFinalState() != Boolean.TRUE) {
+        if (!Boolean.TRUE.equals(breakpoint.getIsFinalState())) {
           return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_CHECKED;
         }
         return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_FINAL;
       case 1:
-        if (breakpoint.getIsFinalState() != Boolean.TRUE) {
+        if (!Boolean.TRUE.equals(breakpoint.getIsFinalState())) {
           return GctBundle.getString("clouddebug.pendingstatus");
         }
         return BreakpointUtil.parseDateTime(breakpoint.getFinalTime());
