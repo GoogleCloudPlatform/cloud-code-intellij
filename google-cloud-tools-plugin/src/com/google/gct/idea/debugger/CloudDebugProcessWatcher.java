@@ -47,7 +47,7 @@ import javax.swing.event.HyperlinkEvent;
  */
 public class CloudDebugProcessWatcher implements CloudBreakpointListener {
   private static final CloudDebugProcessWatcher ourInstance = new CloudDebugProcessWatcher();
-  private CloudDebugGlobalPoller myPoller = null;
+  private CloudDebugGlobalPoller poller = null;
 
   private CloudDebugProcessWatcher() {
   }
@@ -58,17 +58,17 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
   }
 
   public synchronized void ensureWatcher() {
-    if (myPoller == null) {
-      myPoller = new CloudDebugGlobalPoller();
-      myPoller.addListener(this);
-      myPoller.startBackgroundListening();
+    if (poller == null) {
+      poller = new CloudDebugGlobalPoller();
+      poller.addListener(this);
+      poller.startBackgroundListening();
     }
   }
 
   public synchronized void removeWatcher() {
-    if (myPoller != null) {
-      myPoller.stopBackgroundListening();
-      myPoller = null;
+    if (poller != null) {
+      poller.stopBackgroundListening();
+      poller = null;
     }
   }
 

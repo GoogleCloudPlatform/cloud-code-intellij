@@ -26,9 +26,9 @@ import java.awt.*;
  * Represents a single elysium project ui.
  */
 class ProjectSelectorItem extends JBLabel {
-  private Color myTextSelectionColor;
-  private Color myTextNonSelectionColor;
-  private Color myHoverColor;
+  private Color textSelectionColor;
+  private Color textNonSelectionColor;
+  private Color hoverColor;
 
   public ProjectSelectorItem(@NotNull Color backgroundNonSelectionColor,
                              @NotNull Color textSelectionColor, @NotNull Color textNonSelectionColor) {
@@ -36,23 +36,23 @@ class ProjectSelectorItem extends JBLabel {
     setOpaque(false);
     setHorizontalAlignment(SwingConstants.LEFT);
     setVerticalAlignment(SwingConstants.CENTER);
-    myTextSelectionColor = textSelectionColor;
-    myTextNonSelectionColor = textNonSelectionColor;
+    this.textSelectionColor = textSelectionColor;
+    this.textNonSelectionColor = textNonSelectionColor;
 
-    myHoverColor = UI.getColor("link.foreground");
+    hoverColor = UI.getColor("link.foreground");
     setBackground(backgroundNonSelectionColor);
   }
 
   public void initialize(String projectName, String projectId, boolean selected, boolean hovered) {
     setText(projectName + " (" + projectId + ")");
     if (selected) {
-      setForeground(myTextSelectionColor);
+      setForeground(textSelectionColor);
     }
     else if (hovered) {
-      setForeground(myHoverColor);
+      setForeground(hoverColor);
     }
     else {
-      setForeground(myTextNonSelectionColor);
+      setForeground(textNonSelectionColor);
     }
   }
 }

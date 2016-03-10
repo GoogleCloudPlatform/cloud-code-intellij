@@ -36,24 +36,24 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
   private static final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
   private static final Cursor NORMAL_CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 
-  private JLabel myClickHere;
-  private JTree myTree;
-  private JPanel myPanel1;
+  private JLabel clickHere;
+  private JTree tree;
+  private JPanel panel1;
 
   public ProjectSelectorNewProjectItem(@NotNull JTree tree) {
     this.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 5));
 
-    myTree = tree;
+    this.tree = tree;
     this.setOpaque(false);
     setBorder(BorderFactory.createEmptyBorder(2, 10, 2, 0));
 
-    myClickHere = new JBLabel();
-    myClickHere.setHorizontalAlignment(SwingConstants.LEFT);
-    myClickHere.setForeground(UI.getColor("link.foreground"));
-    myClickHere.setText("<HTML><U>Click here</U></HTML>");
-    myClickHere.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+    clickHere = new JBLabel();
+    clickHere.setHorizontalAlignment(SwingConstants.LEFT);
+    clickHere.setForeground(UI.getColor("link.foreground"));
+    clickHere.setText("<HTML><U>Click here</U></HTML>");
+    clickHere.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
-    add(myClickHere);
+    add(clickHere);
 
     JLabel continuation = new JBLabel();
     continuation.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
@@ -64,7 +64,7 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
   }
 
   private boolean isOverLink(int x, int y) {
-    return x <= myClickHere.getPreferredSize().width + 15;
+    return x <= clickHere.getPreferredSize().width + 15;
   }
 
   @Override
@@ -74,7 +74,7 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
   @Override
   public void mousePressed(MouseEvent e) {
     if (isOverLink(e.getX(), e.getY())) {
-      TreeModel model = myTree.getModel();
+      TreeModel model = tree.getModel();
       if (model instanceof ProjectSelector.SelectorTreeModel) {
         ((ProjectSelector.SelectorTreeModel)model).setModelNeedsRefresh(true);
       }
@@ -103,10 +103,10 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
   @Override
   public void mouseMoved(MouseEvent e) {
     if (isOverLink(e.getX(), e.getY())) {
-      myTree.setCursor(HAND_CURSOR);
+      tree.setCursor(HAND_CURSOR);
     }
     else {
-      myTree.setCursor(NORMAL_CURSOR);
+      tree.setCursor(NORMAL_CURSOR);
     }
   }
 }

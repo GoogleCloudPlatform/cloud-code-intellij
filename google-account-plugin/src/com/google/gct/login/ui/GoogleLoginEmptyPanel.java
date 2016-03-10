@@ -30,13 +30,13 @@ import java.util.Map;
 public class GoogleLoginEmptyPanel extends JPanel {
   private static final String ADD_ACCOUNT = "Add Account";
   private static final String SIGN_IN = "Sign In";
-  private JBScrollPane myContentScrollPane;
-  private JPanel myBottomPane;
+  private JBScrollPane contentScrollPane;
+  private JPanel bottomPane;
 
   public GoogleLoginEmptyPanel() {
     super(new BorderLayout());
 
-    myContentScrollPane = new JBScrollPane();
+    contentScrollPane = new JBScrollPane();
     JButton addAccountButton = new JButton(needsToSignIn() ? SIGN_IN : ADD_ACCOUNT);
     addAccountButton.addActionListener(new ActionListener() {
       @Override
@@ -53,10 +53,10 @@ public class GoogleLoginEmptyPanel extends JPanel {
     buttonPane.add(Box.createHorizontalGlue());
     buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-    myBottomPane = new JPanel();
-    buttonPane.add(myBottomPane);
+    bottomPane = new JPanel();
+    buttonPane.add(bottomPane);
 
-    add(myContentScrollPane, BorderLayout.CENTER);
+    add(contentScrollPane, BorderLayout.CENTER);
     add(buttonPane, BorderLayout.PAGE_END);
   }
 
@@ -70,8 +70,8 @@ public class GoogleLoginEmptyPanel extends JPanel {
   }
 
   protected JBScrollPane getContentPane() {
-    return myContentScrollPane;
+    return contentScrollPane;
   }
 
-  protected JPanel getBottomPane() { return myBottomPane; }
+  protected JPanel getBottomPane() { return bottomPane; }
 }

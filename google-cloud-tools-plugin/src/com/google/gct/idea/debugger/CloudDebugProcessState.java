@@ -39,25 +39,25 @@ import java.util.ArrayList;
 public class CloudDebugProcessState extends UserDataHolderBase implements RunProfileState {
   // The current state is simply an array of breakpoints.  It's volatile because it's updated and
   // retrieved on different threads with otherwise no synchronization.
-  private volatile ImmutableList<Breakpoint> myCurrentServerBreakpointList =
+  private volatile ImmutableList<Breakpoint> currentServerBreakpointList =
     ContainerUtil.immutableList(new ArrayList<Breakpoint>());
   // DebuggeeId is defined by the cloud debugger service to represent a single target service
   // that we can debug.
-  private String myDebuggeeId;
+  private String debuggeeId;
   // The local IDE project that contains the source code running in the debuggee.
-  private Project myProject;
+  private Project project;
   // The project name for the target debuggee
-  private String myProjectName;
+  private String projectName;
   // The project number for the target debuggee
-  private String myProjectNumber;
+  private String projectNumber;
   // The email of the user associated with the debugee of this state.
-  private String myUserEmail;
+  private String userEmail;
   // A WaitToken is defined by the cloud debugger service to represent the entirety of the
   // service state.
   // The state is defined by any combination of snapshots and their values.
-  private String myWaitToken;
+  private String waitToken;
   // Whether this state listens in background or not
-  private boolean myListenInBackground;
+  private boolean listenInBackground;
 
   /**
    * This constructor is used by deserialization of the {@link CloudDebugProcessStateSerializer}. We use a separate
@@ -106,14 +106,14 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   @NotNull
   @Transient
   public ImmutableList<Breakpoint> getCurrentServerBreakpointList() {
-    return myCurrentServerBreakpointList;
+    return currentServerBreakpointList;
   }
 
   /**
    * Updates the state (breakpoint list).
    */
   public void setCurrentServerBreakpointList(ImmutableList<Breakpoint> newBreakpointList) {
-    myCurrentServerBreakpointList = newBreakpointList;
+    currentServerBreakpointList = newBreakpointList;
   }
 
   /**
@@ -123,14 +123,14 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    */
   @Nullable
   public String getDebuggeeId() {
-    return myDebuggeeId;
+    return debuggeeId;
   }
 
   /**
    * Called during deserialization from {@link CloudDebugProcessStateSerializer}
    */
   public void setDebuggeeId(@Nullable String debuggeeId) {
-    myDebuggeeId = debuggeeId;
+    this.debuggeeId = debuggeeId;
   }
 
   /**
@@ -140,7 +140,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    */
   @Transient
   public Project getProject() {
-    return myProject;
+    return project;
   }
 
   /**
@@ -149,7 +149,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    * @param project the intelliJ IDE {@link Project}
    */
   public void setProject(@Nullable Project project) {
-    myProject = project;
+    this.project = project;
   }
 
   /**
@@ -158,7 +158,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    * @return the name of the GCP project
    */
   public String getProjectName() {
-    return myProjectName;
+    return projectName;
   }
 
   /**
@@ -167,7 +167,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    * @param projectName the GCP project name that owns the debuggee
    */
   public void setProjectName(String projectName) {
-    myProjectName = projectName;
+    this.projectName = projectName;
   }
 
   /**
@@ -178,7 +178,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    */
   @Nullable
   public String getProjectNumber() {
-    return myProjectNumber;
+    return projectNumber;
   }
 
   /**
@@ -189,7 +189,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    * @param projectNumber the numeric Id associated with the owning GCP project
    */
   public void setProjectNumber(String projectNumber) {
-    myProjectNumber = projectNumber;
+    this.projectNumber = projectNumber;
   }
 
   /**
@@ -199,7 +199,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    */
   @Nullable
   public String getUserEmail() {
-    return myUserEmail;
+    return userEmail;
   }
 
   /**
@@ -208,7 +208,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    * @param userEmail the string identifying the user that has access to the GCP Project
    */
   public void setUserEmail(@Nullable String userEmail) {
-    myUserEmail = userEmail;
+    this.userEmail = userEmail;
   }
 
   /**
@@ -219,7 +219,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    */
   @Nullable
   public String getWaitToken() {
-    return myWaitToken;
+    return waitToken;
   }
 
   /**
@@ -228,20 +228,20 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    * @param waitToken an identifier that represents debuggee state
    */
   public void setWaitToken(@Nullable String waitToken) {
-    myWaitToken = waitToken;
+    this.waitToken = waitToken;
   }
 
   /**
    * Returns whether this state is configured to allow background listening
    */
   public boolean isListenInBackground() {
-    return myListenInBackground;
+    return listenInBackground;
   }
 
   /**
    * Set whether a service should look for events in the background for this state
    */
-  public void setListenInBackground(boolean myListenInBackground) {
-    this.myListenInBackground = myListenInBackground;
+  public void setListenInBackground(boolean listenInBackground) {
+    this.listenInBackground = listenInBackground;
   }
 }

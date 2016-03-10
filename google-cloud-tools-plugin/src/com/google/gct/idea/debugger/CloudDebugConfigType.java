@@ -36,7 +36,7 @@ public class CloudDebugConfigType implements ConfigurationType {
   public static final String GCT_DEBUGGER_ENABLE = "enable.gct.debugger";
   public static final String GCT_DEBUGGER_USETOKEN = "enable.gct.debugger.token";
 
-  private final ConfigurationFactory myFactory;
+  private final ConfigurationFactory factory;
 
   public static boolean isFeatureEnabled() {
     return Boolean.getBoolean(GCT_DEBUGGER_ENABLE);
@@ -47,12 +47,12 @@ public class CloudDebugConfigType implements ConfigurationType {
   }
 
   public CloudDebugConfigType() {
-    myFactory = new MyConfigurationFactory(this);
+    factory = new MyConfigurationFactory(this);
   }
 
   @Override
   public ConfigurationFactory[] getConfigurationFactories() {
-    return new ConfigurationFactory[]{myFactory};
+    return new ConfigurationFactory[]{factory};
   }
 
   @Override

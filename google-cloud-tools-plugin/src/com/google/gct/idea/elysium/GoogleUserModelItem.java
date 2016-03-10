@@ -52,47 +52,47 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
   private static final Logger LOG = Logger.getInstance(GoogleUserModelItem.class);
   private static final int PROJECTS_MAX_PAGE_SIZE = 300;
 
-  private final CredentialedUser myUser;
-  private final DefaultTreeModel myTreeModel;
-  private volatile boolean myIsSynchronizing;
-  private volatile boolean myNeedsSynchronizing;
+  private final CredentialedUser user;
+  private final DefaultTreeModel treeModel;
+  private volatile boolean isSynchronizing;
+  private volatile boolean needsSynchronizing;
   private Developerprojects developerProjectsClient;
 
   GoogleUserModelItem(@NotNull CredentialedUser user, @NotNull DefaultTreeModel treeModel) {
-    myUser = user;
-    myTreeModel = treeModel;
+    this.user = user;
+    this.treeModel = treeModel;
     setNeedsSynchronizing();
     developerProjectsClient = new Developerprojects.Builder(
-        new NetHttpTransport(), new JacksonFactory(), myUser.getCredential())
+        new NetHttpTransport(), new JacksonFactory(), user.getCredential())
         .setApplicationName(
             ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent())
         .build();
   }
 
   public CredentialedUser getCredentialedUser() {
-    return myUser;
+    return user;
   }
 
   public Image getImage() {
-    return myUser.getPicture();
+    return user.getPicture();
   }
 
   public String getName() {
-    return myUser.getName();
+    return user.getName();
   }
 
   public String getEmail() {
-    return myUser.getEmail();
+    return user.getEmail();
   }
 
   // This method "dirties" the node, indicating that it needs another call to elysium to get its projects.
   // The call may not happen immediately if the google login is collapsed in the tree view.
   public void setNeedsSynchronizing() {
-    myNeedsSynchronizing = true;
+    needsSynchronizing = true;
 
     removeAllChildren();
     add(new ElysiumLoadingModelItem());
-    myTreeModel.reload(this);
+    treeModel.reload(this);
   }
 
   /*
@@ -100,27 +100,27 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
    * If synchronization is already in progress, this call is ignored.
    */
   public void synchronize() {
-    if (!myNeedsSynchronizing || myIsSynchronizing) {
+    if (!needsSynchronizing || isSynchronizing) {
       return;
     }
-    myIsSynchronizing = true;
+    isSynchronizing = true;
 
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
       @Override
       public void run() {
         try {
           loadUserProjects();
-          myNeedsSynchronizing = false;
+          needsSynchronizing = false;
         }
         finally {
-          myIsSynchronizing = false;
+          isSynchronizing = false;
         }
       }
     });
   }
 
   public boolean isSynchronizing() {
-    return myIsSynchronizing;
+    return isSynchronizing;
   }
 
   // If an error occurs during the elysium call, we load a model that shows the error.
@@ -130,7 +130,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
       public void run() {
         GoogleUserModelItem.this.removeAllChildren();
         GoogleUserModelItem.this.add(new ElysiumErrorModelItem("Error: " + errorMessage));
-        myTreeModel.reload(GoogleUserModelItem.this);
+        treeModel.reload(GoogleUserModelItem.this);
       }
     });
   }
@@ -172,7 +172,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
       return;
     }
     catch (RuntimeException ex) {
-      LOG.error("Exception loading projects for " + myUser.getName(), ex);
+      LOG.error("Exception loading projects for " + user.getName(), ex);
       loadErrorState(ex.getMessage());
       return;
     }
@@ -190,17 +190,17 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
             GoogleUserModelItem.this.add(item);
           }
 
-          myTreeModel.reload(GoogleUserModelItem.this);
+          treeModel.reload(GoogleUserModelItem.this);
         }
       });
     }
     catch (InterruptedException ex) {
-      LOG.error("InterruptedException loading projects for " + myUser.getName(), ex);
+      LOG.error("InterruptedException loading projects for " + user.getName(), ex);
       loadErrorState(ex.getMessage());
       Thread.currentThread().interrupt();
     }
     catch (InvocationTargetException ex) {
-      LOG.error("InvocationTargetException loading projects for " + myUser.getName(), ex);
+      LOG.error("InvocationTargetException loading projects for " + user.getName(), ex);
       loadErrorState(ex.getMessage());
     }
   }

@@ -89,12 +89,12 @@ import javax.swing.SwingUtilities;
  */
 public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointListener {
   private static final Logger LOG = Logger.getInstance(CloudDebugProcess.class);
-  private volatile Breakpoint myCurrentSnapshot;
-  private CloudDebugProcessState myProcessState;
-  private ProjectRepositoryValidator myRepoValidator;
-  private CloudDebugProcessStateController myStateController;
-  private XBreakpointHandler<?>[] myXBreakpointHandlers;
-  private volatile String myNavigatedSnapshotId;
+  private volatile Breakpoint currentSnapshot;
+  private CloudDebugProcessState processState;
+  private ProjectRepositoryValidator repoValidator;
+  private CloudDebugProcessStateController stateController;
+  private XBreakpointHandler<?>[] xBreakpointHandlers;
+  private volatile String navigatedSnapshotId;
 
   public CloudDebugProcess(@NotNull XDebugSession session) {
     super(session);
@@ -171,17 +171,17 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   @NotNull
   @Override
   public XBreakpointHandler<?>[] getBreakpointHandlers() {
-    if (myXBreakpointHandlers == null) {
-      myXBreakpointHandlers = new XBreakpointHandler<?>[]{
+    if (xBreakpointHandlers == null) {
+      xBreakpointHandlers = new XBreakpointHandler<?>[]{
           new CloudBreakpointHandler(this, new ServerToIDEFileResolver())
       };
     }
-    return myXBreakpointHandlers;
+    return xBreakpointHandlers;
   }
 
   @VisibleForTesting
   void setBreakpointHandler(CloudBreakpointHandler handler) {
-    myXBreakpointHandlers = new XBreakpointHandler<?>[]{handler};
+    xBreakpointHandlers = new XBreakpointHandler<?>[]{handler};
   }
 
   /**
@@ -199,7 +199,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
    * Returns the breakpoint (snapshot) that the debug session is currently analyzing.
    */
   public Breakpoint getCurrentSnapshot() {
-    return myCurrentSnapshot;
+    return currentSnapshot;
   }
 
   @NotNull
@@ -209,21 +209,21 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   }
 
   public CloudDebugProcessState getProcessState() {
-    return myProcessState;
+    return processState;
   }
 
   protected ProjectRepositoryValidator getRepositoryValidator() {
-    if (myRepoValidator == null) {
-      myRepoValidator = new ProjectRepositoryValidator(getProcessState());
+    if (repoValidator == null) {
+      repoValidator = new ProjectRepositoryValidator(getProcessState());
     }
-    return myRepoValidator;
+    return repoValidator;
   }
 
   public CloudDebugProcessStateController getStateController() {
-    if (myStateController == null) {
-      myStateController = new CloudDebugProcessStateController();
+    if (stateController == null) {
+      stateController = new CloudDebugProcessStateController();
     }
-    return myStateController;
+    return stateController;
   }
 
   public XDebugSession getXDebugSession() {
@@ -235,14 +235,14 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
    * to poll for changes.
    */
   public void initialize(@NotNull CloudDebugProcessState processState) {
-    myProcessState = processState;
-    myCurrentSnapshot = null;
+    this.processState = processState;
+    currentSnapshot = null;
 
     new Task.Modal(getXDebugSession().getProject(), GctBundle.getString("clouddebug.attachingtext"), false) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
         indicator.setIndeterminate(true);
-        getStateController().initialize(myProcessState);
+        getStateController().initialize(CloudDebugProcess.this.processState);
         getRepositoryValidator().hardRefresh();
       }
     }.queue();
@@ -284,7 +284,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       LOG.error("unexpected navigation to empty breakpoint id");
       return;
     }
-    myNavigatedSnapshotId = id;
+    navigatedSnapshotId = id;
     getStateController().resolveBreakpointAsync(id,
         new ResolveBreakpointHandler() {
           @Override
@@ -295,7 +295,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
                 // We will only do the selection if the id for this async task matches the latest
                 // user clicked item.  This prevents multiple (and possibly out of order) selections
                 // getting queued up.
-                if (id.equals(myNavigatedSnapshotId)) {
+                if (id.equals(navigatedSnapshotId)) {
                   if (result.getIsFinalState() != Boolean.TRUE || result.getStackFrames() == null) {
                     getBreakpointHandler().navigateTo(result);
                     if (result.getStackFrames() == null) {
@@ -323,7 +323,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       snapshotTime = new Date();
     }
     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-    myCurrentSnapshot = target;
+    currentSnapshot = target;
     if (!getXDebugSession().isStopped()) {
       getXDebugSession().positionReached(new MySuspendContext(
           new CloudExecutionStack(getXDebugSession().getProject(),
@@ -473,7 +473,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
     RunProfile profile = getXDebugSession().getRunProfile();
     if (profile instanceof CloudDebugRunConfiguration) {
-      ((CloudDebugRunConfiguration) profile).setProcessState(myProcessState);
+      ((CloudDebugRunConfiguration) profile).setProcessState(processState);
     }
 
     getRepositoryValidator().restoreToOriginalState(getXDebugSession().getProject());
@@ -510,15 +510,15 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
    * The suspend context gives the debug session the information necessary to populate the stack and variables windows.
    */
   private static class MySuspendContext extends XSuspendContext {
-    private final XExecutionStack myStack;
+    private final XExecutionStack stack;
 
     public MySuspendContext(@NotNull XExecutionStack stack) {
-      myStack = stack;
+      this.stack = stack;
     }
 
     @Override
     public XExecutionStack getActiveExecutionStack() {
-      return myStack;
+      return stack;
     }
 
     @Override
@@ -528,7 +528,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
     @NotNull
     public XExecutionStack getSourceStack() {
-      return myStack;
+      return stack;
     }
   }
 
@@ -547,12 +547,12 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
           GctBundle.getString("clouddebug.stop.listening"),
           Messages.getQuestionIcon());
       if (result == Messages.OK) { // continue
-        myProcessState.setListenInBackground(true);
+        processState.setListenInBackground(true);
         UsageTrackerProvider.getInstance().trackEvent(
             GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.continue.listening", null);
       }
       else {
-        myProcessState.setListenInBackground(false);
+        processState.setListenInBackground(false);
         UsageTrackerProvider.getInstance().trackEvent(
             GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.stop.listening", null);
       }

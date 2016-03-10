@@ -52,8 +52,8 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
   public static final String GCP_USER = "com.google.gct.idea.git.username";
   private static final String GOOGLE_URL_ALT = "http://source.developers.google.com";
 
-  private String mySelectedUser;
-  private boolean myChooseManualLogin;
+  private String selectedUser;
+  private boolean chooseManualLogin;
   private static Project ourCurrentProject;
 
   @Nullable
@@ -62,7 +62,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
     final Project currentProject = getCurrentProject();
     if ((currentProject != null || Context.ourCurrentContext != null) && isUrlGCP(url)) {
       Context currentContext = Context.ourCurrentContext; //always prefer context over project setting.
-      String userEmail = currentContext != null ? currentContext.myUserName : null;
+      String userEmail = currentContext != null ? currentContext.userName : null;
 
       if (Strings.isNullOrEmpty(userEmail) && currentProject != null) {
         userEmail = PropertiesComponent.getInstance(currentProject).getValue(GCP_USER, "");
@@ -76,15 +76,15 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
           public void run() {
             SelectUserDialog dialog = new SelectUserDialog(currentProject, GctBundle.getString("httpauthprovider.chooselogin"));
             DialogManager.show(dialog);
-            myChooseManualLogin = !dialog.isOK();
-            mySelectedUser = dialog.getSelectedUser();
+            chooseManualLogin = !dialog.isOK();
+            selectedUser = dialog.getSelectedUser();
           }
         }, ModalityState.defaultModalityState());
 
-        if (myChooseManualLogin) {
+        if (chooseManualLogin) {
           return null;
         }
-        userEmail = mySelectedUser;
+        userEmail = selectedUser;
         targetUser = getUserFromEmail(userEmail);
         if (targetUser != null && currentProject != null && Context.ourCurrentContext == null) {
           PropertiesComponent.getInstance(currentProject).setValue(GCP_USER, userEmail);
@@ -186,10 +186,10 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
   @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
   public static class Context {
     private static Context ourCurrentContext = null;
-    private String myUserName;
+    private String userName;
 
     private Context(@Nullable String userName) {
-      myUserName = userName;
+      this.userName = userName;
     }
 
     public static Context create(@Nullable String userName) {

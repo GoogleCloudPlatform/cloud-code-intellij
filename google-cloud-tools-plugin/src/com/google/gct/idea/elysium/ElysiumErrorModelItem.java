@@ -25,14 +25,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * The error message is displayed under the user name.
  */
 class ElysiumErrorModelItem extends DefaultMutableTreeNode {
-  private String myErrorMessage;
+  private String errorMessage;
 
   public ElysiumErrorModelItem(@NotNull String errorMessage) {
-    myErrorMessage = errorMessage;
+    this.errorMessage = errorMessage;
   }
 
   public String getErrorMessage() {
-    return myErrorMessage;
+    return errorMessage;
   }
 }
 

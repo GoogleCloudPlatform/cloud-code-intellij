@@ -27,9 +27,9 @@ import org.jetbrains.annotations.Nullable;
 public class ProjectRepositoryState {
   private static final Key<ProjectRepositoryState> REPO_KEY =
     Key.create("com.google.gct.idea.debugger.ProjectRepositoryState");
-  private String myOriginalBranchName;
-  private GitRepository mySourceRepository;
-  private String myStashMessage;
+  private String originalBranchName;
+  private GitRepository sourceRepository;
+  private String stashMessage;
 
   private ProjectRepositoryState() {
   }
@@ -54,12 +54,12 @@ public class ProjectRepositoryState {
   @Transient
   @Nullable
   protected String getOriginalBranchName() {
-    return myOriginalBranchName;
+    return originalBranchName;
   }
 
   @Transient
   public void setOriginalBranchName(@Nullable String originalBranchName) {
-    myOriginalBranchName = originalBranchName;
+    this.originalBranchName = originalBranchName;
   }
 
   /**
@@ -69,12 +69,12 @@ public class ProjectRepositoryState {
   @Transient
   @Nullable
   protected GitRepository getSourceRepository() {
-    return mySourceRepository;
+    return sourceRepository;
   }
 
   @Transient
   public void setSourceRepository(@Nullable GitRepository sourceRepository) {
-    mySourceRepository = sourceRepository;
+    this.sourceRepository = sourceRepository;
   }
 
   /**
@@ -84,12 +84,12 @@ public class ProjectRepositoryState {
   @Transient
   @Nullable
   protected String getStashMessage() {
-    return myStashMessage;
+    return stashMessage;
   }
 
   @Transient
   public void setStashMessage(@Nullable String stashMessage) {
-    myStashMessage = stashMessage;
+    this.stashMessage = stashMessage;
   }
 
   /**

@@ -57,31 +57,31 @@ public class CloudDebugGlobalPoller {
   public static final String CLOUD_DEBUGGER_ERROR_NOTIFICATIONS_DISPLAY_GROUP =
       "Cloud Debugger Error Notifications";
 
-  private final List<CloudBreakpointListener> myBreakpointListChangedListeners =
+  private final List<CloudBreakpointListener> breakpointListChangedListeners =
       new ArrayList<CloudBreakpointListener>();
-  private Timer myWatchTimer = null;
+  private Timer watchTimer = null;
 
   public void addListener(@NotNull CloudBreakpointListener listener) {
-    myBreakpointListChangedListeners.add(listener);
+    breakpointListChangedListeners.add(listener);
   }
 
   public void removeListener(@NotNull CloudBreakpointListener listener) {
-    myBreakpointListChangedListeners.remove(listener);
+    breakpointListChangedListeners.remove(listener);
   }
 
   /**
    * Begins listening on changes in the background.
    */
   public synchronized void startBackgroundListening() {
-    if (myWatchTimer == null) {
-      myWatchTimer = new Timer("cloud debug watcher", true /* isDaemon */);
-      myWatchTimer.schedule(new CloudDebugGlobalPollerTimerTask(this), DELAY_MS, DELAY_MS);
+    if (watchTimer == null) {
+      watchTimer = new Timer("cloud debug watcher", true /* isDaemon */);
+      watchTimer.schedule(new CloudDebugGlobalPollerTimerTask(this), DELAY_MS, DELAY_MS);
 
       ApplicationManager.getApplication().addApplicationListener(new ApplicationAdapter() {
         @Override
         public void applicationExiting() {
-          if (myWatchTimer != null) {
-            myWatchTimer.cancel();
+          if (watchTimer != null) {
+            watchTimer.cancel();
           }
         }
       });
@@ -89,9 +89,9 @@ public class CloudDebugGlobalPoller {
   }
 
   public synchronized void stopBackgroundListening() {
-    if (myWatchTimer != null) {
-      myWatchTimer.cancel();
-      myWatchTimer = null;
+    if (watchTimer != null) {
+      watchTimer.cancel();
+      watchTimer = null;
     }
   }
 
@@ -123,7 +123,7 @@ public class CloudDebugGlobalPoller {
   }
 
   private void fireBreakpointsChanged(@NotNull CloudDebugProcessState state) {
-    for (CloudBreakpointListener listener : myBreakpointListChangedListeners) {
+    for (CloudBreakpointListener listener : breakpointListChangedListeners) {
       listener.onBreakpointListChanged(state);
     }
   }

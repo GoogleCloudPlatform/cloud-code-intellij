@@ -56,11 +56,11 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   private static final String SIGN_OUT = "Sign Out";
   private static final int MAX_VISIBLE_ROW_COUNT = 3;
 
-  private JBList myList;
-  private DefaultListModel myListModel;
-  private JButton mySignOutButton;
-  private boolean myValueChanged;
-  private boolean myIgnoreSelection;
+  private JBList list;
+  private DefaultListModel listModel;
+  private JButton signOutButton;
+  private boolean valueChanged;
+  private boolean ignoreSelection;
 
   public GoogleLoginUsersPanel() {
     super(new BorderLayout());
@@ -69,10 +69,10 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     final UsersListCellRenderer usersListCellRenderer = new UsersListCellRenderer();
 
     //Create the list that displays the users and put it in a scroll pane.
-    myList = new JBList(myListModel) {
+    list = new JBList(listModel) {
       @Override
       public Dimension getPreferredScrollableViewportSize() {
-        int numUsers = myListModel.size();
+        int numUsers = listModel.size();
         Dimension superPreferredSize = super.getPreferredScrollableViewportSize();
         if(numUsers <= 1) {
           return superPreferredSize;
@@ -92,19 +92,19 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
       }
     };
 
-    myList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    myList.setSelectedIndex(indexToSelect);
-    myList.addListSelectionListener(this);
-    myList.setVisibleRowCount(getVisibleRowCount());
-    myList.setCellRenderer(usersListCellRenderer);
-    JBScrollPane listScrollPane = new JBScrollPane(myList);
+    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    list.setSelectedIndex(indexToSelect);
+    list.addListSelectionListener(this);
+    list.setVisibleRowCount(getVisibleRowCount());
+    list.setCellRenderer(usersListCellRenderer);
+    JBScrollPane listScrollPane = new JBScrollPane(list);
 
-    myList.addMouseListener(new MouseAdapter() {
+    list.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent mouseEvent) {
-        myList.updateUI();
+        list.updateUI();
 
-        if (myListModel.getSize() == 1 && (myListModel.get(0) instanceof NoUsersListItem)) {
+        if (listModel.getSize() == 1 && (listModel.get(0) instanceof NoUsersListItem)) {
           // When there are no users available
           if (usersListCellRenderer.inLearnMoreUrl(mouseEvent.getPoint())) {
             BrowserUtil.browse(LEARN_MORE_URL);
@@ -112,9 +112,9 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
         }
         else {
           // When users are available
-          if (!myValueChanged) {
+          if (!valueChanged) {
             // Clicking on an already active user
-            int index = myList.locationToIndex(mouseEvent.getPoint());
+            int index = list.locationToIndex(mouseEvent.getPoint());
             if (index >= 0) {
               boolean inPlayUrl = usersListCellRenderer.inPlayConsoleUrl(mouseEvent.getPoint(), index);
               if (inPlayUrl) {
@@ -129,24 +129,24 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
             }
           }
         }
-        myValueChanged = false;
+        valueChanged = false;
       }
     });
 
-    myList.addMouseMotionListener(new MouseMotionListener() {
+    list.addMouseMotionListener(new MouseMotionListener() {
       @Override
       public void mouseMoved(MouseEvent mouseEvent) {
         // Determine if the user under the cursor is an active user, a non-active user or a non-user
-        int index = myList.locationToIndex(mouseEvent.getPoint());
+        int index = list.locationToIndex(mouseEvent.getPoint());
         if (index >= 0) {
           // If current object is the non-user list item, use default cursor
-          Object currentObject = myListModel.get(index);
+          Object currentObject = listModel.get(index);
           if (currentObject instanceof NoUsersListItem) {
             if (usersListCellRenderer.inLearnMoreUrl(mouseEvent.getPoint())) {
-              myList.setCursor(new Cursor(Cursor.HAND_CURSOR));
+              list.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
             else {
-              myList.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+              list.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
             return;
           }
@@ -156,13 +156,13 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
             boolean inPlayUrl = usersListCellRenderer.inPlayConsoleUrl(mouseEvent.getPoint(), index);
             boolean inCloudUrl = usersListCellRenderer.inCloudConsoleUrl(mouseEvent.getPoint(), index);
             if (inPlayUrl || inCloudUrl) {
-              myList.setCursor(new Cursor(Cursor.HAND_CURSOR));
+              list.setCursor(new Cursor(Cursor.HAND_CURSOR));
             } else {
-              myList.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+              list.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
           } else {
             // For non-active user
-            myList.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            list.setCursor(new Cursor(Cursor.HAND_CURSOR));
           }
         }
       }
@@ -172,7 +172,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
       }
     });
 
-    boolean noUsersAvailable = (myListModel.getSize() == 1) && (myListModel.get(0) instanceof NoUsersListItem);
+    boolean noUsersAvailable = (listModel.getSize() == 1) && (listModel.get(0) instanceof NoUsersListItem);
     JButton addAccountButton = new JButton(noUsersAvailable ? SIGN_IN : ADD_ACCOUNT);
     addAccountButton.addActionListener(new ActionListener() {
       @Override
@@ -182,23 +182,23 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     });
     addAccountButton.setHorizontalAlignment(SwingConstants.LEFT);
 
-    mySignOutButton = new JButton(SIGN_OUT);
-    mySignOutButton.addActionListener(new ActionListener() {
+    signOutButton = new JButton(SIGN_OUT);
+    signOutButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         GoogleLogin.getInstance().logOut(true);
       }
     });
 
-    if (myList.isSelectionEmpty()) {
-      mySignOutButton.setEnabled(false);
+    if (list.isSelectionEmpty()) {
+      signOutButton.setEnabled(false);
     } else {
       // If list contains the NoUsersListItem place holder
       // sign out button should be hidden
       if (noUsersAvailable) {
-        mySignOutButton.setVisible(false);
+        signOutButton.setVisible(false);
       } else {
-        mySignOutButton.setEnabled(true);
+        signOutButton.setEnabled(true);
       }
     }
 
@@ -207,7 +207,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
     buttonPane.add(addAccountButton);
     buttonPane.add(Box.createHorizontalGlue());
-    buttonPane.add(mySignOutButton);
+    buttonPane.add(signOutButton);
     buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
     add(listScrollPane, BorderLayout.CENTER);
@@ -217,62 +217,62 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   //This method is required by ListSelectionListener.
   @Override
   public void valueChanged(ListSelectionEvent e) {
-    if(myIgnoreSelection) {
+    if(ignoreSelection) {
       return;
     }
-    myValueChanged = true;
+    valueChanged = true;
     if (!e.getValueIsAdjusting()) {
-      if (myList.getSelectedIndex() == -1) {
-        mySignOutButton.setEnabled(false);
+      if (list.getSelectedIndex() == -1) {
+        signOutButton.setEnabled(false);
       } else {
-        mySignOutButton.setEnabled(true);
+        signOutButton.setEnabled(true);
 
         // Make newly selected value the active value
-        UsersListItem selectedUser = (UsersListItem)myListModel.get(myList.getSelectedIndex());
+        UsersListItem selectedUser = (UsersListItem)listModel.get(list.getSelectedIndex());
         if(!selectedUser.isActiveUser()) {
           GoogleLogin.getInstance().setActiveUser(selectedUser.getUserEmail());
         }
 
         // Change order of elements in the list so that the
         // active user becomes the first element in the list
-        myIgnoreSelection = true;
+        ignoreSelection = true;
         try {
-          myListModel.remove(myList.getSelectedIndex());
-          myListModel.add(0, selectedUser);
+          listModel.remove(list.getSelectedIndex());
+          listModel.add(0, selectedUser);
 
           // Re-select the active user
-          myList.setSelectedIndex(0);
+          list.setSelectedIndex(0);
         } finally {
-          myIgnoreSelection = false;
+          ignoreSelection = false;
         }
       }
     }
   }
 
   public JBList getList() {
-    return myList;
+    return list;
   }
 
   private int initializeUsers() {
     LinkedHashMap<String, CredentialedUser> allUsers = GoogleLogin.getInstance().getAllUsers();
-    myListModel = new DefaultListModel();
+    listModel = new DefaultListModel();
 
     int activeUserIndex = allUsers.size();
     for(CredentialedUser aUser : allUsers.values()) {
-      myListModel.addElement(new UsersListItem(aUser));
+      listModel.addElement(new UsersListItem(aUser));
       if(aUser.isActive()) {
-        activeUserIndex = myListModel.getSize() - 1;
+        activeUserIndex = listModel.getSize() - 1;
       }
     }
 
-    if(myListModel.getSize() == 0) {
+    if(listModel.getSize() == 0) {
       // Add no user panel
-      myListModel.addElement(NoUsersListItem.INSTANCE);
-    } else if ((activeUserIndex != 0) && (activeUserIndex < myListModel.getSize())) {
+      listModel.addElement(NoUsersListItem.INSTANCE);
+    } else if ((activeUserIndex != 0) && (activeUserIndex < listModel.getSize())) {
       // Change order of elements in the list so that the
       // active user becomes the first element in the list
-      UsersListItem activeUser = (UsersListItem)myListModel.remove(activeUserIndex);
-      myListModel.add(0, activeUser);
+      UsersListItem activeUser = (UsersListItem)listModel.remove(activeUserIndex);
+      listModel.add(0, activeUser);
       activeUserIndex = 0;
     }
 
@@ -280,11 +280,11 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   }
 
   private int getVisibleRowCount(){
-    if (myListModel == null) {
+    if (listModel == null) {
       return 0;
     }
 
-    int size = myListModel.getSize();
+    int size = listModel.getSize();
     if(size >= MAX_VISIBLE_ROW_COUNT) {
       return MAX_VISIBLE_ROW_COUNT;
     } else if (size == 0) {
@@ -295,11 +295,11 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   }
 
   private boolean isActiveUserInVisibleArea() {
-    int max = myListModel.getSize() < MAX_VISIBLE_ROW_COUNT ?
-      myListModel.getSize() : MAX_VISIBLE_ROW_COUNT;
+    int max = listModel.getSize() < MAX_VISIBLE_ROW_COUNT ?
+      listModel.getSize() : MAX_VISIBLE_ROW_COUNT;
 
     for(int i = 0; i < max; i++){
-      if(((UsersListItem)myListModel.get(i)).isActiveUser()) {
+      if(((UsersListItem)listModel.get(i)).isActiveUser()) {
         return true;
       }
     }

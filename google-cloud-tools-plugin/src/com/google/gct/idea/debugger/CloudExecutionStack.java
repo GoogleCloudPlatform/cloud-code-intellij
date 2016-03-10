@@ -32,7 +32,7 @@ import java.util.List;
  * and also the variables and custom watch expressions.
  */
 public class CloudExecutionStack extends XExecutionStack {
-  private final List<CloudStackFrame> myFrames = new ArrayList<CloudStackFrame>();
+  private final List<CloudStackFrame> frames = new ArrayList<CloudStackFrame>();
 
   public CloudExecutionStack(
       @NotNull Project project,
@@ -47,7 +47,7 @@ public class CloudExecutionStack extends XExecutionStack {
         variableTable = Collections.emptyList();
       }
       for (StackFrame nativeFrame : frames) {
-        myFrames
+        this.frames
             .add(new CloudStackFrame(project, nativeFrame, variableTable, evaluatedExpressions,
                 new ServerToIDEFileResolver()));
           // We only show custom watches on the top frame.
@@ -58,8 +58,8 @@ public class CloudExecutionStack extends XExecutionStack {
 
   @Override
   public void computeStackFrames(int firstFrameIndex, XStackFrameContainer container) {
-    if (firstFrameIndex <= myFrames.size()) {
-      container.addStackFrames(myFrames.subList(firstFrameIndex, myFrames.size()), true);
+    if (firstFrameIndex <= frames.size()) {
+      container.addStackFrames(frames.subList(firstFrameIndex, frames.size()), true);
     }
     else {
       container.addStackFrames(Collections.<CloudStackFrame>emptyList(), true);
@@ -68,6 +68,6 @@ public class CloudExecutionStack extends XExecutionStack {
 
   @Override
   public CloudStackFrame getTopFrame() {
-    return myFrames.size() > 0 ? myFrames.get(0) : null;
+    return frames.size() > 0 ? frames.get(0) : null;
   }
 }

@@ -25,14 +25,14 @@ public class GoogleAnonymousFeedbackTask extends Task.Backgroundable {
   static final String CT4IJ_PRODUCT = "Cloud Tools for IntelliJ";
   @VisibleForTesting
   static final String CT4IJ_PACKAGE_NAME = "com.google.gct.idea";
-  private final Consumer<String> myCallback;
-  private final Consumer<Exception> myErrorCallback;
-  private final Throwable myThrowable;
-  private final Map<String, String> myParams;
-  private final String myErrorMessage;
-  private final String myErrorDescription;
-  private final String myAppVersion;
-  private final FeedbackSender myFeedbackSender;
+  private final Consumer<String> callback;
+  private final Consumer<Exception> errorCallback;
+  private final Throwable throwable;
+  private final Map<String, String> params;
+  private final String errorMessage;
+  private final String errorDescription;
+  private final String appVersion;
+  private final FeedbackSender feedbackSender;
   private static final FeedbackSender DEFAULT_FEEDBACK_SENDER = new NetworkFeedbackSender();
 
   public GoogleAnonymousFeedbackTask(
@@ -64,34 +64,34 @@ public class GoogleAnonymousFeedbackTask extends Task.Backgroundable {
       final Consumer<Exception> errorCallback,
       FeedbackSender feedbackSender) {
     super(project, title, canBeCancelled);
-    myThrowable = throwable;
-    myParams = params;
-    myErrorMessage = errorMessage;
-    myErrorDescription = errorDescription;
-    myAppVersion = appVersion;
-    myCallback = callback;
-    myErrorCallback = errorCallback;
-    myFeedbackSender = feedbackSender;
+    this.throwable = throwable;
+    this.params = params;
+    this.errorMessage = errorMessage;
+    this.errorDescription = errorDescription;
+    this.appVersion = appVersion;
+    this.callback = callback;
+    this.errorCallback = errorCallback;
+    this.feedbackSender = feedbackSender;
   }
 
   @Override
   public void run(@NotNull ProgressIndicator indicator) {
     indicator.setIndeterminate(true);
     try {
-      String token = myFeedbackSender.sendFeedback(
+      String token = feedbackSender.sendFeedback(
           CT4IJ_PRODUCT,
           CT4IJ_PACKAGE_NAME,
-          myThrowable,
-          myErrorMessage,
-          myErrorDescription,
-          myAppVersion,
-          myParams
+          throwable,
+          errorMessage,
+          errorDescription,
+          appVersion,
+          params
       );
-      myCallback.consume(token);
+      callback.consume(token);
     } catch (IOException e) {
-      myErrorCallback.consume(e);
+      errorCallback.consume(e);
     } catch (RuntimeException re) {
-      myErrorCallback.consume(re);
+      errorCallback.consume(re);
     }
   }
 

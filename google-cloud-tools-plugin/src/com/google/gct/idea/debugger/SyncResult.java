@@ -8,14 +8,14 @@ import org.jetbrains.annotations.Nullable;
  * attached to on the server.
  */
 public class SyncResult {
-  private final boolean myInvalidDebuggee;
+  private final boolean invalidDebuggee;
 
-  private final boolean myNeedsStash;
-  private final boolean myNeedsSync;
-  private final GitRepository myTargetLocalRepository;
-  private final boolean myHasRemoteRepository;
-  private final String myTargetSyncSHA;
-  private final String myRepoType;
+  private final boolean needsStash;
+  private final boolean needsSync;
+  private final GitRepository targetLocalRepository;
+  private final boolean hasRemoteRepository;
+  private final String targetSyncSHA;
+  private final String repoType;
 
   SyncResult(boolean invalidDebuggee,
              boolean needsStash,
@@ -24,42 +24,42 @@ public class SyncResult {
              @Nullable GitRepository targetRepository,
              boolean hasRemoteRepository,
              String repoType) {
-    myInvalidDebuggee = invalidDebuggee;
-    myNeedsStash = needsStash;
-    myNeedsSync = needsSync;
-    myTargetSyncSHA = targetSyncSHA;
-    myTargetLocalRepository = targetRepository;
-    myHasRemoteRepository = hasRemoteRepository;
-    myRepoType = repoType;
+    this.invalidDebuggee = invalidDebuggee;
+    this.needsStash = needsStash;
+    this.needsSync = needsSync;
+    this.targetSyncSHA = targetSyncSHA;
+    targetLocalRepository = targetRepository;
+    this.hasRemoteRepository = hasRemoteRepository;
+    this.repoType = repoType;
   }
 
   public GitRepository getLocalRepository() {
-    return myTargetLocalRepository;
+    return targetLocalRepository;
   }
 
   public boolean hasLocalRepository() {
-    return myTargetLocalRepository != null;
+    return targetLocalRepository != null;
   }
 
   @Nullable
   public boolean hasRemoteRepository() {
-    return myHasRemoteRepository;
+    return hasRemoteRepository;
   }
 
   @Nullable
   public String getTargetSyncSHA() {
-    return myTargetSyncSHA;
+    return targetSyncSHA;
   }
 
   public boolean isValidDebuggee() {
-    return !myInvalidDebuggee;
+    return !invalidDebuggee;
   }
 
   /**
    * Whether the local repository has uncommitted changes we need to stash
    */
   public boolean needsStash() {
-    return myNeedsStash;
+    return needsStash;
   }
 
   /**
@@ -67,14 +67,14 @@ public class SyncResult {
    */
   @Nullable
   public String getRepositoryType() {
-    return myRepoType;
+    return repoType;
   }
 
   /**
    * Whether the local repository needs to be synced with the remote repository
    */
    public boolean needsSync() {
-    return myNeedsSync;
+    return needsSync;
    }
 
 }

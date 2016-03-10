@@ -96,10 +96,10 @@ public class BreakpointErrorStatusPanel
   extends XBreakpointCustomPropertiesPanel<XLineBreakpoint<CloudLineBreakpointProperties>>  {
 
   private static final Logger LOG = Logger.getInstance(BreakpointErrorStatusPanel.class);
-  private JBLabel myErrorDescription;
-  private JBLabel myErrorLabel;
-  private JPanel myErrorPanel;
-  private JPanel myMainPanel;
+  private JBLabel errorDescription;
+  private JBLabel errorLabel;
+  private JPanel errorPanel;
+  private JPanel mainPanel;
 
   public BreakpointErrorStatusPanel() {
   }
@@ -107,7 +107,7 @@ public class BreakpointErrorStatusPanel
   @NotNull
   @Override
   public JComponent getComponent() {
-    return myMainPanel;
+    return mainPanel;
   }
 
   @Override
@@ -123,10 +123,10 @@ public class BreakpointErrorStatusPanel
       return;
     }
 
-    myErrorPanel.setVisible(cloudBreakpoint.hasError());
+    errorPanel.setVisible(cloudBreakpoint.hasError());
     if (cloudBreakpoint.hasError()) {
-      myErrorLabel.setForeground(JBColor.RED);
-      myErrorDescription.setText(cloudBreakpoint.getErrorMessage());
+      errorLabel.setForeground(JBColor.RED);
+      errorDescription.setText(cloudBreakpoint.getErrorMessage());
     }
   }
 

@@ -73,16 +73,16 @@ public class CloudBreakpointHandler
   public static final Key<String> CLOUD_ID = Key.create("CloudId");
 
   private static final Logger LOG = Logger.getInstance(CloudBreakpointHandler.class);
-  private final Map<String, XBreakpoint> myIdeBreakpoints = new ConcurrentHashMap<String, XBreakpoint>();
-  private final CloudDebugProcess myProcess;
-  private PsiManager myPsiManager;
+  private final Map<String, XBreakpoint> ideBreakpoints = new ConcurrentHashMap<String, XBreakpoint>();
+  private final CloudDebugProcess process;
+  private PsiManager psiManager;
   private ServerToIDEFileResolver fileResolver;
 
   public CloudBreakpointHandler(@NotNull CloudDebugProcess process,
       ServerToIDEFileResolver fileResolver) {
     super(CloudLineBreakpointType.class);
-    myProcess = process;
-    setPsiManager(PsiManager.getInstance(myProcess.getXDebugSession().getProject()));
+    this.process = process;
+    setPsiManager(PsiManager.getInstance(this.process.getXDebugSession().getProject()));
     this.fileResolver = fileResolver;
   }
 
@@ -104,9 +104,9 @@ public class CloudBreakpointHandler
         continue;
       }
 
-      Project currentProject = myProcess.getXDebugSession().getProject();
+      Project currentProject = process.getXDebugSession().getProject();
       final XBreakpointManager manager =
-        XDebuggerManager.getInstance(myProcess.getXDebugSession().getProject())
+        XDebuggerManager.getInstance(process.getXDebugSession().getProject())
             .getBreakpointManager();
       if (serverBreakpoint.getLocation() == null) {
         LOG.warn("attempted to clone a breakpoint without a source location: " +
@@ -178,8 +178,8 @@ public class CloudBreakpointHandler
         continue;
       }
 
-      if (myIdeBreakpoints.containsKey(serverBreakpoint.getId())) {
-        final XBreakpoint xIdeBreakpoint = myIdeBreakpoints.get(serverBreakpoint.getId());
+      if (ideBreakpoints.containsKey(serverBreakpoint.getId())) {
+        final XBreakpoint xIdeBreakpoint = ideBreakpoints.get(serverBreakpoint.getId());
         com.intellij.debugger.ui.breakpoints.Breakpoint cloudIdeBreakpoint =
             BreakpointManager.getJavaBreakpoint(xIdeBreakpoint);
 
@@ -188,14 +188,14 @@ public class CloudBreakpointHandler
               (CloudLineBreakpointType.CloudLineBreakpoint) cloudIdeBreakpoint;
           cloudIdeLineBreakpoint.setVerified(true);
           cloudIdeLineBreakpoint.setErrorMessage(null);
-          myProcess.updateBreakpointPresentation(cloudIdeLineBreakpoint);
+          process.updateBreakpointPresentation(cloudIdeLineBreakpoint);
         }
         continue;
       }
 
-      Project currentProject = myProcess.getXDebugSession().getProject();
+      Project currentProject = process.getXDebugSession().getProject();
       final XBreakpointManager manager = XDebuggerManager.getInstance(
-          myProcess.getXDebugSession().getProject()).getBreakpointManager();
+          process.getXDebugSession().getProject()).getBreakpointManager();
       if (serverBreakpoint.getLocation() == null) {
         continue;
       }
@@ -233,8 +233,8 @@ public class CloudBreakpointHandler
                                                             line,
                                                             properties,
                                                             serverBreakpoint,
-                                                            myIdeBreakpoints,
-                                                            myProcess));
+                                                            ideBreakpoints,
+                                                            process));
     }
 
     if (addedBreakpoint) {
@@ -244,7 +244,7 @@ public class CloudBreakpointHandler
       ApplicationManager.getApplication().runWriteAction(new Runnable() {
         @Override
         public void run() {
-          myProcess.fireBreakpointsChanged();
+          process.fireBreakpointsChanged();
         }
       });
     }
@@ -257,7 +257,7 @@ public class CloudBreakpointHandler
     if (serverBreakpoint.getIsFinalState() != Boolean.TRUE) {
       setStateToDisabled(serverBreakpoint);
     }
-    myProcess.getStateController().deleteBreakpointAsync(serverBreakpoint.getId());
+    process.getStateController().deleteBreakpointAsync(serverBreakpoint.getId());
   }
 
   /**
@@ -283,7 +283,7 @@ public class CloudBreakpointHandler
     if (serverBreakpoint == null) {
       return null;
     }
-    return myIdeBreakpoints.get(serverBreakpoint.getId());
+    return ideBreakpoints.get(serverBreakpoint.getId());
   }
 
   /**
@@ -291,12 +291,12 @@ public class CloudBreakpointHandler
    * navigate to its line of code.
    */
   public void navigateTo(@NotNull Breakpoint serverBreakpoint) {
-    final XBreakpoint xIdeBreakpoint = myIdeBreakpoints.get(serverBreakpoint.getId());
+    final XBreakpoint xIdeBreakpoint = ideBreakpoints.get(serverBreakpoint.getId());
     if (xIdeBreakpoint != null
         && xIdeBreakpoint.getSourcePosition() != null
-        && myProcess.getXDebugSession() != null) {
+        && process.getXDebugSession() != null) {
       xIdeBreakpoint.getSourcePosition().createNavigatable(
-          myProcess.getXDebugSession().getProject()).navigate(true);
+          process.getXDebugSession().getProject()).navigate(true);
     }
   }
 
@@ -338,7 +338,7 @@ public class CloudBreakpointHandler
       return;
     }
 
-    PsiFile javaFile = myPsiManager.findFile(xIdeBreakpoint.getSourcePosition().getFile());
+    PsiFile javaFile = psiManager.findFile(xIdeBreakpoint.getSourcePosition().getFile());
     if (!(javaFile instanceof PsiJavaFile)) {
       return;
     }
@@ -360,7 +360,7 @@ public class CloudBreakpointHandler
     }
 
     // The breakpoint will enter error state asynchronously.  For now, we state that its verified.
-    myProcess.getStateController()
+    process.getStateController()
         .setBreakpointAsync(serverNewBreakpoint, new SetBreakpointHandler() {
           @Override
           public void onSuccess(@NotNull final String id) {
@@ -369,27 +369,27 @@ public class CloudBreakpointHandler
               public void run() {
                 if (!Strings.isNullOrEmpty(id)) {
                   if (!cloudIdeLineBreakpoint.isEnabled()) {
-                    myProcess.getStateController().deleteBreakpointAsync(id); //race condition
+                    process.getStateController().deleteBreakpointAsync(id); //race condition
                   } else { // Success.
                     // Mark as added so we don't add it again.
                     xIdeBreakpoint.getProperties().setAddedOnServer(true);
                     cloudIdeLineBreakpoint.setErrorMessage(null);
-                    myProcess.updateBreakpointPresentation(cloudIdeLineBreakpoint);
+                    process.updateBreakpointPresentation(cloudIdeLineBreakpoint);
                   }
                 } else {
                   // TODO(joaomartins): Why couldn't the breakpoint be set? Improve this message.
                   cloudIdeLineBreakpoint.setErrorMessage(GctBundle.getString("clouddebug.errorset"));
-                  myProcess.updateBreakpointPresentation(cloudIdeLineBreakpoint);
+                  process.updateBreakpointPresentation(cloudIdeLineBreakpoint);
                 }
                 if (!Strings.isNullOrEmpty(id)) {
                   xIdeBreakpoint.getProperties().setDisabledByServer(false);
                   String oldId = xIdeBreakpoint.getUserData(CLOUD_ID);
                   if (!Strings.isNullOrEmpty(oldId)) {
-                    myIdeBreakpoints.remove(oldId);
+                    ideBreakpoints.remove(oldId);
                   }
 
                   xIdeBreakpoint.putUserData(CLOUD_ID, id);
-                  myIdeBreakpoints.put(id, xIdeBreakpoint);
+                  ideBreakpoints.put(id, xIdeBreakpoint);
                 }
               }
             };
@@ -404,13 +404,13 @@ public class CloudBreakpointHandler
           @Override
           public void onError(String errorMessage) {
             cloudIdeLineBreakpoint.setErrorMessage(errorMessage);
-            myProcess.updateBreakpointPresentation(cloudIdeLineBreakpoint);
+            process.updateBreakpointPresentation(cloudIdeLineBreakpoint);
           }
         });
   }
 
   void setPsiManager(PsiManager psiManager) {
-    myPsiManager = psiManager;
+    this.psiManager = psiManager;
   }
 
   /**
@@ -419,7 +419,7 @@ public class CloudBreakpointHandler
    * @param serverBreakpoint
    */
   public void setStateToDisabled(@NotNull Breakpoint serverBreakpoint) {
-    final XBreakpoint xIdeBreakpoint = myIdeBreakpoints.get(serverBreakpoint.getId());
+    final XBreakpoint xIdeBreakpoint = ideBreakpoints.get(serverBreakpoint.getId());
     if (xIdeBreakpoint != null
         && xIdeBreakpoint.getProperties() instanceof CloudLineBreakpointProperties) {
       CloudLineBreakpointProperties properties =
@@ -443,7 +443,7 @@ public class CloudBreakpointHandler
     if (!xIdeBreakpoint.getProperties().isDisabledByServer()) {
       String breakpointId = xIdeBreakpoint.getUserData(CLOUD_ID);
       if (!Strings.isNullOrEmpty(breakpointId)) {
-        myProcess.getStateController().deleteBreakpointAsync(breakpointId);
+        process.getStateController().deleteBreakpointAsync(breakpointId);
       } else {
         LOG.warn("could not delete breakpoint because it was not added through the cloud handler.");
       }

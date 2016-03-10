@@ -34,51 +34,55 @@ import java.awt.*;
  */
 public class SelectUserDialog extends DialogWrapper {
 
-  private JPanel myRootPanel;
-  private UserSelector myLogin;
-  private String mySelectedUser;
+  private JPanel rootPanel;
+  private UserSelector login;
+  private String selectedUser;
 
   public SelectUserDialog(@Nullable Project project, @NotNull String title) {
     super(project, true);
     init();
     setTitle(title);
 
-    myLogin.getDocument().addDocumentListener(new DocumentAdapter() {
+    login.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent e) {
-        setOKActionEnabled(myLogin.getSelectedUser() != null);
+        setOKActionEnabled(login.getSelectedUser() != null);
       }
     });
     setOKButtonText(GctBundle.message("select.user.continue"));
     setCancelButtonText(GctBundle.message("select.user.manuallogin"));
     setOKActionEnabled(false);
-    Window myWindow = getWindow();
-    if (myWindow != null) {
-      myWindow.setPreferredSize(new Dimension(400, 125));
+    Window window = getWindow();
+    if (window != null) {
+      window.setPreferredSize(new Dimension(400, 125));
     }
   }
 
   @NotNull
   public String getSelectedUser() {
-    if (!Strings.isNullOrEmpty(mySelectedUser)) {
-      return mySelectedUser;
+    if (!Strings.isNullOrEmpty(selectedUser)) {
+      return selectedUser;
     }
-    return myLogin.getSelectedUser() != null ? myLogin.getSelectedUser().getEmail() : "";
+    return login.getSelectedUser() != null ? login.getSelectedUser().getEmail() : "";
   }
 
   @VisibleForTesting
   public void setSelectedUser(@NotNull String selectedUser) {
-    mySelectedUser = selectedUser;
+    this.selectedUser = selectedUser;
   }
 
   @Nullable
   @Override
   public JComponent getPreferredFocusedComponent() {
-    return myLogin;
+    return login;
   }
 
   @Override
   protected JComponent createCenterPanel() {
-    return myRootPanel;
+    return rootPanel;
+  }
+
+  private void createUIComponents() {
+    // TODO: place custom component creation code here
   }
 }

@@ -82,23 +82,23 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   private static final int PREFERRED_HEIGHT = 240;
   private static final int POPUP_HEIGHTFRAMESIZE = 50;
 
-  private final DefaultMutableTreeNode myModelRoot;
-  private final SelectorTreeModel myTreeModel;
-  private final boolean myQueryOnExpand;
-  private JBPopup myJBPopup;
-  private PopupPanel myPopupPanel;
+  private final DefaultMutableTreeNode modelRoot;
+  private final SelectorTreeModel treeModel;
+  private final boolean queryOnExpand;
+  private JBPopup jBPopup;
+  private PopupPanel popupPanel;
 
   public ProjectSelector() {
     this(false);
   }
 
   public ProjectSelector(final boolean queryOnExpand) {
-    myQueryOnExpand = queryOnExpand;
-    myModelRoot = new DefaultMutableTreeNode("root");
-    myTreeModel = new SelectorTreeModel(myModelRoot);
+    this.queryOnExpand = queryOnExpand;
+    modelRoot = new DefaultMutableTreeNode("root");
+    treeModel = new SelectorTreeModel(modelRoot);
 
     // synchronize selection between the treemodel and current text.
-    myTreeModel.addTreeModelListener(new TreeModelListener() {
+    treeModel.addTreeModelListener(new TreeModelListener() {
       @Override
       public void treeNodesChanged(TreeModelEvent e) {
       }
@@ -114,7 +114,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       @Override
       public void treeStructureChanged(TreeModelEvent e) {
         if (!Strings.isNullOrEmpty(getText()) &&
-            myJBPopup != null && !myJBPopup.isDisposed() && myPopupPanel != null &&
+            jBPopup != null && !jBPopup.isDisposed() && popupPanel != null &&
             e.getTreePath() != null &&
             e.getTreePath().getLastPathComponent() instanceof GoogleUserModelItem) {
           GoogleUserModelItem userItem = (GoogleUserModelItem) e.getTreePath().getLastPathComponent();
@@ -122,7 +122,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
             DefaultMutableTreeNode loadedItem = (DefaultMutableTreeNode) userItem.getChildAt(index);
             if (loadedItem instanceof ElysiumProjectModelItem &&
                 getText().equals(((ElysiumProjectModelItem) loadedItem).getProjectId())) {
-              myPopupPanel.myJTree.setSelectionPath(new TreePath(loadedItem.getPath()));
+              popupPanel.jTree.setSelectionPath(new TreePath(loadedItem.getPath()));
             }
           }
         }
@@ -174,11 +174,11 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   }
 
   public void addModelListener(TreeModelListener listener) {
-    myTreeModel.addTreeModelListener(listener);
+    treeModel.addTreeModelListener(listener);
   }
 
   public void removeModelListener(TreeModelListener listener) {
-    myTreeModel.removeTreeModelListener(listener);
+    treeModel.removeTreeModelListener(listener);
   }
 
   /**
@@ -194,8 +194,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     }
 
     // Look for the selected text in the model, which will give us the login.
-    for (int i = 0; i < myModelRoot.getChildCount(); i++) {
-      TreeNode node = myModelRoot.getChildAt(i);
+    for (int i = 0; i < modelRoot.getChildCount(); i++) {
+      TreeNode node = modelRoot.getChildAt(i);
       if (node instanceof GoogleUserModelItem) {
         for (int j = 0; j < node.getChildCount(); j++) {
           TreeNode projectNode = node.getChildAt(j);
@@ -241,8 +241,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     }
 
     // Look for the selected text in the model, which will give us the login.
-    for (int i = 0; i < myModelRoot.getChildCount(); i++) {
-      TreeNode userNode = myModelRoot.getChildAt(i);
+    for (int i = 0; i < modelRoot.getChildCount(); i++) {
+      TreeNode userNode = modelRoot.getChildAt(i);
       if (userNode instanceof GoogleUserModelItem) {
         for (int j = 0; j < userNode.getChildCount(); j++) {
           TreeNode projectNode = userNode.getChildAt(j);
@@ -273,8 +273,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     if (user == null) {
       return null;
     }
-    for (int index = 0; index < myModelRoot.getChildCount(); index++) {
-      TreeNode node = myModelRoot.getChildAt(index);
+    for (int index = 0; index < modelRoot.getChildCount(); index++) {
+      TreeNode node = modelRoot.getChildAt(index);
       if (node instanceof GoogleUserModelItem) {
         String currentNodeEmail = ((GoogleUserModelItem) node).getCredentialedUser().getEmail();
         if (!Strings.isNullOrEmpty(currentNodeEmail) && currentNodeEmail.equals(user.getEmail())) {
@@ -283,8 +283,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       }
     }
 
-    GoogleUserModelItem newUser = new GoogleUserModelItem(user, myTreeModel);
-    myTreeModel.insertNodeInto(newUser, myModelRoot, myModelRoot.getChildCount());
+    GoogleUserModelItem newUser = new GoogleUserModelItem(user, treeModel);
+    treeModel.insertNodeInto(newUser, modelRoot, modelRoot.getChildCount());
     return newUser;
   }
 
@@ -305,18 +305,18 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         emailUsers.add(user.getEmail());
       }
     }
-    for (int index = 0; index < myModelRoot.getChildCount(); ) {
-      TreeNode node = myModelRoot.getChildAt(index);
+    for (int index = 0; index < modelRoot.getChildCount(); ) {
+      TreeNode node = modelRoot.getChildAt(index);
       if (node instanceof GoogleUserModelItem) {
         CredentialedUser user = ((GoogleUserModelItem) node).getCredentialedUser();
         // If the user isn't valid anymore, remove the corresponding node..
         if (user == null || !emailUsers.contains(user.getEmail())) {
-          myTreeModel.removeNodeFromParent((GoogleUserModelItem) node);
+          treeModel.removeNodeFromParent((GoogleUserModelItem) node);
           continue;
         }
       }
       else {
-        myTreeModel.removeNodeFromParent((MutableTreeNode) node);
+        treeModel.removeNodeFromParent((MutableTreeNode) node);
         continue;
       }
       index++;
@@ -339,8 +339,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
             if (forceUpdate) {
               node.setNeedsSynchronizing();
             }
-            if (!myQueryOnExpand ||
-                myPopupPanel != null && myPopupPanel.myJTree.isExpanded(new TreePath(node.getPath()))) {
+            if (!queryOnExpand ||
+                popupPanel != null && popupPanel.jTree.isExpanded(new TreePath(node.getPath()))) {
               node.synchronize();
             }
           }
@@ -348,27 +348,27 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       }
     }
     else {
-      myTreeModel.insertNodeInto(new GoogleSignOnModelItem(), myModelRoot, 0);
+      treeModel.insertNodeInto(new GoogleSignOnModelItem(), modelRoot, 0);
     }
   }
 
   @Override
   public void showPopup(RelativePoint showTarget) {
-    if (myJBPopup == null || myJBPopup.isDisposed()) {
-      myPopupPanel = new PopupPanel();
+    if (jBPopup == null || jBPopup.isDisposed()) {
+      popupPanel = new PopupPanel();
 
-      myPopupPanel.initializeContent(getText());
+      popupPanel.initializeContent(getText());
       ComponentPopupBuilder popup = JBPopupFactory.getInstance().
-        createComponentPopupBuilder(myPopupPanel, myPopupPanel.getInitialFocus());
-      myJBPopup = popup.createPopup();
+        createComponentPopupBuilder(popupPanel, popupPanel.getInitialFocus());
+      jBPopup = popup.createPopup();
     }
-    if (!myJBPopup.isVisible()) {
-      myJBPopup.show(showTarget);
+    if (!jBPopup.isVisible()) {
+      jBPopup.show(showTarget);
     }
   }
 
   private class PopupPanel extends GoogleLoginEmptyPanel {
-    private JTree myJTree;
+    private JTree jTree;
 
     @Nullable
     private TreePath find(DefaultMutableTreeNode root, String s) {
@@ -384,32 +384,32 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     }
 
     public JComponent getInitialFocus() {
-      return myJTree;
+      return jTree;
     }
 
     public void initializeContent(String selectedProjectId) {
-      myJTree = new Tree(myTreeModel);
-      myJTree.setRowHeight(0);
+      jTree = new Tree(treeModel);
+      jTree.setRowHeight(0);
 
       if (!Strings.isNullOrEmpty(selectedProjectId)) {
-        TreePath path = find(myModelRoot, selectedProjectId);
+        TreePath path = find(modelRoot, selectedProjectId);
         if (path != null) {
-          myJTree.setSelectionPath(path);
+          jTree.setSelectionPath(path);
         }
       }
-      myJTree.setRootVisible(false);
-      myJTree.setOpaque(false);
-      myJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-      ProjectSelectorRenderer renderer = new ProjectSelectorRenderer(myJTree);
-      myJTree.addMouseListener(renderer);
-      myJTree.addMouseMotionListener(renderer);
-      myJTree.setCellRenderer(renderer);
+      jTree.setRootVisible(false);
+      jTree.setOpaque(false);
+      jTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+      ProjectSelectorRenderer renderer = new ProjectSelectorRenderer(jTree);
+      jTree.addMouseListener(renderer);
+      jTree.addMouseMotionListener(renderer);
+      jTree.setCellRenderer(renderer);
       this.getContentPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-      this.getContentPane().setViewportView(myJTree);
-      myJTree.addTreeSelectionListener(new TreeSelectionListener() {
+      this.getContentPane().setViewportView(jTree);
+      jTree.addTreeSelectionListener(new TreeSelectionListener() {
         @Override
         public void valueChanged(TreeSelectionEvent e) {
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode) myJTree.getLastSelectedPathComponent();
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree.getLastSelectedPathComponent();
           if (node != null) {
             if (node instanceof ElysiumProjectModelItem) {
               if (Strings.isNullOrEmpty(ProjectSelector.this.getText()) ||
@@ -424,14 +424,14 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
               }
             }
             else {
-              myJTree.clearSelection();
+              jTree.clearSelection();
             }
           }
         }
       });
 
-      if (myQueryOnExpand) {
-        myJTree.addTreeExpansionListener(new TreeExpansionListener() {
+      if (queryOnExpand) {
+        jTree.addTreeExpansionListener(new TreeExpansionListener() {
           @Override
           public void treeExpanded(TreeExpansionEvent event) {
             TreePath expandedPath = event.getPath();
@@ -446,18 +446,18 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         });
       }
 
-      for (int i = 0; i < myJTree.getRowCount(); i++) {
-        myJTree.expandRow(i);
-        TreePath path = myJTree.getPathForRow(i);
+      for (int i = 0; i < jTree.getRowCount(); i++) {
+        jTree.expandRow(i);
+        TreePath path = jTree.getPathForRow(i);
         if (path.getLastPathComponent() instanceof GoogleUserModelItem) {
           break; // Remove this to expand all rows on show.
         }
       }
 
-      myJTree.requestFocusInWindow();
+      jTree.requestFocusInWindow();
       Insets thisInsets = this.getInsets();
       Insets contentInset = this.getContentPane().getInsets();
-      Insets treeInset = myJTree.getInsets();
+      Insets treeInset = jTree.getInsets();
 
       int preferredWidth = renderer.getMaximumWidth() +
                            UIUtil.getTreeLeftChildIndent() * 2 +
@@ -487,8 +487,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         getBottomPane().add(synchronizeButton, BorderLayout.EAST);
       }
 
-      if (myTreeModel.isModelNeedsRefresh()) {
-        myTreeModel.setModelNeedsRefresh(false);
+      if (treeModel.isModelNeedsRefresh()) {
+        treeModel.setModelNeedsRefresh(false);
         synchronize(true);
       }
     }
@@ -508,28 +508,28 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   @Override
   public void hidePopup() {
     if (isPopupVisible()) {
-      myJBPopup.closeOk(null);
+      jBPopup.closeOk(null);
     }
   }
 
   @Override
   public boolean isPopupVisible() {
-    return myJBPopup != null && !myJBPopup.isDisposed() && myJBPopup.isVisible();
+    return jBPopup != null && !jBPopup.isDisposed() && jBPopup.isVisible();
   }
 
   static class SelectorTreeModel extends DefaultTreeModel {
-    private boolean myModelNeedsRefresh;
+    private boolean modelNeedsRefresh;
 
     public SelectorTreeModel(TreeNode root) {
       super(root);
     }
 
     public boolean isModelNeedsRefresh() {
-      return myModelNeedsRefresh;
+      return modelNeedsRefresh;
     }
 
     public void setModelNeedsRefresh(boolean modelNeedsRefresh) {
-      this.myModelNeedsRefresh = modelNeedsRefresh;
+      this.modelNeedsRefresh = modelNeedsRefresh;
     }
   }
 }

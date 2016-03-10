@@ -34,21 +34,21 @@ public enum IntelliJPlatform {
   DBE("0xDBE", PlatformUtils.DBE_PREFIX),
   ANDROID_STUDIO("Android Studio", "AndroidStudio");
 
-  private final String myName;
-  private final String myPlatformPrefix;
+  private final String name;
+  private final String platformPrefix;
 
   @Override
   public String toString() {
-    return myName;
+    return name;
   }
 
   public String getPlatformPrefix() {
-    return myPlatformPrefix;
+    return platformPrefix;
   }
 
   IntelliJPlatform(String name, String platformPrefix) {
-    myName = name;
-    myPlatformPrefix = platformPrefix;
+    this.name = name;
+    this.platformPrefix = platformPrefix;
   }
 
   public static IntelliJPlatform fromPrefix(String prefix) {

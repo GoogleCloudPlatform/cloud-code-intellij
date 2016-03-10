@@ -32,12 +32,12 @@ public class CloudDebugProcessHandler extends ProcessHandler {
 
   private static final Logger LOG = Logger.getInstance(CloudDebugProcessHandler.class);
 
-  private final CloudDebugProcess myProcess;
+  private final CloudDebugProcess process;
 
   public CloudDebugProcessHandler(CloudDebugProcess process) {
-    myProcess = process;
-    if (myProcess != null && myProcess.getProcessState() != null) {
-      String userEmail = myProcess.getProcessState().getUserEmail();
+    this.process = process;
+    if (process != null && process.getProcessState() != null) {
+      String userEmail = process.getProcessState().getUserEmail();
       if (userEmail != null) {
         final CredentialedUser user = GoogleLogin.getInstance().getAllUsers().get(userEmail);
         if (user.getGoogleLoginState() != null) {
@@ -75,7 +75,7 @@ public class CloudDebugProcessHandler extends ProcessHandler {
   }
 
   public CloudDebugProcess getProcess() {
-    return myProcess;
+    return process;
   }
 
   @Override
