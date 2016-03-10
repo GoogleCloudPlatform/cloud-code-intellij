@@ -81,8 +81,4 @@ public class SelectUserDialog extends DialogWrapper {
   protected JComponent createCenterPanel() {
     return rootPanel;
   }
-
-  private void createUIComponents() {
-    // TODO: place custom component creation code here
-  }
 }
