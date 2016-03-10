@@ -296,7 +296,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
                 // user clicked item.  This prevents multiple (and possibly out of order) selections
                 // getting queued up.
                 if (id.equals(navigatedSnapshotId)) {
-                  if (result.getIsFinalState() != Boolean.TRUE || result.getStackFrames() == null) {
+                  if (!Boolean.TRUE.equals(result.getIsFinalState()) || result.getStackFrames() == null) {
                     getBreakpointHandler().navigateTo(result);
                     if (result.getStackFrames() == null) {
                       navigateToBreakpoint(result);
@@ -354,18 +354,18 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
           continue;
         }
 
-        if (breakpoint.getIsFinalState() == Boolean.TRUE &&
-            (breakpoint.getStatus() == null || breakpoint.getStatus().getIsError() != Boolean.TRUE)) {
+        if (Boolean.TRUE.equals(breakpoint.getIsFinalState()) &&
+            (breakpoint.getStatus() == null || !Boolean.TRUE.equals(breakpoint.getStatus().getIsError()))) {
           if (!getXDebugSession().isStopped()) {
             getBreakpointHandler().setStateToDisabled(breakpoint);
           }
         }
-        else if (breakpoint.getIsFinalState() == Boolean.TRUE) {
+        else if (Boolean.TRUE.equals(breakpoint.getIsFinalState())) {
           // then this is an error state breakpoint.
           com.intellij.debugger.ui.breakpoints.Breakpoint cloudBreakpoint =
             BreakpointManager.getJavaBreakpoint(breakpointHit);
           if (breakpoint.getStatus() != null &&
-              breakpoint.getStatus().getIsError() == Boolean.TRUE &&
+              Boolean.TRUE.equals(breakpoint.getStatus().getIsError()) &&
               cloudBreakpoint instanceof CloudLineBreakpointType.CloudLineBreakpoint) {
             CloudLineBreakpoint cloudLineBreakpoint = (CloudLineBreakpoint) cloudBreakpoint;
             cloudLineBreakpoint

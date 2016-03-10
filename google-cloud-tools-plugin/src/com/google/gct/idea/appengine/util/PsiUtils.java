@@ -201,12 +201,13 @@ public class PsiUtils {
       return false;
     }
 
-    return Boolean.TRUE == type.accept(new PsiTypeVisitor<Boolean>() {
+    Boolean accepted = type.accept(new PsiTypeVisitor<Boolean>() {
       @Nullable
       @Override
       public Boolean visitClassType(PsiClassType classType) {
         return classType.getParameterCount() > 0;
       }
     });
+    return Boolean.TRUE.equals(accepted);
   }
 }

@@ -100,7 +100,7 @@ public class CloudBreakpointHandler
    */
   public void cloneToNewBreakpoints(@NotNull final List<Breakpoint> serverBreakpoints) {
     for (Breakpoint serverBreakpoint : serverBreakpoints) {
-      if (serverBreakpoint.getIsFinalState() != Boolean.TRUE) {
+      if (!Boolean.TRUE.equals(serverBreakpoint.getIsFinalState())) {
         continue;
       }
 
@@ -174,7 +174,7 @@ public class CloudBreakpointHandler
   {
     boolean addedBreakpoint = false;
     for (final Breakpoint serverBreakpoint : serverBreakpoints) {
-      if (serverBreakpoint.getIsFinalState() == Boolean.TRUE) {
+      if (Boolean.TRUE.equals(serverBreakpoint.getIsFinalState())) {
         continue;
       }
 
@@ -254,7 +254,7 @@ public class CloudBreakpointHandler
    * Called when the user deletes a snapshot from the snapshot list.
    */
   public void deleteBreakpoint(@NotNull Breakpoint serverBreakpoint) {
-    if (serverBreakpoint.getIsFinalState() != Boolean.TRUE) {
+    if (!Boolean.TRUE.equals(serverBreakpoint.getIsFinalState())) {
       setStateToDisabled(serverBreakpoint);
     }
     process.getStateController().deleteBreakpointAsync(serverBreakpoint.getId());

@@ -41,7 +41,7 @@ public class BreakpointUtil {
    */
   @Nullable
   public static String getUserErrorMessage(@Nullable StatusMessage statusMessage) {
-    if (statusMessage == null || statusMessage.getIsError() != Boolean.TRUE) {
+    if (statusMessage == null || !Boolean.TRUE.equals(statusMessage.getIsError())) {
       return null;
     }
 
