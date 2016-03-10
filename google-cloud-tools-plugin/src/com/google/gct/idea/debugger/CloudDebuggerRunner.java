@@ -155,17 +155,9 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
 
     List<CloudDebugProcessState> backgroundSessions = getBackgroundDebugStates(project);
     if (backgroundSessions.size() > 0) {
-      int result = Messages
-          .showOkCancelDialog(project,
-              GctBundle.getString("clouddebug.stop.background.and.create.new.session"),
-              GctBundle.getString("clouddebug.message.title"), GoogleCloudToolsIcons.CLOUD);
-      if (result == Messages.OK) {
         for (CloudDebugProcessState cdps : backgroundSessions) {
           cdps.setListenInBackground(false);
         }
-      } else {
-        throw new RunCanceledByUserException();
-      }
     }
 
     List<CloudDebugProcess> activeDebugProcesses = getActiveDebugProcesses(project);
