@@ -158,7 +158,6 @@ public class CloudDebugProcessStateController {
       return;
     }
     List<Breakpoint> currentList = state.getCurrentServerBreakpointList();
-    final SettableFuture<Breakpoint> future = SettableFuture.create();
     for (Breakpoint serverBreakpointCandidate : currentList) {
       if (serverBreakpointCandidate.getId().equals(id)
           && !Boolean.TRUE.equals(serverBreakpointCandidate.getIsFinalState())) {
