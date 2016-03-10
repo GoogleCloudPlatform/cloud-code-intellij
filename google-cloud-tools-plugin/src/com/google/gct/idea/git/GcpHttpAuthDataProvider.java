@@ -54,14 +54,14 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
 
   private String selectedUser;
   private boolean chooseManualLogin;
-  private static Project ourCurrentProject;
+  private static Project currentProject;
 
   @Nullable
   @Override
   public AuthData getAuthData(@NotNull String url) {
     final Project currentProject = getCurrentProject();
-    if ((currentProject != null || Context.ourCurrentContext != null) && isUrlGCP(url)) {
-      Context currentContext = Context.ourCurrentContext; //always prefer context over project setting.
+    if ((currentProject != null || Context.currentContext != null) && isUrlGCP(url)) {
+      Context currentContext = Context.currentContext; //always prefer context over project setting.
       String userEmail = currentContext != null ? currentContext.userName : null;
 
       if (Strings.isNullOrEmpty(userEmail) && currentProject != null) {
@@ -86,7 +86,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
         }
         userEmail = selectedUser;
         targetUser = getUserFromEmail(userEmail);
-        if (targetUser != null && currentProject != null && Context.ourCurrentContext == null) {
+        if (targetUser != null && currentProject != null && Context.currentContext == null) {
           PropertiesComponent.getInstance(currentProject).setValue(GCP_USER, userEmail);
         }
       }
@@ -170,12 +170,12 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
     if (activeWindow != null) {
       result = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(activeWindow));
     }
-    return result != null ? result : ourCurrentProject;
+    return result != null ? result : currentProject;
   }
 
   @VisibleForTesting
   static void setCurrentProject(Project project) {
-    ourCurrentProject = project;
+    currentProject = project;
   }
 
   /**
@@ -185,7 +185,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
    */
   @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
   public static class Context {
-    private static Context ourCurrentContext = null;
+    private static Context currentContext = null;
     private String userName;
 
     private Context(@Nullable String userName) {
@@ -194,14 +194,14 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
 
     public static Context create(@Nullable String userName) {
       Context newContext = new Context(userName);
-      assert ourCurrentContext == null;
-      ourCurrentContext = newContext;
+      assert currentContext == null;
+      currentContext = newContext;
       return newContext;
     }
 
     public void close() {
-      if (ourCurrentContext == this) {
-        ourCurrentContext = null;
+      if (currentContext == this) {
+        currentContext = null;
       }
     }
   }
