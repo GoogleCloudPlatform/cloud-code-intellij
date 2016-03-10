@@ -210,7 +210,7 @@ public class NamedResourceInspection extends EndpointInspectionBase {
    * LocalQuickFix to add a query name to an @Named without a specified query name.
    */
   public class MissingNameQuickFix implements LocalQuickFix {
-    private final String DEFAULT_PARAMETER_NAME = "myName";
+    private static final String DEFAULT_PARAMETER_NAME = "myName";
 
     @NotNull
     @Override
