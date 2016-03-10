@@ -33,6 +33,8 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,6 +93,8 @@ public class FullMethodNameInspection extends EndpointInspectionBase  {
        * Checks that the API method name specified in @APiMethod's name attribute is unique.
        * API methods.
        */
+      @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                          justification = "PsiMethod.getModifierList() is @NotNull")
       private void validateBackendMethodNameUnique(PsiMethod psiMethod, Map<String, PsiMethod> apiMethodNames) {
         // Check if method is a public or non-static
         if(!EndpointUtilities.isApiMethod(psiMethod)) {
@@ -154,7 +158,12 @@ public class FullMethodNameInspection extends EndpointInspectionBase  {
       }
 
       PsiAnnotation annotation = (PsiAnnotation)element;
-      if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD)) {
+      String annotationQualifiedName = annotation.getQualifiedName();
+      if (annotationQualifiedName == null) {
+        return;
+      }
+
+      if(!annotationQualifiedName.equals(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD)) {
         return;
       }
 

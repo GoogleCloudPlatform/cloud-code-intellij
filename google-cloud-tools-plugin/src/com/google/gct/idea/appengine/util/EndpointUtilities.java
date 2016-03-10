@@ -26,6 +26,8 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -74,8 +76,10 @@ public class EndpointUtilities {
    * @param psiMethod PsiMethod to be parsed.
    * @return  Returns true is a method is public but not static. Returns false otherwise.
    */
+  @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                      justification = "PsiMethod.getModifierList() is @NotNull")
   public static boolean isApiMethod(@NonNls PsiMethod psiMethod) {
-    PsiModifierList psiModifierList =  psiMethod.getModifierList();
+    PsiModifierList psiModifierList = psiMethod.getModifierList();
     if(psiModifierList.hasModifierProperty(PsiModifier.PUBLIC) &&
        !psiModifierList.hasModifierProperty(PsiModifier.STATIC)) {
       return true;
@@ -90,6 +94,8 @@ public class EndpointUtilities {
     return word.replaceAll("[.]+",".");
   }
 
+  @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                      justification = "PsiMethod.getModifierList() is @NotNull")
   public static boolean isPublicNullaryConstructor(PsiMethod method) {
     if(!method.isConstructor()) {
       return false;

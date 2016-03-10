@@ -29,6 +29,9 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,12 +73,19 @@ public class ApiNamespaceInspection extends EndpointInspectionBase{
        * OwnerName and OwnerDomain attributes are not specified.
        */
       @Override
+      @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+                          justification = "PsiAnnotation.findAttributeValue() will not return null in our case")
       public void visitAnnotation(PsiAnnotation annotation) {
         if (!EndpointUtilities.isEndpointClass(annotation)) {
           return;
         }
 
-        if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE)) {
+        String annotationQualifiedName = annotation.getQualifiedName();
+        if (annotationQualifiedName == null) {
+          return;
+        }
+
+        if(!annotationQualifiedName.equals(GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE)) {
           return;
         }
 
@@ -155,8 +165,12 @@ public class ApiNamespaceInspection extends EndpointInspectionBase{
       }
 
       PsiAnnotation annotation = (PsiAnnotation)psiElement;
+      String annotationQualifiedName = annotation.getQualifiedName();
+      if (annotationQualifiedName == null) {
+        return;
+      }
 
-      if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE)) {
+      if(!annotationQualifiedName.equals(GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE)) {
         return;
       }
 
