@@ -34,6 +34,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBCheckBox;
@@ -105,16 +106,8 @@ public class CloudAttachDialog extends DialogWrapper {
         if (syncStashCheckbox.isVisible()) {
           warningHeader.setVisible(!syncStashCheckbox.isSelected());
           warningMessage.setVisible(!syncStashCheckbox.isSelected());
-          if (syncStashCheckbox.isSelected()) {
-            setOKButtonText(isContinued()
-                            ? GctBundle.getString("clouddebug.continuesession")
-                            : GctBundle.getString("clouddebug.attach"));
-          }
-          else {
-            setOKButtonText(isContinued()
-                            ? GctBundle.getString("clouddebug.continueanyway")
-                            : GctBundle.getString("clouddebug.attach.anyway"));
-          }
+          // Show force attach text if the user chooses not to sync/stash
+          setOkText(!syncStashCheckbox.isSelected());
         }
       }
     });
@@ -291,11 +284,10 @@ public class CloudAttachDialog extends DialogWrapper {
     syncStashCheckbox.setSelected(false);
     warningHeader.setVisible(false);
     warningMessage.setVisible(false);
+    checkBackgroundSessions();
 
     if (syncResult.needsStash() && syncResult.needsSync()) {
-      setOKButtonText(isContinued()
-          ? GctBundle.getString("clouddebug.continuesession")
-          : GctBundle.getString("clouddebug.attach"));
+      setOkText(false);
       syncStashCheckbox.setVisible(true);
       assert syncResult.getTargetSyncSHA() != null;
       syncStashCheckbox.setText(
@@ -303,34 +295,26 @@ public class CloudAttachDialog extends DialogWrapper {
       syncStashCheckbox.setSelected(true);
     }
     else if (syncResult.needsStash()) {
-      setOKButtonText(isContinued()
-          ? GctBundle.getString("clouddebug.continuesession")
-          : GctBundle.getString("clouddebug.attach"));
+      setOkText(false);
       syncStashCheckbox.setVisible(true);
       syncStashCheckbox.setText(GctBundle.getString("clouddebug.stashbuttontext"));
       syncStashCheckbox.setSelected(true);
     }
     else if (syncResult.needsSync() && syncResult.getTargetSyncSHA() == null) {
-      setOKButtonText(isContinued()
-              ? GctBundle.getString("clouddebug.continueanyway")
-              : GctBundle.getString("clouddebug.attach.anyway"));
+      setOkText(true);
       warningHeader.setVisible(true);
       warningMessage.setVisible(true);
       warningMessage.setText(GctBundle.getString("clouddebug.no.matching.sha"));
     }
     else if (syncResult.needsSync()) {
-      setOKButtonText(isContinued()
-          ? GctBundle.getString("clouddebug.continuesession")
-          : GctBundle.getString("clouddebug.attach"));
+      setOkText(false);
       syncStashCheckbox.setVisible(true);
       assert syncResult.getTargetSyncSHA() != null;
       syncStashCheckbox.setText("Sync to " + syncResult.getTargetSyncSHA().substring(0, 7));
       syncStashCheckbox.setSelected(true);
     }
     else if (!syncResult.hasRemoteRepository()) {
-      setOKButtonText(isContinued()
-          ? GctBundle.getString("clouddebug.continueanyway")
-          : GctBundle.getString("clouddebug.attach.anyway"));
+      setOkText(true);
       warningHeader.setVisible(true);
       warningMessage.setVisible(true);
       if (syncResult.getRepositoryType() != null) {
@@ -342,15 +326,43 @@ public class CloudAttachDialog extends DialogWrapper {
       }
     }
     else {
-      setOKButtonText(isContinued()
+      setOkText(false);
+    }
+  }
+
+  private void setOkText(boolean showForcedWording) {
+    if(showForcedWording) {
+      setOKButtonText(isContinued() && targetMatchesCurrentState()
+          ? GctBundle.getString("clouddebug.continueanyway")
+          : GctBundle.getString("clouddebug.attach.anyway"));
+    } else {
+      setOKButtonText(isContinued() && targetMatchesCurrentState()
           ? GctBundle.getString("clouddebug.continuesession")
           : GctBundle.getString("clouddebug.attach"));
+    }
+  }
+
+  private void checkBackgroundSessions() {
+    boolean hasUnselectedBackgroundSessions = isContinued() && !targetMatchesCurrentState();
+    if(hasUnselectedBackgroundSessions) {
+      warningHeader.setVisible(true);
+      warningMessage.setVisible(true);
+      warningMessage.setText(GctBundle.getString("clouddebug.terminate.background"));
     }
   }
 
   private boolean isContinued() {
     CloudDebugProcessState state = wireup.getInputState();
     return state != null && state.getCurrentServerBreakpointList().size() > 0;
+  }
+
+  private boolean targetMatchesCurrentState() {
+    CloudDebugProcessState state = wireup.getInputState();
+
+    return state != null
+        && targetSelector != null
+        && targetSelector.getSelectedItem() != null
+        && StringUtil.equals(state.getDebuggeeId(), ((DebugTarget) targetSelector.getSelectedItem()).getId());
   }
 
   private void refreshAndClose() {
