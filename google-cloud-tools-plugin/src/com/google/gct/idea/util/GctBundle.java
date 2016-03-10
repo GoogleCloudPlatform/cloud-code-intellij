@@ -30,13 +30,13 @@ import java.util.ResourceBundle;
 public class GctBundle {
   @NonNls
   private static final String BUNDLE_NAME = "messages.CloudToolsBundle";
-  private static Reference<ResourceBundle> ourBundle;
+  private static Reference<ResourceBundle> bundleReference;
 
   private static ResourceBundle getBundle() {
-    ResourceBundle bundle = com.intellij.reference.SoftReference.dereference(ourBundle);
+    ResourceBundle bundle = com.intellij.reference.SoftReference.dereference(bundleReference);
     if (bundle == null) {
       bundle = ResourceBundle.getBundle(BUNDLE_NAME);
-      ourBundle = new SoftReference<ResourceBundle>(bundle);
+      bundleReference = new SoftReference<ResourceBundle>(bundle);
     }
     return bundle;
   }

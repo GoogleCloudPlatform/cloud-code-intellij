@@ -43,7 +43,7 @@ import javax.swing.table.AbstractTableModel;
  */
 class SnapshotsModel extends AbstractTableModel {
 
-  private static final int ourColumnCount = 5;
+  private static final int COLUMN_COUNT = 5;
 
   private final List<Breakpoint> breakpoints;
   private final Set<String> pendingDeletes = new HashSet<String>();
@@ -92,7 +92,7 @@ class SnapshotsModel extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return ourColumnCount;
+    return COLUMN_COUNT;
   }
 
   @Override

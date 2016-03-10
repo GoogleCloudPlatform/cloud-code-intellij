@@ -30,16 +30,16 @@ import java.util.ResourceBundle;
 public class EndpointBundle {
   @NonNls
   private static final String BUNDLE_NAME = "messages.EndpointBundle";
-  private static Reference<ResourceBundle> ourBundle;
+  private static Reference<ResourceBundle> bundleReference;
 
   private static ResourceBundle getBundle() {
     ResourceBundle bundle = null;
-    if (ourBundle != null) {
-      bundle = ourBundle.get();
+    if (bundleReference != null) {
+      bundle = bundleReference.get();
     }
     if (bundle == null) {
       bundle = ResourceBundle.getBundle(BUNDLE_NAME);
-      ourBundle = new SoftReference<ResourceBundle>(bundle);
+      bundleReference = new SoftReference<ResourceBundle>(bundle);
     }
     return bundle;
   }

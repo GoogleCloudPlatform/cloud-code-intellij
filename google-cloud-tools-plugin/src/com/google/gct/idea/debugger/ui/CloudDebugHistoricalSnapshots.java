@@ -319,8 +319,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   private final class SnapshotTimeCellRenderer extends DefaultTableCellRenderer {
-    private final DateFormat ourDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-    private final DateFormat ourDateFormatToday = DateFormat.getTimeInstance(DateFormat.SHORT);
+    private final DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    private final DateFormat dateformatToday = DateFormat.getTimeInstance(DateFormat.SHORT);
     private final Date todayDate;
 
     public SnapshotTimeCellRenderer() {
@@ -345,10 +345,10 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       if (value instanceof Date) {
         Date finalDate = (Date) value;
         if (finalDate.after(todayDate)) {
-          setText(ourDateFormatToday.format(finalDate));
+          setText(dateformatToday.format(finalDate));
         }
         else {
-          setText(ourDateFormat.format(finalDate));
+          setText(dateFormat.format(finalDate));
         }
       }
       else if (value != null) {

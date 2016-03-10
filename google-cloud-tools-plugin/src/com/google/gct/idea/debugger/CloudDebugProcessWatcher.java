@@ -46,7 +46,7 @@ import javax.swing.event.HyperlinkEvent;
  * The poll interval is currently set at 10 seconds.
  */
 public class CloudDebugProcessWatcher implements CloudBreakpointListener {
-  private static final CloudDebugProcessWatcher ourInstance = new CloudDebugProcessWatcher();
+  private static final CloudDebugProcessWatcher instance = new CloudDebugProcessWatcher();
   private CloudDebugGlobalPoller poller = null;
 
   private CloudDebugProcessWatcher() {
@@ -54,7 +54,7 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
 
   @NotNull
   public static CloudDebugProcessWatcher getInstance() {
-    return ourInstance;
+    return instance;
   }
 
   public synchronized void ensureWatcher() {
