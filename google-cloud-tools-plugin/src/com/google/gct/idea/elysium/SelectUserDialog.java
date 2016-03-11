@@ -18,19 +18,25 @@ package com.google.gct.idea.elysium;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.login.IntellijGoogleLoginService;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.DocumentAdapter;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.Window;
+
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
-import java.awt.*;
 
 /**
- * A dialog that prompts the user to select a {@link com.google.gct.login.GoogleLogin}
- * or click "Login Manually" to continue without {@link com.google.gct.login.GoogleLogin} credentials.
+ * A dialog that prompts the user to select a {@link IntellijGoogleLoginService}
+ * or click "Login Manually" to continue without {@link IntellijGoogleLoginService} credentials.
  */
 public class SelectUserDialog extends DialogWrapper {
 

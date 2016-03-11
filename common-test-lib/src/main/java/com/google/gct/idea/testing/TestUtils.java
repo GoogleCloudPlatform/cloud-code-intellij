@@ -22,6 +22,7 @@ import com.intellij.util.pico.DefaultPicoContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mockito.Mockito;
+import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoContainer;
 
 import java.io.ByteArrayOutputStream;
@@ -116,6 +117,16 @@ public class TestUtils {
       }
       return parentDisposableForCleanup;
     }
+  }
+
+  @NotNull
+  public static <T> T installMockService(@NotNull Class<T> serviceInterface) {
+    T mock = Mockito.mock(serviceInterface);
+    MutablePicoContainer picoContainer = (MutablePicoContainer)
+        ApplicationManager.getApplication().getPicoContainer();
+    picoContainer.unregisterComponent(serviceInterface.getName());
+    picoContainer.registerComponentInstance(serviceInterface.getName(), mock);
+    return mock;
   }
 
   @NotNull

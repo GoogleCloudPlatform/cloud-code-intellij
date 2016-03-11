@@ -19,7 +19,6 @@ package com.google.gct.idea.git;
 import com.google.gct.idea.elysium.SelectUserDialog;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLogin;
-import com.google.gct.login.MockGoogleLogin;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.components.ServiceManager;
@@ -54,8 +53,7 @@ public class GcpHttpAuthProviderTest extends LightIdeaTestCase {
     super.setUp();
     myDialogManager = (TestDialogManager)ServiceManager.getService(DialogManager.class);
 
-    myGoogleLogin = new MockGoogleLogin();
-    myGoogleLogin.install();
+    GoogleLoginService mockLoginService = TestUtils.installMockService(GoogleLoginService.class);
 
     GoogleLoginState googleLoginState = Mockito.mock(GoogleLoginState.class);
     CredentialedUser user = Mockito.mock(CredentialedUser.class);
@@ -64,7 +62,7 @@ public class GcpHttpAuthProviderTest extends LightIdeaTestCase {
     when(user.getEmail()).thenReturn(USER);
     when(user.getGoogleLoginState()).thenReturn(googleLoginState);
     when(googleLoginState.fetchAccessToken()).thenReturn(PASSWORD);
-    when(GoogleLogin.getInstance().getAllUsers()).thenReturn(allusers);
+    when(mockLoginService.getAllUsers()).thenReturn(allusers);
     allusers.put(USER, user);
 
     PropertiesComponent.getInstance(ourProject).unsetValue(CACHE_KEY);

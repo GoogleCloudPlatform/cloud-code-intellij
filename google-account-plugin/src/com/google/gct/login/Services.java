@@ -13,25 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.gct.login;
 
-import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 
-import org.mockito.Mockito;
+import com.intellij.openapi.components.ServiceManager;
 
 /**
- * Helper to install a mock googleLogin
+ * TODO: Describe this class well.
  */
-@VisibleForTesting
-public class MockGoogleLogin {
-  GoogleLogin googleLogin;
+public class Services {
 
-  public void install() {
-    googleLogin = GoogleLogin.getInstance();
-    GoogleLogin.setInstance(Mockito.mock(GoogleLogin.class));
-  }
-
-  public void cleanup() {
-    GoogleLogin.setInstance(googleLogin);
+  public static GoogleLoginService getLoginService() {
+    return ServiceManager.getService(GoogleLoginService.class);
   }
 }

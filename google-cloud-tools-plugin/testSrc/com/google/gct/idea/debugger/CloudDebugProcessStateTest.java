@@ -15,16 +15,21 @@
  */
 package com.google.gct.idea.debugger;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.api.services.clouddebugger.model.FormatMessage;
 import com.google.api.services.clouddebugger.model.ListBreakpointsResponse;
 import com.google.api.services.clouddebugger.model.SourceLocation;
 import com.google.api.services.clouddebugger.model.StatusMessage;
+import com.google.gct.idea.testing.TestUtils;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
-import com.google.gct.login.MockGoogleLogin;
+import com.google.gct.login.GoogleLoginService;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
+
 import com.intellij.mock.MockProjectEx;
 import com.intellij.psi.PsiManager;
 import com.intellij.testFramework.IdeaTestCase;
@@ -32,6 +37,7 @@ import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.util.xmlb.XmlSerializer;
+
 import org.jdom.Element;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -43,10 +49,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
-
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link com.google.gct.idea.debugger.CloudDebugProcessState}
@@ -117,8 +119,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     PsiManager psiManager = Mockito.mock(PsiManager.class);
     project.registerService(PsiManager.class, psiManager);
 
-    MockGoogleLogin googleLogin = new MockGoogleLogin();
-    googleLogin.install();
+    GoogleLoginService mockLoginService = TestUtils.installMockService(GoogleLoginService.class);
 
     GoogleLoginState googleLoginState = Mockito.mock(GoogleLoginState.class);
     CredentialedUser user = Mockito.mock(CredentialedUser.class);
@@ -127,7 +128,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     when(user.getEmail()).thenReturn(USER);
     when(user.getGoogleLoginState()).thenReturn(googleLoginState);
     when(googleLoginState.fetchAccessToken()).thenReturn(PASSWORD);
-    when(GoogleLogin.getInstance().getAllUsers()).thenReturn(allusers);
+    when(mockLoginService.getAllUsers()).thenReturn(allusers);
     allusers.put(USER, user);
   }
 

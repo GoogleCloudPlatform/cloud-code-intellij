@@ -20,7 +20,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.elysium.SelectUserDialog;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.Services;
+
 import com.intellij.ide.DataManager;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -32,15 +33,17 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 import com.intellij.util.AuthData;
-import git4idea.DialogManager;
-import git4idea.remote.GitHttpAuthDataProvider;
-import git4idea.repo.GitRemote;
-import git4idea.repo.GitRepository;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Window;
 import java.io.IOException;
+
+import git4idea.DialogManager;
+import git4idea.remote.GitHttpAuthDataProvider;
+import git4idea.repo.GitRemote;
+import git4idea.repo.GitRepository;
 
 /**
  * Provides credential information for URLs pointing to Google's cloud source.
@@ -145,7 +148,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
       return null;
     }
 
-    for (CredentialedUser user : GoogleLogin.getInstance().getAllUsers().values()) {
+    for (CredentialedUser user : Services.getLoginService().getAllUsers().values()) {
       if (email != null && email.equalsIgnoreCase(user.getEmail())) {
         return user;
       }
