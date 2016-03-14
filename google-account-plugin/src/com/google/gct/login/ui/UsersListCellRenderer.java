@@ -17,7 +17,7 @@ package com.google.gct.login.ui;
 
 import com.google.api.client.util.Maps;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.Services;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
@@ -114,7 +114,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     }
 
     final UsersListItem usersListItem = (UsersListItem)value;
-    final CredentialedUser activeUser = GoogleLogin.getInstance().getActiveUser();
+    final CredentialedUser activeUser = Services.getLoginService().getActiveUser();
     final boolean isActiveUserSelected = activeUser != null && usersListItem.getUserEmail().equals(activeUser.getEmail());
 
     JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, HGAP, VGAP));

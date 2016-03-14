@@ -16,13 +16,21 @@
 package com.google.gct.login.ui;
 
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.Services;
+
 import com.intellij.ui.components.JBScrollPane;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 /**
  * An empty Google Login Panel that displays an option to log in at the bottom.
@@ -61,12 +69,12 @@ public class GoogleLoginEmptyPanel extends JPanel {
   }
 
   private static boolean needsToSignIn() {
-    Map<String, CredentialedUser> users = GoogleLogin.getInstance().getAllUsers();
+    Map<String, CredentialedUser> users = Services.getLoginService().getAllUsers();
     return users == null || users.isEmpty();
   }
 
   protected void doLogin() {
-    GoogleLogin.getInstance().logIn();
+    Services.getLoginService().logIn();
   }
 
   protected JBScrollPane getContentPane() {

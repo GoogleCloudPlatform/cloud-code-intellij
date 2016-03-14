@@ -10,10 +10,9 @@ import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.idea.testing.BasePluginTestCase;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.GoogleLoginService;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,8 +32,8 @@ public class CloudDebuggerClientTest extends BasePluginTestCase {
 
   @Before
   public void setUp() {
-    GoogleLogin mockLogin = Mockito.mock(GoogleLogin.class);
-    GoogleLogin.setInstance(mockLogin);
+    GoogleLoginService mockLogin = Mockito.mock(GoogleLoginService.class);
+    registerService(GoogleLoginService.class, mockLogin);
     registerService(CloudToolsPluginInfoService.class, mockInfoService);
     LinkedHashMap<String, CredentialedUser> allUsers = new LinkedHashMap<String, CredentialedUser>();
     CredentialedUser user = Mockito.mock(CredentialedUser.class);
@@ -44,11 +43,6 @@ public class CloudDebuggerClientTest extends BasePluginTestCase {
     when(user.getCredential()).thenReturn(credential);
     GoogleLoginState loginState = Mockito.mock(GoogleLoginState.class);
     when(user.getGoogleLoginState()).thenReturn(loginState);
-  }
-
-  @After
-  public void unsetLogin() {
-    GoogleLogin.setInstance(null);
   }
 
   @Test

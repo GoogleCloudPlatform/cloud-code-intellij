@@ -29,7 +29,7 @@ import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.Services;
 import com.google.gdt.eclipse.login.common.LoginListener;
 
 import com.intellij.openapi.components.ServiceManager;
@@ -99,7 +99,7 @@ public class CloudDebuggerClient {
     Debugger cloudDebuggerClient = debuggerClientsFromUserEmail.get(hashkey);
     if (cloudDebuggerClient == null) {
       try {
-        final CredentialedUser user = GoogleLogin.getInstance().getAllUsers().get(userEmail);
+        final CredentialedUser user = Services.getLoginService().getAllUsers().get(userEmail);
         final Credential credential = (user != null ? user.getCredential() : null);
         if (credential != null) {
           user.getGoogleLoginState().addLoginListener(new LoginListener() {

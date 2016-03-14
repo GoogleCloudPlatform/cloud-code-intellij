@@ -20,23 +20,36 @@ import com.google.gct.idea.ui.CustomizableComboBox;
 import com.google.gct.idea.ui.CustomizableComboBoxPopup;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
 import com.google.gct.login.IGoogleLoginCompletedCallback;
+import com.google.gct.login.IntellijGoogleLoginService;
+import com.google.gct.login.Services;
 import com.google.gct.login.ui.GoogleLoginEmptyPanel;
+
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBList;
+
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * A custom combobox that allows the user to select a GoogleLogin and also signin/add-account all within a single control.
@@ -56,7 +69,7 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
   /**
    * Returns the selected credentialed user for the project id represented by getText().
    * Note that if the ProjectSelector is created with queryOnExpand, this value could be {@code null} even
-   * if {@link #getText()} represents a valid project because the user has not expanded the owning {@link com.google.gct.login.GoogleLogin}.
+   * if {@link #getText()} represents a valid project because the user has not expanded the owning {@link IntellijGoogleLoginService}.
    */
   @Nullable
   public CredentialedUser getSelectedUser() {
@@ -64,7 +77,7 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
       return null;
     }
 
-    for(CredentialedUser user : GoogleLogin.getInstance().getAllUsers().values()) {
+    for(CredentialedUser user : Services.getLoginService().getAllUsers().values()) {
       if (user.getEmail() != null && user.getEmail().equalsIgnoreCase(getText())) {
         return user;
       }
@@ -84,7 +97,7 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
   }
 
   private static boolean needsToSignIn() {
-    Map<String, CredentialedUser> users = GoogleLogin.getInstance().getAllUsers();
+    Map<String, CredentialedUser> users = Services.getLoginService().getAllUsers();
 
     return users.isEmpty();
   }
@@ -131,7 +144,7 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
       jList.setOpaque(false);
       jList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       jList.setCellRenderer(this);
-      for(CredentialedUser user : GoogleLogin.getInstance().getAllUsers().values()) {
+      for(CredentialedUser user : Services.getLoginService().getAllUsers().values()) {
         model.addElement(user);
         if (user.getEmail() != null && user.getEmail().equalsIgnoreCase(selectedItem)) {
           jList.setSelectedValue(user, true);
@@ -188,15 +201,15 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
 
     @Override
     protected void doLogin() {
-      GoogleLogin.getInstance().logIn(null, new IGoogleLoginCompletedCallback() {
+      Services.getLoginService().logIn(null, new IGoogleLoginCompletedCallback() {
         @Override
         public void onLoginCompleted() {
           SwingUtilities.invokeLater(new Runnable() {
             @SuppressWarnings("ConstantConditions") // This suppresses a nullref warning for GoogleLogin.getInstance().getActiveUser().
             @Override
             public void run() {
-              if (GoogleLogin.getInstance().getActiveUser() != null) {
-                UserSelector.this.setText(GoogleLogin.getInstance().getActiveUser().getEmail());
+              if (Services.getLoginService().getActiveUser() != null) {
+                UserSelector.this.setText(Services.getLoginService().getActiveUser().getEmail());
               }
             }
           });

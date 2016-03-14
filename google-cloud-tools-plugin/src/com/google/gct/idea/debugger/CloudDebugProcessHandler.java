@@ -17,7 +17,7 @@ package com.google.gct.idea.debugger;
 
 import com.google.gct.idea.debugger.ui.LogoutDebugProcessDetacher;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.Services;
 
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.diagnostic.Logger;
@@ -39,7 +39,7 @@ public class CloudDebugProcessHandler extends ProcessHandler {
     if (process != null && process.getProcessState() != null) {
       String userEmail = process.getProcessState().getUserEmail();
       if (userEmail != null) {
-        final CredentialedUser user = GoogleLogin.getInstance().getAllUsers().get(userEmail);
+        final CredentialedUser user = Services.getLoginService().getAllUsers().get(userEmail);
         if (user.getGoogleLoginState() != null) {
           user.getGoogleLoginState()
               .addLoginListener(new LogoutDebugProcessDetacher<CloudDebugProcessHandler>(this));

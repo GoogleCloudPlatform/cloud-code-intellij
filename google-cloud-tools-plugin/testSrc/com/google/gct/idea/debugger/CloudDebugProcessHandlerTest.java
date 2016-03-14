@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import com.google.gct.idea.testing.BasePluginTestCase;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
 import com.google.gct.login.GoogleLoginListener;
+import com.google.gct.login.GoogleLoginService;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 
 import com.intellij.openapi.diagnostic.Logger;
@@ -24,10 +24,12 @@ import java.util.LinkedHashMap;
 public class CloudDebugProcessHandlerTest extends BasePluginTestCase {
 
     private CloudDebugProcessHandler handler = new CloudDebugProcessHandler(null);
+    private GoogleLoginService mockLoginService = mock(GoogleLoginService.class);
 
     @Before
     public void setUp() throws Exception {
         registerExtensionPoint(GoogleLoginListener.EP_NAME, GoogleLoginListener.class);
+        registerService(GoogleLoginService.class, mockLoginService);
     }
 
     @BeforeClass
@@ -62,11 +64,9 @@ public class CloudDebugProcessHandlerTest extends BasePluginTestCase {
         CredentialedUser credentialedUser = mock(CredentialedUser.class);
         when(credentialedUser.getGoogleLoginState()).thenReturn(googleLoginState);
 
-        GoogleLogin googleLogin = mock(GoogleLogin.class);
         LinkedHashMap<String, CredentialedUser> users = new LinkedHashMap<String, CredentialedUser>();
         users.put("mockUser@foo.bar", credentialedUser);
-        when(googleLogin.getAllUsers()).thenReturn(users);
-        GoogleLogin.setInstance(googleLogin);
+        when(mockLoginService.getAllUsers()).thenReturn(users);
 
         CloudDebugProcessState cloudDebugProcessState = mock(CloudDebugProcessState.class);
         when(cloudDebugProcessState.getUserEmail()).thenReturn("mockUser@foo.bar");

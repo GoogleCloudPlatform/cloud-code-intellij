@@ -24,7 +24,7 @@ import com.google.gct.idea.debugger.SyncResult;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.Services;
 import com.google.gct.stats.UsageTrackerProvider;
 
 import com.intellij.dvcs.DvcsUtil;
@@ -178,7 +178,7 @@ public class CloudAttachDialog extends DialogWrapper {
   @Override
   protected ValidationInfo doValidate() {
     // These should not normally occur.
-    if (!GoogleLogin.getInstance().isLoggedIn()) {
+    if (!Services.getLoginService().isLoggedIn()) {
       return new ValidationInfo(GctBundle.getString("clouddebug.nologin"));
     }
 
