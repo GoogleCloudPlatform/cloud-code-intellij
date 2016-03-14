@@ -79,7 +79,7 @@ public class MethodNameInspection extends EndpointInspectionBase {
           return;
         }
 
-        if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD)) {
+        if(!GctConstants.APP_ENGINE_ANNOTATION_API_METHOD.equals(annotation.getQualifiedName())) {
           return;
         }
 

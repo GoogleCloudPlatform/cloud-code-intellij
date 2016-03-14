@@ -80,12 +80,7 @@ public class ApiNameInspection extends EndpointInspectionBase {
           return;
         }
 
-        String annotationQualifiedName = annotation.getQualifiedName();
-        if(annotationQualifiedName == null) {
-          return;
-        }
-
-        if(!annotationQualifiedName.equals(GctConstants.APP_ENGINE_ANNOTATION_API)) {
+        if(!GctConstants.APP_ENGINE_ANNOTATION_API.equals(annotation.getQualifiedName())) {
           return;
         }
 

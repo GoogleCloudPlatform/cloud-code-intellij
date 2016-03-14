@@ -75,7 +75,7 @@ public class ApiNamespaceInspection extends EndpointInspectionBase{
           return;
         }
 
-        if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE)) {
+        if(!GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE.equals(annotation.getQualifiedName())) {
           return;
         }
 
@@ -155,8 +155,7 @@ public class ApiNamespaceInspection extends EndpointInspectionBase{
       }
 
       PsiAnnotation annotation = (PsiAnnotation)psiElement;
-
-      if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE)) {
+      if(!GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE.equals(annotation.getQualifiedName())) {
         return;
       }
 
