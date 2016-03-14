@@ -417,10 +417,8 @@ public class CloudAttachDialog extends DialogWrapper {
       }
     }
 
-    if (syncResult.needsStash()) {
-      if (!stash()) {
-        return;
-      }
+    if (syncResult.needsStash() && !stash()) {
+      return;
     }
 
     if (!Strings.isNullOrEmpty(syncResult.getTargetSyncSHA())) {
