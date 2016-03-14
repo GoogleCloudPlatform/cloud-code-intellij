@@ -152,7 +152,7 @@ public class TestUtils {
       if (out != null) {
         try {
           out.close();
-        } catch (IOException e) {
+        } catch (IOException e) { // NOPMD
           // ignore
         }
       }

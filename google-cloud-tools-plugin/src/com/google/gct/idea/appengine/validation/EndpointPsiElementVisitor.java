@@ -79,10 +79,8 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
     if (apiAnnotation != null) {
       PsiAnnotationMemberValue transformerMember =
         apiAnnotation.findAttributeValue(API_TRANSFORMER_ATTRIBUTE);
-      if(transformerMember != null) {
-        if(!transformerMember.getText().equals("{}")) {
-          return true;
-        }
+      if(transformerMember != null && !transformerMember.getText().equals("{}")) {
+        return true;
       }
     }
 

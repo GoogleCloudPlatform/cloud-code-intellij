@@ -269,7 +269,7 @@ public class CloudDebugProcessStateController {
               // We run after a short period to act as a throttle.
               timer.schedule(new RunnableTimerTask(this), PERIOD_MS);
             }
-            catch (IllegalStateException ex) {
+            catch (IllegalStateException ex) { // NOPMD
               //This can happen in rare race conditions and isn't an error.  We just ignore it.
             }
           }
