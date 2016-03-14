@@ -166,7 +166,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         return null;
       }
 
-      return getSimpleName(project, method.getReturnType()).toLowerCase();
+      String simpleName = getSimpleName(project, method.getReturnType());
+      return simpleName == null ? null : simpleName.toLowerCase();
     }
 
     @Nullable
@@ -448,7 +449,12 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   private String getAttributeFromAnnotation (PsiAnnotation annotation, String annotationType,
     final String attribute) throws InvalidAnnotationException, MissingAttributeException {
 
-    if(annotation.getQualifiedName().equals(annotationType)) {
+    String annotationQualifiedName = annotation.getQualifiedName();
+    if (annotationQualifiedName == null) {
+      throw new InvalidAnnotationException(annotation, annotationType);
+    }
+
+    if(annotationQualifiedName.equals(annotationType)) {
       PsiAnnotationMemberValue annotationMemberValue =  annotation.findAttributeValue(attribute);
       if(annotationMemberValue == null) {
         throw new MissingAttributeException(annotation, attribute);
