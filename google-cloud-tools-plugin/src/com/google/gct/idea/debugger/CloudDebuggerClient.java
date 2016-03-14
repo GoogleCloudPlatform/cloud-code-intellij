@@ -90,6 +90,10 @@ public class CloudDebuggerClient {
    * The function may return null if the user is not logged in.
    */
   @Nullable
+  @edu.umd.cs.findbugs.annotations.SuppressWarnings(
+      value = "AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION",
+      justification = "Tolerable; ok to create and use duplicate or dangling Debugger clients"
+  )
   private static Debugger getClient(final @Nullable String userEmail, final int timeout) {
     if (Strings.isNullOrEmpty(userEmail)) {
       LOG.warn("unexpected null email in controller initialize.");

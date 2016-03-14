@@ -29,6 +29,8 @@ import com.intellij.util.PlatformUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
+
 /**
  * Subclasses of this class will inherit a full implementation of the {@link PluginInfoService}.
  */
@@ -83,14 +85,15 @@ public abstract class BasePluginInfoService implements PluginInfoService {
    */
   @Override
   public boolean shouldEnable(Feature feature) {
-    if (feature.getSupportedPlatforms() != null &&
-        feature.getSupportedPlatforms().contains(getCurrentPlatform())) {
+    Set<IntelliJPlatform> supportedPlatforms = feature.getSupportedPlatforms();
+    if (supportedPlatforms != null && supportedPlatforms.contains(getCurrentPlatform())) {
       return true;
     }
     if (Boolean.parseBoolean(flagReader.getFlagString(feature.getResourceFlagName()))) {
       return true;
     }
-    if (Boolean.getBoolean(feature.getSystemFlagName())) {
+    String flagName = feature.getSystemFlagName();
+    if (flagName != null && Boolean.getBoolean(flagName)) {
       return true;
     }
     return false;

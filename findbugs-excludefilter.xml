@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!--
+    Suppress the following warnings:
+      1. Inefficient 'new String("plain string")' constructor
+      2. Redundant null checking of known non-null value
+  -->
+  <Match>
+    <Bug pattern="DM_STRING_CTOR, RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
+  </Match>
+</FindBugsFilter>

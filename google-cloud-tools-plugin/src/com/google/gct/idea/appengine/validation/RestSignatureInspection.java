@@ -490,7 +490,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
    * that does not have @Nullable/@Default.
    */
   private String getPathParameter(PsiMethod method) {
-    String path = "";
+    StringBuilder path = new StringBuilder();
     EndpointPsiElementVisitor elementVisitor = new EndpointPsiElementVisitor();
     List<String> annotions =
       Arrays.asList(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE, "javax.annotation.Nullable", GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
@@ -508,11 +508,11 @@ public class RestSignatureInspection extends EndpointInspectionBase {
 
       PsiAnnotationMemberValue namedValue = elementVisitor.getNamedAnnotationValue(aParameter);
       if(namedValue != null) {
-        path += "/{}";
+        path.append("/{}");
       }
     }
 
-    return path;
+    return path.toString();
   }
 
   /**
