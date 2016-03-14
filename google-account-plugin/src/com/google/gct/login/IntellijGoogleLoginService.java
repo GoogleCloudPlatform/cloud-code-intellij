@@ -457,18 +457,20 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
 
     @Override
     public boolean askYesOrNo(String title, String message) {
-      String updatedMessage = message;
+      StringBuilder updatedMessageBuilder = new StringBuilder(message);
       if (message.equals("Are you sure you want to sign out?")) {
-        updatedMessage += " This will sign out all logged in users.";
+        updatedMessageBuilder.append(" This will sign out all logged in users.");
         for (GoogleLoginMessageExtender messageExtender : messageExtenders) {
           String additionalLogoutMessage = messageExtender.additionalLogoutMessage();
           if (!Strings.isNullOrEmpty(additionalLogoutMessage)) {
-            updatedMessage += " " + additionalLogoutMessage;
+            updatedMessageBuilder.append(" ").append(additionalLogoutMessage);
           }
         }
       }
-      updatedMessage = WordUtils.wrap(updatedMessage, WRAP_LENGTH, /* newLinestr */ null, /* wrapLongWords */ false);
-      return (Messages.showYesNoDialog(updatedMessage, title, GoogleLoginIcons.GOOGLE_FAVICON) == Messages.YES);
+      String updatedMessage = WordUtils.wrap(
+        updatedMessageBuilder.toString(), WRAP_LENGTH, /* newLinestr */ null, /* wrapLongWords */ false);
+      return (Messages.showYesNoDialog(
+        updatedMessage, title, GoogleLoginIcons.GOOGLE_FAVICON) == Messages.YES);
     }
 
     @Override
@@ -516,7 +518,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     public void initializeUsers() {
       String activeUserString = GoogleLoginPrefs.getActiveUser();
       List<String> allUsers = GoogleLoginPrefs.getStoredUsers();
-      String removedUsers = "";
+      StringBuilder removedUsers = new StringBuilder();
 
       for (String aUser : allUsers) {
         // Add a new user, so that loadOAuth called from the GoogleLoginState constructor
@@ -529,7 +531,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
 
         // delegate will be null if current scopes differ from scopes with users saved auth credentials
         if(delegate == null) {
-          removedUsers += aUser + ", ";
+          removedUsers.append(aUser).append(", ");
           if(aUser.equals(activeUserString)) {
             activeUserString = null;
           }
@@ -561,7 +563,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
       }
 
       // Log removed users
-      if (!removedUsers.isEmpty()) {
+      if (removedUsers.length() != 0) {
         LOG.info("The following user(s) had expired authentication scopes: "
             + removedUsers
             + "and have been logged out.");

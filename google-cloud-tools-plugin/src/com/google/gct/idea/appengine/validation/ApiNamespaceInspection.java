@@ -185,8 +185,6 @@ public class ApiNamespaceInspection extends EndpointInspectionBase{
       } else if (!ownerDomain.isEmpty() && ownerName.isEmpty()) {
         addOwnerNameAttribute(project, annotation);
       }
-
-      return;
     }
 
     private void addOwnerDomainAttribute(@NotNull final Project project, final PsiAnnotation annotation) {

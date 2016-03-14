@@ -60,10 +60,4 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
   public File getDestinationFolder() {
     return new File(destinationFolderChooser.getText());
   }
-
-  @Override
-  protected void doOKAction() {
-
-    super.doOKAction();
-  }
 }

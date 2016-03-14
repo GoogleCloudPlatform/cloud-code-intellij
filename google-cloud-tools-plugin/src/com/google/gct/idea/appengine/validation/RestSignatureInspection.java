@@ -297,16 +297,14 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
         httpMethod = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "httpMethod");
-      } catch (InvalidAnnotationException e) {
+      } catch (InvalidAnnotationException e) { // NOPMD
         // do nothing
       } catch (MissingAttributeException e) {
         break;
       }
 
-      if (httpMethod != null) {
-        if (!httpMethod.isEmpty()) {
-          return httpMethod;
-        }
+      if (httpMethod != null && !httpMethod.isEmpty()) {
+        return httpMethod;
       }
     }
 
@@ -329,7 +327,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
         path = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "path");
-      } catch (InvalidAnnotationException e) {
+      } catch (InvalidAnnotationException e) { // NOPMD
         // do nothing
       } catch (MissingAttributeException e) {
         break;
@@ -409,17 +407,15 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try{
         resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, "resource");
-      } catch (InvalidAnnotationException e) {
+      } catch (InvalidAnnotationException e) { // NOPMD
         // do nothing
       } catch (MissingAttributeException e) {
         break;
       }
 
-      if(resource != null) {
-        // resource attribute is "" by default
-        if(!resource.isEmpty()) {
-          return resource;
-        }
+      // resource attribute is "" by default
+      if(resource != null && !resource.isEmpty()) {
+        return resource;
       }
     }
 
@@ -427,8 +423,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
         resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API, "resource");
-      } catch (InvalidAnnotationException e) {
-        // do nothing;
+      } catch (InvalidAnnotationException e) { // NOPMD
+        // do nothing
       } catch (MissingAttributeException e) {
         break;
       }

@@ -152,7 +152,7 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
     String name = type.getCanonicalText();
     if (name.matches("List<.+>")) {
       return true;
-    };
+    }
     return false;
   }
 }

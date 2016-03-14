@@ -630,10 +630,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
           continue;
         }
         StatusMessage status = bp.getStatus();
-        if (status != null) {
-          if (Boolean.TRUE.equals(status.getIsError())) {
-            continue;
-          }
+        if (status != null && Boolean.TRUE.equals(status.getIsError())) {
+          continue;
         }
         String id = bp.getId();
         // todo: getModel should be newModel
@@ -642,7 +640,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         if (newModelNewlyReceived && !oldModelNewlyReceived) {
           rowForPopup = row;
         }
-        break;
+        break; // NOPMD
       }
       if (rowForPopup != -1) {
         UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "snapshot.received", null);

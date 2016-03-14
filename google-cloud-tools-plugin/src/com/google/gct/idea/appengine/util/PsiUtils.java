@@ -46,7 +46,7 @@ public class PsiUtils {
     for (PsiClass cls : classes) {
       PsiModifierList modifierList = cls.getModifierList();
       if (modifierList != null && modifierList.hasExplicitModifier(PsiModifier.PUBLIC)) {
-        if (AnnotationUtil.isAnnotated(cls, annotationFqn, false)) {
+        if (AnnotationUtil.isAnnotated(cls, annotationFqn, false)) { // NOPMD
           return cls;
         }
       }

@@ -168,7 +168,7 @@ public class CloudDebugGlobalPoller {
         changed = !Strings.isNullOrEmpty(oldToken);
       }
     }
-    catch(SocketTimeoutException sto) {
+    catch(SocketTimeoutException sto) { // NOPMD
       //noop, this is expected behavior.
     } catch (GoogleJsonResponseException e) {
       // HTTP 409 is expected when backend responds to "hanging query" either for timeout or because
