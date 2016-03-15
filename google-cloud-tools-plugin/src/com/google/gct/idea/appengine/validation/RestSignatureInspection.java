@@ -166,7 +166,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         return null;
       }
 
-      return getSimpleName(project, method.getReturnType()).toLowerCase();
+      String simpleName = getSimpleName(project, method.getReturnType());
+      return simpleName == null ? null : simpleName.toLowerCase();
     }
 
     @Nullable
@@ -296,16 +297,14 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
         httpMethod = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "httpMethod");
-      } catch (InvalidAnnotationException e) {
+      } catch (InvalidAnnotationException e) { // NOPMD
         // do nothing
       } catch (MissingAttributeException e) {
         break;
       }
 
-      if (httpMethod != null) {
-        if (!httpMethod.isEmpty()) {
-          return httpMethod;
-        }
+      if (httpMethod != null && !httpMethod.isEmpty()) {
+        return httpMethod;
       }
     }
 
@@ -328,7 +327,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
         path = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "path");
-      } catch (InvalidAnnotationException e) {
+      } catch (InvalidAnnotationException e) { // NOPMD
         // do nothing
       } catch (MissingAttributeException e) {
         break;
@@ -408,17 +407,15 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try{
         resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, "resource");
-      } catch (InvalidAnnotationException e) {
+      } catch (InvalidAnnotationException e) { // NOPMD
         // do nothing
       } catch (MissingAttributeException e) {
         break;
       }
 
-      if(resource != null) {
-        // resource attribute is "" by default
-        if(!resource.isEmpty()) {
-          return resource;
-        }
+      // resource attribute is "" by default
+      if(resource != null && !resource.isEmpty()) {
+        return resource;
       }
     }
 
@@ -426,8 +423,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
         resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API, "resource");
-      } catch (InvalidAnnotationException e) {
-        // do nothing;
+      } catch (InvalidAnnotationException e) { // NOPMD
+        // do nothing
       } catch (MissingAttributeException e) {
         break;
       }
@@ -448,7 +445,12 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   private String getAttributeFromAnnotation (PsiAnnotation annotation, String annotationType,
     final String attribute) throws InvalidAnnotationException, MissingAttributeException {
 
-    if(annotation.getQualifiedName().equals(annotationType)) {
+    String annotationQualifiedName = annotation.getQualifiedName();
+    if (annotationQualifiedName == null) {
+      throw new InvalidAnnotationException(annotation, annotationType);
+    }
+
+    if(annotationQualifiedName.equals(annotationType)) {
       PsiAnnotationMemberValue annotationMemberValue =  annotation.findAttributeValue(attribute);
       if(annotationMemberValue == null) {
         throw new MissingAttributeException(annotation, attribute);
@@ -488,7 +490,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
    * that does not have @Nullable/@Default.
    */
   private String getPathParameter(PsiMethod method) {
-    String path = "";
+    StringBuilder path = new StringBuilder();
     EndpointPsiElementVisitor elementVisitor = new EndpointPsiElementVisitor();
     List<String> annotions =
       Arrays.asList(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE, "javax.annotation.Nullable", GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
@@ -506,11 +508,11 @@ public class RestSignatureInspection extends EndpointInspectionBase {
 
       PsiAnnotationMemberValue namedValue = elementVisitor.getNamedAnnotationValue(aParameter);
       if(namedValue != null) {
-        path += "/{}";
+        path.append("/{}");
       }
     }
 
-    return path;
+    return path.toString();
   }
 
   /**

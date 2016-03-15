@@ -19,7 +19,6 @@ package com.google.gct.idea.appengine.util;
 import com.google.gct.idea.appengine.GctConstants;
 
 import com.intellij.codeInsight.AnnotationUtil;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;

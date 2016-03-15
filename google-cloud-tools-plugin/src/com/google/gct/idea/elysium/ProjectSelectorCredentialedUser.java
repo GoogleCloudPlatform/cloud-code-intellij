@@ -17,7 +17,6 @@ package com.google.gct.idea.elysium;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.hash.HashMap;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;

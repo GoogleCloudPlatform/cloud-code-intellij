@@ -72,7 +72,7 @@ public class GoogleUsageTracker implements UsageTracker {
                            @Nullable String eventLabel,
                            @Nullable Integer eventValue) {
         if (!ApplicationManager.getApplication().isUnitTestMode()) {
-            if (UsageTrackerManager.getInstance().isTrackingEnabled()) {
+            if (UsageTrackerManager.getInstance().isTrackingEnabled()) { // NOPMD
                 ArrayList postData = Lists.newArrayList(analyticsBaseData);
                 postData.add(new BasicNameValuePair("tid", analyticsId));
                 postData.add(new BasicNameValuePair(INTELLIJ_EDITION, PlatformUtils.isCommunityEdition() ? "community" : "ultimate"));

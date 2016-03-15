@@ -183,7 +183,7 @@ class ProjectDebuggeeBinding {
                       perModuleCache.put(key, item);
                     }
                     if (inputState != null && !Strings.isNullOrEmpty(inputState.getDebuggeeId())) {
-                      if (inputState.getDebuggeeId().equals(item.getId())) {
+                      if (inputState.getDebuggeeId().equals(item.getId())) { // NOPMD
                         targetSelection = item;
                       }
                     }

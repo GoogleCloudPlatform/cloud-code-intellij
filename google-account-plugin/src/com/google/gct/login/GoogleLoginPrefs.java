@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.gdt.eclipse.login.common.OAuthData;
 
 import com.intellij.openapi.diagnostic.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -99,7 +100,7 @@ public class GoogleLoginPrefs {
    * Clears the persistently stored {@link OAuthData} object for the active user, if any.
    */
   public static void clearStoredOAuthData() {
-    CredentialedUser activeUser = GoogleLogin.getInstance().getActiveUser();
+    CredentialedUser activeUser = Services.getLoginService().getActiveUser();
     if(activeUser == null) {
       return;
     }
@@ -229,7 +230,7 @@ public class GoogleLoginPrefs {
   }
 
   private static String getCustomUserKey(String key) {
-     CredentialedUser activeUser = GoogleLogin.getInstance().getActiveUser();
+     CredentialedUser activeUser = Services.getLoginService().getActiveUser();
      if(activeUser == null) {
        return key;
      }

@@ -25,9 +25,10 @@ import com.google.gct.idea.debugger.CloudDebugProcessState;
 import com.google.gct.idea.debugger.ProjectRepositoryValidator;
 import com.google.gct.idea.debugger.SyncResult;
 import com.google.gct.idea.elysium.ProjectSelector;
+import com.google.gct.idea.testing.TestUtils;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
-import com.google.gct.login.MockGoogleLogin;
+import com.google.gct.login.GoogleLoginService;
+import com.google.gct.login.Services;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 
 import com.intellij.openapi.project.Project;
@@ -227,8 +228,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   }
 
   private void mockCredentials() throws Exception {
-    MockGoogleLogin googleLogin = new MockGoogleLogin();
-    googleLogin.install();
+    GoogleLoginService mockLoginService = TestUtils.installMockService(GoogleLoginService.class);
 
     GoogleLoginState googleLoginState = mock(GoogleLoginState.class);
     Credential credential = mock(Credential.class);
@@ -239,16 +239,16 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     when(this.user.getEmail()).thenReturn(USER);
     when(this.user.getGoogleLoginState()).thenReturn(googleLoginState);
     when(googleLoginState.fetchAccessToken()).thenReturn(PASSWORD);
-    when(GoogleLogin.getInstance().getAllUsers()).thenReturn(allusers);
+    when(mockLoginService.getAllUsers()).thenReturn(allusers);
     allusers.put(USER, this.user);
   }
 
   private void mockLoggedOutUser() {
-    when(GoogleLogin.getInstance().isLoggedIn()).thenReturn(false);
+    when(Services.getLoginService().isLoggedIn()).thenReturn(false);
   }
 
   private void mockLoggedInUser() {
-    when(GoogleLogin.getInstance().isLoggedIn()).thenReturn(true);
+    when(Services.getLoginService().isLoggedIn()).thenReturn(true);
   }
 
   /**

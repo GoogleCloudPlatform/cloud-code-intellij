@@ -24,7 +24,7 @@ import com.google.gct.idea.debugger.SyncResult;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.Services;
 import com.google.gct.stats.UsageTrackerProvider;
 
 import com.intellij.dvcs.DvcsUtil;
@@ -178,7 +178,7 @@ public class CloudAttachDialog extends DialogWrapper {
   @Override
   protected ValidationInfo doValidate() {
     // These should not normally occur.
-    if (!GoogleLogin.getInstance().isLoggedIn()) {
+    if (!Services.getLoginService().isLoggedIn()) {
       return new ValidationInfo(GctBundle.getString("clouddebug.nologin"));
     }
 
@@ -377,7 +377,9 @@ public class CloudAttachDialog extends DialogWrapper {
     }
 
     final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
-    if (changeListManager.isFreezedWithNotification("Can not stash changes now")) return false;
+    if (changeListManager.isFreezedWithNotification("Can not stash changes now")) {
+      return false;
+    }
 
     final GitLineHandler handler = new GitLineHandler(project, sourceRepository.getRoot(), GitCommand.STASH);
     handler.addParameters("save");
@@ -417,10 +419,8 @@ public class CloudAttachDialog extends DialogWrapper {
       }
     }
 
-    if (syncResult.needsStash()) {
-      if (!stash()) {
-        return;
-      }
+    if (syncResult.needsStash() && !stash()) {
+      return;
     }
 
     if (!Strings.isNullOrEmpty(syncResult.getTargetSyncSHA())) {

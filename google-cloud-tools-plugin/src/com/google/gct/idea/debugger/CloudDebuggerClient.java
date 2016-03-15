@@ -29,7 +29,7 @@ import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.Services;
 import com.google.gdt.eclipse.login.common.LoginListener;
 
 import com.intellij.openapi.components.ServiceManager;
@@ -90,6 +90,10 @@ public class CloudDebuggerClient {
    * The function may return null if the user is not logged in.
    */
   @Nullable
+  @edu.umd.cs.findbugs.annotations.SuppressWarnings(
+      value = "AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION",
+      justification = "Tolerable; ok to create and use duplicate or dangling Debugger clients"
+  )
   private static Debugger getClient(final @Nullable String userEmail, final int timeout) {
     if (Strings.isNullOrEmpty(userEmail)) {
       LOG.warn("unexpected null email in controller initialize.");
@@ -99,7 +103,7 @@ public class CloudDebuggerClient {
     Debugger cloudDebuggerClient = debuggerClientsFromUserEmail.get(hashkey);
     if (cloudDebuggerClient == null) {
       try {
-        final CredentialedUser user = GoogleLogin.getInstance().getAllUsers().get(userEmail);
+        final CredentialedUser user = Services.getLoginService().getAllUsers().get(userEmail);
         final Credential credential = (user != null ? user.getCredential() : null);
         if (credential != null) {
           user.getGoogleLoginState().addLoginListener(new LoginListener() {

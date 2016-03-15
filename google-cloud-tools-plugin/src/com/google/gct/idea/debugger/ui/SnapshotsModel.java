@@ -70,7 +70,7 @@ class SnapshotsModel extends AbstractTableModel {
           if (tempHashMap.containsKey(newBreakpoint.getId())) {
             Breakpoint previousBreakpoint = tempHashMap.get(newBreakpoint.getId());
             if (Boolean.TRUE.equals(previousBreakpoint.getIsFinalState())) {
-              if (!oldModel.isNewlyReceived(previousBreakpoint.getId())) {
+              if (!oldModel.isNewlyReceived(previousBreakpoint.getId())) { // NOPMD
                 continue;
               }
             }

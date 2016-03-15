@@ -154,7 +154,7 @@ public class FullMethodNameInspection extends EndpointInspectionBase  {
       }
 
       PsiAnnotation annotation = (PsiAnnotation)element;
-      if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD)) {
+      if(!GctConstants.APP_ENGINE_ANNOTATION_API_METHOD.equals(annotation.getQualifiedName())) {
         return;
       }
 

@@ -79,7 +79,7 @@ public class MethodNameInspection extends EndpointInspectionBase {
           return;
         }
 
-        if(!annotation.getQualifiedName().equals(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD)) {
+        if(!GctConstants.APP_ENGINE_ANNOTATION_API_METHOD.equals(annotation.getQualifiedName())) {
           return;
         }
 
@@ -127,7 +127,9 @@ public class MethodNameInspection extends EndpointInspectionBase {
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
       PsiElement element = descriptor.getPsiElement();
-      if (element == null) return;
+      if (element == null) {
+        return;
+      }
 
       Editor editor = PsiUtilBase.findEditor(element);
       if (editor == null) {

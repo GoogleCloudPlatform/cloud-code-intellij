@@ -16,7 +16,7 @@
 package com.google.gct.login.ui;
 
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.Services;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -37,7 +37,7 @@ public final class GoogleLoginActionButton extends ActionButton {
 
   public GoogleLoginActionButton(AnAction action, Presentation presentation, String place, @NotNull Dimension minimumSize) {
     super(action, presentation, place, minimumSize);
-    GoogleLogin.getInstance().setLoginMenuItemContribution(this);
+    Services.getLoginService().setLoginMenuItemContribution(this);
     updateUi();
   }
 
@@ -46,7 +46,7 @@ public final class GoogleLoginActionButton extends ActionButton {
    * SIGN_IN_MESSAGE or the active user's email address.
    */
   public void updateUi() {
-    CredentialedUser activeUser = GoogleLogin.getInstance().getActiveUser();
+    CredentialedUser activeUser = Services.getLoginService().getActiveUser();
     if(activeUser == null) {
       setToolTipText(SIGN_IN_MESSAGE);
       myPresentation.setDescription(SIGN_IN_MESSAGE);

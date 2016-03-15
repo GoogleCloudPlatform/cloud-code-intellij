@@ -20,8 +20,9 @@ import com.google.gct.idea.ui.CustomizableComboBox;
 import com.google.gct.idea.ui.CustomizableComboBoxPopup;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
 import com.google.gct.login.IGoogleLoginCompletedCallback;
+import com.google.gct.login.IntellijGoogleLoginService;
+import com.google.gct.login.Services;
 import com.google.gct.login.ui.GoogleLoginEmptyPanel;
 
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
@@ -68,7 +69,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 /**
  * ProjectSelector allows the user to select an Elysium project id.
- * It calls into {@link GoogleLogin} to get the set of credentialed users and then into elysium to get the set of projects.
+ * It calls into {@link IntellijGoogleLoginService} to get the set of credentialed users and then into elysium to get the set of projects.
  * The result is displayed in a tree view organized by google login.
  */
 public class ProjectSelector extends CustomizableComboBox implements CustomizableComboBoxPopup {
@@ -185,7 +186,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    * Returns the selected credentialed user for the project id represented by {@link #getText()}.
    *
    * Note: if the ProjectSelector is created with queryOnExpand, this value could be {@code null} even
-   * if {@link #getText()} represents a valid project because the user has not expanded the owning {@link GoogleLogin}.
+   * if {@link #getText()} represents a valid project because the user has not expanded the owning {@link IntellijGoogleLoginService}.
    */
   @Nullable
   public CredentialedUser getSelectedUser() {
@@ -289,7 +290,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   }
 
   private static boolean needsToSignIn() {
-    Map<String, CredentialedUser> users = GoogleLogin.getInstance().getAllUsers();
+    Map<String, CredentialedUser> users = Services.getLoginService().getAllUsers();
 
     return users.isEmpty();
   }
@@ -301,7 +302,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     // Put all users in a set for fast access.
     Set<String> emailUsers = new HashSet<String>();
     if (!needsToSignIn()) {
-      for (CredentialedUser user : GoogleLogin.getInstance().getAllUsers().values()) {
+      for (CredentialedUser user : Services.getLoginService().getAllUsers().values()) {
         emailUsers.add(user.getEmail());
       }
     }
@@ -324,7 +325,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
     // Now add users that haven't been added
     if (!needsToSignIn()) {
-      GoogleUserModelItem node = getNodeForUser(GoogleLogin.getInstance().getActiveUser());
+      GoogleUserModelItem node = getNodeForUser(Services.getLoginService().getActiveUser());
       if (node != null) {
         if (forceUpdate) {
           node.setNeedsSynchronizing();
@@ -332,8 +333,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         node.synchronize();
       }
 
-      for (CredentialedUser user : GoogleLogin.getInstance().getAllUsers().values()) {
-        if (user != GoogleLogin.getInstance().getActiveUser()) {
+      for (CredentialedUser user : Services.getLoginService().getAllUsers().values()) {
+        if (user != Services.getLoginService().getActiveUser()) {
           node = getNodeForUser(user);
           if (node != null) {
             if (forceUpdate) {
@@ -495,7 +496,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
     @Override
     protected void doLogin() {
-      GoogleLogin.getInstance().logIn(null, new IGoogleLoginCompletedCallback() {
+      Services.getLoginService().logIn(null, new IGoogleLoginCompletedCallback() {
 
         @Override
         public void onLoginCompleted() {

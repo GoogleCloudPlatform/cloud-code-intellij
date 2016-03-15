@@ -24,6 +24,7 @@ import com.google.api.services.developerprojects.model.Project;
 import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.login.CredentialedUser;
+import com.google.gct.login.IntellijGoogleLoginService;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
@@ -45,7 +46,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 /**
- * This model item represents a {@link com.google.gct.login.GoogleLogin} credentialed user
+ * This model item represents a {@link IntellijGoogleLoginService} credentialed user
  * in the treeview of the project selector.
  */
 class GoogleUserModelItem extends DefaultMutableTreeNode {

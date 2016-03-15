@@ -55,6 +55,8 @@
                         serviceImplementation="com.google.gct.idea.IdeaAccountPluginInfoService"/>
     <applicationService serviceInterface="com.google.gct.idea.AccountPluginConfigurationService"
                         serviceImplementation="com.google.gct.idea.DefaultAccountPluginConfigurationService"/>
+    <applicationService serviceInterface="com.google.gct.login.GoogleLoginService"
+                        serviceImplementation="com.google.gct.login.IntellijGoogleLoginService"/>
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct">

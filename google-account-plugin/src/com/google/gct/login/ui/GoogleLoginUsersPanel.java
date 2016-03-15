@@ -16,7 +16,7 @@
 package com.google.gct.login.ui;
 
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.Services;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ui.components.JBList;
@@ -30,7 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -78,7 +78,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
           return superPreferredSize;
         }
 
-        if(GoogleLogin.getInstance().getActiveUser() == null){
+        if(Services.getLoginService().getActiveUser() == null){
           return superPreferredSize;
         } else if(!isActiveUserInVisibleArea()) {
           return superPreferredSize;
@@ -177,7 +177,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     addAccountButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        GoogleLogin.getInstance().logIn();
+        Services.getLoginService().logIn();
       }
     });
     addAccountButton.setHorizontalAlignment(SwingConstants.LEFT);
@@ -186,7 +186,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     signOutButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        GoogleLogin.getInstance().logOut(true);
+        Services.getLoginService().logOut(true);
       }
     });
 
@@ -230,7 +230,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
         // Make newly selected value the active value
         UsersListItem selectedUser = (UsersListItem)listModel.get(list.getSelectedIndex());
         if(!selectedUser.isActiveUser()) {
-          GoogleLogin.getInstance().setActiveUser(selectedUser.getUserEmail());
+          Services.getLoginService().setActiveUser(selectedUser.getUserEmail());
         }
 
         // Change order of elements in the list so that the
@@ -254,7 +254,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   }
 
   private int initializeUsers() {
-    LinkedHashMap<String, CredentialedUser> allUsers = GoogleLogin.getInstance().getAllUsers();
+    Map<String, CredentialedUser> allUsers = Services.getLoginService().getAllUsers();
     listModel = new DefaultListModel();
 
     int activeUserIndex = allUsers.size();

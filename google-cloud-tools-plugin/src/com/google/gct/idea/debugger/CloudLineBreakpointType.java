@@ -122,7 +122,7 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
 
           final int offset = element.getTextOffset();
           if (offset >= 0) {
-            if (document.getLineNumber(offset) != line) {
+            if (document.getLineNumber(offset) != line) { // NOPMD
               break;
             }
           }

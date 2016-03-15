@@ -65,13 +65,15 @@ public class ExportSettings {
         final int ret = Messages
           .showOkCancelDialog(IdeBundle.message("prompt.overwrite.settings.file", FileUtil.toSystemDependentName(saveFile.getPath())),
                               IdeBundle.message("title.file.already.exists"), Messages.getWarningIcon());
-        if (ret != Messages.OK) return;
+        if (ret != Messages.OK) {
+          return;
+        }
       }
 
       final JarOutputStream output = new JarOutputStream(new FileOutputStream(saveFile));
       try {
         final File configPath = new File(PathManager.getConfigPath());
-        final HashSet<String> writtenItemRelativePaths = new HashSet<String>();
+        final Set<String> writtenItemRelativePaths = new HashSet<String>();
         for (File file : exportFiles) {
           final String rPath = FileUtil.getRelativePath(configPath, file);
           assert rPath != null;
@@ -98,7 +100,7 @@ public class ExportSettings {
 
   }
 
-  private static void exportInstalledPlugins(File saveFile, JarOutputStream output, HashSet<String> writtenItemRelativePaths) throws IOException {
+  private static void exportInstalledPlugins(File saveFile, JarOutputStream output, Set<String> writtenItemRelativePaths) throws IOException {
     final List<String> oldPlugins = new ArrayList<String>();
     for (IdeaPluginDescriptor descriptor : PluginManagerCore.getPlugins()) {
       if (!descriptor.isBundled() && descriptor.isEnabled()) {

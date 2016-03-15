@@ -14,8 +14,9 @@ import com.google.api.client.util.Lists;
 import com.google.api.services.clouddebugger.model.Breakpoint;
 import com.google.api.services.clouddebugger.model.StatusMessage;
 import com.google.gct.idea.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
+import com.google.gct.idea.testing.TestUtils;
 import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.GoogleLogin;
+import com.google.gct.login.GoogleLoginService;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 
 import com.intellij.debugger.actions.DebuggerActions;
@@ -79,10 +80,9 @@ public class CloudDebugProcessTest extends PlatformTestCase {
         LinkedHashMap<String, CredentialedUser> users = new LinkedHashMap<String, CredentialedUser>();
         users.put(state.getUserEmail(), credentialedUser);
 
-        GoogleLogin googleLogin = mock(GoogleLogin.class);
-        when(googleLogin.getAllUsers()).thenReturn(users);
-
-        GoogleLogin.setInstance(googleLogin);
+        GoogleLoginService mockGoogleLoginService = TestUtils
+            .installMockService(GoogleLoginService.class);
+        when(mockGoogleLoginService.getAllUsers()).thenReturn(users);
         process.initialize(state);
 
         XDebugTabLayouter layouter = process.createTabLayouter();

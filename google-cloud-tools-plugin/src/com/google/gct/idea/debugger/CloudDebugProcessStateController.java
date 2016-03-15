@@ -19,7 +19,6 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.model.*;
-import com.google.common.util.concurrent.SettableFuture;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -269,7 +268,7 @@ public class CloudDebugProcessStateController {
               // We run after a short period to act as a throttle.
               timer.schedule(new RunnableTimerTask(this), PERIOD_MS);
             }
-            catch (IllegalStateException ex) {
+            catch (IllegalStateException ex) { // NOPMD
               //This can happen in rare race conditions and isn't an error.  We just ignore it.
             }
           }

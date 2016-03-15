@@ -80,12 +80,7 @@ public class ApiNameInspection extends EndpointInspectionBase {
           return;
         }
 
-        String annotationQualifiedName = annotation.getQualifiedName();
-        if(annotationQualifiedName == null) {
-          return;
-        }
-
-        if(!annotationQualifiedName.equals(GctConstants.APP_ENGINE_ANNOTATION_API)) {
+        if(!GctConstants.APP_ENGINE_ANNOTATION_API.equals(annotation.getQualifiedName())) {
           return;
         }
 
@@ -140,7 +135,9 @@ public class ApiNameInspection extends EndpointInspectionBase {
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
       PsiElement element = descriptor.getPsiElement();
-      if (element == null) return;
+      if (element == null) {
+        return;
+      }
 
       Editor editor = PsiUtilBase.findEditor(element);
       if (editor == null) {
