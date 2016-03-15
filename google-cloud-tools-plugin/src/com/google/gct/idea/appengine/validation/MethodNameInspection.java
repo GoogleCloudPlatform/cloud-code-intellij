@@ -127,7 +127,9 @@ public class MethodNameInspection extends EndpointInspectionBase {
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
       PsiElement element = descriptor.getPsiElement();
-      if (element == null) return;
+      if (element == null) {
+        return;
+      }
 
       Editor editor = PsiUtilBase.findEditor(element);
       if (editor == null) {

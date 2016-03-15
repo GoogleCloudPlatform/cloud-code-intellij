@@ -22,7 +22,7 @@ import com.google.gct.login.ui.GoogleLoginActionButton;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Provides Google user authentication services.
@@ -111,7 +111,7 @@ public interface GoogleLoginService {
   /**
    * Returns a copy of the map of the current logged in users.
    */
-  LinkedHashMap<String, CredentialedUser> getAllUsers();
+  Map<String, CredentialedUser> getAllUsers();
 
   /**
    * Returns the active user.

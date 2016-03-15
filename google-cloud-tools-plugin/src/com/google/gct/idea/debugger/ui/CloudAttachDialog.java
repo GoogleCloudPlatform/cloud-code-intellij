@@ -377,7 +377,9 @@ public class CloudAttachDialog extends DialogWrapper {
     }
 
     final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
-    if (changeListManager.isFreezedWithNotification("Can not stash changes now")) return false;
+    if (changeListManager.isFreezedWithNotification("Can not stash changes now")) {
+      return false;
+    }
 
     final GitLineHandler handler = new GitLineHandler(project, sourceRepository.getRoot(), GitCommand.STASH);
     handler.addParameters("save");

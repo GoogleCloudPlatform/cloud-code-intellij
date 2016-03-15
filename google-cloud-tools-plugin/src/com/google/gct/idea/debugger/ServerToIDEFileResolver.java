@@ -16,7 +16,6 @@
 package com.google.gct.idea.debugger;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
 
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.project.Project;
@@ -34,7 +33,6 @@ import com.intellij.util.indexing.FileBasedIndex;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 /**

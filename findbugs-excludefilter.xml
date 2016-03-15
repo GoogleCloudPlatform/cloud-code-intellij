@@ -6,6 +6,10 @@
       2. Redundant null checking of known non-null value
   -->
   <Match>
-    <Bug pattern="DM_STRING_CTOR, RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
+    <Or>
+      <Bug pattern="DM_STRING_CTOR" />
+      <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
+      <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
+    </Or>
   </Match>
 </FindBugsFilter>
