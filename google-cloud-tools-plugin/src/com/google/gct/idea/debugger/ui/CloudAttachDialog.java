@@ -64,6 +64,7 @@ import git4idea.branch.GitBrancher;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitHandlerUtil;
 import git4idea.commands.GitLineHandler;
+import git4idea.GitLocalBranch;
 import git4idea.i18n.GitBundle;
 import git4idea.repo.GitRepository;
 
@@ -286,12 +287,13 @@ public class CloudAttachDialog extends DialogWrapper {
     warningMessage.setVisible(false);
     checkBackgroundSessions();
 
+    String targetSyncSHA = syncResult.getTargetSyncSHA();
     if (syncResult.needsStash() && syncResult.needsSync()) {
       setOkText(false);
       syncStashCheckbox.setVisible(true);
-      assert syncResult.getTargetSyncSHA() != null;
+      assert targetSyncSHA != null;
       syncStashCheckbox.setText(
-          GctBundle.getString("clouddebug.stash.local.changes.and.sync", syncResult.getTargetSyncSHA().substring(0, 7)));
+          GctBundle.getString("clouddebug.stash.local.changes.and.sync", targetSyncSHA.substring(0, 7)));
       syncStashCheckbox.setSelected(true);
     }
     else if (syncResult.needsStash()) {
@@ -300,7 +302,7 @@ public class CloudAttachDialog extends DialogWrapper {
       syncStashCheckbox.setText(GctBundle.getString("clouddebug.stashbuttontext"));
       syncStashCheckbox.setSelected(true);
     }
-    else if (syncResult.needsSync() && syncResult.getTargetSyncSHA() == null) {
+    else if (syncResult.needsSync() && targetSyncSHA == null) {
       setOkText(true);
       warningHeader.setVisible(true);
       warningMessage.setVisible(true);
@@ -309,8 +311,8 @@ public class CloudAttachDialog extends DialogWrapper {
     else if (syncResult.needsSync()) {
       setOkText(false);
       syncStashCheckbox.setVisible(true);
-      assert syncResult.getTargetSyncSHA() != null;
-      syncStashCheckbox.setText("Sync to " + syncResult.getTargetSyncSHA().substring(0, 7));
+      assert targetSyncSHA != null;
+      syncStashCheckbox.setText("Sync to " + targetSyncSHA.substring(0, 7));
       syncStashCheckbox.setSelected(true);
     }
     else if (!syncResult.hasRemoteRepository()) {
@@ -411,8 +413,9 @@ public class CloudAttachDialog extends DialogWrapper {
     sourceRepository = syncResult.getLocalRepository();
 
     if (syncResult.needsStash() || syncResult.needsSync()) {
-      if (sourceRepository.getCurrentBranch() != null) {
-        originalBranchName = sourceRepository.getCurrentBranch().getName();
+      GitLocalBranch currentBranch = sourceRepository.getCurrentBranch();
+      if (currentBranch != null) {
+        originalBranchName = currentBranch.getName();
       }
       else {
         originalBranchName = sourceRepository.getCurrentRevision();

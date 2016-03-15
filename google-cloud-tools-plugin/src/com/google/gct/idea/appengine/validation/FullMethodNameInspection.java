@@ -103,6 +103,7 @@ public class FullMethodNameInspection extends EndpointInspectionBase  {
 
         // Get @ApiMethod's name attribute
         PsiModifierList modifierList = psiMethod.getModifierList();
+        assert modifierList != null;
         PsiAnnotation apiMethodAnnotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD);
         if(apiMethodAnnotation == null) {
           return;

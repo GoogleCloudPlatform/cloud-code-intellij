@@ -61,13 +61,14 @@ public class ToggleSnapshotLocationAction extends AnAction {
         LOG.error("could not add a snapshot location as the target editor was unexpectedly null.");
         return;
       }
-      if (editor.getUserData(POPUP_LINE) == null) {
+      Integer popUpLine = editor.getUserData(POPUP_LINE);
+      if (popUpLine == null) {
         LOG.error("could not add a snapshot location as the target line was unexpectedly null.");
         return;
       }
       XDebuggerUtil.getInstance()
         .toggleLineBreakpoint(exEditor.getProject(), CloudLineBreakpointType.getInstance(), exEditor.getVirtualFile(),
-                              editor.getUserData(POPUP_LINE));
+                              popUpLine);
     }
   }
 

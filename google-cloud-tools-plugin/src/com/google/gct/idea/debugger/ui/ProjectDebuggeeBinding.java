@@ -148,8 +148,9 @@ class ProjectDebuggeeBinding {
       @Override
       public void run() {
         try {
-          if (projectSelector.getProjectNumber() != null && getCloudDebuggerClient() != null) {
-            final ListDebuggeesResponse debuggees = getCloudDebuggerClient().debuggees().list()
+          Debugger debugger = getCloudDebuggerClient();
+          if (projectSelector.getProjectNumber() != null && debugger != null) {
+            final ListDebuggeesResponse debuggees = debugger.debuggees().list()
                 .setProject(projectSelector.getProjectNumber().toString())
                 .execute();
             isCdbQueried = true;
@@ -182,8 +183,9 @@ class ProjectDebuggeeBinding {
                       }
                       perModuleCache.put(key, item);
                     }
-                    if (inputState != null && !Strings.isNullOrEmpty(inputState.getDebuggeeId())) {
-                      if (inputState.getDebuggeeId().equals(item.getId())) { // NOPMD
+                    String debuggeeId = inputState.getDebuggeeId();
+                    if (inputState != null && !Strings.isNullOrEmpty(debuggeeId)) {
+                      if (debuggeeId.equals(item.getId())) { // NOPMD
                         targetSelection = item;
                       }
                     }

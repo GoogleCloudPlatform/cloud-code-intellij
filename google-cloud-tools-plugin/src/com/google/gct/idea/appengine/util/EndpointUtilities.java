@@ -75,6 +75,7 @@ public class EndpointUtilities {
    */
   public static boolean isApiMethod(@NonNls PsiMethod psiMethod) {
     PsiModifierList psiModifierList =  psiMethod.getModifierList();
+    assert psiModifierList != null;
     if(psiModifierList.hasModifierProperty(PsiModifier.PUBLIC) &&
        !psiModifierList.hasModifierProperty(PsiModifier.STATIC)) {
       return true;
@@ -99,6 +100,7 @@ public class EndpointUtilities {
     }
 
     PsiModifierList modifierList = method.getModifierList();
+    assert modifierList != null;
     if(modifierList.hasModifierProperty(PsiModifier.PUBLIC)) {
       return true;
     }

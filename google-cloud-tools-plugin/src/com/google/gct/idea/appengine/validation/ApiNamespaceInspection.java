@@ -98,8 +98,11 @@ public class ApiNamespaceInspection extends EndpointInspectionBase{
         String ownerName =
           EndpointUtilities.removeBeginningAndEndingQuotes(ownerNameWithQuotes);
         // Package Path has a default value of ""
+        PsiAnnotationMemberValue pathAttributeValue =
+          annotation.findAttributeValue(API_NAMESPACE_PACKAGE_PATH_ATTRIBUTE);
+        assert pathAttributeValue != null;
         String packagePath = EndpointUtilities.removeBeginningAndEndingQuotes(
-          annotation.findAttributeValue(API_NAMESPACE_PACKAGE_PATH_ATTRIBUTE).getText());
+          pathAttributeValue.getText());
 
         boolean allUnspecified =
           ownerDomain.isEmpty() && ownerName.isEmpty() && packagePath.isEmpty();

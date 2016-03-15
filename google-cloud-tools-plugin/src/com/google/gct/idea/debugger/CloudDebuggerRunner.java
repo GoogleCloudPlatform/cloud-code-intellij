@@ -114,11 +114,11 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
               throw new RunCanceledByUserException();
             }
 
-            if (environment.getRunnerAndConfigurationSettings() != null &&
-                environment.getRunnerAndConfigurationSettings()
-                    .getConfiguration() instanceof CloudDebugRunConfiguration) {
+            RunnerAndConfigurationSettings runnerAndConfig = environment.getRunnerAndConfigurationSettings();
+            if (runnerAndConfig != null &&
+                runnerAndConfig.getConfiguration() instanceof CloudDebugRunConfiguration) {
               CloudDebugRunConfiguration config =
-                  (CloudDebugRunConfiguration) environment.getRunnerAndConfigurationSettings().getConfiguration();
+                  (CloudDebugRunConfiguration) runnerAndConfig.getConfiguration();
               // State is only stored in the run config between active sessions.
               // Otherwise, the background watcher may hit a check during debug session startup.
               config.setProcessState(null);

@@ -69,14 +69,17 @@ public class GcpCheckoutProvider implements CheckoutProvider {
     BasicAction.saveAll();
     CloneGcpDialog dialog = new CloneGcpDialog(project);
     DialogManager.show(dialog);
+    final String sourceRepositoryURL = dialog.getSourceRepositoryURL();
+    final String directoryName = dialog.getDirectoryName();
+    final String parentDirectory = dialog.getParentDirectory();
     if (!dialog.isOK() ||
-      Strings.isNullOrEmpty(dialog.getParentDirectory()) ||
-      Strings.isNullOrEmpty(dialog.getSourceRepositoryURL()) ||
-      Strings.isNullOrEmpty(dialog.getDirectoryName())) {
+      Strings.isNullOrEmpty(parentDirectory) ||
+      Strings.isNullOrEmpty(sourceRepositoryURL) ||
+      Strings.isNullOrEmpty(directoryName)) {
       return;
     }
     final LocalFileSystem lfs = LocalFileSystem.getInstance();
-    final File parent = new File(dialog.getParentDirectory());
+    final File parent = new File(parentDirectory);
     VirtualFile destinationParent = lfs.findFileByIoFile(parent);
     if (destinationParent == null) {
       destinationParent = lfs.refreshAndFindFileByIoFile(parent);
@@ -84,9 +87,6 @@ public class GcpCheckoutProvider implements CheckoutProvider {
     if (destinationParent == null) {
       return;
     }
-    final String sourceRepositoryURL = dialog.getSourceRepositoryURL();
-    final String directoryName = dialog.getDirectoryName();
-    final String parentDirectory = dialog.getParentDirectory();
     final String gcpUserName = dialog.getGCPUserName();
     if (Strings.isNullOrEmpty(gcpUserName)) {
       LOG.error("unexpected blank username during checkout");

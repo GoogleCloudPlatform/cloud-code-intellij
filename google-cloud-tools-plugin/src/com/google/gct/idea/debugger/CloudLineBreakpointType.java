@@ -28,6 +28,7 @@ import com.intellij.debugger.ui.breakpoints.Breakpoint;
 import com.intellij.debugger.ui.breakpoints.JavaBreakpointType;
 import com.intellij.debugger.ui.breakpoints.LineBreakpoint;
 import com.intellij.execution.impl.RunManagerImpl;
+import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -86,8 +87,9 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
   @Override
   public final boolean canPutAt(@NotNull final VirtualFile file, final int line, @NotNull Project project) {
     RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
-    if (runManager.getSelectedConfiguration() == null ||
-        !(runManager.getSelectedConfiguration().getConfiguration() instanceof CloudDebugRunConfiguration)) {
+    RunnerAndConfigurationSettings runnerAndConfig = runManager.getSelectedConfiguration();
+    if (runnerAndConfig == null ||
+        !(runnerAndConfig.getConfiguration() instanceof CloudDebugRunConfiguration)) {
       return false;
     }
 

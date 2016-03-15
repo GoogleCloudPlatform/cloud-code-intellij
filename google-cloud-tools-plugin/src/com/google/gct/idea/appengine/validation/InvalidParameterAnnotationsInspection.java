@@ -86,13 +86,16 @@ public class InvalidParameterAnnotationsInspection extends EndpointInspectionBas
         }
 
         // Check for @ApiMethod
-        PsiAnnotation apiMethodAnnotation = method.getModifierList().findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD);
+        PsiModifierList methodModifierList = method.getModifierList();
+        assert methodModifierList != null;
+        PsiAnnotation apiMethodAnnotation = methodModifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD);
         if(apiMethodAnnotation == null) {
           return;
         }
 
         // path has a default value of ""
         PsiAnnotationMemberValue pathMember = apiMethodAnnotation.findAttributeValue("path");
+        assert pathMember != null;
         String path = EndpointUtilities.removeBeginningAndEndingQuotes(pathMember.getText());
 
         // Check for path parameter, @ApiMethod(path="xys/{xy}")
@@ -116,9 +119,11 @@ public class InvalidParameterAnnotationsInspection extends EndpointInspectionBas
           }
 
           // Check if @Named parameter also has @Nullable or @DefaultValue
-          if((aParameter.getModifierList().findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE) != null)||
-             (aParameter.getModifierList().findAnnotation("javax.annotation.Nullable") != null) ||
-             (aParameter.getModifierList().findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE) != null)) {
+          PsiModifierList parameterModifierList = aParameter.getModifierList();
+          assert parameterModifierList != null;
+          if((parameterModifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE) != null) ||
+             (parameterModifierList.findAnnotation("javax.annotation.Nullable") != null) ||
+             (parameterModifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE) != null)) {
             holder.registerProblem(aParameter, "Invalid parameter configuration. " +
               "A parameter in the method path should not be marked @Nullable or @DefaultValue.",
               new MyQuickFix());
@@ -181,6 +186,7 @@ public class InvalidParameterAnnotationsInspection extends EndpointInspectionBas
       }
 
       PsiModifierList modifierList = ((PsiParameter)element).getModifierList();
+      assert modifierList != null;
       PsiAnnotation gaeNullableAnnotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE);
       if(gaeNullableAnnotation != null){
         gaeNullableAnnotation.delete();
