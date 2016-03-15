@@ -56,7 +56,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.Window;
 import java.io.IOException;
-import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.List;
 
 
@@ -269,7 +269,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
   }
 
   @Override
-  public LinkedHashMap<String, CredentialedUser> getAllUsers() {
+  public Map<String, CredentialedUser> getAllUsers() {
     return users.getAllUsers();
   }
 

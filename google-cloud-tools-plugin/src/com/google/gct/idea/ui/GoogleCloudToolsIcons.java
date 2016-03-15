@@ -20,7 +20,6 @@ import com.intellij.openapi.util.IconLoader;
 import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;

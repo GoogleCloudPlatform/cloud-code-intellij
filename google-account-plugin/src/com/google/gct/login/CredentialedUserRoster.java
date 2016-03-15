@@ -29,7 +29,7 @@ import java.util.Map;
  * {@link CredentialedUser} objects.
  */
 public class CredentialedUserRoster {
-  private final LinkedHashMap<String, CredentialedUser> allUsers = new LinkedHashMap<String, CredentialedUser>();
+  private final Map<String, CredentialedUser> allUsers = new LinkedHashMap<String, CredentialedUser>();
   private final Collection<GoogleLoginListener> listeners = Lists.newLinkedList();
   private CredentialedUser activeUser;
 
@@ -38,7 +38,7 @@ public class CredentialedUserRoster {
    * @return Copy of current logged in users.
    */
   @NotNull
-  public LinkedHashMap<String, CredentialedUser> getAllUsers() {
+  public Map<String, CredentialedUser> getAllUsers() {
     synchronized (this) {
       LinkedHashMap<String, CredentialedUser> clone = new LinkedHashMap<String, CredentialedUser>();
       clone.putAll(allUsers);

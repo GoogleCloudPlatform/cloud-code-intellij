@@ -86,6 +86,9 @@ subprojects {
     pmd {
         ignoreFailures = true
         sourceSets = [sourceSets.main]
+        // Don't use the default ruleset but use a custom ruleset to exclude some PMD rules.
+        ruleSets = []
+        ruleSetFiles = files("../custom-pmd-ruleset.xml");
     }
 
     apply plugin: 'jdepend'

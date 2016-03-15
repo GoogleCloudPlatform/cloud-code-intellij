@@ -15,14 +15,11 @@
  */
 package com.google.gct.idea.settings;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.ide.IdeBundle;
 import com.intellij.ide.actions.ImportSettingsFilenameFilter;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.startup.StartupActionScriptManager;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.PathManager;
@@ -72,7 +69,7 @@ public class ImportSettings {
         return;
       }
 
-      final ArrayList<ExportableComponent> registeredComponents = new ArrayList<ExportableComponent>(
+      final List<ExportableComponent> registeredComponents = new ArrayList<ExportableComponent>(
         Arrays.asList(ApplicationManager.getApplication().getComponents(ExportableApplicationComponent.class)));
       registeredComponents.addAll(ServiceBean.loadServicesFromBeans(ExportableComponent.EXTENSION_POINT, ExportableComponent.class));
 
@@ -142,18 +139,20 @@ public class ImportSettings {
   }
 
   private static List<ExportableComponent> getComponentsStored(File zipFile,
-    ArrayList<ExportableComponent> registeredComponents)
+    List<ExportableComponent> registeredComponents)
     throws IOException {
     final File configPath = new File(PathManager.getConfigPath());
 
-    final ArrayList<ExportableComponent> components = new ArrayList<ExportableComponent>();
+    final List<ExportableComponent> components = new ArrayList<ExportableComponent>();
     for (ExportableComponent component : registeredComponents) {
       final File[] exportFiles = component.getExportFiles();
       for (File exportFile : exportFiles) {
         final String rPath = FileUtil.getRelativePath(configPath, exportFile);
         assert rPath != null;
         String relativePath = FileUtil.toSystemIndependentName(rPath);
-        if (exportFile.isDirectory()) relativePath += "/";
+        if (exportFile.isDirectory()) {
+          relativePath += "/";
+        }
         if (ZipUtil.isZipContainsEntry(zipFile, relativePath)) {
           components.add(component);
           break;

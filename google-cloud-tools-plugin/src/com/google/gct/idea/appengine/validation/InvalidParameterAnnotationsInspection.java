@@ -134,7 +134,7 @@ public class InvalidParameterAnnotationsInspection extends EndpointInspectionBas
        * @return A collection of the parameter in <code>path</code>
        */
       private Collection<String> getPathParameters(String path) {
-        Pattern pathPattern = java.util.regex.Pattern.compile("\\{([^\\}]*)\\}");
+        Pattern pathPattern = Pattern.compile("\\{([^\\}]*)\\}");
         Matcher pathMatcher = pathPattern.matcher(path);
 
         Collection<String> pathParameters = new HashSet<String>();

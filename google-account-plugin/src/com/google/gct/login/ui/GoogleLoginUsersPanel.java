@@ -30,7 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -254,7 +254,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   }
 
   private int initializeUsers() {
-    LinkedHashMap<String, CredentialedUser> allUsers = Services.getLoginService().getAllUsers();
+    Map<String, CredentialedUser> allUsers = Services.getLoginService().getAllUsers();
     listModel = new DefaultListModel();
 
     int activeUserIndex = allUsers.size();
