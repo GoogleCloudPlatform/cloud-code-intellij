@@ -25,6 +25,7 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.extensions.impl.ExtensionPointImpl;
 import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl;
 import com.intellij.openapi.project.Project;
+import com.intellij.testFramework.TestRunnerUtil;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
@@ -43,6 +44,9 @@ public class BasePluginTestCase {
 
   @Before
   public final void setup() {
+    // prevent memory leak error
+    TestRunnerUtil.replaceIdeEventQueueSafely();
+
     Disposable disposableParent = TestUtils.createMockApplication();
     applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
