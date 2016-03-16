@@ -112,7 +112,7 @@ public class CloudDebuggerClient {
               if (!login) {
                 // aggressively remove the cached item on any status change.
                 debuggerClientsFromUserEmail.remove(hashkey);
-              } else {
+              } else { // NOPMD
                 // user logged in, should we do something?
               }
             }
