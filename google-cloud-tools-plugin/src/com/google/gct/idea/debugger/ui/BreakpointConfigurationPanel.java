@@ -229,11 +229,14 @@ public class BreakpointConfigurationPanel
 
      if (rootNode != null && lineBreakpointImpl != null) {
       List<String> expressionsToSave = new ArrayList<String>();
-      for (WatchNode node : rootNode.getAllChildren()) {
-        expressionsToSave.add(node.getExpression().getExpression());
-      }
-      if (properties.setWatchExpressions(expressionsToSave.toArray(new String[expressionsToSave.size()]))) {
-        lineBreakpointImpl.fireBreakpointChanged();
+      List<? extends WatchNode> children = rootNode.getAllChildren();
+      if (children != null) {
+        for (WatchNode node : rootNode.getAllChildren()) {
+          expressionsToSave.add(node.getExpression().getExpression());
+        }
+        if (properties.setWatchExpressions(expressionsToSave.toArray(new String[expressionsToSave.size()]))) {
+          lineBreakpointImpl.fireBreakpointChanged();
+        }
       }
     }
   }
