@@ -17,6 +17,7 @@
 package com.google.gct.idea.appengine.cloud;
 
 import com.google.common.base.Supplier;
+import com.google.gct.idea.appengine.cloud.ManagedVmCloudType.ManagedVmDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
 import com.google.gct.idea.appengine.cloud.ManagedVmDeploymentConfiguration.ConfigType;
 import com.google.gct.idea.util.GctBundle;
 
@@ -26,6 +27,7 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 
@@ -58,11 +60,18 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
   private TextFieldWithBrowseButton dockerFilePathField;
   private JButton generateAppYamlButton;
   private JButton generateDockerfileButton;
-
+  private JPanel userSpecifiedArtifactPanel;
+  private TextFieldWithBrowseButton userSpecifiedArtifactFileSelector;
+  DeploymentSource deploymentSource;
 
   public ManagedVmDeploymentRunConfigurationEditor(final Project project,
-      final DeploymentSource source, final AppEngineHelper appEngineHelper) {
+      final DeploymentSource deploymentSource, final AppEngineHelper appEngineHelper) {
     this.project = project;
+    this.deploymentSource = deploymentSource;
+
+    toggleJarWarSelector();
+    userSpecifiedArtifactFileSelector.setVisible(true);
+
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
     mvmConfigFilesPanel.setVisible(false);
@@ -76,6 +85,12 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
         }
       }
     });
+    userSpecifiedArtifactFileSelector.addBrowseFolderListener(
+        GctBundle.message("appengine.managedvm.config.user.specified.artifact.title"),
+        null,
+        project,
+        FileChooserDescriptorFactory.createSingleFileDescriptor()
+    );
     dockerFilePathField.addBrowseFolderListener(
         GctBundle.message("appengine.dockerfile.location.browse.button"),
         null,
@@ -98,7 +113,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
           @Override
           public File get() {
             return appEngineHelper
-                .defaultDockerfile(DeploymentArtifactType.typeForPath(source.getFile()));
+                .defaultDockerfile(DeploymentArtifactType.typeForPath(deploymentSource.getFile()));
           }
         }, dockerFilePathField));
   }
@@ -106,6 +121,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
 
   @Override
   protected void resetEditorFrom(ManagedVmDeploymentConfiguration configuration) {
+    userSpecifiedArtifactFileSelector.setText(configuration.getUserSpecifiedArtifactPath());
     dockerFilePathField.setText(configuration.getDockerFilePath());
     appYamlPathField.setText(configuration.getAppYamlPath());
     configTypeComboBox.setSelectedItem(configuration.getConfigType());
@@ -114,9 +130,56 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
   @Override
   protected void applyEditorTo(ManagedVmDeploymentConfiguration configuration)
       throws ConfigurationException {
+    configuration.setUserSpecifiedArtifact(isUserSpecifiedPathDeploymentSource());
+    configuration.setUserSpecifiedArtifactPath(userSpecifiedArtifactFileSelector.getText());
     configuration.setDockerFilePath(dockerFilePathField.getText());
     configuration.setAppYamlPath(appYamlPathField.getText());
     configuration.setConfigType(getConfigType());
+
+    setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
+    toggleJarWarSelector();
+    validateConfiguration();
+  }
+
+  private void toggleJarWarSelector() {
+      userSpecifiedArtifactPanel.setVisible(isUserSpecifiedPathDeploymentSource());
+  }
+
+  /**
+   * The name of the currently selected deployment source is displayed in the Application Servers window.
+   * We want this name to also include the path to the manually chosen archive when one is selected.
+   */
+  private void setDeploymentSourceName(String filePath) {
+    if(isUserSpecifiedPathDeploymentSource() && !StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())) {
+      ((UserSpecifiedPathDeploymentSource) deploymentSource).setName(
+          GctBundle.message(
+              "appengine.managedvm.user.specified.deploymentsource.name.with.filename",
+              new File(filePath).getName()));
+    }
+  }
+
+  private void validateConfiguration() throws ConfigurationException {
+    if (isUserSpecifiedPathDeploymentSource() && (StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())
+        || !isJarOrWar(userSpecifiedArtifactFileSelector.getText()))) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.managedvm.config.user.specified.artifact.error"));
+    } else if (!isUserSpecifiedPathDeploymentSource() && !deploymentSource.isValid()) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.managedvm.config.deployment.source.error"));
+    }
+  }
+
+  private boolean isJarOrWar(String path) {
+    File file = new File(path);
+    if (file.isDirectory()) {
+      return false;
+    }
+    String name = file.getName();
+    return StringUtil.endsWithIgnoreCase(name, ".jar") || StringUtil.endsWithIgnoreCase(name, ".war");
+  }
+
+  private boolean isUserSpecifiedPathDeploymentSource() {
+    return deploymentSource instanceof UserSpecifiedPathDeploymentSource;
   }
 
   @Nullable
