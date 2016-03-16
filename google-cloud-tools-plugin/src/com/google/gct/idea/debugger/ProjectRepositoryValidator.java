@@ -111,13 +111,15 @@ public class ProjectRepositoryValidator {
     String repoType = null;
 
     boolean foundDebuggee = false;
-    if (getCloudDebuggerClient() != null &&
+    Debugger debugger = getCloudDebuggerClient();
+    if (debugger != null &&
         !com.google.common.base.Strings.isNullOrEmpty(processState.getProjectNumber())) {
       ListDebuggeesResponse debuggees;
       try {
-        debuggees = getCloudDebuggerClient().debuggees().list().setProject(processState.getProjectNumber()).execute();
+        debuggees = debugger.debuggees().list().setProject(processState.getProjectNumber()).execute();
         for (Debuggee debuggee : debuggees.getDebuggees()) {
-          if (processState.getDebuggeeId() != null && processState.getDebuggeeId().equals(debuggee.getId())) {
+          String debuggeeId = processState.getDebuggeeId();
+          if (debuggeeId != null && debuggeeId.equals(debuggee.getId())) {
             // implicit assumption this doesn't happen more than once
             foundDebuggee = true;
             List<SourceContext> contexts = debuggee.getSourceContexts();
@@ -194,10 +196,10 @@ public class ProjectRepositoryValidator {
             GitUtil.hasLocalChanges(false, processState.getProject(), targetLocalRepo.getRoot())) {
           needsStash = true;
         }
-        if (!Strings.isNullOrEmpty(targetLocalRepo.getCurrentRevision()) &&
+        String currentRevision = targetLocalRepo.getCurrentRevision();
+        if (!Strings.isNullOrEmpty(currentRevision) &&
             !Strings.isNullOrEmpty(revisionId) &&
-            targetLocalRepo.getCurrentRevision() != null &&
-            !targetLocalRepo.getCurrentRevision().equals(revisionId)) {
+            !currentRevision.equals(revisionId)) {
           syncSHA = revisionId;
           needsSync = true;
         }
@@ -223,7 +225,9 @@ public class ProjectRepositoryValidator {
   @SuppressWarnings("ConstantConditions")
   public void hardRefresh() {
     if (repoState.hasSourceRepository()) {
-      List<VirtualFile> list = VfsUtil.markDirty(true, true, repoState.getSourceRepository().getRoot());
+      GitRepository repository = repoState.getSourceRepository();
+      assert repository != null;
+      List<VirtualFile> list = VfsUtil.markDirty(true, true, repository.getRoot());
       if (!list.isEmpty()) {
         LocalFileSystem.getInstance().refreshFiles(list, false, true, null);
       }
@@ -241,8 +245,9 @@ public class ProjectRepositoryValidator {
 
   public void restoreToOriginalState(final @NotNull Project project) {
     if (repoState.hasSourceRepository()) {
-      assert repoState.getSourceRepository() != null;
-      final VirtualFile root = repoState.getSourceRepository().getRoot();
+      final GitRepository repository = repoState.getSourceRepository();
+      assert repository != null;
+      final VirtualFile root = repository.getRoot();
 
       //check for an unstash requirement.
       final Ref<StashInfo> targetStash = new Ref<StashInfo>();
@@ -259,9 +264,10 @@ public class ProjectRepositoryValidator {
       }
 
       // If an unstash is required, we will always have an original branch name as well.
-      if (!Strings.isNullOrEmpty(repoState.getOriginalBranchName())) {
-        assert repoState.getOriginalBranchName() != null;
-        String branchDisplayName = repoState.getOriginalBranchName();
+      final String originalBranchName = repoState.getOriginalBranchName();
+      if (!Strings.isNullOrEmpty(originalBranchName)) {
+        assert originalBranchName != null;
+        String branchDisplayName = originalBranchName;
         if (branchDisplayName.length() > 10) {
           branchDisplayName = branchDisplayName.substring(0, 7) + "...";
         }
@@ -270,11 +276,11 @@ public class ProjectRepositoryValidator {
                                      Messages.getInformationIcon()) == Messages.YES) {
           final GitBrancher brancher = ServiceManager.getService(project, GitBrancher.class);
           brancher
-            .checkout(repoState.getOriginalBranchName(), false, Collections.singletonList(repoState.getSourceRepository()),
+            .checkout(originalBranchName, false, Collections.singletonList(repository),
                       new Runnable() {
                         @Override
                         public void run() {
-                          repoState.getSourceRepository().update();
+                          repository.update();
                           if (!targetStash.isNull()) {
                             unstash(project, targetStash, root);
                           }
@@ -298,11 +304,13 @@ public class ProjectRepositoryValidator {
   private void unstash(final @NotNull Project project,
                        @NotNull final Ref<StashInfo> targetStash,
                        @NotNull final VirtualFile root) {
-    if (repoState.getSourceRepository() == null ||
-        repoState.getOriginalBranchName() == null ||
-        (!repoState.getOriginalBranchName().equals(repoState.getSourceRepository().getCurrentBranchName()) &&
-         !repoState.getOriginalBranchName().equals(repoState.getSourceRepository().getCurrentRevision()))) {
-      Messages.showErrorDialog(GctBundle.getString("clouddebug.erroroncheckout", repoState.getOriginalBranchName()),
+    GitRepository repository = repoState.getSourceRepository();
+    String originalBranchName = repoState.getOriginalBranchName();
+    if (repository == null ||
+        originalBranchName == null ||
+        (!originalBranchName.equals(repository.getCurrentBranchName()) &&
+         !originalBranchName.equals(repository.getCurrentRevision()))) {
+      Messages.showErrorDialog(GctBundle.getString("clouddebug.erroroncheckout", originalBranchName),
                                "Error");
       return;
     }

@@ -18,6 +18,7 @@ package com.google.gct.idea.elysium;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.IntellijGoogleLoginService;
 
 import com.intellij.openapi.project.Project;
@@ -69,7 +70,8 @@ public class SelectUserDialog extends DialogWrapper {
     if (!Strings.isNullOrEmpty(selectedUser)) {
       return selectedUser;
     }
-    return login.getSelectedUser() != null ? login.getSelectedUser().getEmail() : "";
+    CredentialedUser credUser = login.getSelectedUser();
+    return credUser != null ? credUser.getEmail() : "";
   }
 
   @VisibleForTesting

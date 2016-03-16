@@ -44,6 +44,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.intellij.xdebugger.XExpression;
+import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.breakpoints.ui.XBreakpointCustomPropertiesPanel;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
@@ -229,19 +230,23 @@ public class BreakpointConfigurationPanel
 
      if (rootNode != null && lineBreakpointImpl != null) {
       List<String> expressionsToSave = new ArrayList<String>();
-      for (WatchNode node : rootNode.getAllChildren()) {
-        expressionsToSave.add(node.getExpression().getExpression());
-      }
-      if (properties.setWatchExpressions(expressionsToSave.toArray(new String[expressionsToSave.size()]))) {
-        lineBreakpointImpl.fireBreakpointChanged();
+      List<? extends WatchNode> children = rootNode.getAllChildren();
+      if (children != null) {
+        for (WatchNode node : children) {
+          expressionsToSave.add(node.getExpression().getExpression());
+        }
+        if (properties.setWatchExpressions(expressionsToSave.toArray(new String[expressionsToSave.size()]))) {
+          lineBreakpointImpl.fireBreakpointChanged();
+        }
       }
     }
   }
 
   @Nullable
   private static Language getFileTypeLanguage(XLineBreakpoint<CloudLineBreakpointProperties> breakpoint) {
-    if (breakpoint.getSourcePosition() != null) {
-      FileType fileType = breakpoint.getSourcePosition().getFile().getFileType();
+    XSourcePosition sourcePosition = breakpoint.getSourcePosition();
+    if (sourcePosition != null) {
+      FileType fileType = sourcePosition.getFile().getFileType();
       if (fileType instanceof LanguageFileType) {
         return ((LanguageFileType)fileType).getLanguage();
       }

@@ -125,6 +125,7 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
 
         // Check that parameter does not have an @Named annotation
         PsiModifierList modifierList = psiParameter.getModifierList();
+        assert modifierList != null;
         PsiAnnotation annotation = modifierList.findAnnotation("javax.inject.Named");
         if(annotation == null) {
           annotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED );

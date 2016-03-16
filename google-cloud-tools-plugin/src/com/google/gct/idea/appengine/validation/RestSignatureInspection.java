@@ -96,6 +96,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
       @Override
       public String guessResourceName(PsiMethod method) {
         String methodName = method.getName();
+        assert methodName != null;
         return methodNamePrefix.length() >= methodName.length() ? null :
                methodName.substring(methodNamePrefix.length()).toLowerCase();
       }
@@ -110,6 +111,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
       @Override
       public String guessResourceName(PsiMethod method) {
         String methodName = method.getName();
+        assert methodName != null;
         return methodNamePrefix.length() >= methodName.length() ? null :
                methodName.substring(methodNamePrefix.length()).toLowerCase();
       }
@@ -291,6 +293,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
    */
   public String getHttpMethod(PsiMethod psiMethod) {
     PsiModifierList modifierList = psiMethod.getModifierList();
+    assert modifierList != null;
     String httpMethod = null;
 
     // Check if the httpMethod was specified by uses in @ApiMethod's httpMethod attribute
@@ -321,6 +324,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
    */
   public String getPath(PsiMethod psiMethod) {
     PsiModifierList modifierList = psiMethod.getModifierList();
+    assert modifierList != null;
     String path = null;
 
     // Check if the httpMethod was specified by user in @ApiMethod's httpMethod attribute
@@ -396,6 +400,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   @Nullable
   private String getResourceProperty(PsiMethod psiMethod) {
     PsiClass psiClass = psiMethod.getContainingClass();
+    assert psiClass != null;
     PsiModifierList modifierList = psiClass.getModifierList();
     String resource = null;
 

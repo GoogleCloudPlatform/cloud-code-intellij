@@ -33,6 +33,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.xdebugger.XExpression;
+import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
@@ -309,7 +311,8 @@ public class CloudBreakpointHandler
   @Override
   public void registerBreakpoint(
       @NotNull final XLineBreakpoint<CloudLineBreakpointProperties> xIdeBreakpoint) {
-    if (xIdeBreakpoint.getSourcePosition() == null
+    XSourcePosition sourcePosition = xIdeBreakpoint.getSourcePosition();
+    if (sourcePosition == null
         || !xIdeBreakpoint.isEnabled()
         || !(xIdeBreakpoint.getType() instanceof CloudLineBreakpointType)) {
       return;
@@ -338,7 +341,7 @@ public class CloudBreakpointHandler
       return;
     }
 
-    PsiFile javaFile = psiManager.findFile(xIdeBreakpoint.getSourcePosition().getFile());
+    PsiFile javaFile = psiManager.findFile(sourcePosition.getFile());
     if (!(javaFile instanceof PsiJavaFile)) {
       return;
     }
@@ -346,12 +349,13 @@ public class CloudBreakpointHandler
     // Sending the file as com/package/example/Class.java to Cloud Debugger because it plays nice
     // with the CDB plugin. See ServerToIDEFileResolver.
     location.setPath(ServerToIDEFileResolver.getCloudPathFromJavaFile((PsiJavaFile) javaFile));
-    location.setLine(xIdeBreakpoint.getSourcePosition().getLine() + 1);
+    location.setLine(sourcePosition.getLine() + 1);
 
     Breakpoint serverNewBreakpoint = new Breakpoint();
     serverNewBreakpoint.setLocation(location);
-    if (xIdeBreakpoint.getConditionExpression() != null) {
-      serverNewBreakpoint.setCondition(xIdeBreakpoint.getConditionExpression().getExpression());
+    XExpression conditionExpression = xIdeBreakpoint.getConditionExpression();
+    if (conditionExpression != null) {
+      serverNewBreakpoint.setCondition(conditionExpression.getExpression());
     }
 
     List<String> watches = cloudIdeLineBreakpoint.getWatchExpressions();
