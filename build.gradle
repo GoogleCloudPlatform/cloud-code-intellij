@@ -84,7 +84,7 @@ subprojects {
 
     apply plugin: 'findbugs'
     findbugs {
-        ignoreFailures = true
+        ignoreFailures = System.getenv('TRAVIS') != 'true'
         sourceSets = [sourceSets.main]
         effort = "max"
         toolVersion = '2.0.3'
@@ -100,11 +100,11 @@ subprojects {
 
     apply plugin: 'pmd'
     pmd {
-        ignoreFailures = true
+        ignoreFailures = System.getenv('TRAVIS') != 'true'
         sourceSets = [sourceSets.main]
         // Don't use the default ruleset but use a custom ruleset to exclude some PMD rules.
         ruleSets = []
-        ruleSetFiles = files("../custom-pmd-ruleset.xml");
+        ruleSetFiles = files('../custom-pmd-ruleset.xml');
     }
 
     apply plugin: 'jdepend'
