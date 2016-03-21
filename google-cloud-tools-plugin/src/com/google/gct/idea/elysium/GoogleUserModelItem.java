@@ -18,9 +18,9 @@ package com.google.gct.idea.elysium;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.developerprojects.Developerprojects;
-import com.google.api.services.developerprojects.model.ListProjectsResponse;
-import com.google.api.services.developerprojects.model.Project;
+import com.google.api.services.cloudresourcemanager.CloudResourceManager;
+import com.google.api.services.cloudresourcemanager.model.ListProjectsResponse;
+import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.login.CredentialedUser;
@@ -57,13 +57,14 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
   private final DefaultTreeModel treeModel;
   private volatile boolean isSynchronizing;
   private volatile boolean needsSynchronizing;
-  private Developerprojects developerProjectsClient;
+  private CloudResourceManager cloudResourceManagerClient;
 
   GoogleUserModelItem(@NotNull CredentialedUser user, @NotNull DefaultTreeModel treeModel) {
     this.user = user;
     this.treeModel = treeModel;
     setNeedsSynchronizing();
-    developerProjectsClient = new Developerprojects.Builder(
+
+    cloudResourceManagerClient = new CloudResourceManager.Builder(
         new NetHttpTransport(), new JacksonFactory(), user.getCredential())
         .setApplicationName(
             ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent())
@@ -140,19 +141,21 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     final List<DefaultMutableTreeNode> result = new ArrayList<DefaultMutableTreeNode>();
 
     try {
-      ListProjectsResponse response = developerProjectsClient.projects().list()
+
+      ListProjectsResponse response = cloudResourceManagerClient.projects().list()
           .setPageSize(PROJECTS_MAX_PAGE_SIZE).execute();
+
       if (response != null && response.getProjects() != null) {
         // Sorts the projects list by project ID.
         Set<Project> allProjects = new TreeSet<Project>(new Comparator<Project>() {
           @Override
           public int compare(Project p1, Project p2) {
-            return p1.getTitle().toLowerCase().compareTo(p2.getTitle().toLowerCase());
+            return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase());
           }
         });
         allProjects.addAll(response.getProjects());
         while(!Strings.isNullOrEmpty(response.getNextPageToken())) {
-          response = developerProjectsClient.projects().list()
+          response = cloudResourceManagerClient.projects().list()
               .setPageToken(response.getNextPageToken())
               .setPageSize(PROJECTS_MAX_PAGE_SIZE)
               .execute();
@@ -160,7 +163,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
         }
         for (Project pantheonProject : allProjects) {
           if (!Strings.isNullOrEmpty(pantheonProject.getProjectId())) {
-            result.add(new ElysiumProjectModelItem(pantheonProject.getTitle(),
+            result.add(new ElysiumProjectModelItem(pantheonProject.getName(),
                                                    pantheonProject.getProjectId(),
                                                    pantheonProject.getProjectNumber()));
           }
