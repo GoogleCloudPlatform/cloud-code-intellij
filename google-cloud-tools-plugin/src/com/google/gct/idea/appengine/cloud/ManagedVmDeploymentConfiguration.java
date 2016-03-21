@@ -48,7 +48,19 @@ public class ManagedVmDeploymentConfiguration extends
 
   private String dockerFilePath;
   private String appYamlPath;
+  private boolean userSpecifiedArtifact;
+  private String userSpecifiedArtifactPath;
   private ConfigType configType;
+
+  @Attribute("userSpecifiedArtifact")
+  public boolean isUserSpecifiedArtifact() {
+    return userSpecifiedArtifact;
+  }
+
+  @Attribute("userSpecifiedArtifactPath")
+  public String getUserSpecifiedArtifactPath() {
+    return userSpecifiedArtifactPath;
+  }
 
   @Attribute("dockerFilePath")
   public String getDockerFilePath() {
@@ -67,6 +79,14 @@ public class ManagedVmDeploymentConfiguration extends
 
   public void setConfigType(@NotNull ConfigType configType) {
     this.configType = configType;
+  }
+
+  public void setUserSpecifiedArtifact(boolean userSpecifiedArtifact) {
+    this.userSpecifiedArtifact = userSpecifiedArtifact;
+  }
+
+  public void setUserSpecifiedArtifactPath(String userSpecifiedArtifactPath) {
+    this.userSpecifiedArtifactPath = userSpecifiedArtifactPath;
   }
 
   public void setDockerFilePath(String dockerFilePath) {
