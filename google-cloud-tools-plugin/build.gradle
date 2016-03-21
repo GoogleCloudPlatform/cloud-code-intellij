@@ -38,9 +38,8 @@ dependencies {
     compile(project(':common-lib'))
 
     compile files('lib/google-api-services-clouddebugger-v2-rev4-1.20.0.jar')
-//    compile files('lib/google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar')
-    compile files('lib/google-api-services-source.jar')
     compile files('lib/google-api-services-cloudresourcemanager-v1beta1-rev12-1.21.0.jar')
+    compile files('lib/google-api-services-source.jar')
 
     testCompile(project(':common-test-lib'))
     testRuntime files('../google-account-plugin/lib/google-gct-login-context-ij-pg.jar')

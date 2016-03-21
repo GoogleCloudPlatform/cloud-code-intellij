@@ -19,7 +19,6 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
-import com.google.api.services.cloudresourcemanager.CloudResourceManagerRequest;
 import com.google.api.services.cloudresourcemanager.model.ListProjectsResponse;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.gct.idea.CloudToolsPluginInfoService;
@@ -58,28 +57,18 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
   private final DefaultTreeModel treeModel;
   private volatile boolean isSynchronizing;
   private volatile boolean needsSynchronizing;
-  private CloudResourceManager cloudResourceManager;
-//  private Developerprojects developerProjectsClient;
+  private CloudResourceManager cloudResourceManagerClient;
 
   GoogleUserModelItem(@NotNull CredentialedUser user, @NotNull DefaultTreeModel treeModel) {
     this.user = user;
     this.treeModel = treeModel;
     setNeedsSynchronizing();
 
-    cloudResourceManager = new CloudResourceManager.Builder(
+    cloudResourceManagerClient = new CloudResourceManager.Builder(
         new NetHttpTransport(), new JacksonFactory(), user.getCredential())
         .setApplicationName(
             ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent())
         .build();
-
-
-    /*
-    developerProjectsClient = new Developerprojects.Builder(
-        new NetHttpTransport(), new JacksonFactory(), user.getCredential())
-        .setApplicationName(
-            ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent())
-        .build();
-        */
   }
 
   public CredentialedUser getCredentialedUser() {
@@ -153,9 +142,8 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
 
     try {
 
-      ListProjectsResponse response = cloudResourceManager.projects().list().setPageSize(PROJECTS_MAX_PAGE_SIZE).execute();
-//      ListProjectsResponse response = developerProjectsClient.projects().list()
-//          .setPageSize(PROJECTS_MAX_PAGE_SIZE).execute();
+      ListProjectsResponse response = cloudResourceManagerClient.projects().list()
+          .setPageSize(PROJECTS_MAX_PAGE_SIZE).execute();
 
       if (response != null && response.getProjects() != null) {
         // Sorts the projects list by project ID.
@@ -167,7 +155,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
         });
         allProjects.addAll(response.getProjects());
         while(!Strings.isNullOrEmpty(response.getNextPageToken())) {
-          response = cloudResourceManager.projects().list()
+          response = cloudResourceManagerClient.projects().list()
               .setPageToken(response.getNextPageToken())
               .setPageSize(PROJECTS_MAX_PAGE_SIZE)
               .execute();
