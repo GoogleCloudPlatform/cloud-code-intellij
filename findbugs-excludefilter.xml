@@ -21,9 +21,13 @@
       1. Inefficient 'new String("plain string")' constructor
       2. Redundant null checking of known non-null value
       3. Possible null pointer deref
+      4. Missing equals override
     The main reason we turn these off is that they don't provide justifiable value
     considering the cost of addressing every single case of them, particularly
     because there doesn't seem to exist *the* best way to mute false alarms.
+    The reason for (4) is that in cases where we don't want to override the behavior
+    of the super equals method, we don't want to force the user to create overrides
+    that do nothing but call super.
   -->
   <Match>
     <Or>
@@ -31,6 +35,7 @@
       <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
       <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
       <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
+      <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
     </Or>
   </Match>
 </FindBugsFilter>
