@@ -21,8 +21,11 @@ import com.google.gct.idea.appengine.util.CloudSdkUtil;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
 
+import com.intellij.icons.AllIcons.FileTypes;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.module.ModulePointer;
+import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -36,6 +39,7 @@ import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfigurator;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.JavaDeploymentSourceUtil;
+import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
 import com.intellij.remoteServer.runtime.ServerConnector;
 import com.intellij.remoteServer.runtime.ServerTaskExecutor;
 import com.intellij.remoteServer.runtime.deployment.DeploymentLogManager;
@@ -103,7 +107,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
     return new ManagedVmServerConnector(configuration);
   }
 
-  private static class ManagedVmDeploymentConfigurator extends
+  protected static class ManagedVmDeploymentConfigurator extends
       DeploymentConfigurator<ManagedVmDeploymentConfiguration, ManagedVmServerConfiguration> {
 
     private final Project project;
@@ -115,8 +119,16 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
     @NotNull
     @Override
     public List<DeploymentSource> getAvailableDeploymentSources() {
-      return JavaDeploymentSourceUtil
-          .getInstance().createArtifactDeploymentSources(project, getJarsAndWars());
+      List<DeploymentSource> deploymentSources = new ArrayList<DeploymentSource>();
+
+      ModulePointer modulePointer =
+          ModulePointerManager.getInstance(project).create("userSpecifiedSource");
+      deploymentSources.add(new UserSpecifiedPathDeploymentSource(modulePointer));
+
+      deploymentSources.addAll(JavaDeploymentSourceUtil
+          .getInstance().createArtifactDeploymentSources(project, getJarsAndWars()));
+
+      return deploymentSources;
     }
 
     private List<Artifact> getJarsAndWars() {
@@ -147,6 +159,40 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
       return new ManagedVmDeploymentRunConfigurationEditor(project, source,
           new CloudSdkAppEngineHelper(new File(server.getConfiguration().getCloudSdkExecutablePath()),
               server.getConfiguration().getCloudProjectName()));
+    }
+
+    /**
+     * A deployment source used as a placeholder to allow user selection of a jar or war file from
+     * the filesystem.
+     */
+    protected static class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl {
+      private String name =
+          GctBundle.message("appengine.managedvm.user.specified.deploymentsource.name");
+
+      public UserSpecifiedPathDeploymentSource(@NotNull ModulePointer pointer) {
+        super(pointer);
+      }
+
+      @Override
+      public boolean isValid() {
+        return false;
+      }
+
+      @Nullable
+      @Override
+      public Icon getIcon() {
+        return FileTypes.Any_type;
+      }
+
+      @NotNull
+      @Override
+      public String getPresentableName() {
+        return name;
+      }
+
+      public void setName(String name) {
+        this.name = name;
+      }
     }
   }
 
@@ -195,16 +241,19 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
 
       final Runnable doDeployment;
       ManagedVmDeploymentConfiguration deploymentConfig = task.getConfiguration();
+      File deploymentSource = deploymentConfig.isUserSpecifiedArtifact() ?
+          new File(deploymentConfig.getUserSpecifiedArtifactPath()) : task.getSource().getFile();
+
       if (deploymentConfig.getConfigType() == ConfigType.AUTO) {
         doDeployment = appEngineHelper.createAutoDeploymentOperation(
             logManager.getMainLoggingHandler(),
-            task.getSource().getFile(),
+            deploymentSource,
             callback
         );
       } else {
         doDeployment = appEngineHelper.createCustomDeploymentOperation(
             logManager.getMainLoggingHandler(),
-            task.getSource().getFile(),
+            deploymentSource,
             getFileFromFilePath(deploymentConfig.getAppYamlPath()),
             getFileFromFilePath(deploymentConfig.getDockerFilePath()),
             callback
