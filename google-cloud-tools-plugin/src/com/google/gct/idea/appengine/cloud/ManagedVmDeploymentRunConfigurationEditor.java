@@ -43,6 +43,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -53,6 +54,8 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
 
   private final Project project;
 
+  private AppEngineHelper appEngineHelper;
+
   private JComboBox configTypeComboBox;
   private JPanel mvmConfigFilesPanel;
   private JPanel mainPanel;
@@ -62,12 +65,14 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
   private JButton generateDockerfileButton;
   private JPanel userSpecifiedArtifactPanel;
   private TextFieldWithBrowseButton userSpecifiedArtifactFileSelector;
+  private JLabel cloudProject;
   DeploymentSource deploymentSource;
 
   public ManagedVmDeploymentRunConfigurationEditor(final Project project,
       final DeploymentSource deploymentSource, final AppEngineHelper appEngineHelper) {
     this.project = project;
     this.deploymentSource = deploymentSource;
+    this.appEngineHelper = appEngineHelper;
 
     toggleJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
@@ -75,6 +80,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
     mvmConfigFilesPanel.setVisible(false);
+    cloudProject.setText(appEngineHelper.getProjectId());
     configTypeComboBox.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -136,6 +142,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
     configuration.setAppYamlPath(appYamlPathField.getText());
     configuration.setConfigType(getConfigType());
 
+    cloudProject.setText(appEngineHelper.getProjectId());
     setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
     toggleJarWarSelector();
     validateConfiguration();
