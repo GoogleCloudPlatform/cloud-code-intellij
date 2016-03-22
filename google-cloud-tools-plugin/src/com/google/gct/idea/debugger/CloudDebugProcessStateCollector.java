@@ -56,7 +56,7 @@ public class CloudDebugProcessStateCollector {
       // listening in the background
       for (final RunnerAndConfigurationSettings config : manager.getAllSettings()) {
         if (notRunningConfiguration(runningProfiles, config.getConfiguration())) {
-          if (config.getConfiguration() instanceof CloudDebugRunConfiguration) { // NOPMD
+          if (config.getConfiguration() instanceof CloudDebugRunConfiguration) {
             final CloudDebugRunConfiguration cloudConfig =
                 (CloudDebugRunConfiguration) config.getConfiguration();
             CloudDebugProcessState state = cloudConfig.getProcessState();
