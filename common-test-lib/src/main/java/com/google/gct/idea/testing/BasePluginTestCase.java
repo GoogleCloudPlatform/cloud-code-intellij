@@ -46,11 +46,14 @@ import com.intellij.testFramework.TestRunnerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.picocontainer.MutablePicoContainer;
 
 /**
  * Test base class that provides a mock Intellij application and project.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class BasePluginTestCase {
 
   protected Project project;
