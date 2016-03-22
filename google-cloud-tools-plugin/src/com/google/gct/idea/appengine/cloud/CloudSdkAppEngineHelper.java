@@ -41,10 +41,13 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   private final File gcloudCommandPath;
   private final String projectId;
+  private final String googleUserName;
 
-  public CloudSdkAppEngineHelper(@NotNull File gcloudCommandPath, @NotNull String projectId) {
+  public CloudSdkAppEngineHelper(@NotNull File gcloudCommandPath, @NotNull String projectId,
+     @NotNull String googleUserName) {
     this.gcloudCommandPath = gcloudCommandPath;
     this.projectId = projectId;
+    this.googleUserName = googleUserName;
   }
 
   @NotNull
@@ -57,6 +60,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @Override
   public String getProjectId() {
     return projectId;
+  }
+
+  @Override
+  public String getGoogleUsername() {
+    return googleUserName;
   }
 
   @NotNull

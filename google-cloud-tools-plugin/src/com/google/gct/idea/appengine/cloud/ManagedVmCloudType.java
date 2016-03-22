@@ -20,6 +20,7 @@ import com.google.gct.idea.appengine.cloud.ManagedVmDeploymentConfiguration.Conf
 import com.google.gct.idea.appengine.util.CloudSdkUtil;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
+import com.google.gct.login.Services;
 
 import com.intellij.icons.AllIcons.FileTypes;
 import com.intellij.openapi.application.ApplicationManager;
@@ -58,9 +59,8 @@ import javax.swing.Icon;
 
 
 /**
- * This class hooks into IntelliJ's
- * <a href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a> configurations for
- * infrastructure based deployment flows.
+ * This class hooks into IntelliJ's <a href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a>
+ * configurations for infrastructure based deployment flows.
  */
 public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration> {
 
@@ -157,8 +157,10 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
         @NotNull DeploymentSource source,
         @NotNull RemoteServer<ManagedVmServerConfiguration> server) {
       return new ManagedVmDeploymentRunConfigurationEditor(project, source,
-          new CloudSdkAppEngineHelper(new File(server.getConfiguration().getCloudSdkExecutablePath()),
-              server.getConfiguration().getCloudProjectName()));
+          new CloudSdkAppEngineHelper(
+              new File(server.getConfiguration().getCloudSdkExecutablePath()),
+              server.getConfiguration().getCloudProjectName(),
+              server.getConfiguration().getGoogleUserName()));
     }
 
     /**
@@ -210,8 +212,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
     public void connect(@NotNull ConnectionCallback<ManagedVmDeploymentConfiguration> callback) {
       if (CloudSdkUtil.isCloudSdkExecutable(configuration.getCloudSdkExecutablePath())) {
         callback.connected(new ManagedVmRuntimeInstance(configuration));
-      }
-      else {
+      } else {
         callback.errorOccurred("Invalid Cloud SDK directory path configured.");
         // TODO Consider auto opening configuration panel
       }
@@ -233,11 +234,14 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
         @NotNull final DeploymentLogManager logManager,
         @NotNull final DeploymentOperationCallback callback) {
       FileDocumentManager.getInstance().saveAllDocuments();
-
+      if (!Services.getLoginService().isLoggedIn()) {
+        callback.errorOccurred("You must be logged in to deploy.");
+        return;
+      }
       AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
           getFileFromFilePath(configuration.getCloudSdkExecutablePath()),
-          configuration.getCloudProjectName()
-      );
+          configuration.getCloudProjectName(),
+          configuration.getGoogleUserName());
 
       final Runnable doDeployment;
       ManagedVmDeploymentConfiguration deploymentConfig = task.getConfiguration();
