@@ -24,7 +24,9 @@
   <description>We selectively activate a certain subset of the PMD rules for Java. These rules are actually a larger set than what the Gradle PMD plugin uses as a default.</description>
 
   <!--rule ref="rulesets/java/android.xml" /-->
-  <rule ref="rulesets/java/basic.xml" />
+  <rule ref="rulesets/java/basic.xml" >
+    <exclude name="CollapsibleIfStatements"/>
+  </rule>
   <rule ref="rulesets/java/braces.xml" />
   <!--rule ref="rulesets/java/clone.xml" /-->
   <!--rule ref="rulesets/java/codesize.xml" /-->
