@@ -37,6 +37,11 @@ public interface AppEngineHelper {
   String getProjectId();
 
   /**
+   * The username of the Google user performing the actions.
+   */
+  String getGoogleUsername();
+
+  /**
    * The default app.yaml to use.
    */
   File defaultAppYaml();

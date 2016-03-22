@@ -21,6 +21,7 @@ import com.google.gct.idea.appengine.util.CloudSdkUtil;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.SystemEnvironmentProvider;
+import com.google.gct.login.CredentialedUser;
 
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -142,8 +143,10 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
         CloudSdkUtil.toParentDirectory(configuration.getCloudSdkExecutablePath()));
     boolean isProjectModified = !Comparing.strEqual(getCloudProjectName(),
         configuration.getCloudProjectName());
+    boolean isUserModified = !Comparing.strEqual(getGoogleUserName(),
+        configuration.getGoogleUserName());
 
-    return isSdkDirModified || isProjectModified;
+    return isSdkDirModified || isProjectModified || isUserModified;
   }
 
   @Override
@@ -159,6 +162,10 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
     }
     else {
       configuration.setCloudProjectName(projectSelector.getText());
+      CredentialedUser selectedUser = projectSelector.getSelectedUser();
+      if (selectedUser != null) {
+        configuration.setGoogleUserName(selectedUser.getEmail());
+      }
       configuration.setCloudSdkExecutablePath(
           CloudSdkUtil.toExecutablePath(cloudSdkDirectoryField.getText()));
     }
@@ -185,5 +192,14 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
 
   public String getCloudProjectName() {
     return projectSelector.getText();
+  }
+
+  @Nullable
+  public String getGoogleUserName() {
+    CredentialedUser selectedUser = projectSelector.getSelectedUser();
+    if (selectedUser == null) {
+      return null;
+    }
+    return selectedUser.getEmail();
   }
 }

@@ -29,6 +29,7 @@ public class ManagedVmServerConfiguration extends
 
   private String cloudSdkExecutablePath;
   private String cloudProjectName;
+  private String googleUserName;
 
   @Attribute("cloudSdkExecutablePath")
   public String getCloudSdkExecutablePath() {
@@ -46,5 +47,14 @@ public class ManagedVmServerConfiguration extends
 
   public void setCloudProjectName(String cloudProjectName) {
     this.cloudProjectName = cloudProjectName;
+  }
+
+  @Attribute("googleUserName")
+  public String getGoogleUserName() {
+    return googleUserName;
+  }
+
+  public void setGoogleUserName(String googleUserName) {
+    this.googleUserName = googleUserName;
   }
 }
