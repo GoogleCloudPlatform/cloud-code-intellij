@@ -16,6 +16,8 @@
 
 package com.google.gct.idea.appengine.cloud;
 
+import com.google.common.eventbus.EventBus;
+
 import com.intellij.remoteServer.configuration.ServerConfigurationBase;
 import com.intellij.util.xmlb.annotations.Attribute;
 
@@ -30,6 +32,8 @@ public class ManagedVmServerConfiguration extends
   private String cloudSdkExecutablePath;
   private String cloudProjectName;
   private String googleUserName;
+
+  private EventBus projectNameListener = new EventBus();
 
   @Attribute("cloudSdkExecutablePath")
   public String getCloudSdkExecutablePath() {
@@ -47,6 +51,7 @@ public class ManagedVmServerConfiguration extends
 
   public void setCloudProjectName(String cloudProjectName) {
     this.cloudProjectName = cloudProjectName;
+    projectNameListener.post(cloudProjectName);
   }
 
   @Attribute("googleUserName")
@@ -56,5 +61,9 @@ public class ManagedVmServerConfiguration extends
 
   public void setGoogleUserName(String googleUserName) {
     this.googleUserName = googleUserName;
+  }
+
+  protected EventBus getProjectNameListener() {
+    return projectNameListener;
   }
 }

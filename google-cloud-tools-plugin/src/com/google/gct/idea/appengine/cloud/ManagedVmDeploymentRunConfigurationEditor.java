@@ -17,6 +17,7 @@
 package com.google.gct.idea.appengine.cloud;
 
 import com.google.common.base.Supplier;
+import com.google.common.eventbus.Subscribe;
 import com.google.gct.idea.appengine.cloud.ManagedVmCloudType.ManagedVmDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
 import com.google.gct.idea.appengine.cloud.ManagedVmDeploymentConfiguration.ConfigType;
 import com.google.gct.idea.util.GctBundle;
@@ -48,6 +49,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
 
 /**
  * Editor for a ManagedVM Deployment runtime configuration.
@@ -59,7 +61,8 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
 
   private JComboBox configTypeComboBox;
   private JPanel mvmConfigFilesPanel;
-  private JPanel mainPanel;
+  private JPanel editorPanel;
+  private JPanel titledPanel;
   private TextFieldWithBrowseButton appYamlPathField;
   private TextFieldWithBrowseButton dockerFilePathField;
   private JButton generateAppYamlButton;
@@ -67,11 +70,19 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
   private JPanel userSpecifiedArtifactPanel;
   private TextFieldWithBrowseButton userSpecifiedArtifactFileSelector;
   private DeploymentSource deploymentSource;
+  private AppEngineHelper appEngineHelper;
 
-  public ManagedVmDeploymentRunConfigurationEditor(final Project project,
-      final DeploymentSource deploymentSource, final AppEngineHelper appEngineHelper) {
+  public ManagedVmDeploymentRunConfigurationEditor(
+      final Project project,
+      final DeploymentSource deploymentSource,
+      final ManagedVmServerConfiguration configuration,
+      final AppEngineHelper appEngineHelper) {
     this.project = project;
     this.deploymentSource = deploymentSource;
+    this.appEngineHelper = appEngineHelper;
+
+    updateCloudProjectName(appEngineHelper.getProjectId());
+    configuration.getProjectNameListener().register(new ProjectNameListener());
 
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
@@ -146,9 +157,17 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
     configuration.setAppYamlPath(appYamlPathField.getText());
     configuration.setConfigType(getConfigType());
 
+    updateCloudProjectName(appEngineHelper.getProjectId());
     setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
     updateJarWarSelector();
     validateConfiguration();
+  }
+
+  private void updateCloudProjectName(String name) {
+    TitledBorder border = (TitledBorder) titledPanel.getBorder();
+    border.setTitle(GctBundle.message("appengine.managedvm.config.project.panel.title", name));
+    titledPanel.repaint();
+    titledPanel.revalidate();
   }
 
   private void updateJarWarSelector() {
@@ -204,7 +223,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
   @NotNull
   @Override
   protected JComponent createEditor() {
-    return mainPanel;
+    return editorPanel;
   }
 
   /**
@@ -243,6 +262,13 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
         }
         filePicker.setText(destinationFilePath.getPath());
       }
+    }
+  }
+
+  private class ProjectNameListener {
+    @Subscribe
+    public void handleProjectNameChange(String name) {
+      updateCloudProjectName(name);
     }
   }
 }
