@@ -157,6 +157,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
         @NotNull DeploymentSource source,
         @NotNull RemoteServer<ManagedVmServerConfiguration> server) {
       return new ManagedVmDeploymentRunConfigurationEditor(project, source,
+          server.getConfiguration(),
           new CloudSdkAppEngineHelper(
               new File(server.getConfiguration().getCloudSdkExecutablePath()),
               server.getConfiguration().getCloudProjectName(),
