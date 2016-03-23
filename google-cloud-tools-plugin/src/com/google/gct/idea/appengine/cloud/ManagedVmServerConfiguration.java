@@ -16,10 +16,12 @@
 
 package com.google.gct.idea.appengine.cloud;
 
-import com.google.common.eventbus.EventBus;
-
 import com.intellij.remoteServer.configuration.ServerConfigurationBase;
 import com.intellij.util.xmlb.annotations.Attribute;
+import com.intellij.util.xmlb.annotations.Transient;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * Model for the IntelliJ application scoped 'Cloud' configurations.  This is a base configuration
@@ -33,7 +35,8 @@ public class ManagedVmServerConfiguration extends
   private String cloudProjectName;
   private String googleUserName;
 
-  private EventBus projectNameListener = new EventBus();
+  @Transient
+  private PropertyChangeListener projectNameListener;
 
   @Attribute("cloudSdkExecutablePath")
   public String getCloudSdkExecutablePath() {
@@ -50,9 +53,10 @@ public class ManagedVmServerConfiguration extends
   }
 
   public void setCloudProjectName(String cloudProjectName) {
+    fireNameChangeEvent(this.cloudProjectName, cloudProjectName);
     this.cloudProjectName = cloudProjectName;
-    projectNameListener.post(cloudProjectName);
   }
+
 
   @Attribute("googleUserName")
   public String getGoogleUserName() {
@@ -63,7 +67,18 @@ public class ManagedVmServerConfiguration extends
     this.googleUserName = googleUserName;
   }
 
-  protected EventBus getProjectNameListener() {
-    return projectNameListener;
+  protected void setProjectNameListener(PropertyChangeListener listener) {
+    this.projectNameListener = listener;
+  }
+
+  protected void fireNameChangeEvent(String oldName, String newName) {
+    if (projectNameListener != null) {
+      projectNameListener.propertyChange(new PropertyChangeEvent(
+          this,
+          "cloudProjectName",
+          oldName,
+          newName
+      ));
+    }
   }
 }
