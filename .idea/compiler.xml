@@ -18,5 +18,15 @@
         <processorPath useClasspath="true" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="common-lib_main" target="1.7" />
+      <module name="common-lib_test" target="1.7" />
+      <module name="common-test-lib_main" target="1.7" />
+      <module name="common-test-lib_test" target="1.7" />
+      <module name="google-account-plugin_main" target="1.7" />
+      <module name="google-account-plugin_test" target="1.7" />
+      <module name="google-cloud-tools-plugin_main" target="1.7" />
+      <module name="google-cloud-tools-plugin_test" target="1.7" />
+    </bytecodeTargetLevel>
   </component>
 </project>

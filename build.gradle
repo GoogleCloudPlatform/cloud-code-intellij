@@ -87,7 +87,7 @@ subprojects {
         ignoreFailures = System.getenv('TRAVIS') != 'true'
         sourceSets = [sourceSets.main]
         effort = "max"
-        toolVersion = '2.0.3'
+        toolVersion = '3.0.1'
         excludeFilter = file('../findbugs-excludefilter.xml')
     }
 
