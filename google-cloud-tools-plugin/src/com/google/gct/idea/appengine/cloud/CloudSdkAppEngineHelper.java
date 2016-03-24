@@ -17,7 +17,12 @@
 package com.google.gct.idea.appengine.cloud;
 
 import com.google.common.base.Preconditions;
+import com.google.gct.idea.appengine.cloud.ManagedVmDeploymentConfiguration.ConfigType;
+import com.google.gct.idea.util.GctTracking;
+import com.google.gct.stats.UsageTrackerProvider;
 
+import com.intellij.remoteServer.runtime.Deployment;
+import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -97,7 +102,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         artifactToDeploy,
         appYamlPath,
         dockerfilePath,
-        deploymentCallback
+        wrapCallbackForUsageTracking(deploymentCallback,
+            ConfigType.CUSTOM,DeploymentArtifactType.typeForPath(artifactToDeploy))
     );
   }
 
@@ -118,8 +124,43 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         artifactToDeploy,
         defaultAppYaml(),
         defaultDockerfile(artifactType),
-        deploymentCallback
+        wrapCallbackForUsageTracking(deploymentCallback, ConfigType.AUTO, artifactType)
     );
+  }
+
+  @NotNull
+  private DeploymentOperationCallback wrapCallbackForUsageTracking(
+      final DeploymentOperationCallback deploymentCallback,
+      ConfigType deploymentType, DeploymentArtifactType artifactType) {
+
+    StringBuilder labelBuilder = new StringBuilder("deploy.flex");
+    switch (deploymentType) {
+      case AUTO:
+        labelBuilder.append(".auto");
+        break;
+      case CUSTOM:
+        labelBuilder.append(".custom");
+        break;
+      default:
+        throw new AssertionError();
+    }
+    labelBuilder.append(".java").append(artifactType.toString());
+
+    final String eventLabel = labelBuilder.toString();
+
+    return new DeploymentOperationCallback() {
+      @Override
+      public Deployment succeeded(@NotNull DeploymentRuntime deploymentRuntime) {
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE, eventLabel, null);
+        return deploymentCallback.succeeded(deploymentRuntime);
+      }
+
+      @Override
+      public void errorOccurred(@NotNull String errorMessage) {
+        deploymentCallback.errorOccurred(errorMessage);
+      }
+    };
   }
 
   @NotNull

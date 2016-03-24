@@ -24,7 +24,7 @@ public class GctTracking {
 
   // actions
   public static final String CLOUD_DEBUGGER = "cloud.debugger";
-  public static final String DEPLOY = "appengine.update";
+  public static final String APP_ENGINE = "appengine";
   public static final String GRADLE_IMPORT = "appengine.gradle.import";
   public static final String PROJECT_SELECTION = "project.selection";
   public static final String RUN = "appengine.run";
