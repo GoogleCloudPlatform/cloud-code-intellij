@@ -16,9 +16,9 @@
 
 package com.google.gct.idea.debugger;
 
-import com.google.api.services.clouddebugger.model.SourceLocation;
-import com.google.api.services.clouddebugger.model.StackFrame;
-import com.google.api.services.clouddebugger.model.Variable;
+import com.google.api.services.clouddebugger.v2.model.SourceLocation;
+import com.google.api.services.clouddebugger.v2.model.StackFrame;
+import com.google.api.services.clouddebugger.v2.model.Variable;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;

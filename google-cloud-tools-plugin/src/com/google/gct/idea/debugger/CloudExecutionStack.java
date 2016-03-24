@@ -15,8 +15,8 @@
  */
 package com.google.gct.idea.debugger;
 
-import com.google.api.services.clouddebugger.model.StackFrame;
-import com.google.api.services.clouddebugger.model.Variable;
+import com.google.api.services.clouddebugger.v2.model.StackFrame;
+import com.google.api.services.clouddebugger.v2.model.Variable;
 import com.intellij.openapi.project.Project;
 import com.intellij.xdebugger.frame.XExecutionStack;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * CloudExecutionStack represents an entire stack for a
- * {@link com.google.api.services.clouddebugger.model.Breakpoint}. It stores the individual frames,
+ * {@link com.google.api.services.clouddebugger.v2.model.Breakpoint}. It stores the individual frames,
  * and also the variables and custom watch expressions.
  */
 public class CloudExecutionStack extends XExecutionStack {

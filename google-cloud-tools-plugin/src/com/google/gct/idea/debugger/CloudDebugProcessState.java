@@ -15,7 +15,7 @@
  */
 package com.google.gct.idea.debugger;
 
-import com.google.api.services.clouddebugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.Executor;

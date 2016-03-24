@@ -24,9 +24,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
-import com.google.api.services.clouddebugger.Clouddebugger.Debugger.Debuggees;
-import com.google.api.services.clouddebugger.Clouddebugger.Debugger.Debuggees.Breakpoints;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees.Breakpoints;
 import com.google.gct.idea.testing.BasePluginTestCase;
 
 import com.intellij.notification.Notification;

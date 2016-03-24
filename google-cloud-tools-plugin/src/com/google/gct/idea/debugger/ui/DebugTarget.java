@@ -15,7 +15,7 @@
  */
 package com.google.gct.idea.debugger.ui;
 
-import com.google.api.services.clouddebugger.model.Debuggee;
+import com.google.api.services.clouddebugger.v2.model.Debuggee;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.gct.idea.util.GctBundle;

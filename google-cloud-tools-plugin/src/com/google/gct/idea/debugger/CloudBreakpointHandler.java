@@ -16,8 +16,8 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.clouddebugger.model.Breakpoint;
-import com.google.api.services.clouddebugger.model.SourceLocation;
+import com.google.api.services.clouddebugger.v2.model.Breakpoint;
+import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.GctTracking;

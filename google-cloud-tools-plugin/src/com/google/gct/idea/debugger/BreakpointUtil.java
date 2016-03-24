@@ -16,7 +16,7 @@
 package com.google.gct.idea.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.clouddebugger.model.StatusMessage;
+import com.google.api.services.clouddebugger.v2.model.StatusMessage;
 import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.openapi.diagnostic.Logger;
