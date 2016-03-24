@@ -17,11 +17,11 @@ package com.google.gct.idea.debugger;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
-import com.google.api.services.clouddebugger.Clouddebugger.Debugger.Debuggees;
-import com.google.api.services.clouddebugger.Clouddebugger.Debugger.Debuggees.Breakpoints;
-import com.google.api.services.clouddebugger.model.Breakpoint;
-import com.google.api.services.clouddebugger.model.ListBreakpointsResponse;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees.Breakpoints;
+import com.google.api.services.clouddebugger.v2.model.Breakpoint;
+import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
 import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.notification.Notification;

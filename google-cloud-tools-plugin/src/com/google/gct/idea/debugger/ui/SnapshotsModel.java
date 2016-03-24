@@ -16,7 +16,7 @@
 
 package com.google.gct.idea.debugger.ui;
 
-import com.google.api.services.clouddebugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.gct.idea.debugger.BreakpointUtil;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;

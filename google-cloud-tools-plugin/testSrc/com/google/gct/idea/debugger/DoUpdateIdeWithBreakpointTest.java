@@ -28,7 +28,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.api.services.clouddebugger.model.Breakpoint;
+import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.common.collect.Lists;
 import com.google.gct.idea.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.gct.idea.testing.BasePluginTestCase;

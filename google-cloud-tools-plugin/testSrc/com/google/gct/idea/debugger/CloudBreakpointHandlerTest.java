@@ -30,8 +30,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.api.services.clouddebugger.model.Breakpoint;
-import com.google.api.services.clouddebugger.model.SourceLocation;
+import com.google.api.services.clouddebugger.v2.model.Breakpoint;
+import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gct.idea.debugger.CloudDebugProcessStateController.SetBreakpointHandler;

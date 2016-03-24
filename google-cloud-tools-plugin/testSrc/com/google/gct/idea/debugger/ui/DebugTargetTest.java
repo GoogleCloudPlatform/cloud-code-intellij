@@ -17,7 +17,7 @@ package com.google.gct.idea.debugger.ui;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.api.services.clouddebugger.model.Debuggee;
+import com.google.api.services.clouddebugger.v2.model.Debuggee;
 
 import org.junit.Test;
 

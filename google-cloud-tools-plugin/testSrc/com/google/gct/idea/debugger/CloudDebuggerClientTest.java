@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
-import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
 import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.idea.testing.BasePluginTestCase;
 import com.google.gct.login.CredentialedUser;

@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.services.clouddebugger.model.Debuggee;
+import com.google.api.services.clouddebugger.v2.model.Debuggee;
 import com.google.gct.idea.debugger.CloudDebugProcessState;
 import com.google.gct.idea.debugger.ProjectRepositoryValidator;
 import com.google.gct.idea.debugger.SyncResult;

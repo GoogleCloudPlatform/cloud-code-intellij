@@ -19,12 +19,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.api.services.clouddebugger.Clouddebugger.Debugger;
-import com.google.api.services.clouddebugger.model.Breakpoint;
-import com.google.api.services.clouddebugger.model.FormatMessage;
-import com.google.api.services.clouddebugger.model.ListBreakpointsResponse;
-import com.google.api.services.clouddebugger.model.SourceLocation;
-import com.google.api.services.clouddebugger.model.StatusMessage;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.v2.model.Breakpoint;
+import com.google.api.services.clouddebugger.v2.model.FormatMessage;
+import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
+import com.google.api.services.clouddebugger.v2.model.SourceLocation;
+import com.google.api.services.clouddebugger.v2.model.StatusMessage;
 import com.google.gct.idea.testing.TestUtils;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLoginService;
