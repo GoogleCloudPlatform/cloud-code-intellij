@@ -35,6 +35,11 @@
   <!--rule ref="rulesets/java/coupling.xml" /-->
   <!--rule ref="rulesets/java/design.xml" /-->
   <rule ref="rulesets/java/empty.xml" />
+  <rule ref="rulesets/java/empty.xml/EmptyCatchBlock">
+    <properties>
+      <property name="allowCommentedBlocks" value="true"/>
+    </properties>
+  </rule>
   <rule ref="rulesets/java/finalizers.xml" />
   <rule ref="rulesets/java/imports.xml" />
   <!--rule ref="rulesets/java/j2ee.xml" /-->
