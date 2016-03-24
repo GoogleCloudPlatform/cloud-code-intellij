@@ -17,7 +17,6 @@
 package com.google.gct.idea.appengine.cloud;
 
 import com.google.common.base.Supplier;
-import com.google.common.eventbus.Subscribe;
 import com.google.gct.idea.appengine.cloud.ManagedVmCloudType.ManagedVmDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
 import com.google.gct.idea.appengine.cloud.ManagedVmDeploymentConfiguration.ConfigType;
 import com.google.gct.idea.util.GctBundle;
@@ -41,6 +40,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -82,7 +83,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
     this.appEngineHelper = appEngineHelper;
 
     updateCloudProjectName(appEngineHelper.getProjectId());
-    configuration.getProjectNameListener().register(new ProjectNameListener());
+    configuration.setProjectNameListener(new ProjectNameListener());
 
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
@@ -265,10 +266,10 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
     }
   }
 
-  private class ProjectNameListener {
-    @Subscribe
-    public void handleProjectNameChange(String name) {
-      updateCloudProjectName(name);
+  private class ProjectNameListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      updateCloudProjectName((String) evt.getNewValue());
     }
   }
 }
