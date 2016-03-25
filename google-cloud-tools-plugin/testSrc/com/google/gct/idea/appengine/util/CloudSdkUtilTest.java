@@ -37,8 +37,8 @@ public class CloudSdkUtilTest extends BasePluginTestCase {
   @Mock
   private SystemEnvironmentProvider environmentProvider;
 
-  private static final String CLOUD_SDK_EXECUTABLE_PATH = "/a/b/c/gcloud";
-  private static final String CLOUD_SDK_DIR_PATH = "/a/b/c";
+  private static final String CLOUD_SDK_EXECUTABLE_PATH = "/a/b/c/gcloud-sdk/bin/gcloud";
+  private static final String CLOUD_SDK_DIR_PATH = "/a/b/c/gcloud-sdk";
 
   @Before
   public void setUp() {
@@ -70,6 +70,6 @@ public class CloudSdkUtilTest extends BasePluginTestCase {
     assertEquals(CLOUD_SDK_EXECUTABLE_PATH,
         CloudSdkUtil.toExecutablePath(CLOUD_SDK_DIR_PATH));
     assertEquals(CLOUD_SDK_DIR_PATH,
-        CloudSdkUtil.toParentDirectory(CLOUD_SDK_EXECUTABLE_PATH));
+        CloudSdkUtil.toSdkHomeDirectory(CLOUD_SDK_EXECUTABLE_PATH));
   }
 }

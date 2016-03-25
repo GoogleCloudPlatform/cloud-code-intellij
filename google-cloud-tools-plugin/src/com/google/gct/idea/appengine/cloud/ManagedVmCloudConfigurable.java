@@ -64,13 +64,11 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
 
     warningMessage.setVisible(false);
 
-    final String cloudSdkExecutablePath = CloudSdkUtil.findCloudSdkExecutablePath(environmentProvider);
     final String cloudSdkDirectoryPath = CloudSdkUtil.findCloudSdkDirectoryPath(environmentProvider);
 
-    if (cloudSdkExecutablePath != null
-        && cloudSdkDirectoryPath != null
-        && configuration.getCloudSdkExecutablePath() == null) {
-      configuration.setCloudSdkExecutablePath(cloudSdkExecutablePath);
+    if (cloudSdkDirectoryPath != null
+        && configuration.getCloudSdkHomePath() == null) {
+      configuration.setCloudSdkHomePath(cloudSdkDirectoryPath);
       cloudSdkDirectoryField.setText(cloudSdkDirectoryPath);
     }
 
@@ -140,7 +138,7 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
   @Override
   public boolean isModified() {
     boolean isSdkDirModified = !Comparing.strEqual(getCloudSdkDirectory(),
-        CloudSdkUtil.toParentDirectory(configuration.getCloudSdkExecutablePath()));
+        configuration.getCloudSdkHomePath());
     boolean isProjectModified = !Comparing.strEqual(getCloudProjectName(),
         configuration.getCloudProjectName());
     boolean isUserModified = !Comparing.strEqual(getGoogleUserName(),
@@ -166,15 +164,13 @@ public class ManagedVmCloudConfigurable extends RemoteServerConfigurable impleme
       if (selectedUser != null) {
         configuration.setGoogleUserName(selectedUser.getEmail());
       }
-      configuration.setCloudSdkExecutablePath(
-          CloudSdkUtil.toExecutablePath(cloudSdkDirectoryField.getText()));
+      configuration.setCloudSdkHomePath(cloudSdkDirectoryField.getText());
     }
   }
 
   @Override
   public void reset() {
-    cloudSdkDirectoryField.setText(
-        CloudSdkUtil.toParentDirectory(configuration.getCloudSdkExecutablePath()));
+    cloudSdkDirectoryField.setText(configuration.getCloudSdkHomePath());
     projectSelector.setText(configuration.getCloudProjectName());
   }
 

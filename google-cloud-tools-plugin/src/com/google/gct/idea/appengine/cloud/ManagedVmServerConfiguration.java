@@ -31,16 +31,16 @@ import java.beans.PropertyChangeListener;
 public class ManagedVmServerConfiguration extends
     ServerConfigurationBase<ManagedVmServerConfiguration> {
 
-  private String cloudSdkExecutablePath;
+  private String cloudSdkHomePath;
   private String cloudProjectName;
   private String googleUserName;
 
   @Transient
   private PropertyChangeListener projectNameListener;
 
-  @Attribute("cloudSdkExecutablePath")
-  public String getCloudSdkExecutablePath() {
-    return cloudSdkExecutablePath;
+  @Attribute("cloudSdkHomePath")
+  public String getCloudSdkHomePath() {
+    return cloudSdkHomePath;
   }
 
   @Attribute("cloudProjectName")
@@ -48,8 +48,8 @@ public class ManagedVmServerConfiguration extends
     return cloudProjectName;
   }
 
-  public void setCloudSdkExecutablePath(String cloudSdkExecutablePath) {
-    this.cloudSdkExecutablePath = cloudSdkExecutablePath;
+  public void setCloudSdkHomePath(String cloudSdkHomePath) {
+    this.cloudSdkHomePath = cloudSdkHomePath;
   }
 
   public void setCloudProjectName(String cloudProjectName) {

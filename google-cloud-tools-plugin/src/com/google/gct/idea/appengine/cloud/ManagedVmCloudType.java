@@ -159,7 +159,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
       return new ManagedVmDeploymentRunConfigurationEditor(project, source,
           server.getConfiguration(),
           new CloudSdkAppEngineHelper(
-              new File(server.getConfiguration().getCloudSdkExecutablePath()),
+              new File(CloudSdkUtil.toExecutablePath(server.getConfiguration().getCloudSdkHomePath())),
               server.getConfiguration().getCloudProjectName(),
               server.getConfiguration().getGoogleUserName()));
     }
@@ -211,7 +211,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
 
     @Override
     public void connect(@NotNull ConnectionCallback<ManagedVmDeploymentConfiguration> callback) {
-      if (CloudSdkUtil.isCloudSdkExecutable(configuration.getCloudSdkExecutablePath())) {
+      if (CloudSdkUtil.isCloudSdkExecutable(CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath()))) {
         callback.connected(new ManagedVmRuntimeInstance(configuration));
       } else {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
@@ -240,7 +240,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
         return;
       }
       AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
-          getFileFromFilePath(configuration.getCloudSdkExecutablePath()),
+          getFileFromFilePath(CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath())),
           configuration.getCloudProjectName(),
           configuration.getGoogleUserName());
 
