@@ -16,6 +16,8 @@
 
 package com.google.gct.idea.appengine.cloud;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -66,8 +68,9 @@ public interface AppEngineHelper {
    * @param deploymentCallback a callback for handling successful completion of the operation
    * @return the runnable that will perform the deployment operation
    */
-  Runnable createCustomDeploymentOperation(
+  ManagedVmAction createCustomDeploymentAction(
       LoggingHandler loggingHandler,
+      Project project,
       File artifactToDeploy,
       File appYamlPath,
       File dockerfilePath,
@@ -82,8 +85,14 @@ public interface AppEngineHelper {
    * @param deploymentCallback a callback for handling successful completion of the operation
    * @return the runnable that will perform the deployment operation
    */
-  Runnable createAutoDeploymentOperation(
+  ManagedVmAction createAutoDeploymentAction(
       LoggingHandler loggingHandler,
+      Project project,
       File artifactToDeploy,
       DeploymentOperationCallback deploymentCallback);
+
+  ManagedVmAction createManagedVmStopAction(
+      LoggingHandler loggingHandler,
+      UndeploymentTaskCallback undeploymentTaskCallback
+  );
 }

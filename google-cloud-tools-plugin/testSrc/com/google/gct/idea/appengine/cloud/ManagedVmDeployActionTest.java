@@ -39,9 +39,9 @@ import java.io.FileReader;
 import java.util.Map;
 
 /**
- * Test case for {@link DoManagedVmDeployment}.
+ * Test case for {@link ManagedVmDeployAction}.
  */
-public class DoManagedVmDeploymentTest extends BasePluginTestCase {
+public class ManagedVmDeployActionTest extends BasePluginTestCase {
 
   @Mock private LoggingHandler loggingHandler;
   @Mock private File deploymentArtifactPath;
@@ -52,16 +52,17 @@ public class DoManagedVmDeploymentTest extends BasePluginTestCase {
   @Mock private GoogleLoginService googleLoginService;
   @Mock private CredentialedUser credentialedUser;
   @Mock private GoogleLoginState loginState;
-  DoManagedVmDeployment doManagedVmDeployment;
+  ManagedVmDeployAction managedVmDeployAction;
   File credentialFile;
 
   @Before
   public void initialize() {
     registerService(GoogleLoginService.class, googleLoginService);
     when(deploymentArtifactPath.getPath()).thenReturn("bla.jar");
-    doManagedVmDeployment = new DoManagedVmDeployment(
+    managedVmDeployAction = new ManagedVmDeployAction(
         appEngineHelper,
         loggingHandler,
+        getProject(),
         deploymentArtifactPath,
         appYamlPath,
         dockerFilePath,
@@ -80,7 +81,7 @@ public class DoManagedVmDeploymentTest extends BasePluginTestCase {
     when(loginState.fetchOAuth2ClientId()).thenReturn(clientId);
     when(loginState.fetchOAuth2ClientSecret()).thenReturn(clientSecret);
     when(loginState.fetchOAuth2RefreshToken()).thenReturn(refreshToken);
-    credentialFile = doManagedVmDeployment.createApplicationDefaultCredentials();
+    credentialFile = managedVmDeployAction.createApplicationDefaultCredentials();
     Map jsonMap = new Gson().fromJson(new FileReader(credentialFile), Map.class);
     assertEquals(clientId, jsonMap.get("client_id"));
     assertEquals(clientSecret, jsonMap.get("client_secret"));
