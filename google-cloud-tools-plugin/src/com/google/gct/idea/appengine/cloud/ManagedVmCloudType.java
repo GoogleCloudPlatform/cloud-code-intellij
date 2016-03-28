@@ -214,7 +214,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
       if (CloudSdkUtil.isCloudSdkExecutable(configuration.getCloudSdkExecutablePath())) {
         callback.connected(new ManagedVmRuntimeInstance(configuration));
       } else {
-        callback.errorOccurred("Invalid Cloud SDK directory path configured.");
+        callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
         // TODO Consider auto opening configuration panel
       }
     }
@@ -236,7 +236,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
         @NotNull final DeploymentOperationCallback callback) {
       FileDocumentManager.getInstance().saveAllDocuments();
       if (!Services.getLoginService().isLoggedIn()) {
-        callback.errorOccurred("You must be logged in to deploy.");
+        callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
         return;
       }
       AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
@@ -265,7 +265,8 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
         );
       }
       ProgressManager.getInstance()
-          .run(new Task.Backgroundable(task.getProject(), "Deploying to MVM", true,
+          .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
+              "appengine.deployment.status.deploying"), true,
               null) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
