@@ -18,7 +18,7 @@
   <id>com.google.gct.core</id>
   <name>Google Cloud Tools</name>
   <description>Debug Java applications running in the Google cloud from inside IDEA.
-Code inspections for AppEngine Java code.</description>
+Code inspections for App Engine Java code.</description>
   <vendor>Google</vendor>
   <!-- "version" set by gradle-intellij-plugin -->
   <!-- "idea-version since-build" set by gradle-intellij-plugin -->
