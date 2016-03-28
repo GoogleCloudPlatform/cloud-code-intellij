@@ -16,6 +16,8 @@
 package com.google.gct.login.ui;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
+import com.google.gct.login.util.AccountMessageBundle;
+
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.util.ui.UIUtil;
@@ -38,16 +40,15 @@ import java.awt.event.ActionListener;
 
 /**
  * A dialog to get the verification code from the user.
- * This dialog will  provide the users with an authentication URL to navigate to
+ * This dialog will provide the users with an authentication URL to navigate to
  * and a text box to paste the token they get when they log into Google via an external browser.
  */
 // TODO: set a maximum size for the dialog
 public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
-  private static final String TITLE = "Sign in to Google Services";
-  private static final String SUB_TITLE_1 = "Please sign in to Google Services from the link below.";
-  private static final String SUB_TITLE_2 = "Copy and paste the verification code that will be provided into the text box below.";
-  private static final String ERROR_MESSAGE = "Please log in using the Google Login url above, "
-    + "and copy and paste the generated verification code.";
+  private static final String TITLE = AccountMessageBundle.message("login.copyandpaste.title.text");
+  private static final String SUB_TITLE_1 = AccountMessageBundle.message("login.copyandpaste.subtitle.1.text");
+  private static final String SUB_TITLE_2 = AccountMessageBundle.message("login.copyandpaste.subtitle.2.text");
+  private static final String ERROR_MESSAGE = AccountMessageBundle.message("login.copyandpaste.error.message.text");
 
   private String verificationCode = "";
   private String urlString;
@@ -82,13 +83,13 @@ public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
     JPanel urlPanel = new JPanel(new BorderLayout());
     urlPanel.setLayout(new BoxLayout(urlPanel, BoxLayout.LINE_AXIS));
 
-    JLabel urlLabel = new JLabel(" Google Login Url: ");
+    JLabel urlLabel = new JLabel(AccountMessageBundle.message("login.copyandpaste.login.url.label.text"));
     JTextField urlTextField = createUrlText();
 
     // Add the verification code label and text box
     JPanel codePanel = new JPanel();
     codePanel.setLayout(new BoxLayout(codePanel, BoxLayout.LINE_AXIS));
-    JLabel codeLabel = new JLabel("Verification Code: ");
+    JLabel codeLabel = new JLabel(AccountMessageBundle.message("login.copyandpaste.verification.code.label.text"));
 
     createCodeText();
 
@@ -150,7 +151,7 @@ public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
     urlTextField.add(popup);
     urlTextField.setComponentPopupMenu(popup);
 
-    JMenuItem copyMenu = new JMenuItem("Copy");
+    JMenuItem copyMenu = new JMenuItem(AccountMessageBundle.message("login.copyandpaste.url.copy.text"));
     copyMenu.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -171,7 +172,7 @@ public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
     codeTextField.add(popup);
     codeTextField.setComponentPopupMenu(popup);
 
-    JMenuItem copyMenu = new JMenuItem("Paste");
+    JMenuItem copyMenu = new JMenuItem(AccountMessageBundle.message("login.copyandpaste.url.paste.text"));
     copyMenu.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {

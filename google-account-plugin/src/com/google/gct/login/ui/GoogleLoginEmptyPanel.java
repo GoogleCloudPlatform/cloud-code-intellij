@@ -17,6 +17,7 @@ package com.google.gct.login.ui;
 
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.Services;
+import com.google.gct.login.util.AccountMessageBundle;
 
 import com.intellij.ui.components.JBScrollPane;
 
@@ -36,8 +37,8 @@ import javax.swing.SwingConstants;
  * An empty Google Login Panel that displays an option to log in at the bottom.
  */
 public class GoogleLoginEmptyPanel extends JPanel {
-  private static final String ADD_ACCOUNT = "Add Account";
-  private static final String SIGN_IN = "Sign In";
+  private static final String ADD_ACCOUNT = AccountMessageBundle.message("login.panel.add.account.button.text");
+  private static final String SIGN_IN = AccountMessageBundle.message("login.panel.sign.in.button.text");
   private JBScrollPane contentScrollPane;
   private JPanel bottomPane;
 

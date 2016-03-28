@@ -17,6 +17,7 @@ package com.google.gct.login.ui;
 
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.Services;
+import com.google.gct.login.util.AccountMessageBundle;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ui.components.JBList;
@@ -51,9 +52,9 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   private static final String PLAY_CONSOLE_URL = "https://play.google.com/apps/publish/#ProfilePlace";
   private static final String CLOUD_CONSOLE_URL = "https://console.developers.google.com/";
   private static final String LEARN_MORE_URL = "https://cloud.google.com/docs/overview/developer-and-admin-tools";
-  private static final String ADD_ACCOUNT = "Add Account";
-  private static final String SIGN_IN = "Sign In";
-  private static final String SIGN_OUT = "Sign Out";
+  private static final String ADD_ACCOUNT = AccountMessageBundle.message("login.panel.add.account.button.text");
+  private static final String SIGN_IN = AccountMessageBundle.message("login.panel.sign.in.button.text");
+  private static final String SIGN_OUT = AccountMessageBundle.message("login.panel.sign.out.button.text");
   private static final int MAX_VISIBLE_ROW_COUNT = 3;
 
   private JBList list;

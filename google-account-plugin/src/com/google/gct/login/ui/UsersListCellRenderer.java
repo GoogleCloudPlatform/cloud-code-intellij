@@ -18,6 +18,7 @@ package com.google.gct.login.ui;
 import com.google.api.client.util.Maps;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.Services;
+import com.google.gct.login.util.AccountMessageBundle;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
@@ -53,12 +54,11 @@ import javax.swing.UIManager;
  * how each user item in the Google Login panel would be displayed.
  */
 public class UsersListCellRenderer extends JComponent implements ListCellRenderer {
-  private final static String CLOUD_LABEL_TEXT = "Open Google Developers Console";
-  private final static String PLAY_LABEL_TEXT = "Open Play Developer Console";
+  private final static String CLOUD_LABEL_TEXT = AccountMessageBundle.message("login.panel.play.console.link.text");
+  private final static String PLAY_LABEL_TEXT = AccountMessageBundle.message("login.panel.cloud.console.link.text");
   private final static String DEFAULT_AVATAR = "/icons/loginAvatar@2x.png";
-  private final static String SIGN_IN_TEXT = "<HTML> Sign in with your Google account to start "
-      + "adding <br> Cloud functionality to your applications. </HTML>";
-  private static final String LEARN_MORE_TEXT = "Learn more";
+  private final static String SIGN_IN_TEXT = AccountMessageBundle.message("login.panel.sing.in.body.html");
+  private static final String LEARN_MORE_TEXT = AccountMessageBundle.message("login.panel.learn.more.link.text");
   private static final int PLAIN_USER_IMAGE_WIDTH = 48;
   private static final int PLAIN_USER_IMAGE_HEIGHT = 48;
   private static final int ACTIVE_USER_IMAGE_WIDTH = 96;
