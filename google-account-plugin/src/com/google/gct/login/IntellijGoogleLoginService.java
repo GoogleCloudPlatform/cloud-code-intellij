@@ -24,6 +24,7 @@ import com.google.common.base.Strings;
 import com.google.gct.login.ui.GoogleLoginActionButton;
 import com.google.gct.login.ui.GoogleLoginCopyAndPasteDialog;
 import com.google.gct.login.ui.GoogleLoginIcons;
+import com.google.gct.login.util.AccountMessageBundle;
 import com.google.gct.stats.LoginTracking;
 import com.google.gct.stats.UsageTrackerProvider;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
@@ -167,7 +168,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
 
     // We pass in the current project, which causes intelliJ to properly figure out the parent window.
     // This keeps the cancel dialog on top and visible.
-    new Task.Modal(getCurrentProject(), "Please sign in via the opened browser...", true) {
+    new Task.Modal(getCurrentProject(), AccountMessageBundle.message("login.service.sign.in.via.browser.modal.text"), true) {
       private boolean loggedIn = false;
 
       @Override
@@ -390,7 +391,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
 
     @Override
     public String obtainVerificationCodeFromUserInteraction(String title, GoogleAuthorizationCodeRequestUrl authCodeRequestUrl) {
-      GoogleLoginCopyAndPasteDialog dialog = new GoogleLoginCopyAndPasteDialog(button, authCodeRequestUrl, "Google Login");
+      GoogleLoginCopyAndPasteDialog dialog = new GoogleLoginCopyAndPasteDialog(button, authCodeRequestUrl, AccountMessageBundle.message("login.service.copyandpaste.title.text"));
       dialog.show();
       if (dialog.getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
         return null;
@@ -406,7 +407,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
           localreceiver.stop();
         }
         catch(IOException e) {
-          logErrorAndDisplayDialog("Google Login", e);
+          logErrorAndDisplayDialog(AccountMessageBundle.message("login.service.default.error.dialog.title.text"), e);
         }
       }
     }
@@ -419,7 +420,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
         redirectUrl = receiver.getRedirectUri();
       }
       catch (IOException e) {
-        logErrorAndDisplayDialog(title == null? "Google Login" : title, e);
+        logErrorAndDisplayDialog(title == null? AccountMessageBundle.message("login.service.default.error.dialog.title.text") : title, e);
         return null;
       }
 
@@ -439,7 +440,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
         return null;
       }
       catch (IOException e) {
-        logErrorAndDisplayDialog(title == null ? "Google Login" : title, e);
+        logErrorAndDisplayDialog(title == null ? AccountMessageBundle.message("login.service.default.error.dialog.title.text") : title, e);
         return null;
       }
       finally {
@@ -458,8 +459,8 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     @Override
     public boolean askYesOrNo(String title, String message) {
       StringBuilder updatedMessageBuilder = new StringBuilder(message);
-      if (message.equals("Are you sure you want to sign out?")) {
-        updatedMessageBuilder.append(" This will sign out all logged in users.");
+      if (message.equals(AccountMessageBundle.message("login.service.are.you.sure.key.text"))) {
+        updatedMessageBuilder.append(AccountMessageBundle.message("login.service.are.you.sure.append.text"));
         for (GoogleLoginMessageExtender messageExtender : messageExtenders) {
           String additionalLogoutMessage = messageExtender.additionalLogoutMessage();
           if (!Strings.isNullOrEmpty(additionalLogoutMessage)) {

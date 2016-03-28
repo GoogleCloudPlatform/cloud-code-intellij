@@ -17,6 +17,7 @@ package com.google.gct.login.ui;
 
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.Services;
+import com.google.gct.login.util.AccountMessageBundle;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -33,7 +34,8 @@ import javax.swing.ImageIcon;
  * The Google Login button that appears on the main toolbar.
  */
 public final class GoogleLoginActionButton extends ActionButton {
-  private final static String SIGN_IN_MESSAGE = "Sign in to Google...";
+  private final static String SIGN_IN_MESSAGE = AccountMessageBundle.message(
+      "login.toolbar.button.sign.in.text");
 
   public GoogleLoginActionButton(AnAction action, Presentation presentation, String place, @NotNull Dimension minimumSize) {
     super(action, presentation, place, minimumSize);
@@ -48,11 +50,11 @@ public final class GoogleLoginActionButton extends ActionButton {
   public void updateUi() {
     CredentialedUser activeUser = Services.getLoginService().getActiveUser();
     if(activeUser == null) {
-      setToolTipText(SIGN_IN_MESSAGE);
+      myPresentation.setText(SIGN_IN_MESSAGE);
       myPresentation.setDescription(SIGN_IN_MESSAGE);
       myPresentation.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
     } else {
-      setToolTipText(activeUser.getEmail());
+      myPresentation.setText(activeUser.getEmail());
       myPresentation.setDescription(activeUser.getEmail());
       Image image = activeUser.getPicture();
       if(image == null) {
