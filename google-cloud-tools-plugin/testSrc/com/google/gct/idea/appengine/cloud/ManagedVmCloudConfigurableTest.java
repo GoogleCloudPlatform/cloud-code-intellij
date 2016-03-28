@@ -43,11 +43,11 @@ public class ManagedVmCloudConfigurableTest extends PlatformTestCase {
   private JLabel warningMessage;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
-  private static final String CLOUD_SDK_EXECUTABLE_PATH = "/a/b/c/gcloud";
-  private static final String CLOUD_SDK_DIR_PATH = "/a/b/c";
+  private static final String CLOUD_SDK_EXECUTABLE_PATH = "/a/b/c/gcloud-sdk/bin/gcloud";
+  private static final String CLOUD_SDK_DIR_PATH = "/a/b/c/gcloud-sdk";
 
   private static final String MISSING_PROJECT_WARNING = "Please select a project.";
-  private static final String MISSING_SDK_DIR_WARNING = "Please select a Cloud SDK directory.";
+  private static final String MISSING_SDK_DIR_WARNING = "Please select a Cloud SDK home directory.";
 
   @Override
   public void setUp() throws Exception {
@@ -155,6 +155,8 @@ public class ManagedVmCloudConfigurableTest extends PlatformTestCase {
   private File createTempFile() throws IOException {
     TemporaryFolder tempFolder = new TemporaryFolder();
     tempFolder.create();
-    return tempFolder.newFile("gcloud");
+    File executable = new File(tempFolder.newFolder("bin"), "gcloud");
+    executable.createNewFile();
+    return executable;
   }
 }

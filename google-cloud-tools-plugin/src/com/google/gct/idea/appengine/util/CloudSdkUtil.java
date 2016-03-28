@@ -54,7 +54,7 @@ public final class CloudSdkUtil {
   }
 
   /**
-   * Finds the path to the Cloud SDK binary parent directory on the local file system.
+   * Finds the path to the Cloud SDK home directory on the local file system.
    *
    * @return a {@link String} path to the Cloud SDK directory or {@code null}
    * if it could not be found.
@@ -63,14 +63,14 @@ public final class CloudSdkUtil {
   public static String findCloudSdkDirectoryPath(
       @NotNull SystemEnvironmentProvider environmentProvider) {
     File cloudSdkExecutable = findCloudSdkExecutable(environmentProvider);
-    return cloudSdkExecutable != null ? cloudSdkExecutable.getParent() : null;
+    return cloudSdkExecutable != null ? toSdkHomeDirectory(cloudSdkExecutable.getPath()) : null;
   }
 
   /**
    * Checks if an appropriately named binary exists on the local file system for the given
-   * parent directory path.
+   * SDK home directory path.
    *
-   * @param path @link String} to Cloud SDK binary parent directory on local file system.
+   * @param path @link String} to Cloud SDK home directory on local file system.
    * @return a boolean indicating if the file was found.
    */
   public static boolean containsCloudSdkExecutable(String path) {
@@ -93,12 +93,12 @@ public final class CloudSdkUtil {
   }
 
   /**
-   * Converts from a parent directory path to the Cloud SDK executable path
+   * Converts from a SDK home directory path to the Cloud SDK executable path
    *
    */
   public static String toExecutablePath(String sdkDirectoryPath) {
     if (sdkDirectoryPath != null) {
-      File executablePath = new File(sdkDirectoryPath, getSystemCommand());
+      File executablePath = new File(sdkDirectoryPath + File.separator + "bin", getSystemCommand());
       return executablePath.getAbsolutePath();
     }
 
@@ -106,12 +106,12 @@ public final class CloudSdkUtil {
   }
 
   /**
-   * Converts from a Cloud SDK executable path to its parent directory path
+   * Converts from a Cloud SDK executable path to its SDK home directory
    *
    */
-  public static String toParentDirectory(String sdkExecutablePath) {
+  public static String toSdkHomeDirectory(String sdkExecutablePath) {
     if (sdkExecutablePath != null) {
-      return new File(sdkExecutablePath).getParent();
+      return new File(sdkExecutablePath).getParentFile().getParent();
     }
 
     return null;
