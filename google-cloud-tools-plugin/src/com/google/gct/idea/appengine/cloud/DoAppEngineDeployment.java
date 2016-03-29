@@ -46,11 +46,11 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
- * Performs the deployment of ManagedVM based applications to GCP.
+ * Performs the deployment of App Engine based applications to GCP.
  */
-class DoManagedVmDeployment implements Runnable {
+class DoAppEngineDeployment implements Runnable {
 
-  private static final Logger logger = Logger.getInstance(DoManagedVmDeployment.class);
+  private static final Logger logger = Logger.getInstance(DoAppEngineDeployment.class);
 
   private LoggingHandler loggingHandler;
   private File deploymentArtifactPath;
@@ -60,7 +60,7 @@ class DoManagedVmDeployment implements Runnable {
   private DeploymentOperationCallback callback;
   private DeploymentArtifactType artifactType;
 
-  DoManagedVmDeployment(
+  DoAppEngineDeployment(
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
       @NotNull File deploymentArtifactPath,

@@ -17,7 +17,7 @@
 package com.google.gct.idea.appengine.cloud;
 
 import com.google.common.base.Preconditions;
-import com.google.gct.idea.appengine.cloud.ManagedVmDeploymentConfiguration.ConfigType;
+import com.google.gct.idea.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.stats.UsageTrackerProvider;
 
@@ -96,7 +96,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   public Runnable createCustomDeploymentOperation(LoggingHandler loggingHandler,
       File artifactToDeploy, File appYamlPath, File dockerfilePath,
       DeploymentOperationCallback deploymentCallback) {
-    return new DoManagedVmDeployment(
+    return new DoAppEngineDeployment(
         this,
         loggingHandler,
         artifactToDeploy,
@@ -118,7 +118,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       throw new IllegalArgumentException(artifactToDeploy.getPath() + " is not a support artifact "
           + "type for automatic deployment");
     }
-    return new DoManagedVmDeployment(
+    return new DoAppEngineDeployment(
         this,
         loggingHandler,
         artifactToDeploy,

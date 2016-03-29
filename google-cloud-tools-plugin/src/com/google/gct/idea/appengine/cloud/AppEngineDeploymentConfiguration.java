@@ -24,15 +24,15 @@ import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * The model for a Managed VM based deployment configuration.  This state is specific to the
+ * The model for a App Engine based deployment configuration.  This state is specific to the
  * artifact that's being deployed, as such there can be multiple per project.
  */
-public class ManagedVmDeploymentConfiguration extends
-    CloudDeploymentNameConfiguration<ManagedVmDeploymentConfiguration> {
+public class AppEngineDeploymentConfiguration extends
+    CloudDeploymentNameConfiguration<AppEngineDeploymentConfiguration> {
 
   public enum ConfigType {
-    AUTO("appengine.managedvm.configtype.auto.label"),
-    CUSTOM("appengine.managedvm.configtype.custom.label");
+    AUTO("appengine.flex.configtype.auto.label"),
+    CUSTOM("appengine.flex.configtype.custom.label");
 
     private String label;
 

@@ -17,8 +17,8 @@
 package com.google.gct.idea.appengine.cloud;
 
 import com.google.common.base.Supplier;
-import com.google.gct.idea.appengine.cloud.ManagedVmCloudType.ManagedVmDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
-import com.google.gct.idea.appengine.cloud.ManagedVmDeploymentConfiguration.ConfigType;
+import com.google.gct.idea.appengine.cloud.AppEngineCloudType.AppEngineDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
+import com.google.gct.idea.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -53,10 +53,10 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 /**
- * Editor for a ManagedVM Deployment runtime configuration.
+ * Editor for an App Engine Deployment runtime configuration.
  */
-public class ManagedVmDeploymentRunConfigurationEditor extends
-    SettingsEditor<ManagedVmDeploymentConfiguration> {
+public class AppEngineDeploymentRunConfigurationEditor extends
+    SettingsEditor<AppEngineDeploymentConfiguration> {
 
   private final Project project;
 
@@ -73,10 +73,10 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
   private DeploymentSource deploymentSource;
   private AppEngineHelper appEngineHelper;
 
-  public ManagedVmDeploymentRunConfigurationEditor(
+  public AppEngineDeploymentRunConfigurationEditor(
       final Project project,
       final DeploymentSource deploymentSource,
-      final ManagedVmServerConfiguration configuration,
+      final AppEngineServerConfiguration configuration,
       final AppEngineHelper appEngineHelper) {
     this.project = project;
     this.deploymentSource = deploymentSource;
@@ -102,7 +102,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
       }
     });
     userSpecifiedArtifactFileSelector.addBrowseFolderListener(
-        GctBundle.message("appengine.managedvm.config.user.specified.artifact.title"),
+        GctBundle.message("appengine.flex.config.user.specified.artifact.title"),
         null,
         project,
         FileChooserDescriptorFactory.createSingleFileDescriptor().withFileFilter(new Condition<VirtualFile>() {
@@ -142,7 +142,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
 
 
   @Override
-  protected void resetEditorFrom(ManagedVmDeploymentConfiguration configuration) {
+  protected void resetEditorFrom(AppEngineDeploymentConfiguration configuration) {
     userSpecifiedArtifactFileSelector.setText(configuration.getUserSpecifiedArtifactPath());
     dockerFilePathField.setText(configuration.getDockerFilePath());
     appYamlPathField.setText(configuration.getAppYamlPath());
@@ -150,7 +150,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
   }
 
   @Override
-  protected void applyEditorTo(ManagedVmDeploymentConfiguration configuration)
+  protected void applyEditorTo(AppEngineDeploymentConfiguration configuration)
       throws ConfigurationException {
     configuration.setUserSpecifiedArtifact(isUserSpecifiedPathDeploymentSource());
     configuration.setUserSpecifiedArtifactPath(userSpecifiedArtifactFileSelector.getText());
@@ -166,7 +166,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
 
   private void updateCloudProjectName(String name) {
     TitledBorder border = (TitledBorder) titledPanel.getBorder();
-    border.setTitle(GctBundle.message("appengine.managedvm.config.project.panel.title", name));
+    border.setTitle(GctBundle.message("appengine.config.project.panel.title", name));
     titledPanel.repaint();
     titledPanel.revalidate();
   }
@@ -183,7 +183,7 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
     if(isUserSpecifiedPathDeploymentSource() && !StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())) {
       ((UserSpecifiedPathDeploymentSource) deploymentSource).setName(
           GctBundle.message(
-              "appengine.managedvm.user.specified.deploymentsource.name.with.filename",
+              "appengine.flex.user.specified.deploymentsource.name.with.filename",
               new File(filePath).getName()));
     }
   }
@@ -192,10 +192,10 @@ public class ManagedVmDeploymentRunConfigurationEditor extends
     if (isUserSpecifiedPathDeploymentSource() && (StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())
         || !isJarOrWar(userSpecifiedArtifactFileSelector.getText()))) {
       throw new ConfigurationException(
-          GctBundle.message("appengine.managedvm.config.user.specified.artifact.error"));
+          GctBundle.message("appengine.flex.config.user.specified.artifact.error"));
     } else if (!isUserSpecifiedPathDeploymentSource() && !deploymentSource.isValid()) {
       throw new ConfigurationException(
-          GctBundle.message("appengine.managedvm.config.deployment.source.error"));
+          GctBundle.message("appengine.config.deployment.source.error"));
     }
   }
 

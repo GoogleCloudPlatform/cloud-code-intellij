@@ -40,11 +40,11 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
 
   public SelectConfigDestinationFolderDialog(@Nullable Project project) {
     super(project);
-    setTitle(GctBundle.message("appengine.managedvm.config.destination.chooser.title"));
+    setTitle(GctBundle.message("appengine.flex.config.destination.chooser.title"));
 
     init();
     destinationFolderChooser.addBrowseFolderListener(
-        GctBundle.message("appengine.managedvm.config.choose.destination.folder.window.title"),
+        GctBundle.message("appengine.flex.config.choose.destination.folder.window.title"),
         null,
         project,
         FileChooserDescriptorFactory.createSingleFolderDescriptor()

@@ -44,20 +44,20 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 
 /**
- * GCP ManagedVM Cloud configuration UI.
+ * GCP App Engine Cloud configuration UI.
  */
-public class ManagedVmCloudConfigurable extends RemoteServerConfigurable implements Configurable {
+public class AppEngineCloudConfigurable extends RemoteServerConfigurable implements Configurable {
 
-  private final ManagedVmServerConfiguration configuration;
+  private final AppEngineServerConfiguration configuration;
   private final SystemEnvironmentProvider environmentProvider;
 
-  private String displayName = GctBundle.message("appengine.managedvm.name");
+  private String displayName = GctBundle.message("appengine.flex.name");
   private JPanel mainPanel;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
   private ProjectSelector projectSelector;
   private JLabel warningMessage;
 
-  public ManagedVmCloudConfigurable(ManagedVmServerConfiguration configuration,
+  public AppEngineCloudConfigurable(AppEngineServerConfiguration configuration,
       @Nullable Project project) {
     this.configuration = configuration;
     environmentProvider = SystemEnvironmentProvider.getInstance();
