@@ -29,7 +29,7 @@ import java.util.Set;
 public enum GctFeature implements Feature {
   // DEBUGGER is enabled in IDEA Ultimate and Community, and disabled everywhere else.
   DEBUGGER(ImmutableSet.of(IntelliJPlatform.IDEA, IntelliJPlatform.IDEA_IC), null, null),
-  MANAGEDVM(null, "feature.managedvm", "ct4ij.feature.managedvm");
+  APPENGINE_FLEX(null, "feature.appengine.flex", "ct4ij.feature.appengine.flex");
 
   private final Set<IntelliJPlatform> supportedPlatforms;
   private final String resourceFlagName;

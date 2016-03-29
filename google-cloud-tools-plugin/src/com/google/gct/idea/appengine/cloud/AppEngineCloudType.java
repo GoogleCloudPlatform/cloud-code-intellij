@@ -16,7 +16,7 @@
 
 package com.google.gct.idea.appengine.cloud;
 
-import com.google.gct.idea.appengine.cloud.ManagedVmDeploymentConfiguration.ConfigType;
+import com.google.gct.idea.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.gct.idea.appengine.util.CloudSdkUtil;
 import com.google.gct.idea.ui.GoogleCloudToolsIcons;
 import com.google.gct.idea.util.GctBundle;
@@ -62,16 +62,16 @@ import javax.swing.Icon;
  * This class hooks into IntelliJ's <a href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a>
  * configurations for infrastructure based deployment flows.
  */
-public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration> {
+public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration> {
 
-  public ManagedVmCloudType() {
-    super("app-engine-managed-vm");
+  public AppEngineCloudType() {
+    super("gcp-app-engine"); // "google-app-engine" is used by the native IJ app engine support.
   }
 
   @NotNull
   @Override
   public String getPresentableName() {
-    return GctBundle.message("appengine.managedvm.name");
+    return GctBundle.message("appengine.flex.name");
   }
 
   @NotNull
@@ -82,37 +82,37 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
 
   @NotNull
   @Override
-  public ManagedVmServerConfiguration createDefaultConfiguration() {
-    return new ManagedVmServerConfiguration();
+  public AppEngineServerConfiguration createDefaultConfiguration() {
+    return new AppEngineServerConfiguration();
   }
 
   @NotNull
   @Override
   public RemoteServerConfigurable createServerConfigurable(
-      @NotNull ManagedVmServerConfiguration configuration) {
-    return new ManagedVmCloudConfigurable(configuration, null);
+      @NotNull AppEngineServerConfiguration configuration) {
+    return new AppEngineCloudConfigurable(configuration, null);
   }
 
   @NotNull
   @Override
-  public DeploymentConfigurator<?, ManagedVmServerConfiguration> createDeploymentConfigurator(
+  public DeploymentConfigurator<?, AppEngineServerConfiguration> createDeploymentConfigurator(
       Project project) {
-    return new ManagedVmDeploymentConfigurator(project);
+    return new AppEngineDeploymentConfigurator(project);
   }
 
   @NotNull
   @Override
-  public ServerConnector<?> createConnector(@NotNull ManagedVmServerConfiguration configuration,
+  public ServerConnector<?> createConnector(@NotNull AppEngineServerConfiguration configuration,
       @NotNull ServerTaskExecutor asyncTasksExecutor) {
-    return new ManagedVmServerConnector(configuration);
+    return new AppEngineServerConnector(configuration);
   }
 
-  protected static class ManagedVmDeploymentConfigurator extends
-      DeploymentConfigurator<ManagedVmDeploymentConfiguration, ManagedVmServerConfiguration> {
+  protected static class AppEngineDeploymentConfigurator extends
+      DeploymentConfigurator<AppEngineDeploymentConfiguration, AppEngineServerConfiguration> {
 
     private final Project project;
 
-    public ManagedVmDeploymentConfigurator(Project project) {
+    public AppEngineDeploymentConfigurator(Project project) {
       this.project = project;
     }
 
@@ -146,17 +146,17 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
 
     @NotNull
     @Override
-    public ManagedVmDeploymentConfiguration createDefaultConfiguration(
+    public AppEngineDeploymentConfiguration createDefaultConfiguration(
         @NotNull DeploymentSource source) {
-      return new ManagedVmDeploymentConfiguration();
+      return new AppEngineDeploymentConfiguration();
     }
 
     @Nullable
     @Override
-    public SettingsEditor<ManagedVmDeploymentConfiguration> createEditor(
+    public SettingsEditor<AppEngineDeploymentConfiguration> createEditor(
         @NotNull DeploymentSource source,
-        @NotNull RemoteServer<ManagedVmServerConfiguration> server) {
-      return new ManagedVmDeploymentRunConfigurationEditor(project, source,
+        @NotNull RemoteServer<AppEngineServerConfiguration> server) {
+      return new AppEngineDeploymentRunConfigurationEditor(project, source,
           server.getConfiguration(),
           new CloudSdkAppEngineHelper(
               new File(CloudSdkUtil.toExecutablePath(server.getConfiguration().getCloudSdkHomePath())),
@@ -170,7 +170,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
      */
     protected static class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl {
       private String name =
-          GctBundle.message("appengine.managedvm.user.specified.deploymentsource.name");
+          GctBundle.message("appengine.flex.user.specified.deploymentsource.name");
 
       public UserSpecifiedPathDeploymentSource(@NotNull ModulePointer pointer) {
         super(pointer);
@@ -199,20 +199,20 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
     }
   }
 
-  private static class ManagedVmServerConnector extends
-      ServerConnector<ManagedVmDeploymentConfiguration> {
+  private static class AppEngineServerConnector extends
+      ServerConnector<AppEngineDeploymentConfiguration> {
 
-    private ManagedVmServerConfiguration configuration;
+    private AppEngineServerConfiguration configuration;
 
-    public ManagedVmServerConnector(
-        ManagedVmServerConfiguration configuration) {
+    public AppEngineServerConnector(
+        AppEngineServerConfiguration configuration) {
       this.configuration = configuration;
     }
 
     @Override
-    public void connect(@NotNull ConnectionCallback<ManagedVmDeploymentConfiguration> callback) {
+    public void connect(@NotNull ConnectionCallback<AppEngineDeploymentConfiguration> callback) {
       if (CloudSdkUtil.isCloudSdkExecutable(CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath()))) {
-        callback.connected(new ManagedVmRuntimeInstance(configuration));
+        callback.connected(new AppEngineRuntimeInstance(configuration));
       } else {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
         // TODO Consider auto opening configuration panel
@@ -220,18 +220,18 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
     }
   }
 
-  private static class ManagedVmRuntimeInstance extends
-      ServerRuntimeInstance<ManagedVmDeploymentConfiguration> {
+  private static class AppEngineRuntimeInstance extends
+      ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
-    private ManagedVmServerConfiguration configuration;
+    private AppEngineServerConfiguration configuration;
 
-    public ManagedVmRuntimeInstance(
-        ManagedVmServerConfiguration configuration) {
+    public AppEngineRuntimeInstance(
+        AppEngineServerConfiguration configuration) {
       this.configuration = configuration;
     }
 
     @Override
-    public void deploy(@NotNull final DeploymentTask<ManagedVmDeploymentConfiguration> task,
+    public void deploy(@NotNull final DeploymentTask<AppEngineDeploymentConfiguration> task,
         @NotNull final DeploymentLogManager logManager,
         @NotNull final DeploymentOperationCallback callback) {
       FileDocumentManager.getInstance().saveAllDocuments();
@@ -245,7 +245,7 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
           configuration.getGoogleUserName());
 
       final Runnable doDeployment;
-      ManagedVmDeploymentConfiguration deploymentConfig = task.getConfiguration();
+      AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
       File deploymentSource = deploymentConfig.isUserSpecifiedArtifact() ?
           new File(deploymentConfig.getUserSpecifiedArtifactPath()) : task.getSource().getFile();
 

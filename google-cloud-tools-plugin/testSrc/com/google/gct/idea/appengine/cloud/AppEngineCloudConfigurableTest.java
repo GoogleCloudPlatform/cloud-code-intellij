@@ -36,8 +36,8 @@ import java.io.IOException;
 
 import javax.swing.JLabel;
 
-public class ManagedVmCloudConfigurableTest extends PlatformTestCase {
-  private ManagedVmCloudConfigurable managedVmCloudConfigurable;
+public class AppEngineCloudConfigurableTest extends PlatformTestCase {
+  private AppEngineCloudConfigurable appEngineCloudConfigurable;
   private SystemEnvironmentProvider environmentProvider;
   private ProjectSelector projectSelector;
   private JLabel warningMessage;
@@ -97,7 +97,7 @@ public class ManagedVmCloudConfigurableTest extends PlatformTestCase {
     projectSelector.setText("myProject");
 
     // No exception should be thrown here
-    managedVmCloudConfigurable.apply();
+    appEngineCloudConfigurable.apply();
   }
 
   public void testApply_validSdkAndInvalidProject() throws IOException {
@@ -106,7 +106,7 @@ public class ManagedVmCloudConfigurableTest extends PlatformTestCase {
     // Do not select project
 
     try {
-      managedVmCloudConfigurable.apply();
+      appEngineCloudConfigurable.apply();
       fail("Applying settings without a Project should throw exception.");
     } catch (ConfigurationException ce) {
       assertEquals(MISSING_PROJECT_WARNING, ce.getMessage());
@@ -119,7 +119,7 @@ public class ManagedVmCloudConfigurableTest extends PlatformTestCase {
     projectSelector.setText("myProject");
 
     try {
-      managedVmCloudConfigurable.apply();
+      appEngineCloudConfigurable.apply();
       fail("Applying settings without a valid SDK should throw exception.");
     } catch (ConfigurationException ce) {
       assertEquals(MISSING_SDK_DIR_WARNING, ce.getMessage());
@@ -132,7 +132,7 @@ public class ManagedVmCloudConfigurableTest extends PlatformTestCase {
     // Do not select project
 
     try {
-      managedVmCloudConfigurable.apply();
+      appEngineCloudConfigurable.apply();
       fail("Applying settings without a valid SDK and Project should throw exception.");
     } catch (ConfigurationException ce) {
       assertEquals(MISSING_SDK_DIR_WARNING, ce.getMessage());
@@ -145,11 +145,11 @@ public class ManagedVmCloudConfigurableTest extends PlatformTestCase {
   }
 
   private void initCloudConfigurable() {
-    managedVmCloudConfigurable =
-        new ManagedVmCloudConfigurable(new ManagedVmServerConfiguration(), getProject());
-    projectSelector = managedVmCloudConfigurable.getProjectSelector();
-    warningMessage = managedVmCloudConfigurable.getWarningMessage();
-    cloudSdkDirectoryField = managedVmCloudConfigurable.getCloudSdkDirectoryField();
+    appEngineCloudConfigurable =
+        new AppEngineCloudConfigurable(new AppEngineServerConfiguration(), getProject());
+    projectSelector = appEngineCloudConfigurable.getProjectSelector();
+    warningMessage = appEngineCloudConfigurable.getWarningMessage();
+    cloudSdkDirectoryField = appEngineCloudConfigurable.getCloudSdkDirectoryField();
   }
 
   private File createTempFile() throws IOException {

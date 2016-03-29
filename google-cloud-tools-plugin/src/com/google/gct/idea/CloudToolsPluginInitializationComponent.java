@@ -15,7 +15,7 @@
  */
 package com.google.gct.idea;
 
-import com.google.gct.idea.appengine.cloud.ManagedVmCloudType;
+import com.google.gct.idea.appengine.cloud.AppEngineCloudType;
 import com.google.gct.idea.debugger.CloudDebugConfigType;
 
 import com.intellij.execution.configurations.ConfigurationType;
@@ -53,11 +53,11 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
           .registerExtension(
               ConfigurationType.CONFIGURATION_TYPE_EP, new CloudDebugConfigType());
     }
-    if (pluginInfoService.shouldEnable(GctFeature.MANAGEDVM)) {
-      ManagedVmCloudType managedVmCloudType = new ManagedVmCloudType();
-      pluginConfigurationService.registerExtension(ServerType.EP_NAME, managedVmCloudType);
+    if (pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)) {
+      AppEngineCloudType appEngineCloudType = new AppEngineCloudType();
+      pluginConfigurationService.registerExtension(ServerType.EP_NAME, appEngineCloudType);
       pluginConfigurationService.registerExtension(ConfigurationType.CONFIGURATION_TYPE_EP,
-          new DeployToServerConfigurationType(managedVmCloudType));
+          new DeployToServerConfigurationType(appEngineCloudType));
     }
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
       pluginConfigurationService

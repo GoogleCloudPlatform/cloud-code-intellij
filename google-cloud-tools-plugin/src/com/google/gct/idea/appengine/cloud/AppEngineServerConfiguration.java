@@ -25,11 +25,11 @@ import java.beans.PropertyChangeListener;
 
 /**
  * Model for the IntelliJ application scoped 'Cloud' configurations.  This is a base configuration
- * used by Managed VM deployment runtime configurations. It's primarily the bits that can be
+ * used by App Engine deployment runtime configurations. It's primarily the bits that can be
  * re-used across deployments, such as auth and project.
  */
-public class ManagedVmServerConfiguration extends
-    ServerConfigurationBase<ManagedVmServerConfiguration> {
+public class AppEngineServerConfiguration extends
+    ServerConfigurationBase<AppEngineServerConfiguration> {
 
   private String cloudSdkHomePath;
   private String cloudProjectName;
