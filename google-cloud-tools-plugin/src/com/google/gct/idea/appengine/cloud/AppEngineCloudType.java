@@ -239,8 +239,13 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
         return;
       }
+      String gcloudCommandPath = CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath());
+      File gcloudCommand = getFileFromFilePath(gcloudCommandPath);
+      if (gcloudCommand == null) {
+        throw new RuntimeException(gcloudCommandPath + " does not exist");
+      }
       AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
-          getFileFromFilePath(CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath())),
+          gcloudCommand,
           configuration.getCloudProjectName(),
           configuration.getGoogleUserName());
 
@@ -283,12 +288,12 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     public void disconnect() {
     }
 
-    @NotNull
+    @Nullable
     private File getFileFromFilePath(String filePath) {
       File file;
       file = new File(filePath);
       if (!file.exists()) {
-        throw new RuntimeException(filePath + " does not exist");
+        return null;
       }
       return file;
     }

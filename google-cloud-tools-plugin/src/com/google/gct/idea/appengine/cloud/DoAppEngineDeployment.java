@@ -39,6 +39,7 @@ import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.Deploy
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,8 +65,8 @@ class DoAppEngineDeployment implements Runnable {
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
       @NotNull File deploymentArtifactPath,
-      @NotNull File appYamlPath,
-      @NotNull File dockerFilePath,
+      @Nullable File appYamlPath,
+      @Nullable File dockerFilePath,
       @NotNull DeploymentOperationCallback callback) {
     this.appEngineHelper = appEngineHelper;
     this.loggingHandler = loggingHandler;
@@ -105,8 +106,12 @@ class DoAppEngineDeployment implements Runnable {
           copyFile(stagingDirectory, "target" + artifactType, deploymentArtifactPath);
       stagedArtifactPath.setReadable(true /* readable */, false /* ownerOnly */);
 
-      copyFile(stagingDirectory, "app.yaml", this.appYamlPath);
-      copyFile(stagingDirectory, "Dockerfile", this.dockerFilePath);
+      if (this.appYamlPath != null) {
+        copyFile(stagingDirectory, "app.yaml", this.appYamlPath);
+      }
+      if (this.dockerFilePath != null) {
+        copyFile(stagingDirectory, "Dockerfile", this.dockerFilePath);
+      }
     } catch (IOException e) {
       logger.error(e);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));

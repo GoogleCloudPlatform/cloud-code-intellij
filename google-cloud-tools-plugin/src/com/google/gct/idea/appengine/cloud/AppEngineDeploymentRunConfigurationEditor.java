@@ -61,7 +61,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private final Project project;
 
   private JComboBox configTypeComboBox;
-  private JPanel mvmConfigFilesPanel;
+  private JPanel appEngineConfigFilesPanel;
   private JPanel editorPanel;
   private JPanel titledPanel;
   private TextFieldWithBrowseButton appYamlPathField;
@@ -90,14 +90,14 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
-    mvmConfigFilesPanel.setVisible(false);
+    appEngineConfigFilesPanel.setVisible(false);
     configTypeComboBox.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         if (getConfigType() == ConfigType.CUSTOM) {
-          mvmConfigFilesPanel.setVisible(true);
+          appEngineConfigFilesPanel.setVisible(true);
         } else {
-          mvmConfigFilesPanel.setVisible(false);
+          appEngineConfigFilesPanel.setVisible(false);
         }
       }
     });
