@@ -122,6 +122,7 @@ class DoManagedVmDeployment implements Runnable {
     commandLine.withWorkDirectory(stagingDirectory);
     consoleLogLn(loggingHandler, "Working directory set to: " + stagingDirectory.getAbsolutePath());
     commandLine.withParentEnvironmentType(ParentEnvironmentType.CONSOLE);
+    commandLine.getEnvironment().put("CLOUDSDK_METRICS_ENVIRONMENT", "gcloud-intellij");
     Process process = null;
     try {
       consoleLogLn(loggingHandler, "Executing: " + commandLine.getCommandLineString());
