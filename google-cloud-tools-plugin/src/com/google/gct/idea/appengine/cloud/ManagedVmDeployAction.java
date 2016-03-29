@@ -16,23 +16,19 @@
 
 package com.google.gct.idea.appengine.cloud;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Files;
 import com.google.gct.idea.util.GctBundle;
-import com.google.gct.login.CredentialedUser;
-import com.google.gct.login.Services;
-import com.google.gdt.eclipse.login.common.GoogleLoginState;
-import com.google.gson.Gson;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmentType;
-import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
-import com.intellij.execution.process.ProcessHandler;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
@@ -42,38 +38,38 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Map;
 
 /**
  * Performs the deployment of ManagedVM based applications to GCP.
  */
-class DoManagedVmDeployment implements Runnable {
+class ManagedVmDeployAction extends ManagedVmAction {
+  private static final Logger logger = Logger.getInstance(ManagedVmDeployAction.class);
 
-  private static final Logger logger = Logger.getInstance(DoManagedVmDeployment.class);
-
-  private LoggingHandler loggingHandler;
+  private Project project;
   private File deploymentArtifactPath;
   private File appYamlPath;
   private File dockerFilePath;
   private AppEngineHelper appEngineHelper;
-  private DeploymentOperationCallback callback;
   private DeploymentArtifactType artifactType;
+  private DeploymentOperationCallback callback;
 
-  DoManagedVmDeployment(
+  ManagedVmDeployAction(
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
+      @NotNull Project project,
       @NotNull File deploymentArtifactPath,
       @NotNull File appYamlPath,
       @NotNull File dockerFilePath,
       @NotNull DeploymentOperationCallback callback) {
+    super(loggingHandler, appEngineHelper);
+
     this.appEngineHelper = appEngineHelper;
-    this.loggingHandler = loggingHandler;
+    this.project = project;
     this.deploymentArtifactPath = deploymentArtifactPath;
-    this.callback = callback;
     this.appYamlPath = appYamlPath;
     this.dockerFilePath = dockerFilePath;
     this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
+    this.callback = callback;
   }
 
   public void run() {
@@ -91,7 +87,6 @@ class DoManagedVmDeployment implements Runnable {
           null /* suffix */,
           true  /* deleteOnExit */);
       consoleLogLn(
-          loggingHandler,
           "Created temporary staging directory: " + stagingDirectory.getAbsolutePath());
     } catch (IOException e) {
       logger.error(e);
@@ -120,105 +115,65 @@ class DoManagedVmDeployment implements Runnable {
     commandLine
         .addParameter("--credential-file-override=" + appDefaultCredentialsPath.getAbsolutePath());
     commandLine.withWorkDirectory(stagingDirectory);
-    consoleLogLn(loggingHandler, "Working directory set to: " + stagingDirectory.getAbsolutePath());
+    consoleLogLn("Working directory set to: " + stagingDirectory.getAbsolutePath());
     commandLine.withParentEnvironmentType(ParentEnvironmentType.CONSOLE);
-    Process process = null;
+
     try {
-      consoleLogLn(loggingHandler, "Executing: " + commandLine.getCommandLineString());
-      process = commandLine.createProcess();
+      executeProcess(commandLine, new DeployToManagedVmProcessListener(appDefaultCredentialsPath));
     } catch (ExecutionException e) {
       logger.error(e);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.execution"));
-      return;
     }
-    final ProcessHandler processHandler = new OSProcessHandler(process,
-        commandLine.getCommandLineString());
-    loggingHandler.attachToProcess(processHandler);
-    processHandler.addProcessListener(new ProcessAdapter() {
-      @Override
-      public void processTerminated(ProcessEvent event) {
-        if (event.getExitCode() == 0) {
-          callback.succeeded(new DeploymentRuntime() {
-            @Override
-            public boolean isUndeploySupported() {
-              return false;
-            }
-
-            @Override
-            public void undeploy(@NotNull UndeploymentTaskCallback callback) {
-              throw new UnsupportedOperationException();
-            }
-          });
-        } else {
-          logger.error("Deployment process exited with an error. Exit Code:" + event.getExitCode());
-          callback.errorOccurred(
-              GctBundle.message("appengine.deployment.error.with.code", event.getExitCode()));
-        }
-        if (appDefaultCredentialsPath.exists()) {
-          if (!appDefaultCredentialsPath.delete()) {
-            logger.warn("failed to delete credential file expected at "
-                + appDefaultCredentialsPath.getPath());
-          }
-        }
-      }
-    });
-    processHandler.startNotify();
-  }
-
-  private static final String CLIENT_ID_LABEL = "client_id";
-  private static final String CLIENT_SECRET_LABEL = "client_secret";
-  private static final String REFRESH_TOKEN_LABEL = "refresh_token";
-  private static final String GCLOUD_USER_TYPE_LABEL = "type";
-  private static final String GCLOUD_USER_TYPE = "authorized_user";
-
-  @VisibleForTesting
-  protected File createApplicationDefaultCredentials() {
-    CredentialedUser projectUser = Services.getLoginService().getAllUsers()
-        .get(appEngineHelper.getGoogleUsername());
-
-    GoogleLoginState googleLoginState = null;
-    if (projectUser != null) {
-      googleLoginState = projectUser
-          .getGoogleLoginState();
-    } else {
-      return null;
-    }
-    String clientId = googleLoginState.fetchOAuth2ClientId();
-    String clientSecret = googleLoginState.fetchOAuth2ClientSecret();
-    String refreshToken = googleLoginState.fetchOAuth2RefreshToken();
-    Map<String, String> credentialMap = ImmutableMap.of(
-        CLIENT_ID_LABEL, clientId,
-        CLIENT_SECRET_LABEL, clientSecret,
-        REFRESH_TOKEN_LABEL, refreshToken,
-        GCLOUD_USER_TYPE_LABEL, GCLOUD_USER_TYPE
-    );
-    String jsonCredential = new Gson().toJson(credentialMap);
-    File tempCredentialFilePath = null;
-    try {
-      tempCredentialFilePath = FileUtil
-          .createTempFile(
-              "tmp_google_application_default_credential",
-              "json",
-              true /* deleteOnExit */);
-      Files.write(jsonCredential, tempCredentialFilePath, Charset.forName("UTF-8"));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
-    return tempCredentialFilePath;
   }
 
   private File copyFile(File stagingDirectory, String targetFileName, File sourceFilePath)
       throws IOException {
     File destinationFilePath = new File(stagingDirectory, targetFileName);
     FileUtil.copy(sourceFilePath, destinationFilePath);
-    consoleLogLn(loggingHandler, "Copied %s %s to %s", targetFileName,
+    consoleLogLn("Copied %s %s to %s", targetFileName,
         sourceFilePath.getAbsolutePath(), destinationFilePath.getAbsolutePath());
     return destinationFilePath;
   }
 
-  private void consoleLogLn(LoggingHandler deploymentLoggingHandler, String message,
-      String... arguments) {
-    deploymentLoggingHandler.print(String.format(message + "\n", (Object[]) arguments));
+  private class DeployToManagedVmProcessListener extends ProcessAdapter {
+    private File defaultCredentialsPath;
+
+    public DeployToManagedVmProcessListener(File defaultCredentialsPath) {
+      this.defaultCredentialsPath = defaultCredentialsPath;
+    }
+
+    @Override
+    public void processTerminated(ProcessEvent event) {
+      if (event.getExitCode() == 0) {
+        callback.succeeded(new DeploymentRuntime() {
+          @Override
+          public boolean isUndeploySupported() {
+            return true;
+          }
+
+          @Override
+          public void undeploy(@NotNull UndeploymentTaskCallback callback) {
+            final ManagedVmAction managedVmStopAction = appEngineHelper.createManagedVmStopAction(
+                getLoggingHandler(),
+                callback);
+
+            ProgressManager.getInstance()
+                .run(new Task.Backgroundable(project, "Stopping MVM", true,
+                    null) {
+                  @Override
+                  public void run(@NotNull ProgressIndicator indicator) {
+                    ApplicationManager.getApplication().invokeLater(managedVmStopAction);
+                  }
+                });
+          }
+        });
+      } else {
+        logger.error("Deployment process exited with an error. Exit Code:" + event.getExitCode());
+        callback.errorOccurred(
+            GctBundle.message("appengine.deployment.error.with.code", event.getExitCode()));
+      }
+
+      deleteCredentials(defaultCredentialsPath);
+    }
   }
 }

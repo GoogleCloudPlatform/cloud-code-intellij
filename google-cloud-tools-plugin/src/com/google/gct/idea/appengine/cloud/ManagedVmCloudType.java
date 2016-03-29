@@ -244,20 +244,22 @@ public class ManagedVmCloudType extends ServerType<ManagedVmServerConfiguration>
           configuration.getCloudProjectName(),
           configuration.getGoogleUserName());
 
-      final Runnable doDeployment;
+      final ManagedVmAction doDeployment;
       ManagedVmDeploymentConfiguration deploymentConfig = task.getConfiguration();
       File deploymentSource = deploymentConfig.isUserSpecifiedArtifact() ?
           new File(deploymentConfig.getUserSpecifiedArtifactPath()) : task.getSource().getFile();
 
       if (deploymentConfig.getConfigType() == ConfigType.AUTO) {
-        doDeployment = appEngineHelper.createAutoDeploymentOperation(
+        doDeployment = appEngineHelper.createAutoDeploymentAction(
             logManager.getMainLoggingHandler(),
+            task.getProject(),
             deploymentSource,
             callback
         );
       } else {
-        doDeployment = appEngineHelper.createCustomDeploymentOperation(
+        doDeployment = appEngineHelper.createCustomDeploymentAction(
             logManager.getMainLoggingHandler(),
+            task.getProject(),
             deploymentSource,
             getFileFromFilePath(deploymentConfig.getAppYamlPath()),
             getFileFromFilePath(deploymentConfig.getDockerFilePath()),

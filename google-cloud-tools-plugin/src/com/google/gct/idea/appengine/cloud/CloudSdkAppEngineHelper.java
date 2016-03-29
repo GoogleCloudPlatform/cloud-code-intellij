@@ -21,8 +21,10 @@ import com.google.gct.idea.appengine.cloud.ManagedVmDeploymentConfiguration.Conf
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.stats.UsageTrackerProvider;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.runtime.Deployment;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
+import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -93,12 +95,17 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public Runnable createCustomDeploymentOperation(LoggingHandler loggingHandler,
-      File artifactToDeploy, File appYamlPath, File dockerfilePath,
+  public ManagedVmAction createCustomDeploymentAction(
+      LoggingHandler loggingHandler,
+      Project project,
+      File artifactToDeploy,
+      File appYamlPath,
+      File dockerfilePath,
       DeploymentOperationCallback deploymentCallback) {
-    return new DoManagedVmDeployment(
+    return new ManagedVmDeployAction(
         this,
         loggingHandler,
+        project,
         artifactToDeploy,
         appYamlPath,
         dockerfilePath,
@@ -109,8 +116,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public Runnable createAutoDeploymentOperation(
+  public ManagedVmAction createAutoDeploymentAction(
       LoggingHandler loggingHandler,
+      Project project,
       File artifactToDeploy,
       DeploymentOperationCallback deploymentCallback) throws IllegalArgumentException {
     DeploymentArtifactType artifactType = DeploymentArtifactType.typeForPath(artifactToDeploy);
@@ -118,14 +126,26 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       throw new IllegalArgumentException(artifactToDeploy.getPath() + " is not a support artifact "
           + "type for automatic deployment");
     }
-    return new DoManagedVmDeployment(
+    return new ManagedVmDeployAction(
         this,
         loggingHandler,
+        project,
         artifactToDeploy,
         defaultAppYaml(),
         defaultDockerfile(artifactType),
         wrapCallbackForUsageTracking(deploymentCallback, ConfigType.AUTO, artifactType)
     );
+  }
+
+  @NotNull
+  @Override
+  public ManagedVmAction createManagedVmStopAction(
+      LoggingHandler loggingHandler,
+      UndeploymentTaskCallback undeploymentTaskCallback) {
+    return new ManagedVmStopAction(
+        this,
+        loggingHandler,
+        undeploymentTaskCallback);
   }
 
   @NotNull
