@@ -32,6 +32,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.remoteServer.RemoteServerConfigurable;
@@ -39,7 +40,10 @@ import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfigurator;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.configuration.deployment.JavaDeploymentSourceUtil;
+import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
+import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
 import com.intellij.remoteServer.runtime.ServerConnector;
 import com.intellij.remoteServer.runtime.ServerTaskExecutor;
@@ -47,6 +51,7 @@ import com.intellij.remoteServer.runtime.deployment.DeploymentLogManager;
 import com.intellij.remoteServer.runtime.deployment.DeploymentTask;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance;
 
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -196,6 +201,58 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       public void setName(String name) {
         this.name = name;
       }
+
+      @NotNull
+      @Override
+      public DeploymentSourceType<?> getType() {
+        return DeploymentSourceType.EP_NAME.findExtension(
+            UserSpecifiedPathDeploymentSourceType.class);
+      }
+    }
+  }
+
+  public static class UserSpecifiedPathDeploymentSourceType extends
+      DeploymentSourceType<ModuleDeploymentSource> {
+    private static final String NAME_ATTRIBUTE = "name";
+    private static final String SOURCE_TYPE_ID = "filesystem-war-jar-module";
+
+    public UserSpecifiedPathDeploymentSourceType() { super(SOURCE_TYPE_ID); }
+
+    /**
+     * Restore presentable name (e.g., to be "Filesystem JAR or WAR file - <file path>") of
+     * UserSpecifiedPathDeploymentSource.
+     */
+    @NotNull
+    @Override
+    public ModuleDeploymentSource load(@NotNull Element tag, @NotNull Project project) {
+      AppEngineDeploymentConfigurator.UserSpecifiedPathDeploymentSource userSpecifiedSource =
+          new AppEngineDeploymentConfigurator.UserSpecifiedPathDeploymentSource(ModulePointerManager
+              .getInstance(project).create(tag.getAttributeValue(NAME_ATTRIBUTE)));
+
+      Element settings = tag.getChild(DeployToServerRunConfiguration.SETTINGS_ELEMENT);
+      if (settings != null) {
+        String filePath = settings.getAttributeValue(
+            AppEngineDeploymentConfiguration.USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE);
+
+        if (!StringUtil.isEmpty(filePath)) {
+          userSpecifiedSource.setName(
+              GctBundle.message(
+                  "appengine.flex.user.specified.deploymentsource.name.with.filename",
+                  new File(filePath).getName()));
+
+          return userSpecifiedSource;
+        }
+      }
+
+      userSpecifiedSource.setName(
+          GctBundle.message("appengine.flex.user.specified.deploymentsource.name"));
+
+      return userSpecifiedSource;
+    }
+
+    @Override
+    public void save(@NotNull ModuleDeploymentSource source, @NotNull Element tag) {
+      tag.setAttribute(NAME_ATTRIBUTE, source.getModulePointer().getModuleName());
     }
   }
 

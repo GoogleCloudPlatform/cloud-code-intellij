@@ -16,12 +16,14 @@
 package com.google.gct.idea;
 
 import com.google.gct.idea.appengine.cloud.AppEngineCloudType;
+import com.google.gct.idea.appengine.cloud.AppEngineCloudType.UserSpecifiedPathDeploymentSourceType;
 import com.google.gct.idea.debugger.CloudDebugConfigType;
 
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.remoteServer.ServerType;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationType;
 
 import org.jetbrains.annotations.NotNull;
@@ -56,6 +58,8 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
     if (pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)) {
       AppEngineCloudType appEngineCloudType = new AppEngineCloudType();
       pluginConfigurationService.registerExtension(ServerType.EP_NAME, appEngineCloudType);
+      pluginConfigurationService.registerExtension(DeploymentSourceType.EP_NAME,
+          new UserSpecifiedPathDeploymentSourceType());
       pluginConfigurationService.registerExtension(ConfigurationType.CONFIGURATION_TYPE_EP,
           new DeployToServerConfigurationType(appEngineCloudType));
     }
