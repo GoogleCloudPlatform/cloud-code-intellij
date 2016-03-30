@@ -23,6 +23,7 @@ import com.google.api.services.clouddebugger.v2.model.GerritSourceContext;
 import com.google.api.services.clouddebugger.v2.model.GitSourceContext;
 import com.google.api.services.clouddebugger.v2.model.ListDebuggeesResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceContext;
+import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -115,7 +116,9 @@ public class ProjectRepositoryValidator {
         !com.google.common.base.Strings.isNullOrEmpty(processState.getProjectNumber())) {
       ListDebuggeesResponse debuggees;
       try {
-        debuggees = getCloudDebuggerClient().debuggees().list().setProject(processState.getProjectNumber()).execute();
+        debuggees = getCloudDebuggerClient().debuggees().list().setProject(processState.getProjectNumber())
+            .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+            .execute();
         for (Debuggee debuggee : debuggees.getDebuggees()) {
           if (processState.getDebuggeeId() != null && processState.getDebuggeeId().equals(debuggee.getId())) {
             // implicit assumption this doesn't happen more than once

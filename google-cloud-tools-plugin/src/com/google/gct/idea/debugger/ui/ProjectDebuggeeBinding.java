@@ -20,6 +20,7 @@ import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.v2.model.Debuggee;
 import com.google.api.services.clouddebugger.v2.model.ListDebuggeesResponse;
 import com.google.common.base.Strings;
+import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.idea.debugger.CloudDebugProcessState;
 import com.google.gct.idea.debugger.CloudDebuggerClient;
 import com.google.gct.idea.elysium.ProjectSelector;
@@ -27,6 +28,7 @@ import com.google.gct.idea.util.GctBundle;
 import com.google.gct.login.CredentialedUser;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.DocumentAdapter;
@@ -151,6 +153,7 @@ class ProjectDebuggeeBinding {
           if (projectSelector.getProjectNumber() != null && getCloudDebuggerClient() != null) {
             final ListDebuggeesResponse debuggees = getCloudDebuggerClient().debuggees().list()
                 .setProject(projectSelector.getProjectNumber().toString())
+                .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
                 .execute();
             isCdbQueried = true;
 

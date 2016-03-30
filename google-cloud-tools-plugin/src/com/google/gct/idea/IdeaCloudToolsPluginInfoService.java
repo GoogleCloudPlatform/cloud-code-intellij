@@ -16,13 +16,21 @@
 
 package com.google.gct.idea;
 
+
 /**
  * The singleton instance of this class provides plugin metadata for the Google Cloud Tools plugin.
  */
 public class IdeaCloudToolsPluginInfoService extends BasePluginInfoService implements
     CloudToolsPluginInfoService {
 
+  private final static String CLIENT_VERSION_PREFIX = "google.com/intellij/v";
+
   protected IdeaCloudToolsPluginInfoService() {
     super("gcloud-intellij-cloud-tools-plugin", "com.google.gct.core");
+  }
+
+  @Override
+  public String getClientVersionForCloudDebugger() {
+    return CLIENT_VERSION_PREFIX + getPluginVersion();
   }
 }

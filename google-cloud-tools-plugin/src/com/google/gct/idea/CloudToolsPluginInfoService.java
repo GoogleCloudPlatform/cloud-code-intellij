@@ -21,4 +21,12 @@ package com.google.gct.idea;
  * information service across google-cloud-tools-plugin and google-account-plugin
  */
 public interface CloudToolsPluginInfoService extends PluginInfoService {
+
+  /**
+   * Returns the fully qualified version of the plugin for specifying in Cloud Debugger API
+   * requests.
+   *
+   * @return "google.com/intellij/v{currentPluginVersion}"
+   */
+  String getClientVersionForCloudDebugger();
 }
