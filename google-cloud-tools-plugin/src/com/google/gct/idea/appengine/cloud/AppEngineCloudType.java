@@ -176,6 +176,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     protected static class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl {
       private String name =
           GctBundle.message("appengine.flex.user.specified.deploymentsource.name");
+      private String userSpecifiedFilePath;
 
       public UserSpecifiedPathDeploymentSource(@NotNull ModulePointer pointer) {
         super(pointer);
@@ -200,6 +201,16 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
       public void setName(String name) {
         this.name = name;
+      }
+
+      @Nullable
+      @Override
+      public File getFile() {
+        return userSpecifiedFilePath != null ? new File(userSpecifiedFilePath) : null;
+      }
+
+      public void setFilePath(@NotNull String userSpecifiedFilePath) {
+        this.userSpecifiedFilePath = userSpecifiedFilePath;
       }
 
       @NotNull

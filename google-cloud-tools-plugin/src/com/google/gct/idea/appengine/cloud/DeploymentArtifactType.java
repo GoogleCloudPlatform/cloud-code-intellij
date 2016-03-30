@@ -17,6 +17,7 @@
 package com.google.gct.idea.appengine.cloud;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Locale;
@@ -31,11 +32,13 @@ public enum DeploymentArtifactType {
    * Returns the right {@code DeploymentArtifactType} for the given {@code deployPackage}.
    */
   @NotNull
-  public static DeploymentArtifactType typeForPath(@NotNull File deployPackage) {
-    if (deployPackage.getPath().endsWith(".jar")) {
-      return JAR;
-    } else if (deployPackage.getPath().endsWith(".war")) {
-      return WAR;
+  public static DeploymentArtifactType typeForPath(@Nullable File deployPackage) {
+    if(deployPackage != null) {
+      if (deployPackage.getPath().endsWith(".jar")) {
+        return JAR;
+      } else if (deployPackage.getPath().endsWith(".war")) {
+        return WAR;
+      }
     }
     return UNKNOWN;
   }

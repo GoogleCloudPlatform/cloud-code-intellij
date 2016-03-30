@@ -34,6 +34,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.ui.DocumentAdapter;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +52,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
 
 /**
  * Editor for an App Engine Deployment runtime configuration.
@@ -113,6 +115,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
           }
         })
     );
+    userSpecifiedArtifactFileSelector.getTextField().getDocument()
+        .addDocumentListener(getUserSpecifiedArtifactFileListener());
     dockerFilePathField.addBrowseFolderListener(
         GctBundle.message("appengine.dockerfile.location.browse.button"),
         null,
@@ -210,6 +214,18 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
   private boolean isUserSpecifiedPathDeploymentSource() {
     return deploymentSource instanceof UserSpecifiedPathDeploymentSource;
+  }
+
+  private DocumentAdapter getUserSpecifiedArtifactFileListener() {
+    return new DocumentAdapter() {
+      @Override
+      protected void textChanged(DocumentEvent e) {
+        if(isUserSpecifiedPathDeploymentSource()) {
+          ((UserSpecifiedPathDeploymentSource) deploymentSource).setFilePath(
+              userSpecifiedArtifactFileSelector.getText());
+        }
+      }
+    };
   }
 
   @Nullable
