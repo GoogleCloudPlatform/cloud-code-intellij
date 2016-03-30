@@ -128,6 +128,7 @@ class DoAppEngineDeployment implements Runnable {
     consoleLogLn(loggingHandler, "Working directory set to: " + stagingDirectory.getAbsolutePath());
     commandLine.withParentEnvironmentType(ParentEnvironmentType.CONSOLE);
     commandLine.getEnvironment().put("CLOUDSDK_METRICS_ENVIRONMENT", "gcloud-intellij");
+    commandLine.getEnvironment().put("CLOUDSDK_APP_USE_GSUTIL", "0");
     Process process = null;
     try {
       consoleLogLn(loggingHandler, "Executing: " + commandLine.getCommandLineString());
