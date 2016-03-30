@@ -25,7 +25,12 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.ui.popup.Balloon.Position;
+import com.intellij.openapi.ui.popup.BalloonBuilder;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.SystemInfo;
@@ -35,10 +40,12 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.awt.RelativePoint;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -133,7 +140,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
           public File get() {
             return appEngineHelper.defaultAppYaml();
           }
-        }, appYamlPathField));
+        }, appYamlPathField, userSpecifiedArtifactFileSelector));
     generateDockerfileButton.addActionListener(
         new GenerateConfigActionListener(project, "Dockerfile", new Supplier<File>() {
           @Override
@@ -141,7 +148,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
             return appEngineHelper
                 .defaultDockerfile(DeploymentArtifactType.typeForPath(deploymentSource.getFile()));
           }
-        }, dockerFilePathField));
+        }, dockerFilePathField, userSpecifiedArtifactFileSelector));
   }
 
 
@@ -246,26 +253,48 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   /**
    * A somewhat generic way of generating a file for a {@link TextFieldWithBrowseButton}.
    */
-  private static class GenerateConfigActionListener implements ActionListener {
+  private class GenerateConfigActionListener implements ActionListener {
 
     private final Project project;
     private final String fileName;
     private final TextFieldWithBrowseButton filePicker;
     private final Supplier<File> sourceFileProvider;
+    private final JPanel fileSelector;
 
     public GenerateConfigActionListener(
         Project project,
         String fileName,
         Supplier<File> sourceFileProvider,
-        TextFieldWithBrowseButton filePicker) {
+        TextFieldWithBrowseButton filePicker,
+        JPanel fileSelector) {
       this.project = project;
       this.fileName = fileName;
       this.sourceFileProvider = sourceFileProvider;
       this.filePicker = filePicker;
+      this.fileSelector = fileSelector;
     }
 
     @Override
     public void actionPerformed(ActionEvent event) {
+      if (sourceFileProvider.get() == null) {
+        if (!isUserSpecifiedPathDeploymentSource()) {
+          throw new AssertionError("Error generating configuration file: "
+              + "artifact deployment source is missing a source .jar or .war file.");
+        }
+
+        BalloonBuilder builder = JBPopupFactory.getInstance()
+            .createHtmlTextBalloonBuilder(
+                GctBundle.getString("appengine.config.deployment.source.error"),
+                MessageType.INFO, null)
+            .setFadeoutTime(3000);
+        Balloon balloon = builder.createBalloon();
+        balloon.show(
+            new RelativePoint(fileSelector,
+            new Point(fileSelector.getWidth() / 2, fileSelector.getHeight() / 2)),
+            Position.above);
+        return;
+      }
+
       SelectConfigDestinationFolderDialog destinationFolderDialog = new
           SelectConfigDestinationFolderDialog(project);
       if (destinationFolderDialog.showAndGet()) {
