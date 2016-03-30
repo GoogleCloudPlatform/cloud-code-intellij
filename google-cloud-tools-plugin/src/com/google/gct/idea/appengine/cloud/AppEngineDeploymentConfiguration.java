@@ -46,6 +46,8 @@ public class AppEngineDeploymentConfiguration extends
     }
   }
 
+  public static final String USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE = "userSpecifiedArtifactPath";
+
   private String dockerFilePath;
   private String appYamlPath;
   private boolean userSpecifiedArtifact;
@@ -57,7 +59,7 @@ public class AppEngineDeploymentConfiguration extends
     return userSpecifiedArtifact;
   }
 
-  @Attribute("userSpecifiedArtifactPath")
+  @Attribute(USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE)
   public String getUserSpecifiedArtifactPath() {
     return userSpecifiedArtifactPath;
   }
