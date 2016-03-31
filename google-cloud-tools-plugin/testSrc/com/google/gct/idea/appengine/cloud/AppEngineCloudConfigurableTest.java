@@ -20,6 +20,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.gct.idea.appengine.util.CloudSdkUtil;
 import com.google.gct.idea.elysium.ProjectSelector;
 import com.google.gct.idea.util.SystemEnvironmentProvider;
 
@@ -43,8 +44,8 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private JLabel warningMessage;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
-  private static final String CLOUD_SDK_EXECUTABLE_PATH = "/a/b/c/gcloud-sdk/bin/gcloud";
-  private static final String CLOUD_SDK_DIR_PATH = "/a/b/c/gcloud-sdk";
+  private static final String CLOUD_SDK_EXECUTABLE_PATH = new File("/a/b/c/gcloud-sdk/bin/gcloud").getAbsolutePath();
+  private static final String CLOUD_SDK_DIR_PATH = new File("/a/b/c/gcloud-sdk").getAbsolutePath();
 
   private static final String MISSING_PROJECT_WARNING = "Please select a project.";
   private static final String MISSING_SDK_DIR_WARNING = "Please select a Cloud SDK home directory.";
@@ -155,7 +156,7 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private File createTempFile() throws IOException {
     TemporaryFolder tempFolder = new TemporaryFolder();
     tempFolder.create();
-    File executable = new File(tempFolder.newFolder("bin"), "gcloud");
+    File executable = new File(tempFolder.newFolder("bin"), CloudSdkUtil.getSystemCommand());
     executable.createNewFile();
     return executable;
   }
