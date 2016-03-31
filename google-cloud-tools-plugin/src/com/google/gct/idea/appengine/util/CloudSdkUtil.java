@@ -117,6 +117,10 @@ public final class CloudSdkUtil {
     return null;
   }
 
+  public static String getSystemCommand() {
+    return SystemInfo.isWindows ? WIN_COMMAND : UNIX_COMMAND;
+  }
+
   private static File findCloudSdkExecutable(
       @NotNull SystemEnvironmentProvider environmentProvider) {
     File gcloudPath = environmentProvider.findInPath(getSystemCommand());
@@ -124,9 +128,5 @@ public final class CloudSdkUtil {
       return gcloudPath;
     }
     return null;
-  }
-
-  private static String getSystemCommand() {
-    return SystemInfo.isWindows ? WIN_COMMAND : UNIX_COMMAND;
   }
 }

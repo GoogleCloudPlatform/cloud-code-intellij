@@ -37,8 +37,9 @@ public class CloudSdkUtilTest extends BasePluginTestCase {
   @Mock
   private SystemEnvironmentProvider environmentProvider;
 
-  private static final String CLOUD_SDK_EXECUTABLE_PATH = "/a/b/c/gcloud-sdk/bin/gcloud";
-  private static final String CLOUD_SDK_DIR_PATH = "/a/b/c/gcloud-sdk";
+  private static final String CLOUD_SDK_EXECUTABLE_PATH
+      = new File(String.format("/a/b/c/gcloud-sdk/bin/%s", CloudSdkUtil.getSystemCommand())).getAbsolutePath();
+  private static final String CLOUD_SDK_DIR_PATH = new File("/a/b/c/gcloud-sdk").getAbsolutePath();
 
   @Before
   public void setUp() {
