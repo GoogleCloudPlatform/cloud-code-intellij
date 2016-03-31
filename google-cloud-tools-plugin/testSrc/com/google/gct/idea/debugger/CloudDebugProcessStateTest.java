@@ -25,12 +25,14 @@ import com.google.api.services.clouddebugger.v2.model.FormatMessage;
 import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.api.services.clouddebugger.v2.model.StatusMessage;
+import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.idea.testing.TestUtils;
 import com.google.gct.login.CredentialedUser;
 import com.google.gct.login.GoogleLoginService;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 
 import com.intellij.mock.MockProjectEx;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.psi.PsiManager;
 import com.intellij.testFramework.IdeaTestCase;
 import com.intellij.testFramework.UsefulTestCase;
@@ -236,6 +238,8 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     when(list.setActionValue("CAPTURE")).thenReturn(list);
     when(list.setStripResults(Boolean.TRUE)).thenReturn(list);
     when(list.setWaitToken(null)).thenReturn(list);
+    when(list.setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger()))
+        .thenReturn(list);
     when(list.execute()).thenAnswer(new Answer<Object>() {
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable {

@@ -19,8 +19,10 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.v2.model.*;
+import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.idea.util.GctBundle;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.util.containers.ContainerUtil;
@@ -91,7 +93,9 @@ public class CloudDebugProcessStateController {
       @Override
       public void run() {
         try {
-          client.debuggees().breakpoints().delete(debuggeeId, breakpointId).execute();
+          client.debuggees().breakpoints().delete(debuggeeId, breakpointId)
+              .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+              .execute();
         } catch (IOException ex) {
           LOG.warn("exception deleting breakpoint " + breakpointId, ex);
         }
@@ -173,7 +177,9 @@ public class CloudDebugProcessStateController {
         // back on ui
         GetBreakpointResponse response;
         try {
-          response = client.debuggees().breakpoints().get(state.getDebuggeeId(), id).execute();
+          response = client.debuggees().breakpoints().get(state.getDebuggeeId(), id)
+              .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+              .execute();
           Breakpoint result = response.getBreakpoint();
           if (result != null) {
             fullFinalBreakpoints.put(id, result);
@@ -229,7 +235,9 @@ public class CloudDebugProcessStateController {
           }
 
           SetBreakpointResponse addResponse =
-              client.debuggees().breakpoints().set(debuggeeId, serverBreakpoint).execute();
+              client.debuggees().breakpoints().set(debuggeeId, serverBreakpoint)
+                  .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+                  .execute();
 
           if (addResponse != null && addResponse.getBreakpoint() != null) {
             Breakpoint result = addResponse.getBreakpoint();
@@ -365,7 +373,9 @@ public class CloudDebugProcessStateController {
           client.debuggees().breakpoints().list(state.getDebuggeeId())
               .setIncludeInactive(Boolean.TRUE).setActionValue("CAPTURE")
               .setStripResults(Boolean.TRUE)
-              .setWaitToken(CloudDebugConfigType.useWaitToken() ? tokenToSend : null).execute();
+              .setWaitToken(CloudDebugConfigType.useWaitToken() ? tokenToSend : null)
+              .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+              .execute();
 
       //We are running on a background thread and the cancel can happen any time triggered
       //on the ui thread from the user.  We want to short circuit immediately and not change

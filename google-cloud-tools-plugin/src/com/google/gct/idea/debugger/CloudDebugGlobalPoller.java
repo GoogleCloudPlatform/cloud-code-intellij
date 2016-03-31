@@ -22,6 +22,7 @@ import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees.Breakpoints;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
+import com.google.gct.idea.CloudToolsPluginInfoService;
 import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.notification.Notification;
@@ -29,6 +30,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationAdapter;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -108,7 +110,9 @@ public class CloudDebugGlobalPoller {
         .setStripResults(Boolean.TRUE)
         .setWaitToken(state.getWaitToken());
 
-    ListBreakpointsResponse response = listRequest.execute();
+    ListBreakpointsResponse response = listRequest
+        .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+        .execute();
     List<Breakpoint> currentList = response.getBreakpoints();
     String responseWaitToken = response.getNextWaitToken();
     state.setWaitToken(responseWaitToken);
