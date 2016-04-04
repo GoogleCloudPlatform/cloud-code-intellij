@@ -53,6 +53,7 @@ public class AppEngineDeploymentConfiguration extends
   private boolean userSpecifiedArtifact;
   private String userSpecifiedArtifactPath;
   private ConfigType configType;
+  private String version;
 
   @Attribute("userSpecifiedArtifact")
   public boolean isUserSpecifiedArtifact() {
@@ -79,6 +80,11 @@ public class AppEngineDeploymentConfiguration extends
     return configType == null ? ConfigType.AUTO : configType;
   }
 
+  @Attribute("version")
+  public String getVersion() {
+    return version;
+  }
+
   public void setConfigType(@NotNull ConfigType configType) {
     this.configType = configType;
   }
@@ -97,5 +103,9 @@ public class AppEngineDeploymentConfiguration extends
 
   public void setAppYamlPath(String appYamlPath) {
     this.appYamlPath = appYamlPath;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
   }
 }

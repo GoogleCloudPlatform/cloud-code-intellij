@@ -3,7 +3,7 @@
   <grid id="1c5af" binding="editorPanel" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="8" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="0" y="0" width="401" height="341"/>
+      <xy x="0" y="0" width="512" height="383"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -32,7 +32,7 @@
               <model/>
             </properties>
           </component>
-          <grid id="2f0e9" binding="appEngineConfigFilesPanel" layout-manager="GridLayoutManager" row-count="2" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="2f0e9" binding="appEngineConfigFilesPanel" layout-manager="GridLayoutManager" row-count="3" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -82,6 +82,30 @@
                 </constraints>
                 <properties>
                   <text resource-bundle="messages/CloudToolsBundle" key="appengine.generate.config.button"/>
+                </properties>
+              </component>
+              <component id="8ff9" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.version.label"/>
+                </properties>
+              </component>
+              <component id="f702f" class="javax.swing.JCheckBox" binding="versionOverrideCheckBox">
+                <constraints>
+                  <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Override"/>
+                </properties>
+              </component>
+              <component id="1ebdf" class="com.google.gct.idea.ui.PlaceholderTextField" binding="versionIdField">
+                <constraints>
+                  <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <editable value="false"/>
                 </properties>
               </component>
             </children>

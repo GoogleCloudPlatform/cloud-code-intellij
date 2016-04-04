@@ -19,6 +19,7 @@ package com.google.gct.idea.appengine.cloud;
 import com.google.common.base.Supplier;
 import com.google.gct.idea.appengine.cloud.AppEngineCloudType.AppEngineDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
 import com.google.gct.idea.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.gct.idea.ui.PlaceholderTextField;
 import com.google.gct.idea.ui.BrowserOpeningHyperLinkListener;
 import com.google.gct.idea.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.gct.idea.util.GctBundle;
@@ -45,12 +46,15 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.awt.RelativePoint;
 
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -58,9 +62,11 @@ import java.io.IOException;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -84,6 +90,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private JPanel userSpecifiedArtifactPanel;
   private TextFieldWithBrowseButton userSpecifiedArtifactFileSelector;
   private JTextPane appEngineCostWarningLabel;
+  private PlaceholderTextField versionIdField;
+  private JCheckBox versionOverrideCheckBox;
   private DeploymentSource deploymentSource;
   private AppEngineHelper appEngineHelper;
 
@@ -99,6 +107,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     updateCloudProjectName(appEngineHelper.getProjectId());
     configuration.setProjectNameListener(new ProjectNameListener());
 
+    versionIdField.setPlaceholderText(GctBundle.message("appengine.flex.version.placeholder.text"));
+    resetOverridableFields(versionOverrideCheckBox, versionIdField);
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
 
@@ -157,8 +167,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
                 .defaultDockerfile(DeploymentArtifactType.typeForPath(deploymentSource.getFile()));
           }
         }, dockerFilePathField, userSpecifiedArtifactFileSelector));
+    versionOverrideCheckBox.addItemListener(
+        new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
   }
-
 
   @Override
   protected void resetEditorFrom(AppEngineDeploymentConfiguration configuration) {
@@ -166,6 +177,12 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     dockerFilePathField.setText(configuration.getDockerFilePath());
     appYamlPathField.setText(configuration.getAppYamlPath());
     configTypeComboBox.setSelectedItem(configuration.getConfigType());
+
+    versionOverrideCheckBox.setSelected(!StringUtil.isEmpty(configuration.getVersion()));
+    versionIdField.setEditable(versionOverrideCheckBox.isSelected());
+    if(versionOverrideCheckBox.isSelected()) {
+      versionIdField.setText(configuration.getVersion());
+    }
   }
 
   @Override
@@ -176,6 +193,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     configuration.setDockerFilePath(dockerFilePathField.getText());
     configuration.setAppYamlPath(appYamlPathField.getText());
     configuration.setConfigType(getConfigType());
+    configuration.setVersion(versionOverrideCheckBox.isSelected() ? versionIdField.getText() : null);
 
     updateCloudProjectName(appEngineHelper.getProjectId());
     setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
@@ -192,6 +210,10 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
   private void updateJarWarSelector() {
     userSpecifiedArtifactPanel.setVisible(isUserSpecifiedPathDeploymentSource());
+  }
+
+  private void resetOverridableFields(JCheckBox overrideCheckbox, JTextField field) {
+    field.setEditable(overrideCheckbox.isSelected());
   }
 
   /**
@@ -215,6 +237,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     } else if (!isUserSpecifiedPathDeploymentSource() && !deploymentSource.isValid()) {
       throw new ConfigurationException(
           GctBundle.message("appengine.config.deployment.source.error"));
+    } else if(versionOverrideCheckBox.isSelected() && StringUtils.isBlank(versionIdField.getText())) {
+      throw new ConfigurationException(GctBundle.message("appengine.config.version.error"));
     }
   }
 
@@ -336,6 +360,21 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         }
         filePicker.setText(destinationFilePath.getPath());
       }
+    }
+  }
+
+  private class CustomFieldOverrideListener implements ItemListener {
+    private JCheckBox overrideCheckbox;
+    private JTextField field;
+
+    public CustomFieldOverrideListener(JCheckBox overrideCheckbox, JTextField field) {
+      this.overrideCheckbox = overrideCheckbox;
+      this.field = field;
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent itemEvent) {
+      resetOverridableFields(overrideCheckbox, field);
     }
   }
 

@@ -66,6 +66,7 @@ public class AppEngineDeployActionTest extends BasePluginTestCase {
         deploymentArtifactPath,
         appYamlPath,
         dockerFilePath,
+        "version",
         callback);
   }
   @Test
