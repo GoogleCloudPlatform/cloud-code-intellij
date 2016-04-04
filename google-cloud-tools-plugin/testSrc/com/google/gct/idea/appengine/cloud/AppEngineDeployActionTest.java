@@ -39,9 +39,9 @@ import java.io.FileReader;
 import java.util.Map;
 
 /**
- * Test case for {@link DoAppEngineDeployment}.
+ * Test case for {@link AppEngineDeployAction}.
  */
-public class DoAppEngineDeploymentTest extends BasePluginTestCase {
+public class AppEngineDeployActionTest extends BasePluginTestCase {
 
   @Mock private LoggingHandler loggingHandler;
   @Mock private File deploymentArtifactPath;
@@ -52,16 +52,17 @@ public class DoAppEngineDeploymentTest extends BasePluginTestCase {
   @Mock private GoogleLoginService googleLoginService;
   @Mock private CredentialedUser credentialedUser;
   @Mock private GoogleLoginState loginState;
-  DoAppEngineDeployment doAppEngineDeployment;
+  AppEngineDeployAction appEngineDeployAction;
   File credentialFile;
 
   @Before
   public void initialize() {
     registerService(GoogleLoginService.class, googleLoginService);
     when(deploymentArtifactPath.getPath()).thenReturn("bla.jar");
-    doAppEngineDeployment = new DoAppEngineDeployment(
+    appEngineDeployAction = new AppEngineDeployAction(
         appEngineHelper,
         loggingHandler,
+        project,
         deploymentArtifactPath,
         appYamlPath,
         dockerFilePath,
@@ -80,7 +81,7 @@ public class DoAppEngineDeploymentTest extends BasePluginTestCase {
     when(loginState.fetchOAuth2ClientId()).thenReturn(clientId);
     when(loginState.fetchOAuth2ClientSecret()).thenReturn(clientSecret);
     when(loginState.fetchOAuth2RefreshToken()).thenReturn(refreshToken);
-    credentialFile = doAppEngineDeployment.createApplicationDefaultCredentials();
+    credentialFile = appEngineDeployAction.createApplicationDefaultCredentials();
     Map jsonMap = new Gson().fromJson(new FileReader(credentialFile), Map.class);
     assertEquals(clientId, jsonMap.get("client_id"));
     assertEquals(clientSecret, jsonMap.get("client_secret"));

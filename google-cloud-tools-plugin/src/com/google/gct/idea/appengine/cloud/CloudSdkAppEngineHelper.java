@@ -21,8 +21,10 @@ import com.google.gct.idea.appengine.cloud.AppEngineDeploymentConfiguration.Conf
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.stats.UsageTrackerProvider;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.runtime.Deployment;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
+import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -32,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Set;
 
 /**
  * A Cloud SDK (gcloud) based implementation of the {@link AppEngineHelper} interface.
@@ -93,12 +96,17 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public Runnable createCustomDeploymentOperation(LoggingHandler loggingHandler,
-      File artifactToDeploy, File appYamlPath, File dockerfilePath,
+  public AppEngineAction createCustomDeploymentAction(
+      LoggingHandler loggingHandler,
+      Project project,
+      File artifactToDeploy,
+      File appYamlPath,
+      File dockerfilePath,
       DeploymentOperationCallback deploymentCallback) {
-    return new DoAppEngineDeployment(
+    return new AppEngineDeployAction(
         this,
         loggingHandler,
+        project,
         artifactToDeploy,
         appYamlPath,
         dockerfilePath,
@@ -109,8 +117,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public Runnable createAutoDeploymentOperation(
+  public AppEngineAction createAutoDeploymentAction(
       LoggingHandler loggingHandler,
+      Project project,
       File artifactToDeploy,
       DeploymentOperationCallback deploymentCallback) throws IllegalArgumentException {
     DeploymentArtifactType artifactType = DeploymentArtifactType.typeForPath(artifactToDeploy);
@@ -118,13 +127,30 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       throw new IllegalArgumentException(artifactToDeploy.getPath() + " is not a support artifact "
           + "type for automatic deployment");
     }
-    return new DoAppEngineDeployment(
+    return new AppEngineDeployAction(
         this,
         loggingHandler,
+        project,
         artifactToDeploy,
         defaultAppYaml(),
         defaultDockerfile(artifactType),
         wrapCallbackForUsageTracking(deploymentCallback, ConfigType.AUTO, artifactType)
+    );
+  }
+
+  @NotNull
+  @Override
+  public AppEngineAction createStopAction(
+      LoggingHandler loggingHandler,
+      Set<String> modulesToStop,
+      String versionToStop,
+      UndeploymentTaskCallback undeploymentTaskCallback) {
+    return new AppEngineStopAction(
+        this,
+        loggingHandler,
+        modulesToStop,
+        versionToStop,
+        undeploymentTaskCallback
     );
   }
 
