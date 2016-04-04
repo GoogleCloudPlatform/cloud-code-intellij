@@ -342,7 +342,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
           FileUtil.copy(sourceFileProvider.get(), destinationFilePath);
           LocalFileSystem.getInstance().refreshAndFindFileByIoFile(destinationFilePath);
         } catch (IOException e) {
-          Messages.showErrorDialog(project, e.getLocalizedMessage(), "Error");
+          String message = GctBundle.message(
+              "appengine.flex.config.generation.io.error", destinationFilePath.getName());
+          Messages.showErrorDialog(project, message + e.getLocalizedMessage(), "Error");
           return;
         }
         filePicker.setText(destinationFilePath.getPath());
