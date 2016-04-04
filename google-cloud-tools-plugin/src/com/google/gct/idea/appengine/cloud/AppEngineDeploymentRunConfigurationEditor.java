@@ -27,6 +27,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.Balloon.Position;
@@ -341,7 +342,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
           FileUtil.copy(sourceFileProvider.get(), destinationFilePath);
           LocalFileSystem.getInstance().refreshAndFindFileByIoFile(destinationFilePath);
         } catch (IOException e) {
-          throw new RuntimeException(e);
+          Messages.showErrorDialog(project, e.getLocalizedMessage(), "Error");
+          return;
         }
         filePicker.setText(destinationFilePath.getPath());
       }
