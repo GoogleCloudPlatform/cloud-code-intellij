@@ -19,6 +19,7 @@ package com.google.gct.idea.appengine.cloud;
 import com.google.common.base.Supplier;
 import com.google.gct.idea.appengine.cloud.AppEngineCloudType.AppEngineDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
 import com.google.gct.idea.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.gct.idea.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.gct.idea.util.GctBundle;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -319,6 +320,23 @@ public class AppEngineDeploymentRunConfigurationEditor extends
       if (destinationFolderDialog.showAndGet()) {
         File destinationFolderPath = destinationFolderDialog.getDestinationFolder();
         File destinationFilePath = new File(destinationFolderPath, fileName);
+
+        if (destinationFilePath.exists()) {
+          if (!new FileConfirmationDialog(
+              project, DialogType.CONFIRM_OVERWRITE, destinationFilePath).showAndGet()) {
+            return;
+          }
+        } else if (destinationFolderPath.isFile()) {
+          new FileConfirmationDialog(
+              project, DialogType.NOT_DIRECTORY_ERROR, destinationFolderPath).show();
+          return;
+        } else if (!destinationFolderPath.exists()) {
+          if (!new FileConfirmationDialog(
+              project, DialogType.CONFIRM_CREATE_DIR, destinationFolderPath).showAndGet()) {
+            return;
+          }
+        }
+
         try {
           FileUtil.copy(sourceFileProvider.get(), destinationFilePath);
           LocalFileSystem.getInstance().refreshAndFindFileByIoFile(destinationFilePath);

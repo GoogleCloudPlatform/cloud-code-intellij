@@ -25,10 +25,12 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.text.StringUtil;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -61,6 +63,13 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
 
   public File getDestinationFolder() {
     return new File(destinationFolderChooser.getText());
+  }
+
+  @NotNull
+  @Override
+  protected Action[] createActions() {
+    getOKAction().putValue(Action.NAME, "Generate");
+    return super.createActions();
   }
 
   @Nullable
