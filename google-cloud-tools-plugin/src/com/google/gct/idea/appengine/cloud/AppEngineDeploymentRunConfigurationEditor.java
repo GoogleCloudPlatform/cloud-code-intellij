@@ -19,6 +19,7 @@ package com.google.gct.idea.appengine.cloud;
 import com.google.common.base.Supplier;
 import com.google.gct.idea.appengine.cloud.AppEngineCloudType.AppEngineDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
 import com.google.gct.idea.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.gct.idea.ui.BrowserOpeningHyperLinkListener;
 import com.google.gct.idea.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.gct.idea.util.GctBundle;
 
@@ -47,7 +48,6 @@ import com.intellij.ui.awt.RelativePoint;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Desktop;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -64,8 +64,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 
 /**
  * Editor for an App Engine Deployment runtime configuration.
@@ -105,18 +103,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     userSpecifiedArtifactFileSelector.setVisible(true);
 
     appEngineCostWarningLabel.setText(GctBundle.message("appengine.flex.deployment.cost.warning"));
-    appEngineCostWarningLabel.addHyperlinkListener(new HyperlinkListener() {
-      @Override
-      public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-          try {
-            Desktop.getDesktop().browse(e.getURL().toURI());
-          } catch(Exception ex) {
-            // nothing to do
-          }
-        }
-      }
-    });
+    appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
