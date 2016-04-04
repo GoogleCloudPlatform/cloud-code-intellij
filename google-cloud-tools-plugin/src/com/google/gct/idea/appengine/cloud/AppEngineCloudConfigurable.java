@@ -19,6 +19,7 @@ package com.google.gct.idea.appengine.cloud;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gct.idea.appengine.util.CloudSdkUtil;
 import com.google.gct.idea.elysium.ProjectSelector;
+import com.google.gct.idea.ui.BrowserOpeningHyperLinkListener;
 import com.google.gct.idea.util.GctBundle;
 import com.google.gct.idea.util.SystemEnvironmentProvider;
 import com.google.gct.login.CredentialedUser;
@@ -41,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 
 /**
@@ -50,16 +52,25 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   private final AppEngineServerConfiguration configuration;
   private final SystemEnvironmentProvider environmentProvider;
+  private static final String MORE_INFO_URI_OPEN_TAG = "<a href='https://cloud.google.com/appengine/docs/flexible/'>";
+  private static final String MORE_INFO_URI_CLOSE_TAG = "</a>";
 
   private String displayName = GctBundle.message("appengine.flex.name");
   private JPanel mainPanel;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
   private ProjectSelector projectSelector;
   private JLabel warningMessage;
+  private JTextPane appEngineFlexMoreInfoLabel;
 
   public AppEngineCloudConfigurable(AppEngineServerConfiguration configuration,
       @Nullable Project project) {
     this.configuration = configuration;
+    appEngineFlexMoreInfoLabel.setText(
+        GctBundle.message(
+            "appengine.flex.more.info",
+            MORE_INFO_URI_OPEN_TAG,
+            MORE_INFO_URI_CLOSE_TAG));
+    appEngineFlexMoreInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     environmentProvider = SystemEnvironmentProvider.getInstance();
 
     warningMessage.setVisible(false);
