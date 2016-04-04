@@ -45,6 +45,7 @@ import com.intellij.ui.awt.RelativePoint;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.Desktop;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,8 +59,11 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 /**
  * Editor for an App Engine Deployment runtime configuration.
@@ -79,6 +83,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private JButton generateDockerfileButton;
   private JPanel userSpecifiedArtifactPanel;
   private TextFieldWithBrowseButton userSpecifiedArtifactFileSelector;
+  private JTextPane appEngineCostWarningLabel;
   private DeploymentSource deploymentSource;
   private AppEngineHelper appEngineHelper;
 
@@ -96,6 +101,20 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
+
+    appEngineCostWarningLabel.setText(GctBundle.message("appengine.flex.deployment.cost.warning"));
+    appEngineCostWarningLabel.addHyperlinkListener(new HyperlinkListener() {
+      @Override
+      public void hyperlinkUpdate(HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+          try {
+            Desktop.getDesktop().browse(e.getURL().toURI());
+          } catch(Exception ex) {
+            // nothing to do
+          }
+        }
+      }
+    });
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
@@ -183,7 +202,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   private void updateJarWarSelector() {
-      userSpecifiedArtifactPanel.setVisible(isUserSpecifiedPathDeploymentSource());
+    userSpecifiedArtifactPanel.setVisible(isUserSpecifiedPathDeploymentSource());
   }
 
   /**
@@ -290,7 +309,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         Balloon balloon = builder.createBalloon();
         balloon.show(
             new RelativePoint(fileSelector,
-            new Point(fileSelector.getWidth() / 2, fileSelector.getHeight() / 2)),
+                new Point(fileSelector.getWidth() / 2, fileSelector.getHeight() / 2)),
             Position.above);
         return;
       }
