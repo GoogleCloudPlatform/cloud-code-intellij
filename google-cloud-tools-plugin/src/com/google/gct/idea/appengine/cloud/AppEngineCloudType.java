@@ -319,20 +319,22 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
           configuration.getCloudProjectName(),
           configuration.getGoogleUserName());
 
-      final Runnable doDeployment;
+      final AppEngineAction deployAction;
       AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
       File deploymentSource = deploymentConfig.isUserSpecifiedArtifact() ?
           new File(deploymentConfig.getUserSpecifiedArtifactPath()) : task.getSource().getFile();
 
       if (deploymentConfig.getConfigType() == ConfigType.AUTO) {
-        doDeployment = appEngineHelper.createAutoDeploymentOperation(
+        deployAction = appEngineHelper.createAutoDeploymentAction(
             logManager.getMainLoggingHandler(),
+            task.getProject(),
             deploymentSource,
             callback
         );
       } else {
-        doDeployment = appEngineHelper.createCustomDeploymentOperation(
+        deployAction = appEngineHelper.createCustomDeploymentAction(
             logManager.getMainLoggingHandler(),
+            task.getProject(),
             deploymentSource,
             getFileFromFilePath(deploymentConfig.getAppYamlPath()),
             getFileFromFilePath(deploymentConfig.getDockerFilePath()),
@@ -345,7 +347,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
               null) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-              ApplicationManager.getApplication().invokeLater(doDeployment);
+              ApplicationManager.getApplication().invokeLater(deployAction);
             }
           });
     }

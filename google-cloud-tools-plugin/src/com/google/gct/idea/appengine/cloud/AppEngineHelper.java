@@ -16,10 +16,13 @@
 
 package com.google.gct.idea.appengine.cloud;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import java.io.File;
+import java.util.Set;
 
 /**
  * Provides basic Gcloud based App Engine functionality for our Cloud Tools plugin.
@@ -56,9 +59,11 @@ public interface AppEngineHelper {
   File defaultDockerfile(DeploymentArtifactType deploymentArtifactType);
 
   /**
-   * Creates a {@link Runnable} that will perform custom MVM deployment on {@code run()).
+   * Creates a {@link AppEngineAction} that will perform custom App Engine Flex deployment
+   * on {@code run()).
    *
    * @param loggingHandler logging messages will be output to this
+   * @param project the IJ project
    * @param artifactToDeploy the {@link File} path to the Java artifact to be deployed
    * @param appYamlPath the {@link File} path to the app.yaml to use for deployment
    * @param dockerfilePath the {@link File} path to the Dockerfile to be used for the custom MVM
@@ -66,24 +71,33 @@ public interface AppEngineHelper {
    * @param deploymentCallback a callback for handling successful completion of the operation
    * @return the runnable that will perform the deployment operation
    */
-  Runnable createCustomDeploymentOperation(
+  AppEngineAction createCustomDeploymentAction(
       LoggingHandler loggingHandler,
+      Project project,
       File artifactToDeploy,
       File appYamlPath,
       File dockerfilePath,
       DeploymentOperationCallback deploymentCallback);
 
   /**
-   * Creates a {@link Runnable} that will perform a standard MVM deployment with an automatically
-   * configured runtime (app.yaml and Dockerfile) on {@code run()).
+   * Creates a {@link AppEngineAction} that will perform a standard App Engine Flex deployment
+   * with an automatically configured runtime (app.yaml and Dockerfile) on {@code run()).
    *
    * @param loggingHandler logging messages will be output to this
+   * @param project the IJ project
    * @param artifactToDeploy the {@link File} path to the Java artifact to be deployed
    * @param deploymentCallback a callback for handling successful completion of the operation
    * @return the runnable that will perform the deployment operation
    */
-  Runnable createAutoDeploymentOperation(
+  AppEngineAction createAutoDeploymentAction(
       LoggingHandler loggingHandler,
+      Project project,
       File artifactToDeploy,
       DeploymentOperationCallback deploymentCallback);
+
+  AppEngineAction createStopAction(
+      LoggingHandler loggingHandler,
+      Set<String> modulesToStop,
+      String versionToStop,
+      UndeploymentTaskCallback undeploymentTaskCallback);
 }
