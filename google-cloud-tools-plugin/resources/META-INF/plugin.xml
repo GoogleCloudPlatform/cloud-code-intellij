@@ -37,7 +37,7 @@ Code inspections for App Engine Java code.</description>
 
   <application-components>
     <component>
-      <implementation-class>com.google.gct.idea.CloudToolsPluginInitializationComponent</implementation-class>
+      <implementation-class>com.google.cloud.tools.intellij.CloudToolsPluginInitializationComponent</implementation-class>
     </component>
   </application-components>
 
@@ -45,91 +45,91 @@ Code inspections for App Engine Java code.</description>
   </project-components>
 
   <extensions defaultExtensionNs="com.intellij">
-    <implicitUsageProvider implementation="com.google.gct.idea.appengine.validation.EndpointImplicitUsageProvider"/>
+    <implicitUsageProvider implementation="com.google.cloud.tools.intellij.appengine.validation.EndpointImplicitUsageProvider"/>
 
-    <checkoutProvider implementation="com.google.gct.idea.git.GcpCheckoutProvider"/>
-    <vcsPopupProvider implementation="com.google.gct.idea.git.GcpQuickListContentProvider"/>
+    <checkoutProvider implementation="com.google.cloud.tools.intellij.git.GcpCheckoutProvider"/>
+    <vcsPopupProvider implementation="com.google.cloud.tools.intellij.git.GcpQuickListContentProvider"/>
 
-    <programRunner implementation="com.google.gct.idea.debugger.CloudDebuggerRunner"/>
-    <xdebugger.breakpointType implementation="com.google.gct.idea.debugger.CloudLineBreakpointType"/>
-    <projectService serviceImplementation="com.google.gct.idea.debugger.CloudDebugProcessStateSerializer"/>
+    <programRunner implementation="com.google.cloud.tools.intellij.debugger.CloudDebuggerRunner"/>
+    <xdebugger.breakpointType implementation="com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType"/>
+    <projectService serviceImplementation="com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateSerializer"/>
 
-    <applicationService serviceInterface="com.google.gct.idea.CloudToolsPluginInfoService"
-                        serviceImplementation="com.google.gct.idea.IdeaCloudToolsPluginInfoService"/>
-    <applicationService serviceInterface="com.google.gct.idea.CloudToolsPluginConfigurationService"
-                        serviceImplementation="com.google.gct.idea.DefaultCloudToolsPluginConfigurationService"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.CloudToolsPluginInfoService"
+                        serviceImplementation="com.google.cloud.tools.intellij.IdeaCloudToolsPluginInfoService"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService"
+                        serviceImplementation="com.google.cloud.tools.intellij.DefaultCloudToolsPluginConfigurationService"/>
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
-                     implementationClass="com.google.gct.idea.appengine.validation.ApiNameInspection"/>
+                     implementationClass="com.google.cloud.tools.intellij.appengine.validation.ApiNameInspection"/>
 
     <localInspection language="JAVA" shortName="ApiNamespace" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.namespace.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
-                     implementationClass="com.google.gct.idea.appengine.validation.ApiNamespaceInspection"/>
+                     implementationClass="com.google.cloud.tools.intellij.appengine.validation.ApiNamespaceInspection"/>
 
     <localInspection language="JAVA" shortName="ApiParameter" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.parameter.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.ApiParameterInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.ApiParameterInspection"/>
 
     <localInspection language="JAVA" shortName="Constructor" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="constructor.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.ConstructorInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.ConstructorInspection"/>
 
     <localInspection language="JAVA" shortName="FullJavaName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="backend.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.FullJavaNameInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.FullJavaNameInspection"/>
 
     <localInspection language="JAVA" shortName="FullMethodName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="full.method.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.FullMethodNameInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.FullMethodNameInspection"/>
 
     <localInspection language="JAVA" shortName="InvalidParameterAnnotations" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="invalid.parameter.annotations.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.InvalidParameterAnnotationsInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.InvalidParameterAnnotationsInspection"/>
 
     <localInspection language="JAVA" shortName="MethodName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="method.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.MethodNameInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.MethodNameInspection"/>
 
     <localInspection language="JAVA" shortName="MethodParameterType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="method.parameter.type.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.MethodParameterTypeInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.MethodParameterTypeInspection"/>
 
     <localInspection language="JAVA" shortName="MethodReturnType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="method.return.type.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.MethodReturnTypeInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.MethodReturnTypeInspection"/>
 
     <localInspection language="JAVA" shortName="NamedResource" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="named.resource.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.NamedResourceInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.NamedResourceInspection"/>
 
     <localInspection language="JAVA" shortName="ResourceParameter" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="resource.parameter.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.ResourceParameterInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.ResourceParameterInspection"/>
 
     <localInspection language="JAVA" shortName="RestSignature" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="unique.rest.signature.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.gct.idea.appengine.validation.RestSignatureInspection"/>
+                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.RestSignatureInspection"/>
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">
-    <GitHttpAuthDataProvider implementation="com.google.gct.idea.git.GcpHttpAuthDataProvider" />
+    <GitHttpAuthDataProvider implementation="com.google.cloud.tools.intellij.git.GcpHttpAuthDataProvider" />
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct.login">
     <googleLoginMessageExtender
-            implementation="com.google.gct.login.IntelliJGoogleLoginMessageExtender"/>
+            implementation="com.google.cloud.tools.intellij.login.IntelliJGoogleLoginMessageExtender"/>
   </extensions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationService serviceImplementation="com.google.gct.idea.debugger.CloudDebugProcessStateCollector" />
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateCollector" />
   </extensions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationService serviceImplementation="com.google.gct.idea.util.SystemEnvironmentProvider" />
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.util.SystemEnvironmentProvider" />
   </extensions>
 
   <actions>
-    <action id="AddSnapshotLocation" class="com.google.gct.idea.debugger.actions.ToggleSnapshotLocationAction"/>
+    <action id="AddSnapshotLocation" class="com.google.cloud.tools.intellij.debugger.actions.ToggleSnapshotLocationAction"/>
 
     <group id="EditorGutterCloudDebuggerMenu">
       <separator/>
@@ -146,7 +146,7 @@ Code inspections for App Engine Java code.</description>
     </group>
 
     <action id="GoogleCloudTools.UploadSourceToGCP"
-            class="com.google.gct.idea.git.UploadSourceAction">
+            class="com.google.cloud.tools.intellij.git.UploadSourceAction">
       <add-to-group group-id="Vcs.Import"/>
     </action>
   </actions>
