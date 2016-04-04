@@ -102,6 +102,17 @@ class AppEngineDeployAction extends AppEngineAction {
       return;
     }
 
+    String version = AppEngineUtil.generateVersion();
+
+    GeneralCommandLine commandLine = new GeneralCommandLine(
+        appEngineHelper.getGcloudCommandPath().getAbsolutePath());
+    commandLine.addParameters("preview", "app", "deploy", "--promote", "--quiet");
+    commandLine.addParameter("--version=" + version);
+    commandLine.addParameter("--format=json");
+
+    commandLine.withWorkDirectory(stagingDirectory);
+    consoleLogLn("Working directory set to: " + stagingDirectory.getAbsolutePath());
+
     try {
       File stagedArtifactPath =
           copyFile(stagingDirectory, "target" + artifactType, deploymentArtifactPath);
@@ -109,6 +120,7 @@ class AppEngineDeployAction extends AppEngineAction {
 
       if (this.appYamlPath != null) {
         copyFile(stagingDirectory, "app.yaml", this.appYamlPath);
+        commandLine.addParameters("app.yaml");
       }
       if (this.dockerFilePath != null) {
         copyFile(stagingDirectory, "Dockerfile", this.dockerFilePath);
@@ -118,17 +130,6 @@ class AppEngineDeployAction extends AppEngineAction {
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
       return;
     }
-
-    String version = AppEngineUtil.generateVersion();
-
-    GeneralCommandLine commandLine = new GeneralCommandLine(
-        appEngineHelper.getGcloudCommandPath().getAbsolutePath());
-    commandLine.addParameters("preview", "app", "deploy", "app.yaml", "--promote", "--quiet");
-    commandLine.addParameter("--version=" + version);
-    commandLine.addParameter("--format=json");
-
-    commandLine.withWorkDirectory(stagingDirectory);
-    consoleLogLn("Working directory set to: " + stagingDirectory.getAbsolutePath());
 
     try {
       executeProcess(
