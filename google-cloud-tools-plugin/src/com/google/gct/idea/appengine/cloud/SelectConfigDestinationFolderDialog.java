@@ -22,6 +22,8 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.util.text.StringUtil;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -59,5 +61,15 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
 
   public File getDestinationFolder() {
     return new File(destinationFolderChooser.getText());
+  }
+
+  @Nullable
+  @Override
+  protected ValidationInfo doValidate() {
+    if (StringUtil.isEmpty(destinationFolderChooser.getText())) {
+      return new ValidationInfo(GctBundle.message(
+          "appengine.flex.config.destination.chooser.directory.missing"), destinationFolderChooser);
+    }
+    return null;
   }
 }
