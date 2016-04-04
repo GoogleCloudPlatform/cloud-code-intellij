@@ -18,6 +18,7 @@ package com.google.gct.idea.appengine.cloud;
 
 import com.google.common.base.Preconditions;
 import com.google.gct.idea.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.gct.idea.appengine.util.AppEngineUtil;
 import com.google.gct.idea.util.GctTracking;
 import com.google.gct.stats.UsageTrackerProvider;
 
@@ -102,6 +103,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       File artifactToDeploy,
       File appYamlPath,
       File dockerfilePath,
+      String version,
       DeploymentOperationCallback deploymentCallback) {
     return new AppEngineDeployAction(
         this,
@@ -110,6 +112,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         artifactToDeploy,
         appYamlPath,
         dockerfilePath,
+        version,
         wrapCallbackForUsageTracking(deploymentCallback,
             ConfigType.CUSTOM,DeploymentArtifactType.typeForPath(artifactToDeploy))
     );
@@ -134,6 +137,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         artifactToDeploy,
         defaultAppYaml(),
         defaultDockerfile(artifactType),
+        AppEngineUtil.generateVersion(),
         wrapCallbackForUsageTracking(deploymentCallback, ConfigType.AUTO, artifactType)
     );
   }

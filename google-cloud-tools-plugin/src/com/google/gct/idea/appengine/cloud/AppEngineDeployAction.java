@@ -37,6 +37,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -63,6 +64,7 @@ class AppEngineDeployAction extends AppEngineAction {
   private File deploymentArtifactPath;
   private File appYamlPath;
   private File dockerFilePath;
+  private String customVersionId;
   private AppEngineHelper appEngineHelper;
   private DeploymentOperationCallback callback;
   private DeploymentArtifactType artifactType;
@@ -74,6 +76,7 @@ class AppEngineDeployAction extends AppEngineAction {
       @NotNull File deploymentArtifactPath,
       @Nullable File appYamlPath,
       @Nullable File dockerFilePath,
+      @Nullable String customVersionId,
       @NotNull DeploymentOperationCallback callback) {
     super(loggingHandler, appEngineHelper, callback);
 
@@ -83,6 +86,7 @@ class AppEngineDeployAction extends AppEngineAction {
     this.callback = callback;
     this.appYamlPath = appYamlPath;
     this.dockerFilePath = dockerFilePath;
+    this.customVersionId = customVersionId;
     this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
   }
 
@@ -102,7 +106,8 @@ class AppEngineDeployAction extends AppEngineAction {
       return;
     }
 
-    String version = AppEngineUtil.generateVersion();
+    String version =
+        StringUtil.isEmpty(customVersionId) ? AppEngineUtil.generateVersion() : customVersionId;
 
     GeneralCommandLine commandLine = new GeneralCommandLine(
         appEngineHelper.getGcloudCommandPath().getAbsolutePath());

@@ -338,6 +338,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
             deploymentSource,
             getFileFromFilePath(deploymentConfig.getAppYamlPath()),
             getFileFromFilePath(deploymentConfig.getDockerFilePath()),
+            deploymentConfig.getVersion(),
             callback
         );
       }

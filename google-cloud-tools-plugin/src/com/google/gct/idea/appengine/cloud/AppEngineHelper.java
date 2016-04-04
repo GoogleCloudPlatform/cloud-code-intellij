@@ -77,6 +77,7 @@ public interface AppEngineHelper {
       File artifactToDeploy,
       File appYamlPath,
       File dockerfilePath,
+      String version,
       DeploymentOperationCallback deploymentCallback);
 
   /**
