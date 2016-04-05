@@ -31,7 +31,7 @@
 
   <application-components>
     <component>
-      <implementation-class>com.google.gct.idea.AccountPluginInitializationComponent</implementation-class>
+      <implementation-class>com.google.cloud.tools.intellij.AccountPluginInitializationComponent</implementation-class>
     </component>
   </application-components>
 
@@ -40,7 +40,7 @@
 
   <actions>
     <action id="GoogleLogin.LoginService"
-            class="com.google.gct.login.ui.GoogleLoginAction"
+            class="com.google.cloud.tools.intellij.login.ui.GoogleLoginAction"
             text="Google Login">
       <add-to-group group-id="MainToolBar" anchor="last"  />
       <add-to-group group-id="NavBarToolBar" anchor="last"  />
@@ -48,29 +48,29 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable provider="com.google.gct.stats.GoogleSettingsConfigurableProvider"/>
-    <applicationService serviceInterface="com.google.gct.stats.UsageTrackerProvider"
-                        serviceImplementation="com.google.gct.stats.KeyedExtensionUsageTrackerProvider"/>
-    <applicationService serviceInterface="com.google.gct.idea.AccountPluginInfoService"
-                        serviceImplementation="com.google.gct.idea.IdeaAccountPluginInfoService"/>
-    <applicationService serviceInterface="com.google.gct.idea.AccountPluginConfigurationService"
-                        serviceImplementation="com.google.gct.idea.DefaultAccountPluginConfigurationService"/>
-    <applicationService serviceInterface="com.google.gct.login.GoogleLoginService"
-                        serviceImplementation="com.google.gct.login.IntellijGoogleLoginService"/>
+    <applicationConfigurable provider="com.google.cloud.tools.intellij.stats.GoogleSettingsConfigurableProvider"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.stats.UsageTrackerProvider"
+                        serviceImplementation="com.google.cloud.tools.intellij.stats.KeyedExtensionUsageTrackerProvider"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.AccountPluginInfoService"
+                        serviceImplementation="com.google.cloud.tools.intellij.IdeaAccountPluginInfoService"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.AccountPluginConfigurationService"
+                        serviceImplementation="com.google.cloud.tools.intellij.DefaultAccountPluginConfigurationService"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.login.GoogleLoginService"
+                        serviceImplementation="com.google.cloud.tools.intellij.login.IntellijGoogleLoginService"/>
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct">
     <!-- For IJ Community Edition -->
-    <login.usageTracker implementationClass="com.google.gct.stats.GoogleUsageTracker" key="Idea" />
+    <login.usageTracker implementationClass="com.google.cloud.tools.intellij.stats.GoogleUsageTracker" key="Idea" />
     <!-- For IJ Ultimate Edition -->
-    <login.usageTracker implementationClass="com.google.gct.stats.GoogleUsageTracker" key="idea" />
+    <login.usageTracker implementationClass="com.google.cloud.tools.intellij.stats.GoogleUsageTracker" key="idea" />
   </extensions>
 
   <extensionPoints>
-    <extensionPoint name="googleLoginListener" interface="com.google.gct.login.GoogleLoginListener"/>
-    <extensionPoint name="googleLoginMessageExtender" interface="com.google.gct.login.GoogleLoginMessageExtender"/>
-    <extensionPoint name="usageTracker" beanClass="com.google.gct.stats.UsageTrackerExtensionPointBean">
-      <with attribute="implementationClass" implements="com.google.gct.stats.UsageTracker"/>
+    <extensionPoint name="googleLoginListener" interface="com.google.cloud.tools.intellij.login.GoogleLoginListener"/>
+    <extensionPoint name="googleLoginMessageExtender" interface="com.google.cloud.tools.intellij.login.GoogleLoginMessageExtender"/>
+    <extensionPoint name="usageTracker" beanClass="com.google.cloud.tools.intellij.stats.UsageTrackerExtensionPointBean">
+      <with attribute="implementationClass" implements="com.google.cloud.tools.intellij.stats.UsageTracker"/>
     </extensionPoint>
   </extensionPoints>
 

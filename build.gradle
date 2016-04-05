@@ -36,7 +36,7 @@ subprojects {
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
     tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
-    group = 'com.google.gct'
+    group = 'com.google.cloud.tools.intellij'
 
     task jarSources(type:Jar) {
       from sourceSets.main.allSource
