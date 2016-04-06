@@ -95,6 +95,12 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private DeploymentSource deploymentSource;
   private AppEngineHelper appEngineHelper;
 
+  private static final String COST_WARNING_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
+  private static final String COST_WARNING_CLOSE_TAG = "</i></font></html>";
+  private static final String COST_WARNING_HREF_OPEN_TAG =
+      "<a href='https://cloud.google.com/appengine/pricing'>";
+  private static final String COST_WARNING_HREF_CLOSE_TAG = "</a>";
+
   public AppEngineDeploymentRunConfigurationEditor(
       final Project project,
       final DeploymentSource deploymentSource,
@@ -112,7 +118,12 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
 
-    appEngineCostWarningLabel.setText(GctBundle.message("appengine.flex.deployment.cost.warning"));
+    appEngineCostWarningLabel.setText(
+        GctBundle.message("appengine.flex.deployment.cost.warning",
+            COST_WARNING_OPEN_TAG,
+            COST_WARNING_HREF_OPEN_TAG,
+            COST_WARNING_HREF_CLOSE_TAG,
+            COST_WARNING_CLOSE_TAG));
     appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
