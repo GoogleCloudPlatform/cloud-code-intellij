@@ -311,9 +311,6 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       }
       String gcloudCommandPath = CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath());
       File gcloudCommand = getFileFromFilePath(gcloudCommandPath);
-      if (gcloudCommand == null) {
-        throw new RuntimeException(gcloudCommandPath + " does not exist");
-      }
       AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
           gcloudCommand,
           configuration.getCloudProjectName(),
