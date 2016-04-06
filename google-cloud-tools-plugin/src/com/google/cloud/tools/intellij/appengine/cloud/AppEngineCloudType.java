@@ -361,12 +361,12 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     public void disconnect() {
     }
 
-    @Nullable
+    @NotNull
     private File getFileFromFilePath(String filePath) {
       File file;
       file = new File(filePath);
       if (!file.exists()) {
-        return null;
+        throw new RuntimeException(filePath + " does not exist");
       }
       return file;
     }

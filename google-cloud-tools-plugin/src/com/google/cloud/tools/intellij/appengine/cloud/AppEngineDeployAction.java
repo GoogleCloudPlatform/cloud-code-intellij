@@ -74,8 +74,8 @@ class AppEngineDeployAction extends AppEngineAction {
       @NotNull LoggingHandler loggingHandler,
       @NotNull Project project,
       @NotNull File deploymentArtifactPath,
-      @Nullable File appYamlPath,
-      @Nullable File dockerFilePath,
+      @NotNull File appYamlPath,
+      @NotNull File dockerFilePath,
       @Nullable String customVersionId,
       @NotNull DeploymentOperationCallback callback) {
     super(loggingHandler, appEngineHelper, callback);
