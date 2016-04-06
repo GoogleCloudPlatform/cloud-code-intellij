@@ -39,7 +39,7 @@ public class AppEngineUtil {
    * @return generated version
    */
   public static String generateVersion() {
-    String versionPattern = "yyyyMMdd't'kms";
+    String versionPattern = "yyyyMMdd't'kkmmss";
     DateTime dateTime = new DateTime();
     DateTimeFormatter fmt = DateTimeFormat.forPattern(versionPattern);
 
