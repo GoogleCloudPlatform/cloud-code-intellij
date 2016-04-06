@@ -297,7 +297,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
         httpMethod = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "httpMethod");
-      } catch (InvalidAnnotationException e) { // NOPMD
+      } catch (InvalidAnnotationException e) {
         // do nothing
       } catch (MissingAttributeException e) {
         break;
@@ -327,7 +327,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
         path = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "path");
-      } catch (InvalidAnnotationException e) { // NOPMD
+      } catch (InvalidAnnotationException e) {
         // do nothing
       } catch (MissingAttributeException e) {
         break;
@@ -407,7 +407,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try{
         resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, "resource");
-      } catch (InvalidAnnotationException e) { // NOPMD
+      } catch (InvalidAnnotationException e) {
         // do nothing
       } catch (MissingAttributeException e) {
         break;
@@ -423,7 +423,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
         resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API, "resource");
-      } catch (InvalidAnnotationException e) { // NOPMD
+      } catch (InvalidAnnotationException e) {
         // do nothing
       } catch (MissingAttributeException e) {
         break;
