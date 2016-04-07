@@ -171,6 +171,9 @@ class AppEngineDeployAction extends AppEngineAction {
       try {
         if (event.getExitCode() == 0) {
           callback.succeeded(new DeploymentRuntimeImpl(deploymentOutput.toString(), version));
+        } else if (event.getExitCode() == 137) {
+          // process killed (message should never be seen by user)
+          callback.errorOccurred("Deployment process was killed.");
         } else {
           logger.error("Deployment process exited with an error. Exit Code:" + event.getExitCode());
           callback.errorOccurred(

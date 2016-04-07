@@ -316,6 +316,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
     private AppEngineServerConfiguration configuration;
+    private AppEngineAction currentAction;
 
     public AppEngineRuntimeInstance(
         AppEngineServerConfiguration configuration) {
@@ -323,9 +324,13 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     }
 
     @Override
-    public void deploy(@NotNull final DeploymentTask<AppEngineDeploymentConfiguration> task,
+    public synchronized void deploy(@NotNull final DeploymentTask<AppEngineDeploymentConfiguration> task,
         @NotNull final DeploymentLogManager logManager,
         @NotNull final DeploymentOperationCallback callback) {
+
+      // make sure we stop any active deployments
+      disconnect();
+
       FileDocumentManager.getInstance().saveAllDocuments();
       if (!Services.getLoginService().isLoggedIn()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
@@ -361,6 +366,9 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
             callback
         );
       }
+
+      currentAction = deployAction;
+
       ProgressManager.getInstance()
           .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
               "appengine.deployment.status.deploying"), true,
@@ -377,7 +385,12 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     }
 
     @Override
-    public void disconnect() {
+    public synchronized void disconnect() {
+      // kill any executing process for the current action
+      if (currentAction != null && currentAction.getProcessHandler() != null) {
+        currentAction.getProcessHandler().destroyProcess();
+      }
+      currentAction = null;
     }
 
     @NotNull

@@ -29,6 +29,8 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmentType;
 import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessListener;
 import com.intellij.openapi.diagnostic.Logger;
@@ -55,6 +57,7 @@ public abstract class AppEngineAction implements Runnable {
   private AppEngineHelper appEngineHelper;
   private File credentialsPath;
   private RemoteOperationCallback callback;
+  private ProcessHandler processHandler;
 
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
@@ -65,13 +68,28 @@ public abstract class AppEngineAction implements Runnable {
     this.callback = callback;
   }
 
+  /**
+   * Returns the commandline process handler used to execute the action
+   *
+   * @return the process handler, or null, if the action is not executing
+   */
+  public ProcessHandler getProcessHandler() {
+    return processHandler;
+  }
+
   protected LoggingHandler getLoggingHandler() {
     return loggingHandler;
   }
 
-  protected void executeProcess(
+  protected synchronized void executeProcess(
       @NotNull GeneralCommandLine commandLine,
       @NotNull ProcessListener listener) throws ExecutionException {
+
+    // kill action process if one is already executing
+    if (processHandler != null) {
+      processHandler.destroyProcess();
+      processHandler = null;
+    }
 
     credentialsPath = createApplicationDefaultCredentials();
     if (credentialsPath == null) {
@@ -91,11 +109,20 @@ public abstract class AppEngineAction implements Runnable {
 
     consoleLogLn("Executing: " + commandLine.getCommandLineString());
 
-    final Process process = commandLine.createProcess();
-    final ProcessHandler processHandler = new OSProcessHandler(process,
+    Process process = commandLine.createProcess();
+    processHandler = new OSProcessHandler(process,
         commandLine.getCommandLineString());
     loggingHandler.attachToProcess(processHandler);
     processHandler.addProcessListener(listener);
+
+    // mark process as completed by setting handler to null when terminated
+    processHandler.addProcessListener(new ProcessAdapter() {
+      @Override
+      public void processTerminated(ProcessEvent event) {
+        processHandler = null;
+      }
+    });
+
     processHandler.startNotify();
   }
 
