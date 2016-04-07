@@ -250,6 +250,14 @@ public class AppEngineDeploymentRunConfigurationEditor extends
           GctBundle.message("appengine.config.deployment.source.error"));
     } else if(versionOverrideCheckBox.isSelected() && StringUtils.isBlank(versionIdField.getText())) {
       throw new ConfigurationException(GctBundle.message("appengine.config.version.error"));
+    } else if (getConfigType() == ConfigType.CUSTOM) {
+      if (StringUtils.isBlank(appYamlPathField.getText())) {
+        throw new ConfigurationException(
+            GctBundle.message("appengine.flex.config.custom.app.yaml.error"));
+      } else if (StringUtils.isBlank(dockerFilePathField.getText())) {
+        throw new ConfigurationException(
+            GctBundle.message("appengine.flex.config.custom.dockerfile.error"));
+      }
     }
   }
 
