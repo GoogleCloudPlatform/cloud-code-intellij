@@ -77,17 +77,21 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     super("gcp-app-engine"); // "google-app-engine" is used by the native IJ app engine support.
 
     // listen for project closing event and close all active server connections
-    ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
-      @Override
-      public void projectClosing(Project project) {
-        super.projectClosing(project);
-        for (ServerConnection connection : ServerConnectionManager.getInstance().getConnections()) {
-          if (connection.getServer().getType() instanceof  AppEngineCloudType) {
-            connection.disconnect();
+    ProjectManager projectManager = ProjectManager.getInstance();
+    if (projectManager != null) {
+      projectManager.addProjectManagerListener(new ProjectManagerAdapter() {
+        @Override
+        public void projectClosing(Project project) {
+          super.projectClosing(project);
+          for (ServerConnection connection : ServerConnectionManager.getInstance()
+              .getConnections()) {
+            if (connection.getServer().getType() instanceof AppEngineCloudType) {
+              connection.disconnect();
+            }
           }
         }
-      }
-    });
+      });
+    }
 
   }
 
