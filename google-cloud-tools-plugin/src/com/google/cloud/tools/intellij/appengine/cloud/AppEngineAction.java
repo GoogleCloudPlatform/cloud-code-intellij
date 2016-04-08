@@ -68,15 +68,6 @@ public abstract class AppEngineAction implements Runnable {
     this.callback = callback;
   }
 
-  /**
-   * Returns the commandline process handler used to execute the action
-   *
-   * @return the process handler, or null, if the action is not executing
-   */
-  public ProcessHandler getProcessHandler() {
-    return processHandler;
-  }
-
   protected LoggingHandler getLoggingHandler() {
     return loggingHandler;
   }
@@ -124,6 +115,14 @@ public abstract class AppEngineAction implements Runnable {
     });
 
     processHandler.startNotify();
+  }
+
+  protected void cancel() {
+    // kill any executing process for the action
+    if (processHandler != null) {
+      processHandler.destroyProcess();
+      processHandler = null;
+    }
   }
 
   private static final String CLIENT_ID_LABEL = "client_id";

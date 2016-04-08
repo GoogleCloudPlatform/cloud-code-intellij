@@ -387,10 +387,10 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     @Override
     public synchronized void disconnect() {
       // kill any executing process for the current action
-      if (currentAction != null && currentAction.getProcessHandler() != null) {
-        currentAction.getProcessHandler().destroyProcess();
+      if (currentAction != null) {
+        currentAction.cancel();
+        currentAction = null;
       }
-      currentAction = null;
     }
 
     @NotNull
