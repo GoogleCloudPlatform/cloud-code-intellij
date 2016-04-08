@@ -57,7 +57,7 @@ public abstract class AppEngineAction implements Runnable {
   private AppEngineHelper appEngineHelper;
   private File credentialsPath;
   private RemoteOperationCallback callback;
-  private ProcessHandler processHandler;
+  private OSProcessHandler processHandler;
 
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
@@ -76,11 +76,8 @@ public abstract class AppEngineAction implements Runnable {
       @NotNull GeneralCommandLine commandLine,
       @NotNull ProcessListener listener) throws ExecutionException {
 
-    // kill action process if one is already executing
-    if (processHandler != null) {
-      processHandler.destroyProcess();
-      processHandler = null;
-    }
+    // kill action if it's already executing
+    cancel();
 
     credentialsPath = createApplicationDefaultCredentials();
     if (credentialsPath == null) {
@@ -120,7 +117,7 @@ public abstract class AppEngineAction implements Runnable {
   protected void cancel() {
     // kill any executing process for the action
     if (processHandler != null) {
-      processHandler.destroyProcess();
+      processHandler.getProcess().destroy();
       processHandler = null;
     }
   }
