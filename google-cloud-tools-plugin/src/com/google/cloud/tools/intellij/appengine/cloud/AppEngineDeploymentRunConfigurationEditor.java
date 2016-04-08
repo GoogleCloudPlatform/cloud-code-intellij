@@ -16,13 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.common.base.Supplier;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType.AppEngineDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
-import com.google.cloud.tools.intellij.ui.PlaceholderTextField;
-import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
+import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
+import com.google.cloud.tools.intellij.ui.PlaceholderTextField;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.base.Supplier;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
@@ -125,6 +125,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
             COST_WARNING_HREF_CLOSE_TAG,
             COST_WARNING_CLOSE_TAG));
     appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+    appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
