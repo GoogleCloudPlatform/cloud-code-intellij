@@ -32,6 +32,8 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.ProjectManagerAdapter;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactManager;
@@ -45,6 +47,8 @@ import com.intellij.remoteServer.configuration.deployment.JavaDeploymentSourceUt
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
+import com.intellij.remoteServer.runtime.ServerConnection;
+import com.intellij.remoteServer.runtime.ServerConnectionManager;
 import com.intellij.remoteServer.runtime.ServerConnector;
 import com.intellij.remoteServer.runtime.ServerTaskExecutor;
 import com.intellij.remoteServer.runtime.deployment.DeploymentLogManager;
@@ -71,6 +75,24 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
   public AppEngineCloudType() {
     super("gcp-app-engine"); // "google-app-engine" is used by the native IJ app engine support.
+
+    // listen for project closing event and close all active server connections
+    ProjectManager projectManager = ProjectManager.getInstance();
+    if (projectManager != null) {
+      projectManager.addProjectManagerListener(new ProjectManagerAdapter() {
+        @Override
+        public void projectClosing(Project project) {
+          super.projectClosing(project);
+          for (ServerConnection connection : ServerConnectionManager.getInstance()
+              .getConnections()) {
+            if (connection.getServer().getType() instanceof AppEngineCloudType) {
+              connection.disconnect();
+            }
+          }
+        }
+      });
+    }
+
   }
 
   @NotNull
@@ -311,9 +333,6 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       }
       String gcloudCommandPath = CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath());
       File gcloudCommand = getFileFromFilePath(gcloudCommandPath);
-      if (gcloudCommand == null) {
-        throw new RuntimeException(gcloudCommandPath + " does not exist");
-      }
       AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
           gcloudCommand,
           configuration.getCloudProjectName(),
@@ -361,12 +380,12 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     public void disconnect() {
     }
 
-    @Nullable
+    @NotNull
     private File getFileFromFilePath(String filePath) {
       File file;
       file = new File(filePath);
       if (!file.exists()) {
-        return null;
+        throw new RuntimeException(filePath + " does not exist");
       }
       return file;
     }

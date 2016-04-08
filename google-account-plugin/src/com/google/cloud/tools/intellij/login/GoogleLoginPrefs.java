@@ -58,22 +58,26 @@ public class GoogleLoginPrefs {
    * @param credentials the specified {@code Credentials object}
    */
   public static void saveOAuthData(OAuthData credentials) {
-    Preferences prefs = getPrefs();
     String userEmail = credentials.getStoredEmail();
-    prefs.put(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY, userEmail), credentials.getRefreshToken());
 
-    // we save the scopes so that if the user updates the plugin and the
-    // scopes change, we can force the plugin to log out.
-    Joiner joiner = Joiner.on(DELIMITER);
-    prefs.put(getCustomUserKey(OAUTH_SCOPES_KEY, userEmail), joiner.join(credentials.getStoredScopes()));
+    if (userEmail != null) {
+      Preferences prefs = getPrefs();
 
-    String storedEmail = credentials.getStoredEmail();
-    if (storedEmail != null) {
-      prefs.put(getCustomUserKey(OAUTH_DATA_EMAIL_KEY, userEmail), storedEmail);
+      prefs.put(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY, userEmail),
+          credentials.getRefreshToken());
+
+      // we save the scopes so that if the user updates the plugin and the
+      // scopes change, we can force the plugin to log out.
+      Joiner joiner = Joiner.on(DELIMITER);
+      prefs.put(getCustomUserKey(OAUTH_SCOPES_KEY, userEmail),
+          joiner.join(credentials.getStoredScopes()));
+
+      prefs.put(getCustomUserKey(OAUTH_DATA_EMAIL_KEY, userEmail), userEmail);
+
+      addUser(credentials.getStoredEmail());
+
+      flushPrefs(prefs);
     }
-    addUser(credentials.getStoredEmail());
-
-    flushPrefs(prefs);
   }
 
   /**
@@ -82,17 +86,23 @@ public class GoogleLoginPrefs {
    * an {@code OAuthData} object all of whose getters return {@code null} .
    */
   public static OAuthData loadOAuthData() {
-    Preferences prefs = getPrefs();
-
-    String refreshToken = prefs.get(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY), null);
-    String storedEmail = prefs.get(getCustomUserKey(OAUTH_DATA_EMAIL_KEY), null);
-    String storedScopesString = prefs.get(getCustomUserKey(OAUTH_SCOPES_KEY), "");
-
-    // Use a set to ensure uniqueness.
+    String refreshToken = null;
+    String storedEmail = null;
     SortedSet<String> storedScopes = new TreeSet<String>();
-    for (String scope : storedScopesString.split(DELIMITER)) {
-      storedScopes.add(scope);
+
+    if (Services.getLoginService().getActiveUser() != null) {
+      Preferences prefs = getPrefs();
+
+      refreshToken = prefs.get(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY), null);
+      storedEmail = prefs.get(getCustomUserKey(OAUTH_DATA_EMAIL_KEY), null);
+      String storedScopesString = prefs.get(getCustomUserKey(OAUTH_SCOPES_KEY), "");
+
+      // Use a set to ensure uniqueness.
+      for (String scope : storedScopesString.split(DELIMITER)) {
+        storedScopes.add(scope);
+      }
     }
+
     return new OAuthData(null, refreshToken, storedEmail, storedScopes, 0);
   }
 

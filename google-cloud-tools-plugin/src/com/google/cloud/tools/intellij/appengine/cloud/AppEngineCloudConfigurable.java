@@ -17,12 +17,12 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
-import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -71,6 +71,8 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
             MORE_INFO_URI_OPEN_TAG,
             MORE_INFO_URI_CLOSE_TAG));
     appEngineFlexMoreInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+    appEngineFlexMoreInfoLabel.setBackground(mainPanel.getBackground());
+
     environmentProvider = SystemEnvironmentProvider.getInstance();
 
     warningMessage.setVisible(false);

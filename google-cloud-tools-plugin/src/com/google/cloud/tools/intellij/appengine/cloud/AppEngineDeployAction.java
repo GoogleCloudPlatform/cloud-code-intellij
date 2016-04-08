@@ -74,8 +74,8 @@ class AppEngineDeployAction extends AppEngineAction {
       @NotNull LoggingHandler loggingHandler,
       @NotNull Project project,
       @NotNull File deploymentArtifactPath,
-      @Nullable File appYamlPath,
-      @Nullable File dockerFilePath,
+      @NotNull File appYamlPath,
+      @NotNull File dockerFilePath,
       @Nullable String customVersionId,
       @NotNull DeploymentOperationCallback callback) {
     super(loggingHandler, appEngineHelper, callback);
@@ -112,6 +112,7 @@ class AppEngineDeployAction extends AppEngineAction {
     GeneralCommandLine commandLine = new GeneralCommandLine(
         appEngineHelper.getGcloudCommandPath().getAbsolutePath());
     commandLine.addParameters("preview", "app", "deploy", "--promote", "--quiet");
+    commandLine.addParameter("app.yaml");
     commandLine.addParameter("--version=" + version);
     commandLine.addParameter("--format=json");
 
@@ -123,13 +124,8 @@ class AppEngineDeployAction extends AppEngineAction {
           copyFile(stagingDirectory, "target" + artifactType, deploymentArtifactPath);
       stagedArtifactPath.setReadable(true /* readable */, false /* ownerOnly */);
 
-      if (this.appYamlPath != null) {
-        copyFile(stagingDirectory, "app.yaml", this.appYamlPath);
-        commandLine.addParameters("app.yaml");
-      }
-      if (this.dockerFilePath != null) {
-        copyFile(stagingDirectory, "Dockerfile", this.dockerFilePath);
-      }
+      copyFile(stagingDirectory, "app.yaml", this.appYamlPath);
+      copyFile(stagingDirectory, "Dockerfile", this.dockerFilePath);
     } catch (IOException e) {
       logger.error(e);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
