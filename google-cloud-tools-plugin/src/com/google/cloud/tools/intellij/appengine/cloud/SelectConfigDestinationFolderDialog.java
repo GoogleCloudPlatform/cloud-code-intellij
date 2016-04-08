@@ -38,11 +38,13 @@ import javax.swing.JPanel;
  * A widget for selecting a folder in which to generate ManagedVM source files.
  */
 public class SelectConfigDestinationFolderDialog extends DialogWrapper {
+  public enum ConfigFileType { APP_YAML, DOCKERFILE };
 
   private JPanel rootPanel;
   private TextFieldWithBrowseButton destinationFolderChooser;
 
-  public SelectConfigDestinationFolderDialog(@Nullable Project project) {
+  public SelectConfigDestinationFolderDialog(
+      @Nullable Project project, ConfigFileType fileType) {
     super(project);
     setTitle(GctBundle.message("appengine.flex.config.destination.chooser.title"));
 
@@ -53,6 +55,17 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
         project,
         FileChooserDescriptorFactory.createSingleFolderDescriptor()
     );
+
+    // Present a canonical target folder as default in the path field.
+    if (project != null && project.getBasePath() != null) {
+      if (fileType == ConfigFileType.APP_YAML) {
+        destinationFolderChooser.setText(project.getBasePath() + "/src/main/appengine");
+      } else if (fileType == ConfigFileType.DOCKERFILE) {
+        destinationFolderChooser.setText(project.getBasePath() + "/src/main/docker");
+      } else {
+        destinationFolderChooser.setText(project.getBasePath());
+      }
+    }
   }
 
   @Nullable
