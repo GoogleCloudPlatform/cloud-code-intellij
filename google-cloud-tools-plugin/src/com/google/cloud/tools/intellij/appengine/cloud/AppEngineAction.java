@@ -81,7 +81,7 @@ public abstract class AppEngineAction implements Runnable {
     return loggingHandler;
   }
 
-  protected synchronized void executeProcess(
+  protected void executeProcess(
       @NotNull GeneralCommandLine commandLine,
       @NotNull ProcessListener listener) throws ExecutionException {
 
