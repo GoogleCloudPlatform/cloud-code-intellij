@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.common.base.Supplier;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType.AppEngineDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
