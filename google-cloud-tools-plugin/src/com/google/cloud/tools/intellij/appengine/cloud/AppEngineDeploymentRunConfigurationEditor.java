@@ -175,11 +175,11 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     generateDockerfileButton.addActionListener(
         new GenerateConfigActionListener(project, "Dockerfile", ConfigFileType.DOCKERFILE,
             new Supplier<File>() {
-                @Override
-                public File get() {
-                  return appEngineHelper.defaultDockerfile(
-                      DeploymentArtifactType.typeForPath(deploymentSource.getFile()));
-                }
+              @Override
+              public File get() {
+                return appEngineHelper.defaultDockerfile(
+                    DeploymentArtifactType.typeForPath(deploymentSource.getFile()));
+              }
             }, dockerFilePathField, userSpecifiedArtifactFileSelector));
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
