@@ -38,11 +38,13 @@ import javax.swing.JPanel;
  * A widget for selecting a folder in which to generate ManagedVM source files.
  */
 public class SelectConfigDestinationFolderDialog extends DialogWrapper {
+  public enum ConfigFileType { APP_YAML, DOCKERFILE };
 
   private JPanel rootPanel;
   private TextFieldWithBrowseButton destinationFolderChooser;
 
-  public SelectConfigDestinationFolderDialog(@Nullable Project project) {
+  public SelectConfigDestinationFolderDialog(
+      @Nullable Project project, ConfigFileType fileType) {
     super(project);
     setTitle(GctBundle.message("appengine.flex.config.destination.chooser.title"));
 
@@ -53,6 +55,25 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
         project,
         FileChooserDescriptorFactory.createSingleFolderDescriptor()
     );
+
+    if (project != null && project.getBasePath() != null) {
+      String srcPath = project.getBasePath() + "/src";
+      String srcMainPath = project.getBasePath() + "/src/main";
+      String AppenginePath = project.getBasePath() + "/src/main/appengine";
+      String dockerPath = project.getBasePath() + "/src/main/docker";
+
+      if (fileType == ConfigFileType.APP_YAML && new File(AppenginePath).isDirectory()) {
+        destinationFolderChooser.setText(AppenginePath);
+      } else if (fileType == ConfigFileType.DOCKERFILE && new File(dockerPath).isDirectory()) {
+        destinationFolderChooser.setText(dockerPath);
+      } else if (new File(srcMainPath).isDirectory()) {
+        destinationFolderChooser.setText(srcMainPath);
+      } else if (new File(srcPath).isDirectory()) {
+        destinationFolderChooser.setText(srcPath);
+      } else {
+        destinationFolderChooser.setText(project.getBasePath());
+      }
+    }
   }
 
   @Nullable

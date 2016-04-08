@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
 import com.google.common.base.Supplier;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType.AppEngineDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
@@ -164,20 +165,22 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         project,
         FileChooserDescriptorFactory.createSingleFileDescriptor());
     generateAppYamlButton.addActionListener(
-        new GenerateConfigActionListener(project, "app.yaml", new Supplier<File>() {
-          @Override
-          public File get() {
-            return appEngineHelper.defaultAppYaml();
-          }
-        }, appYamlPathField, userSpecifiedArtifactFileSelector));
+        new GenerateConfigActionListener(project, "app.yaml", ConfigFileType.APP_YAML,
+            new Supplier<File>() {
+              @Override
+              public File get() {
+                return appEngineHelper.defaultAppYaml();
+              }
+            }, appYamlPathField, userSpecifiedArtifactFileSelector));
     generateDockerfileButton.addActionListener(
-        new GenerateConfigActionListener(project, "Dockerfile", new Supplier<File>() {
-          @Override
-          public File get() {
-            return appEngineHelper
-                .defaultDockerfile(DeploymentArtifactType.typeForPath(deploymentSource.getFile()));
-          }
-        }, dockerFilePathField, userSpecifiedArtifactFileSelector));
+        new GenerateConfigActionListener(project, "Dockerfile", ConfigFileType.DOCKERFILE,
+            new Supplier<File>() {
+                @Override
+                public File get() {
+                  return appEngineHelper.defaultDockerfile(
+                      DeploymentArtifactType.typeForPath(deploymentSource.getFile()));
+                }
+            }, dockerFilePathField, userSpecifiedArtifactFileSelector));
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
   }
@@ -300,6 +303,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     private final Project project;
     private final String fileName;
+    private final ConfigFileType configFileType;
     private final TextFieldWithBrowseButton filePicker;
     private final Supplier<File> sourceFileProvider;
     private final JPanel fileSelector;
@@ -307,11 +311,13 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     public GenerateConfigActionListener(
         Project project,
         String fileName,
+        ConfigFileType configFileType,
         Supplier<File> sourceFileProvider,
         TextFieldWithBrowseButton filePicker,
         JPanel fileSelector) {
       this.project = project;
       this.fileName = fileName;
+      this.configFileType = configFileType;
       this.sourceFileProvider = sourceFileProvider;
       this.filePicker = filePicker;
       this.fileSelector = fileSelector;
@@ -339,7 +345,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
       }
 
       SelectConfigDestinationFolderDialog destinationFolderDialog = new
-          SelectConfigDestinationFolderDialog(project);
+          SelectConfigDestinationFolderDialog(project, configFileType);
       if (destinationFolderDialog.showAndGet()) {
         File destinationFolderPath = destinationFolderDialog.getDestinationFolder();
         File destinationFilePath = new File(destinationFolderPath, fileName);
