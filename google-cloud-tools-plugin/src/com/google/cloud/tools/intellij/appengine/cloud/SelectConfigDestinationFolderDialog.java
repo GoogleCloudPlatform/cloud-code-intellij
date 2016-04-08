@@ -56,20 +56,12 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
         FileChooserDescriptorFactory.createSingleFolderDescriptor()
     );
 
+    // Present a canonical target folder as default in the path field.
     if (project != null && project.getBasePath() != null) {
-      String srcPath = project.getBasePath() + "/src";
-      String srcMainPath = project.getBasePath() + "/src/main";
-      String appEnginePath = project.getBasePath() + "/src/main/appengine";
-      String dockerPath = project.getBasePath() + "/src/main/docker";
-
-      if (fileType == ConfigFileType.APP_YAML && new File(appEnginePath).isDirectory()) {
-        destinationFolderChooser.setText(appEnginePath);
-      } else if (fileType == ConfigFileType.DOCKERFILE && new File(dockerPath).isDirectory()) {
-        destinationFolderChooser.setText(dockerPath);
-      } else if (new File(srcMainPath).isDirectory()) {
-        destinationFolderChooser.setText(srcMainPath);
-      } else if (new File(srcPath).isDirectory()) {
-        destinationFolderChooser.setText(srcPath);
+      if (fileType == ConfigFileType.APP_YAML) {
+        destinationFolderChooser.setText(project.getBasePath() + "/src/main/appengine");
+      } else if (fileType == ConfigFileType.DOCKERFILE) {
+        destinationFolderChooser.setText(project.getBasePath() + "/src/main/docker");
       } else {
         destinationFolderChooser.setText(project.getBasePath());
       }
