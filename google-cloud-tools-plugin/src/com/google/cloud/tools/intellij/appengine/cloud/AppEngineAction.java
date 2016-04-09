@@ -57,6 +57,8 @@ public abstract class AppEngineAction implements Runnable {
   private File credentialsPath;
   private RemoteOperationCallback callback;
   private OSProcessHandler processHandler;
+  protected boolean invoked = false;
+  protected boolean cancelled = false;
 
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
@@ -75,8 +77,14 @@ public abstract class AppEngineAction implements Runnable {
       @NotNull GeneralCommandLine commandLine,
       @NotNull ProcessListener listener) throws ExecutionException {
 
-    // kill action if it's already executing
-    cancel();
+    // make sure the action can only be invoked once
+    synchronized (this) {
+      if (invoked) {
+        throw new IllegalStateException("Action can only be invoked once.");
+      } else {
+        invoked = true;
+      }
+    }
 
     credentialsPath = createApplicationDefaultCredentials();
     if (credentialsPath == null) {
@@ -115,9 +123,9 @@ public abstract class AppEngineAction implements Runnable {
 
   protected void cancel() {
     // kill any executing process for the action
-    if (processHandler != null) {
+    if (processHandler != null && processHandler.getProcess() != null) {
+      cancelled = true;
       processHandler.getProcess().destroy();
-      processHandler = null;
     }
   }
 
