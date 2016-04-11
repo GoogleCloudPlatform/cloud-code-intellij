@@ -81,8 +81,8 @@ public interface AppEngineHelper {
       DeploymentOperationCallback deploymentCallback);
 
   /**
-   * Creates a {@link AppEngineAction} that will perform a standard App Engine Flex deployment
-   * with an automatically configured runtime (app.yaml and Dockerfile) on {@code run()).
+   * Creates a {@link AppEngineAction} that will perform a standard App Engine flexible environment
+   * deployment with an automatically configured runtime (app.yaml and Dockerfile) on {@code run()).
    *
    * @param loggingHandler logging messages will be output to this
    * @param project the IJ project
