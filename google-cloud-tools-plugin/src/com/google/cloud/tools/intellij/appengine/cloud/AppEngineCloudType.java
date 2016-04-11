@@ -73,6 +73,8 @@ import javax.swing.Icon;
  */
 public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration> {
 
+  private AppEngineAction currentAction;
+
   public AppEngineCloudType() {
     super("gcp-app-engine"); // "google-app-engine" is used by the native IJ app engine support.
 
@@ -132,6 +134,10 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
   public ServerConnector<?> createConnector(@NotNull AppEngineServerConfiguration configuration,
       @NotNull ServerTaskExecutor asyncTasksExecutor) {
     return new AppEngineServerConnector(configuration);
+  }
+
+  public AppEngineAction getCurrentAction() {
+    return currentAction;
   }
 
   protected static class AppEngineDeploymentConfigurator extends
@@ -289,7 +295,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     }
   }
 
-  private static class AppEngineServerConnector extends
+  private class AppEngineServerConnector extends
       ServerConnector<AppEngineDeploymentConfiguration> {
 
     private AppEngineServerConfiguration configuration;
@@ -312,11 +318,10 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     }
   }
 
-  private static class AppEngineRuntimeInstance extends
+  protected class AppEngineRuntimeInstance extends
       ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
     private AppEngineServerConfiguration configuration;
-    private AppEngineAction currentAction;
 
     public AppEngineRuntimeInstance(
         AppEngineServerConfiguration configuration) {
@@ -324,60 +329,64 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     }
 
     @Override
-    public synchronized void deploy(@NotNull final DeploymentTask<AppEngineDeploymentConfiguration> task,
+    public void deploy(@NotNull final DeploymentTask<AppEngineDeploymentConfiguration> task,
         @NotNull final DeploymentLogManager logManager,
         @NotNull final DeploymentOperationCallback callback) {
 
-      // make sure we stop any active deployments
-      disconnect();
+      synchronized (AppEngineCloudType.this) {
 
-      FileDocumentManager.getInstance().saveAllDocuments();
-      if (!Services.getLoginService().isLoggedIn()) {
-        callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
-        return;
+        // make sure we stop any active deployments
+        disconnect();
+
+        FileDocumentManager.getInstance().saveAllDocuments();
+        if (!Services.getLoginService().isLoggedIn()) {
+          callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
+          return;
+        }
+        String gcloudCommandPath = CloudSdkUtil
+            .toExecutablePath(configuration.getCloudSdkHomePath());
+        File gcloudCommand = getFileFromFilePath(gcloudCommandPath);
+        AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
+            gcloudCommand,
+            configuration.getCloudProjectName(),
+            configuration.getGoogleUserName());
+
+        final AppEngineAction deployAction;
+        AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
+        File deploymentSource = deploymentConfig.isUserSpecifiedArtifact() ?
+            new File(deploymentConfig.getUserSpecifiedArtifactPath()) : task.getSource().getFile();
+
+        if (deploymentConfig.getConfigType() == ConfigType.AUTO) {
+          deployAction = appEngineHelper.createAutoDeploymentAction(
+              logManager.getMainLoggingHandler(),
+              task.getProject(),
+              deploymentSource,
+              callback
+          );
+        } else {
+          deployAction = appEngineHelper.createCustomDeploymentAction(
+              logManager.getMainLoggingHandler(),
+              task.getProject(),
+              deploymentSource,
+              getFileFromFilePath(deploymentConfig.getAppYamlPath()),
+              getFileFromFilePath(deploymentConfig.getDockerFilePath()),
+              deploymentConfig.getVersion(),
+              callback
+          );
+        }
+
+        currentAction = deployAction;
+
+        ProgressManager.getInstance()
+            .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
+                "appengine.deployment.status.deploying"), true,
+                null) {
+              @Override
+              public void run(@NotNull ProgressIndicator indicator) {
+                ApplicationManager.getApplication().invokeLater(deployAction);
+              }
+            });
       }
-      String gcloudCommandPath = CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath());
-      File gcloudCommand = getFileFromFilePath(gcloudCommandPath);
-      AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
-          gcloudCommand,
-          configuration.getCloudProjectName(),
-          configuration.getGoogleUserName());
-
-      final AppEngineAction deployAction;
-      AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
-      File deploymentSource = deploymentConfig.isUserSpecifiedArtifact() ?
-          new File(deploymentConfig.getUserSpecifiedArtifactPath()) : task.getSource().getFile();
-
-      if (deploymentConfig.getConfigType() == ConfigType.AUTO) {
-        deployAction = appEngineHelper.createAutoDeploymentAction(
-            logManager.getMainLoggingHandler(),
-            task.getProject(),
-            deploymentSource,
-            callback
-        );
-      } else {
-        deployAction = appEngineHelper.createCustomDeploymentAction(
-            logManager.getMainLoggingHandler(),
-            task.getProject(),
-            deploymentSource,
-            getFileFromFilePath(deploymentConfig.getAppYamlPath()),
-            getFileFromFilePath(deploymentConfig.getDockerFilePath()),
-            deploymentConfig.getVersion(),
-            callback
-        );
-      }
-
-      currentAction = deployAction;
-
-      ProgressManager.getInstance()
-          .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
-              "appengine.deployment.status.deploying"), true,
-              null) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-              ApplicationManager.getApplication().invokeLater(deployAction);
-            }
-          });
     }
 
     @Override
@@ -385,11 +394,13 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     }
 
     @Override
-    public synchronized void disconnect() {
+    public void disconnect() {
       // kill any executing process for the current action
-      if (currentAction != null) {
-        currentAction.cancel();
-        currentAction = null;
+      synchronized (AppEngineCloudType.this) {
+        if (currentAction != null) {
+          currentAction.cancel();
+          currentAction = null;
+        }
       }
     }
 
