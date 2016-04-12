@@ -69,6 +69,10 @@ class AppEngineDeployAction extends AppEngineAction {
   private DeploymentOperationCallback callback;
   private DeploymentArtifactType artifactType;
 
+  private static final String STOP_CONFIRMATION_URI_OPEN_TAG =
+      "<a href='https://cloud.google.com/appengine/docs/java/console/#versions'>";
+  private static final String STOP_CONFIRMATION_URI_CLOSE_TAG = "</a>";
+
   AppEngineDeployAction(
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
@@ -204,7 +208,10 @@ class AppEngineDeployAction extends AppEngineAction {
         public void run() {
           int doStop = Messages
               .showOkCancelDialog(
-                  GctBundle.message("appengine.stop.modules.version.confirmation.message"),
+                  GctBundle.message(
+                      "appengine.stop.modules.version.confirmation.message",
+                      STOP_CONFIRMATION_URI_OPEN_TAG,
+                      STOP_CONFIRMATION_URI_CLOSE_TAG),
                   GctBundle.message("appengine.stop.modules.version.confirmation.title"),
                   General.Warning);
 
