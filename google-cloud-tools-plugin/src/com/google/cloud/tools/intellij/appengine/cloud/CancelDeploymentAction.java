@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.intellij.icons.AllIcons.Actions;
-import com.intellij.remoteServer.ServerType;
+import com.intellij.remoteServer.configuration.deployment.DeploymentConfiguration;
 import com.intellij.remoteServer.impl.runtime.ui.tree.DeploymentNode;
 import com.intellij.remoteServer.impl.runtime.ui.tree.actions.ServersTreeAction;
 import com.intellij.remoteServer.runtime.Deployment;
@@ -50,13 +50,10 @@ public class CancelDeploymentAction extends ServersTreeAction<DeploymentNode> {
 
   @Override
   protected void doActionPerformed(DeploymentNode node) {
-    ServerType serverType = getDeployment(node).getConnection().getServer().getType();
-    if (serverType instanceof AppEngineCloudType) {
-      ((AppEngineCloudType)serverType).getCurrentAction().cancel();
+    DeploymentConfiguration config = getDeployment(node).getDeploymentTask().getConfiguration();
+    if (config instanceof AppEngineDeploymentConfiguration) {
+      ((AppEngineDeploymentConfiguration)config).cancelCurrentAction();
     }
-
-    // this was disconnect and remove the deployment from the tree
-    // getDeployment(node).getConnection().disconnect();
   }
 
   private Deployment getDeployment(DeploymentNode node) {
