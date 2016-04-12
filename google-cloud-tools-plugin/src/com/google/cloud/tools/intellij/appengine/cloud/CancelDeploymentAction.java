@@ -39,6 +39,11 @@ public class CancelDeploymentAction extends ServersTreeAction<DeploymentNode> {
   }
 
   @Override
+  protected boolean isVisible4(DeploymentNode node) {
+    return getDeployment(node).getConnection().getServer().getType() instanceof AppEngineCloudType;
+  }
+
+  @Override
   protected boolean isEnabled4(DeploymentNode node) {
     return getDeployment(node).getStatus() == DeploymentStatus.DEPLOYING;
   }
@@ -55,6 +60,7 @@ public class CancelDeploymentAction extends ServersTreeAction<DeploymentNode> {
   }
 
   private Deployment getDeployment(DeploymentNode node) {
-      return (Deployment) node.getValue();
+    return (Deployment) node.getValue();
   }
+
 }
