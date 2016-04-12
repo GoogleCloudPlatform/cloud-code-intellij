@@ -453,8 +453,13 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     }
 
     @Override
-    public void showErrorDialog(String title, String message) {
-      Messages.showErrorDialog(message, title);
+    public void showErrorDialog(final String title, final String message) {
+      ApplicationManager.getApplication().invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          Messages.showErrorDialog(message, title);
+        }
+      });
     }
 
     @Override
