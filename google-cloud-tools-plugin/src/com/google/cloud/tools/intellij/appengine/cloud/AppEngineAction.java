@@ -29,7 +29,8 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmentType;
 import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessListener;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
@@ -55,6 +56,9 @@ public abstract class AppEngineAction implements Runnable {
   private AppEngineHelper appEngineHelper;
   private File credentialsPath;
   private RemoteOperationCallback callback;
+  private OSProcessHandler processHandler;
+  protected boolean invoked = false;
+  protected boolean cancelled = false;
 
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
@@ -72,6 +76,15 @@ public abstract class AppEngineAction implements Runnable {
   protected void executeProcess(
       @NotNull GeneralCommandLine commandLine,
       @NotNull ProcessListener listener) throws ExecutionException {
+
+    // make sure the action can only be invoked once
+    synchronized (this) {
+      if (invoked) {
+        throw new IllegalStateException("Action can only be invoked once.");
+      } else {
+        invoked = true;
+      }
+    }
 
     credentialsPath = createApplicationDefaultCredentials();
     if (credentialsPath == null) {
@@ -91,12 +104,29 @@ public abstract class AppEngineAction implements Runnable {
 
     consoleLogLn("Executing: " + commandLine.getCommandLineString());
 
-    final Process process = commandLine.createProcess();
-    final ProcessHandler processHandler = new OSProcessHandler(process,
+    Process process = commandLine.createProcess();
+    processHandler = new OSProcessHandler(process,
         commandLine.getCommandLineString());
     loggingHandler.attachToProcess(processHandler);
     processHandler.addProcessListener(listener);
+
+    // mark process as completed by setting handler to null when terminated
+    processHandler.addProcessListener(new ProcessAdapter() {
+      @Override
+      public void processTerminated(ProcessEvent event) {
+        processHandler = null;
+      }
+    });
+
     processHandler.startNotify();
+  }
+
+  protected void cancel() {
+    // kill any executing process for the action
+    if (processHandler != null && processHandler.getProcess() != null) {
+      cancelled = true;
+      processHandler.getProcess().destroy();
+    }
   }
 
   private static final String CLIENT_ID_LABEL = "client_id";
