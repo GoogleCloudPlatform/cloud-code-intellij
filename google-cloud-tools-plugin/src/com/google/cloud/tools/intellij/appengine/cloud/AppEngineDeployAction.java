@@ -94,7 +94,7 @@ class AppEngineDeployAction extends AppEngineAction {
     this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
   }
 
-  // TODO(chanseok): 'gcloud' may eventually generate the source repository info file for flex env
+  // TODO(chanseok): 'gcloud' may eventually generate the source repository info files for flex env
   // in the future, which it currently does for standard env. In that case, this method should
   // be removed.
   private void generateSourceRepoInfoFile(final File stagingDirectory) {
