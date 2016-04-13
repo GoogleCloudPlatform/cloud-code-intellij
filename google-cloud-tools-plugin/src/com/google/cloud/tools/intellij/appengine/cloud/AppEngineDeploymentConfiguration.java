@@ -55,8 +55,6 @@ public class AppEngineDeploymentConfiguration extends
   private ConfigType configType;
   private String version;
 
-  private AppEngineAction currentAction;
-
   @Attribute("userSpecifiedArtifact")
   public boolean isUserSpecifiedArtifact() {
     return userSpecifiedArtifact;
@@ -109,16 +107,5 @@ public class AppEngineDeploymentConfiguration extends
 
   public void setVersion(String version) {
     this.version = version;
-  }
-
-  protected void cancelCurrentAction() {
-    if (currentAction != null) {
-      currentAction.cancel();
-    }
-  }
-
-  protected void setCurrentAction(
-      AppEngineAction currentAction) {
-    this.currentAction = currentAction;
   }
 }

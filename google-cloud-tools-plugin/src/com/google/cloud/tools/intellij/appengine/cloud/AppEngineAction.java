@@ -95,8 +95,7 @@ public abstract class AppEngineAction implements Runnable {
     consoleLogLn("Executing: " + commandLine.getCommandLineString());
 
     Process process = commandLine.createProcess();
-    processHandler = new OSProcessHandler(process,
-        commandLine.getCommandLineString());
+    processHandler = new OSProcessHandler(process, commandLine.getCommandLineString());
     loggingHandler.attachToProcess(processHandler);
     processHandler.addProcessListener(listener);
 
