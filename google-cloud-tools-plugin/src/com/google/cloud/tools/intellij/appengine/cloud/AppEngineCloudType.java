@@ -7,6 +7,7 @@
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,7 +63,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.Icon;
 
@@ -316,20 +319,18 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
     private AppEngineServerConfiguration configuration;
-    private AppEngineAction currentAction;
+    private Set<AppEngineDeploymentConfiguration> deploymentConfigurations;
 
     public AppEngineRuntimeInstance(
         AppEngineServerConfiguration configuration) {
       this.configuration = configuration;
+      this.deploymentConfigurations = new HashSet<>();
     }
 
     @Override
-    public synchronized void deploy(@NotNull final DeploymentTask<AppEngineDeploymentConfiguration> task,
+    public void deploy(@NotNull final DeploymentTask<AppEngineDeploymentConfiguration> task,
         @NotNull final DeploymentLogManager logManager,
         @NotNull final DeploymentOperationCallback callback) {
-
-      // make sure we stop any active deployments
-      disconnect();
 
       FileDocumentManager.getInstance().saveAllDocuments();
       if (!Services.getLoginService().isLoggedIn()) {
@@ -367,7 +368,11 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
         );
       }
 
-      currentAction = deployAction;
+      // keep track of any active deployments
+      synchronized (deploymentConfig) {
+        deploymentConfig.cancelCurrentAction();
+        deploymentConfig.setCurrentAction(deployAction);
+      }
 
       ProgressManager.getInstance()
           .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
@@ -386,11 +391,11 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
     @Override
     public synchronized void disconnect() {
-      // kill any executing process for the current action
-      if (currentAction != null) {
-        currentAction.cancel();
-        currentAction = null;
+      // kill any executing actions
+      for (AppEngineDeploymentConfiguration config : deploymentConfigurations) {
+        config.cancelCurrentAction();
       }
+      deploymentConfigurations.clear();
     }
 
     @NotNull

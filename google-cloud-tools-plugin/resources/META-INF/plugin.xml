@@ -149,6 +149,11 @@ Code inspections for App Engine Java code.</description>
             class="com.google.cloud.tools.intellij.git.UploadSourceAction">
       <add-to-group group-id="Vcs.Import"/>
     </action>
+
+    <action id="GoogleCloudTools.CancelDeploymentToGCP"
+            class="com.google.cloud.tools.intellij.appengine.cloud.CancelDeploymentAction">
+      <add-to-group group-id="RemoteServersViewToolbar"/>
+    </action>
   </actions>
 
 </idea-plugin>
