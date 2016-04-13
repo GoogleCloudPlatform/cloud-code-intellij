@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.util.GctBundle;
+
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfiguration;
 import com.intellij.remoteServer.impl.runtime.ui.tree.DeploymentNode;
@@ -30,7 +32,8 @@ import com.intellij.remoteServer.runtime.deployment.DeploymentStatus;
 public class CancelDeploymentAction extends ServersTreeAction<DeploymentNode> {
 
   public CancelDeploymentAction() {
-    super("Cancel Deployment", "Cancel the selected deployment", Actions.Cancel);
+    super(GctBundle.message("appengine.deployment.cancel.button.text"),
+        GctBundle.message("appengine.deployment.cancel.button.description"), Actions.Cancel);
   }
 
   @Override
