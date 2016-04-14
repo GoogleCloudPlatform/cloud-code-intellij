@@ -338,7 +338,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
           configuration.getCloudProjectName(),
           configuration.getGoogleUserName());
 
-      final AppEngineAction deployAction;
+      final AppEngineDeployAction deployAction;
       AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
       File deploymentSource = deploymentConfig.isUserSpecifiedArtifact() ?
           new File(deploymentConfig.getUserSpecifiedArtifactPath()) : task.getSource().getFile();

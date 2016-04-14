@@ -97,7 +97,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public AppEngineAction createCustomDeploymentAction(
+  public AppEngineDeployAction createCustomDeploymentAction(
       LoggingHandler loggingHandler,
       Project project,
       File artifactToDeploy,
@@ -120,7 +120,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public AppEngineAction createAutoDeploymentAction(
+  public AppEngineDeployAction createAutoDeploymentAction(
       LoggingHandler loggingHandler,
       Project project,
       File artifactToDeploy,
@@ -144,7 +144,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public AppEngineAction createStopAction(
+  public AppEngineStopAction createStopAction(
       LoggingHandler loggingHandler,
       Set<String> modulesToStop,
       String versionToStop,
