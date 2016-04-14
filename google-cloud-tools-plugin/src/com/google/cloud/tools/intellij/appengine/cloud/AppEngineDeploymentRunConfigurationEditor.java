@@ -16,10 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType.AppEngineDeploymentConfigurator.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
+import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.PlaceholderTextField;
 import com.google.cloud.tools.intellij.util.GctBundle;

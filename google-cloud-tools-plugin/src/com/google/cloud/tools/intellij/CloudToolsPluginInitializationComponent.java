@@ -16,8 +16,8 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType.UserSpecifiedPathDeploymentSourceType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineToolsMenuAction;
+import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSourceType;
 import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
 
 import com.intellij.execution.configurations.ConfigurationType;
