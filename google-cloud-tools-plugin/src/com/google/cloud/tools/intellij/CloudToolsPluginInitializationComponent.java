@@ -17,9 +17,14 @@ package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType.UserSpecifiedPathDeploymentSourceType;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineToolsMenuAction;
 import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
 
 import com.intellij.execution.configurations.ConfigurationType;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.Constraints;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.remoteServer.ServerType;
@@ -62,6 +67,13 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
           new UserSpecifiedPathDeploymentSourceType());
       pluginConfigurationService.registerExtension(ConfigurationType.CONFIGURATION_TYPE_EP,
           new DeployToServerConfigurationType(appEngineCloudType));
+
+      ActionManager actionManager = ActionManager.getInstance();
+      AnAction toolsMenuAction = new AppEngineToolsMenuAction();
+      actionManager.registerAction(AppEngineToolsMenuAction.ID , toolsMenuAction);
+      DefaultActionGroup toolsMenu =
+          (DefaultActionGroup) actionManager.getAction(AppEngineToolsMenuAction.GROUP_ID);
+      toolsMenu.add(toolsMenuAction, Constraints.LAST);
     }
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
       pluginConfigurationService

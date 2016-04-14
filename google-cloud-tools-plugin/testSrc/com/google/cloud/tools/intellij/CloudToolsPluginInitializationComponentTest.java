@@ -26,6 +26,8 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.extensions.ExtensionPointName;
 
 import org.junit.Before;
@@ -46,12 +48,15 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   CloudToolsPluginInfoService pluginInfoService;
   @Mock
   CloudToolsPluginConfigurationService pluginConfigurationService;
+  @Mock
+  ActionManager actionManager;
   CloudToolsPluginInitializationComponent testComponent;
 
   @Before
   public void registerMockServices() {
     registerService(CloudToolsPluginInfoService.class, pluginInfoService);
     registerService(CloudToolsPluginConfigurationService.class, pluginConfigurationService);
+    registerService(ActionManager.class, actionManager);
     testComponent = new CloudToolsPluginInitializationComponent();
   }
 
@@ -76,6 +81,7 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   @Test
   public void testInitComponent_managedVmIsEnabled() {
     when(pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)).thenReturn(true);
+    when(actionManager.getAction(anyString())).thenReturn(new DefaultActionGroup());
     testComponent.initComponent();
     verify(pluginConfigurationService).registerExtension(isA(ExtensionPointName.class),
         isA(AppEngineCloudType.class));
