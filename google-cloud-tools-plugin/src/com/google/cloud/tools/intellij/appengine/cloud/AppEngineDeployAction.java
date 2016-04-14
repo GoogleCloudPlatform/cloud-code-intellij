@@ -175,6 +175,8 @@ class AppEngineDeployAction extends AppEngineAction {
       try {
         if (event.getExitCode() == 0) {
           callback.succeeded(new DeploymentRuntimeImpl(deploymentOutput.toString(), version));
+        } else if (cancelled) {
+          callback.errorOccurred(GctBundle.message("appengine.deployment.error.cancelled"));
         } else {
           logger.error("Deployment process exited with an error. Exit Code:" + event.getExitCode());
           callback.errorOccurred(

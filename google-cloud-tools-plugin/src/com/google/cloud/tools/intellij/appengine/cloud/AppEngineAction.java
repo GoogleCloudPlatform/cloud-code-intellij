@@ -29,7 +29,6 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmentType;
 import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessListener;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
@@ -55,6 +54,8 @@ public abstract class AppEngineAction implements Runnable {
   private AppEngineHelper appEngineHelper;
   private File credentialsPath;
   private RemoteOperationCallback callback;
+  private OSProcessHandler processHandler;
+  protected boolean cancelled = false;
 
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
@@ -91,12 +92,22 @@ public abstract class AppEngineAction implements Runnable {
 
     consoleLogLn("Executing: " + commandLine.getCommandLineString());
 
-    final Process process = commandLine.createProcess();
-    final ProcessHandler processHandler = new OSProcessHandler(process,
-        commandLine.getCommandLineString());
+    Process process = commandLine.createProcess();
+    processHandler = new OSProcessHandler(process, commandLine.getCommandLineString());
     loggingHandler.attachToProcess(processHandler);
     processHandler.addProcessListener(listener);
     processHandler.startNotify();
+  }
+
+  protected void cancel() {
+    // kill any executing process for the action
+    if (processHandler != null
+        && !processHandler.isProcessTerminating()
+        && !processHandler.isProcessTerminated()
+        && processHandler.getProcess() != null) {
+      cancelled = true;
+      processHandler.getProcess().destroy();
+    }
   }
 
   private static final String CLIENT_ID_LABEL = "client_id";

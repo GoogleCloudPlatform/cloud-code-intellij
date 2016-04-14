@@ -7,6 +7,7 @@
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,7 +63,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.Icon;
 
@@ -316,16 +319,19 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
     private AppEngineServerConfiguration configuration;
+    private Set<AppEngineDeployAction> createdDeployments;
 
     public AppEngineRuntimeInstance(
         AppEngineServerConfiguration configuration) {
       this.configuration = configuration;
+      this.createdDeployments = new HashSet<>();
     }
 
     @Override
     public void deploy(@NotNull final DeploymentTask<AppEngineDeploymentConfiguration> task,
         @NotNull final DeploymentLogManager logManager,
         @NotNull final DeploymentOperationCallback callback) {
+
       FileDocumentManager.getInstance().saveAllDocuments();
       if (!Services.getLoginService().isLoggedIn()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
@@ -361,6 +367,12 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
             callback
         );
       }
+
+      // keep track of any active deployments
+      synchronized (createdDeployments) {
+        createdDeployments.add(deployAction);
+      }
+
       ProgressManager.getInstance()
           .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
               "appengine.deployment.status.deploying"), true,
@@ -378,6 +390,13 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
     @Override
     public void disconnect() {
+      // kill any executing deployment actions
+      synchronized (createdDeployments) {
+        for (AppEngineDeployAction action : createdDeployments) {
+          action.cancel();
+        }
+        createdDeployments.clear();
+      }
     }
 
     @NotNull
