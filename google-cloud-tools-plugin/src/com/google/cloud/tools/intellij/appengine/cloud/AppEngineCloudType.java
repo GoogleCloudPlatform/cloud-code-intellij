@@ -369,7 +369,9 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       }
 
       // keep track of any active deployments
-      createdDeployments.add(deployAction);
+      synchronized (createdDeployments) {
+        createdDeployments.add(deployAction);
+      }
 
       ProgressManager.getInstance()
           .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
@@ -387,12 +389,14 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     }
 
     @Override
-    public synchronized void disconnect() {
+    public void disconnect() {
       // kill any executing deployment actions
-      for (AppEngineDeployAction action : createdDeployments) {
-        action.cancel();
+      synchronized (createdDeployments) {
+        for (AppEngineDeployAction action : createdDeployments) {
+          action.cancel();
+        }
+        createdDeployments.clear();
       }
-      createdDeployments.clear();
     }
 
     @NotNull
