@@ -103,14 +103,16 @@ public abstract class AppEngineAction implements Runnable {
     processHandler.addProcessListener(new ProcessAdapter() {
       @Override
       public void processTerminated(ProcessEvent event) {
-        processHandler = null;
+        synchronized (AppEngineAction.this) {
+          processHandler = null;
+        }
       }
     });
 
     processHandler.startNotify();
   }
 
-  protected void cancel() {
+  protected synchronized void cancel() {
     // kill any executing process for the action
     if (processHandler != null && processHandler.getProcess() != null) {
       cancelled = true;
