@@ -98,23 +98,15 @@ public abstract class AppEngineAction implements Runnable {
     processHandler = new OSProcessHandler(process, commandLine.getCommandLineString());
     loggingHandler.attachToProcess(processHandler);
     processHandler.addProcessListener(listener);
-
-    // mark process as completed by setting handler to null when terminated
-    processHandler.addProcessListener(new ProcessAdapter() {
-      @Override
-      public void processTerminated(ProcessEvent event) {
-        synchronized (AppEngineAction.this) {
-          processHandler = null;
-        }
-      }
-    });
-
     processHandler.startNotify();
   }
 
-  protected synchronized void cancel() {
+  protected void cancel() {
     // kill any executing process for the action
-    if (processHandler != null && processHandler.getProcess() != null) {
+    if (processHandler != null
+        && !processHandler.isProcessTerminating()
+        && !processHandler.isProcessTerminated()
+        && processHandler.getProcess() != null) {
       cancelled = true;
       processHandler.getProcess().destroy();
     }
