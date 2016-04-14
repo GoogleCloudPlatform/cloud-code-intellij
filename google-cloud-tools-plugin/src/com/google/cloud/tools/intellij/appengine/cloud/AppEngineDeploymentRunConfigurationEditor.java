@@ -101,6 +101,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private static final String COST_WARNING_HREF_OPEN_TAG =
       "<a href='https://cloud.google.com/appengine/pricing'>";
   private static final String COST_WARNING_HREF_CLOSE_TAG = "</a>";
+  public static final String DEFAULT_APP_YAML_DIR = "/src/main/appengine";
+  public static final String DEFAULT_DOCKERFILE_DIR = "/src/main/docker";
 
   public AppEngineDeploymentRunConfigurationEditor(
       final Project project,
@@ -136,6 +138,25 @@ public class AppEngineDeploymentRunConfigurationEditor extends
       public void actionPerformed(ActionEvent e) {
         if (getConfigType() == ConfigType.CUSTOM) {
           appEngineConfigFilesPanel.setVisible(true);
+
+          // For user convenience, pre-fill the path fields for app.yaml and Dockerfile
+          // if they already exist in their usual directories in the current project.
+          if (project != null && project.getBasePath() != null) {
+            if (StringUtil.isEmpty(appYamlPathField.getText())) {
+              String defaultAppYamlPath =
+                  project.getBasePath() + DEFAULT_APP_YAML_DIR + "/app.yaml";
+              if (new File(defaultAppYamlPath).exists()) {
+                appYamlPathField.setText(defaultAppYamlPath);
+              }
+            }
+            if (StringUtil.isEmpty(dockerFilePathField.getText())) {
+              String defaultDockerfilePath =
+                  project.getBasePath() + DEFAULT_DOCKERFILE_DIR + "/Dockerfile";
+              if (new File(defaultDockerfilePath).exists()) {
+                dockerFilePathField.setText(defaultDockerfilePath);
+              }
+            }
+          }
         } else {
           appEngineConfigFilesPanel.setVisible(false);
         }
