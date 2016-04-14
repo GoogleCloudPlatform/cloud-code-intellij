@@ -319,12 +319,12 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
     private AppEngineServerConfiguration configuration;
-    private Set<AppEngineAction> createdActions;
+    private Set<AppEngineAction> createdDeployments;
 
     public AppEngineRuntimeInstance(
         AppEngineServerConfiguration configuration) {
       this.configuration = configuration;
-      this.createdActions = new HashSet<>();
+      this.createdDeployments = new HashSet<>();
     }
 
     @Override
@@ -369,7 +369,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       }
 
       // keep track of any active deployments
-      createdActions.add(deployAction);
+      createdDeployments.add(deployAction);
 
       ProgressManager.getInstance()
           .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
@@ -389,10 +389,10 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
     @Override
     public synchronized void disconnect() {
       // kill any executing actions
-      for (AppEngineAction action : createdActions) {
+      for (AppEngineAction action : createdDeployments) {
         action.cancel();
       }
-      createdActions.clear();
+      createdDeployments.clear();
     }
 
     @NotNull
