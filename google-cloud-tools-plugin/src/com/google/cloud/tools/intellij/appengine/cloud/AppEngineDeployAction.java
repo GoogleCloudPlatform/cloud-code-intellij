@@ -104,7 +104,7 @@ class AppEngineDeployAction extends AppEngineAction {
       consoleLogLn(
           "Created temporary staging directory: " + stagingDirectory.getAbsolutePath());
     } catch (IOException e) {
-      logger.error(e);
+      logger.warn(e);
       callback.errorOccurred(
           GctBundle.message("appengine.deployment.error.creating.staging.directory"));
       return;
@@ -131,7 +131,7 @@ class AppEngineDeployAction extends AppEngineAction {
       copyFile(stagingDirectory, "app.yaml", this.appYamlPath);
       copyFile(stagingDirectory, "Dockerfile", this.dockerFilePath);
     } catch (IOException e) {
-      logger.error(e);
+      logger.warn(e);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
       return;
     }
@@ -141,7 +141,7 @@ class AppEngineDeployAction extends AppEngineAction {
           commandLine,
           new DeployToAppEngineProcessListener(version));
     } catch (ExecutionException e) {
-      logger.error(e);
+      logger.warn(e);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.execution"));
     }
   }
@@ -178,7 +178,7 @@ class AppEngineDeployAction extends AppEngineAction {
         } else if (cancelled) {
           callback.errorOccurred(GctBundle.message("appengine.deployment.error.cancelled"));
         } else {
-          logger.error("Deployment process exited with an error. Exit Code:" + event.getExitCode());
+          logger.warn("Deployment process exited with an error. Exit Code:" + event.getExitCode());
           callback.errorOccurred(
               GctBundle.message("appengine.deployment.error.with.code", event.getExitCode()));
         }
