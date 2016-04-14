@@ -71,7 +71,7 @@ public interface AppEngineHelper {
    * @param deploymentCallback a callback for handling successful completion of the operation
    * @return the runnable that will perform the deployment operation
    */
-  AppEngineAction createCustomDeploymentAction(
+  AppEngineDeployAction createCustomDeploymentAction(
       LoggingHandler loggingHandler,
       Project project,
       File artifactToDeploy,
@@ -90,13 +90,13 @@ public interface AppEngineHelper {
    * @param deploymentCallback a callback for handling successful completion of the operation
    * @return the runnable that will perform the deployment operation
    */
-  AppEngineAction createAutoDeploymentAction(
+  AppEngineDeployAction createAutoDeploymentAction(
       LoggingHandler loggingHandler,
       Project project,
       File artifactToDeploy,
       DeploymentOperationCallback deploymentCallback);
 
-  AppEngineAction createStopAction(
+  AppEngineStopAction createStopAction(
       LoggingHandler loggingHandler,
       Set<String> modulesToStop,
       String versionToStop,
