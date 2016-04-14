@@ -319,7 +319,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
     private AppEngineServerConfiguration configuration;
-    private Set<AppEngineAction> createdDeployments;
+    private Set<AppEngineDeployAction> createdDeployments;
 
     public AppEngineRuntimeInstance(
         AppEngineServerConfiguration configuration) {
@@ -388,8 +388,8 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
     @Override
     public synchronized void disconnect() {
-      // kill any executing actions
-      for (AppEngineAction action : createdDeployments) {
+      // kill any executing deployment actions
+      for (AppEngineDeployAction action : createdDeployments) {
         action.cancel();
       }
       createdDeployments.clear();
