@@ -75,7 +75,7 @@ public class AppEngineStopAction extends AppEngineAction {
           commandLine,
           new StopModuleProcessListener());
     } catch (ExecutionException e) {
-      logger.error(e);
+      logger.warn(e);
       callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.execution.error"));
     }
   }
@@ -98,7 +98,7 @@ public class AppEngineStopAction extends AppEngineAction {
             }
           });
         } else {
-          logger.error(
+          logger.warn(
               "Application stop process exited with an error. Exit Code:" + event.getExitCode());
           callback.errorOccurred(
               GctBundle.message("appengine.stop.modules.version.execution.error.with.code",
