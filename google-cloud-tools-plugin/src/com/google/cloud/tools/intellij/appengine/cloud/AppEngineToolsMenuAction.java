@@ -21,11 +21,14 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.RemoteServersManager;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfigurationManager;
+import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
+import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerSettingsEditor;
 import com.intellij.util.containers.ContainerUtil;
 
 import java.util.List;
@@ -34,6 +37,8 @@ import java.util.List;
  * Creates a shortcut to App Engine flex cloud configuration in the tools menu
  */
 public class AppEngineToolsMenuAction extends AnAction {
+  private static final Logger logger = Logger.getInstance(AppEngineToolsMenuAction.class);
+
   public static final String ID = "CloudToolsMenuItem";
   public static final String GROUP_ID = "ToolsMenu";
 
@@ -52,8 +57,18 @@ public class AppEngineToolsMenuAction extends AnAction {
       List<RemoteServer<AppEngineServerConfiguration>> servers =
           RemoteServersManager.getInstance().getServers(serverType);
 
-      DeploymentConfigurationManager.getInstance(project).
-          createAndRunConfiguration(serverType, ContainerUtil.getFirstItem(servers));
+      try {
+        DeploymentConfigurationManager.getInstance(project).
+            createAndRunConfiguration(serverType, ContainerUtil.getFirstItem(servers));
+      } catch (NullPointerException npe) {
+        /**
+         * Handles the case where the configuration is executed with a null deployment source.
+         * See {@link DeployToServerSettingsEditor#applyEditorTo(DeployToServerRunConfiguration)}
+         * The deployment configuration is set to null causing the following execution to fail:
+         * {@link DeployToServerRunConfiguration#checkConfiguration()}
+         */
+        logger.warn("Error encountered executing App Engine deployment run configuration.", npe);
+      }
     }
   }
 }
