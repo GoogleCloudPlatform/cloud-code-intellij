@@ -162,7 +162,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
 
     mainPanel.add(new JLabel(new ImageIcon(scaledImage)));
     mainPanel.add(textPanel);
-    mainPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, UIUtil.getBorderColor()));
+    mainPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, JBColor.border()));
 
     return mainPanel;
   }
