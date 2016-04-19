@@ -72,6 +72,8 @@ public interface GoogleLoginService {
    */
   void logIn();
 
+  void logInIfNot();
+
   /**
    * Opens an external browser to allow the user to sign in.
    * If the user is already signed in, this updates the user's credentials.
