@@ -117,6 +117,8 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
     @Override
     public void connect(@NotNull ConnectionCallback<AppEngineDeploymentConfiguration> callback) {
+      Services.getLoginService().logInIfNot();
+
       if (!Services.getLoginService().isLoggedIn()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
       } else if (CloudSdkUtil.isCloudSdkExecutable(CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath()))) {

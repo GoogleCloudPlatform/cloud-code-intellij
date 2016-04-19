@@ -57,6 +57,8 @@ class AppEngineRuntimeInstance extends
       @NotNull final DeploymentOperationCallback callback) {
 
     FileDocumentManager.getInstance().saveAllDocuments();
+
+    Services.getLoginService().logInIfNot();
     if (!Services.getLoginService().isLoggedIn()) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
       return;
