@@ -169,6 +169,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
       @Nullable final IGoogleLoginCompletedCallback callback) {
     UsageTrackerProvider
         .getInstance().trackEvent(LoginTracking.CATEGORY, LoginTracking.LOGIN, "login.start", null);
+    final CredentialedUser lastActiveUser = users.getActiveUser();
     users.removeActiveUser();
     uiFacade.notifyStatusIndicator();
 
@@ -223,8 +224,19 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
           };
           users.addUser(new CredentialedUser(state, localCallback));
         }
-        else if (callback != null) {
-          callback.onLoginCompleted();
+        else {
+          // Login failed (or aborted), so restore the last active user, if any
+          restoreLastActiveUser();
+
+          if (callback != null) {
+            callback.onLoginCompleted();
+          }
+        }
+      }
+
+      private void restoreLastActiveUser() {
+        if (lastActiveUser != null) {
+          setActiveUser(lastActiveUser.getEmail());
         }
       }
     }.queue();
