@@ -72,8 +72,11 @@ class AppEngineRuntimeInstance extends
 
     final AppEngineDeployAction deployAction;
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
-    File deploymentSource = deploymentConfig.isUserSpecifiedArtifact() ?
-        new File(deploymentConfig.getUserSpecifiedArtifactPath()) : task.getSource().getFile();
+    File deploymentSource = task.getSource().getFile();
+    if (deploymentSource == null) {
+      callback.errorOccurred(GctBundle.message("appengine.deployment.source.not.found.error"));
+      return;
+    }
 
     if (deploymentConfig.getConfigType() == ConfigType.AUTO) {
       deployAction = appEngineHelper.createAutoDeploymentAction(

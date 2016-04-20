@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.options.SettingsEditor;
@@ -31,6 +33,8 @@ import com.intellij.remoteServer.configuration.deployment.JavaDeploymentSourceUt
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.idea.maven.project.MavenProject;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,20 +56,41 @@ class AppEngineDeploymentConfigurator extends
   @NotNull
   @Override
   public List<DeploymentSource> getAvailableDeploymentSources() {
-    List<DeploymentSource> deploymentSources = new ArrayList<DeploymentSource>();
+    List<DeploymentSource> deploymentSources = new ArrayList<>();
+
+    for (Module module : ModuleManager.getInstance(project).getModules()) {
+      if (isJarOrWarMavenBuild(module)) {
+        deploymentSources.add(
+            new MavenBuildDeploymentSource(
+                ModulePointerManager.getInstance(project).create(module), project));
+      }
+    }
 
     ModulePointer modulePointer =
         ModulePointerManager.getInstance(project).create("userSpecifiedSource");
     deploymentSources.add(new UserSpecifiedPathDeploymentSource(modulePointer));
 
     deploymentSources.addAll(JavaDeploymentSourceUtil
-        .getInstance().createArtifactDeploymentSources(project, getJarsAndWars()));
+        .getInstance().createArtifactDeploymentSources(project, getJarAndWarArtifacts()));
 
     return deploymentSources;
   }
 
-  private List<Artifact> getJarsAndWars() {
-    List<Artifact> jarsAndWars = new ArrayList<Artifact>();
+  private boolean isJarOrWarMavenBuild(Module module) {
+    MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(project);
+    MavenProject mavenProject = projectsManager.findProject(module);
+
+    boolean isMavenProject = projectsManager.isMavenizedModule(module)
+        && mavenProject != null;
+
+    return isMavenProject &&
+        ("jar".equalsIgnoreCase(mavenProject.getPackaging())
+            || "war".equalsIgnoreCase(mavenProject.getPackaging()));
+
+  }
+
+  private List<Artifact> getJarAndWarArtifacts() {
+    List<Artifact> jarsAndWars = new ArrayList<>();
     for (Artifact artifact : ArtifactManager.getInstance(project).getArtifacts()) {
       if (artifact.getArtifactType().getId().equalsIgnoreCase("jar")
           || artifact.getArtifactType().getId().equalsIgnoreCase("war")) {
