@@ -17,6 +17,7 @@ package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineToolsMenuAction;
+import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSourceType;
 import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSourceType;
 import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
 
@@ -51,33 +52,51 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
 
   @Override
   public void initComponent() {
-    CloudToolsPluginInfoService pluginInfoService = ServiceManager
-        .getService(CloudToolsPluginInfoService.class);
     CloudToolsPluginConfigurationService pluginConfigurationService = ServiceManager
         .getService(CloudToolsPluginConfigurationService.class);
-    if (pluginInfoService.shouldEnable(GctFeature.DEBUGGER)) {
-      pluginConfigurationService
-          .registerExtension(
-              ConfigurationType.CONFIGURATION_TYPE_EP, new CloudDebugConfigType());
-    }
-    if (pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)) {
-      AppEngineCloudType appEngineCloudType = new AppEngineCloudType();
-      pluginConfigurationService.registerExtension(ServerType.EP_NAME, appEngineCloudType);
-      pluginConfigurationService.registerExtension(DeploymentSourceType.EP_NAME,
-          new UserSpecifiedPathDeploymentSourceType());
-      pluginConfigurationService.registerExtension(ConfigurationType.CONFIGURATION_TYPE_EP,
-          new DeployToServerConfigurationType(appEngineCloudType));
+    CloudToolsPluginInfoService pluginInfoService = ServiceManager
+        .getService(CloudToolsPluginInfoService.class);
 
-      ActionManager actionManager = ActionManager.getInstance();
-      AnAction toolsMenuAction = new AppEngineToolsMenuAction();
-      actionManager.registerAction(AppEngineToolsMenuAction.ID , toolsMenuAction);
-      DefaultActionGroup toolsMenu =
-          (DefaultActionGroup) actionManager.getAction(AppEngineToolsMenuAction.GROUP_ID);
-      toolsMenu.add(toolsMenuAction, Constraints.LAST);
+    if (pluginInfoService.shouldEnable(GctFeature.DEBUGGER)) {
+      initDebugger(pluginConfigurationService);
     }
+
+    if (pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)) {
+      initAppEngineFlex(pluginConfigurationService);
+    }
+
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
-      pluginConfigurationService
-          .enabledGoogleFeedbackErrorReporting(pluginInfoService.getPluginId());
+      initErrorReporting(pluginConfigurationService, pluginInfoService);
     }
+  }
+
+  private void initDebugger(CloudToolsPluginConfigurationService pluginConfigurationService) {
+    pluginConfigurationService
+        .registerExtension(
+            ConfigurationType.CONFIGURATION_TYPE_EP, new CloudDebugConfigType());
+  }
+
+  private void initAppEngineFlex(CloudToolsPluginConfigurationService pluginConfigurationService) {
+    AppEngineCloudType appEngineCloudType = new AppEngineCloudType();
+    pluginConfigurationService.registerExtension(ServerType.EP_NAME, appEngineCloudType);
+    pluginConfigurationService.registerExtension(ConfigurationType.CONFIGURATION_TYPE_EP,
+        new DeployToServerConfigurationType(appEngineCloudType));
+    pluginConfigurationService.registerExtension(DeploymentSourceType.EP_NAME,
+        new UserSpecifiedPathDeploymentSourceType());
+    pluginConfigurationService.registerExtension(DeploymentSourceType.EP_NAME,
+        new MavenBuildDeploymentSourceType());
+
+    ActionManager actionManager = ActionManager.getInstance();
+    AnAction toolsMenuAction = new AppEngineToolsMenuAction();
+    actionManager.registerAction(AppEngineToolsMenuAction.ID , toolsMenuAction);
+    DefaultActionGroup toolsMenu =
+        (DefaultActionGroup) actionManager.getAction(AppEngineToolsMenuAction.GROUP_ID);
+    toolsMenu.add(toolsMenuAction, Constraints.LAST);
+  }
+
+  private void initErrorReporting(CloudToolsPluginConfigurationService pluginConfigurationService,
+      CloudToolsPluginInfoService pluginInfoService) {
+    pluginConfigurationService
+        .enabledGoogleFeedbackErrorReporting(pluginInfoService.getPluginId());
   }
 }

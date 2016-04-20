@@ -34,6 +34,7 @@ Code inspections for App Engine Java code.</description>
   <depends>org.jetbrains.plugins.gradle</depends>
   <depends>com.google.gct.login</depends>
   <depends>Git4Idea</depends>
+  <depends>org.jetbrains.idea.maven</depends>
 
   <application-components>
     <component>
