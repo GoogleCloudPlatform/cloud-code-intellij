@@ -94,6 +94,68 @@ class AppEngineDeployAction extends AppEngineAction {
     this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
   }
 
+  // TODO(chanseok): 'gcloud' may eventually generate the source repository info files for flex env
+  // in the future, which it currently does for standard env. In that case, this method should
+  // be removed.
+  private void generateSourceRepoInfoFile(final File stagingDirectory) {
+    try {
+      String projectBasePath = project.getBasePath();
+      if (projectBasePath != null) {
+        runDeployCommand(stagingDirectory);
+        return;
+      }
+
+      // Output directory of the source repository info file.
+      String repoInfoOutputDirectory = stagingDirectory.getAbsolutePath();
+      if (artifactType == DeploymentArtifactType.WAR) {
+        repoInfoOutputDirectory += "/WEB-INF/classes"; // 'gcloud' will create the directory.
+      }
+
+      // Run 'gcloud' to generate 'source-context.json' and 'source-contexts.json'.
+      GeneralCommandLine commandLine = new GeneralCommandLine(
+          appEngineHelper.getGcloudCommandPath().getAbsolutePath());
+      commandLine.addParameters("preview", "app", "gen-repo-info-file");
+      commandLine.addParameters(
+          "--source-directory", new File(projectBasePath).getAbsolutePath());
+      commandLine.addParameters(
+          "--output-directory", new File(repoInfoOutputDirectory).getAbsolutePath());
+      commandLine.withWorkDirectory(stagingDirectory);
+
+      executeProcess(commandLine, new ProcessAdapter() {
+        @Override
+        public void processTerminated(ProcessEvent event) {
+          if (event.getExitCode() == 0) {
+            consoleLogLn("Generated source repo info for Stackdriver Debugger.");
+            packSourceRepoInfo(stagingDirectory);
+          } else {
+            consoleLogLn("Failed to generate source repo info for Stackdriver Debugger.");
+            consoleLogLn("Exit code: " + event.getExitCode());
+          }
+          runDeployCommand(stagingDirectory);
+        }
+      });
+
+    } catch (ExecutionException e) {
+      consoleLogLn("Failed to generate source repo info for Stackdriver Debugger.");
+      consoleLogLn(e.getMessage());
+      runDeployCommand(stagingDirectory); // Ignore error and try deploying.
+    }
+  }
+
+  private void packSourceRepoInfo(File stagingDirectory) {
+    try {
+      // Add 'source-context.json' and 'source-contexts.json' to JAR or WAR using the following
+      // method, however, only if it doesn't already have the above files (i.e., don't overwrite).
+      //
+      // http://stackoverflow.com/questions/3048669/how-can-i-add-entries-to-an-existing-zip-file-in-java
+      //
+      // Quite a lot of code though.
+    } catch (/*Some*/Exception e) {
+      // Will be an empty catch block.
+      // Ignore any error and proceed to deployment.
+    }
+  }
+
   public void run() {
     File stagingDirectory;
     try {
@@ -110,6 +172,10 @@ class AppEngineDeployAction extends AppEngineAction {
       return;
     }
 
+    generateSourceRepoInfoFile(stagingDirectory);
+  }
+
+  private void runDeployCommand(File stagingDirectory) {
     String version =
         StringUtil.isEmpty(customVersionId) ? AppEngineUtil.generateVersion() : customVersionId;
 
