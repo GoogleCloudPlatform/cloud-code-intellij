@@ -94,12 +94,6 @@ public class PluginCompatibilityCheck implements StartupActivity {
               "plugin.compatibility.error.update.link", "<a href=\"#update\">", "</a>"));
       errorMessage.append("</p>");
 
-      errorMessage.append("<p>");
-      errorMessage.append
-          (GctBundle.message(
-              "plugin.compatibility.error.plugin.link", "<a href=\"#manage\">", "</a>"));
-      errorMessage.append("</p>");
-
       notification.createNotification(
           GctBundle.message("plugin.compatibility.error.title"),
           errorMessage.toString(),
