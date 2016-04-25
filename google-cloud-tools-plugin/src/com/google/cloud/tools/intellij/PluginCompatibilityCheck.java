@@ -37,6 +37,11 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.event.HyperlinkEvent;
 
+/**
+ * A plugin post startup activity which checks to ensure that the Google Cloud Tools
+ * and Account plugins are running the same version. If there is a version mismatch, then a
+ * warning dialog is displayed with a link to check for updates.
+ */
 public class PluginCompatibilityCheck implements StartupActivity {
 
   @Override
