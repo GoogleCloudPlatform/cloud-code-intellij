@@ -16,11 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
-import com.google.common.base.Preconditions;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
-import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.base.Preconditions;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.runtime.Deployment;
