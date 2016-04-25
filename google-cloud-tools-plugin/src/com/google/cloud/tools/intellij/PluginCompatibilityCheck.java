@@ -49,7 +49,7 @@ public class PluginCompatibilityCheck implements StartupActivity {
     checkPluginCompatibility(project);
   }
 
-  private void checkPluginCompatibility(@NotNull final Project project) {
+  private void checkPluginCompatibility(@NotNull Project project) {
     IdeaPluginDescriptor cloudToolsPlugin =
         PluginManager.getPlugin(PluginId.findId("com.google.gct.core"));
     IdeaPluginDescriptor accountPlugin =
