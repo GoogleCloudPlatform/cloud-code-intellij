@@ -57,7 +57,7 @@ public class PluginCompatibilityCheck implements StartupActivity {
     String cloudToolsPluginVersion = cloudToolsPlugin.getVersion();
     String accountPluginVersion = accountPlugin.getVersion();
 
-    if (accountPluginVersion.equals(cloudToolsPluginVersion)) {
+    if (!accountPluginVersion.equals(cloudToolsPluginVersion)) {
       NotificationGroup notification = new NotificationGroup(
           GctBundle.message("plugin.compatibility.error.title"),
           NotificationDisplayType.BALLOON, true);
