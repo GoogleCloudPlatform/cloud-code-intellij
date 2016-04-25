@@ -94,6 +94,7 @@ public interface AppEngineHelper {
       LoggingHandler loggingHandler,
       Project project,
       File artifactToDeploy,
+      String version,
       DeploymentOperationCallback deploymentCallback);
 
   AppEngineStopAction createStopAction(

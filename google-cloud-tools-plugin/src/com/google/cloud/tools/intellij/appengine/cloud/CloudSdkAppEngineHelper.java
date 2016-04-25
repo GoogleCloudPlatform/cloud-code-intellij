@@ -124,6 +124,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       LoggingHandler loggingHandler,
       Project project,
       File artifactToDeploy,
+      String version,
       DeploymentOperationCallback deploymentCallback) throws IllegalArgumentException {
     DeploymentArtifactType artifactType = DeploymentArtifactType.typeForPath(artifactToDeploy);
     if (artifactType == DeploymentArtifactType.UNKNOWN) {
@@ -137,7 +138,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         artifactToDeploy,
         defaultAppYaml(),
         defaultDockerfile(artifactType),
-        AppEngineUtil.generateVersion(),
+        version,
         wrapCallbackForUsageTracking(deploymentCallback, ConfigType.AUTO, artifactType)
     );
   }

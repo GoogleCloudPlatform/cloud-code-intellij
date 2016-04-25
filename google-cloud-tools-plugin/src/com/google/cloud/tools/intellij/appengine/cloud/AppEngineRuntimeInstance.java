@@ -83,6 +83,7 @@ class AppEngineRuntimeInstance extends
           logManager.getMainLoggingHandler(),
           task.getProject(),
           deploymentSource,
+          deploymentConfig.getVersion(),
           callback
       );
     } else {
