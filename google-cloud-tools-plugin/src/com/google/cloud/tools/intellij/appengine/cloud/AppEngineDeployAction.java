@@ -17,9 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -44,9 +41,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.SwingUtilities;
 
@@ -109,7 +103,7 @@ class AppEngineDeployAction extends AppEngineAction {
 
     GeneralCommandLine commandLine = new GeneralCommandLine(
         appEngineHelper.getGcloudCommandPath().getAbsolutePath());
-    commandLine.addParameters("preview", "app", "deploy", "--promote", "--quiet");
+    commandLine.addParameters("preview", "app", "deploy", "--promote");
     commandLine.addParameter("app.yaml");
     commandLine.addParameter("--version=" + version);
     commandLine.addParameter("--format=json");
@@ -222,17 +216,8 @@ class AppEngineDeployAction extends AppEngineAction {
     }
 
     private void stop(@NotNull UndeploymentTaskCallback callback) {
-      Set<String> modulesToSop;
-      try {
-        modulesToSop = parseDeployOutputToModuleList(deploymentOutput);
-      } catch (JsonParseException e) {
-        logger.warn("Could not retrieve module(s) of deployed application", e);
-        return;
-      }
-
       final AppEngineAction appEngineStopAction = appEngineHelper.createStopAction(
           getLoggingHandler(),
-          modulesToSop,
           version,
           callback);
 
@@ -246,13 +231,5 @@ class AppEngineDeployAction extends AppEngineAction {
           });
     }
 
-  }
-
-  private Set<String> parseDeployOutputToModuleList(String jsonOutput)
-      throws JsonParseException {
-    Type deployOutputType = new TypeToken<Map<String, String>>() {}.getType();
-    Map<String, String> deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
-
-    return deployOutput != null ? deployOutput.keySet() : null;
   }
 }

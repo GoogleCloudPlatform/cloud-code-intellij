@@ -99,7 +99,6 @@ public interface AppEngineHelper {
 
   AppEngineStopAction createStopAction(
       LoggingHandler loggingHandler,
-      Set<String> modulesToStop,
       String versionToStop,
       UndeploymentTaskCallback undeploymentTaskCallback);
 }

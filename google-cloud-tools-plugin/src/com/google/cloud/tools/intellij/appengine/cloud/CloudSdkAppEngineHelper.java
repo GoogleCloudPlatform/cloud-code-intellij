@@ -36,7 +36,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Set;
 
 /**
  * A Cloud SDK (gcloud) based implementation of the {@link AppEngineHelper} interface.
@@ -148,13 +147,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @Override
   public AppEngineStopAction createStopAction(
       LoggingHandler loggingHandler,
-      Set<String> modulesToStop,
       String versionToStop,
       UndeploymentTaskCallback undeploymentTaskCallback) {
     return new AppEngineStopAction(
         this,
         loggingHandler,
-        modulesToStop,
         versionToStop,
         undeploymentTaskCallback
     );

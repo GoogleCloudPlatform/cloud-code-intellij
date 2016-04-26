@@ -86,6 +86,7 @@ public abstract class AppEngineAction implements Runnable {
     commandLine.addParameter("--project=" + appEngineHelper.getProjectId());
     commandLine
         .addParameter("--credential-file-override=" + credentialsPath.getAbsolutePath());
+    commandLine.addParameter("--quiet");
     commandLine.withParentEnvironmentType(ParentEnvironmentType.CONSOLE);
     commandLine.getEnvironment().put("CLOUDSDK_METRICS_ENVIRONMENT", "gcloud-intellij");
     commandLine.getEnvironment().put("CLOUDSDK_APP_USE_GSUTIL", "0");

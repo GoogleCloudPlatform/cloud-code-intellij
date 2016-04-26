@@ -30,8 +30,6 @@ import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
-
 import javax.swing.SwingUtilities;
 
 /**
@@ -42,20 +40,16 @@ public class AppEngineStopAction extends AppEngineAction {
 
   private AppEngineHelper appEngineHelper;
   private UndeploymentTaskCallback callback;
-
-  private Set<String> modulesToStop;
   private String versionToStop;
 
   public AppEngineStopAction(
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
-      @NotNull Set<String> modulesToStop,
       @NotNull String versionToStop,
       @NotNull UndeploymentTaskCallback callback) {
     super(loggingHandler, appEngineHelper, callback);
 
     this.appEngineHelper = appEngineHelper;
-    this.modulesToStop = modulesToStop;
     this.versionToStop = versionToStop;
     this.callback = callback;
   }
@@ -65,11 +59,8 @@ public class AppEngineStopAction extends AppEngineAction {
     GeneralCommandLine commandLine = new GeneralCommandLine(
         appEngineHelper.getGcloudCommandPath().getAbsolutePath());
 
-    commandLine.addParameters("preview", "app", "modules", "stop");
-    for(String module : modulesToStop) {
-      commandLine.addParameter(module);
-    }
-    commandLine.addParameters("--version", versionToStop);
+    commandLine.addParameters("preview", "app", "versions", "stop");
+    commandLine.addParameters(versionToStop);
     try {
       executeProcess(
           commandLine,
