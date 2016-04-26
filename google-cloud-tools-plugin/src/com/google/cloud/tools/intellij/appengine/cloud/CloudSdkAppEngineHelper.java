@@ -16,13 +16,14 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
-import com.google.common.base.Preconditions;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
-import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.base.Preconditions;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.Deployment;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
@@ -112,7 +113,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         artifactToDeploy,
         appYamlPath,
         dockerfilePath,
-        version,
+        StringUtil.isEmpty(version) ? AppEngineUtil.generateVersion() : version,
         wrapCallbackForUsageTracking(deploymentCallback,
             ConfigType.CUSTOM,DeploymentArtifactType.typeForPath(artifactToDeploy))
     );
@@ -124,6 +125,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       LoggingHandler loggingHandler,
       Project project,
       File artifactToDeploy,
+      String version,
       DeploymentOperationCallback deploymentCallback) throws IllegalArgumentException {
     DeploymentArtifactType artifactType = DeploymentArtifactType.typeForPath(artifactToDeploy);
     if (artifactType == DeploymentArtifactType.UNKNOWN) {
@@ -137,7 +139,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         artifactToDeploy,
         defaultAppYaml(),
         defaultDockerfile(artifactType),
-        AppEngineUtil.generateVersion(),
+        StringUtil.isEmpty(version) ? AppEngineUtil.generateVersion() : version,
         wrapCallbackForUsageTracking(deploymentCallback, ConfigType.AUTO, artifactType)
     );
   }

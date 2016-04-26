@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -37,13 +36,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +61,7 @@ class AppEngineDeployAction extends AppEngineAction {
   private File deploymentArtifactPath;
   private File appYamlPath;
   private File dockerFilePath;
-  private String customVersionId;
+  private String version;
   private AppEngineHelper appEngineHelper;
   private DeploymentOperationCallback callback;
   private DeploymentArtifactType artifactType;
@@ -80,7 +77,7 @@ class AppEngineDeployAction extends AppEngineAction {
       @NotNull File deploymentArtifactPath,
       @NotNull File appYamlPath,
       @NotNull File dockerFilePath,
-      @Nullable String customVersionId,
+      @NotNull String version,
       @NotNull DeploymentOperationCallback callback) {
     super(loggingHandler, appEngineHelper, callback);
 
@@ -90,7 +87,7 @@ class AppEngineDeployAction extends AppEngineAction {
     this.callback = callback;
     this.appYamlPath = appYamlPath;
     this.dockerFilePath = dockerFilePath;
-    this.customVersionId = customVersionId;
+    this.version = version;
     this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
   }
 
@@ -109,9 +106,6 @@ class AppEngineDeployAction extends AppEngineAction {
           GctBundle.message("appengine.deployment.error.creating.staging.directory"));
       return;
     }
-
-    String version =
-        StringUtil.isEmpty(customVersionId) ? AppEngineUtil.generateVersion() : customVersionId;
 
     GeneralCommandLine commandLine = new GeneralCommandLine(
         appEngineHelper.getGcloudCommandPath().getAbsolutePath());
