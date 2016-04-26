@@ -37,7 +37,6 @@ import com.intellij.openapi.ui.popup.BalloonBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.Condition;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -94,6 +93,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private JCheckBox versionOverrideCheckBox;
   private DeploymentSource deploymentSource;
   private AppEngineHelper appEngineHelper;
+  private AppEngineServerConfiguration configuration;
 
   private static final String COST_WARNING_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
   private static final String COST_WARNING_CLOSE_TAG = "</i></font></html>";
@@ -111,9 +111,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     this.project = project;
     this.deploymentSource = deploymentSource;
     this.appEngineHelper = appEngineHelper;
+    this.configuration = configuration;
 
     updateCloudProjectName(appEngineHelper.getProjectId());
-    configuration.setProjectNameListener(new ProjectNameListener());
 
     versionIdField.setPlaceholderText(GctBundle.message("appengine.flex.version.placeholder.text"));
     resetOverridableFields(versionOverrideCheckBox, versionIdField);
@@ -126,12 +126,19 @@ public class AppEngineDeploymentRunConfigurationEditor extends
             COST_WARNING_HREF_OPEN_TAG,
             COST_WARNING_HREF_CLOSE_TAG,
             COST_WARNING_CLOSE_TAG));
-    appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
     appEngineConfigFilesPanel.setVisible(false);
+
+    initListeners();
+  }
+
+  private void initListeners() {
+    configuration.setProjectNameListener(new ProjectNameListener());
+    appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+
     configTypeComboBox.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -165,11 +172,12 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         GctBundle.message("appengine.flex.config.user.specified.artifact.title"),
         null,
         project,
-        FileChooserDescriptorFactory.createSingleFileDescriptor().withFileFilter(new Condition<VirtualFile>() {
+        FileChooserDescriptorFactory
+            .createSingleFileDescriptor().withFileFilter(new Condition<VirtualFile>() {
           @Override
           public boolean value(VirtualFile file) {
-            return Comparing.equal(file.getExtension(), "jar", SystemInfo.isFileSystemCaseSensitive)
-                || Comparing.equal(file.getExtension(), "war", SystemInfo.isFileSystemCaseSensitive);
+            return Comparing.equal(file.getExtension(), "jar", false)
+                || Comparing.equal(file.getExtension(), "war", false);
           }
         })
     );
@@ -179,12 +187,26 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         GctBundle.message("appengine.dockerfile.location.browse.button"),
         null,
         project,
-        FileChooserDescriptorFactory.createSingleFileDescriptor());
+        FileChooserDescriptorFactory
+            .createSingleFileDescriptor().withFileFilter(new Condition<VirtualFile>() {
+          @Override
+          public boolean value(VirtualFile file) {
+            return Comparing.equal(file.getName(), "Dockerfile", false);
+          }
+        })
+    );
     appYamlPathField.addBrowseFolderListener(
         GctBundle.message("appengine.appyaml.location.browse.window.title"),
         null,
         project,
-        FileChooserDescriptorFactory.createSingleFileDescriptor());
+        FileChooserDescriptorFactory
+            .createSingleFileDescriptor().withFileFilter(new Condition<VirtualFile>() {
+          @Override
+          public boolean value(VirtualFile file) {
+            return Comparing.equal(file.getName(), "app.yaml", false);
+          }
+        })
+    );
     generateAppYamlButton.addActionListener(
         new GenerateConfigActionListener(project, "app.yaml", ConfigFileType.APP_YAML,
             new Supplier<File>() {
