@@ -135,6 +135,9 @@ subprojects {
         showViolations false
     }
 
+    // The checkstyle plugin does not provide a way to fail the build on warnings, and
+    // the google_checks.xml sets the severity level to "warning" for all violations. The
+    // following is the workaround
     tasks.withType(Checkstyle).each { checkstyleTask ->
         checkstyleTask.doLast {
             reports.all { report ->
