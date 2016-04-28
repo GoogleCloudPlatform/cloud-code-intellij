@@ -46,7 +46,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.SwingUtilities;
 
@@ -109,7 +108,7 @@ class AppEngineDeployAction extends AppEngineAction {
 
     GeneralCommandLine commandLine = new GeneralCommandLine(
         appEngineHelper.getGcloudCommandPath().getAbsolutePath());
-    commandLine.addParameters("preview", "app", "deploy", "--promote", "--quiet");
+    commandLine.addParameters("preview", "app", "deploy", "--promote");
     commandLine.addParameter("app.yaml");
     commandLine.addParameter("--version=" + version);
     commandLine.addParameter("--format=json");
@@ -222,9 +221,9 @@ class AppEngineDeployAction extends AppEngineAction {
     }
 
     private void stop(@NotNull UndeploymentTaskCallback callback) {
-      Set<String> modulesToSop;
+      String moduleToStop;
       try {
-        modulesToSop = parseDeployOutputToModuleList(deploymentOutput);
+        moduleToStop = parseDeployOutputToModule(deploymentOutput);
       } catch (JsonParseException e) {
         logger.warn("Could not retrieve module(s) of deployed application", e);
         return;
@@ -232,7 +231,7 @@ class AppEngineDeployAction extends AppEngineAction {
 
       final AppEngineAction appEngineStopAction = appEngineHelper.createStopAction(
           getLoggingHandler(),
-          modulesToSop,
+          moduleToStop,
           version,
           callback);
 
@@ -248,11 +247,15 @@ class AppEngineDeployAction extends AppEngineAction {
 
   }
 
-  private Set<String> parseDeployOutputToModuleList(String jsonOutput)
+  private String parseDeployOutputToModule(String jsonOutput)
       throws JsonParseException {
     Type deployOutputType = new TypeToken<Map<String, String>>() {}.getType();
     Map<String, String> deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
 
-    return deployOutput != null ? deployOutput.keySet() : null;
+    if(deployOutput == null || deployOutput.keySet().size() != 1) {
+      throw new AssertionError("Expected a single module output from flex deployment.");
+    }
+
+    return deployOutput.keySet().iterator().next();
   }
 }
