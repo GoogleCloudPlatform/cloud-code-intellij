@@ -132,7 +132,6 @@ subprojects {
     }
     checkstyle {
         config = resources.text.fromArchiveEntry(configurations.checkstyleConfig, 'google_checks.xml')
-        ignoreFailures false
         showViolations false
     }
 
