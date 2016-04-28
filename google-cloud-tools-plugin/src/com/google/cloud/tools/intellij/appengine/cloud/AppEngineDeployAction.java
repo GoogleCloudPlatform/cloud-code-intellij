@@ -223,7 +223,7 @@ class AppEngineDeployAction extends AppEngineAction {
     private void stop(@NotNull UndeploymentTaskCallback callback) {
       String moduleToStop;
       try {
-        moduleToStop = parseDeployOutputToModuleList(deploymentOutput);
+        moduleToStop = parseDeployOutputToModule(deploymentOutput);
       } catch (JsonParseException e) {
         logger.warn("Could not retrieve module(s) of deployed application", e);
         return;
@@ -247,7 +247,7 @@ class AppEngineDeployAction extends AppEngineAction {
 
   }
 
-  private String parseDeployOutputToModuleList(String jsonOutput)
+  private String parseDeployOutputToModule(String jsonOutput)
       throws JsonParseException {
     Type deployOutputType = new TypeToken<Map<String, String>>() {}.getType();
     Map<String, String> deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
