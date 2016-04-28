@@ -30,8 +30,6 @@ import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
-
 import javax.swing.SwingUtilities;
 
 /**
@@ -43,19 +41,19 @@ public class AppEngineStopAction extends AppEngineAction {
   private AppEngineHelper appEngineHelper;
   private UndeploymentTaskCallback callback;
 
-  private Set<String> modulesToStop;
+  private String moduleToStop;
   private String versionToStop;
 
   public AppEngineStopAction(
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
-      @NotNull Set<String> modulesToStop,
+      @NotNull String moduleToStop,
       @NotNull String versionToStop,
       @NotNull UndeploymentTaskCallback callback) {
     super(loggingHandler, appEngineHelper, callback);
 
     this.appEngineHelper = appEngineHelper;
-    this.modulesToStop = modulesToStop;
+    this.moduleToStop = moduleToStop;
     this.versionToStop = versionToStop;
     this.callback = callback;
   }
@@ -69,9 +67,7 @@ public class AppEngineStopAction extends AppEngineAction {
     commandLine.addParameters(versionToStop);
 
     commandLine.addParameter("--service");
-    for(String module : modulesToStop) {
-      commandLine.addParameter(module);
-    }
+    commandLine.addParameter(moduleToStop);
 
     try {
       executeProcess(
