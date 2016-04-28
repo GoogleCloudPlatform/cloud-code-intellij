@@ -132,7 +132,7 @@ subprojects {
     }
     checkstyle {
         config = resources.text.fromArchiveEntry(configurations.checkstyleConfig, 'google_checks.xml')
-        ignoreFailures System.getenv('TRAVIS') != 'true'
+        ignoreFailures false
         showViolations false
     }
 
