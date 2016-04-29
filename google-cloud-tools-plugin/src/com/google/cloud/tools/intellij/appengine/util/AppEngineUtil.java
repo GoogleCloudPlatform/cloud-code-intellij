@@ -16,64 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.util;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.List;
-
 /**
  * App Engine utility methods
  */
 public class AppEngineUtil {
 
-  // Just to return two strings.
-  public static class VersionService {
-    public String version = null;
-    public String service = null;
-  }
-
-  // Holds de-serialized JSON output of gcloud app deploy.
-  private static class DeployOutput {
-    private static class versionElement {
-      String id;
-      String service;
-    }
-    List<versionElement> versions;
-  }
-
   private AppEngineUtil() {
     // Not designed for instantiation
   }
 
-  public static VersionService parseDeployOutputToService(String jsonOutput)
-      throws JsonParseException {
-    /* An example JSON output of gcloud app deloy:
-        {
-          "configs": [],
-          "versions": [
-            {
-              "id": "20160429t112518",
-              "last_deployed_time": null,
-              "project": "springboot-maven-project",
-              "service": "default",
-              "traffic_split": null,
-              "version": null
-            }
-          ]
-        }
-    */
-
-    Type deployOutputType = new TypeToken<DeployOutput>() {}.getType();
-    DeployOutput deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
-    if(deployOutput == null || deployOutput.versions.size() != 1) {
-      throw new AssertionError("Expected a single module output from flex deployment.");
-    }
-
-    VersionService versionService = new VersionService();
-    versionService.version = deployOutput.versions.get(0).id;
-    versionService.service = deployOutput.versions.get(0).service;
-    return versionService;
-  }
 }

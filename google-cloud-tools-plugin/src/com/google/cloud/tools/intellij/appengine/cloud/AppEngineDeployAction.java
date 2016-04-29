@@ -16,10 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil.VersionService;
+import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -46,6 +47,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -214,18 +217,19 @@ class AppEngineDeployAction extends AppEngineAction {
     }
 
     private void stop(@NotNull UndeploymentTaskCallback callback) {
-      VersionService versionService;
+      DeployOutput deployOutput;
       try {
-        versionService = AppEngineUtil.parseDeployOutputToService(deploymentOutput);
+        deployOutput = parseDeployOutputToService(deploymentOutput);
       } catch (JsonParseException e) {
         logger.warn("Could not retrieve module(s) of deployed application", e);
+        callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.execution.error"));
         return;
       }
 
       final AppEngineAction appEngineStopAction = appEngineHelper.createStopAction(
           getLoggingHandler(),
-          versionService.service,
-          versionService.version,
+          deployOutput.getService(),
+          deployOutput.getVersion(),
           callback);
 
       ProgressManager.getInstance()
@@ -237,6 +241,56 @@ class AppEngineDeployAction extends AppEngineAction {
             }
           });
     }
+  }
 
+  // Holds de-serialized JSON output of gcloud app deploy.
+  @VisibleForTesting
+  static class DeployOutput {
+    private static class Version {
+      String id;
+      String service;
+    }
+    List<Version> versions;
+
+    @NotNull
+    public String getVersion() {
+      if (versions.size() != 1) {
+        throw new AssertionError("Should be called only when 'versions' have one element.");
+      }
+      return versions.get(0).id;
+    }
+
+    @NotNull
+    public String getService() {
+      if (versions.size() != 1) {
+        throw new AssertionError("Should be called only when 'versions' have one element.");
+      }
+      return versions.get(0).service;
+    }
+  }
+
+  @VisibleForTesting
+  DeployOutput parseDeployOutputToService(String jsonOutput) throws JsonParseException {
+    /* An example JSON output of gcloud app deloy:
+        {
+          "configs": [],
+          "versions": [
+            {
+              "id": "20160429t112518",
+              "last_deployed_time": null,
+              "project": "springboot-maven-project",
+              "service": "default",
+              "traffic_split": null,
+              "version": null
+            }
+          ]
+        }
+    */
+    Type deployOutputType = new TypeToken<DeployOutput>() {}.getType();
+    DeployOutput deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
+    if (deployOutput == null || deployOutput.versions.size() != 1) {
+      throw new JsonParseException("Cannot get app version: unexpected gcloud JSON output format");
+    }
+    return deployOutput;
   }
 }
