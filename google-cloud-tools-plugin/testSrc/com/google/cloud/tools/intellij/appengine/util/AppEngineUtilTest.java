@@ -16,10 +16,69 @@
 
 package com.google.cloud.tools.intellij.appengine.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil.VersionService;
+
+import org.junit.Test;
+
 /**
  * Tests App Engine Utilities
  *
  */
 public class AppEngineUtilTest {
 
+  @Test
+  public void testJsonDeployOutputJsonParsingOneVersion() {
+    String jsonOutput = "{\n" +
+                        "  \"configs\": [],\n" +
+                        "  \"versions\": [\n" +
+                        "    {\n" +
+                        "      \"id\": \"20160429t112518\",\n" +
+                        "      \"last_deployed_time\": null,\n" +
+                        "      \"project\": \"some-project\",\n" +
+                        "      \"service\": \"default\",\n" +
+                        "      \"traffic_split\": null,\n" +
+                        "      \"version\": null\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}\n";
+
+    VersionService versionService = AppEngineUtil.parseDeployOutputToService(jsonOutput);
+    assertEquals(versionService.version, "20160429t112518");
+    assertEquals(versionService.service, "default");
+  }
+
+  @Test
+  public void testJsonDeployOutputJsonParsingTwoVersions() {
+    String jsonOutput = "{\n" +
+                        "  \"configs\": [],\n" +
+                        "  \"versions\": [\n" +
+                        "    {\n" +
+                        "      \"id\": \"20160429t112518\",\n" +
+                        "      \"last_deployed_time\": null,\n" +
+                        "      \"project\": \"some-project\",\n" +
+                        "      \"service\": \"default\",\n" +
+                        "      \"traffic_split\": null,\n" +
+                        "      \"version\": null\n" +
+                        "    },\n" +
+                        "    {\n" +
+                        "      \"id\": \"20160429t112518\",\n" +
+                        "      \"last_deployed_time\": null,\n" +
+                        "      \"project\": \"some-project\",\n" +
+                        "      \"service\": \"default\",\n" +
+                        "      \"traffic_split\": null,\n" +
+                        "      \"version\": null\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}\n";
+
+    try {
+      AppEngineUtil.parseDeployOutputToService(jsonOutput);
+      fail();
+    } catch (AssertionError e) {
+      // Should throw an AssertionError.
+    }
+  }
 }

@@ -16,10 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil.VersionService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.gson.JsonParseException;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -46,7 +46,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 
 import javax.swing.SwingUtilities;
 
@@ -217,7 +216,7 @@ class AppEngineDeployAction extends AppEngineAction {
     private void stop(@NotNull UndeploymentTaskCallback callback) {
       VersionService versionService;
       try {
-        versionService = parseDeployOutputToModule(deploymentOutput);
+        versionService = AppEngineUtil.parseDeployOutputToService(deploymentOutput);
       } catch (JsonParseException e) {
         logger.warn("Could not retrieve module(s) of deployed application", e);
         return;
@@ -239,74 +238,5 @@ class AppEngineDeployAction extends AppEngineAction {
           });
     }
 
-  }
-
-  // Just to return two strings.
-  static private class VersionService {
-    public String version = null;
-    public String service = null;
-  }
-
-  private VersionService parseDeployOutputToModule(String jsonOutput)
-      throws JsonParseException {
-    VersionService versionService = new VersionService();
-
-    /* An example JSON output of gcloud app deloy:
-        {
-          "configs": [],
-          "versions": [
-            {
-              "id": "20160429t112518",
-              "last_deployed_time": null,
-              "project": "springboot-maven-project",
-              "service": "default",
-              "traffic_split": null,
-              "version": null
-            }
-          ]
-        }
-    */
-
-    JsonReader reader = new JsonReader(new StringReader(jsonOutput));
-    try {
-      reader.beginObject(); // Top-level is a single object.
-
-      // Look for "versions" in the top-level object.
-      while (reader.hasNext()) {
-        String name = reader.nextName();
-
-        if ("versions".equals(name) && reader.peek() != JsonToken.NULL) {
-          reader.beginArray(); // "versions" should be an array.
-          // We hope the array has an element.
-          if (reader.hasNext()) {
-            reader.beginObject(); // An element in "versions" should be an object.
-
-            // Look for "id" and "service" inside the element.
-            while (reader.hasNext()) {
-              String nested_name = reader.nextName();
-              if ("id".equals(nested_name)) {
-                versionService.version = reader.nextString(); // "id" found. (String)
-              } else if ("service".equals(nested_name)) {
-                versionService.service = reader.nextString(); // "service" found. (String)
-              } else {
-                reader.skipValue(); // Skip a value if not "id".
-              }
-            }
-            reader.endObject();
-          }
-          reader.endArray();
-        } else {
-          reader.skipValue(); // Skip a value if not "versions".
-        }
-      }
-      reader.endObject();
-    } catch (IOException e) {
-      throw new JsonParseException(e.getMessage());
-    }
-
-    if (versionService.version == null || versionService.service == null) {
-      throw new JsonParseException("Version/service info not found in JSON");
-    }
-    return versionService;
   }
 }
