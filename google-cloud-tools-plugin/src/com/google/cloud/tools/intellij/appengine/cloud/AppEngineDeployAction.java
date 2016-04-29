@@ -305,7 +305,7 @@ class AppEngineDeployAction extends AppEngineAction {
     }
 
     if (versionService.version == null || versionService.service == null) {
-      throw new JsonParseException("Version info not found in JSON");
+      throw new JsonParseException("Version/service info not found in JSON");
     }
     return versionService;
   }
