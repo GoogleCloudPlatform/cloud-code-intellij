@@ -21,7 +21,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * App Engine utility methods
@@ -40,7 +40,7 @@ public class AppEngineUtil {
       String id;
       String service;
     }
-    ArrayList<versionElement> versions;
+    List<versionElement> versions;
   }
 
   private AppEngineUtil() {
