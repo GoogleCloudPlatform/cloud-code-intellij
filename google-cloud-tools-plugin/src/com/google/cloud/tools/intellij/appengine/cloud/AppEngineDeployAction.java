@@ -17,9 +17,9 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -36,16 +36,17 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Map;
+import java.io.StringReader;
 
 import javax.swing.SwingUtilities;
 
@@ -76,7 +77,7 @@ class AppEngineDeployAction extends AppEngineAction {
       @NotNull File deploymentArtifactPath,
       @NotNull File appYamlPath,
       @NotNull File dockerFilePath,
-      @NotNull String version,
+      @Nullable String version,
       @NotNull DeploymentOperationCallback callback) {
     super(loggingHandler, appEngineHelper, callback);
 
@@ -110,7 +111,9 @@ class AppEngineDeployAction extends AppEngineAction {
         appEngineHelper.getGcloudCommandPath().getAbsolutePath());
     commandLine.addParameters("preview", "app", "deploy", "--promote");
     commandLine.addParameter("app.yaml");
-    commandLine.addParameter("--version=" + version);
+    if (!StringUtil.isEmpty(version)) {
+      commandLine.addParameter("--version=" + version);
+    }
     commandLine.addParameter("--format=json");
 
     commandLine.withWorkDirectory(stagingDirectory);
@@ -130,9 +133,7 @@ class AppEngineDeployAction extends AppEngineAction {
     }
 
     try {
-      executeProcess(
-          commandLine,
-          new DeployToAppEngineProcessListener(version));
+      executeProcess(commandLine, new DeployToAppEngineProcessListener());
     } catch (ExecutionException e) {
       logger.warn(e);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.execution"));
@@ -150,11 +151,6 @@ class AppEngineDeployAction extends AppEngineAction {
 
   private class DeployToAppEngineProcessListener extends ProcessAdapter {
     private StringBuilder deploymentOutput = new StringBuilder();
-    private String version;
-
-    public DeployToAppEngineProcessListener(@NotNull String version) {
-      this.version = version;
-    }
 
     @Override
     public void onTextAvailable(ProcessEvent event, Key outputType) {
@@ -167,7 +163,7 @@ class AppEngineDeployAction extends AppEngineAction {
     public void processTerminated(final ProcessEvent event) {
       try {
         if (event.getExitCode() == 0) {
-          callback.succeeded(new DeploymentRuntimeImpl(deploymentOutput.toString(), version));
+          callback.succeeded(new DeploymentRuntimeImpl(deploymentOutput.toString()));
         } else if (cancelled) {
           callback.errorOccurred(GctBundle.message("appengine.deployment.error.cancelled"));
         } else {
@@ -184,11 +180,9 @@ class AppEngineDeployAction extends AppEngineAction {
 
   private class DeploymentRuntimeImpl extends DeploymentRuntime {
     private String deploymentOutput;
-    private String version;
 
-    public DeploymentRuntimeImpl(@NotNull String deploymentOutput, @NotNull String version) {
+    public DeploymentRuntimeImpl(@NotNull String deploymentOutput) {
       this.deploymentOutput = deploymentOutput;
-      this.version = version;
     }
 
     @Override
@@ -221,9 +215,9 @@ class AppEngineDeployAction extends AppEngineAction {
     }
 
     private void stop(@NotNull UndeploymentTaskCallback callback) {
-      String moduleToStop;
+      VersionService versionService;
       try {
-        moduleToStop = parseDeployOutputToModule(deploymentOutput);
+        versionService = parseDeployOutputToModule(deploymentOutput);
       } catch (JsonParseException e) {
         logger.warn("Could not retrieve module(s) of deployed application", e);
         return;
@@ -231,8 +225,8 @@ class AppEngineDeployAction extends AppEngineAction {
 
       final AppEngineAction appEngineStopAction = appEngineHelper.createStopAction(
           getLoggingHandler(),
-          moduleToStop,
-          version,
+          versionService.service,
+          versionService.version,
           callback);
 
       ProgressManager.getInstance()
@@ -247,15 +241,72 @@ class AppEngineDeployAction extends AppEngineAction {
 
   }
 
-  private String parseDeployOutputToModule(String jsonOutput)
-      throws JsonParseException {
-    Type deployOutputType = new TypeToken<Map<String, String>>() {}.getType();
-    Map<String, String> deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
+  // Just to return two strings.
+  static private class VersionService {
+    public String version = null;
+    public String service = null;
+  }
 
-    if(deployOutput == null || deployOutput.keySet().size() != 1) {
-      throw new AssertionError("Expected a single module output from flex deployment.");
+  private VersionService parseDeployOutputToModule(String jsonOutput)
+      throws JsonParseException {
+    VersionService versionService = new VersionService();
+
+    /* An example JSON output of gcloud app deloy:
+        {
+          "configs": [],
+          "versions": [
+            {
+              "id": "20160429t112518",
+              "last_deployed_time": null,
+              "project": "springboot-maven-project",
+              "service": "default",
+              "traffic_split": null,
+              "version": null
+            }
+          ]
+        }
+    */
+
+    JsonReader reader = new JsonReader(new StringReader(jsonOutput));
+    try {
+      reader.beginObject(); // Top-level is a single object.
+
+      // Look for "versions" in the top-level object.
+      while (reader.hasNext()) {
+        String name = reader.nextName();
+
+        if ("versions".equals(name) && reader.peek() != JsonToken.NULL) {
+          reader.beginArray(); // "versions" should be an array.
+          // We hope the array has an element.
+          if (reader.hasNext()) {
+            reader.beginObject(); // An element in "versions" should be an object.
+
+            // Look for "id" inside the element.
+            while (reader.hasNext()) {
+              String nested_name = reader.nextName();
+              if ("id".equals(nested_name)) {
+                versionService.version = reader.nextString(); // Found. Should be a string.
+              } else if ("service".equals(nested_name)) {
+                versionService.service = reader.nextString();
+              } else {
+                reader.skipValue(); // Skip a value if not "id".
+              }
+            }
+            reader.endObject();
+          }
+          reader.endArray();
+        } else {
+          reader.skipValue(); // Skip a value if not "versions".
+        }
+      }
+      reader.endObject();
+    } catch (IOException e) {
+      throw new JsonParseException(e.getMessage());
     }
 
-    return deployOutput.keySet().iterator().next();
+    if (versionService.version == null || versionService.service == null) {
+      throw new JsonParseException("Version info not found in JSON");
+    }
+    return versionService;
   }
 }
