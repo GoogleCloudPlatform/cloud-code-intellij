@@ -281,13 +281,13 @@ class AppEngineDeployAction extends AppEngineAction {
           if (reader.hasNext()) {
             reader.beginObject(); // An element in "versions" should be an object.
 
-            // Look for "id" inside the element.
+            // Look for "id" and "service" inside the element.
             while (reader.hasNext()) {
               String nested_name = reader.nextName();
               if ("id".equals(nested_name)) {
-                versionService.version = reader.nextString(); // Found. Should be a string.
+                versionService.version = reader.nextString(); // "id" found. (String)
               } else if ("service".equals(nested_name)) {
-                versionService.service = reader.nextString();
+                versionService.service = reader.nextString(); // "service" found. (String)
               } else {
                 reader.skipValue(); // Skip a value if not "id".
               }
