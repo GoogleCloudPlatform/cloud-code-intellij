@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - Support for Maven based projects as deployment sources for App Engine flexible environment deployments ([#600](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/600))
 
 ### Changed
-- App Engine flexible environment deployment can be cancelled by disconnecting to our App Engine applicaiton server. ([#581](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/581))
+- App Engine flexible environment deployment can be cancelled by disconnecting to our App Engine application server. ([#581](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/581))
 - App Engine flexible environment generated Dockerfile and app.yaml now default to the recommended location in a Maven structured Java project. ([#575](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/575))
 
 ### Fixed
