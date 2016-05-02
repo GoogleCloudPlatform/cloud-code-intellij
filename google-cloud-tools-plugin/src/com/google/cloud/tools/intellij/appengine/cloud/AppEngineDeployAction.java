@@ -16,29 +16,18 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessOutputTypes;
-import com.intellij.icons.AllIcons.General;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -47,10 +36,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.List;
-
-import javax.swing.SwingUtilities;
 
 /**
  * Performs the deployment of App Engine based applications to GCP.
@@ -67,10 +52,6 @@ class AppEngineDeployAction extends AppEngineAction {
   private AppEngineHelper appEngineHelper;
   private DeploymentOperationCallback callback;
   private DeploymentArtifactType artifactType;
-
-  private static final String STOP_CONFIRMATION_URI_OPEN_TAG =
-      "<a href='https://cloud.google.com/appengine/docs/java/console/#versions'>";
-  private static final String STOP_CONFIRMATION_URI_CLOSE_TAG = "</a>";
 
   AppEngineDeployAction(
       @NotNull AppEngineHelper appEngineHelper,
@@ -165,7 +146,8 @@ class AppEngineDeployAction extends AppEngineAction {
     public void processTerminated(final ProcessEvent event) {
       try {
         if (event.getExitCode() == 0) {
-          callback.succeeded(new DeploymentRuntimeImpl(deploymentOutput.toString()));
+          callback.succeeded(new AppEngineDeploymentRuntimeImpl(
+              project, appEngineHelper, getLoggingHandler(), deploymentOutput.toString()));
         } else if (cancelled) {
           callback.errorOccurred(GctBundle.message("appengine.deployment.error.cancelled"));
         } else {
@@ -178,119 +160,5 @@ class AppEngineDeployAction extends AppEngineAction {
       }
 
     }
-  }
-
-  private class DeploymentRuntimeImpl extends DeploymentRuntime {
-    private String deploymentOutput;
-
-    public DeploymentRuntimeImpl(@NotNull String deploymentOutput) {
-      this.deploymentOutput = deploymentOutput;
-    }
-
-    @Override
-    public boolean isUndeploySupported() {
-      return true;
-    }
-
-    @Override
-    public void undeploy(@NotNull final UndeploymentTaskCallback callback) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          int doStop = Messages
-              .showOkCancelDialog(
-                  GctBundle.message(
-                      "appengine.stop.modules.version.confirmation.message",
-                      STOP_CONFIRMATION_URI_OPEN_TAG,
-                      STOP_CONFIRMATION_URI_CLOSE_TAG),
-                  GctBundle.message("appengine.stop.modules.version.confirmation.title"),
-                  General.Warning);
-
-          if (doStop == Messages.YES) {
-            stop(callback);
-          } else {
-            callback.errorOccurred(
-                GctBundle.message("appengine.stop.modules.version.canceled.message"));
-          }
-        }
-      });
-    }
-
-    private void stop(@NotNull UndeploymentTaskCallback callback) {
-      DeployOutput deployOutput;
-      try {
-        deployOutput = parseDeployOutputToService(deploymentOutput);
-      } catch (JsonParseException e) {
-        logger.warn("Could not retrieve module(s) of deployed application", e);
-        callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.execution.error"));
-        return;
-      }
-
-      final AppEngineAction appEngineStopAction = appEngineHelper.createStopAction(
-          getLoggingHandler(),
-          deployOutput.getService(),
-          deployOutput.getVersion(),
-          callback);
-
-      ProgressManager.getInstance()
-          .run(new Task.Backgroundable(project, "Stop App Engine", true,
-              null) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-              ApplicationManager.getApplication().invokeLater(appEngineStopAction);
-            }
-          });
-    }
-  }
-
-  // Holds de-serialized JSON output of gcloud app deploy.
-  @VisibleForTesting
-  static class DeployOutput {
-    private static class Version {
-      String id;
-      String service;
-    }
-    List<Version> versions;
-
-    @NotNull
-    public String getVersion() {
-      if (versions.size() != 1) {
-        throw new AssertionError("Should be called only when 'versions' have one element.");
-      }
-      return versions.get(0).id;
-    }
-
-    @NotNull
-    public String getService() {
-      if (versions.size() != 1) {
-        throw new AssertionError("Should be called only when 'versions' have one element.");
-      }
-      return versions.get(0).service;
-    }
-  }
-
-  @VisibleForTesting
-  DeployOutput parseDeployOutputToService(String jsonOutput) throws JsonParseException {
-    /* An example JSON output of gcloud app deloy:
-        {
-          "configs": [],
-          "versions": [
-            {
-              "id": "20160429t112518",
-              "last_deployed_time": null,
-              "project": "springboot-maven-project",
-              "service": "default",
-              "traffic_split": null,
-              "version": null
-            }
-          ]
-        }
-    */
-    Type deployOutputType = new TypeToken<DeployOutput>() {}.getType();
-    DeployOutput deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
-    if (deployOutput == null || deployOutput.versions.size() != 1) {
-      throw new JsonParseException("Cannot get app version: unexpected gcloud JSON output format");
-    }
-    return deployOutput;
   }
 }

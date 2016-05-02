@@ -17,17 +17,14 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployAction.DeployOutput;
 import com.google.common.collect.ImmutableMap;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginService;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -90,60 +87,5 @@ public class AppEngineDeployActionTest extends BasePluginTestCase {
     assertEquals(refreshToken, jsonMap.get("refresh_token"));
     assertEquals("authorized_user", jsonMap.get("type"));
     credentialFile.delete();
-  }
-
-  @Test
-  public void testJsonDeployOutputJsonParsingOneVersion() {
-    String jsonOutput =
-        "{\n" +
-        "  \"configs\": [],\n" +
-        "  \"versions\": [\n" +
-        "    {\n" +
-        "      \"id\": \"20160429t112518\",\n" +
-        "      \"last_deployed_time\": null,\n" +
-        "      \"project\": \"some-project\",\n" +
-        "      \"service\": \"default\",\n" +
-        "      \"traffic_split\": null,\n" +
-        "      \"version\": null\n" +
-        "    }\n" +
-        "  ]\n" +
-        "}\n";
-
-    DeployOutput deployOutput = appEngineDeployAction.parseDeployOutputToService(jsonOutput);
-    assertEquals(deployOutput.getVersion(), "20160429t112518");
-    assertEquals(deployOutput.getService(), "default");
-  }
-
-  @Test
-  public void testJsonDeployOutputJsonParsingTwoVersions() {
-    String jsonOutput =
-        "{\n" +
-        "  \"configs\": [],\n" +
-        "  \"versions\": [\n" +
-        "    {\n" +
-        "      \"id\": \"20160429t112518\",\n" +
-        "      \"last_deployed_time\": null,\n" +
-        "      \"project\": \"some-project\",\n" +
-        "      \"service\": \"default\",\n" +
-        "      \"traffic_split\": null,\n" +
-        "      \"version\": null\n" +
-        "    },\n" +
-        "    {\n" +
-        "      \"id\": \"20160429t112518\",\n" +
-        "      \"last_deployed_time\": null,\n" +
-        "      \"project\": \"some-project\",\n" +
-        "      \"service\": \"default\",\n" +
-        "      \"traffic_split\": null,\n" +
-        "      \"version\": null\n" +
-        "    }\n" +
-        "  ]\n" +
-        "}\n";
-
-    try {
-      appEngineDeployAction.parseDeployOutputToService(jsonOutput);
-      fail();
-    } catch (JsonParseException e) {
-      // Should throw an AssertionError.
-    }
   }
 }
