@@ -16,7 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -28,6 +32,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -36,6 +41,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Performs the deployment of App Engine based applications to GCP.
@@ -146,8 +155,20 @@ class AppEngineDeployAction extends AppEngineAction {
     public void processTerminated(final ProcessEvent event) {
       try {
         if (event.getExitCode() == 0) {
-          callback.succeeded(new AppEngineDeploymentRuntimeImpl(
-              project, appEngineHelper, getLoggingHandler(), deploymentOutput.toString()));
+
+          // Parse JSON output to retrieve service/version info.
+          DeployOutput deployOutput = null;
+          try {
+            deployOutput = parseDeployOutput(deploymentOutput.toString());
+          } catch (JsonParseException e) {
+            getLoggingHandler().print(
+                GctBundle.message("appengine.deployment.version.extraction.failure") + "\n");
+            logger.warn("Could not retrieve service/version info of deployed application", e);
+          }
+
+          callback.succeeded(
+              new AppEngineDeploymentRuntime(project, appEngineHelper, getLoggingHandler(),
+                                             deployOutput.getService(), deployOutput.getVersion()));
         } else if (cancelled) {
           callback.errorOccurred(GctBundle.message("appengine.deployment.error.cancelled"));
         } else {
@@ -159,6 +180,59 @@ class AppEngineDeployAction extends AppEngineAction {
         deleteCredentials();
       }
 
+    }
+  }
+
+  @VisibleForTesting
+  static DeployOutput parseDeployOutput(String jsonOutput) throws JsonParseException {
+    /* An example JSON output of gcloud app deloy:
+        {
+          "configs": [],
+          "versions": [
+            {
+              "id": "20160429t112518",
+              "last_deployed_time": null,
+              "project": "springboot-maven-project",
+              "service": "default",
+              "traffic_split": null,
+              "version": null
+            }
+          ]
+        }
+    */
+    Type deployOutputType = new TypeToken<DeployOutput>() {}.getType();
+    DeployOutput deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
+    if (deployOutput == null || deployOutput.versions == null ||
+        deployOutput.versions.size() != 1) {
+      throw new JsonParseException("Cannot get app version: unexpected gcloud JSON output format");
+    }
+    return deployOutput;
+  }
+
+  // Holds de-serialized JSON output of gcloud app deploy. Don't change the field names
+  // because Gson uses it for automatic de-serialization.
+  @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Initialized by Gson")
+  static class DeployOutput {
+    private static class Version {
+      String id;
+      String service;
+    }
+    List<Version> versions;
+
+    @Nullable
+    public String getVersion() {
+      if (versions == null || versions.size() != 1) {
+        return null;
+      }
+      return versions.get(0).id;
+    }
+
+    @Nullable
+    public String getService() {
+      if (versions == null || versions.size() != 1) {
+        return null;
+      }
+      return versions.get(0).service;
     }
   }
 }
