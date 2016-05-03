@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Helper class to return clients on a per user email basis.
  */
@@ -90,7 +92,7 @@ public class CloudDebuggerClient {
    * The function may return null if the user is not logged in.
    */
   @Nullable
-  @edu.umd.cs.findbugs.annotations.SuppressWarnings(
+  @SuppressFBWarnings(
       value = "AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION",
       justification = "Tolerable; ok to create and use duplicate or dangling Debugger clients"
   )
