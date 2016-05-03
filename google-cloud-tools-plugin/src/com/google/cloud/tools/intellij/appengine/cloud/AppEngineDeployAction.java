@@ -160,7 +160,7 @@ class AppEngineDeployAction extends AppEngineAction {
           try {
             deployOutput = parseDeployOutput(deploymentOutput.toString());
           } catch (JsonParseException e) {
-            logger.error("Could not retrieve service/version info of deployed application\n", e);
+            logger.error("Could not retrieve service/version info of deployed application", e);
           }
           // Recommend to update gcloud if we can't get service/version for whatever reasons.
           if (deployOutput == null
