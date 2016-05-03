@@ -164,7 +164,7 @@ class AppEngineDeploymentRuntimeImpl extends DeploymentRuntime {
 
     @NotNull
     public String getVersion() {
-      if (versions.size() != 1) {
+      if (versions == null || versions.size() != 1 || versions.get(0).id == null) {
         throw new AssertionError("Should be called only when 'versions' have one element.");
       }
       return versions.get(0).id;
@@ -172,7 +172,7 @@ class AppEngineDeploymentRuntimeImpl extends DeploymentRuntime {
 
     @NotNull
     public String getService() {
-      if (versions.size() != 1) {
+      if (versions == null || versions.size() != 1 || versions.get(0).service == null) {
         throw new AssertionError("Should be called only when 'versions' have one element.");
       }
       return versions.get(0).service;
