@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login.ui;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -37,11 +38,16 @@ import javax.swing.SwingConstants;
  * An empty Google Login Panel that displays an option to log in at the bottom.
  */
 public class GoogleLoginEmptyPanel extends JPanel {
-  private static final String ADD_ACCOUNT = AccountMessageBundle.message("login.panel.add.account.button.text");
-  private static final String SIGN_IN = AccountMessageBundle.message("login.panel.sign.in.button.text");
+  private static final String ADD_ACCOUNT =
+      AccountMessageBundle.message("login.panel.add.account.button.text");
+  private static final String SIGN_IN =
+      AccountMessageBundle.message("login.panel.sign.in.button.text");
   private JBScrollPane contentScrollPane;
   private JPanel bottomPane;
 
+  /**
+   * Initializes an empty Google Login Panel.
+   */
   public GoogleLoginEmptyPanel() {
     super(new BorderLayout());
 
@@ -49,7 +55,7 @@ public class GoogleLoginEmptyPanel extends JPanel {
     JButton addAccountButton = new JButton(needsToSignIn() ? SIGN_IN : ADD_ACCOUNT);
     addAccountButton.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent event) {
         doLogin();
       }
     });
@@ -82,5 +88,7 @@ public class GoogleLoginEmptyPanel extends JPanel {
     return contentScrollPane;
   }
 
-  protected JPanel getBottomPane() { return bottomPane; }
+  protected JPanel getBottomPane() {
+    return bottomPane;
+  }
 }

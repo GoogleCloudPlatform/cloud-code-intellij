@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login;
 
 import com.intellij.openapi.extensions.ExtensionPointName;
@@ -21,7 +22,8 @@ import com.intellij.openapi.extensions.ExtensionPointName;
  * Listener for changes in the login status.
  */
 public interface GoogleLoginListener {
-  ExtensionPointName<GoogleLoginListener> EP_NAME = new ExtensionPointName<GoogleLoginListener>("com.google.gct.login.googleLoginListener");
+  ExtensionPointName<GoogleLoginListener> EP_NAME =
+      new ExtensionPointName<GoogleLoginListener>("com.google.gct.login.googleLoginListener");
 
   /**
    * Called when the login or active status of the user changes.

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login.ui;
 
 import com.google.api.client.util.Maps;
@@ -50,15 +51,20 @@ import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
 /**
- * A custom cell render for {@link GoogleLoginUsersPanel#list} that manages
- * how each user item in the Google Login panel would be displayed.
+ * A custom cell render for {@link GoogleLoginUsersPanel#list} that manages how each user item in
+ * the Google Login panel would be displayed.
  */
 public class UsersListCellRenderer extends JComponent implements ListCellRenderer {
-  private final static String CLOUD_LABEL_TEXT = AccountMessageBundle.message("login.panel.play.console.link.text");
-  private final static String PLAY_LABEL_TEXT = AccountMessageBundle.message("login.panel.cloud.console.link.text");
-  private final static String DEFAULT_AVATAR = "/icons/loginAvatar@2x.png";
-  private final static String SIGN_IN_TEXT = AccountMessageBundle.message("login.panel.sing.in.body.html");
-  private static final String LEARN_MORE_TEXT = AccountMessageBundle.message("login.panel.learn.more.link.text");
+
+  private static final String CLOUD_LABEL_TEXT = AccountMessageBundle
+      .message("login.panel.play.console.link.text");
+  private static final String PLAY_LABEL_TEXT = AccountMessageBundle
+      .message("login.panel.cloud.console.link.text");
+  private static final String DEFAULT_AVATAR = "/icons/loginAvatar@2x.png";
+  private static final String SIGN_IN_TEXT = AccountMessageBundle
+      .message("login.panel.sing.in.body.html");
+  private static final String LEARN_MORE_TEXT = AccountMessageBundle
+      .message("login.panel.learn.more.link.text");
   private static final int PLAIN_USER_IMAGE_WIDTH = 48;
   private static final int PLAIN_USER_IMAGE_HEIGHT = 48;
   private static final int ACTIVE_USER_IMAGE_WIDTH = 96;
@@ -83,29 +89,41 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
   private final Dimension learnMoreLabelDimension;
   private JLabel googleImageLabel;
 
-  /** Maps user emails to large user image icons. */
+  /**
+   * Maps user emails to large user image icons.
+   */
   private final Map<String, Image> userLargeImageCache = Maps.newHashMap();
-  /** Maps user emails to small user image icons. */
+  /**
+   * Maps user emails to small user image icons.
+   */
   private final Map<String, Image> userSmallImageCache = Maps.newHashMap();
 
+  /**
+   * Initializes the custom cell renderer.
+   */
   public UsersListCellRenderer() {
     nameFont = new Font("Helvetica", Font.BOLD, 13);
     generalFont = new Font("Helvetica", Font.PLAIN, 13);
     mainPanelDimension = new Dimension(250, 68);
     activeMainPanelDimension = new Dimension(250, 116);
-    activeColor = UIUtil.isUnderDarcula() ? UIManager.getColor("TextField.background") : Color.WHITE;
-    inactiveColor = UIUtil.isUnderDarcula() ? UIManager.getColor("darcula.inactiveBackground") : new Color(0xf5f5f5);
+    activeColor =
+        UIUtil.isUnderDarcula() ? UIManager.getColor("TextField.background") : Color.WHITE;
+    inactiveColor = UIUtil.isUnderDarcula() ? UIManager.getColor("darcula.inactiveBackground")
+        : new Color(0xf5f5f5);
 
     FontMetrics fontMetrics = getFontMetrics(generalFont);
     generalFontHeight = fontMetrics.getHeight();
-    cloudLabelDimension = new Dimension(fontMetrics.stringWidth(CLOUD_LABEL_TEXT), generalFontHeight);
+    cloudLabelDimension = new Dimension(fontMetrics.stringWidth(CLOUD_LABEL_TEXT),
+        generalFontHeight);
     playLabelDimension = new Dimension(fontMetrics.stringWidth(PLAY_LABEL_TEXT), generalFontHeight);
-    learnMoreLabelDimension = new Dimension(fontMetrics.stringWidth(LEARN_MORE_TEXT), generalFontHeight);
+    learnMoreLabelDimension = new Dimension(fontMetrics.stringWidth(LEARN_MORE_TEXT),
+        generalFontHeight);
   }
 
   @Nullable
   @Override
-  public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+  public Component getListCellRendererComponent(JList list, Object value, int index,
+      boolean isSelected, boolean cellHasFocus) {
     if (value instanceof NoUsersListItem) {
       return createNoUserDisplay();
     }
@@ -113,9 +131,10 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
       return null;
     }
 
-    final UsersListItem usersListItem = (UsersListItem)value;
+    final UsersListItem usersListItem = (UsersListItem) value;
     final CredentialedUser activeUser = Services.getLoginService().getActiveUser();
-    final boolean isActiveUserSelected = activeUser != null && usersListItem.getUserEmail().equals(activeUser.getEmail());
+    final boolean isActiveUserSelected =
+        activeUser != null && usersListItem.getUserEmail().equals(activeUser.getEmail());
 
     JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, HGAP, VGAP));
     mainPanel.setMinimumSize(isActiveUserSelected ? activeMainPanelDimension : mainPanelDimension);
@@ -123,17 +142,20 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
 
     // Update colors
     final Color bg = isActiveUserSelected ? activeColor : inactiveColor;
-    final Color fg = isActiveUserSelected ? UIUtil.getListSelectionForeground() : UIUtil.getListForeground();
+    final Color fg =
+        isActiveUserSelected ? UIUtil.getListSelectionForeground() : UIUtil.getListForeground();
     mainPanel.setBackground(bg);
     mainPanel.setForeground(fg);
 
     Image image = usersListItem.getUserPicture();
-    if (image == null){
+    if (image == null) {
       // Use default profile image.
-      image = Toolkit.getDefaultToolkit().getImage(UsersListCellRenderer.class.getResource(DEFAULT_AVATAR));
+      image = Toolkit.getDefaultToolkit()
+          .getImage(UsersListCellRenderer.class.getResource(DEFAULT_AVATAR));
     }
 
-    final int imageWidth, imageHeight;
+    final int imageWidth;
+    final int imageHeight;
     final Map<String, Image> userImageCache;
     if (isActiveUserSelected) {
       imageWidth = ACTIVE_USER_IMAGE_WIDTH;
@@ -167,43 +189,56 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     return mainPanel;
   }
 
+  /**
+   * Determines if clicked point is on the play console url.
+   */
   public boolean inPlayConsoleUrl(Point point, int activeIndex) {
     // 2 is for the number of labels before this one
     double playYStart = VGAP + ACTIVE_USER_IMAGE_HEIGHT - playLabelDimension.getHeight()
-      - cloudLabelDimension.getHeight() - 2 + (mainPanelDimension.getHeight() * activeIndex)
-      + USER_LABEL_VERTICAL_STRUT;
+        - cloudLabelDimension.getHeight() - 2 + (mainPanelDimension.getHeight() * activeIndex)
+        + USER_LABEL_VERTICAL_STRUT;
     double playYEnd = playYStart + playLabelDimension.getHeight();
     double playXStart = ACTIVE_USER_IMAGE_WIDTH + HGAP + VGAP;
     double playXEnd = playXStart + playLabelDimension.getWidth();
-    return (point.getX() > playXStart) && (point.getX() < playXEnd) && (point.getY() > playYStart) && (point.getY() < playYEnd);
+    return (point.getX() > playXStart) && (point.getX() < playXEnd) && (point.getY() > playYStart)
+        && (point.getY() < playYEnd);
   }
 
+  /**
+   * Determines if clicked point is on the cloud console url.
+   */
   public boolean inCloudConsoleUrl(Point point, int activeIndex) {
     // 3 is for the number of labels before this one
     double playYStart = VGAP + ACTIVE_USER_IMAGE_HEIGHT - cloudLabelDimension.getHeight()
-      - 3 + (mainPanelDimension.getHeight() * activeIndex) + (USER_LABEL_VERTICAL_STRUT * 2);
+        - 3 + (mainPanelDimension.getHeight() * activeIndex) + (USER_LABEL_VERTICAL_STRUT * 2);
     double playYEnd = playYStart + cloudLabelDimension.getHeight();
     double playXStart = ACTIVE_USER_IMAGE_WIDTH + HGAP + VGAP;
     double playXEnd = playXStart + cloudLabelDimension.getWidth();
-    return (point.getX() > playXStart) && (point.getX() < playXEnd) && (point.getY() > playYStart) && (point.getY() < playYEnd);
+    return (point.getX() > playXStart) && (point.getX() < playXEnd) && (point.getY() > playYStart)
+        && (point.getY() < playYEnd);
   }
 
+  /**
+   * Determines if clicked point is on the learn more url.
+   */
   public boolean inLearnMoreUrl(Point point) {
     // 2 is for the number of labels and row of texts
-    double urlYStart = GOOGLE_IMAGE_NORTH + googleImageLabel.getIcon().getIconHeight() + WELCOME_LABEL_NORTH
-      + (generalFontHeight * 2) + 3;
+    double urlYStart =
+        GOOGLE_IMAGE_NORTH + googleImageLabel.getIcon().getIconHeight() + WELCOME_LABEL_NORTH
+            + (generalFontHeight * 2) + 3;
     double urlYEnd = urlYStart + learnMoreLabelDimension.getHeight();
     double urlXStart = GOOGLE_IMAGE_WEST;
     double urlXEnd = urlXStart + learnMoreLabelDimension.getWidth();
-    return (point.getX() > urlXStart) && (point.getX() < urlXEnd) && (point.getY() > urlYStart) && (point.getY() < urlYEnd);
+    return (point.getX() > urlXStart) && (point.getX() < urlXEnd) && (point.getY() > urlYStart) && (
+        point.getY() < urlYEnd);
   }
 
   public int getMainPanelHeight() {
-    return (int)mainPanelDimension.getHeight();
+    return (int) mainPanelDimension.getHeight();
   }
 
   public int getActivePanelHeight() {
-    return (int)activeMainPanelDimension.getHeight();
+    return (int) activeMainPanelDimension.getHeight();
   }
 
   private JComponent createTextDisplay(boolean isSelected, UsersListItem usersListItem) {
@@ -215,7 +250,7 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     panel.setBackground(bg);
     panel.setForeground(fg);
 
-    JLabel nameLabel = new JLabel( usersListItem.getUserName());
+    JLabel nameLabel = new JLabel(usersListItem.getUserName());
     nameLabel.setFont(nameFont);
     panel.add(nameLabel);
     panel.add(Box.createVerticalStrut(USER_LABEL_VERTICAL_STRUT));
@@ -239,7 +274,8 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.PAGE_AXIS));
     bottomPanel.setBackground(activeColor);
     bottomPanel.setForeground(UIUtil.getListSelectionForeground());
-    bottomPanel.setPreferredSize(new Dimension(220, (generalFontHeight * 2) + USER_LABEL_VERTICAL_STRUT));
+    bottomPanel
+        .setPreferredSize(new Dimension(220, (generalFontHeight * 2) + USER_LABEL_VERTICAL_STRUT));
 
     JLabel playLabel = new JLabel(PLAY_LABEL_TEXT);
     playLabel.setFont(generalFont);
@@ -284,7 +320,8 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
     JLabel signInLabel = new JLabel(SIGN_IN_TEXT);
     signInLabel.setFont(generalFont);
     Dimension textSize = signInLabel.getPreferredSize();
-    signInLabel.setPreferredSize(new Dimension((int)textSize.getWidth() + WELCOME_LABEL_EAST, (int)textSize.getHeight()));
+    signInLabel.setPreferredSize(
+        new Dimension((int) textSize.getWidth() + WELCOME_LABEL_EAST, (int) textSize.getHeight()));
 
     JLabel urlLabel = new JLabel(LEARN_MORE_TEXT);
     urlLabel.setFont(generalFont);

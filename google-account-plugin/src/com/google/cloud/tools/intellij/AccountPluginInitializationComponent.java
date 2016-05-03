@@ -16,10 +16,10 @@
 
 package com.google.cloud.tools.intellij;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
 import com.google.cloud.tools.intellij.stats.UsageTrackerManager;
 import com.google.cloud.tools.intellij.stats.UsageTrackerNotification;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationsConfiguration;
@@ -48,7 +48,8 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
     AccountPluginConfigurationService pluginConfigurationService = ServiceManager
         .getService(AccountPluginConfigurationService.class);
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
-      pluginConfigurationService.enabledGoogleFeedbackErrorReporting(pluginInfoService.getPluginId());
+      pluginConfigurationService
+          .enabledGoogleFeedbackErrorReporting(pluginInfoService.getPluginId());
     }
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       configureUsageTracking();

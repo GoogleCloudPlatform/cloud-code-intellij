@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -41,6 +42,7 @@ import java.net.URL;
  * Utility methods of Google Login.
  */
 public class GoogleLoginUtils {
+
   public static final Logger LOG = Logger.getInstance(GoogleLoginUtils.class);
   public static final int DEFAULT_PICTURE_SIZE = 96;
 
@@ -48,18 +50,18 @@ public class GoogleLoginUtils {
    * Gets the profile picture that corresponds to the {@code userInfo} and sets it on the provided
    * {@code pictureCallback}.
    *
-   * @param userInfo  the class to be parsed
+   * @param userInfo the class to be parsed
    * @param pictureCallback the user image will be set on this callback
    */
-  public static void provideUserPicture(Userinfoplus userInfo, final IUserPropertyCallback pictureCallback) {
+  public static void provideUserPicture(Userinfoplus userInfo,
+      final IUserPropertyCallback pictureCallback) {
     // set the size of the image before it is served
     String urlString = userInfo.getPicture() + "?sz=" + DEFAULT_PICTURE_SIZE;
     URL url = null;
     try {
       url = new URL(urlString);
-    }
-    catch (MalformedURLException e) {
-      LOG.warn(String.format("The picture URL: %s,  is not a valid URL string.", urlString), e);
+    } catch (MalformedURLException ex) {
+      LOG.warn(String.format("The picture URL: %s,  is not a valid URL string.", urlString), ex);
       return;
     }
 
@@ -75,13 +77,16 @@ public class GoogleLoginUtils {
     });
   }
 
+  /**
+   * Sets the user info on the callback.
+   */
   public static void getUserInfo(@NotNull final Credential credential,
-    final IUserPropertyCallback callback) {
+      final IUserPropertyCallback callback) {
     final Oauth2 userInfoService =
-      new Oauth2.Builder(new NetHttpTransport(), new JacksonFactory(), credential)
-        .setApplicationName(
-            ServiceManager.getService(AccountPluginInfoService.class).getUserAgent())
-        .build();
+        new Oauth2.Builder(new NetHttpTransport(), new JacksonFactory(), credential)
+            .setApplicationName(
+                ServiceManager.getService(AccountPluginInfoService.class).getUserAgent())
+            .build();
 
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
       @Override
@@ -89,12 +94,12 @@ public class GoogleLoginUtils {
         Userinfoplus userInfo = null;
         try {
           userInfo = userInfoService.userinfo().get().execute();
-        } catch (IOException e) {
+        } catch (IOException ex) {
           //The core IDE functionality still works, so this does
           //not affect anything right now. The user will receive
           //error messages when they attempt to do something that
           //requires a logged in state.
-          LOG.warn("Error retrieving user information.", e);
+          LOG.warn("Error retrieving user information.", ex);
         }
 
         if (userInfo != null && userInfo.getId() != null) {
@@ -107,8 +112,8 @@ public class GoogleLoginUtils {
   }
 
   /**
-   * Opens an error dialog with the specified title.
-   * Ensures that the error dialog is opened on the UI thread.
+   * Opens an error dialog with the specified title. Ensures that the error dialog is opened on the
+   * UI thread.
    *
    * @param message The message to be displayed.
    * @param title The title of the error dialog to be displayed
@@ -127,8 +132,8 @@ public class GoogleLoginUtils {
   }
 
   /**
-   * Returns a {@link Credential} object for a fake user.
-   * Used for testing.
+   * Returns a {@link Credential} object for a fake user. Used for testing.
+   *
    * @return a {@link Credential} object for the fake user.
    */
   @NotNull
@@ -139,11 +144,11 @@ public class GoogleLoginUtils {
     String accessToken = System.getenv().get("FAKE_USER_ACCESS_TOKEN");
 
     Credential cred =
-      new GoogleCredential.Builder()
-        .setJsonFactory(new JacksonFactory())
-        .setTransport(new NetHttpTransport())
-        .setClientSecrets(clientId, clientSecret)
-        .build();
+        new GoogleCredential.Builder()
+            .setJsonFactory(new JacksonFactory())
+            .setTransport(new NetHttpTransport())
+            .setClientSecrets(clientId, clientSecret)
+            .build();
     cred.setAccessToken(accessToken);
     cred.setRefreshToken(refreshToken);
     return cred;

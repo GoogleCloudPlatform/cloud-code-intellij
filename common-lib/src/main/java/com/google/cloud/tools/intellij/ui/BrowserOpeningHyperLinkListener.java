@@ -27,11 +27,11 @@ import javax.swing.event.HyperlinkListener;
 public class BrowserOpeningHyperLinkListener implements HyperlinkListener {
 
   @Override
-  public void hyperlinkUpdate(HyperlinkEvent e) {
-    if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+  public void hyperlinkUpdate(HyperlinkEvent event) {
+    if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
       try {
-        Desktop.getDesktop().browse(e.getURL().toURI());
-      } catch(Exception ex) {
+        Desktop.getDesktop().browse(event.getURL().toURI());
+      } catch (Exception ex) {
         // nothing to do
       }
     }
