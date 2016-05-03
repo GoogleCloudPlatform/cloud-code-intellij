@@ -88,7 +88,7 @@ public class AppEngineDeploymentRuntimeImplTest extends BasePluginTestCase {
       AppEngineDeploymentRuntimeImpl.parseDeployOutputToService(jsonOutput);
       fail();
     } catch (JsonParseException e) {
-      // Success! Should throw an JsonParseException.
+      // Success! Should throw a JsonParseException.
     }
   }
 
@@ -103,7 +103,7 @@ public class AppEngineDeploymentRuntimeImplTest extends BasePluginTestCase {
       AppEngineDeploymentRuntimeImpl.parseDeployOutputToService(jsonOutput);
       fail();
     } catch (JsonParseException e) {
-      // Success! Should throw an JsonParseException.
+      // Success! Should throw a JsonParseException.
     }
   }
 }
