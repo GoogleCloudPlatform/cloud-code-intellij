@@ -40,6 +40,8 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Takes care of undeploy and stop of App Engine applications.
  */
@@ -155,6 +157,7 @@ class AppEngineDeploymentRuntimeImpl extends DeploymentRuntime {
   // Holds de-serialized JSON output of gcloud app deploy. Don't change the field names
   // because Gson uses it for automatic de-serialization.
   @VisibleForTesting
+  @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Initialized by Gson")
   static class DeployOutput {
     private static class Version {
       String id;
