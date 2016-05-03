@@ -133,6 +133,7 @@ subprojects {
     checkstyle {
         config = resources.text.fromArchiveEntry(configurations.checkstyleConfig, 'google_checks.xml')
         showViolations false
+        sourceSets = [project.sourceSets.main]
     }
 
     // The checkstyle plugin does not provide a way to fail the build on warnings, and
