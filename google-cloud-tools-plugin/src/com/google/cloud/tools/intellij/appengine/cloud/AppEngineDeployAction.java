@@ -32,7 +32,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -161,14 +160,19 @@ class AppEngineDeployAction extends AppEngineAction {
           try {
             deployOutput = parseDeployOutput(deploymentOutput.toString());
           } catch (JsonParseException e) {
-            getLoggingHandler().print(
-                GctBundle.message("appengine.deployment.version.extraction.failure") + "\n");
-            logger.warn("Could not retrieve service/version info of deployed application", e);
+            logger.error("Could not retrieve service/version info of deployed application\n", e);
+          }
+          // Recommend to update gcloud if we can't get service/version for whatever reasons.
+          if (deployOutput == null
+              || deployOutput.getService() == null || deployOutput.getVersion() == null) {
+            consoleLogLn(GctBundle.message("appengine.deployment.version.extract.failure") + "\n");
           }
 
           callback.succeeded(
-              new AppEngineDeploymentRuntime(project, appEngineHelper, getLoggingHandler(),
-                                             deployOutput.getService(), deployOutput.getVersion()));
+              new AppEngineDeploymentRuntime(
+                  project, appEngineHelper, getLoggingHandler(),
+                  deployOutput != null ? deployOutput.getService() : null,
+                  deployOutput != null ? deployOutput.getVersion() : null));
         } else if (cancelled) {
           callback.errorOccurred(GctBundle.message("appengine.deployment.error.cancelled"));
         } else {
@@ -202,8 +206,8 @@ class AppEngineDeployAction extends AppEngineAction {
     */
     Type deployOutputType = new TypeToken<DeployOutput>() {}.getType();
     DeployOutput deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
-    if (deployOutput == null || deployOutput.versions == null ||
-        deployOutput.versions.size() != 1) {
+    if (deployOutput == null
+        || deployOutput.versions == null || deployOutput.versions.size() != 1) {
       throw new JsonParseException("Cannot get app version: unexpected gcloud JSON output format");
     }
     return deployOutput;

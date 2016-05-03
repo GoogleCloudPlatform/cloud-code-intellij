@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.api.client.repackaged.javax.annotation.OverridingMethodsMustInvokeSuper;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.icons.AllIcons.General;
@@ -69,11 +68,6 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
 
   @Override
   public void undeploy(@NotNull final UndeploymentTaskCallback callback) {
-    if (!isUndeploySupported()) {
-      callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.execution.error"));
-      return;
-    }
-
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
