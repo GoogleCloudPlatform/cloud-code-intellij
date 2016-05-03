@@ -22,19 +22,13 @@ import static org.junit.Assert.fail;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.gson.JsonParseException;
 
-import com.intellij.remoteServer.runtime.log.LoggingHandler;
-
 import org.junit.Test;
-import org.mockito.Mock;
 
 /**
  * Test case for {@link AppEngineDeploymentRuntimeImpl}.
  */
 
 public class AppEngineDeploymentRuntimeImplTest extends BasePluginTestCase {
-
-  @Mock private AppEngineHelper appEngineHelper;
-  @Mock private LoggingHandler loggingHandler;
 
   @Test
   public void testDeployOutputJsonParsingOneVersion() {
