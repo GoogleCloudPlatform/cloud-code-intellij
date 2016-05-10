@@ -30,6 +30,9 @@ plugins {
 subprojects {
     repositories {
         mavenCentral()
+        // This is temporary so we can install the latest common-lib jar in the local
+        // repo and test with it.
+        mavenLocal()
     }
 
     apply plugin: 'java'

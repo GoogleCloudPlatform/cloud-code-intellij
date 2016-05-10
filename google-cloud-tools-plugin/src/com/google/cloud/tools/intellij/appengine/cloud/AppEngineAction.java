@@ -16,20 +16,17 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessRunner;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
-import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.Services;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmentType;
-import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessListener;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.remoteServer.runtime.RemoteOperationCallback;
@@ -54,8 +51,8 @@ public abstract class AppEngineAction implements Runnable {
   private AppEngineHelper appEngineHelper;
   private File credentialsPath;
   private RemoteOperationCallback callback;
-  private OSProcessHandler processHandler;
-  protected boolean cancelled = false;
+  private DefaultProcessRunner processRunner;
+  boolean cancelled = false;
 
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
@@ -66,47 +63,38 @@ public abstract class AppEngineAction implements Runnable {
     this.callback = callback;
   }
 
-  protected LoggingHandler getLoggingHandler() {
+  LoggingHandler getLoggingHandler() {
     return loggingHandler;
   }
 
-  protected void executeProcess(
-      @NotNull GeneralCommandLine commandLine,
-      @NotNull ProcessListener listener) throws ExecutionException {
+  @Nullable
+  CloudSdk prepareExecution(DefaultProcessRunner processRunner) {
+    this.processRunner = processRunner;
 
     credentialsPath = createApplicationDefaultCredentials();
     if (credentialsPath == null) {
       callback.errorOccurred(
-          GctBundle.message("appengine.deployment.credential.not.found",
+          GctBundle.message("appengine.action.credential.not.found",
               appEngineHelper.getGoogleUsername()));
-      return;
+      return null;
     }
 
-    // Common command line settings
-    commandLine.addParameter("--project=" + appEngineHelper.getProjectId());
-    commandLine.addParameter("--credential-file-override=" + credentialsPath.getAbsolutePath());
-    commandLine.addParameter("--quiet");
-    commandLine.withParentEnvironmentType(ParentEnvironmentType.CONSOLE);
-    commandLine.getEnvironment().put("CLOUDSDK_METRICS_ENVIRONMENT", "gcloud-intellij");
-    commandLine.getEnvironment().put("CLOUDSDK_APP_USE_GSUTIL", "0");
-
-    consoleLogLn("Executing: " + commandLine.getCommandLineString());
-
-    Process process = commandLine.createProcess();
-    processHandler = new OSProcessHandler(process, commandLine.getCommandLineString());
-    loggingHandler.attachToProcess(processHandler);
-    processHandler.addProcessListener(listener);
-    processHandler.startNotify();
+    // TODO set CLOUDSDK_METRICS_ENVIRONMENT and CLOUDSDK_APP_USE_GSUTIL env vars
+    //     once functionality is available in common-lib
+    return new CloudSdk.Builder()
+        .sdkPath(appEngineHelper.getGcloudCommandPath())
+        .processRunner(processRunner)
+        .appCommandCredentialFile(credentialsPath)
+        .appCommandOutputFormat("json")
+        .build();
   }
 
-  protected void cancel() {
+  void cancel() {
     // kill any executing process for the action
-    if (processHandler != null
-        && !processHandler.isProcessTerminating()
-        && !processHandler.isProcessTerminated()
-        && processHandler.getProcess() != null) {
+    if (processRunner != null
+        && processRunner.getProcess() != null) {
       cancelled = true;
-      processHandler.getProcess().destroy();
+      processRunner.getProcess().destroy();
     }
   }
 
@@ -118,7 +106,7 @@ public abstract class AppEngineAction implements Runnable {
 
   @VisibleForTesting
   @Nullable
-  protected File createApplicationDefaultCredentials() {
+  File createApplicationDefaultCredentials() {
     CredentialedUser projectUser = Services.getLoginService().getAllUsers()
         .get(appEngineHelper.getGoogleUsername());
 
@@ -138,7 +126,7 @@ public abstract class AppEngineAction implements Runnable {
         GCLOUD_USER_TYPE_LABEL, GCLOUD_USER_TYPE
     );
     String jsonCredential = new Gson().toJson(credentialMap);
-    File tempCredentialFilePath = null;
+    File tempCredentialFilePath;
     try {
       tempCredentialFilePath = FileUtil
           .createTempFile(
@@ -146,14 +134,15 @@ public abstract class AppEngineAction implements Runnable {
               "json",
               true /* deleteOnExit */);
       Files.write(jsonCredential, tempCredentialFilePath, Charset.forName("UTF-8"));
+      credentialsPath = tempCredentialFilePath;
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
 
-    return tempCredentialFilePath;
+    return credentialsPath;
   }
 
-  protected void deleteCredentials() {
+  void deleteCredentials() {
     if (credentialsPath != null && credentialsPath.exists()) {
       if (!credentialsPath.delete()) {
         logger.warn("failed to delete credential file expected at "
@@ -162,7 +151,7 @@ public abstract class AppEngineAction implements Runnable {
     }
   }
 
-  protected void consoleLogLn(String message,
+  void consoleLogLn(String message,
       String... arguments) {
     loggingHandler.print(String.format(message + "\n", (Object[]) arguments));
   }
