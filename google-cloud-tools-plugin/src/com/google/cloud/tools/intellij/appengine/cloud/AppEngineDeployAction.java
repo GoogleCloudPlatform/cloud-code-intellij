@@ -140,7 +140,7 @@ public class AppEngineDeployAction extends AppEngineAction {
     configuration.setDeployables(Collections.singletonList(new File(stagingDirectory, "app.yaml")));
     configuration.setProject(appEngineHelper.getProjectId());
     configuration.setPromote(true);
-    if(!StringUtil.isEmpty(version)) {
+    if (!StringUtil.isEmpty(version)) {
       configuration.setVersion(version);
     }
 
@@ -217,6 +217,12 @@ public class AppEngineDeployAction extends AppEngineAction {
     return destinationFilePath;
   }
 
+  /**
+   * Parse the raw json output of the deployment.
+   *
+   * @return an object modeling the output of a deploy command.
+   * @throws JsonParseException
+   */
   @VisibleForTesting
   static DeployOutput parseDeployOutput(String jsonOutput) throws JsonParseException {
     Type deployOutputType = new TypeToken<DeployOutput>() {}.getType();

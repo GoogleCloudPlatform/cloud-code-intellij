@@ -67,6 +67,13 @@ public abstract class AppEngineAction implements Runnable {
     return loggingHandler;
   }
 
+  /**
+   * Creates and stages credential file used for executing cloud sdk actions and returns
+   * {@link CloudSdk} instance.
+   *
+   * @param processRunner a {@link DefaultProcessRunner} for managing the process that runs the
+   *   action.
+   */
   @Nullable
   CloudSdk prepareExecution(DefaultProcessRunner processRunner) {
     this.processRunner = processRunner;
@@ -89,8 +96,10 @@ public abstract class AppEngineAction implements Runnable {
         .build();
   }
 
+  /**
+   * Kill any executing process for the action.
+   */
   void cancel() {
-    // kill any executing process for the action
     if (processRunner != null
         && processRunner.getProcess() != null) {
       cancelled = true;
@@ -104,6 +113,9 @@ public abstract class AppEngineAction implements Runnable {
   private static final String GCLOUD_USER_TYPE_LABEL = "type";
   private static final String GCLOUD_USER_TYPE = "authorized_user";
 
+  /**
+   * Create and stage a temporary credentials file used by various cloud sdk actions.
+   */
   @VisibleForTesting
   @Nullable
   File createApplicationDefaultCredentials() {
@@ -142,6 +154,9 @@ public abstract class AppEngineAction implements Runnable {
     return credentialsPath;
   }
 
+  /**
+   * Delete the credential file if it exists.
+   */
   void deleteCredentials() {
     if (credentialsPath != null && credentialsPath.exists()) {
       if (!credentialsPath.delete()) {
