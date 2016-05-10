@@ -75,7 +75,7 @@ public abstract class AppEngineAction implements Runnable {
    *   action.
    */
   @Nullable
-  CloudSdk prepareExecution(DefaultProcessRunner processRunner) {
+  CloudSdk prepareExecution(@NotNull DefaultProcessRunner processRunner) {
     this.processRunner = processRunner;
 
     credentialsPath = createApplicationDefaultCredentials();

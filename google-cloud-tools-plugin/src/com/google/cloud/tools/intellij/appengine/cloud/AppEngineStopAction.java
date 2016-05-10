@@ -79,20 +79,15 @@ public class AppEngineStopAction extends AppEngineAction {
         new DefaultProcessRunner(new ProcessBuilder());
     processRunner.setAsync(true);
 
-    processRunner.setStdErrLineListener(new ProcessOutputLineListener() {
+    ProcessOutputLineListener lineListener = new ProcessOutputLineListener() {
       @Override
       public void outputLine(String output) {
         consoleLogLn(output);
       }
-    });
+    };
 
-    processRunner.setStdOutLineListener(new ProcessOutputLineListener() {
-      @Override
-      public void outputLine(String output) {
-        consoleLogLn(output);
-      }
-    });
-
+    processRunner.setStdErrLineListener(lineListener);
+    processRunner.setStdOutLineListener(lineListener);
     processRunner.setExitListener(new StopExitListener());
 
     return processRunner;
