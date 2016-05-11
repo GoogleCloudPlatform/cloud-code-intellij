@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineVersions;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessRunner;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
@@ -62,7 +63,14 @@ public class AppEngineStopAction extends AppEngineAction {
 
   @Override
   public void run() {
-    CloudSdk sdk = prepareExecution(createStopProcessRunner());
+    CloudSdk sdk;
+
+    try {
+      sdk = prepareExecution(createStopProcessRunner());
+    } catch(AppEngineException ex) {
+      callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.error"));
+      return;
+    }
 
     CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
 

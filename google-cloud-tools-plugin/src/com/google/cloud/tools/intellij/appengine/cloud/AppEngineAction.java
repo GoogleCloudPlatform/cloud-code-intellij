@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessRunner;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -74,16 +75,15 @@ public abstract class AppEngineAction implements Runnable {
    * @param processRunner a {@link DefaultProcessRunner} for managing the process that runs the
    *   action.
    */
-  @Nullable
-  CloudSdk prepareExecution(@NotNull DefaultProcessRunner processRunner) {
+  @NotNull
+  CloudSdk prepareExecution(@NotNull DefaultProcessRunner processRunner) throws AppEngineException {
     this.processRunner = processRunner;
 
     credentialsPath = createApplicationDefaultCredentials();
     if (credentialsPath == null) {
-      callback.errorOccurred(
-          GctBundle.message("appengine.action.credential.not.found",
-              appEngineHelper.getGoogleUsername()));
-      return null;
+      consoleLogLn(GctBundle.message("appengine.action.credential.not.found",
+          appEngineHelper.getGoogleUsername()));
+      throw new AppEngineException("Failed to create application default credentials.");
     }
 
     // TODO set CLOUDSDK_METRICS_ENVIRONMENT and CLOUDSDK_APP_USE_GSUTIL env vars

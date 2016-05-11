@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
+import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineDeployment;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessRunner;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
@@ -132,7 +133,13 @@ public class AppEngineDeployAction extends AppEngineAction {
    * Perform a deployment from the given staging directory.
    */
   private void deploy(@NotNull File stagingDirectory) {
-    CloudSdk sdk = prepareExecution(createDeployProcessRunner());
+    CloudSdk sdk;
+    try {
+      sdk = prepareExecution(createDeployProcessRunner());
+    } catch(AppEngineException ex) {
+      callback.errorOccurred(GctBundle.message("appengine.deployment.error"));
+      return;
+    }
 
     CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
 
