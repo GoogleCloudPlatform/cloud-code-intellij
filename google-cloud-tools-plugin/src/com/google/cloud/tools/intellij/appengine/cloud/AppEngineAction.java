@@ -146,12 +146,11 @@ public abstract class AppEngineAction implements Runnable {
               "json",
               true /* deleteOnExit */);
       Files.write(jsonCredential, tempCredentialFilePath, Charset.forName("UTF-8"));
-      credentialsPath = tempCredentialFilePath;
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
 
-    return credentialsPath;
+    return tempCredentialFilePath;
   }
 
   /**
