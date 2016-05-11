@@ -72,7 +72,7 @@ public class AppEngineDeployAction extends AppEngineAction {
       @NotNull File dockerFilePath,
       @Nullable String version,
       @NotNull DeploymentOperationCallback callback) {
-    super(loggingHandler, appEngineHelper, callback);
+    super(loggingHandler, appEngineHelper);
 
     this.appEngineHelper = appEngineHelper;
     this.project = project;
@@ -175,44 +175,52 @@ public class AppEngineDeployAction extends AppEngineAction {
       }
     });
 
-    processRunner.setExitListener(new ProcessExitListener() {
-      @Override
-      public void exit(int exitCode) {
-        try {
-          if (exitCode == 0) {
-            DeployOutput deployOutput = null;
-
-            try {
-              deployOutput = parseDeployOutput(rawDeployOutput.toString());
-            } catch (JsonParseException e) {
-              logger.error("Could not retrieve service/version info of deployed application", e);
-            }
-
-            if (deployOutput == null
-                || deployOutput.getService() == null || deployOutput.getVersion() == null) {
-              consoleLogLn(
-                  GctBundle.message("appengine.deployment.version.extract.failure") + "\n");
-            }
-
-            callback.succeeded(
-                new AppEngineDeploymentRuntime(
-                    project, appEngineHelper, getLoggingHandler(),
-                    deployOutput != null ? deployOutput.getService() : null,
-                    deployOutput != null ? deployOutput.getVersion() : null));
-          } else if (cancelled) {
-            callback.errorOccurred(GctBundle.message("appengine.deployment.error.cancelled"));
-          } else {
-            logger.warn("Deployment process exited with an error. Exit Code:" + exitCode);
-            callback.errorOccurred(
-                GctBundle.message("appengine.deployment.error.with.code", exitCode));
-          }
-        } finally {
-          deleteCredentials();
-        }
-      }
-    });
+    processRunner.setExitListener(new DeployExitListener(rawDeployOutput));
 
     return processRunner;
+  }
+
+  private class DeployExitListener implements ProcessExitListener {
+    final StringBuilder rawDeployOutput;
+
+    DeployExitListener(StringBuilder rawDeployOutput) {
+      this.rawDeployOutput = rawDeployOutput;
+    }
+
+    @Override
+    public void exit(int exitCode) {
+      try {
+        if (exitCode == 0) {
+          DeployOutput deployOutput = null;
+
+          try {
+            deployOutput = parseDeployOutput(rawDeployOutput.toString());
+          } catch (JsonParseException e) {
+            logger.error("Could not retrieve service/version info of deployed application", e);
+          }
+
+          if (deployOutput == null
+              || deployOutput.getService() == null || deployOutput.getVersion() == null) {
+            consoleLogLn(
+                GctBundle.message("appengine.deployment.version.extract.failure") + "\n");
+          }
+
+          callback.succeeded(
+              new AppEngineDeploymentRuntime(
+                  project, appEngineHelper, getLoggingHandler(),
+                  deployOutput != null ? deployOutput.getService() : null,
+                  deployOutput != null ? deployOutput.getVersion() : null));
+        } else if (cancelled) {
+          callback.errorOccurred(GctBundle.message("appengine.deployment.error.cancelled"));
+        } else {
+          logger.warn("Deployment process exited with an error. Exit Code:" + exitCode);
+          callback.errorOccurred(
+              GctBundle.message("appengine.deployment.error.with.code", exitCode));
+        }
+      } finally {
+        deleteCredentials();
+      }
+    }
   }
 
   private File copyFile(File stagingDirectory, String targetFileName, File sourceFilePath)

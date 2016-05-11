@@ -30,7 +30,6 @@ import com.google.gson.Gson;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.remoteServer.runtime.RemoteOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
@@ -51,17 +50,14 @@ public abstract class AppEngineAction implements Runnable {
   private LoggingHandler loggingHandler;
   private AppEngineHelper appEngineHelper;
   private File credentialsPath;
-  private RemoteOperationCallback callback;
   private DefaultProcessRunner processRunner;
   boolean cancelled = false;
 
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
-      @NotNull AppEngineHelper appEngineHelper,
-      @NotNull RemoteOperationCallback callback) {
+      @NotNull AppEngineHelper appEngineHelper) {
     this.loggingHandler = loggingHandler;
     this.appEngineHelper = appEngineHelper;
-    this.callback = callback;
   }
 
   LoggingHandler getLoggingHandler() {
