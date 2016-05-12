@@ -132,7 +132,7 @@ subprojects {
     }
     checkstyle {
         configFile = rootProject.file('google_checks.xml')
-        showViolations false
+        showViolations true
         sourceSets = [project.sourceSets.main]
     }
 
