@@ -82,12 +82,12 @@ public abstract class AppEngineAction implements Runnable {
       throw new AppEngineException("Failed to create application default credentials.");
     }
 
-    // TODO set CLOUDSDK_METRICS_ENVIRONMENT and CLOUDSDK_APP_USE_GSUTIL env vars
-    //     once functionality is available in common-lib
     return new CloudSdk.Builder()
         .sdkPath(appEngineHelper.getGcloudCommandPath())
         .processRunner(processRunner)
         .appCommandCredentialFile(credentialsPath)
+        .appCommandMetricsEnvironment("gcloud-intellij")
+        .appCommandGsUtil(1)
         .appCommandOutputFormat("json")
         .build();
   }
