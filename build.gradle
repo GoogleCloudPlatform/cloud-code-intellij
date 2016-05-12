@@ -131,7 +131,7 @@ subprojects {
         checkstyle "com.puppycrawl.tools:checkstyle:${versions.checkstyle}"
     }
     checkstyle {
-        config = resources.text.fromArchiveEntry(configurations.checkstyleConfig, 'google_checks.xml')
+        configFile = rootProject.file('google_checks.xml')
         showViolations false
         sourceSets = [project.sourceSets.main]
     }
