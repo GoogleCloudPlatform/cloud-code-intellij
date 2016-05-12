@@ -253,8 +253,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   private void validateConfiguration() throws ConfigurationException {
-    if (isUserSpecifiedPathDeploymentSource() && (
-        StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())
+    if (isUserSpecifiedPathDeploymentSource()
+        && (StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())
             || !isJarOrWar(userSpecifiedArtifactFileSelector.getText()))) {
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.user.specified.artifact.error"));
@@ -264,8 +264,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     } else if (StringUtils.isBlank(projectSelector.getText())) {
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.project.missing.message"));
-    } else if (versionOverrideCheckBox.isSelected() && StringUtils
-        .isBlank(versionIdField.getText())) {
+    } else if (versionOverrideCheckBox.isSelected()
+        && StringUtils.isBlank(versionIdField.getText())) {
       throw new ConfigurationException(GctBundle.message("appengine.config.version.error"));
     } else if (getConfigType() == ConfigType.CUSTOM) {
       if (StringUtils.isBlank(appYamlPathField.getText())) {

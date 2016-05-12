@@ -28,7 +28,6 @@ public class AppEngineServerConfiguration extends
     ServerConfigurationBase<AppEngineServerConfiguration> {
 
   private String cloudSdkHomePath;
-  private String googleUserName;
 
   @Attribute("cloudSdkHomePath")
   public String getCloudSdkHomePath() {
@@ -37,14 +36,5 @@ public class AppEngineServerConfiguration extends
 
   public void setCloudSdkHomePath(String cloudSdkHomePath) {
     this.cloudSdkHomePath = cloudSdkHomePath;
-  }
-
-  @Attribute("googleUserName")
-  public String getGoogleUserName() {
-    return googleUserName;
-  }
-
-  public void setGoogleUserName(String googleUserName) {
-    this.googleUserName = googleUserName;
   }
 }
