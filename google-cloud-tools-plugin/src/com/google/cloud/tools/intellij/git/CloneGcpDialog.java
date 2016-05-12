@@ -183,6 +183,7 @@ public class CloneGcpDialog extends DialogWrapper {
     return GcpHttpAuthDataProvider.getGcpUrl(repositoryUrl.getText());
   }
 
+  @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
     repositoryUrl = new ProjectSelector();
     repositoryUrl.setMinimumSize(new Dimension(300, 0));

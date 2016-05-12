@@ -82,6 +82,7 @@ public class BreakpointErrorStatusPanel
   public void saveTo(@NotNull final XLineBreakpoint<CloudLineBreakpointProperties> ideBreakpoint) {
   }
 
+  @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
   }
 }
