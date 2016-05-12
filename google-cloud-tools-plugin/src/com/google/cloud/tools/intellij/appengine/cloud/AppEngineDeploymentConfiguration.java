@@ -48,12 +48,24 @@ public class AppEngineDeploymentConfiguration extends
 
   public static final String USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE = "userSpecifiedArtifactPath";
 
+  private String cloudProjectName;
+  private String googleUsername;
   private String dockerFilePath;
   private String appYamlPath;
   private boolean userSpecifiedArtifact;
   private String userSpecifiedArtifactPath;
   private ConfigType configType;
   private String version;
+
+  @Attribute("cloudProjectName")
+  public String getCloudProjectName() {
+    return cloudProjectName;
+  }
+
+  @Attribute("googleUsername")
+  public String getGoogleUsername() {
+    return googleUsername;
+  }
 
   @Attribute("userSpecifiedArtifact")
   public boolean isUserSpecifiedArtifact() {
@@ -89,6 +101,14 @@ public class AppEngineDeploymentConfiguration extends
     this.configType = configType;
   }
 
+  public void setCloudProjectName(String cloudProjectName) {
+    this.cloudProjectName = cloudProjectName;
+  }
+
+  public void setGoogleUsername(String googleUsername) {
+    this.googleUsername = googleUsername;
+  }
+
   public void setUserSpecifiedArtifact(boolean userSpecifiedArtifact) {
     this.userSpecifiedArtifact = userSpecifiedArtifact;
   }
@@ -107,5 +127,9 @@ public class AppEngineDeploymentConfiguration extends
 
   public void setVersion(String version) {
     this.version = version;
+  }
+
+  public boolean isAuto() {
+    return getConfigType() == ConfigType.AUTO;
   }
 }

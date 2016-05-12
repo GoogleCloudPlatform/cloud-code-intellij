@@ -16,10 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.util;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 /**
  * App Engine utility methods
  */
@@ -27,23 +23,6 @@ public class AppEngineUtil {
 
   private AppEngineUtil() {
     // Not designed for instantiation
-  }
-
-  /**
-   * Generates a version string in the gcloud version format:
-   *
-   * [year][month][day]t[hours][min][sec]
-   *
-   * For example: 20160331t132711
-   *
-   * @return generated version
-   */
-  public static String generateVersion() {
-    String versionPattern = "yyyyMMdd't'kkmmss";
-    DateTime dateTime = new DateTime();
-    DateTimeFormatter fmt = DateTimeFormat.forPattern(versionPattern);
-
-    return fmt.print(dateTime);
   }
 
 }

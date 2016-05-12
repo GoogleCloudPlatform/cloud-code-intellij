@@ -121,6 +121,16 @@ public final class CloudSdkUtil {
     return SystemInfo.isWindows ? WIN_COMMAND : UNIX_COMMAND;
   }
 
+  @NotNull
+  public static File getFileFromFilePath(String filePath) {
+    File file;
+    file = new File(filePath);
+    if (!file.exists()) {
+      throw new RuntimeException(filePath + " does not exist");
+    }
+    return file;
+  }
+
   private static File findCloudSdkExecutable(
       @NotNull SystemEnvironmentProvider environmentProvider) {
     File gcloudPath = environmentProvider.findInPath(getSystemCommand());

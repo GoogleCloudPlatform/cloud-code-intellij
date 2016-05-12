@@ -22,7 +22,6 @@ import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.Deploy
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import java.io.File;
-import java.util.Set;
 
 /**
  * Provides basic Gcloud based App Engine functionality for our Cloud Tools plugin.
@@ -33,16 +32,6 @@ public interface AppEngineHelper {
    * The path to the gcloud command on the local file system.
    */
   File getGcloudCommandPath();
-
-  /**
-   * The app engine project ID configured for this helper.
-   */
-  String getProjectId();
-
-  /**
-   * The username of the Google user performing the actions.
-   */
-  String getGoogleUsername();
 
   /**
    * The default app.yaml to use.
@@ -59,47 +48,39 @@ public interface AppEngineHelper {
   File defaultDockerfile(DeploymentArtifactType deploymentArtifactType);
 
   /**
-   * Creates a {@link AppEngineAction} that will perform custom App Engine Flex deployment
-   * on {@code run()).
+   * Creates a {@link AppEngineDeployAction} that will perform an App Engine flexible environment
+   * deployment based on the {@link AppEngineDeploymentConfiguration}.
    *
    * @param loggingHandler logging messages will be output to this
    * @param project the IJ project
    * @param artifactToDeploy the {@link File} path to the Java artifact to be deployed
-   * @param appYamlPath the {@link File} path to the app.yaml to use for deployment
-   * @param dockerfilePath the {@link File} path to the Dockerfile to be used for the custom MVM
-   *                       runtime
-   * @param deploymentCallback a callback for handling successful completion of the operation
-   * @return the runnable that will perform the deployment operation
+   * @param deploymentConfiguration the configuration specifying the deployment
+   * @param deploymentCallback a callback for handling completions of the operation
+   * @return the action that will perform the deployment operation
    */
-  AppEngineDeployAction createCustomDeploymentAction(
+  AppEngineDeployAction createDeploymentAction(
       LoggingHandler loggingHandler,
       Project project,
       File artifactToDeploy,
-      File appYamlPath,
-      File dockerfilePath,
-      String version,
+      AppEngineDeploymentConfiguration deploymentConfiguration,
       DeploymentOperationCallback deploymentCallback);
 
   /**
-   * Creates a {@link AppEngineAction} that will perform a standard App Engine flexible environment
-   * deployment with an automatically configured runtime (app.yaml and Dockerfile) on {@code run()).
+   * Creates a {@link AppEngineStopAction} that will stop an App Engine application that was just
+   * deployed.
    *
    * @param loggingHandler logging messages will be output to this
-   * @param project the IJ project
-   * @param artifactToDeploy the {@link File} path to the Java artifact to be deployed
-   * @param deploymentCallback a callback for handling successful completion of the operation
-   * @return the runnable that will perform the deployment operation
+   * @param deploymentConfiguration the configuration specifying the deployment that is to be
+   *     stopped
+   * @param moduleToStop the module to stop
+   * @param versionToStop the version to stop
+   * @param undeploymentTaskCallback a callback for handling completions of the operation
+   * @return the action that will perform the stop operation
    */
-  AppEngineDeployAction createAutoDeploymentAction(
-      LoggingHandler loggingHandler,
-      Project project,
-      File artifactToDeploy,
-      String version,
-      DeploymentOperationCallback deploymentCallback);
-
   AppEngineStopAction createStopAction(
       LoggingHandler loggingHandler,
-      Set<String> modulesToStop,
+      AppEngineDeploymentConfiguration deploymentConfiguration,
+      String moduleToStop,
       String versionToStop,
       UndeploymentTaskCallback undeploymentTaskCallback);
 }

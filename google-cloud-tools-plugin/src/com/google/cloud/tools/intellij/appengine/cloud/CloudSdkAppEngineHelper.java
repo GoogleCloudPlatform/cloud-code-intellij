@@ -17,13 +17,11 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.base.Preconditions;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.Deployment;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
@@ -36,28 +34,22 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Set;
 
 /**
  * A Cloud SDK (gcloud) based implementation of the {@link AppEngineHelper} interface.
  */
 public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
-  private static final String DEFAUL_APP_YAML_PATH = "/generation/src/appengine/mvm/app.yaml";
-  private static final String DEFAUL_JAR_DOCKERFILE_PATH
+  private static final String DEFAULT_APP_YAML_PATH = "/generation/src/appengine/mvm/app.yaml";
+  private static final String DEFAULT_JAR_DOCKERFILE_PATH
       = "/generation/src/appengine/mvm/jar.dockerfile";
-  private static final String DEFAUL_WAR_DOCKERFILE_PATH
+  private static final String DEFAULT_WAR_DOCKERFILE_PATH
       = "/generation/src/appengine/mvm/war.dockerfile";
 
   private final File gcloudCommandPath;
-  private final String projectId;
-  private final String googleUserName;
 
-  public CloudSdkAppEngineHelper(@NotNull File gcloudCommandPath, @NotNull String projectId,
-     @NotNull String googleUserName) {
+  public CloudSdkAppEngineHelper(@NotNull File gcloudCommandPath) {
     this.gcloudCommandPath = gcloudCommandPath;
-    this.projectId = projectId;
-    this.googleUserName = googleUserName;
   }
 
   @NotNull
@@ -68,19 +60,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public String getProjectId() {
-    return projectId;
-  }
-
-  @Override
-  public String getGoogleUsername() {
-    return googleUserName;
-  }
-
-  @NotNull
-  @Override
   public File defaultAppYaml() {
-    return getFileFromResourcePath(DEFAUL_APP_YAML_PATH);
+    return getFileFromResourcePath(DEFAULT_APP_YAML_PATH);
   }
 
   @Nullable
@@ -88,9 +69,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   public File defaultDockerfile(DeploymentArtifactType deploymentArtifactType) {
     switch (deploymentArtifactType) {
       case WAR:
-        return getFileFromResourcePath(DEFAUL_WAR_DOCKERFILE_PATH);
+        return getFileFromResourcePath(DEFAULT_WAR_DOCKERFILE_PATH);
       case JAR:
-        return getFileFromResourcePath(DEFAUL_JAR_DOCKERFILE_PATH);
+        return getFileFromResourcePath(DEFAULT_JAR_DOCKERFILE_PATH);
       default:
         return null;
     }
@@ -98,34 +79,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public AppEngineDeployAction createCustomDeploymentAction(
+  public AppEngineDeployAction createDeploymentAction(
       LoggingHandler loggingHandler,
       Project project,
       File artifactToDeploy,
-      File appYamlPath,
-      File dockerfilePath,
-      String version,
-      DeploymentOperationCallback deploymentCallback) {
-    return new AppEngineDeployAction(
-        this,
-        loggingHandler,
-        project,
-        artifactToDeploy,
-        appYamlPath,
-        dockerfilePath,
-        StringUtil.isEmpty(version) ? AppEngineUtil.generateVersion() : version,
-        wrapCallbackForUsageTracking(deploymentCallback,
-            ConfigType.CUSTOM,DeploymentArtifactType.typeForPath(artifactToDeploy))
-    );
-  }
-
-  @NotNull
-  @Override
-  public AppEngineDeployAction createAutoDeploymentAction(
-      LoggingHandler loggingHandler,
-      Project project,
-      File artifactToDeploy,
-      String version,
+      AppEngineDeploymentConfiguration deploymentConfiguration,
       DeploymentOperationCallback deploymentCallback) throws IllegalArgumentException {
     DeploymentArtifactType artifactType = DeploymentArtifactType.typeForPath(artifactToDeploy);
     if (artifactType == DeploymentArtifactType.UNKNOWN) {
@@ -137,9 +95,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         loggingHandler,
         project,
         artifactToDeploy,
-        defaultAppYaml(),
-        defaultDockerfile(artifactType),
-        StringUtil.isEmpty(version) ? AppEngineUtil.generateVersion() : version,
+        deploymentConfiguration,
         wrapCallbackForUsageTracking(deploymentCallback, ConfigType.AUTO, artifactType)
     );
   }
@@ -148,13 +104,15 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @Override
   public AppEngineStopAction createStopAction(
       LoggingHandler loggingHandler,
-      Set<String> modulesToStop,
+      AppEngineDeploymentConfiguration deploymentConfiguration,
+      String moduleToStop,
       String versionToStop,
       UndeploymentTaskCallback undeploymentTaskCallback) {
     return new AppEngineStopAction(
         this,
         loggingHandler,
-        modulesToStop,
+        deploymentConfiguration,
+        moduleToStop,
         versionToStop,
         undeploymentTaskCallback
     );

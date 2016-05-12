@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
+import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -26,29 +28,23 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessOutputTypes;
-import com.intellij.icons.AllIcons.General;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
-import javax.swing.SwingUtilities;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Performs the deployment of App Engine based applications to GCP.
@@ -59,35 +55,25 @@ class AppEngineDeployAction extends AppEngineAction {
 
   private Project project;
   private File deploymentArtifactPath;
-  private File appYamlPath;
-  private File dockerFilePath;
-  private String version;
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
   private AppEngineHelper appEngineHelper;
   private DeploymentOperationCallback callback;
   private DeploymentArtifactType artifactType;
-
-  private static final String STOP_CONFIRMATION_URI_OPEN_TAG =
-      "<a href='https://cloud.google.com/appengine/docs/java/console/#versions'>";
-  private static final String STOP_CONFIRMATION_URI_CLOSE_TAG = "</a>";
 
   AppEngineDeployAction(
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
       @NotNull Project project,
       @NotNull File deploymentArtifactPath,
-      @NotNull File appYamlPath,
-      @NotNull File dockerFilePath,
-      @NotNull String version,
+      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
       @NotNull DeploymentOperationCallback callback) {
-    super(loggingHandler, appEngineHelper, callback);
+    super(loggingHandler, deploymentConfiguration, callback);
 
     this.appEngineHelper = appEngineHelper;
     this.project = project;
     this.deploymentArtifactPath = deploymentArtifactPath;
+    this.deploymentConfiguration = deploymentConfiguration;
     this.callback = callback;
-    this.appYamlPath = appYamlPath;
-    this.dockerFilePath = dockerFilePath;
-    this.version = version;
     this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
   }
 
@@ -109,9 +95,11 @@ class AppEngineDeployAction extends AppEngineAction {
 
     GeneralCommandLine commandLine = new GeneralCommandLine(
         appEngineHelper.getGcloudCommandPath().getAbsolutePath());
-    commandLine.addParameters("preview", "app", "deploy", "--promote", "--quiet");
+    commandLine.addParameters("preview", "app", "deploy", "--promote");
     commandLine.addParameter("app.yaml");
-    commandLine.addParameter("--version=" + version);
+    if (!StringUtil.isEmpty(deploymentConfiguration.getVersion())) {
+      commandLine.addParameter("--version=" + deploymentConfiguration.getVersion());
+    }
     commandLine.addParameter("--format=json");
 
     commandLine.withWorkDirectory(stagingDirectory);
@@ -122,8 +110,17 @@ class AppEngineDeployAction extends AppEngineAction {
           copyFile(stagingDirectory, "target" + artifactType, deploymentArtifactPath);
       stagedArtifactPath.setReadable(true /* readable */, false /* ownerOnly */);
 
-      copyFile(stagingDirectory, "app.yaml", this.appYamlPath);
-      copyFile(stagingDirectory, "Dockerfile", this.dockerFilePath);
+      File appYamlPath = deploymentConfiguration.isAuto()
+          ? appEngineHelper.defaultAppYaml()
+          : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getAppYamlPath());
+
+      File dockerFilePath = deploymentConfiguration.isAuto()
+          ? appEngineHelper.defaultDockerfile(
+              DeploymentArtifactType.typeForPath(deploymentArtifactPath))
+          : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getDockerFilePath());
+
+      copyFile(stagingDirectory, "app.yaml", appYamlPath);
+      copyFile(stagingDirectory, "Dockerfile", dockerFilePath);
     } catch (IOException e) {
       logger.warn(e);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
@@ -131,9 +128,7 @@ class AppEngineDeployAction extends AppEngineAction {
     }
 
     try {
-      executeProcess(
-          commandLine,
-          new DeployToAppEngineProcessListener(version));
+      executeProcess(commandLine, new DeployToAppEngineProcessListener());
     } catch (ExecutionException e) {
       logger.warn(e);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.execution"));
@@ -151,11 +146,6 @@ class AppEngineDeployAction extends AppEngineAction {
 
   private class DeployToAppEngineProcessListener extends ProcessAdapter {
     private StringBuilder deploymentOutput = new StringBuilder();
-    private String version;
-
-    public DeployToAppEngineProcessListener(@NotNull String version) {
-      this.version = version;
-    }
 
     @Override
     public void onTextAvailable(ProcessEvent event, Key outputType) {
@@ -168,7 +158,25 @@ class AppEngineDeployAction extends AppEngineAction {
     public void processTerminated(final ProcessEvent event) {
       try {
         if (event.getExitCode() == 0) {
-          callback.succeeded(new DeploymentRuntimeImpl(deploymentOutput.toString(), version));
+
+          // Parse JSON output to retrieve service/version info.
+          DeployOutput deployOutput = null;
+          try {
+            deployOutput = parseDeployOutput(deploymentOutput.toString());
+          } catch (JsonParseException e) {
+            logger.error("Could not retrieve service/version info of deployed application", e);
+          }
+          // Recommend to update gcloud if we can't get service/version for whatever reasons.
+          if (deployOutput == null
+              || deployOutput.getService() == null || deployOutput.getVersion() == null) {
+            consoleLogLn(GctBundle.message("appengine.deployment.version.extract.failure") + "\n");
+          }
+
+          callback.succeeded(
+              new AppEngineDeploymentRuntime(
+                  project, appEngineHelper, getLoggingHandler(), deploymentConfiguration,
+                  deployOutput != null ? deployOutput.getService() : null,
+                  deployOutput != null ? deployOutput.getVersion() : null));
         } else if (cancelled) {
           callback.errorOccurred(GctBundle.message("appengine.deployment.error.cancelled"));
         } else {
@@ -183,76 +191,56 @@ class AppEngineDeployAction extends AppEngineAction {
     }
   }
 
-  private class DeploymentRuntimeImpl extends DeploymentRuntime {
-    private String deploymentOutput;
-    private String version;
-
-    public DeploymentRuntimeImpl(@NotNull String deploymentOutput, @NotNull String version) {
-      this.deploymentOutput = deploymentOutput;
-      this.version = version;
-    }
-
-    @Override
-    public boolean isUndeploySupported() {
-      return true;
-    }
-
-    @Override
-    public void undeploy(@NotNull final UndeploymentTaskCallback callback) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          int doStop = Messages
-              .showOkCancelDialog(
-                  GctBundle.message(
-                      "appengine.stop.modules.version.confirmation.message",
-                      STOP_CONFIRMATION_URI_OPEN_TAG,
-                      STOP_CONFIRMATION_URI_CLOSE_TAG),
-                  GctBundle.message("appengine.stop.modules.version.confirmation.title"),
-                  General.Warning);
-
-          if (doStop == Messages.YES) {
-            stop(callback);
-          } else {
-            callback.errorOccurred(
-                GctBundle.message("appengine.stop.modules.version.canceled.message"));
-          }
-        }
-      });
-    }
-
-    private void stop(@NotNull UndeploymentTaskCallback callback) {
-      Set<String> modulesToSop;
-      try {
-        modulesToSop = parseDeployOutputToModuleList(deploymentOutput);
-      } catch (JsonParseException e) {
-        logger.warn("Could not retrieve module(s) of deployed application", e);
-        return;
-      }
-
-      final AppEngineAction appEngineStopAction = appEngineHelper.createStopAction(
-          getLoggingHandler(),
-          modulesToSop,
-          version,
-          callback);
-
-      ProgressManager.getInstance()
-          .run(new Task.Backgroundable(project, "Stop App Engine", true,
-              null) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-              ApplicationManager.getApplication().invokeLater(appEngineStopAction);
+  @VisibleForTesting
+  static DeployOutput parseDeployOutput(String jsonOutput) throws JsonParseException {
+    /* An example JSON output of gcloud app deloy:
+        {
+          "configs": [],
+          "versions": [
+            {
+              "id": "20160429t112518",
+              "last_deployed_time": null,
+              "project": "springboot-maven-project",
+              "service": "default",
+              "traffic_split": null,
+              "version": null
             }
-          });
+          ]
+        }
+    */
+    Type deployOutputType = new TypeToken<DeployOutput>() {}.getType();
+    DeployOutput deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
+    if (deployOutput == null
+        || deployOutput.versions == null || deployOutput.versions.size() != 1) {
+      throw new JsonParseException("Cannot get app version: unexpected gcloud JSON output format");
     }
-
+    return deployOutput;
   }
 
-  private Set<String> parseDeployOutputToModuleList(String jsonOutput)
-      throws JsonParseException {
-    Type deployOutputType = new TypeToken<Map<String, String>>() {}.getType();
-    Map<String, String> deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
+  // Holds de-serialized JSON output of gcloud app deploy. Don't change the field names
+  // because Gson uses it for automatic de-serialization.
+  @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Initialized by Gson")
+  static class DeployOutput {
+    private static class Version {
+      String id;
+      String service;
+    }
+    List<Version> versions;
 
-    return deployOutput != null ? deployOutput.keySet() : null;
+    @Nullable
+    public String getVersion() {
+      if (versions == null || versions.size() != 1) {
+        return null;
+      }
+      return versions.get(0).id;
+    }
+
+    @Nullable
+    public String getService() {
+      if (versions == null || versions.size() != 1) {
+        return null;
+      }
+      return versions.get(0).service;
+    }
   }
 }

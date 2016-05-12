@@ -78,6 +78,7 @@ Other useful targets while developing include:
    existing code has tests. We're slowly fixing that, and contributions of tests
    for existing code are much appreciated.)
 1. Make sure all existing tests pass. (gradlew test)
+1. For significant user facing changes add your change to the 'Unreleased' section of CHANGELOG.md.
 1. Associate the change with an existing issue or [file a new issue](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/new).
 1. Create a pull request and send it to gcloud-intellij:master.
 
