@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
-import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
@@ -40,7 +39,6 @@ import javax.swing.JLabel;
 public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private AppEngineCloudConfigurable appEngineCloudConfigurable;
   private SystemEnvironmentProvider environmentProvider;
-  private ProjectSelector projectSelector;
   private JLabel warningMessage;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
@@ -95,7 +93,6 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
     when(environmentProvider.findInPath(anyString()))
         .thenReturn(createTempFile());
     initCloudConfigurable();
-    projectSelector.setText("myProject");
 
     // No exception should be thrown here
     appEngineCloudConfigurable.apply();
@@ -117,7 +114,6 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   public void testApply_invalidSdkAndValidProject() {
     initCloudConfigurable();
     cloudSdkDirectoryField.setText("/some/invalid/path");
-    projectSelector.setText("myProject");
 
     try {
       appEngineCloudConfigurable.apply();
@@ -148,7 +144,6 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private void initCloudConfigurable() {
     appEngineCloudConfigurable =
         new AppEngineCloudConfigurable(new AppEngineServerConfiguration(), getProject());
-    projectSelector = appEngineCloudConfigurable.getProjectSelector();
     warningMessage = appEngineCloudConfigurable.getWarningMessage();
     cloudSdkDirectoryField = appEngineCloudConfigurable.getCloudSdkDirectoryField();
   }

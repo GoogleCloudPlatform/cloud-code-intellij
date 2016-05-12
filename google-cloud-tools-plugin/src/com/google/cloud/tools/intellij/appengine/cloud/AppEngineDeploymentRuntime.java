@@ -45,6 +45,7 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
   private Project project;
   private AppEngineHelper appEngineHelper;
   private LoggingHandler loggingHandler;
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
   private String service;
   private String version;
 
@@ -52,11 +53,13 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
       @NotNull Project project,
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
+      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
       @Nullable String service,
       @Nullable String version) {
     this.project = project;
     this.appEngineHelper = appEngineHelper;
     this.loggingHandler = loggingHandler;
+    this.deploymentConfiguration = deploymentConfiguration;
     this.service = service;
     this.version = version;
   }
@@ -92,7 +95,7 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
 
   private void stop(@NotNull UndeploymentTaskCallback callback) {
     final AppEngineAction appEngineStopAction = appEngineHelper.createStopAction(
-        loggingHandler, service, version, callback);
+        loggingHandler, deploymentConfiguration, service, version, callback);
 
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(project, "Stop App Engine", true,
