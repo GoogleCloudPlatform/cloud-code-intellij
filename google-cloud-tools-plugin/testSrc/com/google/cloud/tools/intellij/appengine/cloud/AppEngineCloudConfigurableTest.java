@@ -45,7 +45,6 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private static final String CLOUD_SDK_EXECUTABLE_PATH = new File("/a/b/c/gcloud-sdk/bin/gcloud").getAbsolutePath();
   private static final String CLOUD_SDK_DIR_PATH = new File("/a/b/c/gcloud-sdk").getAbsolutePath();
 
-  private static final String MISSING_PROJECT_WARNING = "Please select a project.";
   private static final String MISSING_SDK_DIR_WARNING = "Please select a Cloud SDK home directory.";
 
   @Override
@@ -89,7 +88,7 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
     assertEquals(MISSING_SDK_DIR_WARNING, warningMessage.getText());
   }
 
-  public void testApply_validSdkAndValidProject() throws Exception {
+  public void testApply_validSdk() throws Exception {
     when(environmentProvider.findInPath(anyString()))
         .thenReturn(createTempFile());
     initCloudConfigurable();
@@ -98,39 +97,13 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
     appEngineCloudConfigurable.apply();
   }
 
-  public void testApply_validSdkAndInvalidProject() throws IOException {
-    when(environmentProvider.findInPath(anyString())).thenReturn(createTempFile());
-    initCloudConfigurable();
-    // Do not select project
-
-    try {
-      appEngineCloudConfigurable.apply();
-      fail("Applying settings without a Project should throw exception.");
-    } catch (ConfigurationException ce) {
-      assertEquals(MISSING_PROJECT_WARNING, ce.getMessage());
-    }
-  }
-
-  public void testApply_invalidSdkAndValidProject() {
+  public void testApply_invalidSdk() {
     initCloudConfigurable();
     cloudSdkDirectoryField.setText("/some/invalid/path");
 
     try {
       appEngineCloudConfigurable.apply();
       fail("Applying settings without a valid SDK should throw exception.");
-    } catch (ConfigurationException ce) {
-      assertEquals(MISSING_SDK_DIR_WARNING, ce.getMessage());
-    }
-  }
-
-  public void testApply_invalidSdkAndInvalidProject() {
-    initCloudConfigurable();
-    cloudSdkDirectoryField.setText("/some/invalid/path");
-    // Do not select project
-
-    try {
-      appEngineCloudConfigurable.apply();
-      fail("Applying settings without a valid SDK and Project should throw exception.");
     } catch (ConfigurationException ce) {
       assertEquals(MISSING_SDK_DIR_WARNING, ce.getMessage());
     }
