@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
+
+import static git4idea.commands.GitLocalChangesWouldBeOverwrittenDetector.Operation.MERGE;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
@@ -46,6 +49,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.Consumer;
 import com.intellij.util.xmlb.annotations.Transient;
+
 import git4idea.GitPlatformFacade;
 import git4idea.GitUtil;
 import git4idea.GitVcs;
@@ -68,8 +72,9 @@ import git4idea.repo.GitRepositoryManager;
 import git4idea.stash.GitStashUtils;
 import git4idea.ui.StashInfo;
 import git4idea.util.GitUIUtil;
-import git4idea.util.LocalChangesWouldBeOverwrittenHelper;
 import git4idea.util.GitUntrackedFilesHelper;
+import git4idea.util.LocalChangesWouldBeOverwrittenHelper;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,12 +83,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static git4idea.commands.GitLocalChangesWouldBeOverwrittenDetector.Operation.MERGE;
 
 /**
  * This class validates current source state and restores it using git stash.
  */
 public class ProjectRepositoryValidator {
+
   private static final Logger LOG = Logger.getInstance(ProjectRepositoryValidator.class);
   private final CloudDebugProcessState processState;
   private final ProjectRepositoryState repoState;
@@ -95,15 +100,21 @@ public class ProjectRepositoryValidator {
   }
 
   /**
-   * Compares the current source tree with the state described by the Cloud Debugger api.
-   * Only local and cloud repo Git repositories are supported.
+   * Compares the current source tree with the state described by the Cloud Debugger api. Only local
+   * and cloud repo Git repositories are supported.
    */
   @NotNull
   @Transient
   public SyncResult checkSyncStashState() {
     if (processState.getProject() == null) {
-      return new SyncResult(/*isInvalid*/ true, /*needsStash*/ false, /*needsSync*/ false,
-                            /*target SHA*/ null, /*target repo*/ null, /* cloud repo */ false, /* repoType */ null);
+      return new SyncResult(
+          /*isInvalid*/ true,
+          /*needsStash*/ false,
+          /*needsSync*/ false,
+          /*target SHA*/ null,
+          /*target repo*/ null,
+          /* cloud repo */ false,
+          /* repoType */ null);
     }
     GitRepositoryManager manager = GitUtil.getRepositoryManager(processState.getProject());
     List<GitRepository> repositories = manager.getRepositories();
@@ -113,15 +124,18 @@ public class ProjectRepositoryValidator {
     String repoType = null;
 
     boolean foundDebuggee = false;
-    if (getCloudDebuggerClient() != null &&
-        !com.google.common.base.Strings.isNullOrEmpty(processState.getProjectNumber())) {
+    if (getCloudDebuggerClient() != null
+        && !com.google.common.base.Strings.isNullOrEmpty(processState.getProjectNumber())) {
       ListDebuggeesResponse debuggees;
       try {
-        debuggees = getCloudDebuggerClient().debuggees().list().setProject(processState.getProjectNumber())
-            .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+        debuggees = getCloudDebuggerClient().debuggees().list()
+            .setProject(processState.getProjectNumber())
+            .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class)
+                .getClientVersionForCloudDebugger())
             .execute();
         for (Debuggee debuggee : debuggees.getDebuggees()) {
-          if (processState.getDebuggeeId() != null && processState.getDebuggeeId().equals(debuggee.getId())) {
+          if (processState.getDebuggeeId() != null && processState.getDebuggeeId()
+              .equals(debuggee.getId())) {
             // implicit assumption this doesn't happen more than once
             foundDebuggee = true;
             List<SourceContext> contexts = debuggee.getSourceContexts();
@@ -133,28 +147,27 @@ public class ProjectRepositoryValidator {
                 if (cloudRepo != null) {
                   // shouldn't be more than one repo but if there is, we'll prefer cloud repos
                   break;
-                }
-                else if (sourceContext.getCloudWorkspace() != null) {
+                } else if (sourceContext.getCloudWorkspace() != null) {
                   repoType = GctBundle.getString("clouddebug.workspace");
                 }
               }
             }
           }
         }
-      }
-      catch (IOException ex) {
+      } catch (IOException ex) {
         LOG.warn("Error detecting server side source context", ex);
       }
     }
 
     if (!foundDebuggee) {
-      return new SyncResult(/*isinvalid*/ true,
-                            /*needsstash*/ false,
-                            /*needssync*/ false,
-                            /*target SHA*/ null,
-                            /*target repo*/ null,
-                            /* hasCloudRepository */ false,
-                            /* repoType */ GctBundle.getString("clouddebug.unknown.repository.type"));
+      return new SyncResult(
+          /*isinvalid*/ true,
+          /*needsstash*/ false,
+          /*needssync*/ false,
+          /*target SHA*/ null,
+          /*target repo*/ null,
+          /* hasCloudRepository */ false,
+          /* repoType */ GctBundle.getString("clouddebug.unknown.repository.type"));
     }
 
     GitRepository targetLocalRepo = null;
@@ -164,12 +177,10 @@ public class ProjectRepositoryValidator {
     if (cloudRepo != null) {
       revisionId = cloudRepo.getRevisionId();
       repoType = GctBundle.getString("clouddebug.cloud.repository");
-    }
-    else if (gerritRepo != null) {
+    } else if (gerritRepo != null) {
       revisionId = gerritRepo.getRevisionId();
       repoType = GctBundle.getString("clouddebug.gerrit");
-    }
-    else if (otherGitRepo != null) {
+    } else if (otherGitRepo != null) {
       revisionId = otherGitRepo.getRevisionId();
       repoType = GctBundle.getString("clouddebug.nongoogle.git");
     }
@@ -177,11 +188,11 @@ public class ProjectRepositoryValidator {
     if (revisionId != null) {
       for (GitRepository repository : repositories) {
         try {
-          GitChangeUtils.resolveReference(processState.getProject(), repository.getRoot(), revisionId);
+          GitChangeUtils
+              .resolveReference(processState.getProject(), repository.getRoot(), revisionId);
           targetLocalRepo = repository;
           break;
-        }
-        catch (VcsException ex) {
+        } catch (VcsException ex) {
           LOG.warn("cloud revision not found in local repo.  continuing search...");
         }
       }
@@ -189,31 +200,32 @@ public class ProjectRepositoryValidator {
 
     boolean needsStash = false;
     boolean needsSync = false;
-    String syncSHA = null;
+    String syncSha = null;
 
     if (targetLocalRepo != null) {
       //check for local changes.
       try {
-        if (GitUtil.hasLocalChanges(true, processState.getProject(), targetLocalRepo.getRoot()) ||
-            GitUtil.hasLocalChanges(false, processState.getProject(), targetLocalRepo.getRoot())) {
+        if (GitUtil.hasLocalChanges(true, processState.getProject(), targetLocalRepo.getRoot())
+            || GitUtil.hasLocalChanges(
+            false, processState.getProject(), targetLocalRepo.getRoot())) {
           needsStash = true;
         }
-        if (!Strings.isNullOrEmpty(targetLocalRepo.getCurrentRevision()) &&
-            !Strings.isNullOrEmpty(revisionId) &&
-            targetLocalRepo.getCurrentRevision() != null &&
-            !targetLocalRepo.getCurrentRevision().equals(revisionId)) {
-          syncSHA = revisionId;
+        if (!Strings.isNullOrEmpty(targetLocalRepo.getCurrentRevision())
+            && !Strings.isNullOrEmpty(revisionId)
+            && targetLocalRepo.getCurrentRevision() != null
+            && !targetLocalRepo.getCurrentRevision().equals(revisionId)) {
+          syncSha = revisionId;
           needsSync = true;
         }
 
-      }
-      catch (VcsException vcsException) {
+      } catch (VcsException vcsException) {
         LOG.error("Error detecting local changes during attach", vcsException);
       }
     }
 
     boolean hasRemoteRepository = cloudRepo != null || gerritRepo != null || otherGitRepo != null;
-    return new SyncResult(/*isinvalid*/ false, needsStash, needsSync, syncSHA, targetLocalRepo, hasRemoteRepository, repoType);
+    return new SyncResult(/*isinvalid*/ false, needsStash, needsSync, syncSha, targetLocalRepo,
+        hasRemoteRepository, repoType);
   }
 
   @Nullable
@@ -224,10 +236,14 @@ public class ProjectRepositoryValidator {
     return cloudDebuggerClient;
   }
 
+  /**
+   * Refresh the repository files.
+   */
   @SuppressWarnings("ConstantConditions")
   public void hardRefresh() {
     if (repoState.hasSourceRepository()) {
-      List<VirtualFile> list = VfsUtil.markDirty(true, true, repoState.getSourceRepository().getRoot());
+      List<VirtualFile> list = VfsUtil
+          .markDirty(true, true, repoState.getSourceRepository().getRoot());
       if (!list.isEmpty()) {
         LocalFileSystem.getInstance().refreshFiles(list, false, true, null);
       }
@@ -243,6 +259,9 @@ public class ProjectRepositoryValidator {
     return result.isValidDebuggee();
   }
 
+  /**
+   * Restore the repository to its original state.
+   */
   public void restoreToOriginalState(final @NotNull Project project) {
     if (repoState.hasSourceRepository()) {
       assert repoState.getSourceRepository() != null;
@@ -254,8 +273,8 @@ public class ProjectRepositoryValidator {
         GitStashUtils.loadStashStack(project, root, new Consumer<StashInfo>() {
           @Override
           public void consume(StashInfo stashInfo) {
-            if (!Strings.isNullOrEmpty(stashInfo.getMessage()) &&
-                stashInfo.getMessage().equals(repoState.getStashMessage())) {
+            if (!Strings.isNullOrEmpty(stashInfo.getMessage())
+                && stashInfo.getMessage().equals(repoState.getStashMessage())) {
               targetStash.set(stashInfo);
             }
           }
@@ -269,45 +288,50 @@ public class ProjectRepositoryValidator {
         if (branchDisplayName.length() > 10) {
           branchDisplayName = branchDisplayName.substring(0, 7) + "...";
         }
-        if (Messages.showYesNoDialog(GctBundle.getString("clouddebug.restorestash", branchDisplayName),
-                                     GctBundle.getString("clouddebug.restorechanges.title"),
-                                     Messages.getInformationIcon()) == Messages.YES) {
+        if (Messages
+            .showYesNoDialog(GctBundle.getString("clouddebug.restorestash", branchDisplayName),
+                GctBundle.getString("clouddebug.restorechanges.title"),
+                Messages.getInformationIcon()) == Messages.YES) {
           final GitBrancher brancher = ServiceManager.getService(project, GitBrancher.class);
           brancher
-            .checkout(repoState.getOriginalBranchName(), false, Collections.singletonList(repoState.getSourceRepository()),
-                      new Runnable() {
-                        @Override
-                        public void run() {
-                          repoState.getSourceRepository().update();
-                          if (!targetStash.isNull()) {
-                            unstash(project, targetStash, root);
-                          }
-                        }
-                      });
+              .checkout(repoState.getOriginalBranchName(), false,
+                  Collections.singletonList(repoState.getSourceRepository()),
+                  new Runnable() {
+                    @Override
+                    public void run() {
+                      repoState.getSourceRepository().update();
+                      if (!targetStash.isNull()) {
+                        unstash(project, targetStash, root);
+                      }
+                    }
+                  });
         }
       }
     }
   }
 
-  private static void addStashParameter(@NotNull Project project, @NotNull GitHandler handler, @NotNull String stash) {
+  private static void addStashParameter(@NotNull Project project, @NotNull GitHandler handler,
+      @NotNull String stash) {
     GitVcs vcs = GitVcs.getInstance(project);
     if (vcs != null && GitVersionSpecialty.NEEDS_QUOTES_IN_STASH_NAME.existsIn(vcs.getVersion())) {
       handler.addParameters(GeneralCommandLine.inescapableQuote(stash));
-    }
-    else {
+    } else {
       handler.addParameters(stash);
     }
   }
 
   private void unstash(final @NotNull Project project,
-                       @NotNull final Ref<StashInfo> targetStash,
-                       @NotNull final VirtualFile root) {
-    if (repoState.getSourceRepository() == null ||
-        repoState.getOriginalBranchName() == null ||
-        (!repoState.getOriginalBranchName().equals(repoState.getSourceRepository().getCurrentBranchName()) &&
-         !repoState.getOriginalBranchName().equals(repoState.getSourceRepository().getCurrentRevision()))) {
-      Messages.showErrorDialog(GctBundle.getString("clouddebug.erroroncheckout", repoState.getOriginalBranchName()),
-                               "Error");
+      @NotNull final Ref<StashInfo> targetStash,
+      @NotNull final VirtualFile root) {
+    if (repoState.getSourceRepository() == null
+        || repoState.getOriginalBranchName() == null
+        || (!repoState.getOriginalBranchName()
+            .equals(repoState.getSourceRepository().getCurrentBranchName())
+            && !repoState.getOriginalBranchName()
+                .equals(repoState.getSourceRepository().getCurrentRevision()))) {
+      Messages.showErrorDialog(
+          GctBundle.getString("clouddebug.erroroncheckout", repoState.getOriginalBranchName()),
+          "Error");
       return;
     }
     final GitLineHandler handler = new GitLineHandler(project, root, GitCommand.STASH);
@@ -340,61 +364,62 @@ public class ProjectRepositoryValidator {
             public void run(@NotNull final ProgressIndicator indicator) {
               indicator.setIndeterminate(true);
               handler
-                  .addLineListener(new GitHandlerUtil.GitLineHandlerListenerProgress(indicator, handler, "stash", false));
+                  .addLineListener(
+                      new GitHandlerUtil.GitLineHandlerListenerProgress(indicator, handler, "stash",
+                          false));
               Git git = ServiceManager.getService(Git.class);
-              result.set(git.runCommand(new Computable.PredefinedValueComputable<GitLineHandler>(handler)));
-          }
-        });
+              result.set(git.runCommand(
+                  new Computable.PredefinedValueComputable<GitLineHandler>(handler)));
+            }
+          });
 
       ServiceManager.getService(project, GitPlatformFacade.class).hardRefresh(root);
       GitCommandResult res = result.get();
       if (conflict.get()) {
         Messages
-          .showDialog(GctBundle.getString("clouddebug.unstashmergeconflicts"), "Merge Conflicts", new String[]{"Ok"}, 0,
-                      Messages.getErrorIcon());
+            .showDialog(GctBundle.getString("clouddebug.unstashmergeconflicts"), "Merge Conflicts",
+                new String[]{"Ok"}, 0,
+                Messages.getErrorIcon());
 
-      }
-      else if (untrackedFilesDetector.wasMessageDetected()) {
+      } else if (untrackedFilesDetector.wasMessageDetected()) {
         GitUntrackedFilesHelper
-          .notifyUntrackedFilesOverwrittenBy(project, root, untrackedFilesDetector.getRelativeFilePaths(), "unstash",
-                                             null);
-      }
-      else if (localChangesDetector.wasMessageDetected()) {
+            .notifyUntrackedFilesOverwrittenBy(project, root,
+                untrackedFilesDetector.getRelativeFilePaths(), "unstash",
+                null);
+      } else if (localChangesDetector.wasMessageDetected()) {
         LocalChangesWouldBeOverwrittenHelper
-          .showErrorDialog(project, root, "unstash", localChangesDetector.getRelativeFilePaths());
-      }
-      else if (!res.success()) {
+            .showErrorDialog(project, root, "unstash", localChangesDetector.getRelativeFilePaths());
+      } else if (!res.success()) {
         GitUIUtil.showOperationErrors(project, handler.errors(), handler.printableCommandLine());
-      }
-      else if (res.success()) {
+      } else if (res.success()) {
         ProgressManager.getInstance().run(
-          new Task.Modal(project, GctBundle.getString("clouddebug.removestashx", targetStash.get().getStash()), false) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-              if (project == null) {
-                return;
+            new Task.Modal(project,
+                GctBundle.getString("clouddebug.removestashx", targetStash.get().getStash()),
+                false) {
+              @Override
+              public void run(@NotNull ProgressIndicator indicator) {
+                if (project == null) {
+                  return;
+                }
+                final GitSimpleHandler h = new GitSimpleHandler(project, root, GitCommand.STASH);
+                h.addParameters("drop");
+                addStashParameter(project, h, targetStash.get().getStash());
+                try {
+                  h.run();
+                  h.unsilence();
+                } catch (final VcsException ex) {
+                  ApplicationManager.getApplication().invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                      GitUIUtil.showOperationError(project, ex, h.printableCommandLine());
+                    }
+                  });
+                }
               }
-              final GitSimpleHandler h = new GitSimpleHandler(project, root, GitCommand.STASH);
-              h.addParameters("drop");
-              addStashParameter(project, h, targetStash.get().getStash());
-              try {
-                h.run();
-                h.unsilence();
-              }
-              catch (final VcsException ex) {
-                ApplicationManager.getApplication().invokeLater(new Runnable() {
-                  @Override
-                  public void run() {
-                    GitUIUtil.showOperationError(project, ex, h.printableCommandLine());
-                  }
-                });
-              }
-            }
-          });
+            });
 
       }
-    }
-    finally {
+    } finally {
       DvcsUtil.workingTreeChangeFinished(project, token);
     }
   }

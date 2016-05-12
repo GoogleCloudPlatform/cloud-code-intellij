@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.appengine.validation;
 
 
@@ -22,8 +23,10 @@ import com.intellij.psi.PsiAnnotation;
  * Exception when an attribute does not exist in an annotation.
  */
 public class MissingAttributeException extends Exception {
+
   public MissingAttributeException(PsiAnnotation annotation, String attribute) {
-    super("Attribute \"" + attribute + "\" does not exist in annotation \"" + annotation.getText()+ "\"");
+    super("Attribute \"" + attribute + "\" does not exist in annotation \"" + annotation.getText()
+        + "\"");
   }
 }
 

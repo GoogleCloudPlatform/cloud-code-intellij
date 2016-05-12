@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
@@ -31,6 +32,7 @@ import java.util.Date;
  * Utility functions for cloud debug data.
  */
 public class BreakpointUtil {
+
   private static final Logger LOG = Logger.getInstance(BreakpointUtil.class);
 
   // 2015-07-23T16:37:33.000Z
@@ -50,23 +52,29 @@ public class BreakpointUtil {
         : GctBundle.getString("clouddebug.fallbackerrormessage");
   }
 
+  /**
+   * Formats and returns the user message.
+   */
   @Nullable
   public static String getUserMessage(@Nullable StatusMessage statusMessage) {
     if (statusMessage != null && statusMessage.getDescription() != null) {
       String formatString = statusMessage.getDescription().getFormat();
-      Integer i = 0;
+      Integer idx = 0;
       // Parameters in the server version are encoded script style with '$'.
-      String argString = "$" + i.toString();
+      String argString = "$" + idx.toString();
       while (formatString.contains(argString)) {
         formatString = formatString.replace(argString, "%s");
-        i++;
-        argString = "$" + i.toString();
+        idx++;
+        argString = "$" + idx.toString();
       }
       return String.format(formatString, statusMessage.getDescription().getParameters());
     }
     return null;
   }
 
+  /**
+   * Parses a date time string to a {@link java.util.Date}.
+   */
   @Nullable
   public static Date parseDateTime(@Nullable String dateString) {
     if (dateString == null) {
@@ -79,8 +87,8 @@ public class BreakpointUtil {
 
     try {
       return iso8601Format.parse(dateString);
-    } catch (ParseException e) {
-      LOG.error("error parsing datetime " + dateString, e);
+    } catch (ParseException ex) {
+      LOG.error("error parsing datetime " + dateString, ex);
     }
 
     return null;

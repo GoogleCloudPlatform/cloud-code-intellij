@@ -17,15 +17,28 @@
 package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.google.cloud.tools.intellij.appengine.GctConstants;
-import com.google.common.collect.Maps;
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
 import com.google.cloud.tools.intellij.appengine.util.PsiUtils;
+import com.google.common.collect.Maps;
+
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiArrayType;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiInvalidElementAccessException;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiType;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,6 +51,7 @@ import java.util.Map;
  * Inspection to check that REST signatures in an Endpoint class are unique.
  */
 public class RestSignatureInspection extends EndpointInspectionBase {
+
   public enum RestMethod {
     LIST("list", "GET") {
       /**
@@ -57,8 +71,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         }
 
         PsiType returnType = method.getReturnType();
-        if(isValidCollectionType(project, returnType)) {
-          assert(returnType instanceof PsiClassType);
+        if (isValidCollectionType(project, returnType)) {
+          assert (returnType instanceof PsiClassType);
           PsiClassType classType = (PsiClassType) returnType;
           PsiType[] typeParams = classType.getParameters();
 
@@ -70,15 +84,17 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         return null;
       }
 
-      private boolean isValidCollectionType (Project project, PsiType type) {
+      private boolean isValidCollectionType(Project project, PsiType type) {
         // Check if type is a Collection
-        if(PsiUtils.isParameterizedType(type)) {
+        if (PsiUtils.isParameterizedType(type)) {
           PsiClassType collectionType =
-            JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
+              JavaPsiFacade.getElementFactory(project)
+                  .createTypeByFQClassName("java.util.Collection");
           PsiClassType collectionResponseType = JavaPsiFacade.getElementFactory(project)
-            .createTypeByFQClassName("com.google.api.server.spi.response.CollectionResponse");
+              .createTypeByFQClassName("com.google.api.server.spi.response.CollectionResponse");
 
-          return collectionType.isAssignableFrom(type) || collectionResponseType.isAssignableFrom(type);
+          return collectionType.isAssignableFrom(type) || collectionResponseType
+              .isAssignableFrom(type);
         }
         return false;
       }
@@ -97,7 +113,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
       public String guessResourceName(PsiMethod method) {
         String methodName = method.getName();
         return methodNamePrefix.length() >= methodName.length() ? null :
-               methodName.substring(methodNamePrefix.length()).toLowerCase();
+            methodName.substring(methodNamePrefix.length()).toLowerCase();
       }
     },
     REMOVE("remove", "DELETE") {
@@ -111,10 +127,10 @@ public class RestSignatureInspection extends EndpointInspectionBase {
       public String guessResourceName(PsiMethod method) {
         String methodName = method.getName();
         return methodNamePrefix.length() >= methodName.length() ? null :
-               methodName.substring(methodNamePrefix.length()).toLowerCase();
+            methodName.substring(methodNamePrefix.length()).toLowerCase();
       }
     },
-    DEFAULT("", "POST"){
+    DEFAULT("", "POST") {
       @Override
       @Nullable
       public String guessResourceName(PsiMethod method) {
@@ -126,7 +142,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     private final String httpMethod;
 
     /**
-     * Specifies a default REST method prefix, as well as what HTTP method it should use by default.
+     * Specifies a default REST method prefix, as well as what HTTP method it should use by
+     * default.
      *
      * @param methodNamePrefix a method name prefix
      * @param httpMethod the default HTTP method for this prefix
@@ -147,6 +164,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
 
     /**
      * Gets the default HTTP method for this instance.
+     *
      * @return The HTTP method.
      */
     public String getHttpMethod() {
@@ -173,7 +191,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     @Nullable
     private static String getSimpleName(Project project, PsiType type) {
       PsiClassType collectionType =
-        JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
+          JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
 
       if (type == null) {
         return null;
@@ -193,9 +211,9 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         builder.append(getSimpleName(project, classType.rawType()));
 
         PsiType[] typeParams = classType.getParameters();
-        for(PsiType aType : typeParams) {
+        for (PsiType psiType : typeParams) {
           builder.append('_');
-          builder.append(getSimpleName(project, aType));
+          builder.append(getSimpleName(project, psiType));
         }
         return builder.toString();
 
@@ -231,30 +249,31 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
     return new EndpointPsiElementVisitor() {
       @Override
-      public void visitClass(PsiClass aClass){
-        if (!EndpointUtilities.isEndpointClass(aClass)) {
+      public void visitClass(PsiClass psiClass) {
+        if (!EndpointUtilities.isEndpointClass(psiClass)) {
           return;
         }
 
-        if(hasTransformer(aClass)) {
+        if (hasTransformer(psiClass)) {
           return;
         }
 
-        PsiMethod[] allMethods = aClass.getMethods();
+        PsiMethod[] allMethods = psiClass.getMethods();
         Map<String, PsiMethod> restfulSignatures = Maps.newHashMap();
 
-        for(PsiMethod aMethod : allMethods)  {
-          validateRestSignatureUnique(aMethod, restfulSignatures );
+        for (PsiMethod psiMethod : allMethods) {
+          validateRestSignatureUnique(psiMethod, restfulSignatures);
         }
       }
 
-      private void validateRestSignatureUnique(PsiMethod psiMethod, Map<String, PsiMethod> restfulSignatures) {
+      private void validateRestSignatureUnique(PsiMethod psiMethod,
+          Map<String, PsiMethod> restfulSignatures) {
         // Check if method public or non-static
-        if(!EndpointUtilities.isApiMethod(psiMethod)) {
+        if (!EndpointUtilities.isApiMethod(psiMethod)) {
           return;
         }
 
-        if(psiMethod.isConstructor()) {
+        if (psiMethod.isConstructor()) {
           return;
         }
 
@@ -263,28 +282,30 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         if (seenMethod == null) {
           restfulSignatures.put(restSignature, psiMethod);
         } else {
-          holder.registerProblem(psiMethod, getErrorMessage(restSignature, psiMethod.getName(), seenMethod.getName()),
-                                 LocalQuickFix.EMPTY_ARRAY);
+          holder.registerProblem(psiMethod,
+              getErrorMessage(restSignature, psiMethod.getName(), seenMethod.getName()),
+              LocalQuickFix.EMPTY_ARRAY);
         }
       }
     };
   }
 
   /**
-   * Returns the REST signature of the specified method. The REST signature is derived from
-   * a combination of httpMethod and path.
+   * Returns the REST signature of the specified method. The REST signature is derived from a
+   * combination of httpMethod and path.
    *
    * @param psiMethod the method whose REST signature is to be determined
-   * @return  the Rest Signature of psiMethod
+   * @return the Rest Signature of psiMethod
    */
   public String getRestfulSignature(PsiMethod psiMethod) {
-    return getHttpMethod(psiMethod) + " " + getPath(psiMethod).replaceAll("\\{([^\\}]*)\\}", "\\{\\}");
+    return getHttpMethod(psiMethod) + " " + getPath(psiMethod)
+        .replaceAll("\\{([^\\}]*)\\}", "\\{\\}");
   }
 
   /**
-   * Returns the http method of the specified psiMethod. The httpMethod can be set by
-   * the user by setting the httpMethod attribute in @ApiMethod. If the httpMethod attribute
-   * of the @ApiMethod is not set, the default value of the method is used.
+   * Returns the http method of the specified psiMethod. The httpMethod can be set by the user by
+   * setting the httpMethod attribute in @ApiMethod. If the httpMethod attribute of the @ApiMethod
+   * is not set, the default value of the method is used.
    *
    * @param psiMethod the method hose HTTP method is to be determined
    * @return the http Method pf psiMethod
@@ -296,10 +317,11 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     // Check if the httpMethod was specified by uses in @ApiMethod's httpMethod attribute
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
-        httpMethod = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "httpMethod");
-      } catch (InvalidAnnotationException e) {
+        httpMethod = getAttributeFromAnnotation(annotation,
+            GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "httpMethod");
+      } catch (InvalidAnnotationException ex) {
         // do nothing
-      } catch (MissingAttributeException e) {
+      } catch (MissingAttributeException ex) {
         break;
       }
 
@@ -313,8 +335,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   }
 
   /**
-   * Returns the path for psiMethod. The path can be set by the user by setting the path
-   * attribute of @ApiMethod. If the path attribute is not set, a default value will be returned.
+   * Returns the path for psiMethod. The path can be set by the user by setting the path attribute
+   * of @ApiMethod. If the path attribute is not set, a default value will be returned.
    *
    * @param psiMethod the method whose path is to be determined
    * @return the path for psiMethod
@@ -326,10 +348,11 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     // Check if the httpMethod was specified by user in @ApiMethod's httpMethod attribute
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
-        path = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "path");
-      } catch (InvalidAnnotationException e) {
+        path = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD,
+            "path");
+      } catch (InvalidAnnotationException ex) {
         // do nothing
-      } catch (MissingAttributeException e) {
+      } catch (MissingAttributeException ex) {
         break;
       }
 
@@ -348,12 +371,12 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   }
 
   /**
-   * Returns the default path of psiMethod. The default path is determined in the following order
-   * 1. If the resource attribute of @ApiClass is set, the default value is this attribute + the path parameters
-   * 2. If the resource attribute of @Api is set, the default value is this attribute + the path parameters
-   * 3. If the method return type is not void, we guess the resource value in
-   *    {@link RestSignatureInspection#guessResourceName(com.intellij.psi.PsiMethod)} and add the path parameters
-   * 4. Else use the method's name as the resource name + the path parameters.
+   * Returns the default path of psiMethod. The default path is determined in the following order 1.
+   * If the resource attribute of @ApiClass is set, the default value is this attribute + the path
+   * parameters 2. If the resource attribute of @Api is set, the default value is this attribute +
+   * the path parameters 3. If the method return type is not void, we guess the resource value in
+   * {@link RestSignatureInspection#guessResourceName(com.intellij.psi.PsiMethod)} and add the path
+   * parameters 4. Else use the method's name as the resource name + the path parameters.
    *
    * @param psiMethod the method whose default path is to be determined
    * @return the default path for psiMethod
@@ -361,13 +384,13 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   private String getDefaultPath(PsiMethod psiMethod) {
     // Get path from @ApiClass or @Api's resource attribute if it exists
     String apiDefaultResource = getResourceProperty(psiMethod);
-    if(apiDefaultResource != null) {
+    if (apiDefaultResource != null) {
       return apiDefaultResource.toLowerCase() + getPathParameter(psiMethod);
     }
 
     // If the method return type is not void, use guessed resource type name
     String guessedResourceName = guessResourceName(psiMethod);
-    if(guessedResourceName != null) {
+    if (guessedResourceName != null) {
       return guessedResourceName + getPathParameter(psiMethod);
     }
 
@@ -376,10 +399,9 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   }
 
   /**
-   * Returns the default REST method for {@code psiMethod}. The default REST method is
-   * determined by parsing the method name. If the method name begins with any of the REST
-   * method's prefixes, the REST method of the respective RESTMethod is returned.
-   * If not, the POST RestMethod is returned.
+   * Returns the default REST method for {@code psiMethod}. The default REST method is determined by
+   * parsing the method name. If the method name begins with any of the REST method's prefixes, the
+   * REST method of the respective RESTMethod is returned. If not, the POST RestMethod is returned.
    *
    * @param psiMethod the method whose default HTTP method is to be determined
    */
@@ -390,7 +412,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         return entry;
       }
     }
-    throw new AssertionError("It's impossible for method" + psiMethod.getName() + " to map to no REST path.");
+    throw new AssertionError(
+        "It's impossible for method" + psiMethod.getName() + " to map to no REST path.");
   }
 
   @Nullable
@@ -399,22 +422,23 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     PsiModifierList modifierList = psiClass.getModifierList();
     String resource = null;
 
-    if(modifierList == null) {
+    if (modifierList == null) {
       return null;
     }
 
     // Get @ApiClass's resource attribute if it exists
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
-      try{
-        resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, "resource");
-      } catch (InvalidAnnotationException e) {
+      try {
+        resource = getAttributeFromAnnotation(annotation,
+            GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, "resource");
+      } catch (InvalidAnnotationException ex) {
         // do nothing
-      } catch (MissingAttributeException e) {
+      } catch (MissingAttributeException ex) {
         break;
       }
 
       // resource attribute is "" by default
-      if(resource != null && !resource.isEmpty()) {
+      if (resource != null && !resource.isEmpty()) {
         return resource;
       }
     }
@@ -422,10 +446,11 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     // Get @Api's resource attribute if it exists
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
-        resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API, "resource");
-      } catch (InvalidAnnotationException e) {
+        resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API,
+            "resource");
+      } catch (InvalidAnnotationException ex) {
         // do nothing
-      } catch (MissingAttributeException e) {
+      } catch (MissingAttributeException ex) {
         break;
       }
 
@@ -442,22 +467,22 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     return null;
   }
 
-  private String getAttributeFromAnnotation (PsiAnnotation annotation, String annotationType,
-    final String attribute) throws InvalidAnnotationException, MissingAttributeException {
+  private String getAttributeFromAnnotation(PsiAnnotation annotation, String annotationType,
+      final String attribute) throws InvalidAnnotationException, MissingAttributeException {
 
     String annotationQualifiedName = annotation.getQualifiedName();
     if (annotationQualifiedName == null) {
       throw new InvalidAnnotationException(annotation, annotationType);
     }
 
-    if(annotationQualifiedName.equals(annotationType)) {
-      PsiAnnotationMemberValue annotationMemberValue =  annotation.findAttributeValue(attribute);
-      if(annotationMemberValue == null) {
+    if (annotationQualifiedName.equals(annotationType)) {
+      PsiAnnotationMemberValue annotationMemberValue = annotation.findAttributeValue(attribute);
+      if (annotationMemberValue == null) {
         throw new MissingAttributeException(annotation, attribute);
       }
 
       String httpMethodWithQuotes = annotationMemberValue.getText();
-      return httpMethodWithQuotes.substring(1,httpMethodWithQuotes.length()-1);
+      return httpMethodWithQuotes.substring(1, httpMethodWithQuotes.length() - 1);
     } else {
       throw new InvalidAnnotationException(annotation, annotationType);
     }
@@ -465,7 +490,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
 
   private String getErrorMessage(String restSignature, String method1, String method2) {
     return String.format("Multiple methods with same rest path \"%s\": \"%s\" and \"%s\"",
-                         restSignature, method1, method2);
+        restSignature, method1, method2);
   }
 
   /**
@@ -474,7 +499,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   @Nullable
   private String guessResourceName(PsiMethod method) {
     // Check if return type is void
-    if(method.getReturnType() == PsiType.VOID) {
+    if (method.getReturnType() == PsiType.VOID) {
       return null;
     }
 
@@ -486,28 +511,29 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   }
 
   /**
-   * Returns "/{}" for every parameter with a valid @Named annotation in {@code method}
-   * that does not have @Nullable/@Default.
+   * Returns "/{}" for every parameter with a valid @Named annotation in {@code method} that does
+   * not have @Nullable/@Default.
    */
   private String getPathParameter(PsiMethod method) {
     StringBuilder path = new StringBuilder();
     EndpointPsiElementVisitor elementVisitor = new EndpointPsiElementVisitor();
     List<String> annotions =
-      Arrays.asList(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE, "javax.annotation.Nullable", GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
+        Arrays.asList(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE, "javax.annotation.Nullable",
+            GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
 
-    for(PsiParameter aParameter : method.getParameterList().getParameters()) {
+    for (PsiParameter param : method.getParameterList().getParameters()) {
       // Check for @Nullable/@Default
-      PsiModifierList modifierList = aParameter.getModifierList();
-      if(modifierList == null) {
+      PsiModifierList modifierList = param.getModifierList();
+      if (modifierList == null) {
         continue;
       }
 
-      if (AnnotationUtil.isAnnotated(aParameter, annotions)) {
+      if (AnnotationUtil.isAnnotated(param, annotions)) {
         continue;
       }
 
-      PsiAnnotationMemberValue namedValue = elementVisitor.getNamedAnnotationValue(aParameter);
-      if(namedValue != null) {
+      PsiAnnotationMemberValue namedValue = elementVisitor.getNamedAnnotationValue(param);
+      if (namedValue != null) {
         path.append("/{}");
       }
     }
@@ -523,8 +549,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     Project project;
     try {
       project = method.getContainingFile().getProject();
-    } catch (PsiInvalidElementAccessException e) {
-      LOG.error("Error getting project with parameter " + method.getText(), e);
+    } catch (PsiInvalidElementAccessException ex) {
+      LOG.error("Error getting project with parameter " + method.getText(), ex);
       return null;
     }
     return project;

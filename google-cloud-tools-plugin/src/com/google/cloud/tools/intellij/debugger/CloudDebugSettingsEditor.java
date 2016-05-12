@@ -13,20 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.cloud.tools.intellij.debugger.ui.CloudDebugRunConfigurationPanel;
+
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
+
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
 
 /**
- * Creates the UI to change Run Configuration settings and applies those to our
- * {@link CloudDebugRunConfiguration}.
+ * Creates the UI to change Run Configuration settings and applies those to our {@link
+ * CloudDebugRunConfiguration}.
  */
 public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfiguration> {
+
   private final CloudDebugRunConfigurationPanel settingsPanel;
 
   public CloudDebugSettingsEditor() {
@@ -34,7 +38,8 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
   }
 
   @Override
-  protected void applyEditorTo(CloudDebugRunConfiguration runConfiguration) throws ConfigurationException {
+  protected void applyEditorTo(CloudDebugRunConfiguration runConfiguration)
+      throws ConfigurationException {
     runConfiguration.setCloudProjectName(settingsPanel.getProjectName());
 
   }

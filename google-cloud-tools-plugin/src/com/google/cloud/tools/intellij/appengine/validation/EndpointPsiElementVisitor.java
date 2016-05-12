@@ -44,42 +44,44 @@ import java.util.Set;
  * A visitor that has endpoint validation specific functionality.
  */
 public class EndpointPsiElementVisitor extends JavaElementVisitor {
+
   // TODO: Add tests
   private static final String API_TRANSFORMER_ATTRIBUTE = "transformers";
 
   /**
-   *  Returns true if the class containing <code>psiElement</code> has a transformer
-   *  specified by using the @ApiTransformer annotation on a class or by
-   *  using the transformer attribute of the @Api annotation. Returns false otherwise.
-   * @param psiElement
-   * @return  True if the class containing <code>psiElement</code> has a transformer
-   * and false otherwise.
+   * Returns true if the class containing <code>psiElement</code> has a transformer specified by
+   * using the @ApiTransformer annotation on a class or by using the transformer attribute of the
+   *
+   * @return True if the class containing <code>psiElement</code> has a transformer and false
+   *     otherwise.
+   * @Api annotation. Returns false otherwise.
    */
   public boolean hasTransformer(PsiElement psiElement) {
     PsiClass psiClass = PsiUtils.findClass(psiElement);
-    if(psiClass == null) {
+    if (psiClass == null) {
       return false;
     }
 
     PsiModifierList modifierList = psiClass.getModifierList();
-    if(modifierList == null) {
+    if (modifierList == null) {
       return false;
     }
 
     // Check if class has @ApiTransformer to specify a transformer
     PsiAnnotation apiTransformerAnnotation =
-      modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API_TRANSFORMER);
+        modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API_TRANSFORMER);
     if (apiTransformerAnnotation != null) {
       return true;
     }
 
     // Check if class utilizes the transformer attribute of the @Api annotation
     // to specify its transformer
-    PsiAnnotation apiAnnotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API);
+    PsiAnnotation apiAnnotation = modifierList
+        .findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API);
     if (apiAnnotation != null) {
       PsiAnnotationMemberValue transformerMember =
-        apiAnnotation.findAttributeValue(API_TRANSFORMER_ATTRIBUTE);
-      if(transformerMember != null && !transformerMember.getText().equals("{}")) {
+          apiAnnotation.findAttributeValue(API_TRANSFORMER_ATTRIBUTE);
+      if (transformerMember != null && !transformerMember.getText().equals("{}")) {
         return true;
       }
     }
@@ -88,33 +90,34 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
   }
 
   /**
-   * Returns the value for @Named if it exists for <code>psiParameter</code>
-   * or null if it does not exist.
+   * Returns the value for @Named if it exists for <code>psiParameter</code> or null if it does not
+   * exist.
+   *
    * @param psiParameter The parameter whose @Named value is to be returned.
-   * @return  The @Named value if it exists for <code>psiParameter</code>
-   * or null if it does not exist.
+   * @return The @Named value if it exists for <code>psiParameter</code> or null if it does not
+   *     exist.
    */
   @Nullable
   public PsiAnnotationMemberValue getNamedAnnotationValue(PsiParameter psiParameter) {
     PsiModifierList modifierList = psiParameter.getModifierList();
-    if(modifierList == null) {
+    if (modifierList == null) {
       return null;
     }
 
     PsiAnnotation annotation = modifierList.findAnnotation("javax.inject.Named");
-    if(annotation == null) {
-      annotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED );
-      if(annotation == null) {
+    if (annotation == null) {
+      annotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED);
+      if (annotation == null) {
         return null;
       }
     }
 
     PsiNameValuePair[] nameValuePairs = annotation.getParameterList().getAttributes();
-    if(nameValuePairs.length != 1){
+    if (nameValuePairs.length != 1) {
       return null;
     }
 
-    if(nameValuePairs[0] == null) {
+    if (nameValuePairs[0] == null) {
       return null;
     }
 
@@ -129,16 +132,26 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
    */
   private static Set<PsiClassType> createParameterTypes(Project project) {
     Set<PsiClassType> parameterTypes = new HashSet<PsiClassType>();
-    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Enum"));
-    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.String"));
-    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Boolean"));
-    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Integer"));
-    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Long"));
-    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Float"));
-    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Double"));
-    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Date"));
-    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("com.google.api.server.spi.types.DateAndTime"));
-    parameterTypes.add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("com.google.api.server.spi.types.SimpleDate"));
+    parameterTypes
+        .add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Enum"));
+    parameterTypes
+        .add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.String"));
+    parameterTypes
+        .add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Boolean"));
+    parameterTypes
+        .add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Integer"));
+    parameterTypes
+        .add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Long"));
+    parameterTypes
+        .add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Float"));
+    parameterTypes
+        .add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.lang.Double"));
+    parameterTypes
+        .add(JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Date"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project)
+        .createTypeByFQClassName("com.google.api.server.spi.types.DateAndTime"));
+    parameterTypes.add(JavaPsiFacade.getElementFactory(project)
+        .createTypeByFQClassName("com.google.api.server.spi.types.SimpleDate"));
 
     return Collections.unmodifiableSet(parameterTypes);
   }
@@ -152,41 +165,44 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
   private static Set<PsiClassType> createInjectedClassTypes(Project project) {
     Set<PsiClassType> injectedClassTypes = new HashSet<PsiClassType>();
     injectedClassTypes.add(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("com.google.appengine.api.users.User"));
+        JavaPsiFacade.getElementFactory(project)
+            .createTypeByFQClassName("com.google.appengine.api.users.User"));
     injectedClassTypes.add(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("javax.servlet.http.HttpServletRequest"));
+        JavaPsiFacade.getElementFactory(project)
+            .createTypeByFQClassName("javax.servlet.http.HttpServletRequest"));
     injectedClassTypes.add(
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("javax.servlet.ServletContext"));
+        JavaPsiFacade.getElementFactory(project)
+            .createTypeByFQClassName("javax.servlet.ServletContext"));
 
     return Collections.unmodifiableSet(injectedClassTypes);
   }
 
   /**
-   * @return true if the raw or base type of <code>psiType</code> is
-   * one of the endpoint parameter types.
+   * @return true if the raw or base type of <code>psiType</code> is one of the endpoint parameter
+   *     types.
    */
   public boolean isApiParameter(PsiType psiType, Project project) {
     PsiType baseType = psiType;
     PsiClassType collectionType =
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
+        JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
 
     // If type is an array or collection, get the component type
     if (psiType instanceof PsiArrayType) {
-      PsiArrayType arrayType = (PsiArrayType)psiType;
-      baseType= arrayType.getDeepComponentType();
+      PsiArrayType arrayType = (PsiArrayType) psiType;
+      baseType = arrayType.getDeepComponentType();
     } else if (collectionType.isAssignableFrom(psiType)) {
       assert (psiType instanceof PsiClassType);
       PsiClassType classType = (PsiClassType) psiType;
       PsiType[] parameters = classType.getParameters();
-      if(parameters.length == 0) {
+      if (parameters.length == 0) {
         return false;
       }
       baseType = parameters[0];
     }
 
     Set<PsiClassType> parameterTypes = createParameterTypes(project);
-    for(PsiClassType aClassType : parameterTypes) {
-      if (aClassType.isAssignableFrom(baseType)) {
+    for (PsiClassType classType : parameterTypes) {
+      if (classType.isAssignableFrom(baseType)) {
         return true;
       }
     }
@@ -195,14 +211,13 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
   }
 
   /**
-   * Returns true if the raw or base type of <code>psiParameter</code> is
-   * one of endpoint injected type.
-   * @return
+   * Returns true if the raw or base type of <code>psiParameter</code> is one of endpoint injected
+   * type.
    */
   public boolean isInjectedParameter(PsiType psiType, Project project) {
     Set<PsiClassType> injectedClassTypes = createInjectedClassTypes(project);
-    for(PsiClassType aClassType : injectedClassTypes) {
-      if (aClassType.isAssignableFrom(psiType)) {
+    for (PsiClassType classType : injectedClassTypes) {
+      if (classType.isAssignableFrom(psiType)) {
         return true;
       }
     }
@@ -211,13 +226,13 @@ public class EndpointPsiElementVisitor extends JavaElementVisitor {
   }
 
   /**
-   * @return true if the raw or base type of <code>psiType</code> is
-   * an entity(resource) type; i.e. not of parameter type nor of entity type
+   * @return true if the raw or base type of <code>psiType</code> is an entity(resource) type; i.e.
+   *     not of parameter type nor of entity type
    */
   public boolean isEntityParameter(PsiType psiType, Project project) {
     boolean isApiParameter = isApiParameter(psiType, project);
     boolean isInjectedParameter = isInjectedParameter(psiType, project);
-    if(!isApiParameter && !isInjectedParameter) {
+    if (!isApiParameter && !isInjectedParameter) {
       return true;
     } else {
       return false;

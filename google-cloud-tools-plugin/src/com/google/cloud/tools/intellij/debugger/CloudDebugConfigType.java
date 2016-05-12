@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -33,6 +34,7 @@ import javax.swing.Icon;
  * This class defines the runconfig type and factory for Cloud Debugger RunConfigurations.
  */
 public class CloudDebugConfigType implements ConfigurationType {
+
   public static final String GCT_DEBUGGER_ENABLE = "enable.gct.debugger";
   public static final String GCT_DEBUGGER_USETOKEN = "enable.gct.debugger.token";
 
@@ -77,12 +79,14 @@ public class CloudDebugConfigType implements ConfigurationType {
   }
 
   private static class MyConfigurationFactory extends ConfigurationFactory {
+
     MyConfigurationFactory(@NotNull CloudDebugConfigType type) {
       super(type);
     }
 
     @Override
-    public void configureBeforeRunTaskDefaults(Key<? extends BeforeRunTask> providerID, BeforeRunTask task) {
+    public void configureBeforeRunTaskDefaults(Key<? extends BeforeRunTask> providerId,
+        BeforeRunTask task) {
       task.setEnabled(false);
     }
 

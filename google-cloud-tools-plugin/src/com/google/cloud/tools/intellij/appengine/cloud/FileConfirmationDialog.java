@@ -33,11 +33,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
- * A dialog warning for, e.g., overwriting existing app.yaml and Dockerfile configuration files
- * when user selects a destination folder to auto-generate them.
+ * A dialog warning for, e.g., overwriting existing app.yaml and Dockerfile configuration files when
+ * user selects a destination folder to auto-generate them.
  */
 public class FileConfirmationDialog extends DialogWrapper {
-  public enum DialogType { CONFIRM_OVERWRITE, CONFIRM_CREATE_DIR, NOT_DIRECTORY_ERROR };
+
+  public enum DialogType {
+    CONFIRM_OVERWRITE, CONFIRM_CREATE_DIR, NOT_DIRECTORY_ERROR
+  }
 
   private JPanel rootPanel;
   private JLabel warningLabel;
@@ -45,6 +48,9 @@ public class FileConfirmationDialog extends DialogWrapper {
 
   private DialogType dialogType;
 
+  /**
+   * Initialize the dialog of the correct type.
+   */
   public FileConfirmationDialog(
       @Nullable Project project, DialogType dialogType, @NotNull File targetPath) {
     super(project);
@@ -85,7 +91,7 @@ public class FileConfirmationDialog extends DialogWrapper {
   @Override
   protected Action[] createActions() {
     if (dialogType == DialogType.NOT_DIRECTORY_ERROR) {
-      return new Action[]{ getOKAction() };
+      return new Action[]{getOKAction()};
     } else {
       return super.createActions();
     }

@@ -13,16 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.RunManager;
-import com.intellij.execution.configurations.*;
+import com.intellij.execution.configurations.ConfigurationFactory;
+import com.intellij.execution.configurations.LocatableConfigurationBase;
+import com.intellij.execution.configurations.ModuleRunConfiguration;
+import com.intellij.execution.configurations.RemoteRunProfile;
+import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.configurations.RunConfigurationWithSuppressedDefaultDebugAction;
+import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAction;
 import com.intellij.openapi.module.Module;
@@ -30,24 +37,26 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The CloudDebugRunConfiguration stores settings to use when attaching to a target. It also creates and possibly caches
- * {@link CloudDebugProcessState}.
+ * The CloudDebugRunConfiguration stores settings to use when attaching to a target. It also creates
+ * and possibly caches {@link CloudDebugProcessState}.
  * <p/>
- * When the IDE is shut down, we store this state using {@link CloudDebugProcessStateSerializer} to ensure that it is
- * stored on a per-user basis in workspace.xml.
+ * When the IDE is shut down, we store this state using {@link CloudDebugProcessStateSerializer} to
+ * ensure that it is stored on a per-user basis in workspace.xml.
  * <p/>
- * RunConfigurations can either be stored in workspace.xml or in a shared location depending on whether the user has
- * selected "Shared".
+ * RunConfigurations can either be stored in workspace.xml or in a shared location depending on
+ * whether the user has selected "Shared".
  */
 public class CloudDebugRunConfiguration extends LocatableConfigurationBase
     implements ModuleRunConfiguration, RunConfigurationWithSuppressedDefaultDebugAction,
-               RunConfigurationWithSuppressedDefaultRunAction, RemoteRunProfile {
+    RunConfigurationWithSuppressedDefaultRunAction, RemoteRunProfile {
+
   private static final String NAME = "Cloud Debug Configuration";
   private static final String PROJECT_NAME_TAG = "CloudProjectName";
   private String cloudProjectName;
@@ -60,9 +69,10 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
 
   @Override
   public final RunConfiguration clone() {
-    // clone is called for both creation of run configuration and duplication. New run configurations are cloned
-    // from the configuration factory's instance
-    if (this == RunManager.getInstance(getProject()).getConfigurationTemplate(this.getFactory()).getConfiguration()) {
+    // clone is called for both creation of run configuration and duplication. New run
+    // configurations are cloned from the configuration factory's instance
+    if (this == RunManager.getInstance(getProject()).getConfigurationTemplate(this.getFactory())
+        .getConfiguration()) {
       UsageTrackerProvider.getInstance()
           .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "new.run.config", null);
     }
@@ -105,7 +115,8 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   /**
    * Returns the current debuggee state associated with this {@link CloudDebugRunConfiguration}.
    *
-   * @return a CloudDebugProcessState that may be deserialized from workspace.xml or updated live from the server
+   * @return a CloudDebugProcessState that may be deserialized from workspace.xml or updated live
+   *     from the server
    */
   @Nullable
   public CloudDebugProcessState getProcessState() {
@@ -122,17 +133,19 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   }
 
   /**
-   * Returns either cached state (if we were previously watching this state in this or the last IDE session) Or it
-   * returns a partially valid state, which will later be filled in by the {@link com.google.gct.idea.debugger
-   * .CloudDebuggerRunner}
+   * Returns either cached state (if we were previously watching this state in this or the last IDE
+   * session) Or it returns a partially valid state, which will later be filled in by the {@link
+   * com.google.gct.idea.debugger .CloudDebuggerRunner}
    *
-   * @param executor    the execution mode selected by the user (run, debug, profile etc.)
-   * @param environment the environment object containing additional settings for executing the configuration.
+   * @param executor the execution mode selected by the user (run, debug, profile etc.)
+   * @param environment the environment object containing additional settings for executing the
+   *     configuration.
    */
   @Nullable
   @Override
-  public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment environment)
-    throws ExecutionException {
+  public RunProfileState getState(@NotNull Executor executor,
+      @NotNull ExecutionEnvironment environment)
+      throws ExecutionException {
     if (processState == null) {
       return new CloudDebugProcessState(null, null, cloudProjectName, null, getProject());
     }
@@ -149,7 +162,8 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
     // Call out to the state serializer to get process state out of workspace.xml.
     if (!Strings.isNullOrEmpty(cloudProjectName) && !Strings.isNullOrEmpty(getName())) {
       processState =
-        CloudDebugProcessStateSerializer.getInstance(getProject()).getState(getName(), cloudProjectName);
+          CloudDebugProcessStateSerializer.getInstance(getProject())
+              .getState(getName(), cloudProjectName);
     }
     CloudDebugProcessWatcher.getInstance().ensureWatcher();
   }

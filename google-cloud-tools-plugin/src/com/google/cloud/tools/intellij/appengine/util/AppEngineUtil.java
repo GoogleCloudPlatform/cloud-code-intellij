@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.util;
 
 /**
- * App Engine utility methods
+ * App Engine utility methods.
  */
 public class AppEngineUtil {
 

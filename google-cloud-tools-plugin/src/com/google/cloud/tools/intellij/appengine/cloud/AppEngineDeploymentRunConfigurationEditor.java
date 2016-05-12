@@ -103,6 +103,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   public static final String DEFAULT_APP_YAML_DIR = "/src/main/appengine";
   public static final String DEFAULT_DOCKERFILE_DIR = "/src/main/docker";
 
+  /**
+   * Initializes the UI components.
+   */
   public AppEngineDeploymentRunConfigurationEditor(
       final Project project,
       final DeploymentSource deploymentSource,
@@ -134,7 +137,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     appEngineConfigFilesPanel.setVisible(false);
     configTypeComboBox.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent event) {
         if (getConfigType() == ConfigType.CUSTOM) {
           appEngineConfigFilesPanel.setVisible(true);
 
@@ -165,13 +168,16 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         GctBundle.message("appengine.flex.config.user.specified.artifact.title"),
         null,
         project,
-        FileChooserDescriptorFactory.createSingleFileDescriptor().withFileFilter(new Condition<VirtualFile>() {
-          @Override
-          public boolean value(VirtualFile file) {
-            return Comparing.equal(file.getExtension(), "jar", SystemInfo.isFileSystemCaseSensitive)
-                || Comparing.equal(file.getExtension(), "war", SystemInfo.isFileSystemCaseSensitive);
-          }
-        })
+        FileChooserDescriptorFactory.createSingleFileDescriptor()
+            .withFileFilter(new Condition<VirtualFile>() {
+              @Override
+              public boolean value(VirtualFile file) {
+                return Comparing
+                    .equal(file.getExtension(), "jar", SystemInfo.isFileSystemCaseSensitive)
+                    || Comparing
+                    .equal(file.getExtension(), "war", SystemInfo.isFileSystemCaseSensitive);
+              }
+            })
     );
     userSpecifiedArtifactFileSelector.getTextField().getDocument()
         .addDocumentListener(getUserSpecifiedArtifactFileListener());
@@ -215,7 +221,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     versionOverrideCheckBox.setSelected(!StringUtil.isEmpty(configuration.getVersion()));
     versionIdField.setEditable(versionOverrideCheckBox.isSelected());
-    if(versionOverrideCheckBox.isSelected()) {
+    if (versionOverrideCheckBox.isSelected()) {
       versionIdField.setText(configuration.getVersion());
     }
   }
@@ -228,7 +234,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     configuration.setDockerFilePath(dockerFilePathField.getText());
     configuration.setAppYamlPath(appYamlPathField.getText());
     configuration.setConfigType(getConfigType());
-    configuration.setVersion(versionOverrideCheckBox.isSelected() ? versionIdField.getText() : null);
+    configuration
+        .setVersion(versionOverrideCheckBox.isSelected() ? versionIdField.getText() : null);
 
     updateCloudProjectName(appEngineHelper.getProjectId());
     setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
@@ -252,11 +259,13 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   /**
-   * The name of the currently selected deployment source is displayed in the Application Servers window.
-   * We want this name to also include the path to the manually chosen archive when one is selected.
+   * The name of the currently selected deployment source is displayed in the Application Servers
+   * window. We want this name to also include the path to the manually chosen archive when one is
+   * selected.
    */
   private void setDeploymentSourceName(String filePath) {
-    if(isUserSpecifiedPathDeploymentSource() && !StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())) {
+    if (isUserSpecifiedPathDeploymentSource() && !StringUtil
+        .isEmpty(userSpecifiedArtifactFileSelector.getText())) {
       ((UserSpecifiedPathDeploymentSource) deploymentSource).setName(
           GctBundle.message(
               "appengine.flex.user.specified.deploymentsource.name.with.filename",
@@ -265,14 +274,16 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   private void validateConfiguration() throws ConfigurationException {
-    if (isUserSpecifiedPathDeploymentSource() && (StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())
-        || !isJarOrWar(userSpecifiedArtifactFileSelector.getText()))) {
+    if (isUserSpecifiedPathDeploymentSource() && (
+        StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())
+            || !isJarOrWar(userSpecifiedArtifactFileSelector.getText()))) {
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.user.specified.artifact.error"));
     } else if (!isUserSpecifiedPathDeploymentSource() && !deploymentSource.isValid()) {
       throw new ConfigurationException(
           GctBundle.message("appengine.config.deployment.source.error"));
-    } else if(versionOverrideCheckBox.isSelected() && StringUtils.isBlank(versionIdField.getText())) {
+    } else if (versionOverrideCheckBox.isSelected() && StringUtils
+        .isBlank(versionIdField.getText())) {
       throw new ConfigurationException(GctBundle.message("appengine.config.version.error"));
     } else if (getConfigType() == ConfigType.CUSTOM) {
       if (StringUtils.isBlank(appYamlPathField.getText())) {
@@ -291,7 +302,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
       return false;
     }
     String name = file.getName();
-    return StringUtil.endsWithIgnoreCase(name, ".jar") || StringUtil.endsWithIgnoreCase(name, ".war");
+    return StringUtil.endsWithIgnoreCase(name, ".jar") || StringUtil
+        .endsWithIgnoreCase(name, ".war");
   }
 
   private boolean isUserSpecifiedPathDeploymentSource() {
@@ -301,8 +313,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private DocumentAdapter getUserSpecifiedArtifactFileListener() {
     return new DocumentAdapter() {
       @Override
-      protected void textChanged(DocumentEvent e) {
-        if(isUserSpecifiedPathDeploymentSource()) {
+      protected void textChanged(DocumentEvent event) {
+        if (isUserSpecifiedPathDeploymentSource()) {
           ((UserSpecifiedPathDeploymentSource) deploymentSource).setFilePath(
               userSpecifiedArtifactFileSelector.getText());
         }
@@ -398,10 +410,10 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         try {
           FileUtil.copy(sourceFileProvider.get(), destinationFilePath);
           LocalFileSystem.getInstance().refreshAndFindFileByIoFile(destinationFilePath);
-        } catch (IOException e) {
+        } catch (IOException ex) {
           String message = GctBundle.message(
               "appengine.flex.config.generation.io.error", destinationFilePath.getName());
-          Messages.showErrorDialog(project, message + e.getLocalizedMessage(), "Error");
+          Messages.showErrorDialog(project, message + ex.getLocalizedMessage(), "Error");
           return;
         }
         filePicker.setText(destinationFilePath.getPath());
@@ -410,6 +422,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   private class CustomFieldOverrideListener implements ItemListener {
+
     private JCheckBox overrideCheckbox;
     private JTextField field;
 
@@ -425,6 +438,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   private class ProjectNameListener implements PropertyChangeListener {
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       updateCloudProjectName((String) evt.getNewValue());

@@ -52,21 +52,21 @@ public interface AppEngineHelper {
    * The default Dockerfile we suggest for custom MVM deployments.
    *
    * @param deploymentArtifactType depending on the artifact type we provide a different default
-   *                               Dockerfile
+   *     Dockerfile
    * @return A {@link java.io.File} path to the default Dockerfile
    */
   File defaultDockerfile(DeploymentArtifactType deploymentArtifactType);
 
   /**
-   * Creates a {@link AppEngineAction} that will perform custom App Engine Flex deployment
-   * on {@code run()).
+   * Creates a {@link AppEngineAction} that will perform custom App Engine Flex deployment on {@code
+   * run()}.
    *
    * @param loggingHandler logging messages will be output to this
    * @param project the IJ project
    * @param artifactToDeploy the {@link File} path to the Java artifact to be deployed
    * @param appYamlPath the {@link File} path to the app.yaml to use for deployment
    * @param dockerfilePath the {@link File} path to the Dockerfile to be used for the custom MVM
-   *                       runtime
+   *     runtime
    * @param deploymentCallback a callback for handling successful completion of the operation
    * @return the runnable that will perform the deployment operation
    */
@@ -81,7 +81,8 @@ public interface AppEngineHelper {
 
   /**
    * Creates a {@link AppEngineAction} that will perform a standard App Engine flexible environment
-   * deployment with an automatically configured runtime (app.yaml and Dockerfile) on {@code run()).
+   * deployment with an automatically configured runtime (app.yaml and Dockerfile) on {@code
+   * run()}.
    *
    * @param loggingHandler logging messages will be output to this
    * @param project the IJ project

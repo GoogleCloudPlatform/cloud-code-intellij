@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
@@ -28,21 +29,23 @@ import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.ImmutableList;
 import com.intellij.util.xmlb.annotations.Transient;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
 /**
- * CloudDebugProcessState is serializable state that stores the current set of snapshots for a given GCP application. It
- * is used by a {@link CloudDebugProcess}, but its lifetime can span beyond a debug session
- * and be used by the background process watcher.
+ * CloudDebugProcessState is serializable state that stores the current set of snapshots for a given
+ * GCP application. It is used by a {@link CloudDebugProcess}, but its lifetime can span beyond a
+ * debug session and be used by the background process watcher.
  */
 public class CloudDebugProcessState extends UserDataHolderBase implements RunProfileState {
+
   // The current state is simply an array of breakpoints.  It's volatile because it's updated and
   // retrieved on different threads with otherwise no synchronization.
   private volatile ImmutableList<Breakpoint> currentServerBreakpointList =
-    ContainerUtil.immutableList(new ArrayList<Breakpoint>());
+      ContainerUtil.immutableList(new ArrayList<Breakpoint>());
   // DebuggeeId is defined by the cloud debugger service to represent a single target service
   // that we can debug.
   private String debuggeeId;
@@ -62,29 +65,31 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   private boolean listenInBackground;
 
   /**
-   * This constructor is used by deserialization of the {@link CloudDebugProcessStateSerializer}. We use a separate
-   * serializer so we can ensure that the config is written to workspace.xml which is not shared between users and is
-   * never checked in.
+   * This constructor is used by deserialization of the {@link CloudDebugProcessStateSerializer}. We
+   * use a separate serializer so we can ensure that the config is written to workspace.xml which is
+   * not shared between users and is never checked in.
    */
   public CloudDebugProcessState() {
   }
 
   /**
-   * CloudDebugProcessState can be initialized with partial state to indicate preferences on the {@link
-   * CloudDebugRunConfiguration}. When the process state is partial, the attach dialog is used to make it complete.
-   * isValidDebuggee must be true for the attach to continue.
+   * CloudDebugProcessState can be initialized with partial state to indicate preferences on the
+   * {@link CloudDebugRunConfiguration}. When the process state is partial, the attach dialog is
+   * used to make it complete. isValidDebuggee must be true for the attach to continue.
    *
-   * @param userEmail     the user's email which corresponds to a login {@link CredentialedUser}
-   * @param debuggeeId    a String Id that represents a target application to debug (debuggee)
-   * @param projectName   a alpha-numeric String name identifying a GCP project that owns the target debuggee
-   * @param projectNumber a numeric String identifying the same GCP project that owns the target debuggee
-   * @param project       the intelliJ IDE project
+   * @param userEmail the user's email which corresponds to a login {@link CredentialedUser}
+   * @param debuggeeId a String Id that represents a target application to debug (debuggee)
+   * @param projectName a alpha-numeric String name identifying a GCP project that owns the target
+   *     debuggee
+   * @param projectNumber a numeric String identifying the same GCP project that owns the target
+   *     debuggee
+   * @param project the intelliJ IDE project
    */
   public CloudDebugProcessState(@Nullable String userEmail,
-                                @Nullable String debuggeeId,
-                                @Nullable String projectName,
-                                @Nullable String projectNumber,
-                                @Nullable Project project) {
+      @Nullable String debuggeeId,
+      @Nullable String projectName,
+      @Nullable String projectNumber,
+      @Nullable Project project) {
     setUserEmail(userEmail);
     setDebuggeeId(debuggeeId);
     setProjectName(projectName);
@@ -95,13 +100,15 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
 
   @Nullable
   @Override
-  public ExecutionResult execute(Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
+  public ExecutionResult execute(Executor executor, @NotNull ProgramRunner runner)
+      throws ExecutionException {
     // There is nothing to execute.  We set up all of our state in CloudDebugRunner.
     return null;
   }
 
   /**
-   * Returns a cached set of {@link Breakpoint} objects.  The list is periodically updated from a background timer.
+   * Returns a cached set of {@link Breakpoint} objects.  The list is periodically updated from a
+   * background timer.
    *
    * @return the current list of breakpoints and their state
    */
@@ -129,7 +136,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * Called during deserialization from {@link CloudDebugProcessStateSerializer}
+   * Called during deserialization from {@link CloudDebugProcessStateSerializer}.
    */
   public void setDebuggeeId(@Nullable String debuggeeId) {
     this.debuggeeId = debuggeeId;
@@ -155,7 +162,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * Used by serialization and de-serialization to store the project name
+   * Used by serialization and de-serialization to store the project name.
    *
    * @return the name of the GCP project
    */
@@ -164,7 +171,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * Sets the project name associated with the debuggee
+   * Sets the project name associated with the debuggee.
    *
    * @param projectName the GCP project name that owns the debuggee
    */
@@ -173,8 +180,8 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * The project number corresponds to the project name, but is not user friendly.  However its required in calls to the
-   * debugger apiary.
+   * The project number corresponds to the project name, but is not user friendly.  However its
+   * required in calls to the debugger apiary.
    *
    * @return the numeric Id associated with the owning GCP project
    */
@@ -184,9 +191,9 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * Sets the project number that identifies the debugee target. It's similar to project name.  We store both because
-   * locally we resolve project via name, but the server takes a project number. We don't want to have to call elysium
-   * to resolve between the two if we don't have to.
+   * Sets the project number that identifies the debugee target. It's similar to project name.  We
+   * store both because locally we resolve project via name, but the server takes a project number.
+   * We don't want to have to call elysium to resolve between the two if we don't have to.
    *
    * @param projectNumber the numeric Id associated with the owning GCP project
    */
@@ -195,7 +202,8 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * The email user is stored in workspace.xml and is used during deserialization to recreate the debugger client.
+   * The email user is stored in workspace.xml and is used during deserialization to recreate the
+   * debugger client.
    *
    * @return the string identifying the user that has access to the GCP Project
    */
@@ -214,8 +222,8 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * Returns an identifier that represents debuggee state. The wait token is guaranteed to be unique between two
-   * different debuggee states.
+   * Returns an identifier that represents debuggee state. The wait token is guaranteed to be unique
+   * between two different debuggee states.
    *
    * @return the waitToken for use during serialization
    */
@@ -234,14 +242,14 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * Returns whether this state is configured to allow background listening
+   * Returns whether this state is configured to allow background listening.
    */
   public boolean isListenInBackground() {
     return listenInBackground;
   }
 
   /**
-   * Set whether a service should look for events in the background for this state
+   * Set whether a service should look for events in the background for this state.
    */
   public void setListenInBackground(boolean listenInBackground) {
     this.listenInBackground = listenInBackground;

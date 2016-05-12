@@ -35,6 +35,8 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,8 +44,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Performs the deployment of App Engine based applications to GCP.
@@ -91,8 +91,8 @@ class AppEngineDeployAction extends AppEngineAction {
           true  /* deleteOnExit */);
       consoleLogLn(
           "Created temporary staging directory: " + stagingDirectory.getAbsolutePath());
-    } catch (IOException e) {
-      logger.warn(e);
+    } catch (IOException ex) {
+      logger.warn(ex);
       callback.errorOccurred(
           GctBundle.message("appengine.deployment.error.creating.staging.directory"));
       return;
@@ -117,16 +117,16 @@ class AppEngineDeployAction extends AppEngineAction {
 
       copyFile(stagingDirectory, "app.yaml", this.appYamlPath);
       copyFile(stagingDirectory, "Dockerfile", this.dockerFilePath);
-    } catch (IOException e) {
-      logger.warn(e);
+    } catch (IOException ex) {
+      logger.warn(ex);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
       return;
     }
 
     try {
       executeProcess(commandLine, new DeployToAppEngineProcessListener());
-    } catch (ExecutionException e) {
-      logger.warn(e);
+    } catch (ExecutionException ex) {
+      logger.warn(ex);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.execution"));
     }
   }
@@ -141,11 +141,12 @@ class AppEngineDeployAction extends AppEngineAction {
   }
 
   private class DeployToAppEngineProcessListener extends ProcessAdapter {
+
     private StringBuilder deploymentOutput = new StringBuilder();
 
     @Override
     public void onTextAvailable(ProcessEvent event, Key outputType) {
-      if(outputType.equals(ProcessOutputTypes.STDOUT)) {
+      if (outputType.equals(ProcessOutputTypes.STDOUT)) {
         deploymentOutput.append(event.getText());
       }
     }
@@ -159,8 +160,8 @@ class AppEngineDeployAction extends AppEngineAction {
           DeployOutput deployOutput = null;
           try {
             deployOutput = parseDeployOutput(deploymentOutput.toString());
-          } catch (JsonParseException e) {
-            logger.error("Could not retrieve service/version info of deployed application", e);
+          } catch (JsonParseException ex) {
+            logger.error("Could not retrieve service/version info of deployed application", ex);
           }
           // Recommend to update gcloud if we can't get service/version for whatever reasons.
           if (deployOutput == null
@@ -204,7 +205,8 @@ class AppEngineDeployAction extends AppEngineAction {
           ]
         }
     */
-    Type deployOutputType = new TypeToken<DeployOutput>() {}.getType();
+    Type deployOutputType = new TypeToken<DeployOutput>() {
+    }.getType();
     DeployOutput deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
     if (deployOutput == null
         || deployOutput.versions == null || deployOutput.versions.size() != 1) {
@@ -217,10 +219,13 @@ class AppEngineDeployAction extends AppEngineAction {
   // because Gson uses it for automatic de-serialization.
   @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Initialized by Gson")
   static class DeployOutput {
+
     private static class Version {
+
       String id;
       String service;
     }
+
     List<Version> versions;
 
     @Nullable

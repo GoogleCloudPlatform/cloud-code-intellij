@@ -16,12 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
-import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.Services;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 
@@ -44,10 +44,11 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
- * Base class for App Engine runnable actions - e.g. deploy, stop. Provides implementations
- * for executing CLI based commands.
+ * Base class for App Engine runnable actions - e.g. deploy, stop. Provides implementations for
+ * executing CLI based commands.
  */
 public abstract class AppEngineAction implements Runnable {
+
   private static final Logger logger = Logger.getInstance(AppEngineAction.class);
 
   private LoggingHandler loggingHandler;
@@ -57,6 +58,9 @@ public abstract class AppEngineAction implements Runnable {
   private OSProcessHandler processHandler;
   protected boolean cancelled = false;
 
+  /**
+   * Initialize the base action.
+   */
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
       @NotNull AppEngineHelper appEngineHelper,
@@ -146,8 +150,8 @@ public abstract class AppEngineAction implements Runnable {
               "json",
               true /* deleteOnExit */);
       Files.write(jsonCredential, tempCredentialFilePath, Charset.forName("UTF-8"));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
     }
 
     return tempCredentialFilePath;

@@ -35,7 +35,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A Maven build deployment source type providing an auto configured pre-deploy build step
+ * A Maven build deployment source type providing an auto configured pre-deploy build step.
  */
 public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
 
@@ -54,7 +54,7 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
   protected BeforeRunTask createBuildTask(@NotNull Module module) {
     String mavenModulePath = getMavenModulePath(module);
 
-    if(mavenModulePath != null) {
+    if (mavenModulePath != null) {
       MavenBeforeRunTask task = new MavenBeforeRunTask();
 
       task.setProjectPath(mavenModulePath);
@@ -87,7 +87,7 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
     MavenProject mavenProject =
         MavenProjectsManager.getInstance(module.getProject()).findProject(module);
 
-    if(mavenProject == null) {
+    if (mavenProject == null) {
       return null;
     }
 

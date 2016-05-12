@@ -50,8 +50,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private final String projectId;
   private final String googleUserName;
 
+  /**
+   * Initialize the helper.
+   */
   public CloudSdkAppEngineHelper(@NotNull File gcloudCommandPath, @NotNull String projectId,
-     @NotNull String googleUserName) {
+      @NotNull String googleUserName) {
     this.gcloudCommandPath = gcloudCommandPath;
     this.projectId = projectId;
     this.googleUserName = googleUserName;
@@ -112,7 +115,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         dockerfilePath,
         version,
         wrapCallbackForUsageTracking(deploymentCallback,
-            ConfigType.CUSTOM,DeploymentArtifactType.typeForPath(artifactToDeploy))
+            ConfigType.CUSTOM, DeploymentArtifactType.typeForPath(artifactToDeploy))
     );
   }
 
@@ -200,8 +203,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       Preconditions
           .checkArgument(resource != null, resourcePath + " is not a valid resource path.");
       appYaml = new File(resource.toURI());
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+    } catch (URISyntaxException ex) {
+      throw new RuntimeException(ex);
     }
     return appYaml;
   }

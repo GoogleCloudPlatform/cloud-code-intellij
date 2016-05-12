@@ -36,14 +36,20 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Retrieves {@link CloudDebugProcessState} objects from application run configurations
+ * Retrieves {@link CloudDebugProcessState} objects from application run configurations.
  */
 public class CloudDebugProcessStateCollector {
 
+  /**
+   * Returns an instance of this from the container.
+   */
   public static CloudDebugProcessStateCollector getInstance() {
     return ServiceManager.getService(CloudDebugProcessStateCollector.class);
   }
 
+  /**
+   *  Get all the background snapshot states.
+   */
   public List<CloudDebugProcessState> getBackgroundListeningStates() {
     List<CloudDebugProcessState> states = new ArrayList<CloudDebugProcessState>();
 

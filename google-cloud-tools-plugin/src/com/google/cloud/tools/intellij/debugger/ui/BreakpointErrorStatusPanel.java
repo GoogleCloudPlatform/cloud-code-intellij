@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointProperties;
@@ -33,12 +34,12 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
- * The breakpoint config panel is shown for both the config popup (right click on a breakpoint) and in the full
- * breakpoint manager dialog. Cloud snapshot locations can have a condition and custom watches. They do not support
- * "Suspend" options.
+ * The breakpoint config panel is shown for both the config popup (right click on a breakpoint) and
+ * in the full breakpoint manager dialog. Cloud snapshot locations can have a condition and custom
+ * watches. They do not support "Suspend" options.
  */
 public class BreakpointErrorStatusPanel
-  extends XBreakpointCustomPropertiesPanel<XLineBreakpoint<CloudLineBreakpointProperties>>  {
+    extends XBreakpointCustomPropertiesPanel<XLineBreakpoint<CloudLineBreakpointProperties>> {
 
   private static final Logger LOG = Logger.getInstance(BreakpointErrorStatusPanel.class);
   private JBLabel errorDescription;
@@ -57,11 +58,12 @@ public class BreakpointErrorStatusPanel
 
   @Override
   public void loadFrom(@NotNull XLineBreakpoint<CloudLineBreakpointProperties> breakpoint) {
-    XBreakpointBase lineBreakpointImpl = breakpoint instanceof XBreakpointBase ? (XBreakpointBase)breakpoint : null;
+    XBreakpointBase lineBreakpointImpl =
+        breakpoint instanceof XBreakpointBase ? (XBreakpointBase) breakpoint : null;
     Breakpoint javaBreakpoint = BreakpointManager.getJavaBreakpoint(breakpoint);
     CloudLineBreakpoint cloudBreakpoint = null;
     if (javaBreakpoint instanceof CloudLineBreakpoint) {
-      cloudBreakpoint = (CloudLineBreakpoint)javaBreakpoint;
+      cloudBreakpoint = (CloudLineBreakpoint) javaBreakpoint;
     }
 
     if (cloudBreakpoint == null || lineBreakpointImpl == null) {
@@ -77,7 +79,7 @@ public class BreakpointErrorStatusPanel
 
   @SuppressWarnings("ConstantConditions")
   @Override
-  public void saveTo(@NotNull final XLineBreakpoint<CloudLineBreakpointProperties> xIdebreakpoint) {
+  public void saveTo(@NotNull final XLineBreakpoint<CloudLineBreakpointProperties> ideBreakpoint) {
   }
 
   private void createUIComponents() {

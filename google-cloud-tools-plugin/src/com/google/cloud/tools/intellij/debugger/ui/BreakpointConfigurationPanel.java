@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointProperties;
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType;
+
 import com.intellij.debugger.ui.breakpoints.Breakpoint;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.ide.DataManager;
@@ -55,23 +57,25 @@ import com.intellij.xdebugger.impl.ui.tree.XDebuggerTreePanel;
 import com.intellij.xdebugger.impl.ui.tree.nodes.WatchNode;
 import com.intellij.xdebugger.impl.ui.tree.nodes.WatchesRootNode;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XDebuggerTreeNode;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * The breakpoint config panel is shown for both the config popup (right click on a breakpoint) and in the full
- * breakpoint manager dialog. Cloud snapshot locations can have a condition and custom watches. They do not support
- * "Suspend" options.
+ * The breakpoint config panel is shown for both the config popup (right click on a breakpoint) and
+ * in the full breakpoint manager dialog. Cloud snapshot locations can have a condition and custom
+ * watches. They do not support "Suspend" options.
  */
 public class BreakpointConfigurationPanel
     extends XBreakpointCustomPropertiesPanel<XLineBreakpoint<CloudLineBreakpointProperties>>
@@ -85,6 +89,9 @@ public class BreakpointConfigurationPanel
   private JBLabel watchLabel;
   private JPanel watchPanel;
 
+  /**
+   * Initialize the panel.
+   */
   public BreakpointConfigurationPanel(@NotNull CloudLineBreakpointType cloudLineBreakpointType) {
     this.cloudLineBreakpointType = cloudLineBreakpointType;
 
@@ -109,7 +116,8 @@ public class BreakpointConfigurationPanel
   }
 
   @Override
-  public void addWatchExpression(@NotNull XExpression expression, int index, boolean navigateToWatchNode) {
+  public void addWatchExpression(@NotNull XExpression expression, int index,
+      boolean navigateToWatchNode) {
     rootNode.addWatchExpression(null, expression, index, navigateToWatchNode);
   }
 
@@ -128,11 +136,12 @@ public class BreakpointConfigurationPanel
 
   @Override
   public void loadFrom(@NotNull XLineBreakpoint<CloudLineBreakpointProperties> breakpoint) {
-    XBreakpointBase lineBreakpointImpl = breakpoint instanceof XBreakpointBase ? (XBreakpointBase)breakpoint : null;
+    XBreakpointBase lineBreakpointImpl =
+        breakpoint instanceof XBreakpointBase ? (XBreakpointBase) breakpoint : null;
     Breakpoint javaBreakpoint = BreakpointManager.getJavaBreakpoint(breakpoint);
     CloudLineBreakpointType.CloudLineBreakpoint cloudBreakpoint = null;
     if (javaBreakpoint instanceof CloudLineBreakpointType.CloudLineBreakpoint) {
-      cloudBreakpoint = (CloudLineBreakpointType.CloudLineBreakpoint)javaBreakpoint;
+      cloudBreakpoint = (CloudLineBreakpointType.CloudLineBreakpoint) javaBreakpoint;
     }
 
     if (cloudBreakpoint == null || lineBreakpointImpl == null) {
@@ -140,31 +149,34 @@ public class BreakpointConfigurationPanel
     }
 
     XDebuggerEditorsProvider debuggerEditorsProvider =
-      cloudLineBreakpointType.getEditorsProvider(breakpoint, cloudBreakpoint.getProject());
+        cloudLineBreakpointType.getEditorsProvider(breakpoint, cloudBreakpoint.getProject());
 
     if (debuggerEditorsProvider != null) {
       treePanel = new XDebuggerTreePanel(cloudBreakpoint.getProject(),
-                                           debuggerEditorsProvider,
-                                           this,
-                                           breakpoint.getSourcePosition(),
-                                           "GoogleCloudTools.BreakpointWatchContextMenu",
-                                           null);
+          debuggerEditorsProvider,
+          this,
+          breakpoint.getSourcePosition(),
+          "GoogleCloudTools.BreakpointWatchContextMenu",
+          null);
       List<XExpression> watches = new ArrayList<XExpression>();
       for (String watchExpression : breakpoint.getProperties().getWatchExpressions()) {
         watches.add(debuggerEditorsProvider
-                      .createExpression(((XBreakpointBase)breakpoint).getProject(),
-                                        new DocumentImpl(watchExpression),
-                                        getFileTypeLanguage(breakpoint),
-                                        EvaluationMode.EXPRESSION));
+            .createExpression(((XBreakpointBase) breakpoint).getProject(),
+                new DocumentImpl(watchExpression),
+                getFileTypeLanguage(breakpoint),
+                EvaluationMode.EXPRESSION));
       }
 
-      rootNode = new WatchesRootNode(treePanel.getTree(), this, watches.toArray(new XExpression[watches.size()]));
+      rootNode = new WatchesRootNode(treePanel.getTree(), this,
+          watches.toArray(new XExpression[watches.size()]));
       treePanel.getTree().setRoot(rootNode, false);
 
       watchPanel.removeAll();
       watchPanel.add(watchLabel, BorderLayout.NORTH);
-      treePanel.getTree().getEmptyText().setText("There are no custom watches for this snapshot location.");
-      final ToolbarDecorator decorator = ToolbarDecorator.createDecorator(treePanel.getTree()).disableUpDownActions();
+      treePanel.getTree().getEmptyText()
+          .setText("There are no custom watches for this snapshot location.");
+      final ToolbarDecorator decorator = ToolbarDecorator.createDecorator(treePanel.getTree())
+          .disableUpDownActions();
       decorator.setToolbarPosition(ActionToolbarPosition.RIGHT);
       decorator.setAddAction(new AnActionButtonRunnable() {
         @Override
@@ -178,8 +190,9 @@ public class BreakpointConfigurationPanel
           executeAction(XDebuggerActions.XREMOVE_WATCH);
         }
       });
-      CustomLineBorder border = new CustomLineBorder(CaptionPanel.CNT_ACTIVE_BORDER_COLOR, SystemInfo.isMac ? 1 : 0, 0,
-                                                     SystemInfo.isMac ? 0 : 1, 0);
+      CustomLineBorder border = new CustomLineBorder(CaptionPanel.CNT_ACTIVE_BORDER_COLOR,
+          SystemInfo.isMac ? 1 : 0, 0,
+          SystemInfo.isMac ? 0 : 1, 0);
       decorator.setToolbarBorder(border);
       watchPanel.add(decorator.createPanel(), BorderLayout.CENTER);
     }
@@ -209,32 +222,35 @@ public class BreakpointConfigurationPanel
     List<? extends WatchNode> newChildren = rootNode.getAllChildren();
     if (newChildren != null && !newChildren.isEmpty()) {
       WatchNode node =
-        minIndex < newChildren.size() ? newChildren.get(minIndex) : newChildren.get(newChildren.size() - 1);
+          minIndex < newChildren.size() ? newChildren.get(minIndex)
+              : newChildren.get(newChildren.size() - 1);
       TreeUtil.selectNode(treePanel.getTree(), node);
     }
   }
 
   @SuppressWarnings("ConstantConditions")
   @Override
-  public void saveTo(@NotNull final XLineBreakpoint<CloudLineBreakpointProperties> xIdebreakpoint) {
-    CloudLineBreakpointProperties properties = xIdebreakpoint.getProperties();
+  public void saveTo(@NotNull final XLineBreakpoint<CloudLineBreakpointProperties> ideBreakpoint) {
+    CloudLineBreakpointProperties properties = ideBreakpoint.getProperties();
     if (properties == null) {
       LOG.error(
-        "Could not save changes to the breakpoint because for some reason it does not have cloud " + "properties.");
+          "Could not save changes to the breakpoint because for some reason it does not have cloud "
+              + "properties.");
       return;
     }
 
     XBreakpointBase lineBreakpointImpl =
-      xIdebreakpoint instanceof XBreakpointBase ? (XBreakpointBase)xIdebreakpoint : null;
+        ideBreakpoint instanceof XBreakpointBase ? (XBreakpointBase) ideBreakpoint : null;
 
-     if (rootNode != null && lineBreakpointImpl != null) {
+    if (rootNode != null && lineBreakpointImpl != null) {
       List<String> expressionsToSave = new ArrayList<String>();
       List<? extends WatchNode> children = rootNode.getAllChildren();
       if (children != null) {
         for (WatchNode node : rootNode.getAllChildren()) {
           expressionsToSave.add(node.getExpression().getExpression());
         }
-        if (properties.setWatchExpressions(expressionsToSave.toArray(new String[expressionsToSave.size()]))) {
+        if (properties
+            .setWatchExpressions(expressionsToSave.toArray(new String[expressionsToSave.size()]))) {
           lineBreakpointImpl.fireBreakpointChanged();
         }
       }
@@ -242,11 +258,12 @@ public class BreakpointConfigurationPanel
   }
 
   @Nullable
-  private static Language getFileTypeLanguage(XLineBreakpoint<CloudLineBreakpointProperties> breakpoint) {
+  private static Language getFileTypeLanguage(
+      XLineBreakpoint<CloudLineBreakpointProperties> breakpoint) {
     if (breakpoint.getSourcePosition() != null) {
       FileType fileType = breakpoint.getSourcePosition().getFile().getFileType();
       if (fileType instanceof LanguageFileType) {
-        return ((LanguageFileType)fileType).getLanguage();
+        return ((LanguageFileType) fileType).getLanguage();
       }
     }
     return null;
@@ -265,15 +282,18 @@ public class BreakpointConfigurationPanel
     DataContext context = DataManager.getInstance().getDataContext(treePanel.getTree());
 
     AnActionEvent actionEvent =
-      new AnActionEvent(null, context, ActionPlaces.DEBUGGER_TOOLBAR, presentation, ActionManager.getInstance(), 0);
+        new AnActionEvent(null, context, ActionPlaces.DEBUGGER_TOOLBAR, presentation,
+            ActionManager.getInstance(), 0);
     action.actionPerformed(actionEvent);
   }
 
   /**
-   * The XWatchesView contract is used to actually perform the add/remove watch when the item is added or removed from
-   * the watches view.  It is supplied somewhat indirectly through the visual hierarchy via getData.
+   * The XWatchesView contract is used to actually perform the add/remove watch when the item is
+   * added or removed from the watches view.  It is supplied somewhat indirectly through the visual
+   * hierarchy via getData.
    */
   private class MyPanel extends JPanel implements DataProvider {
+
     public MyPanel() {
       setLayout(new BorderLayout());
     }

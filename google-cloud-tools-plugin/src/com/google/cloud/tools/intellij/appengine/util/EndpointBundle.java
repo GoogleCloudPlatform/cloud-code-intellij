@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.util;
 
 import com.intellij.CommonBundle;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.PropertyKey;
 
@@ -28,6 +29,7 @@ import java.util.ResourceBundle;
  * Endpoint messages bundle.
  */
 public class EndpointBundle {
+
   @NonNls
   private static final String BUNDLE_NAME = "messages.EndpointBundle";
   private static Reference<ResourceBundle> bundleReference;
@@ -47,7 +49,8 @@ public class EndpointBundle {
   private EndpointBundle() {
   }
 
-  public static String message(@PropertyKey(resourceBundle = BUNDLE_NAME) String key, Object... params) {
+  public static String message(@PropertyKey(resourceBundle = BUNDLE_NAME) String key,
+      Object... params) {
     return CommonBundle.message(getBundle(), key, params);
   }
 }

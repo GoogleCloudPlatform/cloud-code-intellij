@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.appengine.util;
 
 import com.intellij.codeInsight.AnnotationUtil;
@@ -20,13 +21,25 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiJavaFile;
+import com.intellij.psi.PsiModifier;
+import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiTypeVisitor;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
+
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Utilities for working with Intellij Psi constructs
+ * Utilities for working with Intellij Psi constructs.
  */
 public class PsiUtils {
 
@@ -35,11 +48,8 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE : requires readAction, if not on the dispatch thread
-   * Get the public class in a file that is annotated with a certain annotation
-   * @param psiJavaFile
-   * @param annotationFqn
-   * @return
+   * NOTE : requires readAction, if not on the dispatch thread Get the public class in a file that
+   * is annotated with a certain annotation.
    */
   public static PsiClass getPublicAnnotatedClass(PsiJavaFile psiJavaFile, String annotationFqn) {
     PsiClass[] classes = psiJavaFile.getClasses();
@@ -55,10 +65,9 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE : requires readAction, if not on the dispatch thread
-   * Get an field annotated with a particular annotation from a class
-   * @param entityClass
-   * @param annotationFqn
+   * NOTE : requires readAction, if not on the dispatch thread Get an field annotated with a
+   * particular annotation from a class.
+   *
    * @return the first field found with the annotation
    */
   public static PsiField getAnnotatedFieldFromClass(PsiClass entityClass, String annotationFqn) {
@@ -71,11 +80,8 @@ public class PsiUtils {
   }
 
   /**
-   * Add (or overwrite) a file in a directory
-   * NOTE : This must run in a runWriteAction
+   * Add (or overwrite) a file in a directory NOTE : This must run in a runWriteAction.
    *
-   * @param dir
-   * @param file
    * @return the newly written file
    */
   public static PsiFile addOrReplaceFile(PsiDirectory dir, PsiFile file) {
@@ -83,15 +89,12 @@ public class PsiUtils {
     if (existingFile != null) {
       existingFile.delete();
     }
-    return (PsiFile)dir.add(file);
+    return (PsiFile) dir.add(file);
   }
 
   /**
-   * NOTE : This must run in a runWriteAction
-   * Add file to directory only if it doesn't exist
+   * NOTE : This must run in a runWriteAction Add file to directory only if it doesn't exist.
    *
-   * @param dir
-   * @param file
    * @return the existing file or the newly added file
    */
   // for whatever reason if we don't want to replace ?
@@ -101,15 +104,12 @@ public class PsiUtils {
     if (existingFile != null) {
       return existingFile;
     }
-    return (PsiFile)dir.add(file);
+    return (PsiFile) dir.add(file);
   }
 
   /**
-   * NOTE : This must run in a runWriteAction
-   * Create (or overwrite) a directory
+   * NOTE : This must run in a runWriteAction Create (or overwrite) a directory.
    *
-   * @param parent
-   * @param dirName
    * @return the new/existing directory
    */
   public static PsiDirectory addOrReplaceDirectory(PsiDirectory parent, String dirName) {
@@ -118,11 +118,8 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE : This must run in a runWriteAction
-   * Add directory to directory only if it doesn't exist
+   * NOTE : This must run in a runWriteAction Add directory to directory only if it doesn't exist.
    *
-   * @param parent
-   * @param dirName
    * @return the new/existing directory
    */
   public static PsiDirectory addIfMissingDirectory(PsiDirectory parent, String dirName) {
@@ -134,11 +131,7 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE : This must run in a runWriteAction
-   * Delete a directory (no error if it doesn't exist)
-   *
-   * @param parent
-   * @param dirName
+   * NOTE : This must run in a runWriteAction Delete a directory (no error if it doesn't exist).
    */
   public static void deleteIfExists(PsiDirectory parent, String dirName) {
     final PsiDirectory existingDir = parent.findSubdirectory(dirName);
@@ -148,34 +141,31 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE this must run in a runWriteAction
-   * Create a file using intellijs built in system with the defined type and format it
-   *
-   * @param project
-   * @param filename
-   * @param fileType
-   * @param fileContents
-   * @return
+   * NOTE this must run in a runWriteAction Create a file using intellijs built in system with the
+   * defined type and format it.
    */
-  public static PsiFile createFormattedFile(Project project, String filename, FileType fileType, String fileContents) {
-    final PsiFile rawFile = PsiFileFactory.getInstance(project).createFileFromText(filename, fileType, fileContents);
-    final PsiFile formattedFile = (PsiFile)CodeStyleManager.getInstance(project).reformat(rawFile);
+  public static PsiFile createFormattedFile(Project project, String filename, FileType fileType,
+      String fileContents) {
+    final PsiFile rawFile = PsiFileFactory.getInstance(project)
+        .createFileFromText(filename, fileType, fileContents);
+    final PsiFile formattedFile = (PsiFile) CodeStyleManager.getInstance(project).reformat(rawFile);
     return formattedFile;
   }
 
   /**
-   * Returns the parent class of element. If element is a class, it returns element.
-   * If element is null, it returns null.
+   * Returns the parent class of element. If element is a class, it returns element. If element is
+   * null, it returns null.
    *
    * @param element the PsiElement we want to know the class of.
-   * @return
    */
   public static PsiClass findClass(PsiElement element) {
-    return (element instanceof PsiClass) ? (PsiClass) element : PsiTreeUtil.getParentOfType(element, PsiClass.class);
+    return (element instanceof PsiClass) ? (PsiClass) element
+        : PsiTreeUtil.getParentOfType(element, PsiClass.class);
   }
 
   /**
    * Returns the PsiJavaFile associated with <code>actionEvent</code> and null if non exists.
+   *
    * @param actionEvent the actionEvent to be evaluated.
    * @return the PsiJavaFile associated with <code>actionEvent</code> and null if non exists.
    */
@@ -184,8 +174,7 @@ public class PsiUtils {
     PsiFile psiFile = actionEvent.getData(LangDataKeys.PSI_FILE);
     if (psiFile == null || !(psiFile instanceof PsiJavaFile)) {
       return null;
-    }
-    else {
+    } else {
       return (PsiJavaFile) psiFile;
     }
   }
@@ -197,7 +186,7 @@ public class PsiUtils {
    * @return {@code true} if {@code type} is a parameterized type and {@code false} otherwise
    */
   public static boolean isParameterizedType(PsiType type) {
-    if(!(type instanceof  PsiClassType)) {
+    if (!(type instanceof PsiClassType)) {
       return false;
     }
 

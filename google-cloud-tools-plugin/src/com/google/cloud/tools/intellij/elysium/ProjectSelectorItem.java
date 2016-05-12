@@ -13,25 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import com.intellij.ui.UI;
 import com.intellij.ui.components.JBLabel;
+
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
+import javax.swing.SwingConstants;
 
 /**
  * Represents a single elysium project ui.
  */
 class ProjectSelectorItem extends JBLabel {
+
   private Color textSelectionColor;
   private Color textNonSelectionColor;
   private Color hoverColor;
 
   public ProjectSelectorItem(@NotNull Color backgroundNonSelectionColor,
-                             @NotNull Color textSelectionColor, @NotNull Color textNonSelectionColor) {
+      @NotNull Color textSelectionColor, @NotNull Color textNonSelectionColor) {
     setBorder(BorderFactory.createEmptyBorder(2, 15, 2, 0));
     setOpaque(false);
     setHorizontalAlignment(SwingConstants.LEFT);
@@ -47,11 +52,9 @@ class ProjectSelectorItem extends JBLabel {
     setText(projectName + " (" + projectId + ")");
     if (selected) {
       setForeground(textSelectionColor);
-    }
-    else if (hovered) {
+    } else if (hovered) {
       setForeground(hoverColor);
-    }
-    else {
+    } else {
       setForeground(textNonSelectionColor);
     }
   }

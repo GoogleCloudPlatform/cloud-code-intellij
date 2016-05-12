@@ -38,9 +38,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.event.HyperlinkEvent;
 
 /**
- * A plugin post startup activity which checks to ensure that the Google Cloud Tools
- * and Account plugins are running the same version. If there is a version mismatch, then a
- * warning dialog is displayed with a link to check for updates.
+ * A plugin post startup activity which checks to ensure that the Google Cloud Tools and Account
+ * plugins are running the same version. If there is a version mismatch, then a warning dialog is
+ * displayed with a link to check for updates.
  */
 public class PluginCompatibilityCheck implements StartupActivity {
 
@@ -63,16 +63,11 @@ public class PluginCompatibilityCheck implements StartupActivity {
     String accountPluginVersion = accountPlugin.getVersion();
 
     if (!accountPluginVersion.equals(cloudToolsPluginVersion)) {
-      NotificationGroup notification = new NotificationGroup(
-          GctBundle.message("plugin.compatibility.error.title"),
-          NotificationDisplayType.BALLOON, true);
-
       StringBuilder errorMessage = new StringBuilder();
 
       errorMessage.append("<p>");
       errorMessage.append(GctBundle.message("plugin.compatibility.error.message"));
       errorMessage.append("<p/>");
-
 
       errorMessage.append("<ul>");
       errorMessage.append("<li>");
@@ -99,6 +94,10 @@ public class PluginCompatibilityCheck implements StartupActivity {
               "plugin.compatibility.error.update.link", "<a href=\"#update\">", "</a>"));
       errorMessage.append("</p>");
 
+      NotificationGroup notification = new NotificationGroup(
+          GctBundle.message("plugin.compatibility.error.title"),
+          NotificationDisplayType.BALLOON, true);
+
       notification.createNotification(
           GctBundle.message("plugin.compatibility.error.title"),
           errorMessage.toString(),
@@ -107,6 +106,7 @@ public class PluginCompatibilityCheck implements StartupActivity {
   }
 
   private static class PluginCompatibilityLinkListener implements NotificationListener {
+
     private Project project;
 
     public PluginCompatibilityLinkListener(@NotNull final Project project) {

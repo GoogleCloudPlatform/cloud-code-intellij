@@ -28,15 +28,17 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Inspection to check that each class within an Endpoint API has a public nullary constructor.
- * The class is allowed to have other constructors.
+ * Inspection to check that each class within an Endpoint API has a public nullary constructor. The
+ * class is allowed to have other constructors.
  */
 public class ConstructorInspection extends EndpointInspectionBase {
+
   @Override
   @Nullable
   public String getStaticDescription() {
@@ -69,26 +71,28 @@ public class ConstructorInspection extends EndpointInspectionBase {
         }
 
         PsiMethod[] allConstructors = psiClass.getConstructors();
-        if(allConstructors.length == 0) {
+        if (allConstructors.length == 0) {
           return;
         }
 
         // If there are user defined constructors, check that one of them
         // is a public nullary constructor
-        for(PsiMethod aConstructor : allConstructors) {
-           if(EndpointUtilities.isPublicNullaryConstructor(aConstructor)) {
-             return;
-           }
+        for (PsiMethod constructor : allConstructors) {
+          if (EndpointUtilities.isPublicNullaryConstructor(constructor)) {
+            return;
+          }
         }
 
         // Register error if class does not have a public nullary constructor
-        holder.registerProblem(psiClass, "Each class that is within an API must have a public nullary constructor.",
-          new MyQuickFix(psiClass));
+        holder.registerProblem(psiClass,
+            "Each class that is within an API must have a public nullary constructor.",
+            new MyQuickFix(psiClass));
       }
     };
   }
 
   public class MyQuickFix implements LocalQuickFix {
+
     private final PsiClass psiClass;
 
     public MyQuickFix(PsiClass psiClass) {
@@ -109,16 +113,17 @@ public class ConstructorInspection extends EndpointInspectionBase {
 
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
-      for(PsiMethod aConstructor : psiClass.getConstructors()) {
-        if(EndpointUtilities.isPublicNullaryConstructor(aConstructor)) {
+      for (PsiMethod constructor : psiClass.getConstructors()) {
+        if (EndpointUtilities.isPublicNullaryConstructor(constructor)) {
           return;
         }
       }
 
       PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
-      PsiMethod newConstructor = factory.createMethodFromText("public " + psiClass.getName() + "() { }", psiClass);
+      PsiMethod newConstructor = factory
+          .createMethodFromText("public " + psiClass.getName() + "() { }", psiClass);
       final PsiMethod[] psiMethods = psiClass.getMethods();
-      PsiMethod firstMethod = (psiMethods.length == 0) ? null : psiMethods [0];
+      PsiMethod firstMethod = (psiMethods.length == 0) ? null : psiMethods[0];
       psiClass.addBefore(newConstructor, firstMethod);
     }
   }

@@ -13,26 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
+
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ui.UI;
 import com.intellij.ui.components.JBLabel;
+
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import javax.swing.event.MouseInputListener;
-import javax.swing.tree.TreeModel;
-import java.awt.*;
+import java.awt.Cursor;
+import java.awt.FlowLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.SwingConstants;
+import javax.swing.event.MouseInputListener;
+import javax.swing.tree.TreeModel;
 
 /**
  * UI for the "click here to add a project" node.
  */
 class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, MouseInputListener {
+
   private static final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
   private static final Cursor NORMAL_CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 
@@ -63,49 +73,49 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
     add(continuation);
   }
 
-  private boolean isOverLink(int x, int y) {
-    return x <= clickHere.getPreferredSize().width + 15;
+  private boolean isOverLink(int coordX, int coordY) {
+    return coordX <= clickHere.getPreferredSize().width + 15;
   }
 
   @Override
-  public void mouseClicked(MouseEvent e) {
+  public void mouseClicked(MouseEvent event) {
   }
 
   @Override
-  public void mousePressed(MouseEvent e) {
-    if (isOverLink(e.getX(), e.getY())) {
+  public void mousePressed(MouseEvent event) {
+    if (isOverLink(event.getX(), event.getY())) {
       TreeModel model = tree.getModel();
       if (model instanceof ProjectSelector.SelectorTreeModel) {
-        ((ProjectSelector.SelectorTreeModel)model).setModelNeedsRefresh(true);
+        ((ProjectSelector.SelectorTreeModel) model).setModelNeedsRefresh(true);
       }
       BrowserUtil.browse("https://console.developers.google.com/project");
-      UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.PROJECT_SELECTION,
-          "create.new.project", null);
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.CATEGORY, GctTracking.PROJECT_SELECTION,
+              "create.new.project", null);
     }
   }
 
   @Override
-  public void mouseReleased(MouseEvent e) {
+  public void mouseReleased(MouseEvent event) {
   }
 
   @Override
-  public void mouseEntered(MouseEvent e) {
+  public void mouseEntered(MouseEvent event) {
   }
 
   @Override
-  public void mouseExited(MouseEvent e) {
+  public void mouseExited(MouseEvent event) {
   }
 
   @Override
-  public void mouseDragged(MouseEvent e) {
+  public void mouseDragged(MouseEvent event) {
   }
 
   @Override
-  public void mouseMoved(MouseEvent e) {
-    if (isOverLink(e.getX(), e.getY())) {
+  public void mouseMoved(MouseEvent event) {
+    if (isOverLink(event.getX(), event.getY())) {
       tree.setCursor(HAND_CURSOR);
-    }
-    else {
+    } else {
       tree.setCursor(NORMAL_CURSOR);
     }
   }

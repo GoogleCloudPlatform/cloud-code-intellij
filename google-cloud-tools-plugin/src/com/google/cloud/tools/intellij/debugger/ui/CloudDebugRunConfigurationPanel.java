@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
@@ -23,6 +24,7 @@ import javax.swing.JPanel;
  * This is the config UI for cloud debug run configs.
  */
 public class CloudDebugRunConfigurationPanel {
+
   private ProjectSelector elysiumProjectId;
   private JPanel panel;
 

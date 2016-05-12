@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.ui;
 
-import com.intellij.openapi.util.IconLoader;
-
 import com.google.common.collect.ImmutableList;
+
+import com.intellij.openapi.util.IconLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +30,12 @@ import javax.swing.Icon;
  * http://youtrack.jetbrains.com/issue/IDEA-103558
  */
 public final class GoogleCloudToolsIcons {
+
   private static final int STEPS_COUNT = 12;
 
   public static final Icon APP_ENGINE = load("/icons/appEngine.png"); // 16x16
   public static final Icon CLOUD_60x60 = load("/icons/cloudPlatform_60x60.png");
-  public static final Icon CLOUD= load("/icons/cloudPlatform.png");
+  public static final Icon CLOUD = load("/icons/cloudPlatform.png");
   public static final Icon CLOUD_MODULE = load("/icons/google_cloud_module.png");
   public static final Icon REFRESH = load("/icons/refresh.png");
   public static final ImmutableList<Icon> STEP_ICONS = findStepIcons("/icons/step_");
@@ -46,7 +48,8 @@ public final class GoogleCloudToolsIcons {
   public static final Icon CLOUD_BREAKPOINT_ERROR = load("/icons/cloudbreakpointerror.png");
   public static final Icon CLOUD_BREAKPOINT_DISABLED = load("/icons/cloudbreakpointdisabled.png");
   public static final Icon CLOUD_DEBUG_SAVE_EXIT = load("/icons/debugsaveexit.png");
-  public static final Icon CLOUD_DEBUG_REACTIVATE_BREAKPOINT = load("/icons/debugreactivatebreakpoint.png");
+  public static final Icon CLOUD_DEBUG_REACTIVATE_BREAKPOINT = load(
+      "/icons/debugreactivatebreakpoint.png");
   public static final Icon CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS = load("/icons/debugdeleteall.png");
 
   private static Icon load(String path) {
