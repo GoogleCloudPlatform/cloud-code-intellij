@@ -20,10 +20,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginService;
+import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
+import com.google.common.collect.ImmutableMap;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -48,6 +48,7 @@ public class AppEngineDeployActionTest extends BasePluginTestCase {
   @Mock private File deploymentArtifactPath;
   @Mock private File appYamlPath;
   @Mock private File dockerFilePath;
+  @Mock private AppEngineDeploymentConfiguration deploymentConfiguration;
   @Mock private AppEngineHelper appEngineHelper;
   @Mock private DeploymentOperationCallback callback;
   @Mock private GoogleLoginService googleLoginService;
@@ -64,9 +65,7 @@ public class AppEngineDeployActionTest extends BasePluginTestCase {
         loggingHandler,
         project,
         deploymentArtifactPath,
-        appYamlPath,
-        dockerFilePath,
-        "version",
+        deploymentConfiguration,
         callback);
   }
   @Test
@@ -75,7 +74,7 @@ public class AppEngineDeployActionTest extends BasePluginTestCase {
     String clientId = "clientId";
     String clientSecret = "clientSecret";
     String refreshToken = "refreshToken";
-    when(appEngineHelper.getGoogleUsername()).thenReturn(username);
+    when(deploymentConfiguration.getGoogleUsername()).thenReturn(username);
     when(googleLoginService.getAllUsers())
         .thenReturn(ImmutableMap.of(username, credentialedUser));
     when(credentialedUser.getGoogleLoginState()).thenReturn(loginState);

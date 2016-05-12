@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
+import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -54,9 +55,7 @@ class AppEngineDeployAction extends AppEngineAction {
 
   private Project project;
   private File deploymentArtifactPath;
-  private File appYamlPath;
-  private File dockerFilePath;
-  private String version;
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
   private AppEngineHelper appEngineHelper;
   private DeploymentOperationCallback callback;
   private DeploymentArtifactType artifactType;
@@ -66,19 +65,15 @@ class AppEngineDeployAction extends AppEngineAction {
       @NotNull LoggingHandler loggingHandler,
       @NotNull Project project,
       @NotNull File deploymentArtifactPath,
-      @NotNull File appYamlPath,
-      @NotNull File dockerFilePath,
-      @Nullable String version,
+      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
       @NotNull DeploymentOperationCallback callback) {
-    super(loggingHandler, appEngineHelper, callback);
+    super(loggingHandler, deploymentConfiguration, callback);
 
     this.appEngineHelper = appEngineHelper;
     this.project = project;
     this.deploymentArtifactPath = deploymentArtifactPath;
+    this.deploymentConfiguration = deploymentConfiguration;
     this.callback = callback;
-    this.appYamlPath = appYamlPath;
-    this.dockerFilePath = dockerFilePath;
-    this.version = version;
     this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
   }
 
@@ -102,8 +97,8 @@ class AppEngineDeployAction extends AppEngineAction {
         appEngineHelper.getGcloudCommandPath().getAbsolutePath());
     commandLine.addParameters("preview", "app", "deploy", "--promote");
     commandLine.addParameter("app.yaml");
-    if (!StringUtil.isEmpty(version)) {
-      commandLine.addParameter("--version=" + version);
+    if (!StringUtil.isEmpty(deploymentConfiguration.getVersion())) {
+      commandLine.addParameter("--version=" + deploymentConfiguration.getVersion());
     }
     commandLine.addParameter("--format=json");
 
@@ -115,8 +110,17 @@ class AppEngineDeployAction extends AppEngineAction {
           copyFile(stagingDirectory, "target" + artifactType, deploymentArtifactPath);
       stagedArtifactPath.setReadable(true /* readable */, false /* ownerOnly */);
 
-      copyFile(stagingDirectory, "app.yaml", this.appYamlPath);
-      copyFile(stagingDirectory, "Dockerfile", this.dockerFilePath);
+      File appYamlPath = deploymentConfiguration.isAuto()
+          ? appEngineHelper.defaultAppYaml()
+          : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getAppYamlPath());
+
+      File dockerFilePath = deploymentConfiguration.isAuto()
+          ? appEngineHelper.defaultDockerfile(
+              DeploymentArtifactType.typeForPath(deploymentArtifactPath))
+          : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getDockerFilePath());
+
+      copyFile(stagingDirectory, "app.yaml", appYamlPath);
+      copyFile(stagingDirectory, "Dockerfile", dockerFilePath);
     } catch (IOException e) {
       logger.warn(e);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
@@ -170,7 +174,7 @@ class AppEngineDeployAction extends AppEngineAction {
 
           callback.succeeded(
               new AppEngineDeploymentRuntime(
-                  project, appEngineHelper, getLoggingHandler(),
+                  project, appEngineHelper, getLoggingHandler(), deploymentConfiguration,
                   deployOutput != null ? deployOutput.getService() : null,
                   deployOutput != null ? deployOutput.getVersion() : null));
         } else if (cancelled) {

@@ -114,12 +114,11 @@ class AppEngineDeploymentConfigurator extends
   public SettingsEditor<AppEngineDeploymentConfiguration> createEditor(
       @NotNull DeploymentSource source,
       @NotNull RemoteServer<AppEngineServerConfiguration> server) {
-    return new AppEngineDeploymentRunConfigurationEditor(project, source,
-        server.getConfiguration(),
+    return new AppEngineDeploymentRunConfigurationEditor(
+        project,
+        source,
         new CloudSdkAppEngineHelper(
             new File(
-                CloudSdkUtil.toExecutablePath(server.getConfiguration().getCloudSdkHomePath())),
-            server.getConfiguration().getCloudProjectName(),
-            server.getConfiguration().getGoogleUserName()));
+                CloudSdkUtil.toExecutablePath(server.getConfiguration().getCloudSdkHomePath()))));
   }
 }
