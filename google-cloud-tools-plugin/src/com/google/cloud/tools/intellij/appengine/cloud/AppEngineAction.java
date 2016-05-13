@@ -52,8 +52,8 @@ public abstract class AppEngineAction implements Runnable {
   private static final Logger logger = Logger.getInstance(AppEngineAction.class);
 
   private LoggingHandler loggingHandler;
-  private AppEngineHelper appEngineHelper;
   private File credentialsPath;
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
   private RemoteOperationCallback callback;
   private OSProcessHandler processHandler;
   protected boolean cancelled = false;
@@ -63,10 +63,10 @@ public abstract class AppEngineAction implements Runnable {
    */
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
-      @NotNull AppEngineHelper appEngineHelper,
+      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
       @NotNull RemoteOperationCallback callback) {
     this.loggingHandler = loggingHandler;
-    this.appEngineHelper = appEngineHelper;
+    this.deploymentConfiguration = deploymentConfiguration;
     this.callback = callback;
   }
 
@@ -77,17 +77,16 @@ public abstract class AppEngineAction implements Runnable {
   protected void executeProcess(
       @NotNull GeneralCommandLine commandLine,
       @NotNull ProcessListener listener) throws ExecutionException {
-
     credentialsPath = createApplicationDefaultCredentials();
     if (credentialsPath == null) {
       callback.errorOccurred(
           GctBundle.message("appengine.deployment.credential.not.found",
-              appEngineHelper.getGoogleUsername()));
+              deploymentConfiguration.getGoogleUsername()));
       return;
     }
 
     // Common command line settings
-    commandLine.addParameter("--project=" + appEngineHelper.getProjectId());
+    commandLine.addParameter("--project=" + deploymentConfiguration.getCloudProjectName());
     commandLine.addParameter("--credential-file-override=" + credentialsPath.getAbsolutePath());
     commandLine.addParameter("--quiet");
     commandLine.withParentEnvironmentType(ParentEnvironmentType.CONSOLE);
@@ -124,7 +123,7 @@ public abstract class AppEngineAction implements Runnable {
   @Nullable
   protected File createApplicationDefaultCredentials() {
     CredentialedUser projectUser = Services.getLoginService().getAllUsers()
-        .get(appEngineHelper.getGoogleUsername());
+        .get(deploymentConfiguration.getGoogleUsername());
 
     GoogleLoginState googleLoginState;
     if (projectUser != null) {

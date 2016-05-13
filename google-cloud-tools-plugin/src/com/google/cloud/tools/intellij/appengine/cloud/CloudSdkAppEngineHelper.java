@@ -40,24 +40,16 @@ import java.net.URL;
  */
 public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
-  private static final String DEFAUL_APP_YAML_PATH = "/generation/src/appengine/mvm/app.yaml";
-  private static final String DEFAUL_JAR_DOCKERFILE_PATH
+  private static final String DEFAULT_APP_YAML_PATH = "/generation/src/appengine/mvm/app.yaml";
+  private static final String DEFAULT_JAR_DOCKERFILE_PATH
       = "/generation/src/appengine/mvm/jar.dockerfile";
-  private static final String DEFAUL_WAR_DOCKERFILE_PATH
+  private static final String DEFAULT_WAR_DOCKERFILE_PATH
       = "/generation/src/appengine/mvm/war.dockerfile";
 
   private final File gcloudCommandPath;
-  private final String projectId;
-  private final String googleUserName;
 
-  /**
-   * Initialize the helper.
-   */
-  public CloudSdkAppEngineHelper(@NotNull File gcloudCommandPath, @NotNull String projectId,
-      @NotNull String googleUserName) {
+  public CloudSdkAppEngineHelper(@NotNull File gcloudCommandPath) {
     this.gcloudCommandPath = gcloudCommandPath;
-    this.projectId = projectId;
-    this.googleUserName = googleUserName;
   }
 
   @NotNull
@@ -68,19 +60,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public String getProjectId() {
-    return projectId;
-  }
-
-  @Override
-  public String getGoogleUsername() {
-    return googleUserName;
-  }
-
-  @NotNull
-  @Override
   public File defaultAppYaml() {
-    return getFileFromResourcePath(DEFAUL_APP_YAML_PATH);
+    return getFileFromResourcePath(DEFAULT_APP_YAML_PATH);
   }
 
   @Nullable
@@ -88,9 +69,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   public File defaultDockerfile(DeploymentArtifactType deploymentArtifactType) {
     switch (deploymentArtifactType) {
       case WAR:
-        return getFileFromResourcePath(DEFAUL_WAR_DOCKERFILE_PATH);
+        return getFileFromResourcePath(DEFAULT_WAR_DOCKERFILE_PATH);
       case JAR:
-        return getFileFromResourcePath(DEFAUL_JAR_DOCKERFILE_PATH);
+        return getFileFromResourcePath(DEFAULT_JAR_DOCKERFILE_PATH);
       default:
         return null;
     }
@@ -98,34 +79,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public AppEngineDeployAction createCustomDeploymentAction(
+  public AppEngineDeployAction createDeploymentAction(
       LoggingHandler loggingHandler,
       Project project,
       File artifactToDeploy,
-      File appYamlPath,
-      File dockerfilePath,
-      String version,
-      DeploymentOperationCallback deploymentCallback) {
-    return new AppEngineDeployAction(
-        this,
-        loggingHandler,
-        project,
-        artifactToDeploy,
-        appYamlPath,
-        dockerfilePath,
-        version,
-        wrapCallbackForUsageTracking(deploymentCallback,
-            ConfigType.CUSTOM, DeploymentArtifactType.typeForPath(artifactToDeploy))
-    );
-  }
-
-  @NotNull
-  @Override
-  public AppEngineDeployAction createAutoDeploymentAction(
-      LoggingHandler loggingHandler,
-      Project project,
-      File artifactToDeploy,
-      String version,
+      AppEngineDeploymentConfiguration deploymentConfiguration,
       DeploymentOperationCallback deploymentCallback) throws IllegalArgumentException {
     DeploymentArtifactType artifactType = DeploymentArtifactType.typeForPath(artifactToDeploy);
     if (artifactType == DeploymentArtifactType.UNKNOWN) {
@@ -137,9 +95,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         loggingHandler,
         project,
         artifactToDeploy,
-        defaultAppYaml(),
-        defaultDockerfile(artifactType),
-        version,
+        deploymentConfiguration,
         wrapCallbackForUsageTracking(deploymentCallback, ConfigType.AUTO, artifactType)
     );
   }
@@ -148,12 +104,14 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @Override
   public AppEngineStopAction createStopAction(
       LoggingHandler loggingHandler,
+      AppEngineDeploymentConfiguration deploymentConfiguration,
       String moduleToStop,
       String versionToStop,
       UndeploymentTaskCallback undeploymentTaskCallback) {
     return new AppEngineStopAction(
         this,
         loggingHandler,
+        deploymentConfiguration,
         moduleToStop,
         versionToStop,
         undeploymentTaskCallback
@@ -203,8 +161,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       Preconditions
           .checkArgument(resource != null, resourcePath + " is not a valid resource path.");
       appYaml = new File(resource.toURI());
-    } catch (URISyntaxException ex) {
-      throw new RuntimeException(ex);
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
     return appYaml;
   }

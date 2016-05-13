@@ -51,10 +51,11 @@ public class AppEngineStopAction extends AppEngineAction {
   public AppEngineStopAction(
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
+      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
       @NotNull String moduleToStop,
       @NotNull String versionToStop,
       @NotNull UndeploymentTaskCallback callback) {
-    super(loggingHandler, appEngineHelper, callback);
+    super(loggingHandler, deploymentConfiguration, callback);
 
     this.appEngineHelper = appEngineHelper;
     this.moduleToStop = moduleToStop;
