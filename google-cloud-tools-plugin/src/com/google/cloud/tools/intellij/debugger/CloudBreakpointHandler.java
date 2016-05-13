@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
@@ -20,9 +21,9 @@ import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
-import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.openapi.application.ApplicationManager;
@@ -68,19 +69,25 @@ import javax.swing.SwingUtilities;
  *                 IDE breakpoints, but IntelliJ does this to control some base behavior.
  * <li>serverBreakpoint: these are the {@link Breakpoint} breakpoints our server gives us via the
  *                 client api.
+ * </ul>
  */
 public class CloudBreakpointHandler
     extends XBreakpointHandler<XLineBreakpoint<CloudLineBreakpointProperties>> {
+
   public static final Key<String> CLOUD_ID = Key.create("CloudId");
 
   private static final Logger LOG = Logger.getInstance(CloudBreakpointHandler.class);
-  private final Map<String, XBreakpoint> ideBreakpoints = new ConcurrentHashMap<String, XBreakpoint>();
+  private final Map<String, XBreakpoint> ideBreakpoints
+      = new ConcurrentHashMap<String, XBreakpoint>();
   private final CloudDebugProcess process;
   private PsiManager psiManager;
-  private ServerToIDEFileResolver fileResolver;
+  private ServerToIdeFileResolver fileResolver;
 
+  /**
+   * Initializes the handler.
+   */
   public CloudBreakpointHandler(@NotNull CloudDebugProcess process,
-      ServerToIDEFileResolver fileResolver) {
+      ServerToIdeFileResolver fileResolver) {
     super(CloudLineBreakpointType.class);
     this.process = process;
     setPsiManager(PsiManager.getInstance(this.process.getXDebugSession().getProject()));
@@ -91,13 +98,10 @@ public class CloudBreakpointHandler
    * Called when the user "reactivates" an existing snapshot to create a new breakpoint, this clones
    * state into a new breakpoint. It is different from "createIdeRepresentationsIfNecessary" in the
    * following respects:
-   *
-   * <ul>
-   * <li>It only operates on final state breakpoints.
-   * <li>It always clones them into a new IDE breakpoint.
-   * <li>It does not set "created by server = true", so when control flow comes back into register,
-   *     it will register with the server.
-   * </ul>
+   * <p/>
+   * <ul> <li>It only operates on final state breakpoints. <li>It always clones them into a new IDE
+   * breakpoint. <li>It does not set "created by server = true", so when control flow comes back
+   * into register, it will register with the server. </ul>
    */
   public void cloneToNewBreakpoints(@NotNull final List<Breakpoint> serverBreakpoints) {
     for (Breakpoint serverBreakpoint : serverBreakpoints) {
@@ -107,11 +111,11 @@ public class CloudBreakpointHandler
 
       Project currentProject = process.getXDebugSession().getProject();
       final XBreakpointManager manager =
-        XDebuggerManager.getInstance(process.getXDebugSession().getProject())
-            .getBreakpointManager();
+          XDebuggerManager.getInstance(process.getXDebugSession().getProject())
+              .getBreakpointManager();
       if (serverBreakpoint.getLocation() == null) {
-        LOG.warn("attempted to clone a breakpoint without a source location: " +
-                 StringUtil.notNullize(serverBreakpoint.getId()));
+        LOG.warn("attempted to clone a breakpoint without a source location: "
+            + StringUtil.notNullize(serverBreakpoint.getId()));
         continue;
       }
 
@@ -123,8 +127,8 @@ public class CloudBreakpointHandler
       final VirtualFile file = fileResolver.getFileFromPath(currentProject, path);
       final int line = serverBreakpoint.getLocation().getLine() - 1;
       if (file == null) {
-        LOG.warn("attempted to clone a breakpoint whose file doesn't exist locally: " +
-                 StringUtil.notNullize(serverBreakpoint.getLocation().getPath()));
+        LOG.warn("attempted to clone a breakpoint whose file doesn't exist locally: "
+            + StringUtil.notNullize(serverBreakpoint.getLocation().getPath()));
         continue;
       }
 
@@ -171,8 +175,8 @@ public class CloudBreakpointHandler
    * Called when new breakpoints are encountered in polling the server, this method possibly creates
    * local representations of those breakpoints if there isn't one already at that line.
    */
-  public void createIdeRepresentationsIfNecessary(@NotNull final List<Breakpoint> serverBreakpoints)
-  {
+  public void createIdeRepresentationsIfNecessary(
+      @NotNull final List<Breakpoint> serverBreakpoints) {
     boolean addedBreakpoint = false;
     for (final Breakpoint serverBreakpoint : serverBreakpoints) {
       if (Boolean.TRUE.equals(serverBreakpoint.getIsFinalState())) {
@@ -212,7 +216,7 @@ public class CloudBreakpointHandler
         continue;
       }
       final XLineBreakpoint existingXIdeBreakpoint =
-        manager.findBreakpointAtLine(CloudLineBreakpointType.getInstance(), file, line);
+          manager.findBreakpointAtLine(CloudLineBreakpointType.getInstance(), file, line);
       if (existingXIdeBreakpoint != null && existingXIdeBreakpoint.isEnabled()) {
         continue;
       }
@@ -230,12 +234,12 @@ public class CloudBreakpointHandler
       addedBreakpoint = true;
       ApplicationManager.getApplication()
           .runWriteAction(new DoUpdateIdeWithBreakpoint(manager,
-                                                            file,
-                                                            line,
-                                                            properties,
-                                                            serverBreakpoint,
-                                                            ideBreakpoints,
-                                                            process));
+              file,
+              line,
+              properties,
+              serverBreakpoint,
+              ideBreakpoints,
+              process));
     }
 
     if (addedBreakpoint) {
@@ -262,19 +266,19 @@ public class CloudBreakpointHandler
   }
 
   /**
-   * Returns the XBreakpoint corresponding to the given server breakpoint
+   * Returns the XBreakpoint corresponding to the given server breakpoint.
    *
    * @param serverBreakpoint the server breakpoint representation
    * @return the local IDE representation in x-breakpoint form, if enabled
    */
   @Nullable
   public XBreakpoint getEnabledXBreakpoint(@NotNull Breakpoint serverBreakpoint) {
-    XBreakpoint xIdeBreakpoint = getXBreakpoint(serverBreakpoint);
-    return (xIdeBreakpoint == null || !xIdeBreakpoint.isEnabled()) ? null : xIdeBreakpoint;
+    XBreakpoint ideBreakpoint = getXBreakpoint(serverBreakpoint);
+    return (ideBreakpoint == null || !ideBreakpoint.isEnabled()) ? null : ideBreakpoint;
   }
 
   /**
-   * Returns the XBreakpoint corresponding to the given server breakpoint
+   * Returns the XBreakpoint corresponding to the given server breakpoint.
    *
    * @param serverBreakpoint The server breakpoint representation
    * @return the local IDE representation in x-breakpoint form
@@ -305,54 +309,55 @@ public class CloudBreakpointHandler
    * Called by IntelliJ when the user has enabled or created a new breakpoint. Creates the server
    * breakpoint.
    *
-   * @param xIdeBreakpoint breakpoint to register
+   * @param ideBreakpoint breakpoint to register
    */
   @Override
   public void registerBreakpoint(
-      @NotNull final XLineBreakpoint<CloudLineBreakpointProperties> xIdeBreakpoint) {
-    if (xIdeBreakpoint.getSourcePosition() == null
-        || !xIdeBreakpoint.isEnabled()
-        || !(xIdeBreakpoint.getType() instanceof CloudLineBreakpointType)) {
+      @NotNull final XLineBreakpoint<CloudLineBreakpointProperties> ideBreakpoint) {
+    if (ideBreakpoint.getSourcePosition() == null
+        || !ideBreakpoint.isEnabled()
+        || !(ideBreakpoint.getType() instanceof CloudLineBreakpointType)) {
       return;
     }
     com.intellij.debugger.ui.breakpoints.Breakpoint cloudIdeBreakpoint =
-      BreakpointManager.getJavaBreakpoint(xIdeBreakpoint);
+        BreakpointManager.getJavaBreakpoint(ideBreakpoint);
     if (!(cloudIdeBreakpoint instanceof CloudLineBreakpointType.CloudLineBreakpoint)) {
-      LOG.error("breakpoint was not of the correct type to create on the cloud.  It was not a " +
-                "CloudLineBreakpoint");
+      LOG.error("breakpoint was not of the correct type to create on the cloud.  It was not a "
+          + "CloudLineBreakpoint");
       return;
     }
 
     final CloudLineBreakpointType.CloudLineBreakpoint cloudIdeLineBreakpoint =
-      (CloudLineBreakpointType.CloudLineBreakpoint)cloudIdeBreakpoint;
-    if (xIdeBreakpoint.getProperties().isCreatedByServer()) {
+        (CloudLineBreakpointType.CloudLineBreakpoint) cloudIdeBreakpoint;
+    if (ideBreakpoint.getProperties().isCreatedByServer()) {
       // This newly created IDE breakpoint could be the result of syncing with the server state,
       // in which case, there is nothing to do.  Just return.
       // Note that we need to implement this flag as a transient property because this method
       // gets called during construction.
       return;
     }
-    if (xIdeBreakpoint.getProperties().isAddedOnServer() && !xIdeBreakpoint.getProperties().isDisabledByServer()) {
+    if (ideBreakpoint.getProperties().isAddedOnServer() && !ideBreakpoint.getProperties()
+        .isDisabledByServer()) {
       // If this breakpoint was already added, but was hit offline, let's not add it again once we
-      // resume a debug session. unless this reigster request comes from re-enabling a previously disabled
-      // breakpoint
+      // resume a debug session. unless this reigster request comes from re-enabling a previously
+      // disabled breakpoint
       return;
     }
 
-    PsiFile javaFile = psiManager.findFile(xIdeBreakpoint.getSourcePosition().getFile());
+    PsiFile javaFile = psiManager.findFile(ideBreakpoint.getSourcePosition().getFile());
     if (!(javaFile instanceof PsiJavaFile)) {
       return;
     }
     SourceLocation location = new SourceLocation();
     // Sending the file as com/package/example/Class.java to Cloud Debugger because it plays nice
-    // with the CDB plugin. See ServerToIDEFileResolver.
-    location.setPath(ServerToIDEFileResolver.getCloudPathFromJavaFile((PsiJavaFile) javaFile));
-    location.setLine(xIdeBreakpoint.getSourcePosition().getLine() + 1);
+    // with the CDB plugin. See ServerToIdeFileResolver.
+    location.setPath(ServerToIdeFileResolver.getCloudPathFromJavaFile((PsiJavaFile) javaFile));
+    location.setLine(ideBreakpoint.getSourcePosition().getLine() + 1);
 
     Breakpoint serverNewBreakpoint = new Breakpoint();
     serverNewBreakpoint.setLocation(location);
-    if (xIdeBreakpoint.getConditionExpression() != null) {
-      serverNewBreakpoint.setCondition(xIdeBreakpoint.getConditionExpression().getExpression());
+    if (ideBreakpoint.getConditionExpression() != null) {
+      serverNewBreakpoint.setCondition(ideBreakpoint.getConditionExpression().getExpression());
     }
 
     List<String> watches = cloudIdeLineBreakpoint.getWatchExpressions();
@@ -365,7 +370,7 @@ public class CloudBreakpointHandler
         .setBreakpointAsync(serverNewBreakpoint, new SetBreakpointHandler() {
           @Override
           public void onSuccess(@NotNull final String id) {
-            Runnable r = new Runnable() {
+            Runnable runnable = new Runnable() {
               @Override
               public void run() {
                 if (!Strings.isNullOrEmpty(id)) {
@@ -373,32 +378,32 @@ public class CloudBreakpointHandler
                     process.getStateController().deleteBreakpointAsync(id); //race condition
                   } else { // Success.
                     // Mark as added so we don't add it again.
-                    xIdeBreakpoint.getProperties().setAddedOnServer(true);
+                    ideBreakpoint.getProperties().setAddedOnServer(true);
                     cloudIdeLineBreakpoint.setErrorMessage(null);
                     process.updateBreakpointPresentation(cloudIdeLineBreakpoint);
                   }
                 } else {
                   // TODO(joaomartins): Why couldn't the breakpoint be set? Improve this message.
-                  cloudIdeLineBreakpoint.setErrorMessage(GctBundle.getString("clouddebug.errorset"));
+                  cloudIdeLineBreakpoint
+                      .setErrorMessage(GctBundle.getString("clouddebug.errorset"));
                   process.updateBreakpointPresentation(cloudIdeLineBreakpoint);
                 }
                 if (!Strings.isNullOrEmpty(id)) {
-                  xIdeBreakpoint.getProperties().setDisabledByServer(false);
-                  String oldId = xIdeBreakpoint.getUserData(CLOUD_ID);
+                  ideBreakpoint.getProperties().setDisabledByServer(false);
+                  String oldId = ideBreakpoint.getUserData(CLOUD_ID);
                   if (!Strings.isNullOrEmpty(oldId)) {
                     ideBreakpoints.remove(oldId);
                   }
 
-                  xIdeBreakpoint.putUserData(CLOUD_ID, id);
-                  ideBreakpoints.put(id, xIdeBreakpoint);
+                  ideBreakpoint.putUserData(CLOUD_ID, id);
+                  ideBreakpoints.put(id, ideBreakpoint);
                 }
               }
             };
             if (ApplicationManager.getApplication().isUnitTestMode()) {
-              r.run();
-            }
-            else {
-              SwingUtilities.invokeLater(r);
+              runnable.run();
+            } else {
+              SwingUtilities.invokeLater(runnable);
             }
           }
 
@@ -416,20 +421,18 @@ public class CloudBreakpointHandler
 
   /**
    * Called when the server records a new snapshot, we find the IDE representation and disable it.
-   *
-   * @param serverBreakpoint
    */
   public void setStateToDisabled(@NotNull Breakpoint serverBreakpoint) {
-    final XBreakpoint xIdeBreakpoint = ideBreakpoints.get(serverBreakpoint.getId());
-    if (xIdeBreakpoint != null
-        && xIdeBreakpoint.getProperties() instanceof CloudLineBreakpointProperties) {
+    final XBreakpoint ideBreakpoint = ideBreakpoints.get(serverBreakpoint.getId());
+    if (ideBreakpoint != null
+        && ideBreakpoint.getProperties() instanceof CloudLineBreakpointProperties) {
       CloudLineBreakpointProperties properties =
-          (CloudLineBreakpointProperties)xIdeBreakpoint.getProperties();
+          (CloudLineBreakpointProperties) ideBreakpoint.getProperties();
       properties.setDisabledByServer(true);
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
-          xIdeBreakpoint.setEnabled(false);
+          ideBreakpoint.setEnabled(false);
         }
       });
     }
@@ -437,12 +440,12 @@ public class CloudBreakpointHandler
 
   @Override
   public void unregisterBreakpoint(
-      @NotNull XLineBreakpoint<CloudLineBreakpointProperties> xIdeBreakpoint,
+      @NotNull XLineBreakpoint<CloudLineBreakpointProperties> ideBreakpoint,
       boolean temporary) {
     // If the state was set to disabled as a result of a server update,
     // then we do not need to update the server side.
-    if (!xIdeBreakpoint.getProperties().isDisabledByServer()) {
-      String breakpointId = xIdeBreakpoint.getUserData(CLOUD_ID);
+    if (!ideBreakpoint.getProperties().isDisabledByServer()) {
+      String breakpointId = ideBreakpoint.getUserData(CLOUD_ID);
       if (!Strings.isNullOrEmpty(breakpointId)) {
         process.getStateController().deleteBreakpointAsync(breakpointId);
       } else {
@@ -451,6 +454,6 @@ public class CloudBreakpointHandler
     }
     // reset this flag: either it has been disabled by the server or the client has deleted it, in
     // both cases we need to add it again, if it is re-enabled
-    xIdeBreakpoint.getProperties().setAddedOnServer(false);
+    ideBreakpoint.getProperties().setAddedOnServer(false);
   }
 }

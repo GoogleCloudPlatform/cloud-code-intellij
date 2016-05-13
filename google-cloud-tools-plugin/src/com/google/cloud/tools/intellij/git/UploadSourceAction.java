@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.git;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
-import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationListener;
@@ -52,17 +53,6 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.HashSet;
 import com.intellij.vcsUtil.VcsFileUtil;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
-
 import git4idea.DialogManager;
 import git4idea.GitLocalBranch;
 import git4idea.GitRemoteBranch;
@@ -86,35 +76,48 @@ import git4idea.update.GitFetcher;
 import git4idea.util.GitFileUtils;
 import git4idea.util.GitUIUtil;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+
 /**
  * Action to trigger an upload to a GCP git repository.
  */
 public class UploadSourceAction extends DumbAwareAction {
+
   private static final Logger LOG = Logger.getInstance(UploadSourceAction.class);
 
   public UploadSourceAction() {
     super(GctBundle.message("uploadtogcp.text"), GctBundle.message("uploadtogcp.description"),
-          GoogleCloudToolsIcons.CLOUD);
+        GoogleCloudToolsIcons.CLOUD);
   }
 
   @Override
-  public void update(AnActionEvent e) {
-    final Project project = e.getData(CommonDataKeys.PROJECT);
+  public void update(AnActionEvent event) {
+    final Project project = event.getData(CommonDataKeys.PROJECT);
     if (project == null || project.isDefault()) {
-      e.getPresentation().setVisible(false);
-      e.getPresentation().setEnabled(false);
+      event.getPresentation().setVisible(false);
+      event.getPresentation().setEnabled(false);
       return;
     }
-    e.getPresentation().setVisible(true);
-    e.getPresentation().setEnabled(true);
+    event.getPresentation().setVisible(true);
+    event.getPresentation().setEnabled(true);
   }
 
   @Override
-  public void actionPerformed(final AnActionEvent e) {
-    UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "upload", null);
+  public void actionPerformed(final AnActionEvent event) {
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "upload", null);
 
-    final Project project = e.getData(CommonDataKeys.PROJECT);
-    final VirtualFile file = e.getData(CommonDataKeys.VIRTUAL_FILE);
+    final Project project = event.getData(CommonDataKeys.PROJECT);
+    final VirtualFile file = event.getData(CommonDataKeys.VIRTUAL_FILE);
 
     if (project == null || project.isDisposed() || !isGitSupported(project)) {
       return;
@@ -123,7 +126,8 @@ public class UploadSourceAction extends DumbAwareAction {
     uploadProjectToGoogleCloud(project, file);
   }
 
-  private static void uploadProjectToGoogleCloud(@NotNull final Project project, @Nullable final VirtualFile file) {
+  private static void uploadProjectToGoogleCloud(@NotNull final Project project,
+      @Nullable final VirtualFile file) {
     BasicAction.saveAll();
     project.save();
 
@@ -134,7 +138,7 @@ public class UploadSourceAction extends DumbAwareAction {
     // check for existing git repo
     boolean externalRemoteDetected = false;
     if (gitDetected) {
-      final String gcpRemote = GcpHttpAuthDataProvider.findGCPRemoteUrl(gitRepository);
+      final String gcpRemote = GcpHttpAuthDataProvider.findGcpRemoteUrl(gitRepository);
       if (gcpRemote != null) {
         Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.alreadyexists"), "Google");
         return;
@@ -143,9 +147,11 @@ public class UploadSourceAction extends DumbAwareAction {
     }
 
     ChooseProjectDialog dialog =
-      new ChooseProjectDialog(project, GctBundle.message("uploadtogcp.selecttext"), GctBundle.message("uploadtogcp.oktext"));
+        new ChooseProjectDialog(project, GctBundle.message("uploadtogcp.selecttext"),
+            GctBundle.message("uploadtogcp.oktext"));
     DialogManager.show(dialog);
-    if (!dialog.isOK() || dialog.getCredentialedUser() == null || Strings.isNullOrEmpty(dialog.getProjectId())) {
+    if (!dialog.isOK() || dialog.getCredentialedUser() == null || Strings
+        .isNullOrEmpty(dialog.getProjectId())) {
       return;
     }
 
@@ -174,7 +180,8 @@ public class UploadSourceAction extends DumbAwareAction {
           SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-              Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.failedtocreategit"), "Google");
+              Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.failedtocreategit"),
+                  "Google");
             }
           });
           return;
@@ -191,11 +198,13 @@ public class UploadSourceAction extends DumbAwareAction {
 
         boolean succeeded = false;
         try {
-          PropertiesComponent.getInstance(project).setValue(GcpHttpAuthDataProvider.GCP_USER, user.getEmail());
+          PropertiesComponent.getInstance(project)
+              .setValue(GcpHttpAuthDataProvider.GCP_USER, user.getEmail());
 
           LOG.info("Fetching from Google remote");
           indicator.setText(GctBundle.message("uploadtogcp.fetching"));
-          if (!fetchGit(project, indicator, repository, remoteName) || hasRemoteBranch(project, repository, remoteName, projectId)) {
+          if (!fetchGit(project, indicator, repository, remoteName) || hasRemoteBranch(project,
+              repository, remoteName, projectId)) {
             return;
           }
 
@@ -212,15 +221,14 @@ public class UploadSourceAction extends DumbAwareAction {
           }
 
           succeeded = true;
-        }
-        finally {
+        } finally {
           if (!succeeded) {
             //remove the remote if possible on a failure, so the user can try again.
             removeGitRemote(project, repository, remoteName);
           }
         }
 
-        showInfoURL(project,
+        showInfoUrl(project,
             remoteName,
             GctBundle.message("uploadtogcp.success"),
             remoteUrl);
@@ -228,7 +236,7 @@ public class UploadSourceAction extends DumbAwareAction {
     }.queue();
   }
 
-  static void showInfoURL(@NotNull Project project, @NotNull String title,
+  static void showInfoUrl(@NotNull Project project, @NotNull String title,
       @NotNull String message, @NotNull String url) {
 
     LOG.info(title + "; " + message + "; " + url);
@@ -239,7 +247,8 @@ public class UploadSourceAction extends DumbAwareAction {
   }
 
   @Nullable
-  private static GitRepository getGitRepository(@NotNull Project project, @Nullable VirtualFile file) {
+  private static GitRepository getGitRepository(@NotNull Project project,
+      @Nullable VirtualFile file) {
     GitRepositoryManager manager = GitUtil.getRepositoryManager(project);
     List<GitRepository> repositories = manager.getRepositories();
     if (repositories.size() == 0) {
@@ -263,36 +272,40 @@ public class UploadSourceAction extends DumbAwareAction {
     final GitVersion version;
     try {
       version = GitVersion.identifyVersion(executable);
-    }
-    catch (Exception e) {
-      Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.giterror"), e.getMessage());
+    } catch (Exception ex) {
+      Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.giterror"), ex.getMessage());
       return false;
     }
 
     if (!version.isSupported()) {
-      Messages.showWarningDialog(project, GctBundle.message("uploadtogcp.git.unsupported.message", version.toString(), GitVersion.MIN),
-                                 GctBundle.message("uploadtogcp.giterror"));
+      Messages.showWarningDialog(project, GctBundle
+              .message("uploadtogcp.git.unsupported.message", version.toString(), GitVersion.MIN),
+          GctBundle.message("uploadtogcp.giterror"));
       return false;
     }
     return true;
   }
 
   private static boolean createEmptyGitRepository(@NotNull final Project project,
-                                                  @NotNull VirtualFile root,
-                                                  @NotNull ProgressIndicator indicator) {
+      @NotNull VirtualFile root,
+      @NotNull ProgressIndicator indicator) {
     final GitLineHandler gitLineHandler = new GitLineHandler(project, root, GitCommand.INIT);
     gitLineHandler.setStdoutSuppressed(false);
-    GitHandlerUtil.runInCurrentThread(gitLineHandler, indicator, true, GitBundle.getString("initializing.title"));
+    GitHandlerUtil.runInCurrentThread(gitLineHandler, indicator, true,
+        GitBundle.getString("initializing.title"));
     if (!gitLineHandler.errors().isEmpty()) {
       GitUIUtil.showOperationErrors(project, gitLineHandler.errors(), "git init");
       LOG.info("Failed to create empty git repo: " + gitLineHandler.errors());
       return false;
     }
     try {
-      GitConfigUtil.setValue(project, root, "credential.https://source.developers.google.com.useHttpPath", "true");
-    }
-    catch(VcsException ex) {
-      LOG.error("VcsException while setting up credential parameters (credentials will be not be cached per project url)" + ex.toString());
+      GitConfigUtil
+          .setValue(project, root, "credential.https://source.developers.google.com.useHttpPath",
+              "true");
+    } catch (VcsException ex) {
+      LOG.error(
+          "VcsException while setting up credential parameters (credentials will be not be cached "
+              + "per project url)" + ex.toString());
     }
     GitInit.refreshAndConfigureVcsMappings(project, root, root.getPath());
     try {
@@ -302,13 +315,11 @@ public class UploadSourceAction extends DumbAwareAction {
           project.save();
         }
       });
-    }
-    catch (InterruptedException ex) {
+    } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
       LOG.error("InterruptedException while saving project: " + ex.toString());
       return false;
-    }
-    catch (InvocationTargetException ex) {
+    } catch (InvocationTargetException ex) {
       LOG.error("InvocationTargetException while saving project: " + ex.toString());
       return false;
     }
@@ -316,9 +327,9 @@ public class UploadSourceAction extends DumbAwareAction {
   }
 
   private static boolean fetchGit(@NotNull final Project project,
-                                  @NotNull ProgressIndicator indicator,
-                                  @NotNull GitRepository repository,
-                                  final @NotNull String remote) {
+      @NotNull ProgressIndicator indicator,
+      @NotNull GitRepository repository,
+      final @NotNull String remote) {
 
     GitFetcher fetcher = new GitFetcher(project, indicator, true);
     GitFetchResult result = fetcher.fetch(repository);
@@ -328,7 +339,7 @@ public class UploadSourceAction extends DumbAwareAction {
         @Override
         public void run() {
           Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.fetchfailed", remote),
-                                   GctBundle.message("uploadtogcp.fetchfailedtitle"));
+              GctBundle.message("uploadtogcp.fetchfailedtitle"));
         }
       });
       return false;
@@ -338,17 +349,18 @@ public class UploadSourceAction extends DumbAwareAction {
   }
 
   private static boolean hasRemoteBranch(final @NotNull Project project,
-                                         @NotNull GitRepository repository,
-                                         @NotNull String remoteName,
-                                         final @NotNull String projectId) {
+      @NotNull GitRepository repository,
+      @NotNull String remoteName,
+      final @NotNull String projectId) {
     for (GitRemoteBranch remoteBranch : repository.getInfo().getRemoteBranches()) {
       if (remoteBranch.getRemote().getName().equalsIgnoreCase(remoteName)) {
         LOG.warn("git repo is not empty, bailing");
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run() {
-            Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.remotenotempty", projectId),
-                                     GctBundle.message("uploadtogcp.remotenotemptytitle"));
+            Messages.showErrorDialog(project,
+                GctBundle.message("uploadtogcp.remotenotempty", projectId),
+                GctBundle.message("uploadtogcp.remotenotemptytitle"));
           }
         });
         return true;
@@ -359,10 +371,11 @@ public class UploadSourceAction extends DumbAwareAction {
   }
 
   private static boolean addGitRemote(final @NotNull Project project,
-                                      @NotNull GitRepository repository,
-                                      @NotNull String remote,
-                                      final @NotNull String url) {
-    final GitSimpleHandler handler = new GitSimpleHandler(project, repository.getRoot(), GitCommand.REMOTE);
+      @NotNull GitRepository repository,
+      @NotNull String remote,
+      final @NotNull String url) {
+    final GitSimpleHandler handler = new GitSimpleHandler(project, repository.getRoot(),
+        GitCommand.REMOTE);
     handler.setSilent(true);
     try {
       handler.addParameters("add", remote, url);
@@ -371,8 +384,9 @@ public class UploadSourceAction extends DumbAwareAction {
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run() {
-            Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.addremotefailed", url, handler.getStderr()),
-                                     GctBundle.message("uploadtogcp.addremotefailedtitle"));
+            Messages.showErrorDialog(project,
+                GctBundle.message("uploadtogcp.addremotefailed", url, handler.getStderr()),
+                GctBundle.message("uploadtogcp.addremotefailedtitle"));
           }
         });
         return false;
@@ -380,28 +394,29 @@ public class UploadSourceAction extends DumbAwareAction {
       // catch newly added remote
       repository.update();
       return true;
-    }
-    catch (final VcsException e) {
+    } catch (final VcsException ex) {
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
-          Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.addremotefailed", url, e.toString()),
-                                   GctBundle.message("uploadtogcp.addremotefailedtitle"));
+          Messages.showErrorDialog(project,
+              GctBundle.message("uploadtogcp.addremotefailed", url, ex.toString()),
+              GctBundle.message("uploadtogcp.addremotefailedtitle"));
         }
       });
       return false;
     }
   }
 
-  private static void removeGitRemote(final @NotNull Project project, @NotNull GitRepository repository, @NotNull String remote) {
-    final GitSimpleHandler handler = new GitSimpleHandler(project, repository.getRoot(), GitCommand.REMOTE);
+  private static void removeGitRemote(final @NotNull Project project,
+      @NotNull GitRepository repository, @NotNull String remote) {
+    final GitSimpleHandler handler = new GitSimpleHandler(project, repository.getRoot(),
+        GitCommand.REMOTE);
     handler.setSilent(true);
     try {
       handler.addParameters("remove", remote);
       handler.run();
-    }
-    catch (final VcsException e) {
-      LOG.error("error removing newly added remote on error:" + e.toString());
+    } catch (final VcsException ex) {
+      LOG.error("error removing newly added remote on error:" + ex.toString());
     }
     // catch newly added remote
     repository.update();
@@ -409,9 +424,9 @@ public class UploadSourceAction extends DumbAwareAction {
 
 
   private static boolean performFirstCommitIfRequired(@NotNull final Project project,
-                                                      @NotNull VirtualFile root,
-                                                      @NotNull GitRepository repository,
-                                                      @NotNull ProgressIndicator indicator) {
+      @NotNull VirtualFile root,
+      @NotNull GitRepository repository,
+      @NotNull ProgressIndicator indicator) {
     // check if there are no commits
     if (!repository.isFresh()) {
       return true;
@@ -423,20 +438,21 @@ public class UploadSourceAction extends DumbAwareAction {
       indicator.setText(GctBundle.getString("uploadsourceaction.addfiles"));
 
       // ask for files to add
-      final List<VirtualFile> trackedFiles = ChangeListManager.getInstance(project).getAffectedFiles();
+      final List<VirtualFile> trackedFiles = ChangeListManager.getInstance(project)
+          .getAffectedFiles();
       final Collection<VirtualFile> untrackedFiles =
-        filterOutIgnored(project, repository.getUntrackedFilesHolder().retrieveUntrackedFiles());
+          filterOutIgnored(project, repository.getUntrackedFilesHolder().retrieveUntrackedFiles());
       trackedFiles.removeAll(untrackedFiles); // fix IDEA-119855
 
       final List<VirtualFile> allFiles = new ArrayList<VirtualFile>();
       allFiles.addAll(trackedFiles);
       allFiles.addAll(untrackedFiles);
 
-      final Ref<GCPUntrackedFilesDialog> dialogRef = new Ref<GCPUntrackedFilesDialog>();
+      final Ref<GcpUntrackedFilesDialog> dialogRef = new Ref<GcpUntrackedFilesDialog>();
       ApplicationManager.getApplication().invokeAndWait(new Runnable() {
         @Override
         public void run() {
-          GCPUntrackedFilesDialog dialog = new GCPUntrackedFilesDialog(project, allFiles);
+          GcpUntrackedFilesDialog dialog = new GcpUntrackedFilesDialog(project, allFiles);
           if (!trackedFiles.isEmpty()) {
             dialog.setSelectedFiles(trackedFiles);
           }
@@ -444,7 +460,7 @@ public class UploadSourceAction extends DumbAwareAction {
           dialogRef.set(dialog);
         }
       }, indicator.getModalityState());
-      final GCPUntrackedFilesDialog dialog = dialogRef.get();
+      final GcpUntrackedFilesDialog dialog = dialogRef.get();
 
       final Collection<VirtualFile> files2commit = dialog.getSelectedFiles();
       if (!dialog.isOK() || files2commit.isEmpty()) {
@@ -470,14 +486,14 @@ public class UploadSourceAction extends DumbAwareAction {
       handler.run();
 
       VcsFileUtil.markFilesDirty(project, modified);
-    }
-    catch (final VcsException e) {
-      LOG.warn(e);
+    } catch (final VcsException ex) {
+      LOG.warn(ex);
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
-          Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.initialcommitfailed", e.toString()),
-                                   GctBundle.message("uploadtogcp.initialcommitfailedtitle"));
+          Messages.showErrorDialog(project,
+              GctBundle.message("uploadtogcp.initialcommitfailed", ex.toString()),
+              GctBundle.message("uploadtogcp.initialcommitfailedtitle"));
         }
       });
       return false;
@@ -487,7 +503,8 @@ public class UploadSourceAction extends DumbAwareAction {
   }
 
   @NotNull
-  private static Collection<VirtualFile> filterOutIgnored(@NotNull Project project, @NotNull Collection<VirtualFile> files) {
+  private static Collection<VirtualFile> filterOutIgnored(@NotNull Project project,
+      @NotNull Collection<VirtualFile> files) {
     final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
     final FileIndexFacade fileIndex = FileIndexFacade.getInstance(project);
     return ContainerUtil.filter(files, new Condition<VirtualFile>() {
@@ -499,9 +516,9 @@ public class UploadSourceAction extends DumbAwareAction {
   }
 
   private static boolean pushCurrentBranch(final @NotNull Project project,
-                                           @NotNull GitRepository repository,
-                                           @NotNull String remoteName,
-                                           @NotNull String remoteUrl) {
+      @NotNull GitRepository repository,
+      @NotNull String remoteName,
+      @NotNull String remoteUrl) {
     Git git = ServiceManager.getService(Git.class);
 
     GitLocalBranch currentBranch = repository.getCurrentBranch();
@@ -510,19 +527,20 @@ public class UploadSourceAction extends DumbAwareAction {
         @Override
         public void run() {
           Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.initialpushfailed"),
-                                   GctBundle.message("uploadtogcp.initialpushfailedtitle"));
+              GctBundle.message("uploadtogcp.initialpushfailedtitle"));
         }
       });
       return false;
     }
-    GitCommandResult result = git.push(repository, remoteName, remoteUrl, currentBranch.getName(), true);
+    GitCommandResult result = git
+        .push(repository, remoteName, remoteUrl, currentBranch.getName(), true);
     if (!result.success()) {
       LOG.warn(result.getErrorOutputAsJoinedString());
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
           Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.initialpushfailed"),
-                                   GctBundle.message("uploadtogcp.initialpushfailedtitle"));
+              GctBundle.message("uploadtogcp.initialpushfailedtitle"));
         }
       });
       return false;
@@ -530,14 +548,19 @@ public class UploadSourceAction extends DumbAwareAction {
     return true;
   }
 
-  private static class GCPUntrackedFilesDialog extends SelectFilesDialog implements TypeSafeDataProvider {
+  private static class GcpUntrackedFilesDialog extends SelectFilesDialog implements
+      TypeSafeDataProvider {
+
     private static final float SPLIT_PROPORTION = 0.7f;
 
-    @NotNull private final Project project;
+    @NotNull
+    private final Project project;
     private CommitMessage commitMessagePanel;
 
-    @SuppressWarnings("ConstantConditions") // This suppresses an invalid null warning for calling the super with null params.
-    public GCPUntrackedFilesDialog(@NotNull Project project, @NotNull List<VirtualFile> untrackedFiles) {
+    @SuppressWarnings("ConstantConditions")
+    // This suppresses an invalid null warning for calling the super with null params.
+    public GcpUntrackedFilesDialog(@NotNull Project project,
+        @NotNull List<VirtualFile> untrackedFiles) {
       super(project, untrackedFiles, null, null, true, false, false);
       this.project = project;
       setTitle(GctBundle.getString("uploadsourceaction.addfilestitle"));

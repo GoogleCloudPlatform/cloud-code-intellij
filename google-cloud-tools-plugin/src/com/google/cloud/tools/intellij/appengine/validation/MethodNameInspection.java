@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.google.cloud.tools.intellij.appengine.GctConstants;
@@ -43,10 +44,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.regex.Pattern;
 
 /**
- *  Inspection to check that a specified method name provided in @ApiMethod
- *  is in the correct pattern.
+ * Inspection to check that a specified method name provided in @ApiMethod is in the correct
+ * pattern.
  */
 public class MethodNameInspection extends EndpointInspectionBase {
+
   private static final String API_NAME_ATTRIBUTE = "name";
   private static final Pattern API_NAME_PATTERN = Pattern.compile("^\\w+(\\.\\w+)*$");
 
@@ -79,24 +81,26 @@ public class MethodNameInspection extends EndpointInspectionBase {
           return;
         }
 
-        if(!GctConstants.APP_ENGINE_ANNOTATION_API_METHOD.equals(annotation.getQualifiedName())) {
+        if (!GctConstants.APP_ENGINE_ANNOTATION_API_METHOD.equals(annotation.getQualifiedName())) {
           return;
         }
 
         PsiAnnotationMemberValue memberValue = annotation.findAttributeValue(API_NAME_ATTRIBUTE);
-        if(memberValue == null) {
+        if (memberValue == null) {
           return;
         }
 
         String nameValueWithQuotes = memberValue.getText();
         String nameValue = EndpointUtilities.removeBeginningAndEndingQuotes(nameValueWithQuotes);
-        if(nameValue.isEmpty()) {
+        if (nameValue.isEmpty()) {
           return;
         }
 
-        if (!API_NAME_PATTERN.matcher(EndpointUtilities.collapseSequenceOfDots(nameValue)).matches()) {
-          holder.registerProblem(memberValue, "Invalid method name: letters, digits, underscores and dots are acceptable characters. " +
-            "Leading and trailing dots are prohibited.", new MyQuickFix());
+        if (!API_NAME_PATTERN.matcher(EndpointUtilities.collapseSequenceOfDots(nameValue))
+            .matches()) {
+          holder.registerProblem(memberValue,
+              "Invalid method name: letters, digits, underscores and dots are acceptable "
+                  + "characters. Leading and trailing dots are prohibited.", new MyQuickFix());
         }
       }
     };
@@ -120,8 +124,10 @@ public class MethodNameInspection extends EndpointInspectionBase {
     }
 
     /**
-     * Provides a replacement API method name that matches the {@link MethodNameInspection.API_NAME_PATTERN}.
-     * @param project    {@link com.intellij.openapi.project.Project}
+     * Provides a replacement API method name that matches the
+     * {@link MethodNameInspection.API_NAME_PATTERN}.
+     *
+     * @param project {@link com.intellij.openapi.project.Project}
      * @param descriptor problem reported by the tool which provided this quick fix action
      */
     @Override
@@ -136,7 +142,7 @@ public class MethodNameInspection extends EndpointInspectionBase {
         return;
       }
 
-      TextRange textRange = ((ProblemDescriptorBase)descriptor).getTextRange();
+      TextRange textRange = ((ProblemDescriptorBase) descriptor).getTextRange();
       editor.getSelectionModel().setSelection(textRange.getStartOffset(), textRange.getEndOffset());
 
       String wordWithQuotes = editor.getSelectionModel().getSelectedText();
@@ -156,38 +162,37 @@ public class MethodNameInspection extends EndpointInspectionBase {
      */
     @VisibleForTesting
     public String getMethodNameSuggestions(String baseString) {
-      if(baseString == null) {
+      if (baseString == null) {
         return null;
       }
 
-      if(baseString.isEmpty()) {
+      if (baseString.isEmpty()) {
         return "";
       }
 
       // Remove illegal characters
-      String noInvalidChars = baseString.replaceAll("[^a-zA-Z0-9_.]+","");
-      if(noInvalidChars.isEmpty()) {
+      String noInvalidChars = baseString.replaceAll("[^a-zA-Z0-9_.]+", "");
+      if (noInvalidChars.isEmpty()) {
         return "";
       }
 
-      if(API_NAME_PATTERN.matcher(noInvalidChars).matches()) {
+      if (API_NAME_PATTERN.matcher(noInvalidChars).matches()) {
         return noInvalidChars;
       }
       baseString = noInvalidChars;
 
       // Replace sequence of dots with single dot
       String noSequencingDots = EndpointUtilities.collapseSequenceOfDots(baseString);
-      if(API_NAME_PATTERN.matcher(noSequencingDots).matches()) {
+      if (API_NAME_PATTERN.matcher(noSequencingDots).matches()) {
         return noSequencingDots;
       }
       baseString = noSequencingDots;
 
-
       // If name starts with ".", remove starting "."
-      if(baseString.startsWith(".")) {
+      if (baseString.startsWith(".")) {
         String noLeadingDots = baseString.substring(1);
 
-        if(API_NAME_PATTERN.matcher(noLeadingDots).matches()) {
+        if (API_NAME_PATTERN.matcher(noLeadingDots).matches()) {
           return noLeadingDots;
         }
 
@@ -201,7 +206,7 @@ public class MethodNameInspection extends EndpointInspectionBase {
       if (baseString.endsWith(".")) {
         String noTrailingDots = baseString.substring(0, baseString.length() - 1);
 
-        if(API_NAME_PATTERN.matcher(noTrailingDots).matches()) {
+        if (API_NAME_PATTERN.matcher(noTrailingDots).matches()) {
           return noTrailingDots;
         }
 

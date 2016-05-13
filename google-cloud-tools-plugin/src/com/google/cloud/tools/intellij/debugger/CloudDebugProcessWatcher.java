@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
-import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 
 import com.intellij.execution.Executor;
 import com.intellij.execution.ProgramRunnerUtil;
@@ -28,16 +29,18 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
+
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 
 /**
- * Checks for updates on Cloud Debugger targets in the background. When it detects a change (a
- * new breakpoint has entered final state), it shows a notification.
+ * Checks for updates on Cloud Debugger targets in the background. When it detects a change (a new
+ * breakpoint has entered final state), it shows a notification.
  * <p/>
- * It enumerates all open projects and their run configurations looking for {@link CloudDebugRunConfiguration} objects.
+ * It enumerates all open projects and their run configurations looking for {@link
+ * CloudDebugRunConfiguration} objects.
  * <p/>
  * If it finds one that is marked for watching, it attempts to update its state.
  * <p/>
@@ -46,6 +49,7 @@ import javax.swing.event.HyperlinkEvent;
  * The poll interval is currently set at 10 seconds.
  */
 public class CloudDebugProcessWatcher implements CloudBreakpointListener {
+
   private static final CloudDebugProcessWatcher instance = new CloudDebugProcessWatcher();
   private CloudDebugGlobalPoller poller = null;
 
@@ -57,6 +61,9 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
     return instance;
   }
 
+  /**
+   * Creates a background listener.
+   */
   public synchronized void ensureWatcher() {
     if (poller == null) {
       poller = new CloudDebugGlobalPoller();
@@ -65,6 +72,9 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
     }
   }
 
+  /**
+   * Stop the background listener.
+   */
   public synchronized void removeWatcher() {
     if (poller != null) {
       poller.stopBackgroundListening();
@@ -77,30 +87,36 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        NotificationGroup notificationGroup = NotificationGroup.balloonGroup("Cloud Debugger watcher");
-        String message = GctBundle.getString("clouddebug.balloonnotification.message", state.getProjectName());
+        NotificationGroup notificationGroup = NotificationGroup
+            .balloonGroup("Cloud Debugger watcher");
+        String message = GctBundle
+            .getString("clouddebug.balloonnotification.message", state.getProjectName());
         UsageTrackerProvider.getInstance()
-            .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "notify.background.bubble", null);
-        notificationGroup.createNotification("", message, NotificationType.INFORMATION, new NotificationListener() {
-          @Override
-          public void hyperlinkUpdate(@NotNull Notification notification,
-              @NotNull HyperlinkEvent event) {
-            notification.expire();
-            RunnerAndConfigurationSettings targetConfig = null;
-            RunManager manager = RunManager.getInstance(state.getProject());
-            for (final RunnerAndConfigurationSettings config : manager.getAllSettings()) {
-              if (config.getConfiguration() instanceof CloudDebugRunConfiguration &&
-                  ((CloudDebugRunConfiguration) config.getConfiguration()).getProcessState() == state) {
-                targetConfig = config;
-              }
-            }
+            .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER,
+                "notify.background.bubble", null);
+        notificationGroup.createNotification("", message, NotificationType.INFORMATION,
+            new NotificationListener() {
+              @Override
+              public void hyperlinkUpdate(@NotNull Notification notification,
+                  @NotNull HyperlinkEvent event) {
+                notification.expire();
+                RunnerAndConfigurationSettings targetConfig = null;
+                RunManager manager = RunManager.getInstance(state.getProject());
+                for (final RunnerAndConfigurationSettings config : manager.getAllSettings()) {
+                  if (config.getConfiguration() instanceof CloudDebugRunConfiguration
+                      && ((CloudDebugRunConfiguration) config.getConfiguration()).getProcessState()
+                          == state) {
+                    targetConfig = config;
+                  }
+                }
 
-            if (targetConfig != null) {
-              Executor executor = DefaultDebugExecutor.getDebugExecutorInstance();
-              ProgramRunnerUtil.executeConfiguration(state.getProject(), targetConfig, executor);
-            }
-          }
-        }).notify(state.getProject());
+                if (targetConfig != null) {
+                  Executor executor = DefaultDebugExecutor.getDebugExecutorInstance();
+                  ProgramRunnerUtil
+                      .executeConfiguration(state.getProject(), targetConfig, executor);
+                }
+              }
+            }).notify(state.getProject());
       }
     });
   }

@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.StatusMessage;
-import com.google.cloud.tools.intellij.debugger.CloudDebugProcessHandler;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.debugger.BreakpointUtil;
 import com.google.cloud.tools.intellij.debugger.CloudBreakpointListener;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcess;
+import com.google.cloud.tools.intellij.debugger.CloudDebugProcessHandler;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
-import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.diagnostic.logging.AdditionalTabComponent;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -52,7 +53,13 @@ import com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -65,29 +72,33 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 /**
- * This panel shows the list of cloud debugger snapshots.
- * It contains one Swing table which is divided into five columns:
- *
- * 0. An icon indicating the state of the breakpoint
- * 1. A date-time for received snapshots or the word "Pending" otherwise.
- * 2. The file and line number of the snapshot; e.g. "GeneratorServlet.java:40"
- * 3. The breakpoint condition, if any
- * 4. For pending snapshots only, the word "More" which is a link to the Breakpoints dialog.
+ * This panel shows the list of cloud debugger snapshots. It contains one Swing table which is
+ * divided into five columns:
+ * <p/>
+ * 0. An icon indicating the state of the breakpoint 1. A date-time for received snapshots or the
+ * word "Pending" otherwise. 2. The file and line number of the snapshot; e.g.
+ * "GeneratorServlet.java:40" 3. The breakpoint condition, if any 4. For pending snapshots only, the
+ * word "More" which is a link to the Breakpoints dialog.
  */
- // todo: why *historical* snapshots? Isn't this just all snapshots?
+// todo: why *historical* snapshots? Isn't this just all snapshots?
 public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     implements XDebugSessionListener, CloudBreakpointListener {
 
   private static final int COLUMN_MARGIN_PX = 3;
   private static final Cursor DEFAULT_CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
   private static final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-  private static final int WINDOW_HEIGHT_PX = 8 * JBTable.PREFERRED_SCROLLABLE_VIEWPORT_HEIGHT_IN_ROWS;
+  private static final int WINDOW_HEIGHT_PX =
+      8 * JBTable.PREFERRED_SCROLLABLE_VIEWPORT_HEIGHT_IN_ROWS;
   private static final int WINDOW_WIDTH_PX = 200;
 
   private CloudDebugProcess process;
@@ -97,6 +108,9 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   @VisibleForTesting
   Balloon balloon = null;
 
+  /**
+   * Initialize the panel.
+   */
   public CloudDebugHistoricalSnapshots(@NotNull CloudDebugProcessHandler processHandler) {
     super(new BorderLayout());
 
@@ -227,7 +241,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   /**
-   * Deletes breakpoints asynchronously on a threadpool thread. The user will see these breakpoints gradually disappear.
+   * Deletes breakpoints asynchronously on a threadpool thread. The user will see these breakpoints
+   * gradually disappear.
    */
   private void fireDeleteBreakpoints(@NotNull final List<Breakpoint> breakpointsToDelete) {
     for (Breakpoint breakpoint : breakpointsToDelete) {
@@ -238,8 +253,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   @Nullable
-  private Breakpoint getBreakPoint(@NotNull Point p) {
-    int row = table.rowAtPoint(p);
+  private Breakpoint getBreakPoint(@NotNull Point point) {
+    int row = table.rowAtPoint(point);
     if (row >= 0 && row < getModel().getBreakpoints().size()) {
       return getModel().getBreakpoints().get(row);
     }
@@ -252,7 +267,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   /**
-   * Used by delete and clone, this returns the lines the user currently has selected in the snapshot list.
+   * Used by delete and clone, this returns the lines the user currently has selected in the
+   * snapshot list.
    */
   @NotNull
   private List<Breakpoint> getSelectedBreakpoints() {
@@ -266,9 +282,10 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   /**
-   * This is fired when the set of breakpoints from the server changes. We create a new table model while keeping the
-   * selection as it was. Most routines on selection are therefore based on the breakpoint Id and not a reference to a
-   * breakpoint object -- because we never know when the server instance will get replaced.
+   * This is fired when the set of breakpoints from the server changes. We create a new table model
+   * while keeping the selection as it was. Most routines on selection are therefore based on the
+   * breakpoint Id and not a reference to a breakpoint object -- because we never know when the
+   * server instance will get replaced.
    */
   private void onBreakpointsChanged() {
     // Read the list of breakpoints and show them.
@@ -304,12 +321,11 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   /**
-   * Returns true if we have a local representation of the snapshot.
-   * The snapshot may be pending or in final state.  If in final state,
-   * then the local representation will be disabled (not enabled).
-   * The user can re-enable the local state and it will create a new pending snapshot
-   * and de-link the old snapshot from the local representation.
-   *
+   * Returns true if we have a local representation of the snapshot. The snapshot may be pending or
+   * in final state.  If in final state, then the local representation will be disabled (not
+   * enabled). The user can re-enable the local state and it will create a new pending snapshot and
+   * de-link the old snapshot from the local representation.
+   * <p/>
    * Snapshots that support more config show a "More..." link in the rightmost column of the table.
    */
   // todo: is there any feasible way to push this into the breakpoint class itself?
@@ -319,26 +335,28 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   private final class SnapshotTimeCellRenderer extends DefaultTableCellRenderer {
-    private final DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+
+    private final DateFormat dateFormat = DateFormat
+        .getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     private final DateFormat dateformatToday = DateFormat.getTimeInstance(DateFormat.SHORT);
     private final Date todayDate;
 
     public SnapshotTimeCellRenderer() {
       setHorizontalAlignment(SwingConstants.LEFT);
-      Calendar c = new GregorianCalendar();
-      c.set(Calendar.HOUR_OF_DAY, 0);
-      c.set(Calendar.MINUTE, 0);
-      c.set(Calendar.SECOND, 0);
-      todayDate = c.getTime();
+      Calendar calendar = new GregorianCalendar();
+      calendar.set(Calendar.HOUR_OF_DAY, 0);
+      calendar.set(Calendar.MINUTE, 0);
+      calendar.set(Calendar.SECOND, 0);
+      todayDate = calendar.getTime();
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table,
-                                                   Object value,
-                                                   boolean isSelected,
-                                                   boolean hasFocus,
-                                                   int row,
-                                                   int column) {
+        Object value,
+        boolean isSelected,
+        boolean hasFocus,
+        int row,
+        int column) {
       super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       setBorder(noFocusBorder);
 
@@ -346,15 +364,12 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         Date finalDate = (Date) value;
         if (finalDate.after(todayDate)) {
           setText(dateformatToday.format(finalDate));
-        }
-        else {
+        } else {
           setText(dateFormat.format(finalDate));
         }
-      }
-      else if (value != null) {
+      } else if (value != null) {
         setText(value.toString());
-      }
-      else {
+      } else {
         setText("");
       }
 
@@ -362,8 +377,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         Font font = getFont();
         Font boldFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
         setFont(boldFont);
-      }
-      else {
+      } else {
         Font font = getFont();
         Font plainFont = new Font(font.getFontName(), Font.PLAIN, font.getSize());
         setFont(plainFont);
@@ -378,8 +392,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         attributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
         attributes.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
         setFont(new Font(attributes));
-      }
-      else if (!isSelected) {
+      } else if (!isSelected) {
         setForeground(UIUtil.getActiveTextColor());
       }
 
@@ -387,7 +400,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     }
   }
 
-  private final static class MoreCellRenderer extends DefaultTableCellRenderer {
+  private static final class MoreCellRenderer extends DefaultTableCellRenderer {
+
     MoreCellRenderer() {
       setHorizontalAlignment(SwingConstants.LEFT);
       setForeground(UI.getColor("link.foreground"));
@@ -395,11 +409,11 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     @Override
     public Component getTableCellRendererComponent(JTable table,
-                                                   Object value,
-                                                   boolean isSelected,
-                                                   boolean hasFocus,
-                                                   int row,
-                                                   int column) {
+        Object value,
+        boolean isSelected,
+        boolean hasFocus,
+        int row,
+        int column) {
       super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       setBorder(noFocusBorder);
       if (value != null) {
@@ -410,13 +424,14 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   private class DefaultRenderer extends DefaultTableCellRenderer {
+
     @Override
     public Component getTableCellRendererComponent(JTable table,
-                                                   Object value,
-                                                   boolean isSelected,
-                                                   boolean hasFocus,
-                                                   int row,
-                                                   int column) {
+        Object value,
+        boolean isSelected,
+        boolean hasFocus,
+        int row,
+        int column) {
       super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       setBorder(noFocusBorder);
       if (getModel().isMarkedForDelete(row)) {
@@ -428,16 +443,14 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         attributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
         attributes.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
         setFont(new Font(attributes));
-      }
-      else if (!isSelected) {
+      } else if (!isSelected) {
         setForeground(UIUtil.getActiveTextColor());
 
         if (getModel().isNewlyReceived(row)) {
           Font font = getFont();
           Font plainFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
           setFont(plainFont);
-        }
-        else {
+        } else {
           Font font = getFont();
           Font boldFont = new Font(font.getFontName(), Font.PLAIN, font.getSize());
           setFont(boldFont);
@@ -448,6 +461,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   private class RemoveSelectedBreakpointsAction implements AnActionButtonRunnable {
+
     @Override
     public void run(AnActionButton button) {
       // todo(elharo): inject a pointer to the parent class, and we can make this class static
@@ -457,17 +471,19 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   private class RemoveAllBreakpointsAction extends AnActionButton {
+
     RemoveAllBreakpointsAction() {
-      super(GctBundle.getString("clouddebug.delete.all"), GoogleCloudToolsIcons.CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS);
+      super(GctBundle.getString("clouddebug.delete.all"),
+          GoogleCloudToolsIcons.CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS);
     }
 
     @Override
     public void actionPerformed(AnActionEvent event) {
       int result = Messages.showOkCancelDialog(GctBundle.getString("clouddebug.remove.all"),
-              GctBundle.getString("clouddebug.delete.snapshots"),
-              GctBundle.getString("clouddebug.buttondelete"),
-              GctBundle.getString("clouddebug.cancelbutton"),
-              Messages.getQuestionIcon());
+          GctBundle.getString("clouddebug.delete.snapshots"),
+          GctBundle.getString("clouddebug.buttondelete"),
+          GctBundle.getString("clouddebug.cancelbutton"),
+          Messages.getQuestionIcon());
 
       if (result == Messages.OK) { // pressed remove all
         SnapshotsModel model = getModel();
@@ -477,8 +493,10 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   }
 
   private class ReactivateBreakpointAction extends AnActionButton {
+
     public ReactivateBreakpointAction() {
-      super(GctBundle.getString("clouddebug.reactivatesnapshotlocation"), GoogleCloudToolsIcons.CLOUD_DEBUG_REACTIVATE_BREAKPOINT);
+      super(GctBundle.getString("clouddebug.reactivatesnapshotlocation"),
+          GoogleCloudToolsIcons.CLOUD_DEBUG_REACTIVATE_BREAKPOINT);
     }
 
     @Override
@@ -523,27 +541,27 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     @NotNull
     @Override
     public Component prepareRenderer(@NotNull TableCellRenderer renderer, int row, int column) {
-      Component c = super.prepareRenderer(renderer, row, column);
-      if (c instanceof JComponent) {
-        JComponent jc = (JComponent) c;
+      Component component = super.prepareRenderer(renderer, row, column);
+      if (component instanceof JComponent) {
+        JComponent jc = (JComponent) component;
         SnapshotsModel model = (SnapshotsModel) getModel();
         Breakpoint breakpoint = model.getBreakpoints().get(row);
         jc.setToolTipText(BreakpointUtil.getUserErrorMessage(breakpoint.getStatus()));
       }
-      return c;
+      return component;
     }
   }
 
   /**
    * This click handler does one of three things:
-   *
-   * 1. Single click on a final snapshot will load the debugger with that snapshot.
-   * 2. Single click on a pending snapshot will show the line of code.
-   * 3. Single click on "More" will show the breakpoint config dialog.
-   * todo: single click on a pending snapshot clears the debugger with the previous snapshot
-   * https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/143
+   * <p/>
+   * 1. Single click on a final snapshot will load the debugger with that snapshot. 2. Single click
+   * on a pending snapshot will show the line of code. 3. Single click on "More" will show the
+   * breakpoint config dialog. todo: single click on a pending snapshot clears the debugger with the
+   * previous snapshot https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/143
    */
   private class SnapshotClicker extends MouseAdapter {
+
     @Override
     public void mousePressed(MouseEvent event) {
       JTable table = (JTable) event.getSource();
@@ -555,8 +573,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       if (breakpoint != null && column == 4 && supportsMoreConfig(breakpoint)) {
         BreakpointsDialogFactory.getInstance(process.getXDebugSession().getProject())
             .showDialog(process.getBreakpointHandler().getXBreakpoint(breakpoint));
-      }
-      else if (event.getClickCount() == 1 && breakpoint != null && table.getSelectedRows().length == 1) {
+      } else if (event.getClickCount() == 1 && breakpoint != null
+          && table.getSelectedRows().length == 1) {
         selectSnapshot(breakpoint, false);
       }
     }
@@ -565,20 +583,21 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   private void selectSnapshot(Breakpoint breakpoint, boolean isSelectedBeforeTrigger) {
     getModel().unMarkAsNewlyReceived(breakpoint.getId());
 
-    if(isSelectedBeforeTrigger || isNewlySelected(breakpoint)) {
+    if (isSelectedBeforeTrigger || isNewlySelected(breakpoint)) {
       process.navigateToSnapshot(breakpoint.getId());
     }
   }
 
   private boolean isNewlySelected(Breakpoint breakpoint) {
-      return process.getCurrentSnapshot() == null
-          || !process.getCurrentSnapshot().getId().equals(breakpoint.getId());
+    return process.getCurrentSnapshot() == null
+        || !process.getCurrentSnapshot().getId().equals(breakpoint.getId());
   }
 
   /**
    * Create a hand cursor over a link within a table.
    */
   private class CursorSwitcher implements MouseMotionListener {
+
     @Override
     public void mouseDragged(MouseEvent me) {
     }
@@ -586,9 +605,9 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     @Override
     public void mouseMoved(MouseEvent event) {
       JTable table = (JTable) event.getSource();
-      Point p = event.getPoint();
-      int column = table.columnAtPoint(p);
-      Breakpoint breakpoint = getBreakPoint(p);
+      Point point = event.getPoint();
+      int column = table.columnAtPoint(point);
+      Breakpoint breakpoint = getBreakPoint(point);
       if (column == 4 && breakpoint != null && supportsMoreConfig(breakpoint)) {
         if (table.getCursor() != HAND_CURSOR) {
           table.setCursor(HAND_CURSOR);
@@ -603,6 +622,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
   @VisibleForTesting
   class ModelSetter implements Runnable {
+
     private final List<Breakpoint> breakpointList;
     private final int finalSelection;
 
@@ -614,9 +634,11 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     @Override
     public void run() {
       // todo: why are we switching out the model instead of simply updating the old model?
-      // todo: a lot of this code might be pushed into CloudDebuggerTable.setBrekpoints or equivalent
+      // todo: a lot of this code might be pushed into CloudDebuggerTable.setBrekpoints or
+      // equivalent
       SnapshotsModel oldModel = getModel();
-      SnapshotsModel newModel = new SnapshotsModel(CloudDebugHistoricalSnapshots.this, breakpointList, oldModel);
+      SnapshotsModel newModel = new SnapshotsModel(CloudDebugHistoricalSnapshots.this,
+          breakpointList, oldModel);
       table.setModel(newModel);
       if (finalSelection != -1) {
         table.setRowSelectionInterval(finalSelection, finalSelection);
@@ -643,39 +665,44 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         break; // NOPMD
       }
       if (rowForPopup != -1) {
-        UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "snapshot.received", null);
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "snapshot.received",
+                null);
         // Show a popup indicating a new item has appeared.
         if (balloon != null) {
           balloon.hide();
         }
         Rectangle rectangle = table.getCellRect(rowForPopup, 0, true);
         BalloonBuilder builder = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder(GctBundle.getString("clouddebug.new.snapshot.received"), MessageType.INFO, null)
+            .createHtmlTextBalloonBuilder(GctBundle.getString("clouddebug.new.snapshot.received"),
+                MessageType.INFO, null)
             .setFadeoutTime(3000)
             .setDisposable(process.getXDebugSession().getProject());
         balloon = builder.createBalloon();
-        balloon.show(new RelativePoint(table, new Point(table.getWidth() / 2, rectangle.y)), Position.above);
+        balloon.show(new RelativePoint(table, new Point(table.getWidth() / 2, rectangle.y)),
+            Position.above);
 
         reloadSnapshot();
-      } else if (oldModel.hasPendingDeletes() && oldModel.getBreakpoints().size() > newModel.getBreakpoints().size()) {
-          process.clearExecutionStack();
+      } else if (oldModel.hasPendingDeletes() && oldModel.getBreakpoints().size() > newModel
+          .getBreakpoints().size()) {
+        process.clearExecutionStack();
       }
     }
 
     /**
-     * If the snapshot was already selected prior to being triggered,
-     * e.g. the user selected it while in a pending state,
-     * we need to force trigger its selection so that the new results are drawn
+     * If the snapshot was already selected prior to being triggered, e.g. the user selected it
+     * while in a pending state, we need to force trigger its selection so that the new results are
+     * drawn
      */
     private void reloadSnapshot() {
       int selectedRow = table.getSelectedRow();
 
-      if(selectedRow != -1
+      if (selectedRow != -1
           && selectedRow < getModel().getBreakpoints().size()
           && getModel().isNewlyReceived(selectedRow)) {
         Breakpoint breakpoint = getModel().getBreakpoints().get(selectedRow);
 
-        if(breakpoint != null && table.getSelectedRows().length == 1) {
+        if (breakpoint != null && table.getSelectedRows().length == 1) {
           selectSnapshot(breakpoint, true);
         }
       }

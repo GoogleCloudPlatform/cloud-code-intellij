@@ -259,7 +259,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     SyncResult syncResult = mock(SyncResult.class);
     when(syncResult.needsStash()).thenReturn(needsStash);
     when(syncResult.needsSync()).thenReturn(false);
-    when(syncResult.getTargetSyncSHA()).thenReturn(null);
+    when(syncResult.getTargetSyncSha()).thenReturn(null);
     when(syncResult.hasRemoteRepository()).thenReturn(hasRemoteRepository);
 
     return syncResult;

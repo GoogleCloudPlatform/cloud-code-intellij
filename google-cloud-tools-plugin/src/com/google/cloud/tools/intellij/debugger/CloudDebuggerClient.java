@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -26,14 +27,16 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Builder;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gdt.eclipse.login.common.LoginListener;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,8 +45,6 @@ import org.jetbrains.annotations.TestOnly;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.ConcurrentHashMap;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Helper class to return clients on a per user email basis.
@@ -66,21 +67,21 @@ public class CloudDebuggerClient {
 
   /**
    * Returns a cloud debugger connection given {@link CloudDebugProcessState} to indicate the
-   * credentials to use. The function may return null if the user is not logged in.
-   * TODO: Create a better experience attaching when not logged in
-   * TODO: Handle cases where the user logs out in the middle of a debug session.
+   * credentials to use. The function may return null if the user is not logged in. TODO: Create a
+   * better experience attaching when not logged in TODO: Handle cases where the user logs out in
+   * the middle of a debug session.
    */
   @Nullable
   public static Debugger getLongTimeoutClient(final @NotNull CloudDebugProcessState state) {
     return getClient(state.getUserEmail(), LONG_CONNECTION_TIMEOUT_MS);
   }
 
-  public static Debugger getShortTimeoutClient(final @NotNull CloudDebugProcessState state) {
-    return getClient(state.getUserEmail(), SHORT_CONNECTION_TIMEOUT_MS);
-  }
-
   public static Debugger getLongTimeoutClient(final @Nullable String userEmail) {
     return getClient(userEmail, LONG_CONNECTION_TIMEOUT_MS);
+  }
+
+  public static Debugger getShortTimeoutClient(final @NotNull CloudDebugProcessState state) {
+    return getClient(state.getUserEmail(), SHORT_CONNECTION_TIMEOUT_MS);
   }
 
   public static Debugger getShortTimeoutClient(final @Nullable String userEmail) {
@@ -88,8 +89,8 @@ public class CloudDebuggerClient {
   }
 
   /**
-   * Returns a cloud debugger connection given a user email to indicate the credentials to use.
-   * The function may return null if the user is not logged in.
+   * Returns a cloud debugger connection given a user email to indicate the credentials to use. The
+   * function may return null if the user is not logged in.
    */
   @Nullable
   @SuppressFBWarnings(
@@ -139,11 +140,9 @@ public class CloudDebuggerClient {
               .setApplicationName(userAgent)
               .build().debugger();
         }
-      }
-      catch (IOException ex) {
+      } catch (IOException ex) {
         LOG.warn("Error connecting to Cloud Debugger API", ex);
-      }
-      catch (GeneralSecurityException ex) {
+      } catch (GeneralSecurityException ex) {
         LOG.warn("Error connecting to Cloud Debugger API", ex);
       }
 

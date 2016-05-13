@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.git;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
@@ -32,6 +33,7 @@ import com.intellij.openapi.vcs.VcsNotifier;
 import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+
 import git4idea.DialogManager;
 import git4idea.GitVcs;
 import git4idea.actions.BasicAction;
@@ -39,6 +41,7 @@ import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
 import git4idea.commands.GitLineHandlerListener;
 import git4idea.commands.GitStandardProgressAnalyzer;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,6 +52,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Checkout provider for the Google Cloud Platform.
  */
 public class GcpCheckoutProvider implements CheckoutProvider {
+
   private static final Logger LOG = Logger.getInstance(GcpCheckoutProvider.class);
 
   private final Git git;
@@ -64,15 +68,16 @@ public class GcpCheckoutProvider implements CheckoutProvider {
 
   @Override
   public void doCheckout(@NotNull final Project project, @Nullable final Listener listener) {
-    UsageTrackerProvider.getInstance().trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "checkout", null);
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "checkout", null);
 
     BasicAction.saveAll();
     CloneGcpDialog dialog = new CloneGcpDialog(project);
     DialogManager.show(dialog);
-    if (!dialog.isOK() ||
-      Strings.isNullOrEmpty(dialog.getParentDirectory()) ||
-      Strings.isNullOrEmpty(dialog.getSourceRepositoryURL()) ||
-      Strings.isNullOrEmpty(dialog.getDirectoryName())) {
+    if (!dialog.isOK()
+        || Strings.isNullOrEmpty(dialog.getParentDirectory())
+        || Strings.isNullOrEmpty(dialog.getSourceRepositoryUrl())
+        || Strings.isNullOrEmpty(dialog.getDirectoryName())) {
       return;
     }
     final LocalFileSystem lfs = LocalFileSystem.getInstance();
@@ -84,31 +89,35 @@ public class GcpCheckoutProvider implements CheckoutProvider {
     if (destinationParent == null) {
       return;
     }
-    final String sourceRepositoryURL = dialog.getSourceRepositoryURL();
+    final String sourceRepositoryUrl = dialog.getSourceRepositoryUrl();
     final String directoryName = dialog.getDirectoryName();
     final String parentDirectory = dialog.getParentDirectory();
-    final String gcpUserName = dialog.getGCPUserName();
+    final String gcpUserName = dialog.getGcpUserName();
     if (Strings.isNullOrEmpty(gcpUserName)) {
       LOG.error("unexpected blank username during checkout");
       return;
     }
-    clone(project, git, listener, destinationParent, sourceRepositoryURL, directoryName, parentDirectory, gcpUserName);
+    clone(project, git, listener, destinationParent, sourceRepositoryUrl, directoryName,
+        parentDirectory, gcpUserName);
   }
 
-  private static void clone(@NotNull final Project project, @NotNull final Git git, @Nullable final Listener listener,
-                            @NotNull final VirtualFile destinationParent, @NotNull final String sourceRepositoryURL,
-                            @NotNull final String directoryName,  @NotNull final String parentDirectory,
-                            @Nullable final String gcpUserName) {
+  private static void clone(@NotNull final Project project, @NotNull final Git git,
+      @Nullable final Listener listener,
+      @NotNull final VirtualFile destinationParent, @NotNull final String sourceRepositoryUrl,
+      @NotNull final String directoryName, @NotNull final String parentDirectory,
+      @Nullable final String gcpUserName) {
 
     final AtomicBoolean cloneResult = new AtomicBoolean();
-    new Task.Backgroundable(project, GctBundle.message("clonefromgcp.repository", sourceRepositoryURL)) {
+    new Task.Backgroundable(project,
+        GctBundle.message("clonefromgcp.repository", sourceRepositoryUrl)) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
-        GcpHttpAuthDataProvider.Context context = GcpHttpAuthDataProvider.createContext(gcpUserName);
+        GcpHttpAuthDataProvider.Context context = GcpHttpAuthDataProvider
+            .createContext(gcpUserName);
         try {
-          cloneResult.set(doClone(project, indicator, git, directoryName, parentDirectory, sourceRepositoryURL));
-        }
-        finally {
+          cloneResult.set(doClone(project, indicator, git, directoryName, parentDirectory,
+              sourceRepositoryUrl));
+        } finally {
           context.close();
         }
       }
@@ -132,7 +141,8 @@ public class GcpCheckoutProvider implements CheckoutProvider {
         ProjectManagerListener configWriter = new ProjectManagerListener() {
           @Override
           public void projectOpened(Project project) {
-            PropertiesComponent.getInstance(project).setValue(GcpHttpAuthDataProvider.GCP_USER, gcpUserName == null ? "" : gcpUserName);
+            PropertiesComponent.getInstance(project)
+                .setValue(GcpHttpAuthDataProvider.GCP_USER, gcpUserName == null ? "" : gcpUserName);
           }
 
           @Override
@@ -157,23 +167,27 @@ public class GcpCheckoutProvider implements CheckoutProvider {
             listener.directoryCheckedOut(new File(parentDirectory, directoryName), GitVcs.getKey());
             listener.checkoutCompleted();
           }
-        }
-        finally {
+        } finally {
           ProjectManager.getInstance().removeProjectManagerListener(configWriter);
         }
       }
     }.queue();
   }
 
-  private static boolean doClone(@NotNull Project project, @NotNull ProgressIndicator indicator, @NotNull Git git,
-                                @NotNull String directoryName, @NotNull String parentDirectory, @NotNull String sourceRepositoryURL) {
+  private static boolean doClone(@NotNull Project project, @NotNull ProgressIndicator indicator,
+      @NotNull Git git,
+      @NotNull String directoryName, @NotNull String parentDirectory,
+      @NotNull String sourceRepositoryUrl) {
     indicator.setIndeterminate(false);
     GitLineHandlerListener progressListener = GitStandardProgressAnalyzer.createListener(indicator);
-    GitCommandResult result = git.clone(project, new File(parentDirectory), sourceRepositoryURL, directoryName, progressListener);
+    GitCommandResult result = git
+        .clone(project, new File(parentDirectory), sourceRepositoryUrl, directoryName,
+            progressListener);
     if (result.success()) {
       return true;
     }
-    VcsNotifier.getInstance(project).notifyError(GctBundle.message("clonefromgcp.failed"), result.getErrorOutputAsHtmlString());
+    VcsNotifier.getInstance(project)
+        .notifyError(GctBundle.message("clonefromgcp.failed"), result.getErrorOutputAsHtmlString());
     return false;
   }
 

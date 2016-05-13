@@ -13,40 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
-import com.google.api.services.clouddebugger.v2.model.*;
+import com.google.api.services.clouddebugger.v2.model.Breakpoint;
+import com.google.api.services.clouddebugger.v2.model.GetBreakpointResponse;
+import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
+import com.google.api.services.clouddebugger.v2.model.SetBreakpointResponse;
+import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.util.GctBundle;
+
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.HashSet;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A controller is responsible for keeping one {@link CloudDebugProcessState} object up to date and notifies {@link
- * CloudBreakpointListener} when state changes. It also performs asynchronous operations to retrieve fully hydrated
- * {@link Breakpoint}.
+ * A controller is responsible for keeping one {@link CloudDebugProcessState} object up to date and
+ * notifies {@link CloudBreakpointListener} when state changes. It also performs asynchronous
+ * operations to retrieve fully hydrated {@link Breakpoint}.
  */
 public class CloudDebugProcessStateController {
+
   private static final int INITIAL_DELAY_MS = 2000;
   private static final Logger LOG = Logger.getInstance(CloudDebugProcessStateController.class);
   private static final int PERIOD_MS = 500;
   private final List<CloudBreakpointListener> breakpointListChangedListeners =
-    new ArrayList<CloudBreakpointListener>();
+      new ArrayList<CloudBreakpointListener>();
   private final ConcurrentHashMap<String, Breakpoint> fullFinalBreakpoints =
-    new ConcurrentHashMap<String, Breakpoint>();
+      new ConcurrentHashMap<String, Breakpoint>();
   private volatile Timer listBreakpointsJob;
   private CloudDebugProcessState state;
 
@@ -54,7 +66,8 @@ public class CloudDebugProcessStateController {
   }
 
   /**
-   * Adds a listener for update events.  When the controller detects changes, it will fire an event to all subscribers
+   * Adds a listener for update events.  When the controller detects changes, it will fire an event
+   * to all subscribers
    *
    * @param listener the subscriber to receive events
    */
@@ -62,12 +75,12 @@ public class CloudDebugProcessStateController {
     breakpointListChangedListeners.add(listener);
   }
 
-  void deleteBreakpoint(@NotNull final String breakpointId) {
-    deleteBreakpoint(breakpointId, false);
-  }
-
   void deleteBreakpointAsync(@NotNull final String breakpointId) {
     deleteBreakpoint(breakpointId, true);
+  }
+
+  void deleteBreakpoint(@NotNull final String breakpointId) {
+    deleteBreakpoint(breakpointId, false);
   }
 
   /**
@@ -82,8 +95,9 @@ public class CloudDebugProcessStateController {
     final Debugger client = CloudDebuggerClient.getLongTimeoutClient(state);
     if (client == null) {
       LOG.warn("no client available attempting to setBreakpoint");
-      Messages.showErrorDialog(state.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
-                               GctBundle.getString("clouddebug.message.title"));
+      Messages
+          .showErrorDialog(state.getProject(), GctBundle.getString("clouddebug.bad.login.message"),
+              GctBundle.getString("clouddebug.message.title"));
       return;
     }
     final String debuggeeId = state.getDebuggeeId();
@@ -94,7 +108,8 @@ public class CloudDebugProcessStateController {
       public void run() {
         try {
           client.debuggees().breakpoints().delete(debuggeeId, breakpointId)
-              .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+              .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class)
+                  .getClientVersionForCloudDebugger())
               .execute();
         } catch (IOException ex) {
           LOG.warn("exception deleting breakpoint " + breakpointId, ex);
@@ -104,8 +119,7 @@ public class CloudDebugProcessStateController {
 
     if (performAsync) {
       ApplicationManager.getApplication().executeOnPooledThread(performDelete);
-    }
-    else {
+    } else {
       performDelete.run();
     }
   }
@@ -120,7 +134,8 @@ public class CloudDebugProcessStateController {
   }
 
   /**
-   * Binds this controller to a {@link CloudDebugProcessState} and initializes that state from the server.
+   * Binds this controller to a {@link CloudDebugProcessState} and initializes that state from the
+   * server.
    *
    * @param state the {@link CloudDebugProcessState} the controller will be bound to
    */
@@ -140,8 +155,7 @@ public class CloudDebugProcessStateController {
   }
 
   /**
-   * Returns a fully realized {@link Breakpoint} with all results possibly asynchronously
-   *
+   * Returns a fully realized {@link Breakpoint} with all results possibly asynchronously.
    */
   public void resolveBreakpointAsync(@NotNull final String id,
       @NotNull final ResolveBreakpointHandler handler) {
@@ -178,20 +192,19 @@ public class CloudDebugProcessStateController {
         GetBreakpointResponse response;
         try {
           response = client.debuggees().breakpoints().get(state.getDebuggeeId(), id)
-              .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+              .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class)
+                  .getClientVersionForCloudDebugger())
               .execute();
           Breakpoint result = response.getBreakpoint();
           if (result != null) {
             fullFinalBreakpoints.put(id, result);
             handler.onSuccess(result);
-          }
-          else {
+          } else {
             handler.onError(GctBundle.getString("clouddebug.no.response"));
           }
-        }
-        catch (IOException e) {
-          LOG.warn("IOException hydrating a snapshot.  User may have deleted the snapshot", e);
-          handler.onError(e.toString());
+        } catch (IOException ex) {
+          LOG.warn("IOException hydrating a snapshot.  User may have deleted the snapshot", ex);
+          handler.onError(ex.toString());
         }
       }
     });
@@ -225,26 +238,27 @@ public class CloudDebugProcessStateController {
           List<Breakpoint> currentList = state.getCurrentServerBreakpointList();
           SourceLocation location = serverBreakpoint.getLocation();
           for (Breakpoint serverBp : currentList) {
-            if (!Boolean.TRUE.equals(serverBp.getIsFinalState()) &&
-                serverBp.getLocation().getLine() != null &&
-                serverBp.getLocation().getLine().equals(location.getLine()) &&
-                !Strings.isNullOrEmpty(serverBp.getLocation().getPath()) &&
-                serverBp.getLocation().getPath().equals(location.getPath())) {
+            if (!Boolean.TRUE.equals(serverBp.getIsFinalState())
+                && serverBp.getLocation().getLine() != null
+                && serverBp.getLocation().getLine().equals(location.getLine())
+                && !Strings.isNullOrEmpty(serverBp.getLocation().getPath())
+                && serverBp.getLocation().getPath().equals(location.getPath())) {
               deleteBreakpoint(serverBp.getId()); //should not be async here.
             }
           }
 
           SetBreakpointResponse addResponse =
               client.debuggees().breakpoints().set(debuggeeId, serverBreakpoint)
-                  .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+                  .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class)
+                      .getClientVersionForCloudDebugger())
                   .execute();
 
           if (addResponse != null && addResponse.getBreakpoint() != null) {
             Breakpoint result = addResponse.getBreakpoint();
-            if (result.getStatus() != null &&
-                Boolean.TRUE.equals(result.getStatus().getIsError()) &&
-                handler != null &&
-                result.getStatus().getDescription() != null) {
+            if (result.getStatus() != null
+                && Boolean.TRUE.equals(result.getStatus().getIsError())
+                && handler != null
+                && result.getStatus().getDescription() != null) {
               handler.onError(BreakpointUtil.getUserErrorMessage(result.getStatus()));
             }
             handler.onSuccess(addResponse.getBreakpoint().getId());
@@ -275,8 +289,7 @@ public class CloudDebugProcessStateController {
             try {
               // We run after a short period to act as a throttle.
               timer.schedule(new RunnableTimerTask(this), PERIOD_MS);
-            }
-            catch (IllegalStateException ex) {
+            } catch (IllegalStateException ex) {
               //This can happen in rare race conditions and isn't an error.  We just ignore it.
             }
           }
@@ -318,29 +331,24 @@ public class CloudDebugProcessStateController {
     List<Breakpoint> currentList;
     try {
       currentList = queryServerForBreakpoints(state, client, tokenToSend);
-    }
-    catch (SocketTimeoutException ex) {
+    } catch (SocketTimeoutException ex) {
       // Timeout is expected on a hanging get.
       return;
-    }
-    catch (GoogleJsonResponseException ex) {
+    } catch (GoogleJsonResponseException ex) {
       // A 409 JsonResponseException is used by the server to indicate to us a change happened and
       // we need to requery.
       if (ex.getDetails().getCode() == 409) {
         try {
           currentList = queryServerForBreakpoints(state, client, tokenToSend);
-        }
-        catch (IOException ioException) {
+        } catch (IOException ioException) {
           LOG.warn("exception listing breakpoints", ioException);
           return;
         }
-      }
-      else {
+      } else {
         LOG.warn("exception listing breakpoints", ex);
         return;
       }
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       LOG.warn("exception listing breakpoints", ex);
       return;
     }
@@ -358,13 +366,13 @@ public class CloudDebugProcessStateController {
   }
 
   private List<Breakpoint> queryServerForBreakpoints(CloudDebugProcessState state,
-                                                            Debugger client,
-                                                            String tokenToSend) throws IOException {
+      Debugger client,
+      String tokenToSend) throws IOException {
     List<Breakpoint> currentList = null;
 
     String responseWaitToken = tokenToSend;
 
-    while(tokenToSend == null || tokenToSend.equals(responseWaitToken)) {
+    while (tokenToSend == null || tokenToSend.equals(responseWaitToken)) {
       if (tokenToSend != null && !isBackgroundListening()) {
         return null;
       }
@@ -374,7 +382,8 @@ public class CloudDebugProcessStateController {
               .setIncludeInactive(Boolean.TRUE).setActionValue("CAPTURE")
               .setStripResults(Boolean.TRUE)
               .setWaitToken(CloudDebugConfigType.useWaitToken() ? tokenToSend : null)
-              .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+              .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class)
+                  .getClientVersionForCloudDebugger())
               .execute();
 
       //We are running on a background thread and the cancel can happen any time triggered
@@ -407,8 +416,8 @@ public class CloudDebugProcessStateController {
     }
 
     state.setCurrentServerBreakpointList(currentList != null
-                                         ? ContainerUtil.immutableList(currentList)
-                                         : ContainerUtil.immutableList(new ArrayList<Breakpoint>()));
+        ? ContainerUtil.immutableList(currentList)
+        : ContainerUtil.immutableList(new ArrayList<Breakpoint>()));
 
     return currentList;
   }
@@ -429,16 +438,21 @@ public class CloudDebugProcessStateController {
   }
 
   interface SetBreakpointHandler {
+
     void onSuccess(@NotNull String newBreakpointId);
+
     void onError(String errorMessage);
   }
 
   interface ResolveBreakpointHandler {
+
     void onSuccess(@NotNull Breakpoint newBreakpoint);
+
     void onError(String errorMessage);
   }
 
   static class RunnableTimerTask extends TimerTask {
+
     private final Runnable runnable;
 
     public RunnableTimerTask(@NotNull Runnable runnable) {

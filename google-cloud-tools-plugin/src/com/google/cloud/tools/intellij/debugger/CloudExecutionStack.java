@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.services.clouddebugger.v2.model.StackFrame;
 import com.google.api.services.clouddebugger.v2.model.Variable;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.xdebugger.frame.XExecutionStack;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,12 +31,16 @@ import java.util.List;
 
 /**
  * CloudExecutionStack represents an entire stack for a
- * {@link com.google.api.services.clouddebugger.v2.model.Breakpoint}. It stores the individual frames,
- * and also the variables and custom watch expressions.
+ * {@link com.google.api.services.clouddebugger.v2.model.Breakpoint}. It stores the individual
+ * frames, and also the variables and custom watch expressions.
  */
 public class CloudExecutionStack extends XExecutionStack {
+
   private final List<CloudStackFrame> frames = new ArrayList<CloudStackFrame>();
 
+  /**
+   * Initialize the execution stack.
+   */
   public CloudExecutionStack(
       @NotNull Project project,
       @NotNull String name,
@@ -49,9 +56,9 @@ public class CloudExecutionStack extends XExecutionStack {
       for (StackFrame nativeFrame : frames) {
         this.frames
             .add(new CloudStackFrame(project, nativeFrame, variableTable, evaluatedExpressions,
-                new ServerToIDEFileResolver()));
-          // We only show custom watches on the top frame.
-          evaluatedExpressions = null;
+                new ServerToIdeFileResolver()));
+        // We only show custom watches on the top frame.
+        evaluatedExpressions = null;
       }
     }
   }
@@ -60,8 +67,7 @@ public class CloudExecutionStack extends XExecutionStack {
   public void computeStackFrames(int firstFrameIndex, XStackFrameContainer container) {
     if (firstFrameIndex <= frames.size()) {
       container.addStackFrames(frames.subList(firstFrameIndex, frames.size()), true);
-    }
-    else {
+    } else {
       container.addStackFrames(Collections.<CloudStackFrame>emptyList(), true);
     }
   }

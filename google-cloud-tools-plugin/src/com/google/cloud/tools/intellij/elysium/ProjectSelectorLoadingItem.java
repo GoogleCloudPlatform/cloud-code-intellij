@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -33,9 +34,11 @@ import javax.swing.SwingConstants;
  * Displays UI similar to "loading..." when an elysium call is in progress.
  */
 class ProjectSelectorLoadingItem extends JPanel {
+
   private JLabel progressIcon;
 
-  public ProjectSelectorLoadingItem(@NotNull Color backgroundNonSelectionColor, @NotNull Color textNonSelectionColor) {
+  public ProjectSelectorLoadingItem(@NotNull Color backgroundNonSelectionColor,
+      @NotNull Color textNonSelectionColor) {
     this.setLayout(new FlowLayout());
     this.setOpaque(false);
 
@@ -56,10 +59,11 @@ class ProjectSelectorLoadingItem extends JPanel {
     this.add(loadText);
   }
 
-  // This is called to animate the spinner.  It snaps a frame of the spinner based on current timer ticks.
+  // This is called to animate the spinner.  It snaps a frame of the spinner based on current
+  // timer ticks.
   public void snap() {
     long currentMilliseconds = System.nanoTime() / 1000000;
-    int frame = (int)(currentMilliseconds / 100) % GoogleCloudToolsIcons.STEP_ICONS.size();
+    int frame = (int) (currentMilliseconds / 100) % GoogleCloudToolsIcons.STEP_ICONS.size();
     progressIcon.setIcon(GoogleCloudToolsIcons.STEP_ICONS.get(frame));
   }
 }

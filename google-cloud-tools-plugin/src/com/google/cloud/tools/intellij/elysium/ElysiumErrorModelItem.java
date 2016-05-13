@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import org.jetbrains.annotations.NotNull;
@@ -20,11 +21,12 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * This model item represents a node shown in the project selector when an error occurs attempting to query elysium.
- * The user can recover and try again by hitting refresh at the bottom right.
- * The error message is displayed under the user name.
+ * This model item represents a node shown in the project selector when an error occurs attempting
+ * to query elysium. The user can recover and try again by hitting refresh at the bottom right. The
+ * error message is displayed under the user name.
  */
 class ElysiumErrorModelItem extends DefaultMutableTreeNode {
+
   private String errorMessage;
 
   public ElysiumErrorModelItem(@NotNull String errorMessage) {

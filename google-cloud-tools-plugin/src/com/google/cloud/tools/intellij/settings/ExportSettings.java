@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.settings;
 
 import com.intellij.ide.IdeBundle;
@@ -29,24 +30,33 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.io.ZipUtil;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.jar.JarOutputStream;
 
 /**
- * Provides functionality to export the IDEA settings into a specified jar
+ * Provides functionality to export the IDEA settings into a specified jar.
  */
 public class ExportSettings {
+
   // TODO: use ImportSettings.SETTINGS_JAR_MARKER after merge
   public static final String SETTINGS_JAR_MARKER = "IntelliJ IDEA Global Settings";
 
+  /**
+   * Exports IDEA settings.
+   */
   public static void doExport(String path) {
     final Set<ExportableComponent> exportableComponents =
-      new HashSet<ExportableComponent>(Arrays.asList(ApplicationManager.getApplication().getComponents(ExportableApplicationComponent.class)));
-    exportableComponents.addAll(ServiceBean.loadServicesFromBeans(ExportableComponent.EXTENSION_POINT, ExportableComponent.class));
+        new HashSet<ExportableComponent>(Arrays.asList(ApplicationManager.getApplication()
+            .getComponents(ExportableApplicationComponent.class)));
+    exportableComponents.addAll(ServiceBean
+        .loadServicesFromBeans(ExportableComponent.EXTENSION_POINT, ExportableComponent.class));
 
     if (exportableComponents.isEmpty()) {
       return;
@@ -63,8 +73,9 @@ public class ExportSettings {
     try {
       if (saveFile.exists()) {
         final int ret = Messages
-          .showOkCancelDialog(IdeBundle.message("prompt.overwrite.settings.file", FileUtil.toSystemDependentName(saveFile.getPath())),
-                              IdeBundle.message("title.file.already.exists"), Messages.getWarningIcon());
+            .showOkCancelDialog(IdeBundle.message("prompt.overwrite.settings.file",
+                FileUtil.toSystemDependentName(saveFile.getPath())),
+                IdeBundle.message("title.file.already.exists"), Messages.getWarningIcon());
         if (ret != Messages.OK) {
           return;
         }
@@ -79,7 +90,8 @@ public class ExportSettings {
           assert rPath != null;
           final String relativePath = FileUtil.toSystemIndependentName(rPath);
           if (file.exists()) {
-            ZipUtil.addFileOrDirRecursively(output, saveFile, file, relativePath, null, writtenItemRelativePaths);
+            ZipUtil.addFileOrDirRecursively(output, saveFile, file, relativePath, null,
+                writtenItemRelativePaths);
           }
         }
 
@@ -88,19 +100,20 @@ public class ExportSettings {
         final File magicFile = new File(FileUtil.getTempDirectory(), SETTINGS_JAR_MARKER);
         FileUtil.createIfDoesntExist(magicFile);
         magicFile.deleteOnExit();
-        ZipUtil.addFileToZip(output, magicFile, SETTINGS_JAR_MARKER, writtenItemRelativePaths, null);
-      }
-      finally {
+        ZipUtil
+            .addFileToZip(output, magicFile, SETTINGS_JAR_MARKER, writtenItemRelativePaths, null);
+      } finally {
         output.close();
       }
-    }
-    catch (IOException e1) {
-      Messages.showErrorDialog(IdeBundle.message("error.writing.settings", e1.toString()),IdeBundle.message("title.error.writing.file"));
+    } catch (IOException e1) {
+      Messages.showErrorDialog(IdeBundle.message("error.writing.settings", e1.toString()),
+          IdeBundle.message("title.error.writing.file"));
     }
 
   }
 
-  private static void exportInstalledPlugins(File saveFile, JarOutputStream output, Set<String> writtenItemRelativePaths) throws IOException {
+  private static void exportInstalledPlugins(File saveFile, JarOutputStream output,
+      Set<String> writtenItemRelativePaths) throws IOException {
     final List<String> oldPlugins = new ArrayList<String>();
     for (IdeaPluginDescriptor descriptor : PluginManagerCore.getPlugins()) {
       if (!descriptor.isBundled() && descriptor.isEnabled()) {
@@ -111,7 +124,8 @@ public class ExportSettings {
       final File tempFile = File.createTempFile("installed", "plugins");
       tempFile.deleteOnExit();
       PluginManagerCore.savePluginsList(oldPlugins, false, tempFile);
-      ZipUtil.addDirToZipRecursively(output, saveFile, tempFile, "/" + PluginManager.INSTALLED_TXT, null, writtenItemRelativePaths);
+      ZipUtil.addDirToZipRecursively(output, saveFile, tempFile, "/" + PluginManager.INSTALLED_TXT,
+          null, writtenItemRelativePaths);
     }
   }
 }

@@ -31,8 +31,8 @@ import java.io.File;
 import javax.swing.Icon;
 
 /**
- * A deployment source used as a placeholder to allow user selection of a jar or war file from
- * the filesystem.
+ * A deployment source used as a placeholder to allow user selection of a jar or war file from the
+ * filesystem.
  */
 class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl {
 

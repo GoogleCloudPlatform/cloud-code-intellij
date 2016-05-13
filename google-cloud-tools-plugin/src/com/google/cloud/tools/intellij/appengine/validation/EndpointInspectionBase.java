@@ -26,26 +26,30 @@ import com.intellij.psi.PsiInvalidElementAccessException;
  * The base class for all endpoint inspections.
  */
 public class EndpointInspectionBase extends LocalInspectionTool {
+
   public static final Logger LOG =
-    Logger.getInstance(EndpointInspectionBase.class);
+      Logger.getInstance(EndpointInspectionBase.class);
 
   @Override
   public String getGroupDisplayName() {
     return "Google Cloud Platform";
   }
 
-  public Project getProject(PsiElement element ) {
+  /**
+   * Get the project for the hierarchy.
+   */
+  public Project getProject(PsiElement element) {
     Project project;
     try {
       project = element.getContainingFile().getProject();
       if (project == null) {
         return null;
       }
-    } catch (PsiInvalidElementAccessException e) {
-      LOG.error("Error getting project with annotation " + element.getText(), e);
+    } catch (PsiInvalidElementAccessException ex) {
+      LOG.error("Error getting project with annotation " + element.getText(), ex);
       return null;
     }
 
-    return  project;
+    return project;
   }
 }

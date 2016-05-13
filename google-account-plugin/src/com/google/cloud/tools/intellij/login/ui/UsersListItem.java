@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login.ui;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -25,8 +26,8 @@ import java.awt.Image;
 public class UsersListItem {
   private final CredentialedUser user;
 
-  public UsersListItem(CredentialedUser aUser) {
-    user = aUser;
+  public UsersListItem(CredentialedUser user) {
+    this.user = user;
   }
 
   public String getUserEmail() {

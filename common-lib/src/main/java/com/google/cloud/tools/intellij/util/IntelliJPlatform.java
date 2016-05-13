@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.util;
 
 import com.intellij.util.PlatformUtils;
@@ -51,6 +52,9 @@ public enum IntelliJPlatform {
     this.platformPrefix = platformPrefix;
   }
 
+  /**
+   *  Given a prefix, return the corresponding platform.
+   */
   public static IntelliJPlatform fromPrefix(String prefix) {
     for (IntelliJPlatform product : values()) {
       if (prefix.equals(product.getPlatformPrefix())) {

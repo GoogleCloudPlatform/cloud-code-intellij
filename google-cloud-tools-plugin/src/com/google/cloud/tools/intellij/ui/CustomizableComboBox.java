@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.ui;
 
 import com.intellij.ide.ui.laf.darcula.DarculaUIUtil;
@@ -23,40 +24,66 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.UIUtil;
+
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Path2D;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.text.Document;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.Path2D;
 
 /**
- * This is a combobox control whose {@link com.intellij.openapi.ui.popup.JBPopup} is defined externally.
- * It gives the look and feel of a standard combobox without defining anything that appears in the popup.
- * The popup returns the currently selected text as well as an event when the selection change.
+ * This is a combobox control whose {@link com.intellij.openapi.ui.popup.JBPopup} is defined
+ * externally. It gives the look and feel of a standard combobox without defining anything that
+ * appears in the popup. The popup returns the currently selected text as well as an event when the
+ * selection change.
  */
 public abstract class CustomizableComboBox extends JPanel {
+
   private JBTextField textField;
   private JComboBox themedCombo = new ComboBox();
   private boolean popupVisible;
 
+  /**
+   * Initializes UI components.
+   */
   public CustomizableComboBox() {
     super(new BorderLayout());
 
     themedCombo.setEditable(true);
 
-    PopupMouseListener listener = new PopupMouseListener();
     // GTK always draws a border on the textbox.  It cannot be removed,
     // so to compensate, we remove our own border so we don't have a double border.
     if (UIUtil.isUnderGTKLookAndFeel()) {
       this.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-    }
-    else {
+    } else {
       this.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2),
-                                                        BorderFactory.createLineBorder(getBorderColor(), 1)));
+          BorderFactory.createLineBorder(getBorderColor(), 1)));
     }
 
     // Try to turn off the border on the JTextField.
@@ -66,16 +93,17 @@ public abstract class CustomizableComboBox extends JPanel {
         super.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
       }
     };
+    PopupMouseListener listener = new PopupMouseListener();
     textField.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
     textField.addMouseListener(listener);
     textField.addFocusListener(new FocusListener() {
       @Override
-      public void focusGained(FocusEvent e) {
+      public void focusGained(FocusEvent event) {
         textField.selectAll();
       }
 
       @Override
-      public void focusLost(FocusEvent e) {
+      public void focusLost(FocusEvent event) {
         // no-op
       }
     });
@@ -93,20 +121,20 @@ public abstract class CustomizableComboBox extends JPanel {
   }
 
   class PopupMouseListener implements MouseListener {
+
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(MouseEvent event) {
       // no-op
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent event) {
       if (popupVisible) {
         if (getPopup() != null && getPopup().isPopupVisible()) {
           getPopup().hidePopup();
         }
         popupVisible = false;
-      }
-      else {
+      } else {
         textField.grabFocus();
         showPopup();
         popupVisible = true;
@@ -114,17 +142,17 @@ public abstract class CustomizableComboBox extends JPanel {
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(MouseEvent event) {
       // no-op
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
+    public void mouseEntered(MouseEvent event) {
       popupVisible = getPopup() != null && getPopup().isPopupVisible();
     }
 
     @Override
-    public void mouseExited(MouseEvent e) {
+    public void mouseExited(MouseEvent event) {
       // no-op
     }
   }
@@ -172,27 +200,26 @@ public abstract class CustomizableComboBox extends JPanel {
           }
           if (showOnTop) {
             getPopup().showPopup(new RelativePoint(CustomizableComboBox.this,
-                                                   new Point(0, -getPreferredPopupHeight())));
-          }
-          else {
+                new Point(0, -getPreferredPopupHeight())));
+          } else {
             getPopup().showPopup(new RelativePoint(CustomizableComboBox.this,
-                                                   new Point(0, CustomizableComboBox.this.getHeight() - 1)));
+                new Point(0, CustomizableComboBox.this.getHeight() - 1)));
           }
         }
       });
     }
   }
 
-  private static boolean isUsingDarculaUIFlavor() {
+  private static boolean isUsingDarculaUiFlavor() {
     return UIUtil.isUnderDarcula() || UIUtil.isUnderIntelliJLaF();
   }
 
   @Override
-  public void paint(Graphics g) {
-    super.paint(g);
+  public void paint(Graphics graphics) {
+    super.paint(graphics);
     if ((textField.isFocusOwner() || (getPopup() != null && getPopup().isPopupVisible()))) {
-      if (isUsingDarculaUIFlavor()) {
-        DarculaUIUtil.paintFocusRing(g, 3, 3, getWidth() - 4, getHeight() - 4);
+      if (isUsingDarculaUiFlavor()) {
+        DarculaUIUtil.paintFocusRing(graphics, 3, 3, getWidth() - 4, getHeight() - 4);
       }
     }
   }
@@ -203,12 +230,12 @@ public abstract class CustomizableComboBox extends JPanel {
 
     textField.addFocusListener(new FocusAdapter() {
       @Override
-      public void focusGained(FocusEvent e) {
+      public void focusGained(FocusEvent event) {
         CustomizableComboBox.this.repaint();
       }
 
       @Override
-      public void focusLost(FocusEvent e) {
+      public void focusLost(FocusEvent event) {
         CustomizableComboBox.this.repaint();
       }
     });
@@ -217,10 +244,9 @@ public abstract class CustomizableComboBox extends JPanel {
   private static Color getButtonBackgroundColor() {
     Color color;
 
-    if (isUsingDarculaUIFlavor()) {
+    if (isUsingDarculaUiFlavor()) {
       color = UIManager.getColor("ComboBox.darcula.arrowFillColor");
-    }
-    else {
+    } else {
       color = UIManager.getColor("ComboBox.buttonBackground");
     }
 
@@ -229,8 +255,9 @@ public abstract class CustomizableComboBox extends JPanel {
 
   private Color getArrowColor() {
     Color color = null;
-    if (isUsingDarculaUIFlavor()) {
-      color = isEnabled() ? new JBColor(Gray._255, getForeground()) : new JBColor(Gray._255, getForeground().darker());
+    if (isUsingDarculaUiFlavor()) {
+      color = isEnabled() ? new JBColor(Gray._255, getForeground())
+          : new JBColor(Gray._255, getForeground().darker());
     }
     if (color == null) {
       color = getForeground();
@@ -256,7 +283,8 @@ public abstract class CustomizableComboBox extends JPanel {
   * button outside the button.  That is, the arrow button looks like it's about 20x20,
   * but actually, it's only 16x16, with part of the rendering done via paint on the combobox itself.
   * So while this creates some small inconsistencies,
-  * it reduces the chance of a major UI issue such as a completely poorly drawn button with a double border.
+  * it reduces the chance of a major UI issue such as a completely poorly drawn button with a
+  * double border.
   */
   private JButton createArrowButton() {
     final Color bg = getBackground();
@@ -265,7 +293,7 @@ public abstract class CustomizableComboBox extends JPanel {
 
       @Override
       public void paint(Graphics g2) {
-        final Graphics2D g = (Graphics2D)g2;
+        final Graphics2D g = (Graphics2D) g2;
         final GraphicsConfig config = new GraphicsConfig(g);
 
         final int w = getWidth();
@@ -274,7 +302,8 @@ public abstract class CustomizableComboBox extends JPanel {
         g.fillRect(0, 0, w, h);
         g.setColor(getArrowColor());
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
+            RenderingHints.VALUE_STROKE_NORMALIZE);
         g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
         final int midx = (int) Math.ceil((w - 1) / 2.0) + 1;
         final int midy = (int) Math.ceil(h / 2.0);
@@ -291,8 +320,7 @@ public abstract class CustomizableComboBox extends JPanel {
           g.drawLine(0, 1, w - 2, 1);
           g.drawLine(0, h - 2, w - 2, h - 2);
           g.drawLine(w - 2, 1, w - 2, h - 2);
-        }
-        else {
+        } else {
           g.drawLine(0, 0, 0, h);
         }
         config.restore();
@@ -300,7 +328,9 @@ public abstract class CustomizableComboBox extends JPanel {
 
       @Override
       public Dimension getPreferredSize() {
-        int newSize = CustomizableComboBox.this.getHeight() - (CustomizableComboBox.this.getInsets().bottom + CustomizableComboBox.this.getInsets().top);
+        int newSize =
+            CustomizableComboBox.this.getHeight() - (CustomizableComboBox.this.getInsets().bottom
+                + CustomizableComboBox.this.getInsets().top);
         return new Dimension(newSize, newSize);
       }
     };

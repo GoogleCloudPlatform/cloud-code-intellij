@@ -36,7 +36,7 @@ public class ProjectRepositoryValidatorTest {
     Assert.assertFalse(result.needsSync());
     Assert.assertFalse(result.hasLocalRepository());
     Assert.assertFalse(result.hasRemoteRepository());
-    Assert.assertNull(result.getTargetSyncSHA());
+    Assert.assertNull(result.getTargetSyncSha());
     Assert.assertNull(result.getRepositoryType());
   }
 }

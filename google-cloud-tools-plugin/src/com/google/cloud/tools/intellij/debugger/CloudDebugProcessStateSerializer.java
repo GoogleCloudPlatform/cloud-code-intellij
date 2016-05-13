@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.cloud.tools.intellij.debugger.actions.ToggleSnapshotLocationAction;
+
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -30,6 +32,7 @@ import com.intellij.openapi.editor.event.EditorFactoryListener;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.containers.HashMap;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,16 +44,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Stores process state to workspace.xml. This allows us to continue watching the
- * process after a restart.
+ * Stores process state to workspace.xml. This allows us to continue watching the process after a
+ * restart.
  */
 @State(
-  name = "CloudDebugProcessStateSerializer",
-  storages = {@Storage(file = StoragePathMacros.WORKSPACE_FILE)})
+    name = "CloudDebugProcessStateSerializer",
+    storages = {@Storage(file = StoragePathMacros.WORKSPACE_FILE)})
 public class CloudDebugProcessStateSerializer
-   implements PersistentStateComponent<CloudDebugProcessStateSerializer.ProjectState> {
+    implements PersistentStateComponent<CloudDebugProcessStateSerializer.ProjectState> {
+
   private final Project project;
-  private final Map<String, CloudDebugProcessState> stateMap = new HashMap<String, CloudDebugProcessState>();
+  private final Map<String, CloudDebugProcessState> stateMap =
+      new HashMap<String, CloudDebugProcessState>();
 
   private CloudDebugProcessStateSerializer(@NotNull Project project) {
     this.project = project;
@@ -60,13 +65,13 @@ public class CloudDebugProcessStateSerializer
       // in our right click menu action.
       EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryListener() {
         private final Map<Editor, TargetLineMouseAdapter> mouseAdapterMap =
-          new HashMap<Editor, TargetLineMouseAdapter>();
+            new HashMap<Editor, TargetLineMouseAdapter>();
 
         @Override
         public void editorCreated(@NotNull EditorFactoryEvent event) {
           if (event.getEditor().getProject() == CloudDebugProcessStateSerializer.this.project
               && event.getEditor().getGutter() instanceof Component) {
-            Component gutterComponent = (Component)event.getEditor().getGutter();
+            Component gutterComponent = (Component) event.getEditor().getGutter();
             TargetLineMouseAdapter adapter = new TargetLineMouseAdapter(event.getEditor());
             assert !mouseAdapterMap.containsKey(event.getEditor());
             mouseAdapterMap.put(event.getEditor(), adapter);
@@ -78,7 +83,7 @@ public class CloudDebugProcessStateSerializer
         public void editorReleased(@NotNull EditorFactoryEvent event) {
           TargetLineMouseAdapter adapter = mouseAdapterMap.get(event.getEditor());
           if (adapter != null && event.getEditor().getGutter() instanceof Component) {
-            Component gutterComponent = (Component)event.getEditor().getGutter();
+            Component gutterComponent = (Component) event.getEditor().getGutter();
             gutterComponent.removeMouseListener(adapter);
             mouseAdapterMap.remove(event.getEditor());
           }
@@ -92,7 +97,8 @@ public class CloudDebugProcessStateSerializer
   }
 
   /**
-   * Enumerates all runconfigurations in this project and returns a serialized form of their process states.
+   * Enumerates all runconfigurations in this project and returns a serialized form of their process
+   * states.
    *
    * @return a serialized form of the debuggee state as known to the client
    */
@@ -108,10 +114,11 @@ public class CloudDebugProcessStateSerializer
         }
 
         if (config.getConfiguration() instanceof CloudDebugRunConfiguration) {
-          final CloudDebugRunConfiguration cloudConfig = (CloudDebugRunConfiguration)config.getConfiguration();
+          final CloudDebugRunConfiguration cloudConfig = (CloudDebugRunConfiguration) config
+              .getConfiguration();
           final CloudDebugProcessState state = cloudConfig.getProcessState();
           if (state != null) {
-            projectState.CONFIG_STATES.add(new RunConfigState(cloudConfig.getName(), state));
+            projectState.configStates.add(new RunConfigState(cloudConfig.getName(), state));
           }
         }
       }
@@ -121,18 +128,18 @@ public class CloudDebugProcessStateSerializer
   }
 
   /**
-   * Called from {@link CloudDebugRunConfiguration}, it finds any serialized state for that
-   * named run config and if the project name matches, it initializes and returns it.
+   * Called from {@link CloudDebugRunConfiguration}, it finds any serialized state for that named
+   * run config and if the project name matches, it initializes and returns it.
    *
-   * @param runConfig   the runconfig for which state is queried for
+   * @param runConfig the runconfig for which state is queried for
    * @param projectName the GCP project name associated with this runconfig
    * @return deserialized state that may have been cached in workspace.xml
    */
   public CloudDebugProcessState getState(@NotNull String runConfig, @NotNull String projectName) {
     CloudDebugProcessState state = stateMap.get(runConfig);
-    if (state != null &&
-        state.getProjectName() != null &&
-        state.getProjectName().equals(projectName)) {
+    if (state != null
+        && state.getProjectName() != null
+        && state.getProjectName().equals(projectName)) {
       state.setProject(project);
       return state;
     }
@@ -146,14 +153,15 @@ public class CloudDebugProcessStateSerializer
    */
   @Override
   public void loadState(CloudDebugProcessStateSerializer.ProjectState state) {
-    if (CloudDebugConfigType.isFeatureEnabled() && state.CONFIG_STATES != null) {
-      for (RunConfigState configState : state.CONFIG_STATES) {
-        stateMap.put(configState.CONFIG_NAME, configState.PROCESS_STATE);
+    if (CloudDebugConfigType.isFeatureEnabled() && state.configStates != null) {
+      for (RunConfigState configState : state.configStates) {
+        stateMap.put(configState.configName, configState.processState);
       }
     }
   }
 
   static class TargetLineMouseAdapter extends MouseAdapter {
+
     private final Editor editor;
 
     public TargetLineMouseAdapter(Editor editor) {
@@ -161,30 +169,31 @@ public class CloudDebugProcessStateSerializer
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-      if (e.isPopupTrigger()) {
+    public void mousePressed(MouseEvent event) {
+      if (event.isPopupTrigger()) {
         // We should see if we can get JB to make this information public from the Gutter so we
         // don't have to calculate it.
         editor.putUserData(ToggleSnapshotLocationAction.POPUP_LINE,
-                             Integer.valueOf(EditorUtil.yPositionToLogicalLine(editor, e.getPoint())));
-      }
-      else {
+            Integer.valueOf(EditorUtil.yPositionToLogicalLine(editor, event.getPoint())));
+      } else {
         editor.putUserData(ToggleSnapshotLocationAction.POPUP_LINE, null);
       }
     }
   }
 
   public static class ProjectState {
+
     //For serialization purposes, this cannot be final.
-    public List<RunConfigState> CONFIG_STATES = new ArrayList<RunConfigState>();
+    public List<RunConfigState> configStates = new ArrayList<RunConfigState>();
 
     public ProjectState() {
     }
   }
 
   public static class RunConfigState {
-    public String CONFIG_NAME;
-    public CloudDebugProcessState PROCESS_STATE;
+
+    public String configName;
+    public CloudDebugProcessState processState;
 
     /**
      * This is used during deserialization.
@@ -192,9 +201,9 @@ public class CloudDebugProcessStateSerializer
     public RunConfigState() {
     }
 
-    public RunConfigState(String configName, CloudDebugProcessState state) {
-      CONFIG_NAME = configName;
-      PROCESS_STATE = state;
+    public RunConfigState(String configName, CloudDebugProcessState processState) {
+      this.configName = configName;
+      this.processState = processState;
     }
   }
 }

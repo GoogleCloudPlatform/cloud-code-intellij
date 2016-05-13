@@ -161,8 +161,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       Preconditions
           .checkArgument(resource != null, resourcePath + " is not a valid resource path.");
       appYaml = new File(resource.toURI());
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+    } catch (URISyntaxException ex) {
+      throw new RuntimeException(ex);
     }
     return appYaml;
   }

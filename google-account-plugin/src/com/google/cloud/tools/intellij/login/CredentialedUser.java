@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -44,7 +45,11 @@ public class CredentialedUser {
     googleLoginState = null;
   }
 
-  public CredentialedUser(GoogleLoginState state, final IGoogleLoginCompletedCallback updateUserCallback) {
+  /**
+   * Creates a credentialed user.
+   */
+  public CredentialedUser(GoogleLoginState state,
+      final IGoogleLoginCompletedCallback updateUserCallback) {
     this.email = state.getEmail();
     googleLoginState = state;
     credential = googleLoginState.makeCredential();
@@ -69,12 +74,16 @@ public class CredentialedUser {
 
   /**
    * Returns the credential of this user.
+   *
    * @return Credential of user.
    */
-  public Credential getCredential() { return credential; }
+  public Credential getCredential() {
+    return credential;
+  }
 
   /**
    * Returns true if this user is the active user and false otherwise.
+   *
    * @return True if this user is active and false otherwise.
    */
   public boolean isActive() {
@@ -101,8 +110,9 @@ public class CredentialedUser {
     this.isActive = isActive;
   }
 
-  private void initializeUserInfo(Userinfoplus userInfo, final IGoogleLoginCompletedCallback updateUserCallback) {
-    if(userInfo == null) {
+  private void initializeUserInfo(Userinfoplus userInfo,
+      final IGoogleLoginCompletedCallback updateUserCallback) {
+    if (userInfo == null) {
       name = null;
       image = null;
     } else {

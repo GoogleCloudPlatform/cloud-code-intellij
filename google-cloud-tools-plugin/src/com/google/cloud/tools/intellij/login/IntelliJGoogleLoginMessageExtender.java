@@ -29,7 +29,7 @@ public class IntelliJGoogleLoginMessageExtender implements GoogleLoginMessageExt
 
   @Override
   public String additionalLogoutMessage() {
-     if (stateCollector != null
+    if (stateCollector != null
         && stateCollector.getBackgroundListeningStates() != null
         && !stateCollector.getBackgroundListeningStates().isEmpty()) {
       return GctBundle.message("clouddebug.logout.additional.message");

@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.intellij.openapi.util.Key;
 import com.intellij.util.xmlb.annotations.Transient;
+
 import git4idea.repo.GitRepository;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,8 +28,9 @@ import org.jetbrains.annotations.Nullable;
  * Holds state and performs operations related to source control contexts.
  */
 public class ProjectRepositoryState {
+
   private static final Key<ProjectRepositoryState> REPO_KEY =
-    Key.create("ProjectRepositoryState");
+      Key.create("ProjectRepositoryState");
   private String originalBranchName;
   private GitRepository sourceRepository;
   private String stashMessage;
@@ -34,8 +38,12 @@ public class ProjectRepositoryState {
   private ProjectRepositoryState() {
   }
 
+  /**
+   * Given a {@link CloudDebugProcessState}.
+   */
   @NotNull
-  public static ProjectRepositoryState fromProcessState(@NotNull CloudDebugProcessState processState) {
+  public static ProjectRepositoryState fromProcessState(
+      @NotNull CloudDebugProcessState processState) {
     ProjectRepositoryState repoState = processState.getUserData(REPO_KEY);
     if (repoState == null) {
       repoState = new ProjectRepositoryState();
@@ -49,7 +57,8 @@ public class ProjectRepositoryState {
   }
 
   /**
-   * This is the branch the user was on before they started a debug session and we moved them to the target SHA.
+   * This is the branch the user was on before they started a debug session and we moved them to the
+   * target SHA.
    */
   @Transient
   @Nullable
@@ -63,8 +72,9 @@ public class ProjectRepositoryState {
   }
 
   /**
-   * The source repository is used during stash/unstash and sync to perform Git operations. Right now we only support
-   * Git.  If we added citc or other clients, this would need to be factored out.
+   * The source repository is used during stash/unstash and sync to perform Git operations. Right
+   * now we only support Git.  If we added citc or other clients, this would need to be factored
+   * out.
    */
   @Transient
   @Nullable
@@ -78,8 +88,9 @@ public class ProjectRepositoryState {
   }
 
   /**
-   * The stash message is how we identify which item to unstash when the session ends. Stashes are ordered and may not
-   * necessarily have the same ordinal value because new stashes are inserted at the top.
+   * The stash message is how we identify which item to unstash when the session ends. Stashes are
+   * ordered and may not necessarily have the same ordinal value because new stashes are inserted at
+   * the top.
    */
   @Transient
   @Nullable
@@ -93,7 +104,7 @@ public class ProjectRepositoryState {
   }
 
   /**
-   * @return True if we have a valid git repo
+   * @return True if we have a valid git repo.
    */
   protected boolean hasSourceRepository() {
     return getSourceRepository() != null;

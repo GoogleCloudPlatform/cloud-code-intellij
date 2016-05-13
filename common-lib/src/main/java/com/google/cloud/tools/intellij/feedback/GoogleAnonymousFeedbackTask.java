@@ -104,8 +104,8 @@ public class GoogleAnonymousFeedbackTask extends Task.Backgroundable {
           params
       );
       callback.consume(token);
-    } catch (IOException e) {
-      errorCallback.consume(e);
+    } catch (IOException ioe) {
+      errorCallback.consume(ioe);
     } catch (RuntimeException re) {
       errorCallback.consume(re);
     }

@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.api.services.clouddebugger.v2.model.Debuggee;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -30,6 +31,7 @@ import java.util.Map;
  * The class models out the details for a target debuggable module.
  */
 class DebugTarget implements DebugTargetSelectorItem {
+
   private static final Logger LOG = Logger.getInstance(DebugTarget.class);
   private static final String MODULE = "module";
   private static final String VERSION = "version";
@@ -53,14 +55,11 @@ class DebugTarget implements DebugTargetSelectorItem {
       for (Map.Entry<String, String> entry : this.debuggee.getLabels().entrySet()) {
         if (entry.getKey().equalsIgnoreCase(MODULE)) {
           module = entry.getValue();
-        }
-        else if (entry.getKey().equalsIgnoreCase(MINOR_VERSION)) {
+        } else if (entry.getKey().equalsIgnoreCase(MINOR_VERSION)) {
           minorVersion = entry.getValue();
-        }
-        else if (entry.getKey().equalsIgnoreCase(VERSION)) {
+        } else if (entry.getKey().equalsIgnoreCase(VERSION)) {
           version = entry.getValue();
-        }
-        else {
+        } else {
           //This is fallback logic where we dump the labels verbatim if they
           //change from underneath us.
           description += String.format("%s:%s", entry.getKey(), entry.getValue());
@@ -83,8 +82,7 @@ class DebugTarget implements DebugTargetSelectorItem {
         if (!Strings.isNullOrEmpty(minorVersion)) {
           this.minorVersion = Long.parseLong(minorVersion);
         }
-      }
-      catch(NumberFormatException ex) {
+      } catch (NumberFormatException ex) {
         LOG.warn("unable to parse minor version: " + minorVersion);
       }
     }
@@ -93,9 +91,9 @@ class DebugTarget implements DebugTargetSelectorItem {
     //back to the old logic of using description with the project name stripped out.
     if (Strings.isNullOrEmpty(description)) {
       description = this.debuggee.getDescription();
-      if (description != null &&
-          !Strings.isNullOrEmpty(projectName) &&
-          description.startsWith(projectName + "-")) {
+      if (description != null
+          && !Strings.isNullOrEmpty(projectName)
+          && description.startsWith(projectName + "-")) {
         description = description.substring(projectName.length() + 1);
       }
     }

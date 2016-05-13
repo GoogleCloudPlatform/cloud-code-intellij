@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.util;
 
 import com.intellij.CommonBundle;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
@@ -25,9 +27,10 @@ import java.lang.ref.SoftReference;
 import java.util.ResourceBundle;
 
 /**
- * Bundle class to get cloud tools messages from resources/messages
+ * Bundle class to get cloud tools messages from resources/messages.
  */
 public class GctBundle {
+
   @NonNls
   private static final String BUNDLE_NAME = "messages.CloudToolsBundle";
   private static Reference<ResourceBundle> bundleReference;
@@ -44,11 +47,13 @@ public class GctBundle {
   private GctBundle() {
   }
 
-  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params) {
+  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key,
+      @NotNull Object... params) {
     return CommonBundle.message(getBundle(), key, params);
   }
 
-  public static String getString(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params) {
+  public static String getString(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key,
+      @NotNull Object... params) {
     return message(key, params);
   }
 }

@@ -23,7 +23,7 @@ package com.google.cloud.tools.intellij;
 public class IdeaCloudToolsPluginInfoService extends BasePluginInfoService implements
     CloudToolsPluginInfoService {
 
-  private final static String CLIENT_VERSION_PREFIX = "google.com/intellij/v";
+  private static final String CLIENT_VERSION_PREFIX = "google.com/intellij/v";
 
   protected IdeaCloudToolsPluginInfoService() {
     super("gcloud-intellij-cloud-tools-plugin", "com.google.gct.core");

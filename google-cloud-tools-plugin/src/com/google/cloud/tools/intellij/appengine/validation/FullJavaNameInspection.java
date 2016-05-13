@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.appengine.validation;
 
 
-import com.google.common.collect.Maps;
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
-
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
+import com.google.common.collect.Maps;
+
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -36,11 +37,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 /**
- * Inspection to check for unique backend method names.
- * The backend method name is the full java name of the actual java method
- * (fully-specified class name + "." + method name).
+ * Inspection to check for unique backend method names. The backend method name is the full java
+ * name of the actual java method (fully-specified class name + "." + method name).
  */
 public class FullJavaNameInspection extends EndpointInspectionBase {
+
   @Override
   @Nullable
   public String getStaticDescription() {
@@ -68,47 +69,49 @@ public class FullJavaNameInspection extends EndpointInspectionBase {
        * Flags methods that have a duplicate full java name.
        */
       @Override
-      public void visitClass(PsiClass aClass){
-        if (!EndpointUtilities.isEndpointClass(aClass)) {
+      public void visitClass(PsiClass psiClass) {
+        if (!EndpointUtilities.isEndpointClass(psiClass)) {
           return;
         }
 
-        PsiMethod[] allMethods = aClass.getMethods();
+        PsiMethod[] allMethods = psiClass.getMethods();
         Map<String, PsiMethod> javaMethodNames = Maps.newHashMap();
 
-        for(PsiMethod aMethod : allMethods)  {
-          validateBackendMethodNameUnique(aMethod, javaMethodNames );
+        for (PsiMethod psiMethod : allMethods) {
+          validateBackendMethodNameUnique(psiMethod, javaMethodNames);
         }
       }
 
       /**
        * Checks that the backend method name is unique to ensure that there are no overloaded
        * API methods.
-       * @param psiMethod
-       * @param javaMethodNames
        */
-      private void validateBackendMethodNameUnique(PsiMethod psiMethod, Map<String, PsiMethod> javaMethodNames) {
+      private void validateBackendMethodNameUnique(PsiMethod psiMethod,
+          Map<String, PsiMethod> javaMethodNames) {
         // Check if method is a public or non-static
-        if(!EndpointUtilities.isApiMethod(psiMethod)) {
+        if (!EndpointUtilities.isApiMethod(psiMethod)) {
           return;
         }
 
-        if(psiMethod.isConstructor()) {
+        if (psiMethod.isConstructor()) {
           return;
         }
 
-        String javaName = psiMethod.getContainingClass().getQualifiedName() + "." + psiMethod.getName();
+        String javaName =
+            psiMethod.getContainingClass().getQualifiedName() + "." + psiMethod.getName();
         PsiMethod seenMethod = javaMethodNames.get(javaName);
         if (seenMethod == null) {
           javaMethodNames.put(javaName, psiMethod);
         } else {
-          String psiMethodName = psiMethod.getContainingClass().getName() + "." + psiMethod.getName() +
-            psiMethod.getParameterList().getText();
-          String seenMethodName = seenMethod.getContainingClass().getName() + "." + seenMethod.getName() +
-            seenMethod.getParameterList().getText();
-          holder.registerProblem(psiMethod, "Overloaded methods are not supported. " +  javaName +
-            " has at least one overload: " + psiMethodName + " and " + seenMethodName,
-            new MyQuickFix());
+          String psiMethodName =
+              psiMethod.getContainingClass().getName() + "." + psiMethod.getName()
+                  + psiMethod.getParameterList().getText();
+          String seenMethodName =
+              seenMethod.getContainingClass().getName() + "." + seenMethod.getName()
+                  + seenMethod.getParameterList().getText();
+          holder.registerProblem(psiMethod, "Overloaded methods are not supported. " + javaName
+              + " has at least one overload: " + psiMethodName + " and " + seenMethodName,
+              new MyQuickFix());
         }
 
       }
@@ -119,6 +122,7 @@ public class FullJavaNameInspection extends EndpointInspectionBase {
    * Quick fix for {@link FullJavaNameInspection} problems.
    */
   public class MyQuickFix implements LocalQuickFix {
+
     public MyQuickFix() {
 
     }
@@ -141,10 +145,10 @@ public class FullJavaNameInspection extends EndpointInspectionBase {
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
       PsiElement element = descriptor.getPsiElement();
-      if(!(element instanceof PsiMethod)) {
+      if (!(element instanceof PsiMethod)) {
         return;
       }
-      PsiMethod method = (PsiMethod)element;
+      PsiMethod method = (PsiMethod) element;
       method.setName(method.getName() + "_1");
     }
 

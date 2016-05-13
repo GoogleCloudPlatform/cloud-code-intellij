@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.stats;
 
 import com.intellij.openapi.components.ServiceManager;
@@ -20,7 +21,7 @@ import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Usage Tracker Provider (as a Service) for obtaining UsageTracker implementations
+ * Usage Tracker Provider (as a Service) for obtaining UsageTracker implementations.
  */
 public abstract class UsageTrackerProvider {
 
@@ -30,7 +31,7 @@ public abstract class UsageTrackerProvider {
   }
 
   /**
-   * Do not return a tracker that includes PII
+   * Do not return a tracker that includes PII.
    */
   @NotNull
   protected abstract UsageTracker getTracker();

@@ -83,9 +83,9 @@ class AppEngineDeploymentConfigurator extends
     boolean isMavenProject = projectsManager.isMavenizedModule(module)
         && mavenProject != null;
 
-    return isMavenProject &&
-        ("jar".equalsIgnoreCase(mavenProject.getPackaging())
-            || "war".equalsIgnoreCase(mavenProject.getPackaging()));
+    return isMavenProject
+        && ("jar".equalsIgnoreCase(mavenProject.getPackaging())
+        || "war".equalsIgnoreCase(mavenProject.getPackaging()));
 
   }
 

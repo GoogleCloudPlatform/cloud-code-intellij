@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login.ui;
 
 /**
- * A place holder for when no user exist. This allows us to create a customized panel when no users exist.
+ * A place holder for when no user exist. This allows us to create a customized panel
+ * when no users exist.
  */
 public class NoUsersListItem {
   public static final NoUsersListItem INSTANCE = new NoUsersListItem();

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.util.Lists;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.debugger.ui.CloudAttachDialog;
+import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.execution.ExecutionException;
@@ -41,17 +42,17 @@ import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 
+import git4idea.DialogManager;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import git4idea.DialogManager;
-
 /**
- * The CloudDebuggerRunner shows the attach dialog, creates a cloud process representation and returns a content
- * descriptor once logically "attached".
+ * The CloudDebuggerRunner shows the attach dialog, creates a cloud process representation and
+ * returns a content descriptor once logically "attached".
  */
 public class CloudDebuggerRunner extends DefaultProgramRunner {
 
@@ -65,7 +66,8 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
   }
 
   @Override
-  protected RunContentDescriptor doExecute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment env)
+  protected RunContentDescriptor doExecute(@NotNull RunProfileState state,
+      @NotNull ExecutionEnvironment env)
       throws ExecutionException {
 
     ensureSingleDebugSession(env.getProject());
@@ -86,49 +88,53 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
     return ID;
   }
 
-  private static RunContentDescriptor createContentDescriptor(@Nullable final CloudDebugProcessState processState,
+  private static RunContentDescriptor createContentDescriptor(
+      @Nullable final CloudDebugProcessState processState,
       @NotNull final ExecutionEnvironment environment) throws ExecutionException {
 
     final XDebugSession debugSession =
-        XDebuggerManager.getInstance(environment.getProject()).startSession(environment, new XDebugProcessStarter() {
-          @NotNull
-          @Override
-          public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
+        XDebuggerManager.getInstance(environment.getProject())
+            .startSession(environment, new XDebugProcessStarter() {
+              @NotNull
+              @Override
+              public XDebugProcess start(@NotNull final XDebugSession session)
+                  throws ExecutionException {
 
-            // Clear out the stash state which is queried on debug exit.
-            if (processState != null) {
-              ProjectRepositoryState.fromProcessState(processState).clearForNextSession();
-            }
+                // Clear out the stash state which is queried on debug exit.
+                if (processState != null) {
+                  ProjectRepositoryState.fromProcessState(processState).clearForNextSession();
+                }
 
-            CloudDebugProcessState state = processState;
-            CloudAttachDialog attachDialog = new CloudAttachDialog(session.getProject(), null);
-            attachDialog.setInputState(state);
-            DialogManager.show(attachDialog);
-            state = attachDialog.getResultState();
+                CloudDebugProcessState state = processState;
+                CloudAttachDialog attachDialog = new CloudAttachDialog(session.getProject(), null);
+                attachDialog.setInputState(state);
+                DialogManager.show(attachDialog);
+                state = attachDialog.getResultState();
 
-            ProjectRepositoryValidator validator = null;
-            if (state != null) {
-              validator = new ProjectRepositoryValidator(state);
-            }
-            if (!attachDialog.isOK() || state == null || !validator.isValidDebuggee()) {
-              throw new RunCanceledByUserException();
-            }
+                ProjectRepositoryValidator validator = null;
+                if (state != null) {
+                  validator = new ProjectRepositoryValidator(state);
+                }
+                if (!attachDialog.isOK() || state == null || !validator.isValidDebuggee()) {
+                  throw new RunCanceledByUserException();
+                }
 
-            if (environment.getRunnerAndConfigurationSettings() != null &&
-                environment.getRunnerAndConfigurationSettings()
-                    .getConfiguration() instanceof CloudDebugRunConfiguration) {
-              CloudDebugRunConfiguration config =
-                  (CloudDebugRunConfiguration) environment.getRunnerAndConfigurationSettings().getConfiguration();
-              // State is only stored in the run config between active sessions.
-              // Otherwise, the background watcher may hit a check during debug session startup.
-              config.setProcessState(null);
-            }
+                if (environment.getRunnerAndConfigurationSettings() != null
+                    && environment.getRunnerAndConfigurationSettings()
+                        .getConfiguration() instanceof CloudDebugRunConfiguration) {
+                  CloudDebugRunConfiguration config =
+                      (CloudDebugRunConfiguration) environment.getRunnerAndConfigurationSettings()
+                          .getConfiguration();
+                  // State is only stored in the run config between active sessions.
+                  // Otherwise, the background watcher may hit a check during debug session startup.
+                  config.setProcessState(null);
+                }
 
-            CloudDebugProcess process = new CloudDebugProcess(session);
-            process.initialize(state);
-            return process;
-          }
-        });
+                CloudDebugProcess process = new CloudDebugProcess(session);
+                process.initialize(state);
+                return process;
+              }
+            });
 
     RunnerLayoutUi ui = debugSession.getUI();
     if (ui instanceof DataProvider) {
@@ -155,9 +161,9 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
 
     List<CloudDebugProcessState> backgroundSessions = getBackgroundDebugStates(project);
     if (backgroundSessions.size() > 0) {
-        for (CloudDebugProcessState cdps : backgroundSessions) {
-          cdps.setListenInBackground(false);
-        }
+      for (CloudDebugProcessState cdps : backgroundSessions) {
+        cdps.setListenInBackground(false);
+      }
     }
 
     List<CloudDebugProcess> activeDebugProcesses = getActiveDebugProcesses(project);
@@ -169,8 +175,7 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
         for (CloudDebugProcess cdb : activeDebugProcesses) {
           cdb.getProcessHandler().detachProcess();
         }
-      }
-      else {
+      } else {
         throw new RunCanceledByUserException();
       }
     }
@@ -183,7 +188,8 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
     RunManager manager = RunManager.getInstance(project);
     for (final RunnerAndConfigurationSettings config : manager.getAllSettings()) {
       if (config.getConfiguration() instanceof CloudDebugRunConfiguration) {
-        final CloudDebugRunConfiguration cloudConfig = (CloudDebugRunConfiguration)config.getConfiguration();
+        final CloudDebugRunConfiguration cloudConfig = (CloudDebugRunConfiguration) config
+            .getConfiguration();
         CloudDebugProcessState processState = cloudConfig.getProcessState();
         if (processState != null && processState.isListenInBackground()) {
           states.add(processState);

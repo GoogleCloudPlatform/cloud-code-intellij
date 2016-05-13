@@ -13,21 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.hash.HashMap;
+
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
 /**
- * UI that represents a single Google Login
- * It displays an image of the user with his or her email.
+ * UI that represents a single Google Login It displays an image of the user with his or her email.
  */
 class ProjectSelectorCredentialedUser extends JPanel {
+
   private JLabel userIcon = new JBLabel();
   private JLabel name = new JBLabel();
   private JLabel emailLabel = new JBLabel();
@@ -40,55 +52,53 @@ class ProjectSelectorCredentialedUser extends JPanel {
     this.setOpaque(false);
     this.setBorder(BorderFactory.createEmptyBorder(1, 0, 1, 0));
 
-    GridBagConstraints c = new GridBagConstraints();
-
     userIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 15));
     userIcon.setOpaque(false);
     userIcon.setHorizontalAlignment(SwingConstants.CENTER);
     userIcon.setVerticalAlignment(SwingConstants.CENTER);
-    c.gridx = 0;
-    c.gridy = 0;
-    c.gridheight = 3;
-    c.weightx = 0;
-    c.weighty = 0;
-    add(userIcon, c);
+
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.gridx = 0;
+    constraints.gridy = 0;
+    constraints.gridheight = 3;
+    constraints.weightx = 0;
+    constraints.weighty = 0;
+    add(userIcon, constraints);
 
     Font originalFont = name.getFont();
     name.setOpaque(false);
     Font boldFont = new Font(originalFont.getFontName(), Font.BOLD, originalFont.getSize() + 1);
     name.setFont(boldFont);
 
-    c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 1;
-    c.gridy = 0;
-    c.gridheight = 1;
-    c.weightx = 1;
-    c.weighty = 0;
-    add(name, c);
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.gridx = 1;
+    constraints.gridy = 0;
+    constraints.gridheight = 1;
+    constraints.weightx = 1;
+    constraints.weighty = 0;
+    add(name, constraints);
 
     emailLabel.setOpaque(false);
     Font plainFont = new Font(originalFont.getFontName(), Font.ITALIC, originalFont.getSize() - 1);
     emailLabel.setFont(plainFont);
 
-    c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 1;
-    c.gridy = 1;
-    c.gridheight = 1;
-    c.weightx = 1;
-    c.weighty = 0;
-    add(emailLabel, c);
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.gridx = 1;
+    constraints.gridy = 1;
+    constraints.gridheight = 1;
+    constraints.weightx = 1;
+    constraints.weighty = 0;
+    add(emailLabel, constraints);
   }
 
   public void initialize(@Nullable Image image, @Nullable String userName, @Nullable String email) {
     Icon scaledIcon;
     if (image == null) {
       scaledIcon = null;
-    }
-    else if (!imageCache.containsKey(image)) {
+    } else if (!imageCache.containsKey(image)) {
       scaledIcon = new ImageIcon(image.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
       imageCache.put(image, scaledIcon);
-    }
-    else {
+    } else {
       scaledIcon = imageCache.get(image);
     }
 
@@ -97,8 +107,10 @@ class ProjectSelectorCredentialedUser extends JPanel {
     emailLabel.setText(email);
 
     this.setPreferredSize(
-      new Dimension(userIcon.getPreferredSize().width + name.getPreferredSize().width + emailLabel.getPreferredSize().width,
-                    Math.max(scaledIcon != null ? scaledIcon.getIconHeight() + 2 : 0, emailLabel.getPreferredSize().height +
-                                                             name.getPreferredSize().height + 4)));
+        new Dimension(userIcon.getPreferredSize().width + name.getPreferredSize().width + emailLabel
+            .getPreferredSize().width,
+            Math.max(scaledIcon != null ? scaledIcon.getIconHeight() + 2 : 0,
+                emailLabel.getPreferredSize().height
+                    + name.getPreferredSize().height + 4)));
   }
 }
