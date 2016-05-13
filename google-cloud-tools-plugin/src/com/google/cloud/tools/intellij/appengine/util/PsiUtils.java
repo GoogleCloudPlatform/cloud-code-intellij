@@ -48,7 +48,7 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE : requires readAction, if not on the dispatch thread Get the public class in a file that
+   * NOTE: requires readAction, if not on the dispatch thread Get the public class in a file that
    * is annotated with a certain annotation.
    */
   public static PsiClass getPublicAnnotatedClass(PsiJavaFile psiJavaFile, String annotationFqn) {
@@ -65,7 +65,7 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE : requires readAction, if not on the dispatch thread Get an field annotated with a
+   * NOTE: requires readAction, if not on the dispatch thread Get an field annotated with a
    * particular annotation from a class.
    *
    * @return the first field found with the annotation
@@ -80,7 +80,7 @@ public class PsiUtils {
   }
 
   /**
-   * Add (or overwrite) a file in a directory NOTE : This must run in a runWriteAction.
+   * Add (or overwrite) a file in a directory. NOTE: This must run in a runWriteAction.
    *
    * @return the newly written file
    */
@@ -93,7 +93,7 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE : This must run in a runWriteAction Add file to directory only if it doesn't exist.
+   * NOTE: This must run in a runWriteAction Add file to directory only if it doesn't exist.
    *
    * @return the existing file or the newly added file
    */
@@ -108,7 +108,7 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE : This must run in a runWriteAction Create (or overwrite) a directory.
+   * NOTE: This must run in a runWriteAction Create (or overwrite) a directory.
    *
    * @return the new/existing directory
    */
@@ -118,7 +118,7 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE : This must run in a runWriteAction Add directory to directory only if it doesn't exist.
+   * NOTE: This must run in a runWriteAction Add directory to directory only if it doesn't exist.
    *
    * @return the new/existing directory
    */
@@ -131,7 +131,7 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE : This must run in a runWriteAction Delete a directory (no error if it doesn't exist).
+   * NOTE: This must run in a runWriteAction Delete a directory (no error if it doesn't exist).
    */
   public static void deleteIfExists(PsiDirectory parent, String dirName) {
     final PsiDirectory existingDir = parent.findSubdirectory(dirName);
@@ -141,7 +141,7 @@ public class PsiUtils {
   }
 
   /**
-   * NOTE this must run in a runWriteAction Create a file using intellijs built in system with the
+   * NOTE: this must run in a runWriteAction Create a file using intellijs built in system with the
    * defined type and format it.
    */
   public static PsiFile createFormattedFile(Project project, String filename, FileType fileType,

@@ -162,10 +162,10 @@ public class AppEngineDeploymentRunConfigurationEditor extends
             .withFileFilter(new Condition<VirtualFile>() {
               @Override
               public boolean value(VirtualFile file) {
-                return Comparing
-                    .equal(file.getExtension(), "jar", SystemInfo.isFileSystemCaseSensitive)
-                    || Comparing
-                    .equal(file.getExtension(), "war", SystemInfo.isFileSystemCaseSensitive);
+                return Comparing.equal(
+                        file.getExtension(), "jar", SystemInfo.isFileSystemCaseSensitive)
+                    || Comparing.equal(
+                        file.getExtension(), "war", SystemInfo.isFileSystemCaseSensitive);
               }
             })
     );

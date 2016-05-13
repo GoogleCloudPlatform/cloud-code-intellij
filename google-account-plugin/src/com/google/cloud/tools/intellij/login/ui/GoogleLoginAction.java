@@ -54,7 +54,7 @@ public class GoogleLoginAction extends AnAction
    */
   private static void showPopup(AnActionEvent event) {
     GoogleLoginUsersPanel usersPanel = new GoogleLoginUsersPanel();
-    JComponent source = (JComponent)event.getInputEvent().getSource();
+    JComponent source = (JComponent) event.getInputEvent().getSource();
     ComponentPopupBuilder popupBuilder =
         JBPopupFactory.getInstance().createComponentPopupBuilder(usersPanel, usersPanel.getList());
     JBPopup popup = popupBuilder.createPopup();

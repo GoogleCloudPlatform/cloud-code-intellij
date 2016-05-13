@@ -262,7 +262,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
       logOutAllUsers();
       UsageTrackerProvider
           .getInstance().trackEvent(
-          LoginTracking.CATEGORY, LoginTracking.LOGIN, "logout.complete", null);
+            LoginTracking.CATEGORY, LoginTracking.LOGIN, "logout.complete", null);
     }
 
     return loggedOut;
