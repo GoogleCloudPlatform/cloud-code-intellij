@@ -24,6 +24,7 @@ import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitList
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.app.impl.config.DefaultDeployConfiguration;
+import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -36,8 +37,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +45,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Performs the deployment of App Engine based applications to GCP.
@@ -68,7 +69,7 @@ public class AppEngineDeployAction extends AppEngineAction {
       @NotNull File deploymentArtifactPath,
       @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
       @NotNull DeploymentOperationCallback callback) {
-    super(loggingHandler, appEngineHelper);
+    super(loggingHandler, appEngineHelper, deploymentConfiguration);
 
     this.appEngineHelper = appEngineHelper;
     this.project = project;
@@ -112,8 +113,17 @@ public class AppEngineDeployAction extends AppEngineAction {
           copyFile(stagingDirectory, "target" + artifactType, deploymentArtifactPath);
       stagedArtifactPath.setReadable(true /* readable */, false /* ownerOnly */);
 
-      copyFile(stagingDirectory, "app.yaml", this.appYamlPath);
-      copyFile(stagingDirectory, "Dockerfile", this.dockerFilePath);
+      File appYamlPath = deploymentConfiguration.isAuto()
+          ? appEngineHelper.defaultAppYaml()
+          : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getAppYamlPath());
+
+      File dockerFilePath = deploymentConfiguration.isAuto()
+          ? appEngineHelper.defaultDockerfile(
+          DeploymentArtifactType.typeForPath(deploymentArtifactPath))
+          : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getDockerFilePath());
+
+      copyFile(stagingDirectory, "app.yaml", appYamlPath);
+      copyFile(stagingDirectory, "Dockerfile", dockerFilePath);
     } catch (IOException e) {
       logger.warn(e);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
@@ -139,10 +149,10 @@ public class AppEngineDeployAction extends AppEngineAction {
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
     configuration.setDeployables(Collections.singletonList(new File(stagingDirectory, "app.yaml")));
-    configuration.setProject(appEngineHelper.getProjectId());
+    configuration.setProject(deploymentConfiguration.getCloudProjectName());
     configuration.setPromote(true);
-    if (!StringUtil.isEmpty(version)) {
-      configuration.setVersion(version);
+    if (!StringUtil.isEmpty(deploymentConfiguration.getVersion())) {
+      configuration.setVersion(deploymentConfiguration.getVersion());
     }
 
     deployment.deploy(configuration);

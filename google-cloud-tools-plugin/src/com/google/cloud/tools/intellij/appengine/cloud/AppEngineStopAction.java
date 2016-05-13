@@ -59,7 +59,7 @@ public class AppEngineStopAction extends AppEngineAction {
       @NotNull String moduleToStop,
       @NotNull String versionToStop,
       @NotNull UndeploymentTaskCallback callback) {
-    super(loggingHandler, appEngineHelper);
+    super(loggingHandler, appEngineHelper, deploymentConfiguration);
 
     this.moduleToStop = moduleToStop;
     this.versionToStop = versionToStop;

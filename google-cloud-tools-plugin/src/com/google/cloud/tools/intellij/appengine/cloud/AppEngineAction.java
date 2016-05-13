@@ -50,6 +50,7 @@ public abstract class AppEngineAction implements Runnable {
 
   private LoggingHandler loggingHandler;
   private File credentialsPath;
+  private AppEngineHelper appEngineHelper;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
   private DefaultProcessRunner processRunner;
   protected boolean cancelled = false;
@@ -59,8 +60,10 @@ public abstract class AppEngineAction implements Runnable {
    */
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
+      @NotNull AppEngineHelper appEngineHelper,
       @NotNull AppEngineDeploymentConfiguration deploymentConfiguration) {
     this.loggingHandler = loggingHandler;
+    this.appEngineHelper = appEngineHelper;
     this.deploymentConfiguration = deploymentConfiguration;
   }
 
@@ -82,7 +85,7 @@ public abstract class AppEngineAction implements Runnable {
     credentialsPath = createApplicationDefaultCredentials();
     if (credentialsPath == null) {
       consoleLogLn(GctBundle.message("appengine.action.credential.not.found",
-          appEngineHelper.getGoogleUsername()));
+          deploymentConfiguration.getGoogleUsername()));
       throw new AppEngineException("Failed to create application default credentials.");
     }
 
@@ -159,8 +162,7 @@ public abstract class AppEngineAction implements Runnable {
   protected void deleteCredentials() {
     if (credentialsPath != null && credentialsPath.exists()) {
       if (!credentialsPath.delete()) {
-        logger.warn("failed to delete credential file expected at "
-            + credentialsPath.getPath());
+        logger.warn("failed to delete credential file expected at " + credentialsPath.getPath());
       }
     }
   }
