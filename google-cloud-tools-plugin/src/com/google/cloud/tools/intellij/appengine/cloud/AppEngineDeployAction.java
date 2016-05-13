@@ -102,6 +102,12 @@ class AppEngineDeployAction extends AppEngineAction {
     }
     commandLine.addParameter("--format=json");
 
+    // TODO(chanseok): this split does not work with quoted parameter values containing spaces.
+    final List<String> parameters =
+        StringUtil.split(deploymentConfiguration.getCustomDeployFlags(), " ");
+    consoleLogLn("Param size: " + parameters.size());
+    commandLine.addParameters(parameters);
+
     commandLine.withWorkDirectory(stagingDirectory);
     consoleLogLn("Working directory set to: " + stagingDirectory.getAbsolutePath());
 
