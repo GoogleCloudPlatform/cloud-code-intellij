@@ -76,7 +76,7 @@ public abstract class AppEngineAction implements Runnable {
    * {@link CloudSdk} instance.
    *
    * @param processRunner a {@link DefaultProcessRunner} for managing the process that runs the
-   *   action.
+   *     action.
    */
   @NotNull
   CloudSdk prepareExecution(@NotNull DefaultProcessRunner processRunner) throws AppEngineException {
@@ -102,7 +102,7 @@ public abstract class AppEngineAction implements Runnable {
   /**
    * Kill any executing process for the action.
    */
-  void cancel() {
+  protected void cancel() {
     if (processRunner != null
         && processRunner.getProcess() != null) {
       cancelled = true;

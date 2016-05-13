@@ -72,7 +72,7 @@ public class AppEngineStopAction extends AppEngineAction {
 
     try {
       sdk = prepareExecution(createStopProcessRunner());
-    } catch(AppEngineException ex) {
+    } catch (AppEngineException ex) {
       callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.error"));
       return;
     }

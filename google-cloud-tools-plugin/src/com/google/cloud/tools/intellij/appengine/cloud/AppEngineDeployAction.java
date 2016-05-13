@@ -37,6 +37,8 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,8 +47,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Performs the deployment of App Engine based applications to GCP.
@@ -62,6 +62,9 @@ public class AppEngineDeployAction extends AppEngineAction {
   private DeploymentOperationCallback callback;
   private DeploymentArtifactType artifactType;
 
+  /**
+   * Initialize the deployment action.
+   */
   public AppEngineDeployAction(
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
@@ -79,6 +82,7 @@ public class AppEngineDeployAction extends AppEngineAction {
     this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
   }
 
+  @Override
   public void run() {
     File stagingDirectory = stage();
 
@@ -88,8 +92,7 @@ public class AppEngineDeployAction extends AppEngineAction {
   }
 
   /**
-   *
-   * @return the staging directory or null if it failed.
+   * Stage the deployment artifacts and return the staging directory or null if it failed.
    */
   @Nullable
   private File stage() {
@@ -124,8 +127,8 @@ public class AppEngineDeployAction extends AppEngineAction {
 
       copyFile(stagingDirectory, "app.yaml", appYamlPath);
       copyFile(stagingDirectory, "Dockerfile", dockerFilePath);
-    } catch (IOException e) {
-      logger.warn(e);
+    } catch (IOException ex) {
+      logger.warn(ex);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
       return null;
     }
@@ -140,12 +143,10 @@ public class AppEngineDeployAction extends AppEngineAction {
     CloudSdk sdk;
     try {
       sdk = prepareExecution(createDeployProcessRunner());
-    } catch(AppEngineException ex) {
+    } catch (AppEngineException ex) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.error"));
       return;
     }
-
-    CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
     configuration.setDeployables(Collections.singletonList(new File(stagingDirectory, "app.yaml")));
@@ -155,6 +156,7 @@ public class AppEngineDeployAction extends AppEngineAction {
       configuration.setVersion(deploymentConfiguration.getVersion());
     }
 
+    CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
     deployment.deploy(configuration);
   }
 
@@ -199,8 +201,8 @@ public class AppEngineDeployAction extends AppEngineAction {
 
           try {
             deployOutput = parseDeployOutput(rawDeployOutput.toString());
-          } catch (JsonParseException e) {
-            logger.error("Could not retrieve service/version info of deployed application", e);
+          } catch (JsonParseException ex) {
+            logger.error("Could not retrieve service/version info of deployed application", ex);
           }
 
           if (deployOutput == null
@@ -239,8 +241,8 @@ public class AppEngineDeployAction extends AppEngineAction {
   /**
    * Parse the raw json output of the deployment.
    *
-   * @return an object modeling the output of a deploy command.
-   * @throws JsonParseException
+   * @return an object modeling the output of a deploy command
+   * @throws JsonParseException if unable to extract the deploy output information needed
    */
   @VisibleForTesting
   static DeployOutput parseDeployOutput(String jsonOutput) throws JsonParseException {
