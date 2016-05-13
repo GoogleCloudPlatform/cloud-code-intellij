@@ -119,6 +119,9 @@ public final class CloudSdkUtil {
     return SystemInfo.isWindows ? WIN_COMMAND : UNIX_COMMAND;
   }
 
+  /**
+   * Given a filePath return its {@link java.io.File}.
+   */
   @NotNull
   public static File getFileFromFilePath(String filePath) {
     File file;

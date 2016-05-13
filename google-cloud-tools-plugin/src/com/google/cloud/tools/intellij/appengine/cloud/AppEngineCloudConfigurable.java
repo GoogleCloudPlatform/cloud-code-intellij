@@ -59,6 +59,9 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   private JLabel warningMessage;
   private JTextPane appEngineFlexMoreInfoLabel;
 
+  /**
+   * Initialize the UI.
+   */
   public AppEngineCloudConfigurable(AppEngineServerConfiguration configuration,
       @Nullable Project project) {
     this.configuration = configuration;
@@ -74,7 +77,8 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
     warningMessage.setVisible(false);
 
-    final String cloudSdkDirectoryPath = CloudSdkUtil.findCloudSdkDirectoryPath(environmentProvider);
+    final String cloudSdkDirectoryPath
+        = CloudSdkUtil.findCloudSdkDirectoryPath(environmentProvider);
 
     if (cloudSdkDirectoryPath != null
         && configuration.getCloudSdkHomePath() == null) {
@@ -96,7 +100,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   private DocumentAdapter getSdkDirectoryFieldListener() {
     return new DocumentAdapter() {
       @Override
-      protected void textChanged(DocumentEvent e) {
+      protected void textChanged(DocumentEvent event) {
         String path = cloudSdkDirectoryField.getText();
         boolean isValid = CloudSdkUtil.containsCloudSdkExecutable(path);
         if (isValid) {

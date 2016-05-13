@@ -135,7 +135,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   /**
    * Returns either cached state (if we were previously watching this state in this or the last IDE
    * session) Or it returns a partially valid state, which will later be filled in by the {@link
-   * com.google.gct.idea.debugger .CloudDebuggerRunner}
+   * com.google.gct.idea.debugger.CloudDebuggerRunner}
    *
    * @param executor the execution mode selected by the user (run, debug, profile etc.)
    * @param environment the environment object containing additional settings for executing the
