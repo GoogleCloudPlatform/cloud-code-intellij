@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login.ui;
 
 import com.intellij.openapi.util.IconLoader;
@@ -21,21 +22,22 @@ import javax.swing.Icon;
 
 /**
  * A utility class that loads the icons that are used by the Google Login plugin.
- *
+ * <p/>
  * Using this class to load icons is preferred over creating scaled image icons manually in code,
  * as this utility class will automatically select the appropriate icons based on the current
  * theme (IntelliJ classic vs. Darcula) and will automatically select high resolution icons
  * for retina displays.
- *
- * To ensure the appropriate icons are selected, they should be named according to the following rules:
- *
+ * <p/>
+ * To ensure the appropriate icons are selected, they should be named according to the
+ * following rules:
+ * <p/>
  * <ul>
  *   <li>icon_name.png - The IntelliJ classic image icon to use.</li>
  *   <li>icon_name@2x.png - The IntelliJ classic image icon to use for retina displays.</li>
  *   <li>icon_name_dark.png - The Darcula image icon to use.</li>
  *   <li>icon_name@2x_dark.png - The Darcula image icon to use for retina displays.</li>
  * </ul>
- *
+ * <p/>
  * Note that if no alternative image icons are specified, the single provided image icon
  * will be used in all themes and resolutions.
  */

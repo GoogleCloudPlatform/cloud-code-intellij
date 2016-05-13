@@ -34,7 +34,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Inspection to check that the return type of an API method is an entity (resource) type.
  */
-public class MethodReturnTypeInspection extends EndpointInspectionBase{
+public class MethodReturnTypeInspection extends EndpointInspectionBase {
+
   @Override
   @Nullable
   public String getStaticDescription() {
@@ -64,20 +65,20 @@ public class MethodReturnTypeInspection extends EndpointInspectionBase{
           return;
         }
 
-        if(hasTransformer(method)) {
+        if (hasTransformer(method)) {
           return;
         }
 
-        if(!EndpointUtilities.isApiMethod(method)) {
+        if (!EndpointUtilities.isApiMethod(method)) {
           return;
         }
 
         PsiType returnType = method.getReturnType();
-        if(returnType == null) {
+        if (returnType == null) {
           return;
         }
 
-        if(returnType.isAssignableFrom(PsiType.VOID)) {
+        if (returnType.isAssignableFrom(PsiType.VOID)) {
           return;
         }
 
@@ -87,14 +88,15 @@ public class MethodReturnTypeInspection extends EndpointInspectionBase{
           if (project == null) {
             return;
           }
-        } catch (PsiInvalidElementAccessException e) {
-          LOG.error("Error getting project with method " + method.getText(), e);
+        } catch (PsiInvalidElementAccessException ex) {
+          LOG.error("Error getting project with method " + method.getText(), ex);
           return;
         }
 
-        if(!isEntityParameter(returnType, project)){
-          holder.registerProblem(method.getReturnTypeElement(), "Invalid return type: " + returnType.getPresentableText() +
-            ". Primitives and enums are not allowed.", LocalQuickFix.EMPTY_ARRAY);
+        if (!isEntityParameter(returnType, project)) {
+          holder.registerProblem(method.getReturnTypeElement(),
+              "Invalid return type: " + returnType.getPresentableText()
+                  + ". Primitives and enums are not allowed.", LocalQuickFix.EMPTY_ARRAY);
         }
       }
     };

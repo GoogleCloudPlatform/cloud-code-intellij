@@ -22,16 +22,28 @@ import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiArrayType;
+import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiInvalidElementAccessException;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiPrimitiveType;
+import com.intellij.psi.PsiType;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Inspection to check that parameter types do not contain multiple levels of collections or arrays.
+ * Inspection to check that parameter types do not contain multiple levels of collections or
+ * arrays.
  */
 public class MethodParameterTypeInspection extends EndpointInspectionBase {
-  // TODO: check if class has a transformer and add check that only parameter and entity types have @Named
+  // TODO: check if class has a transformer and add check that only parameter and entity types
+  // have @Named
 
   @Override
   @Nullable
@@ -53,11 +65,11 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
   }
 
   /**
-   * Returns false if <code>type</code> is a multiple levels of collections or arrays.
-   * Returns true otherwise.
+   * Returns false if <code>type</code> is a multiple levels of collections or arrays. Returns true
+   * otherwise.
+   *
    * @param type The PsiType been validated.
    * @param project The project that has the PsiElement associated with <code>type</code>.
-   * @return
    */
   public boolean isValidArrayOrPrimitiveType(PsiType type, Project project) {
     if (type instanceof PsiArrayType) {
@@ -71,24 +83,24 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
 
     // Check if type is a Collection
     PsiClassType collectionType =
-      JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
+        JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
     if (collectionType.isAssignableFrom(type)) {
       assert (type instanceof PsiClassType);
       PsiClassType classType = (PsiClassType) type;
       PsiType[] typeParams = classType.getParameters();
       assert (typeParams.length > 0);
-      return  isValidInnerArrayType(typeParams[0], project);
+      return isValidInnerArrayType(typeParams[0], project);
     }
 
     return true;
   }
 
   /**
-   * Returns false is <code>type</code> is an array or a java.util.Collection
-   * or one of its subtypes. Returns true otherwise.
+   * Returns false is <code>type</code> is an array or a java.util.Collection or one of its
+   * subtypes. Returns true otherwise.
+   *
    * @param type The PsiType been validated.
    * @param project The project that has the PsiElement associated with  <code>type</code>.
-   * @return
    */
   public boolean isValidInnerArrayType(PsiType type, Project project) {
     if (type instanceof PsiArrayType) {
@@ -96,7 +108,8 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
     }
 
     // Check if type is a Collection
-    PsiClassType collectionType = JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
+    PsiClassType collectionType = JavaPsiFacade.getElementFactory(project)
+        .createTypeByFQClassName("java.util.Collection");
     if (collectionType.isAssignableFrom(type)) {
       return false;
     }
@@ -109,18 +122,18 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
   public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
     return new EndpointPsiElementVisitor() {
       @Override
-      public void visitParameter (PsiParameter psiParameter){
+      public void visitParameter(PsiParameter psiParameter) {
         if (!EndpointUtilities.isEndpointClass(psiParameter)) {
           return;
         }
 
-        if(hasTransformer(psiParameter)) {
+        if (hasTransformer(psiParameter)) {
           return;
         }
 
         PsiElement psiElement = psiParameter.getDeclarationScope();
         if (psiElement instanceof PsiMethod) {
-          if(!EndpointUtilities.isApiMethod((PsiMethod)psiElement)) {
+          if (!EndpointUtilities.isApiMethod((PsiMethod) psiElement)) {
             return;
           }
         } else {
@@ -133,13 +146,15 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
           if (project == null) {
             return;
           }
-        } catch (PsiInvalidElementAccessException e) {
-          LOG.error("Error getting project with parameter " + psiParameter.getText(), e);
+        } catch (PsiInvalidElementAccessException ex) {
+          LOG.error("Error getting project with parameter " + psiParameter.getText(), ex);
           return;
         }
 
-        if(!isValidArrayOrPrimitiveType(psiParameter.getType(), project)) {
-          holder.registerProblem(psiParameter, "Illegal nested collection type " + psiParameter.getType().getPresentableText() + ".", LocalQuickFix.EMPTY_ARRAY);
+        if (!isValidArrayOrPrimitiveType(psiParameter.getType(), project)) {
+          holder.registerProblem(psiParameter,
+              "Illegal nested collection type " + psiParameter.getType().getPresentableText() + ".",
+              LocalQuickFix.EMPTY_ARRAY);
         }
       }
     };

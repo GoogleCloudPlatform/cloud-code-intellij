@@ -37,19 +37,19 @@ import java.util.List;
 import javax.swing.JComponent;
 
 /**
- * Base class for build-system (e.g. maven or gradle) deployment source types. Deployment
- * sources for specific build-systems should extend this providing the build-system specific
+ * Base class for build-system (e.g. maven or gradle) deployment source types. Deployment sources
+ * for specific build-systems should extend this providing the build-system specific
  * implementations.
  */
 public abstract class BuildDeploymentSourceType extends ModuleDeploymentSourceType {
 
   /**
-   * Creates a pre-deploy task ({@link BeforeRunTask}) for the given build-system and attaches it
-   * to this module deployment source type. Invoked when a new deployment configuration is created.
-   *
-   * Provides the common functionality for creating the build-system packaging task,
-   * delegating build-system specific functions to the concrete sub-types.
-   *
+   * Creates a pre-deploy task ({@link BeforeRunTask}) for the given build-system and attaches it to
+   * this module deployment source type. Invoked when a new deployment configuration is created.
+   * <p/>
+   * Provides the common functionality for creating the build-system packaging task, delegating
+   * build-system specific functions to the concrete sub-types.
+   * <p/>
    * Only creates a new task if one is not already configured.
    */
   @Override
@@ -82,11 +82,11 @@ public abstract class BuildDeploymentSourceType extends ModuleDeploymentSourceTy
   /**
    * Updates the pre-deploy build tasks ({@link BeforeRunTask}) when the deployment source is
    * updated.
-   *
-   * Similar to {@link BuildDeploymentSourceType#setBuildBeforeRunTask(
-   * RunConfiguration, ModuleDeploymentSource)}, but it is invoked when switching between
-   * deployment sources in the UI.
-   *
+   * <p/>
+   * Similar to {@link BuildDeploymentSourceType#setBuildBeforeRunTask(RunConfiguration,
+   * ModuleDeploymentSource)}, but it is invoked when switching between deployment sources in the
+   * UI.
+   * <p/>
    * Only creates a new task if one is not already configured. In following the IntelliJ pattern
    * used for bundled deployment sources, this does NOT remove any existing tasks.
    */
@@ -119,8 +119,8 @@ public abstract class BuildDeploymentSourceType extends ModuleDeploymentSourceTy
   }
 
   /**
-   * @return the collection of already configured {@link BeforeRunTask} subtypes for the given
-   * build-system.
+   * Returns the collection of already configured {@link BeforeRunTask} subtypes for the given
+   *     build-system.
    */
   @NotNull
   protected abstract Collection<? extends BeforeRunTask> getBuildTasks(
@@ -129,9 +129,8 @@ public abstract class BuildDeploymentSourceType extends ModuleDeploymentSourceTy
 
   /**
    * Creates a new instance of a {@link BeforeRunTask} for the corresponding build-system.
-   *
-   * This build task should encapsulate packaging of the build artifact for
-   * the supplied module.
+   * <p/>
+   * This build task should encapsulate packaging of the build artifact for the supplied module.
    *
    * @param module for which this task is scoped
    * @return a new build task
@@ -142,9 +141,9 @@ public abstract class BuildDeploymentSourceType extends ModuleDeploymentSourceTy
 
   /**
    * Determines if there is already a configured build task in the supplied collection.
-   *
-   * Implementors should consider only those tasks corresponding to their build-systems, those
-   * that produce the build artifact, and those scoped to the supplied module.
+   * <p/>
+   * Implementors should consider only those tasks corresponding to their build-systems, those that
+   * produce the build artifact, and those scoped to the supplied module.
    *
    * @return boolean indicating if a build task exists.
    */
@@ -152,9 +151,9 @@ public abstract class BuildDeploymentSourceType extends ModuleDeploymentSourceTy
       Collection<? extends BeforeRunTask> beforeRunTasks, Module module);
 
   /**
-   * Manually set the deployment configuration so that its available immediately in the
-   * deployment configuration dialog even if the user does not trigger any UI actions. This
-   * prevents downstream npe's in {@link DeployToServerRunConfiguration#checkConfiguration()}.
+   * Manually set the deployment configuration so that its available immediately in the deployment
+   * configuration dialog even if the user does not trigger any UI actions. This prevents downstream
+   * npe's in {@link DeployToServerRunConfiguration#checkConfiguration()}.
    */
   @SuppressWarnings("unchecked")
   private void setConfiguration(@NotNull RunConfiguration configuration) {

@@ -20,11 +20,12 @@ package com.google.cloud.tools.intellij.stats;
  * For usage tracker of the Google Login actions.
  */
 public class LoginTracking {
-    private LoginTracking() {
-    }
 
-    public static final String CATEGORY = "com.google.cloud.tools";
+  private LoginTracking() {
+  }
 
-    // actions
-    public static final String LOGIN = "user.login";
+  public static final String CATEGORY = "com.google.cloud.tools";
+
+  // actions
+  public static final String LOGIN = "user.login";
 }

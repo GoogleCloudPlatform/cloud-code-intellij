@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
+import com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.cloud.tools.intellij.debugger.actions.CloudDebugHelpAction;
 import com.google.cloud.tools.intellij.debugger.ui.CloudDebugHistoricalSnapshots;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
-import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 
 import com.intellij.debugger.actions.DebuggerActions;
 import com.intellij.debugger.ui.DebuggerContentInfo;
@@ -75,25 +76,27 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 /**
- * CloudDebugProcess is the controller that represents our attached state to the server. It provides the breakpoint
- * handler as well as functionality for stepover/into (which is disabled) Most importantly for the Cloud Debugger, it
- * customizes the UI layout and polls the server for changes.
+ * CloudDebugProcess is the controller that represents our attached state to the server. It provides
+ * the breakpoint handler as well as functionality for stepover/into (which is disabled) Most
+ * importantly for the Cloud Debugger, it customizes the UI layout and polls the server for
+ * changes.
  * <p/>
- * It also sets the debug session to a certain snapshot when appropriate which requires the creation of a {@link
- * CloudExecutionStack}.
+ * It also sets the debug session to a certain snapshot when appropriate which requires the creation
+ * of a {@link CloudExecutionStack}.
  * <p/>
  * CloudDebugProcess only exists for the duration of the IDE debug session.
  * <p/>
- * It also contains state {@link CloudDebugProcessState} that can live beyond the lifetime of the debug
- * session and be serialized into workspace.xml state.
+ * It also contains state {@link CloudDebugProcessState} that can live beyond the lifetime of the
+ * debug session and be serialized into workspace.xml state.
  */
 public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointListener {
+
   private static final Logger LOG = Logger.getInstance(CloudDebugProcess.class);
   private volatile Breakpoint currentSnapshot;
   private CloudDebugProcessState processState;
   private ProjectRepositoryValidator repoValidator;
   private CloudDebugProcessStateController stateController;
-  private XBreakpointHandler<?>[] xBreakpointHandlers;
+  private XBreakpointHandler<?>[] breakpointHandlers;
   private volatile String navigatedSnapshotId;
 
   public CloudDebugProcess(@NotNull XDebugSession session) {
@@ -106,15 +109,16 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
   @Override
   public boolean checkCanPerformCommands() {
-    Messages.showErrorDialog("The Cloud Debugger does not pause execution. Therefore, this feature is unavailable.",
-            "Not Supported");
+    Messages.showErrorDialog(
+        "The Cloud Debugger does not pause execution. Therefore, this feature is unavailable.",
+        "Not Supported");
     return false;
   }
 
   @Override
   @NotNull
   public XDebugTabLayouter createTabLayouter() {
-    final CloudDebugProcessHandler handler = (CloudDebugProcessHandler)getProcessHandler();
+    final CloudDebugProcessHandler handler = (CloudDebugProcessHandler) getProcessHandler();
 
     return new XDebugTabLayouter() {
       @Override
@@ -143,12 +147,13 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
         CloudDebugHistoricalSnapshots timeline = new CloudDebugHistoricalSnapshots(handler);
         timeline.onBreakpointListChanged(getProcessState());
         Content snapshots = layout
-          .createContent(timeline.getTabTitle(), (ComponentWithActions)timeline, timeline.getTabTitle(),
-                         GoogleCloudToolsIcons.CLOUD, null);
+            .createContent(timeline.getTabTitle(), (ComponentWithActions) timeline,
+                timeline.getTabTitle(),
+                GoogleCloudToolsIcons.CLOUD, null);
         layout.addContent(snapshots, 0, PlaceInGrid.left, false);
 
         layout.getDefaults().initFocusContent(timeline.getTabTitle(), LayoutViewOptions.STARTUP,
-                                              new LayoutAttractionPolicy.FocusOnce(false));
+            new LayoutAttractionPolicy.FocusOnce(false));
       }
     };
   }
@@ -165,30 +170,31 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
   @NotNull
   public CloudBreakpointHandler getBreakpointHandler() {
-    return (CloudBreakpointHandler)getBreakpointHandlers()[0];
+    return (CloudBreakpointHandler) getBreakpointHandlers()[0];
   }
 
   @NotNull
   @Override
   public XBreakpointHandler<?>[] getBreakpointHandlers() {
-    if (xBreakpointHandlers == null) {
-      xBreakpointHandlers = new XBreakpointHandler<?>[]{
-          new CloudBreakpointHandler(this, new ServerToIDEFileResolver())
+    if (breakpointHandlers == null) {
+      breakpointHandlers = new XBreakpointHandler<?>[]{
+          new CloudBreakpointHandler(this, new ServerToIdeFileResolver())
       };
     }
-    return xBreakpointHandlers;
+    return breakpointHandlers;
   }
 
   @VisibleForTesting
   void setBreakpointHandler(CloudBreakpointHandler handler) {
-    xBreakpointHandlers = new XBreakpointHandler<?>[]{handler};
+    breakpointHandlers = new XBreakpointHandler<?>[]{handler};
   }
 
   /**
    * The value returned from the method is immutable and is safe to access on multiple threads.
    * <p/>
-   * However, multiple successive calls to this method may return a different list. Therefore, callers must store the
-   * return value locally to operate on it and should not call this method repeatedly expecting the same list.
+   * However, multiple successive calls to this method may return a different list. Therefore,
+   * callers must store the return value locally to operate on it and should not call this method
+   * repeatedly expecting the same list.
    */
   // todo: can we declare this as ImmutableList?
   public List<Breakpoint> getCurrentBreakpointList() {
@@ -219,6 +225,9 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     return repoValidator;
   }
 
+  /**
+   * Return the state controller creating a new one if needed.
+   */
   public CloudDebugProcessStateController getStateController() {
     if (stateController == null) {
       stateController = new CloudDebugProcessStateController();
@@ -231,14 +240,15 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   }
 
   /**
-   * Initializes the current state, synchronously checks for the latest set of changes and kicks off the background job
-   * to poll for changes.
+   * Initializes the current state, synchronously checks for the latest set of changes and kicks off
+   * the background job to poll for changes.
    */
   public void initialize(@NotNull CloudDebugProcessState processState) {
     this.processState = processState;
     currentSnapshot = null;
 
-    new Task.Modal(getXDebugSession().getProject(), GctBundle.getString("clouddebug.attachingtext"), false) {
+    new Task.Modal(getXDebugSession().getProject(), GctBundle.getString("clouddebug.attachingtext"),
+        false) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
         indicator.setIndeterminate(true);
@@ -259,25 +269,28 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   }
 
   /**
-   * Clears out the current execution stack while keeping the debug session alive.
-   * Useful for breakpoint delete operations which result in no selected snapshots, requiring us
-   * to display an empty stack in the UI, while keeping the debug session alive.
+   * Clears out the current execution stack while keeping the debug session alive. Useful for
+   * breakpoint delete operations which result in no selected snapshots, requiring us to display an
+   * empty stack in the UI, while keeping the debug session alive.
    */
   public void clearExecutionStack() {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         if (!getXDebugSession().isStopped()) {
-          // Since there is no equivalent metaphor in traditional debug sessions, this simulates the desired
-          // behavior of clearing the current context by setting the current position to an empty context
-          getXDebugSession().positionReached(new XSuspendContext() {});
+          // Since there is no equivalent metaphor in traditional debug sessions, this simulates
+          // the desired behavior of clearing the current context by setting the current position
+          // to an empty context
+          getXDebugSession().positionReached(new XSuspendContext() {
+          });
         }
       }
     });
   }
 
   /**
-   * Finds the snapshot associated with the given id and sets it as the active snapshot in the current debug session.
+   * Finds the snapshot associated with the given id and sets it as the active snapshot in the
+   * current debug session.
    */
   public void navigateToSnapshot(@NotNull final String id) {
     if (Strings.isNullOrEmpty(id)) {
@@ -293,10 +306,11 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
               @Override
               public void run() {
                 // We will only do the selection if the id for this async task matches the latest
-                // user clicked item.  This prevents multiple (and possibly out of order) selections
-                // getting queued up.
+                // user clicked item.  This prevents multiple (and possibly out of order)
+                // selections getting queued up.
                 if (id.equals(navigatedSnapshotId)) {
-                  if (!Boolean.TRUE.equals(result.getIsFinalState()) || result.getStackFrames() == null) {
+                  if (!Boolean.TRUE.equals(result.getIsFinalState())
+                      || result.getStackFrames() == null) {
                     getBreakpointHandler().navigateTo(result);
                     if (result.getStackFrames() == null) {
                       navigateToBreakpoint(result);
@@ -334,8 +348,8 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   }
 
   /**
-   * Called when the poll job detects a change in the list of breakpoints. It will disable the ide breakpoint and move
-   * the debug session to that snapshot if nothing has yet been selected.
+   * Called when the poll job detects a change in the list of breakpoints. It will disable the ide
+   * breakpoint and move the debug session to that snapshot if nothing has yet been selected.
    */
   @Override
   public void onBreakpointListChanged(CloudDebugProcessState state) {
@@ -354,22 +368,22 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
           continue;
         }
 
-        if (Boolean.TRUE.equals(breakpoint.getIsFinalState()) &&
-            (breakpoint.getStatus() == null || !Boolean.TRUE.equals(breakpoint.getStatus().getIsError()))) {
+        if (Boolean.TRUE.equals(breakpoint.getIsFinalState())
+            && (breakpoint.getStatus() == null || !Boolean.TRUE
+                .equals(breakpoint.getStatus().getIsError()))) {
           if (!getXDebugSession().isStopped()) {
             getBreakpointHandler().setStateToDisabled(breakpoint);
           }
-        }
-        else if (Boolean.TRUE.equals(breakpoint.getIsFinalState())) {
+        } else if (Boolean.TRUE.equals(breakpoint.getIsFinalState())) {
           // then this is an error state breakpoint.
           com.intellij.debugger.ui.breakpoints.Breakpoint cloudBreakpoint =
-            BreakpointManager.getJavaBreakpoint(breakpointHit);
-          if (breakpoint.getStatus() != null &&
-              Boolean.TRUE.equals(breakpoint.getStatus().getIsError()) &&
-              cloudBreakpoint instanceof CloudLineBreakpointType.CloudLineBreakpoint) {
+              BreakpointManager.getJavaBreakpoint(breakpointHit);
+          if (breakpoint.getStatus() != null
+              && Boolean.TRUE.equals(breakpoint.getStatus().getIsError())
+              && cloudBreakpoint instanceof CloudLineBreakpointType.CloudLineBreakpoint) {
             CloudLineBreakpoint cloudLineBreakpoint = (CloudLineBreakpoint) cloudBreakpoint;
             cloudLineBreakpoint
-              .setErrorMessage(BreakpointUtil.getUserErrorMessage(breakpoint.getStatus()));
+                .setErrorMessage(BreakpointUtil.getUserErrorMessage(breakpoint.getStatus()));
             updateBreakpointPresentation(cloudLineBreakpoint);
           }
         }
@@ -392,10 +406,11 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
   @Override
   public void registerAdditionalActions(@NotNull DefaultActionGroup leftToolbar,
-                                        @NotNull DefaultActionGroup topToolbar,
-                                        @NotNull DefaultActionGroup settings) {
+      @NotNull DefaultActionGroup topToolbar,
+      @NotNull DefaultActionGroup settings) {
     ActionManager manager = ActionManager.getInstance();
-    leftToolbar.add(new SaveAndExitAction(), new Constraints(Anchor.AFTER, IdeActions.ACTION_STOP_PROGRAM));
+    leftToolbar.add(new SaveAndExitAction(),
+        new Constraints(Anchor.AFTER, IdeActions.ACTION_STOP_PROGRAM));
 
     leftToolbar.remove(manager.getAction(IdeActions.ACTION_RERUN));
     leftToolbar.remove(manager.getAction(IdeActions.ACTION_STOP_PROGRAM));
@@ -479,14 +494,15 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     getRepositoryValidator().restoreToOriginalState(getXDebugSession().getProject());
 
     XBreakpointManager breakpointManager =
-      XDebuggerManager.getInstance(getXDebugSession().getProject()).getBreakpointManager();
+        XDebuggerManager.getInstance(getXDebugSession().getProject()).getBreakpointManager();
     for (XBreakpoint bp : breakpointManager.getAllBreakpoints()) {
-      com.intellij.debugger.ui.breakpoints.Breakpoint cloudBreakpoint = BreakpointManager.getJavaBreakpoint(bp);
+      com.intellij.debugger.ui.breakpoints.Breakpoint cloudBreakpoint = BreakpointManager
+          .getJavaBreakpoint(bp);
       if (!(cloudBreakpoint instanceof CloudLineBreakpointType.CloudLineBreakpoint)) {
         continue;
       }
       CloudLineBreakpointType.CloudLineBreakpoint cloudLineBreakpoint =
-        (CloudLineBreakpointType.CloudLineBreakpoint)cloudBreakpoint;
+          (CloudLineBreakpointType.CloudLineBreakpoint) cloudBreakpoint;
       cloudLineBreakpoint.setVerified(false);
       cloudLineBreakpoint.setErrorMessage(null);
       updateBreakpointPresentation(cloudLineBreakpoint);
@@ -495,21 +511,33 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
   // These are used to hide unsupported actions.
   interface XDebuggerActions {
-    @NonNls String EVALUATE_EXPRESSION = "EvaluateExpression";
-    @NonNls String FORCE_STEP_INTO = "ForceStepInto";
-    @NonNls String MUTE_BREAKPOINTS = "XDebugger.MuteBreakpoints";
-    @NonNls String PAUSE = "Pause";
-    @NonNls String RESUME = "Resume";
-    @NonNls String RUN_TO_CURSOR = "RunToCursor";
-    @NonNls String STEP_INTO = "StepInto";
-    @NonNls String STEP_OUT = "StepOut";
-    @NonNls String STEP_OVER = "StepOver";
+
+    @NonNls
+    String EVALUATE_EXPRESSION = "EvaluateExpression";
+    @NonNls
+    String FORCE_STEP_INTO = "ForceStepInto";
+    @NonNls
+    String MUTE_BREAKPOINTS = "XDebugger.MuteBreakpoints";
+    @NonNls
+    String PAUSE = "Pause";
+    @NonNls
+    String RESUME = "Resume";
+    @NonNls
+    String RUN_TO_CURSOR = "RunToCursor";
+    @NonNls
+    String STEP_INTO = "StepInto";
+    @NonNls
+    String STEP_OUT = "StepOut";
+    @NonNls
+    String STEP_OVER = "StepOver";
   }
 
   /**
-   * The suspend context gives the debug session the information necessary to populate the stack and variables windows.
+   * The suspend context gives the debug session the information necessary to populate the stack and
+   * variables windows.
    */
   private static class MySuspendContext extends XSuspendContext {
+
     private final XExecutionStack stack;
 
     public MySuspendContext(@NotNull XExecutionStack stack) {
@@ -533,9 +561,11 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   }
 
   private class SaveAndExitAction extends AnAction {
+
     public SaveAndExitAction() {
-      super(GctBundle.getString("clouddebug.stopandcontinue"), GctBundle.getString("clouddebug.exitdebug"),
-            GoogleCloudToolsIcons.CLOUD_DEBUG_SAVE_EXIT);
+      super(GctBundle.getString("clouddebug.stopandcontinue"),
+          GctBundle.getString("clouddebug.exitdebug"),
+          GoogleCloudToolsIcons.CLOUD_DEBUG_SAVE_EXIT);
     }
 
     @Override
@@ -550,8 +580,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
         processState.setListenInBackground(true);
         UsageTrackerProvider.getInstance().trackEvent(
             GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.continue.listening", null);
-      }
-      else {
+      } else {
         processState.setListenInBackground(false);
         UsageTrackerProvider.getInstance().trackEvent(
             GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "close.stop.listening", null);
@@ -563,8 +592,8 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     }
 
     @Override
-    public void update(AnActionEvent e) {
-      e.getPresentation().setEnabled(!CloudDebugProcess.this.getXDebugSession().isStopped());
+    public void update(AnActionEvent event) {
+      event.getPresentation().setEnabled(!CloudDebugProcess.this.getXDebugSession().isStopped());
     }
   }
 }

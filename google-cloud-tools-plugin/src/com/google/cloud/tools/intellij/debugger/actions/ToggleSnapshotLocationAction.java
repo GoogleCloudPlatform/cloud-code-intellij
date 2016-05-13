@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger.actions;
 
 import static com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR;
@@ -36,27 +37,32 @@ import com.intellij.xdebugger.XDebuggerUtil;
 import java.awt.event.MouseEvent;
 
 /**
- * This action sets a cloud breakpoint (snapshot location) at the line of code the user right clicked on. Right now, we
- * store that line of code in user data (SnapshotTargetLine).
+ * This action sets a cloud breakpoint (snapshot location) at the line of code the user right
+ * clicked on. Right now, we store that line of code in user data (SnapshotTargetLine).
  */
 public class ToggleSnapshotLocationAction extends AnAction {
+
   public static final Key<Integer> POPUP_LINE = Key.create("SnapshotTargetLine");
   private static final Logger LOG = Logger.getInstance(ToggleSnapshotLocationAction.class);
 
+  /**
+   * Initialize the action.
+   */
   public ToggleSnapshotLocationAction() {
-    super(GctBundle.getString("clouddebug.snapshot.location"), GctBundle.getString("clouddebug.adds.snapshot.location"),
-          GoogleCloudToolsIcons.CLOUD);
+    super(GctBundle.getString("clouddebug.snapshot.location"),
+        GctBundle.getString("clouddebug.adds.snapshot.location"),
+        GoogleCloudToolsIcons.CLOUD);
   }
 
   @SuppressWarnings("ConstantConditions")
   @Override
-  public void actionPerformed(AnActionEvent e) {
-    DataContext dataContext = e.getDataContext();
+  public void actionPerformed(AnActionEvent event) {
+    DataContext dataContext = event.getDataContext();
     Editor editor = EDITOR.getData(dataContext);
-    if (editor instanceof EditorEx &&
-        e.getInputEvent() instanceof MouseEvent &&
-        editor.getUserData(POPUP_LINE) != null) {
-      EditorEx exEditor = (EditorEx)editor;
+    if (editor instanceof EditorEx
+        && event.getInputEvent() instanceof MouseEvent
+        && editor.getUserData(POPUP_LINE) != null) {
+      EditorEx exEditor = (EditorEx) editor;
       if (exEditor.getProject() == null) {
         LOG.error("could not add a snapshot location as the target editor was unexpectedly null.");
         return;
@@ -66,25 +72,26 @@ public class ToggleSnapshotLocationAction extends AnAction {
         return;
       }
       XDebuggerUtil.getInstance()
-        .toggleLineBreakpoint(exEditor.getProject(), CloudLineBreakpointType.getInstance(), exEditor.getVirtualFile(),
-                              editor.getUserData(POPUP_LINE));
+          .toggleLineBreakpoint(exEditor.getProject(), CloudLineBreakpointType.getInstance(),
+              exEditor.getVirtualFile(),
+              editor.getUserData(POPUP_LINE));
     }
   }
 
   @Override
-  public void update(AnActionEvent e) {
-    Editor editor = EDITOR.getData(e.getDataContext());
+  public void update(AnActionEvent event) {
+    Editor editor = EDITOR.getData(event.getDataContext());
     if (editor == null) {
       return;
     }
     RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(editor.getProject());
     for (RunConfiguration runConfiguration : runManager.getAllConfigurations()) {
       if (runConfiguration instanceof CloudDebugRunConfiguration) {
-        e.getPresentation().setVisible(true);
+        event.getPresentation().setVisible(true);
         return;
       }
     }
 
-    e.getPresentation().setVisible(false);
+    event.getPresentation().setVisible(false);
   }
 }

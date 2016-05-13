@@ -61,6 +61,18 @@ public class TestUtils {
     return mockProject(null);
   }
 
+  /**
+   * Construct a mock project.
+   */
+  @NotNull
+  public static MockProject mockProject(@Nullable PicoContainer container) {
+    Extensions.registerAreaClass("IDEA_PROJECT", null);
+    container = container != null
+        ? container
+        : new DefaultPicoContainer();
+    return new MockProject(container, getParentDisposableForCleanup());
+  }
+
   static class PluginMockApplication extends MockApplicationEx {
 
     private final ListeningExecutorService executor = MoreExecutors.sameThreadExecutor();
@@ -82,8 +94,10 @@ public class TestUtils {
     }
   }
 
-  // For every #createMockApplication there needs to be a corresponding call to
-  // #disposeMockApplication when the test is complete
+  /**
+   * For every #createMockApplication there needs to be a corresponding call to
+   * #disposeMockApplication when the test is complete.
+   */
   public static Disposable createMockApplication() {
     Disposable parentDisposable = getParentDisposableForCleanup();
 
@@ -101,6 +115,9 @@ public class TestUtils {
     return parentDisposable;
   }
 
+  /**
+   * Cleanup.
+   */
   public static void disposeMockApplication() {
     // Originally the application was replaced with an empty mock application to make any subsequent
     // test cases fail that do not setup their own application. However having quite many legacy
@@ -119,6 +136,9 @@ public class TestUtils {
     }
   }
 
+  /**
+   * Register a service class with the container.
+   */
   @NotNull
   public static <T> T installMockService(@NotNull Class<T> serviceInterface) {
     T mock = Mockito.mock(serviceInterface);
@@ -129,30 +149,24 @@ public class TestUtils {
     return mock;
   }
 
-  @NotNull
-  public static MockProject mockProject(@Nullable PicoContainer container) {
-    Extensions.registerAreaClass("IDEA_PROJECT", null);
-    container = container != null
-        ? container
-        : new DefaultPicoContainer();
-    return new MockProject(container, getParentDisposableForCleanup());
-  }
-
+  /**
+   * Serialize input and fail on exception.
+   */
   public static void assertIsSerializable(@NotNull Serializable object) {
     ObjectOutputStream out = null;
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     try {
       out = new ObjectOutputStream(byteArrayOutputStream);
       out.writeObject(object);
-    } catch (NotSerializableException e) {
-      fail("An object is not serializable: " + e.getMessage());
-    } catch (IOException e) {
-      fail("Could not serialize object: " + e.getMessage());
+    } catch (NotSerializableException nse) {
+      fail("An object is not serializable: " + nse.getMessage());
+    } catch (IOException ioe) {
+      fail("Could not serialize object: " + ioe.getMessage());
     } finally {
       if (out != null) {
         try {
           out.close();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
           // ignore
         }
       }

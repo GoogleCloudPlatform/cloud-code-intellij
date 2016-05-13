@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.git;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.elysium.SelectUserDialog;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.ide.DataManager;
 import com.intellij.ide.util.PropertiesComponent;
@@ -34,21 +35,22 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 import com.intellij.util.AuthData;
 
+import git4idea.DialogManager;
+import git4idea.remote.GitHttpAuthDataProvider;
+import git4idea.repo.GitRemote;
+import git4idea.repo.GitRepository;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Window;
 import java.io.IOException;
 
-import git4idea.DialogManager;
-import git4idea.remote.GitHttpAuthDataProvider;
-import git4idea.repo.GitRemote;
-import git4idea.repo.GitRepository;
-
 /**
  * Provides credential information for URLs pointing to Google's cloud source.
  */
 public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
+
   private static final Logger LOG = Logger.getInstance(GcpHttpAuthDataProvider.class);
 
   public static final String GOOGLE_URL = "https://source.developers.google.com";
@@ -63,7 +65,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
   @Override
   public AuthData getAuthData(@NotNull String url) {
     final Project currentProject = getCurrentProject();
-    if ((currentProject != null || Context.currentContext != null) && isUrlGCP(url)) {
+    if ((currentProject != null || Context.currentContext != null) && isUrlGcp(url)) {
       Context currentContext = Context.currentContext; //always prefer context over project setting.
       String userEmail = currentContext != null ? currentContext.userName : null;
 
@@ -77,7 +79,8 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
         ApplicationManager.getApplication().invokeAndWait(new Runnable() {
           @Override
           public void run() {
-            SelectUserDialog dialog = new SelectUserDialog(currentProject, GctBundle.getString("httpauthprovider.chooselogin"));
+            SelectUserDialog dialog = new SelectUserDialog(currentProject,
+                GctBundle.getString("httpauthprovider.chooselogin"));
             DialogManager.show(dialog);
             chooseManualLogin = !dialog.isOK();
             selectedUser = dialog.getSelectedUser();
@@ -96,9 +99,9 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
 
       if (targetUser != null) {
         try {
-          return new AuthData(targetUser.getEmail(), targetUser.getGoogleLoginState().fetchAccessToken());
-        }
-        catch (IOException ex) {
+          return new AuthData(targetUser.getEmail(),
+              targetUser.getGoogleLoginState().fetchAccessToken());
+        } catch (IOException ex) {
           LOG.error("IOException creating authdata:" + ex.toString());
         }
       }
@@ -107,29 +110,39 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
     return null;
   }
 
-  public static boolean isUrlGCP(@Nullable String url) {
-    return (url != null &&
-      (StringUtil.startsWithIgnoreCase(url, GOOGLE_URL) || StringUtil.startsWithIgnoreCase(url, GOOGLE_URL_ALT)));
+  /**
+   * Check if url is a Google Cloud Platform URL.
+   */
+  public static boolean isUrlGcp(@Nullable String url) {
+    return (url != null
+        && (StringUtil.startsWithIgnoreCase(url, GOOGLE_URL) || StringUtil
+            .startsWithIgnoreCase(url, GOOGLE_URL_ALT)));
   }
 
   public static String getGcpUrl(String projectId) {
     return "https://source.developers.google.com/p/" + projectId + "/";
   }
 
+  /**
+   * Find the remote repository url from the given git repo.
+   */
   @Nullable
-  public static String findGCPRemoteUrl(@NotNull GitRepository repository) {
-    Pair<GitRemote, String> remote = findGCPRemote(repository);
+  public static String findGcpRemoteUrl(@NotNull GitRepository repository) {
+    Pair<GitRemote, String> remote = findGcpRemote(repository);
     if (remote == null) {
       return null;
     }
     return remote.getSecond();
   }
 
+  /**
+   * Find the remote repository and its url.
+   */
   @Nullable
-  public static Pair<GitRemote, String> findGCPRemote(@NotNull GitRepository repository) {
+  public static Pair<GitRemote, String> findGcpRemote(@NotNull GitRepository repository) {
     for (GitRemote gitRemote : repository.getRemotes()) {
       for (String remoteUrl : gitRemote.getUrls()) {
-        if (isUrlGCP(remoteUrl)) {
+        if (isUrlGcp(remoteUrl)) {
           return Pair.create(gitRemote, remoteUrl);
         }
       }
@@ -171,7 +184,8 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
     Project result = null;
     Window activeWindow = WindowManagerEx.getInstanceEx().getMostRecentFocusedWindow();
     if (activeWindow != null) {
-      result = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(activeWindow));
+      result = CommonDataKeys.PROJECT
+          .getData(DataManager.getInstance().getDataContext(activeWindow));
     }
     return result != null ? result : currentProject;
   }
@@ -182,12 +196,14 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
   }
 
   /**
-   * This class allows IJ to perform Git operations without a project, but with context that will give the authdataprovider
-   * enough information to log in.  This is used in the checkout from GCP scenario, where the user has explicitly chosen
-   * a GCP project (with username), but there isn't a project yet to choose from.
+   * This class allows IJ to perform Git operations without a project, but with context that will
+   * give the authdataprovider enough information to log in.  This is used in the checkout from GCP
+   * scenario, where the user has explicitly chosen a GCP project (with username), but there isn't a
+   * project yet to choose from.
    */
   @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
   public static class Context {
+
     private static Context currentContext = null;
     private String userName;
 
@@ -195,6 +211,9 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
       this.userName = userName;
     }
 
+    /**
+     * Creates a new context.
+     */
     public static Context create(@Nullable String userName) {
       Context newContext = new Context(userName);
       assert currentContext == null;
@@ -202,6 +221,9 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
       return newContext;
     }
 
+    /**
+     * Close the current context.
+     */
     public void close() {
       if (currentContext == this) {
         currentContext = null;

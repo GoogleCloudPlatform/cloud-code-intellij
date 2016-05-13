@@ -21,8 +21,8 @@ import com.intellij.util.xmlb.annotations.Attribute;
 
 /**
  * Model for the IntelliJ application scoped 'Cloud' configurations.  This is a base configuration
- * used by App Engine deployment runtime configurations. It's primarily the bits that can be
- * re-used across deployments, such as auth and project.
+ * used by App Engine deployment runtime configurations. It's primarily the bits that can be re-used
+ * across deployments, such as auth and project.
  */
 public class AppEngineServerConfiguration extends
     ServerConfigurationBase<AppEngineServerConfiguration> {

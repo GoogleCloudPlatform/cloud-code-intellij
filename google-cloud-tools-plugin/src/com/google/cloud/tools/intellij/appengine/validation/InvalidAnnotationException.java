@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.intellij.psi.PsiAnnotation;
@@ -21,6 +22,7 @@ import com.intellij.psi.PsiAnnotation;
  * Exception for values that do not match annotation.
  */
 public class InvalidAnnotationException extends Exception {
+
   public InvalidAnnotationException(PsiAnnotation annotation, String annotationType) {
     super("Annotation \"" + annotation.getText() + "\" is not of type \"" + annotationType + "\"");
   }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
@@ -88,7 +89,7 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
 
     ActionManager actionManager = ActionManager.getInstance();
     AnAction toolsMenuAction = new AppEngineToolsMenuAction();
-    actionManager.registerAction(AppEngineToolsMenuAction.ID , toolsMenuAction);
+    actionManager.registerAction(AppEngineToolsMenuAction.ID, toolsMenuAction);
     DefaultActionGroup toolsMenu =
         (DefaultActionGroup) actionManager.getAction(AppEngineToolsMenuAction.GROUP_ID);
     toolsMenu.add(toolsMenuAction, Constraints.LAST);

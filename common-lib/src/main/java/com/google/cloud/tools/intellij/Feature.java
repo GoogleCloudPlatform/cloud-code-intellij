@@ -26,7 +26,7 @@ import java.util.Set;
  * An instance of this class represents a feature in one of our plugins. The sole purpose of a
  * {@code feature} is to determine whether to enable the corresponding functionality using the
  * {@link PluginInfoService} and the {@link PluginConfigurationService}.
- *
+ * </p>
  * The algorithm that determines whether a given {@code feature} configuration is enabled is as
  * follows:
  * <ol>

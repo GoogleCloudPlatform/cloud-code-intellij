@@ -29,6 +29,7 @@ import javax.swing.Icon;
  * Opens the Cloud Debugger help page.
  */
 public class CloudDebugHelpAction extends AnAction {
+
   private static final Icon icon = IconLoader.getIcon("/actions/help.png");
   private String url;
 

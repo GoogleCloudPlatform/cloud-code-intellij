@@ -16,10 +16,10 @@
 
 package com.google.cloud.tools.intellij;
 
+import com.google.cloud.tools.intellij.flags.FlagReader;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.cloud.tools.intellij.flags.FlagReader;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;

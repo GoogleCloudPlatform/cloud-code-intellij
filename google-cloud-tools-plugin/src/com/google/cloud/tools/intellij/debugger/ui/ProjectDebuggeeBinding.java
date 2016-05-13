@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.v2.model.Debuggee;
 import com.google.api.services.clouddebugger.v2.model.ListDebuggeesResponse;
-import com.google.cloud.tools.intellij.debugger.CloudDebuggerClient;
-import com.google.cloud.tools.intellij.elysium.ProjectSelector;
-import com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.debugger.CloudDebuggerClient;
+import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.base.Strings;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
@@ -48,9 +49,11 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 
 /**
- * This binding between the project and debuggee is refactored out to make it reusable in the future.
+ * This binding between the project and debuggee is refactored out to make it reusable in the
+ * future.
  */
 class ProjectDebuggeeBinding {
+
   private static final Logger LOG = Logger.getInstance(ProjectDebuggeeBinding.class);
   private final JComboBox targetSelector;
   private final ProjectSelector projectSelector;
@@ -65,34 +68,34 @@ class ProjectDebuggeeBinding {
   private boolean isCdbQueried = false;
 
   public ProjectDebuggeeBinding(@NotNull ProjectSelector projectSelector,
-                                @NotNull JComboBox targetSelector,
-                                @NotNull Action okAction) {
+      @NotNull JComboBox targetSelector,
+      @NotNull Action okAction) {
     this.projectSelector = projectSelector;
     this.targetSelector = targetSelector;
     this.okAction = okAction;
 
     this.projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
-      protected void textChanged(DocumentEvent e) {
+      protected void textChanged(DocumentEvent event) {
         refreshDebugTargetList();
       }
     });
 
     this.projectSelector.addModelListener(new TreeModelListener() {
       @Override
-      public void treeNodesChanged(TreeModelEvent e) {
+      public void treeNodesChanged(TreeModelEvent event) {
       }
 
       @Override
-      public void treeNodesInserted(TreeModelEvent e) {
+      public void treeNodesInserted(TreeModelEvent event) {
       }
 
       @Override
-      public void treeNodesRemoved(TreeModelEvent e) {
+      public void treeNodesRemoved(TreeModelEvent event) {
       }
 
       @Override
-      public void treeStructureChanged(TreeModelEvent e) {
+      public void treeStructureChanged(TreeModelEvent event) {
         refreshDebugTargetList();
       }
     });
@@ -153,7 +156,8 @@ class ProjectDebuggeeBinding {
           if (projectSelector.getProjectNumber() != null && getCloudDebuggerClient() != null) {
             final ListDebuggeesResponse debuggees = getCloudDebuggerClient().debuggees().list()
                 .setProject(projectSelector.getProjectNumber().toString())
-                .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+                .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class)
+                    .getClientVersionForCloudDebugger())
                 .execute();
             isCdbQueried = true;
 
@@ -162,19 +166,19 @@ class ProjectDebuggeeBinding {
               public void run() {
                 DebugTarget targetSelection = null;
 
-                if (debuggees == null || debuggees.getDebuggees() == null || debuggees.getDebuggees().isEmpty()) {
+                if (debuggees == null || debuggees.getDebuggees() == null || debuggees
+                    .getDebuggees().isEmpty()) {
                   disableTargetSelector(GctBundle.getString("clouddebug.nomodulesfound"));
-                }
-                else {
+                } else {
                   targetSelector.setEnabled(true);
                   Map<String, DebugTarget> perModuleCache = new HashMap<String, DebugTarget>();
 
                   for (Debuggee debuggee : debuggees.getDebuggees()) {
                     DebugTarget item = new DebugTarget(debuggee, projectSelector.getText());
-                    if (!Strings.isNullOrEmpty(item.getModule()) &&
-                        !Strings.isNullOrEmpty(item.getVersion())) {
-                      //If we already have an existing item for that module+version, compare the minor
-                      // versions and only use the latest minor version.
+                    if (!Strings.isNullOrEmpty(item.getModule())
+                        && !Strings.isNullOrEmpty(item.getVersion())) {
+                      //If we already have an existing item for that module+version, compare the
+                      // minor versions and only use the latest minor version.
                       String key = String.format("%s:%s", item.getModule(), item.getVersion());
                       DebugTarget existing = perModuleCache.get(key);
                       if (existing != null && existing.getMinorVersion() > item.getMinorVersion()) {
@@ -224,7 +228,7 @@ class ProjectDebuggeeBinding {
   private void disableTargetSelector(String reason) {
     targetSelector.setEnabled(false);
 
-    if(targetSelector.getSelectedItem() instanceof ErrorHolder) {
+    if (targetSelector.getSelectedItem() instanceof ErrorHolder) {
       ((ErrorHolder) targetSelector.getSelectedItem()).setErrorMessage(reason);
     } else {
       targetSelector.addItem(new ErrorHolder(reason));
@@ -244,7 +248,8 @@ class ProjectDebuggeeBinding {
       case 403:
         return GctBundle.message("clouddebug.debug.targets.accessdenied");
       default:
-        return GctBundle.getString("clouddebug.debug.targets.error", reason.getDetails().getMessage());
+        return GctBundle
+            .getString("clouddebug.debug.targets.error", reason.getDetails().getMessage());
     }
   }
 

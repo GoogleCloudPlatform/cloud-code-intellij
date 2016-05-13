@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 /**
  * Implement this interface to listen on update events to the cloud state.
  */
 public interface CloudBreakpointListener {
+
   void onBreakpointListChanged(CloudDebugProcessState state);
 }

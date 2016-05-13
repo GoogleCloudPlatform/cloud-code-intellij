@@ -44,6 +44,9 @@ import javax.swing.Icon;
  */
 public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration> {
 
+  /**
+   * Initialize the App Engine Cloud Type and handle cleanup.
+   */
   public AppEngineCloudType() {
     super("gcp-app-engine"); // "google-app-engine" is used by the native IJ app engine support.
 
@@ -121,7 +124,8 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
       if (!Services.getLoginService().isLoggedIn()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
-      } else if (CloudSdkUtil.isCloudSdkExecutable(CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath()))) {
+      } else if (CloudSdkUtil.isCloudSdkExecutable(
+          CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath()))) {
         callback.connected(new AppEngineRuntimeInstance(configuration));
       } else {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));

@@ -31,8 +31,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 
 /**
- * A {@link DeploymentSourceType} that supports serialization for a
- * {@link UserSpecifiedPathDeploymentSource}.
+ * A {@link DeploymentSourceType} that supports serialization for a {@link
+ * UserSpecifiedPathDeploymentSource}.
  */
 public class UserSpecifiedPathDeploymentSourceType extends
     DeploymentSourceType<ModuleDeploymentSource> {
@@ -45,7 +45,7 @@ public class UserSpecifiedPathDeploymentSourceType extends
   }
 
   /**
-   * Restore presentable name (e.g., to be "Filesystem JAR or WAR file - <file path>") of
+   * Restore presentable name (e.g., to be "Filesystem JAR or WAR file - [file path]") of
    * UserSpecifiedPathDeploymentSource.
    */
   @NotNull

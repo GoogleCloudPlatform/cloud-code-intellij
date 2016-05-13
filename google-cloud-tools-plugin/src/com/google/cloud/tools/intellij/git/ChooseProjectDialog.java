@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.git;
 
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.DocumentAdapter;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import java.awt.Dimension;
+
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
-import java.awt.*;
 
 /**
- * Shows a dialog that has one entry value which is a GCP project using the project selector.
- * The title and ok button text is passed into the constructor.
+ * Shows a dialog that has one entry value which is a GCP project using the project selector. The
+ * title and ok button text is passed into the constructor.
  */
 public class ChooseProjectDialog extends DialogWrapper {
 
@@ -38,7 +43,11 @@ public class ChooseProjectDialog extends DialogWrapper {
   private String projectId;
   private CredentialedUser credentialedUser;
 
-  public ChooseProjectDialog(@NotNull Project project, @NotNull String title, @NotNull String okText) {
+  /**
+   * Initialize the project selection dialog.
+   */
+  public ChooseProjectDialog(@NotNull Project project, @NotNull String title,
+      @NotNull String okText) {
     super(project, true);
     init();
     setTitle(title);
@@ -47,7 +56,7 @@ public class ChooseProjectDialog extends DialogWrapper {
   }
 
   /**
-   * @return the project ID selected by the user.
+   * Return the project ID selected by the user.
    */
   @NotNull
   public String getProjectId() {
@@ -55,7 +64,7 @@ public class ChooseProjectDialog extends DialogWrapper {
   }
 
   /**
-   * @return the credentialeduser that owns the ID returned from {@link #getProjectId()}.
+   * Return the credentialeduser that owns the ID returned from {@link #getProjectId()}.
    */
   @Nullable
   public CredentialedUser getCredentialedUser() {
@@ -67,12 +76,13 @@ public class ChooseProjectDialog extends DialogWrapper {
     return "ChooseProjectDialog";
   }
 
+  @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
     projectSelector = new ProjectSelector();
     projectSelector.setMinimumSize(new Dimension(300, 0));
     projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
-      protected void textChanged(DocumentEvent e) {
+      protected void textChanged(DocumentEvent event) {
         setOKActionEnabled(projectSelector.getSelectedUser() != null);
       }
     });

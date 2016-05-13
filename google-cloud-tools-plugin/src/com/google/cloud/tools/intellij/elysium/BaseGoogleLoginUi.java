@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
@@ -35,12 +36,12 @@ import javax.swing.SwingConstants;
 /**
  * UI for the node that prompts for Google Login.
  */
-class BaseGoogleLoginUI extends JPanel {
+class BaseGoogleLoginUi extends JPanel {
 
   public static final int PREFERRED_HEIGHT = 150;
   public static final int MIN_WIDTH = 450;
 
-  public BaseGoogleLoginUI(@NotNull String signinText) {
+  public BaseGoogleLoginUi(@NotNull String signinText) {
     setLayout(new GridBagLayout());
     setPreferredSize(new Dimension(MIN_WIDTH, PREFERRED_HEIGHT));
     setOpaque(false);
@@ -52,12 +53,12 @@ class BaseGoogleLoginUI extends JPanel {
     googleIcon.setVerticalAlignment(SwingConstants.CENTER);
     googleIcon.setOpaque(false);
     googleIcon.setIcon(GoogleLoginIcons.GOOGLE_LOGO);
-    googleIcon.setBorder(BorderFactory.createEmptyBorder(5,0,5,0));
-    GridBagConstraints c = new GridBagConstraints();
-    c.gridx = 0;
-    c.gridy = 0;
-    c.weighty = 0;
-    add(googleIcon, c);
+    googleIcon.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.gridx = 0;
+    constraints.gridy = 0;
+    constraints.weighty = 0;
+    add(googleIcon, constraints);
 
     JTextArea signinTextArea = new JTextArea();
     signinTextArea.setFont(UIUtil.getLabelFont());
@@ -65,13 +66,13 @@ class BaseGoogleLoginUI extends JPanel {
     signinTextArea.setWrapStyleWord(true);
     signinTextArea.setOpaque(false);
     signinTextArea.setText(signinText);
-    c.gridx = 0;
-    c.gridy = 1;
-    c.weighty = 1;
-    c.gridwidth = 2;
-    c.weightx = 1;
-    c.fill = GridBagConstraints.BOTH;
-    c.anchor = GridBagConstraints.CENTER;
-    add(signinTextArea, c);
+    constraints.gridx = 0;
+    constraints.gridy = 1;
+    constraints.weighty = 1;
+    constraints.gridwidth = 2;
+    constraints.weightx = 1;
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.anchor = GridBagConstraints.CENTER;
+    add(signinTextArea, constraints);
   }
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login.ui;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -34,10 +35,14 @@ import javax.swing.ImageIcon;
  * The Google Login button that appears on the main toolbar.
  */
 public final class GoogleLoginActionButton extends ActionButton {
-  private final static String SIGN_IN_MESSAGE = AccountMessageBundle.message(
+  private static final String SIGN_IN_MESSAGE = AccountMessageBundle.message(
       "login.toolbar.button.sign.in.text");
 
-  public GoogleLoginActionButton(AnAction action, Presentation presentation, String place, @NotNull Dimension minimumSize) {
+  /**
+   * Initialize the Google Login button.
+   */
+  public GoogleLoginActionButton(AnAction action, Presentation presentation,
+      String place, @NotNull Dimension minimumSize) {
     super(action, presentation, place, minimumSize);
     Services.getLoginService().setLoginMenuItemContribution(this);
     updateUi();
@@ -49,7 +54,7 @@ public final class GoogleLoginActionButton extends ActionButton {
    */
   public void updateUi() {
     CredentialedUser activeUser = Services.getLoginService().getActiveUser();
-    if(activeUser == null) {
+    if (activeUser == null) {
       myPresentation.setText(SIGN_IN_MESSAGE);
       myPresentation.setDescription(SIGN_IN_MESSAGE);
       myPresentation.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
@@ -57,7 +62,7 @@ public final class GoogleLoginActionButton extends ActionButton {
       myPresentation.setText(activeUser.getEmail());
       myPresentation.setDescription(activeUser.getEmail());
       Image image = activeUser.getPicture();
-      if(image == null) {
+      if (image == null) {
         myPresentation.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
       } else {
         Image scaledImage = image.getScaledInstance(16, 16, Image.SCALE_SMOOTH);

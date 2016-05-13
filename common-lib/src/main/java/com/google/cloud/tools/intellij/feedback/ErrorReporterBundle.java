@@ -34,7 +34,7 @@ public class ErrorReporterBundle {
   private static final String BUNDLE_NAME = "messages.ErrorReporterBundle";
   private static Reference<ResourceBundle> bundleReference;
 
-  private synchronized static ResourceBundle getBundle() {
+  private static synchronized ResourceBundle getBundle() {
     ResourceBundle bundle = com.intellij.reference.SoftReference.dereference(bundleReference);
     if (bundle == null) {
       bundle = ResourceBundle.getBundle(BUNDLE_NAME);
@@ -46,7 +46,8 @@ public class ErrorReporterBundle {
   private ErrorReporterBundle() {
   }
 
-  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params) {
+  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key,
+      @NotNull Object... params) {
     return CommonBundle.message(getBundle(), key, params);
   }
 }

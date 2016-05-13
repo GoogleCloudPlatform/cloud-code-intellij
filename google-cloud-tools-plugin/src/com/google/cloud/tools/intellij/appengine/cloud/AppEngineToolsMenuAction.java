@@ -34,14 +34,18 @@ import com.intellij.util.containers.ContainerUtil;
 import java.util.List;
 
 /**
- * Creates a shortcut to App Engine flex cloud configuration in the tools menu
+ * Creates a shortcut to App Engine flex cloud configuration in the tools menu.
  */
 public class AppEngineToolsMenuAction extends AnAction {
+
   private static final Logger logger = Logger.getInstance(AppEngineToolsMenuAction.class);
 
   public static final String ID = "CloudToolsMenuItem";
   public static final String GROUP_ID = "ToolsMenu";
 
+  /**
+   * Initialize the tools menu shortcut.
+   */
   public AppEngineToolsMenuAction() {
     super(GctBundle.message("appengine.flex.tools.menu.item.label"),
         GctBundle.message("appengine.flex.tools.menu.item.label"),
@@ -49,8 +53,8 @@ public class AppEngineToolsMenuAction extends AnAction {
   }
 
   @Override
-  public void actionPerformed(AnActionEvent e) {
-    Project project = e.getProject();
+  public void actionPerformed(AnActionEvent event) {
+    Project project = event.getProject();
 
     if (project != null) {
       AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
@@ -58,8 +62,8 @@ public class AppEngineToolsMenuAction extends AnAction {
           RemoteServersManager.getInstance().getServers(serverType);
 
       try {
-        DeploymentConfigurationManager.getInstance(project).
-            createAndRunConfiguration(serverType, ContainerUtil.getFirstItem(servers));
+        DeploymentConfigurationManager.getInstance(project)
+            .createAndRunConfiguration(serverType, ContainerUtil.getFirstItem(servers));
       } catch (NullPointerException npe) {
         /**
          * Handles the case where the configuration is executed with a null deployment source.

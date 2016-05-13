@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.intellij.openapi.util.Comparing;
 import com.intellij.util.xmlb.annotations.Tag;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
 /**
- * CloudLineBreakpointProperties holds custom properties not normally set on a java line breakpoint. Right now, this is
- * just watch expressions.  Custom conditions are supported by default as is the enabled state and other attributes such
- * as source location.
+ * CloudLineBreakpointProperties holds custom properties not normally set on a java line breakpoint.
+ * Right now, this is just watch expressions.  Custom conditions are supported by default as is the
+ * enabled state and other attributes such as source location.
  */
-public class CloudLineBreakpointProperties extends XBreakpointProperties<CloudLineBreakpointProperties> {
+public class CloudLineBreakpointProperties extends
+    XBreakpointProperties<CloudLineBreakpointProperties> {
+
   private static final String[] EMPTY_ARRAY = new String[0];
   private boolean createdByServer = false;
   private boolean disabledByServer = false;
@@ -68,19 +72,24 @@ public class CloudLineBreakpointProperties extends XBreakpointProperties<CloudLi
     watchExpressions = state.getWatchExpressions();
   }
 
+  /**
+   * Sets the watch expressions and returns if the passed in expression differ from the
+   * currently set ones.
+   */
   public final boolean setWatchExpressions(@Nullable String[] watchExpressions) {
     boolean changed = !arrayEqual(this.watchExpressions, watchExpressions);
     if (changed) {
-      this.watchExpressions = watchExpressions == null ? null : Arrays.copyOf(watchExpressions, watchExpressions.length);
+      this.watchExpressions = watchExpressions == null ? null
+          : Arrays.copyOf(watchExpressions, watchExpressions.length);
     }
     return changed;
   }
 
-  private static boolean arrayEqual(@Nullable Object[] a, @Nullable Object[] b) {
-    if ((a == null || a.length == 0) && (b == null || b.length == 0)) {
+  private static boolean arrayEqual(@Nullable Object[] first, @Nullable Object[] second) {
+    if ((first == null || first.length == 0) && (second == null || second.length == 0)) {
       return true;
     }
-    return Comparing.equal(a, b);
+    return Comparing.equal(first, second);
   }
 
   public boolean isAddedOnServer() {

@@ -51,14 +51,14 @@ public class PropertiesFileFlagReader implements FlagReader {
             + " which was configured as " + propertiesFilePath);
       }
       properties.load(in);
-    } catch (IOException e) {
-      throw new RuntimeException("Error reading the properties file: " + propertiesFilePath, e);
+    } catch (IOException ioe) {
+      throw new RuntimeException("Error reading the properties file: " + propertiesFilePath, ioe);
     } finally {
       if (in != null) {
         try {
           in.close();
-        } catch (IOException e) {
-          LOGGER.error(e);
+        } catch (IOException ioe) {
+          LOGGER.error(ioe);
         }
       }
     }

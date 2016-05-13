@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
+import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -35,8 +36,8 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 
 /**
- * A dialog that prompts the user to select a {@link IntellijGoogleLoginService}
- * or click "Login Manually" to continue without {@link IntellijGoogleLoginService} credentials.
+ * A dialog that prompts the user to select a {@link IntellijGoogleLoginService} or click "Login
+ * Manually" to continue without {@link IntellijGoogleLoginService} credentials.
  */
 public class SelectUserDialog extends DialogWrapper {
 
@@ -44,6 +45,9 @@ public class SelectUserDialog extends DialogWrapper {
   private UserSelector login;
   private String selectedUser;
 
+  /**
+   * Initializes the dialog.
+   */
   public SelectUserDialog(@Nullable Project project, @NotNull String title) {
     super(project, true);
     init();
@@ -51,7 +55,7 @@ public class SelectUserDialog extends DialogWrapper {
 
     login.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
-      protected void textChanged(DocumentEvent e) {
+      protected void textChanged(DocumentEvent event) {
         setOKActionEnabled(login.getSelectedUser() != null);
       }
     });
@@ -64,6 +68,9 @@ public class SelectUserDialog extends DialogWrapper {
     }
   }
 
+  /**
+   * Returns the currently selected user.
+   */
   @NotNull
   public String getSelectedUser() {
     if (!Strings.isNullOrEmpty(selectedUser)) {

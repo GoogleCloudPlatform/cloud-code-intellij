@@ -33,9 +33,10 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.SwingUtilities;
 
 /**
- * Stops an App Engine based application running on GCP
+ * Stops an App Engine based application running on GCP.
  */
 public class AppEngineStopAction extends AppEngineAction {
+
   private static final Logger logger = Logger.getInstance(AppEngineStopAction.class);
 
   private AppEngineHelper appEngineHelper;
@@ -44,6 +45,9 @@ public class AppEngineStopAction extends AppEngineAction {
   private String moduleToStop;
   private String versionToStop;
 
+  /**
+   * Initialize the stop action.
+   */
   public AppEngineStopAction(
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
@@ -74,8 +78,8 @@ public class AppEngineStopAction extends AppEngineAction {
       executeProcess(
           commandLine,
           new StopModuleProcessListener());
-    } catch (ExecutionException e) {
-      logger.warn(e);
+    } catch (ExecutionException ex) {
+      logger.warn(ex);
       callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.execution.error"));
     }
   }

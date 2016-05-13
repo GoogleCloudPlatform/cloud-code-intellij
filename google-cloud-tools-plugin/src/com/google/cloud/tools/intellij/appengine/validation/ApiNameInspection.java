@@ -16,10 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.validation;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.appengine.GctConstants;
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupManager;
@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
  * Inspection class for validating endpoint API name.
  */
 public class ApiNameInspection extends EndpointInspectionBase {
+
   private static final String API_NAME_ATTRIBUTE = "name";
   private static final Pattern API_NAME_PATTERN = Pattern.compile("^[a-z]+[A-Za-z0-9]*$");
 
@@ -71,28 +72,30 @@ public class ApiNameInspection extends EndpointInspectionBase {
 
   @NotNull
   @Override
-  public PsiElementVisitor buildVisitor(@NotNull final com.intellij.codeInspection.ProblemsHolder holder, boolean isOnTheFly) {
+  public PsiElementVisitor buildVisitor(
+      @NotNull final com.intellij.codeInspection.ProblemsHolder holder, boolean isOnTheFly) {
     return new EndpointPsiElementVisitor() {
 
       @Override
       public void visitAnnotation(PsiAnnotation annotation) {
-        if(annotation == null) {
+        if (annotation == null) {
           return;
         }
 
-        if(!GctConstants.APP_ENGINE_ANNOTATION_API.equals(annotation.getQualifiedName())) {
+        if (!GctConstants.APP_ENGINE_ANNOTATION_API.equals(annotation.getQualifiedName())) {
           return;
         }
 
         // Need to check for user added attributes because default values are used when not
         // specified by user and we are only interested in the user specified values
         PsiAnnotationParameterList parameterList = annotation.getParameterList();
-        if(parameterList.getAttributes().length == 0) {
+        if (parameterList.getAttributes().length == 0) {
           return;
         }
 
-        PsiAnnotationMemberValue annotationMemberValue = annotation.findAttributeValue(API_NAME_ATTRIBUTE);
-        if(annotationMemberValue == null) {
+        PsiAnnotationMemberValue annotationMemberValue = annotation
+            .findAttributeValue(API_NAME_ATTRIBUTE);
+        if (annotationMemberValue == null) {
           return;
         }
 
@@ -100,13 +103,15 @@ public class ApiNameInspection extends EndpointInspectionBase {
         String nameValue = EndpointUtilities.removeBeginningAndEndingQuotes(nameValueWithQuotes);
 
         // Empty API name is valid
-        if(nameValue.isEmpty()) {
+        if (nameValue.isEmpty()) {
           return;
         }
 
         if (!API_NAME_PATTERN.matcher(nameValue).matches()) {
-          holder.registerProblem(annotationMemberValue, "Invalid api name: it must start with a lower case letter and consists only of letter and digits",
-            new MyQuickFix());
+          holder.registerProblem(annotationMemberValue,
+              "Invalid api name: it must start with a lower case letter and consists only of "
+                  + "letter and digits",
+              new MyQuickFix());
         }
 
       }
@@ -114,6 +119,7 @@ public class ApiNameInspection extends EndpointInspectionBase {
   }
 
   public class MyQuickFix implements LocalQuickFix {
+
     private static final String DEFAULT_API_NAME = "myApi";
 
     public MyQuickFix() {
@@ -144,7 +150,7 @@ public class ApiNameInspection extends EndpointInspectionBase {
         return;
       }
 
-      TextRange textRange = ((ProblemDescriptorBase)descriptor).getTextRange();
+      TextRange textRange = ((ProblemDescriptorBase) descriptor).getTextRange();
       editor.getSelectionModel().setSelection(textRange.getStartOffset(), textRange.getEndOffset());
 
       String wordWithQuotes = editor.getSelectionModel().getSelectedText();
@@ -159,32 +165,35 @@ public class ApiNameInspection extends EndpointInspectionBase {
       lookupManager.showLookup(editor, LookupElementBuilder.create(variant));
     }
 
+    /**
+     * Get an api naming suggestion.
+     */
     @VisibleForTesting
     public String getNameSuggestions(String baseString) {
-      if(baseString.isEmpty()) {
+      if (baseString.isEmpty()) {
         return DEFAULT_API_NAME;
       }
 
       // If name consists of illegal characters, remove all illegal characters
-      String noInvalidChars = baseString.replaceAll("[^a-zA-Z0-9]+","");
-      if(noInvalidChars.isEmpty()) {
+      String noInvalidChars = baseString.replaceAll("[^a-zA-Z0-9]+", "");
+      if (noInvalidChars.isEmpty()) {
         return DEFAULT_API_NAME;
       }
 
-      if(API_NAME_PATTERN.matcher(noInvalidChars).matches()) {
+      if (API_NAME_PATTERN.matcher(noInvalidChars).matches()) {
         return noInvalidChars;
       }
       baseString = noInvalidChars;
 
       // If name starts with digit, suggestion will be to remove beginning digits
       if (Character.isDigit(baseString.charAt(0))) {
-        int n = 0;
-        while ((n < baseString.length()) && Character.isDigit(baseString.charAt(n))) {
-          n += 1;
+        int count = 0;
+        while ((count < baseString.length()) && Character.isDigit(baseString.charAt(count))) {
+          count += 1;
         }
-        String nonDigitName = baseString.substring(n);
+        String nonDigitName = baseString.substring(count);
 
-        if(API_NAME_PATTERN.matcher(nonDigitName).matches()) {
+        if (API_NAME_PATTERN.matcher(nonDigitName).matches()) {
           return nonDigitName;
         }
 
@@ -195,9 +204,10 @@ public class ApiNameInspection extends EndpointInspectionBase {
       }
 
       // If name starts with uppercase, suggestion will be to change to lower case
-      if(Character.isUpperCase(baseString.charAt(0))){
-        String beginWithLowerCase = baseString.substring(0, 1).toLowerCase() + baseString.substring(1);
-        if(API_NAME_PATTERN.matcher(beginWithLowerCase).matches()) {
+      if (Character.isUpperCase(baseString.charAt(0))) {
+        String beginWithLowerCase =
+            baseString.substring(0, 1).toLowerCase() + baseString.substring(1);
+        if (API_NAME_PATTERN.matcher(beginWithLowerCase).matches()) {
           return beginWithLowerCase;
         }
       }

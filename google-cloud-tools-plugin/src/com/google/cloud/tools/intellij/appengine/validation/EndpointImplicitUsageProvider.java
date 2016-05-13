@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
@@ -23,15 +24,16 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 
 /**
- * Disables highlighting of certain Endpoint class elements as unused
- * because they might not be referenced from the code but are referenced
- * from the generated Endpoint APIs and client libraries.
+ * Disables highlighting of certain Endpoint class elements as unused because they might not be
+ * referenced from the code but are referenced from the generated Endpoint APIs and client
+ * libraries.
  */
-public class EndpointImplicitUsageProvider implements ImplicitUsageProvider{
+public class EndpointImplicitUsageProvider implements ImplicitUsageProvider {
+
   @Override
   public boolean isImplicitUsage(PsiElement element) {
     // Checks that if a class is annotated as @Api/@ApiClass, it shouldn't be highlighted as unused
-    if(element instanceof PsiClass) {
+    if (element instanceof PsiClass) {
       return EndpointUtilities.isEndpointClass(element);
     }
 
@@ -39,10 +41,10 @@ public class EndpointImplicitUsageProvider implements ImplicitUsageProvider{
       return false;
     }
 
-    if(element instanceof PsiMethod) {
+    if (element instanceof PsiMethod) {
       // Checks that all public methods in a Endpoint class shouldn't be highlighted as unused
       // because all public methods (those with and without @ApiMethod) would be exposed in the API
-      return EndpointUtilities.isApiMethod((PsiMethod)element);
+      return EndpointUtilities.isApiMethod((PsiMethod) element);
     }
 
     return false;

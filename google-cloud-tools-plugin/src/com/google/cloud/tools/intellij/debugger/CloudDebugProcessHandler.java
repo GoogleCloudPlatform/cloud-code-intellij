@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.cloud.tools.intellij.debugger.ui.LogoutDebugProcessDetacher;
@@ -25,8 +26,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import java.io.OutputStream;
 
 /**
- * The CloudDebugProcessHandler handles attach and detach actions. It also acts as the container of the process and
- * returns its output stream.
+ * The CloudDebugProcessHandler handles attach and detach actions. It also acts as the container of
+ * the process and returns its output stream.
  */
 public class CloudDebugProcessHandler extends ProcessHandler {
 
@@ -34,6 +35,9 @@ public class CloudDebugProcessHandler extends ProcessHandler {
 
   private final CloudDebugProcess process;
 
+  /**
+   * Initialize the cloud debug process handler.
+   */
   public CloudDebugProcessHandler(CloudDebugProcess process) {
     this.process = process;
     if (process != null && process.getProcessState() != null) {
@@ -44,7 +48,8 @@ public class CloudDebugProcessHandler extends ProcessHandler {
           user.getGoogleLoginState()
               .addLoginListener(new LogoutDebugProcessDetacher<CloudDebugProcessHandler>(this));
         } else {
-          LOG.error("GoogleLoginState is null. To launch a debug session user needs to be logged in");
+          LOG.error(
+              "GoogleLoginState is null. To launch a debug session user needs to be logged in");
         }
       } else {
         LOG.error("userEmail is null. To launch a debug session user needs to be logged in");

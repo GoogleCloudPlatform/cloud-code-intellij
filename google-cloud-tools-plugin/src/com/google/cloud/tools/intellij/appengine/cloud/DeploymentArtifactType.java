@@ -33,7 +33,7 @@ public enum DeploymentArtifactType {
    */
   @NotNull
   public static DeploymentArtifactType typeForPath(@Nullable File deployPackage) {
-    if(deployPackage != null) {
+    if (deployPackage != null) {
       if (deployPackage.getPath().endsWith(".jar")) {
         return JAR;
       } else if (deployPackage.getPath().endsWith(".war")) {

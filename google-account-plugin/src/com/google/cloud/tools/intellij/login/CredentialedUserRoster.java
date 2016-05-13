@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login;
 
 import com.google.common.collect.Lists;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,12 +31,15 @@ import java.util.Map;
  * {@link CredentialedUser} objects.
  */
 public class CredentialedUserRoster {
-  private final Map<String, CredentialedUser> allUsers = new LinkedHashMap<String, CredentialedUser>();
+
+  private final Map<String, CredentialedUser> allUsers =
+      new LinkedHashMap<String, CredentialedUser>();
   private final Collection<GoogleLoginListener> listeners = Lists.newLinkedList();
   private CredentialedUser activeUser;
 
   /**
    * Returns a copy of the map of the current logged in users.
+   *
    * @return Copy of current logged in users.
    */
   @NotNull
@@ -48,6 +53,7 @@ public class CredentialedUserRoster {
 
   /**
    * Completely overrides current map of logged in users with <code>users</code>.
+   *
    * @param users Map of users to set.
    */
   public void setAllUsers(Map<String, CredentialedUser> users) {
@@ -59,6 +65,7 @@ public class CredentialedUserRoster {
 
   /**
    * Returns the active user.
+   *
    * @return the active user.
    */
   @Nullable
@@ -69,11 +76,11 @@ public class CredentialedUserRoster {
   }
 
   /**
-   * Sets the active user to <code>userEmail</code> if <code>userEmail</code> is a logged
-   * in user.
+   * Sets the active user to <code>userEmail</code> if <code>userEmail</code> is a logged in user.
+   *
    * @param userEmail The user to be set as active.
-   * @throws IllegalArgumentException if the <code>userEmail</code> does not exist i.e. is
-   * not a logged in user.
+   * @throws IllegalArgumentException if the <code>userEmail</code> does not exist i.e. is not a
+   *     logged in user.
    */
   public void setActiveUser(@NotNull String userEmail) throws IllegalArgumentException {
     synchronized (this) {
@@ -108,6 +115,7 @@ public class CredentialedUserRoster {
 
   /**
    * Returns the number of logged in users.
+   *
    * @return Number of logged in users.
    */
   public int numberOfUsers() {
@@ -118,6 +126,7 @@ public class CredentialedUserRoster {
 
   /**
    * Returns true if there is an active user and false otherwise.
+   *
    * @return True if there is an active user and false otherwise.
    */
   public boolean isActiveUserAvailable() {
@@ -127,11 +136,8 @@ public class CredentialedUserRoster {
   }
 
   /**
-   * Adds a user to the list of current users. If the user already exists,
-   * the user will be updated.
+   * Adds a user to the list of current users. If the user already exists, the user will be updated.
    * The <code>user</code> becomes the active user.
-   * @param user
-   * @return
    */
   public void addUser(CredentialedUser user) {
     synchronized (this) {
@@ -141,13 +147,14 @@ public class CredentialedUserRoster {
   }
 
   /**
-   * Remove <code>userEmail</code> from the list of logged in users if <code>userEmail</code> is
-   * a logged in user. If <code>userEmail</code> is the active user, there would no longer be
-   * an active user once <code>userEmail</code> is removed. Another user will have to explicitly
+   * Remove <code>userEmail</code> from the list of logged in users if <code>userEmail</code> is a
+   * logged in user. If <code>userEmail</code> is the active user, there would no longer be an
+   * active user once <code>userEmail</code> is removed. Another user will have to explicitly
    * selected for there to be an active user again.
+   *
    * @param userEmail The user to be removed.
-   * @return  True if <code>userEmail</code> was successfully removed from the list of
-   * logged in users and false if <code>userEmail</code> is not a logged in user.
+   * @return True if <code>userEmail</code> was successfully removed from the list of logged in
+   *     users and false if <code>userEmail</code> is not a logged in user.
    */
   public boolean removeUser(String userEmail) {
     synchronized (this) {
@@ -179,19 +186,19 @@ public class CredentialedUserRoster {
   }
 
   /**
-   * Register a specified {@link GoogleLoginListener} to be notified of changes to the
-   * logged-in state.
+   * Register a specified {@link GoogleLoginListener} to be notified of changes to the logged-in
+   * state.
    *
    * @param listener the specified {@code GoogleLoginListener}
    */
   void addLoginListener(GoogleLoginListener listener) {
-    synchronized(listeners) {
+    synchronized (listeners) {
       listeners.add(listener);
     }
   }
 
   private void notifyLoginStatusChange() {
-    synchronized(listeners) {
+    synchronized (listeners) {
       for (GoogleLoginListener listener : listeners) {
         listener.statusChanged();
       }
