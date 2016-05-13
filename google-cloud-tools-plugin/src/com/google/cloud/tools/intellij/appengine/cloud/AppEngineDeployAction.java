@@ -105,7 +105,6 @@ class AppEngineDeployAction extends AppEngineAction {
     // TODO(chanseok): this split does not work with quoted parameter values containing spaces.
     final List<String> parameters =
         StringUtil.split(deploymentConfiguration.getCustomDeployFlags(), " ");
-    consoleLogLn("Param size: " + parameters.size());
     commandLine.addParameters(parameters);
 
     commandLine.withWorkDirectory(stagingDirectory);
