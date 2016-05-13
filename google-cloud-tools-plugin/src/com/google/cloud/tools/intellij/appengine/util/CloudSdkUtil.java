@@ -29,7 +29,7 @@ import java.io.File;
 
 /**
  * Handy Cloud SDK utility methods.
- *
+ * <p/>
  * Not for instantiation.
  */
 public final class CloudSdkUtil {
@@ -37,14 +37,14 @@ public final class CloudSdkUtil {
   private CloudSdkUtil() {
     // Not designed for instantiation.
   }
+
   private static final String UNIX_COMMAND = "gcloud";
   private static final String WIN_COMMAND = "gcloud.cmd";
 
   /**
    * Finds the path to the Cloud SDK binary on the local file system.
    *
-   * @return a {@link String} path to the Cloud SDK binary or {@code null}
-   * if it could not be found.
+   * @return a {@link String} path to the Cloud SDK binary or {@code null} if it could not be found.
    */
   @Nullable
   public static String findCloudSdkExecutablePath(
@@ -56,8 +56,8 @@ public final class CloudSdkUtil {
   /**
    * Finds the path to the Cloud SDK home directory on the local file system.
    *
-   * @return a {@link String} path to the Cloud SDK directory or {@code null}
-   * if it could not be found.
+   * @return a {@link String} path to the Cloud SDK directory or {@code null} if it could not be
+   *     found.
    */
   @Nullable
   public static String findCloudSdkDirectoryPath(
@@ -67,8 +67,8 @@ public final class CloudSdkUtil {
   }
 
   /**
-   * Checks if an appropriately named binary exists on the local file system for the given
-   * SDK home directory path.
+   * Checks if an appropriately named binary exists on the local file system for the given SDK home
+   * directory path.
    *
    * @param path @link String} to Cloud SDK home directory on local file system.
    * @return a boolean indicating if the file was found.
@@ -93,8 +93,7 @@ public final class CloudSdkUtil {
   }
 
   /**
-   * Converts from a SDK home directory path to the Cloud SDK executable path
-   *
+   * Converts from a SDK home directory path to the Cloud SDK executable path.
    */
   public static String toExecutablePath(String sdkDirectoryPath) {
     if (sdkDirectoryPath != null) {
@@ -106,8 +105,7 @@ public final class CloudSdkUtil {
   }
 
   /**
-   * Converts from a Cloud SDK executable path to its SDK home directory
-   *
+   * Converts from a Cloud SDK executable path to its SDK home directory.
    */
   public static String toSdkHomeDirectory(String sdkExecutablePath) {
     if (sdkExecutablePath != null) {
@@ -119,6 +117,19 @@ public final class CloudSdkUtil {
 
   public static String getSystemCommand() {
     return SystemInfo.isWindows ? WIN_COMMAND : UNIX_COMMAND;
+  }
+
+  /**
+   * Given a filePath return its {@link java.io.File}.
+   */
+  @NotNull
+  public static File getFileFromFilePath(String filePath) {
+    File file;
+    file = new File(filePath);
+    if (!file.exists()) {
+      throw new RuntimeException(filePath + " does not exist");
+    }
+    return file;
   }
 
   private static File findCloudSdkExecutable(

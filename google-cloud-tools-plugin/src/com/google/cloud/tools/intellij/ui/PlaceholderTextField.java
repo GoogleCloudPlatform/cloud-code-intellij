@@ -34,6 +34,10 @@ public class PlaceholderTextField extends JTextField {
     return defaultColor;
   }
 
+  /**
+   * Sets the placeholder text on the input and attaches a listener to update the placeholder text
+   * when the input's editability property changes.
+   */
   public void setPlaceholderText(String placeholderText) {
     this.placeholderText = placeholderText;
     this.defaultColor = this.getForeground();
@@ -49,7 +53,7 @@ public class PlaceholderTextField extends JTextField {
   }
 
   private void updatePlaceholderText() {
-    if(isEditable()) {
+    if (isEditable()) {
       setText("");
       setForeground(getDefaultColor());
     } else {

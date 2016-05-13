@@ -81,9 +81,9 @@ class AppEngineDeploymentConfigurator extends
     boolean isMavenProject = projectsManager.isMavenizedModule(module)
         && mavenProject != null;
 
-    return isMavenProject &&
-        ("jar".equalsIgnoreCase(mavenProject.getPackaging())
-            || "war".equalsIgnoreCase(mavenProject.getPackaging()));
+    return isMavenProject
+        && ("jar".equalsIgnoreCase(mavenProject.getPackaging())
+        || "war".equalsIgnoreCase(mavenProject.getPackaging()));
 
   }
 
@@ -112,11 +112,9 @@ class AppEngineDeploymentConfigurator extends
   public SettingsEditor<AppEngineDeploymentConfiguration> createEditor(
       @NotNull DeploymentSource source,
       @NotNull RemoteServer<AppEngineServerConfiguration> server) {
-    return new AppEngineDeploymentRunConfigurationEditor(project, source,
-        server.getConfiguration(),
-        new CloudSdkAppEngineHelper(
-            new File(server.getConfiguration().getCloudSdkHomePath()),
-            server.getConfiguration().getCloudProjectName(),
-            server.getConfiguration().getGoogleUserName()));
+    return new AppEngineDeploymentRunConfigurationEditor(
+        project,
+        source,
+        new CloudSdkAppEngineHelper(new File(server.getConfiguration().getCloudSdkHomePath())));
   }
 }

@@ -38,9 +38,10 @@ import java.util.Collections;
 import javax.swing.SwingUtilities;
 
 /**
- * Stops an App Engine based application running on GCP
+ * Stops an App Engine based application running on GCP.
  */
 public class AppEngineStopAction extends AppEngineAction {
+
   private static final Logger logger = Logger.getInstance(AppEngineStopAction.class);
 
   private UndeploymentTaskCallback callback;
@@ -48,9 +49,13 @@ public class AppEngineStopAction extends AppEngineAction {
   private String moduleToStop;
   private String versionToStop;
 
+  /**
+   * Initialize the stop action.
+   */
   public AppEngineStopAction(
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
+      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
       @NotNull String moduleToStop,
       @NotNull String versionToStop,
       @NotNull UndeploymentTaskCallback callback) {

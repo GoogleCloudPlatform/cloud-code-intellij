@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -45,8 +46,8 @@ import java.util.List;
 import java.util.Timer;
 
 /**
- * Queries multiple states on a fixed interval for updates. It notifies listeners
- * when updates occur.
+ * Queries multiple states on a fixed interval for updates. It notifies listeners when updates
+ * occur.
  */
 public class CloudDebugGlobalPoller {
 
@@ -54,7 +55,7 @@ public class CloudDebugGlobalPoller {
   private static final Logger LOG = Logger.getInstance(CloudDebugGlobalPoller.class);
 
   /**
-   * Display group used to display notifications in the IDE
+   * Display group used to display notifications in the IDE.
    */
   public static final String CLOUD_DEBUGGER_ERROR_NOTIFICATIONS_DISPLAY_GROUP =
       "Cloud Debugger Error Notifications";
@@ -90,6 +91,9 @@ public class CloudDebugGlobalPoller {
     }
   }
 
+  /**
+   * Stops listening on changes in the background.
+   */
   public synchronized void stopBackgroundListening() {
     if (watchTimer != null) {
       watchTimer.cancel();
@@ -111,7 +115,8 @@ public class CloudDebugGlobalPoller {
         .setWaitToken(state.getWaitToken());
 
     ListBreakpointsResponse response = listRequest
-        .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class).getClientVersionForCloudDebugger())
+        .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class)
+            .getClientVersionForCloudDebugger())
         .execute();
     List<Breakpoint> currentList = response.getBreakpoints();
     String responseWaitToken = response.getNextWaitToken();
@@ -122,8 +127,8 @@ public class CloudDebugGlobalPoller {
     }
 
     state.setCurrentServerBreakpointList(currentList != null
-                                         ? ContainerUtil.immutableList(currentList)
-                                         : ContainerUtil.immutableList(new ArrayList<Breakpoint>()));
+        ? ContainerUtil.immutableList(currentList)
+        : ContainerUtil.immutableList(new ArrayList<Breakpoint>()));
   }
 
   private void fireBreakpointsChanged(@NotNull CloudDebugProcessState state) {
@@ -133,9 +138,9 @@ public class CloudDebugGlobalPoller {
   }
 
   /**
-   * pollForChanges sends a synchronous, hanging query to the server and compares the result to
-   * see if there are changes from the current state. Explanation of
-   * <a href="https://en.wikipedia.org/wiki/Push_technology#Long_polling">hanging query (a.k.a. long poll)</a>
+   * pollForChanges sends a synchronous, hanging query to the server and compares the result to see
+   * if there are changes from the current state. Explanation of <a href="https://en.wikipedia.org/wiki/Push_technology#Long_polling">hanging
+   * query (a.k.a. long poll)</a>
    *
    * @param state represents the target debuggee to query
    */
@@ -147,8 +152,8 @@ public class CloudDebugGlobalPoller {
         LOG.warn("CloudDebugProcessState is listening in the background but no debugger client "
             + "could be retrieved => stop listening");
         handleBreakpointQueryError(state,
-                                   GctBundle.message("clouddebug.background.listener.access.error.message",
-                                                     state.getProject().getName()));
+            GctBundle.message("clouddebug.background.listener.access.error.message",
+                state.getProject().getName()));
         return;
       } else {
         // We should poll only states that listen in the background, reaching this branch is
@@ -167,27 +172,24 @@ public class CloudDebugGlobalPoller {
       String responseWaitToken = state.getWaitToken();
       if (!Strings.isNullOrEmpty(responseWaitToken)) {
         changed = oldToken == null || !responseWaitToken.equals(oldToken);
-      }
-      else {
+      } else {
         changed = !Strings.isNullOrEmpty(oldToken);
       }
-    }
-    catch(SocketTimeoutException sto) {
+    } catch (SocketTimeoutException ex) {
       //noop, this is expected behavior.
-    } catch (GoogleJsonResponseException e) {
+    } catch (GoogleJsonResponseException ex) {
       // HTTP 409 is expected when backend responds to "hanging query" either for timeout or because
       // a result is available (which will be retrieved via the subsequent query)
-      if (e.getStatusCode() != HttpURLConnection.HTTP_CONFLICT) {
-        handleBreakpointQueryError(state, e);
+      if (ex.getStatusCode() != HttpURLConnection.HTTP_CONFLICT) {
+        handleBreakpointQueryError(state, ex);
       }
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       LOG.warn("exception listing breakpoints", ex);
       handleBreakpointQueryError(state, ex);
       return;
-    } catch (Exception e) {
-      LOG.error("exception listing breakpoints", e);
-      handleBreakpointQueryError(state, e);
+    } catch (Exception ex) {
+      LOG.error("exception listing breakpoints", ex);
+      handleBreakpointQueryError(state, ex);
       return;
     }
 
@@ -196,24 +198,25 @@ public class CloudDebugGlobalPoller {
     }
   }
 
-  private void handleBreakpointQueryError(@NotNull CloudDebugProcessState state, @NotNull Exception e) {
+  private void handleBreakpointQueryError(@NotNull CloudDebugProcessState state,
+      @NotNull Exception ex) {
     String message;
     String projectName = state.getProject().getName();
-    if (e instanceof GoogleJsonResponseException) {
-      GoogleJsonResponseException jsonResponseException = (GoogleJsonResponseException) e;
+    if (ex instanceof GoogleJsonResponseException) {
+      GoogleJsonResponseException jsonResponseException = (GoogleJsonResponseException) ex;
       if (jsonResponseException.getStatusCode() == HttpURLConnection.HTTP_FORBIDDEN
           || jsonResponseException.getStatusCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
         message = GctBundle.message("clouddebug.background.listener.access.error.message",
-                                    projectName);
+            projectName);
       } else {
         message = GctBundle.message("clouddebug.background.listener.general.error.message",
-                                    projectName,
-                                    jsonResponseException.getDetails().getMessage());
+            projectName,
+            jsonResponseException.getDetails().getMessage());
       }
     } else {
       message = GctBundle.message("clouddebug.background.listener.general.error.message",
-                                  projectName,
-                                  e.getLocalizedMessage());
+          projectName,
+          ex.getLocalizedMessage());
     }
     handleBreakpointQueryError(state, message);
   }
@@ -223,9 +226,9 @@ public class CloudDebugGlobalPoller {
     String title = GctBundle.message("clouddebug.background.listener.error.title");
     Notification notification =
         new Notification(CLOUD_DEBUGGER_ERROR_NOTIFICATIONS_DISPLAY_GROUP,
-                         title,
-                         message,
-                         NotificationType.ERROR);
+            title,
+            message,
+            NotificationType.ERROR);
     Notifications.Bus.notify(notification, state.getProject());
   }
 }

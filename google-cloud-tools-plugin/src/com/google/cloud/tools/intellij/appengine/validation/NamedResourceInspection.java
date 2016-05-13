@@ -17,9 +17,9 @@
 package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.google.cloud.tools.intellij.appengine.GctConstants;
-import com.google.common.collect.Maps;
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
+import com.google.common.collect.Maps;
 
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
@@ -47,7 +47,12 @@ import java.util.Map;
  * and that the resource names are specified in the @Named annotations.
  */
 public class NamedResourceInspection extends EndpointInspectionBase {
-  public enum Error {MISSING_NAME, DUPLICATE_PARAMETER};
+
+  public enum Error {
+    MISSING_NAME, DUPLICATE_PARAMETER
+  }
+
+  ;
 
   @Override
   @Nullable
@@ -78,52 +83,54 @@ public class NamedResourceInspection extends EndpointInspectionBase {
           return;
         }
 
-        if(hasTransformer(psiMethod)) {
+        if (hasTransformer(psiMethod)) {
           return;
         }
 
         // Check if method is public or non-static
-        if(!EndpointUtilities.isApiMethod(psiMethod)) {
+        if (!EndpointUtilities.isApiMethod(psiMethod)) {
           return;
         }
 
         PsiParameterList parameterList = psiMethod.getParameterList();
         Map<String, PsiParameter> methodNames = Maps.newHashMap();
 
-        for(PsiParameter aParameter : parameterList.getParameters())  {
-          validateMethodNameUnique(aParameter, methodNames);
+        for (PsiParameter psiParameter : parameterList.getParameters()) {
+          validateMethodNameUnique(psiParameter, methodNames);
         }
       }
 
-      private void validateMethodNameUnique(PsiParameter psiParameter, Map<String, PsiParameter> methodNames) {
+      private void validateMethodNameUnique(PsiParameter psiParameter,
+          Map<String, PsiParameter> methodNames) {
         PsiModifierList modifierList = psiParameter.getModifierList();
-        if(modifierList == null) {
+        if (modifierList == null) {
           return;
         }
 
         PsiAnnotation annotation = modifierList.findAnnotation("javax.inject.Named");
-        if(annotation == null) {
-          annotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED );
-          if(annotation == null) {
+        if (annotation == null) {
+          annotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED);
+          if (annotation == null) {
             return;
           }
         }
 
         PsiNameValuePair[] nameValuePairs = annotation.getParameterList().getAttributes();
-        if(nameValuePairs.length == 0) {
+        if (nameValuePairs.length == 0) {
           // For @Named, @Named()
-          holder.registerProblem(annotation, "Parameter name must be specified.", new MissingNameQuickFix());
+          holder.registerProblem(annotation, "Parameter name must be specified.",
+              new MissingNameQuickFix());
           return;
-        } else if(nameValuePairs.length != 1){
+        } else if (nameValuePairs.length != 1) {
           return;
         }
 
-        if(nameValuePairs[0] == null) {
+        if (nameValuePairs[0] == null) {
           return;
         }
 
         PsiAnnotationMemberValue memberValue = nameValuePairs[0].getValue();
-        if(memberValue == null) {
+        if (memberValue == null) {
           return;
         }
 
@@ -131,8 +138,9 @@ public class NamedResourceInspection extends EndpointInspectionBase {
         String nameValue = EndpointUtilities.removeBeginningAndEndingQuotes(nameValueWithQuotes);
 
         // For @Named("")
-        if(nameValue.isEmpty()){
-          holder.registerProblem(annotation, "Parameter name must be specified.", new MissingNameQuickFix());
+        if (nameValue.isEmpty()) {
+          holder.registerProblem(annotation, "Parameter name must be specified.",
+              new MissingNameQuickFix());
           return;
         }
 
@@ -140,18 +148,18 @@ public class NamedResourceInspection extends EndpointInspectionBase {
         if (seenParameter == null) {
           methodNames.put(nameValue, psiParameter);
         } else {
-          holder.registerProblem(annotation, "Duplicate parameter name: " + nameValue +
-             ". Parameter names must be unique.", new DuplicateNameQuickFix());
+          holder.registerProblem(annotation, "Duplicate parameter name: " + nameValue
+              + ". Parameter names must be unique.", new DuplicateNameQuickFix());
         }
       }
     };
   }
 
   /**
-   * LocalQuickFix to add "_1" to the end of a query name as specified
-   * by @Named.
+   * LocalQuickFix to add "_1" to the end of a query name as specified by @Named.
    */
   public class DuplicateNameQuickFix implements LocalQuickFix {
+
     @NotNull
     @Override
     public String getName() {
@@ -174,32 +182,35 @@ public class NamedResourceInspection extends EndpointInspectionBase {
         return;
       }
 
-      if(!(element instanceof PsiAnnotation)) {
+      if (!(element instanceof PsiAnnotation)) {
         return;
       }
 
-      PsiAnnotation annotation = (PsiAnnotation)element;
-      if((!"javax.inject.Named".equals(annotation.getQualifiedName()))  &&
-        (!GctConstants.APP_ENGINE_ANNOTATION_NAMED.equals(annotation.getQualifiedName()))) {
-          return;
+      PsiAnnotation annotation = (PsiAnnotation) element;
+      if ((!"javax.inject.Named".equals(annotation.getQualifiedName()))
+          && (!GctConstants.APP_ENGINE_ANNOTATION_NAMED.equals(annotation.getQualifiedName()))) {
+        return;
       }
 
       // Get @Named value
       PsiNameValuePair[] nameValuePairs = annotation.getParameterList().getAttributes();
-      if(nameValuePairs.length == 0){
+      if (nameValuePairs.length == 0) {
         return;
       }
 
       PsiAnnotationMemberValue memberValue = nameValuePairs[0].getValue();
-      if(memberValue == null){
+      if (memberValue == null) {
         return;
       }
 
       // Create new annotation with  value equal to  @Named's value plus "_1"
-      String newNamedValue  =  "@Named(\"" + EndpointUtilities.removeBeginningAndEndingQuotes(memberValue.getText()) +  "_1\")";
+      String newNamedValue =
+          "@Named(\"" + EndpointUtilities.removeBeginningAndEndingQuotes(memberValue.getText())
+              + "_1\")";
       PsiAnnotation newAnnotation =
-        JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText(newNamedValue, null);
-      assert(newAnnotation.getParameterList().getAttributes().length == 1);
+          JavaPsiFacade.getInstance(project).getElementFactory()
+              .createAnnotationFromText(newNamedValue, null);
+      assert (newAnnotation.getParameterList().getAttributes().length == 1);
 
       // Update value of @Named
       memberValue.replace(newAnnotation.getParameterList().getAttributes()[0].getValue());
@@ -210,6 +221,7 @@ public class NamedResourceInspection extends EndpointInspectionBase {
    * LocalQuickFix to add a query name to an @Named without a specified query name.
    */
   public class MissingNameQuickFix implements LocalQuickFix {
+
     private static final String DEFAULT_PARAMETER_NAME = "myName";
 
     @NotNull
@@ -225,10 +237,9 @@ public class NamedResourceInspection extends EndpointInspectionBase {
     }
 
     /**
-     * Adds a query parameter name to an @Named annotation in <code>descriptor</code>.
-     * If the @Named annotation in <code>descriptor</code> is a child of a {@link PsiParameter}
-     * the query name is the {@link PsiParameter}'s name else, the new query name is a default
-     * query name.
+     * Adds a query parameter name to an @Named annotation in <code>descriptor</code>. If the @Named
+     * annotation in <code>descriptor</code> is a child of a {@link PsiParameter} the query name is
+     * the {@link PsiParameter}'s name else, the new query name is a default query name.
      */
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
@@ -237,30 +248,31 @@ public class NamedResourceInspection extends EndpointInspectionBase {
         return;
       }
 
-      if(!(element instanceof PsiAnnotation)) {
+      if (!(element instanceof PsiAnnotation)) {
         return;
       }
 
-      PsiAnnotation annotation = (PsiAnnotation)element;
-      if((!"javax.inject.Named".equals(annotation.getQualifiedName()))  &&
-         (!GctConstants.APP_ENGINE_ANNOTATION_NAMED.equals(annotation.getQualifiedName()))) {
+      PsiAnnotation annotation = (PsiAnnotation) element;
+      if ((!"javax.inject.Named".equals(annotation.getQualifiedName()))
+          && (!GctConstants.APP_ENGINE_ANNOTATION_NAMED.equals(annotation.getQualifiedName()))) {
         return;
       }
 
       String nameValue = DEFAULT_PARAMETER_NAME;
       PsiElement modifierList = annotation.getParent();
-      if(modifierList != null)  {
+      if (modifierList != null) {
         PsiElement annotationParent = modifierList.getParent();
-        if(annotationParent instanceof  PsiParameter) {
-          nameValue = ((PsiParameter)annotationParent).getName();
+        if (annotationParent instanceof PsiParameter) {
+          nameValue = ((PsiParameter) annotationParent).getName();
         }
       }
 
       // Create dummy annotation with replacement value
-      String newNamedValue  =  "@Named(\"" + nameValue + "\")";
+      String newNamedValue = "@Named(\"" + nameValue + "\")";
       PsiAnnotation newAnnotation =
-        JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText(newNamedValue, null);
-      assert(newAnnotation.getParameterList().getAttributes().length == 1);
+          JavaPsiFacade.getInstance(project).getElementFactory()
+              .createAnnotationFromText(newNamedValue, null);
+      assert (newAnnotation.getParameterList().getAttributes().length == 1);
 
       // Add new value to @Named
       annotation.getParameterList().replace(newAnnotation.getParameterList());

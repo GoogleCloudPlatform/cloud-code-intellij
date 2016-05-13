@@ -32,10 +32,10 @@ import static org.mockito.Mockito.when;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
+import com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
 
 import com.intellij.mock.MockProjectEx;
 import com.intellij.openapi.project.Project;
@@ -92,7 +92,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   }
 
   private XBreakpointManager breakpointManager;
-  private ServerToIDEFileResolver fileResolver;
+  private ServerToIdeFileResolver fileResolver;
 
   @Override
   protected void setUp() throws Exception {
@@ -145,7 +145,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
       }
     }).when(stateController).deleteBreakpointAsync(anyString());
 
-    fileResolver = mock(ServerToIDEFileResolver.class);
+    fileResolver = mock(ServerToIdeFileResolver.class);
     handler = new CloudBreakpointHandler(process, fileResolver);
 
     XDebuggerManager debuggerManager = mock(XDebuggerManager.class);

@@ -19,7 +19,8 @@ package com.google.cloud.tools.intellij;
 /**
  * The singleton instance of this class provides plugin metadata for the Google Account plugin.
  */
-public class IdeaAccountPluginInfoService extends BasePluginInfoService implements AccountPluginInfoService {
+public class IdeaAccountPluginInfoService extends BasePluginInfoService
+    implements AccountPluginInfoService {
 
   protected IdeaAccountPluginInfoService() {
     super("gcloud-intellij-account-plugin", "com.google.gct.login");

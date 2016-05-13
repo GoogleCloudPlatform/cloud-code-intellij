@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.ui;
 
 import com.intellij.ui.awt.RelativePoint;
 
 /**
- * The interface implemented when creating a customized combobox.
- * The implementor needs to define the contents of the popup as well
- * as implements methods for setting and getting the currently selected
- * item's text.
+ * The interface implemented when creating a customized combobox. The implementor needs to define
+ * the contents of the popup as well as implements methods for setting and getting the currently
+ * selected item's text.
  */
 public interface CustomizableComboBoxPopup {
+
   // Shows a PopUp at the given point.
   void showPopup(RelativePoint showTarget);
 

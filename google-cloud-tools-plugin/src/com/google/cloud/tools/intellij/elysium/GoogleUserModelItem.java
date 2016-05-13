@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -22,9 +23,9 @@ import com.google.api.services.cloudresourcemanager.CloudResourceManager;
 import com.google.api.services.cloudresourcemanager.model.ListProjectsResponse;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
@@ -46,10 +47,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 /**
- * This model item represents a {@link IntellijGoogleLoginService} credentialed user
- * in the treeview of the project selector.
+ * This model item represents a {@link IntellijGoogleLoginService} credentialed user in the treeview
+ * of the project selector.
  */
 class GoogleUserModelItem extends DefaultMutableTreeNode {
+
   private static final Logger LOG = Logger.getInstance(GoogleUserModelItem.class);
   private static final int PROJECTS_MAX_PAGE_SIZE = 300;
 
@@ -87,8 +89,9 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     return user.getEmail();
   }
 
-  // This method "dirties" the node, indicating that it needs another call to elysium to get its projects.
-  // The call may not happen immediately if the google login is collapsed in the tree view.
+  // This method "dirties" the node, indicating that it needs another call to elysium to get its
+  // projects. The call may not happen immediately if the google login is collapsed in the tree
+  // view.
   public void setNeedsSynchronizing() {
     needsSynchronizing = true;
 
@@ -113,8 +116,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
         try {
           loadUserProjects();
           needsSynchronizing = false;
-        }
-        finally {
+        } finally {
           isSynchronizing = false;
         }
       }
@@ -154,7 +156,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
           }
         });
         allProjects.addAll(response.getProjects());
-        while(!Strings.isNullOrEmpty(response.getNextPageToken())) {
+        while (!Strings.isNullOrEmpty(response.getNextPageToken())) {
           response = cloudResourceManagerClient.projects().list()
               .setPageToken(response.getNextPageToken())
               .setPageSize(PROJECTS_MAX_PAGE_SIZE)
@@ -164,18 +166,16 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
         for (Project pantheonProject : allProjects) {
           if (!Strings.isNullOrEmpty(pantheonProject.getProjectId())) {
             result.add(new ElysiumProjectModelItem(pantheonProject.getName(),
-                                                   pantheonProject.getProjectId(),
-                                                   pantheonProject.getProjectNumber()));
+                pantheonProject.getProjectId(),
+                pantheonProject.getProjectNumber()));
           }
         }
       }
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/323
       loadErrorState(GctBundle.getString("clouddebug.couldnotconnect"));
       return;
-    }
-    catch (RuntimeException ex) {
+    } catch (RuntimeException ex) {
       LOG.error("Exception loading projects for " + user.getName(), ex);
       loadErrorState(ex.getMessage());
       return;
@@ -197,13 +197,11 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
           treeModel.reload(GoogleUserModelItem.this);
         }
       });
-    }
-    catch (InterruptedException ex) {
+    } catch (InterruptedException ex) {
       LOG.error("InterruptedException loading projects for " + user.getName(), ex);
       loadErrorState(ex.getMessage());
       Thread.currentThread().interrupt();
-    }
-    catch (InvocationTargetException ex) {
+    } catch (InvocationTargetException ex) {
       LOG.error("InvocationTargetException loading projects for " + user.getName(), ex);
       loadErrorState(ex.getMessage());
     }

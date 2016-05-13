@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.debugger.ui;
 
 /**
  * Stores the error message received when querying debug targets, but provides a blank item as
- * representation in a JComboBox
+ * representation in a JComboBox.
  */
 // The reason for this class is that the combobox must have an item to ensure that
 // CloudAttachDialog#doValidate() method correctly identifies

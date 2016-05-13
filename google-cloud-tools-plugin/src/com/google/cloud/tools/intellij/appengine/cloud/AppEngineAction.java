@@ -45,22 +45,26 @@ import java.util.Map;
  * for executing CLI based commands.
  */
 public abstract class AppEngineAction implements Runnable {
+
   private static final Logger logger = Logger.getInstance(AppEngineAction.class);
 
   private LoggingHandler loggingHandler;
-  private AppEngineHelper appEngineHelper;
   private File credentialsPath;
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
   private DefaultProcessRunner processRunner;
-  boolean cancelled = false;
+  protected boolean cancelled = false;
 
+  /**
+   * Initialize the base action.
+   */
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
-      @NotNull AppEngineHelper appEngineHelper) {
+      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration) {
     this.loggingHandler = loggingHandler;
-    this.appEngineHelper = appEngineHelper;
+    this.deploymentConfiguration = deploymentConfiguration;
   }
 
-  LoggingHandler getLoggingHandler() {
+  protected LoggingHandler getLoggingHandler() {
     return loggingHandler;
   }
 
@@ -114,9 +118,9 @@ public abstract class AppEngineAction implements Runnable {
    */
   @VisibleForTesting
   @Nullable
-  File createApplicationDefaultCredentials() {
+  protected File createApplicationDefaultCredentials() {
     CredentialedUser projectUser = Services.getLoginService().getAllUsers()
-        .get(appEngineHelper.getGoogleUsername());
+        .get(deploymentConfiguration.getGoogleUsername());
 
     GoogleLoginState googleLoginState;
     if (projectUser != null) {
@@ -142,8 +146,8 @@ public abstract class AppEngineAction implements Runnable {
               "json",
               true /* deleteOnExit */);
       Files.write(jsonCredential, tempCredentialFilePath, Charset.forName("UTF-8"));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
     }
 
     return tempCredentialFilePath;
@@ -152,7 +156,7 @@ public abstract class AppEngineAction implements Runnable {
   /**
    * Delete the credential file if it exists.
    */
-  void deleteCredentials() {
+  protected void deleteCredentials() {
     if (credentialsPath != null && credentialsPath.exists()) {
       if (!credentialsPath.delete()) {
         logger.warn("failed to delete credential file expected at "
@@ -161,7 +165,7 @@ public abstract class AppEngineAction implements Runnable {
     }
   }
 
-  void consoleLogLn(String message,
+  protected void consoleLogLn(String message,
       String... arguments) {
     loggingHandler.print(String.format(message + "\n", (Object[]) arguments));
   }

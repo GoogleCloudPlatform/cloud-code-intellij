@@ -26,7 +26,7 @@ import java.lang.ref.SoftReference;
 import java.util.ResourceBundle;
 
 /**
- * Bundle class to get account plugin messages from resources/messages
+ * Bundle class to get account plugin messages from resources/messages.
  */
 public class AccountMessageBundle {
   @NonNls
@@ -46,11 +46,13 @@ public class AccountMessageBundle {
   private AccountMessageBundle() {
   }
 
-  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params) {
+  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key,
+      @NotNull Object... params) {
     return CommonBundle.message(getBundle(), key, params);
   }
 
-  public static String getString(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params) {
+  public static String getString(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key,
+      @NotNull Object... params) {
     return message(key, params);
   }
 }

@@ -21,7 +21,7 @@ import com.google.gdt.eclipse.login.common.LoginListener;
 import com.intellij.execution.process.ProcessHandler;
 
 /**
- * Detaches a Cloud Debug sessions represented by an instance of ProcessHandler on a logout event
+ * Detaches a Cloud Debug sessions represented by an instance of ProcessHandler on a logout event.
  */
 public class LogoutDebugProcessDetacher<H extends ProcessHandler> implements LoginListener {
 

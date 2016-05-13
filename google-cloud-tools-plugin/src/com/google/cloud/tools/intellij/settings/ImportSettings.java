@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.settings;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
+
 import com.intellij.ide.IdeBundle;
 import com.intellij.ide.actions.ImportSettingsFilenameFilter;
 import com.intellij.ide.plugins.PluginManager;
@@ -34,21 +36,27 @@ import com.intellij.util.io.ZipUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 /**
- * Provides functionality to update IDEA setting from a jar containing new settings
+ * Provides functionality to update IDEA setting from a jar containing new settings.
  */
 public class ImportSettings {
+
   private static final String DIALOG_TITLE = "Setting Synchronization";
   public static final String SETTINGS_JAR_MARKER = "IntelliJ IDEA Global Settings";
 
   /**
-   * Parse and update the IDEA settings in the jar at <code>path</code>.
-   * Note: This function might require a restart of the application.
+   * Parse and update the IDEA settings in the jar at <code>path</code>. Note: This function might
+   * require a restart of the application.
+   *
    * @param path The location of the jar with the new IDEA settings.
    */
   public static void doImport(String path) {
@@ -56,7 +64,9 @@ public class ImportSettings {
     ZipFile saveZipFile = null;
     try {
       if (!saveFile.exists()) {
-        Messages.showErrorDialog(IdeBundle.message("error.cannot.find.file", presentableFileName(saveFile)), DIALOG_TITLE);
+        Messages.showErrorDialog(
+            IdeBundle.message("error.cannot.find.file", presentableFileName(saveFile)),
+            DIALOG_TITLE);
         return;
       }
 
@@ -64,20 +74,24 @@ public class ImportSettings {
       saveZipFile = new ZipFile(saveFile);
       final ZipEntry magicEntry = saveZipFile.getEntry(SETTINGS_JAR_MARKER);
       if (magicEntry == null) {
-        Messages.showErrorDialog("The file " + presentableFileName(saveFile) + " contains no settings to import",
-          DIALOG_TITLE);
+        Messages.showErrorDialog(
+            "The file " + presentableFileName(saveFile) + " contains no settings to import",
+            DIALOG_TITLE);
         return;
       }
 
       final List<ExportableComponent> registeredComponents = new ArrayList<ExportableComponent>(
-        Arrays.asList(ApplicationManager.getApplication().getComponents(ExportableApplicationComponent.class)));
-      registeredComponents.addAll(ServiceBean.loadServicesFromBeans(ExportableComponent.EXTENSION_POINT, ExportableComponent.class));
+          Arrays.asList(ApplicationManager.getApplication()
+              .getComponents(ExportableApplicationComponent.class)));
+      registeredComponents.addAll(ServiceBean
+          .loadServicesFromBeans(ExportableComponent.EXTENSION_POINT, ExportableComponent.class));
 
-      List<ExportableComponent> storedComponents = getComponentsStored(saveFile, registeredComponents);
+      List<ExportableComponent> storedComponents = getComponentsStored(saveFile,
+          registeredComponents);
 
       Set<String> relativeNamesToExtract = new HashSet<String>();
-      for (final ExportableComponent aComponent : storedComponents) {
-        final File[] exportFiles = aComponent.getExportFiles();
+      for (final ExportableComponent exportableComponent : storedComponents) {
+        final File[] exportFiles = exportableComponent.getExportFiles();
         for (File exportFile : exportFiles) {
           final File configPath = new File(PathManager.getConfigPath());
           final String rPath = FileUtil.getRelativePath(configPath, exportFile);
@@ -92,35 +106,41 @@ public class ImportSettings {
       final File tempFile = new File(PathManager.getPluginTempPath() + "/" + saveFile.getName());
       FileUtil.copy(saveFile, tempFile);
       File outDir = new File(PathManager.getConfigPath());
-      final ImportSettingsFilenameFilter filenameFilter = new ImportSettingsFilenameFilter(relativeNamesToExtract);
-      StartupActionScriptManager.ActionCommand unzip = new StartupActionScriptManager.UnzipCommand(tempFile, outDir, filenameFilter);
+      final ImportSettingsFilenameFilter filenameFilter = new ImportSettingsFilenameFilter(
+          relativeNamesToExtract);
+      StartupActionScriptManager.ActionCommand unzip = new StartupActionScriptManager.UnzipCommand(
+          tempFile, outDir, filenameFilter);
       StartupActionScriptManager.addActionCommand(unzip);
 
       // remove temp file
-      StartupActionScriptManager.ActionCommand deleteTemp = new StartupActionScriptManager.DeleteCommand(tempFile);
+      StartupActionScriptManager.ActionCommand deleteTemp =
+          new StartupActionScriptManager.DeleteCommand(
+              tempFile);
       StartupActionScriptManager.addActionCommand(deleteTemp);
 
       UpdateSettings.getInstance().forceCheckForUpdateAfterRestart();
 
       String key = ApplicationManager.getApplication().isRestartCapable()
-                   ? "message.settings.imported.successfully.restart"
-                   : "message.settings.imported.successfully";
+          ? "message.settings.imported.successfully.restart"
+          : "message.settings.imported.successfully";
       final int ret = Messages.showOkCancelDialog(IdeBundle.message(key,
-                                                                    ApplicationNamesInfo.getInstance().getProductName(),
-                                                                    ApplicationNamesInfo.getInstance().getFullProductName()),
-                                                  IdeBundle.message("title.restart.needed"), Messages.getQuestionIcon());
+          ApplicationNamesInfo.getInstance().getProductName(),
+          ApplicationNamesInfo.getInstance().getFullProductName()),
+          IdeBundle.message("title.restart.needed"), Messages.getQuestionIcon());
       if (ret == Messages.OK) {
-        ((ApplicationEx)ApplicationManager.getApplication()).restart(true);
+        ((ApplicationEx) ApplicationManager.getApplication()).restart(true);
       }
-    }
-    catch (ZipException e1) {
+    } catch (ZipException e1) {
       Messages.showErrorDialog(
-        "Error reading file " + presentableFileName(saveFile) + ".\\nThere was " + e1.getMessage(),
-        DIALOG_TITLE);
-    }
-    catch (IOException e1) {
-      Messages.showErrorDialog(IdeBundle.message("error.reading.settings.file.2", presentableFileName(saveFile), e1.getMessage()),
-                               DIALOG_TITLE);
+          "Error reading file " + presentableFileName(saveFile) + ".\\nThere was " + e1
+              .getMessage(),
+          DIALOG_TITLE);
+    } catch (IOException e1) {
+      Messages.showErrorDialog(IdeBundle
+              .message(
+                  "error.reading.settings.file.2",
+                  presentableFileName(saveFile), e1.getMessage()),
+          DIALOG_TITLE);
     } finally {
       try {
         if (saveZipFile != null) {
@@ -128,8 +148,9 @@ public class ImportSettings {
         }
       } catch (IOException e1) {
         Messages.showErrorDialog(
-          GctBundle.message("settings.error.closing.file", presentableFileName(saveFile), e1.getMessage()),
-                            DIALOG_TITLE);
+            GctBundle.message("settings.error.closing.file", presentableFileName(saveFile),
+                e1.getMessage()),
+            DIALOG_TITLE);
       }
     }
   }
@@ -139,8 +160,8 @@ public class ImportSettings {
   }
 
   private static List<ExportableComponent> getComponentsStored(File zipFile,
-    List<ExportableComponent> registeredComponents)
-    throws IOException {
+      List<ExportableComponent> registeredComponents)
+      throws IOException {
     final File configPath = new File(PathManager.getConfigPath());
 
     final List<ExportableComponent> components = new ArrayList<ExportableComponent>();

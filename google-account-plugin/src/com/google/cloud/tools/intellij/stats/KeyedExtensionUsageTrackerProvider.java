@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.stats;
 
 import com.intellij.openapi.util.KeyedExtensionCollector;
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvider {
   private static final KeyedExtensionCollector<UsageTracker, String> COLLECTOR =
-      new KeyedExtensionCollector<UsageTracker, String>(UsageTrackerExtensionPointBean.EP_NAME.getName());
+      new KeyedExtensionCollector<>(UsageTrackerExtensionPointBean.EP_NAME.getName());
 
   /**
    * When using the usage tracker, do NOT include any information that can identify the user
@@ -41,13 +42,13 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
   }
 
   /**
-   * For usage tracking in the Cloud Tools family of plugins, we only want one tracker pinging an analytics backend
-   * for a given platform. New platform specific trackers can register with their platform prefix key and the
-   * UsageTrackerProvider will select them.  Otherwise, the no-op usage tracker will be used.
+   * For usage tracking in the Cloud Tools family of plugins, we only want one tracker pinging an
+   * analytics backend for a given platform. New platform specific trackers can register with their
+   * platform prefix key and the UsageTrackerProvider will select them.  Otherwise, the no-op usage
+   * tracker will be used.
    *
    * @param key A string search key associated with an extension
    * @return the first implementation of UsageTracker associated with {@param key}
-   *
    */
   static UsageTracker getTracker(@Nullable String key) {
     UsageTracker instance = (key == null) ? null : COLLECTOR.findSingle(key);
@@ -63,8 +64,8 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
   public static class NoOpUsageTracker implements UsageTracker {
 
     @Override
-    public void trackEvent(@NotNull String eventCategory, @NotNull String eventAction, @Nullable String eventLabel,
-        @Nullable Integer eventValue) {
+    public void trackEvent(@NotNull String eventCategory, @NotNull String eventAction,
+        @Nullable String eventLabel, @Nullable Integer eventValue) {
       // Do nothing
     }
   }

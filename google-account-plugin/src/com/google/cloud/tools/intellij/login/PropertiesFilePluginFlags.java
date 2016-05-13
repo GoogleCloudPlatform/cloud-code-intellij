@@ -30,12 +30,15 @@ public class PropertiesFilePluginFlags implements PluginFlags {
   private static final String USAGE_TRACKER_PROPERTY = "usage.tracker.property";
   private FlagReader flagReader;
 
+  /**
+   * Initialize the property flag reader.
+   */
   public PropertiesFilePluginFlags() {
     try {
       flagReader = new PropertiesFileFlagReader();
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException ex) {
       // TODO: Fail hard once we refactor to services and using aswb service mockable tests
-      LOGGER.warn(e);
+      LOGGER.warn(ex);
     }
   }
 

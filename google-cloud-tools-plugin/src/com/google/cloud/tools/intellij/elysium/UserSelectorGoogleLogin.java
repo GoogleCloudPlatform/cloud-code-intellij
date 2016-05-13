@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -20,7 +21,8 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 /**
  * UI for the node that prompts for signin in the {@link UserSelector}.
  */
-class UserSelectorGoogleLogin extends BaseGoogleLoginUI {
+class UserSelectorGoogleLogin extends BaseGoogleLoginUi {
+
   public UserSelectorGoogleLogin() {
     super(GctBundle.message("select.user.signin"));
   }

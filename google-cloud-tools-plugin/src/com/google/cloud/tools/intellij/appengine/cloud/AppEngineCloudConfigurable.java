@@ -17,8 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
-import com.google.cloud.tools.intellij.elysium.ProjectSelector;
-import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
@@ -58,10 +56,12 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   private String displayName = GctBundle.message("appengine.flex.name");
   private JPanel mainPanel;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
-  private ProjectSelector projectSelector;
   private JLabel warningMessage;
   private JTextPane appEngineFlexMoreInfoLabel;
 
+  /**
+   * Initialize the UI.
+   */
   public AppEngineCloudConfigurable(AppEngineServerConfiguration configuration,
       @Nullable Project project) {
     this.configuration = configuration;
@@ -77,7 +77,8 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
     warningMessage.setVisible(false);
 
-    final String cloudSdkDirectoryPath = CloudSdkUtil.findCloudSdkDirectoryPath(environmentProvider);
+    final String cloudSdkDirectoryPath
+        = CloudSdkUtil.findCloudSdkDirectoryPath(environmentProvider);
 
     if (cloudSdkDirectoryPath != null
         && configuration.getCloudSdkHomePath() == null) {
@@ -99,7 +100,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   private DocumentAdapter getSdkDirectoryFieldListener() {
     return new DocumentAdapter() {
       @Override
-      protected void textChanged(DocumentEvent e) {
+      protected void textChanged(DocumentEvent event) {
         String path = cloudSdkDirectoryField.getText();
         boolean isValid = CloudSdkUtil.containsCloudSdkExecutable(path);
         if (isValid) {
@@ -113,11 +114,6 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
         }
       }
     };
-  }
-
-  @VisibleForTesting
-  ProjectSelector getProjectSelector() {
-    return projectSelector;
   }
 
   @VisibleForTesting
@@ -152,12 +148,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   public boolean isModified() {
     boolean isSdkDirModified = !Comparing.strEqual(getCloudSdkDirectory(),
         configuration.getCloudSdkHomePath());
-    boolean isProjectModified = !Comparing.strEqual(getCloudProjectName(),
-        configuration.getCloudProjectName());
-    boolean isUserModified = !Comparing.strEqual(getGoogleUserName(),
-        configuration.getGoogleUserName());
-
-    return isSdkDirModified || isProjectModified || isUserModified;
+    return isSdkDirModified;
   }
 
   @Override
@@ -166,17 +157,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
         || !CloudSdkUtil.containsCloudSdkExecutable(cloudSdkDirectoryField.getText())) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.cloudsdk.location.missing.message"));
-    }
-    else if (StringUtil.isEmpty(projectSelector.getText())) {
-      throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.cloudsdk.project.missing.message"));
-    }
-    else {
-      configuration.setCloudProjectName(projectSelector.getText());
-      CredentialedUser selectedUser = projectSelector.getSelectedUser();
-      if (selectedUser != null) {
-        configuration.setGoogleUserName(selectedUser.getEmail());
-      }
+    } else {
       configuration.setCloudSdkHomePath(cloudSdkDirectoryField.getText());
     }
   }
@@ -184,7 +165,6 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   @Override
   public void reset() {
     cloudSdkDirectoryField.setText(configuration.getCloudSdkHomePath());
-    projectSelector.setText(configuration.getCloudProjectName());
   }
 
   /**
@@ -197,18 +177,5 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   public String getCloudSdkDirectory() {
     return cloudSdkDirectoryField.getText();
-  }
-
-  public String getCloudProjectName() {
-    return projectSelector.getText();
-  }
-
-  @Nullable
-  public String getGoogleUserName() {
-    CredentialedUser selectedUser = projectSelector.getSelectedUser();
-    if (selectedUser == null) {
-      return null;
-    }
-    return selectedUser.getEmail();
   }
 }

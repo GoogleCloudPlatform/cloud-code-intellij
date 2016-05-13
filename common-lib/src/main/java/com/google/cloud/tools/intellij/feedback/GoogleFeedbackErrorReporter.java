@@ -109,7 +109,6 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
       final Consumer<SubmittedReportInfo> callback,
       final ErrorBean error,
       final String description) {
-    DataContext dataContext = DataManager.getInstance().getDataContext(parentComponent);
     error.setDescription(description);
     error.setMessage(event.getMessage());
 
@@ -121,6 +120,7 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
     Map<String, String> params = buildKeyValuesMap(error, intelliJAppNameInfo,
         intelliJAppExtendedInfo, ApplicationManager.getApplication());
 
+    DataContext dataContext = DataManager.getInstance().getDataContext(parentComponent);
     final Project project = CommonDataKeys.PROJECT.getData(dataContext);
 
     Consumer<String> successCallback = new Consumer<String>() {
@@ -139,8 +139,8 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
 
     Consumer<Exception> errorCallback = new Consumer<Exception>() {
       @Override
-      public void consume(Exception e) {
-        String message = ErrorReporterBundle.message("error.googlefeedback.error", e.getMessage());
+      public void consume(Exception ex) {
+        String message = ErrorReporterBundle.message("error.googlefeedback.error", ex.getMessage());
         ReportMessages.GROUP.createNotification(ReportMessages.ERROR_REPORT,
             message,
             NotificationType.ERROR,

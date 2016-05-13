@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -34,12 +35,12 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * The class responsible for storing the active user's {@link OAuthData}
- * object persistently, retrieving it, and clearing it. Only the active
- * user's data is managed at any given time.
+ * The class responsible for storing the active user's {@link OAuthData} object persistently,
+ * retrieving it, and clearing it. Only the active user's data is managed at any given time.
  */
 // TODO: see if PersistentStateComponent is a better way to store settings
 public class GoogleLoginPrefs {
+
   // Delimiter for the list of scopes.
   private static final String DELIMITER = " ";
   private static String PREFERENCES_PATH = "/com/google/gct/login";
@@ -51,10 +52,11 @@ public class GoogleLoginPrefs {
   private static final String USERS = "all_users";
   private static final String ACTIVE_USER = "active_user";
 
-  public static final Logger LOG =  Logger.getInstance(GoogleLoginPrefs.class);
+  public static final Logger LOG = Logger.getInstance(GoogleLoginPrefs.class);
 
   /**
    * Stores the specified {@link OAuthData} object for the active user persistently.
+   *
    * @param credentials the specified {@code Credentials object}
    */
   public static void saveOAuthData(OAuthData credentials) {
@@ -82,8 +84,9 @@ public class GoogleLoginPrefs {
 
   /**
    * Retrieves the persistently stored {@link OAuthData} object for the active user, if any.
-   * @return the persistently stored {@code OAuthData} object for the active user if it exists or
-   * an {@code OAuthData} object all of whose getters return {@code null} .
+   *
+   * @return the persistently stored {@code OAuthData} object for the active user if it exists or an
+   * {@code OAuthData} object all of whose getters return {@code null} .
    */
   public static OAuthData loadOAuthData() {
     String refreshToken = null;
@@ -111,7 +114,7 @@ public class GoogleLoginPrefs {
    */
   public static void clearStoredOAuthData() {
     CredentialedUser activeUser = Services.getLoginService().getActiveUser();
-    if(activeUser == null) {
+    if (activeUser == null) {
       return;
     }
 
@@ -124,9 +127,11 @@ public class GoogleLoginPrefs {
   }
 
   /**
-   * Stores the specified preference of the active user to display only the icon in the login panel.
-   * @param logoutOnExit the preference of the active user to display only the icon in the
-   *                     login panel.
+   * Stores the specified preference of the active user to display only the icon in the login
+   * panel.
+   *
+   * @param logoutOnExit the preference of the active user to display only the icon in the login
+   *     panel.
    */
   public static void saveIconOnlyPref(boolean logoutOnExit) {
     Preferences prefs = getPrefs();
@@ -135,10 +140,11 @@ public class GoogleLoginPrefs {
   }
 
   /**
-   * Retrieves the persistently stored preference of the active user, if any, to
-   * logout on closing Android Studio.
-   * @return  the persistently stored preference of the active user, if any, to
-   * logout on closing Android Studio or false if preference does not exist.
+   * Retrieves the persistently stored preference of the active user, if any, to logout on closing
+   * Android Studio.
+   *
+   * @return the persistently stored preference of the active user, if any, to logout on closing
+   *     Android Studio or false if preference does not exist.
    */
   public static boolean getLogoutOnExitPref() {
     return getPrefs().getBoolean(getCustomUserKey(LOGOUT_ON_EXIT_KEY), false);
@@ -146,6 +152,7 @@ public class GoogleLoginPrefs {
 
   /**
    * Stores the specified preference of the active user to logout on closing Android Studio.
+   *
    * @param logoutOnExit the preference of the active user to logout on closing Android Studio.
    */
   public static void saveLogoutOnExitPref(boolean logoutOnExit) {
@@ -156,6 +163,7 @@ public class GoogleLoginPrefs {
 
   /**
    * Retrieves the persistently stored list of users.
+   *
    * @return the stored list of users.
    */
   @NotNull
@@ -163,19 +171,20 @@ public class GoogleLoginPrefs {
     Preferences prefs = getPrefs();
     String allUsersString = prefs.get(USERS, "");
     List<String> allUsers = new ArrayList<String>();
-    if(allUsersString.isEmpty()) {
+    if (allUsersString.isEmpty()) {
       return allUsers;
     }
 
     Splitter splitter = Splitter.on(DELIMITER).omitEmptyStrings();
-    for (String aUser : splitter.split(allUsersString)) {
-      allUsers.add(aUser);
+    for (String user : splitter.split(allUsersString)) {
+      allUsers.add(user);
     }
     return allUsers;
   }
 
   /**
    * Stores <code>user</code> as the active user.
+   *
    * @param user The user to be stored as active.
    */
   public static void saveActiveUser(@NotNull String user) {
@@ -205,13 +214,14 @@ public class GoogleLoginPrefs {
 
   /**
    * Retrieves the persistently stored active user.
+   *
    * @return the stored active user.
    */
   @Nullable
   public static String getActiveUser() {
     Preferences prefs = getPrefs();
     String activeUser = prefs.get(ACTIVE_USER, null);
-    if((activeUser == null) || activeUser.isEmpty()) {
+    if ((activeUser == null) || activeUser.isEmpty()) {
       return null;
     }
     return activeUser;
@@ -230,8 +240,8 @@ public class GoogleLoginPrefs {
   private static void flushPrefs(Preferences prefs) {
     try {
       prefs.flush();
-    } catch (BackingStoreException e) {
-      LOG.error("Could not flush preferences while saving login credentials", e);
+    } catch (BackingStoreException ex) {
+      LOG.error("Could not flush preferences while saving login credentials", ex);
     }
   }
 
@@ -240,16 +250,16 @@ public class GoogleLoginPrefs {
   }
 
   private static String getCustomUserKey(String key) {
-     CredentialedUser activeUser = Services.getLoginService().getActiveUser();
-     if(activeUser == null) {
-       return key;
-     }
+    CredentialedUser activeUser = Services.getLoginService().getActiveUser();
+    if (activeUser == null) {
+      return key;
+    }
 
-     return key + "_" + activeUser.getEmail();
+    return key + "_" + activeUser.getEmail();
   }
 
   private static String getCustomUserKey(String key, String userEmail) {
-    if(userEmail == null) {
+    if (userEmail == null) {
       return key;
     }
 
@@ -259,7 +269,7 @@ public class GoogleLoginPrefs {
   private static void addUser(String user) {
     Preferences prefs = getPrefs();
     String allUsersString = prefs.get(USERS, null);
-    if(allUsersString == null) {
+    if (allUsersString == null) {
       prefs.put(USERS, user);
       return;
     }
@@ -270,7 +280,7 @@ public class GoogleLoginPrefs {
       allUsers.add(scope);
     }
 
-    if(allUsers.contains(user)) {
+    if (allUsers.contains(user)) {
       return;
     }
 

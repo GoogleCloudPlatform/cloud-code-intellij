@@ -34,12 +34,11 @@ import javax.swing.table.AbstractTableModel;
 /**
  * Swing TableModel for a list of cloud debugger snapshots. Each table row represents a single
  * snapshot. There are five columns in the table:
- *
- * 0. An icon indicating the state of the breakpoint: error, checked, or final
- * 1. A date-time for received snapshots or the word "Pending" otherwise.
- * 2. The file and line number of the snapshot; e.g. "GeneratorServlet.java:40"
- * 3. The breakpoint condition, if any
- * 4. For pending snapshots only, the word "More" which is a link to the Breakpoints dialog.
+ * <p/>
+ * 0. An icon indicating the state of the breakpoint: error, checked, or final 1. A date-time for
+ * received snapshots or the word "Pending" otherwise. 2. The file and line number of the snapshot;
+ * e.g. "GeneratorServlet.java:40" 3. The breakpoint condition, if any 4. For pending snapshots
+ * only, the word "More" which is a link to the Breakpoints dialog.
  */
 class SnapshotsModel extends AbstractTableModel {
 
@@ -84,8 +83,8 @@ class SnapshotsModel extends AbstractTableModel {
     this.snapshots = snapshots;
   }
 
-  @NotNull
   // todo: seem to be exposing mutable private stat here, though not too broadly so it may be OK
+  @NotNull
   List<Breakpoint> getBreakpoints() {
     return breakpoints;
   }
@@ -141,7 +140,8 @@ class SnapshotsModel extends AbstractTableModel {
 
     switch (columnIndex) {
       case 0:
-        if (breakpoint.getStatus() != null && Boolean.TRUE.equals(breakpoint.getStatus().getIsError())) {
+        if (breakpoint.getStatus() != null && Boolean.TRUE
+            .equals(breakpoint.getStatus().getIsError())) {
           return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_ERROR;
         }
         if (!Boolean.TRUE.equals(breakpoint.getIsFinalState())) {
@@ -156,16 +156,18 @@ class SnapshotsModel extends AbstractTableModel {
       case 2:
         String path = breakpoint.getLocation().getPath();
         int startIndex = path.lastIndexOf('/');
-        return path.substring(startIndex >= 0 ? startIndex + 1 : 0) +
-            ":" +
-            breakpoint.getLocation().getLine().toString();
+        return path.substring(startIndex >= 0 ? startIndex + 1 : 0)
+            + ":"
+            + breakpoint.getLocation().getLine().toString();
       case 3:
         return breakpoint.getCondition();
       case 4:
         if (snapshots.supportsMoreConfig(breakpoint)) {
           return GctBundle.getString("clouddebug.moreHTML");
+        } else {
+          return null;
         }
+      default: return null;
     }
-    return null;
   }
 }

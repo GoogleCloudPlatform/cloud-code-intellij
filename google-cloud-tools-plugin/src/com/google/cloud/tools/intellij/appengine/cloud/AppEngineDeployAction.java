@@ -36,6 +36,8 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,8 +46,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Performs the deployment of App Engine based applications to GCP.
@@ -56,9 +56,7 @@ public class AppEngineDeployAction extends AppEngineAction {
 
   private Project project;
   private File deploymentArtifactPath;
-  private File appYamlPath;
-  private File dockerFilePath;
-  private String version;
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
   private AppEngineHelper appEngineHelper;
   private DeploymentOperationCallback callback;
   private DeploymentArtifactType artifactType;
@@ -68,19 +66,15 @@ public class AppEngineDeployAction extends AppEngineAction {
       @NotNull LoggingHandler loggingHandler,
       @NotNull Project project,
       @NotNull File deploymentArtifactPath,
-      @NotNull File appYamlPath,
-      @NotNull File dockerFilePath,
-      @Nullable String version,
+      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
       @NotNull DeploymentOperationCallback callback) {
     super(loggingHandler, appEngineHelper);
 
     this.appEngineHelper = appEngineHelper;
     this.project = project;
     this.deploymentArtifactPath = deploymentArtifactPath;
+    this.deploymentConfiguration = deploymentConfiguration;
     this.callback = callback;
-    this.appYamlPath = appYamlPath;
-    this.dockerFilePath = dockerFilePath;
-    this.version = version;
     this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
   }
 
@@ -106,8 +100,8 @@ public class AppEngineDeployAction extends AppEngineAction {
           true  /* deleteOnExit */);
       consoleLogLn(
           "Created temporary staging directory: " + stagingDirectory.getAbsolutePath());
-    } catch (IOException e) {
-      logger.warn(e);
+    } catch (IOException ex) {
+      logger.warn(ex);
       callback.errorOccurred(
           GctBundle.message("appengine.deployment.error.creating.staging.directory"));
       return null;
@@ -207,7 +201,7 @@ public class AppEngineDeployAction extends AppEngineAction {
 
           callback.succeeded(
               new AppEngineDeploymentRuntime(
-                  project, appEngineHelper, getLoggingHandler(),
+                  project, appEngineHelper, getLoggingHandler(), deploymentConfiguration,
                   deployOutput != null ? deployOutput.getService() : null,
                   deployOutput != null ? deployOutput.getVersion() : null));
         } else if (cancelled) {
@@ -259,6 +253,7 @@ public class AppEngineDeployAction extends AppEngineAction {
       String id;
       String service;
     }
+
     List<Version> versions;
 
     @Nullable

@@ -20,6 +20,7 @@ package com.google.cloud.tools.intellij.appengine.validation;
 import com.google.cloud.tools.intellij.appengine.GctConstants;
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
+
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
@@ -33,16 +34,18 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
 /**
- *  Inspection to check that resource or entity parameters are not a collection or an array and
- *  do not utilize @Named.
+ * Inspection to check that resource or entity parameters are not a collection or an array and do
+ * not utilize @Named.
  */
 public class ResourceParameterInspection extends EndpointInspectionBase {
+
   @Override
   @Nullable
   public String getStaticDescription() {
@@ -74,12 +77,12 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
           return;
         }
 
-        if(method.isConstructor()) {
+        if (method.isConstructor()) {
           return;
         }
 
         // Check if method is public or non-static
-        if(!EndpointUtilities.isApiMethod(method)) {
+        if (!EndpointUtilities.isApiMethod(method)) {
           return;
         }
 
@@ -89,27 +92,29 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
           if (project == null) {
             return;
           }
-        } catch (PsiInvalidElementAccessException e) {
-          LOG.error("Error getting project with parameter " + method.getText(), e);
+        } catch (PsiInvalidElementAccessException ex) {
+          LOG.error("Error getting project with parameter " + method.getText(), ex);
           return;
         }
 
         resourceParameterCount = 0;
-        for (PsiParameter aParameter : method.getParameterList().getParameters()) {
-          validateMethodParameters(aParameter, project);
+        for (PsiParameter param : method.getParameterList().getParameters()) {
+          validateMethodParameters(param, project);
         }
 
         // Check that there is no more than one resource (entity) parameter for this method.
-        if(resourceParameterCount > 1) {
-          holder.registerProblem(method, "Multiple entity parameters. There can only be a single entity parameter per method.",
-            LocalQuickFix.EMPTY_ARRAY);
+        if (resourceParameterCount > 1) {
+          holder.registerProblem(method,
+              "Multiple entity parameters. There can only be a single entity parameter per method.",
+              LocalQuickFix.EMPTY_ARRAY);
         }
       }
 
       private void validateMethodParameters(PsiParameter psiParameter, Project project) {
-        // Check if parameter is of entity (resource) type which is not of parameter type or injected type.
+        // Check if parameter is of entity (resource) type which is not of parameter type or
+        // injected type.
         PsiType type = psiParameter.getType();
-        if(!isEntityParameter(type, project)) {
+        if (!isEntityParameter(type, project)) {
           return;
         }
 
@@ -117,31 +122,33 @@ public class ResourceParameterInspection extends EndpointInspectionBase {
         resourceParameterCount++;
 
         // Check that parameter is not a collection or an array
-        if (type instanceof PsiArrayType || isCollectionType(type, project)){
-          holder.registerProblem(psiParameter, "Illegal parameter type (\'"  + psiParameter.getType().getPresentableText() +
-                                               "\'). Arrays or collections of entity types are not allowed.", LocalQuickFix.EMPTY_ARRAY);
+        if (type instanceof PsiArrayType || isCollectionType(type, project)) {
+          holder.registerProblem(psiParameter,
+              "Illegal parameter type (\'" + psiParameter.getType().getPresentableText()
+                  + "\'). Arrays or collections of entity types are not allowed.",
+              LocalQuickFix.EMPTY_ARRAY);
 
         }
 
         // Check that parameter does not have an @Named annotation
         PsiModifierList modifierList = psiParameter.getModifierList();
         PsiAnnotation annotation = modifierList.findAnnotation("javax.inject.Named");
-        if(annotation == null) {
-          annotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED );
-          if(annotation == null) {
+        if (annotation == null) {
+          annotation = modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED);
+          if (annotation == null) {
             return;
           }
         }
 
-        holder.registerProblem(psiParameter, "Bad parameter name. Parameter is entity (resource)" +
-                                             " type and should not be named.", LocalQuickFix.EMPTY_ARRAY);
+        holder.registerProblem(psiParameter, "Bad parameter name. Parameter is entity (resource)"
+            + " type and should not be named.", LocalQuickFix.EMPTY_ARRAY);
       }
     };
   }
 
   private boolean isCollectionType(PsiType type, Project project) {
     PsiClassType collectionType =
-            JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
+        JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
 
     if (collectionType.isAssignableFrom(type)) {
       return true;

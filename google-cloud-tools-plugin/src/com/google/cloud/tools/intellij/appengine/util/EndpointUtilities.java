@@ -32,9 +32,11 @@ import org.jetbrains.annotations.NotNull;
  * Utility methods for endpoint validation checks.
  */
 public class EndpointUtilities {
+
   /**
-   * Removes the beginning and ending quotes on a string. If the input string
-   * does not have quotes at the beginning and at the end, the input string is returned.
+   * Removes the beginning and ending quotes on a string. If the input string does not have quotes
+   * at the beginning and at the end, the input string is returned.
+   *
    * @param input String to be parsed
    * @return input string with quotes at the beginning and end removed if they both exist.
    */
@@ -43,25 +45,26 @@ public class EndpointUtilities {
       return input;
     }
 
-    return input.substring(1,input.length() - 1);
+    return input.substring(1, input.length() - 1);
   }
 
   /**
    * Returns true if the class containing the psiElement has the @Api annotation
-   *     (com.google.api.server.spi.config.Api). Returns false otherwise.
-   * @param psiElement
+   * (com.google.api.server.spi.config.Api). Returns false otherwise.
+   *
    * @return true if the class containing to the psiElement has the @Api
    *     (com.google.api.server.spi.config.Api). Returns false otherwise.
    */
   public static boolean isEndpointClass(PsiElement psiElement) {
     PsiClass psiClass = PsiUtils.findClass(psiElement);
-    if(psiClass == null) {
+    if (psiClass == null) {
       return false;
     }
 
-    if (AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API, true) ||
-        AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, true) ||
-        AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_REFERENCE, true) ) {
+    if (AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API, true)
+        || AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, true)
+        || AnnotationUtil
+            .isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_REFERENCE, true)) {
       return true;
     } else {
       return false;
@@ -70,13 +73,14 @@ public class EndpointUtilities {
 
   /**
    * Returns true is a method is public but not static. Returns false otherwise.
+   *
    * @param psiMethod PsiMethod to be parsed.
-   * @return  Returns true is a method is public but not static. Returns false otherwise.
+   * @return Returns true is a method is public but not static. Returns false otherwise.
    */
   public static boolean isApiMethod(@NonNls PsiMethod psiMethod) {
-    PsiModifierList psiModifierList =  psiMethod.getModifierList();
-    if(psiModifierList.hasModifierProperty(PsiModifier.PUBLIC) &&
-       !psiModifierList.hasModifierProperty(PsiModifier.STATIC)) {
+    PsiModifierList psiModifierList = psiMethod.getModifierList();
+    if (psiModifierList.hasModifierProperty(PsiModifier.PUBLIC)
+        && !psiModifierList.hasModifierProperty(PsiModifier.STATIC)) {
       return true;
     }
     return false;
@@ -85,21 +89,24 @@ public class EndpointUtilities {
   /**
    * Replace sequence of dots with single dot.
    */
-  public static String collapseSequenceOfDots(@NotNull String word){
-    return word.replaceAll("[.]+",".");
+  public static String collapseSequenceOfDots(@NotNull String word) {
+    return word.replaceAll("[.]+", ".");
   }
 
+  /**
+   * Checks if the supplied method is a public constructor with no parameters.
+   */
   public static boolean isPublicNullaryConstructor(PsiMethod method) {
-    if(!method.isConstructor()) {
+    if (!method.isConstructor()) {
       return false;
     }
 
-    if(method.getParameterList().getParametersCount() > 0) {
+    if (method.getParameterList().getParametersCount() > 0) {
       return false;
     }
 
     PsiModifierList modifierList = method.getModifierList();
-    if(modifierList.hasModifierProperty(PsiModifier.PUBLIC)) {
+    if (modifierList.hasModifierProperty(PsiModifier.PUBLIC)) {
       return true;
     }
 

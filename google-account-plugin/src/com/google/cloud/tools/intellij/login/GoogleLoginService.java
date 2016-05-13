@@ -30,21 +30,19 @@ import java.util.Map;
 public interface GoogleLoginService {
 
   /**
-   * Returns an HttpRequestFactory object that has been signed with the active user's
-   * authentication headers to use to make http requests. If the user has not
-   * signed in, this method will block and pop up the login dialog to the user.
-   * If the user cancels signing in, this method will return null.
+   * Returns an HttpRequestFactory object that has been signed with the active user's authentication
+   * headers to use to make http requests. If the user has not signed in, this method will block and
+   * pop up the login dialog to the user. If the user cancels signing in, this method will return
+   * null.
+   * <p/>
+   * If the access token that was used to sign this transport was revoked or has expired, then
+   * execute() invoked on Request objects constructed from this transport will throw an exception,
+   * for example, "com.google.api.client.http.HttpResponseException: 401 Unauthorized"
    *
-   *  If the access token that was used to sign this transport was revoked or
-   * has expired, then execute() invoked on Request objects constructed from
-   * this transport will throw an exception, for example,
-   * "com.google.api.client.http.HttpResponseException: 401 Unauthorized"
-   *
-   * @param message The message to display in the login dialog if the user needs
-   *          to log in to complete this action. If null, then no message area
-   *          is created.
-   * @return  An HttpRequestFactory object that has been signed with the active user's
-   * authentication headers or null if there is no active user.
+   * @param message The message to display in the login dialog if the user needs to log in to
+   *     complete this action. If null, then no message area is created.
+   * @return An HttpRequestFactory object that has been signed with the active user's authentication
+   *     headers or null if there is no active user.
    */
   @Nullable
   HttpRequestFactory createRequestFactory(@Nullable String message);
@@ -67,12 +65,12 @@ public interface GoogleLoginService {
    */
   boolean isLoggedIn();
 
+  void logInIfNot();
+
   /**
    * See {@link #logIn(String, IGoogleLoginCompletedCallback)}.
    */
   void logIn();
-
-  void logInIfNot();
 
   /**
    * Opens an external browser to allow the user to sign in.
@@ -87,7 +85,7 @@ public interface GoogleLoginService {
    *          "Importing a project from Google Project Hosting requires signing
    *          in."
    * @param callback if not null, then this callback is called when the login
-   * either succeeds or fails.
+   *     either succeeds or fails.
    */
   void logIn(@Nullable String message, @Nullable IGoogleLoginCompletedCallback callback);
 
@@ -106,7 +104,7 @@ public interface GoogleLoginService {
    * in user.
    * @param userEmail The user to be set as active.
    * @throws IllegalArgumentException if the <code>userEmail</code> does not exist i.e. is
-   * not a logged in user.
+   *     not a logged in user.
    */
   void setActiveUser(String userEmail) throws IllegalArgumentException;
 

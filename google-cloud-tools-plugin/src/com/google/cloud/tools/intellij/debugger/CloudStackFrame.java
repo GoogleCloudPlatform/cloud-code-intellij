@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
@@ -44,27 +45,31 @@ import java.util.List;
  * variables and if appropriate, the set of watch expressions at that location.
  */
 public class CloudStackFrame extends XStackFrame {
-  @Nullable private final List<Variable> evaluatedExpressions;
+
+  @Nullable
+  private final List<Variable> evaluatedExpressions;
   private final StackFrame frame;
   private final List<Variable> variableTable;
-  private final XSourcePosition xSourcePosition;
+  private final XSourcePosition sourcePosition;
 
+  /**
+   * Initialize the frame.
+   */
   public CloudStackFrame(@NotNull Project project,
       @NotNull StackFrame frame,
       @NotNull List<Variable> variableTable,
       @Nullable List<Variable> evaluatedExpressions,
-      @NotNull ServerToIDEFileResolver fileResolver) {
+      @NotNull ServerToIdeFileResolver fileResolver) {
     this.frame = frame;
     this.variableTable = variableTable;
     this.evaluatedExpressions = evaluatedExpressions;
     String path = frame.getLocation().getPath();
     if (!Strings.isNullOrEmpty(path)) {
-      xSourcePosition = XDebuggerUtil.getInstance().createPosition(
+      sourcePosition = XDebuggerUtil.getInstance().createPosition(
           fileResolver.getFileFromPath(project, path),
           frame.getLocation().getLine() - 1);
-    }
-    else {
-      xSourcePosition = null;
+    } else {
+      sourcePosition = null;
     }
   }
 
@@ -111,10 +116,11 @@ public class CloudStackFrame extends XStackFrame {
         packageName = frame.getFunction().substring(0, classNameDot);
       }
     }
-    component.append(functionName + "():" + frame.getLocation().getLine().toString() + ", " + className,
-                     xSourcePosition != null
-                     ? SimpleTextAttributes.REGULAR_ATTRIBUTES
-                     : SimpleTextAttributes.GRAYED_ATTRIBUTES);
+    component
+        .append(functionName + "():" + frame.getLocation().getLine().toString() + ", " + className,
+            sourcePosition != null
+                ? SimpleTextAttributes.REGULAR_ATTRIBUTES
+                : SimpleTextAttributes.GRAYED_ATTRIBUTES);
     component.append(" (" + packageName + ")", SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES);
 
   }
@@ -126,10 +132,11 @@ public class CloudStackFrame extends XStackFrame {
 
   @Override
   public XSourcePosition getSourcePosition() {
-    return xSourcePosition;
+    return sourcePosition;
   }
 
   private static class MyValue extends XValue {
+
     private final List<Variable> members;
     private final Variable variable;
     private final List<Variable> variableTable;
@@ -138,7 +145,8 @@ public class CloudStackFrame extends XStackFrame {
       //Note that we have to examine the variable table for some cases depending on how the
       // server compressed results.
       this.variableTable = variableTable;
-      this.variable = variable.getVarTableIndex() != null ? variableTable.get(variable.getVarTableIndex().intValue())
+      this.variable = variable.getVarTableIndex() != null ? variableTable
+          .get(variable.getVarTableIndex().intValue())
           : variable;
       members = variable.getMembers();
     }
@@ -164,9 +172,10 @@ public class CloudStackFrame extends XStackFrame {
     @Override
     public void computePresentation(@NotNull XValueNode node, @NotNull XValuePlace place) {
       String status = BreakpointUtil.getUserMessage(variable.getStatus());
-      String value = !Strings.isNullOrEmpty(status) ?
-          String.format("%s (%s)", variable.getValue(), status) : variable.getValue();
-      node.setPresentation(null, members != null && members.size() > 0 ? "..." : null, value != null ? value : "",
+      String value = !Strings.isNullOrEmpty(status)
+          ? String.format("%s (%s)", variable.getValue(), status) : variable.getValue();
+      node.setPresentation(null, members != null && members.size() > 0 ? "..." : null,
+          value != null ? value : "",
           members != null && members.size() > 0);
     }
 
@@ -177,6 +186,7 @@ public class CloudStackFrame extends XStackFrame {
   }
 
   private class CustomWatchGroup extends XValueGroup {
+
     protected CustomWatchGroup() {
       super(GctBundle.getString("clouddebug.watchexpressiongrouptitle"));
     }

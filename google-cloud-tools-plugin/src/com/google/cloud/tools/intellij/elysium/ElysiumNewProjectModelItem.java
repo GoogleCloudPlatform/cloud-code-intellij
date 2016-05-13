@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -21,6 +22,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * This model item represents the "Click here to create a project" node in the project selector.
  */
 class ElysiumNewProjectModelItem extends DefaultMutableTreeNode {
+
   public ElysiumNewProjectModelItem() {
   }
 }

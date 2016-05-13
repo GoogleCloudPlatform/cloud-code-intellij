@@ -50,6 +50,9 @@ public final class UsageTrackerManager {
     this.flags = flags;
   }
 
+  /**
+   * Return an instance of this manager.
+   */
   public static UsageTrackerManager getInstance() {
     synchronized (factoryLock) {
       if (instance == null) {

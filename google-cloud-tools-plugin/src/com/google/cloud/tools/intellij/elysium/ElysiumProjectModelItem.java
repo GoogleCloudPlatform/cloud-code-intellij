@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * This model item represents a single elysium project.
  */
 class ElysiumProjectModelItem extends DefaultMutableTreeNode {
+
   private String description;
   private String projectId;
   private Long number;

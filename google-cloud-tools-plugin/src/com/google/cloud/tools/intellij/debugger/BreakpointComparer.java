@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
@@ -26,8 +27,10 @@ import java.util.Date;
  * BreakpointComparer is a comparer used to sort breakpoints in the historical snapshot list.
  */
 public class BreakpointComparer implements Comparator<Breakpoint> {
+
   private static final BreakpointComparer DEFAULT_INSTANCE = new BreakpointComparer();
   private static final Date MINIMUM_DATE = new Date(Long.MIN_VALUE);
+
   private BreakpointComparer() {
   }
 

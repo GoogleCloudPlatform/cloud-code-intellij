@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.stats;
 
 import com.intellij.openapi.extensions.AbstractExtensionPointBean;

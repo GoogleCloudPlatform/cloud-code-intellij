@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login;
 
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
@@ -20,14 +21,14 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.common.base.Strings;
-import com.google.gct.login.LoginContext;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginActionButton;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginCopyAndPasteDialog;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
 import com.google.cloud.tools.intellij.stats.LoginTracking;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.common.base.Strings;
+import com.google.gct.login.LoginContext;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gdt.eclipse.login.common.LoggerFacade;
 import com.google.gdt.eclipse.login.common.OAuthData;
@@ -58,8 +59,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.Window;
 import java.io.IOException;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -83,18 +84,17 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
   }
 
   /**
-   * Returns an HttpRequestFactory object that has been signed with the active user's
-   * authentication headers to use to make http requests. If the user has not
-   * signed in, this method will block and pop up the login dialog to the user.
-   * If the user cancels signing in, this method will return null.
+   * Returns an HttpRequestFactory object that has been signed with the active user's authentication
+   * headers to use to make http requests. If the user has not signed in, this method will block and
+   * pop up the login dialog to the user. If the user cancels signing in, this method will return
+   * null.
+   * <p/>
+   * If the access token that was used to sign this transport was revoked or has expired,
+   * then execute() invoked on Request objects constructed from this transport will throw an
+   * exception, for example, "com.google.api.client.http.HttpResponseException: 401 Unauthorized"
    *
-   * If the access token that was used to sign this transport was revoked or
-   * has expired, then execute() invoked on Request objects constructed from
-   * this transport will throw an exception, for example,
-   * "com.google.api.client.http.HttpResponseException: 401 Unauthorized"
-   *
-   * @return  An HttpRequestFactory object that has been signed with the active user's
-   * authentication headers or null if there is no active user.
+   * @return An HttpRequestFactory object that has been signed with the active user's authentication
+   *     headers or null if there is no active user.
    */
   @Nullable
   public HttpRequestFactory createRequestFactory() {
@@ -138,31 +138,29 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
   }
 
   @Override
-  public void logIn() {
-    logIn(null, null);
-  }
-
-  @Override
   public void logInIfNot() {
-    if(!isLoggedIn()) {
+    if (!isLoggedIn()) {
       logIn();
     }
   }
 
+  @Override
+  public void logIn() {
+    logIn(null, null);
+  }
+
   /**
-   * Opens an external browser to allow the user to sign in.
-   * If the user is already signed in, this updates the user's credentials.
-   * If the logging process fails, a message dialog will pop up to notify
-   * the user. If the logging process succeeds, a logging event will be fired.
+   * Opens an external browser to allow the user to sign in. If the user is already signed in, this
+   * updates the user's credentials. If the logging process fails, a message dialog will pop up to
+   * notify the user. If the logging process succeeds, a logging event will be fired.
    *
-   * @param message if not null, then this message is displayed above the
-   *          login dialog. This is for when the user is presented
-   *          the login dialog from doing something other than logging in, such
-   *          as accessing Google API services. It should say something like
-   *          "Importing a project from Google Project Hosting requires signing
-   *          in."
-   * @param callback if not null, then this callback is called when the login
-   * either succeeds or fails.
+   * @param message if not null, then this message is displayed above the login dialog. This is for
+   *     when the user is presented the login dialog from doing something other than logging in,
+   *     such as accessing Google API services. It should say something like "Importing a project
+   *     from Google Project Hosting requires signing in."
+   * @param callback if not null, then this callback is called when the login either succeeds or
+   *     fails.
+   *
    */
   @Override
   public void logIn(@Nullable final String message,
@@ -175,9 +173,11 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
 
     final GoogleLoginState state = createGoogleLoginState(false);
 
-    // We pass in the current project, which causes intelliJ to properly figure out the parent window.
-    // This keeps the cancel dialog on top and visible.
-    new Task.Modal(getCurrentProject(), AccountMessageBundle.message("login.service.sign.in.via.browser.modal.text"), true) {
+    // We pass in the current project, which causes intelliJ to properly figure out the
+    // parent window. This keeps the cancel dialog on top and visible.
+    new Task.Modal(
+        getCurrentProject(),
+        AccountMessageBundle.message("login.service.sign.in.via.browser.modal.text"), true) {
       private boolean loggedIn = false;
 
       @Override
@@ -211,20 +211,19 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
 
       private void notifyOnComplete() {
         // TODO: add user preference to chose to use pop-up copy and paste dialog
-        if(loggedIn) {
+        if (loggedIn) {
           IGoogleLoginCompletedCallback localCallback = new IGoogleLoginCompletedCallback() {
 
             @Override
             public void onLoginCompleted() {
               uiFacade.notifyStatusIndicator();
-              if(callback != null) {
+              if (callback != null) {
                 callback.onLoginCompleted();
               }
             }
           };
           users.addUser(new CredentialedUser(state, localCallback));
-        }
-        else {
+        } else {
           // Login failed (or aborted), so restore the last active user, if any
           restoreLastActiveUser();
 
@@ -259,10 +258,11 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     }
 
     boolean loggedOut = activeUser.getGoogleLoginState().logOut(showPrompt);
-    if(loggedOut) {
+    if (loggedOut) {
       logOutAllUsers();
       UsageTrackerProvider
-          .getInstance().trackEvent(LoginTracking.CATEGORY, LoginTracking.LOGIN, "logout.complete", null);
+          .getInstance().trackEvent(
+            LoginTracking.CATEGORY, LoginTracking.LOGIN, "logout.complete", null);
     }
 
     return loggedOut;
@@ -309,8 +309,8 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
    * Logs out all signed in users without popping up logout confirmation message.
    */
   private void logOutAllUsers() {
-    for (CredentialedUser aUser : users.getAllUsers().values()) {
-      aUser.getGoogleLoginState().logOut(false /* showPrompt */);
+    for (CredentialedUser user : users.getAllUsers().values()) {
+      user.getGoogleLoginState().logOut(false /* showPrompt */);
     }
     users.removeAllUsers();
   }
@@ -321,19 +321,18 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
    */
   private void addLoginListenersFromExtensionPoints() {
     GoogleLoginListener[] loginListeners = Extensions.getExtensions(GoogleLoginListener.EP_NAME);
-    for(GoogleLoginListener listener : loginListeners) {
+    for (GoogleLoginListener listener : loginListeners) {
       users.addLoginListener(listener);
     }
   }
 
   /**
-   * Creates a new instance of {@link GoogleLoginState}
-   * @return a new instance of {@link GoogleLoginState}
+   * Creates a new instance of {@link GoogleLoginState}.
+   * @return a new instance of {@link GoogleLoginState}.
    */
   @Nullable
   private GoogleLoginState createGoogleLoginState(boolean initializingUsers) {
-    GoogleLoginState state =
-      new GoogleLoginState(
+    GoogleLoginState state = new GoogleLoginState(
         clientInfo.getId(),
         clientInfo.getInfo(),
         OAuthScopeRegistry.getScopes(),
@@ -354,18 +353,20 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
    * Returns the Client Info for Android Studio in a {@link ClientInfo}.
    */
   private static ClientInfo getClientInfo() {
-      String id = LoginContext.getId();
-      String info = LoginContext.getInfo();
-      if (id != null && id.trim().length() > 0
-          && info != null && info.trim().length() > 0) {
-        return new ClientInfo(id, info);
+    String id = LoginContext.getId();
+    String info = LoginContext.getInfo();
+    if (id != null && id.trim().length() > 0
+        && info != null && info.trim().length() > 0) {
+      return new ClientInfo(id, info);
     }
 
     throw new IllegalStateException("The client information for Android Studio was not found");
   }
 
   // TODO: update code to specify parent
-  private static void logErrorAndDisplayDialog(@NotNull final String title, @NotNull final Exception exception) {
+  private static void logErrorAndDisplayDialog(
+      @NotNull final String title,
+      @NotNull final Exception exception) {
     LOG.error(exception.getMessage(), exception);
     GoogleLoginUtils.showErrorDialog(exception.getMessage(), title);
   }
@@ -398,7 +399,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
   private class AndroidUiFacade implements UiFacade {
 
     /**
-     * number of characters to wrap lines after in the logout message
+     * number of characters to wrap lines after in the logout message.
      */
     public static final int WRAP_LENGTH = 60;
     private GoogleLoginActionButton button;
@@ -410,8 +411,14 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     }
 
     @Override
-    public String obtainVerificationCodeFromUserInteraction(String title, GoogleAuthorizationCodeRequestUrl authCodeRequestUrl) {
-      GoogleLoginCopyAndPasteDialog dialog = new GoogleLoginCopyAndPasteDialog(button, authCodeRequestUrl, AccountMessageBundle.message("login.service.copyandpaste.title.text"));
+    public String obtainVerificationCodeFromUserInteraction(
+        String title,
+        GoogleAuthorizationCodeRequestUrl authCodeRequestUrl) {
+      GoogleLoginCopyAndPasteDialog dialog =
+          new GoogleLoginCopyAndPasteDialog(
+              button,
+              authCodeRequestUrl,
+              AccountMessageBundle.message("login.service.copyandpaste.title.text"));
       dialog.show();
       if (dialog.getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
         return null;
@@ -425,9 +432,9 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
       if (localreceiver != null) {
         try {
           localreceiver.stop();
-        }
-        catch(IOException e) {
-          logErrorAndDisplayDialog(AccountMessageBundle.message("login.service.default.error.dialog.title.text"), e);
+        } catch (IOException ioe) {
+          logErrorAndDisplayDialog(
+              AccountMessageBundle.message("login.service.default.error.dialog.title.text"), ioe);
         }
       }
     }
@@ -438,36 +445,39 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
       String redirectUrl;
       try {
         redirectUrl = receiver.getRedirectUri();
-      }
-      catch (IOException e) {
-        logErrorAndDisplayDialog(title == null? AccountMessageBundle.message("login.service.default.error.dialog.title.text") : title, e);
+      } catch (IOException ioe) {
+        logErrorAndDisplayDialog(title == null
+            ? AccountMessageBundle.message("login.service.default.error.dialog.title.text")
+            : title, ioe);
         return null;
       }
 
       AuthorizationCodeRequestUrl authCodeRequestUrl =
-        new AuthorizationCodeRequestUrl(GoogleOAuthConstants.AUTHORIZATION_SERVER_URL, clientInfo.getId())
-          .setRedirectUri(redirectUrl)
-          .setScopes(OAuthScopeRegistry.getScopes());
+          new AuthorizationCodeRequestUrl(
+              GoogleOAuthConstants.AUTHORIZATION_SERVER_URL, clientInfo.getId())
+              .setRedirectUri(redirectUrl)
+              .setScopes(OAuthScopeRegistry.getScopes());
 
       BrowserUtil.browse(authCodeRequestUrl.build());
 
       String verificationCode;
       try {
         verificationCode = receiver.waitForCode();
-      }
-      catch (RequestCancelledException e) {
-        UsageTrackerProvider.getInstance().trackEvent(LoginTracking.CATEGORY, LoginTracking.LOGIN, "login.cancelled", null);
+      } catch (RequestCancelledException rce) {
+        UsageTrackerProvider.getInstance().trackEvent(
+            LoginTracking.CATEGORY, LoginTracking.LOGIN, "login.cancelled", null);
         return null;
-      }
-      catch (IOException e) {
-        logErrorAndDisplayDialog(title == null ? AccountMessageBundle.message("login.service.default.error.dialog.title.text") : title, e);
+      } catch (IOException ioe) {
+        logErrorAndDisplayDialog(title == null
+            ? AccountMessageBundle.message("login.service.default.error.dialog.title.text")
+            : title, ioe);
         return null;
-      }
-      finally {
+      } finally {
         receiver = null;
       }
 
-      UsageTrackerProvider.getInstance().trackEvent(LoginTracking.CATEGORY, LoginTracking.LOGIN, "login.complete", null);
+      UsageTrackerProvider.getInstance().trackEvent(
+          LoginTracking.CATEGORY, LoginTracking.LOGIN, "login.complete", null);
       return new VerificationCodeHolder(verificationCode, redirectUrl);
     }
 
@@ -485,7 +495,8 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     public boolean askYesOrNo(String title, String message) {
       StringBuilder updatedMessageBuilder = new StringBuilder(message);
       if (message.equals(AccountMessageBundle.message("login.service.are.you.sure.key.text"))) {
-        updatedMessageBuilder.append(AccountMessageBundle.message("login.service.are.you.sure.append.text"));
+        updatedMessageBuilder.append(
+            AccountMessageBundle.message("login.service.are.you.sure.append.text"));
         for (GoogleLoginMessageExtender messageExtender : messageExtenders) {
           String additionalLogoutMessage = messageExtender.additionalLogoutMessage();
           if (!Strings.isNullOrEmpty(additionalLogoutMessage)) {
@@ -494,7 +505,10 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
         }
       }
       String updatedMessage = WordUtils.wrap(
-        updatedMessageBuilder.toString(), WRAP_LENGTH, /* newLinestr */ null, /* wrapLongWords */ false);
+          updatedMessageBuilder.toString(),
+          WRAP_LENGTH,
+          /* newLinestr */ null,
+          /* wrapLongWords */ false);
       return (Messages.showYesNoDialog(
         updatedMessage, title, GoogleLoginIcons.GOOGLE_FAVICON) == Messages.YES);
     }
@@ -546,23 +560,25 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
       List<String> allUsers = GoogleLoginPrefs.getStoredUsers();
       StringBuilder removedUsers = new StringBuilder();
 
-      for (String aUser : allUsers) {
+      for (String user : allUsers) {
         // Add a new user, so that loadOAuth called from the GoogleLoginState constructor
         // will be able to create a customized key to get that user's OAuth data
         // This will be overwritten with new GoogleLoginState object
-        users.addUser(new CredentialedUser(aUser));
+        users.addUser(new CredentialedUser(user));
 
-        // CredentialedUser's credentials will be updated from the persistent storage in GoogleLoginState constructor
+        // CredentialedUser's credentials will be updated from the persistent storage
+        // in GoogleLoginState constructor
         GoogleLoginState delegate = createGoogleLoginState(true);
 
-        // delegate will be null if current scopes differ from scopes with users saved auth credentials
-        if(delegate == null) {
-          removedUsers.append(aUser).append(", ");
-          if(aUser.equals(activeUserString)) {
+        // delegate will be null if current scopes differ from scopes with users saved
+        // auth credentials
+        if (delegate == null) {
+          removedUsers.append(user).append(", ");
+          if (user.equals(activeUserString)) {
             activeUserString = null;
           }
 
-          users.removeUser(aUser);
+          users.removeUser(user);
           continue;
         }
 
@@ -576,7 +592,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
         users.addUser(new CredentialedUser(delegate, callback));
       }
 
-      if(activeUserString == null) {
+      if (activeUserString == null) {
         users.removeActiveUser();
       } else {
         try {
@@ -599,8 +615,8 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
 
   private static class AndroidLoggerFacade implements LoggerFacade {
     @Override
-    public void logError(String msg, Throwable t) {
-      LOG.error(msg, t);
+    public void logError(String msg, Throwable throwable) {
+      LOG.error(msg, throwable);
     }
 
     @Override

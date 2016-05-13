@@ -28,6 +28,9 @@ public final class FeedbackUtil {
 
   private FeedbackUtil() {}
 
+  /**
+   *  Registers an error reporter extension point for the given plugin.
+   */
   public static void enableGoogleFeedbackErrorReporting(String pluginId) {
     GoogleFeedbackErrorReporter errorReporter = new GoogleFeedbackErrorReporter();
     errorReporter

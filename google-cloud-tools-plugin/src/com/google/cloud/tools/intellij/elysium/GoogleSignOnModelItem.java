@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.elysium;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * This model item represents the node displayed in the project selector when the
- * user has not yet signed in.
+ * This model item represents the node displayed in the project selector when the user has not yet
+ * signed in.
  */
 class GoogleSignOnModelItem extends DefaultMutableTreeNode {
+
   public GoogleSignOnModelItem() {
   }
 }

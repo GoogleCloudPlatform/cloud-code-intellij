@@ -46,6 +46,9 @@ public class BasePluginTestCase {
 
   private ExtensionsAreaImpl extensionsArea;
 
+  /**
+   * Sets up the container.
+   */
   @Before
   public final void setup() {
     // prevent memory leak error
@@ -67,9 +70,10 @@ public class BasePluginTestCase {
   }
 
   /**
-   * Register your extenstion points for test here!
+   * Register your extension points for test here.
    */
-  protected <N, T extends N> ExtensionPointImpl<T> registerExtensionPoint(@NotNull ExtensionPointName<N> name,
+  protected <N, T extends N> ExtensionPointImpl<T> registerExtensionPoint(
+      @NotNull ExtensionPointName<N> name,
       @NotNull Class<T> type) {
     ExtensionPointImpl<T> extensionPoint = new ExtensionPointImpl<T>(
         name.getName(),

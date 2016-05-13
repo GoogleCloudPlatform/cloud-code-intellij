@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.cloud.tools.intellij.login;
 
 import org.jetbrains.annotations.NotNull;
@@ -21,8 +22,13 @@ import org.jetbrains.annotations.NotNull;
  * Exception when a method is required but not called from an Event Dispatch Thread (EDT).
  */
 public class InvalidThreadTypeException extends Exception  {
+
+  /**
+   * Initialize the exception type.
+   */
   public InvalidThreadTypeException(@NotNull String methodName) {
-    super(methodName.isEmpty()? "Method" : methodName +
-      " must be called from an event dispatch thread (EDT)");
+    super(methodName.isEmpty()
+        ? "Method"
+        : methodName + " must be called from an event dispatch thread (EDT)");
   }
 }

@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -62,12 +61,9 @@ class AppEngineRuntimeInstance extends
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
       return;
     }
-    File gcloudCommandPath = new File(configuration.getCloudSdkHomePath());
 
-    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
-        gcloudCommandPath,
-        configuration.getCloudProjectName(),
-        configuration.getGoogleUserName());
+    File gcloudCommandPath = new File(configuration.getCloudSdkHomePath());
+    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(gcloudCommandPath);
 
     final AppEngineDeployAction deployAction;
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
@@ -77,25 +73,13 @@ class AppEngineRuntimeInstance extends
       return;
     }
 
-    if (deploymentConfig.getConfigType() == ConfigType.AUTO) {
-      deployAction = appEngineHelper.createAutoDeploymentAction(
-          logManager.getMainLoggingHandler(),
-          task.getProject(),
-          deploymentSource,
-          deploymentConfig.getVersion(),
-          callback
-      );
-    } else {
-      deployAction = appEngineHelper.createCustomDeploymentAction(
-          logManager.getMainLoggingHandler(),
-          task.getProject(),
-          deploymentSource,
-          getFileFromFilePath(deploymentConfig.getAppYamlPath()),
-          getFileFromFilePath(deploymentConfig.getDockerFilePath()),
-          deploymentConfig.getVersion(),
-          callback
-      );
-    }
+    deployAction = appEngineHelper.createDeploymentAction(
+        logManager.getMainLoggingHandler(),
+        task.getProject(),
+        deploymentSource,
+        deploymentConfig,
+        callback
+    );
 
     // keep track of any active deployments
     synchronized (createdDeployments) {
@@ -128,13 +112,4 @@ class AppEngineRuntimeInstance extends
     }
   }
 
-  @NotNull
-  private File getFileFromFilePath(String filePath) {
-    File file;
-    file = new File(filePath);
-    if (!file.exists()) {
-      throw new RuntimeException(filePath + " does not exist");
-    }
-    return file;
-  }
 }
