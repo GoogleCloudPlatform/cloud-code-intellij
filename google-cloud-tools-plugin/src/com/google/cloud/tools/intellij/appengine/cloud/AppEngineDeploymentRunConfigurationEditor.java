@@ -241,6 +241,11 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   @VisibleForTesting
+  JComboBox getConfigTypeComboBox() {
+    return configTypeComboBox;
+  }
+
+  @VisibleForTesting
   void setProjectSelector(ProjectSelector projectSelector) {
     this.projectSelector = projectSelector;
   }

@@ -33,6 +33,8 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   private AppEngineHelper appEngineHelper;
   private ProjectSelector projectSelector;
 
+  private static final String PROJECT_NAME = "test-proj";
+
   @Override
   public void setUp() throws Exception {
     super.setUp();
@@ -43,10 +45,10 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     appEngineHelper = mock(AppEngineHelper.class);
 
     projectSelector = mock(ProjectSelector.class);
-    when(projectSelector.getText()).thenReturn("test-proj");
+    when(projectSelector.getText()).thenReturn(PROJECT_NAME);
   }
 
-  public void testValidSelections() throws ConfigurationException {
+  public void testValidSelections() {
     editor = new AppEngineDeploymentRunConfigurationEditor(
         getProject(), deploymentSource, appEngineHelper);
 
@@ -60,6 +62,27 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
       editor.applyEditorTo(config);
     } catch (ConfigurationException ce) {
       fail("No validation error expected");
+    }
+  }
+
+  public void testOnValidationFailure_configIsNotUpdated() {
+    editor = new AppEngineDeploymentRunConfigurationEditor(
+        getProject(), deploymentSource, appEngineHelper);
+
+    editor.setProjectSelector(projectSelector);
+
+    AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
+
+    // Simulate updating the project in the UI, then saving with an invalid configuration.
+    // The resultant configuration should not contain the update.
+
+    editor.getConfigTypeComboBox().setSelectedItem(ConfigType.CUSTOM);
+
+    try {
+      editor.applyEditorTo(config);
+      fail("Expected validation failure");
+    } catch (ConfigurationException ce) {
+      assertEquals(ConfigType.AUTO, config.getConfigType());
     }
   }
 
