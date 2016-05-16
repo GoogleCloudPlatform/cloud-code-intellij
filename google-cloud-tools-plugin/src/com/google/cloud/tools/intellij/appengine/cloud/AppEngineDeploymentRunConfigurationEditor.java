@@ -220,6 +220,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   @Override
   protected void applyEditorTo(AppEngineDeploymentConfiguration configuration)
       throws ConfigurationException {
+    validateConfiguration();
+
     configuration.setCloudProjectName(projectSelector.getText());
     CredentialedUser selectedUser = projectSelector.getSelectedUser();
     if (selectedUser != null) {
@@ -235,7 +237,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
     updateJarWarSelector();
-    validateConfiguration();
   }
 
   private void updateJarWarSelector() {
