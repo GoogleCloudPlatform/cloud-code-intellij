@@ -56,6 +56,7 @@ public class AppEngineDeploymentConfiguration extends
   private String userSpecifiedArtifactPath;
   private ConfigType configType;
   private String version;
+  private String customDeployFlags;
 
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
@@ -97,6 +98,11 @@ public class AppEngineDeploymentConfiguration extends
     return version;
   }
 
+  @Attribute("customDeployFlags")
+  public String getCustomDeployFlags() {
+    return customDeployFlags;
+  }
+
   public void setConfigType(@NotNull ConfigType configType) {
     this.configType = configType;
   }
@@ -127,6 +133,10 @@ public class AppEngineDeploymentConfiguration extends
 
   public void setVersion(String version) {
     this.version = version;
+  }
+
+  public void setCustomDeployFlags(String customDeployFlags) {
+    this.customDeployFlags = customDeployFlags;
   }
 
   public boolean isAuto() {

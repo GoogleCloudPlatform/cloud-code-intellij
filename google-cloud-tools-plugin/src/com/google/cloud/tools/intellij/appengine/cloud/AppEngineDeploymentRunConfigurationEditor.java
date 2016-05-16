@@ -89,6 +89,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private PlaceholderTextField versionIdField;
   private JCheckBox versionOverrideCheckBox;
   private ProjectSelector projectSelector;
+  private JTextField customDeployFlagsField;
   private DeploymentSource deploymentSource;
 
   private static final String COST_WARNING_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
@@ -215,6 +216,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     if (versionOverrideCheckBox.isSelected()) {
       versionIdField.setText(configuration.getVersion());
     }
+    customDeployFlagsField.setText(configuration.getCustomDeployFlags());
   }
 
   @Override
@@ -232,6 +234,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     configuration.setConfigType(getConfigType());
     configuration.setVersion(
         versionOverrideCheckBox.isSelected() ? versionIdField.getText() : null);
+    configuration.setCustomDeployFlags(customDeployFlagsField.getText());
 
     setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
     updateJarWarSelector();
