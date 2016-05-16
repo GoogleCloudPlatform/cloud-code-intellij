@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.PlaceholderTextField;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -237,6 +238,11 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
     updateJarWarSelector();
+  }
+
+  @VisibleForTesting
+  void setProjectSelector(ProjectSelector projectSelector) {
+    this.projectSelector = projectSelector;
   }
 
   private void updateJarWarSelector() {
