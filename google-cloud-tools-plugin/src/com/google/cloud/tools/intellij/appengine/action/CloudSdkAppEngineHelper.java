@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.cloud.tools.intellij.appengine.action.configuration.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.action.configuration.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.cloud.tools.intellij.appengine.cloud.DeploymentArtifactType;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.base.Preconditions;

@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action;
 
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 

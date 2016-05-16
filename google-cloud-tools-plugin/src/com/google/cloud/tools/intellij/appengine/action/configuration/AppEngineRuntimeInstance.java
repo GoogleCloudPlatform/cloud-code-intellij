@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action.configuration;
 
+import com.google.cloud.tools.intellij.appengine.action.AppEngineDeployAction;
+import com.google.cloud.tools.intellij.appengine.action.AppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.action.CloudSdkAppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -37,7 +42,7 @@ import java.util.Set;
 /**
  * A {@link ServerRuntimeInstance} for the {@link AppEngineCloudType}.
  */
-class AppEngineRuntimeInstance extends
+public class AppEngineRuntimeInstance extends
     ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
   private AppEngineServerConfiguration configuration;
