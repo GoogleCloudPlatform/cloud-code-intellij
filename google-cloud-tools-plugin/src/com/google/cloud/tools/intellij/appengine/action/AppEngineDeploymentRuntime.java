@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action;
 
+import com.google.cloud.tools.intellij.appengine.action.configuration.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.icons.AllIcons.General;
@@ -36,7 +37,7 @@ import javax.swing.SwingUtilities;
 /**
  * Takes care of undeploy and stop of App Engine applications.
  */
-class AppEngineDeploymentRuntime extends DeploymentRuntime {
+public class AppEngineDeploymentRuntime extends DeploymentRuntime {
 
   private static final String STOP_CONFIRMATION_URI_OPEN_TAG =
       "<a href='https://cloud.google.com/appengine/docs/java/console/#versions'>";
@@ -49,6 +50,9 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
   private String service;
   private String version;
 
+  /**
+   * Initialize the deployment runtime.
+   */
   public AppEngineDeploymentRuntime(
       @NotNull Project project,
       @NotNull AppEngineHelper appEngineHelper,
