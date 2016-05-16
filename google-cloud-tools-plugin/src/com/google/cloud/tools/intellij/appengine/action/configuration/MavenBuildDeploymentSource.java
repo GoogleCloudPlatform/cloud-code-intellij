@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action.configuration;
 
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.project.Project;
