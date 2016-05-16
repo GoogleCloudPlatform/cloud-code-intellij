@@ -16,15 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.testFramework.PlatformTestCase;
-
-import org.junit.Test;
-import org.mockito.Mockito;
 
 public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestCase {
 
@@ -37,16 +37,15 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   public void setUp() throws Exception {
     super.setUp();
 
-    deploymentSource = Mockito.mock(DeploymentSource.class);
-    Mockito.when(deploymentSource.isValid()).thenReturn(true);
+    deploymentSource = mock(DeploymentSource.class);
+    when(deploymentSource.isValid()).thenReturn(true);
 
-    appEngineHelper = Mockito.mock(AppEngineHelper.class);
+    appEngineHelper = mock(AppEngineHelper.class);
 
-    projectSelector = Mockito.mock(ProjectSelector.class);
-    Mockito.when(projectSelector.getText()).thenReturn("test-proj");
+    projectSelector = mock(ProjectSelector.class);
+    when(projectSelector.getText()).thenReturn("test-proj");
   }
 
-  @Test
   public void testValidSelections() throws ConfigurationException {
     editor = new AppEngineDeploymentRunConfigurationEditor(
         getProject(), deploymentSource, appEngineHelper);
