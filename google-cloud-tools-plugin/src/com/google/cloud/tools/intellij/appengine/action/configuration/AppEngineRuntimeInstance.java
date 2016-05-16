@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action.configuration;
 
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
+import com.google.cloud.tools.intellij.appengine.action.AppEngineDeployAction;
+import com.google.cloud.tools.intellij.appengine.action.AppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.action.CloudSdkAppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -38,11 +42,11 @@ import java.util.Set;
 /**
  * A {@link ServerRuntimeInstance} for the {@link AppEngineCloudType}.
  */
-class AppEngineRuntimeInstance extends
+public class AppEngineRuntimeInstance extends
     ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
   private AppEngineServerConfiguration configuration;
-  private Set<AppEngineDeployAction> createdDeployments;
+  private final Set<AppEngineDeployAction> createdDeployments;
 
   public AppEngineRuntimeInstance(
       AppEngineServerConfiguration configuration) {
@@ -62,9 +66,9 @@ class AppEngineRuntimeInstance extends
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
       return;
     }
-    String gcloudCommandPath = CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath());
-    File gcloudCommand = CloudSdkUtil.getFileFromFilePath(gcloudCommandPath);
-    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(gcloudCommand);
+
+    File gcloudCommandPath = new File(configuration.getCloudSdkHomePath());
+    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(gcloudCommandPath);
 
     final AppEngineDeployAction deployAction;
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();

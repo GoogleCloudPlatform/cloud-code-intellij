@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action.ui;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
-import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
-import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
+import com.google.cloud.tools.intellij.appengine.action.AppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.action.configuration.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.action.configuration.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.cloud.tools.intellij.appengine.action.configuration.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.action.ui.FileConfirmationDialog.DialogType;
+import com.google.cloud.tools.intellij.appengine.action.ui.SelectConfigDestinationFolderDialog.ConfigFileType;
+import com.google.cloud.tools.intellij.appengine.cloud.DeploymentArtifactType;
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;

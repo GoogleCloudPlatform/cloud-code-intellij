@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action.configuration;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -34,7 +34,7 @@ import javax.swing.Icon;
  * A deployment source used as a placeholder to allow user selection of a jar or war file from the
  * filesystem.
  */
-class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl {
+public class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl {
 
   private String name =
       GctBundle.message("appengine.flex.user.specified.deploymentsource.name");

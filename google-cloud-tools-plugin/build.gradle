@@ -39,6 +39,9 @@ dependencies {
 
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
     compile 'com.google.apis:google-api-services-cloudresourcemanager:v1beta1-rev12-1.21.0'
+    compile ('com.google.cloud.tools:app-tools-lib-for-java:0.1.0-SNAPSHOT') {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
     compile files('lib/google-api-services-source.jar')
 
     testCompile(project(':common-test-lib'))

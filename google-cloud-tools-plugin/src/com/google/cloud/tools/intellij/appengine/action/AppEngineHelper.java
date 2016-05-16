@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action;
+
+import com.google.cloud.tools.intellij.appengine.action.configuration.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.DeploymentArtifactType;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;

@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action.configuration;
 
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
+import com.google.cloud.tools.intellij.appengine.action.CloudSdkAppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.action.ui.AppEngineDeploymentRunConfigurationEditor;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -44,7 +46,7 @@ import java.util.List;
 /**
  * Sets up the configuration elements for an AppEngine Cloud deployment.
  */
-class AppEngineDeploymentConfigurator extends
+public class AppEngineDeploymentConfigurator extends
     DeploymentConfigurator<AppEngineDeploymentConfiguration, AppEngineServerConfiguration> {
 
   private final Project project;
@@ -117,8 +119,6 @@ class AppEngineDeploymentConfigurator extends
     return new AppEngineDeploymentRunConfigurationEditor(
         project,
         source,
-        new CloudSdkAppEngineHelper(
-            new File(
-                CloudSdkUtil.toExecutablePath(server.getConfiguration().getCloudSdkHomePath()))));
+        new CloudSdkAppEngineHelper(new File(server.getConfiguration().getCloudSdkHomePath())));
   }
 }

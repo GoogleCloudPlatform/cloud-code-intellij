@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action;
 
+import com.google.cloud.tools.app.api.AppEngineException;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessRunner;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
+import com.google.cloud.tools.intellij.appengine.action.configuration.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -25,14 +29,8 @@ import com.google.common.io.Files;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmentType;
-import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessListener;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.remoteServer.runtime.RemoteOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,8 +42,8 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
- * Base class for App Engine runnable actions - e.g. deploy, stop. Provides implementations for
- * executing CLI based commands.
+ * Base class for App Engine runnable actions - e.g. deploy, stop. Provides implementations
+ * for executing CLI based commands.
  */
 public abstract class AppEngineAction implements Runnable {
 
@@ -53,9 +51,9 @@ public abstract class AppEngineAction implements Runnable {
 
   private LoggingHandler loggingHandler;
   private File credentialsPath;
+  private AppEngineHelper appEngineHelper;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
-  private RemoteOperationCallback callback;
-  private OSProcessHandler processHandler;
+  private DefaultProcessRunner processRunner;
   protected boolean cancelled = false;
 
   /**
@@ -63,53 +61,53 @@ public abstract class AppEngineAction implements Runnable {
    */
   public AppEngineAction(
       @NotNull LoggingHandler loggingHandler,
-      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
-      @NotNull RemoteOperationCallback callback) {
+      @NotNull AppEngineHelper appEngineHelper,
+      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration) {
     this.loggingHandler = loggingHandler;
+    this.appEngineHelper = appEngineHelper;
     this.deploymentConfiguration = deploymentConfiguration;
-    this.callback = callback;
   }
 
   protected LoggingHandler getLoggingHandler() {
     return loggingHandler;
   }
 
-  protected void executeProcess(
-      @NotNull GeneralCommandLine commandLine,
-      @NotNull ProcessListener listener) throws ExecutionException {
+  /**
+   * Creates and stages credential file used for executing cloud sdk actions and returns
+   * {@link CloudSdk} instance.
+   *
+   * @param processRunner a {@link DefaultProcessRunner} for managing the process that runs the
+   *     action.
+   */
+  @NotNull
+  CloudSdk prepareExecution(@NotNull DefaultProcessRunner processRunner) throws AppEngineException {
+    this.processRunner = processRunner;
+
     credentialsPath = createApplicationDefaultCredentials();
     if (credentialsPath == null) {
-      callback.errorOccurred(
-          GctBundle.message("appengine.deployment.credential.not.found",
-              deploymentConfiguration.getGoogleUsername()));
-      return;
+      consoleLogLn(GctBundle.message("appengine.action.credential.not.found",
+          deploymentConfiguration.getGoogleUsername()));
+      throw new AppEngineException("Failed to create application default credentials.");
     }
 
-    // Common command line settings
-    commandLine.addParameter("--project=" + deploymentConfiguration.getCloudProjectName());
-    commandLine.addParameter("--credential-file-override=" + credentialsPath.getAbsolutePath());
-    commandLine.addParameter("--quiet");
-    commandLine.withParentEnvironmentType(ParentEnvironmentType.CONSOLE);
-    commandLine.getEnvironment().put("CLOUDSDK_METRICS_ENVIRONMENT", "gcloud-intellij");
-    commandLine.getEnvironment().put("CLOUDSDK_APP_USE_GSUTIL", "0");
-
-    consoleLogLn("Executing: " + commandLine.getCommandLineString());
-
-    Process process = commandLine.createProcess();
-    processHandler = new OSProcessHandler(process, commandLine.getCommandLineString());
-    loggingHandler.attachToProcess(processHandler);
-    processHandler.addProcessListener(listener);
-    processHandler.startNotify();
+    return new CloudSdk.Builder()
+        .sdkPath(appEngineHelper.getGcloudCommandPath())
+        .processRunner(processRunner)
+        .appCommandCredentialFile(credentialsPath)
+        .appCommandMetricsEnvironment("gcloud-intellij")
+        .appCommandGsUtil(1)
+        .appCommandOutputFormat("json")
+        .build();
   }
 
-  protected void cancel() {
-    // kill any executing process for the action
-    if (processHandler != null
-        && !processHandler.isProcessTerminating()
-        && !processHandler.isProcessTerminated()
-        && processHandler.getProcess() != null) {
+  /**
+   * Kill any executing process for the action.
+   */
+  public void cancel() {
+    if (processRunner != null
+        && processRunner.getProcess() != null) {
       cancelled = true;
-      processHandler.getProcess().destroy();
+      processRunner.getProcess().destroy();
     }
   }
 
@@ -119,6 +117,9 @@ public abstract class AppEngineAction implements Runnable {
   private static final String GCLOUD_USER_TYPE_LABEL = "type";
   private static final String GCLOUD_USER_TYPE = "authorized_user";
 
+  /**
+   * Create and stage a temporary credentials file used by various cloud sdk actions.
+   */
   @VisibleForTesting
   @Nullable
   protected File createApplicationDefaultCredentials() {
@@ -141,7 +142,7 @@ public abstract class AppEngineAction implements Runnable {
         GCLOUD_USER_TYPE_LABEL, GCLOUD_USER_TYPE
     );
     String jsonCredential = new Gson().toJson(credentialMap);
-    File tempCredentialFilePath = null;
+    File tempCredentialFilePath;
     try {
       tempCredentialFilePath = FileUtil
           .createTempFile(
@@ -156,11 +157,13 @@ public abstract class AppEngineAction implements Runnable {
     return tempCredentialFilePath;
   }
 
+  /**
+   * Delete the credential file if it exists.
+   */
   protected void deleteCredentials() {
     if (credentialsPath != null && credentialsPath.exists()) {
       if (!credentialsPath.delete()) {
-        logger.warn("failed to delete credential file expected at "
-            + credentialsPath.getPath());
+        logger.warn("failed to delete credential file expected at " + credentialsPath.getPath());
       }
     }
   }

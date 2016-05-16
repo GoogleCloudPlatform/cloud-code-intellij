@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.action;
 
+import com.google.cloud.tools.app.api.AppEngineException;
+import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineVersions;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessRunner;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
+import com.google.cloud.tools.app.impl.config.DefaultVersionsSelectionConfiguration;
+import com.google.cloud.tools.intellij.appengine.action.configuration.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.process.ProcessAdapter;
-import com.intellij.execution.process.ProcessEvent;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.Messages;
@@ -29,6 +33,8 @@ import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.Undeployme
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
 
 import javax.swing.SwingUtilities;
 
@@ -39,7 +45,6 @@ public class AppEngineStopAction extends AppEngineAction {
 
   private static final Logger logger = Logger.getInstance(AppEngineStopAction.class);
 
-  private AppEngineHelper appEngineHelper;
   private UndeploymentTaskCallback callback;
 
   private String moduleToStop;
@@ -55,9 +60,8 @@ public class AppEngineStopAction extends AppEngineAction {
       @NotNull String moduleToStop,
       @NotNull String versionToStop,
       @NotNull UndeploymentTaskCallback callback) {
-    super(loggingHandler, deploymentConfiguration, callback);
+    super(loggingHandler, appEngineHelper, deploymentConfiguration);
 
-    this.appEngineHelper = appEngineHelper;
     this.moduleToStop = moduleToStop;
     this.versionToStop = versionToStop;
     this.callback = callback;
@@ -65,31 +69,50 @@ public class AppEngineStopAction extends AppEngineAction {
 
   @Override
   public void run() {
-    GeneralCommandLine commandLine = new GeneralCommandLine(
-        appEngineHelper.getGcloudCommandPath().getAbsolutePath());
-
-    commandLine.addParameters("preview", "app", "versions", "stop");
-    commandLine.addParameters(versionToStop);
-
-    commandLine.addParameter("--service");
-    commandLine.addParameter(moduleToStop);
+    CloudSdk sdk;
 
     try {
-      executeProcess(
-          commandLine,
-          new StopModuleProcessListener());
-    } catch (ExecutionException ex) {
-      logger.warn(ex);
-      callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.execution.error"));
+      sdk = prepareExecution(createStopProcessRunner());
+    } catch (AppEngineException ex) {
+      callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.error"));
+      return;
     }
+
+    CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
+
+    DefaultVersionsSelectionConfiguration configuration =
+        new DefaultVersionsSelectionConfiguration();
+    configuration.setVersions(Collections.singletonList(versionToStop));
+    configuration.setService(moduleToStop);
+
+    command.stop(configuration);
   }
 
-  private class StopModuleProcessListener extends ProcessAdapter {
+  private DefaultProcessRunner createStopProcessRunner() {
+    DefaultProcessRunner processRunner =
+        new DefaultProcessRunner(new ProcessBuilder());
+    processRunner.setAsync(true);
+
+    ProcessOutputLineListener lineListener = new ProcessOutputLineListener() {
+      @Override
+      public void outputLine(String output) {
+        consoleLogLn(output);
+      }
+    };
+
+    processRunner.setStdErrLineListener(lineListener);
+    processRunner.setStdOutLineListener(lineListener);
+    processRunner.setExitListener(new StopExitListener());
+
+    return processRunner;
+  }
+
+  private class StopExitListener implements ProcessExitListener {
 
     @Override
-    public void processTerminated(ProcessEvent event) {
+    public void exit(int exitCode) {
       try {
-        if (event.getExitCode() == 0) {
+        if (exitCode == 0) {
           callback.succeeded();
 
           SwingUtilities.invokeLater(new Runnable() {
@@ -103,15 +126,14 @@ public class AppEngineStopAction extends AppEngineAction {
           });
         } else {
           logger.warn(
-              "Application stop process exited with an error. Exit Code:" + event.getExitCode());
+              "Application stop process exited with an error. Exit Code:" + exitCode);
           callback.errorOccurred(
               GctBundle.message("appengine.stop.modules.version.execution.error.with.code",
-                  event.getExitCode()));
+                  exitCode));
         }
       } finally {
         deleteCredentials();
       }
     }
-
   }
 }
