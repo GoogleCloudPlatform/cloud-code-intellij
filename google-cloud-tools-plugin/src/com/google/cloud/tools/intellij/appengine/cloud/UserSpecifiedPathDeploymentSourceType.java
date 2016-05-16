@@ -61,6 +61,7 @@ public class UserSpecifiedPathDeploymentSourceType extends
           AppEngineDeploymentConfiguration.USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE);
 
       if (!StringUtil.isEmpty(filePath)) {
+        userSpecifiedSource.setFilePath(filePath);
         userSpecifiedSource.setName(
             GctBundle.message(
                 "appengine.flex.user.specified.deploymentsource.name.with.filename",
