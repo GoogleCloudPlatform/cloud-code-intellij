@@ -73,7 +73,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
 
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
 
-    // Simulate updating the project in the UI, then saving with an invalid configuration.
+    // Simulate updating the config type in the UI then saving with an invalid configuration.
     // The resultant configuration should not contain the update.
 
     editor.getConfigTypeComboBox().setSelectedItem(ConfigType.CUSTOM);
