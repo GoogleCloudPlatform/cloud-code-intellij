@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessRunner;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
@@ -74,13 +76,12 @@ public abstract class AppEngineAction implements Runnable {
   /**
    * Creates and stages credential file used for executing cloud sdk actions and returns
    * {@link CloudSdk} instance.
-   *
-   * @param processRunner a {@link DefaultProcessRunner} for managing the process that runs the
-   *     action.
    */
   @NotNull
-  CloudSdk prepareExecution(@NotNull DefaultProcessRunner processRunner) throws AppEngineException {
-    this.processRunner = processRunner;
+  CloudSdk prepareExecution(
+      @NotNull ProcessOutputLineListener stdErrListener,
+      @NotNull ProcessOutputLineListener stdOutListener,
+      @NotNull ProcessExitListener exitListener) throws AppEngineException {
 
     credentialsPath = createApplicationDefaultCredentials();
     if (credentialsPath == null) {
@@ -91,7 +92,10 @@ public abstract class AppEngineAction implements Runnable {
 
     return new CloudSdk.Builder()
         .sdkPath(appEngineHelper.getGcloudCommandPath())
-        .processRunner(processRunner)
+        .async(true)
+        .addStdErrLineListener(stdErrListener)
+        .addStdOutLineListener(stdOutListener)
+        .exitListener(exitListener)
         .appCommandCredentialFile(credentialsPath)
         .appCommandMetricsEnvironment("gcloud-intellij")
         .appCommandGsUtil(1)

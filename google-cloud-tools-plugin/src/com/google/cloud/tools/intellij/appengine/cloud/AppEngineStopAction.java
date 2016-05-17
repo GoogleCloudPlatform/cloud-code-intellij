@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineVersions;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessRunner;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
@@ -71,7 +70,16 @@ public class AppEngineStopAction extends AppEngineAction {
     CloudSdk sdk;
 
     try {
-      sdk = prepareExecution(createStopProcessRunner());
+      ProcessOutputLineListener outputLineListener = new ProcessOutputLineListener() {
+        @Override
+        public void outputLine(String output) {
+          consoleLogLn(output);
+        }
+      };
+
+      ProcessExitListener stopExitListener = new StopExitListener();
+
+      sdk = prepareExecution(outputLineListener, outputLineListener, stopExitListener);
     } catch (AppEngineException ex) {
       callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.error"));
       return;
@@ -85,25 +93,6 @@ public class AppEngineStopAction extends AppEngineAction {
     configuration.setService(moduleToStop);
 
     command.stop(configuration);
-  }
-
-  private DefaultProcessRunner createStopProcessRunner() {
-    DefaultProcessRunner processRunner =
-        new DefaultProcessRunner(new ProcessBuilder());
-    processRunner.setAsync(true);
-
-    ProcessOutputLineListener lineListener = new ProcessOutputLineListener() {
-      @Override
-      public void outputLine(String output) {
-        consoleLogLn(output);
-      }
-    };
-
-    processRunner.setStdErrLineListener(lineListener);
-    processRunner.setStdOutLineListener(lineListener);
-    processRunner.setExitListener(new StopExitListener());
-
-    return processRunner;
   }
 
   private class StopExitListener implements ProcessExitListener {

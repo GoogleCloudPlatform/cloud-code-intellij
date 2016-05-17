@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineDeployment;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessRunner;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
@@ -140,9 +139,27 @@ public class AppEngineDeployAction extends AppEngineAction {
    * Perform a deployment from the given staging directory.
    */
   private void deploy(@NotNull File stagingDirectory) {
+    final StringBuilder rawDeployOutput = new StringBuilder();
     CloudSdk sdk;
+
+    ProcessOutputLineListener stdErrListener = new ProcessOutputLineListener() {
+      @Override
+      public void outputLine(String output) {
+        consoleLogLn(output);
+      }
+    };
+
+    ProcessOutputLineListener stdOutListener = new ProcessOutputLineListener() {
+      @Override
+      public void outputLine(String output) {
+        rawDeployOutput.append(output);
+      }
+    };
+
+    ProcessExitListener deployExitListener = new DeployExitListener(rawDeployOutput);
+
     try {
-      sdk = prepareExecution(createDeployProcessRunner());
+      sdk = prepareExecution(stdErrListener, stdOutListener, deployExitListener);
     } catch (AppEngineException ex) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.error"));
       return;
@@ -158,32 +175,6 @@ public class AppEngineDeployAction extends AppEngineAction {
 
     CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
     deployment.deploy(configuration);
-  }
-
-  private DefaultProcessRunner createDeployProcessRunner() {
-    final StringBuilder rawDeployOutput = new StringBuilder();
-
-    DefaultProcessRunner processRunner =
-        new DefaultProcessRunner(new ProcessBuilder());
-    processRunner.setAsync(true);
-
-    processRunner.setStdErrLineListener(new ProcessOutputLineListener() {
-      @Override
-      public void outputLine(String output) {
-        consoleLogLn(output);
-      }
-    });
-
-    processRunner.setStdOutLineListener(new ProcessOutputLineListener() {
-      @Override
-      public void outputLine(String output) {
-        rawDeployOutput.append(output);
-      }
-    });
-
-    processRunner.setExitListener(new DeployExitListener(rawDeployOutput));
-
-    return processRunner;
   }
 
   private class DeployExitListener implements ProcessExitListener {
