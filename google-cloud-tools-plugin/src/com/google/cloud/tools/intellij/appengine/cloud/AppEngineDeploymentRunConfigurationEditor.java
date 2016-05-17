@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.PlaceholderTextField;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -220,6 +221,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   @Override
   protected void applyEditorTo(AppEngineDeploymentConfiguration configuration)
       throws ConfigurationException {
+    validateConfiguration();
+
     configuration.setCloudProjectName(projectSelector.getText());
     CredentialedUser selectedUser = projectSelector.getSelectedUser();
     if (selectedUser != null) {
@@ -235,7 +238,16 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
     updateJarWarSelector();
-    validateConfiguration();
+  }
+
+  @VisibleForTesting
+  JComboBox getConfigTypeComboBox() {
+    return configTypeComboBox;
+  }
+
+  @VisibleForTesting
+  void setProjectSelector(ProjectSelector projectSelector) {
+    this.projectSelector = projectSelector;
   }
 
   private void updateJarWarSelector() {
