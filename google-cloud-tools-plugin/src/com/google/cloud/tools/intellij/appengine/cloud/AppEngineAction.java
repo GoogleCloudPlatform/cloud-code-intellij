@@ -107,8 +107,7 @@ public abstract class AppEngineAction implements Runnable {
    * Kill any executing process for the action.
    */
   protected void cancel() {
-    if (processRunner != null
-        && processRunner.getProcess() != null) {
+    if (processRunner != null && processRunner.getProcess() != null) {
       cancelled = true;
       processRunner.getProcess().destroy();
     }
