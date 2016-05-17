@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
-
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModulePointer;
@@ -117,8 +115,6 @@ class AppEngineDeploymentConfigurator extends
     return new AppEngineDeploymentRunConfigurationEditor(
         project,
         source,
-        new CloudSdkAppEngineHelper(
-            new File(
-                CloudSdkUtil.toExecutablePath(server.getConfiguration().getCloudSdkHomePath()))));
+        new CloudSdkAppEngineHelper(new File(server.getConfiguration().getCloudSdkHomePath())));
   }
 }

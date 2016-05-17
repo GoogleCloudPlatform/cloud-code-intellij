@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -42,7 +41,7 @@ class AppEngineRuntimeInstance extends
     ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
   private AppEngineServerConfiguration configuration;
-  private Set<AppEngineDeployAction> createdDeployments;
+  private final Set<AppEngineDeployAction> createdDeployments;
 
   public AppEngineRuntimeInstance(
       AppEngineServerConfiguration configuration) {
@@ -62,9 +61,9 @@ class AppEngineRuntimeInstance extends
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
       return;
     }
-    String gcloudCommandPath = CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath());
-    File gcloudCommand = CloudSdkUtil.getFileFromFilePath(gcloudCommandPath);
-    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(gcloudCommand);
+
+    File gcloudCommandPath = new File(configuration.getCloudSdkHomePath());
+    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(gcloudCommandPath);
 
     final AppEngineDeployAction deployAction;
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();

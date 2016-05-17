@@ -30,6 +30,9 @@ plugins {
 subprojects {
     repositories {
         mavenCentral()
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots'
+        }
     }
 
     apply plugin: 'java'
