@@ -23,6 +23,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfig
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.testFramework.PlatformTestCase;
 
@@ -89,6 +90,6 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   @Override
   protected void tearDown() throws Exception {
     super.tearDown();
-    editor.dispose();
+    Disposer.dispose(editor);
   }
 }
