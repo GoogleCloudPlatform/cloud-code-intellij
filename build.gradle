@@ -89,6 +89,7 @@ subprojects {
 
     apply plugin: 'findbugs'
     findbugs {
+        ignoreFailures = false
         sourceSets = [sourceSets.main]
         effort = "max"
         toolVersion = '3.0.1'
@@ -104,6 +105,7 @@ subprojects {
 
     apply plugin: 'pmd'
     pmd {
+        ignoreFailures = false
         sourceSets = [sourceSets.main]
         // Don't use the default ruleset but use a custom ruleset to exclude some PMD rules.
         ruleSets = []
