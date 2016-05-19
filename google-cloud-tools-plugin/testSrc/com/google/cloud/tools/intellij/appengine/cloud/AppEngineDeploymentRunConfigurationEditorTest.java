@@ -23,6 +23,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfig
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.testFramework.PlatformTestCase;
 
@@ -46,14 +47,14 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
 
     projectSelector = mock(ProjectSelector.class);
     when(projectSelector.getText()).thenReturn(PROJECT_NAME);
-  }
 
-  public void testValidSelections() {
     editor = new AppEngineDeploymentRunConfigurationEditor(
         getProject(), deploymentSource, appEngineHelper);
 
     editor.setProjectSelector(projectSelector);
+  }
 
+  public void testValidSelections() {
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
     config.setConfigType(ConfigType.AUTO);
@@ -66,16 +67,10 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   public void testOnValidationFailure_configIsNotUpdated() {
-    editor = new AppEngineDeploymentRunConfigurationEditor(
-        getProject(), deploymentSource, appEngineHelper);
-
-    editor.setProjectSelector(projectSelector);
-
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
 
     // Simulate updating the config type in the UI then saving with an invalid configuration.
     // The resultant configuration should not contain the update.
-
     editor.getConfigTypeComboBox().setSelectedItem(ConfigType.CUSTOM);
 
     try {
@@ -89,6 +84,6 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   @Override
   protected void tearDown() throws Exception {
     super.tearDown();
-    editor.dispose();
+    Disposer.dispose(editor);
   }
 }
