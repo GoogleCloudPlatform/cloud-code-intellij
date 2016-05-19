@@ -21,6 +21,7 @@ import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessR
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
+import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -30,6 +31,7 @@ import com.google.common.io.Files;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -90,7 +92,7 @@ public abstract class AppEngineAction implements Runnable {
       throw new AppEngineException("Failed to create application default credentials.");
     }
 
-    return new CloudSdk.Builder()
+    CloudSdk.Builder cloudSdkBuilder = new CloudSdk.Builder()
         .sdkPath(appEngineHelper.getGcloudCommandPath())
         .async(true)
         .addStdErrLineListener(stdErrListener)
@@ -99,8 +101,15 @@ public abstract class AppEngineAction implements Runnable {
         .appCommandCredentialFile(credentialsPath)
         .appCommandMetricsEnvironment("gcloud-intellij")
         .appCommandGsUtil(1)
-        .appCommandOutputFormat("json")
-        .build();
+        .appCommandOutputFormat("json");
+
+    CloudToolsPluginInfoService pluginInfoService =
+        ServiceManager.getService(CloudToolsPluginInfoService.class);
+    if (pluginInfoService != null) {
+      cloudSdkBuilder.appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion());
+    }
+
+    return cloudSdkBuilder.build();
   }
 
   /**
