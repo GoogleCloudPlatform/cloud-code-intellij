@@ -104,7 +104,7 @@ public abstract class AppEngineAction implements Runnable {
         .appCommandCredentialFile(credentialsPath)
         .appCommandMetricsEnvironment("gcloud-intellij")
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
-        .appCommandGsUtil(1)
+        .appCommandGsUtil(0)
         .appCommandOutputFormat("json")
         .build();
   }
