@@ -92,7 +92,10 @@ public abstract class AppEngineAction implements Runnable {
       throw new AppEngineException("Failed to create application default credentials.");
     }
 
-    CloudSdk.Builder cloudSdkBuilder = new CloudSdk.Builder()
+    CloudToolsPluginInfoService pluginInfoService =
+        ServiceManager.getService(CloudToolsPluginInfoService.class);
+
+    return new CloudSdk.Builder()
         .sdkPath(appEngineHelper.getGcloudCommandPath())
         .async(true)
         .addStdErrLineListener(stdErrListener)
@@ -100,16 +103,10 @@ public abstract class AppEngineAction implements Runnable {
         .exitListener(exitListener)
         .appCommandCredentialFile(credentialsPath)
         .appCommandMetricsEnvironment("gcloud-intellij")
+        .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
         .appCommandGsUtil(1)
-        .appCommandOutputFormat("json");
-
-    CloudToolsPluginInfoService pluginInfoService =
-        ServiceManager.getService(CloudToolsPluginInfoService.class);
-    if (pluginInfoService != null) {
-      cloudSdkBuilder.appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion());
-    }
-
-    return cloudSdkBuilder.build();
+        .appCommandOutputFormat("json")
+        .build();
   }
 
   /**
