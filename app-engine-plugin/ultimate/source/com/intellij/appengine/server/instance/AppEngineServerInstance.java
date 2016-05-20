@@ -2,7 +2,7 @@ package com.intellij.appengine.server.instance;
 
 import com.intellij.debugger.DebuggerManager;
 import com.intellij.debugger.engine.DebugProcess;
-import com.intellij.debugger.engine.DebugProcessAdapter;
+import com.intellij.debugger.engine.DebugProcessListener;
 import com.intellij.debugger.engine.DefaultJSPPositionManager;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessHandler;
@@ -23,7 +23,7 @@ public class AppEngineServerInstance extends DefaultServerInstance {
   public void start(ProcessHandler processHandler) {
     super.start(processHandler);
     final Project project = getCommonModel().getProject();
-    DebuggerManager.getInstance(project).addDebugProcessListener(processHandler, new DebugProcessAdapter() {
+    DebuggerManager.getInstance(project).addDebugProcessListener(processHandler, new DebugProcessListener() {
       @Override
       public void processAttached(DebugProcess process) {
         process.appendPositionManager(new DefaultJSPPositionManager(process, JavaeeFacetUtil.getInstance().getAllJavaeeFacets(project)) {
