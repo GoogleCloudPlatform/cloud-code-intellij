@@ -56,7 +56,7 @@ public abstract class AppEngineAction implements Runnable {
   private File credentialsPath;
   private AppEngineHelper appEngineHelper;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
-  private Process deployProcess = null;
+  private Process process = null;
   protected boolean cancelled = false;
 
   /**
@@ -104,7 +104,7 @@ public abstract class AppEngineAction implements Runnable {
         .startListener(new ProcessStartListener() {
           @Override
           public void start(Process process) {
-            deployProcess = process;  // Save the reference so that we can cancel() it later.
+            process = process;  // Save the reference so that we can cancel() it later.
           }
         })
         .appCommandCredentialFile(credentialsPath)
@@ -119,9 +119,9 @@ public abstract class AppEngineAction implements Runnable {
    * Kill any executing process for the action.
    */
   protected void cancel() {
-    if (deployProcess != null) {
+    if (process != null) {
       cancelled = true;
-      deployProcess.destroy();
+      process.destroy();
     }
   }
 
