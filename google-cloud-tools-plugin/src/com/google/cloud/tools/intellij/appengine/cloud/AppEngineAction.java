@@ -17,9 +17,9 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.app.api.AppEngineException;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.DefaultProcessRunner;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -56,7 +56,7 @@ public abstract class AppEngineAction implements Runnable {
   private File credentialsPath;
   private AppEngineHelper appEngineHelper;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
-  private DefaultProcessRunner processRunner;
+  private Process actionProcess;
   protected boolean cancelled = false;
 
   /**
@@ -101,6 +101,7 @@ public abstract class AppEngineAction implements Runnable {
         .addStdErrLineListener(stdErrListener)
         .addStdOutLineListener(stdOutListener)
         .exitListener(exitListener)
+        .startListener(new ActionProcessStartListener())
         .appCommandCredentialFile(credentialsPath)
         .appCommandMetricsEnvironment("gcloud-intellij")
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
@@ -113,9 +114,9 @@ public abstract class AppEngineAction implements Runnable {
    * Kill any executing process for the action.
    */
   protected void cancel() {
-    if (processRunner != null && processRunner.getProcess() != null) {
+    if (actionProcess != null) {
       cancelled = true;
-      processRunner.getProcess().destroy();
+      actionProcess.destroy();
     }
   }
 
@@ -179,6 +180,13 @@ public abstract class AppEngineAction implements Runnable {
   protected void consoleLogLn(String message,
       String... arguments) {
     loggingHandler.print(String.format(message + "\n", (Object[]) arguments));
+  }
+
+  private class ActionProcessStartListener implements ProcessStartListener {
+    @Override
+    public void start(Process process) {
+      actionProcess = process;  // Save the reference so that we can cancel() it later.
+    }
   }
 }
 
