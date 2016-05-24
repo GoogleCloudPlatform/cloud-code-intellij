@@ -56,7 +56,7 @@ public abstract class AppEngineAction implements Runnable {
   private File credentialsPath;
   private AppEngineHelper appEngineHelper;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
-  private Process process = null;
+  private Process actionProcess = null;
   protected boolean cancelled = false;
 
   /**
@@ -101,12 +101,7 @@ public abstract class AppEngineAction implements Runnable {
         .addStdErrLineListener(stdErrListener)
         .addStdOutLineListener(stdOutListener)
         .exitListener(exitListener)
-        .startListener(new ProcessStartListener() {
-          @Override
-          public void start(Process process) {
-            process = process;  // Save the reference so that we can cancel() it later.
-          }
-        })
+        .startListener(new ActionProcessStartListener())
         .appCommandCredentialFile(credentialsPath)
         .appCommandMetricsEnvironment("gcloud-intellij")
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
@@ -119,9 +114,9 @@ public abstract class AppEngineAction implements Runnable {
    * Kill any executing process for the action.
    */
   protected void cancel() {
-    if (process != null) {
+    if (actionProcess != null) {
       cancelled = true;
-      process.destroy();
+      actionProcess.destroy();
     }
   }
 
@@ -185,6 +180,13 @@ public abstract class AppEngineAction implements Runnable {
   protected void consoleLogLn(String message,
       String... arguments) {
     loggingHandler.print(String.format(message + "\n", (Object[]) arguments));
+  }
+
+  private class ActionProcessStartListener implements ProcessStartListener {
+    @Override
+    public void start(Process process) {
+      actionProcess = process;  // Save the reference so that we can cancel() it later.
+    }
   }
 }
 
