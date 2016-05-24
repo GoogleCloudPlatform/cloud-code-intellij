@@ -56,7 +56,7 @@ public abstract class AppEngineAction implements Runnable {
   private File credentialsPath;
   private AppEngineHelper appEngineHelper;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
-  private Process actionProcess = null;
+  private Process actionProcess;
   protected boolean cancelled = false;
 
   /**
