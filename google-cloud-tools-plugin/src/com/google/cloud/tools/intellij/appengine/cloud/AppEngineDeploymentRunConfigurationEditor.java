@@ -92,7 +92,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private PlaceholderTextField versionIdField;
   private JCheckBox versionOverrideCheckBox;
   private ProjectSelector projectSelector;
-  private JLabel envLabel;
+  private JLabel environmentLabel;
   private JPanel appEngineFlexConfigPanel;
   private DeploymentSource deploymentSource;
 
@@ -206,7 +206,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
 
-    envLabel.setText(appEngineHelper.getEnvironment().toString());
+    environmentLabel.setText(appEngineHelper.getEnvironment().toString());
     appEngineFlexConfigPanel
         .setVisible(appEngineHelper.getEnvironment() == Environment.APP_ENGINE_FLEX);
   }
@@ -251,6 +251,16 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   @VisibleForTesting
   JComboBox getConfigTypeComboBox() {
     return configTypeComboBox;
+  }
+
+  @VisibleForTesting
+  JLabel getEnvironmentLabel() {
+    return environmentLabel;
+  }
+
+  @VisibleForTesting
+  JPanel getAppEngineFlexConfigPanel() {
+    return appEngineFlexConfigPanel;
   }
 
   @VisibleForTesting
