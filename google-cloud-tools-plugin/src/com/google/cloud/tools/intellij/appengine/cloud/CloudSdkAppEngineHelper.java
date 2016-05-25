@@ -143,32 +143,21 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   private DeploymentOperationCallback wrapCallbackForUsageTracking(
-      final DeploymentOperationCallback deploymentCallback,
-      ConfigType flexDeploymentType, AppEngineFlexDeploymentArtifactType artifactType) {
+    final DeploymentOperationCallback deploymentCallback,
+    ConfigType flexDeploymentType, AppEngineFlexDeploymentArtifactType artifactType) {
 
     StringBuilder labelBuilder = new StringBuilder("deploy");
 
-    switch (environment) {
-      case APP_ENGINE_STANDARD:
-        labelBuilder.append(".standard");
-        break;
-      case APP_ENGINE_FLEX:
-        labelBuilder.append(".flex");
+    if (environment == Environment.APP_ENGINE_STANDARD) {
+      labelBuilder.append(".standard");
+    } else {
+      labelBuilder.append(".flex");
 
-        switch (flexDeploymentType) {
-          case AUTO:
-            labelBuilder.append(".auto");
-            break;
-          case CUSTOM:
-            labelBuilder.append(".custom");
-            break;
-          default:
-            throw new AssertionError("Unknown flexible deployment type.");
-        }
-
-        break;
-      default:
-        throw new AssertionError("Unknown environment type.");
+      if(flexDeploymentType == ConfigType.AUTO) {
+        labelBuilder.append(".auto");
+      } else {
+        labelBuilder.append(".custom");
+      }
     }
 
     labelBuilder.append(".java").append(artifactType.toString());
