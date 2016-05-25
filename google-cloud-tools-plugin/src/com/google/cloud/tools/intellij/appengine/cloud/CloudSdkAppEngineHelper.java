@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.base.Preconditions;
@@ -119,7 +118,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         project,
         artifactToDeploy,
         deploymentConfiguration,
-        wrapCallbackForUsageTracking(deploymentCallback, ConfigType.AUTO, artifactType)
+        wrapCallbackForUsageTracking(deploymentCallback, deploymentConfiguration, artifactType)
     );
   }
 
@@ -143,8 +142,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   private DeploymentOperationCallback wrapCallbackForUsageTracking(
-    final DeploymentOperationCallback deploymentCallback,
-    ConfigType flexDeploymentType, AppEngineFlexDeploymentArtifactType artifactType) {
+      final DeploymentOperationCallback deploymentCallback,
+      AppEngineDeploymentConfiguration deploymentConfiguration,
+      AppEngineFlexDeploymentArtifactType artifactType) {
 
     StringBuilder labelBuilder = new StringBuilder("deploy");
 
@@ -153,7 +153,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     } else {
       labelBuilder.append(".flex");
 
-      if(flexDeploymentType == ConfigType.AUTO) {
+      if(deploymentConfiguration.isAuto()) {
         labelBuilder.append(".auto");
       } else {
         labelBuilder.append(".custom");
