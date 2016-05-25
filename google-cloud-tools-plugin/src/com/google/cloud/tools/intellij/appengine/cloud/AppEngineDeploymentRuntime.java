@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.icons.AllIcons.General;
@@ -66,7 +67,8 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
 
   @Override
   public boolean isUndeploySupported() {
-    return service != null && version != null;
+    return appEngineHelper.getEnvironment() != Environment.APP_ENGINE_STANDARD
+        && service != null && version != null;
   }
 
   @Override

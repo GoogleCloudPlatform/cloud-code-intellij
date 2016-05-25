@@ -19,10 +19,13 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineDeployment;
+import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineStandardStaging;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.app.impl.config.DefaultDeployConfiguration;
+import com.google.cloud.tools.app.impl.config.DefaultStageStandardConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.gson.Gson;
@@ -36,8 +39,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +47,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Performs the deployment of App Engine based applications to GCP.
@@ -59,7 +62,6 @@ public class AppEngineDeployAction extends AppEngineAction {
   private AppEngineDeploymentConfiguration deploymentConfiguration;
   private AppEngineHelper appEngineHelper;
   private DeploymentOperationCallback callback;
-  private DeploymentArtifactType artifactType;
 
   /**
    * Initialize the deployment action.
@@ -78,15 +80,24 @@ public class AppEngineDeployAction extends AppEngineAction {
     this.deploymentArtifactPath = deploymentArtifactPath;
     this.deploymentConfiguration = deploymentConfiguration;
     this.callback = callback;
-    this.artifactType = DeploymentArtifactType.typeForPath(deploymentArtifactPath);
   }
 
   @Override
   public void run() {
-    File stagingDirectory = stage();
+    final File stagingDirectory = createStagingDirectory();
 
     if (stagingDirectory != null) {
-      deploy(stagingDirectory);
+      if (appEngineHelper.getEnvironment() == Environment.APP_ENGINE_STANDARD) {
+        stageStandard(stagingDirectory, new ProcessExitListener() {
+          @Override
+          public void exit(int exitCode) {
+            deploy(stagingDirectory);
+          }
+        });
+      } else {
+        stageFlex(stagingDirectory);
+        deploy(stagingDirectory);
+      }
     }
   }
 
@@ -94,7 +105,7 @@ public class AppEngineDeployAction extends AppEngineAction {
    * Stage the deployment artifacts and return the staging directory or null if it failed.
    */
   @Nullable
-  private File stage() {
+  private File createStagingDirectory() {
     File stagingDirectory;
     try {
       stagingDirectory = FileUtil.createTempDirectory(
@@ -110,9 +121,33 @@ public class AppEngineDeployAction extends AppEngineAction {
       return null;
     }
 
+    return stagingDirectory;
+  }
+
+  private void stageStandard(final File stagingDirectory, ProcessExitListener onComplete) {
+    ConsoleOutputLineListener outputLineListener = new ConsoleOutputLineListener();
+    CloudSdk sdk = createSdk(
+        outputLineListener,
+        outputLineListener,
+        onComplete);
+
+    // TODO determine the default set of flags we want to set for AE standard staging
+    DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();
+    stageConfig.setEnableJarSplitting(true);
+    stageConfig.setStagingDirectory(stagingDirectory);
+    stageConfig.setSourceDirectory(deploymentArtifactPath);
+
+    CloudSdkAppEngineStandardStaging staging = new CloudSdkAppEngineStandardStaging(sdk);
+    staging.stageStandard(stageConfig);
+  }
+
+  private void stageFlex(File stagingDirectory) {
     try {
       File stagedArtifactPath =
-          copyFile(stagingDirectory, "target" + artifactType, deploymentArtifactPath);
+          copyFile(
+              stagingDirectory,
+              "target" + AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath),
+              deploymentArtifactPath);
       stagedArtifactPath.setReadable(true /* readable */, false /* ownerOnly */);
 
       File appYamlPath = deploymentConfiguration.isAuto()
@@ -121,7 +156,7 @@ public class AppEngineDeployAction extends AppEngineAction {
 
       File dockerFilePath = deploymentConfiguration.isAuto()
           ? appEngineHelper.defaultDockerfile(
-          DeploymentArtifactType.typeForPath(deploymentArtifactPath))
+          AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath))
           : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getDockerFilePath());
 
       copyFile(stagingDirectory, "app.yaml", appYamlPath);
@@ -129,10 +164,7 @@ public class AppEngineDeployAction extends AppEngineAction {
     } catch (IOException ex) {
       logger.warn(ex);
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
-      return null;
     }
-
-    return stagingDirectory;
   }
 
   /**
@@ -140,26 +172,19 @@ public class AppEngineDeployAction extends AppEngineAction {
    */
   private void deploy(@NotNull File stagingDirectory) {
     final StringBuilder rawDeployOutput = new StringBuilder();
-    CloudSdk sdk;
 
-    ProcessOutputLineListener stdErrListener = new ProcessOutputLineListener() {
-      @Override
-      public void outputLine(String output) {
-        consoleLogLn(output);
-      }
-    };
-
-    ProcessOutputLineListener stdOutListener = new ProcessOutputLineListener() {
+    ProcessOutputLineListener outputListener = new ConsoleOutputLineListener();
+    ProcessOutputLineListener deployOutputListener = new ProcessOutputLineListener() {
       @Override
       public void outputLine(String output) {
         rawDeployOutput.append(output);
       }
     };
-
     ProcessExitListener deployExitListener = new DeployExitListener(rawDeployOutput);
 
+    CloudSdk sdk;
     try {
-      sdk = prepareExecution(stdErrListener, stdOutListener, deployExitListener);
+      sdk = createSdk(outputListener, deployOutputListener, deployExitListener);
     } catch (AppEngineException ex) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.error"));
       return;

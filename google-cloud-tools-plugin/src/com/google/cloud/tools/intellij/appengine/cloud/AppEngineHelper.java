@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
@@ -34,18 +36,23 @@ public interface AppEngineHelper {
   File getGcloudCommandPath();
 
   /**
+   * The App Engine environment.
+   */
+  Environment getEnvironment();
+
+  /**
    * The default app.yaml to use.
    */
   File defaultAppYaml();
 
   /**
-   * The default Dockerfile we suggest for custom MVM deployments.
+   * The default Dockerfile we suggest for custom flexible deployments.
    *
    * @param deploymentArtifactType depending on the artifact type we provide a different default
    *                               Dockerfile
    * @return A {@link java.io.File} path to the default Dockerfile
    */
-  File defaultDockerfile(DeploymentArtifactType deploymentArtifactType);
+  File defaultDockerfile(AppEngineFlexDeploymentArtifactType deploymentArtifactType);
 
   /**
    * Creates a {@link AppEngineDeployAction} that will perform an App Engine flexible environment

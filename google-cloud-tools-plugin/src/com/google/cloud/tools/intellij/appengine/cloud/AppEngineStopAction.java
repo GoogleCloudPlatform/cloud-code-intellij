@@ -70,16 +70,10 @@ public class AppEngineStopAction extends AppEngineAction {
     CloudSdk sdk;
 
     try {
-      ProcessOutputLineListener outputLineListener = new ProcessOutputLineListener() {
-        @Override
-        public void outputLine(String output) {
-          consoleLogLn(output);
-        }
-      };
-
+      ProcessOutputLineListener outputListener = new ConsoleOutputLineListener();
       ProcessExitListener stopExitListener = new StopExitListener();
 
-      sdk = prepareExecution(outputLineListener, outputLineListener, stopExitListener);
+      sdk = createSdk(outputListener, outputListener, stopExitListener);
     } catch (AppEngineException ex) {
       callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.error"));
       return;

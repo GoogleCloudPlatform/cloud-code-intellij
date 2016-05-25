@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
@@ -66,6 +67,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
@@ -90,6 +92,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private PlaceholderTextField versionIdField;
   private JCheckBox versionOverrideCheckBox;
   private ProjectSelector projectSelector;
+  private JLabel envLabel;
+  private JPanel appEngineFlexConfigPanel;
   private DeploymentSource deploymentSource;
 
   private static final String COST_WARNING_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
@@ -196,11 +200,15 @@ public class AppEngineDeploymentRunConfigurationEditor extends
               @Override
               public File get() {
                 return appEngineHelper.defaultDockerfile(
-                    DeploymentArtifactType.typeForPath(deploymentSource.getFile()));
+                    AppEngineFlexDeploymentArtifactType.typeForPath(deploymentSource.getFile()));
               }
             }, dockerFilePathField, userSpecifiedArtifactFileSelector));
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
+
+    envLabel.setText(appEngineHelper.getEnvironment().toString());
+    appEngineFlexConfigPanel
+        .setVisible(appEngineHelper.getEnvironment() == Environment.APP_ENGINE_FLEX);
   }
 
   @Override

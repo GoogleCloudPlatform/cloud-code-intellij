@@ -47,9 +47,29 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       = "/generation/src/appengine/mvm/war.dockerfile";
 
   private final File gcloudCommandPath;
+  private final Environment environment;
 
-  public CloudSdkAppEngineHelper(@NotNull File gcloudCommandPath) {
+  public enum Environment {
+    APP_ENGINE_STANDARD("App Engine standard"),
+    APP_ENGINE_FLEX("App Engine flexible");
+
+    private String label;
+
+    Environment(String label) {
+      this.label = label;
+    }
+
+    @Override
+    public String toString() {
+      return label; // TODO message bundle
+    }
+  }
+
+  public CloudSdkAppEngineHelper(
+      @NotNull File gcloudCommandPath,
+      @NotNull Environment environment) {
     this.gcloudCommandPath = gcloudCommandPath;
+    this.environment = environment;
   }
 
   @NotNull
@@ -60,13 +80,19 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
+  public Environment getEnvironment() {
+    return environment;
+  }
+
+  @NotNull
+  @Override
   public File defaultAppYaml() {
     return getFileFromResourcePath(DEFAULT_APP_YAML_PATH);
   }
 
   @Nullable
   @Override
-  public File defaultDockerfile(DeploymentArtifactType deploymentArtifactType) {
+  public File defaultDockerfile(AppEngineFlexDeploymentArtifactType deploymentArtifactType) {
     switch (deploymentArtifactType) {
       case WAR:
         return getFileFromResourcePath(DEFAULT_WAR_DOCKERFILE_PATH);
@@ -85,11 +111,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       File artifactToDeploy,
       AppEngineDeploymentConfiguration deploymentConfiguration,
       DeploymentOperationCallback deploymentCallback) throws IllegalArgumentException {
-    DeploymentArtifactType artifactType = DeploymentArtifactType.typeForPath(artifactToDeploy);
-    if (artifactType == DeploymentArtifactType.UNKNOWN) {
-      throw new IllegalArgumentException(artifactToDeploy.getPath() + " is not a support artifact "
-          + "type for automatic deployment");
-    }
+    AppEngineFlexDeploymentArtifactType artifactType = AppEngineFlexDeploymentArtifactType.typeForPath(artifactToDeploy);
     return new AppEngineDeployAction(
         this,
         loggingHandler,
@@ -121,10 +143,22 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @NotNull
   private DeploymentOperationCallback wrapCallbackForUsageTracking(
       final DeploymentOperationCallback deploymentCallback,
-      ConfigType deploymentType, DeploymentArtifactType artifactType) {
+      ConfigType flexDeploymentType, AppEngineFlexDeploymentArtifactType artifactType) {
 
-    StringBuilder labelBuilder = new StringBuilder("deploy.flex");
-    switch (deploymentType) {
+    StringBuilder labelBuilder = new StringBuilder("deploy");
+
+    switch (environment) {
+      case APP_ENGINE_STANDARD:
+        labelBuilder.append(".standard");
+        break;
+      case APP_ENGINE_FLEX:
+        labelBuilder.append(".flex");
+        break;
+      default:
+        throw new AssertionError("Unknown environment type.");
+    }
+
+    switch (flexDeploymentType) {
       case AUTO:
         labelBuilder.append(".auto");
         break;
@@ -132,8 +166,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         labelBuilder.append(".custom");
         break;
       default:
-        throw new AssertionError();
+        throw new AssertionError("Unknown flexible deployment type.");
     }
+
     labelBuilder.append(".java").append(artifactType.toString());
 
     final String eventLabel = labelBuilder.toString();

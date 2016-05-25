@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -24,6 +26,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.runtime.deployment.DeploymentLogManager;
 import com.intellij.remoteServer.runtime.deployment.DeploymentTask;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance;
@@ -63,7 +66,10 @@ class AppEngineRuntimeInstance extends
     }
 
     File gcloudCommandPath = new File(configuration.getCloudSdkHomePath());
-    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(gcloudCommandPath);
+    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(gcloudCommandPath,
+        AppEngineUtil.isAppEngineStandardProject(task.getProject())
+            ? Environment.APP_ENGINE_STANDARD
+            : Environment.APP_ENGINE_FLEX);
 
     final AppEngineDeployAction deployAction;
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();

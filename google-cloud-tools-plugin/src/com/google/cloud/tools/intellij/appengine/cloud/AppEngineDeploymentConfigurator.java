@@ -16,6 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
+import com.google.common.base.Predicate;
+
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModulePointer;
@@ -28,6 +32,7 @@ import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfigurator;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.JavaDeploymentSourceUtil;
+import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,6 +51,7 @@ class AppEngineDeploymentConfigurator extends
     DeploymentConfigurator<AppEngineDeploymentConfiguration, AppEngineServerConfiguration> {
 
   private final Project project;
+  private Environment environment;
 
   public AppEngineDeploymentConfigurator(Project project) {
     this.project = project;
@@ -56,9 +62,59 @@ class AppEngineDeploymentConfigurator extends
   public List<DeploymentSource> getAvailableDeploymentSources() {
     List<DeploymentSource> deploymentSources = new ArrayList<>();
 
+    deploymentSources.addAll(JavaDeploymentSourceUtil
+        .getInstance().createArtifactDeploymentSources(project, collectArtifacts()));
+
+    deploymentSources.addAll(collectModules());
+
+    return deploymentSources;
+  }
+
+  private List<Artifact> collectArtifacts() {
+    List<Artifact> artifacts = new ArrayList<>();
+
+    if (getEnvironment() == Environment.APP_ENGINE_STANDARD) {
+      artifacts.addAll(collectArtifacts(new Predicate<Artifact>() {
+        @Override
+        public boolean apply(Artifact artifact) {
+          return AppEngineUtil.isAppEngineStandardArtifactType(artifact);
+        }
+      }));
+    } else {
+      artifacts.addAll(collectArtifacts(new Predicate<Artifact>() {
+        @Override
+        public boolean apply(Artifact artifact) {
+          return AppEngineUtil.isAppEngineFlexArtifactType(artifact);
+        }
+      }));
+    }
+
+    return artifacts;
+  }
+
+  private List<Artifact> collectArtifacts(Predicate<Artifact> shouldCollect) {
+    List<Artifact> artifacts = new ArrayList<>();
+
+    for (Artifact artifact : ArtifactManager.getInstance(project).getArtifacts()) {
+      if (shouldCollect.apply(artifact)) {
+        artifacts.add(artifact);
+      }
+    }
+
+    Collections.sort(artifacts, ArtifactManager.ARTIFACT_COMPARATOR);
+    return artifacts;
+  }
+
+  private List<ModuleDeploymentSource> collectModules() {
+    if (getEnvironment() == Environment.APP_ENGINE_STANDARD) {
+      return Collections.emptyList();
+    }
+
+    List<ModuleDeploymentSource> moduleDeploymentSources = new ArrayList<>();
+
     for (Module module : ModuleManager.getInstance(project).getModules()) {
       if (isJarOrWarMavenBuild(module)) {
-        deploymentSources.add(
+        moduleDeploymentSources.add(
             new MavenBuildDeploymentSource(
                 ModulePointerManager.getInstance(project).create(module), project));
       }
@@ -66,12 +122,9 @@ class AppEngineDeploymentConfigurator extends
 
     ModulePointer modulePointer =
         ModulePointerManager.getInstance(project).create("userSpecifiedSource");
-    deploymentSources.add(new UserSpecifiedPathDeploymentSource(modulePointer));
+    moduleDeploymentSources.add(new UserSpecifiedPathDeploymentSource(modulePointer));
 
-    deploymentSources.addAll(JavaDeploymentSourceUtil
-        .getInstance().createArtifactDeploymentSources(project, getJarAndWarArtifacts()));
-
-    return deploymentSources;
+    return moduleDeploymentSources;
   }
 
   private boolean isJarOrWarMavenBuild(Module module) {
@@ -85,19 +138,6 @@ class AppEngineDeploymentConfigurator extends
         && ("jar".equalsIgnoreCase(mavenProject.getPackaging())
         || "war".equalsIgnoreCase(mavenProject.getPackaging()));
 
-  }
-
-  private List<Artifact> getJarAndWarArtifacts() {
-    List<Artifact> jarsAndWars = new ArrayList<>();
-    for (Artifact artifact : ArtifactManager.getInstance(project).getArtifacts()) {
-      if (artifact.getArtifactType().getId().equalsIgnoreCase("jar")
-          || artifact.getArtifactType().getId().equalsIgnoreCase("war")) {
-        jarsAndWars.add(artifact);
-      }
-    }
-
-    Collections.sort(jarsAndWars, ArtifactManager.ARTIFACT_COMPARATOR);
-    return jarsAndWars;
   }
 
   @NotNull
@@ -115,6 +155,25 @@ class AppEngineDeploymentConfigurator extends
     return new AppEngineDeploymentRunConfigurationEditor(
         project,
         source,
-        new CloudSdkAppEngineHelper(new File(server.getConfiguration().getCloudSdkHomePath())));
+        new CloudSdkAppEngineHelper(
+            new File(server.getConfiguration().getCloudSdkHomePath()),
+            getEnvironment())
+    );
+  }
+
+  /**
+   * Laziliy ininitialize the environment because this class is instantiated on IDE boot time
+   * and the project may not have yet been fully constructed.
+   *
+   * @return
+   */
+  public Environment getEnvironment() {
+    if (environment == null) {
+      environment = AppEngineUtil.isAppEngineStandardProject(project)
+          ? Environment.APP_ENGINE_STANDARD
+          : Environment.APP_ENGINE_FLEX;
+    }
+
+    return environment;
   }
 }

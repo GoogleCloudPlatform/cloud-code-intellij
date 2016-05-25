@@ -72,7 +72,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
   @NotNull
   @Override
   public String getPresentableName() {
-    return GctBundle.message("appengine.flex.name");
+    return GctBundle.message("appengine.name");
   }
 
   @NotNull

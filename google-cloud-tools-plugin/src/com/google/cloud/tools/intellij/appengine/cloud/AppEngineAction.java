@@ -76,11 +76,10 @@ public abstract class AppEngineAction implements Runnable {
   }
 
   /**
-   * Creates and stages credential file used for executing cloud sdk actions and returns
-   * {@link CloudSdk} instance.
+   * Creates and returns a {@link CloudSdk} instance for executing cloud sdk actions.
    */
   @NotNull
-  CloudSdk prepareExecution(
+  CloudSdk createSdk(
       @NotNull ProcessOutputLineListener stdErrListener,
       @NotNull ProcessOutputLineListener stdOutListener,
       @NotNull ProcessExitListener exitListener) throws AppEngineException {
@@ -180,6 +179,13 @@ public abstract class AppEngineAction implements Runnable {
   protected void consoleLogLn(String message,
       String... arguments) {
     loggingHandler.print(String.format(message + "\n", (Object[]) arguments));
+  }
+
+  protected class ConsoleOutputLineListener implements ProcessOutputLineListener {
+    @Override
+    public void outputLine(String line) {
+      consoleLogLn(line);
+    }
   }
 
   private class ActionProcessStartListener implements ProcessStartListener {
