@@ -15,6 +15,20 @@
  */
 
 dependencies {
+    compile (group: 'com.google.cloud', name: 'reporting-lib', version: '1.0') {
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    }
     compile files('lib/GoogleFeedback.jar')
     testCompile project(":common-test-lib")
+}
+
+processResources {
+    def trackingId =  System.getenv("ANALYTICS_TRACKING_ID");
+    if (trackingId) {
+        filesMatching("**/config.properties") {
+            expand "usageAnalyticsTrackingId": trackingId
+        }
+    }
 }

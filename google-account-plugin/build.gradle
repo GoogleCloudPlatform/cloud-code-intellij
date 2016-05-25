@@ -53,11 +53,18 @@ configurations {
 }
 
 processResources {
+    // TODO: we will soon remove ANALYTICS_ID all together.
     def trackerProperty =  System.getenv("ANALYTICS_ID");
-    if (trackerProperty) {
-        inputs.property("usageTrackerProperty", trackerProperty)
-        filesMatching("**/config.properties") {
-            expand "usageTrackerProperty": trackerProperty
-        }
+    if (!trackerProperty) {
+        trackerProperty = '${usageTrackerProperty}';
+    }
+
+    def analyticsTrackingId = System.getenv("ANALYTICS_TRACKING_ID");
+
+    inputs.property("usageTrackerProperty", trackerProperty);
+    inputs.property("usageAnalyticsTrackingId", analyticsTrackingId);
+
+    filesMatching("**/config.properties") {
+        expand inputs.properties
     }
 }

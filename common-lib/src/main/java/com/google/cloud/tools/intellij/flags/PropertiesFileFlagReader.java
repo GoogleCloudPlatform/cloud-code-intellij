@@ -44,8 +44,7 @@ public class PropertiesFileFlagReader implements FlagReader {
     properties = new Properties();
     InputStream in = null;
     try {
-      in = getClass().getClassLoader()
-          .getResourceAsStream(propertiesFilePath);
+      in = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
       if (in == null) {
         throw new IllegalArgumentException("Failed to find the plugins property configuration file"
             + " which was configured as " + propertiesFilePath);
