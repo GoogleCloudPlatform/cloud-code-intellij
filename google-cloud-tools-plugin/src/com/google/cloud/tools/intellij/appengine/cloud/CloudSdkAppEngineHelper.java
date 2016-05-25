@@ -111,7 +111,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       File artifactToDeploy,
       AppEngineDeploymentConfiguration deploymentConfiguration,
       DeploymentOperationCallback deploymentCallback) throws IllegalArgumentException {
-    AppEngineFlexDeploymentArtifactType artifactType = AppEngineFlexDeploymentArtifactType.typeForPath(artifactToDeploy);
+    AppEngineFlexDeploymentArtifactType artifactType
+        = AppEngineFlexDeploymentArtifactType.typeForPath(artifactToDeploy);
     return new AppEngineDeployAction(
         this,
         loggingHandler,

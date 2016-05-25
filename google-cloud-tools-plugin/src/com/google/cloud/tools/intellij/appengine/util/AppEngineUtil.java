@@ -38,6 +38,10 @@ public class AppEngineUtil {
     // Not designed for instantiation
   }
 
+  /**
+   * A project is an App Engine standard project if it has an artifact that has both an App Engine
+   * standard facet and is an App Engine standard artifact type.
+   */
   public static boolean isAppEngineStandardProject(final Project project) {
     Artifact[] artifacts = ArtifactManager.getInstance(project).getArtifacts();
 
@@ -51,6 +55,10 @@ public class AppEngineUtil {
     return false;
   }
 
+  /**
+   * An artifact has an app engine standard facet if it has a module who's facet name matches that
+   * the facet configured by the App Engine legacy IJ plugin.
+   */
   public static boolean hasAppEngineStandardFacet(Project project, Artifact artifact) {
     Set<Module> modules = ArtifactUtil
         .getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);

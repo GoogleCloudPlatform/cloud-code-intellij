@@ -162,10 +162,8 @@ class AppEngineDeploymentConfigurator extends
   }
 
   /**
-   * Laziliy ininitialize the environment because this class is instantiated on IDE boot time
+   * Lazily initialize the environment because this class is instantiated on IDE boot time
    * and the project may not have yet been fully constructed.
-   *
-   * @return
    */
   public Environment getEnvironment() {
     if (environment == null) {
