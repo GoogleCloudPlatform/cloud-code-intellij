@@ -95,13 +95,20 @@ public abstract class AppEngineAction implements Runnable {
     CloudToolsPluginInfoService pluginInfoService =
         ServiceManager.getService(CloudToolsPluginInfoService.class);
 
+    ProcessStartListener startListener = new ProcessStartListener() {
+      @Override
+      public void start(Process process) {
+        actionProcess = process;  // Save the reference so that we can cancel() it later.
+      }
+    };
+
     return new CloudSdk.Builder()
         .sdkPath(appEngineHelper.getGcloudCommandPath())
         .async(true)
         .addStdErrLineListener(stdErrListener)
         .addStdOutLineListener(stdOutListener)
         .exitListener(exitListener)
-        .startListener(new ActionProcessStartListener())
+        .startListener(startListener)
         .appCommandCredentialFile(credentialsPath)
         .appCommandMetricsEnvironment("gcloud-intellij")
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
@@ -180,13 +187,6 @@ public abstract class AppEngineAction implements Runnable {
   protected void consoleLogLn(String message,
       String... arguments) {
     loggingHandler.print(String.format(message + "\n", (Object[]) arguments));
-  }
-
-  private class ActionProcessStartListener implements ProcessStartListener {
-    @Override
-    public void start(Process process) {
-      actionProcess = process;  // Save the reference so that we can cancel() it later.
-    }
   }
 }
 
