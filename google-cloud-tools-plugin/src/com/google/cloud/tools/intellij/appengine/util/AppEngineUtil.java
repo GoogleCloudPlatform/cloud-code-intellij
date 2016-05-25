@@ -57,7 +57,7 @@ public class AppEngineUtil {
 
   /**
    * An artifact has an app engine standard facet if it has a module who's facet name matches that
-   * the facet configured by the App Engine legacy IJ plugin.
+   * of the facet configured by the App Engine legacy IJ plugin.
    */
   public static boolean hasAppEngineStandardFacet(Project project, Artifact artifact) {
     Set<Module> modules = ArtifactUtil
