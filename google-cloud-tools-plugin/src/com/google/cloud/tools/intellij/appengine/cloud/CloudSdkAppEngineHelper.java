@@ -154,20 +154,21 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         break;
       case APP_ENGINE_FLEX:
         labelBuilder.append(".flex");
+
+        switch (flexDeploymentType) {
+          case AUTO:
+            labelBuilder.append(".auto");
+            break;
+          case CUSTOM:
+            labelBuilder.append(".custom");
+            break;
+          default:
+            throw new AssertionError("Unknown flexible deployment type.");
+        }
+
         break;
       default:
         throw new AssertionError("Unknown environment type.");
-    }
-
-    switch (flexDeploymentType) {
-      case AUTO:
-        labelBuilder.append(".auto");
-        break;
-      case CUSTOM:
-        labelBuilder.append(".custom");
-        break;
-      default:
-        throw new AssertionError("Unknown flexible deployment type.");
     }
 
     labelBuilder.append(".java").append(artifactType.toString());
