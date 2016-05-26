@@ -86,7 +86,11 @@ public class AppEngineDeployAction extends AppEngineAction {
   public void run() {
     final File stagingDirectory = createStagingDirectory();
 
-    if (stagingDirectory != null) {
+    if (stagingDirectory == null) {
+      return;
+    }
+
+    try {
       if (appEngineHelper.getEnvironment() == Environment.APP_ENGINE_STANDARD) {
         stageStandard(stagingDirectory, new ProcessExitListener() {
           @Override
@@ -98,6 +102,8 @@ public class AppEngineDeployAction extends AppEngineAction {
         stageFlex(stagingDirectory);
         deploy(stagingDirectory);
       }
+    } catch (DeployActionException dae) {
+      callback.errorOccurred(dae.getMessage());
     }
   }
 
@@ -124,23 +130,38 @@ public class AppEngineDeployAction extends AppEngineAction {
     return stagingDirectory;
   }
 
+  /**
+   * Performs staging of the project for the App Engine standard environment.
+   *
+   * @throws DeployActionException if staging is not successful
+   */
   private void stageStandard(final File stagingDirectory, ProcessExitListener onComplete) {
-    ConsoleOutputLineListener outputLineListener = new ConsoleOutputLineListener();
-    CloudSdk sdk = createSdk(
-        outputLineListener,
-        outputLineListener,
-        onComplete);
+    try {
+      ConsoleOutputLineListener outputLineListener = new ConsoleOutputLineListener();
+      CloudSdk sdk = createSdk(
+          outputLineListener,
+          outputLineListener,
+          onComplete);
 
-    // TODO determine the default set of flags we want to set for AE standard staging
-    DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();
-    stageConfig.setEnableJarSplitting(true);
-    stageConfig.setStagingDirectory(stagingDirectory);
-    stageConfig.setSourceDirectory(deploymentArtifactPath);
+      // TODO determine the default set of flags we want to set for AE standard staging
+      DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();
+      stageConfig.setEnableJarSplitting(true);
+      stageConfig.setStagingDirectory(stagingDirectory);
+      stageConfig.setSourceDirectory(deploymentArtifactPath);
 
-    CloudSdkAppEngineStandardStaging staging = new CloudSdkAppEngineStandardStaging(sdk);
-    staging.stageStandard(stageConfig);
+      CloudSdkAppEngineStandardStaging staging = new CloudSdkAppEngineStandardStaging(sdk);
+      staging.stageStandard(stageConfig);
+    } catch(AppEngineException aee) {
+      logger.warn(aee);
+      throw new DeployActionException(GctBundle.message("appengine.deployment.error.during.staging"));
+    }
   }
 
+  /**
+   * Perform staging of the project for the App Engine flexible environment.
+   *
+   * @throws DeployActionException if staging is not successful
+   */
   private void stageFlex(File stagingDirectory) {
     try {
       File stagedArtifactPath =
@@ -163,7 +184,7 @@ public class AppEngineDeployAction extends AppEngineAction {
       copyFile(stagingDirectory, "Dockerfile", dockerFilePath);
     } catch (IOException ex) {
       logger.warn(ex);
-      callback.errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
+      throw new DeployActionException(GctBundle.message("appengine.deployment.error.during.staging"));
     }
   }
 
@@ -186,8 +207,7 @@ public class AppEngineDeployAction extends AppEngineAction {
     try {
       sdk = createSdk(outputListener, deployOutputListener, deployExitListener);
     } catch (AppEngineException ex) {
-      callback.errorOccurred(GctBundle.message("appengine.deployment.error"));
-      return;
+      throw new DeployActionException(GctBundle.message("appengine.deployment.error"));
     }
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
@@ -298,6 +318,13 @@ public class AppEngineDeployAction extends AppEngineAction {
         return null;
       }
       return versions.get(0).service;
+    }
+  }
+
+  public static class DeployActionException extends RuntimeException {
+
+    DeployActionException(String message) {
+      super(message);
     }
   }
 }
