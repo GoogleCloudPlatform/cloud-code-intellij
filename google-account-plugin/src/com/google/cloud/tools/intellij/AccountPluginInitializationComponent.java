@@ -30,7 +30,6 @@ import com.intellij.notification.NotificationsManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.diagnostic.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,9 +37,6 @@ import org.jetbrains.annotations.NotNull;
  * Performs runtime initialization for the Google Login plugin.
  */
 public class AccountPluginInitializationComponent implements ApplicationComponent {
-
-  private static final Logger logger =
-      Logger.getInstance(AccountPluginInitializationComponent.class);
 
   @NotNull
   @Override
