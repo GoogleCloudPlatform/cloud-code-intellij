@@ -80,8 +80,10 @@ public class AccountPluginInitializationComponentTest extends BasePluginTestCase
     ApplicationManager.setApplication(mockApplication, mock(Disposable.class));
     AccountPluginInitializationComponent testComponent = spy(new AccountPluginInitializationComponent());
     doNothing().when(testComponent).configureUsageTracking();
+    doNothing().when(testComponent).initUsageTracker();
     testComponent.initComponent();
     verify(testComponent).configureUsageTracking();
+    verify(testComponent).initUsageTracker();
   }
 
   @Test

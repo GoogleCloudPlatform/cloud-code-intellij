@@ -16,10 +16,13 @@
 
 package com.google.cloud.tools.intellij;
 
+import com.google.cloud.tools.intellij.analytics.IdeaUsageTracker;
+import com.google.cloud.tools.intellij.login.PropertiesFilePluginFlags;
 import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
 import com.google.cloud.tools.intellij.stats.UsageTrackerManager;
 import com.google.cloud.tools.intellij.stats.UsageTrackerNotification;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicate;
 
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationsConfiguration;
@@ -27,6 +30,7 @@ import com.intellij.notification.NotificationsManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.diagnostic.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -34,6 +38,9 @@ import org.jetbrains.annotations.NotNull;
  * Performs runtime initialization for the Google Login plugin.
  */
 public class AccountPluginInitializationComponent implements ApplicationComponent {
+
+  private static final Logger logger =
+      Logger.getInstance(AccountPluginInitializationComponent.class);
 
   @NotNull
   @Override
@@ -53,7 +60,24 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
     }
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       configureUsageTracking();
+      initUsageTracker();
     }
+  }
+
+  @VisibleForTesting
+  void initUsageTracker() {
+    String platformPrefix = System.getProperty("idea.platform.prefix");
+    String trackingId = new PropertiesFilePluginFlags().getAnalyticsId();
+
+    Predicate<Object> userOptedIn = new Predicate<Object>() {
+      @Override
+      public boolean apply(@javax.annotation.Nullable Object object) {
+        return UsageTrackerManager.getInstance().hasUserOptedIn();
+      }
+    };
+
+    IdeaUsageTracker usageTracker = ServiceManager.getService(IdeaUsageTracker.class);
+    usageTracker.init(platformPrefix, trackingId, userOptedIn);
   }
 
   @Override
