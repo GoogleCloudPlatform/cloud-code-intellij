@@ -249,8 +249,8 @@ public class AppEngineDeployAction extends AppEngineAction {
       throws IOException {
     File destinationFilePath = new File(stagingDirectory, targetFileName);
     FileUtil.copy(sourceFilePath, destinationFilePath);
-    consoleLogLn("Copied %s %s to %s", targetFileName,
-        sourceFilePath.getAbsolutePath(), destinationFilePath.getAbsolutePath());
+    consoleLogLn(String.format("Copied %s %s to %s", targetFileName,
+        sourceFilePath.getAbsolutePath(), destinationFilePath.getAbsolutePath()));
     return destinationFilePath;
   }
 

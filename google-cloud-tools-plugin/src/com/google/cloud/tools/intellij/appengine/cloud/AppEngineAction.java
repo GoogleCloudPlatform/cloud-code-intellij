@@ -176,9 +176,8 @@ public abstract class AppEngineAction implements Runnable {
     }
   }
 
-  protected void consoleLogLn(String message,
-      String... arguments) {
-    loggingHandler.print(String.format(message + "\n", (Object[]) arguments));
+  protected void consoleLogLn(String message) {
+    loggingHandler.print(message + "\n");
   }
 
   protected class ConsoleOutputLineListener implements ProcessOutputLineListener {
