@@ -151,9 +151,10 @@ public class AppEngineDeployAction extends AppEngineAction {
 
       CloudSdkAppEngineStandardStaging staging = new CloudSdkAppEngineStandardStaging(sdk);
       staging.stageStandard(stageConfig);
-    } catch(AppEngineException aee) {
+    } catch (AppEngineException aee) {
       logger.warn(aee);
-      throw new DeployActionException(GctBundle.message("appengine.deployment.error.during.staging"));
+      throw new DeployActionException(
+          GctBundle.message("appengine.deployment.error.during.staging"));
     }
   }
 
@@ -184,7 +185,8 @@ public class AppEngineDeployAction extends AppEngineAction {
       copyFile(stagingDirectory, "Dockerfile", dockerFilePath);
     } catch (IOException ex) {
       logger.warn(ex);
-      throw new DeployActionException(GctBundle.message("appengine.deployment.error.during.staging"));
+      throw new DeployActionException(
+          GctBundle.message("appengine.deployment.error.during.staging"));
     }
   }
 

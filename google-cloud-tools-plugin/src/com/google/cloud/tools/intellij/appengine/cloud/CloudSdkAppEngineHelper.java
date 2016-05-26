@@ -153,7 +153,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     } else {
       labelBuilder.append(".flex");
 
-      if(deploymentConfiguration.isAuto()) {
+      if (deploymentConfiguration.isAuto()) {
         labelBuilder.append(".auto");
       } else {
         labelBuilder.append(".custom");
