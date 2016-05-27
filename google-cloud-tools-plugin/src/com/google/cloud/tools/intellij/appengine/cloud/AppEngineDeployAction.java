@@ -84,13 +84,9 @@ public class AppEngineDeployAction extends AppEngineAction {
 
   @Override
   public void run() {
-    final File stagingDirectory = createStagingDirectory();
-
-    if (stagingDirectory == null) {
-      return;
-    }
-
     try {
+      final File stagingDirectory = createStagingDirectory();
+
       if (appEngineHelper.getEnvironment() == Environment.APP_ENGINE_STANDARD) {
         stageStandard(stagingDirectory, new ProcessExitListener() {
           @Override
@@ -114,7 +110,7 @@ public class AppEngineDeployAction extends AppEngineAction {
   /**
    * Stage the deployment artifacts and return the staging directory or null if it failed.
    */
-  @Nullable
+  @NotNull
   private File createStagingDirectory() {
     File stagingDirectory;
     try {
@@ -126,9 +122,8 @@ public class AppEngineDeployAction extends AppEngineAction {
           "Created temporary staging directory: " + stagingDirectory.getAbsolutePath());
     } catch (IOException ex) {
       logger.warn(ex);
-      callback.errorOccurred(
+      throw new DeployActionException(
           GctBundle.message("appengine.deployment.error.creating.staging.directory"));
-      return null;
     }
 
     return stagingDirectory;
