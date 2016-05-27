@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij;
 
+import com.google.cloud.tools.intellij.analytics.IdeaUsageTracker;
+import com.google.cloud.tools.intellij.login.PropertiesFilePluginFlags;
 import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
 import com.google.cloud.tools.intellij.stats.UsageTrackerManager;
 import com.google.cloud.tools.intellij.stats.UsageTrackerNotification;
@@ -53,7 +55,15 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
     }
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       configureUsageTracking();
+      initUsageTracker();
     }
+  }
+
+  @VisibleForTesting
+  void initUsageTracker() {
+    String trackingId = new PropertiesFilePluginFlags().getAnalyticsId();
+    IdeaUsageTracker usageTracker = ServiceManager.getService(IdeaUsageTracker.class);
+    usageTracker.init(trackingId);
   }
 
   @Override
