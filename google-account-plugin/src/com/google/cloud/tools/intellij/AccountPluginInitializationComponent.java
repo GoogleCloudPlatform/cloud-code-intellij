@@ -22,7 +22,6 @@ import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
 import com.google.cloud.tools.intellij.stats.UsageTrackerManager;
 import com.google.cloud.tools.intellij.stats.UsageTrackerNotification;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
 
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationsConfiguration;
@@ -62,18 +61,9 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
 
   @VisibleForTesting
   void initUsageTracker() {
-    String platformPrefix = System.getProperty("idea.platform.prefix");
     String trackingId = new PropertiesFilePluginFlags().getAnalyticsId();
-
-    Predicate<Object> userOptedIn = new Predicate<Object>() {
-      @Override
-      public boolean apply(@javax.annotation.Nullable Object object) {
-        return UsageTrackerManager.getInstance().hasUserOptedIn();
-      }
-    };
-
     IdeaUsageTracker usageTracker = ServiceManager.getService(IdeaUsageTracker.class);
-    usageTracker.init(platformPrefix, trackingId, userOptedIn);
+    usageTracker.init(trackingId);
   }
 
   @Override

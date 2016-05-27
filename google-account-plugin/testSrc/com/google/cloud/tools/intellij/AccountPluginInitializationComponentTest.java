@@ -83,7 +83,7 @@ public class AccountPluginInitializationComponentTest extends BasePluginTestCase
     doNothing().when(testComponent).initUsageTracker();
     testComponent.initComponent();
     verify(testComponent).configureUsageTracking();
-    verify(testComponent).initUsageTracker();
+    doNothing().when(testComponent).initUsageTracker();
   }
 
   @Test

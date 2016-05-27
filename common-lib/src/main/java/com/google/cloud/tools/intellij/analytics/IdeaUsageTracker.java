@@ -20,13 +20,12 @@ import com.google.cloud.metrics.Event;
 import com.google.cloud.metrics.MetricsException;
 import com.google.cloud.metrics.MetricsSender;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.updateSettings.impl.UpdateChecker;
+import com.intellij.util.PlatformUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,44 +44,42 @@ public class IdeaUsageTracker {
 
   private static final Logger logger = Logger.getInstance(IdeaUsageTracker.class);
 
-  // UUID for this IntelliJ installation. Will be used to uniquely identify a user.
-  private static final String clientUuid =
+  private static final String USAGE_TRACKER_KEY = "GOOGLE_CLOUD_TOOLS_USAGE_TRACKER_OPT_IN";
+
+  // UUID for this IntelliJ installation.
+  private static final String CLIENT_UUID =
       UpdateChecker.getInstallationUID(PropertiesComponent.getInstance());
 
-  private String ideaType;
+  private static final String TYPE_PREFIX = "gcloud-intellij-";
+
   private String analyticsTrackingId;
-  private Predicate<Object> optedIn;
 
   /**
    * Initialize the tracker.
    *
-   * @param ideaTypePostfix String indicating IntelliJ IDEA type (e.g., Community Edition or
-   *      Ultimate Edition) appended to the event type string reported to GA.
-   * @param analyticsTrackingId In our IntelliJ codebase, the Tracking ID is supposed to come from
-   *     "google-account-plugin/resources/config.properties". The property name is
-   *     "usage.analytics.tracking.id".
-   * @param optedIn A predicate (effectively an 0-argument lambda function) returning if a user has
-   *     opted in for client-side usage reporting.
+   * @param analyticsTrackingId Tracking ID of a Property in Google Analytics to which this class
+   *     will send usage pings. (In our IntelliJ codebase, the Tracking ID is supposed to come
+   *     from "google-account-plugin/resources/config.properties". The property name is
+   *     "usage.analytics.tracking.id".)
    */
-  public void init(@Nullable String ideaTypePostfix,
-      @Nullable String analyticsTrackingId, @Nullable Predicate<Object> optedIn) {
+  public void init(@Nullable String analyticsTrackingId) {
     // Do the basic checking to see if "google-account-plugin/build.gradle" has expanded the
     // Tracking ID property. Analytics Tracking ID has the form of "UA-xxxxxxxx-y"
     // (https://support.google.com/analytics/answer/1032385?hl=en).
     if (analyticsTrackingId != null && analyticsTrackingId.startsWith("UA-")) {
-      Preconditions.checkNotNull(optedIn);
-
       this.analyticsTrackingId = analyticsTrackingId;
-      this.optedIn = optedIn;
-      this.ideaType = "gcloud.intellij." + (ideaTypePostfix == null ? "unknown" : ideaTypePostfix);
     }
+  }
+
+  private boolean hasUserOptedIn() {
+    return PropertiesComponent.getInstance().getBoolean(USAGE_TRACKER_KEY, false);
   }
 
   /**
    * Send an opt-in usage event to Google Analytics. Do not send any PII.
    */
   public void trackEvent(@NotNull String eventName, @Nullable Map<String, String> metadata) {
-    if (analyticsTrackingId != null && optedIn != null && optedIn.apply(null)) {
+    if (analyticsTrackingId != null && hasUserOptedIn()) {
       try {
         new MetricsSender(analyticsTrackingId).send(buildEvent(eventName, metadata));
       } catch (MetricsException me) {
@@ -103,8 +100,8 @@ public class IdeaUsageTracker {
   @VisibleForTesting
   Event buildEvent(@NotNull String eventName, @Nullable Map<String, String> metadata) {
     Event.Builder builder = Event.builder();
-    builder.setClientId(clientUuid);
-    builder.setType(ideaType);
+    builder.setClientId(CLIENT_UUID);
+    builder.setType(TYPE_PREFIX + PlatformUtils.getPlatformPrefix());
     builder.setName(eventName);
     builder.setIsUserSignedIn(false);
     builder.setIsUserInternal(false);
