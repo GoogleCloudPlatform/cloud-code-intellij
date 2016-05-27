@@ -95,7 +95,11 @@ public class AppEngineDeployAction extends AppEngineAction {
         stageStandard(stagingDirectory, new ProcessExitListener() {
           @Override
           public void exit(int exitCode) {
-            deploy(stagingDirectory);
+            try {
+              deploy(stagingDirectory);
+            } catch (DeployActionException dae) {
+              callback.errorOccurred(dae.getMessage());
+            }
           }
         });
       } else {
@@ -154,7 +158,8 @@ public class AppEngineDeployAction extends AppEngineAction {
     } catch (AppEngineException aee) {
       logger.warn(aee);
       throw new DeployActionException(
-          GctBundle.message("appengine.deployment.error.during.staging"));
+          GctBundle.message("appengine.deployment.error.during.staging") + "\n"
+              + GctBundle.message("appengine.action.error.update.message"));
     }
   }
 
@@ -205,23 +210,23 @@ public class AppEngineDeployAction extends AppEngineAction {
     };
     ProcessExitListener deployExitListener = new DeployExitListener(rawDeployOutput);
 
-    CloudSdk sdk;
     try {
-      sdk = createSdk(outputListener, deployOutputListener, deployExitListener);
-    } catch (AppEngineException ex) {
-      throw new DeployActionException(GctBundle.message("appengine.deployment.error"));
-    }
+      CloudSdk sdk = createSdk(outputListener, deployOutputListener, deployExitListener);
 
-    DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
-    configuration.setDeployables(Collections.singletonList(new File(stagingDirectory, "app.yaml")));
-    configuration.setProject(deploymentConfiguration.getCloudProjectName());
-    configuration.setPromote(true);
-    if (!StringUtil.isEmpty(deploymentConfiguration.getVersion())) {
-      configuration.setVersion(deploymentConfiguration.getVersion());
-    }
+      DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
+      configuration.setDeployables(Collections.singletonList(new File(stagingDirectory, "app.yaml")));
+      configuration.setProject(deploymentConfiguration.getCloudProjectName());
+      configuration.setPromote(true);
+      if (!StringUtil.isEmpty(deploymentConfiguration.getVersion())) {
+        configuration.setVersion(deploymentConfiguration.getVersion());
+      }
 
-    CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
-    deployment.deploy(configuration);
+      CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
+      deployment.deploy(configuration);
+    } catch (AppEngineException | IllegalArgumentException ex) {
+      throw new DeployActionException(GctBundle.message("appengine.deployment.error") + "\n"
+          + GctBundle.message("appengine.action.error.update.message"));
+    }
   }
 
   private class DeployExitListener implements ProcessExitListener {
@@ -246,7 +251,8 @@ public class AppEngineDeployAction extends AppEngineAction {
           if (deployOutput == null
               || deployOutput.getService() == null || deployOutput.getVersion() == null) {
             consoleLogLn(
-                GctBundle.message("appengine.deployment.version.extract.failure") + "\n");
+                GctBundle.message("appengine.deployment.version.extract.failure") + "\n"
+                    + GctBundle.message("appengine.action.error.update.message"));
           }
 
           callback.succeeded(
@@ -259,7 +265,8 @@ public class AppEngineDeployAction extends AppEngineAction {
         } else {
           logger.warn("Deployment process exited with an error. Exit Code:" + exitCode);
           callback.errorOccurred(
-              GctBundle.message("appengine.deployment.error.with.code", exitCode));
+              GctBundle.message("appengine.deployment.error.with.code", exitCode) + "\n"
+                  + GctBundle.message("appengine.action.error.update.message"));
         }
       } finally {
         deleteCredentials();
