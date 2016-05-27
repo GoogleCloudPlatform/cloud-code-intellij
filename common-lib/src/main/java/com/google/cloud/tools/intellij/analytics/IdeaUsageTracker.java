@@ -50,7 +50,7 @@ public class IdeaUsageTracker {
   private static final String CLIENT_UUID =
       UpdateChecker.getInstallationUID(PropertiesComponent.getInstance());
 
-  private static final String TYPE_PREFIX = "gcloud-intellij-";
+  private static final String EVENT_TYPE = "gcloud-intellij-" + PlatformUtils.getPlatformPrefix();
 
   private String analyticsTrackingId;
 
@@ -101,7 +101,7 @@ public class IdeaUsageTracker {
   Event buildEvent(@NotNull String eventName, @Nullable Map<String, String> metadata) {
     Event.Builder builder = Event.builder();
     builder.setClientId(CLIENT_UUID);
-    builder.setType(TYPE_PREFIX + PlatformUtils.getPlatformPrefix());
+    builder.setType(EVENT_TYPE);
     builder.setName(eventName);
     builder.setIsUserSignedIn(false);
     builder.setIsUserInternal(false);
