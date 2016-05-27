@@ -206,16 +206,16 @@ public class AppEngineDeployAction extends AppEngineAction {
     ProcessExitListener deployExitListener = new DeployExitListener(rawDeployOutput);
 
     try {
-      CloudSdk sdk = createSdk(outputListener, deployOutputListener, deployExitListener);
-
       DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
-      configuration.setDeployables(Collections.singletonList(new File(stagingDirectory, "app.yaml")));
+      configuration.setDeployables(
+          Collections.singletonList(new File(stagingDirectory, "app.yaml")));
       configuration.setProject(deploymentConfiguration.getCloudProjectName());
       configuration.setPromote(true);
       if (!StringUtil.isEmpty(deploymentConfiguration.getVersion())) {
         configuration.setVersion(deploymentConfiguration.getVersion());
       }
 
+      CloudSdk sdk = createSdk(outputListener, deployOutputListener, deployExitListener);
       CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
       deployment.deploy(configuration);
     } catch (AppEngineException | IllegalArgumentException ex) {
