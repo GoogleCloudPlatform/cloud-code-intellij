@@ -43,7 +43,7 @@ class AppEngineRuntimeInstance extends
     ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
   private AppEngineServerConfiguration configuration;
-  private final Set<AppEngineDeployAction> createdDeployments;
+  private final Set<Runnable> createdDeployments;
 
   public AppEngineRuntimeInstance(
       AppEngineServerConfiguration configuration) {
@@ -65,12 +65,13 @@ class AppEngineRuntimeInstance extends
     }
 
     File gcloudCommandPath = new File(configuration.getCloudSdkHomePath());
-    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(gcloudCommandPath,
+    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
+        task.getProject(),
+        gcloudCommandPath,
         AppEngineUtil.isAppEngineStandardProject(task.getProject())
             ? Environment.APP_ENGINE_STANDARD
             : Environment.APP_ENGINE_FLEX);
 
-    final AppEngineDeployAction deployAction;
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
     File deploymentSource = task.getSource().getFile();
     if (deploymentSource == null) {
@@ -78,17 +79,15 @@ class AppEngineRuntimeInstance extends
       return;
     }
 
-    deployAction = appEngineHelper.createDeploymentAction(
+    final Runnable deployRunner =  appEngineHelper.createDeployRunner(
         logManager.getMainLoggingHandler(),
-        task.getProject(),
         deploymentSource,
         deploymentConfig,
-        callback
-    );
+        callback);
 
     // keep track of any active deployments
     synchronized (createdDeployments) {
-      createdDeployments.add(deployAction);
+      createdDeployments.add(deployRunner);
     }
 
     ProgressManager.getInstance()
@@ -97,7 +96,7 @@ class AppEngineRuntimeInstance extends
             null) {
           @Override
           public void run(@NotNull ProgressIndicator indicator) {
-            ApplicationManager.getApplication().invokeLater(deployAction);
+            ApplicationManager.getApplication().invokeLater(deployRunner);
           }
         });
   }
@@ -110,8 +109,9 @@ class AppEngineRuntimeInstance extends
   public void disconnect() {
     // kill any executing deployment actions
     synchronized (createdDeployments) {
-      for (AppEngineDeployAction action : createdDeployments) {
-        action.cancel();
+      for (Runnable runnable : createdDeployments) {
+        // TODO replace cancel functionality
+        // runnable.cancel();
       }
       createdDeployments.clear();
     }

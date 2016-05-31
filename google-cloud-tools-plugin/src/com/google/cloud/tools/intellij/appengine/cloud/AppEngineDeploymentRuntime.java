@@ -44,23 +44,21 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
   private static final String STOP_CONFIRMATION_URI_CLOSE_TAG = "</a>";
 
   private Project project;
-  private AppEngineHelper appEngineHelper;
   private LoggingHandler loggingHandler;
-  private AppEngineDeploymentConfiguration deploymentConfiguration;
+  private AppEngineHelper appEngineHelper;
   private String service;
   private String version;
 
   public AppEngineDeploymentRuntime(
       @NotNull Project project,
-      @NotNull AppEngineHelper appEngineHelper,
       @NotNull LoggingHandler loggingHandler,
+      @NotNull AppEngineHelper appEngineHelper,
       @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
       @Nullable String service,
       @Nullable String version) {
     this.project = project;
-    this.appEngineHelper = appEngineHelper;
     this.loggingHandler = loggingHandler;
-    this.deploymentConfiguration = deploymentConfiguration;
+    this.appEngineHelper = appEngineHelper;
     this.service = service;
     this.version = version;
   }
@@ -96,15 +94,17 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
   }
 
   private void stop(@NotNull UndeploymentTaskCallback callback) {
-    final AppEngineAction appEngineStopAction = appEngineHelper.createStopAction(
-        loggingHandler, deploymentConfiguration, service, version, callback);
+    AppEngineStop stop = new AppEngineStop(appEngineHelper, loggingHandler, callback);
+
+    final AppEngineStopRunner stopRunner =
+        new AppEngineStopRunner(stop, service, version);
 
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(project, "Stop App Engine", true,
             null) {
           @Override
           public void run(@NotNull ProgressIndicator indicator) {
-            ApplicationManager.getApplication().invokeLater(appEngineStopAction);
+            ApplicationManager.getApplication().invokeLater(stopRunner);
           }
         });
   }

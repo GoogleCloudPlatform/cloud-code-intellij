@@ -16,19 +16,27 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Provides basic Gcloud based App Engine functionality for our Cloud Tools plugin.
  */
 public interface AppEngineHelper {
+
+  /**
+   * The project within the context of this helper.
+   */
+  Project getProject();
 
   /**
    * The path to the gcloud command on the local file system.
@@ -55,39 +63,52 @@ public interface AppEngineHelper {
   File defaultDockerfile(AppEngineFlexDeploymentArtifactType deploymentArtifactType);
 
   /**
-   * Creates a {@link AppEngineDeployAction} that will perform an App Engine flexible environment
-   * deployment based on the {@link AppEngineDeploymentConfiguration}.
+   * Creates a {@link Runnable} that will execute the tasks necessary for deployment to an App
+   * Engine environment.
    *
    * @param loggingHandler logging messages will be output to this
-   * @param project the IJ project
    * @param artifactToDeploy the {@link File} path to the Java artifact to be deployed
    * @param deploymentConfiguration the configuration specifying the deployment
-   * @param deploymentCallback a callback for handling completions of the operation
-   * @return the action that will perform the deployment operation
+   * @param callback a callback for handling completions of the operation
+   * @return the runnable that will perform the deployment operation
    */
-  AppEngineDeployAction createDeploymentAction(
+  Runnable createDeployRunner(
       LoggingHandler loggingHandler,
-      Project project,
       File artifactToDeploy,
       AppEngineDeploymentConfiguration deploymentConfiguration,
-      DeploymentOperationCallback deploymentCallback);
+      DeploymentOperationCallback callback);
 
   /**
-   * Creates a {@link AppEngineStopAction} that will stop an App Engine application that was just
-   * deployed.
+   * Creates a temporary staging directory on the local filesystem.
    *
    * @param loggingHandler logging messages will be output to this
-   * @param deploymentConfiguration the configuration specifying the deployment that is to be
-   *     stopped
-   * @param moduleToStop the module to stop
-   * @param versionToStop the version to stop
-   * @param undeploymentTaskCallback a callback for handling completions of the operation
-   * @return the action that will perform the stop operation
+   * @return the file representing the staging directory
+   * @throws IOException if the staging fails
    */
-  AppEngineStopAction createStopAction(
+  File createStagingDirectory(LoggingHandler loggingHandler) throws IOException;
+
+  /**
+   * Creates an {@link CloudSdk} object that is used in execution of various App Engine actions.
+   *
+   * @param loggingHandler logging messages will be output to this
+   * @param stdErrListener the output listener for handling "normal" operation messages
+   * @param stdOutListener the output listener for handling the output messages of the operation
+   * @param exitListener the listener for handling the completeion of the operation
+   * @return the {@link CloudSdk} object used in executing the operation
+   */
+  CloudSdk createSdk(
       LoggingHandler loggingHandler,
-      AppEngineDeploymentConfiguration deploymentConfiguration,
-      String moduleToStop,
-      String versionToStop,
-      UndeploymentTaskCallback undeploymentTaskCallback);
+      ProcessOutputLineListener stdErrListener,
+      ProcessOutputLineListener stdOutListener,
+      ProcessExitListener exitListener);
+
+  /**
+   * Locally stages user credentials to support various App Engine actions.
+   */
+  void stageCredentials(String googleUsername);
+
+  /**
+   * Delets the locally staged credentials, if they exist.
+   */
+  void deleteCredentials();
 }

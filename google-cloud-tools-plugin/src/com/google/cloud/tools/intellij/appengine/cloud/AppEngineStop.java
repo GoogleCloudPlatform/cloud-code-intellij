@@ -37,56 +37,62 @@ import java.util.Collections;
 import javax.swing.SwingUtilities;
 
 /**
- * Stops an App Engine based application running on GCP.
+ * Stops a module & version of an application running on App Engine.
  */
-public class AppEngineStopAction extends AppEngineAction {
+public class AppEngineStop {
 
-  private static final Logger logger = Logger.getInstance(AppEngineStopAction.class);
+  private static final Logger logger = Logger.getInstance(AppEngineStop.class);
 
+  private AppEngineHelper helper;
+  private LoggingHandler loggingHandler;
   private UndeploymentTaskCallback callback;
 
-  private String moduleToStop;
-  private String versionToStop;
-
   /**
-   * Initialize the stop action.
+   * Initialize the stop dependencies.
    */
-  public AppEngineStopAction(
-      @NotNull AppEngineHelper appEngineHelper,
-      @NotNull LoggingHandler loggingHandler,
-      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
-      @NotNull String moduleToStop,
-      @NotNull String versionToStop,
-      @NotNull UndeploymentTaskCallback callback) {
-    super(loggingHandler, appEngineHelper, deploymentConfiguration);
-
-    this.moduleToStop = moduleToStop;
-    this.versionToStop = versionToStop;
+  public AppEngineStop(AppEngineHelper helper,
+      LoggingHandler loggingHandler,
+      UndeploymentTaskCallback callback) {
+    this.helper = helper;
+    this.loggingHandler = loggingHandler;
     this.callback = callback;
   }
 
-  @Override
-  public void run() {
-    CloudSdk sdk;
+  /**
+   * Stops the given module / version of an App Engine application.
+   */
+  public void stop(@NotNull String module, @NotNull String version) {
+    ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
+      @Override
+      public void outputLine(String line) {
+        loggingHandler.print(line + "\n");
+      }
+    };
+
+    ProcessExitListener stopExitListener = new StopExitListener();
 
     try {
-      ProcessOutputLineListener outputListener = new ConsoleOutputLineListener();
-      ProcessExitListener stopExitListener = new StopExitListener();
+      CloudSdk sdk = helper.createSdk(
+          loggingHandler,
+          outputListener,
+          outputListener,
+          stopExitListener);
 
-      sdk = createSdk(outputListener, outputListener, stopExitListener);
+      CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
+
+      DefaultVersionsSelectionConfiguration configuration =
+          new DefaultVersionsSelectionConfiguration();
+      configuration.setVersions(Collections.singletonList(version));
+      configuration.setService(module);
+
+      command.stop(configuration);
     } catch (AppEngineException ex) {
-      callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.error"));
-      return;
+      throw new AppEngineStopException(GctBundle.message("appengine.stop.modules.version.error"));
     }
+  }
 
-    CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
-
-    DefaultVersionsSelectionConfiguration configuration =
-        new DefaultVersionsSelectionConfiguration();
-    configuration.setVersions(Collections.singletonList(versionToStop));
-    configuration.setService(moduleToStop);
-
-    command.stop(configuration);
+  UndeploymentTaskCallback getCallback() {
+    return callback;
   }
 
   private class StopExitListener implements ProcessExitListener {
@@ -114,8 +120,16 @@ public class AppEngineStopAction extends AppEngineAction {
                   exitCode));
         }
       } finally {
-        deleteCredentials();
+        helper.deleteCredentials();
       }
     }
+  }
+
+  public static class AppEngineStopException extends RuntimeException {
+
+    public AppEngineStopException(String message) {
+      super(message);
+    }
+
   }
 }

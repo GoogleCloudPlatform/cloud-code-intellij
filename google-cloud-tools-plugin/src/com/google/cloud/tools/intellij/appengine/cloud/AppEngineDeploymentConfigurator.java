@@ -156,6 +156,7 @@ class AppEngineDeploymentConfigurator extends
         project,
         source,
         new CloudSdkAppEngineHelper(
+            project,
             new File(server.getConfiguration().getCloudSdkHomePath()),
             getEnvironment())
     );

@@ -16,14 +16,29 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.app.api.AppEngineException;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
+import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
+import com.google.gdt.eclipse.login.common.GoogleLoginState;
+import com.google.gson.Gson;
 
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.remoteServer.runtime.Deployment;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
-import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -31,13 +46,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * A Cloud SDK (gcloud) based implementation of the {@link AppEngineHelper} interface.
  */
 public class CloudSdkAppEngineHelper implements AppEngineHelper {
+
+  private static final Logger logger = Logger.getInstance(CloudSdkAppEngineHelper.class);
 
   private static final String DEFAULT_APP_YAML_PATH = "/generation/src/appengine/mvm/app.yaml";
   private static final String DEFAULT_JAR_DOCKERFILE_PATH
@@ -45,8 +65,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private static final String DEFAULT_WAR_DOCKERFILE_PATH
       = "/generation/src/appengine/mvm/war.dockerfile";
 
+  private final Project project;
   private final File gcloudCommandPath;
   private final Environment environment;
+
+  private File credentialsPath;
 
   public enum Environment {
     APP_ENGINE_STANDARD("App Engine standard"),
@@ -64,11 +87,21 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     }
   }
 
+  /**
+   * Initialize the helper.
+   */
   public CloudSdkAppEngineHelper(
+      @NotNull Project project,
       @NotNull File gcloudCommandPath,
       @NotNull Environment environment) {
+    this.project = project;
     this.gcloudCommandPath = gcloudCommandPath;
     this.environment = environment;
+  }
+
+  @Override
+  public Project getProject() {
+    return project;
   }
 
   @NotNull
@@ -104,40 +137,130 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public AppEngineDeployAction createDeploymentAction(
+  public Runnable createDeployRunner(
       LoggingHandler loggingHandler,
-      Project project,
       File artifactToDeploy,
       AppEngineDeploymentConfiguration deploymentConfiguration,
-      DeploymentOperationCallback deploymentCallback) throws IllegalArgumentException {
-    AppEngineFlexDeploymentArtifactType artifactType
-        = AppEngineFlexDeploymentArtifactType.typeForPath(artifactToDeploy);
-    return new AppEngineDeployAction(
+      DeploymentOperationCallback callback) {
+    AppEngineDeploy deploy = new AppEngineDeploy(
         this,
         loggingHandler,
-        project,
-        artifactToDeploy,
         deploymentConfiguration,
-        wrapCallbackForUsageTracking(deploymentCallback, deploymentConfiguration, artifactType)
-    );
+        callback);
+
+    if (environment == Environment.APP_ENGINE_STANDARD) {
+      AppEngineStandardStage standardStage = new AppEngineStandardStage(
+          this,
+          loggingHandler,
+          artifactToDeploy);
+
+      return new AppEngineStandardDeployRunner(deploy, standardStage);
+    } else {
+      AppEngineFlexibleStage flexibleStage = new AppEngineFlexibleStage(
+          this,
+          loggingHandler,
+          artifactToDeploy,
+          deploymentConfiguration);
+
+      return new AppEngineFlexibleDeployRunner(deploy, flexibleStage);
+    }
   }
 
-  @NotNull
   @Override
-  public AppEngineStopAction createStopAction(
+  public File createStagingDirectory(LoggingHandler loggingHandler) throws IOException {
+    File stagingDirectory = FileUtil.createTempDirectory(
+        "gae-mvm" /* prefix */,
+        null /* suffix */,
+        true  /* deleteOnExit */);
+    loggingHandler.print(
+        "Created temporary staging directory: " + stagingDirectory.getAbsolutePath() + "\n");
+
+    return stagingDirectory;
+  }
+
+  @Override
+  public CloudSdk createSdk(
       LoggingHandler loggingHandler,
-      AppEngineDeploymentConfiguration deploymentConfiguration,
-      String moduleToStop,
-      String versionToStop,
-      UndeploymentTaskCallback undeploymentTaskCallback) {
-    return new AppEngineStopAction(
-        this,
-        loggingHandler,
-        deploymentConfiguration,
-        moduleToStop,
-        versionToStop,
-        undeploymentTaskCallback
+      ProcessOutputLineListener stdErrListener,
+      ProcessOutputLineListener stdOutListener,
+      ProcessExitListener exitListener) {
+    if (credentialsPath == null) {
+      loggingHandler.print(GctBundle.message("appengine.action.credential.not.found") + "\n");
+      throw new AppEngineException("Failed to create application default credentials.");
+    }
+
+    CloudToolsPluginInfoService pluginInfoService =
+        ServiceManager.getService(CloudToolsPluginInfoService.class);
+
+    // TODO replace this
+    // ProcessStartListener startListener = new ProcessStartListener() {
+    //  @Override
+    //  public void start(Process process) {
+    //    actionProcess = process;  // Save the reference so that we can cancel() it later.
+    //  }
+    //};
+
+    return new CloudSdk.Builder()
+        .sdkPath(getGcloudCommandPath())
+        .async(true)
+        .addStdErrLineListener(stdErrListener)
+        .addStdOutLineListener(stdOutListener)
+        .exitListener(exitListener)
+        .startListener(null) // todo
+        .appCommandCredentialFile(credentialsPath)
+        .appCommandMetricsEnvironment("gcloud-intellij")
+        .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
+        .appCommandGsUtil(0)
+        .appCommandOutputFormat("json")
+        .build();
+  }
+
+  private static final String CLIENT_ID_LABEL = "client_id";
+  private static final String CLIENT_SECRET_LABEL = "client_secret";
+  private static final String REFRESH_TOKEN_LABEL = "refresh_token";
+  private static final String GCLOUD_USER_TYPE_LABEL = "type";
+  private static final String GCLOUD_USER_TYPE = "authorized_user";
+
+  @Override
+  public void stageCredentials(String googleUsername) {
+    CredentialedUser projectUser = Services.getLoginService().getAllUsers()
+        .get(googleUsername);
+
+    GoogleLoginState googleLoginState;
+    if (projectUser != null) {
+      googleLoginState = projectUser.getGoogleLoginState();
+    } else {
+      return;
+    }
+    String clientId = googleLoginState.fetchOAuth2ClientId();
+    String clientSecret = googleLoginState.fetchOAuth2ClientSecret();
+    String refreshToken = googleLoginState.fetchOAuth2RefreshToken();
+    Map<String, String> credentialMap = ImmutableMap.of(
+        CLIENT_ID_LABEL, clientId,
+        CLIENT_SECRET_LABEL, clientSecret,
+        REFRESH_TOKEN_LABEL, refreshToken,
+        GCLOUD_USER_TYPE_LABEL, GCLOUD_USER_TYPE
     );
+    String jsonCredential = new Gson().toJson(credentialMap);
+    try {
+      credentialsPath = FileUtil
+          .createTempFile(
+              "tmp_google_application_default_credential",
+              "json",
+              true /* deleteOnExit */);
+      Files.write(jsonCredential, credentialsPath, Charset.forName("UTF-8"));
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  @Override
+  public void deleteCredentials() {
+    if (credentialsPath != null && credentialsPath.exists()) {
+      if (!credentialsPath.delete()) {
+        logger.warn("failed to delete credential file expected at " + credentialsPath.getPath());
+      }
+    }
   }
 
   @NotNull
@@ -193,4 +316,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     return appYaml;
   }
 
+  @VisibleForTesting
+  public File getCredentialsPath() {
+    return credentialsPath;
+  }
 }
