@@ -19,6 +19,8 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy.AppEngineDeployException;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardStage.AppEngineStandardStageException;
+import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -52,21 +54,34 @@ public class AppEngineStandardDeployRunner implements Runnable {
 
       deploy.getHelper().stageCredentials(deploy.getDeploymentConfiguration().getGoogleUsername());
 
-      stageStandard.stage(stagingDirectory, new ProcessExitListener() {
-        @Override
-        public void exit(int exitCode) {
-          try {
-            // TODO figure out cancel
-            deploy.deploy(stagingDirectory);
-          } catch (AppEngineDeployException de) {
-            logger.warn(de.getMessage());
-            deploy.getCallback().errorOccurred(de.getMessage());
-          }
-        }
-      });
+      stageStandard.stage(stagingDirectory, deploy(stagingDirectory));
     } catch (AppEngineStandardStageException | IOException ex) {
       logger.warn(ex.getMessage());
       deploy.getCallback().errorOccurred(ex.getMessage());
     }
+  }
+
+  @VisibleForTesting
+  ProcessExitListener deploy(@NotNull final File stagingDirectory) {
+    return new ProcessExitListener() {
+      @Override
+      public void exit(int exitCode) {
+        if (exitCode == 0) {
+          try {
+            // TODO figure out cancel
+            deploy.deploy(stagingDirectory);
+          } catch (AppEngineDeployException de) {
+            error(de.getMessage());
+          }
+        } else {
+          error(GctBundle.message("appengine.deployment.error.during.staging"));
+        }
+      }
+
+      private void error(String message) {
+        logger.warn(message);
+        deploy.getCallback().errorOccurred(message);
+      }
+    };
   }
 }
