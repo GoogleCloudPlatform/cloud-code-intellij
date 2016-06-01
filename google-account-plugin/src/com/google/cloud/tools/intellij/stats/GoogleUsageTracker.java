@@ -102,7 +102,7 @@ public class GoogleUsageTracker implements UsageTracker {
         postData.add(new BasicNameValuePair("dp", virtualPageUrl));
         if (eventLabel != null) {
           // Event metadata are passed as a (virtual) page title.
-          String virtualPageTitle = eventLabel + "\\=" + (eventValue != null ? eventValue : "null");
+          String virtualPageTitle = eventLabel + "=" + (eventValue != null ? eventValue : "null");
           postData.add(new BasicNameValuePair("dt", virtualPageTitle));
         }
 
