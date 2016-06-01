@@ -56,7 +56,7 @@ public class GoogleUsageTracker implements UsageTracker {
     this.analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
   }
 
-  private static final List<? extends NameValuePair> analyticsBaseData = ImmutableList
+  private static final List<BasicNameValuePair> analyticsBaseData = ImmutableList
       .of(new BasicNameValuePair("v", "1"),         // Protocol version
           new BasicNameValuePair("t", "pageview"),  // Note the "pageview" type, not "event"
           new BasicNameValuePair("ni", "0"),        // Non-interactive? Report as interactive.
