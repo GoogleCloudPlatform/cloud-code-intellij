@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
-import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineDeployment;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
@@ -75,6 +74,15 @@ public class AppEngineDeploy {
   public void deploy(@NotNull File stagingDirectory) {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
+    DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
+    configuration.setDeployables(
+        Collections.singletonList(new File(stagingDirectory, "app.yaml")));
+    configuration.setProject(deploymentConfiguration.getCloudProjectName());
+    configuration.setPromote(true);
+    if (!StringUtil.isEmpty(deploymentConfiguration.getVersion())) {
+      configuration.setVersion(deploymentConfiguration.getVersion());
+    }
+
     ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
       @Override
       public void outputLine(String line) {
@@ -89,27 +97,13 @@ public class AppEngineDeploy {
     };
     ProcessExitListener deployExitListener = new DeployExitListener(rawDeployOutput);
 
-    try {
-      DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
-      configuration.setDeployables(
-          Collections.singletonList(new File(stagingDirectory, "app.yaml")));
-      configuration.setProject(deploymentConfiguration.getCloudProjectName());
-      configuration.setPromote(true);
-      if (!StringUtil.isEmpty(deploymentConfiguration.getVersion())) {
-        configuration.setVersion(deploymentConfiguration.getVersion());
-      }
-
-      CloudSdk sdk = helper.createSdk(
-          loggingHandler,
-          outputListener,
-          deployOutputListener,
-          deployExitListener);
-      CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
-      deployment.deploy(configuration);
-    } catch (AppEngineException | IllegalArgumentException ex) {
-      throw new AppEngineDeployException(GctBundle.message("appengine.deployment.error") + "\n"
-          + GctBundle.message("appengine.action.error.update.message"));
-    }
+    CloudSdk sdk = helper.createSdk(
+        loggingHandler,
+        outputListener,
+        deployOutputListener,
+        deployExitListener);
+    CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
+    deployment.deploy(configuration);
   }
 
   AppEngineHelper getHelper() {
@@ -221,13 +215,5 @@ public class AppEngineDeploy {
       }
       return versions.get(0).service;
     }
-  }
-
-  public static class AppEngineDeployException extends RuntimeException {
-
-    public AppEngineDeployException(String message) {
-      super(message);
-    }
-
   }
 }

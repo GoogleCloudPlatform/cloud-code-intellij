@@ -16,13 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineStandardStaging;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.app.impl.config.DefaultStageStandardConfiguration;
-import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -65,42 +63,26 @@ public class AppEngineStandardStage {
       @NotNull File stagingDirectory,
       @NotNull ProcessExitListener onStageComplete) {
 
-    try {
-      ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
-        @Override
-        public void outputLine(String line) {
-          loggingHandler.print(line + "\n");
-        }
-      };
+    ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
+      @Override
+      public void outputLine(String line) {
+        loggingHandler.print(line + "\n");
+      }
+    };
 
-      CloudSdk sdk = helper.createSdk(
-          loggingHandler,
-          outputListener,
-          outputListener,
-          onStageComplete);
+    CloudSdk sdk = helper.createSdk(
+        loggingHandler,
+        outputListener,
+        outputListener,
+        onStageComplete);
 
-      // TODO determine the default set of flags we want to set for AE standard staging
-      DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();
-      stageConfig.setEnableJarSplitting(true);
-      stageConfig.setStagingDirectory(stagingDirectory);
-      stageConfig.setSourceDirectory(deploymentArtifactPath);
+    // TODO determine the default set of flags we want to set for AE standard staging
+    DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();
+    stageConfig.setEnableJarSplitting(true);
+    stageConfig.setStagingDirectory(stagingDirectory);
+    stageConfig.setSourceDirectory(deploymentArtifactPath);
 
-      CloudSdkAppEngineStandardStaging staging = new CloudSdkAppEngineStandardStaging(sdk);
-      staging.stageStandard(stageConfig);
-    } catch (AppEngineException aee) {
-      logger.warn(aee);
-      throw new AppEngineStandardStageException(
-          GctBundle.message("appengine.deployment.error.during.staging") + "\n"
-              + GctBundle.message("appengine.action.error.update.message"));
-    }
+    CloudSdkAppEngineStandardStaging staging = new CloudSdkAppEngineStandardStaging(sdk);
+    staging.stageStandard(stageConfig);
   }
-
-  public static class AppEngineStandardStageException extends RuntimeException {
-
-    public AppEngineStandardStageException(String message) {
-      super(message);
-    }
-
-  }
-
 }

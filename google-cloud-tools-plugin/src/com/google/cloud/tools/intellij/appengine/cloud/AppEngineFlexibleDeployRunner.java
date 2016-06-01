@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy.AppEngineDeployException;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineFlexibleStage.AppEngineFlexibleStageException;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.diagnostic.Logger;
@@ -44,30 +42,34 @@ public class AppEngineFlexibleDeployRunner implements Runnable {
 
   @Override
   public void run() {
-    File stagingDirectory = null;
+    File stagingDirectory;
 
     try {
       stagingDirectory = deploy.getHelper().createStagingDirectory(deploy.getLoggingHandler());
     } catch (IOException ioe) {
-      logger.warn(GctBundle.message("appengine.deployment.error.creating.staging.directory"));
       deploy.getCallback().errorOccurred(
           GctBundle.message("appengine.deployment.error.creating.staging.directory"));
+      logger.error(ioe);
+      return;
     }
 
     try {
       flexibleStage.stage(stagingDirectory);
-    } catch (AppEngineFlexibleStageException fse) {
-      logger.warn(fse.getMessage());
-      deploy.getCallback().errorOccurred(fse.getMessage());
+    } catch (RuntimeException re) {
+      deploy.getCallback()
+          .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
+      logger.error(re);
+      return;
     }
 
     try {
       deploy.getHelper().stageCredentials(deploy.getDeploymentConfiguration().getGoogleUsername());
 
       deploy.deploy(stagingDirectory);
-    } catch (AppEngineDeployException de) {
-      logger.warn(de.getMessage());
-      deploy.getCallback().errorOccurred(de.getMessage());
+    } catch (RuntimeException re) {
+      deploy.getCallback().errorOccurred(GctBundle.message("appengine.deployment.error") + "\n"
+          + GctBundle.message("appengine.action.error.update.message"));
+      logger.error(re);
     }
   }
 }

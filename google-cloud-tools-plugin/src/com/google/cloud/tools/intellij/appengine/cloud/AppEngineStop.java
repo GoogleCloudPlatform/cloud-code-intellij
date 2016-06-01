@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineVersions;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
@@ -71,24 +70,20 @@ public class AppEngineStop {
 
     ProcessExitListener stopExitListener = new StopExitListener();
 
-    try {
-      CloudSdk sdk = helper.createSdk(
-          loggingHandler,
-          outputListener,
-          outputListener,
-          stopExitListener);
+    CloudSdk sdk = helper.createSdk(
+        loggingHandler,
+        outputListener,
+        outputListener,
+        stopExitListener);
 
-      CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
+    CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
 
-      DefaultVersionsSelectionConfiguration configuration =
-          new DefaultVersionsSelectionConfiguration();
-      configuration.setVersions(Collections.singletonList(version));
-      configuration.setService(module);
+    DefaultVersionsSelectionConfiguration configuration =
+        new DefaultVersionsSelectionConfiguration();
+    configuration.setVersions(Collections.singletonList(version));
+    configuration.setService(module);
 
-      command.stop(configuration);
-    } catch (AppEngineException ex) {
-      throw new AppEngineStopException(GctBundle.message("appengine.stop.modules.version.error"));
-    }
+    command.stop(configuration);
   }
 
   UndeploymentTaskCallback getCallback() {
@@ -123,13 +118,5 @@ public class AppEngineStop {
         helper.deleteCredentials();
       }
     }
-  }
-
-  public static class AppEngineStopException extends RuntimeException {
-
-    public AppEngineStopException(String message) {
-      super(message);
-    }
-
   }
 }

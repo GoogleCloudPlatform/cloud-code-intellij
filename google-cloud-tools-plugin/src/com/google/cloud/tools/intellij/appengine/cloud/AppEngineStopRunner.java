@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStop.AppEngineStopException;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -43,9 +43,9 @@ public class AppEngineStopRunner implements Runnable {
   public void run() {
     try {
       stop.stop(module, version);
-    } catch (AppEngineStopException se) {
-      logger.warn(se.getMessage());
-      stop.getCallback().errorOccurred(se.getMessage());
+    } catch (RuntimeException re) {
+      stop.getCallback().errorOccurred(GctBundle.message("appengine.stop.modules.version.error"));
+      logger.error(re);
     }
   }
 }

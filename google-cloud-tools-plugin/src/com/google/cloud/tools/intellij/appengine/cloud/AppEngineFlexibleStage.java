@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
-import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
@@ -79,9 +78,7 @@ public class AppEngineFlexibleStage {
       copyFile(stagingDirectory, "app.yaml", appYamlPath);
       copyFile(stagingDirectory, "Dockerfile", dockerFilePath);
     } catch (IOException ex) {
-      logger.warn(ex);
-      throw new AppEngineFlexibleStageException(
-          GctBundle.message("appengine.deployment.error.during.staging"));
+      throw new RuntimeException(ex);
     }
   }
 
@@ -93,13 +90,4 @@ public class AppEngineFlexibleStage {
         sourceFilePath.getAbsolutePath(), destinationFilePath.getAbsolutePath()) +  "\n");
     return destinationFilePath;
   }
-
-  public static class AppEngineFlexibleStageException extends RuntimeException {
-
-    public AppEngineFlexibleStageException(String message) {
-      super(message);
-    }
-
-  }
-
 }

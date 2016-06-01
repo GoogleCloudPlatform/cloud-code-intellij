@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -25,8 +26,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy.AppEngineDeployException;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardStage.AppEngineStandardStageException;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -53,6 +52,18 @@ public class AppEngineStandardDeployRunnerTest {
   @Mock AppEngineDeploymentConfiguration deploymentConfiguration;
   @Mock AppEngineHelper helper;
 
+  private static final String DEPLOY_FAIL_MSG =
+      "Deployment failed due to an unexpected error.\n"
+          + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
+          + "Run ''gcloud components update'' to update the SDK. "
+          + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)";
+
+  private static final String STAGE_FAIL_MSG =
+      "Deployment failed due to an unexpected error while staging the project.\n"
+          + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
+          + "Run ''gcloud components update'' to update the SDK. "
+          + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)";
+
   @Before
   public void setUp() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class))).thenReturn(new File("myFile"));
@@ -66,20 +77,26 @@ public class AppEngineStandardDeployRunnerTest {
   @Test
   public void createStagingDirectory_Error() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class)))
-        .thenThrow(new IOException("myError"));
-    deployRunner.run();
-
-    verify(callback, times(1)).errorOccurred("myError");
+        .thenThrow(new IOException());
+    try {
+      deployRunner.run();
+      failureExpected();
+    } catch (Throwable t) {
+      verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
+    }
   }
 
   @Test
   public void stage_Error() {
-    doThrow(new AppEngineStandardStageException("myError"))
+    doThrow(new RuntimeException())
         .when(stage)
         .stage(any(File.class), any(ProcessExitListener.class));
-    deployRunner.run();
-
-    verify(callback, times(1)).errorOccurred("myError");
+    try {
+      deployRunner.run();
+      failureExpected();
+    } catch (Throwable t) {
+      verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
+    }
   }
 
   @Test
@@ -91,9 +108,17 @@ public class AppEngineStandardDeployRunnerTest {
 
   @Test
   public void deploy_Error() {
-    doThrow(new AppEngineDeployException("myError")).when(deploy).deploy(new File("myFile.jar"));
-    deployRunner.deploy(new File("myFile.jar")).exit(0);
+    doThrow(new RuntimeException())
+        .when(deploy).deploy(new File("myFile.jar"));
+    try {
+      deployRunner.deploy(new File("myFile.jar")).exit(0);
+      failureExpected();
+    } catch (Throwable t) {
+      verify(callback, times(1)).errorOccurred(DEPLOY_FAIL_MSG);
+    }
+  }
 
-    verify(callback, times(1)).errorOccurred("myError");
+  private void failureExpected() {
+    fail("Expected throwable due to log error level");
   }
 }

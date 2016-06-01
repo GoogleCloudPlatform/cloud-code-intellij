@@ -17,8 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy.AppEngineDeployException;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardStage.AppEngineStandardStageException;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -55,9 +53,11 @@ public class AppEngineStandardDeployRunner implements Runnable {
       deploy.getHelper().stageCredentials(deploy.getDeploymentConfiguration().getGoogleUsername());
 
       stageStandard.stage(stagingDirectory, deploy(stagingDirectory));
-    } catch (AppEngineStandardStageException | IOException ex) {
-      logger.warn(ex.getMessage());
-      deploy.getCallback().errorOccurred(ex.getMessage());
+    } catch (RuntimeException | IOException ex) {
+      deploy.getCallback()
+          .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging") + "\n"
+              + GctBundle.message("appengine.action.error.update.message"));
+      logger.error(ex);
     }
   }
 
@@ -70,17 +70,18 @@ public class AppEngineStandardDeployRunner implements Runnable {
           try {
             // TODO figure out cancel
             deploy.deploy(stagingDirectory);
-          } catch (AppEngineDeployException de) {
-            error(de.getMessage());
+          } catch (RuntimeException re) {
+            deploy.getCallback()
+                .errorOccurred(GctBundle.message("appengine.deployment.error") + "\n"
+                    + GctBundle.message("appengine.action.error.update.message"));
+            logger.error(re);
           }
         } else {
-          error(GctBundle.message("appengine.deployment.error.during.staging"));
+          deploy.getCallback()
+              .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
+          logger.warn(
+              "App engine standard staging process exited with an error. Exit Code:" + exitCode);
         }
-      }
-
-      private void error(String message) {
-        logger.warn(message);
-        deploy.getCallback().errorOccurred(message);
       }
     };
   }

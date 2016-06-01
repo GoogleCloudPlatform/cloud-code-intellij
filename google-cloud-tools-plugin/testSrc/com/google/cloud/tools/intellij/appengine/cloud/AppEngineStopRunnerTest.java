@@ -16,14 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStop.AppEngineStopException;
 
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 
@@ -59,10 +58,14 @@ public class AppEngineStopRunnerTest {
 
   @Test
   public void testStop_Error() {
-    doThrow(new AppEngineStopException("myError")).when(stop).stop(anyString(), anyString());
-    stopRunner.run();
-
-    verify(callback, times(1)).errorOccurred("myError");
+    doThrow(new RuntimeException("myError")).when(stop).stop(anyString(), anyString());
+    try {
+      stopRunner.run();
+      fail("Expected throwable due to logging error level.");
+    } catch (Throwable t) {
+      verify(callback, times(1))
+          .errorOccurred("Stop application failed due to an unexpected error.");
+    }
   }
 
 }

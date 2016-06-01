@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -23,9 +24,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy.AppEngineDeployException;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineFlexibleStage.AppEngineFlexibleStageException;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -52,9 +50,6 @@ public class AppEngineFlexibleDeployRunnerTest {
   @Mock AppEngineFlexibleStage stage;
   @Mock AppEngineHelper helper;
 
-  private static final String STAGE_DIR_ERROR
-      = "There was an unexpected error creating the staging directory";
-
   @Before
   public void setUp() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class))).thenReturn(new File("myFile.jar"));
@@ -67,18 +62,27 @@ public class AppEngineFlexibleDeployRunnerTest {
 
   @Test
   public void testCreateStagingDirectory_Error() throws IOException {
-    when(helper.createStagingDirectory(any(LoggingHandler.class))).thenThrow(new IOException());
-    deployRunner.run();
-
-    verify(callback, times(1)).errorOccurred(STAGE_DIR_ERROR);
+    when(helper.createStagingDirectory(any(LoggingHandler.class)))
+        .thenThrow(new IOException());
+    try {
+      deployRunner.run();
+      failureExpected();
+    } catch (Throwable t) {
+      verify(callback, times(1))
+          .errorOccurred("There was an unexpected error creating the staging directory");
+    }
   }
 
   @Test
   public void stage_Error() {
-    doThrow(new AppEngineFlexibleStageException("myError")).when(stage).stage(new File("myFile.jar"));
-    deployRunner.run();
-
-    verify(callback, times(1)).errorOccurred("myError");
+    doThrow(new RuntimeException("myError")).when(stage).stage(new File("myFile.jar"));
+    try {
+      deployRunner.run();
+      failureExpected();
+    } catch (Throwable t) {
+      verify(callback, times(1))
+          .errorOccurred("Deployment failed due to an unexpected error while staging the project.");
+    }
   }
 
   @Test
@@ -90,10 +94,21 @@ public class AppEngineFlexibleDeployRunnerTest {
 
   @Test
   public void deploy_Error() {
-    doThrow(new AppEngineDeployException("myError")).when(deploy).deploy(new File("myFile.jar"));
-    deployRunner.run();
+    doThrow(new RuntimeException()).when(deploy).deploy(new File("myFile.jar"));
 
-    verify(callback, times(1)).errorOccurred("myError");
+    try {
+      deployRunner.run();
+      failureExpected();
+    } catch (Throwable t) {
+      verify(callback, times(1))
+          .errorOccurred("Deployment failed due to an unexpected error.\n"
+          + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
+          + "Run ''gcloud components update'' to update the SDK. "
+          + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)");
+    }
   }
 
+  private void failureExpected() {
+    fail("Expected throwable due to log error level");
+  }
 }
