@@ -16,9 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,11 +29,13 @@ import java.io.IOException;
  * Runnable that executes task responsible for deploying an application to the App Engine
  * flexible environment.
  */
-public class AppEngineFlexibleDeployRunner implements Runnable {
+public class AppEngineFlexibleDeployRunner implements CancellableRunnable {
   private static final Logger logger = Logger.getInstance(AppEngineFlexibleDeployRunner.class);
 
   private AppEngineDeploy deploy;
   private AppEngineFlexibleStage flexibleStage;
+
+  private Process process;
 
   public AppEngineFlexibleDeployRunner(
       AppEngineDeploy deploy,
@@ -65,11 +69,29 @@ public class AppEngineFlexibleDeployRunner implements Runnable {
     try {
       deploy.getHelper().stageCredentials(deploy.getDeploymentConfiguration().getGoogleUsername());
 
-      deploy.deploy(stagingDirectory);
+      ProcessStartListener startListener = new ProcessStartListener() {
+        @Override
+        public void start(Process process) {
+          setProcess(process);
+        }
+      };
+
+      deploy.deploy(stagingDirectory, startListener);
     } catch (RuntimeException re) {
       deploy.getCallback().errorOccurred(GctBundle.message("appengine.deployment.error") + "\n"
           + GctBundle.message("appengine.action.error.update.message"));
       logger.error(re);
     }
+  }
+
+  @Override
+  public void cancel() {
+    if (process != null) {
+      process.destroy();
+    }
+  }
+
+  private void setProcess(Process process) {
+    this.process = process;
   }
 }

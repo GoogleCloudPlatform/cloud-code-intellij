@@ -18,10 +18,12 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -72,7 +74,7 @@ public interface AppEngineHelper {
    * @param callback a callback for handling completions of the operation
    * @return the runnable that will perform the deployment operation
    */
-  Runnable createDeployRunner(
+  CancellableRunnable createDeployRunner(
       LoggingHandler loggingHandler,
       File artifactToDeploy,
       AppEngineDeploymentConfiguration deploymentConfiguration,
@@ -91,6 +93,7 @@ public interface AppEngineHelper {
    * Creates an {@link CloudSdk} object that is used in execution of various App Engine actions.
    *
    * @param loggingHandler logging messages will be output to this
+   * @param startListener the "callback" listener used for fetching the running process.
    * @param stdErrListener the output listener for handling "normal" operation messages
    * @param stdOutListener the output listener for handling the output messages of the operation
    * @param exitListener the listener for handling the completeion of the operation
@@ -98,6 +101,7 @@ public interface AppEngineHelper {
    */
   CloudSdk createSdk(
       LoggingHandler loggingHandler,
+      ProcessStartListener startListener,
       ProcessOutputLineListener stdErrListener,
       ProcessOutputLineListener stdOutListener,
       ProcessExitListener exitListener);

@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.app.api.AppEngineException;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -37,6 +38,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.runtime.Deployment;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
@@ -137,7 +139,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public Runnable createDeployRunner(
+  public CancellableRunnable createDeployRunner(
       LoggingHandler loggingHandler,
       File artifactToDeploy,
       AppEngineDeploymentConfiguration deploymentConfiguration,
@@ -146,7 +148,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         this,
         loggingHandler,
         deploymentConfiguration,
-        callback);
+        wrapCallbackForUsageTracking(callback, deploymentConfiguration, artifactToDeploy));
 
     if (environment == Environment.APP_ENGINE_STANDARD) {
       AppEngineStandardStage standardStage = new AppEngineStandardStage(
@@ -181,6 +183,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @Override
   public CloudSdk createSdk(
       LoggingHandler loggingHandler,
+      ProcessStartListener startListener,
       ProcessOutputLineListener stdErrListener,
       ProcessOutputLineListener stdOutListener,
       ProcessExitListener exitListener) {
@@ -192,21 +195,13 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     CloudToolsPluginInfoService pluginInfoService =
         ServiceManager.getService(CloudToolsPluginInfoService.class);
 
-    // TODO replace this
-    // ProcessStartListener startListener = new ProcessStartListener() {
-    //  @Override
-    //  public void start(Process process) {
-    //    actionProcess = process;  // Save the reference so that we can cancel() it later.
-    //  }
-    //};
-
     return new CloudSdk.Builder()
         .sdkPath(getGcloudCommandPath())
         .async(true)
         .addStdErrLineListener(stdErrListener)
         .addStdOutLineListener(stdOutListener)
         .exitListener(exitListener)
-        .startListener(null) // todo
+        .startListener(startListener)
         .appCommandCredentialFile(credentialsPath)
         .appCommandMetricsEnvironment("gcloud-intellij")
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
@@ -267,7 +262,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private DeploymentOperationCallback wrapCallbackForUsageTracking(
       final DeploymentOperationCallback deploymentCallback,
       AppEngineDeploymentConfiguration deploymentConfiguration,
-      AppEngineFlexDeploymentArtifactType artifactType) {
+      File artifactToDeploy) {
 
     StringBuilder labelBuilder = new StringBuilder("deploy");
 
@@ -282,6 +277,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         labelBuilder.append(".custom");
       }
     }
+
+    AppEngineFlexDeploymentArtifactType artifactType
+        = AppEngineFlexDeploymentArtifactType.typeForPath(artifactToDeploy);
 
     labelBuilder.append(".java").append(artifactType.toString());
 

@@ -17,12 +17,15 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 
@@ -58,7 +61,9 @@ public class AppEngineStopRunnerTest {
 
   @Test
   public void testStop_Error() {
-    doThrow(new RuntimeException("myError")).when(stop).stop(anyString(), anyString());
+    doThrow(new RuntimeException("myError"))
+        .when(stop)
+        .stop(anyString(), anyString(), any(ProcessStartListener.class));
     try {
       stopRunner.run();
       fail("Expected throwable due to logging error level.");

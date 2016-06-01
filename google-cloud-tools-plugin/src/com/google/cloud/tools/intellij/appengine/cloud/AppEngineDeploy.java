@@ -20,6 +20,7 @@ import com.google.api.client.repackaged.com.google.common.annotations.VisibleFor
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineDeployment;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.app.impl.config.DefaultDeployConfiguration;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -71,7 +72,7 @@ public class AppEngineDeploy {
   /**
    * Given a staging directory, deploy the application to Google App Engine.
    */
-  public void deploy(@NotNull File stagingDirectory) {
+  public void deploy(@NotNull File stagingDirectory, @NotNull ProcessStartListener startListener) {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
@@ -99,6 +100,7 @@ public class AppEngineDeploy {
 
     CloudSdk sdk = helper.createSdk(
         loggingHandler,
+        startListener,
         outputListener,
         deployOutputListener,
         deployExitListener);
@@ -160,10 +162,6 @@ public class AppEngineDeploy {
               GctBundle.message("appengine.deployment.error.with.code", exitCode) + "\n"
                   + GctBundle.message("appengine.action.error.update.message"));
         }
-        // TODO replace the cancel functionality
-        // else if (cancelled) {
-        //   callback.errorOccurred(GctBundle.message("appengine.deployment.error.cancelled"));
-        // }
       } finally {
         helper.deleteCredentials();
       }

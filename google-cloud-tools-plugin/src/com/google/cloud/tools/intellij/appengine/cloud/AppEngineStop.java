@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineVersions;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.app.impl.config.DefaultVersionsSelectionConfiguration;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -60,7 +61,10 @@ public class AppEngineStop {
   /**
    * Stops the given module / version of an App Engine application.
    */
-  public void stop(@NotNull String module, @NotNull String version) {
+  public void stop(
+      @NotNull String module,
+      @NotNull String version,
+      @NotNull ProcessStartListener startListener) {
     ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
       @Override
       public void outputLine(String line) {
@@ -72,6 +76,7 @@ public class AppEngineStop {
 
     CloudSdk sdk = helper.createSdk(
         loggingHandler,
+        startListener,
         outputListener,
         outputListener,
         stopExitListener);

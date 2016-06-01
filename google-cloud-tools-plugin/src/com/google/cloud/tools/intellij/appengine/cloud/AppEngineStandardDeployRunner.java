@@ -17,10 +17,12 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,11 +33,13 @@ import java.io.IOException;
  * Runnable that executes task responsible for deploying an application to the App Engine
  * standard environment.
  */
-public class AppEngineStandardDeployRunner implements Runnable {
+public class AppEngineStandardDeployRunner implements CancellableRunnable {
   private static final Logger logger = Logger.getInstance(AppEngineStandardDeployRunner.class);
 
   private AppEngineDeploy deploy;
   private AppEngineStandardStage stageStandard;
+
+  private Process process;
 
   public AppEngineStandardDeployRunner(
       @NotNull AppEngineDeploy deploy,
@@ -52,7 +56,10 @@ public class AppEngineStandardDeployRunner implements Runnable {
 
       deploy.getHelper().stageCredentials(deploy.getDeploymentConfiguration().getGoogleUsername());
 
-      stageStandard.stage(stagingDirectory, deploy(stagingDirectory));
+      stageStandard.stage(
+          stagingDirectory,
+          createProcessStartListener(),
+          deploy(stagingDirectory));
     } catch (RuntimeException | IOException ex) {
       deploy.getCallback()
           .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging") + "\n"
@@ -68,8 +75,7 @@ public class AppEngineStandardDeployRunner implements Runnable {
       public void exit(int exitCode) {
         if (exitCode == 0) {
           try {
-            // TODO figure out cancel
-            deploy.deploy(stagingDirectory);
+            deploy.deploy(stagingDirectory, createProcessStartListener());
           } catch (RuntimeException re) {
             deploy.getCallback()
                 .errorOccurred(GctBundle.message("appengine.deployment.error") + "\n"
@@ -82,6 +88,26 @@ public class AppEngineStandardDeployRunner implements Runnable {
           logger.warn(
               "App engine standard staging process exited with an error. Exit Code:" + exitCode);
         }
+      }
+    };
+  }
+
+  @Override
+  public void cancel() {
+    if (process != null) {
+      process.destroy();
+    }
+  }
+
+  private void setProcess(Process process) {
+    this.process = process;
+  }
+
+  private ProcessStartListener createProcessStartListener() {
+    return new  ProcessStartListener() {
+      @Override
+      public void start(Process process) {
+        setProcess(process);
       }
     };
   }

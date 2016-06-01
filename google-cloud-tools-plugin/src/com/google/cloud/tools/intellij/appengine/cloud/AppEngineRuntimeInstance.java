@@ -26,6 +26,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.runtime.deployment.DeploymentLogManager;
 import com.intellij.remoteServer.runtime.deployment.DeploymentTask;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance;
@@ -43,7 +44,7 @@ class AppEngineRuntimeInstance extends
     ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
   private AppEngineServerConfiguration configuration;
-  private final Set<Runnable> createdDeployments;
+  private final Set<CancellableRunnable> createdDeployments;
 
   public AppEngineRuntimeInstance(
       AppEngineServerConfiguration configuration) {
@@ -79,7 +80,7 @@ class AppEngineRuntimeInstance extends
       return;
     }
 
-    final Runnable deployRunner =  appEngineHelper.createDeployRunner(
+    final CancellableRunnable deployRunner =  appEngineHelper.createDeployRunner(
         logManager.getMainLoggingHandler(),
         deploymentSource,
         deploymentConfig,
@@ -109,9 +110,8 @@ class AppEngineRuntimeInstance extends
   public void disconnect() {
     // kill any executing deployment actions
     synchronized (createdDeployments) {
-      for (Runnable runnable : createdDeployments) {
-        // TODO replace cancel functionality
-        // runnable.cancel();
+      for (CancellableRunnable runnable : createdDeployments) {
+        runnable.cancel();
       }
       createdDeployments.clear();
     }

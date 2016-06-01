@@ -25,6 +25,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
+
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -94,7 +96,9 @@ public class AppEngineFlexibleDeployRunnerTest {
 
   @Test
   public void deploy_Error() {
-    doThrow(new RuntimeException()).when(deploy).deploy(new File("myFile.jar"));
+    doThrow(new RuntimeException())
+        .when(deploy)
+        .deploy(any(File.class), any(ProcessStartListener.class));
 
     try {
       deployRunner.run();

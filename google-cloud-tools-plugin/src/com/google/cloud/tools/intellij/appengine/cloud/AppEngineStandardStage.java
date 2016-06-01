@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineStandardStaging;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
 import com.google.cloud.tools.app.impl.config.DefaultStageStandardConfiguration;
 
@@ -61,6 +62,7 @@ public class AppEngineStandardStage {
    */
   public void stage(
       @NotNull File stagingDirectory,
+      @NotNull ProcessStartListener startListener,
       @NotNull ProcessExitListener onStageComplete) {
 
     ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
@@ -72,6 +74,7 @@ public class AppEngineStandardStage {
 
     CloudSdk sdk = helper.createSdk(
         loggingHandler,
+        startListener,
         outputListener,
         outputListener,
         onStageComplete);

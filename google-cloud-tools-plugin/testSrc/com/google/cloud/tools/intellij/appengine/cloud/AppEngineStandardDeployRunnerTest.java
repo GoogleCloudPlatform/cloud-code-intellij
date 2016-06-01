@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
+import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -90,7 +91,7 @@ public class AppEngineStandardDeployRunnerTest {
   public void stage_Error() {
     doThrow(new RuntimeException())
         .when(stage)
-        .stage(any(File.class), any(ProcessExitListener.class));
+        .stage(any(File.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
     try {
       deployRunner.run();
       failureExpected();
@@ -109,7 +110,7 @@ public class AppEngineStandardDeployRunnerTest {
   @Test
   public void deploy_Error() {
     doThrow(new RuntimeException())
-        .when(deploy).deploy(new File("myFile.jar"));
+        .when(deploy).deploy(any(File.class), any(ProcessStartListener.class));
     try {
       deployRunner.deploy(new File("myFile.jar")).exit(0);
       failureExpected();
