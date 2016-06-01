@@ -118,14 +118,18 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
 
-    appEngineCostWarningLabel.setText(
-        GctBundle.message("appengine.flex.deployment.cost.warning",
-            COST_WARNING_OPEN_TAG,
-            COST_WARNING_HREF_OPEN_TAG,
-            COST_WARNING_HREF_CLOSE_TAG,
-            COST_WARNING_CLOSE_TAG));
-    appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
+    if (appEngineHelper.getEnvironment() == Environment.APP_ENGINE_FLEX) {
+      appEngineCostWarningLabel.setText(
+          GctBundle.message("appengine.flex.deployment.cost.warning",
+              COST_WARNING_OPEN_TAG,
+              COST_WARNING_HREF_OPEN_TAG,
+              COST_WARNING_HREF_CLOSE_TAG,
+              COST_WARNING_CLOSE_TAG));
+      appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+      appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
+    } else {
+      appEngineCostWarningLabel.setVisible(false);
+    }
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
