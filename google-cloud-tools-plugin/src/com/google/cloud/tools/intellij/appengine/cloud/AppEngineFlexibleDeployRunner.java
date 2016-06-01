@@ -69,14 +69,12 @@ public class AppEngineFlexibleDeployRunner implements CancellableRunnable {
     try {
       deploy.getHelper().stageCredentials(deploy.getDeploymentConfiguration().getGoogleUsername());
 
-      ProcessStartListener startListener = new ProcessStartListener() {
+      deploy.deploy(stagingDirectory, new ProcessStartListener() {
         @Override
         public void start(Process process) {
           setProcess(process);
         }
-      };
-
-      deploy.deploy(stagingDirectory, startListener);
+      });
     } catch (RuntimeException re) {
       deploy.getCallback().errorOccurred(GctBundle.message("appengine.deployment.error") + "\n"
           + GctBundle.message("appengine.action.error.update.message"));

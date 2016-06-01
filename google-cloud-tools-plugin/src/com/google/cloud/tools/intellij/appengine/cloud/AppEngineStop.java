@@ -50,9 +50,10 @@ public class AppEngineStop {
   /**
    * Initialize the stop dependencies.
    */
-  public AppEngineStop(AppEngineHelper helper,
-      LoggingHandler loggingHandler,
-      UndeploymentTaskCallback callback) {
+  public AppEngineStop(
+      @NotNull AppEngineHelper helper,
+      @NotNull LoggingHandler loggingHandler,
+      @NotNull UndeploymentTaskCallback callback) {
     this.helper = helper;
     this.loggingHandler = loggingHandler;
     this.callback = callback;

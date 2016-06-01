@@ -46,14 +46,12 @@ public class AppEngineStopRunner implements CancellableRunnable {
   @Override
   public void run() {
     try {
-      ProcessStartListener startListener = new ProcessStartListener() {
+      stop.stop(module, version, new ProcessStartListener() {
         @Override
         public void start(Process process) {
           setProcess(process);
         }
-      };
-
-      stop.stop(module, version, startListener);
+      });
     } catch (RuntimeException re) {
       stop.getCallback().errorOccurred(GctBundle.message("appengine.stop.modules.version.error"));
       logger.error(re);

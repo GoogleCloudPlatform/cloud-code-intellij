@@ -66,8 +66,8 @@ public class AppEngineStopRunnerTest {
         .stop(anyString(), anyString(), any(ProcessStartListener.class));
     try {
       stopRunner.run();
-      fail("Expected throwable due to logging error level.");
-    } catch (Throwable t) {
+      fail("Expected exception due to logging error level.");
+    } catch (AssertionError ae) {
       verify(callback, times(1))
           .errorOccurred("Stop application failed due to an unexpected error.");
     }

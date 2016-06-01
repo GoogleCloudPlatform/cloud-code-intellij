@@ -82,7 +82,7 @@ public class AppEngineStandardDeployRunnerTest {
     try {
       deployRunner.run();
       failureExpected();
-    } catch (Throwable t) {
+    } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
     }
   }
@@ -95,7 +95,7 @@ public class AppEngineStandardDeployRunnerTest {
     try {
       deployRunner.run();
       failureExpected();
-    } catch (Throwable t) {
+    } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
     }
   }
@@ -114,12 +114,12 @@ public class AppEngineStandardDeployRunnerTest {
     try {
       deployRunner.deploy(new File("myFile.jar")).exit(0);
       failureExpected();
-    } catch (Throwable t) {
+    } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(DEPLOY_FAIL_MSG);
     }
   }
 
   private void failureExpected() {
-    fail("Expected throwable due to log error level");
+    fail("Expected exception due to log error level");
   }
 }

@@ -69,7 +69,7 @@ public class AppEngineFlexibleDeployRunnerTest {
     try {
       deployRunner.run();
       failureExpected();
-    } catch (Throwable t) {
+    } catch (AssertionError ae) {
       verify(callback, times(1))
           .errorOccurred("There was an unexpected error creating the staging directory");
     }
@@ -81,7 +81,7 @@ public class AppEngineFlexibleDeployRunnerTest {
     try {
       deployRunner.run();
       failureExpected();
-    } catch (Throwable t) {
+    } catch (AssertionError ae) {
       verify(callback, times(1))
           .errorOccurred("Deployment failed due to an unexpected error while staging the project.");
     }
@@ -103,7 +103,7 @@ public class AppEngineFlexibleDeployRunnerTest {
     try {
       deployRunner.run();
       failureExpected();
-    } catch (Throwable t) {
+    } catch (AssertionError ae) {
       verify(callback, times(1))
           .errorOccurred("Deployment failed due to an unexpected error.\n"
           + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
@@ -113,6 +113,6 @@ public class AppEngineFlexibleDeployRunnerTest {
   }
 
   private void failureExpected() {
-    fail("Expected throwable due to log error level");
+    fail("Expected exception due to log error level");
   }
 }
