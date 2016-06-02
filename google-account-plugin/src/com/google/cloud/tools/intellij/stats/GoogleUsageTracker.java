@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.stats;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
