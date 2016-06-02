@@ -77,10 +77,6 @@ public class GoogleUsageTracker implements UsageTracker {
       @NotNull String eventAction,
       @Nullable String eventLabel,
       @Nullable Integer eventValue) {
-    if (eventValue != null) {
-      Preconditions.checkArgument(eventLabel != null);
-    }
-
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       if (UsageTrackerManager.getInstance().isTrackingEnabled()) {
         // For the semantics of each parameter, consult the followings:
