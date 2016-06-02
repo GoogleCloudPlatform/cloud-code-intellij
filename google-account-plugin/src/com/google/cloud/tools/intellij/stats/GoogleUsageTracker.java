@@ -64,12 +64,6 @@ public class GoogleUsageTracker implements UsageTracker {
 
   /**
    * Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property.
-   *
-   * @param eventCategory Ignored for plugins installed on IntelliJ. Retained to maintain backward
-   *     compatibility on Android Studio.
-   * @param eventAction On IntelliJ, this is the primary event action.
-   * @param eventLabel On IntelliJ, reported as a metadata key.
-   * @param eventValue On IntelliJ, reported as a metadata value.
    */
   @Override
   public void trackEvent(@NotNull String eventCategory,
@@ -86,7 +80,7 @@ public class GoogleUsageTracker implements UsageTracker {
         List<BasicNameValuePair> postData = Lists.newArrayList(analyticsBaseData);
         postData.add(new BasicNameValuePair("tid", analyticsId));
 
-        postData.add(new BasicNameValuePair("cd19", ANALYTICS_APP));  // Event type
+        postData.add(new BasicNameValuePair("cd19", eventCategory));  // Event type
         postData.add(new BasicNameValuePair("cd20", eventAction));  // Event name
         postData.add(new BasicNameValuePair("cd16", "0"));  // Internal user? No.
         postData.add(new BasicNameValuePair("cd17", "0"));  // User signed in? We will ignore this.
