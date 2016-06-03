@@ -13,7 +13,7 @@
     <orderEntry type="module" module-name="google-app-engine" />
     <orderEntry type="module" module-name="web-openapi" />
     <orderEntry type="module" module-name="javaee-api" />
-    <orderEntry type="module" module-name="javaee-impl" />
+    <orderEntry type="module" module-name="javaee-impl" scope="TEST" />
     <orderEntry type="module" module-name="GwtStudio" />
     <orderEntry type="module" module-name="execution-openapi" />
     <orderEntry type="module" module-name="jpa-openapi" />
@@ -24,5 +24,7 @@
     <orderEntry type="module" module-name="testFramework-java" scope="TEST" />
     <orderEntry type="module" module-name="web-impl" scope="TEST" />
     <orderEntry type="module" module-name="javaee_tests" scope="TEST" />
+    <orderEntry type="module" module-name="idea-ui" />
+    <orderEntry type="module" module-name="compiler-impl" />
   </component>
 </module>
