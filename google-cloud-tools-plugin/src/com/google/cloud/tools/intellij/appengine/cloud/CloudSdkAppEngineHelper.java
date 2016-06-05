@@ -184,8 +184,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   public CloudSdk createSdk(
       LoggingHandler loggingHandler,
       ProcessStartListener startListener,
-      ProcessOutputLineListener stdErrListener,
-      ProcessOutputLineListener stdOutListener,
+      ProcessOutputLineListener logListener,
+      ProcessOutputLineListener outputListener,
       ProcessExitListener exitListener) {
     if (credentialsPath == null) {
       loggingHandler.print(GctBundle.message("appengine.action.credential.not.found") + "\n");
@@ -198,8 +198,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     return new CloudSdk.Builder()
         .sdkPath(getGcloudCommandPath())
         .async(true)
-        .addStdErrLineListener(stdErrListener)
-        .addStdOutLineListener(stdOutListener)
+        .addStdErrLineListener(logListener)
+        .addStdOutLineListener(outputListener)
         .exitListener(exitListener)
         .startListener(startListener)
         .appCommandCredentialFile(credentialsPath)

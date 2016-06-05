@@ -94,16 +94,16 @@ public interface AppEngineHelper {
    *
    * @param loggingHandler logging messages will be output to this
    * @param startListener the "callback" listener used for fetching the running process.
-   * @param stdErrListener the output listener for handling "normal" operation messages
-   * @param stdOutListener the output listener for handling the output messages of the operation
+   * @param logListener the output listener for handling "normal" operation log messages
+   * @param outputListener the output listener for handling the output messages of the operation
    * @param exitListener the listener for handling the completeion of the operation
    * @return the {@link CloudSdk} object used in executing the operation
    */
   CloudSdk createSdk(
       LoggingHandler loggingHandler,
       ProcessStartListener startListener,
-      ProcessOutputLineListener stdErrListener,
-      ProcessOutputLineListener stdOutListener,
+      ProcessOutputLineListener logListener,
+      ProcessOutputLineListener outputListener,
       ProcessExitListener exitListener);
 
   /**

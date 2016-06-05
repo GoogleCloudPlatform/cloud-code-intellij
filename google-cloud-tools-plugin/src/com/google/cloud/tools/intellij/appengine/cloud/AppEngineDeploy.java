@@ -72,7 +72,7 @@ public class AppEngineDeploy {
   /**
    * Given a staging directory, deploy the application to Google App Engine.
    */
-  public void deploy(@NotNull File stagingDirectory, @NotNull ProcessStartListener startListener) {
+  public void deploy(@NotNull File stagingDirectory, @NotNull ProcessStartListener deployStartListener) {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
@@ -84,7 +84,7 @@ public class AppEngineDeploy {
       configuration.setVersion(deploymentConfiguration.getVersion());
     }
 
-    ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
+    ProcessOutputLineListener deployLogListener = new ProcessOutputLineListener() {
       @Override
       public void outputLine(String line) {
         loggingHandler.print(line + "\n");
@@ -100,8 +100,8 @@ public class AppEngineDeploy {
 
     CloudSdk sdk = helper.createSdk(
         loggingHandler,
-        startListener,
-        outputListener,
+        deployStartListener,
+        deployLogListener,
         deployOutputListener,
         deployExitListener);
     CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
