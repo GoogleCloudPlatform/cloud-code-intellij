@@ -208,7 +208,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         .exitListener(exitListener)
         .startListener(startListener)
         .appCommandCredentialFile(credentialsPath)
-        .appCommandMetricsEnvironment("gcloud-intellij")
+        .appCommandMetricsEnvironment(pluginInfoService.getUserAgent())
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
         .appCommandGsUtil(0)
         .appCommandOutputFormat("json")
