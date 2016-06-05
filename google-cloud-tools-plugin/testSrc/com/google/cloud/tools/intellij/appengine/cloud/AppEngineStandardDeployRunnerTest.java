@@ -81,10 +81,12 @@ public class AppEngineStandardDeployRunnerTest {
         .thenThrow(new IOException());
     try {
       deployRunner.run();
-      failureExpected();
     } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
+      return;
     }
+
+    failureExpected();
   }
 
   @Test
@@ -94,10 +96,12 @@ public class AppEngineStandardDeployRunnerTest {
         .stage(any(File.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
     try {
       deployRunner.run();
-      failureExpected();
     } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
+      return;
     }
+
+    failureExpected();
   }
 
   @Test
@@ -113,10 +117,12 @@ public class AppEngineStandardDeployRunnerTest {
         .when(deploy).deploy(any(File.class), any(ProcessStartListener.class));
     try {
       deployRunner.deploy(new File("myFile.jar")).exit(0);
-      failureExpected();
     } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(DEPLOY_FAIL_MSG);
+      return;
     }
+
+    failureExpected();
   }
 
   private void failureExpected() {

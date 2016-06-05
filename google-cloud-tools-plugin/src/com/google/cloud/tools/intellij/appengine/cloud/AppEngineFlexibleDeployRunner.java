@@ -53,7 +53,7 @@ public class AppEngineFlexibleDeployRunner implements CancellableRunnable {
     } catch (IOException ioe) {
       deploy.getCallback().errorOccurred(
           GctBundle.message("appengine.deployment.error.creating.staging.directory"));
-      logger.error(ioe);
+      logger.warn(ioe);
       return;
     }
 

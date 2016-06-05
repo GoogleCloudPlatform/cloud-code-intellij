@@ -66,13 +66,10 @@ public class AppEngineFlexibleDeployRunnerTest {
   public void testCreateStagingDirectory_Error() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class)))
         .thenThrow(new IOException());
-    try {
-      deployRunner.run();
-      failureExpected();
-    } catch (AssertionError ae) {
-      verify(callback, times(1))
-          .errorOccurred("There was an unexpected error creating the staging directory");
-    }
+
+    deployRunner.run();
+    verify(callback, times(1))
+        .errorOccurred("There was an unexpected error creating the staging directory");
   }
 
   @Test
@@ -80,11 +77,13 @@ public class AppEngineFlexibleDeployRunnerTest {
     doThrow(new RuntimeException("myError")).when(stage).stage(new File("myFile.jar"));
     try {
       deployRunner.run();
-      failureExpected();
     } catch (AssertionError ae) {
       verify(callback, times(1))
           .errorOccurred("Deployment failed due to an unexpected error while staging the project.");
+      return;
     }
+
+    failureExpected();
   }
 
   @Test
@@ -102,14 +101,16 @@ public class AppEngineFlexibleDeployRunnerTest {
 
     try {
       deployRunner.run();
-      failureExpected();
     } catch (AssertionError ae) {
       verify(callback, times(1))
           .errorOccurred("Deployment failed due to an unexpected error.\n"
           + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
           + "Run ''gcloud components update'' to update the SDK. "
           + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)");
+      return;
     }
+
+    failureExpected();
   }
 
   private void failureExpected() {
