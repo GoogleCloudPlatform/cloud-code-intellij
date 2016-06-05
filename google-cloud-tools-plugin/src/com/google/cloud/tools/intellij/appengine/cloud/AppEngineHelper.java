@@ -84,16 +84,19 @@ public interface AppEngineHelper {
    * Creates a temporary staging directory on the local filesystem.
    *
    * @param loggingHandler logging messages will be output to this
+   * @param cloudProjectName the app engine project name
    * @return the file representing the staging directory
    * @throws IOException if the staging fails
    */
-  File createStagingDirectory(LoggingHandler loggingHandler) throws IOException;
+  File createStagingDirectory(
+      LoggingHandler loggingHandler,
+      String cloudProjectName) throws IOException;
 
   /**
-   * Creates an {@link CloudSdk} object that is used in execution of various App Engine actions.
+   * Creates a {@link CloudSdk} object that is used in execution of various App Engine actions.
    *
    * @param loggingHandler logging messages will be output to this
-   * @param startListener the "callback" listener used for fetching the running process.
+   * @param startListener the "callback" listener used for fetching the running process
    * @param logListener the output listener for handling "normal" operation log messages
    * @param outputListener the output listener for handling the output messages of the operation
    * @param exitListener the listener for handling the completeion of the operation

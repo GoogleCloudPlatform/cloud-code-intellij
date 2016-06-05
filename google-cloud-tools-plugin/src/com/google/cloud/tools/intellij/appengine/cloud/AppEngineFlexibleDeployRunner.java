@@ -49,7 +49,9 @@ public class AppEngineFlexibleDeployRunner implements CancellableRunnable {
     File stagingDirectory;
 
     try {
-      stagingDirectory = deploy.getHelper().createStagingDirectory(deploy.getLoggingHandler());
+      stagingDirectory = deploy.getHelper().createStagingDirectory(
+          deploy.getLoggingHandler(),
+          deploy.getDeploymentConfiguration().getCloudProjectName());
     } catch (IOException ioe) {
       deploy.getCallback().errorOccurred(
           GctBundle.message("appengine.deployment.error.creating.staging.directory"));

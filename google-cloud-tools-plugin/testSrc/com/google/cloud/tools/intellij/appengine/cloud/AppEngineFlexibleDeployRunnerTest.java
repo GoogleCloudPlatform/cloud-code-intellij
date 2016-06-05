@@ -54,7 +54,8 @@ public class AppEngineFlexibleDeployRunnerTest {
 
   @Before
   public void setUp() throws IOException {
-    when(helper.createStagingDirectory(any(LoggingHandler.class))).thenReturn(new File("myFile.jar"));
+    when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
+        .thenReturn(new File("myFile.jar"));
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
@@ -64,7 +65,7 @@ public class AppEngineFlexibleDeployRunnerTest {
 
   @Test
   public void testCreateStagingDirectory_Error() throws IOException {
-    when(helper.createStagingDirectory(any(LoggingHandler.class)))
+    when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
         .thenThrow(new IOException());
 
     deployRunner.run();

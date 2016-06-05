@@ -67,7 +67,8 @@ public class AppEngineStandardDeployRunnerTest {
 
   @Before
   public void setUp() throws IOException {
-    when(helper.createStagingDirectory(any(LoggingHandler.class))).thenReturn(new File("myFile"));
+    when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
+        .thenReturn(new File("myFile"));
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
@@ -77,7 +78,7 @@ public class AppEngineStandardDeployRunnerTest {
 
   @Test
   public void createStagingDirectory_Error() throws IOException {
-    when(helper.createStagingDirectory(any(LoggingHandler.class)))
+    when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
         .thenThrow(new IOException());
     try {
       deployRunner.run();

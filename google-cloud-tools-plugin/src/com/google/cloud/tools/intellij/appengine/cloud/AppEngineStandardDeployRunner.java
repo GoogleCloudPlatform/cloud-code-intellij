@@ -52,7 +52,9 @@ public class AppEngineStandardDeployRunner implements CancellableRunnable {
   public void run() {
     try {
       final File stagingDirectory =
-          deploy.getHelper().createStagingDirectory(deploy.getLoggingHandler());
+          deploy.getHelper().createStagingDirectory(
+              deploy.getLoggingHandler(),
+              deploy.getDeploymentConfiguration().getCloudProjectName());
 
       deploy.getHelper().stageCredentials(deploy.getDeploymentConfiguration().getGoogleUsername());
 

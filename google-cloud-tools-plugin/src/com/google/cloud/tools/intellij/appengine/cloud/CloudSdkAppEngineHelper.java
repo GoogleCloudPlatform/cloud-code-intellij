@@ -73,9 +73,12 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   private File credentialsPath;
 
+  /**
+   * Specifies the App Engine environment.
+   */
   public enum Environment {
-    APP_ENGINE_STANDARD("App Engine standard"),
-    APP_ENGINE_FLEX("App Engine flexible");
+    APP_ENGINE_STANDARD("appengine.environment.name.standard"),
+    APP_ENGINE_FLEX("appengine.environment.name.flexible");
 
     private String label;
 
@@ -85,7 +88,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
     @Override
     public String toString() {
-      return label; // TODO message bundle
+      return GctBundle.message(label);
     }
   }
 
@@ -169,9 +172,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   @Override
-  public File createStagingDirectory(LoggingHandler loggingHandler) throws IOException {
+  public File createStagingDirectory(
+      LoggingHandler loggingHandler,
+      String cloudProjectName) throws IOException {
     File stagingDirectory = FileUtil.createTempDirectory(
-        "gae-mvm" /* prefix */,
+        "gae-staging-" + cloudProjectName/* prefix */,
         null /* suffix */,
         true  /* deleteOnExit */);
     loggingHandler.print(

@@ -72,7 +72,9 @@ public class AppEngineDeploy {
   /**
    * Given a staging directory, deploy the application to Google App Engine.
    */
-  public void deploy(@NotNull File stagingDirectory, @NotNull ProcessStartListener deployStartListener) {
+  public void deploy(
+      @NotNull File stagingDirectory,
+      @NotNull ProcessStartListener deployStartListener) {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
