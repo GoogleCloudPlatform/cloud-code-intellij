@@ -40,17 +40,18 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Unit tests for {@link AppEngineFlexibleDeployRunner}
+ * Unit tests for {@link AppEngineFlexibleDeployTask}
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AppEngineFlexibleDeployRunnerTest {
+public class AppEngineFlexibleDeployTaskTest {
 
-  private AppEngineFlexibleDeployRunner deployRunner;
+  private AppEngineFlexibleDeployTask task;
   @Mock AppEngineDeploy deploy;
   @Mock DeploymentOperationCallback callback;
   @Mock AppEngineDeploymentConfiguration deploymentConfiguration;
   @Mock AppEngineFlexibleStage stage;
   @Mock AppEngineHelper helper;
+  @Mock ProcessStartListener startListener;
 
   @Before
   public void setUp() throws IOException {
@@ -60,7 +61,7 @@ public class AppEngineFlexibleDeployRunnerTest {
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
 
-    deployRunner = new AppEngineFlexibleDeployRunner(deploy, stage);
+    task = new AppEngineFlexibleDeployTask(deploy, stage);
   }
 
   @Test
@@ -68,7 +69,7 @@ public class AppEngineFlexibleDeployRunnerTest {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
         .thenThrow(new IOException());
 
-    deployRunner.run();
+    task.execute(startListener);
     verify(callback, times(1))
         .errorOccurred("There was an unexpected error creating the staging directory");
   }
@@ -77,7 +78,7 @@ public class AppEngineFlexibleDeployRunnerTest {
   public void stage_Error() {
     doThrow(new RuntimeException("myError")).when(stage).stage(new File("myFile.jar"));
     try {
-      deployRunner.run();
+      task.execute(startListener);
     } catch (AssertionError ae) {
       verify(callback, times(1))
           .errorOccurred("Deployment failed due to an unexpected error while staging the project.");
@@ -89,7 +90,7 @@ public class AppEngineFlexibleDeployRunnerTest {
 
   @Test
   public void deploy_Success() {
-    deployRunner.run();
+    task.execute(startListener);
 
     verify(callback, never()).errorOccurred(anyString());
   }
@@ -101,7 +102,7 @@ public class AppEngineFlexibleDeployRunnerTest {
         .deploy(any(File.class), any(ProcessStartListener.class));
 
     try {
-      deployRunner.run();
+      task.execute(startListener);
     } catch (AssertionError ae) {
       verify(callback, times(1))
           .errorOccurred("Deployment failed due to an unexpected error.\n"

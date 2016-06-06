@@ -36,25 +36,26 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * Unit tests for {@link AppEngineStopRunner}
+ * Unit tests for {@link AppEngineStopTask}
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AppEngineStopRunnerTest {
+public class AppEngineStopTaskTest {
 
-  private AppEngineStopRunner stopRunner;
+  private AppEngineStopTask task;
   @Mock AppEngineStop stop;
   @Mock UndeploymentTaskCallback callback;
+  @Mock ProcessStartListener startListener;
 
   @Before
   public void setUp() {
     when(stop.getCallback()).thenReturn(callback);
 
-    stopRunner = new AppEngineStopRunner(stop, "myModule", "myVersion");
+    task = new AppEngineStopTask(stop, "myModule", "myVersion");
   }
 
   @Test
   public void testStop_Success() {
-    stopRunner.run();
+    task.execute(startListener);
 
     verify(callback, never()).errorOccurred(anyString());
   }
@@ -65,7 +66,7 @@ public class AppEngineStopRunnerTest {
         .when(stop)
         .stop(anyString(), anyString(), any(ProcessStartListener.class));
     try {
-      stopRunner.run();
+      task.execute(startListener);
     } catch (AssertionError ae) {
       verify(callback, times(1))
           .errorOccurred("Stop application failed due to an unexpected error.");

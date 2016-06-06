@@ -41,17 +41,18 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Unit tests for {@link AppEngineStandardDeployRunner}
+ * Unit tests for {@link AppEngineStandardDeployTask}
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AppEngineStandardDeployRunnerTest {
+public class AppEngineStandardDeployTaskTest {
 
-  private AppEngineStandardDeployRunner deployRunner;
+  private AppEngineStandardDeployTask task;
   @Mock AppEngineDeploy deploy;
   @Mock AppEngineStandardStage stage;
   @Mock DeploymentOperationCallback callback;
   @Mock AppEngineDeploymentConfiguration deploymentConfiguration;
   @Mock AppEngineHelper helper;
+  @Mock ProcessStartListener startListener;
 
   private static final String DEPLOY_FAIL_MSG =
       "Deployment failed due to an unexpected error.\n"
@@ -73,7 +74,7 @@ public class AppEngineStandardDeployRunnerTest {
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
 
-    deployRunner = new AppEngineStandardDeployRunner(deploy, stage);
+    task = new AppEngineStandardDeployTask(deploy, stage);
   }
 
   @Test
@@ -81,7 +82,7 @@ public class AppEngineStandardDeployRunnerTest {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
         .thenThrow(new IOException());
     try {
-      deployRunner.run();
+      task.execute(startListener);
     } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
       return;
@@ -96,7 +97,7 @@ public class AppEngineStandardDeployRunnerTest {
         .when(stage)
         .stage(any(File.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
     try {
-      deployRunner.run();
+      task.execute(startListener);
     } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
       return;
@@ -107,7 +108,7 @@ public class AppEngineStandardDeployRunnerTest {
 
   @Test
   public void deploy_Success() {
-    deployRunner.deploy(new File("myFile.jar")).exit(0);
+    task.deploy(new File("myFile.jar"), startListener).exit(0);
 
     verify(callback, never()).errorOccurred(anyString());
   }
@@ -117,7 +118,7 @@ public class AppEngineStandardDeployRunnerTest {
     doThrow(new RuntimeException())
         .when(deploy).deploy(any(File.class), any(ProcessStartListener.class));
     try {
-      deployRunner.deploy(new File("myFile.jar")).exit(0);
+      task.deploy(new File("myFile.jar"), startListener).exit(0);
     } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(DEPLOY_FAIL_MSG);
       return;

@@ -159,7 +159,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           loggingHandler,
           artifactToDeploy);
 
-      return new AppEngineStandardDeployRunner(deploy, standardStage);
+      return new AppEngineRunner(
+          new AppEngineStandardDeployTask(deploy, standardStage));
     } else {
       AppEngineFlexibleStage flexibleStage = new AppEngineFlexibleStage(
           this,
@@ -167,7 +168,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           artifactToDeploy,
           deploymentConfiguration);
 
-      return new AppEngineFlexibleDeployRunner(deploy, flexibleStage);
+      return new AppEngineRunner(
+          new AppEngineFlexibleDeployTask(deploy, flexibleStage));
     }
   }
 
