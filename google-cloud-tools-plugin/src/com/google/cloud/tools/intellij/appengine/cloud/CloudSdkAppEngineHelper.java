@@ -210,7 +210,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         .exitListener(exitListener)
         .startListener(startListener)
         .appCommandCredentialFile(credentialsPath)
-        .appCommandMetricsEnvironment(pluginInfoService.getUserAgent())
+        .appCommandMetricsEnvironment(pluginInfoService.getExternalPluginName())
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
         .appCommandGsUtil(0)
         .appCommandOutputFormat("json")
