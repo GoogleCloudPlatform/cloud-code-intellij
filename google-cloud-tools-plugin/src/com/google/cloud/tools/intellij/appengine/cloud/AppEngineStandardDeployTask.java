@@ -47,23 +47,31 @@ public class AppEngineStandardDeployTask implements AppEngineTask {
 
   @Override
   public void execute(ProcessStartListener startListener) {
-    try {
-      final File stagingDirectory =
-          deploy.getHelper().createStagingDirectory(
-              deploy.getLoggingHandler(),
-              deploy.getDeploymentConfiguration().getCloudProjectName());
+    File stagingDirectory;
 
+    try {
+      stagingDirectory = deploy.getHelper().createStagingDirectory(
+          deploy.getLoggingHandler(),
+          deploy.getDeploymentConfiguration().getCloudProjectName());
+    } catch (IOException ioe) {
+      deploy.getCallback().errorOccurred(
+          GctBundle.message("appengine.deployment.error.creating.staging.directory"));
+      logger.warn(ioe);
+      return;
+    }
+
+    try {
       deploy.getHelper().stageCredentials(deploy.getDeploymentConfiguration().getGoogleUsername());
 
       stageStandard.stage(
           stagingDirectory,
           startListener,
           deploy(stagingDirectory, startListener));
-    } catch (RuntimeException | IOException ex) {
+    } catch (RuntimeException re) {
       deploy.getCallback()
           .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging") + "\n"
               + GctBundle.message("appengine.action.error.update.message"));
-      logger.error(ex);
+      logger.error(re);
     }
   }
 

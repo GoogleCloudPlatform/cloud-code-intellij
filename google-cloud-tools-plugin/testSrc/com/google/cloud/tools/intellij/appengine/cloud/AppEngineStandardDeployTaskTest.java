@@ -81,14 +81,10 @@ public class AppEngineStandardDeployTaskTest {
   public void createStagingDirectory_error() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
         .thenThrow(new IOException());
-    try {
-      task.execute(startListener);
-    } catch (AssertionError ae) {
-      verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
-      return;
-    }
 
-    failureExpected();
+    task.execute(startListener);
+    verify(callback, times(1))
+        .errorOccurred("There was an unexpected error creating the staging directory");
   }
 
   @Test
