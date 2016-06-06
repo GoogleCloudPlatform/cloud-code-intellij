@@ -45,6 +45,7 @@ public class AppEngineStop {
 
   private AppEngineHelper helper;
   private LoggingHandler loggingHandler;
+  private AppEngineDeploymentConfiguration configuration;
   private UndeploymentTaskCallback callback;
 
   /**
@@ -53,9 +54,11 @@ public class AppEngineStop {
   public AppEngineStop(
       @NotNull AppEngineHelper helper,
       @NotNull LoggingHandler loggingHandler,
+      @NotNull AppEngineDeploymentConfiguration configuration,
       @NotNull UndeploymentTaskCallback callback) {
     this.helper = helper;
     this.loggingHandler = loggingHandler;
+    this.configuration = configuration;
     this.callback = callback;
   }
 
@@ -90,6 +93,14 @@ public class AppEngineStop {
     configuration.setService(module);
 
     command.stop(configuration);
+  }
+
+  AppEngineHelper getHelper() {
+    return helper;
+  }
+
+  AppEngineDeploymentConfiguration getDeploymentConfiguration() {
+    return configuration;
   }
 
   UndeploymentTaskCallback getCallback() {

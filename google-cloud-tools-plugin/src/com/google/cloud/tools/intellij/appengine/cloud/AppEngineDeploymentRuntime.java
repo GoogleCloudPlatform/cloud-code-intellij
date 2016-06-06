@@ -45,6 +45,7 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
 
   private Project project;
   private LoggingHandler loggingHandler;
+  private AppEngineDeploymentConfiguration configuration;
   private AppEngineHelper appEngineHelper;
   private String service;
   private String version;
@@ -53,11 +54,12 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
       @NotNull Project project,
       @NotNull LoggingHandler loggingHandler,
       @NotNull AppEngineHelper appEngineHelper,
-      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
+      @NotNull AppEngineDeploymentConfiguration configuration,
       @Nullable String service,
       @Nullable String version) {
     this.project = project;
     this.loggingHandler = loggingHandler;
+    this.configuration = configuration;
     this.appEngineHelper = appEngineHelper;
     this.service = service;
     this.version = version;
@@ -94,7 +96,8 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
   }
 
   private void stop(@NotNull UndeploymentTaskCallback callback) {
-    AppEngineStop stop = new AppEngineStop(appEngineHelper, loggingHandler, callback);
+    AppEngineStop stop = new AppEngineStop(
+        appEngineHelper, loggingHandler, configuration, callback);
 
     final AppEngineRunner stopRunner =
         new AppEngineRunner(new AppEngineStopTask(stop, service, version));

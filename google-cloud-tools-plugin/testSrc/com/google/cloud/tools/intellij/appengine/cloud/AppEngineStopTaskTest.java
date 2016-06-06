@@ -43,12 +43,16 @@ public class AppEngineStopTaskTest {
 
   private AppEngineStopTask task;
   @Mock AppEngineStop stop;
+  @Mock AppEngineDeploymentConfiguration configuration;
+  @Mock AppEngineHelper helper;
   @Mock UndeploymentTaskCallback callback;
   @Mock ProcessStartListener startListener;
 
   @Before
   public void setUp() {
     when(stop.getCallback()).thenReturn(callback);
+    when(stop.getHelper()).thenReturn(helper);
+    when(stop.getDeploymentConfiguration()).thenReturn(configuration);
 
     task = new AppEngineStopTask(stop, "myModule", "myVersion");
   }

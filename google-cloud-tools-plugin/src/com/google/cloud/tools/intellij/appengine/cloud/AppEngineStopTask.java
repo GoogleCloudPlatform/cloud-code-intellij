@@ -43,6 +43,8 @@ public class AppEngineStopTask implements AppEngineTask {
   @Override
   public void execute(ProcessStartListener startListener) {
     try {
+      stop.getHelper().stageCredentials(stop.getDeploymentConfiguration().getGoogleUsername());
+
       stop.stop(module, version, startListener);
     } catch (RuntimeException re) {
       stop.getCallback().errorOccurred(GctBundle.message("appengine.stop.modules.version.error"));
