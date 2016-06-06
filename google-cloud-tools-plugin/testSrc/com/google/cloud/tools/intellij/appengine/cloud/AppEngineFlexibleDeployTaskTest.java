@@ -65,7 +65,7 @@ public class AppEngineFlexibleDeployTaskTest {
   }
 
   @Test
-  public void testCreateStagingDirectory_Error() throws IOException {
+  public void testCreateStagingDirectory_error() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
         .thenThrow(new IOException());
 
@@ -75,7 +75,7 @@ public class AppEngineFlexibleDeployTaskTest {
   }
 
   @Test
-  public void stage_Error() {
+  public void stage_error() {
     doThrow(new RuntimeException("myError")).when(stage).stage(new File("myFile.jar"));
     try {
       task.execute(startListener);
@@ -89,14 +89,14 @@ public class AppEngineFlexibleDeployTaskTest {
   }
 
   @Test
-  public void deploy_Success() {
+  public void deploy_success() {
     task.execute(startListener);
 
     verify(callback, never()).errorOccurred(anyString());
   }
 
   @Test
-  public void deploy_Error() {
+  public void deploy_error() {
     doThrow(new RuntimeException())
         .when(deploy)
         .deploy(any(File.class), any(ProcessStartListener.class));

@@ -78,7 +78,7 @@ public class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void createStagingDirectory_Error() throws IOException {
+  public void createStagingDirectory_error() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
         .thenThrow(new IOException());
     try {
@@ -92,7 +92,7 @@ public class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void stage_Error() {
+  public void stage_error() {
     doThrow(new RuntimeException())
         .when(stage)
         .stage(any(File.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
@@ -107,14 +107,14 @@ public class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void deploy_Success() {
+  public void deploy_success() {
     task.deploy(new File("myFile.jar"), startListener).exit(0);
 
     verify(callback, never()).errorOccurred(anyString());
   }
 
   @Test
-  public void deploy_Error() {
+  public void deploy_error() {
     doThrow(new RuntimeException())
         .when(deploy).deploy(any(File.class), any(ProcessStartListener.class));
     try {

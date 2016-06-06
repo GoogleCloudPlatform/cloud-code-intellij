@@ -54,14 +54,14 @@ public class AppEngineStopTaskTest {
   }
 
   @Test
-  public void testStop_Success() {
+  public void testStop_success() {
     task.execute(startListener);
 
     verify(callback, never()).errorOccurred(anyString());
   }
 
   @Test
-  public void testStop_Error() {
+  public void testStop_error() {
     doThrow(new RuntimeException("myError"))
         .when(stop)
         .stop(anyString(), anyString(), any(ProcessStartListener.class));
