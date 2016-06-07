@@ -39,6 +39,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.Deployment;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
@@ -69,39 +70,17 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   private final Project project;
   private final File gcloudCommandPath;
-  private final Environment environment;
 
   private File credentialsPath;
-
-  /**
-   * Specifies the App Engine environment.
-   */
-  public enum Environment {
-    APP_ENGINE_STANDARD("appengine.environment.name.standard"),
-    APP_ENGINE_FLEX("appengine.environment.name.flexible");
-
-    private String label;
-
-    Environment(String label) {
-      this.label = label;
-    }
-
-    @Override
-    public String toString() {
-      return GctBundle.message(label);
-    }
-  }
 
   /**
    * Initialize the helper.
    */
   public CloudSdkAppEngineHelper(
       @NotNull Project project,
-      @NotNull File gcloudCommandPath,
-      @NotNull Environment environment) {
+      @NotNull File gcloudCommandPath) {
     this.project = project;
     this.gcloudCommandPath = gcloudCommandPath;
-    this.environment = environment;
   }
 
   @Override
@@ -113,12 +92,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @Override
   public File getGcloudCommandPath() {
     return gcloudCommandPath;
-  }
-
-  @NotNull
-  @Override
-  public Environment getEnvironment() {
-    return environment;
   }
 
   @NotNull
@@ -144,33 +117,59 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @Override
   public CancellableRunnable createDeployRunner(
       LoggingHandler loggingHandler,
-      File artifactToDeploy,
+      DeploymentSource source,
       AppEngineDeploymentConfiguration deploymentConfiguration,
       DeploymentOperationCallback callback) {
+
+    if (source.getFile() == null
+        || !(source instanceof AppEngineDeployable)) {
+      callback.errorOccurred(GctBundle.message("appengine.deployment.source.not.found.error"));
+      throw new RuntimeException("Invalid deployment source selected for deployment");
+    }
+
+    AppEngineEnvironment targetEnvironment = ((AppEngineDeployable) source).getEnvironment();
+
     AppEngineDeploy deploy = new AppEngineDeploy(
         this,
         loggingHandler,
         deploymentConfiguration,
-        wrapCallbackForUsageTracking(callback, deploymentConfiguration, artifactToDeploy));
+        targetEnvironment,
+        wrapCallbackForUsageTracking(
+            callback, deploymentConfiguration, source.getFile(), targetEnvironment));
 
-    if (environment == Environment.APP_ENGINE_STANDARD) {
-      AppEngineStandardStage standardStage = new AppEngineStandardStage(
+    if (targetEnvironment == AppEngineEnvironment.APP_ENGINE_STANDARD) {
+      return createStandardRunner(loggingHandler, source.getFile(), deploy);
+    } else if (targetEnvironment == AppEngineEnvironment.APP_ENGINE_FLEX) {
+      return createFlexRunner(loggingHandler, source.getFile(), deploymentConfiguration, deploy);
+    } else {
+      throw new AssertionError("Invalid App Engine target environment: " + targetEnvironment);
+    }
+  }
+
+  private AppEngineRunner createStandardRunner(
+      LoggingHandler loggingHandler,
+      File artifactToDeploy,
+      AppEngineDeploy deploy) {
+    AppEngineStandardStage standardStage = new AppEngineStandardStage(
           this,
           loggingHandler,
           artifactToDeploy);
 
-      return new AppEngineRunner(
-          new AppEngineStandardDeployTask(deploy, standardStage));
-    } else {
-      AppEngineFlexibleStage flexibleStage = new AppEngineFlexibleStage(
+    return new AppEngineRunner(new AppEngineStandardDeployTask(deploy, standardStage));
+  }
+
+  private AppEngineRunner createFlexRunner(
+      LoggingHandler loggingHandler,
+      File artifactToDeploy,
+      AppEngineDeploymentConfiguration config,
+      AppEngineDeploy deploy) {
+    AppEngineFlexibleStage flexibleStage = new AppEngineFlexibleStage(
           this,
           loggingHandler,
           artifactToDeploy,
-          deploymentConfiguration);
+          config);
 
-      return new AppEngineRunner(
-          new AppEngineFlexibleDeployTask(deploy, flexibleStage));
-    }
+    return new AppEngineRunner(new AppEngineFlexibleDeployTask(deploy, flexibleStage));
   }
 
   @Override
@@ -269,11 +268,12 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private DeploymentOperationCallback wrapCallbackForUsageTracking(
       final DeploymentOperationCallback deploymentCallback,
       AppEngineDeploymentConfiguration deploymentConfiguration,
-      File artifactToDeploy) {
+      File artifactToDeploy,
+      AppEngineEnvironment environment) {
 
     StringBuilder labelBuilder = new StringBuilder("deploy");
 
-    if (environment == Environment.APP_ENGINE_STANDARD) {
+    if (environment == AppEngineEnvironment.APP_ENGINE_STANDARD) {
       labelBuilder.append(".standard");
     } else {
       labelBuilder.append(".flex");

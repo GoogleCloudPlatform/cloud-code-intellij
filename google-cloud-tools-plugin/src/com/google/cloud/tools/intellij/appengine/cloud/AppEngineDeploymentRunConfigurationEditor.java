@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
@@ -94,6 +93,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private ProjectSelector projectSelector;
   private JLabel environmentLabel;
   private JPanel appEngineFlexConfigPanel;
+
   private DeploymentSource deploymentSource;
 
   private static final String COST_WARNING_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
@@ -110,6 +110,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   public AppEngineDeploymentRunConfigurationEditor(
       final Project project,
       final DeploymentSource deploymentSource,
+      final AppEngineEnvironment environment,
       final AppEngineHelper appEngineHelper) {
     this.deploymentSource = deploymentSource;
 
@@ -118,7 +119,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
 
-    if (appEngineHelper.getEnvironment() == Environment.APP_ENGINE_FLEX) {
+    if (environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
       appEngineCostWarningLabel.setText(
           GctBundle.message("appengine.flex.deployment.cost.warning",
               COST_WARNING_OPEN_TAG,
@@ -210,9 +211,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
 
-    environmentLabel.setText(appEngineHelper.getEnvironment().toString());
+    environmentLabel.setText(environment.toString());
     appEngineFlexConfigPanel
-        .setVisible(appEngineHelper.getEnvironment() == Environment.APP_ENGINE_FLEX);
+        .setVisible(environment == AppEngineEnvironment.APP_ENGINE_FLEX);
   }
 
   @Override

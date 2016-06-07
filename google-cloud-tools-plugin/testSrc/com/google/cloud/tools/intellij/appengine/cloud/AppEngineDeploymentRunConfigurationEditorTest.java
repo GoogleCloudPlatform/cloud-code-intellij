@@ -20,7 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 
 import com.intellij.openapi.options.ConfigurationException;
@@ -45,13 +44,12 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     when(deploymentSource.isValid()).thenReturn(true);
 
     appEngineHelper = mock(AppEngineHelper.class);
-    when(appEngineHelper.getEnvironment()).thenReturn(Environment.APP_ENGINE_STANDARD);
 
     projectSelector = mock(ProjectSelector.class);
     when(projectSelector.getText()).thenReturn(PROJECT_NAME);
 
     editor = new AppEngineDeploymentRunConfigurationEditor(
-        getProject(), deploymentSource, appEngineHelper);
+        getProject(), deploymentSource, AppEngineEnvironment.APP_ENGINE_STANDARD, appEngineHelper);
 
     editor.setProjectSelector(projectSelector);
   }
@@ -84,10 +82,12 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   public void testUiAppEngineStandardEnvironment() {
-    when(appEngineHelper.getEnvironment()).thenReturn(Environment.APP_ENGINE_STANDARD);
-
     AppEngineDeploymentRunConfigurationEditor editor =
-        new AppEngineDeploymentRunConfigurationEditor(getProject(), deploymentSource, appEngineHelper);
+        new AppEngineDeploymentRunConfigurationEditor(
+            getProject(),
+            deploymentSource,
+            AppEngineEnvironment.APP_ENGINE_STANDARD,
+            appEngineHelper);
 
     assertEquals("App Engine standard", editor.getEnvironmentLabel().getText());
     assertFalse(editor.getAppEngineFlexConfigPanel().isVisible());
@@ -95,20 +95,13 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   public void testUiAppEngineFlexEnvironment() {
-    when(appEngineHelper.getEnvironment()).thenReturn(Environment.APP_ENGINE_FLEX);
-
     AppEngineDeploymentRunConfigurationEditor editor =
         new AppEngineDeploymentRunConfigurationEditor(
-            getProject(), deploymentSource, appEngineHelper);
+            getProject(), deploymentSource, AppEngineEnvironment.APP_ENGINE_FLEX, appEngineHelper);
 
     assertEquals("App Engine flexible", editor.getEnvironmentLabel().getText());
     assertTrue(editor.getAppEngineFlexConfigPanel().isVisible());
     Disposer.dispose(editor);
-  }
-
-  private AppEngineDeploymentRunConfigurationEditor createEditor() {
-    return new AppEngineDeploymentRunConfigurationEditor(
-        getProject(), deploymentSource, appEngineHelper);
   }
 
   @Override

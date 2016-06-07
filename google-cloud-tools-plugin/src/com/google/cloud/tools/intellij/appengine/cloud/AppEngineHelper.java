@@ -20,10 +20,10 @@ import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitList
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
 import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
@@ -46,11 +46,6 @@ public interface AppEngineHelper {
   File getGcloudCommandPath();
 
   /**
-   * The App Engine environment.
-   */
-  Environment getEnvironment();
-
-  /**
    * The default app.yaml to use.
    */
   File defaultAppYaml();
@@ -69,14 +64,14 @@ public interface AppEngineHelper {
    * Engine environment.
    *
    * @param loggingHandler logging messages will be output to this
-   * @param artifactToDeploy the {@link File} path to the Java artifact to be deployed
+   * @param source the deployment source to be deployed
    * @param deploymentConfiguration the configuration specifying the deployment
    * @param callback a callback for handling completions of the operation
    * @return the runnable that will perform the deployment operation
    */
   CancellableRunnable createDeployRunner(
       LoggingHandler loggingHandler,
-      File artifactToDeploy,
+      DeploymentSource source,
       AppEngineDeploymentConfiguration deploymentConfiguration,
       DeploymentOperationCallback callback);
 

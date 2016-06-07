@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
@@ -50,8 +49,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   public void initialize() {
     helper = new CloudSdkAppEngineHelper(
         getProject(),
-        new File("someFile.jar"),
-        Environment.APP_ENGINE_STANDARD);
+        new File("someFile.jar"));
 
     registerService(GoogleLoginService.class, googleLoginService);
   }

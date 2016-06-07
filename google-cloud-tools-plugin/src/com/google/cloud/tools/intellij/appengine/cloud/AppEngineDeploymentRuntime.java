@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.icons.AllIcons.General;
@@ -24,7 +23,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -43,31 +41,31 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
       "<a href='https://cloud.google.com/appengine/docs/java/console/#versions'>";
   private static final String STOP_CONFIRMATION_URI_CLOSE_TAG = "</a>";
 
-  private Project project;
   private LoggingHandler loggingHandler;
   private AppEngineDeploymentConfiguration configuration;
   private AppEngineHelper appEngineHelper;
+  private AppEngineEnvironment environment;
   private String service;
   private String version;
 
   public AppEngineDeploymentRuntime(
-      @NotNull Project project,
       @NotNull LoggingHandler loggingHandler,
       @NotNull AppEngineHelper appEngineHelper,
       @NotNull AppEngineDeploymentConfiguration configuration,
+      @NotNull AppEngineEnvironment environment,
       @Nullable String service,
       @Nullable String version) {
-    this.project = project;
     this.loggingHandler = loggingHandler;
     this.configuration = configuration;
     this.appEngineHelper = appEngineHelper;
+    this.environment = environment;
     this.service = service;
     this.version = version;
   }
 
   @Override
   public boolean isUndeploySupported() {
-    return appEngineHelper.getEnvironment() != Environment.APP_ENGINE_STANDARD
+    return environment != AppEngineEnvironment.APP_ENGINE_STANDARD
         && service != null && version != null;
   }
 
@@ -103,7 +101,7 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
         new AppEngineRunner(new AppEngineStopTask(stop, service, version));
 
     ProgressManager.getInstance()
-        .run(new Task.Backgroundable(project, "Stop App Engine", true,
+        .run(new Task.Backgroundable(appEngineHelper.getProject(), "Stop App Engine", true,
             null) {
           @Override
           public void run(@NotNull ProgressIndicator indicator) {

@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper.Environment;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -68,21 +66,14 @@ class AppEngineRuntimeInstance extends
     File gcloudCommandPath = new File(configuration.getCloudSdkHomePath());
     AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
         task.getProject(),
-        gcloudCommandPath,
-        AppEngineUtil.isAppEngineStandardProject(task.getProject())
-            ? Environment.APP_ENGINE_STANDARD
-            : Environment.APP_ENGINE_FLEX);
+        gcloudCommandPath);
 
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
-    File deploymentSource = task.getSource().getFile();
-    if (deploymentSource == null) {
-      callback.errorOccurred(GctBundle.message("appengine.deployment.source.not.found.error"));
-      return;
-    }
+
 
     final CancellableRunnable deployRunner =  appEngineHelper.createDeployRunner(
         logManager.getMainLoggingHandler(),
-        deploymentSource,
+        task.getSource(),
         deploymentConfig,
         callback);
 

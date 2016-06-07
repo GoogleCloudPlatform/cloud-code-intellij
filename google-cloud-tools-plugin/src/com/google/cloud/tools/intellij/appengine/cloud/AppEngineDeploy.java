@@ -53,6 +53,7 @@ public class AppEngineDeploy {
   private AppEngineHelper helper;
   private LoggingHandler loggingHandler;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
+  private AppEngineEnvironment environment; // TODO change name to AppEngineEnvironment
   private DeploymentOperationCallback callback;
 
   /**
@@ -62,10 +63,12 @@ public class AppEngineDeploy {
       @NotNull AppEngineHelper helper,
       @NotNull LoggingHandler loggingHandler,
       @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
+      @NotNull AppEngineEnvironment environment,
       @NotNull DeploymentOperationCallback callback) {
     this.helper = helper;
     this.loggingHandler = loggingHandler;
     this.deploymentConfiguration = deploymentConfiguration;
+    this.environment = environment;
     this.callback = callback;
   }
 
@@ -154,7 +157,7 @@ public class AppEngineDeploy {
 
           callback.succeeded(
               new AppEngineDeploymentRuntime(
-                  helper.getProject(), loggingHandler, helper, deploymentConfiguration,
+                  loggingHandler, helper, deploymentConfiguration, environment,
                   deployOutput != null ? deployOutput.getService() : null,
                   deployOutput != null ? deployOutput.getVersion() : null));
 
