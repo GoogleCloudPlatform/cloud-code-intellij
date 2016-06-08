@@ -85,14 +85,13 @@ public class AppEngineStop {
         outputListener,
         stopExitListener);
 
-    CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
-
     DefaultVersionsSelectionConfiguration configuration =
         new DefaultVersionsSelectionConfiguration();
     configuration.setVersions(Collections.singletonList(version));
     configuration.setService(module);
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
+    CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
     command.stop(configuration);
   }
 
