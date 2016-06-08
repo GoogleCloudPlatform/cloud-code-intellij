@@ -109,7 +109,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
    */
   public AppEngineDeploymentRunConfigurationEditor(
       final Project project,
-      final DeploymentSource deploymentSource,
+      final AppEngineDeployable deploymentSource,
       final AppEngineHelper appEngineHelper) {
     this.deploymentSource = deploymentSource;
 
@@ -118,7 +118,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
 
-    AppEngineEnvironment environment = ((AppEngineDeployable) deploymentSource).getEnvironment();
+    AppEngineEnvironment environment = deploymentSource.getEnvironment();
 
     if (environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
       appEngineCostWarningLabel.setText(

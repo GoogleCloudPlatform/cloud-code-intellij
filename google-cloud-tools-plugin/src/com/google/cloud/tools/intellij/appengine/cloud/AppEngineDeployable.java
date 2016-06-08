@@ -16,11 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+
 /**
- * Deployment sources of this type are indicated to be deployable to Google App Engine and must
- * provide their target App Engine environment.
+ * An {@link DeploymentSource} that is deployable to Google App engine that specifies its target
+ * App Engine environment.
  */
-public interface AppEngineDeployable {
+public interface AppEngineDeployable extends DeploymentSource {
 
   /**
    * Returns the targeted App Engine environment.
