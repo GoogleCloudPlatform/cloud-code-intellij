@@ -23,16 +23,18 @@ import java.io.File;
 import java.util.Locale;
 
 /**
- * Represents the supported Java artifact types that we can deploy to App Engine (Managed VMs).
+ * Represents the supported Java artifact types that we can deploy to App Engine flexible
+ * environment.
  */
-public enum DeploymentArtifactType {
+public enum AppEngineFlexDeploymentArtifactType {
   UNKNOWN, JAR, WAR;
 
   /**
-   * Returns the right {@code DeploymentArtifactType} for the given {@code deployPackage}.
+   * Returns the right {@code AppEngineFlexDeploymentArtifactType} for the given
+   * {@code deployPackage}.
    */
   @NotNull
-  public static DeploymentArtifactType typeForPath(@Nullable File deployPackage) {
+  public static AppEngineFlexDeploymentArtifactType typeForPath(@Nullable File deployPackage) {
     if (deployPackage != null) {
       if (deployPackage.getPath().endsWith(".jar")) {
         return JAR;

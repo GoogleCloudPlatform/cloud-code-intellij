@@ -66,6 +66,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
@@ -90,6 +91,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private PlaceholderTextField versionIdField;
   private JCheckBox versionOverrideCheckBox;
   private ProjectSelector projectSelector;
+  private JLabel environmentLabel;
+  private JPanel appEngineFlexConfigPanel;
+
   private DeploymentSource deploymentSource;
 
   private static final String COST_WARNING_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
@@ -105,7 +109,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
    */
   public AppEngineDeploymentRunConfigurationEditor(
       final Project project,
-      final DeploymentSource deploymentSource,
+      final AppEngineDeployable deploymentSource,
       final AppEngineHelper appEngineHelper) {
     this.deploymentSource = deploymentSource;
 
@@ -114,14 +118,20 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
 
-    appEngineCostWarningLabel.setText(
-        GctBundle.message("appengine.flex.deployment.cost.warning",
-            COST_WARNING_OPEN_TAG,
-            COST_WARNING_HREF_OPEN_TAG,
-            COST_WARNING_HREF_CLOSE_TAG,
-            COST_WARNING_CLOSE_TAG));
-    appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
+    AppEngineEnvironment environment = deploymentSource.getEnvironment();
+
+    if (environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
+      appEngineCostWarningLabel.setText(
+          GctBundle.message("appengine.flex.deployment.cost.warning",
+              COST_WARNING_OPEN_TAG,
+              COST_WARNING_HREF_OPEN_TAG,
+              COST_WARNING_HREF_CLOSE_TAG,
+              COST_WARNING_CLOSE_TAG));
+      appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+      appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
+    } else {
+      appEngineCostWarningLabel.setVisible(false);
+    }
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
@@ -196,11 +206,15 @@ public class AppEngineDeploymentRunConfigurationEditor extends
               @Override
               public File get() {
                 return appEngineHelper.defaultDockerfile(
-                    DeploymentArtifactType.typeForPath(deploymentSource.getFile()));
+                    AppEngineFlexDeploymentArtifactType.typeForPath(deploymentSource.getFile()));
               }
             }, dockerFilePathField, userSpecifiedArtifactFileSelector));
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
+
+    environmentLabel.setText(environment.localizedLabel());
+    appEngineFlexConfigPanel
+        .setVisible(environment == AppEngineEnvironment.APP_ENGINE_FLEX);
   }
 
   @Override
@@ -243,6 +257,16 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   @VisibleForTesting
   JComboBox getConfigTypeComboBox() {
     return configTypeComboBox;
+  }
+
+  @VisibleForTesting
+  JLabel getEnvironmentLabel() {
+    return environmentLabel;
+  }
+
+  @VisibleForTesting
+  JPanel getAppEngineFlexConfigPanel() {
+    return appEngineFlexConfigPanel;
   }
 
   @VisibleForTesting

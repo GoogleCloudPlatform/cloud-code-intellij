@@ -53,7 +53,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   private static final String MORE_INFO_URI_OPEN_TAG = "<a href='https://cloud.google.com/appengine/docs/flexible/'>";
   private static final String MORE_INFO_URI_CLOSE_TAG = "</a>";
 
-  private String displayName = GctBundle.message("appengine.flex.name");
+  private String displayName = GctBundle.message("appengine.name");
   private JPanel mainPanel;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
   private JLabel warningMessage;

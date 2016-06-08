@@ -28,6 +28,12 @@ public interface PluginInfoService {
   String getPluginId();
 
   /**
+   * Returns the name of the plugin as defined externally (the unified name of the gcloud plugin
+   * and its dependencies).
+   */
+  String getExternalPluginName();
+
+  /**
    * Returns the user agent to use for interactions with Google APIs.
    */
   String getUserAgent();
