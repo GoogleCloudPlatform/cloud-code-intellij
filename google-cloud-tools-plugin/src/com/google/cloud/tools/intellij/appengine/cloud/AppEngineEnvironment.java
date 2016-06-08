@@ -31,8 +31,7 @@ public enum AppEngineEnvironment {
     this.label = label;
   }
 
-  @Override
-  public String toString() {
+  public String localizedLabel() {
     return GctBundle.message(label);
   }
 }

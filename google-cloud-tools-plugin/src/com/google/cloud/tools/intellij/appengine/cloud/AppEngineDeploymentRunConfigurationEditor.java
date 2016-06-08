@@ -212,7 +212,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
 
-    environmentLabel.setText(environment.toString());
+    environmentLabel.setText(environment.localizedLabel());
     appEngineFlexConfigPanel
         .setVisible(environment == AppEngineEnvironment.APP_ENGINE_FLEX);
   }
