@@ -23,7 +23,8 @@ import java.io.File;
 import java.util.Locale;
 
 /**
- * Represents the supported Java artifact types that we can deploy to App Engine flexible.
+ * Represents the supported Java artifact types that we can deploy to App Engine flexible
+ * environment.
  */
 public enum AppEngineFlexDeploymentArtifactType {
   UNKNOWN, JAR, WAR;

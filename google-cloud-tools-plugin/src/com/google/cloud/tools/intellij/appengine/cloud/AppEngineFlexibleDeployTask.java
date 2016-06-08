@@ -25,7 +25,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Runnable that executes task responsible for deploying an application to the App Engine
+ * Runnable that executes a task responsible for deploying an application to the App Engine
  * flexible environment.
  */
 public class AppEngineFlexibleDeployTask implements AppEngineTask {
