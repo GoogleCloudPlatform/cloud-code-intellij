@@ -45,7 +45,7 @@ public class AppEngineStop {
 
   private AppEngineHelper helper;
   private LoggingHandler loggingHandler;
-  private AppEngineDeploymentConfiguration configuration;
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
   private UndeploymentTaskCallback callback;
 
   /**
@@ -54,11 +54,11 @@ public class AppEngineStop {
   public AppEngineStop(
       @NotNull AppEngineHelper helper,
       @NotNull LoggingHandler loggingHandler,
-      @NotNull AppEngineDeploymentConfiguration configuration,
+      @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
       @NotNull UndeploymentTaskCallback callback) {
     this.helper = helper;
     this.loggingHandler = loggingHandler;
-    this.configuration = configuration;
+    this.deploymentConfiguration = deploymentConfiguration;
     this.callback = callback;
   }
 
@@ -91,6 +91,7 @@ public class AppEngineStop {
         new DefaultVersionsSelectionConfiguration();
     configuration.setVersions(Collections.singletonList(version));
     configuration.setService(module);
+    configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
     command.stop(configuration);
   }
@@ -100,7 +101,7 @@ public class AppEngineStop {
   }
 
   AppEngineDeploymentConfiguration getDeploymentConfiguration() {
-    return configuration;
+    return deploymentConfiguration;
   }
 
   UndeploymentTaskCallback getCallback() {
