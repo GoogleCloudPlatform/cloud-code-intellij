@@ -24,13 +24,12 @@ import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.testFramework.PlatformTestCase;
 
 public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestCase {
 
   private AppEngineDeploymentRunConfigurationEditor editor;
-  private DeploymentSource deploymentSource;
+  private AppEngineArtifactDeploymentSource deploymentSource;
   private AppEngineHelper appEngineHelper;
   private ProjectSelector projectSelector;
 
@@ -40,8 +39,10 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   public void setUp() throws Exception {
     super.setUp();
 
-    deploymentSource = mock(DeploymentSource.class);
+    deploymentSource = mock(AppEngineArtifactDeploymentSource.class);
     when(deploymentSource.isValid()).thenReturn(true);
+    when(deploymentSource.getEnvironment())
+        .thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
 
     appEngineHelper = mock(AppEngineHelper.class);
 
@@ -49,7 +50,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     when(projectSelector.getText()).thenReturn(PROJECT_NAME);
 
     editor = new AppEngineDeploymentRunConfigurationEditor(
-        getProject(), deploymentSource, AppEngineEnvironment.APP_ENGINE_STANDARD, appEngineHelper);
+        getProject(), deploymentSource, appEngineHelper);
 
     editor.setProjectSelector(projectSelector);
   }
@@ -82,11 +83,12 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   public void testUiAppEngineStandardEnvironment() {
+    when(deploymentSource.getEnvironment())
+        .thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
     AppEngineDeploymentRunConfigurationEditor editor =
         new AppEngineDeploymentRunConfigurationEditor(
             getProject(),
             deploymentSource,
-            AppEngineEnvironment.APP_ENGINE_STANDARD,
             appEngineHelper);
 
     assertEquals("App Engine standard", editor.getEnvironmentLabel().getText());
@@ -95,9 +97,11 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   public void testUiAppEngineFlexEnvironment() {
+    when(deploymentSource.getEnvironment())
+        .thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
     AppEngineDeploymentRunConfigurationEditor editor =
         new AppEngineDeploymentRunConfigurationEditor(
-            getProject(), deploymentSource, AppEngineEnvironment.APP_ENGINE_FLEX, appEngineHelper);
+            getProject(), deploymentSource, appEngineHelper);
 
     assertEquals("App Engine flexible", editor.getEnvironmentLabel().getText());
     assertTrue(editor.getAppEngineFlexConfigPanel().isVisible());

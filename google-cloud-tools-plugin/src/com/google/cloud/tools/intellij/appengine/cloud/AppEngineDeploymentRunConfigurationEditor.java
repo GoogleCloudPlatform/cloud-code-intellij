@@ -110,7 +110,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   public AppEngineDeploymentRunConfigurationEditor(
       final Project project,
       final DeploymentSource deploymentSource,
-      final AppEngineEnvironment environment,
       final AppEngineHelper appEngineHelper) {
     this.deploymentSource = deploymentSource;
 
@@ -118,6 +117,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     resetOverridableFields(versionOverrideCheckBox, versionIdField);
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
+
+    AppEngineEnvironment environment = ((AppEngineDeployable) deploymentSource).getEnvironment();
 
     if (environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
       appEngineCostWarningLabel.setText(

@@ -79,7 +79,6 @@ class AppEngineDeploymentConfigurator extends
     return new AppEngineDeploymentRunConfigurationEditor(
         project,
         source,
-        ((AppEngineDeployable) source).getEnvironment(),
         new CloudSdkAppEngineHelper(
             project,
             new File(server.getConfiguration().getCloudSdkHomePath()))
