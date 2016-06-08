@@ -25,8 +25,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -104,7 +104,7 @@ public class AppEngineStandardDeployTaskTest {
 
   @Test
   public void deploy_success() {
-    task.deploy(new File("myFile.jar"), startListener).exit(0);
+    task.deploy(new File("myFile.jar"), startListener).onExit(0);
 
     verify(callback, never()).errorOccurred(anyString());
   }
@@ -114,7 +114,7 @@ public class AppEngineStandardDeployTaskTest {
     doThrow(new RuntimeException())
         .when(deploy).deploy(any(File.class), any(ProcessStartListener.class));
     try {
-      task.deploy(new File("myFile.jar"), startListener).exit(0);
+      task.deploy(new File("myFile.jar"), startListener).onExit(0);
     } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(DEPLOY_FAIL_MSG);
       return;

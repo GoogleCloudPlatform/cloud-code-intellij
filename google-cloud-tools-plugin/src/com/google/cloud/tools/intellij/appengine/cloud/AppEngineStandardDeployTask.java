@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -81,7 +81,7 @@ public class AppEngineStandardDeployTask implements AppEngineTask {
       @NotNull final ProcessStartListener startListener) {
     return new ProcessExitListener() {
       @Override
-      public void exit(int exitCode) {
+      public void onExit(int exitCode) {
         if (exitCode == 0) {
           try {
             deploy.deploy(stagingDirectory, startListener);

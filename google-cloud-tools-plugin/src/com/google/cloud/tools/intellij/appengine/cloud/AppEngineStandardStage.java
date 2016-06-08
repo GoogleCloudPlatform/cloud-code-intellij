@@ -16,12 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineStandardStaging;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
-import com.google.cloud.tools.app.impl.config.DefaultStageStandardConfiguration;
+import com.google.cloud.tools.appengine.api.deploy.DefaultStageStandardConfiguration;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineStandardStaging;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -67,7 +67,7 @@ public class AppEngineStandardStage {
 
     ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
       @Override
-      public void outputLine(String line) {
+      public void onOutputLine(String line) {
         loggingHandler.print(line + "\n");
       }
     };

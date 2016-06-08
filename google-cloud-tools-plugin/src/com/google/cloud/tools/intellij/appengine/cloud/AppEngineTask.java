@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 
 /**
  * Encapsulates a task to be run on Google App Engine.

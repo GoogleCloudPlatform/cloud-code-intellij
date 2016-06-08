@@ -16,12 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineVersions;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessStartListener;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
-import com.google.cloud.tools.app.impl.config.DefaultVersionsSelectionConfiguration;
+import com.google.cloud.tools.appengine.api.versions.DefaultVersionsSelectionConfiguration;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineVersions;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.icons.AllIcons.General;
@@ -71,7 +71,7 @@ public class AppEngineStop {
       @NotNull ProcessStartListener startListener) {
     ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
       @Override
-      public void outputLine(String line) {
+      public void onOutputLine(String line) {
         loggingHandler.print(line + "\n");
       }
     };
@@ -110,7 +110,7 @@ public class AppEngineStop {
   private class StopExitListener implements ProcessExitListener {
 
     @Override
-    public void exit(int exitCode) {
+    public void onExit(int exitCode) {
       try {
         if (exitCode == 0) {
           callback.succeeded();
