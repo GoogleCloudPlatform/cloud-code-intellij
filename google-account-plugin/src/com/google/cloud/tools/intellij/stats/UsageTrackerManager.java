@@ -30,16 +30,16 @@ import org.jetbrains.annotations.Nullable;
  */
 // TODO: Refactor to an IntelliJ service
 public final class UsageTrackerManager {
-  public static final String USAGE_TRACKER_KEY = "GOOGLE_CLOUD_TOOLS_USAGE_TRACKER_OPT_IN";
   @VisibleForTesting
-  protected static final String USAGE_TRACKER_PROPERTY_PLACEHOLDER = "${usageTrackerProperty}";
+  static final String USAGE_TRACKER_KEY = "GOOGLE_CLOUD_TOOLS_USAGE_TRACKER_OPT_IN";
+  @VisibleForTesting
+  static final String USAGE_TRACKER_PROPERTY_PLACEHOLDER = "${usageTrackerProperty}";
   private static UsageTrackerManager instance;
   private PropertiesComponent datastore;
   private PluginFlags flags;
   private static final Object factoryLock = new Object();
 
-  @VisibleForTesting
-  UsageTrackerManager() {
+  private UsageTrackerManager() {
     datastore = PropertiesComponent.getInstance();
     flags = new PropertiesFilePluginFlags();
   }
@@ -93,7 +93,7 @@ public final class UsageTrackerManager {
   @Nullable
   protected String getAnalyticsProperty() {
     String analyticsId = flags.getAnalyticsId();
-    if (analyticsId != null && !USAGE_TRACKER_PROPERTY_PLACEHOLDER.equals(analyticsId)) {
+    if (!USAGE_TRACKER_PROPERTY_PLACEHOLDER.equals(analyticsId)) {
       return analyticsId;
     }
     return null;
