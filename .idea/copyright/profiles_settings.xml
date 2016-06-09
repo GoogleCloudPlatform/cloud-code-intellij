@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="Android Copyright">
+  <settings default="Google Copyright">
     <module2copyright>
-      <element module="All" copyright="Android Copyright" />
+      <element module="All" copyright="Google Copyright" />
     </module2copyright>
   </settings>
 </component>
