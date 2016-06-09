@@ -129,7 +129,7 @@ public class AppEngineDeploymentConfiguration extends
     this.version = version;
   }
 
-  public boolean isAuto() {
-    return getConfigType() == ConfigType.AUTO;
+  public boolean isCustom() {
+    return getConfigType() == ConfigType.CUSTOM;
   }
 }
