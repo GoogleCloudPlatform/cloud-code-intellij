@@ -24,10 +24,12 @@ import com.google.common.collect.Lists;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
+import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.module.ModulePointerManager;
+import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactManager;
@@ -106,15 +108,22 @@ public class AppEngineUtil {
       @NotNull Project project) {
     List<ModuleDeploymentSource> moduleDeploymentSources = Lists.newArrayList();
 
+    boolean hasNonAppEngineStandardJavaModules = false;
+
     for (Module module : ModuleManager.getInstance(project).getModules()) {
-      if (!containsAppEngineStandardArtifacts(project, module)
-          && isJarOrWarMavenBuild(project, module)) {
-        moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module));
+      if (ModuleType.is(module, JavaModuleType.getModuleType())) {
+        if (!containsAppEngineStandardArtifacts(project, module)) {
+          hasNonAppEngineStandardJavaModules = true;
+          if (isJarOrWarMavenBuild(project, module)) {
+            moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module));
+          }
+        }
       }
     }
 
-    Artifact[] artifacts = ArtifactManager.getInstance(project).getArtifacts();
-    if (!containsAppEngineStandardArtifacts(project, Arrays.asList(artifacts))) {
+    // I kind of expected the logic for adding the user specific deployment source to be in the
+    // artifact based deployment sources.
+    if (hasNonAppEngineStandardJavaModules) {
       moduleDeploymentSources.add(createUserSpecifiedPathDeploymentSource(project));
     }
 
@@ -178,7 +187,7 @@ public class AppEngineUtil {
 
   /**
    * An artifact has an app engine standard facet if it associated with a module that has a facet
-   * who's name matches that of the facet configured by the App Engine legacy IJ plugin.
+   * whose name matches that of the facet configured by the App Engine legacy IJ plugin.
    */
   private static boolean hasAppEngineStandardFacet(@NotNull Project project,
       @NotNull Artifact artifact) {
