@@ -32,7 +32,6 @@ import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.packaging.artifacts.ArtifactPointerManager;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
@@ -42,7 +41,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
