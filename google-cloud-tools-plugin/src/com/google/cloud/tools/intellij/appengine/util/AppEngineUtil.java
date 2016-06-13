@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeployme
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.dom.AppEngineStandardDomElement;
 import com.google.common.collect.Lists;
 
 import com.intellij.facet.Facet;
@@ -31,10 +32,17 @@ import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
+import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.packaging.artifacts.ArtifactPointerManager;
+import com.intellij.packaging.elements.PackagingElementResolvingContext;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.xml.XmlFile;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
+import com.intellij.util.xml.DomFileElement;
+import com.intellij.util.xml.DomManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,8 +88,8 @@ public class AppEngineUtil {
         AppEngineEnvironment environment = getAppEngineArtifactEnvironment(project, artifact);
 
         if (environment != null
-            && environment == AppEngineEnvironment.APP_ENGINE_STANDARD
-            || (environment == AppEngineEnvironment.APP_ENGINE_FLEX && addFlexArtifact)) {
+            && (environment.isStandard()
+            || (environment.isFlexible() && addFlexArtifact))) {
           sources.add(createArtifactDeploymentSource(project, artifact, environment));
         }
       }
@@ -157,12 +165,51 @@ public class AppEngineUtil {
   private static AppEngineEnvironment getAppEngineArtifactEnvironment(@NotNull Project project,
       @NotNull Artifact artifact) {
     if (hasAppEngineStandardFacet(project, artifact) && isAppEngineStandardArtifactType(artifact)) {
-      return AppEngineEnvironment.APP_ENGINE_STANDARD;
+      return getAppEngineStandardEnvironment(project, artifact);
     } else if (isAppEngineFlexArtifactType(artifact)) {
       return AppEngineEnvironment.APP_ENGINE_FLEX;
     } else {
       return null;
     }
+  }
+
+  @NotNull
+  private static AppEngineEnvironment getAppEngineStandardEnvironment(@NotNull Project project,
+      @NotNull Artifact artifact) {
+    XmlFile webXml = loadAppEngineStandardWebXml(project, artifact);
+
+    if (webXml != null) {
+      DomManager manager = DomManager.getDomManager(project);
+      DomFileElement<AppEngineStandardDomElement> element
+          = manager.getFileElement(webXml, AppEngineStandardDomElement.class);
+
+      boolean isVmTrue = false;
+      if (element != null) {
+        isVmTrue = Boolean.parseBoolean(element.getRootElement().getVm().getValue());
+      }
+
+      return isVmTrue
+          ? AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT
+          : AppEngineEnvironment.APP_ENGINE_STANDARD;
+    }
+
+    // TODO fail hard here?
+    return AppEngineEnvironment.APP_ENGINE_STANDARD;
+  }
+
+  @Nullable
+  private static XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
+      @NotNull Artifact artifact) {
+    PackagingElementResolvingContext context = ArtifactManager.getInstance(project)
+        .getResolvingContext();
+    VirtualFile descriptorFile = ArtifactUtil
+        .findSourceFileByOutputPath(artifact, "WEB-INF/appengine-web.xml", context);
+
+    if (descriptorFile != null) {
+      return (XmlFile) PsiManager.getInstance(project).findFile(descriptorFile);
+    }
+
+    return null;
   }
 
   private static boolean containsAppEngineStandardArtifacts(@NotNull Project project,
