@@ -23,8 +23,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
  */
 public enum AppEngineEnvironment {
   APP_ENGINE_STANDARD("appengine.environment.name.standard"),
-  APP_ENGINE_FLEX("appengine.environment.name.flexible"),
-  APP_ENGINE_FLEX_COMPAT("appengine.environment.name.flexible");
+  APP_ENGINE_FLEX("appengine.environment.name.flexible");
 
   private String label;
 
@@ -34,10 +33,6 @@ public enum AppEngineEnvironment {
 
   public boolean isStandard() {
     return this == APP_ENGINE_STANDARD;
-  }
-
-  public boolean isFlexCompat() {
-    return this == APP_ENGINE_FLEX_COMPAT;
   }
 
   public boolean isFlexible() {

@@ -40,6 +40,7 @@ import com.intellij.packaging.elements.PackagingElementResolvingContext;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomManager;
@@ -82,13 +83,15 @@ public class AppEngineUtil {
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
       Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
-      boolean addFlexArtifact = !containsAppEngineStandardArtifacts(project, artifacts);
 
       for (Artifact artifact : artifacts) {
+        boolean hasStandardArtifacts = containsAppEngineStandardArtifacts(project, artifacts);
+        boolean addFlexArtifact = !hasStandardArtifacts || isFlexCompat(project, artifact);
+
         AppEngineEnvironment environment = getAppEngineArtifactEnvironment(project, artifact);
 
         if (environment != null
-            && (environment.isStandard() || environment.isFlexCompat()
+            && (environment.isStandard()
             || (environment.isFlexible() && addFlexArtifact))) {
           sources.add(createArtifactDeploymentSource(project, artifact, environment));
         }
@@ -136,6 +139,45 @@ public class AppEngineUtil {
     return moduleDeploymentSources;
   }
 
+  /**
+   * Determines if a project is set up like an App Engine standard project but is configured
+   * in 'compatibility' mode. This indicates that the project runs in the flexible environment.
+   */
+  public static boolean isFlexCompat(@NotNull Project project, @NotNull DeploymentSource source) {
+    Artifact artifact;
+    if (source instanceof AppEngineArtifactDeploymentSource) {
+      artifact = ((AppEngineArtifactDeploymentSource) source).getArtifact();
+      if (artifact != null) {
+        return isFlexCompat(project, artifact);
+      }
+    }
+
+    return false;
+  }
+
+  private static boolean isFlexCompat(@NotNull Project project,
+      @NotNull Artifact artifact) {
+    if (!isAppEngineStandardArtifact(project, artifact)) {
+      return false;
+    }
+
+    XmlFile webXml = loadAppEngineStandardWebXml(project, artifact);
+
+    boolean isVmTrue = false;
+    if (webXml != null) {
+      DomManager manager = DomManager.getDomManager(project);
+      DomFileElement<AppEngineStandardDomElement> element
+          = manager.getFileElement(webXml, AppEngineStandardDomElement.class);
+
+      if (element != null) {
+        isVmTrue = Boolean.parseBoolean(element.getRootElement().getVm().getValue());
+      }
+
+    }
+
+    return isVmTrue;
+  }
+
   private static AppEngineArtifactDeploymentSource createArtifactDeploymentSource(
       @NotNull Project project,
       @NotNull Artifact artifact,
@@ -164,37 +206,15 @@ public class AppEngineUtil {
   @Nullable
   private static AppEngineEnvironment getAppEngineArtifactEnvironment(@NotNull Project project,
       @NotNull Artifact artifact) {
-    if (hasAppEngineStandardFacet(project, artifact) && isAppEngineStandardArtifactType(artifact)) {
-      return getAppEngineStandardEnvironment(project, artifact);
+    if (isAppEngineStandardArtifact(project, artifact)) {
+      return isFlexCompat(project, artifact)
+          ? AppEngineEnvironment.APP_ENGINE_FLEX
+          : AppEngineEnvironment.APP_ENGINE_STANDARD;
     } else if (isAppEngineFlexArtifactType(artifact)) {
       return AppEngineEnvironment.APP_ENGINE_FLEX;
     } else {
       return null;
     }
-  }
-
-  @NotNull
-  private static AppEngineEnvironment getAppEngineStandardEnvironment(@NotNull Project project,
-      @NotNull Artifact artifact) {
-    XmlFile webXml = loadAppEngineStandardWebXml(project, artifact);
-
-    if (webXml != null) {
-      DomManager manager = DomManager.getDomManager(project);
-      DomFileElement<AppEngineStandardDomElement> element
-          = manager.getFileElement(webXml, AppEngineStandardDomElement.class);
-
-      boolean isVmTrue = false;
-      if (element != null) {
-        isVmTrue = Boolean.parseBoolean(element.getRootElement().getVm().getValue());
-      }
-
-      return isVmTrue
-          ? AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT
-          : AppEngineEnvironment.APP_ENGINE_STANDARD;
-    }
-
-    // TODO fail hard here?
-    return AppEngineEnvironment.APP_ENGINE_STANDARD;
   }
 
   @Nullable
@@ -228,6 +248,12 @@ public class AppEngineUtil {
     }
 
     return false;
+  }
+
+  private static boolean isAppEngineStandardArtifact(@NotNull Project project,
+      @NotNull Artifact artifact) {
+    return hasAppEngineStandardFacet(project, artifact)
+        && isAppEngineStandardArtifactType(artifact);
   }
 
   /**
