@@ -33,7 +33,11 @@ public enum AppEngineEnvironment {
   }
 
   public boolean isStandard() {
-    return this == APP_ENGINE_STANDARD || this == APP_ENGINE_FLEX_COMPAT;
+    return this == APP_ENGINE_STANDARD;
+  }
+
+  public boolean isFlexCompat() {
+    return this == APP_ENGINE_FLEX_COMPAT;
   }
 
   public boolean isFlexible() {

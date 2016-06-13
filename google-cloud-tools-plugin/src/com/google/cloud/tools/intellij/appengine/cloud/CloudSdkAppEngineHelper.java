@@ -137,7 +137,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         wrapCallbackForUsageTracking(
             callback, deploymentConfiguration, source.getFile(), targetEnvironment));
 
-    if (targetEnvironment.isStandard()) {
+    if (targetEnvironment.isStandard() || targetEnvironment.isFlexCompat()) {
       return createStandardRunner(loggingHandler, source.getFile(), deploy);
     } else if (targetEnvironment.isFlexible()) {
       return createFlexRunner(loggingHandler, source.getFile(), deploymentConfiguration, deploy);

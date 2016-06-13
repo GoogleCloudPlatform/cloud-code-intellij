@@ -88,7 +88,7 @@ public class AppEngineUtil {
         AppEngineEnvironment environment = getAppEngineArtifactEnvironment(project, artifact);
 
         if (environment != null
-            && (environment.isStandard()
+            && (environment.isStandard() || environment.isFlexCompat()
             || (environment.isFlexible() && addFlexArtifact))) {
           sources.add(createArtifactDeploymentSource(project, artifact, environment));
         }
