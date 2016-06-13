@@ -124,8 +124,6 @@ public class AppEngineUtil {
       }
     }
 
-    // I kind of expected the logic for adding the user specific deployment source to be in the
-    // artifact based deployment sources.
     moduleDeploymentSources.add(createUserSpecifiedPathDeploymentSource(project));
 
     return moduleDeploymentSources;
