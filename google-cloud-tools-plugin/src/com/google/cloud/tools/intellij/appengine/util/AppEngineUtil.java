@@ -108,8 +108,7 @@ public class AppEngineUtil {
    * <p>Maven based deployment sources are included if there are no App Engine standard artifacts
    * associated with the same module.
    *
-   * <p>User browsable jar/war deployment sources are added only if there are no App Engine
-   * standard artifacts in the entire project.
+   * <p>User browsable jar/war deployment sources are always available.
    *
    * @return a list of {@link ModuleDeploymentSource}'s
    */
@@ -117,24 +116,17 @@ public class AppEngineUtil {
       @NotNull Project project) {
     List<ModuleDeploymentSource> moduleDeploymentSources = Lists.newArrayList();
 
-    boolean hasNonAppEngineStandardJavaModules = false;
-
     for (Module module : ModuleManager.getInstance(project).getModules()) {
-      if (ModuleType.is(module, JavaModuleType.getModuleType())) {
-        if (!containsAppEngineStandardArtifacts(project, module)) {
-          hasNonAppEngineStandardJavaModules = true;
-          if (isJarOrWarMavenBuild(project, module)) {
-            moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module));
-          }
-        }
+      if (ModuleType.is(module, JavaModuleType.getModuleType())
+          && !containsAppEngineStandardArtifacts(project, module)
+          && isJarOrWarMavenBuild(project, module)) {
+        moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module));
       }
     }
 
     // I kind of expected the logic for adding the user specific deployment source to be in the
     // artifact based deployment sources.
-    if (hasNonAppEngineStandardJavaModules) {
-      moduleDeploymentSources.add(createUserSpecifiedPathDeploymentSource(project));
-    }
+    moduleDeploymentSources.add(createUserSpecifiedPathDeploymentSource(project));
 
     return moduleDeploymentSources;
   }
