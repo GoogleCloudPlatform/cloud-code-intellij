@@ -22,6 +22,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
@@ -137,9 +138,10 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         wrapCallbackForUsageTracking(
             callback, deploymentConfiguration, source.getFile(), targetEnvironment));
 
-    if (targetEnvironment == AppEngineEnvironment.APP_ENGINE_STANDARD) {
+    if (targetEnvironment.isStandard()
+        || (targetEnvironment.isFlexible() && AppEngineUtil.isFlexCompat(project, source))) {
       return createStandardRunner(loggingHandler, source.getFile(), deploy);
-    } else if (targetEnvironment == AppEngineEnvironment.APP_ENGINE_FLEX) {
+    } else if (targetEnvironment.isFlexible()) {
       return createFlexRunner(loggingHandler, source.getFile(), deploymentConfiguration, deploy);
     } else {
       throw new AssertionError("Invalid App Engine target environment: " + targetEnvironment);

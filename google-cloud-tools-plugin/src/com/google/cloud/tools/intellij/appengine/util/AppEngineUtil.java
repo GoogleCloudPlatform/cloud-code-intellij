@@ -31,10 +31,19 @@ import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
+import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.packaging.artifacts.ArtifactPointerManager;
+import com.intellij.packaging.elements.PackagingElementResolvingContext;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.xml.XmlFile;
+import com.intellij.psi.xml.XmlTag;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
+import com.intellij.util.xml.DomFileElement;
+import com.intellij.util.xml.DomManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -74,14 +83,16 @@ public class AppEngineUtil {
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
       Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
-      boolean addFlexArtifact = !containsAppEngineStandardArtifacts(project, artifacts);
 
       for (Artifact artifact : artifacts) {
+        boolean hasStandardArtifacts = containsAppEngineStandardArtifacts(project, artifacts);
+        boolean addFlexArtifact = !hasStandardArtifacts || isFlexCompat(project, artifact);
+
         AppEngineEnvironment environment = getAppEngineArtifactEnvironment(project, artifact);
 
         if (environment != null
-            && environment == AppEngineEnvironment.APP_ENGINE_STANDARD
-            || (environment == AppEngineEnvironment.APP_ENGINE_FLEX && addFlexArtifact)) {
+            && (environment.isStandard()
+            || (environment.isFlexible() && addFlexArtifact))) {
           sources.add(createArtifactDeploymentSource(project, artifact, environment));
         }
       }
@@ -113,11 +124,52 @@ public class AppEngineUtil {
       }
     }
 
-    // I kind of expected the logic for adding the user specific deployment source to be in the
-    // artifact based deployment sources.
     moduleDeploymentSources.add(createUserSpecifiedPathDeploymentSource(project));
 
     return moduleDeploymentSources;
+  }
+
+  /**
+   * Determines if a project is set up like an App Engine standard project but is configured
+   * in 'compatibility' mode. This indicates that the project runs in the flexible environment.
+   */
+  public static boolean isFlexCompat(@NotNull Project project, @NotNull DeploymentSource source) {
+    Artifact artifact;
+    if (source instanceof AppEngineArtifactDeploymentSource) {
+      artifact = ((AppEngineArtifactDeploymentSource) source).getArtifact();
+      if (artifact != null) {
+        return isFlexCompat(project, artifact);
+      }
+    }
+
+    return false;
+  }
+
+  private static boolean isFlexCompat(@NotNull Project project,
+      @NotNull Artifact artifact) {
+    if (!isAppEngineStandardArtifact(project, artifact)) {
+      return false;
+    }
+
+    XmlFile webXml = loadAppEngineStandardWebXml(project, artifact);
+
+    boolean isVmTrue = false;
+    if (webXml != null) {
+      DomManager manager = DomManager.getDomManager(project);
+      DomFileElement element = manager.getFileElement(webXml);
+
+      if (element != null) {
+        XmlTag root = element.getRootElement().getXmlTag();
+        if (root != null) {
+          XmlTag vmTag = root.findFirstSubTag("vm");
+          if (vmTag != null) {
+            isVmTrue = Boolean.parseBoolean(vmTag.getValue().getTrimmedText());
+          }
+        }
+      }
+    }
+
+    return isVmTrue;
   }
 
   private static AppEngineArtifactDeploymentSource createArtifactDeploymentSource(
@@ -148,13 +200,30 @@ public class AppEngineUtil {
   @Nullable
   private static AppEngineEnvironment getAppEngineArtifactEnvironment(@NotNull Project project,
       @NotNull Artifact artifact) {
-    if (hasAppEngineStandardFacet(project, artifact) && isAppEngineStandardArtifactType(artifact)) {
-      return AppEngineEnvironment.APP_ENGINE_STANDARD;
+    if (isAppEngineStandardArtifact(project, artifact)) {
+      return isFlexCompat(project, artifact)
+          ? AppEngineEnvironment.APP_ENGINE_FLEX
+          : AppEngineEnvironment.APP_ENGINE_STANDARD;
     } else if (isAppEngineFlexArtifactType(artifact)) {
       return AppEngineEnvironment.APP_ENGINE_FLEX;
     } else {
       return null;
     }
+  }
+
+  @Nullable
+  private static XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
+      @NotNull Artifact artifact) {
+    PackagingElementResolvingContext context = ArtifactManager.getInstance(project)
+        .getResolvingContext();
+    VirtualFile descriptorFile = ArtifactUtil
+        .findSourceFileByOutputPath(artifact, "WEB-INF/appengine-web.xml", context);
+
+    if (descriptorFile != null) {
+      return (XmlFile) PsiManager.getInstance(project).findFile(descriptorFile);
+    }
+
+    return null;
   }
 
   private static boolean containsAppEngineStandardArtifacts(@NotNull Project project,
@@ -173,6 +242,12 @@ public class AppEngineUtil {
     }
 
     return false;
+  }
+
+  private static boolean isAppEngineStandardArtifact(@NotNull Project project,
+      @NotNull Artifact artifact) {
+    return hasAppEngineStandardFacet(project, artifact)
+        && isAppEngineStandardArtifactType(artifact);
   }
 
   /**
