@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeployme
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSource;
-import com.google.cloud.tools.intellij.appengine.dom.AppEngineStandardDomElement;
 import com.google.common.collect.Lists;
 
 import com.intellij.facet.Facet;
@@ -40,6 +39,7 @@ import com.intellij.packaging.elements.PackagingElementResolvingContext;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
+import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.util.xml.DomFileElement;
@@ -156,13 +156,18 @@ public class AppEngineUtil {
     boolean isVmTrue = false;
     if (webXml != null) {
       DomManager manager = DomManager.getDomManager(project);
-      DomFileElement<AppEngineStandardDomElement> element
-          = manager.getFileElement(webXml, AppEngineStandardDomElement.class);
+      DomFileElement element
+          = manager.getFileElement(webXml);
 
       if (element != null) {
-        isVmTrue = Boolean.parseBoolean(element.getRootElement().getVm().getValue());
+        XmlTag root = element.getRootElement().getXmlTag();
+        if (root != null) {
+          XmlTag vmTag = root.findFirstSubTag("vm");
+          if (vmTag != null) {
+            isVmTrue = Boolean.parseBoolean(vmTag.getValue().getTrimmedText());
+          }
+        }
       }
-
     }
 
     return isVmTrue;

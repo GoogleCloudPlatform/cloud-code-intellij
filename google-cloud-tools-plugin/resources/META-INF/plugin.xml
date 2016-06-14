@@ -51,8 +51,6 @@ Code inspections for App Engine Java code.</description>
     <checkoutProvider implementation="com.google.cloud.tools.intellij.git.GcpCheckoutProvider"/>
     <vcsPopupProvider implementation="com.google.cloud.tools.intellij.git.GcpQuickListContentProvider"/>
 
-    <dom.fileDescription implementation="com.google.cloud.tools.intellij.appengine.dom.AppEngineStandardFileDescription"/>
-
     <programRunner implementation="com.google.cloud.tools.intellij.debugger.CloudDebuggerRunner"/>
     <xdebugger.breakpointType implementation="com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType"/>
     <projectService serviceImplementation="com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateSerializer"/>
