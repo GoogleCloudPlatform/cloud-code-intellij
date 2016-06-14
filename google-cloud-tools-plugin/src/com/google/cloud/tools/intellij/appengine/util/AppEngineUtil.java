@@ -156,8 +156,7 @@ public class AppEngineUtil {
     boolean isVmTrue = false;
     if (webXml != null) {
       DomManager manager = DomManager.getDomManager(project);
-      DomFileElement element
-          = manager.getFileElement(webXml);
+      DomFileElement element = manager.getFileElement(webXml);
 
       if (element != null) {
         XmlTag root = element.getRootElement().getXmlTag();
