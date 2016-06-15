@@ -31,7 +31,16 @@ public enum AppEngineEnvironment {
     this.label = label;
   }
 
+  public boolean isStandard() {
+    return this == APP_ENGINE_STANDARD;
+  }
+
+  public boolean isFlexible() {
+    return this == APP_ENGINE_FLEX;
+  }
+
   public String localizedLabel() {
     return GctBundle.message(label);
   }
 }
+
