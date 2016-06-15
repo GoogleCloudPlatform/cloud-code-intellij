@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - Deploy to App Engine flexible compat environment support.
 ([#720](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/720))
 - Deploy to App Engine standard environment support.
-([#700](https://github.com/GoogleCloudPlatform/gcloud-intellij/pull/700))
+([#665](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/665))
 - Check for Cloud Tools and Account plugin compatibility.
 ([#651](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/650))
 
