@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.intellij.packaging.artifacts.ArtifactPointer;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ArtifactDeploymentSourceImpl;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +30,13 @@ public class AppEngineArtifactDeploymentSource extends ArtifactDeploymentSourceI
     implements AppEngineDeployable {
 
   private AppEngineEnvironment environment;
+
+  /**
+   * Default constructor used instantiating plain Artifact Deployment sources.
+   */
+  public AppEngineArtifactDeploymentSource(@NotNull ArtifactPointer pointer) {
+    super(pointer);
+  }
 
   /**
    * Initialize the artifact deployment source given a target App Engine environment, and an
@@ -44,5 +52,11 @@ public class AppEngineArtifactDeploymentSource extends ArtifactDeploymentSourceI
   @Override
   public AppEngineEnvironment getEnvironment() {
     return environment;
+  }
+
+  @NotNull
+  @Override
+  public AppEngineArtifactDeploymentSourceType getType() {
+    return DeploymentSourceType.EP_NAME.findExtension(AppEngineArtifactDeploymentSourceType.class);
   }
 }
