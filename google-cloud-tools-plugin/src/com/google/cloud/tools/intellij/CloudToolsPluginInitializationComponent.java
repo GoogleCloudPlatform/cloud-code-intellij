@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij;
 
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSourceType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineToolsMenuAction;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSourceType;
@@ -63,7 +64,7 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
     }
 
     if (pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)) {
-      initAppEngineFlex(pluginConfigurationService);
+      initAppEngineSupport(pluginConfigurationService);
     }
 
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
@@ -77,7 +78,7 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
             ConfigurationType.CONFIGURATION_TYPE_EP, new CloudDebugConfigType());
   }
 
-  private void initAppEngineFlex(CloudToolsPluginConfigurationService pluginConfigurationService) {
+  private void initAppEngineSupport(CloudToolsPluginConfigurationService pluginConfigurationService) {
     AppEngineCloudType appEngineCloudType = new AppEngineCloudType();
     pluginConfigurationService.registerExtension(ServerType.EP_NAME, appEngineCloudType);
     pluginConfigurationService.registerExtension(ConfigurationType.CONFIGURATION_TYPE_EP,
@@ -86,6 +87,8 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
         new UserSpecifiedPathDeploymentSourceType());
     pluginConfigurationService.registerExtension(DeploymentSourceType.EP_NAME,
         new MavenBuildDeploymentSourceType());
+    pluginConfigurationService.registerExtension(DeploymentSourceType.EP_NAME,
+        new AppEngineArtifactDeploymentSourceType());
 
     ActionManager actionManager = ActionManager.getInstance();
     AnAction toolsMenuAction = new AppEngineToolsMenuAction();
