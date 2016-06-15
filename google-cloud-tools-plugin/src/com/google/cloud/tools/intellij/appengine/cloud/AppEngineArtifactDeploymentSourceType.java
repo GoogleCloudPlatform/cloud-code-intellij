@@ -49,32 +49,32 @@ public class AppEngineArtifactDeploymentSourceType
   @NotNull
   @Override
   public AppEngineArtifactDeploymentSource load(@NotNull Element tag, @NotNull Project project) {
-    final String name = tag.getAttributeValue(NAME_ATTRIBUTE);
-
-    Artifact[] artifacts = ArtifactManager.getInstance(project).getArtifacts();
-    Optional<Artifact> artifact = Iterables.tryFind(Arrays.asList(artifacts),
-        new Predicate<Artifact>() {
-          @Override
-          public boolean apply(Artifact artifact) {
-            return artifact.getName().equals(name);
-          }
-        }
-    );
-
+    final String artifactName = tag.getAttributeValue(NAME_ATTRIBUTE);
     Element settings = tag.getChild(DeployToServerRunConfiguration.SETTINGS_ELEMENT);
 
-    if (artifact.isPresent() && settings != null) {
-      String environment = settings.getAttributeValue(
-          AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
+    if (settings != null) {
+      Artifact[] artifacts = ArtifactManager.getInstance(project).getArtifacts();
+      Optional<Artifact> artifact = Iterables.tryFind(Arrays.asList(artifacts),
+          new Predicate<Artifact>() {
+            @Override
+            public boolean apply(Artifact artifact) {
+              return artifact.getName().equals(artifactName);
+            }
+          }
+      );
 
-      return new AppEngineArtifactDeploymentSource(
-          AppEngineEnvironment.valueOf(environment),
-          ArtifactPointerManager.getInstance(project).createPointer(artifact.get()));
-    } else {
-      return new AppEngineArtifactDeploymentSource(
-          ArtifactPointerManager.getInstance(project)
-              .createPointer(tag.getAttributeValue(NAME_ATTRIBUTE)));
+      if (artifact.isPresent()) {
+        String environment = settings.getAttributeValue(
+            AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
+
+        return new AppEngineArtifactDeploymentSource(
+            AppEngineEnvironment.valueOf(environment),
+            ArtifactPointerManager.getInstance(project).createPointer(artifact.get()));
+      }
     }
+
+    return new AppEngineArtifactDeploymentSource(
+        ArtifactPointerManager.getInstance(project).createPointer(artifactName));
   }
 
   @Override
