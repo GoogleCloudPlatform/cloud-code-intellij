@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.9.5-beta] - 2016-06-16
+### Added
+- Deploy to App Engine flexible compat environment support
+([#720](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/720))
+- Deploy to App Engine standard environment support
+([#700](https://github.com/GoogleCloudPlatform/gcloud-intellij/pull/700))
+- Check for Cloud Tools and Account plugin compatibility
+([#651](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/650))
 
 ## [0.9.4-beta] - 2016-04-20
 ### Added
