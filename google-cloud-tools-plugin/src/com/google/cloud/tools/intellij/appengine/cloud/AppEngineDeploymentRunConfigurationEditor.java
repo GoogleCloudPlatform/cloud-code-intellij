@@ -95,6 +95,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private JPanel appEngineFlexConfigPanel;
 
   private DeploymentSource deploymentSource;
+  private AppEngineEnvironment environment;
 
   private static final String COST_WARNING_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
   private static final String COST_WARNING_CLOSE_TAG = "</i></font></html>";
@@ -118,7 +119,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
 
-    AppEngineEnvironment environment = deploymentSource.getEnvironment();
+    environment = deploymentSource.getEnvironment();
 
     if (environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
       appEngineCostWarningLabel.setText(
@@ -220,6 +221,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   @Override
   protected void resetEditorFrom(AppEngineDeploymentConfiguration configuration) {
     projectSelector.setText(configuration.getCloudProjectName());
+    environmentLabel.setText(
+        AppEngineEnvironment.valueOf(configuration.getEnvironment()).localizedLabel());
     userSpecifiedArtifactFileSelector.setText(configuration.getUserSpecifiedArtifactPath());
     dockerFilePathField.setText(configuration.getDockerFilePath());
     appYamlPathField.setText(configuration.getAppYamlPath());
@@ -242,6 +245,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     if (selectedUser != null) {
       configuration.setGoogleUsername(selectedUser.getEmail());
     }
+    configuration.setEnvironment(environment.name());
     configuration.setUserSpecifiedArtifact(isUserSpecifiedPathDeploymentSource());
     configuration.setUserSpecifiedArtifactPath(userSpecifiedArtifactFileSelector.getText());
     configuration.setDockerFilePath(dockerFilePathField.getText());
