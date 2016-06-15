@@ -32,7 +32,7 @@ public class AppEngineArtifactDeploymentSource extends ArtifactDeploymentSourceI
   private AppEngineEnvironment environment;
 
   /**
-   * Default constructor used instantiating plain Artifact Deployment sources
+   * Default constructor used instantiating plain Artifact Deployment sources.
    */
   public AppEngineArtifactDeploymentSource(@NotNull ArtifactPointer pointer) {
     super(pointer);

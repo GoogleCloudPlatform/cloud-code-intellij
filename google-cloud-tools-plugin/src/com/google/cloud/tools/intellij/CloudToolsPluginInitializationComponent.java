@@ -78,7 +78,8 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
             ConfigurationType.CONFIGURATION_TYPE_EP, new CloudDebugConfigType());
   }
 
-  private void initAppEngineSupport(CloudToolsPluginConfigurationService pluginConfigurationService) {
+  private void initAppEngineSupport(
+      CloudToolsPluginConfigurationService pluginConfigurationService) {
     AppEngineCloudType appEngineCloudType = new AppEngineCloudType();
     pluginConfigurationService.registerExtension(ServerType.EP_NAME, appEngineCloudType);
     pluginConfigurationService.registerExtension(ConfigurationType.CONFIGURATION_TYPE_EP,
