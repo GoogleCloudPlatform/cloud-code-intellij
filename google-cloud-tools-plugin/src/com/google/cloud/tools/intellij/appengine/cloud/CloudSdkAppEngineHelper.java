@@ -213,7 +213,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         .appCommandCredentialFile(credentialsPath)
         .appCommandMetricsEnvironment(pluginInfoService.getExternalPluginName())
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
-        .appCommandGsUtil(0)
         .appCommandOutputFormat("json")
         .build();
   }
