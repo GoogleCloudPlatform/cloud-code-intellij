@@ -221,8 +221,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   @Override
   protected void resetEditorFrom(AppEngineDeploymentConfiguration configuration) {
     projectSelector.setText(configuration.getCloudProjectName());
-    environmentLabel.setText(
-        AppEngineEnvironment.valueOf(configuration.getEnvironment()).localizedLabel());
     userSpecifiedArtifactFileSelector.setText(configuration.getUserSpecifiedArtifactPath());
     dockerFilePathField.setText(configuration.getDockerFilePath());
     appYamlPathField.setText(configuration.getAppYamlPath());
