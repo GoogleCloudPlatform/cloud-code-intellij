@@ -51,7 +51,15 @@ public class AppEngineDeploymentConfiguration extends
 
   private String cloudProjectName;
   private String googleUsername;
+
+  /**
+   * Environment is stored here in order to restore the environment when this configuration is
+   * deserialized. At deserialization time, we cannot resolve the environment via the normal means
+   * of inspecting the Project's modules and artifacts because this happens before the modules have
+   * been loaded.
+   */
   private String environment;
+
   private String dockerFilePath;
   private String appYamlPath;
   private boolean userSpecifiedArtifact;
