@@ -135,8 +135,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         loggingHandler,
         deploymentConfiguration,
         targetEnvironment,
-        wrapCallbackForUsageTracking(
-            callback, deploymentConfiguration, source.getFile(), targetEnvironment));
+        wrapCallbackForUsageTracking(callback, deploymentConfiguration, targetEnvironment));
 
     if (targetEnvironment.isStandard()
         || (targetEnvironment.isFlexible() && AppEngineUtil.isFlexCompat(project, source))) {
@@ -269,15 +268,13 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private DeploymentOperationCallback wrapCallbackForUsageTracking(
       final DeploymentOperationCallback deploymentCallback,
       AppEngineDeploymentConfiguration deploymentConfiguration,
-      File artifactToDeploy,
       AppEngineEnvironment environment) {
 
-    StringBuilder labelBuilder = new StringBuilder("deploy");
-
+    StringBuilder labelBuilder = new StringBuilder();
     if (environment == AppEngineEnvironment.APP_ENGINE_STANDARD) {
-      labelBuilder.append(".standard");
+      labelBuilder.append("standard");
     } else {
-      labelBuilder.append(".flex");
+      labelBuilder.append("flex");
 
       if (deploymentConfiguration.isAuto()) {
         labelBuilder.append(".auto");
@@ -285,19 +282,13 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         labelBuilder.append(".custom");
       }
     }
-
-    AppEngineFlexDeploymentArtifactType artifactType
-        = AppEngineFlexDeploymentArtifactType.typeForPath(artifactToDeploy);
-
-    labelBuilder.append(".java").append(artifactType.toString());
-
     final String eventLabel = labelBuilder.toString();
 
     return new DeploymentOperationCallback() {
       @Override
       public Deployment succeeded(@NotNull DeploymentRuntime deploymentRuntime) {
         UsageTrackerProvider.getInstance()
-            .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE, eventLabel, null);
+            .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY, eventLabel, null);
         return deploymentCallback.succeeded(deploymentRuntime);
       }
 

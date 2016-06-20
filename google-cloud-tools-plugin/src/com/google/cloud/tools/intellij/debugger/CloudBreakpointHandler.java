@@ -163,12 +163,12 @@ public class CloudBreakpointHandler
           if (!Strings.isNullOrEmpty(finalserverBreakpoint.getCondition())) {
             newxIdeBreakpoint.setCondition(finalserverBreakpoint.getCondition());
           }
-
-          UsageTrackerProvider.getInstance().trackEvent(
-              GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "create.breakpoint.clone", null);
         }
       });
     }
+
+    UsageTrackerProvider.getInstance().trackEvent(
+        GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER_CLONE_BREAKPOINTS, null, null);
   }
 
   /**
