@@ -20,10 +20,12 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.packaging.artifacts.ArtifactPointerManager;
+import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
 import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
@@ -32,6 +34,8 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+
+import javax.swing.JComponent;
 
 /**
  * A {@link DeploymentSourceType} loading and saving of a {@link AppEngineArtifactDeploymentSource}.
@@ -81,5 +85,26 @@ public class AppEngineArtifactDeploymentSourceType
   public void save(@NotNull ArtifactDeploymentSource deploymentSource,
       @NotNull Element tag) {
     tag.setAttribute(NAME_ATTRIBUTE, deploymentSource.getPresentableName());
+  }
+
+  @Override
+  public void setBuildBeforeRunTask(@NotNull RunConfiguration configuration,
+      @NotNull ArtifactDeploymentSource source) {
+    Artifact artifact = source.getArtifact();
+    if (artifact != null) {
+      BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRun(
+          configuration.getProject(), configuration, artifact);
+    }
+  }
+
+  @Override
+  public void updateBuildBeforeRunOption(@NotNull JComponent runConfigurationEditorComponent,
+      @NotNull Project project,
+      @NotNull ArtifactDeploymentSource source, boolean select) {
+    Artifact artifact = source.getArtifact();
+    if (artifact != null) {
+      BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRunOption(
+          runConfigurationEditorComponent, project, artifact, select);
+    }
   }
 }
