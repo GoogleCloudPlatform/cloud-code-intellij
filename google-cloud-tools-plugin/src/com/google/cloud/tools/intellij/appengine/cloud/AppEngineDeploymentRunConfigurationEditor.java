@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -214,8 +215,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
 
     environmentLabel.setText(environment.localizedLabel());
-    appEngineFlexConfigPanel
-        .setVisible(environment == AppEngineEnvironment.APP_ENGINE_FLEX);
+    appEngineFlexConfigPanel.setVisible(
+        environment == AppEngineEnvironment.APP_ENGINE_FLEX
+            && !AppEngineUtil.isFlexCompat(project, deploymentSource));
   }
 
   @Override
