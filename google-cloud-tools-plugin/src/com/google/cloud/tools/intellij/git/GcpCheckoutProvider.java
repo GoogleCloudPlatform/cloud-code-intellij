@@ -69,7 +69,7 @@ public class GcpCheckoutProvider implements CheckoutProvider {
   @Override
   public void doCheckout(@NotNull final Project project, @Nullable final Listener listener) {
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "checkout", null);
+        .trackEvent(GctTracking.CATEGORY, GctTracking.VCS_CHECKOUT, null, null);
 
     BasicAction.saveAll();
     CloneGcpDialog dialog = new CloneGcpDialog(project);

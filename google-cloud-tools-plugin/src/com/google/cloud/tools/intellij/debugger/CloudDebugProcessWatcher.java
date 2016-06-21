@@ -92,8 +92,8 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
         String message = GctBundle
             .getString("clouddebug.balloonnotification.message", state.getProjectName());
         UsageTrackerProvider.getInstance()
-            .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER,
-                "notify.background.bubble", null);
+            .trackEvent(GctTracking.CATEGORY,
+                GctTracking.CLOUD_DEBUGGER_NOTIFY_BREAKPOINT_LIST_CHANGE, null, null);
         notificationGroup.createNotification("", message, NotificationType.INFORMATION,
             new NotificationListener() {
               @Override
