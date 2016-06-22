@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.9.5-beta] - 2016-06-16
+## [0.9.5-beta] - 2016-06-21
 ### Added
 - Deploy to App Engine flexible _compat_ environment support.
 ([#720](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/720))

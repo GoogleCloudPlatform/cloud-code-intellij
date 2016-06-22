@@ -18,7 +18,9 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.diagnostic.Logger;
@@ -37,16 +39,27 @@ public class AppEngineStandardDeployTask implements AppEngineTask {
 
   private AppEngineDeploy deploy;
   private AppEngineStandardStage stageStandard;
+  private boolean isFlexCompat;
 
+  /**
+   * @param isFlexCompat does not change any behavior of actual deployment. Provided solely
+   *     for the purpose of Analytics usage reporting.
+   */
   public AppEngineStandardDeployTask(
       @NotNull AppEngineDeploy deploy,
-      @NotNull AppEngineStandardStage stageStandard) {
+      @NotNull AppEngineStandardStage stageStandard,
+      boolean isFlexCompat) {
     this.deploy = deploy;
     this.stageStandard = stageStandard;
+    this.isFlexCompat = isFlexCompat;
   }
 
   @Override
   public void execute(ProcessStartListener startListener) {
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY,
+            isFlexCompat ? "flex-compat" : "standard", null);
+
     File stagingDirectory;
 
     try {
