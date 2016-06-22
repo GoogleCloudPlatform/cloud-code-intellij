@@ -137,11 +137,16 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         targetEnvironment,
         wrapCallbackForUsageTracking(callback, deploymentConfiguration, targetEnvironment));
 
-    if (targetEnvironment.isStandard()
-        || (targetEnvironment.isFlexible() && AppEngineUtil.isFlexCompat(project, source))) {
-      return createStandardRunner(loggingHandler, source.getFile(), deploy);
+    if (targetEnvironment.isStandard()) {
+      return createStandardRunner(loggingHandler, source.getFile(), deploy,
+          false); // not flex compat (usage tracking purpose)
     } else if (targetEnvironment.isFlexible()) {
-      return createFlexRunner(loggingHandler, source.getFile(), deploymentConfiguration, deploy);
+      if (AppEngineUtil.isFlexCompat(project, source)) {
+        return createStandardRunner(loggingHandler, source.getFile(), deploy,
+            true); // flex compat (usage tracking purpose)
+      } else {
+        return createFlexRunner(loggingHandler, source.getFile(), deploymentConfiguration, deploy);
+      }
     } else {
       throw new AssertionError("Invalid App Engine target environment: " + targetEnvironment);
     }
@@ -150,13 +155,15 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private AppEngineRunner createStandardRunner(
       LoggingHandler loggingHandler,
       File artifactToDeploy,
-      AppEngineDeploy deploy) {
+      AppEngineDeploy deploy,
+      boolean isFlexCompat) {
     AppEngineStandardStage standardStage = new AppEngineStandardStage(
           this,
           loggingHandler,
           artifactToDeploy);
 
-    return new AppEngineRunner(new AppEngineStandardDeployTask(deploy, standardStage));
+    return new AppEngineRunner(
+        new AppEngineStandardDeployTask(deploy, standardStage, isFlexCompat));
   }
 
   private AppEngineRunner createFlexRunner(
@@ -288,12 +295,15 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       @Override
       public Deployment succeeded(@NotNull DeploymentRuntime deploymentRuntime) {
         UsageTrackerProvider.getInstance()
-            .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY, eventLabel, null);
+            .trackEvent(
+                GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY_SUCCESS, eventLabel, null);
         return deploymentCallback.succeeded(deploymentRuntime);
       }
 
       @Override
       public void errorOccurred(@NotNull String errorMessage) {
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY_FAIL, eventLabel, null);
         deploymentCallback.errorOccurred(errorMessage);
       }
     };

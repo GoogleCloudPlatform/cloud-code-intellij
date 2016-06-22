@@ -74,7 +74,7 @@ public class AppEngineStandardDeployTaskTest {
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
 
-    task = new AppEngineStandardDeployTask(deploy, stage);
+    task = new AppEngineStandardDeployTask(deploy, stage, false);
   }
 
   @Test

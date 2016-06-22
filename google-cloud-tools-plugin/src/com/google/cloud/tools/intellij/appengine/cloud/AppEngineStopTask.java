@@ -17,7 +17,9 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -42,6 +44,9 @@ public class AppEngineStopTask implements AppEngineTask {
 
   @Override
   public void execute(ProcessStartListener startListener) {
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_STOP, null, null);
+
     try {
       stop.getHelper().stageCredentials(stop.getDeploymentConfiguration().getGoogleUsername());
 
