@@ -58,7 +58,7 @@ public class AppEngineStandardDeployTask implements AppEngineTask {
   public void execute(ProcessStartListener startListener) {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY,
-            isFlexCompat ? "flex.compat" : "standard", null);
+            isFlexCompat ? "flex-compat" : "standard", null);
 
     File stagingDirectory;
 
