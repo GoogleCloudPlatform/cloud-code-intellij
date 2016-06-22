@@ -295,7 +295,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     if (compatConfig != null) {
       if ("env".equals(compatConfig.getName())
           && "flex".equals(compatConfig.getValue().getTrimmedText())) {
-        return "MVM";
+        return GctBundle.message("appengine.environment.name.mvm");
       }
     }
 
