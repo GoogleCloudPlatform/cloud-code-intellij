@@ -137,16 +137,12 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         targetEnvironment,
         wrapCallbackForUsageTracking(callback, deploymentConfiguration, targetEnvironment));
 
-    if (targetEnvironment.isStandard()) {
-      return createStandardRunner(loggingHandler, source.getFile(), deploy,
-          false); // not flex compat (usage tracking purpose)
+    boolean isFlexCompat =
+        targetEnvironment.isFlexible() && AppEngineUtil.isFlexCompat(project, source);
+    if (targetEnvironment.isStandard() || isFlexCompat) {
+      return createStandardRunner(loggingHandler, source.getFile(), deploy, isFlexCompat);
     } else if (targetEnvironment.isFlexible()) {
-      if (AppEngineUtil.isFlexCompat(project, source)) {
-        return createStandardRunner(loggingHandler, source.getFile(), deploy,
-            true); // flex compat (usage tracking purpose)
-      } else {
-        return createFlexRunner(loggingHandler, source.getFile(), deploymentConfiguration, deploy);
-      }
+      return createFlexRunner(loggingHandler, source.getFile(), deploymentConfiguration, deploy);
     } else {
       throw new AssertionError("Invalid App Engine target environment: " + targetEnvironment);
     }
