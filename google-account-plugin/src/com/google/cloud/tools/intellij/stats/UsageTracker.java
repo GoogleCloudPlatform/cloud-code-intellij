@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.stats;
 
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,4 +34,26 @@ public interface UsageTracker {
       @Nullable String eventLabel,
       @Nullable Integer eventValue);
 
+  PartialTrackingEventAction trackEvent(String category);
+
+  interface SendsEvent {
+
+    void send();
+  }
+
+
+  interface PartialTrackingEventAction extends SendsEvent {
+
+    PartialTrackingEventLabel withAction(String value);
+
+    interface PartialTrackingEventLabel extends SendsEvent {
+
+      PartialTrackingEventValue andLabel(String value);
+
+      interface PartialTrackingEventValue extends SendsEvent {
+
+        SendsEvent andValue(Integer value);
+      }
+    }
+  }
 }
