@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.stats;
 
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
