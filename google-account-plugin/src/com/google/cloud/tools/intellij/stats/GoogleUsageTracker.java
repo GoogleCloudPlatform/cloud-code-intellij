@@ -16,11 +16,13 @@
 
 package com.google.cloud.tools.intellij.stats;
 
+import com.google.cloud.tools.intellij.IdeaAccountPluginInfoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.updateSettings.impl.UpdateChecker;
 
@@ -47,7 +49,6 @@ public class GoogleUsageTracker implements UsageTracker {
   private static final Logger logger = Logger.getInstance(GoogleUsageTracker.class);
 
   private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
-  private static final String ANALYTICS_APP = "gcloud-intellij";
 
   private final String analyticsId;
 
@@ -85,10 +86,14 @@ public class GoogleUsageTracker implements UsageTracker {
         postData.add(new BasicNameValuePair("cd16", "0"));  // Internal user? No.
         postData.add(new BasicNameValuePair("cd17", "0"));  // User signed in? We will ignore this.
 
+        IdeaAccountPluginInfoService pluginInfoService =
+            ServiceManager.getService(IdeaAccountPluginInfoService.class);
+
         // Virtual page information
-        postData.add(new BasicNameValuePair("cd21", "1"));  // Yes, this ping is a virtual "page".
-        String virtualPageUrl = "/virtual/" + ANALYTICS_APP + "/" + eventAction;
+        String virtualPageUrl =
+            "/virtual/" + pluginInfoService.getExternalPluginName() + "/" + eventAction;
         postData.add(new BasicNameValuePair("dp", virtualPageUrl));
+        postData.add(new BasicNameValuePair("cd21", "1"));  // Yes, this ping is a virtual "page".
         if (eventLabel != null) {
           // Event metadata are passed as a (virtual) page title.
           String virtualPageTitle = eventLabel + "=" + (eventValue != null ? eventValue : "null");
