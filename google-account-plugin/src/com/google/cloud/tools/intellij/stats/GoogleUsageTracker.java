@@ -81,17 +81,15 @@ public class GoogleUsageTracker implements UsageTracker {
         List<BasicNameValuePair> postData = Lists.newArrayList(analyticsBaseData);
         postData.add(new BasicNameValuePair("tid", analyticsId));
 
-        postData.add(new BasicNameValuePair("cd19", eventCategory));  // Event type
+        String externalPluginName =
+            ServiceManager.getService(IdeaAccountPluginInfoService.class).getExternalPluginName();
+        postData.add(new BasicNameValuePair("cd19", externalPluginName));  // Event type
         postData.add(new BasicNameValuePair("cd20", eventAction));  // Event name
         postData.add(new BasicNameValuePair("cd16", "0"));  // Internal user? No.
         postData.add(new BasicNameValuePair("cd17", "0"));  // User signed in? We will ignore this.
 
-        IdeaAccountPluginInfoService pluginInfoService =
-            ServiceManager.getService(IdeaAccountPluginInfoService.class);
-
         // Virtual page information
-        String virtualPageUrl =
-            "/virtual/" + pluginInfoService.getExternalPluginName() + "/" + eventAction;
+        String virtualPageUrl = "/virtual/" + externalPluginName + "/" + eventAction;
         postData.add(new BasicNameValuePair("dp", virtualPageUrl));
         postData.add(new BasicNameValuePair("cd21", "1"));  // Yes, this ping is a virtual "page".
         if (eventLabel != null) {
