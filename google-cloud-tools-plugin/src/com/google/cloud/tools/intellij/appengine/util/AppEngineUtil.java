@@ -184,8 +184,7 @@ public class AppEngineUtil {
     return isFlexCompat(project, getArtifact(source));
   }
 
-  private static boolean isFlexCompat(@NotNull Project project,
-      @Nullable Artifact artifact) {
+  private static boolean isFlexCompat(@NotNull Project project, @Nullable Artifact artifact) {
     if (artifact == null) {
       return false;
     }

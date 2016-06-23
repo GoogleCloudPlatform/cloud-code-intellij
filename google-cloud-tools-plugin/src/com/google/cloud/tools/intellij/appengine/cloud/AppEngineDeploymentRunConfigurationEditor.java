@@ -134,8 +134,10 @@ public class AppEngineDeploymentRunConfigurationEditor extends
               COST_WARNING_CLOSE_TAG));
       appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
       appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
+      environmentLabel.setText(getEnvironmentDisplayableLabel());
     } else {
       appEngineCostWarningLabel.setVisible(false);
+      environmentLabel.setText(environment.localizedLabel());
     }
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
@@ -217,11 +219,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
 
-    if (environment.isStandard()) {
-      environmentLabel.setText(environment.localizedLabel());
-    } else {
-      environmentLabel.setText(getEnvironmentDisplayableLabel());
-    }
     appEngineFlexConfigPanel.setVisible(
         environment == AppEngineEnvironment.APP_ENGINE_FLEX
             && !AppEngineUtil.isFlexCompat(project, deploymentSource));
