@@ -46,9 +46,9 @@ public class AppEngineFlexibleDeployTask implements AppEngineTask {
   @Override
   public void execute(ProcessStartListener startListener) {
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY,
-            "flex." + (deploy.getDeploymentConfiguration().isAuto() ? "auto" : "custom"),
-            null);
+        .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
+        .withLabel("flex." + (deploy.getDeploymentConfiguration().isAuto() ? "auto" : "custom"))
+        .ping();
 
     File stagingDirectory;
 

@@ -44,7 +44,7 @@ import java.util.List;
 /**
  * Google Usage Tracker that reports to Cloud Tools Analytics backend.
  */
-public class GoogleUsageTracker implements UsageTracker {
+public class GoogleUsageTracker implements UsageTracker, SendsEvents {
 
   private static final Logger logger = Logger.getInstance(GoogleUsageTracker.class);
 
@@ -70,11 +70,7 @@ public class GoogleUsageTracker implements UsageTracker {
           new BasicNameValuePair("cid",             // UUID for this IntelliJ client
               UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
 
-  /**
-   * Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property.
-   */
-  @Override
-  public void trackEvent(@NotNull String eventCategory,
+  public void sendEvent(@NotNull String eventCategory,
       @NotNull String eventAction,
       @Nullable String eventLabel,
       @Nullable Integer eventValue) {
@@ -87,7 +83,7 @@ public class GoogleUsageTracker implements UsageTracker {
 
         List<BasicNameValuePair> postData = Lists.newArrayList(analyticsBaseData);
         postData.add(new BasicNameValuePair("tid", analyticsId));
-        postData.add(new BasicNameValuePair("cd19", externalPluginName));  // Event type
+        postData.add(new BasicNameValuePair("cd19", eventCategory));  // Event type
         postData.add(new BasicNameValuePair("cd20", eventAction));  // Event name
         postData.add(new BasicNameValuePair("cd16", "0"));  // Internal user? No.
         postData.add(new BasicNameValuePair("cd17", "0"));  // User signed in? We will ignore this.
@@ -108,8 +104,8 @@ public class GoogleUsageTracker implements UsageTracker {
   }
 
   @Override
-  public PartialTrackingEventAction trackEvent(String category) {
-    return new TrackingEventBuilder(this, category);
+  public PartialTrackingEventLabel trackEvent(String action) {
+    return new TrackingEventBuilder(this, externalPluginName, action);
   }
 
   private static void sendPing(@NotNull final List<? extends NameValuePair> postData) {

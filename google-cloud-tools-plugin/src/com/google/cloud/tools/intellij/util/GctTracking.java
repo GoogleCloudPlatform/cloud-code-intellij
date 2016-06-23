@@ -21,8 +21,6 @@ package com.google.cloud.tools.intellij.util;
  */
 public class GctTracking {
 
-  public static final String CATEGORY = "com.google.cloud.tools";
-
   // Event actions
   public static final String APP_ENGINE_DEPLOY = "appengine.deploy";
   public static final String APP_ENGINE_DEPLOY_SUCCESS = "appengine.deploy.success";
@@ -31,6 +29,8 @@ public class GctTracking {
   public static final String APP_ENGINE_STOP = "appengine.stop";
 
   public static final String PROJECT_SELECTION = "project.selection";
+  public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =
+      "project.selection.create.new.project";
 
   public static final String VCS_CHECKOUT = "vcs.checkout";
   public static final String VCS_UPLOAD = "vcs.uplaod";

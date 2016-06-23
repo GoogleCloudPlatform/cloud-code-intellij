@@ -578,12 +578,12 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
           Messages.getQuestionIcon());
       if (result == Messages.OK) { // continue
         processState.setListenInBackground(true);
-        UsageTrackerProvider.getInstance().trackEvent(
-            GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER_CLOSE_CONTINUE_LISTEN, null, null);
+        UsageTrackerProvider.getInstance().
+            trackEvent(GctTracking.CLOUD_DEBUGGER_CLOSE_CONTINUE_LISTEN).ping();
       } else {
         processState.setListenInBackground(false);
-        UsageTrackerProvider.getInstance().trackEvent(
-            GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER_CLOSE_STOP_LISTEN, null, null);
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.CLOUD_DEBUGGER_CLOSE_STOP_LISTEN).ping();
       }
       ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM).actionPerformed(event);
       ActionManager.getInstance().getAction(IdeActions.ACTION_CLOSE).actionPerformed(event);

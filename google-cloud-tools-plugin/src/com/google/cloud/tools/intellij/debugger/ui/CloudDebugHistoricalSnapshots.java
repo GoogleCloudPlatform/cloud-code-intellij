@@ -665,8 +665,9 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         break; // NOPMD
       }
       if (rowForPopup != -1) {
-        UsageTrackerProvider.getInstance().trackEvent(
-            GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER_SNAPSHOT_RECEIVED, null, null);
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.CLOUD_DEBUGGER_SNAPSHOT_RECEIVED)
+            .ping();
         // Show a popup indicating a new item has appeared.
         if (balloon != null) {
           balloon.hide();
