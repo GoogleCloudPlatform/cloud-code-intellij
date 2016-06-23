@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.stats;
 
 import com.google.cloud.tools.intellij.AccountPluginInfoService;
-import com.google.cloud.tools.intellij.IdeaAccountPluginInfoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
