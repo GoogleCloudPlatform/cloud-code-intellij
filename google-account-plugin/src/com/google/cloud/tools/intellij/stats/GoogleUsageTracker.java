@@ -53,6 +53,10 @@ public class GoogleUsageTracker implements UsageTracker {
   private final String analyticsId;
   private String externalPluginName;
 
+  /**
+   * Constructs a usage tracker configured with analytics and plugin name configured from its
+   * environment.
+   */
   public GoogleUsageTracker() {
     analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
     externalPluginName = ServiceManager.getService(AccountPluginInfoService.class)
