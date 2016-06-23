@@ -109,7 +109,7 @@ public class GoogleUsageTracker implements UsageTracker {
 
   @Override
   public PartialTrackingEventAction trackEvent(String category) {
-    return new TrackingEventBuilder(category);
+    return new TrackingEventBuilder(this, category);
   }
 
   private static void sendPing(@NotNull final List<? extends NameValuePair> postData) {

@@ -60,13 +60,17 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
 
   }
 
-  // Default no-op implementation of the UsageTracker
-  public static class NoOpUsageTracker implements UsageTracker {
+  private static class NoOpUsageTracker implements UsageTracker {
 
     @Override
     public void trackEvent(@NotNull String eventCategory, @NotNull String eventAction,
         @Nullable String eventLabel, @Nullable Integer eventValue) {
       // Do nothing
+    }
+
+    @Override
+    public PartialTrackingEventAction trackEvent(String category) {
+      return new TrackingEventBuilder(this, category);
     }
   }
 }
