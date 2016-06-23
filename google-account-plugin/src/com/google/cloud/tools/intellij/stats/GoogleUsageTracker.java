@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.stats;
 
+import com.google.cloud.tools.intellij.AccountPluginInfoService;
 import com.google.cloud.tools.intellij.IdeaAccountPluginInfoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -51,9 +52,12 @@ public class GoogleUsageTracker implements UsageTracker {
   private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
 
   private final String analyticsId;
+  private String externalPluginName;
 
   public GoogleUsageTracker() {
-    this.analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
+    analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
+    externalPluginName = ServiceManager.getService(AccountPluginInfoService.class)
+        .getExternalPluginName();
   }
 
   private static final List<BasicNameValuePair> analyticsBaseData = ImmutableList
@@ -80,9 +84,6 @@ public class GoogleUsageTracker implements UsageTracker {
 
         List<BasicNameValuePair> postData = Lists.newArrayList(analyticsBaseData);
         postData.add(new BasicNameValuePair("tid", analyticsId));
-
-        String externalPluginName =
-            ServiceManager.getService(IdeaAccountPluginInfoService.class).getExternalPluginName();
         postData.add(new BasicNameValuePair("cd19", externalPluginName));  // Event type
         postData.add(new BasicNameValuePair("cd20", eventAction));  // Event name
         postData.add(new BasicNameValuePair("cd16", "0"));  // Internal user? No.
