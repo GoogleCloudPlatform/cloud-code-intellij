@@ -197,10 +197,10 @@ public class AppEngineUtil {
 
     String tagName = compatConfig.getName();
 
-    if ("vm".equals(tagName)) {
+    if ("vm".equalsIgnoreCase(tagName)) {
       return Boolean.parseBoolean(compatConfig.getValue().getTrimmedText());
-    } else if ("env".equals(tagName)) {
-      return "flex".equals(compatConfig.getValue().getTrimmedText());
+    } else if ("env".equalsIgnoreCase(tagName)) {
+      return "flex".equalsIgnoreCase(compatConfig.getValue().getTrimmedText());
     } else {
       return false;
     }

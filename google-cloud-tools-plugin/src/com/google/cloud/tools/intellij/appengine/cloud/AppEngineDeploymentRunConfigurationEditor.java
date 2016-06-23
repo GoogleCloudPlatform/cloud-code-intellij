@@ -290,8 +290,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     XmlTag compatConfig = AppEngineUtil.getFlexCompatXmlConfiguration(project, deploymentSource);
 
     if (compatConfig != null) {
-      if ("env".equals(compatConfig.getName())
-          && "flex".equals(compatConfig.getValue().getTrimmedText())) {
+      if ("env".equalsIgnoreCase(compatConfig.getName())
+          && "flex".equalsIgnoreCase(compatConfig.getValue().getTrimmedText())) {
         return GctBundle.message("appengine.environment.name.mvm");
       }
     }
