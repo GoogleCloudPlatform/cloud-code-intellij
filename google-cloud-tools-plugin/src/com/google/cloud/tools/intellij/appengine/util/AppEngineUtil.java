@@ -40,6 +40,7 @@ import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
+import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.util.xml.DomFileElement;
@@ -130,30 +131,25 @@ public class AppEngineUtil {
   }
 
   /**
-   * Determines if a project is set up like an App Engine standard project but is configured
-   * in 'compatibility' mode. This indicates that the project runs in the flexible environment.
+   * Returns the xml tag corresponding to the project's appengine-web.xml compat configuration
+   * or null if there isn't one.
    */
-  public static boolean isFlexCompat(@NotNull Project project, @NotNull DeploymentSource source) {
-    Artifact artifact;
-    if (source instanceof AppEngineArtifactDeploymentSource) {
-      artifact = ((AppEngineArtifactDeploymentSource) source).getArtifact();
-      if (artifact != null) {
-        return isFlexCompat(project, artifact);
-      }
-    }
-
-    return false;
+  @Nullable
+  public static XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
+      @NotNull DeploymentSource source)  {
+    return getFlexCompatXmlConfiguration(project, getArtifact(source));
   }
 
-  private static boolean isFlexCompat(@NotNull Project project,
-      @NotNull Artifact artifact) {
-    if (!isAppEngineStandardArtifact(project, artifact)) {
-      return false;
+  @Nullable
+  private static XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
+      @Nullable Artifact artifact) {
+
+    if (artifact == null || !isAppEngineStandardArtifact(project, artifact)) {
+      return null;
     }
 
     XmlFile webXml = loadAppEngineStandardWebXml(project, artifact);
 
-    boolean isVmTrue = false;
     if (webXml != null) {
       DomManager manager = DomManager.getDomManager(project);
       DomFileElement element = manager.getFileElement(webXml);
@@ -163,13 +159,60 @@ public class AppEngineUtil {
         if (root != null) {
           XmlTag vmTag = root.findFirstSubTag("vm");
           if (vmTag != null) {
-            isVmTrue = Boolean.parseBoolean(vmTag.getValue().getTrimmedText());
+            return vmTag;
+          } else {
+            return root.findFirstSubTag("env");
           }
         }
       }
     }
 
-    return isVmTrue;
+    return null;
+  }
+
+  /**
+   * Determines if a project is set up like an App Engine standard project but is configured
+   * in 'compatibility' mode. This indicates that the project runs in the flexible environment.
+   *
+   * <p>A flex compat project has an appengine-web.xml with either:
+   * {@code
+   * <vm>true</vm>
+   * <env>flex</env>
+   * }
+   */
+  public static boolean isFlexCompat(@NotNull Project project, @NotNull DeploymentSource source) {
+    return isFlexCompat(project, getArtifact(source));
+  }
+
+  private static boolean isFlexCompat(@NotNull Project project, @Nullable Artifact artifact) {
+    if (artifact == null) {
+      return false;
+    }
+
+    XmlTag compatConfig = getFlexCompatXmlConfiguration(project, artifact);
+
+    if (compatConfig == null) {
+      return false;
+    }
+
+    String tagName = compatConfig.getName();
+
+    if ("vm".equalsIgnoreCase(tagName)) {
+      return Boolean.parseBoolean(compatConfig.getValue().getTrimmedText());
+    } else if ("env".equalsIgnoreCase(tagName)) {
+      return "flex".equalsIgnoreCase(compatConfig.getValue().getTrimmedText());
+    } else {
+      return false;
+    }
+  }
+
+  @Nullable
+  private static Artifact getArtifact(@NotNull DeploymentSource source) {
+    if (source instanceof ArtifactDeploymentSource) {
+      return ((ArtifactDeploymentSource) source).getArtifact();
+    }
+
+    return null;
   }
 
   private static AppEngineArtifactDeploymentSource createArtifactDeploymentSource(

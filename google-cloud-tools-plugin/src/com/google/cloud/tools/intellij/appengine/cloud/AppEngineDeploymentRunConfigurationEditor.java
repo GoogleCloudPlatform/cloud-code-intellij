@@ -46,6 +46,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.awt.RelativePoint;
@@ -78,6 +79,7 @@ import javax.swing.event.DocumentEvent;
  */
 public class AppEngineDeploymentRunConfigurationEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
+  private Project project;
 
   private JComboBox configTypeComboBox;
   private JPanel appEngineConfigFilesPanel;
@@ -113,6 +115,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
       final Project project,
       final AppEngineDeployable deploymentSource,
       final AppEngineHelper appEngineHelper) {
+    this.project = project;
     this.deploymentSource = deploymentSource;
 
     versionIdField.setPlaceholderText(GctBundle.message("appengine.flex.version.placeholder.text"));
@@ -122,7 +125,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     environment = deploymentSource.getEnvironment();
 
-    if (environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
+    if (environment.isFlexible()) {
       appEngineCostWarningLabel.setText(
           GctBundle.message("appengine.flex.deployment.cost.warning",
               COST_WARNING_OPEN_TAG,
@@ -131,8 +134,10 @@ public class AppEngineDeploymentRunConfigurationEditor extends
               COST_WARNING_CLOSE_TAG));
       appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
       appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
+      environmentLabel.setText(getEnvironmentDisplayableLabel());
     } else {
       appEngineCostWarningLabel.setVisible(false);
+      environmentLabel.setText(environment.localizedLabel());
     }
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
@@ -214,7 +219,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
 
-    environmentLabel.setText(environment.localizedLabel());
     appEngineFlexConfigPanel.setVisible(
         environment == AppEngineEnvironment.APP_ENGINE_FLEX
             && !AppEngineUtil.isFlexCompat(project, deploymentSource));
@@ -276,6 +280,23 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   @VisibleForTesting
   void setProjectSelector(ProjectSelector projectSelector) {
     this.projectSelector = projectSelector;
+  }
+
+  /**
+   * If a project's appengine-web.xml contains <env>flex</env> then we want to override
+   * the default localized label of the environment
+   */
+  private String getEnvironmentDisplayableLabel() {
+    XmlTag compatConfig = AppEngineUtil.getFlexCompatXmlConfiguration(project, deploymentSource);
+
+    if (compatConfig != null) {
+      if ("env".equalsIgnoreCase(compatConfig.getName())
+          && "flex".equalsIgnoreCase(compatConfig.getValue().getTrimmedText())) {
+        return GctBundle.message("appengine.environment.name.mvm");
+      }
+    }
+
+    return environment.localizedLabel();
   }
 
   private void updateJarWarSelector() {
