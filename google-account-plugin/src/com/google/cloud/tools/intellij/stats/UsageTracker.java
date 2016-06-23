@@ -37,7 +37,7 @@ public interface UsageTracker {
   /**
    * Returns a fluent API for pinging tracking events.
    *
-   * Example:
+   * <p>Example:
    * {@code
    *  trackEvent("com.google.cloud.tools")
    *    .withAction("appengine.deployment")
