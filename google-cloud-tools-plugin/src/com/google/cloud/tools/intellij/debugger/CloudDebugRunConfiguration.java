@@ -74,7 +74,8 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
     if (this == RunManager.getInstance(getProject()).getConfigurationTemplate(this.getFactory())
         .getConfiguration()) {
       UsageTrackerProvider.getInstance()
-          .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER_NEW_RUN_CONFIG, null, null);
+          .trackEvent(GctTracking.CLOUD_DEBUGGER_NEW_RUN_CONFIG)
+          .ping();
     }
     final CloudDebugRunConfiguration configuration = (CloudDebugRunConfiguration) super.clone();
     configuration.setCloudProjectName(getCloudProjectName());

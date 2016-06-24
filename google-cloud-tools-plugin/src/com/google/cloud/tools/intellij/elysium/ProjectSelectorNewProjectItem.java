@@ -90,8 +90,8 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
       }
       BrowserUtil.browse("https://console.developers.google.com/project");
       UsageTrackerProvider.getInstance()
-          .trackEvent(GctTracking.CATEGORY, GctTracking.PROJECT_SELECTION,
-              "create.new.project", null);
+          .trackEvent(GctTracking.PROJECT_SELECTION_CREATE_NEW_PROJECT)
+          .ping();
     }
   }
 

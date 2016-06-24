@@ -44,8 +44,7 @@ public class AppEngineStopTask implements AppEngineTask {
 
   @Override
   public void execute(ProcessStartListener startListener) {
-    UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_STOP, null, null);
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.APP_ENGINE_STOP).ping();
 
     try {
       stop.getHelper().stageCredentials(stop.getDeploymentConfiguration().getGoogleUsername());

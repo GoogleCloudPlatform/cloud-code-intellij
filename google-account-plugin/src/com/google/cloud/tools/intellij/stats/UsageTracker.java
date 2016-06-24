@@ -16,10 +16,6 @@
 
 package com.google.cloud.tools.intellij.stats;
 
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 /**
  * Interface for defining the actual tracking behavior, implementations must be declared in
  * plugin.xml for the {@link UsageTrackerExtensionPointBean} extension point.
@@ -27,88 +23,57 @@ import org.jetbrains.annotations.Nullable;
 public interface UsageTracker {
 
   /**
-   * When tracking events, do NOT include any information that can identify the user.
-   */
-  void trackEvent(@NotNull String eventCategory,
-      @NotNull String eventAction,
-      @Nullable String eventLabel,
-      @Nullable Integer eventValue);
-
-  /**
    * Returns a fluent API for pinging tracking events.
    *
-   * <p>Example:
-   * {@code
-   *  trackEvent("com.google.cloud.tools")
-   *    .withAction("appengine.deployment")
-   *    .andLabel("flex")
-   *    .setValue(1)
-   *    .send();
-   * }
+   * <p>Example: {@code sendEvent("appengine.deployment").withLabel("flex").setValue(1).ping();}
    *
-   * @param category this is used to identify the client being used. It will be typically the same
-   *                 for all invocations from the same plugin.
-   * @return a fluent interface that allows the user to set the 'action' being tracked by the event
+   * @param action is typically a specific operation the user has performed in the plugin, and is
+   *               often prefixed with a domain such as 'appengine.' or 'clouddebugger.'
+   * @return a fluent interface for setting the remaining parameters of a tracking ping
    */
-  //TODO: Check all invocations fo track event and consider defaulting 'category' to a global value.
-  PartialTrackingEventAction trackEvent(String category);
+  FluentTrackingEventWithLabel trackEvent(String action);
 
   /**
-   * Part of the tracking event fluent API. Denotes steps in the API where the event has enough
-   * data to send a ping.
+   * Part of the tracking event fluent API. Denotes steps in the API where the event has enough data
+   * to ping a ping.
    */
-  interface SendsEvent {
+  interface PingsAnalytics {
 
     /**
      * Send the analytics ping.
      */
-    void send();
+    void ping();
   }
 
   /**
-   * Interface that accepts the 'action' required field for pinging tracking events.
+   * Interface that accepts the 'label' optional field for pinging tracking events.
    */
-  interface PartialTrackingEventAction {
+  interface FluentTrackingEventWithLabel extends PingsAnalytics {
 
     /**
-     * Sets the required 'action' field.
+     * Sets the optional 'label' field.
      *
-     * @param action is typically a specific operation the user has performed in the plugin, and is
-     *               often prefixed with a domain such as 'appengine.' or 'clouddebugger.'
-     * @return a fluent interface for setting the remaining parameters of a tracking ping
+     * @param label adds metadata about the 'action' being performed. For example an action of
+     *              'appengine.deploy', could qualify the deployment as a flex deployment by passing
+     *              'flex' as the {@code label} value.
+     * @return a fluent interface for setting a scalar value attributed to the parameters of the
+     *         tracking ping
      */
-    PartialTrackingEventLabel withAction(String action);
+    FluentTrackingEventWithValue withLabel(String label);
 
     /**
-     * Interface that accepts the 'label' optional field for pinging tracking events.
+     * Interface that accepts a scalar Integer value as a metric for the analytics ping.
      */
-    interface PartialTrackingEventLabel extends SendsEvent {
+    interface FluentTrackingEventWithValue extends PingsAnalytics {
 
       /**
-       * Sets the optional 'label' field.
+       * Sets the optional scalar value to be associated with this tracking event.
        *
-       * @param label adds metadata about the 'action' being performed. For example an action of
-       *              'appengine.deploy', could qualify the deployment as a flex deployment by
-       *              passing 'flex' as the {@code label} value.
-       * @return a fluent interface for setting a scalar value attributed to the parameters of the
-       *         tracking ping
+       * @param value an optional scalar value that will be recorded as a metric against this
+       *              tracking event
+       * @return a fluent interface for sending the tracking event ping
        */
-      PartialTrackingEventValue andLabel(String label);
-
-      /**
-       * Interface that accepts a scalar Integer value as a metric for the analytics ping.
-       */
-      interface PartialTrackingEventValue extends SendsEvent {
-
-        /**
-         * Sets the optional scalar value to be associated with this tracking event.
-         *
-         * @param value an optional scalar value that will be recorded as a metric against this
-         *              tracking event
-         * @return a fluent interface for sending the tracking event ping
-         */
-        SendsEvent setValue(Integer value);
-      }
+      PingsAnalytics setValue(Integer value);
     }
   }
 }

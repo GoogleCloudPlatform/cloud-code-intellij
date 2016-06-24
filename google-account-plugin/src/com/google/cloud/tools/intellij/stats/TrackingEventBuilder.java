@@ -16,48 +16,42 @@
 
 package com.google.cloud.tools.intellij.stats;
 
-import com.google.cloud.tools.intellij.stats.UsageTracker.PartialTrackingEventAction;
-import com.google.cloud.tools.intellij.stats.UsageTracker.PartialTrackingEventAction.PartialTrackingEventLabel;
-import com.google.cloud.tools.intellij.stats.UsageTracker.PartialTrackingEventAction.PartialTrackingEventLabel.PartialTrackingEventValue;
-import com.google.cloud.tools.intellij.stats.UsageTracker.SendsEvent;
+import com.google.api.client.repackaged.com.google.common.base.Preconditions;
+import com.google.cloud.tools.intellij.stats.UsageTracker.FluentTrackingEventWithLabel;
+import com.google.cloud.tools.intellij.stats.UsageTracker.FluentTrackingEventWithLabel.FluentTrackingEventWithValue;
+import com.google.cloud.tools.intellij.stats.UsageTracker.PingsAnalytics;
 
 /**
  * Implements the fluent interface exposed for tracking by {@link UsageTracker}.
  */
-class TrackingEventBuilder implements
-    PartialTrackingEventAction, PartialTrackingEventLabel, PartialTrackingEventValue {
+class TrackingEventBuilder implements FluentTrackingEventWithLabel, FluentTrackingEventWithValue {
 
-  private UsageTracker googleUsageTracker;
+  private SendsEvents eventSender;
   private String category;
   private String action;
   private String label;
   private Integer value;
 
-  TrackingEventBuilder(UsageTracker googleUsageTracker, String category) {
-    this.googleUsageTracker = googleUsageTracker;
-    this.category = category;
+  TrackingEventBuilder(SendsEvents eventSender, String category, String action) {
+    this.eventSender = Preconditions.checkNotNull(eventSender);
+    this.category = Preconditions.checkNotNull(category);
+    this.action = Preconditions.checkNotNull(action);
   }
 
   @Override
-  public PartialTrackingEventLabel withAction(String action) {
-    this.action = action;
+  public FluentTrackingEventWithValue withLabel(String label) {
+    this.label = Preconditions.checkNotNull(label);
     return this;
   }
 
   @Override
-  public PartialTrackingEventValue andLabel(String label) {
-    this.label = label;
+  public PingsAnalytics setValue(Integer value) {
+    this.value = Preconditions.checkNotNull(value);
     return this;
   }
 
   @Override
-  public SendsEvent setValue(Integer value) {
-    this.value = value;
-    return this;
-  }
-
-  @Override
-  public void send() {
-    googleUsageTracker.trackEvent(category, action, label, value);
+  public void ping() {
+    eventSender.sendEvent(category, action, label, value);
   }
 }

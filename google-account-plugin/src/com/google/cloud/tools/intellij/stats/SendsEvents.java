@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,20 @@
 
 package com.google.cloud.tools.intellij.stats;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
- * For usage tracker of the Google Login actions.
+ * Package internal only interface used for providing multiple ping implementations to the
+ * {@link TrackingEventBuilder}.
  */
-public class LoginTracking {
+interface SendsEvents {
 
-  private LoginTracking() {
-  }
-
-  public static final String LOGIN_START = "user.login.start";
-  public static final String LOGIN_CANCELLED = "user.login.cancelled";
-  public static final String LOGIN_COMPLETE = "user.login.complete";
+  /**
+   * When tracking events, do NOT include any information that can identify the user.
+   */
+  void sendEvent(@NotNull String eventCategory,
+      @NotNull String eventAction,
+      @Nullable String eventLabel,
+      @Nullable Integer eventValue);
 }

@@ -291,15 +291,18 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       @Override
       public Deployment succeeded(@NotNull DeploymentRuntime deploymentRuntime) {
         UsageTrackerProvider.getInstance()
-            .trackEvent(
-                GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY_SUCCESS, eventLabel, null);
+            .trackEvent(GctTracking.APP_ENGINE_DEPLOY_SUCCESS)
+            .withLabel(eventLabel)
+            .ping();
         return deploymentCallback.succeeded(deploymentRuntime);
       }
 
       @Override
       public void errorOccurred(@NotNull String errorMessage) {
         UsageTrackerProvider.getInstance()
-            .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY_FAIL, eventLabel, null);
+            .trackEvent(GctTracking.APP_ENGINE_DEPLOY_FAIL)
+            .withLabel(eventLabel)
+            .ping();
         deploymentCallback.errorOccurred(errorMessage);
       }
     };
