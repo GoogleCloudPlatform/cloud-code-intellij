@@ -71,7 +71,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
               UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
 
   /**
-   * Sends an event to Analytics.
+   * Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property.
    */
   public void sendEvent(@NotNull String eventCategory,
       @NotNull String eventAction,
