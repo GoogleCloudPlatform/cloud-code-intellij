@@ -69,7 +69,7 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
     }
 
     @Override
-    public PartialTrackingEventLabel trackEvent(String action) {
+    public FluentTrackingEventWithLabel trackEvent(String action) {
       return new TrackingEventBuilder(this, "no-category", action);
     }
   }

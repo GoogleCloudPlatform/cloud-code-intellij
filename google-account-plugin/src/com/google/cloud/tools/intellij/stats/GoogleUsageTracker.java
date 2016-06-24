@@ -92,7 +92,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         postData.add(new BasicNameValuePair("cd17", "0"));  // User signed in? We will ignore this.
 
         // Virtual page information
-        String virtualPageUrl = "/virtual/" + externalPluginName + "/" + eventAction;
+        String virtualPageUrl = "/virtual/" + eventCategory + "/" + eventAction;
         postData.add(new BasicNameValuePair("dp", virtualPageUrl));
         postData.add(new BasicNameValuePair("cd21", "1"));  // Yes, this ping is a virtual "page".
         if (eventLabel != null) {
@@ -107,7 +107,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   }
 
   @Override
-  public PartialTrackingEventLabel trackEvent(String action) {
+  public FluentTrackingEventWithLabel trackEvent(String action) {
     return new TrackingEventBuilder(this, externalPluginName, action);
   }
 

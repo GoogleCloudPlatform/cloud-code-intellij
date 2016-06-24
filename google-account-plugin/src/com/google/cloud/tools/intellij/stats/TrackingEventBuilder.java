@@ -17,14 +17,14 @@
 package com.google.cloud.tools.intellij.stats;
 
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
-import com.google.cloud.tools.intellij.stats.UsageTracker.PartialTrackingEventLabel;
-import com.google.cloud.tools.intellij.stats.UsageTracker.PartialTrackingEventLabel.PartialTrackingEventValue;
+import com.google.cloud.tools.intellij.stats.UsageTracker.FluentTrackingEventWithLabel;
+import com.google.cloud.tools.intellij.stats.UsageTracker.FluentTrackingEventWithLabel.FluentTrackingEventWithValue;
 import com.google.cloud.tools.intellij.stats.UsageTracker.PingsAnalytics;
 
 /**
  * Implements the fluent interface exposed for tracking by {@link UsageTracker}.
  */
-class TrackingEventBuilder implements PartialTrackingEventLabel, PartialTrackingEventValue {
+class TrackingEventBuilder implements FluentTrackingEventWithLabel, FluentTrackingEventWithValue {
 
   private SendsEvents eventSender;
   private String category;
@@ -39,7 +39,7 @@ class TrackingEventBuilder implements PartialTrackingEventLabel, PartialTracking
   }
 
   @Override
-  public PartialTrackingEventValue withLabel(String label) {
+  public FluentTrackingEventWithValue withLabel(String label) {
     this.label = Preconditions.checkNotNull(label);
     return this;
   }

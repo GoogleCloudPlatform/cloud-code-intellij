@@ -31,7 +31,7 @@ public interface UsageTracker {
    *               often prefixed with a domain such as 'appengine.' or 'clouddebugger.'
    * @return a fluent interface for setting the remaining parameters of a tracking ping
    */
-  PartialTrackingEventLabel trackEvent(String action);
+  FluentTrackingEventWithLabel trackEvent(String action);
 
   /**
    * Part of the tracking event fluent API. Denotes steps in the API where the event has enough data
@@ -48,7 +48,7 @@ public interface UsageTracker {
   /**
    * Interface that accepts the 'label' optional field for pinging tracking events.
    */
-  interface PartialTrackingEventLabel extends PingsAnalytics {
+  interface FluentTrackingEventWithLabel extends PingsAnalytics {
 
     /**
      * Sets the optional 'label' field.
@@ -59,12 +59,12 @@ public interface UsageTracker {
      * @return a fluent interface for setting a scalar value attributed to the parameters of the
      *         tracking ping
      */
-    PartialTrackingEventValue withLabel(String label);
+    FluentTrackingEventWithValue withLabel(String label);
 
     /**
      * Interface that accepts a scalar Integer value as a metric for the analytics ping.
      */
-    interface PartialTrackingEventValue extends PingsAnalytics {
+    interface FluentTrackingEventWithValue extends PingsAnalytics {
 
       /**
        * Sets the optional scalar value to be associated with this tracking event.

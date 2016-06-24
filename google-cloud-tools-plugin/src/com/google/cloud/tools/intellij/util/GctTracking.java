@@ -28,7 +28,6 @@ public class GctTracking {
   public static final String APP_ENGINE_DEPLOY_CANCEL = "appengine.deploy.cancel";
   public static final String APP_ENGINE_STOP = "appengine.stop";
 
-  public static final String PROJECT_SELECTION = "project.selection";
   public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =
       "project.selection.create.new.project";
 
