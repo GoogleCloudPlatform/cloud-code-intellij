@@ -165,8 +165,12 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
   @Override
   public void logIn(@Nullable final String message,
       @Nullable final IGoogleLoginCompletedCallback callback) {
-    UsageTrackerProvider
-        .getInstance().trackEvent(LoginTracking.CATEGORY, LoginTracking.LOGIN, "login.start", null);
+    UsageTrackerProvider.getInstance()
+        .trackEvent(LoginTracking.CATEGORY)
+        .withAction(LoginTracking.LOGIN)
+        .andLabel("login.start")
+        .send();
+
     final CredentialedUser lastActiveUser = users.getActiveUser();
     users.removeActiveUser();
     uiFacade.notifyStatusIndicator();
