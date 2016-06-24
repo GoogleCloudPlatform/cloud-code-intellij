@@ -44,7 +44,7 @@ public class AppEngineStandardDeployTask implements AppEngineTask {
 
   /**
    * @param isFlexCompat does not change any behavior of actual deployment. Provided solely for the
-   * purpose of Analytics usage reporting.
+   *                     purpose of Analytics usage reporting.
    */
   public AppEngineStandardDeployTask(
       @NotNull AppEngineDeploy deploy,

@@ -70,6 +70,9 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           new BasicNameValuePair("cid",             // UUID for this IntelliJ client
               UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
 
+  /**
+   * Sends an event to Analytics.
+   */
   public void sendEvent(@NotNull String eventCategory,
       @NotNull String eventAction,
       @Nullable String eventLabel,

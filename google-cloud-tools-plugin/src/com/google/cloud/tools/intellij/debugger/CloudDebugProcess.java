@@ -578,8 +578,9 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
           Messages.getQuestionIcon());
       if (result == Messages.OK) { // continue
         processState.setListenInBackground(true);
-        UsageTrackerProvider.getInstance().
-            trackEvent(GctTracking.CLOUD_DEBUGGER_CLOSE_CONTINUE_LISTEN).ping();
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.CLOUD_DEBUGGER_CLOSE_CONTINUE_LISTEN)
+            .ping();
       } else {
         processState.setListenInBackground(false);
         UsageTrackerProvider.getInstance()

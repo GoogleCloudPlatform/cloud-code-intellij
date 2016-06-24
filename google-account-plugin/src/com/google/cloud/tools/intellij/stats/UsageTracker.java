@@ -28,7 +28,7 @@ public interface UsageTracker {
    * <p>Example: {@code sendEvent("appengine.deployment").withLabel("flex").setValue(1).ping();}
    *
    * @param action is typically a specific operation the user has performed in the plugin, and is
-   * often prefixed with a domain such as 'appengine.' or 'clouddebugger.'
+   *               often prefixed with a domain such as 'appengine.' or 'clouddebugger.'
    * @return a fluent interface for setting the remaining parameters of a tracking ping
    */
   PartialTrackingEventLabel trackEvent(String action);
@@ -54,10 +54,10 @@ public interface UsageTracker {
      * Sets the optional 'label' field.
      *
      * @param label adds metadata about the 'action' being performed. For example an action of
-     * 'appengine.deploy', could qualify the deployment as a flex deployment by passing 'flex' as
-     * the {@code label} value.
+     *              'appengine.deploy', could qualify the deployment as a flex deployment by passing
+     *              'flex' as the {@code label} value.
      * @return a fluent interface for setting a scalar value attributed to the parameters of the
-     * tracking ping
+     *         tracking ping
      */
     PartialTrackingEventValue withLabel(String label);
 
@@ -70,7 +70,7 @@ public interface UsageTracker {
        * Sets the optional scalar value to be associated with this tracking event.
        *
        * @param value an optional scalar value that will be recorded as a metric against this
-       * tracking event
+       *              tracking event
        * @return a fluent interface for sending the tracking event ping
        */
       PingsAnalytics setValue(Integer value);
