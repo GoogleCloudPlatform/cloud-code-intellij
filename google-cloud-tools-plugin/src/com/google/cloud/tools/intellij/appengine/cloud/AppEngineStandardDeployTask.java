@@ -31,10 +31,11 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Runnable that executes task responsible for deploying an application to the App Engine
- * standard environment.
+ * Runnable that executes task responsible for deploying an application to the App Engine standard
+ * environment.
  */
 public class AppEngineStandardDeployTask implements AppEngineTask {
+
   private static final Logger logger = Logger.getInstance(AppEngineStandardDeployTask.class);
 
   private AppEngineDeploy deploy;
@@ -42,8 +43,8 @@ public class AppEngineStandardDeployTask implements AppEngineTask {
   private boolean isFlexCompat;
 
   /**
-   * @param isFlexCompat does not change any behavior of actual deployment. Provided solely
-   *     for the purpose of Analytics usage reporting.
+   * @param isFlexCompat does not change any behavior of actual deployment. Provided solely for the
+   *                     purpose of Analytics usage reporting.
    */
   public AppEngineStandardDeployTask(
       @NotNull AppEngineDeploy deploy,
@@ -57,8 +58,9 @@ public class AppEngineStandardDeployTask implements AppEngineTask {
   @Override
   public void execute(ProcessStartListener startListener) {
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY,
-            isFlexCompat ? "flex-compat" : "standard", null);
+        .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
+        .withLabel(isFlexCompat ? "flex-compat" : "standard")
+        .ping();
 
     File stagingDirectory;
 

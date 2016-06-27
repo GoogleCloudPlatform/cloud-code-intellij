@@ -46,8 +46,7 @@ public class AppEngineRunner implements CancellableRunnable {
 
   @Override
   public void cancel() {
-    UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.CATEGORY, GctTracking.APP_ENGINE_DEPLOY_CANCEL, null, null);
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.APP_ENGINE_DEPLOY_CANCEL).ping();
 
     if (process != null) {
       process.destroy();

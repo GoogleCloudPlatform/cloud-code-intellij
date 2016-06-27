@@ -44,7 +44,7 @@ import java.util.List;
 /**
  * Google Usage Tracker that reports to Cloud Tools Analytics backend.
  */
-public class GoogleUsageTracker implements UsageTracker {
+public class GoogleUsageTracker implements UsageTracker, SendsEvents {
 
   private static final Logger logger = Logger.getInstance(GoogleUsageTracker.class);
 
@@ -73,8 +73,7 @@ public class GoogleUsageTracker implements UsageTracker {
   /**
    * Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property.
    */
-  @Override
-  public void trackEvent(@NotNull String eventCategory,
+  public void sendEvent(@NotNull String eventCategory,
       @NotNull String eventAction,
       @Nullable String eventLabel,
       @Nullable Integer eventValue) {
@@ -87,13 +86,13 @@ public class GoogleUsageTracker implements UsageTracker {
 
         List<BasicNameValuePair> postData = Lists.newArrayList(analyticsBaseData);
         postData.add(new BasicNameValuePair("tid", analyticsId));
-        postData.add(new BasicNameValuePair("cd19", externalPluginName));  // Event type
+        postData.add(new BasicNameValuePair("cd19", eventCategory));  // Event type
         postData.add(new BasicNameValuePair("cd20", eventAction));  // Event name
         postData.add(new BasicNameValuePair("cd16", "0"));  // Internal user? No.
         postData.add(new BasicNameValuePair("cd17", "0"));  // User signed in? We will ignore this.
 
         // Virtual page information
-        String virtualPageUrl = "/virtual/" + externalPluginName + "/" + eventAction;
+        String virtualPageUrl = "/virtual/" + eventCategory + "/" + eventAction;
         postData.add(new BasicNameValuePair("dp", virtualPageUrl));
         postData.add(new BasicNameValuePair("cd21", "1"));  // Yes, this ping is a virtual "page".
         if (eventLabel != null) {
@@ -105,6 +104,11 @@ public class GoogleUsageTracker implements UsageTracker {
         sendPing(postData);
       }
     }
+  }
+
+  @Override
+  public FluentTrackingEventWithLabel trackEvent(String action) {
+    return new TrackingEventBuilder(this, externalPluginName, action);
   }
 
   private static void sendPing(@NotNull final List<? extends NameValuePair> postData) {

@@ -167,8 +167,8 @@ public class CloudBreakpointHandler
       });
     }
 
-    UsageTrackerProvider.getInstance().trackEvent(
-        GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER_CLONE_BREAKPOINTS, null, null);
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.CLOUD_DEBUGGER_CLONE_BREAKPOINTS).ping();
   }
 
   /**
