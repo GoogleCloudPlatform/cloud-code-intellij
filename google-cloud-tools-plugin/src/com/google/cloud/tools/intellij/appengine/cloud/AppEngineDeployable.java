@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stats;
+package com.google.cloud.tools.intellij.appengine.cloud;
+
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 
 /**
- * For usage tracker of the Google Login actions.
+ * An {@link DeploymentSource} that is deployable to Google App engine that specifies its target
+ * App Engine environment.
  */
-public class LoginTracking {
+public interface AppEngineDeployable extends DeploymentSource {
 
-  private LoginTracking() {
-  }
+  /**
+   * Returns the targeted App Engine environment.
+   */
+  AppEngineEnvironment getEnvironment();
 
-  public static final String LOGIN_START = "user.login.start";
-  public static final String LOGIN_CANCELLED = "user.login.cancelled";
-  public static final String LOGIN_COMPLETE = "user.login.complete";
 }

@@ -41,6 +41,7 @@ public abstract class BasePluginInfoService implements PluginInfoService {
   private final String userAgent;
   private final IdeaPluginDescriptor plugin;
   private final FlagReader flagReader;
+  private static final String PLUGIN_NAME_EXTERNAL = "gcloud-intellij";
 
   protected BasePluginInfoService(@NotNull String pluginUserAgentName, @NotNull String pluginId) {
     this(
@@ -72,6 +73,11 @@ public abstract class BasePluginInfoService implements PluginInfoService {
   @Override
   public String getPluginId() {
     return plugin.getPluginId().getIdString();
+  }
+
+  @Override
+  public String getExternalPluginName() {
+    return PLUGIN_NAME_EXTERNAL;
   }
 
   @Override

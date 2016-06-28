@@ -14,17 +14,33 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stats;
+package com.google.cloud.tools.intellij.appengine.cloud;
+
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 /**
- * For usage tracker of the Google Login actions.
+ * Specifies an App Engine environment.
  */
-public class LoginTracking {
+public enum AppEngineEnvironment {
+  APP_ENGINE_STANDARD("appengine.environment.name.standard"),
+  APP_ENGINE_FLEX("appengine.environment.name.flexible");
 
-  private LoginTracking() {
+  private String label;
+
+  AppEngineEnvironment(String label) {
+    this.label = label;
   }
 
-  public static final String LOGIN_START = "user.login.start";
-  public static final String LOGIN_CANCELLED = "user.login.cancelled";
-  public static final String LOGIN_COMPLETE = "user.login.complete";
+  public boolean isStandard() {
+    return this == APP_ENGINE_STANDARD;
+  }
+
+  public boolean isFlexible() {
+    return this == APP_ENGINE_FLEX;
+  }
+
+  public String localizedLabel() {
+    return GctBundle.message(label);
+  }
 }
+

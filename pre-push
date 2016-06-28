@@ -1,0 +1,18 @@
+#!/bin/sh
+# From gist at https://gist.github.com/chadmaughan/5889802
+# Copy into your .git/hooks and chmod +x
+
+# stash any unstaged changes
+git stash -q --keep-index
+
+# run the tests with the gradle wrapper
+./gradlew check
+
+# store the last exit code in a variable
+RESULT=$?
+
+# unstash the unstashed changes
+git stash pop -q
+
+# return the './gradlew check' exit code
+exit $RESULT

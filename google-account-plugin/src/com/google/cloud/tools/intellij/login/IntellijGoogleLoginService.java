@@ -165,8 +165,8 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
   @Override
   public void logIn(@Nullable final String message,
       @Nullable final IGoogleLoginCompletedCallback callback) {
-    UsageTrackerProvider
-        .getInstance().trackEvent(LoginTracking.CATEGORY, LoginTracking.LOGIN, "login.start", null);
+    UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGIN_START).ping();
+
     final CredentialedUser lastActiveUser = users.getActiveUser();
     users.removeActiveUser();
     uiFacade.notifyStatusIndicator();
@@ -260,9 +260,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     boolean loggedOut = activeUser.getGoogleLoginState().logOut(showPrompt);
     if (loggedOut) {
       logOutAllUsers();
-      UsageTrackerProvider
-          .getInstance().trackEvent(
-            LoginTracking.CATEGORY, LoginTracking.LOGIN, "logout.complete", null);
+      UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGIN_COMPLETE).ping();
     }
 
     return loggedOut;
@@ -464,8 +462,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
       try {
         verificationCode = receiver.waitForCode();
       } catch (RequestCancelledException rce) {
-        UsageTrackerProvider.getInstance().trackEvent(
-            LoginTracking.CATEGORY, LoginTracking.LOGIN, "login.cancelled", null);
+        UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGIN_CANCELLED).ping();
         return null;
       } catch (IOException ioe) {
         logErrorAndDisplayDialog(title == null
@@ -476,8 +473,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
         receiver = null;
       }
 
-      UsageTrackerProvider.getInstance().trackEvent(
-          LoginTracking.CATEGORY, LoginTracking.LOGIN, "login.complete", null);
+      UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGIN_COMPLETE).ping();
       return new VerificationCodeHolder(verificationCode, redirectUrl);
     }
 

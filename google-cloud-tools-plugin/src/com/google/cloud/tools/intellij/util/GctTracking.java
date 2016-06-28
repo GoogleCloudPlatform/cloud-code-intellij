@@ -17,18 +17,31 @@
 package com.google.cloud.tools.intellij.util;
 
 /**
- * Created by appu on 2/13/15.
+ * Class defining client-side event actions we want to track.
  */
 public class GctTracking {
 
-  public static final String CATEGORY = "com.google.cloud.tools";
+  // Event actions
+  public static final String APP_ENGINE_DEPLOY = "appengine.deploy";
+  public static final String APP_ENGINE_DEPLOY_SUCCESS = "appengine.deploy.success";
+  public static final String APP_ENGINE_DEPLOY_FAIL = "applengine.deploy.fail";
+  public static final String APP_ENGINE_DEPLOY_CANCEL = "appengine.deploy.cancel";
+  public static final String APP_ENGINE_STOP = "appengine.stop";
 
-  // actions
-  public static final String CLOUD_DEBUGGER = "cloud.debugger";
-  public static final String APP_ENGINE = "appengine";
-  public static final String GRADLE_IMPORT = "appengine.gradle.import";
-  public static final String PROJECT_SELECTION = "project.selection";
-  public static final String RUN = "appengine.run";
-  public static final String VCS = "vcs";
+  public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =
+      "project.selection.create.new.project";
 
+  public static final String VCS_CHECKOUT = "vcs.checkout";
+  public static final String VCS_UPLOAD = "vcs.uplaod";
+
+  public static final String CLOUD_DEBUGGER_NEW_RUN_CONFIG = "cloud.debugger.new.run.config";
+  public static final String CLOUD_DEBUGGER_CREATE_BREAKPOINT = "cloud.debugger.create.breakpoint";
+  public static final String CLOUD_DEBUGGER_CLONE_BREAKPOINTS = "cloud.debugger.clone.breakpoints";
+  public static final String CLOUD_DEBUGGER_SNAPSHOT_RECEIVED = "cloud.debugger.snapshot.received";
+  public static final String CLOUD_DEBUGGER_START_SESSION = "cloud.debugger.start.session";
+  public static final String CLOUD_DEBUGGER_CLOSE_STOP_LISTEN = "cloud.debugger.close.stop.listen";
+  public static final String CLOUD_DEBUGGER_CLOSE_CONTINUE_LISTEN =
+      "cloud.debugger.close.continue.listen";
+  public static final String CLOUD_DEBUGGER_NOTIFY_BREAKPOINT_LIST_CHANGE =
+      "cloud.debugger.notify.breakpoint.list.change";
 }

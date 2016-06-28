@@ -16,12 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.app.api.AppEngineException;
-import com.google.cloud.tools.app.impl.cloudsdk.CloudSdkAppEngineVersions;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessExitListener;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.process.ProcessOutputLineListener;
-import com.google.cloud.tools.app.impl.cloudsdk.internal.sdk.CloudSdk;
-import com.google.cloud.tools.app.impl.config.DefaultVersionsSelectionConfiguration;
+import com.google.cloud.tools.appengine.api.versions.DefaultVersionsSelectionConfiguration;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineVersions;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.icons.AllIcons.General;
@@ -37,68 +37,80 @@ import java.util.Collections;
 import javax.swing.SwingUtilities;
 
 /**
- * Stops an App Engine based application running on GCP.
+ * Stops a module & version of an application running on App Engine.
  */
-public class AppEngineStopAction extends AppEngineAction {
+public class AppEngineStop {
 
-  private static final Logger logger = Logger.getInstance(AppEngineStopAction.class);
+  private static final Logger logger = Logger.getInstance(AppEngineStop.class);
 
+  private AppEngineHelper helper;
+  private LoggingHandler loggingHandler;
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
   private UndeploymentTaskCallback callback;
 
-  private String moduleToStop;
-  private String versionToStop;
-
   /**
-   * Initialize the stop action.
+   * Initialize the stop dependencies.
    */
-  public AppEngineStopAction(
-      @NotNull AppEngineHelper appEngineHelper,
+  public AppEngineStop(
+      @NotNull AppEngineHelper helper,
       @NotNull LoggingHandler loggingHandler,
       @NotNull AppEngineDeploymentConfiguration deploymentConfiguration,
-      @NotNull String moduleToStop,
-      @NotNull String versionToStop,
       @NotNull UndeploymentTaskCallback callback) {
-    super(loggingHandler, appEngineHelper, deploymentConfiguration);
-
-    this.moduleToStop = moduleToStop;
-    this.versionToStop = versionToStop;
+    this.helper = helper;
+    this.loggingHandler = loggingHandler;
+    this.deploymentConfiguration = deploymentConfiguration;
     this.callback = callback;
   }
 
-  @Override
-  public void run() {
-    CloudSdk sdk;
+  /**
+   * Stops the given module / version of an App Engine application.
+   */
+  public void stop(
+      @NotNull String module,
+      @NotNull String version,
+      @NotNull ProcessStartListener startListener) {
+    ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
+      @Override
+      public void onOutputLine(String line) {
+        loggingHandler.print(line + "\n");
+      }
+    };
 
-    try {
-      ProcessOutputLineListener outputLineListener = new ProcessOutputLineListener() {
-        @Override
-        public void outputLine(String output) {
-          consoleLogLn(output);
-        }
-      };
+    ProcessExitListener stopExitListener = new StopExitListener();
 
-      ProcessExitListener stopExitListener = new StopExitListener();
-
-      sdk = prepareExecution(outputLineListener, outputLineListener, stopExitListener);
-    } catch (AppEngineException ex) {
-      callback.errorOccurred(GctBundle.message("appengine.stop.modules.version.error"));
-      return;
-    }
-
-    CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
+    CloudSdk sdk = helper.createSdk(
+        loggingHandler,
+        startListener,
+        outputListener,
+        outputListener,
+        stopExitListener);
 
     DefaultVersionsSelectionConfiguration configuration =
         new DefaultVersionsSelectionConfiguration();
-    configuration.setVersions(Collections.singletonList(versionToStop));
-    configuration.setService(moduleToStop);
+    configuration.setVersions(Collections.singletonList(version));
+    configuration.setService(module);
+    configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
+    CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
     command.stop(configuration);
+  }
+
+  AppEngineHelper getHelper() {
+    return helper;
+  }
+
+  AppEngineDeploymentConfiguration getDeploymentConfiguration() {
+    return deploymentConfiguration;
+  }
+
+  UndeploymentTaskCallback getCallback() {
+    return callback;
   }
 
   private class StopExitListener implements ProcessExitListener {
 
     @Override
-    public void exit(int exitCode) {
+    public void onExit(int exitCode) {
       try {
         if (exitCode == 0) {
           callback.succeeded();
@@ -120,7 +132,7 @@ public class AppEngineStopAction extends AppEngineAction {
                   exitCode));
         }
       } finally {
-        deleteCredentials();
+        helper.deleteCredentials();
       }
     }
   }

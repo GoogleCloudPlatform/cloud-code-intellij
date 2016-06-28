@@ -116,6 +116,7 @@ subprojects {
             // JDepend manages to include a different version of itself in its own transitive closure.
             force "jdepend:jdepend:${project.jdepend.toolVersion}"
         }
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     }
 
     apply plugin: 'checkstyle'

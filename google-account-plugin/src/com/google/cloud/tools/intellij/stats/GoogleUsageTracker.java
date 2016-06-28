@@ -16,16 +16,15 @@
 
 package com.google.cloud.tools.intellij.stats;
 
-import com.google.common.base.Strings;
+import com.google.cloud.tools.intellij.AccountPluginInfoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.updateSettings.impl.UpdateChecker;
-import com.intellij.util.PlatformUtils;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -36,69 +35,80 @@ import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Google Usage Tracker that reports to Cloud Tools Analytics backend.
  */
-public class GoogleUsageTracker implements UsageTracker {
+public class GoogleUsageTracker implements UsageTracker, SendsEvents {
 
-  private static final Logger LOG = Logger.getInstance(GoogleUsageTracker.class);
-  @NonNls
+  private static final Logger logger = Logger.getInstance(GoogleUsageTracker.class);
+
   private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
-  @NonNls
-  private static final String ANALYTICS_APP = "Cloud Tools for IntelliJ";
-  @NonNls
-  private static final String INTELLIJ_EDITION = "intellij.edition";
 
   private final String analyticsId;
+  private String externalPluginName;
 
+  /**
+   * Constructs a usage tracker configured with analytics and plugin name configured from its
+   * environment.
+   */
   public GoogleUsageTracker() {
-    this.analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
+    analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
+    externalPluginName = ServiceManager.getService(AccountPluginInfoService.class)
+        .getExternalPluginName();
   }
 
-  private static final List<? extends NameValuePair> analyticsBaseData = ImmutableList
-      .of(new BasicNameValuePair("v", "1"),
-          new BasicNameValuePair("t", "event"),
-          new BasicNameValuePair("an", ANALYTICS_APP),
-          new BasicNameValuePair("av", ApplicationInfo.getInstance().getFullVersion()),
-          new BasicNameValuePair("cid",
+  private static final List<BasicNameValuePair> analyticsBaseData = ImmutableList
+      .of(new BasicNameValuePair("v", "1"),         // Protocol version
+          new BasicNameValuePair("t", "pageview"),  // Note the "pageview" type, not "event"
+          new BasicNameValuePair("ni", "0"),        // Non-interactive? Report as interactive.
+          new BasicNameValuePair("cid",             // UUID for this IntelliJ client
               UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
 
-  @Override
-  public void trackEvent(@NotNull String eventCategory,
+  /**
+   * Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property.
+   */
+  public void sendEvent(@NotNull String eventCategory,
       @NotNull String eventAction,
       @Nullable String eventLabel,
       @Nullable Integer eventValue) {
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       if (UsageTrackerManager.getInstance().isTrackingEnabled()) {
-        ArrayList postData = Lists.newArrayList(analyticsBaseData);
+        // For the semantics of each parameter, consult the followings:
+        //
+        // https://github.com/google/cloud-reporting/blob/master/src/main/java/com/google/cloud/metrics/MetricsUtils.java#L183
+        // https://developers.google.com/analytics/devguides/collection/protocol/v1/reference
+
+        List<BasicNameValuePair> postData = Lists.newArrayList(analyticsBaseData);
         postData.add(new BasicNameValuePair("tid", analyticsId));
-        postData.add(new BasicNameValuePair(INTELLIJ_EDITION,
-            PlatformUtils.isCommunityEdition() ? "community" : "ultimate"));
-        postData.add(new BasicNameValuePair("ec", eventCategory));
-        postData.add(new BasicNameValuePair("ea", eventAction));
-        if (!Strings.isNullOrEmpty(eventLabel)) {
-          postData.add(new BasicNameValuePair("el", eventLabel));
-        }
+        postData.add(new BasicNameValuePair("cd19", eventCategory));  // Event type
+        postData.add(new BasicNameValuePair("cd20", eventAction));  // Event name
+        postData.add(new BasicNameValuePair("cd16", "0"));  // Internal user? No.
+        postData.add(new BasicNameValuePair("cd17", "0"));  // User signed in? We will ignore this.
 
-        if (eventValue != null) {
-          if (eventValue.intValue() < 0) {
-            LOG.debug("Attempting to send negative event value to the analytics server");
-          }
-
-          postData.add(new BasicNameValuePair("ev", eventValue.toString()));
+        // Virtual page information
+        String virtualPageUrl = "/virtual/" + eventCategory + "/" + eventAction;
+        postData.add(new BasicNameValuePair("dp", virtualPageUrl));
+        postData.add(new BasicNameValuePair("cd21", "1"));  // Yes, this ping is a virtual "page".
+        if (eventLabel != null) {
+          // Event metadata are passed as a (virtual) page title.
+          String virtualPageTitle = eventLabel + "=" + (eventValue != null ? eventValue : "null");
+          postData.add(new BasicNameValuePair("dt", virtualPageTitle));
         }
 
         sendPing(postData);
       }
     }
+  }
+
+  @Override
+  public FluentTrackingEventWithLabel trackEvent(String action) {
+    return new TrackingEventBuilder(this, externalPluginName, action);
   }
 
   private static void sendPing(@NotNull final List<? extends NameValuePair> postData) {
@@ -112,11 +122,11 @@ public class GoogleUsageTracker implements UsageTracker {
           CloseableHttpResponse response = client.execute(request);
           StatusLine status = response.getStatusLine();
           if (status.getStatusCode() >= 300) {
-            LOG.debug("Non 200 status code : " + status.getStatusCode() + " - " + status
+            logger.debug("Non 200 status code : " + status.getStatusCode() + " - " + status
                 .getReasonPhrase());
           }
         } catch (IOException ex) {
-          LOG.debug("IOException during Analytics Ping", new Object[]{ex.getMessage()});
+          logger.debug("IOException during Analytics Ping", ex.getMessage());
         } finally {
           HttpClientUtils.closeQuietly(client);
         }

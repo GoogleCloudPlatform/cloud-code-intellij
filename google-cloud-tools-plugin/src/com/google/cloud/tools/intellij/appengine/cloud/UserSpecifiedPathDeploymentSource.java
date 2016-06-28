@@ -34,7 +34,8 @@ import javax.swing.Icon;
  * A deployment source used as a placeholder to allow user selection of a jar or war file from the
  * filesystem.
  */
-class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl {
+public class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl
+    implements AppEngineDeployable {
 
   private String name =
       GctBundle.message("appengine.flex.user.specified.deploymentsource.name");
@@ -80,5 +81,10 @@ class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl {
   public DeploymentSourceType<?> getType() {
     return DeploymentSourceType.EP_NAME.findExtension(
         UserSpecifiedPathDeploymentSourceType.class);
+  }
+
+  @Override
+  public AppEngineEnvironment getEnvironment() {
+    return AppEngineEnvironment.APP_ENGINE_FLEX;
   }
 }

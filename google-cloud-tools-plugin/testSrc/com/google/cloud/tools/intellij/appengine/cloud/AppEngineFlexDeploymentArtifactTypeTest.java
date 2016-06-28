@@ -23,25 +23,25 @@ import org.junit.Test;
 import java.io.File;
 
 /**
- * Test cases for {@link DeploymentArtifactType}.
+ * Test cases for {@link AppEngineFlexDeploymentArtifactType}.
  */
-public class DeploymentArtifactTypeTest {
+public class AppEngineFlexDeploymentArtifactTypeTest {
 
   @Test
   public void testTypeForPath_jar() throws Exception {
-    assertEquals(DeploymentArtifactType.JAR,
-        DeploymentArtifactType.typeForPath(new File("/some/path/to/a.jar")));
+    assertEquals(AppEngineFlexDeploymentArtifactType.JAR,
+        AppEngineFlexDeploymentArtifactType.typeForPath(new File("/some/path/to/a.jar")));
   }
 
   @Test
   public void testTypeForPath_war() throws Exception {
-    assertEquals(DeploymentArtifactType.WAR,
-        DeploymentArtifactType.typeForPath(new File("/some/path/to/a.war")));
+    assertEquals(AppEngineFlexDeploymentArtifactType.WAR,
+        AppEngineFlexDeploymentArtifactType.typeForPath(new File("/some/path/to/a.war")));
   }
 
   @Test
   public void testTypeForPath_anythingElse() throws Exception {
-    assertEquals(DeploymentArtifactType.UNKNOWN,
-        DeploymentArtifactType.typeForPath(new File("/some/path/to/a.txt")));
+    assertEquals(AppEngineFlexDeploymentArtifactType.UNKNOWN,
+        AppEngineFlexDeploymentArtifactType.typeForPath(new File("/some/path/to/a.txt")));
   }
 }

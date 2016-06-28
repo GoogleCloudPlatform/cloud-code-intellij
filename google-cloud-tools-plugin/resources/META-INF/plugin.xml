@@ -23,8 +23,8 @@ Code inspections for App Engine Java code.</description>
   <!-- "version" set by gradle-intellij-plugin -->
   <!-- "idea-version since-build" set by gradle-intellij-plugin -->
   <!-- Workaround for gradle-intellij-plugin limitation: https://github.com/JetBrains/gradle-intellij-plugin/issues/66 -->
-  <!-- Setting version to 15.0.3 and up. https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+15+143.1821.5+Release+Notes -->
-  <idea-version since-build="143.1821.5" />
+  <!-- Setting version to 15.0.6 and up. https://confluence.jetbrains.com/display/IDEADEV/IDEA+15+EAP -->
+  <idea-version since-build="143.2370.31" />
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>

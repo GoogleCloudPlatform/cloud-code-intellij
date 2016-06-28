@@ -35,7 +35,8 @@ import javax.swing.Icon;
 /**
  * A deployment source backed by the Maven build system.
  */
-public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl {
+public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
+    implements AppEngineDeployable {
 
   private final Project project;
 
@@ -82,5 +83,10 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl {
             + mavenProject.getPackaging();
 
     return new File(targetBuild);
+  }
+
+  @Override
+  public AppEngineEnvironment getEnvironment() {
+    return AppEngineEnvironment.APP_ENGINE_FLEX;
   }
 }

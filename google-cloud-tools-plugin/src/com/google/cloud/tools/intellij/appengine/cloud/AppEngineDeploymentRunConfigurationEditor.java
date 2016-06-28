@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -45,6 +46,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.awt.RelativePoint;
@@ -66,6 +68,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
@@ -76,6 +79,7 @@ import javax.swing.event.DocumentEvent;
  */
 public class AppEngineDeploymentRunConfigurationEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
+  private Project project;
 
   private JComboBox configTypeComboBox;
   private JPanel appEngineConfigFilesPanel;
@@ -90,7 +94,11 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private PlaceholderTextField versionIdField;
   private JCheckBox versionOverrideCheckBox;
   private ProjectSelector projectSelector;
+  private JLabel environmentLabel;
+  private JPanel appEngineFlexConfigPanel;
+
   private DeploymentSource deploymentSource;
+  private AppEngineEnvironment environment;
 
   private static final String COST_WARNING_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
   private static final String COST_WARNING_CLOSE_TAG = "</i></font></html>";
@@ -105,8 +113,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
    */
   public AppEngineDeploymentRunConfigurationEditor(
       final Project project,
-      final DeploymentSource deploymentSource,
+      final AppEngineDeployable deploymentSource,
       final AppEngineHelper appEngineHelper) {
+    this.project = project;
     this.deploymentSource = deploymentSource;
 
     versionIdField.setPlaceholderText(GctBundle.message("appengine.flex.version.placeholder.text"));
@@ -114,14 +123,22 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
 
-    appEngineCostWarningLabel.setText(
-        GctBundle.message("appengine.flex.deployment.cost.warning",
-            COST_WARNING_OPEN_TAG,
-            COST_WARNING_HREF_OPEN_TAG,
-            COST_WARNING_HREF_CLOSE_TAG,
-            COST_WARNING_CLOSE_TAG));
-    appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
+    environment = deploymentSource.getEnvironment();
+
+    if (environment.isFlexible()) {
+      appEngineCostWarningLabel.setText(
+          GctBundle.message("appengine.flex.deployment.cost.warning",
+              COST_WARNING_OPEN_TAG,
+              COST_WARNING_HREF_OPEN_TAG,
+              COST_WARNING_HREF_CLOSE_TAG,
+              COST_WARNING_CLOSE_TAG));
+      appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+      appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
+      environmentLabel.setText(getEnvironmentDisplayableLabel());
+    } else {
+      appEngineCostWarningLabel.setVisible(false);
+      environmentLabel.setText(environment.localizedLabel());
+    }
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
     configTypeComboBox.setSelectedItem(ConfigType.AUTO);
@@ -196,11 +213,15 @@ public class AppEngineDeploymentRunConfigurationEditor extends
               @Override
               public File get() {
                 return appEngineHelper.defaultDockerfile(
-                    DeploymentArtifactType.typeForPath(deploymentSource.getFile()));
+                    AppEngineFlexDeploymentArtifactType.typeForPath(deploymentSource.getFile()));
               }
             }, dockerFilePathField, userSpecifiedArtifactFileSelector));
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
+
+    appEngineFlexConfigPanel.setVisible(
+        environment == AppEngineEnvironment.APP_ENGINE_FLEX
+            && !AppEngineUtil.isFlexCompat(project, deploymentSource));
   }
 
   @Override
@@ -228,6 +249,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     if (selectedUser != null) {
       configuration.setGoogleUsername(selectedUser.getEmail());
     }
+    configuration.setEnvironment(environment.name());
     configuration.setUserSpecifiedArtifact(isUserSpecifiedPathDeploymentSource());
     configuration.setUserSpecifiedArtifactPath(userSpecifiedArtifactFileSelector.getText());
     configuration.setDockerFilePath(dockerFilePathField.getText());
@@ -246,8 +268,35 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   @VisibleForTesting
+  JLabel getEnvironmentLabel() {
+    return environmentLabel;
+  }
+
+  @VisibleForTesting
+  JPanel getAppEngineFlexConfigPanel() {
+    return appEngineFlexConfigPanel;
+  }
+
+  @VisibleForTesting
   void setProjectSelector(ProjectSelector projectSelector) {
     this.projectSelector = projectSelector;
+  }
+
+  /**
+   * If a project's appengine-web.xml contains <env>flex</env> then we want to override
+   * the default localized label of the environment
+   */
+  private String getEnvironmentDisplayableLabel() {
+    XmlTag compatConfig = AppEngineUtil.getFlexCompatXmlConfiguration(project, deploymentSource);
+
+    if (compatConfig != null) {
+      if ("env".equalsIgnoreCase(compatConfig.getName())
+          && "flex".equalsIgnoreCase(compatConfig.getValue().getTrimmedText())) {
+        return GctBundle.message("appengine.environment.name.mvm");
+      }
+    }
+
+    return environment.localizedLabel();
   }
 
   private void updateJarWarSelector() {

@@ -24,6 +24,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.runtime.deployment.DeploymentLogManager;
 import com.intellij.remoteServer.runtime.deployment.DeploymentTask;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance;
@@ -41,7 +42,7 @@ class AppEngineRuntimeInstance extends
     ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
   private AppEngineServerConfiguration configuration;
-  private final Set<AppEngineDeployAction> createdDeployments;
+  private final Set<CancellableRunnable> createdDeployments;
 
   public AppEngineRuntimeInstance(
       AppEngineServerConfiguration configuration) {
@@ -63,27 +64,22 @@ class AppEngineRuntimeInstance extends
     }
 
     File gcloudCommandPath = new File(configuration.getCloudSdkHomePath());
-    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(gcloudCommandPath);
-
-    final AppEngineDeployAction deployAction;
-    AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
-    File deploymentSource = task.getSource().getFile();
-    if (deploymentSource == null) {
-      callback.errorOccurred(GctBundle.message("appengine.deployment.source.not.found.error"));
-      return;
-    }
-
-    deployAction = appEngineHelper.createDeploymentAction(
-        logManager.getMainLoggingHandler(),
+    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
         task.getProject(),
-        deploymentSource,
+        gcloudCommandPath);
+
+    AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
+
+
+    final CancellableRunnable deployRunner =  appEngineHelper.createDeployRunner(
+        logManager.getMainLoggingHandler(),
+        task.getSource(),
         deploymentConfig,
-        callback
-    );
+        callback);
 
     // keep track of any active deployments
     synchronized (createdDeployments) {
-      createdDeployments.add(deployAction);
+      createdDeployments.add(deployRunner);
     }
 
     ProgressManager.getInstance()
@@ -92,7 +88,7 @@ class AppEngineRuntimeInstance extends
             null) {
           @Override
           public void run(@NotNull ProgressIndicator indicator) {
-            ApplicationManager.getApplication().invokeLater(deployAction);
+            ApplicationManager.getApplication().invokeLater(deployRunner);
           }
         });
   }
@@ -105,8 +101,8 @@ class AppEngineRuntimeInstance extends
   public void disconnect() {
     // kill any executing deployment actions
     synchronized (createdDeployments) {
-      for (AppEngineDeployAction action : createdDeployments) {
-        action.cancel();
+      for (CancellableRunnable runnable : createdDeployments) {
+        runnable.cancel();
       }
       createdDeployments.clear();
     }

@@ -47,8 +47,8 @@ public class AppEngineToolsMenuAction extends AnAction {
    * Initialize the tools menu shortcut.
    */
   public AppEngineToolsMenuAction() {
-    super(GctBundle.message("appengine.flex.tools.menu.item.label"),
-        GctBundle.message("appengine.flex.tools.menu.item.label"),
+    super(GctBundle.message("appengine.tools.menu.item.label"),
+        GctBundle.message("appengine.tools.menu.item.label"),
         GoogleCloudToolsIcons.APP_ENGINE);
   }
 

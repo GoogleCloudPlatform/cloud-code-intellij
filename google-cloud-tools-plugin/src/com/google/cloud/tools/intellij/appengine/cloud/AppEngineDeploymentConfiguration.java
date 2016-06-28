@@ -47,9 +47,19 @@ public class AppEngineDeploymentConfiguration extends
   }
 
   public static final String USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE = "userSpecifiedArtifactPath";
+  public static final String ENVIRONMENT_ATTRIBUTE = "environment";
 
   private String cloudProjectName;
   private String googleUsername;
+
+  /**
+   * Environment is stored here in order to restore the environment when this configuration is
+   * deserialized. At deserialization time, we cannot resolve the environment via the normal means
+   * of inspecting the Project's modules and artifacts because this happens before the modules have
+   * been loaded.
+   */
+  private String environment;
+
   private String dockerFilePath;
   private String appYamlPath;
   private boolean userSpecifiedArtifact;
@@ -65,6 +75,11 @@ public class AppEngineDeploymentConfiguration extends
   @Attribute("googleUsername")
   public String getGoogleUsername() {
     return googleUsername;
+  }
+
+  @Attribute(ENVIRONMENT_ATTRIBUTE)
+  public String getEnvironment() {
+    return environment;
   }
 
   @Attribute("userSpecifiedArtifact")
@@ -107,6 +122,10 @@ public class AppEngineDeploymentConfiguration extends
 
   public void setGoogleUsername(String googleUsername) {
     this.googleUsername = googleUsername;
+  }
+
+  public void setEnvironment(String environment) {
+    this.environment = environment;
   }
 
   public void setUserSpecifiedArtifact(boolean userSpecifiedArtifact) {

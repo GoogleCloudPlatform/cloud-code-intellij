@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stats;
+package com.google.cloud.tools.intellij.appengine.cloud;
+
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 
 /**
- * For usage tracker of the Google Login actions.
+ * Encapsulates a task to be run on Google App Engine.
  */
-public class LoginTracking {
+public interface AppEngineTask {
 
-  private LoginTracking() {
-  }
+  /**
+   * Executes an App Engine task.
+   * @param startListener a callback for retrieving the running process
+   */
+  void execute(ProcessStartListener startListener);
 
-  public static final String LOGIN_START = "user.login.start";
-  public static final String LOGIN_CANCELLED = "user.login.cancelled";
-  public static final String LOGIN_COMPLETE = "user.login.complete";
 }

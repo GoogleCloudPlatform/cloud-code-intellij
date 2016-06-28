@@ -16,27 +16,20 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.module.ModulePointer;
-import com.intellij.openapi.module.ModulePointerManager;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
+
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfigurator;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
-import com.intellij.remoteServer.configuration.deployment.JavaDeploymentSourceUtil;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.idea.maven.project.MavenProject;
-import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,6 +37,8 @@ import java.util.List;
  */
 class AppEngineDeploymentConfigurator extends
     DeploymentConfigurator<AppEngineDeploymentConfiguration, AppEngineServerConfiguration> {
+
+  private static final Logger logger = Logger.getInstance(AppEngineDeploymentConfigurator.class);
 
   private final Project project;
 
@@ -56,48 +51,10 @@ class AppEngineDeploymentConfigurator extends
   public List<DeploymentSource> getAvailableDeploymentSources() {
     List<DeploymentSource> deploymentSources = new ArrayList<>();
 
-    for (Module module : ModuleManager.getInstance(project).getModules()) {
-      if (isJarOrWarMavenBuild(module)) {
-        deploymentSources.add(
-            new MavenBuildDeploymentSource(
-                ModulePointerManager.getInstance(project).create(module), project));
-      }
-    }
-
-    ModulePointer modulePointer =
-        ModulePointerManager.getInstance(project).create("userSpecifiedSource");
-    deploymentSources.add(new UserSpecifiedPathDeploymentSource(modulePointer));
-
-    deploymentSources.addAll(JavaDeploymentSourceUtil
-        .getInstance().createArtifactDeploymentSources(project, getJarAndWarArtifacts()));
+    deploymentSources.addAll(AppEngineUtil.createArtifactDeploymentSources(project));
+    deploymentSources.addAll(AppEngineUtil.createModuleDeploymentSources(project));
 
     return deploymentSources;
-  }
-
-  private boolean isJarOrWarMavenBuild(Module module) {
-    MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(project);
-    MavenProject mavenProject = projectsManager.findProject(module);
-
-    boolean isMavenProject = projectsManager.isMavenizedModule(module)
-        && mavenProject != null;
-
-    return isMavenProject
-        && ("jar".equalsIgnoreCase(mavenProject.getPackaging())
-        || "war".equalsIgnoreCase(mavenProject.getPackaging()));
-
-  }
-
-  private List<Artifact> getJarAndWarArtifacts() {
-    List<Artifact> jarsAndWars = new ArrayList<>();
-    for (Artifact artifact : ArtifactManager.getInstance(project).getArtifacts()) {
-      if (artifact.getArtifactType().getId().equalsIgnoreCase("jar")
-          || artifact.getArtifactType().getId().equalsIgnoreCase("war")) {
-        jarsAndWars.add(artifact);
-      }
-    }
-
-    Collections.sort(jarsAndWars, ArtifactManager.ARTIFACT_COMPARATOR);
-    return jarsAndWars;
   }
 
   @NotNull
@@ -112,9 +69,19 @@ class AppEngineDeploymentConfigurator extends
   public SettingsEditor<AppEngineDeploymentConfiguration> createEditor(
       @NotNull DeploymentSource source,
       @NotNull RemoteServer<AppEngineServerConfiguration> server) {
+    if (!(source instanceof AppEngineDeployable)) {
+      logger.error(
+          String.format("Deployment source with name %s is not deployable to App Engine.",
+              source.getPresentableName()));
+      return null;
+    }
+
     return new AppEngineDeploymentRunConfigurationEditor(
         project,
-        source,
-        new CloudSdkAppEngineHelper(new File(server.getConfiguration().getCloudSdkHomePath())));
+        (AppEngineDeployable) source,
+        new CloudSdkAppEngineHelper(
+            project,
+            new File(server.getConfiguration().getCloudSdkHomePath()))
+    );
   }
 }

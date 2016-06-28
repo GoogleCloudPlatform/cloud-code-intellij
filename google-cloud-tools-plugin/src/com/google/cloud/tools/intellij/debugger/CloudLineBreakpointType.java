@@ -155,7 +155,8 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     });
 
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.CATEGORY, GctTracking.CLOUD_DEBUGGER, "create.breakpoint", null);
+        .trackEvent(GctTracking.CLOUD_DEBUGGER_CREATE_BREAKPOINT)
+        .ping();
     return result.get() == getClass();
   }
 

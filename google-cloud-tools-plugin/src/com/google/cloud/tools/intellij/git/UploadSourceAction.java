@@ -113,8 +113,7 @@ public class UploadSourceAction extends DumbAwareAction {
 
   @Override
   public void actionPerformed(final AnActionEvent event) {
-    UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.CATEGORY, GctTracking.VCS, "upload", null);
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.VCS_UPLOAD).ping();
 
     final Project project = event.getData(CommonDataKeys.PROJECT);
     final VirtualFile file = event.getData(CommonDataKeys.VIRTUAL_FILE);
