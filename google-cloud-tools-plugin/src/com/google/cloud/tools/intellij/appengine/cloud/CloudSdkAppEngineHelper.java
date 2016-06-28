@@ -22,7 +22,6 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
@@ -137,8 +136,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         targetEnvironment,
         wrapCallbackForUsageTracking(callback, deploymentConfiguration, targetEnvironment));
 
-    boolean isFlexCompat =
-        targetEnvironment.isFlexible() && AppEngineUtil.isFlexCompat(project, source);
+    boolean isFlexCompat = targetEnvironment.isFlexible()
+        && AppEngineProjectHelper.getInstance().isFlexCompat(project, source);
     if (targetEnvironment.isStandard() || isFlexCompat) {
       return createStandardRunner(loggingHandler, source.getFile(), deploy, isFlexCompat);
     } else if (targetEnvironment.isFlexible()) {

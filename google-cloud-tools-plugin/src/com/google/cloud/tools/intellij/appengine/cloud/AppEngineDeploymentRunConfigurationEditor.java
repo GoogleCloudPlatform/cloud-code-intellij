@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -221,7 +220,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     appEngineFlexConfigPanel.setVisible(
         environment == AppEngineEnvironment.APP_ENGINE_FLEX
-            && !AppEngineUtil.isFlexCompat(project, deploymentSource));
+            && !AppEngineProjectHelper.getInstance().isFlexCompat(project, deploymentSource));
   }
 
   @Override
@@ -287,7 +286,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
    * the default localized label of the environment
    */
   private String getEnvironmentDisplayableLabel() {
-    XmlTag compatConfig = AppEngineUtil.getFlexCompatXmlConfiguration(project, deploymentSource);
+    XmlTag compatConfig = AppEngineProjectHelper.getInstance()
+        .getFlexCompatXmlConfiguration(project, deploymentSource);
 
     if (compatConfig != null) {
       if ("env".equalsIgnoreCase(compatConfig.getName())
