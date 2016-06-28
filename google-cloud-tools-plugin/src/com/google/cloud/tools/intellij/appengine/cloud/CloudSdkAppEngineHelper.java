@@ -137,7 +137,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         wrapCallbackForUsageTracking(callback, deploymentConfiguration, targetEnvironment));
 
     boolean isFlexCompat = targetEnvironment.isFlexible()
-        && AppEngineProjectHelper.getInstance().isFlexCompat(project, source);
+        && AppEngineProjectService.getInstance().isFlexCompat(project, source);
     if (targetEnvironment.isStandard() || isFlexCompat) {
       return createStandardRunner(loggingHandler, source.getFile(), deploy, isFlexCompat);
     } else if (targetEnvironment.isFlexible()) {

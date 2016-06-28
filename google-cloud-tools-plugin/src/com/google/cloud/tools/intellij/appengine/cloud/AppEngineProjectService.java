@@ -32,12 +32,12 @@ import java.util.Collection;
 /**
  * A set of helper methods for inspecting an App Engine project's structure and configuration.
  */
-public abstract class AppEngineProjectHelper {
+public abstract class AppEngineProjectService {
 
   public static final String APP_ENGINE_STANDARD_FACET_NAME = "Google App Engine";
 
-  public static AppEngineProjectHelper getInstance() {
-    return ServiceManager.getService(AppEngineProjectHelper.class);
+  public static AppEngineProjectService getInstance() {
+    return ServiceManager.getService(AppEngineProjectService.class);
   }
 
   /**
@@ -48,14 +48,12 @@ public abstract class AppEngineProjectHelper {
   public abstract XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
       @NotNull DeploymentSource source);
 
-
   /**
-   * @see AppEngineProjectHelper#getFlexCompatXmlConfiguration(Project, DeploymentSource).
+   * @see AppEngineProjectService#getFlexCompatXmlConfiguration(Project, DeploymentSource).
    */
   @Nullable
   public abstract XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
       @Nullable Artifact artifact);
-
 
   /**
    * Determines if a project is set up like an App Engine standard project but is configured in
@@ -70,7 +68,7 @@ public abstract class AppEngineProjectHelper {
   public abstract boolean isFlexCompat(@NotNull Project project, @NotNull DeploymentSource source);
 
   /**
-   * @see AppEngineProjectHelper#isFlexCompat(Project, DeploymentSource).
+   * @see AppEngineProjectService#isFlexCompat(Project, DeploymentSource).
    */
   public abstract boolean isFlexCompat(@NotNull Project project, @Nullable Artifact artifact);
 
@@ -97,12 +95,14 @@ public abstract class AppEngineProjectHelper {
       @NotNull Module module);
 
   /**
-   * @see AppEngineProjectHelper#containsAppEngineStandardArtifacts(Project, Module).
+   * @see AppEngineProjectService#containsAppEngineStandardArtifacts(Project, Module).
    */
   public abstract boolean containsAppEngineStandardArtifacts(Project project,
       Collection<Artifact> artifacts);
 
-
+  /**
+   * @see AppEngineProjectService#containsAppEngineStandardArtifacts(Project, Module).
+   */
   public abstract boolean isAppEngineStandardArtifact(@NotNull Project project,
       @NotNull Artifact artifact);
 

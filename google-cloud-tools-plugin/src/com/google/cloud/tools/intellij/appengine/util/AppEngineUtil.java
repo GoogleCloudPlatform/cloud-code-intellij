@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.util;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineProjectHelper;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSource;
 import com.google.common.collect.Lists;
@@ -63,7 +63,7 @@ public class AppEngineUtil {
   public static List<AppEngineArtifactDeploymentSource> createArtifactDeploymentSources(
       @NotNull Project project) {
     List<AppEngineArtifactDeploymentSource> sources = Lists.newArrayList();
-    AppEngineProjectHelper aeProjectHelper = AppEngineProjectHelper.getInstance();
+    AppEngineProjectService aeProjectHelper = AppEngineProjectService.getInstance();
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
       Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
@@ -101,7 +101,7 @@ public class AppEngineUtil {
   public static List<ModuleDeploymentSource> createModuleDeploymentSources(
       @NotNull Project project) {
     List<ModuleDeploymentSource> moduleDeploymentSources = Lists.newArrayList();
-    AppEngineProjectHelper aeProjectHelper = AppEngineProjectHelper.getInstance();
+    AppEngineProjectService aeProjectHelper = AppEngineProjectService.getInstance();
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
       if (ModuleType.is(module, JavaModuleType.getModuleType())

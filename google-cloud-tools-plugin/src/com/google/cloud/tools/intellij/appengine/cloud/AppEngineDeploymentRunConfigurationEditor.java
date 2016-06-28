@@ -220,7 +220,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     appEngineFlexConfigPanel.setVisible(
         environment == AppEngineEnvironment.APP_ENGINE_FLEX
-            && !AppEngineProjectHelper.getInstance().isFlexCompat(project, deploymentSource));
+            && !AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
   }
 
   @Override
@@ -286,7 +286,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
    * the default localized label of the environment
    */
   private String getEnvironmentDisplayableLabel() {
-    XmlTag compatConfig = AppEngineProjectHelper.getInstance()
+    XmlTag compatConfig = AppEngineProjectService.getInstance()
         .getFlexCompatXmlConfiguration(project, deploymentSource);
 
     if (compatConfig != null) {

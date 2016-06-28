@@ -42,7 +42,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-public class AppEngineProjectHelperImpl extends AppEngineProjectHelper {
+public class AppEngineProjectServiceImpl extends AppEngineProjectService {
 
   @Nullable
   @Override
