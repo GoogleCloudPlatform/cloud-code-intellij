@@ -123,14 +123,15 @@ public class AppEngineProjectServiceImplTest extends PlatformTestCase {
     Artifact artifact = createTestArtifact(new ExplodedWarArtifactTestType());
     addAppEngineFacet(createModule("myModule"));
 
-    // Load flex-compat appengine-web.xml
-    when(appEngineAssetProvider
-        .loadAppEngineStandardWebXml(any(Project.class), any(Artifact.class)))
-        .thenReturn(loadTestFlexCompatWebXml("testData/descriptor/appengine-web_flex-compat.xml"));
+    // Load flex-compat appengine-web.xml with vm: true
+    mockLoadWebXml("testData/descriptor/appengine-web_flex-compat_vm.xml");
+    assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
+        appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), artifact));
 
-    AppEngineEnvironment environment
-        = appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), artifact);
-    assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX, environment);
+    // Load flex-compat appengine-web.xml with env: flex
+    mockLoadWebXml("testData/descriptor/appengine-web_flex-compat_env.xml");
+    assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
+        appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), artifact));
   }
 
   public void testIsAppEngineStandardArtifact() {
@@ -170,6 +171,13 @@ public class AppEngineProjectServiceImplTest extends PlatformTestCase {
     return vFile == null
         ? null
         : (XmlFile) PsiManager.getInstance(getProject()).findFile(vFile);
+  }
+
+  private void mockLoadWebXml(String path) {
+    when(appEngineAssetProvider
+        .loadAppEngineStandardWebXml(any(Project.class), any(Artifact.class)))
+        .thenReturn(
+            loadTestFlexCompatWebXml(path));
   }
 
   @SuppressWarnings("unchecked")
