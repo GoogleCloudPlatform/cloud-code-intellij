@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.project;
+
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 
@@ -60,8 +61,8 @@ public abstract class AppEngineProjectService {
    * 'compatibility' mode. This indicates that the project runs in the flexible environment.
    *
    * <p>A flex compat project has an appengine-web.xml with either:
-   * {
-   * @code <vm>true</vm>
+   * {@code
+   * <vm>true</vm>
    * <env>flex</env>
    * }
    */
@@ -79,12 +80,7 @@ public abstract class AppEngineProjectService {
   public abstract AppEngineEnvironment getAppEngineArtifactEnvironment(@NotNull Project project,
       @NotNull Artifact artifact);
 
-  /**
-   * Returns the project's appengine-web.xml or null if it does not exist.
-   */
-  @Nullable
-  public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
-      @NotNull Artifact artifact);
+
 
   /**
    * Determines if a module has App Engine standard deployable artifacts. An artifact is considered

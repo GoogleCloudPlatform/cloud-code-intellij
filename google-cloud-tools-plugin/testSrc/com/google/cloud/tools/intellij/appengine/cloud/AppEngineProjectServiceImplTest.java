@@ -16,6 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProviderImpl;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectServiceImpl;
+
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.FacetManager;
@@ -24,14 +33,18 @@ import com.intellij.facet.FacetTypeId;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.facet.ui.FacetValidatorsManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.module.ModuleType;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactType;
 import com.intellij.packaging.elements.CompositePackagingElement;
@@ -41,11 +54,16 @@ import com.intellij.packaging.impl.artifacts.JarArtifactType;
 import com.intellij.packaging.impl.elements.ArtifactRootElementImpl;
 import com.intellij.packaging.impl.elements.ModuleOutputPackagingElementBase;
 import com.intellij.packaging.impl.elements.TestModuleOutputPackagingElement;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.xml.XmlFile;
 import com.intellij.testFramework.PlatformTestCase;
 
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.picocontainer.MutablePicoContainer;
+
+import java.io.File;
 
 import javax.swing.Icon;
 
@@ -55,10 +73,20 @@ import javax.swing.Icon;
 public class AppEngineProjectServiceImplTest extends PlatformTestCase {
 
   private AppEngineProjectService appEngineProjectService;
+  private AppEngineAssetProvider appEngineAssetProvider;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
+
+    MutablePicoContainer applicationContainer = (MutablePicoContainer)
+        ApplicationManager.getApplication().getPicoContainer();
+
+    appEngineAssetProvider = mock(AppEngineAssetProviderImpl.class);
+    applicationContainer.unregisterComponent(AppEngineAssetProvider.class.getName());
+    applicationContainer.registerComponentInstance(
+        AppEngineAssetProvider.class.getName(), appEngineAssetProvider);
+
     appEngineProjectService = new AppEngineProjectServiceImpl();
   }
 
@@ -85,20 +113,18 @@ public class AppEngineProjectServiceImplTest extends PlatformTestCase {
         appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), warArtifact));
   }
 
-  // TODO failing test
   public void testGetAppEngineArtifactEnvironment_FlexibleCompat() {
     Artifact artifact = createTestArtifact(new ExplodedWarArtifactTestType());
     addAppEngineFacet(createModule("myModule"));
+
+    // Mock the flex-compat appengine-web.xml
+    when(appEngineAssetProvider
+        .loadAppEngineStandardWebXml(any(Project.class), any(Artifact.class)))
+        .thenReturn(loadTestFlexCompatWebXml());
+
     AppEngineEnvironment environment
         = appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), artifact);
-
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX, environment);
-  }
-
-
-  // TODO need to externalize virtual filesystem access so it can mocked
-  public void testLoadAppEngineStandardWebXml() {
-
   }
 
   public void testIsAppEngineStandardArtifact() {
@@ -129,6 +155,15 @@ public class AppEngineProjectServiceImplTest extends PlatformTestCase {
             new AppEngineFacetTestType(), "Google App Engine", null);
       }
     }.execute();
+  }
+
+  private XmlFile loadTestFlexCompatWebXml() {
+    VirtualFile vFile = LocalFileSystem.getInstance().findFileByIoFile(
+        new File("testData/descriptor/appengine-web_flex-compat.xml"));
+
+    return vFile == null
+        ? null
+        : (XmlFile) PsiManager.getInstance(getProject()).findFile(vFile);
   }
 
   @SuppressWarnings("unchecked")

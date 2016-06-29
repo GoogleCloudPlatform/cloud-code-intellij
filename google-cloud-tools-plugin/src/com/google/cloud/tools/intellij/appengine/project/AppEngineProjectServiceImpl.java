@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.project;
+
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.artifacts.ArtifactManager;
-import com.intellij.packaging.elements.PackagingElementResolvingContext;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
-import com.intellij.util.xml.DomFileElement;
-import com.intellij.util.xml.DomManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +39,12 @@ import java.util.Collections;
 import java.util.Set;
 
 public class AppEngineProjectServiceImpl extends AppEngineProjectService {
+
+  private AppEngineAssetProvider assetProvider;
+
+  public AppEngineProjectServiceImpl() {
+    assetProvider = AppEngineAssetProvider.getInstance();
+  }
 
   @Nullable
   @Override
@@ -59,21 +61,16 @@ public class AppEngineProjectServiceImpl extends AppEngineProjectService {
       return null;
     }
 
-    XmlFile webXml = loadAppEngineStandardWebXml(project, artifact);
+    XmlFile webXml = assetProvider.loadAppEngineStandardWebXml(project, artifact);
 
     if (webXml != null) {
-      DomManager manager = DomManager.getDomManager(project);
-      DomFileElement element = manager.getFileElement(webXml);
-
-      if (element != null) {
-        XmlTag root = element.getRootElement().getXmlTag();
-        if (root != null) {
-          XmlTag vmTag = root.findFirstSubTag("vm");
-          if (vmTag != null) {
-            return vmTag;
-          } else {
-            return root.findFirstSubTag("env");
-          }
+      XmlTag root = webXml.getRootTag();
+      if (root != null) {
+        XmlTag vmTag = root.findFirstSubTag("vm");
+        if (vmTag != null) {
+          return vmTag;
+        } else {
+          return root.findFirstSubTag("env");
         }
       }
     }
@@ -122,21 +119,6 @@ public class AppEngineProjectServiceImpl extends AppEngineProjectService {
     } else {
       return null;
     }
-  }
-
-  @Nullable
-  @Override
-  public XmlFile loadAppEngineStandardWebXml(@NotNull Project project, @NotNull Artifact artifact) {
-    PackagingElementResolvingContext context = ArtifactManager.getInstance(project)
-        .getResolvingContext();
-    VirtualFile descriptorFile = ArtifactUtil
-        .findSourceFileByOutputPath(artifact, "WEB-INF/appengine-web.xml", context);
-
-    if (descriptorFile != null) {
-      return (XmlFile) PsiManager.getInstance(project).findFile(descriptorFile);
-    }
-
-    return null;
   }
 
   @Override
