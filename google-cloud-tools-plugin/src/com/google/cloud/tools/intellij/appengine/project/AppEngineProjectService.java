@@ -80,8 +80,6 @@ public abstract class AppEngineProjectService {
   public abstract AppEngineEnvironment getAppEngineArtifactEnvironment(@NotNull Project project,
       @NotNull Artifact artifact);
 
-
-
   /**
    * Determines if a module has App Engine standard deployable artifacts. An artifact is considered
    * deployable to App Engine standard if it has the AE facet and it is an exploded war artifact

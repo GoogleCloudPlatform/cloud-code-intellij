@@ -93,6 +93,12 @@ public class AppEngineProjectServiceImplTest extends PlatformTestCase {
   public void testGetAppEngineArtifactEnvironment_Standard() {
     Artifact artifact = createTestArtifact(new ExplodedWarArtifactTestType());
     addAppEngineFacet(createModule("myModule"));
+
+    // Load "plain" appengine-web.xml
+    when(appEngineAssetProvider
+        .loadAppEngineStandardWebXml(any(Project.class), any(Artifact.class)))
+        .thenReturn(loadTestFlexCompatWebXml("testData/descriptor/appengine-web.xml"));
+
     AppEngineEnvironment environment
         = appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), artifact);
 
@@ -117,10 +123,10 @@ public class AppEngineProjectServiceImplTest extends PlatformTestCase {
     Artifact artifact = createTestArtifact(new ExplodedWarArtifactTestType());
     addAppEngineFacet(createModule("myModule"));
 
-    // Mock the flex-compat appengine-web.xml
+    // Load flex-compat appengine-web.xml
     when(appEngineAssetProvider
         .loadAppEngineStandardWebXml(any(Project.class), any(Artifact.class)))
-        .thenReturn(loadTestFlexCompatWebXml());
+        .thenReturn(loadTestFlexCompatWebXml("testData/descriptor/appengine-web_flex-compat.xml"));
 
     AppEngineEnvironment environment
         = appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), artifact);
@@ -157,9 +163,9 @@ public class AppEngineProjectServiceImplTest extends PlatformTestCase {
     }.execute();
   }
 
-  private XmlFile loadTestFlexCompatWebXml() {
+  private XmlFile loadTestFlexCompatWebXml(String path) {
     VirtualFile vFile = LocalFileSystem.getInstance().findFileByIoFile(
-        new File("testData/descriptor/appengine-web_flex-compat.xml"));
+        new File(path));
 
     return vFile == null
         ? null
