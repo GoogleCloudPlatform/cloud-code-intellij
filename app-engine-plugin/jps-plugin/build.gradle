@@ -1,0 +1,11 @@
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.main.resources.srcDirs = ['resources']
+sourceSets.test.java.srcDirs = ['testSource']
+sourceSets.test.resources.srcDirs = ['testData']
+
+jar.archiveName = "google-app-engine-jps-plugin.jar"
+
+dependencies {
+    compile project(':app-engine-plugin:runtime')
+    testCompile group: 'com.jetbrains.intellij.idea', name:'jps-build-test', version: ideaVersion
+}

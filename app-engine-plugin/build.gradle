@@ -1,0 +1,47 @@
+sourceSets.main.java.srcDirs = ['source', 'gen']
+sourceSets.main.resources.srcDirs = ['resources']
+sourceSets.test.java.srcDirs = ['testSource']
+sourceSets.test.resources.srcDirs = ['testData']
+
+def appEnginePluginName = 'google-app-engine'
+intellij {
+    pluginName = appEnginePluginName
+    plugins 'maven', 'properties', 'java-i18n'
+}
+
+apply plugin: 'idea'
+idea {
+    module {
+        generatedSourceDirs += file('gen')
+    }
+}
+
+dependencies {
+    compile project('jps-plugin')
+    compile project('runtime')
+}
+
+task testJar(type: Jar, dependsOn: testClasses) {
+    baseName = "${project.archivesBaseName}-tests"
+    from sourceSets.test.output
+}
+
+configurations {
+    tests
+}
+
+artifacts {
+    tests testJar
+}
+
+//todo: currently we need this to include 'ultimate' module to the plugin zip; it would be better to support such inclusion in 'intellij' plugin
+project.afterEvaluate {
+    def task = project.tasks.findByName("prepareSandbox")
+    task.dependsOn project('ultimate').jar
+    task.doLast {
+        copy {
+            from files(project('ultimate').jar)
+            into "$task.destinationDir/$appEnginePluginName/lib"
+        }
+    }
+}

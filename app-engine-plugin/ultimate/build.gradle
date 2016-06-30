@@ -1,0 +1,25 @@
+sourceSets.main.resources.srcDirs = ['resources']
+sourceSets.main.java.srcDirs = ['source']
+sourceSets.test.java.srcDirs = ['testSrc']
+
+intellij {
+    //actually only 'JavaEE' and 'GwtStudio' plugins are required, the others are transitive dependencies
+    plugins 'JavaEE', 'GwtStudio',
+            'maven', 'properties', 'java-i18n',
+            'DatabaseTools', 'PersistenceSupport', 'JavaScriptLanguage', 'CSS', 'jsp'
+}
+
+//todo: we need to manually add dependency on 'app-engine-plugin' project because
+// if we add simple project(':app-engine-plugin') it will introduce circular dependency for :app-engine-plugin:prepareSandbox
+compileJava.dependsOn project(':app-engine-plugin').tasks.getByName("compileJava")
+dependencies {
+    compile files(project(':app-engine-plugin').sourceSets.main.output)
+    compile files(project(':app-engine-plugin:jps-plugin').sourceSets.main.output)
+    compile files("${System.properties['java.home']}/../lib/tools.jar")
+    testCompile project(path: ':app-engine-plugin', configuration: 'tests')
+    testRuntime files(project(':app-engine-plugin').sourceSets.test.resources.srcDirs)
+}
+
+jar.archiveName = "google-app-engine-ultimate.jar"
+
+
