@@ -22,7 +22,6 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,14 +39,6 @@ public abstract class AppEngineProjectService {
   public static AppEngineProjectService getInstance() {
     return ServiceManager.getService(AppEngineProjectService.class);
   }
-
-  /**
-   * Given an artifact, returns the xml tag corresponding to the artifact's
-   * appengine-web.xml compat configuration or null if there isn't one.
-   */
-  @Nullable
-  public abstract XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
-      @Nullable Artifact artifact);
 
   /**
    * Determines if a deployment source is set up like an App Engine standard deployable but is

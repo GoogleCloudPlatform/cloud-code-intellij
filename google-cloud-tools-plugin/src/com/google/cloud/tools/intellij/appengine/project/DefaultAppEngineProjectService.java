@@ -49,31 +49,6 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     assetProvider = AppEngineAssetProvider.getInstance();
   }
 
-  @Nullable
-  @Override
-  public XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
-      @Nullable Artifact artifact) {
-    if (artifact == null || !isAppEngineStandardArtifact(project, artifact)) {
-      return null;
-    }
-
-    XmlFile webXml = assetProvider.loadAppEngineStandardWebXml(project, artifact);
-
-    if (webXml != null) {
-      XmlTag root = webXml.getRootTag();
-      if (root != null) {
-        XmlTag vmTag = root.findFirstSubTag("vm");
-        if (vmTag != null) {
-          return vmTag;
-        } else {
-          return root.findFirstSubTag("env");
-        }
-      }
-    }
-
-    return null;
-  }
-
   @Override
   public boolean isFlexCompat(@NotNull Project project, @NotNull DeploymentSource source) {
     Artifact artifact = getArtifact(source);
@@ -188,7 +163,35 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
         && ("jar".equalsIgnoreCase(mavenProject.getPackaging())
         || "war".equalsIgnoreCase(mavenProject.getPackaging()));
   }
-  
+
+  /**
+   * Given an artifact, returns the xml tag corresponding to the artifact's
+   * appengine-web.xml compat configuration or null if there isn't one.
+   */
+  @Nullable
+  private XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
+      @Nullable Artifact artifact) {
+    if (artifact == null || !isAppEngineStandardArtifact(project, artifact)) {
+      return null;
+    }
+
+    XmlFile webXml = assetProvider.loadAppEngineStandardWebXml(project, artifact);
+
+    if (webXml != null) {
+      XmlTag root = webXml.getRootTag();
+      if (root != null) {
+        XmlTag vmTag = root.findFirstSubTag("vm");
+        if (vmTag != null) {
+          return vmTag;
+        } else {
+          return root.findFirstSubTag("env");
+        }
+      }
+    }
+
+    return null;
+  }
+
   @Nullable
   private static Artifact getArtifact(@NotNull DeploymentSource source) {
     if (source instanceof ArtifactDeploymentSource) {
