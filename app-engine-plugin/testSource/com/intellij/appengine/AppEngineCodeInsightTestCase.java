@@ -19,7 +19,6 @@ import com.intellij.appengine.facet.AppEngineFacet;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.openapi.application.ex.PathManagerEx;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
 import com.intellij.openapi.util.io.FileUtil;
@@ -33,6 +32,9 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 
 /**
  * @author nik
@@ -97,7 +99,13 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
     return codeInsightFixture;
   }
 
-  private static File getTestDataPath() {
-    return PathManagerEx.findFileUnderCommunityHome("plugins/google-app-engine/testData");
+  public static File getTestDataPath() {
+    try {
+      URL resource = AppEngineCodeInsightTestCase.class.getResource("/sdk");
+      File testDataRoot = Paths.get(resource.toURI()).toFile().getParentFile();
+      return testDataRoot;
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

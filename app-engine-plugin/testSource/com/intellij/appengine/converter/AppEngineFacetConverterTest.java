@@ -15,6 +15,7 @@
  */
 package com.intellij.appengine.converter;
 
+import com.intellij.appengine.AppEngineCodeInsightTestCase;
 import com.intellij.conversion.ProjectConversionTestUtil;
 import com.intellij.conversion.impl.ProjectConversionUtil;
 import com.intellij.openapi.application.ex.PathManagerEx;
@@ -33,12 +34,12 @@ import java.io.IOException;
  */
 public class AppEngineFacetConverterTest extends PlatformTestCase {
   public void testConvert() throws IOException {
-    String testDataPath = "plugins/google-app-engine/testData/conversion/appEngineFacet/";
-    File testData = PathManagerEx.findFileUnderProjectHome(testDataPath + "before", getClass());
+    File testDataRoot = new File(AppEngineCodeInsightTestCase.getTestDataPath(), "conversion/appEngineFacet");
+    File testData = new File(testDataRoot, "before");
     File tempDir = FileUtil.createTempDirectory("app-engine-project", null);
     FileUtil.copyDir(testData, tempDir);
     ProjectConversionTestUtil.convert(tempDir.getAbsolutePath());
-    File expectedDataDir = PathManagerEx.findFileUnderProjectHome(testDataPath + "after", getClass());
+    File expectedDataDir = new File(testDataRoot, "after");
     PlatformTestUtil.assertDirectoriesEqual(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(expectedDataDir),
                                             LocalFileSystem.getInstance().refreshAndFindFileByIoFile(tempDir),
                                             new VirtualFileFilter() {

@@ -22,11 +22,16 @@ import org.jetbrains.jps.appengine.model.PersistenceApi;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.model.serialization.JpsSerializationTestCase;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+
 /**
  * @author nik
  */
 public class JpsAppEngineSerializationTest extends JpsSerializationTestCase {
-  public static final String PROJECT_PATH = "plugins/google-app-engine/jps-plugin/testData/serialization/appEngine";
+  public static final String PROJECT_PATH = "serialization/appEngine";
 
   public void testLoad() {
     loadProject(PROJECT_PATH + "/appEngine.ipr");
@@ -37,5 +42,20 @@ public class JpsAppEngineSerializationTest extends JpsSerializationTestCase {
     assertEquals(PersistenceApi.JPA2, extension.getPersistenceApi());
     assertEquals(FileUtil.toSystemIndependentName(getTestDataFileAbsolutePath(PROJECT_PATH) + "/src"), assertOneElement(extension.getFilesToEnhance()));
     assertTrue(extension.isRunEnhancerOnMake());
+  }
+
+  @Override
+  protected String getTestDataFileAbsolutePath(String relativePath) {
+    return new File(getTestDataPath(), relativePath).getAbsolutePath();
+  }
+
+  public static File getTestDataPath() {
+    try {
+      URL resource = JpsAppEngineSerializationTest.class.getResource("/serialization");
+      File testDataRoot = Paths.get(resource.toURI()).toFile().getParentFile();
+      return testDataRoot;
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
