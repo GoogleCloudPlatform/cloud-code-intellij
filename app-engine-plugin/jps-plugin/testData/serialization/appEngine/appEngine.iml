@@ -10,16 +10,16 @@
           <root url="file://$MODULE_DIR$/war" relative="/" />
         </webroots>
       </configuration>
-      <facet type="google-app-engine" name="Google App Engine">
-        <configuration>
-          <files-to-enhance>
-            <file path="$MODULE_DIR$/src" />
-          </files-to-enhance>
-          <persistence-api>JPA2</persistence-api>
-          <run-enhancer-on-make>true</run-enhancer-on-make>
-          <sdk-home-path>$USER_HOME$/applications/appengine-java-sdk-1.7.3</sdk-home-path>
-        </configuration>
-      </facet>
+    </facet>
+    <facet type="google-app-engine" name="Google App Engine">
+      <configuration>
+        <files-to-enhance>
+          <file path="$MODULE_DIR$/src" />
+        </files-to-enhance>
+        <persistence-api>JPA2</persistence-api>
+        <run-enhancer-on-make>true</run-enhancer-on-make>
+        <sdk-home-path>$USER_HOME$/applications/appengine-java-sdk-1.7.3</sdk-home-path>
+      </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
