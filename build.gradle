@@ -18,11 +18,13 @@ buildscript {
     repositories {
         maven { url "https://plugins.gradle.org/m2/" }
     }
+    dependencies {
+        classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.1.10'
+    }
 }
 
 plugins {
     id 'net.researchgate.release' version '2.3.4'
-    id 'org.jetbrains.intellij' version '0.1.10'
 }
 
 subprojects {
