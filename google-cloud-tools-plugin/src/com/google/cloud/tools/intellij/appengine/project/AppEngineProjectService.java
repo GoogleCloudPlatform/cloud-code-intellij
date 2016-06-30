@@ -50,8 +50,9 @@ public abstract class AppEngineProjectService {
       @Nullable Artifact artifact);
 
   /**
-   * Determines if a project is set up like an App Engine standard project but is configured in
-   * 'compatibility' mode. This indicates that the project runs in the flexible environment.
+   * Determines if a deployment source is set up like an App Engine standard deployable but is
+   * configured in 'compatibility' mode. This indicates that the deployable runs in the flexible
+   * environment.
    *
    * <p>A flex compat deployment source has an appengine-web.xml with either:
    * {@code
