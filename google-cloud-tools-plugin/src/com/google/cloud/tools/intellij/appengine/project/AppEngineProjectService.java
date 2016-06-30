@@ -42,15 +42,8 @@ public abstract class AppEngineProjectService {
   }
 
   /**
-   * Given a deployment source, returns the xml tag corresponding to the project's appengine-web.xml
-   * compat configuration or null if there isn't one.
-   */
-  @Nullable
-  public abstract XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
-      @NotNull DeploymentSource source);
-
-  /**
-   * @see AppEngineProjectService#getFlexCompatXmlConfiguration(Project, DeploymentSource).
+   * Given an artifact, returns the xml tag corresponding to the artifact's
+   * appengine-web.xml compat configuration or null if there isn't one.
    */
   @Nullable
   public abstract XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
@@ -60,7 +53,7 @@ public abstract class AppEngineProjectService {
    * Determines if a project is set up like an App Engine standard project but is configured in
    * 'compatibility' mode. This indicates that the project runs in the flexible environment.
    *
-   * <p>A flex compat project has an appengine-web.xml with either:
+   * <p>A flex compat deployment source has an appengine-web.xml with either:
    * {@code
    * <vm>true</vm>
    * <env>flex</env>
@@ -71,7 +64,10 @@ public abstract class AppEngineProjectService {
   /**
    * @see AppEngineProjectService#isFlexCompat(Project, DeploymentSource).
    */
-  public abstract boolean isFlexCompat(@NotNull Project project, @Nullable Artifact artifact);
+  public abstract boolean isFlexCompat(@NotNull Project project, @NotNull Artifact artifact);
+
+  public abstract boolean isFlexCompatEnvFlex(@NotNull Project project,
+      @NotNull DeploymentSource source);
 
   /**
    * Determines the {@link AppEngineEnvironment} type of the artifact.
@@ -101,18 +97,19 @@ public abstract class AppEngineProjectService {
       @NotNull Artifact artifact);
 
   /**
-   * True if the artifact has the App Engine standard facet.
+   * {@code true} if the artifact is associated with a module that has the App Engine standard
+   * facet.
    */
   public abstract boolean hasAppEngineStandardFacet(@NotNull Project project,
       @NotNull Artifact artifact);
 
   /**
-   * True if the artifact type is an exploded-war.
+   * {@code true} if the artifact type is an exploded-war.
    */
   public abstract boolean isAppEngineStandardArtifactType(@NotNull Artifact artifact);
 
   /**
-   * True if the artifact type is a jar or war.
+   * {@code true} if the artifact type is a jar or war.
    */
   public abstract boolean isAppEngineFlexArtifactType(@NotNull Artifact artifact);
 

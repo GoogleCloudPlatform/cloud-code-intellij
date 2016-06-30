@@ -28,7 +28,7 @@ import com.intellij.psi.xml.XmlFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AppEngineAssetProviderImpl extends AppEngineAssetProvider {
+public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
 
   @Nullable
   @Override

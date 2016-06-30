@@ -38,19 +38,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-public class AppEngineProjectServiceImpl extends AppEngineProjectService {
+/**
+ * Implementation of methods for inspecting an App Engine project's structure and configuration.
+ */
+public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   private AppEngineAssetProvider assetProvider;
 
-  public AppEngineProjectServiceImpl() {
+  public DefaultAppEngineProjectService() {
     assetProvider = AppEngineAssetProvider.getInstance();
-  }
-
-  @Nullable
-  @Override
-  public XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
-      @NotNull DeploymentSource source) {
-    return getFlexCompatXmlConfiguration(project, getArtifact(source));
   }
 
   @Nullable
@@ -80,30 +76,35 @@ public class AppEngineProjectServiceImpl extends AppEngineProjectService {
 
   @Override
   public boolean isFlexCompat(@NotNull Project project, @NotNull DeploymentSource source) {
-    return isFlexCompat(project, getArtifact(source));
+    Artifact artifact = getArtifact(source);
+
+    return artifact != null && isFlexCompat(project, artifact);
   }
 
   @Override
-  public boolean isFlexCompat(@NotNull Project project, @Nullable Artifact artifact) {
-    if (artifact == null) {
-      return false;
-    }
-
+  public boolean isFlexCompat(@NotNull Project project, @NotNull Artifact artifact) {
     XmlTag compatConfig = getFlexCompatXmlConfiguration(project, artifact);
 
-    if (compatConfig == null) {
-      return false;
-    }
+    return isFlexCompatEnvFlex(compatConfig) || isFlexCompatVmTrue(compatConfig);
+  }
 
-    String tagName = compatConfig.getName();
+  @Override
+  public boolean isFlexCompatEnvFlex(@NotNull Project project, @NotNull DeploymentSource source) {
+    XmlTag compatConfig = getFlexCompatXmlConfiguration(project, getArtifact(source));
 
-    if ("vm".equalsIgnoreCase(tagName)) {
-      return Boolean.parseBoolean(compatConfig.getValue().getTrimmedText());
-    } else if ("env".equalsIgnoreCase(tagName)) {
-      return "flex".equalsIgnoreCase(compatConfig.getValue().getTrimmedText());
-    } else {
-      return false;
-    }
+    return isFlexCompatEnvFlex(compatConfig);
+  }
+
+  private boolean isFlexCompatEnvFlex(@Nullable XmlTag compatConfig) {
+    return compatConfig != null
+        && "env".equalsIgnoreCase(compatConfig.getName())
+        && "flex".equalsIgnoreCase(compatConfig.getValue().getTrimmedText());
+  }
+
+  private boolean isFlexCompatVmTrue(@Nullable XmlTag compatConfig) {
+    return compatConfig != null
+        && "vm".equalsIgnoreCase(compatConfig.getName())
+        && Boolean.parseBoolean(compatConfig.getValue().getTrimmedText());
   }
 
   @Nullable

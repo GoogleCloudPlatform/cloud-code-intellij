@@ -46,7 +46,6 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.awt.RelativePoint;
@@ -287,14 +286,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
    * the default localized label of the environment
    */
   private String getEnvironmentDisplayableLabel() {
-    XmlTag compatConfig = AppEngineProjectService.getInstance()
-        .getFlexCompatXmlConfiguration(project, deploymentSource);
-
-    if (compatConfig != null) {
-      if ("env".equalsIgnoreCase(compatConfig.getName())
-          && "flex".equalsIgnoreCase(compatConfig.getValue().getTrimmedText())) {
-        return GctBundle.message("appengine.environment.name.mvm");
-      }
+    if (AppEngineProjectService.getInstance().isFlexCompatEnvFlex(project, deploymentSource)) {
+      return GctBundle.message("appengine.environment.name.mvm");
     }
 
     return environment.localizedLabel();

@@ -21,9 +21,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
-import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProviderImpl;
+import com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectServiceImpl;
+import com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetConfiguration;
@@ -68,9 +68,9 @@ import java.io.File;
 import javax.swing.Icon;
 
 /**
- * Unit tests for {@link AppEngineProjectServiceImpl}
+ * Unit tests for {@link DefaultAppEngineProjectService}
  */
-public class AppEngineProjectServiceImplTest extends PlatformTestCase {
+public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
   private AppEngineProjectService appEngineProjectService;
   private AppEngineAssetProvider appEngineAssetProvider;
@@ -82,12 +82,12 @@ public class AppEngineProjectServiceImplTest extends PlatformTestCase {
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
 
-    appEngineAssetProvider = mock(AppEngineAssetProviderImpl.class);
+    appEngineAssetProvider = mock(DefaultAppEngineAssetProvider.class);
     applicationContainer.unregisterComponent(AppEngineAssetProvider.class.getName());
     applicationContainer.registerComponentInstance(
         AppEngineAssetProvider.class.getName(), appEngineAssetProvider);
 
-    appEngineProjectService = new AppEngineProjectServiceImpl();
+    appEngineProjectService = new DefaultAppEngineProjectService();
   }
 
   public void testGetAppEngineArtifactEnvironment_Standard() {
