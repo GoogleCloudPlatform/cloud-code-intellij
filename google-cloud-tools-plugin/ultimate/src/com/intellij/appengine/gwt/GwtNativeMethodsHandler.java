@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-include 'google-account-plugin'
-include 'google-cloud-tools-plugin'
-include 'common-lib'
-include 'common-test-lib'
+package com.intellij.appengine.gwt;
 
-include 'google-cloud-tools-plugin:jps-plugin'
-include 'google-cloud-tools-plugin:runtime'
-include 'google-cloud-tools-plugin:ultimate'
+import com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeHandler;
+
+import com.intellij.gwt.jsinject.JsInjector;
+import com.intellij.psi.PsiMethod;
+
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * @author nik
+ */
+public class GwtNativeMethodsHandler extends AppEngineForbiddenCodeHandler {
+  @Override
+  public boolean isNativeMethodAllowed(@NotNull PsiMethod method) {
+    return JsInjector.isJsniMethod(method);
+  }
+}

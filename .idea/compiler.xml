@@ -27,6 +27,12 @@
       <module name="google-account-plugin_test" target="1.7" />
       <module name="google-cloud-tools-plugin_main" target="1.7" />
       <module name="google-cloud-tools-plugin_test" target="1.7" />
+      <module name="jps-plugin_main" target="1.7" />
+      <module name="jps-plugin_test" target="1.7" />
+      <module name="runtime_main" target="1.7" />
+      <module name="runtime_test" target="1.7" />
+      <module name="ultimate_main" target="1.7" />
+      <module name="ultimate_test" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>

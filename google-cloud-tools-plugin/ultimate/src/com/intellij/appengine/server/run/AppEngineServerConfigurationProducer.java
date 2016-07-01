@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2000-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-include 'google-account-plugin'
-include 'google-cloud-tools-plugin'
-include 'common-lib'
-include 'common-test-lib'
+/*
+ * User: anna
+ * Date: 13-May-2010
+ */
 
-include 'google-cloud-tools-plugin:jps-plugin'
-include 'google-cloud-tools-plugin:runtime'
-include 'google-cloud-tools-plugin:ultimate'
+package com.intellij.appengine.server.run;
+
+import com.intellij.javaee.run.configuration.J2EEConfigurationProducer;
+
+public class AppEngineServerConfigurationProducer extends J2EEConfigurationProducer {
+
+  public AppEngineServerConfigurationProducer() {
+    super(AppEngineServerConfigurationType.getInstance());
+  }
+}
