@@ -18,7 +18,7 @@
 sourceSets.main.java.srcDirs = ['src']
 sourceSets.main.resources.srcDirs = ['resources']
 sourceSets.test.java.srcDirs = ['testSrc']
-sourceSets.test.resources.srcDirs = ['testResources']
+sourceSets.test.resources.srcDirs = ['testResources', 'testData']
 
 intellij {
     pluginName = 'google-cloud-tools'
@@ -31,11 +31,24 @@ intellij {
 
 project.afterEvaluate {
     prepareSandbox.dependsOn ':google-account-plugin:prepareSandbox'
+
+    //todo: currently we need this to include 'ultimate' module to the plugin zip; it would be better to support such inclusion in 'intellij' plugin
+    def task = project.tasks.findByName("prepareSandbox")
+    task.dependsOn project('ultimate').jar
+    task.doLast {
+        copy {
+            from files(project('ultimate').jar)
+            into "$task.destinationDir/lib"
+        }
+    }
 }
 
 dependencies {
     compile(project(':google-account-plugin'))
     compile(project(':common-lib'))
+
+    compile project('jps-plugin')
+    compile project('runtime')
 
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
     compile 'com.google.apis:google-api-services-cloudresourcemanager:v1beta1-rev12-1.21.0'
@@ -48,9 +61,19 @@ dependencies {
     testRuntime files('../google-account-plugin/lib/google-gct-login-context-ij-pg.jar')
 }
 
+task testJar(type: Jar, dependsOn: testClasses) {
+    baseName = "${project.archivesBaseName}-tests"
+    from sourceSets.test.output
+}
+
 configurations {
     // this is already obtained from google-api-java-client-min-repackaged
     compile.exclude group: 'com.google.api-client', module: 'google-api-client'
+    tests
+}
+
+artifacts {
+    tests testJar
 }
 
 test {
