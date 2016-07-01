@@ -59,6 +59,11 @@ Code inspections for App Engine Java code.</description>
                         serviceImplementation="com.google.cloud.tools.intellij.IdeaCloudToolsPluginInfoService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService"
                         serviceImplementation="com.google.cloud.tools.intellij.DefaultCloudToolsPluginConfigurationService"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider"/>
+
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
                      implementationClass="com.google.cloud.tools.intellij.appengine.validation.ApiNameInspection"/>

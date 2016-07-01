@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -46,7 +46,6 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.awt.RelativePoint;
@@ -221,7 +220,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     appEngineFlexConfigPanel.setVisible(
         environment == AppEngineEnvironment.APP_ENGINE_FLEX
-            && !AppEngineUtil.isFlexCompat(project, deploymentSource));
+            && !AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
   }
 
   @Override
@@ -287,13 +286,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
    * the default localized label of the environment
    */
   private String getEnvironmentDisplayableLabel() {
-    XmlTag compatConfig = AppEngineUtil.getFlexCompatXmlConfiguration(project, deploymentSource);
-
-    if (compatConfig != null) {
-      if ("env".equalsIgnoreCase(compatConfig.getName())
-          && "flex".equalsIgnoreCase(compatConfig.getValue().getTrimmedText())) {
-        return GctBundle.message("appengine.environment.name.mvm");
-      }
+    if (AppEngineProjectService.getInstance().isFlexCompatEnvFlex(project, deploymentSource)) {
+      return GctBundle.message("appengine.environment.name.mvm");
     }
 
     return environment.localizedLabel();

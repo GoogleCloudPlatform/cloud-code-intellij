@@ -94,7 +94,7 @@ public interface AppEngineHelper {
    * @param startListener the "callback" listener used for fetching the running process
    * @param logListener the output listener for handling "normal" operation log messages
    * @param outputListener the output listener for handling the output messages of the operation
-   * @param exitListener the listener for handling the completeion of the operation
+   * @param exitListener the listener for handling the completion of the operation
    * @return the {@link CloudSdk} object used in executing the operation
    */
   CloudSdk createSdk(
@@ -110,7 +110,7 @@ public interface AppEngineHelper {
   void stageCredentials(String googleUsername);
 
   /**
-   * Delets the locally staged credentials, if they exist.
+   * Deletes the locally staged credentials, if they exist.
    */
   void deleteCredentials();
 }
