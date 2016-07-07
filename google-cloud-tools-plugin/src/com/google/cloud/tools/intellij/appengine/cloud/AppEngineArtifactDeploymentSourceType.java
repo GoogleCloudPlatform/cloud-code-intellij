@@ -67,10 +67,10 @@ public class AppEngineArtifactDeploymentSourceType
           }
       );
 
-      if (artifact.isPresent()) {
-        String environment = settings.getAttributeValue(
-            AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
+      String environment = settings.getAttributeValue(
+          AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
 
+      if (artifact.isPresent() && environment != null) {
         return new AppEngineArtifactDeploymentSource(
             AppEngineEnvironment.valueOf(environment),
             ArtifactPointerManager.getInstance(project).createPointer(artifact.get()));
