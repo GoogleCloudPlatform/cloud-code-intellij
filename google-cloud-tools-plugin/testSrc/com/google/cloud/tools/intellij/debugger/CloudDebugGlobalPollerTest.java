@@ -16,30 +16,28 @@
 
 package com.google.cloud.tools.intellij.debugger;
 
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+
+import org.jetbrains.annotations.NotNull;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees.Breakpoints;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-
 import com.intellij.notification.Notification;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-
-import org.hamcrest.beans.HasPropertyWithValue;
-import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
 
 public class CloudDebugGlobalPollerTest extends BasePluginTestCase {
 
@@ -106,8 +104,9 @@ public class CloudDebugGlobalPollerTest extends BasePluginTestCase {
   }
 
   private void verifyNotificationFired() {
-    verify(notificationsHandler)
-        .notify(argThat(HasPropertyWithValue.<Notification>hasProperty("title",
-                                                                       is("Error while connecting to Cloud Debugger backend"))));
+	ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
+	verify(notificationsHandler).notify(captor.capture());
+	assertEquals(1, captor.getAllValues().size());
+	assertEquals("Error while connecting to Cloud Debugger backend", captor.getValue().getTitle());
   }
 }
