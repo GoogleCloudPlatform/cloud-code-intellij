@@ -16,21 +16,6 @@
 
 package com.google.cloud.tools.intellij.debugger.ui;
 
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
-import javax.swing.tree.TreeNode;
-
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointProperties;
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType;
 import com.intellij.debugger.ui.breakpoints.Breakpoint;
@@ -64,15 +49,26 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.breakpoints.ui.XBreakpointCustomPropertiesPanel;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
-import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.impl.actions.XDebuggerActions;
 import com.intellij.xdebugger.impl.breakpoints.XBreakpointBase;
 import com.intellij.xdebugger.impl.frame.XWatchesView;
 import com.intellij.xdebugger.impl.ui.tree.XDebuggerTreePanel;
-import com.intellij.xdebugger.impl.ui.tree.nodes.WatchNode;
+import com.intellij.xdebugger.impl.ui.tree.nodes.WatchNodeImpl;
 import com.intellij.xdebugger.impl.ui.tree.nodes.WatchesRootNode;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XDebuggerTreeNode;
+import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.tree.TreeNode;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The breakpoint config panel is shown for both the config popup (right click on a breakpoint) and
@@ -120,7 +116,7 @@ public class BreakpointConfigurationPanel
   @Override
   public void addWatchExpression(@NotNull XExpression expression, int index,
       boolean navigateToWatchNode) {
-    rootNode.addWatchExpression((XDebuggerEvaluator) null, expression, index, navigateToWatchNode);
+    rootNode.addWatchExpression((XStackFrame) null, expression, index, navigateToWatchNode);
   }
 
   @Override
@@ -249,7 +245,7 @@ public class BreakpointConfigurationPanel
       List<? extends TreeNode> children = rootNode.getChildren();
       if (children != null) {
         for (TreeNode node : rootNode.getChildren()) {
-          expressionsToSave.add(((WatchNode) node).getExpression().getExpression());
+          expressionsToSave.add(((WatchNodeImpl) node).getExpression().getExpression());
         }
         if (properties
             .setWatchExpressions(expressionsToSave.toArray(new String[expressionsToSave.size()]))) {
