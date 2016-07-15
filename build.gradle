@@ -49,6 +49,7 @@ subprojects {
 
     apply plugin: 'org.jetbrains.intellij'
     intellij {
+        type = ideaEdition
         version = ideaVersion
         updateSinceUntilBuild = false
         downloadSources = true

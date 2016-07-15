@@ -26,6 +26,10 @@ Code inspections for App Engine Java code.</description>
   <!-- Setting version to 15.0.6 and up. https://confluence.jetbrains.com/display/IDEADEV/IDEA+15+EAP -->
   <idea-version since-build="143.2370.31" />
 
+  <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
+  <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
+  <depends optional="true" config-file="google-app-engine-maven-support.xml">org.jetbrains.idea.maven</depends>
+
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
   <depends>com.intellij.modules.vcs</depends>
@@ -45,6 +49,10 @@ Code inspections for App Engine Java code.</description>
   <project-components>
   </project-components>
 
+  <extensionPoints>
+    <extensionPoint name="forbiddenCodeHandler" interface="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeHandler"/>
+  </extensionPoints>
+
   <extensions defaultExtensionNs="com.intellij">
     <implicitUsageProvider implementation="com.google.cloud.tools.intellij.appengine.validation.EndpointImplicitUsageProvider"/>
 
@@ -59,10 +67,29 @@ Code inspections for App Engine Java code.</description>
                         serviceImplementation="com.google.cloud.tools.intellij.IdeaCloudToolsPluginInfoService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService"
                         serviceImplementation="com.google.cloud.tools.intellij.DefaultCloudToolsPluginConfigurationService"/>
+
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkManager"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.impl.AppEngineSdkManagerImpl"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineCommunityWebIntegration"/>
+
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider"/>
+
+    <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType"/>
+    <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory"/>
+    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.converter.AppEngineFacetConverterProvider"/>
+    <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkDetector"/>
+    <compileServer.plugin classpath="google-app-engine-jps-plugin.jar;appEngine-runtime.jar"/>
+
+    <xml.schemaProvider implementation="com.google.cloud.tools.intellij.appengine.descriptor.AppEngineWebSchemaProvider"/>
+
+    <localInspection language="JAVA" shortName="AppEngineForbiddenCode" displayName="Forbidden code in App Engine applications"
+                     groupName="Google App Engine" enabledByDefault="true" level="ERROR"
+                     implementationClass="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeInspection"/>
 
     <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
                      key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
