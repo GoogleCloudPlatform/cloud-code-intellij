@@ -66,6 +66,9 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
             .append("<p>")
             .append(GctBundle.message("plugin.conflict.error.detail", pluginName))
             .append("</p>")
+            
+            .append("<br />")
+            
             .append("<p>")
             .append(GctBundle.message("plugin.conflict.error.action",
                 "<a href=\"" + DEACTIVATE_LINK_HREF + "\">",
