@@ -144,6 +144,7 @@ Code inspections for App Engine Java code.</description>
                      level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.RestSignatureInspection"/>
 
     <postStartupActivity implementation="com.google.cloud.tools.intellij.PluginCompatibilityCheck"/>
+    <postStartupActivity implementation="com.google.cloud.tools.intellij.BundledAppEnginePluginExistenceCheck"/>
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">
