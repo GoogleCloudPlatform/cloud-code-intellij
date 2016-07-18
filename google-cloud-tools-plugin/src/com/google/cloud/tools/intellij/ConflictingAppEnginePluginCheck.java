@@ -36,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
  * A plugin post startup activity which checks if the bundled (now deprecated) app engine plugin is
  * running. If so, the user is notified to disable it.
  */
-public class BundledAppEnginePluginExistenceCheck implements StartupActivity {
+public class ConflictingAppEnginePluginCheck implements StartupActivity {
 
   private static final String DEACTIVATE_LINK_HREF = "#deactivate";
 
