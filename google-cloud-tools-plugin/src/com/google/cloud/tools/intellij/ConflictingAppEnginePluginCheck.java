@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
+
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.plugins.PluginManagerConfigurable;
@@ -29,8 +30,10 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
-import javax.swing.event.HyperlinkEvent;
+
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.event.HyperlinkEvent;
 
 /**
  * A plugin post startup activity which checks if the bundled (now deprecated) app engine plugin is
@@ -66,21 +69,22 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
             .append("<p>")
             .append(GctBundle.message("plugin.conflict.error.detail", pluginName))
             .append("</p>")
-            
             .append("<br />")
-            
             .append("<p>")
-            .append(GctBundle.message("plugin.conflict.error.action",
-                "<a href=\"" + DEACTIVATE_LINK_HREF + "\">",
-                "</a>"))
+            .append(
+                GctBundle.message(
+                    "plugin.conflict.error.action",
+                    "<a href=\"" + DEACTIVATE_LINK_HREF + "\">",
+                    "</a>"))
             .append("</p>")
             .toString();
 
-    notification.createNotification(
-        GctBundle.message("plugin.conflict.error.title"),
-        errorMessage,
-        NotificationType.ERROR,
-        new IdeaAppEnginePluginLinkListener(project))
+    notification
+        .createNotification(
+            GctBundle.message("plugin.conflict.error.title"),
+            errorMessage,
+            NotificationType.ERROR,
+            new IdeaAppEnginePluginLinkListener(project))
         .notify(project);
   }
 
