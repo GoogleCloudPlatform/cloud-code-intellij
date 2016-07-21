@@ -18,20 +18,24 @@ package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 
+import com.intellij.diagnostic.errordialog.DisablePluginWarningDialog;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
-import com.intellij.ide.plugins.PluginManagerConfigurable;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.PluginId;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
+import com.intellij.openapi.wm.WindowManager;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.awt.Window;
 
 import javax.swing.event.HyperlinkEvent;
 
@@ -49,7 +53,7 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
         PluginManager.getPlugin(PluginId.findId("com.intellij.appengine"));
 
     if (pluginIsActive(bundledPlugin)) {
-      notifyUser(project, bundledPlugin.getName());
+      notifyUser(project, bundledPlugin);
     }
   }
 
@@ -57,7 +61,7 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
     return plugin != null && plugin.isEnabled();
   }
 
-  private void notifyUser(@NotNull Project project, String pluginName) {
+  private void notifyUser(@NotNull Project project, @NotNull IdeaPluginDescriptor plugin) {
     NotificationGroup notification =
         new NotificationGroup(
             GctBundle.message("plugin.conflict.error.title"),
@@ -67,7 +71,7 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
     String errorMessage =
         new StringBuilder()
             .append("<p>")
-            .append(GctBundle.message("plugin.conflict.error.detail", pluginName))
+            .append(GctBundle.message("plugin.conflict.error.detail", plugin.getName()))
             .append("</p>")
             .append("<br />")
             .append("<p>")
@@ -84,16 +88,18 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
             GctBundle.message("plugin.conflict.error.title"),
             errorMessage,
             NotificationType.ERROR,
-            new IdeaAppEnginePluginLinkListener(project))
+            new IdeaAppEnginePluginLinkListener(project, plugin))
         .notify(project);
   }
 
   private static class IdeaAppEnginePluginLinkListener implements NotificationListener {
 
     private Project project;
+    private IdeaPluginDescriptor plugin;
 
-    public IdeaAppEnginePluginLinkListener(@NotNull final Project project) {
+    public IdeaAppEnginePluginLinkListener(@NotNull final Project project, @NotNull IdeaPluginDescriptor plugin) {
       this.project = project;
+      this.plugin = plugin;
     }
 
     @Override
@@ -101,7 +107,31 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
       String href = event.getDescription();
 
       if (DEACTIVATE_LINK_HREF.equals(href)) {
-        ShowSettingsUtil.getInstance().showSettingsDialog(project, PluginManagerConfigurable.class);
+        showDisablePluginDialog(project);
+        notification.hideBalloon();
+      }
+    }
+
+    private void showDisablePluginDialog(@NotNull Project project) {
+      Application app = ApplicationManager.getApplication();
+      Window parent = WindowManager.getInstance().suggestParentWindow(project);
+
+      DisablePluginWarningDialog d =
+          new DisablePluginWarningDialog(parent, plugin.getName(), true, app.isRestartCapable());
+      d.show();
+
+      String pluginId = plugin.getPluginId().getIdString();
+
+      switch (d.getExitCode()) {
+        case DisablePluginWarningDialog.CANCEL_EXIT_CODE:
+          return;
+        case DisablePluginWarningDialog.DISABLE_EXIT_CODE:
+          PluginManager.disablePlugin(pluginId);
+          break;
+        case DisablePluginWarningDialog.DISABLE_AND_RESTART_EXIT_CODE:
+          PluginManager.disablePlugin(pluginId);
+          app.restart();
+          break;
       }
     }
   }
