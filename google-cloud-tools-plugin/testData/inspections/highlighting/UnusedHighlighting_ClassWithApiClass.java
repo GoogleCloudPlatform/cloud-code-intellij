@@ -18,9 +18,9 @@ package com.example.app;
 import com.google.api.server.spi.config.ApiClass;
 import com.google.api.server.spi.config.ApiMethod;
 
-<error descr="'@ApiClass' not applicable to type">@ApiClass</error>
+@ApiClass
 public class UnusedHighlighting_ClassWithApiClass {
-  <error descr="'@ApiMethod' not applicable to method">@ApiMethod(name = "someFoo")</error>
+  @ApiMethod
   public void foo() {
 
   }

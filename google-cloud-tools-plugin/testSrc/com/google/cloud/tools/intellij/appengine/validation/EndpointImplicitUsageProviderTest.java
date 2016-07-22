@@ -15,6 +15,8 @@
  */
 package com.google.cloud.tools.intellij.appengine.validation;
 
+import com.intellij.codeInspection.deadCode.UnusedDeclarationInspection;
+
 /**
  * Tests for {@link EndpointImplicitUsageProvider}.
  * See http://www.jetbrains.org/intellij/sdk/docs/basics/testing_plugins/testing_highlighting.html
@@ -37,6 +39,7 @@ public class EndpointImplicitUsageProviderTest extends EndpointTestBase {
     final String testDataPath = getTestDataPath();
     myFixture.setTestDataPath(testDataPath);
     String path = "inspections/highlighting/" + getTestName(false) + ".java";
+    myFixture.enableInspections(new UnusedDeclarationInspection(true));
     myFixture.testHighlighting(true, false, false, path);
   }
 

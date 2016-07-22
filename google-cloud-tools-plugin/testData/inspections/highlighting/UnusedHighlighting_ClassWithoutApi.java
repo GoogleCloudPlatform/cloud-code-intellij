@@ -15,6 +15,8 @@
  */
 package com.example.app;
 
-public class UnusedHighlighting_ClassWithoutApi {
+public class <warning descr="Class 'UnusedHighlighting_ClassWithoutApi' is never used">UnusedHighlighting_ClassWithoutApi</warning> {
+  public void <warning descr="Method 'foo()' is never used">foo</warning>() {
 
+  }
 }
