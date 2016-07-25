@@ -97,7 +97,8 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
     private Project project;
     private IdeaPluginDescriptor plugin;
 
-    public IdeaAppEnginePluginLinkListener(@NotNull final Project project, @NotNull IdeaPluginDescriptor plugin) {
+    public IdeaAppEnginePluginLinkListener(@NotNull final Project project,
+        @NotNull IdeaPluginDescriptor plugin) {
       this.project = project;
       this.plugin = plugin;
     }
@@ -116,13 +117,13 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
       Application app = ApplicationManager.getApplication();
       Window parent = WindowManager.getInstance().suggestParentWindow(project);
 
-      DisablePluginWarningDialog d =
+      DisablePluginWarningDialog dialog =
           new DisablePluginWarningDialog(parent, plugin.getName(), true, app.isRestartCapable());
-      d.show();
+      dialog.show();
 
       String pluginId = plugin.getPluginId().getIdString();
 
-      switch (d.getExitCode()) {
+      switch (dialog.getExitCode()) {
         case DisablePluginWarningDialog.CANCEL_EXIT_CODE:
           return;
         case DisablePluginWarningDialog.DISABLE_EXIT_CODE:
@@ -132,6 +133,7 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
           PluginManager.disablePlugin(pluginId);
           app.restart();
           break;
+        default:
       }
     }
   }
