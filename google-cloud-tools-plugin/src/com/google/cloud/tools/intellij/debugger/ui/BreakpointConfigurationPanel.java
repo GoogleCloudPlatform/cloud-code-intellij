@@ -50,12 +50,12 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.breakpoints.ui.XBreakpointCustomPropertiesPanel;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
-import com.intellij.xdebugger.frame.XStackFrame;
+import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.impl.actions.XDebuggerActions;
 import com.intellij.xdebugger.impl.breakpoints.XBreakpointBase;
 import com.intellij.xdebugger.impl.frame.XWatchesView;
 import com.intellij.xdebugger.impl.ui.tree.XDebuggerTreePanel;
-import com.intellij.xdebugger.impl.ui.tree.nodes.WatchNodeImpl;
+import com.intellij.xdebugger.impl.ui.tree.nodes.WatchNode;
 import com.intellij.xdebugger.impl.ui.tree.nodes.WatchesRootNode;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XDebuggerTreeNode;
 
@@ -72,7 +72,6 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
-import javax.swing.tree.TreeNode;
 
 /**
  * The breakpoint config panel is shown for both the config popup (right click on a breakpoint) and
@@ -120,7 +119,7 @@ public class BreakpointConfigurationPanel
   @Override
   public void addWatchExpression(@NotNull XExpression expression, int index,
       boolean navigateToWatchNode) {
-    rootNode.addWatchExpression((XStackFrame) null, expression, index, navigateToWatchNode);
+    rootNode.addWatchExpression((XDebuggerEvaluator) null, expression, index, navigateToWatchNode);
   }
 
   @Override
@@ -207,7 +206,7 @@ public class BreakpointConfigurationPanel
 
   @Override
   public void removeWatches(List<? extends XDebuggerTreeNode> nodes) {
-    List<? extends TreeNode> children = rootNode.getChildren();
+    List<? extends WatchNode> children = rootNode.getAllChildren();
     int minIndex = Integer.MAX_VALUE;
     List<XDebuggerTreeNode> toRemove = new ArrayList<XDebuggerTreeNode>();
     if (children != null) {
@@ -221,9 +220,9 @@ public class BreakpointConfigurationPanel
     }
     rootNode.removeChildren(toRemove);
 
-    List<? extends TreeNode> newChildren = rootNode.getChildren();
+    List<? extends WatchNode> newChildren = rootNode.getAllChildren();
     if (newChildren != null && !newChildren.isEmpty()) {
-      TreeNode node =
+      WatchNode node =
           minIndex < newChildren.size() ? newChildren.get(minIndex)
               : newChildren.get(newChildren.size() - 1);
       TreeUtil.selectNode(treePanel.getTree(), node);
@@ -246,10 +245,10 @@ public class BreakpointConfigurationPanel
 
     if (rootNode != null && lineBreakpointImpl != null) {
       List<String> expressionsToSave = new ArrayList<String>();
-      List<? extends TreeNode> children = rootNode.getChildren();
+      List<? extends WatchNode> children = rootNode.getAllChildren();
       if (children != null) {
-        for (TreeNode node : rootNode.getChildren()) {
-          expressionsToSave.add(((WatchNodeImpl) node).getExpression().getExpression());
+        for (WatchNode node : rootNode.getAllChildren()) {
+          expressionsToSave.add(node.getExpression().getExpression());
         }
         if (properties
             .setWatchExpressions(expressionsToSave.toArray(new String[expressionsToSave.size()]))) {
