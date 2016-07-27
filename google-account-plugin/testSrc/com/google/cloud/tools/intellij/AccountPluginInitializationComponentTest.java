@@ -24,6 +24,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.login.GoogleLoginService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import com.intellij.openapi.Disposable;
@@ -47,6 +48,9 @@ public class AccountPluginInitializationComponentTest extends BasePluginTestCase
   AccountPluginInfoService pluginInfoService;
   @Mock
   AccountPluginConfigurationService pluginConfigurationService;
+  @Mock
+  GoogleLoginService googleLoginService;
+
   AccountPluginInitializationComponent testComponent;
 
 
@@ -54,6 +58,7 @@ public class AccountPluginInitializationComponentTest extends BasePluginTestCase
   public void registerMockServices() {
     registerService(AccountPluginInfoService.class, pluginInfoService);
     registerService(AccountPluginConfigurationService.class, pluginConfigurationService);
+    registerService(GoogleLoginService.class, googleLoginService);
     testComponent = new AccountPluginInitializationComponent();
   }
 
@@ -92,5 +97,11 @@ public class AccountPluginInitializationComponentTest extends BasePluginTestCase
     AccountPluginInitializationComponent testComponent = spy(new AccountPluginInitializationComponent());
     testComponent.initComponent();
     verify(testComponent, never()).configureUsageTracking();
+  }
+
+  @Test
+  public void testInitComponent_loginServiceIsInitialized() {
+    testComponent.initComponent();
+    verify(googleLoginService).loadPersistedCredentials();
   }
 }
