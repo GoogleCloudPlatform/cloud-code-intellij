@@ -127,4 +127,9 @@ public interface GoogleLoginService {
    * @param button The login menu item.
    */
   void setLoginMenuItemContribution(GoogleLoginActionButton button);
+
+  /**
+   * Initializes the service from the persisted credential store.
+   */
+  void loadPersistedCredentials();
 }

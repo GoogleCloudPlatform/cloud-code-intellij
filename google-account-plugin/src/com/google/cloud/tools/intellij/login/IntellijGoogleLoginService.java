@@ -303,6 +303,11 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     uiFacade.setLoginMenuItemContribution(button);
   }
 
+  @Override
+  public void loadPersistedCredentials() {
+    dataStore.initializeUsers();
+  }
+
   /**
    * Logs out all signed in users without popping up logout confirmation message.
    */
