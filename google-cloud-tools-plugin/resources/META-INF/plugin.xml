@@ -47,6 +47,9 @@ Code inspections for App Engine Java code.</description>
   </application-components>
 
   <project-components>
+    <component>
+      <implementation-class>com.google.cloud.tools.intellij.LegacyFacetUpdater</implementation-class>
+    </component>
   </project-components>
 
   <extensionPoints>

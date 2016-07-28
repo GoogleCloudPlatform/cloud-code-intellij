@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 
+import com.intellij.facet.FacetType;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -33,8 +34,6 @@ import java.util.Collection;
  * A set of helper methods for inspecting an App Engine project's structure and configuration.
  */
 public abstract class AppEngineProjectService {
-
-  public static final String APP_ENGINE_STANDARD_FACET_NAME = "Google App Engine";
 
   public static AppEngineProjectService getInstance() {
     return ServiceManager.getService(AppEngineProjectService.class);

@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.Plugins;
 
 import com.intellij.diagnostic.errordialog.DisablePluginWarningDialog;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
@@ -46,19 +47,12 @@ import javax.swing.event.HyperlinkEvent;
 public class ConflictingAppEnginePluginCheck implements StartupActivity {
 
   private static final String DEACTIVATE_LINK_HREF = "#deactivate";
-
+  private static final String BUNDLED_PLUGIN_ID = "com.intellij.appengine";
   @Override
   public void runActivity(@NotNull Project project) {
-    IdeaPluginDescriptor bundledPlugin =
-        PluginManager.getPlugin(PluginId.findId("com.intellij.appengine"));
-
-    if (pluginIsActive(bundledPlugin)) {
-      notifyUser(project, bundledPlugin);
+    if (Plugins.isPluginInstalled(BUNDLED_PLUGIN_ID)) {
+      notifyUser(project, Plugins.getPluginById(BUNDLED_PLUGIN_ID));
     }
-  }
-
-  private boolean pluginIsActive(IdeaPluginDescriptor plugin) {
-    return plugin != null && plugin.isEnabled();
   }
 
   private void notifyUser(@NotNull Project project, @NotNull IdeaPluginDescriptor plugin) {
