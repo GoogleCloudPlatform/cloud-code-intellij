@@ -15,17 +15,17 @@
  */
 package com.example.app;
 
-import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.ApiClass;
 import com.google.api.server.spi.config.ApiMethod;
 
-@Api
-public class UnusedHighlighting_ClassWithApi {
-  @ApiMethod(name = "someFoo")
-  public void foo() {
+@ApiClass
+public class ClassWithApiClass_assert_isImplicitUsage {
+  @ApiMethod
+  public void assert_isImplicitUsage() {
 
   }
 
-  public void boo() {
+  public static void assert_isNotImplicitUsage() {
 
   }
 }

@@ -15,8 +15,17 @@
  */
 package com.example.app;
 
-public class <warning descr="Class 'UnusedHighlighting_ClassWithoutApi' is never used">UnusedHighlighting_ClassWithoutApi</warning> {
-  public void <warning descr="Method 'foo()' is never used">foo</warning>() {
+import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.ApiMethod;
+
+@Api
+public class ClassWithApi_assert_isImplicitUsage {
+  @ApiMethod(name = "someFoo")
+  public void assert_isImplicitUsage() {
+
+  }
+
+  public static void assert_isNotImplicitUsage() {
 
   }
 }
