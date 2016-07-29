@@ -1,0 +1,46 @@
+/*
+ * Copyright 2000-2016 JetBrains s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+sourceSets.main.resources.srcDirs = ['resources']
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.test.java.srcDirs = ['testSrc']
+
+intellij {
+    type 'IU'
+
+    // only the 'JavaEE' and 'GwtStudio' plugins are directly used by the plugins,
+    // the others are transitive dependencies of these and need to be defined explicitly
+    plugins 'JavaEE', 'GwtStudio', 'Groovy', 'junit', 'git4idea',
+            'maven', 'gradle', 'properties', 'java-i18n',
+            'DatabaseTools', 'PersistenceSupport', 'JavaScriptLanguage', 'CSS', 'jsp'
+}
+
+//todo: we need to manually add dependency on 'app-engine-plugin' project because
+// if we add simple project(':google-cloud-tools-plugin') it will introduce circular dependency
+// for :google-cloud-tools-plugin:prepareSandbox
+compileJava.dependsOn project(':google-cloud-tools-plugin').tasks.getByName("compileJava")
+dependencies {
+    compile files(project(':google-cloud-tools-plugin').sourceSets.main.output)
+    compile files(project(':google-cloud-tools-plugin:jps-plugin').sourceSets.main.output)
+    compile files("${System.properties['java.home']}/../lib/tools.jar")
+    testCompile project(path: ':google-account-plugin')
+    testCompile project(path: ':google-cloud-tools-plugin', configuration: 'tests')
+    testRuntime files(project(':google-cloud-tools-plugin').sourceSets.test.resources.srcDirs)
+}
+
+jar.archiveName = "google-cloud-tools-ultimate.jar"
+
+
