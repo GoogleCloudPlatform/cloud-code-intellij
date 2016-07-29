@@ -279,10 +279,10 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     } else {
       labelBuilder.append("flex");
 
-      if (deploymentConfiguration.isAuto()) {
-        labelBuilder.append(".auto");
-      } else {
+      if (deploymentConfiguration.isCustom()) {
         labelBuilder.append(".custom");
+      } else {
+        labelBuilder.append(".auto");
       }
     }
     final String eventLabel = labelBuilder.toString();

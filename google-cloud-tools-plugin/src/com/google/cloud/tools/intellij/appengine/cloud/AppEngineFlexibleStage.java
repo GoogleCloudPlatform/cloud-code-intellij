@@ -16,16 +16,16 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.appengine.api.deploy.DefaultStageFlexibleConfiguration;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineFlexibleStaging;
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Stages an application in preparation for deployment to the App Engine flexible environment.
@@ -58,36 +58,21 @@ public class AppEngineFlexibleStage {
    * App Engine flexible environment.
    */
   public void stage(@NotNull File stagingDirectory) {
-    try {
-      File stagedArtifactPath =
-          copyFile(
-              stagingDirectory,
-              "target" + AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath),
-              deploymentArtifactPath);
-      stagedArtifactPath.setReadable(true /* readable */, false /* ownerOnly */);
+    File appYamlPath = deploymentConfiguration.isCustom()
+        ? CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getAppYamlPath())
+        : helper.defaultAppYaml();
 
-      File appYamlPath = deploymentConfiguration.isAuto()
-          ? helper.defaultAppYaml()
-          : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getAppYamlPath());
-
-      File dockerFilePath = deploymentConfiguration.isAuto()
-          ? helper.defaultDockerfile(
-          AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath))
-          : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getDockerFilePath());
-
-      copyFile(stagingDirectory, "app.yaml", appYamlPath);
-      copyFile(stagingDirectory, "Dockerfile", dockerFilePath);
-    } catch (IOException ex) {
-      throw new RuntimeException(ex);
+    DefaultStageFlexibleConfiguration stageConfig = new DefaultStageFlexibleConfiguration();
+    stageConfig.setStagingDirectory(stagingDirectory);
+    stageConfig.setArtifact(deploymentArtifactPath);
+    stageConfig.setAppYaml(appYamlPath);
+    if (deploymentConfiguration.isCustom()) {
+      File customDockerfile
+          = CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getDockerFilePath());
+      stageConfig.setDockerfile(customDockerfile);
     }
-  }
 
-  private File copyFile(File stagingDirectory, String targetFileName, File sourceFilePath)
-      throws IOException {
-    File destinationFilePath = new File(stagingDirectory, targetFileName);
-    FileUtil.copy(sourceFilePath, destinationFilePath);
-    loggingHandler.print(String.format("Copied %s %s to %s", targetFileName,
-        sourceFilePath.getAbsolutePath(), destinationFilePath.getAbsolutePath()) +  "\n");
-    return destinationFilePath;
+    CloudSdkAppEngineFlexibleStaging staging = new CloudSdkAppEngineFlexibleStaging();
+    staging.stageFlexible(stageConfig);
   }
 }
