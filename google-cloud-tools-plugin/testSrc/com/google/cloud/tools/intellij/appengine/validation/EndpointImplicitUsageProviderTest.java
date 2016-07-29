@@ -66,11 +66,11 @@ public class EndpointImplicitUsageProviderTest extends EndpointTestBase {
           ASSERT_IMPLICIT_USAGE_TRUE+"' or '"+ASSERT_IMPLICIT_USAGE_FALSE+"')");
     }
 
-    for (PsiMethod m : implicitUsageMethods) {
-      assertTrue(endpointUsageProvider.isImplicitUsage(m));
+    for (PsiMethod method : implicitUsageMethods) {
+      assertTrue(endpointUsageProvider.isImplicitUsage(method));
     }
-    for (PsiMethod m : notImplicitUsageMethods) {
-      assertFalse(endpointUsageProvider.isImplicitUsage(m));
+    for (PsiMethod method : notImplicitUsageMethods) {
+      assertFalse(endpointUsageProvider.isImplicitUsage(method));
     }
   }
 
