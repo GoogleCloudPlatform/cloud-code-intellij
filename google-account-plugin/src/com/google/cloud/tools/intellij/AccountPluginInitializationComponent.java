@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij;
 
+import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
 import com.google.cloud.tools.intellij.stats.UsageTrackerManager;
 import com.google.cloud.tools.intellij.stats.UsageTrackerNotification;
@@ -54,6 +55,7 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       configureUsageTracking();
     }
+    Services.getLoginService().loadPersistedCredentials();
   }
 
   @Override
