@@ -45,4 +45,3 @@ If you wish to build this plugin from source, please see the
 
 
 **None yet**
-
