@@ -1,6 +1,11 @@
 language: java
-jdk:
-  - oraclejdk8
+matrix:
+  include:
+  - jdk: openjdk7
+    env: IDEA_VERSION=15.0.6
+  - jdk: oraclejdk8
+    env: IDEA_VERSION=2016.2
+script: ./gradlew check -PideaVersion=$IDEA_VERSION
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
