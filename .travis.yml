@@ -4,7 +4,7 @@ matrix:
   - jdk: openjdk7
     env: ORG_GRADLE_PROJECT_ideaVersion=15.0.6
   - jdk: oraclejdk8
-    env: ORG_GRADLE_PROJECT_ideaVersion=2016.2
+    env: ORG_GRADLE_PROJECT_ideaVersion=162.1447.21 # latest 2016.2 build
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
