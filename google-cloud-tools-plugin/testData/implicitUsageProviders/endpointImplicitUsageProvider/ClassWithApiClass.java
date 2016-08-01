@@ -15,6 +15,17 @@
  */
 package com.example.app;
 
-public class UnusedHighlighting_ClassWithoutApi {
+import com.google.api.server.spi.config.ApiClass;
+import com.google.api.server.spi.config.ApiMethod;
 
+@ApiClass
+public class ClassWithApiClass_assert_isImplicitUsage {
+  @ApiMethod
+  public void assert_isImplicitUsage() {
+
+  }
+
+  public static void assert_isNotImplicitUsage() {
+
+  }
 }

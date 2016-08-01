@@ -26,15 +26,26 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import javax.swing.Icon;
+
+import org.jetbrains.annotations.NotNull;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
+
 import com.google.api.client.util.Lists;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.StatusMessage;
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
-import com.google.cloud.tools.intellij.testing.TestUtils;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginService;
+import com.google.cloud.tools.intellij.testing.TestUtils;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
-
 import com.intellij.debugger.actions.DebuggerActions;
 import com.intellij.debugger.ui.DebuggerContentInfo;
 import com.intellij.execution.ui.RunnerLayoutUi;
@@ -56,18 +67,6 @@ import com.intellij.xdebugger.impl.actions.XDebuggerActions;
 import com.intellij.xdebugger.impl.breakpoints.XLineBreakpointImpl;
 import com.intellij.xdebugger.ui.XDebugTabLayouter;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import javax.swing.Icon;
-
 public class CloudDebugProcessTest extends PlatformTestCase {
 
     private CloudDebugProcess process;
@@ -81,7 +80,7 @@ public class CloudDebugProcessTest extends PlatformTestCase {
         when(session.getProject()).thenReturn(this.getProject());
         process = new CloudDebugProcess(session);
     }
-
+    
     @Test
     public void testRemoveConsolePane() {
         // if this was a JUnit4 test case, we could set the LoggedErrorProcessor to a mock that does
@@ -110,10 +109,11 @@ public class CloudDebugProcessTest extends PlatformTestCase {
         LayoutStateDefaults defaults = mock(LayoutStateDefaults.class);
         when(ui.getDefaults()).thenReturn(defaults);
 
-
         layouter.registerAdditionalContent(ui);
 
         verify(ui, Mockito.atLeast(1)).removeContent(console, false);
+        
+        process.getStateController().stopBackgroundListening();
     }
 
     @Test
@@ -329,6 +329,8 @@ public class CloudDebugProcessTest extends PlatformTestCase {
         verify(cloudLineBreakpoint).getSetIcon(Matchers.anyBoolean());
         verify(cloudLineBreakpoint).getErrorMessage();
         verify(breakpointManager).updateBreakpointPresentation(same(xLineBreakpointImpl), any(Icon.class), eq("General error"));
+        
+        process.getStateController().stopBackgroundListening(); 
     }
 
     @NotNull

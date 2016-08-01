@@ -1,6 +1,10 @@
 language: java
-jdk:
-  - openjdk7
+matrix:
+  include:
+  - jdk: openjdk7
+    env: ORG_GRADLE_PROJECT_ideaVersion=15.0.6
+  - jdk: oraclejdk8
+    env: ORG_GRADLE_PROJECT_ideaVersion=162.1447.21 # latest 2016.2 build
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
@@ -19,5 +23,6 @@ deploy:
   on:
     tags: true
     condition: "$TRAVIS_TAG =~ ^v[0-9]+.*$"
+    condition: "$ORG_GRADLE_PROJECT_ideaVersion = '15.0.6'"
 after_deploy:
   - ./gradlew publishPlugin
