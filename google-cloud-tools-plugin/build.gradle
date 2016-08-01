@@ -33,12 +33,12 @@ project.afterEvaluate {
     prepareSandbox.dependsOn ':google-account-plugin:prepareSandbox'
 
     //todo: currently we need this to include 'ultimate' module to the plugin zip; it would be better to support such inclusion in 'intellij' plugin
-    def task = project.tasks.findByName("prepareSandbox")
-    task.dependsOn project('ultimate').jar
-    task.doLast {
+    def prepareSandboxTask = project.tasks.findByName("prepareSandbox")
+    prepareSandboxTask.dependsOn project('ultimate').jar
+    prepareSandboxTask.doLast {
         copy {
             from files(project('ultimate').jar)
-            into "$task.destinationDir/lib"
+            into "$prepareSandboxTask.destinationDir/lib"
         }
     }
 }
@@ -52,7 +52,7 @@ dependencies {
 
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
     compile 'com.google.apis:google-api-services-cloudresourcemanager:v1beta1-rev12-1.21.0'
-    compile ('com.google.cloud.tools:appengine-plugins-core:0.1.0') {
+    compile ('com.google.cloud.tools:appengine-plugins-core:0.1.4') {
         exclude group: 'com.google.guava', module: 'guava'
     }
     compile files('lib/google-api-services-source.jar')

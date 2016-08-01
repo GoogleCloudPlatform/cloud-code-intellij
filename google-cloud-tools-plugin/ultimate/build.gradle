@@ -21,18 +21,11 @@ sourceSets.test.java.srcDirs = ['testSrc']
 intellij {
     type 'IU'
 
-    //actually only 'JavaEE' and 'GwtStudio' plugins are required, the others are transitive dependencies
+    // only the 'JavaEE' and 'GwtStudio' plugins are directly used by the plugins,
+    // the others are transitive dependencies of these and need to be defined explicitly
     plugins 'JavaEE', 'GwtStudio', 'Groovy', 'junit', 'git4idea',
             'maven', 'gradle', 'properties', 'java-i18n',
             'DatabaseTools', 'PersistenceSupport', 'JavaScriptLanguage', 'CSS', 'jsp'
-}
-
-// Overriding paths in root build file since this module is nested one level deeper
-pmd {
-    ruleSetFiles = files('../../custom-pmd-ruleset.xml');
-}
-findbugs {
-    excludeFilter = file('../../findbugs-excludefilter.xml')
 }
 
 //todo: we need to manually add dependency on 'app-engine-plugin' project because

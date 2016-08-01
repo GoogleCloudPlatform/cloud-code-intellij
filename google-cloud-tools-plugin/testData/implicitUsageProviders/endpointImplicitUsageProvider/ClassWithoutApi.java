@@ -15,17 +15,8 @@
  */
 package com.example.app;
 
-import com.google.api.server.spi.config.Api;
-import com.google.api.server.spi.config.ApiMethod;
-
-<error descr="'@Api' not applicable to type">@Api</error>
-public class UnusedHighlighting_ClassWithApi {
-  <error descr="'@ApiMethod' not applicable to method">@ApiMethod(name = "someFoo")</error>
-  public void foo() {
-
-  }
-
-  public void boo() {
+public class ClassWithoutApi_assert_isNotImplicitUsage {
+  public void assert_isNotImplicitUsage() {
 
   }
 }

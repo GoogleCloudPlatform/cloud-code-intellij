@@ -16,12 +16,4 @@
 
 sourceSets.main.java.srcDirs = ['src']
 
-// Overriding paths in root build file since this module is nested one level deeper
-pmd {
-    ruleSetFiles = files('../../custom-pmd-ruleset.xml');
-}
-findbugs {
-    excludeFilter = file('../../findbugs-excludefilter.xml')
-}
-
-jar.archiveName = "appEngine-runtime.jar"
+jar.archiveName = "appengine-runtime.jar"

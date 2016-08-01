@@ -94,7 +94,7 @@ subprojects {
         sourceSets = [sourceSets.main]
         effort = "max"
         toolVersion = '3.0.1'
-        excludeFilter = file('../findbugs-excludefilter.xml')
+        excludeFilter = rootProject.file('findbugs-excludefilter.xml')
     }
 
     tasks.withType(FindBugs) {
@@ -110,7 +110,7 @@ subprojects {
         sourceSets = [sourceSets.main]
         // Don't use the default ruleset but use a custom ruleset to exclude some PMD rules.
         ruleSets = []
-        ruleSetFiles = files('../custom-pmd-ruleset.xml');
+        ruleSetFiles = rootProject.files('custom-pmd-ruleset.xml');
     }
 
     apply plugin: 'jdepend'
