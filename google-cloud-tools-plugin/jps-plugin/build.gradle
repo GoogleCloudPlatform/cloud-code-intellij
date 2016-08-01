@@ -21,14 +21,6 @@ sourceSets.test.resources.srcDirs = ['testData']
 
 jar.archiveName = "google-app-engine-jps-plugin.jar"
 
-// Overriding paths in root build file since this module is nested one level deeper
-pmd {
-    ruleSetFiles = files('../../custom-pmd-ruleset.xml');
-}
-findbugs {
-    excludeFilter = file('../../findbugs-excludefilter.xml')
-}
-
 dependencies {
     compile project(':google-cloud-tools-plugin:runtime')
     testCompile group: 'com.jetbrains.intellij.idea', name:'jps-build-test', version: ideaVersion
