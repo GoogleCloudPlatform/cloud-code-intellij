@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@ import org.jetbrains.annotations.Nullable;
  * Registers an implementation of {@code applicationConfigurable} extension to provide a Google.
  * Cloud Tools tab in the "Settings" dialog if current application is IntelliJ.
  */
-public class GoogleSettingsConfigurableProvider extends ConfigurableProvider {
+public class UsageTrackerConfigurableProvider extends ConfigurableProvider {
 
   @Nullable
   @Override
   public Configurable createConfigurable() {
-    return new GoogleSettingsConfigurable();
+    return new UsageTrackerConfigurable();
   }
 
   /**
@@ -41,6 +41,7 @@ public class GoogleSettingsConfigurableProvider extends ConfigurableProvider {
   public boolean canCreateConfigurable() {
     // For now we can hide Google entirely if usage tracking isn't available as there are no
     // other Google related account settings in the IJ UI.
+    // Create a sub-menu item for the cloud SDK and hide the usage tracker if not avaible
     if (PlatformUtils.isIntelliJ() && UsageTrackerManager.getInstance()
         .isUsageTrackingAvailable()) {
       return true;

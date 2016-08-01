@@ -125,6 +125,9 @@
       <item class="com.intellij.openapi.ui.TextFieldWithBrowseButton" icon="com/intellij/ide/ui/laf/icons/browseButton.png" removable="true" auto-create-binding="false" can-attach-label="false">
         <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="0" />
       </item>
+      <item class="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel" icon="" removable="true" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="0" />
+      </item>
     </group>
   </component>
 </project>

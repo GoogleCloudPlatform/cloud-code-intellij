@@ -20,6 +20,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
 
@@ -34,16 +35,10 @@ import org.picocontainer.MutablePicoContainer;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JLabel;
-
 public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private AppEngineCloudConfigurable appEngineCloudConfigurable;
   private SystemEnvironmentProvider environmentProvider;
-  private JLabel warningMessage;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
-
-  private static final String CLOUD_SDK_EXECUTABLE_PATH = new File("/a/b/c/gcloud-sdk/bin/gcloud").getAbsolutePath();
-  private static final String CLOUD_SDK_DIR_PATH = new File("/a/b/c/gcloud-sdk").getAbsolutePath();
 
   private static final String MISSING_SDK_DIR_WARNING = "Please select a Cloud SDK home directory.";
 
@@ -59,33 +54,6 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
     applicationContainer.unregisterComponent(SystemEnvironmentProvider.class.getName());
     applicationContainer.registerComponentInstance(
         SystemEnvironmentProvider.class.getName(), environmentProvider);
-  }
-
-  public void testSetupWithoutSdkInPath() {
-    when(environmentProvider.findInPath(anyString())).thenReturn(null);
-    initCloudConfigurable();
-
-    assertFalse(warningMessage.isVisible());
-    assertEmpty(cloudSdkDirectoryField.getText());
-  }
-
-  public void testSetupWithSdkInPath() {
-    when(environmentProvider.findInPath(anyString()))
-        .thenReturn(new File(CLOUD_SDK_EXECUTABLE_PATH));
-    initCloudConfigurable();
-
-    assertFalse(warningMessage.isVisible());
-    assertEquals(CLOUD_SDK_DIR_PATH, cloudSdkDirectoryField.getText());
-  }
-
-  public void testSetupWithInvalidSdk() {
-    initCloudConfigurable();
-
-    // Simulating user choosing (or manually typing) an invalid path in the field
-    cloudSdkDirectoryField.setText("/some/invalid/path");
-
-    assertTrue(warningMessage.isVisible());
-    assertEquals(MISSING_SDK_DIR_WARNING, warningMessage.getText());
   }
 
   public void testApply_validSdk() throws Exception {
@@ -116,9 +84,11 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
 
   private void initCloudConfigurable() {
     appEngineCloudConfigurable =
-        new AppEngineCloudConfigurable(new AppEngineServerConfiguration(), getProject());
-    warningMessage = appEngineCloudConfigurable.getWarningMessage();
-    cloudSdkDirectoryField = appEngineCloudConfigurable.getCloudSdkDirectoryField();
+        new AppEngineCloudConfigurable();
+
+    CloudSdkPanel panel = appEngineCloudConfigurable.getCloudSdkPanel();
+
+    cloudSdkDirectoryField = panel.getCloudSdkDirectoryField();
   }
 
   private File createTempFile() throws IOException {

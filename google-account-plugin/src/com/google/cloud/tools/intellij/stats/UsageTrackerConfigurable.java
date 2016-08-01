@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.stats;
 
-import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 
@@ -27,24 +26,22 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.JComponent;
 
 /**
- * Creates a Google menu item to contain various Google plugins related settings.
+ * Implementation of {@code ApplicationConfigurable} extension that provides a Google Cloud Tools
+ * tab in the "Settings" dialog.
  */
-public class GoogleSettingsConfigurable implements SearchableConfigurable.Parent {
+public class UsageTrackerConfigurable implements SearchableConfigurable {
 
-  @Override
-  public boolean hasOwnContent() {
-    return false;
-  }
+  private UsageTrackerPanel usageTrackerPanel;
+  private UsageTrackerManager usageTrackerManager;
 
-  @Override
-  public boolean isVisible() {
-    return true;
+  public UsageTrackerConfigurable() {
+    usageTrackerManager = UsageTrackerManager.getInstance();
   }
 
   @NotNull
   @Override
   public String getId() {
-    return "settings.google";
+    return "google.settings.tracker";
   }
 
   @Nullable
@@ -56,7 +53,7 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable.Parent
   @Nls
   @Override
   public String getDisplayName() {
-    return "Google";
+    return "Usage Tracking";
   }
 
   @Nullable
@@ -65,34 +62,36 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable.Parent
     return null;
   }
 
-  @Override
-  public Configurable[] getConfigurables() {
-    return new Configurable[0];
-  }
-
   @Nullable
   @Override
   public JComponent createComponent() {
-    return null;
+    if (usageTrackerPanel == null) {
+      usageTrackerPanel = new UsageTrackerPanel(usageTrackerManager);
+    }
+    return usageTrackerPanel.getComponent();
   }
 
   @Override
   public boolean isModified() {
-    return false;
+    return usageTrackerPanel != null && usageTrackerPanel.isModified();
   }
 
   @Override
   public void apply() throws ConfigurationException {
-
+    if (usageTrackerPanel != null) {
+      usageTrackerPanel.apply();
+    }
   }
 
   @Override
   public void reset() {
-
+    if (usageTrackerPanel != null) {
+      usageTrackerPanel.reset();
+    }
   }
 
   @Override
   public void disposeUIResources() {
-
+    usageTrackerPanel = null;
   }
 }

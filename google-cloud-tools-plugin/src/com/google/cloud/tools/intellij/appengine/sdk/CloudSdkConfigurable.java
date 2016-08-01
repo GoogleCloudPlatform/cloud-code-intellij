@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stats;
+package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 
@@ -27,24 +26,21 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.JComponent;
 
 /**
- * Creates a Google menu item to contain various Google plugins related settings.
+ * Creates a Cloud SDK menu item for configuring the path to the Cloud SDK.
  */
-public class GoogleSettingsConfigurable implements SearchableConfigurable.Parent {
+public class CloudSdkConfigurable implements SearchableConfigurable {
 
-  @Override
-  public boolean hasOwnContent() {
-    return false;
-  }
+  private CloudSdkPanel cloudSdkPanel;
+  private CloudSdkService cloudSdkService;
 
-  @Override
-  public boolean isVisible() {
-    return true;
+  public CloudSdkConfigurable() {
+    cloudSdkService = CloudSdkService.getInstance();
   }
 
   @NotNull
   @Override
   public String getId() {
-    return "settings.google";
+    return "google.settings.sdk";
   }
 
   @Nullable
@@ -56,7 +52,7 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable.Parent
   @Nls
   @Override
   public String getDisplayName() {
-    return "Google";
+    return "Cloud SDK";
   }
 
   @Nullable
@@ -65,30 +61,29 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable.Parent
     return null;
   }
 
-  @Override
-  public Configurable[] getConfigurables() {
-    return new Configurable[0];
-  }
-
   @Nullable
   @Override
   public JComponent createComponent() {
-    return null;
+    if (cloudSdkPanel == null) {
+      cloudSdkPanel = new CloudSdkPanel(cloudSdkService);
+    }
+
+    return cloudSdkPanel.getComponent();
   }
 
   @Override
   public boolean isModified() {
-    return false;
+    return cloudSdkPanel.isModified();
   }
 
   @Override
   public void apply() throws ConfigurationException {
-
+    cloudSdkPanel.apply();
   }
 
   @Override
   public void reset() {
-
+    cloudSdkPanel.reset();
   }
 
   @Override
