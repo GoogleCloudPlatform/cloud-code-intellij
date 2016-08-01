@@ -34,7 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- *
+ * Contains the panel with the Google plugin usage tracker settings.
  */
 public class UsageTrackerPanel {
 

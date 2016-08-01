@@ -26,8 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.JComponent;
 
 /**
- * Implementation of {@code ApplicationConfigurable} extension that provides a Google Cloud Tools
- * tab in the "Settings" dialog.
+ * Creates a Usage Tracking item in the settings.
  */
 public class UsageTrackerConfigurable implements SearchableConfigurable {
 
