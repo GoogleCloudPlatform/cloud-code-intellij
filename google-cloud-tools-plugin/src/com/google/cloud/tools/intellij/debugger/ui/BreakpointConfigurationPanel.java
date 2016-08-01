@@ -50,6 +50,7 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.breakpoints.ui.XBreakpointCustomPropertiesPanel;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.impl.actions.XDebuggerActions;
 import com.intellij.xdebugger.impl.breakpoints.XBreakpointBase;
 import com.intellij.xdebugger.impl.frame.XWatchesView;
@@ -118,7 +119,7 @@ public class BreakpointConfigurationPanel
   @Override
   public void addWatchExpression(@NotNull XExpression expression, int index,
       boolean navigateToWatchNode) {
-    rootNode.addWatchExpression(null, expression, index, navigateToWatchNode);
+    rootNode.addWatchExpression((XDebuggerEvaluator) null, expression, index, navigateToWatchNode);
   }
 
   @Override
