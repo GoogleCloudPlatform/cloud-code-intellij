@@ -16,20 +16,28 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.intellij.ide.util.PropertiesComponent;
+
 /**
- * Default implementation of {@link CloudSdkService}.
+ * Default implementation of {@link CloudSdkService} backed by {@link PropertiesComponent} for
+ * serialization.
  */
 public class DefaultCloudSdkService extends CloudSdkService {
 
-  private String cloudSdkHomePath;
+  private PropertiesComponent propertiesComponent;
+  private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
+
+  public DefaultCloudSdkService() {
+    this.propertiesComponent = PropertiesComponent.getInstance();
+  }
 
   @Override
   public String getCloudSdkHomePath() {
-    return cloudSdkHomePath;
+    return propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY);
   }
 
   @Override
   public void setCloudSdkHomePath(String cloudSdkHomePath) {
-    this.cloudSdkHomePath = cloudSdkHomePath;
+    propertiesComponent.setValue(CLOUD_SDK_PROPERTY_KEY, cloudSdkHomePath);
   }
 }

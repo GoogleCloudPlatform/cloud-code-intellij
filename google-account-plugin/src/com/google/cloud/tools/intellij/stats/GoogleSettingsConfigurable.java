@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.stats;
 
+import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
+
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
@@ -56,7 +58,7 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable.Parent
   @Nls
   @Override
   public String getDisplayName() {
-    return "Google";
+    return AccountMessageBundle.message("settings.menu.item.google.text");
   }
 
   @Nullable

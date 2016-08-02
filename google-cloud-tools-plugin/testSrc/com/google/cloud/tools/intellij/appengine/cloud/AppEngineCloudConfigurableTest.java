@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
 
@@ -38,8 +39,10 @@ import java.io.IOException;
 public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private AppEngineCloudConfigurable appEngineCloudConfigurable;
   private SystemEnvironmentProvider environmentProvider;
+  private CloudSdkService cloudSdkService;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
+  private static final String CLOUD_SDK_DIR_PATH = new File("/a/b/c/gcloud-sdk").getAbsolutePath();
   private static final String MISSING_SDK_DIR_WARNING = "Please select a Cloud SDK home directory.";
 
   @Override
@@ -50,10 +53,23 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
         ApplicationManager.getApplication().getPicoContainer();
 
     environmentProvider = mock(SystemEnvironmentProvider.class);
+    cloudSdkService = mock(CloudSdkService.class);
 
     applicationContainer.unregisterComponent(SystemEnvironmentProvider.class.getName());
+    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
+
     applicationContainer.registerComponentInstance(
         SystemEnvironmentProvider.class.getName(), environmentProvider);
+    applicationContainer.registerComponentInstance(
+        CloudSdkService.class.getName(), cloudSdkService);
+  }
+
+  public void testSetupWithGoogleSettingSdkConfigured() throws Exception {
+    when(cloudSdkService.getCloudSdkHomePath()).thenReturn(CLOUD_SDK_DIR_PATH);
+    initCloudConfigurable();
+    appEngineCloudConfigurable.reset();
+
+    assertEquals(CLOUD_SDK_DIR_PATH, cloudSdkDirectoryField.getText());
   }
 
   public void testApply_validSdk() throws Exception {

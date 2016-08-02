@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.stats;
 
+import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
+
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 
@@ -52,7 +54,7 @@ public class UsageTrackerConfigurable implements SearchableConfigurable {
   @Nls
   @Override
   public String getDisplayName() {
-    return "Usage Tracking";
+    return AccountMessageBundle.message("settings.menu.item.usage.tracking.text");
   }
 
   @Nullable

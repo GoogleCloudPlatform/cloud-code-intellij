@@ -113,7 +113,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   }
 
   @VisibleForTesting
-  public CloudSdkPanel getCloudSdkPanel() {
+  CloudSdkPanel getCloudSdkPanel() {
     return cloudSdkPanel;
   }
 

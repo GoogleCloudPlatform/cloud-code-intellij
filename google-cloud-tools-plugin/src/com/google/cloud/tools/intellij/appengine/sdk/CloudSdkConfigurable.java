@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.intellij.util.GctBundle;
+
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 
@@ -52,7 +54,7 @@ public class CloudSdkConfigurable implements SearchableConfigurable {
   @Nls
   @Override
   public String getDisplayName() {
-    return "Cloud SDK";
+    return GctBundle.message("settings.menu.item.cloud.sdk.text");
   }
 
   @Nullable
@@ -78,16 +80,20 @@ public class CloudSdkConfigurable implements SearchableConfigurable {
 
   @Override
   public void apply() throws ConfigurationException {
-    cloudSdkPanel.apply();
+    if (cloudSdkPanel != null) {
+      cloudSdkPanel.apply();
+    }
   }
 
   @Override
   public void reset() {
-    cloudSdkPanel.reset();
+    if (cloudSdkPanel != null) {
+      cloudSdkPanel.reset();
+    }
   }
 
   @Override
   public void disposeUIResources() {
-
+    cloudSdkPanel = null;
   }
 }

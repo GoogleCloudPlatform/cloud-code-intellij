@@ -64,12 +64,7 @@ public class CloudSdkPanel {
     );
 
     cloudSdkDirectoryField.getTextField().getDocument()
-        .addDocumentListener(getSdkDirectoryFieldListener());
-  }
-
-  @VisibleForTesting
-  public JLabel getWarningMessage() {
-    return warningMessage;
+        .addDocumentListener(new SdkDirectoryFieldListener());
   }
 
   @VisibleForTesting
@@ -77,23 +72,9 @@ public class CloudSdkPanel {
     return cloudSdkDirectoryField;
   }
 
-  private DocumentAdapter getSdkDirectoryFieldListener() {
-    return new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        String path = cloudSdkDirectoryField.getText();
-        boolean isValid = CloudSdkUtil.containsCloudSdkExecutable(path);
-        if (isValid) {
-          cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
-          warningMessage.setVisible(false);
-        } else {
-          cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
-          warningMessage.setVisible(true);
-          warningMessage.setText(
-              GctBundle.message("appengine.cloudsdk.location.missing.message"));
-        }
-      }
-    };
+  @VisibleForTesting
+  JLabel getWarningMessage() {
+    return warningMessage;
   }
 
   public boolean isModified() {
@@ -123,5 +104,22 @@ public class CloudSdkPanel {
   @NotNull
   public JPanel getComponent() {
     return cloudSdkPanel;
+  }
+
+  private class SdkDirectoryFieldListener extends DocumentAdapter {
+    @Override
+    protected void textChanged(DocumentEvent event) {
+      String path = cloudSdkDirectoryField.getText();
+      boolean isValid = CloudSdkUtil.containsCloudSdkExecutable(path);
+      if (isValid) {
+        cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
+        warningMessage.setVisible(false);
+      } else {
+        cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
+        warningMessage.setVisible(true);
+        warningMessage.setText(
+            GctBundle.message("appengine.cloudsdk.location.missing.message"));
+      }
+    }
   }
 }
