@@ -18,11 +18,10 @@ package com.google.cloud.tools.intellij.stats;
 
 import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
 
+import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.options.SearchableConfigurable;
 
 import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
@@ -30,25 +29,13 @@ import javax.swing.JComponent;
 /**
  * Creates a Usage Tracking item in the settings.
  */
-public class UsageTrackerConfigurable implements SearchableConfigurable {
+public class UsageTrackerConfigurable implements Configurable {
 
   private UsageTrackerPanel usageTrackerPanel;
   private UsageTrackerManager usageTrackerManager;
 
   public UsageTrackerConfigurable() {
     usageTrackerManager = UsageTrackerManager.getInstance();
-  }
-
-  @NotNull
-  @Override
-  public String getId() {
-    return "google.settings.tracker";
-  }
-
-  @Nullable
-  @Override
-  public Runnable enableSearch(String option) {
-    return null;
   }
 
   @Nls

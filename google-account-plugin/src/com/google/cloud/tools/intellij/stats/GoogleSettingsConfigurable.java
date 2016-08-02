@@ -20,10 +20,8 @@ import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.options.SearchableConfigurable;
 
 import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
@@ -31,29 +29,7 @@ import javax.swing.JComponent;
 /**
  * Creates a Google menu item to contain various Google plugins related settings.
  */
-public class GoogleSettingsConfigurable implements SearchableConfigurable.Parent {
-
-  @Override
-  public boolean hasOwnContent() {
-    return false;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return true;
-  }
-
-  @NotNull
-  @Override
-  public String getId() {
-    return "settings.google";
-  }
-
-  @Nullable
-  @Override
-  public Runnable enableSearch(String option) {
-    return null;
-  }
+public class GoogleSettingsConfigurable implements Configurable {
 
   @Nls
   @Override
@@ -65,11 +41,6 @@ public class GoogleSettingsConfigurable implements SearchableConfigurable.Parent
   @Override
   public String getHelpTopic() {
     return null;
-  }
-
-  @Override
-  public Configurable[] getConfigurables() {
-    return new Configurable[0];
   }
 
   @Nullable

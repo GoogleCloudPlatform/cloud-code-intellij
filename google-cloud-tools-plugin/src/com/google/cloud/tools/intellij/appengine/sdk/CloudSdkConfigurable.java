@@ -18,11 +18,10 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 
+import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.options.SearchableConfigurable;
 
 import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
@@ -30,25 +29,13 @@ import javax.swing.JComponent;
 /**
  * Creates a Cloud SDK menu item for configuring the path to the Cloud SDK.
  */
-public class CloudSdkConfigurable implements SearchableConfigurable {
+public class CloudSdkConfigurable implements Configurable {
 
   private CloudSdkPanel cloudSdkPanel;
   private CloudSdkService cloudSdkService;
 
   public CloudSdkConfigurable() {
     cloudSdkService = CloudSdkService.getInstance();
-  }
-
-  @NotNull
-  @Override
-  public String getId() {
-    return "google.settings.sdk";
-  }
-
-  @Nullable
-  @Override
-  public Runnable enableSearch(String option) {
-    return null;
   }
 
   @Nls
