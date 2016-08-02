@@ -47,13 +47,14 @@ public class CloudSdkPanel {
   public CloudSdkPanel(@NotNull CloudSdkService cloudSdkService) {
     warningMessage.setVisible(false);
 
-    final String cloudSdkDirectoryPath
-        = CloudSdkUtil.findCloudSdkDirectoryPath(SystemEnvironmentProvider.getInstance());
+    if (cloudSdkService.getCloudSdkHomePath() == null) {
+      final String cloudSdkDirectoryPath
+          = CloudSdkUtil.findCloudSdkDirectoryPath(SystemEnvironmentProvider.getInstance());
 
-    if (cloudSdkDirectoryPath != null
-        && cloudSdkService.getCloudSdkHomePath() == null) {
-      cloudSdkService.setCloudSdkHomePath(cloudSdkDirectoryPath);
-      cloudSdkDirectoryField.setText(cloudSdkDirectoryPath);
+      if (cloudSdkDirectoryPath != null) {
+        cloudSdkService.setCloudSdkHomePath(cloudSdkDirectoryPath);
+        cloudSdkDirectoryField.setText(cloudSdkDirectoryPath);
+      }
     }
 
     cloudSdkDirectoryField.addBrowseFolderListener(
@@ -107,6 +108,7 @@ public class CloudSdkPanel {
   }
 
   private class SdkDirectoryFieldListener extends DocumentAdapter {
+
     @Override
     protected void textChanged(DocumentEvent event) {
       String path = cloudSdkDirectoryField.getText();
