@@ -46,12 +46,6 @@ Code inspections for App Engine Java code.</description>
     </component>
   </application-components>
 
-  <project-components>
-    <component>
-      <implementation-class>com.google.cloud.tools.intellij.LegacyFacetUpdater</implementation-class>
-    </component>
-  </project-components>
-
   <extensionPoints>
     <extensionPoint name="forbiddenCodeHandler" interface="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeHandler"/>
   </extensionPoints>
@@ -85,6 +79,7 @@ Code inspections for App Engine Java code.</description>
     <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory"/>
     <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType"/>
     <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.converter.AppEngineFacetConverterProvider"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.converter.AppEngineFacetMigrationConverterProvider"/>
     <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkDetector"/>
     <compileServer.plugin classpath="google-app-engine-jps-plugin.jar;appengine-runtime.jar"/>
 
