@@ -23,6 +23,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListen
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
@@ -70,29 +71,19 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       = "/generation/src/appengine/mvm/war.dockerfile";
 
   private final Project project;
-  private final File gcloudCommandPath;
-
   private File credentialsPath;
 
   /**
    * Initialize the helper.
    */
   public CloudSdkAppEngineHelper(
-      @NotNull Project project,
-      @NotNull File gcloudCommandPath) {
+      @NotNull Project project) {
     this.project = project;
-    this.gcloudCommandPath = gcloudCommandPath;
   }
 
   @Override
   public Project getProject() {
     return project;
-  }
-
-  @NotNull
-  @Override
-  public File getGcloudCommandPath() {
-    return gcloudCommandPath;
   }
 
   @NotNull
@@ -206,7 +197,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         ServiceManager.getService(CloudToolsPluginInfoService.class);
 
     return new CloudSdk.Builder()
-        .sdkPath(getGcloudCommandPath().toPath())
+        .sdkPath(new File(CloudSdkService.getInstance().getCloudSdkHomePath()).toPath())
         .async(true)
         .addStdErrLineListener(logListener)
         .addStdOutLineListener(outputListener)

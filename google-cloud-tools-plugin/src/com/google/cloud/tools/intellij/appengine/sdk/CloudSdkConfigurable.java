@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stats;
+package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -27,14 +27,21 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.JComponent;
 
 /**
- * Creates a Google menu item to contain various Google plugins related settings.
+ * Creates a Cloud SDK menu item for configuring the path to the Cloud SDK.
  */
-public class GoogleSettingsConfigurable implements Configurable {
+public class CloudSdkConfigurable implements Configurable {
+
+  private CloudSdkPanel cloudSdkPanel;
+  private CloudSdkService cloudSdkService;
+
+  public CloudSdkConfigurable() {
+    cloudSdkService = CloudSdkService.getInstance();
+  }
 
   @Nls
   @Override
   public String getDisplayName() {
-    return AccountMessageBundle.message("settings.menu.item.google.text");
+    return GctBundle.message("settings.menu.item.cloud.sdk.text");
   }
 
   @Nullable
@@ -46,26 +53,34 @@ public class GoogleSettingsConfigurable implements Configurable {
   @Nullable
   @Override
   public JComponent createComponent() {
-    return null;
+    if (cloudSdkPanel == null) {
+      cloudSdkPanel = new CloudSdkPanel(cloudSdkService);
+    }
+
+    return cloudSdkPanel.getComponent();
   }
 
   @Override
   public boolean isModified() {
-    return false;
+    return cloudSdkPanel.isModified();
   }
 
   @Override
   public void apply() throws ConfigurationException {
-
+    if (cloudSdkPanel != null) {
+      cloudSdkPanel.apply();
+    }
   }
 
   @Override
   public void reset() {
-
+    if (cloudSdkPanel != null) {
+      cloudSdkPanel.reset();
+    }
   }
 
   @Override
   public void disposeUIResources() {
-
+    cloudSdkPanel = null;
   }
 }
