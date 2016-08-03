@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -145,7 +146,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     }
   }
 
-  private AppEngineRunner createStandardRunner(
+  private AppEngineExecutor createStandardRunner(
       LoggingHandler loggingHandler,
       File artifactToDeploy,
       AppEngineDeploy deploy,
@@ -155,11 +156,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           loggingHandler,
           artifactToDeploy);
 
-    return new AppEngineRunner(
+    return new AppEngineExecutor(
         new AppEngineStandardDeployTask(deploy, standardStage, isFlexCompat));
   }
 
-  private AppEngineRunner createFlexRunner(
+  private AppEngineExecutor createFlexRunner(
       LoggingHandler loggingHandler,
       File artifactToDeploy,
       AppEngineDeploymentConfiguration config,
@@ -170,7 +171,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           artifactToDeploy,
           config);
 
-    return new AppEngineRunner(new AppEngineFlexibleDeployTask(deploy, flexibleStage));
+    return new AppEngineExecutor(new AppEngineFlexibleDeployTask(deploy, flexibleStage));
   }
 
   @Override
