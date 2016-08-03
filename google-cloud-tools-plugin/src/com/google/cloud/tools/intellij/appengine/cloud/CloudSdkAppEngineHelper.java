@@ -114,8 +114,10 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       DeploymentOperationCallback callback) {
 
     if (source.getFile() == null
-        || !(source instanceof AppEngineDeployable)) {
-      callback.errorOccurred(GctBundle.message("appengine.deployment.source.not.found.error"));
+        || !(source instanceof AppEngineDeployable)
+        || !source.getFile().exists()) {
+      callback.errorOccurred(GctBundle.message("appengine.deployment.source.not.found.error",
+          source.getFilePath()));
       throw new RuntimeException("Invalid deployment source selected for deployment");
     }
 
