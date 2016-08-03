@@ -47,9 +47,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
   @Before
   public void initialize() {
-    helper = new CloudSdkAppEngineHelper(
-        getProject(),
-        new File("someFile.jar"));
+    helper = new CloudSdkAppEngineHelper(getProject());
 
     registerService(GoogleLoginService.class, googleLoginService);
   }

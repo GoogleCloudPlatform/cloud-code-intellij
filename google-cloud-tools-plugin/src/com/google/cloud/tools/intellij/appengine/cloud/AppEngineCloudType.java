@@ -17,6 +17,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -91,7 +92,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
   @Override
   public RemoteServerConfigurable createServerConfigurable(
       @NotNull AppEngineServerConfiguration configuration) {
-    return new AppEngineCloudConfigurable(configuration, null);
+    return new AppEngineCloudConfigurable();
   }
 
   @NotNull
@@ -105,18 +106,11 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
   @Override
   public ServerConnector<?> createConnector(@NotNull AppEngineServerConfiguration configuration,
       @NotNull ServerTaskExecutor asyncTasksExecutor) {
-    return new AppEngineServerConnector(configuration);
+    return new AppEngineServerConnector();
   }
 
   private static class AppEngineServerConnector extends
       ServerConnector<AppEngineDeploymentConfiguration> {
-
-    private AppEngineServerConfiguration configuration;
-
-    private AppEngineServerConnector(
-        AppEngineServerConfiguration configuration) {
-      this.configuration = configuration;
-    }
 
     @Override
     public void connect(@NotNull ConnectionCallback<AppEngineDeploymentConfiguration> callback) {
@@ -125,8 +119,8 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       if (!Services.getLoginService().isLoggedIn()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
       } else if (CloudSdkUtil.isCloudSdkExecutable(
-          CloudSdkUtil.toExecutablePath(configuration.getCloudSdkHomePath()))) {
-        callback.connected(new AppEngineRuntimeInstance(configuration));
+          CloudSdkUtil.toExecutablePath(CloudSdkService.getInstance().getCloudSdkHomePath()))) {
+        callback.connected(new AppEngineRuntimeInstance());
       } else {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
         // TODO Consider auto opening configuration panel
