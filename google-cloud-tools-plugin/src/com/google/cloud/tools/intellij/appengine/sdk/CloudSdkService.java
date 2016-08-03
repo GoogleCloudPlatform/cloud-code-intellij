@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.login;
+package com.google.cloud.tools.intellij.appengine.sdk;
 
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.components.ServiceManager;
 
 /**
- * Exception when a method is required but not called from an Event Dispatch Thread (EDT).
+ * IntelliJ configured service for providing the path to the Cloud SDK.
  */
-public class InvalidThreadTypeException extends Exception  {
+public abstract class CloudSdkService {
 
-  /**
-   * Initialize the exception type.
-   */
-  public InvalidThreadTypeException(@NotNull String methodName) {
-    super(methodName.isEmpty()
-        ? "Method"
-        : methodName + " must be called from an event dispatch thread (EDT)");
+  public static CloudSdkService getInstance() {
+    return ServiceManager.getService(CloudSdkService.class);
   }
+
+  public abstract String getCloudSdkHomePath();
+
+  public abstract void setCloudSdkHomePath(String path);
 }

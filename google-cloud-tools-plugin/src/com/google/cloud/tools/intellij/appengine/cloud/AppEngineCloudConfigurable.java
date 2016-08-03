@@ -16,55 +16,43 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.configurations.RuntimeConfigurationError;
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.RemoteServerConfigurable;
-import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.JBColor;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
-import javax.swing.event.DocumentEvent;
 
 /**
  * GCP App Engine Cloud configuration UI.
  */
 public class AppEngineCloudConfigurable extends RemoteServerConfigurable implements Configurable {
 
-  private final AppEngineServerConfiguration configuration;
-  private final SystemEnvironmentProvider environmentProvider;
   private static final String MORE_INFO_URI_OPEN_TAG = "<a href='https://cloud.google.com/appengine/docs/flexible/'>";
   private static final String MORE_INFO_URI_CLOSE_TAG = "</a>";
 
   private String displayName = GctBundle.message("appengine.name");
   private JPanel mainPanel;
-  private TextFieldWithBrowseButton cloudSdkDirectoryField;
-  private JLabel warningMessage;
   private JTextPane appEngineFlexMoreInfoLabel;
+  private CloudSdkPanel cloudSdkPanel;
 
   /**
    * Initialize the UI.
    */
-  public AppEngineCloudConfigurable(AppEngineServerConfiguration configuration,
-      @Nullable Project project) {
-    this.configuration = configuration;
+  public AppEngineCloudConfigurable() {
     appEngineFlexMoreInfoLabel.setText(
         GctBundle.message(
             "appengine.flex.more.info",
@@ -72,58 +60,6 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
             MORE_INFO_URI_CLOSE_TAG));
     appEngineFlexMoreInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appEngineFlexMoreInfoLabel.setBackground(mainPanel.getBackground());
-
-    environmentProvider = SystemEnvironmentProvider.getInstance();
-
-    warningMessage.setVisible(false);
-
-    final String cloudSdkDirectoryPath
-        = CloudSdkUtil.findCloudSdkDirectoryPath(environmentProvider);
-
-    if (cloudSdkDirectoryPath != null
-        && configuration.getCloudSdkHomePath() == null) {
-      configuration.setCloudSdkHomePath(cloudSdkDirectoryPath);
-      cloudSdkDirectoryField.setText(cloudSdkDirectoryPath);
-    }
-
-    cloudSdkDirectoryField.addBrowseFolderListener(
-        GctBundle.message("appengine.cloudsdk.location.browse.window.title"),
-        null,
-        project,
-        FileChooserDescriptorFactory.createSingleFolderDescriptor()
-    );
-
-    cloudSdkDirectoryField.getTextField().getDocument()
-        .addDocumentListener(getSdkDirectoryFieldListener());
-  }
-
-  private DocumentAdapter getSdkDirectoryFieldListener() {
-    return new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        String path = cloudSdkDirectoryField.getText();
-        boolean isValid = CloudSdkUtil.containsCloudSdkExecutable(path);
-        if (isValid) {
-          cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
-          warningMessage.setVisible(false);
-        } else {
-          cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
-          warningMessage.setVisible(true);
-          warningMessage.setText(
-              GctBundle.message("appengine.cloudsdk.location.missing.message"));
-        }
-      }
-    };
-  }
-
-  @VisibleForTesting
-  JLabel getWarningMessage() {
-    return warningMessage;
-  }
-
-  @VisibleForTesting
-  TextFieldWithBrowseButton getCloudSdkDirectoryField() {
-    return cloudSdkDirectoryField;
   }
 
   @Nls
@@ -146,25 +82,26 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   @Override
   public boolean isModified() {
-    boolean isSdkDirModified = !Comparing.strEqual(getCloudSdkDirectory(),
-        configuration.getCloudSdkHomePath());
-    return isSdkDirModified;
+    return cloudSdkPanel.isModified();
   }
 
+  /**
+   * User's shouldn't be able to save a cloud configuration without a valid Cloud SDK configured.
+   */
   @Override
   public void apply() throws ConfigurationException {
-    if (StringUtil.isEmpty(cloudSdkDirectoryField.getText())
-        || !CloudSdkUtil.containsCloudSdkExecutable(cloudSdkDirectoryField.getText())) {
+    if (StringUtil.isEmpty(cloudSdkPanel.getCloudSdkDirectory())
+        || !CloudSdkUtil.containsCloudSdkExecutable(cloudSdkPanel.getCloudSdkDirectory())) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.cloudsdk.location.missing.message"));
     } else {
-      configuration.setCloudSdkHomePath(cloudSdkDirectoryField.getText());
+      CloudSdkService.getInstance().setCloudSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
     }
   }
 
   @Override
   public void reset() {
-    cloudSdkDirectoryField.setText(configuration.getCloudSdkHomePath());
+    cloudSdkPanel.reset();
   }
 
   /**
@@ -175,7 +112,13 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
     return false;
   }
 
-  public String getCloudSdkDirectory() {
-    return cloudSdkDirectoryField.getText();
+  @VisibleForTesting
+  CloudSdkPanel getCloudSdkPanel() {
+    return cloudSdkPanel;
+  }
+
+  @SuppressWarnings("checkstyle:abbreviationaswordinname")
+  private void createUIComponents() {
+    cloudSdkPanel = new CloudSdkPanel(CloudSdkService.getInstance());
   }
 }

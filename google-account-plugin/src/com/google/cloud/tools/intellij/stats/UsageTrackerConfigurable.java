@@ -27,14 +27,21 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.JComponent;
 
 /**
- * Creates a Google menu item to contain various Google plugins related settings.
+ * Creates a Usage Tracking item in the settings.
  */
-public class GoogleSettingsConfigurable implements Configurable {
+public class UsageTrackerConfigurable implements Configurable {
+
+  private UsageTrackerPanel usageTrackerPanel;
+  private UsageTrackerManager usageTrackerManager;
+
+  public UsageTrackerConfigurable() {
+    usageTrackerManager = UsageTrackerManager.getInstance();
+  }
 
   @Nls
   @Override
   public String getDisplayName() {
-    return AccountMessageBundle.message("settings.menu.item.google.text");
+    return AccountMessageBundle.message("settings.menu.item.usage.tracking.text");
   }
 
   @Nullable
@@ -46,26 +53,33 @@ public class GoogleSettingsConfigurable implements Configurable {
   @Nullable
   @Override
   public JComponent createComponent() {
-    return null;
+    if (usageTrackerPanel == null) {
+      usageTrackerPanel = new UsageTrackerPanel(usageTrackerManager);
+    }
+    return usageTrackerPanel.getComponent();
   }
 
   @Override
   public boolean isModified() {
-    return false;
+    return usageTrackerPanel != null && usageTrackerPanel.isModified();
   }
 
   @Override
   public void apply() throws ConfigurationException {
-
+    if (usageTrackerPanel != null) {
+      usageTrackerPanel.apply();
+    }
   }
 
   @Override
   public void reset() {
-
+    if (usageTrackerPanel != null) {
+      usageTrackerPanel.reset();
+    }
   }
 
   @Override
   public void disposeUIResources() {
-
+    usageTrackerPanel = null;
   }
 }

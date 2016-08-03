@@ -31,7 +31,6 @@ import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,12 +40,9 @@ import java.util.Set;
 class AppEngineRuntimeInstance extends
     ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
-  private AppEngineServerConfiguration configuration;
   private final Set<CancellableRunnable> createdDeployments;
 
-  public AppEngineRuntimeInstance(
-      AppEngineServerConfiguration configuration) {
-    this.configuration = configuration;
+  public AppEngineRuntimeInstance() {
     this.createdDeployments = new HashSet<>();
   }
 
@@ -63,13 +59,9 @@ class AppEngineRuntimeInstance extends
       return;
     }
 
-    File gcloudCommandPath = new File(configuration.getCloudSdkHomePath());
-    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(
-        task.getProject(),
-        gcloudCommandPath);
+    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(task.getProject());
 
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
-
 
     final CancellableRunnable deployRunner =  appEngineHelper.createDeployRunner(
         logManager.getMainLoggingHandler(),

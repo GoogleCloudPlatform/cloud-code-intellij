@@ -41,11 +41,6 @@ public interface AppEngineHelper {
   Project getProject();
 
   /**
-   * The path to the gcloud command on the local file system.
-   */
-  File getGcloudCommandPath();
-
-  /**
    * The default app.yaml to use.
    */
   File defaultAppYaml();

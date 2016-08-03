@@ -17,24 +17,12 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.intellij.remoteServer.configuration.ServerConfigurationBase;
-import com.intellij.util.xmlb.annotations.Attribute;
 
 /**
  * Model for the IntelliJ application scoped 'Cloud' configurations.  This is a base configuration
  * used by App Engine deployment runtime configurations. It's primarily the bits that can be re-used
- * across deployments, such as auth and project.
+ * across deployments.
  */
 public class AppEngineServerConfiguration extends
     ServerConfigurationBase<AppEngineServerConfiguration> {
-
-  private String cloudSdkHomePath;
-
-  @Attribute("cloudSdkHomePath")
-  public String getCloudSdkHomePath() {
-    return cloudSdkHomePath;
-  }
-
-  public void setCloudSdkHomePath(String cloudSdkHomePath) {
-    this.cloudSdkHomePath = cloudSdkHomePath;
-  }
 }

@@ -22,6 +22,7 @@ import com.google.cloud.tools.intellij.debugger.CloudDebugProcess;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessHandler;
 import com.google.cloud.tools.intellij.debugger.CloudBreakpointHandler;
 
+import com.intellij.ide.ui.UISettings;
 import com.intellij.mock.MockApplication;
 import com.intellij.mock.MockApplicationEx;
 import com.intellij.openapi.Disposable;
@@ -62,6 +63,7 @@ public class CloudDebugHistoricalSnapshotsTest {
     Mockito.when(manager.createActionToolbar(Mockito.anyString(), Mockito.any(ActionGroup.class), Mockito.anyBoolean())).thenReturn(actionToolbar);
     Mockito.when(manager.createActionToolbar(Mockito.anyString(), Mockito.any(ActionGroup.class), Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(actionToolbar);
     application.addComponent(ActionManager.class, manager);
+    application.registerService(UISettings.class);
     ApplicationManager.setApplication(application, parent);
 
     XDebugSession session = Mockito.mock(XDebugSession.class);
