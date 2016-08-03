@@ -15,6 +15,8 @@
  */
 package com.intellij.appengine.converter;
 
+import com.google.cloud.tools.intellij.appengine.converter.BaseConverterTest;
+
 import com.intellij.appengine.AppEngineCodeInsightTestCase;
 import com.intellij.conversion.ProjectConversionTestUtil;
 import com.intellij.conversion.impl.ProjectConversionUtil;
@@ -31,21 +33,10 @@ import java.io.IOException;
 /**
  * @author nik
  */
-public class AppEngineFacetConverterTest extends PlatformTestCase {
+public class AppEngineFacetConverterTest extends BaseConverterTest {
+
   public void testConvert() throws IOException {
-    File testDataRoot = new File(AppEngineCodeInsightTestCase.getTestDataPath(), "conversion/appEngineFacet");
-    File testData = new File(testDataRoot, "before");
-    File tempDir = FileUtil.createTempDirectory("app-engine-project", null);
-    FileUtil.copyDir(testData, tempDir);
-    ProjectConversionTestUtil.convert(tempDir.getAbsolutePath());
-    File expectedDataDir = new File(testDataRoot, "after");
-    PlatformTestUtil.assertDirectoriesEqual(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(expectedDataDir),
-                                            LocalFileSystem.getInstance().refreshAndFindFileByIoFile(tempDir),
-                                            new VirtualFileFilter() {
-                                              @Override
-                                              public boolean accept(VirtualFile file) {
-                                                return !file.getName().startsWith(ProjectConversionUtil.PROJECT_FILES_BACKUP);
-                                              }
-                                            });
+    testConvert("conversion/appEngineFacet");
   }
+
 }

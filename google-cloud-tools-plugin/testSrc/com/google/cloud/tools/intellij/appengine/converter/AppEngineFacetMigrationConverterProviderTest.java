@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.util;
+package com.google.cloud.tools.intellij.appengine.converter;
 
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
-import com.intellij.openapi.extensions.PluginId;
+import java.io.IOException;
 
-public class Plugins {
+public class AppEngineFacetMigrationConverterProviderTest extends BaseConverterTest {
 
-  public boolean isPluginInstalled(String pluginId) {
-    IdeaPluginDescriptor pluginDescriptor = getPluginById(pluginId);
-    return pluginDescriptor != null && pluginDescriptor.isEnabled();
+  public void testConvertBasic() throws IOException {
+    testConvert("conversion/appEngineFacetMigration");
   }
 
-  public IdeaPluginDescriptor getPluginById(String pluginId) {
-    return PluginManager.getPlugin(PluginId.findId(pluginId));
-  }
 }
