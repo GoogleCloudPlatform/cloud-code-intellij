@@ -48,7 +48,9 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable provider="com.google.cloud.tools.intellij.stats.GoogleSettingsConfigurableProvider"/>
+    <applicationConfigurable groupId="google" id="google.settings" instance="com.google.cloud.tools.intellij.stats.GoogleSettingsConfigurable"/>
+    <applicationConfigurable parentId="google.settings" provider="com.google.cloud.tools.intellij.stats.UsageTrackerConfigurableProvider"/>
+
     <applicationService serviceInterface="com.google.cloud.tools.intellij.stats.UsageTrackerProvider"
                         serviceImplementation="com.google.cloud.tools.intellij.stats.KeyedExtensionUsageTrackerProvider"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.AccountPluginInfoService"

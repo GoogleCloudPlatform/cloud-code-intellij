@@ -28,7 +28,6 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,9 +78,7 @@ class AppEngineDeploymentConfigurator extends
     return new AppEngineDeploymentRunConfigurationEditor(
         project,
         (AppEngineDeployable) source,
-        new CloudSdkAppEngineHelper(
-            project,
-            new File(server.getConfiguration().getCloudSdkHomePath()))
+        new CloudSdkAppEngineHelper(project)
     );
   }
 }
