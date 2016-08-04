@@ -11,7 +11,7 @@
         </webroots>
       </configuration>
     </facet>
-    <facet type="google-app-engine" name="Google App Engine">
+    <facet type="gcp-app-engine-standard" name="Google App Engine">
       <configuration>
         <files-to-enhance>
           <file path="$MODULE_DIR$/src" />
