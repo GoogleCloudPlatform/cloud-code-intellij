@@ -20,8 +20,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.util.Plugins;
-
 import com.intellij.conversion.ModuleSettings;
 import com.intellij.testFramework.PlatformTestCase;
 
@@ -35,7 +33,6 @@ import java.util.Collections;
  */
 public class AppEngineFacetMigrationConversionProcessorTest extends PlatformTestCase {
 
-  private Plugins pluginsMock;
   private ModuleSettings moduleSettingsMock;
   private AppEngineFacetMigrationConversionProcessor processor;
   private Collection testFacetElements;
@@ -43,29 +40,18 @@ public class AppEngineFacetMigrationConversionProcessorTest extends PlatformTest
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    // init mocks
-    pluginsMock = mock(Plugins.class);
+    // init mocks & test data
     moduleSettingsMock = mock(ModuleSettings.class);
-    // init test data
     testFacetElements = Collections.singletonList(mock(Element.class));
 
     processor = new AppEngineFacetMigrationConversionProcessor();
-    processor.setPlugins(pluginsMock);
   }
 
-  public void testIsConversionNeeded_oldPluginIsInstalled() {
-    when(pluginsMock.isPluginInstalled(getOldPluginId())).thenReturn(true);
-    when(moduleSettingsMock.getFacetElements(getOldFacetId())).thenReturn(testFacetElements);
-    assertFalse(processor.isConversionNeeded(moduleSettingsMock));
-  }
-
-  public void testIsConversionNeeded_oldPluginIsNotInstalled_noOldFacetsPresent() {
-    when(pluginsMock.isPluginInstalled(getOldPluginId())).thenReturn(false);
+  public void testIsConversionNeeded_oldFacetsAreNotPresent() {
     when(moduleSettingsMock.getFacetElements(getOldFacetId())).thenReturn((Collection) Collections.emptyList());
     assertFalse(processor.isConversionNeeded(moduleSettingsMock));
   }
-  public void testIsConversionNeeded_oldPluginIsNotInstalled_oldFacetsArePresent() {
-    when(pluginsMock.isPluginInstalled(getOldPluginId())).thenReturn(false);
+  public void testIsConversionNeeded_oldFacetsArePresent() {
     when(moduleSettingsMock.getFacetElements(getOldFacetId())).thenReturn(testFacetElements);
     assertTrue(processor.isConversionNeeded(moduleSettingsMock));
   }
@@ -74,8 +60,5 @@ public class AppEngineFacetMigrationConversionProcessorTest extends PlatformTest
     return eq(AppEngineFacetMigrationConversionProcessor.DEPRECATED_APP_ENGINE_FACET_ID);
   }
 
-  private String getOldPluginId() {
-    return eq(AppEngineFacetMigrationConversionProcessor.DEPRECATED_PLUGIN_ID);
-  }
 }
 

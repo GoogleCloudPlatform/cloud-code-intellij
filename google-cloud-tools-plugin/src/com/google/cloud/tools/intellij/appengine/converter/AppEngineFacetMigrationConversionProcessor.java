@@ -17,14 +17,12 @@
 package com.google.cloud.tools.intellij.appengine.converter;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType;
-import com.google.cloud.tools.intellij.util.Plugins;
 
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionProcessor;
 import com.intellij.conversion.ModuleSettings;
 
 import org.jdom.Element;
-import org.jetbrains.annotations.TestOnly;
 import org.jetbrains.jps.model.serialization.facet.JpsFacetSerializer;
 
 /**
@@ -33,26 +31,11 @@ import org.jetbrains.jps.model.serialization.facet.JpsFacetSerializer;
 public class AppEngineFacetMigrationConversionProcessor extends
     ConversionProcessor<ModuleSettings> {
 
-  static final String DEPRECATED_PLUGIN_ID = "com.intellij.appengine";
   static final String DEPRECATED_APP_ENGINE_FACET_ID = "google-app-engine";
-
-  private Plugins plugins;
-
-  public AppEngineFacetMigrationConversionProcessor() {
-    this.plugins = new Plugins();
-  }
-
-  @TestOnly
-  public void setPlugins(Plugins plugins) {
-    this.plugins = plugins;
-  }
 
   @Override
   public boolean isConversionNeeded(ModuleSettings settings) {
-    boolean deprecatedPluginIsNotInstalled = !plugins.isPluginInstalled(DEPRECATED_PLUGIN_ID);
-    boolean deprecatedFacetsArePresent =
-        !settings.getFacetElements(DEPRECATED_APP_ENGINE_FACET_ID).isEmpty();
-    return deprecatedPluginIsNotInstalled && deprecatedFacetsArePresent;
+    return !settings.getFacetElements(DEPRECATED_APP_ENGINE_FACET_ID).isEmpty();
   }
 
   @Override
