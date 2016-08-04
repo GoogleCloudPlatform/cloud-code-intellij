@@ -309,6 +309,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       return myMainPanel;
     }
 
+    @SuppressWarnings("checkstyle:abbreviationaswordinname")
     private void createUIComponents() {
       cloudSdkPanel = new CloudSdkPanel(CloudSdkService.getInstance());
     }

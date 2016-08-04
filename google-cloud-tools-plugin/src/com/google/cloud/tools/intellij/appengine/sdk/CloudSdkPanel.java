@@ -70,7 +70,7 @@ public class CloudSdkPanel {
     cloudSdkDirectoryField.getTextField().getDocument()
         .addDocumentListener(new DocumentAdapter() {
           @Override
-          protected void textChanged(DocumentEvent e) {
+          protected void textChanged(DocumentEvent event) {
             checkSdk();
           }
         });
