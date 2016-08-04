@@ -27,6 +27,9 @@ import org.jdom.Element;
 import org.jetbrains.annotations.TestOnly;
 import org.jetbrains.jps.model.serialization.facet.JpsFacetSerializer;
 
+/**
+ * Performs conversions from deprecated App Engine Facets to their new version.
+ */
 public class AppEngineFacetMigrationConversionProcessor extends
     ConversionProcessor<ModuleSettings> {
 

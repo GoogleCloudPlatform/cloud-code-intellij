@@ -20,6 +20,9 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.extensions.PluginId;
 
+/**
+ * Helper methods for dealing with installed plugins.
+ */
 public class Plugins {
 
   public boolean isPluginInstalled(String pluginId) {
