@@ -49,7 +49,8 @@ public class AppEngineFacetMigrationConversionProcessorTest extends PlatformTest
     // init test data
     testFacetElements = Collections.singletonList(mock(Element.class));
 
-    processor = new AppEngineFacetMigrationConversionProcessor(pluginsMock);
+    processor = new AppEngineFacetMigrationConversionProcessor();
+    processor.setPlugins(pluginsMock);
   }
 
   public void testIsConversionNeeded_oldPluginIsInstalled() {

@@ -24,17 +24,23 @@ import com.intellij.conversion.ConversionProcessor;
 import com.intellij.conversion.ModuleSettings;
 
 import org.jdom.Element;
+import org.jetbrains.annotations.TestOnly;
 import org.jetbrains.jps.model.serialization.facet.JpsFacetSerializer;
 
 public class AppEngineFacetMigrationConversionProcessor extends
     ConversionProcessor<ModuleSettings> {
 
-  final static String DEPRECATED_PLUGIN_ID = "com.intellij.appengine";
-  final static String DEPRECATED_APP_ENGINE_FACET_ID = "google-app-engine";
+  static final String DEPRECATED_PLUGIN_ID = "com.intellij.appengine";
+  static final String DEPRECATED_APP_ENGINE_FACET_ID = "google-app-engine";
 
   private Plugins plugins;
 
-  public AppEngineFacetMigrationConversionProcessor(Plugins plugins) {
+  public AppEngineFacetMigrationConversionProcessor() {
+    this.plugins = new Plugins();
+  }
+
+  @TestOnly
+  public void setPlugins(Plugins plugins) {
     this.plugins = plugins;
   }
 

@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.converter;
 
-import com.google.cloud.tools.intellij.util.Plugins;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.conversion.ConversionContext;
 import com.intellij.conversion.ConversionProcessor;
@@ -38,7 +38,7 @@ public class AppEngineFacetMigrationConverterProvider extends ConverterProvider 
     return new ProjectConverter() {
       @Override
       public ConversionProcessor<ModuleSettings> createModuleFileConverter() {
-        return new AppEngineFacetMigrationConversionProcessor(new Plugins());
+        return new AppEngineFacetMigrationConversionProcessor();
       }
     };
   }
@@ -46,8 +46,7 @@ public class AppEngineFacetMigrationConverterProvider extends ConverterProvider 
   @NotNull
   @Override
   public String getConversionDescription() {
-    // TODO get from properties bundle
-    return "Deprecated Google App Engine facets will be replaced with the latest version";
+    return GctBundle.message("appengine.facet.converter.description");
   }
 
 }
