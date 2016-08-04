@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
