@@ -69,20 +69,22 @@ class AppEngineRuntimeInstance extends
         deploymentConfig,
         callback);
 
-    // keep track of any active deployments
-    synchronized (createdDeployments) {
-      createdDeployments.add(deployRunner);
-    }
+    if (deployRunner != null) {
+      // keep track of any active deployments
+      synchronized (createdDeployments) {
+        createdDeployments.add(deployRunner);
+      }
 
-    ProgressManager.getInstance()
-        .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
-            "appengine.deployment.status.deploying"), true,
-            null) {
-          @Override
-          public void run(@NotNull ProgressIndicator indicator) {
-            ApplicationManager.getApplication().invokeLater(deployRunner);
-          }
-        });
+      ProgressManager.getInstance()
+          .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
+              "appengine.deployment.status.deploying"), true,
+              null) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+              ApplicationManager.getApplication().invokeLater(deployRunner);
+            }
+          });
+    }
   }
 
   @Override
