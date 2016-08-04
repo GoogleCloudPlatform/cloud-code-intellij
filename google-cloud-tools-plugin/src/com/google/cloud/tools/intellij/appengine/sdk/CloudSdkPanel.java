@@ -21,6 +21,8 @@ import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
 
+import com.intellij.icons.AllIcons;
+import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -46,6 +48,7 @@ public class CloudSdkPanel {
 
   public CloudSdkPanel(@NotNull CloudSdkService cloudSdkService) {
     warningMessage.setVisible(false);
+    warningMessage.setIcon(RunConfigurations.ConfigurationWarning);
 
     if (cloudSdkService.getCloudSdkHomePath() == null) {
       final String cloudSdkDirectoryPath
@@ -65,7 +68,36 @@ public class CloudSdkPanel {
     );
 
     cloudSdkDirectoryField.getTextField().getDocument()
-        .addDocumentListener(new SdkDirectoryFieldListener());
+        .addDocumentListener(new DocumentAdapter() {
+          @Override
+          protected void textChanged(DocumentEvent e) {
+            checkSdk();
+          }
+        });
+
+    checkSdk();
+  }
+
+  private void checkSdk() {
+    String path = cloudSdkDirectoryField.getText();
+
+    if (StringUtil.isEmpty(path)) {
+      warningMessage.setVisible(true);
+      warningMessage.setText(
+          GctBundle.message("appengine.cloudsdk.location.missing.message"));
+      return;
+    }
+
+    boolean isValid = CloudSdkUtil.containsCloudSdkExecutable(path);
+    if (isValid) {
+      cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
+      warningMessage.setVisible(false);
+    } else {
+      cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
+      warningMessage.setVisible(true);
+      warningMessage.setText(
+          GctBundle.message("appengine.cloudsdk.location.invalid.message"));
+    }
   }
 
   @VisibleForTesting
@@ -84,10 +116,7 @@ public class CloudSdkPanel {
   }
 
   public void apply() throws ConfigurationException {
-    if (!StringUtil.isEmpty(getCloudSdkDirectory())
-        && CloudSdkUtil.containsCloudSdkExecutable(getCloudSdkDirectory())) {
-      CloudSdkService.getInstance().setCloudSdkHomePath(getCloudSdkDirectory());
-    }
+    CloudSdkService.getInstance().setCloudSdkHomePath(getCloudSdkDirectory());
   }
 
   public void reset() {
@@ -105,23 +134,5 @@ public class CloudSdkPanel {
   @NotNull
   public JPanel getComponent() {
     return cloudSdkPanel;
-  }
-
-  private class SdkDirectoryFieldListener extends DocumentAdapter {
-
-    @Override
-    protected void textChanged(DocumentEvent event) {
-      String path = cloudSdkDirectoryField.getText();
-      boolean isValid = CloudSdkUtil.containsCloudSdkExecutable(path);
-      if (isValid) {
-        cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
-        warningMessage.setVisible(false);
-      } else {
-        cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
-        warningMessage.setVisible(true);
-        warningMessage.setText(
-            GctBundle.message("appengine.cloudsdk.location.missing.message"));
-      }
-    }
   }
 }

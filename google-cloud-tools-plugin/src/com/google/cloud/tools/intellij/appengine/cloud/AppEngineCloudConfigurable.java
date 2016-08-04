@@ -93,7 +93,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
     if (StringUtil.isEmpty(cloudSdkPanel.getCloudSdkDirectory())
         || !CloudSdkUtil.containsCloudSdkExecutable(cloudSdkPanel.getCloudSdkDirectory())) {
       throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.cloudsdk.location.missing.message"));
+          GctBundle.message("appengine.cloudsdk.location.invalid.message"));
     } else {
       CloudSdkService.getInstance().setCloudSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
     }
