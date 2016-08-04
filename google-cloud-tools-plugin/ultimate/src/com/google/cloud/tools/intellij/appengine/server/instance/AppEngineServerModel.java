@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
+import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
@@ -47,22 +48,28 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * @author nik
  */
-public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStartupOnly {
+public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStartupOnly,
+    RunConfiguration {
 
-  private ArtifactPointer myArtifactPointer;
-  private int myPort = 8080;
-  private String myServerParameters = "";
-  private CommonModel myCommonModel;
+  private ArtifactPointer artifactPointer;
+  private String serverParameters = "";
+  private CommonModel commonModel;
+
+  private final AppEngineModelSettings settings = new AppEngineModelSettings();
 
   @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
-    return new AppEngineServerInstance(myCommonModel);
+    return new AppEngineServerInstance(commonModel);
   }
 
   @Override
@@ -73,12 +80,12 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   @NotNull
   public String getDefaultUrlForBrowser() {
-    return "http://" + myCommonModel.getHost() + ":" + myPort;
+    return "http://" + commonModel.getHost() + ":" + settings.getPort();
   }
 
   @Override
   public SettingsEditor<CommonModel> getEditor() {
-    return new AppEngineRunConfigurationEditor(myCommonModel.getProject());
+    return new AppEngineRunConfigurationEditor(commonModel.getProject());
   }
 
   @Override
@@ -89,12 +96,13 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public List<Pair<String, Integer>> getAddressesToCheck() {
-    return Collections.singletonList(Pair.create(myCommonModel.getHost(), myPort));
+    return Collections.singletonList(Pair.create(commonModel.getHost(),
+        settings.getPort()));
   }
 
   @Override
   public boolean isResourcesReloadingSupported() {
-    return myCommonModel.isLocal();
+    return commonModel.isLocal();
   }
 
   @Override
@@ -105,12 +113,12 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   public void checkConfiguration() throws RuntimeConfigurationException {
     Artifact artifact;
-    if (myArtifactPointer == null || (artifact = myArtifactPointer.getArtifact()) == null) {
+    if (artifactPointer == null || (artifact = artifactPointer.getArtifact()) == null) {
       throw new RuntimeConfigurationError("Artifact isn't specified");
     }
 
     final AppEngineFacet facet = AppEngineUtilLegacy
-        .findAppEngineFacet(myCommonModel.getProject(), artifact);
+        .findAppEngineFacet(commonModel.getProject(), artifact);
     if (facet == null) {
       throw new RuntimeConfigurationWarning(
           "App Engine facet not found in '" + artifact.getName() + "' artifact");
@@ -124,7 +132,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public void setCommonModel(CommonModel commonModel) {
-    myCommonModel = commonModel;
+    this.commonModel = commonModel;
   }
 
   @Override
@@ -134,97 +142,224 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public int getLocalPort() {
-    return myPort;
+    return settings.getPort();
   }
 
   @Override
   public void readExternal(Element element) throws InvalidDataException {
-    final AppEngineModelSettings settings = new AppEngineModelSettings();
     XmlSerializer.deserializeInto(settings, element);
-    myPort = settings.getPort();
-    myServerParameters = settings.getServerParameters();
+//    port = settings.getPort();
+    serverParameters = settings.getServerParameters();
     final String artifactName = settings.getArtifact();
     if (artifactName != null) {
-      myArtifactPointer = ArtifactPointerManager.getInstance(myCommonModel.getProject())
+      artifactPointer = ArtifactPointerManager.getInstance(commonModel.getProject())
           .createPointer(artifactName);
     } else {
-      myArtifactPointer = null;
+      artifactPointer = null;
     }
   }
 
   @Override
   public void writeExternal(Element element) throws WriteExternalException {
-    XmlSerializer
-        .serializeInto(new AppEngineModelSettings(myPort, myArtifactPointer, myServerParameters),
-            element, new SkipDefaultValuesSerializationFilters());
+    XmlSerializer.serializeInto(settings, element, new SkipDefaultValuesSerializationFilters());
   }
 
   @Nullable
   public Artifact getArtifact() {
-    return myArtifactPointer != null ? myArtifactPointer.getArtifact() : null;
+    return artifactPointer != null ? artifactPointer.getArtifact() : null;
   }
 
   public void setPort(int port) {
-    myPort = port;
+    settings.setPort(port);
   }
 
   public String getServerParameters() {
-    return myServerParameters;
+    return serverParameters;
   }
 
   public void setServerParameters(String serverParameters) {
-    myServerParameters = serverParameters;
+    this.serverParameters = serverParameters;
   }
 
   public void setArtifact(@Nullable Artifact artifact) {
     if (artifact != null) {
-      myArtifactPointer = ArtifactPointerManager.getInstance(myCommonModel.getProject())
+      artifactPointer = ArtifactPointerManager.getInstance(commonModel.getProject())
           .createPointer(artifact);
     } else {
-      myArtifactPointer = null;
+      artifactPointer = null;
     }
+  }
+
+  public AppEngineModelSettings getSettings() {
+    return settings;
+  }
+
+  @Override
+  public List<File> getAppYamls() {
+    List<File> appYamls = new ArrayList<>();
+    Path appYaml = Paths.get(artifactPointer.getArtifact().getOutputPath()).resolve("app.yaml");
+    appYamls.add(appYaml.toFile());
+    return appYamls;
+  }
+
+  @Override
+  public String getHost() {
+    return null;
+  }
+
+  @Override
+  public Integer getPort() {
+    return settings.getPort();
+  }
+
+  @Override
+  public String getAdminHost() {
+    return null;
+  }
+
+  @Override
+  public Integer getAdminPort() {
+    return null;
+  }
+
+  @Override
+  public String getAuthDomain() {
+    return null;
+  }
+
+  @Override
+  public String getStoragePath() {
+    return null;
+  }
+
+  @Override
+  public String getLogLevel() {
+    return null;
+  }
+
+  @Override
+  public Integer getMaxModuleInstances() {
+    return null;
+  }
+
+  @Override
+  public Boolean getUseMtimeFileWatcher() {
+    return null;
+  }
+
+  @Override
+  public String getThreadsafeOverride() {
+    return null;
+  }
+
+  @Override
+  public String getPythonStartupScript() {
+    return null;
+  }
+
+  @Override
+  public String getPythonStartupArgs() {
+    return null;
+  }
+
+  @Override
+  public List<String> getJvmFlags() {
+    return settings.jvmFlags;
+  }
+
+  public void addJvmFlag(String flag) {
+    if (settings.jvmFlags == null) {
+      settings.jvmFlags = new ArrayList<>();
+    }
+    settings.jvmFlags.add(flag);
+  }
+
+  @Override
+  public String getCustomEntrypoint() {
+    return null;
+  }
+
+  @Override
+  public String getRuntime() {
+    return null;
+  }
+
+  @Override
+  public Boolean getAllowSkippedFiles() {
+    return null;
+  }
+
+  @Override
+  public Integer getApiPort() {
+    return null;
+  }
+
+  @Override
+  public Boolean getAutomaticRestart() {
+    return null;
+  }
+
+  @Override
+  public String getDevAppserverLogLevel() {
+    return null;
+  }
+
+  @Override
+  public Boolean getSkipSdkUpdateCheck() {
+    return null;
+  }
+
+  @Override
+  public String getDefaultGcsBucketName() {
+    return null;
   }
 
   public static class AppEngineModelSettings {
 
-    @Tag("port")
-    private int myPort = 8080;
     @Tag("artifact")
-    private String myArtifact;
+    private String artifact;
+
+    @Tag("host")
+    private String host;
+    @Tag("port")
+    private int port = 8080;
+    @Tag("admin_host")
+    private String adminHost;
+    @Tag("admin_port")
+    private String adminPort;
+    @Tag("auth_domain")
+    private String authDomain;
+    @Tag("storage_path")
+    private String storagePath;
+
+    @Tag("jvmFlags")
+    List<String> jvmFlags;
+
     @Tag("server-parameters")
-    private String myServerParameters = "";
-
-    public AppEngineModelSettings() {
-    }
-
-    public AppEngineModelSettings(int port, ArtifactPointer pointer, String serverParameters) {
-      myPort = port;
-      myServerParameters = serverParameters;
-      myArtifact = pointer != null ? pointer.getArtifactName() : null;
-    }
-
-    public int getPort() {
-      return myPort;
-    }
+    private String serverParameters = "";
 
     public void setPort(int port) {
-      myPort = port;
+      this.port = port;
     }
 
     public String getArtifact() {
-      return myArtifact;
+      return artifact;
     }
 
     public void setArtifact(String artifact) {
-      myArtifact = artifact;
+      this.artifact = artifact;
     }
 
     public String getServerParameters() {
-      return myServerParameters;
+      return serverParameters;
     }
 
     public void setServerParameters(String serverParameters) {
-      myServerParameters = serverParameters;
+      this.serverParameters = serverParameters;
+    }
+
+    public Integer getPort() {
+      return port;
     }
   }
 }

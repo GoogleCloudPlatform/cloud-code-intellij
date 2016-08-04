@@ -17,9 +17,11 @@
 package com.intellij.appengine.server.run;
 
 import com.google.cloud.tools.appengine.api.devserver.DefaultRunConfiguration;
+import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRunTask;
 
+import com.intellij.appengine.server.instance.AppEngineServerModel;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ProgramRunner;
@@ -39,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by joaomartins on 7/27/16.
+ * Runs a Google App Engine Standard app locally with devappserver, through the tools lib.
  */
 public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
@@ -63,18 +65,15 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           @Override
           public OSProcessHandler createProcessHandler(String s, Map<String, String> map)
               throws ExecutionException {
-            DefaultRunConfiguration runConfig = new DefaultRunConfiguration();
-            List<File> appYamls = new ArrayList<>();
-            appYamls.add(new File("/usr/local/google/home/joaomartins/IdeaProjects/"
-                + "JoaoDiscoProject/out/artifacts/main_war_exploded/app.yaml"));
-            runConfig.setAppYamls(appYamls);
+            AppEngineServerModel runConfiguration =
+                (AppEngineServerModel) commonModel.getServerModel();
 
-            List<String> jvmFlags = new ArrayList<>();
-            jvmFlags.add(map.get("").trim());
-            runConfig.setJvmFlags(jvmFlags);
-            runConfig.setPort(4577);
+            // This is the place we have access to the debug jvm flag provided by IJ in the
+            // Startup/Shutdown tab. We need to add it here.
+            String jvmDebugFlag = map.get("").trim();
+            runConfiguration.addJvmFlag(jvmDebugFlag);
 
-            AppEngineRunTask runTask = new AppEngineRunTask(runConfig, null, null, null);
+            AppEngineRunTask runTask = new AppEngineRunTask(runConfiguration, null, null, null);
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 
@@ -99,6 +98,10 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             return "";
           }
 
+          /**
+           * We declare a dummy script here so there is no warning in the IJ Run/Debug configuration
+           * window about "missing shutdown script".
+           */
           @Override
           public OSProcessHandler createProcessHandler(String s, Map<String, String> map)
               throws ExecutionException {

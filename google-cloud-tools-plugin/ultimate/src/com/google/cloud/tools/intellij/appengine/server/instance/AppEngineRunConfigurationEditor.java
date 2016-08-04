@@ -34,9 +34,11 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 /**
@@ -52,6 +54,12 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JBLabel myWebArtifactToDeployLabel;
   private JBLabel myPortLabel;
   private JBLabel myServerParametersLabel;
+  private JTextField textField3;
+  private JTextField textField4;
+  private JCheckBox enableAdvanced;
+  private JTextField textField1;
+  private JTextField textField2;
+  private JPanel advancedSettingsPanel;
   private final Project myProject;
   private Artifact myLastSelectedArtifact;
   private JComponent anchor;
@@ -61,6 +69,16 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     myArtifactComboBox.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         onArtifactChanged();
+      }
+    });
+    enableAdvanced.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent actionEvent) {
+        if (enableAdvanced.isSelected()) {
+          advancedSettingsPanel.setVisible(true);
+        } else {
+          advancedSettingsPanel.setVisible(false);
+        }
       }
     });
 
