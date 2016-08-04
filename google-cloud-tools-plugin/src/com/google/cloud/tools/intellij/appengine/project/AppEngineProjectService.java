@@ -34,6 +34,8 @@ import java.util.Collection;
  */
 public abstract class AppEngineProjectService {
 
+  public static final String APP_ENGINE_STANDARD_FACET_NAME = "Google App Engine";
+
   public static AppEngineProjectService getInstance() {
     return ServiceManager.getService(AppEngineProjectService.class);
   }

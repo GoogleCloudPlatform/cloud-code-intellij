@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
@@ -131,8 +130,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
     for (Module module : modules) {
       for (Facet facet : FacetManager.getInstance(module).getAllFacets()) {
-        if (facet != null && facet.getType() != null && facet.getType().getStringId().equals(
-            AppEngineFacetType.STRING_ID)) {
+        if (facet != null && APP_ENGINE_STANDARD_FACET_NAME.equals(facet.getName())) {
           return true;
         }
       }
