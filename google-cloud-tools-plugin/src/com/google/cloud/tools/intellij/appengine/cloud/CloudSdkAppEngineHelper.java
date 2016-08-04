@@ -115,7 +115,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
     if (!(source instanceof AppEngineDeployable)) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.invalid.source.error"));
-      return null;
+      throw new RuntimeException("Invalid deployment source selected for deployment");
     }
 
     if (source.getFile() == null
