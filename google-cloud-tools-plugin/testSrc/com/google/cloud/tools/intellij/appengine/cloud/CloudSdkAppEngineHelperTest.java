@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -26,6 +27,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
+import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
+import com.intellij.remoteServer.runtime.log.LoggingHandler;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -33,6 +41,8 @@ import org.mockito.Mock;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Map;
+
+import javax.swing.Icon;
 
 /**
  * Unit tests for {@link CloudSdkAppEngineHelper}
@@ -43,6 +53,8 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   @Mock private GoogleLoginService googleLoginService;
   @Mock private CredentialedUser credentialedUser;
   @Mock private GoogleLoginState loginState;
+  @Mock private LoggingHandler loggingHandler;
+  @Mock private DeploymentOperationCallback callback;
   CloudSdkAppEngineHelper helper;
 
   @Before
@@ -73,6 +85,116 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     assertEquals(refreshToken, jsonMap.get("refresh_token"));
     assertEquals("authorized_user", jsonMap.get("type"));
     credentialFile.delete();
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testCreateDeployRunnerInvalidDeploymentSourceType_throwsException() {
+    helper.createDeployRunner(
+        loggingHandler,
+        new SimpleDeploymentSource(),
+        deploymentConfiguration,
+        callback);
+  }
+
+  @Test
+  public void testCreateDeployRunnerInvalidDeploymentSourceFile_returnsNull() {
+    Runnable runner = helper.createDeployRunner(
+        loggingHandler,
+        new DeployableDeploymentSource(),
+        deploymentConfiguration,
+        callback);
+
+    assertNull(runner);
+  }
+
+
+  private static class SimpleDeploymentSource implements DeploymentSource {
+    @Nullable
+    @Override
+    public File getFile() {
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public String getFilePath() {
+      return null;
+    }
+
+    @NotNull
+    @Override
+    public String getPresentableName() {
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon() {
+      return null;
+    }
+
+    @Override
+    public boolean isValid() {
+      return false;
+    }
+
+    @Override
+    public boolean isArchive() {
+      return false;
+    }
+
+    @NotNull
+    @Override
+    public DeploymentSourceType<?> getType() {
+      return null;
+    }
+  }
+
+  private static class DeployableDeploymentSource implements DeploymentSource, AppEngineDeployable {
+    @Override
+    public AppEngineEnvironment getEnvironment() {
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public File getFile() {
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public String getFilePath() {
+      return null;
+    }
+
+    @NotNull
+    @Override
+    public String getPresentableName() {
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon() {
+      return null;
+    }
+
+    @Override
+    public boolean isValid() {
+      return false;
+    }
+
+    @Override
+    public boolean isArchive() {
+      return false;
+    }
+
+    @NotNull
+    @Override
+    public DeploymentSourceType<?> getType() {
+      return null;
+    }
   }
 
 }
