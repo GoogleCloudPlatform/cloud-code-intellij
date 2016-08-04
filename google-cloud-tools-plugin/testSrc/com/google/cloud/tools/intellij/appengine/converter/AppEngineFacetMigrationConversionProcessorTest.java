@@ -30,6 +30,9 @@ import org.jdom.Element;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * Unit tests for {@link AppEngineFacetMigrationConversionProcessor}
+ */
 public class AppEngineFacetMigrationConversionProcessorTest extends PlatformTestCase {
 
   private Plugins pluginsMock;

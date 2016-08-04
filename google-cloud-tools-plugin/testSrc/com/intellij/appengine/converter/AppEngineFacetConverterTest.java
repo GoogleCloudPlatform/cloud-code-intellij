@@ -31,7 +31,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * @author nik
+ * Unit tests for {@link com.google.cloud.tools.intellij.appengine.converter.AppEngineFacetConverterProvider}
  */
 public class AppEngineFacetConverterTest extends BaseConverterTest {
 
