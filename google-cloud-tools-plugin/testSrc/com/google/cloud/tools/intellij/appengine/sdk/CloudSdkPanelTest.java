@@ -20,15 +20,18 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.testFramework.PlatformTestCase;
 
+import org.junit.rules.TemporaryFolder;
 import org.picocontainer.MutablePicoContainer;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 
@@ -45,10 +48,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   private JLabel warningMessage;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
-  private static final String CLOUD_SDK_EXECUTABLE_PATH = new File("/a/b/c/gcloud-sdk/bin/gcloud").getAbsolutePath();
-  private static final String CLOUD_SDK_DIR_PATH = new File("/a/b/c/gcloud-sdk").getAbsolutePath();
-
-  private static final String MISSING_SDK_DIR_WARNING = "Please select a Cloud SDK home directory.";
+  private static final String INVALID_SDK_DIR_WARNING = "Cloud SDK home directory is not correct.";
 
   @Override
   public void setUp() throws Exception {
@@ -73,17 +73,23 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     when(environmentProvider.findInPath(anyString())).thenReturn(null);
     initCloudSdkPanel();
 
-    assertFalse(warningMessage.isVisible());
+    assertTrue(warningMessage.isVisible());
     assertEmpty(cloudSdkDirectoryField.getText());
   }
 
-  public void testSetupWithSdkInPath() {
+  public void testSetupWithSdkInPath() throws IOException {
+    TemporaryFolder tempFolder = new TemporaryFolder();
+    tempFolder.create();
+    File executable = new File(tempFolder.newFolder("bin"), CloudSdkUtil.getSystemCommand());
+    executable.createNewFile();
+
     when(environmentProvider.findInPath(anyString()))
-        .thenReturn(new File(CLOUD_SDK_EXECUTABLE_PATH));
+        .thenReturn(executable);
     initCloudSdkPanel();
 
     assertFalse(warningMessage.isVisible());
-    assertEquals(CLOUD_SDK_DIR_PATH, cloudSdkDirectoryField.getText());
+    assertEquals(CloudSdkUtil.toSdkHomeDirectory(executable.getPath()),
+        cloudSdkDirectoryField.getText());
   }
 
   public void testSetupWithInvalidSdk() {
@@ -93,7 +99,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     cloudSdkDirectoryField.setText("/some/invalid/path");
 
     assertTrue(warningMessage.isVisible());
-    assertEquals(MISSING_SDK_DIR_WARNING, warningMessage.getText());
+    assertEquals(INVALID_SDK_DIR_WARNING, warningMessage.getText());
   }
 
   public void testApplyWith_invalidSdk() throws Exception {
