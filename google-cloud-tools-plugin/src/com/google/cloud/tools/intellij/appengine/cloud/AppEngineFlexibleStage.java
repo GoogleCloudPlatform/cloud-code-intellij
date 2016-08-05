@@ -78,6 +78,7 @@ public class AppEngineFlexibleStage {
       copyFile(stagingDirectory, "app.yaml", appYamlPath);
       copyFile(stagingDirectory, "Dockerfile", dockerFilePath);
     } catch (IOException ex) {
+      loggingHandler.print(ex.getMessage() + "\n");
       throw new RuntimeException(ex);
     }
   }

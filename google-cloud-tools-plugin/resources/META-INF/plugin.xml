@@ -51,6 +51,8 @@ Code inspections for App Engine Java code.</description>
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
+    <applicationConfigurable parentId="google.settings" instance="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkConfigurable"/>
+
     <implicitUsageProvider implementation="com.google.cloud.tools.intellij.appengine.validation.EndpointImplicitUsageProvider"/>
 
     <checkoutProvider implementation="com.google.cloud.tools.intellij.git.GcpCheckoutProvider"/>
@@ -64,6 +66,9 @@ Code inspections for App Engine Java code.</description>
                         serviceImplementation="com.google.cloud.tools.intellij.IdeaCloudToolsPluginInfoService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService"
                         serviceImplementation="com.google.cloud.tools.intellij.DefaultCloudToolsPluginConfigurationService"/>
+
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkService"/>
 
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkManager"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.impl.AppEngineSdkManagerImpl"/>
