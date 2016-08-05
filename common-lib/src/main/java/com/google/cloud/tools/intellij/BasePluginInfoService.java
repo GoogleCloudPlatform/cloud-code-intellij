@@ -60,6 +60,8 @@ public abstract class BasePluginInfoService implements PluginInfoService {
     this.flagReader = flagReader;
   }
 
+  // TODO: move the code from Plugins helper here??
+
   @Override
   public String getUserAgent() {
     return userAgent;
@@ -105,6 +107,19 @@ public abstract class BasePluginInfoService implements PluginInfoService {
     return false;
   }
 
+  @NotNull
+  @Override
+  public boolean isPluginInstalled(String pluginId) {
+    IdeaPluginDescriptor pluginDescriptor = getPluginById(pluginId);
+    return pluginDescriptor != null && pluginDescriptor.isEnabled();
+  }
+
+  @NotNull
+  @Override
+  public IdeaPluginDescriptor getPluginById(String pluginId) {
+    return PluginManager.getPlugin(PluginId.findId(pluginId));
+  }
+
   @VisibleForTesting
   String constructUserAgent(String pluginUserAgentName, String pluginVersion) {
     return pluginUserAgentName + "/" + pluginVersion + " (" + getCurrentPlatform() + "/"
@@ -122,4 +137,5 @@ public abstract class BasePluginInfoService implements PluginInfoService {
   String getCurrentPlatformVersion() {
     return ApplicationInfo.getInstance().getBuild().asString();
   }
+
 }

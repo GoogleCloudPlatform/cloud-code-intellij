@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.cloud.tools.intellij.util.Plugins;
 
 import com.intellij.diagnostic.errordialog.DisablePluginWarningDialog;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
@@ -29,6 +28,7 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.wm.WindowManager;
@@ -48,16 +48,12 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
   private static final String DEACTIVATE_LINK_HREF = "#deactivate";
   private static final String BUNDLED_PLUGIN_ID = "com.intellij.appengine";
 
-  private Plugins plugins;
-
-  public ConflictingAppEnginePluginCheck() {
-    plugins = new Plugins();
-  }
-
   @Override
   public void runActivity(@NotNull Project project) {
-    if (plugins.isPluginInstalled(BUNDLED_PLUGIN_ID)) {
-      notifyUser(project, plugins.getPluginById(BUNDLED_PLUGIN_ID));
+    CloudToolsPluginInfoService service = ServiceManager
+              .getService(CloudToolsPluginInfoService.class);
+    if (service.isPluginInstalled(BUNDLED_PLUGIN_ID)) {
+      notifyUser(project, service.getPluginById(BUNDLED_PLUGIN_ID));
     }
   }
 
