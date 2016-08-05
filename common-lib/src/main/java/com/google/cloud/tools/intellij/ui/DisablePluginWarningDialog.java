@@ -50,13 +50,15 @@ public class DisablePluginWarningDialog extends DialogWrapper {
   private static final int DISABLE_AND_RESTART_EXIT_CODE = NEXT_USER_EXIT_CODE;
   private final boolean myRestartCapable;
 
-  private DisablePluginWarningDialog(@NotNull Component parent, String pluginName, boolean restartCapable) {
+  private DisablePluginWarningDialog(@NotNull Component parent, String pluginName,
+      boolean restartCapable) {
     super(parent, false);
     myRestartCapable = restartCapable;
     myPromptLabel.setText(
         PluginStatusBundle.message("error.dialog.disable.plugin.prompt", pluginName));
     myRestartLabel
-        .setText(PluginStatusBundle.message(restartCapable ? "error.dialog.disable.plugin.restart" : "error.dialog.disable.plugin.norestart",
+        .setText(PluginStatusBundle.message(restartCapable
+            ? "error.dialog.disable.plugin.restart" : "error.dialog.disable.plugin.norestart",
             ApplicationNamesInfo.getInstance().getFullProductName()));
 
     setTitle(PluginStatusBundle.message("error.dialog.disable.plugin.title"));
@@ -67,9 +69,10 @@ public class DisablePluginWarningDialog extends DialogWrapper {
     IdeaPluginDescriptor plugin = PluginManager.getPlugin(pluginId);
 
     Application app = ApplicationManager.getApplication();
-    DisablePluginWarningDialog d = new DisablePluginWarningDialog(parentComponent, plugin.getName(), app.isRestartCapable());
-    d.show();
-    switch (d.getExitCode()) {
+    DisablePluginWarningDialog dialog = new DisablePluginWarningDialog(parentComponent,
+        plugin.getName(), app.isRestartCapable());
+    dialog.show();
+    switch (dialog.getExitCode()) {
       case CANCEL_EXIT_CODE:
         return;
       case DISABLE_EXIT_CODE:
@@ -79,6 +82,7 @@ public class DisablePluginWarningDialog extends DialogWrapper {
         PluginManagerCore.disablePlugin(pluginId.getIdString());
         app.restart();
         break;
+      default:
     }
   }
 
@@ -93,16 +97,13 @@ public class DisablePluginWarningDialog extends DialogWrapper {
     if (SystemInfo.isMac) {
       if (myRestartCapable) {
         return new Action[]{getCancelAction(), new DisableAction(), new DisableAndRestartAction()};
-      }
-      else {
+      } else {
         return new Action[]{getCancelAction(), new DisableAction()};
       }
-    }
-    else {
+    } else {
       if (myRestartCapable) {
         return new Action[]{new DisableAction(), new DisableAndRestartAction(), getCancelAction()};
-      }
-      else {
+      } else {
         return new Action[]{new DisableAction(), getCancelAction()};
       }
     }
@@ -114,7 +115,7 @@ public class DisablePluginWarningDialog extends DialogWrapper {
     }
 
     @Override
-    protected void doAction(ActionEvent e) {
+    protected void doAction(ActionEvent event) {
       close(DISABLE_EXIT_CODE);
     }
   }
@@ -125,7 +126,7 @@ public class DisablePluginWarningDialog extends DialogWrapper {
     }
 
     @Override
-    protected void doAction(ActionEvent e) {
+    protected void doAction(ActionEvent event) {
       close(DISABLE_AND_RESTART_EXIT_CODE);
     }
   }
