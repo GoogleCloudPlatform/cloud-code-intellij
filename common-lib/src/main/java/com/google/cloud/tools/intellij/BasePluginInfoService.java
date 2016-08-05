@@ -60,8 +60,6 @@ public abstract class BasePluginInfoService implements PluginInfoService {
     this.flagReader = flagReader;
   }
 
-  // TODO: move the code from Plugins helper here??
-
   @Override
   public String getUserAgent() {
     return userAgent;
