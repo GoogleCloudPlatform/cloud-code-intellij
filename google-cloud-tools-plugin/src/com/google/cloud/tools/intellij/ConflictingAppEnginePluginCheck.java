@@ -16,11 +16,10 @@
 
 package com.google.cloud.tools.intellij;
 
+import com.google.cloud.tools.intellij.ui.DisablePluginWarningDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
-import com.intellij.diagnostic.errordialog.DisablePluginWarningDialog;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -110,27 +109,8 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
     }
 
     private void showDisablePluginDialog(@NotNull Project project) {
-      Application app = ApplicationManager.getApplication();
       Window parent = WindowManager.getInstance().suggestParentWindow(project);
-
-      DisablePluginWarningDialog dialog =
-          new DisablePluginWarningDialog(parent, plugin.getName(), true, app.isRestartCapable());
-      dialog.show();
-
-      String pluginId = plugin.getPluginId().getIdString();
-
-      switch (dialog.getExitCode()) {
-        case DisablePluginWarningDialog.CANCEL_EXIT_CODE:
-          return;
-        case DisablePluginWarningDialog.DISABLE_EXIT_CODE:
-          PluginManager.disablePlugin(pluginId);
-          break;
-        case DisablePluginWarningDialog.DISABLE_AND_RESTART_EXIT_CODE:
-          PluginManager.disablePlugin(pluginId);
-          app.restart();
-          break;
-        default:
-      }
+      DisablePluginWarningDialog.disablePlugin(plugin.getPluginId(), parent);
     }
   }
 }
