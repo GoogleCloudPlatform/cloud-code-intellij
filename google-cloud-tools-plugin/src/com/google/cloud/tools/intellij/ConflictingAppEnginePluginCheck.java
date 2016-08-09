@@ -48,18 +48,18 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
 
   @Override
   public void runActivity(@NotNull Project project) {
-    if (isPluginInstalled(BUNDLED_PLUGIN_ID)) {
-      notifyUser(project, getPluginById(BUNDLED_PLUGIN_ID));
+    if (isPluginInstalled()) {
+      notifyUser(project, getPlugin());
     }
   }
 
-  private boolean isPluginInstalled(String pluginId) {
-    IdeaPluginDescriptor pluginDescriptor = getPluginById(pluginId);
+  private boolean isPluginInstalled() {
+    IdeaPluginDescriptor pluginDescriptor = getPlugin();
     return pluginDescriptor != null && pluginDescriptor.isEnabled();
   }
 
-  private IdeaPluginDescriptor getPluginById(String pluginId) {
-    return PluginManager.getPlugin(PluginId.findId(pluginId));
+  private IdeaPluginDescriptor getPlugin() {
+    return PluginManager.getPlugin(PluginId.findId(BUNDLED_PLUGIN_ID));
   }
 
   private void notifyUser(@NotNull Project project, @NotNull IdeaPluginDescriptor plugin) {
