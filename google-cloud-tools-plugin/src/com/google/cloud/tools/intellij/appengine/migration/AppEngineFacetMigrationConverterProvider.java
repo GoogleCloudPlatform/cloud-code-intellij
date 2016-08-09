@@ -26,6 +26,10 @@ import com.intellij.conversion.ProjectConverter;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Provides converters for an App Engine Facet Migration. This migration migrates facets that use
+ * a deprecated facet ID to a new facet ID.
+ */
 public class AppEngineFacetMigrationConverterProvider extends ConverterProvider {
 
   public AppEngineFacetMigrationConverterProvider() {
