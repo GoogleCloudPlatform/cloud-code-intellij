@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.converter;
+package com.google.cloud.tools.intellij.appengine.migration;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.converter;
+package com.google.cloud.tools.intellij.appengine.migration;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;

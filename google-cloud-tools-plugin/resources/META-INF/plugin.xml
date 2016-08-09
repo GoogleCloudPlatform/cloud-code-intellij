@@ -83,8 +83,8 @@ Code inspections for App Engine Java code.</description>
     <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType"/>
     <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory"/>
     <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.converter.AppEngineFacetConverterProvider"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.converter.AppEngineFacetMigrationConverterProvider"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineFacetConverterProvider"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineFacetMigrationConverterProvider"/>
     <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkDetector"/>
     <compileServer.plugin classpath="google-app-engine-jps-plugin.jar;appengine-runtime.jar"/>
 
