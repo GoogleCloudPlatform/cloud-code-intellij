@@ -116,7 +116,9 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
 
     private void showDisablePluginDialog(@NotNull Project project) {
       Window parent = WindowManager.getInstance().suggestParentWindow(project);
-      DisablePluginWarningDialog.disablePlugin(plugin.getPluginId(), parent);
+      DisablePluginWarningDialog dialog = new DisablePluginWarningDialog(plugin.getPluginId(),
+          parent);
+      dialog.showAndDisablePlugin();
     }
   }
 }

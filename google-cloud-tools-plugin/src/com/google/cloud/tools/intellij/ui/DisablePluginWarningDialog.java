@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.plugins.PluginManagerCore;
-import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.extensions.PluginId;
@@ -48,16 +47,20 @@ public class DisablePluginWarningDialog extends DialogWrapper {
 
   private static final int DISABLE_EXIT_CODE = OK_EXIT_CODE;
   private static final int DISABLE_AND_RESTART_EXIT_CODE = NEXT_USER_EXIT_CODE;
-  private final boolean myRestartCapable;
+  private final PluginId pluginId;
+  private final boolean isRestartCapable;
 
-  private DisablePluginWarningDialog(@NotNull Component parent, String pluginName,
-      boolean restartCapable) {
-    super(parent, false);
-    myRestartCapable = restartCapable;
+  public DisablePluginWarningDialog(@NotNull PluginId pluginId,
+      @NotNull Component parentComponent) {
+    super(parentComponent, false);
+
+    this.pluginId = pluginId;
+    IdeaPluginDescriptor plugin = PluginManager.getPlugin(pluginId);
+    isRestartCapable = ApplicationManager.getApplication().isRestartCapable();
     promptLabel.setText(
-        GctBundle.message("error.dialog.disable.plugin.prompt", pluginName));
+        GctBundle.message("error.dialog.disable.plugin.prompt", plugin.getName()));
     restartLabel
-        .setText(GctBundle.message(restartCapable
+        .setText(GctBundle.message(isRestartCapable
             ? "error.dialog.disable.plugin.restart" : "error.dialog.disable.plugin.norestart",
             ApplicationNamesInfo.getInstance().getFullProductName()));
 
@@ -65,14 +68,9 @@ public class DisablePluginWarningDialog extends DialogWrapper {
     init();
   }
 
-  public static void disablePlugin(@NotNull PluginId pluginId, @NotNull Component parentComponent) {
-    IdeaPluginDescriptor plugin = PluginManager.getPlugin(pluginId);
-
-    Application app = ApplicationManager.getApplication();
-    DisablePluginWarningDialog dialog = new DisablePluginWarningDialog(parentComponent,
-        plugin.getName(), app.isRestartCapable());
-    dialog.show();
-    switch (dialog.getExitCode()) {
+  public void showAndDisablePlugin() {
+    show();
+    switch (getExitCode()) {
       case CANCEL_EXIT_CODE:
         return;
       case DISABLE_EXIT_CODE:
@@ -80,7 +78,7 @@ public class DisablePluginWarningDialog extends DialogWrapper {
         break;
       case DISABLE_AND_RESTART_EXIT_CODE:
         PluginManagerCore.disablePlugin(pluginId.getIdString());
-        app.restart();
+        ApplicationManager.getApplication().restart();
         break;
       default:
     }
@@ -95,13 +93,13 @@ public class DisablePluginWarningDialog extends DialogWrapper {
   @Override
   protected Action[] createActions() {
     if (SystemInfo.isMac) {
-      if (myRestartCapable) {
+      if (isRestartCapable) {
         return new Action[]{getCancelAction(), new DisableAction(), new DisableAndRestartAction()};
       } else {
         return new Action[]{getCancelAction(), new DisableAction()};
       }
     } else {
-      if (myRestartCapable) {
+      if (isRestartCapable) {
         return new Action[]{new DisableAction(), new DisableAndRestartAction(), getCancelAction()};
       } else {
         return new Action[]{new DisableAction(), getCancelAction()};
