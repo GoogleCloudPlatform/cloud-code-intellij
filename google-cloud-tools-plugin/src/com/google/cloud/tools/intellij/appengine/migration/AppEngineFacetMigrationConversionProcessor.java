@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.migration;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionProcessor;
@@ -31,6 +32,7 @@ import org.jetbrains.jps.model.serialization.facet.JpsFacetSerializer;
 public class AppEngineFacetMigrationConversionProcessor extends
     ConversionProcessor<ModuleSettings> {
 
+  @VisibleForTesting
   static final String DEPRECATED_APP_ENGINE_FACET_ID = "google-app-engine";
 
   @Override
