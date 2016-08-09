@@ -33,7 +33,7 @@ import javax.swing.Icon;
  * @author nik
  */
 public class AppEngineFacetType extends FacetType<AppEngineFacet,  AppEngineFacetConfiguration> {
-  public static final String STRING_ID = "gcp-app-engine-standard";
+  public static final String STRING_ID = "app-engine-standard";
 
   public AppEngineFacetType() {
     super(AppEngineFacet.ID, STRING_ID, "Google App Engine");
