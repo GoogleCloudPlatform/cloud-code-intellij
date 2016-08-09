@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.ui;
 
-import com.google.cloud.tools.intellij.feedback.PluginStatusBundle;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
@@ -55,13 +55,13 @@ public class DisablePluginWarningDialog extends DialogWrapper {
     super(parent, false);
     myRestartCapable = restartCapable;
     myPromptLabel.setText(
-        PluginStatusBundle.message("error.dialog.disable.plugin.prompt", pluginName));
+        GctBundle.message("error.dialog.disable.plugin.prompt", pluginName));
     myRestartLabel
-        .setText(PluginStatusBundle.message(restartCapable
+        .setText(GctBundle.message(restartCapable
             ? "error.dialog.disable.plugin.restart" : "error.dialog.disable.plugin.norestart",
             ApplicationNamesInfo.getInstance().getFullProductName()));
 
-    setTitle(PluginStatusBundle.message("error.dialog.disable.plugin.title"));
+    setTitle(GctBundle.message("error.dialog.disable.plugin.title"));
     init();
   }
 
@@ -111,7 +111,7 @@ public class DisablePluginWarningDialog extends DialogWrapper {
 
   private class DisableAction extends DialogWrapperAction {
     protected DisableAction() {
-      super(PluginStatusBundle.message("error.dialog.disable.plugin.action.disable"));
+      super(GctBundle.message("error.dialog.disable.plugin.action.disable"));
     }
 
     @Override
@@ -122,7 +122,7 @@ public class DisablePluginWarningDialog extends DialogWrapper {
 
   private class DisableAndRestartAction extends DialogWrapperAction {
     protected DisableAndRestartAction() {
-      super(PluginStatusBundle.message("error.dialog.disable.plugin.action.disableAndRestart"));
+      super(GctBundle.message("error.dialog.disable.plugin.action.disableAndRestart"));
     }
 
     @Override
