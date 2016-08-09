@@ -42,9 +42,9 @@ import javax.swing.JPanel;
  * A Dialog that prompts a user to disable a plugin.
  */
 public class DisablePluginWarningDialog extends DialogWrapper {
-  private JLabel myPromptLabel;
-  private JLabel myRestartLabel;
-  private JPanel myContentPane;
+  private JLabel promptLabel;
+  private JLabel restartLabel;
+  private JPanel contentPane;
 
   private static final int DISABLE_EXIT_CODE = OK_EXIT_CODE;
   private static final int DISABLE_AND_RESTART_EXIT_CODE = NEXT_USER_EXIT_CODE;
@@ -54,9 +54,9 @@ public class DisablePluginWarningDialog extends DialogWrapper {
       boolean restartCapable) {
     super(parent, false);
     myRestartCapable = restartCapable;
-    myPromptLabel.setText(
+    promptLabel.setText(
         GctBundle.message("error.dialog.disable.plugin.prompt", pluginName));
-    myRestartLabel
+    restartLabel
         .setText(GctBundle.message(restartCapable
             ? "error.dialog.disable.plugin.restart" : "error.dialog.disable.plugin.norestart",
             ApplicationNamesInfo.getInstance().getFullProductName()));
@@ -88,7 +88,7 @@ public class DisablePluginWarningDialog extends DialogWrapper {
 
   @Override
   protected JComponent createCenterPanel() {
-    return myContentPane;
+    return contentPane;
   }
 
   @NotNull
