@@ -40,12 +40,12 @@ public class AppEngineFacetMigrationConversionProcessor extends
 
   @Override
   public void process(ModuleSettings settings) throws CannotConvertException {
-    for (Element tag : settings.getFacetElements(DEPRECATED_APP_ENGINE_FACET_ID)) {
+    for (Element deprecatedTag : settings.getFacetElements(DEPRECATED_APP_ENGINE_FACET_ID)) {
       // remove the old tag
-      tag.detach();
+      deprecatedTag.detach();
 
-      Element configuration = tag.getChild(JpsFacetSerializer.CONFIGURATION_TAG);
-      String facetName = tag.getAttributeValue(JpsFacetSerializer.NAME_ATTRIBUTE);
+      Element configuration = deprecatedTag.getChild(JpsFacetSerializer.CONFIGURATION_TAG);
+      String facetName = deprecatedTag.getAttributeValue(JpsFacetSerializer.NAME_ATTRIBUTE);
 
       // add a new tag with all the same settings as the old one, but the new facet type id
       settings.addFacetElement(AppEngineFacetType.STRING_ID, facetName, configuration.clone());
