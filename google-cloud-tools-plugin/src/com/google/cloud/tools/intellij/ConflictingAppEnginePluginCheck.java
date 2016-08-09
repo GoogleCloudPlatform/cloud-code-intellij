@@ -20,12 +20,13 @@ import com.google.cloud.tools.intellij.ui.DisablePluginWarningDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.wm.WindowManager;
@@ -47,11 +48,18 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
 
   @Override
   public void runActivity(@NotNull Project project) {
-    CloudToolsPluginInfoService service = ServiceManager
-              .getService(CloudToolsPluginInfoService.class);
-    if (service.isPluginInstalled(BUNDLED_PLUGIN_ID)) {
-      notifyUser(project, service.getPluginById(BUNDLED_PLUGIN_ID));
+    if (isPluginInstalled(BUNDLED_PLUGIN_ID)) {
+      notifyUser(project, getPluginById(BUNDLED_PLUGIN_ID));
     }
+  }
+
+  private boolean isPluginInstalled(String pluginId) {
+    IdeaPluginDescriptor pluginDescriptor = getPluginById(pluginId);
+    return pluginDescriptor != null && pluginDescriptor.isEnabled();
+  }
+
+  private IdeaPluginDescriptor getPluginById(String pluginId) {
+    return PluginManager.getPlugin(PluginId.findId(pluginId));
   }
 
   private void notifyUser(@NotNull Project project, @NotNull IdeaPluginDescriptor plugin) {

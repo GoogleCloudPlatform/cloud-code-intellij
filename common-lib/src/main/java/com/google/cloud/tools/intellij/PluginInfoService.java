@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij;
 
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-
 /**
  * Instances of this service correspond to a particular IntelliJ plugin and
  * provide information about the current configuration of the plugin.
@@ -56,14 +54,4 @@ public interface PluginInfoService {
    * for the current run of this plugin.
    */
   boolean shouldEnableErrorFeedbackReporting();
-
-  /**
-   * Determines whether the given plugin is installed.
-   */
-  boolean isPluginInstalled(String pluginId);
-
-  /**
-   * Returns the descriptor for the given plugin ID.
-   */
-  IdeaPluginDescriptor getPluginById(String pluginId);
 }
