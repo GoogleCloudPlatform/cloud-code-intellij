@@ -1,7 +1,4 @@
 language: java
-branches:
-  only:
-  - master
 matrix:
   include:
   - jdk: openjdk7
