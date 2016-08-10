@@ -43,7 +43,7 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
   private static final String CLOUD_SDK_DIR_PATH = new File("/a/b/c/gcloud-sdk").getAbsolutePath();
-  private static final String INVALID_SDK_DIR_WARNING = "Cloud SDK home directory is not correct.";
+  private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in this directory.";
 
   @Override
   public void setUp() throws Exception {
