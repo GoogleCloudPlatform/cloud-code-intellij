@@ -16,10 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
-
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.util.text.StringUtil;
 
 /**
  * Default implementation of {@link CloudSdkService} backed by {@link PropertiesComponent} for
@@ -41,9 +38,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   @Override
   public void setCloudSdkHomePath(String cloudSdkHomePath) {
-    if (!StringUtil.isEmpty(cloudSdkHomePath)
-        && CloudSdkUtil.containsCloudSdkExecutable(cloudSdkHomePath)) {
-      propertiesComponent.setValue(CLOUD_SDK_PROPERTY_KEY, cloudSdkHomePath);
-    }
+    propertiesComponent.setValue(CLOUD_SDK_PROPERTY_KEY, cloudSdkHomePath);
   }
 }
