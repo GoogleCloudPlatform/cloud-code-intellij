@@ -1,11 +1,11 @@
 /*
- * Copyright 2000-2016 JetBrains s.r.o.
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-sourceSets.main.java.srcDirs = ['src']
-sourceSets.main.resources.srcDirs = ['resources']
-sourceSets.test.java.srcDirs = ['testSrc']
-sourceSets.test.resources.srcDirs = ['testData']
+package com.google.cloud.tools.intellij.appengine.migration;
 
-jar.archiveName = "google-app-engine-jps-plugin.jar"
+import java.io.IOException;
 
-dependencies {
-    compile project(':google-cloud-tools-plugin:runtime')
-    testCompile group: 'com.jetbrains.intellij.idea', name:'jps-build-test', version: ideaVersion
+/**
+ * Unit tests for {@link AppEngineFacetMigrationConverterProvider}
+ */
+public class AppEngineFacetMigrationConverterProviderTest extends BaseConverterTest {
+
+  public void testConvertBasic() throws IOException {
+    testConvert("conversion/appEngineFacetMigration");
+  }
+
 }

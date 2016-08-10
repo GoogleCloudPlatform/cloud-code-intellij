@@ -46,9 +46,6 @@ Code inspections for App Engine Java code.</description>
     </component>
   </application-components>
 
-  <project-components>
-  </project-components>
-
   <extensionPoints>
     <extensionPoint name="forbiddenCodeHandler" interface="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeHandler"/>
   </extensionPoints>
@@ -86,7 +83,8 @@ Code inspections for App Engine Java code.</description>
     <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType"/>
     <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory"/>
     <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.converter.AppEngineFacetConverterProvider"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineFacetConverterProvider"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineFacetMigrationConverterProvider"/>
     <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkDetector"/>
     <compileServer.plugin classpath="google-app-engine-jps-plugin.jar;appengine-runtime.jar"/>
 
@@ -149,6 +147,7 @@ Code inspections for App Engine Java code.</description>
                      level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.RestSignatureInspection"/>
 
     <postStartupActivity implementation="com.google.cloud.tools.intellij.PluginCompatibilityCheck"/>
+    <postStartupActivity implementation="com.google.cloud.tools.intellij.ConflictingAppEnginePluginCheck"/>
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">
