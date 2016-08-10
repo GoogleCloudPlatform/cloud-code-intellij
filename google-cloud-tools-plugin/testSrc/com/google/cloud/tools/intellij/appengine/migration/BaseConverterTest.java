@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intellij.appengine.converter;
+
+package com.google.cloud.tools.intellij.appengine.migration;
 
 import com.intellij.appengine.AppEngineCodeInsightTestCase;
 import com.intellij.conversion.ProjectConversionTestUtil;
@@ -29,23 +30,34 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * @author nik
+ * Base class for integration tests for converters.
  */
-public class AppEngineFacetConverterTest extends PlatformTestCase {
-  public void testConvert() throws IOException {
-    File testDataRoot = new File(AppEngineCodeInsightTestCase.getTestDataPath(), "conversion/appEngineFacet");
-    File testData = new File(testDataRoot, "before");
-    File tempDir = FileUtil.createTempDirectory("app-engine-project", null);
+public abstract class BaseConverterTest extends PlatformTestCase {
+
+  protected static final String BEFORE_PATH = "before";
+  protected static final String AFTER_PATH = "after";
+
+  protected void testConvert(String testDataPath) throws IOException {
+    // setup test data
+    File testDataRoot = new File(AppEngineCodeInsightTestCase.getTestDataPath(), testDataPath);
+    File testData = new File(testDataRoot, BEFORE_PATH);
+    File tempDir = FileUtil.createTempDirectory(testDataPath, null);
     FileUtil.copyDir(testData, tempDir);
+    File expectedDataDir = new File(testDataRoot, AFTER_PATH);
+
+    // run the conversion operation
     ProjectConversionTestUtil.convert(tempDir.getAbsolutePath());
-    File expectedDataDir = new File(testDataRoot, "after");
+
     PlatformTestUtil.assertDirectoriesEqual(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(expectedDataDir),
-                                            LocalFileSystem.getInstance().refreshAndFindFileByIoFile(tempDir),
-                                            new VirtualFileFilter() {
-                                              @Override
-                                              public boolean accept(VirtualFile file) {
-                                                return !file.getName().startsWith(ProjectConversionUtil.PROJECT_FILES_BACKUP);
-                                              }
-                                            });
+        LocalFileSystem.getInstance().refreshAndFindFileByIoFile(tempDir),
+        new VirtualFileFilter() {
+          @Override
+          public boolean accept(VirtualFile file) {
+            // ignore any generated backup files
+            return !file.getName().startsWith(
+                ProjectConversionUtil.PROJECT_FILES_BACKUP);
+          }
+        });
   }
+
 }
