@@ -2,7 +2,7 @@
 # Google Cloud Platform IntelliJ IDEA plugin 
 [![Build Status](https://travis-ci.org/GoogleCloudPlatform/gcloud-intellij.svg?branch=master)](https://travis-ci.org/GoogleCloudPlatform/gcloud-intellij)
 
-**Alpha. For development only. Documentation incomplete. You will encounter bugs.**
+**This plugin is BETA quality.**
 
 The plugin integrates the [Google Cloud Platform](https://cloud.google.com/)
 into the IntelliJ IDEA UI. Currently this includes:
@@ -12,13 +12,14 @@ into the IntelliJ IDEA UI. Currently this includes:
 * The [Google Cloud Debugger](https://cloud.google.com/tools/cloud-debugger/) 
   The Cloud Debugger can inspect the state of a Java application running on 
   [Google App Engine](https://cloud.google.com/appengine/)
-  at any code location without stopping the application. 
+  at any code location without stopping the application.
+* [Google App Engine](https://cloud.google.com/appengine/docs/) deployment via the Cloud SDK.
 
 
 ## Supported Platforms
 
-* IntelliJ IDEA Community Edition 14.1 or later
-* IntelliJ IDEA Ultimate Edition 14.1 or later
+* IntelliJ IDEA Community Edition 15.0.6 or later
+* IntelliJ IDEA Ultimate Edition 15.0.6 or later
 
 ## Installation
 
@@ -27,7 +28,7 @@ You will see a prompt to install the 'Google Account' plugin which provides comm
 
 ### Pre-releases 
 
-The pre-release alpha binaries are being deployed to the Jetbrains plugin repository on an alpha
+The pre-release binaries are being deployed to the Jetbrains plugin repository on an alpha
 channel. To install them please perform the following steps:
 
 1. Install the Google Account plugin
