@@ -15,6 +15,8 @@ into the IntelliJ IDEA UI. Currently this includes:
   at any code location without stopping the application.
 * [Google App Engine](https://cloud.google.com/appengine/docs/) deployment via the Cloud SDK.
 
+For detailed user documentation go to our documentation
+ [website](https://cloud.google.com/tools/intellij/docs/).
 
 ## Supported Platforms
 
