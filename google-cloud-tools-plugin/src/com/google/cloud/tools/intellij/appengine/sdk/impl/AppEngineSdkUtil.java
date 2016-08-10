@@ -19,27 +19,11 @@ package com.google.cloud.tools.intellij.appengine.sdk.impl;
 import com.intellij.facet.ui.FacetConfigurationQuickFix;
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.util.lang.UrlClassLoader;
-
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
 
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JComponent;
 
@@ -48,8 +32,6 @@ import javax.swing.JComponent;
  */
 public class AppEngineSdkUtil {
 
-  private static final Logger LOG
-      = Logger.getInstance("#com.intellij.appengine.sdk.impl.AppEngineSdkUtil");
   @NonNls
   public static final String APP_ENGINE_DOWNLOAD_URL
       = "http://code.google.com/appengine/downloads.html#Google_App_Engine_SDK_for_Java";
@@ -62,81 +44,6 @@ public class AppEngineSdkUtil {
         };
 
   private AppEngineSdkUtil() {
-  }
-
-  public static void saveWhiteList(File cachedWhiteList,
-      Map<String, Set<String>> classesWhiteList) {
-    try {
-      FileUtil.createParentDirs(cachedWhiteList);
-      PrintWriter writer = new PrintWriter(cachedWhiteList, StandardCharsets.UTF_8.name());
-      try {
-        for (Map.Entry<String, Set<String>> packageEntry : classesWhiteList.entrySet()) {
-          String packageName = packageEntry.getKey();
-          writer.println("." + packageName);
-          final Set<String> classes = classesWhiteList.get(packageName);
-          for (String someClass : classes) {
-            writer.println(someClass);
-          }
-        }
-      } finally {
-        writer.close();
-      }
-    } catch (IOException ioe) {
-      LOG.error(ioe);
-    }
-  }
-
-  public static Map<String, Set<String>> loadWhiteList(File input) throws IOException {
-    final THashMap<String, Set<String>> map = new THashMap<String, Set<String>>();
-    BufferedReader reader
-        = new BufferedReader(new InputStreamReader(
-            new FileInputStream(input), StandardCharsets.UTF_8));
-    try {
-      String line;
-      Set<String> currentClasses = new THashSet<String>();
-      map.put("", currentClasses);
-      while ((line = reader.readLine()) != null) {
-        if (line.startsWith(".")) {
-          String packageName = line.substring(1);
-          currentClasses = new THashSet<String>();
-          map.put(packageName, currentClasses);
-        } else {
-          currentClasses.add(line);
-        }
-      }
-    } finally {
-      reader.close();
-    }
-    return map;
-  }
-
-  public static Map<String, Set<String>> computeWhiteList(final File toolsApiJarFile) {
-    try {
-      final THashMap<String, Set<String>> map = new THashMap<String, Set<String>>();
-      final ClassLoader loader = UrlClassLoader.build().urls(toolsApiJarFile.toURI().toURL())
-          .parent(
-              AppEngineSdkUtil.class.getClassLoader()).get();
-      final Class<?> whiteListClass = Class
-          .forName("com.google.apphosting.runtime.security.WhiteList", true, loader);
-      final Set<String> classes = (Set<String>) whiteListClass.getMethod("getWhiteList")
-          .invoke(null);
-      for (String qualifiedName : classes) {
-        final String packageName = StringUtil.getPackageName(qualifiedName);
-        Set<String> classNames = map.get(packageName);
-        if (classNames == null) {
-          classNames = new THashSet<String>();
-          map.put(packageName, classNames);
-        }
-        classNames.add(StringUtil.getShortName(qualifiedName));
-      }
-      return map;
-    } catch (UnsupportedClassVersionError ex) {
-      LOG.warn(ex);
-      return Collections.emptyMap();
-    } catch (Exception ex) {
-      LOG.error(ex);
-      return Collections.emptyMap();
-    }
   }
 
   @NotNull
