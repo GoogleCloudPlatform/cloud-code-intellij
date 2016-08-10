@@ -21,7 +21,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
 /**
- * Runner of {@link AppEngineTask}'s.
+ * Executor of {@link AppEngineTask}'s.
  */
 public class AppEngineExecutor implements CancellableRunnable {
 

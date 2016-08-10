@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.server.instance;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
-
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
@@ -43,29 +42,27 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.xmlb.SkipDefaultValuesSerializationFilters;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Tag;
-
-import org.jdom.Element;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author nik
  */
 public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStartupOnly,
-    RunConfiguration {
+    RunConfiguration, Cloneable {
 
   private ArtifactPointer artifactPointer;
-  private String serverParameters = "";
   private CommonModel commonModel;
 
-  private final AppEngineModelSettings settings = new AppEngineModelSettings();
+  private AppEngineModelSettings settings = new AppEngineModelSettings();
 
   @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
@@ -80,7 +77,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   @NotNull
   public String getDefaultUrlForBrowser() {
-    return "http://" + commonModel.getHost() + ":" + settings.getPort();
+    String host = settings.getHost() != null ? settings.getHost() : commonModel.getHost();
+    return "http://" + host + ":" + settings.getPort();
   }
 
   @Override
@@ -96,8 +94,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public List<Pair<String, Integer>> getAddressesToCheck() {
-    return Collections.singletonList(Pair.create(commonModel.getHost(),
-        settings.getPort()));
+    String host = settings.getHost() != null ? settings.getHost() : commonModel.getHost();
+    return Collections.singletonList(Pair.create(host, settings.getPort()));
   }
 
   @Override
@@ -137,19 +135,26 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public Object clone() throws CloneNotSupportedException {
-    return super.clone();
+    AppEngineServerModel clone = (AppEngineServerModel) super.clone();
+    clone.setSettings((AppEngineModelSettings) settings.clone());
+    return clone;
+  }
+
+  /**
+   * Only to be used in cloning.
+   */
+  private void setSettings(AppEngineModelSettings settings) {
+    this.settings = settings;
   }
 
   @Override
   public int getLocalPort() {
-    return settings.getPort();
+    return getPort();
   }
 
   @Override
   public void readExternal(Element element) throws InvalidDataException {
     XmlSerializer.deserializeInto(settings, element);
-//    port = settings.getPort();
-    serverParameters = settings.getServerParameters();
     final String artifactName = settings.getArtifact();
     if (artifactName != null) {
       artifactPointer = ArtifactPointerManager.getInstance(commonModel.getProject())
@@ -169,29 +174,14 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return artifactPointer != null ? artifactPointer.getArtifact() : null;
   }
 
-  public void setPort(int port) {
-    settings.setPort(port);
-  }
-
-  public String getServerParameters() {
-    return serverParameters;
-  }
-
-  public void setServerParameters(String serverParameters) {
-    this.serverParameters = serverParameters;
-  }
-
   public void setArtifact(@Nullable Artifact artifact) {
     if (artifact != null) {
       artifactPointer = ArtifactPointerManager.getInstance(commonModel.getProject())
           .createPointer(artifact);
+      settings.setArtifact(artifact.getName());
     } else {
       artifactPointer = null;
     }
-  }
-
-  public AppEngineModelSettings getSettings() {
-    return settings;
   }
 
   @Override
@@ -202,9 +192,21 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return appYamls;
   }
 
+  public Boolean getAdvancedSettings() {
+    return settings.getAdvancedSettings();
+  }
+
+  public void setAdvancedSettings(Boolean advancedSettings) {
+    settings.setAdvancedSettings(advancedSettings);
+  }
+
   @Override
   public String getHost() {
     return null;
+  }
+
+  public void setHost(String host) {
+    settings.setHost(host);
   }
 
   @Override
@@ -212,135 +214,191 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return settings.getPort();
   }
 
+  public void setPort(Integer port) {
+    settings.setPort(port);
+  }
+
   @Override
   public String getAdminHost() {
-    return null;
+    return settings.getAdminHost();
+  }
+
+  public void setAdminHost(String adminHost) {
+    settings.setAdminHost(adminHost);
   }
 
   @Override
   public Integer getAdminPort() {
-    return null;
+    return settings.getAdminPort();
+  }
+
+  public void setAdminPort(Integer adminPort) {
+    settings.setAdminPort(adminPort);
   }
 
   @Override
   public String getAuthDomain() {
-    return null;
+    return settings.getAuthDomain();
+  }
+
+  public void setAuthDomain(String authDomain) {
+    settings.setAuthDomain(authDomain);
   }
 
   @Override
   public String getStoragePath() {
-    return null;
+    return settings.getStoragePath();
+  }
+
+  public void setStoragePath(String storagePath) {
+    settings.setStoragePath(storagePath);
   }
 
   @Override
   public String getLogLevel() {
-    return null;
+    return settings.getLogLevel();
   }
 
   @Override
   public Integer getMaxModuleInstances() {
-    return null;
+    return settings.getMaxModuleInstances();
   }
 
   @Override
   public Boolean getUseMtimeFileWatcher() {
-    return null;
+    return settings.isUseMtimeFileWatcher();
   }
 
   @Override
   public String getThreadsafeOverride() {
-    return null;
+    return settings.getThreadsafeOverride();
   }
 
   @Override
   public String getPythonStartupScript() {
-    return null;
+    return settings.getPythonStartupScript();
   }
 
   @Override
   public String getPythonStartupArgs() {
-    return null;
+    return settings.getPythonStartupArgs();
   }
 
   @Override
   public List<String> getJvmFlags() {
-    return settings.jvmFlags;
+    return Arrays.asList(settings.getJvmFlags() != null
+        ? settings.getJvmFlags().split(" ") : new String[]{});
   }
 
   public void addJvmFlag(String flag) {
-    if (settings.jvmFlags == null) {
-      settings.jvmFlags = new ArrayList<>();
-    }
-    settings.jvmFlags.add(flag);
+    settings.setJvmFlags(settings.getJvmFlags() + " " + flag);
+  }
+
+  public void setJvmFlags(String jvmFlags) {
+    settings.setJvmFlags(jvmFlags);
   }
 
   @Override
   public String getCustomEntrypoint() {
-    return null;
+    return settings.getCustomEntrypoint();
   }
 
   @Override
   public String getRuntime() {
-    return null;
+    return settings.getRuntime();
   }
 
   @Override
   public Boolean getAllowSkippedFiles() {
-    return null;
+    return settings.isAllowSkippedFiles();
   }
 
   @Override
   public Integer getApiPort() {
-    return null;
+    return settings.getApiPort();
+  }
+
+  public void setApiPort(Integer apiPort) {
+    settings.setApiPort(apiPort);
   }
 
   @Override
   public Boolean getAutomaticRestart() {
-    return null;
+    return settings.isAutomaticRestart();
   }
 
   @Override
   public String getDevAppserverLogLevel() {
-    return null;
+    return settings.getDevAppserverLogLevel();
   }
 
   @Override
   public Boolean getSkipSdkUpdateCheck() {
-    return null;
+    return settings.isSkipSdkUpdateCheck();
   }
 
   @Override
   public String getDefaultGcsBucketName() {
-    return null;
+    return settings.getDefaultGcsBucketName();
   }
 
-  public static class AppEngineModelSettings {
+  /**
+   * This class is used to serialize run/debug config settings. It only supports basic types (e.g.,
+   * int, String, List, etc.).
+   *
+   * We use this class to store data and use {@link AppEngineServerModel} as an interface to get
+   * that data. We need to interface some non-basic types (e.g., File, Path).
+   * {@link AppEngineServerModel} translates stored data in its basic form to non-basic form.
+   */
+  private static class AppEngineModelSettings implements Cloneable {
 
     @Tag("artifact")
     private String artifact;
+    @Tag("advanced_settings")
+    private Boolean advancedSettings;
 
     @Tag("host")
     private String host;
     @Tag("port")
-    private int port = 8080;
+    private Integer port = 8080;
     @Tag("admin_host")
     private String adminHost;
     @Tag("admin_port")
-    private String adminPort;
+    private Integer adminPort;
     @Tag("auth_domain")
     private String authDomain;
     @Tag("storage_path")
     private String storagePath;
-
-    @Tag("jvmFlags")
-    List<String> jvmFlags;
-
-    @Tag("server-parameters")
-    private String serverParameters = "";
-
-    public void setPort(int port) {
-      this.port = port;
-    }
+    @Tag("log_level")
+    private String logLevel;
+    @Tag("max_module_instances")
+    private Integer maxModuleInstances;
+    @Tag("use_mtime_file_watcher")
+    private boolean useMtimeFileWatcher;
+    @Tag("threadsafe_override")
+    private String threadsafeOverride;
+    @Tag("python_startup_script")
+    private String pythonStartupScript;
+    @Tag("python_startup_args")
+    private String pythonStartupArgs;
+    @Tag("jvm_flags")
+    private String jvmFlags;
+    @Tag("custom_entrypoint")
+    private String customEntrypoint;
+    @Tag("runtime")
+    private String runtime;
+    @Tag("allow_skipped_files")
+    private boolean allowSkippedFiles;
+    @Tag("api_port")
+    private Integer apiPort;
+    @Tag("automatic_restart")
+    private boolean automaticRestart;
+    @Tag("devappserver_log_level")
+    private String devAppserverLogLevel;
+    @Tag("skip_sdk_update_check")
+    private boolean skipSdkUpdateCheck;
+    @Tag("default_gcs_bucket_name")
+    private String defaultGcsBucketName;
 
     public String getArtifact() {
       return artifact;
@@ -350,16 +408,185 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       this.artifact = artifact;
     }
 
-    public String getServerParameters() {
-      return serverParameters;
+    public Boolean getAdvancedSettings() {
+      return advancedSettings;
     }
 
-    public void setServerParameters(String serverParameters) {
-      this.serverParameters = serverParameters;
+    public void setAdvancedSettings(Boolean advancedSettings) {
+      this.advancedSettings = advancedSettings;
+    }
+
+    public String getHost() {
+      return host;
+    }
+
+    public void setHost(String host) {
+      this.host = host;
     }
 
     public Integer getPort() {
       return port;
+    }
+
+    public void setPort(Integer port) {
+      this.port = port;
+    }
+
+    public String getAdminHost() {
+      return adminHost;
+    }
+
+    public void setAdminHost(String adminHost) {
+      this.adminHost = adminHost;
+    }
+
+    public Integer getAdminPort() {
+      return adminPort;
+    }
+
+    public void setAdminPort(Integer adminPort) {
+      this.adminPort = adminPort;
+    }
+
+    public String getAuthDomain() {
+      return authDomain;
+    }
+
+    public void setAuthDomain(String authDomain) {
+      this.authDomain = authDomain;
+    }
+
+    public String getStoragePath() {
+      return storagePath;
+    }
+
+    public void setStoragePath(String storagePath) {
+      this.storagePath = storagePath;
+    }
+
+    public String getLogLevel() {
+      return logLevel;
+    }
+
+    public void setLogLevel(String logLevel) {
+      this.logLevel = logLevel;
+    }
+
+    public Integer getMaxModuleInstances() {
+      return maxModuleInstances;
+    }
+
+    public void setMaxModuleInstances(Integer maxModuleInstances) {
+      this.maxModuleInstances = maxModuleInstances;
+    }
+
+    public boolean isUseMtimeFileWatcher() {
+      return useMtimeFileWatcher;
+    }
+
+    public void setUseMtimeFileWatcher(boolean useMtimeFileWatcher) {
+      this.useMtimeFileWatcher = useMtimeFileWatcher;
+    }
+
+    public String getThreadsafeOverride() {
+      return threadsafeOverride;
+    }
+
+    public void setThreadsafeOverride(String threadsafeOverride) {
+      this.threadsafeOverride = threadsafeOverride;
+    }
+
+    public String getPythonStartupScript() {
+      return pythonStartupScript;
+    }
+
+    public void setPythonStartupScript(String pythonStartupScript) {
+      this.pythonStartupScript = pythonStartupScript;
+    }
+
+    public String getPythonStartupArgs() {
+      return pythonStartupArgs;
+    }
+
+    public void setPythonStartupArgs(String pythonStartupArgs) {
+      this.pythonStartupArgs = pythonStartupArgs;
+    }
+
+    public String getJvmFlags() {
+      return jvmFlags;
+    }
+
+    public void setJvmFlags(String jvmFlags) {
+      this.jvmFlags = jvmFlags;
+    }
+
+    public String getCustomEntrypoint() {
+      return customEntrypoint;
+    }
+
+    public void setCustomEntrypoint(String customEntrypoint) {
+      this.customEntrypoint = customEntrypoint;
+    }
+
+    public String getRuntime() {
+      return runtime;
+    }
+
+    public void setRuntime(String runtime) {
+      this.runtime = runtime;
+    }
+
+    public boolean isAllowSkippedFiles() {
+      return allowSkippedFiles;
+    }
+
+    public void setAllowSkippedFiles(boolean allowSkippedFiles) {
+      this.allowSkippedFiles = allowSkippedFiles;
+    }
+
+    public Integer getApiPort() {
+      return apiPort;
+    }
+
+    public void setApiPort(Integer apiPort) {
+      this.apiPort = apiPort;
+    }
+
+    public boolean isAutomaticRestart() {
+      return automaticRestart;
+    }
+
+    public void setAutomaticRestart(boolean automaticRestart) {
+      this.automaticRestart = automaticRestart;
+    }
+
+    public String getDevAppserverLogLevel() {
+      return devAppserverLogLevel;
+    }
+
+    public void setDevAppserverLogLevel(String devAppserverLogLevel) {
+      this.devAppserverLogLevel = devAppserverLogLevel;
+    }
+
+    public boolean isSkipSdkUpdateCheck() {
+      return skipSdkUpdateCheck;
+    }
+
+    public void setSkipSdkUpdateCheck(boolean skipSdkUpdateCheck) {
+      this.skipSdkUpdateCheck = skipSdkUpdateCheck;
+    }
+
+    public String getDefaultGcsBucketName() {
+      return defaultGcsBucketName;
+    }
+
+    public void setDefaultGcsBucketName(String defaultGcsBucketName) {
+      this.defaultGcsBucketName = defaultGcsBucketName;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+      return super.clone();
     }
   }
 }

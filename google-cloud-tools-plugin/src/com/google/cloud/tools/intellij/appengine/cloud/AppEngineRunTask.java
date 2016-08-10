@@ -35,11 +35,15 @@ public class AppEngineRunTask implements AppEngineTask {
   private ProcessOutputLineListener stdErrListener;
   private ProcessExitListener exitListener;
 
+  public AppEngineRunTask(@NotNull RunConfiguration runConfig) {
+    this.runConfig = runConfig;
+  }
+
   public AppEngineRunTask(@NotNull RunConfiguration runConfig,
       ProcessOutputLineListener stdOutListener,
       ProcessOutputLineListener stdErrListener,
       ProcessExitListener exitListener) {
-    this.runConfig = runConfig;
+    this(runConfig);
     this.stdOutListener = stdOutListener;
     this.stdErrListener = stdErrListener;
     this.exitListener = exitListener;
@@ -47,6 +51,7 @@ public class AppEngineRunTask implements AppEngineTask {
 
   @Override
   public void execute(ProcessStartListener startListener) {
+    // TODO(joaomartins): Get SDK from central place.
     CloudSdk.Builder sdkBuilder = new CloudSdk.Builder().async(true)
         .startListener(startListener);
 

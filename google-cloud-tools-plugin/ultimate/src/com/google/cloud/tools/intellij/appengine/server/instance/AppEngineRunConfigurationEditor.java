@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
+import com.google.common.base.Joiner;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -33,12 +34,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 /**
@@ -49,20 +50,21 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
 
   private JPanel myMainPanel;
   private JComboBox myArtifactComboBox;
-  private JTextField myPortField;
+  private JTextField port;
   private RawCommandLineEditor myServerParametersEditor;
   private JBLabel myWebArtifactToDeployLabel;
   private JBLabel myPortLabel;
   private JBLabel myServerParametersLabel;
-  private JTextField textField3;
-  private JTextField textField4;
   private JCheckBox enableAdvanced;
-  private JTextField textField1;
-  private JTextField textField2;
   private JPanel advancedSettingsPanel;
   private final Project myProject;
   private Artifact myLastSelectedArtifact;
   private JComponent anchor;
+  private JTextField authDomain;
+  private JTextField storagePath;
+  private JTextField adminHost;
+  private JTextField adminPort;
+  private JTextField apiPort;
 
   public AppEngineRunConfigurationEditor(Project project) {
     myProject = project;
@@ -74,11 +76,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     enableAdvanced.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent actionEvent) {
-        if (enableAdvanced.isSelected()) {
-          advancedSettingsPanel.setVisible(true);
-        } else {
-          advancedSettingsPanel.setVisible(false);
-        }
+        advancedSettingsPanel.setVisible(enableAdvanced.isSelected());
       }
     });
 
@@ -102,25 +100,58 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
 
   protected void resetEditorFrom(CommonModel commonModel) {
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
-    myPortField.setText(String.valueOf(serverModel.getLocalPort()));
     final Artifact artifact = serverModel.getArtifact();
     myArtifactComboBox.setSelectedItem(artifact);
     if (artifact == null && myArtifactComboBox.getItemCount() == 1) {
       myArtifactComboBox.setSelectedIndex(0);
     }
+    port.setText(String.valueOf(serverModel.getPort()));
+    enableAdvanced.setSelected(serverModel.getAdvancedSettings());
+    adminHost.setText(serverModel.getAdminHost());
+    adminPort.setText(String.valueOf(serverModel.getAdminPort()));
+    authDomain.setText(serverModel.getAuthDomain());
+    storagePath.setText(serverModel.getStoragePath());
     myServerParametersEditor.setDialogCaption("Server Parameters");
-    myServerParametersEditor.setText(serverModel.getServerParameters());
+    myServerParametersEditor.setText(Joiner.on(" ").join(serverModel.getJvmFlags()));
+    apiPort.setText(String.valueOf(serverModel.getApiPort()));
+    advancedSettingsPanel.setVisible(enableAdvanced.isSelected());
   }
 
   protected void applyEditorTo(CommonModel commonModel) throws ConfigurationException {
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
     try {
-      serverModel.setPort(Integer.parseInt(myPortField.getText()));
+      serverModel.setPort(Integer.parseInt(port.getText()));
     } catch (NumberFormatException nfe) {
-      throw new ConfigurationException("'" + myPortField.getText() + "' is not valid port number");
+      throw new ConfigurationException("'" + port.getText() + "' is not a valid port "
+          + "number");
     }
-    serverModel.setServerParameters(myServerParametersEditor.getText());
     serverModel.setArtifact(getSelectedArtifact());
+    serverModel.setAdvancedSettings(enableAdvanced.isSelected());
+
+    if (enableAdvanced.isSelected()) {
+      serverModel.setAdminHost(adminHost.getText());
+      try {
+        if (!adminPort.getText().isEmpty()) {
+          serverModel.setAdminPort(Integer.parseInt(adminPort.getText()));
+        }
+      } catch (NumberFormatException nfe) {
+        throw new ConfigurationException("'" + adminPort.getText() + "' is not a valid admin port "
+            + "number.");
+      }
+      serverModel.setAuthDomain(authDomain.getText());
+      serverModel.setStoragePath(storagePath.getText());
+      serverModel.setJvmFlags(myServerParametersEditor.getText());
+      try {
+        if (!apiPort.getText().isEmpty()) {
+          serverModel.setApiPort(Integer.parseInt(apiPort.getText()));
+        }
+      } catch (NumberFormatException nfe) {
+        throw new ConfigurationException("'" + apiPort.getText() + "' is not a valid API port "
+            + "number.");
+      }
+    }
+    // TODO(joaomartins): What happens when there are already advanced settings serialized
+    // and we turn advanced settings off?
   }
 
   private Artifact getSelectedArtifact() {

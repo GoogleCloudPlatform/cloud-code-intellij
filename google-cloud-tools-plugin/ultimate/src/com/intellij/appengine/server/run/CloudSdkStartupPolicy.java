@@ -65,15 +65,22 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           @Override
           public OSProcessHandler createProcessHandler(String s, Map<String, String> map)
               throws ExecutionException {
-            AppEngineServerModel runConfiguration =
-                (AppEngineServerModel) commonModel.getServerModel();
+            AppEngineServerModel runConfiguration;
+            try {
+              // Getting the clone so the debug flags aren't added to the persisted settings.
+              runConfiguration = (AppEngineServerModel) commonModel.getServerModel().clone();
+            } catch (CloneNotSupportedException ee) {
+              throw new ExecutionException(ee);
+            }
 
             // This is the place we have access to the debug jvm flag provided by IJ in the
             // Startup/Shutdown tab. We need to add it here.
-            String jvmDebugFlag = map.get("").trim();
-            runConfiguration.addJvmFlag(jvmDebugFlag);
+            String jvmDebugFlag = map.get("");
+            if (jvmDebugFlag != null) {
+              runConfiguration.addJvmFlag(jvmDebugFlag.trim());
+            }
 
-            AppEngineRunTask runTask = new AppEngineRunTask(runConfiguration, null, null, null);
+            AppEngineRunTask runTask = new AppEngineRunTask(runConfiguration);
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 
