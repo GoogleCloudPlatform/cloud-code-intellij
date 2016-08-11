@@ -25,15 +25,6 @@ import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeId;
 import com.intellij.facet.FacetTypeRegistry;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VfsUtilCore;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.xml.XmlFile;
-import com.intellij.util.ReflectionUtil;
-import com.intellij.util.xml.DomElement;
-import com.intellij.util.xml.DomFileElement;
-import com.intellij.util.xml.DomManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,36 +58,5 @@ public class AppEngineFacet extends Facet<AppEngineFacetConfiguration> {
   @NotNull
   public AppEngineSdk getSdk() {
     return AppEngineSdkManager.getInstance().findSdk(getConfiguration().getSdkHomePath());
-  }
-
-  //todo[nik] copied from JamCommonUtil
-  @Nullable
-  private static <T> T getRootElement(final PsiFile file, final Class<T> domClass,
-      final Module module) {
-    if (!(file instanceof XmlFile)) {
-      return null;
-    }
-    final DomManager domManager = DomManager.getDomManager(file.getProject());
-    final DomFileElement<DomElement> element = domManager
-        .getFileElement((XmlFile) file, DomElement.class);
-    if (element == null) {
-      return null;
-    }
-    final DomElement root = element.getRootElement();
-    if (!ReflectionUtil.isAssignable(domClass, root.getClass())) {
-      return null;
-    }
-    return (T) root;
-  }
-
-
-  public boolean shouldRunEnhancerFor(@NotNull VirtualFile file) {
-    for (String path : getConfiguration().getFilesToEnhance()) {
-      final VirtualFile toEnhance = LocalFileSystem.getInstance().findFileByPath(path);
-      if (toEnhance != null && VfsUtilCore.isAncestor(toEnhance, file, false)) {
-        return true;
-      }
-    }
-    return false;
   }
 }

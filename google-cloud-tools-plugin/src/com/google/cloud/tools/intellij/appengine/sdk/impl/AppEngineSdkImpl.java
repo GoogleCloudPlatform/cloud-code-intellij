@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk.impl;
 
+import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
 import com.google.cloud.tools.intellij.appengine.jps.model.impl.JpsAppEngineModuleExtensionImpl;
 import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.openapi.diagnostic.Logger;
@@ -59,7 +59,6 @@ public class AppEngineSdkImpl implements AppEngineSdk {
 
   private static final Logger LOG = Logger
       .getInstance("#com.intellij.appengine.sdk.impl.AppEngineSdkImpl");
-  private Map<String, Set<String>> myClassesWhiteList;
   private Map<String, Set<String>> myMethodsBlackList;
   private final String myHomePath;
 
@@ -112,7 +111,7 @@ public class AppEngineSdkImpl implements AppEngineSdk {
   }
 
   private static File[] getJarsFromDirectory(File libFolder) {
-    List<File> jars = new ArrayList<File>();
+    List<File> jars = new ArrayList<>();
     final File[] files = libFolder.listFiles();
     if (files != null) {
       for (File file : files) {
@@ -130,35 +129,7 @@ public class AppEngineSdkImpl implements AppEngineSdk {
   }
 
   public boolean isClassInWhiteList(@NotNull String className) {
-    if (!isValid()) {
-      return true;
-    }
-
-    if (myClassesWhiteList == null) {
-      File cachedWhiteList = getCachedWhiteListFile();
-      if (cachedWhiteList.exists()) {
-        try {
-          myClassesWhiteList = AppEngineSdkUtil.loadWhiteList(cachedWhiteList);
-        } catch (IOException ioe) {
-          LOG.error(ioe);
-          myClassesWhiteList = Collections.emptyMap();
-        }
-      } else {
-        myClassesWhiteList = AppEngineSdkUtil.computeWhiteList(getToolsApiJarFile());
-        if (!myClassesWhiteList.isEmpty()) {
-          AppEngineSdkUtil.saveWhiteList(cachedWhiteList, myClassesWhiteList);
-        }
-      }
-    }
-    if (myClassesWhiteList.isEmpty()) {
-      //don't report errors if white-list wasn't properly loaded
-      return true;
-    }
-
-    final String packageName = StringUtil.getPackageName(className);
-    final String name = StringUtil.getShortName(className);
-    final Set<String> classes = myClassesWhiteList.get(packageName);
-    return classes != null && classes.contains(name);
+    return AppEngineJreWhitelist.contains(className);
   }
 
   @Override
@@ -168,20 +139,13 @@ public class AppEngineSdkImpl implements AppEngineSdk {
         Attributes.Name.SPECIFICATION_VERSION);
   }
 
-  private File getCachedWhiteListFile() {
-    String fileName =
-        StringUtil.getShortName(myHomePath, '/') + Integer.toHexString(myHomePath.hashCode()) + "_"
-            + Long.toHexString(getToolsApiJarFile().lastModified());
-    return new File(AppEngineUtilLegacy.getAppEngineSystemDir(), fileName);
-  }
-
   public boolean isMethodInBlacklist(@NotNull String className, @NotNull String methodName) {
     if (myMethodsBlackList == null) {
       try {
         myMethodsBlackList = loadBlackList();
       } catch (IOException ioe) {
         LOG.error(ioe);
-        myMethodsBlackList = new THashMap<String, Set<String>>();
+        myMethodsBlackList = new THashMap<>();
       }
     }
     final Set<String> methods = myMethodsBlackList.get(className);
@@ -221,7 +185,7 @@ public class AppEngineSdkImpl implements AppEngineSdk {
   public VirtualFile[] getOrmLibSources() {
     final File libsDir = new File(myHomePath, "src/orm");
     final File[] files = libsDir.listFiles();
-    List<VirtualFile> roots = new ArrayList<VirtualFile>();
+    List<VirtualFile> roots = new ArrayList<>();
     if (files != null) {
       for (File file : files) {
         final String url = VfsUtil.getUrlForLibraryRoot(file);
@@ -248,7 +212,7 @@ public class AppEngineSdkImpl implements AppEngineSdk {
   private Map<String, Set<String>> loadBlackList() throws IOException {
     final InputStream stream = getClass().getResourceAsStream("/data/methodsBlacklist.txt");
     LOG.assertTrue(stream != null, "/data/methodsBlacklist.txt not found");
-    final THashMap<String, Set<String>> map = new THashMap<String, Set<String>>();
+    final THashMap<String, Set<String>> map = new THashMap<>();
     BufferedReader reader
         = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     try {
@@ -257,7 +221,7 @@ public class AppEngineSdkImpl implements AppEngineSdk {
         final int i = line.indexOf(':');
         String className = line.substring(0, i);
         String methods = line.substring(i + 1);
-        map.put(className, new THashSet<String>(StringUtil.split(methods, ",")));
+        map.put(className, new THashSet<>(StringUtil.split(methods, ",")));
       }
     } finally {
       reader.close();

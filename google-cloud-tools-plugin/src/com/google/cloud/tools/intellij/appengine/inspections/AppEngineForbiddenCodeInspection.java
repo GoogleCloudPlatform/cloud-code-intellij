@@ -69,9 +69,6 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
       return null;
     }
     final AppEngineSdk appEngineSdk = appEngineFacet.getSdk();
-    if (!appEngineSdk.isValid()) {
-      return null;
-    }
 
     final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
     final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
