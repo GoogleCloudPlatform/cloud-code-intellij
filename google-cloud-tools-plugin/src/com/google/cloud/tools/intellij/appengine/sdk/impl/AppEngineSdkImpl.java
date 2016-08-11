@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk.impl;
 
+import com.google.cloud.tools.intellij.appengine.jps.model.impl.JpsAppEngineModuleExtensionImpl;
 import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
 import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
 
@@ -36,7 +37,6 @@ import gnu.trove.THashSet;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.jps.appengine.model.impl.JpsAppEngineModuleExtensionImpl;
 
 import java.io.BufferedReader;
 import java.io.File;

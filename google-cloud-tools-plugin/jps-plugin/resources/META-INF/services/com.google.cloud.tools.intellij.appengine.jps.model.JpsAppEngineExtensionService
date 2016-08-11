@@ -14,4 +14,4 @@
 # limitations under the License.
 #
 
-com.google.cloud.tools.intellij.appengine.jps.builder.AppEngineEnhancerBuilderService
+com.google.cloud.tools.intellij.appengine.jps.model.impl.JpsAppEngineExtensionServiceImpl

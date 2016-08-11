@@ -16,9 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.cloud.tools.intellij.appengine.jps.model.PersistenceApi;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.jps.appengine.model.PersistenceApi;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
