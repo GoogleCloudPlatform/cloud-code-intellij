@@ -114,7 +114,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private static void sendPing(@NotNull final List<? extends NameValuePair> postData) {
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
       public void run() {
-        CloseableHttpClient client = HttpClientBuilder.create().build();
+        CloseableHttpClient client = HttpClientBuilder.create().setUserAgent("Automated").build();
         HttpPost request = new HttpPost(ANALYTICS_URL);
 
         try {
