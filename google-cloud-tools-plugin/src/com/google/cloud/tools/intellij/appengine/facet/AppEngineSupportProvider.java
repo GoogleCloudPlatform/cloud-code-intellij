@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.cloud.tools.intellij.appengine.jps.model.PersistenceApi;
 import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
@@ -59,7 +60,6 @@ import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
-import org.jetbrains.jps.appengine.model.PersistenceApi;
 
 import java.io.IOException;
 import java.util.Collection;

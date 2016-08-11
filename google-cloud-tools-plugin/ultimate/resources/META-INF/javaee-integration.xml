@@ -17,15 +17,15 @@
 <idea-plugin>
   <extensions defaultExtensionNs="com.intellij">
     <javaee.appServerIntegration
-        implementation="com.intellij.appengine.server.integration.AppEngineServerIntegration"/>
+        implementation="com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerIntegration"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration"
-                        serviceImplementation="com.intellij.appengine.facet.impl.AppEngineUltimateWebIntegration"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineUltimateWebIntegration"
                         overrides="true"/>
 
-    <configurationType implementation="com.intellij.appengine.server.run.AppEngineServerConfigurationType"/>
-    <configurationProducer implementation="com.intellij.appengine.server.run.AppEngineServerConfigurationProducer"/>
+    <configurationType implementation="com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType"/>
+    <configurationProducer implementation="com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationProducer"/>
 
     <javaee.frameworkSupportContributor
-        implementation="com.intellij.appengine.facet.impl.AppEngineJavaeeSupportContributor"/>
+        implementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineJavaeeSupportContributor"/>
   </extensions>
 </idea-plugin>

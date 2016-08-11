@@ -1,1 +1,1 @@
-org.jetbrains.jps.appengine.model.impl.JpsAppEngineModelSerializerExtension
+com.google.cloud.tools.intellij.appengine.jps.model.impl.JpsAppEngineModelSerializerExtension

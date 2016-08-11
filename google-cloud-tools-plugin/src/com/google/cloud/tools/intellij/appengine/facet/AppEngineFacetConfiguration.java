@@ -16,6 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.cloud.tools.intellij.appengine.jps.model.PersistenceApi;
+import com.google.cloud.tools.intellij.appengine.jps.model.impl.AppEngineModuleExtensionProperties;
+
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
@@ -25,8 +28,6 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 
 import org.jdom.Element;
-import org.jetbrains.jps.appengine.model.PersistenceApi;
-import org.jetbrains.jps.appengine.model.impl.AppEngineModuleExtensionProperties;
 
 import java.util.List;
 
