@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk.impl;
 
-import com.google.cloud.tools.intellij.appengine.jps.model.impl.JpsAppEngineModuleExtensionImpl;
 import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
+import com.google.cloud.tools.intellij.appengine.jps.model.impl.JpsAppEngineModuleExtensionImpl;
 import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
 
 import com.intellij.execution.configurations.ParametersList;
