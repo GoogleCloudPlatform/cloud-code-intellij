@@ -32,6 +32,7 @@ import java.io.File;
  * <p/>
  * Not for instantiation.
  */
+// TODO(joaomartins): Refactor to use Paths instead of File/String.
 public final class CloudSdkUtil {
 
   private CloudSdkUtil() {

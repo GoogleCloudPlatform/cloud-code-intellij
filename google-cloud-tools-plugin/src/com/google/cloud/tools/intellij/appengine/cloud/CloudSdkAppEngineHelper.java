@@ -204,7 +204,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         ServiceManager.getService(CloudToolsPluginInfoService.class);
 
     return new CloudSdk.Builder()
-        .sdkPath(new File(CloudSdkService.getInstance().getSdkHomePath()).toPath())
+        .sdkPath(CloudSdkService.getInstance().getCloudSdkHomePath())
         .async(true)
         .addStdErrLineListener(logListener)
         .addStdOutLineListener(outputListener)

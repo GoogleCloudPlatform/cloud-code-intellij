@@ -77,7 +77,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   @NotNull
   public String getDefaultUrlForBrowser() {
-    String host = settings.getHost() != null ? settings.getHost() : commonModel.getHost();
+    String host = settings.getHost() != null && settings.getHost().compareTo("") != 0
+        ? settings.getHost() : commonModel.getHost();
     return "http://" + host + ":" + settings.getPort();
   }
 
@@ -259,9 +260,17 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return settings.getLogLevel();
   }
 
+  public void setLogLevel(String logLevel) {
+    settings.setLogLevel(logLevel);
+  }
+
   @Override
   public Integer getMaxModuleInstances() {
     return settings.getMaxModuleInstances();
+  }
+
+  public void setMaxModuleInstances(Integer maxModuleInstances) {
+    settings.setMaxModuleInstances(maxModuleInstances);
   }
 
   @Override
@@ -269,9 +278,17 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return settings.isUseMtimeFileWatcher();
   }
 
+  public void setUseMtimeFileWatcher(Boolean useMtimeFileWatcher) {
+    settings.setUseMtimeFileWatcher(useMtimeFileWatcher);
+  }
+
   @Override
   public String getThreadsafeOverride() {
     return settings.getThreadsafeOverride();
+  }
+
+  public void setThreadsafeOverride(String threadsafeOverride) {
+    settings.setThreadsafeOverride(threadsafeOverride);
   }
 
   @Override
@@ -279,9 +296,17 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return settings.getPythonStartupScript();
   }
 
+  public void setPythonStartupScript(String pythonStartupScript) {
+    settings.setPythonStartupScript(pythonStartupScript);
+  }
+
   @Override
   public String getPythonStartupArgs() {
     return settings.getPythonStartupArgs();
+  }
+
+  public void setPythonStartupArgs(String pythonStartupArgs) {
+    settings.setPythonStartupArgs(pythonStartupArgs);
   }
 
   @Override
@@ -303,14 +328,26 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return settings.getCustomEntrypoint();
   }
 
+  public void setCustomEntrypoint(String customEntrypoint) {
+    settings.setCustomEntrypoint(customEntrypoint);
+  }
+
   @Override
   public String getRuntime() {
     return settings.getRuntime();
   }
 
+  public void setRuntime(String runtime) {
+    settings.setRuntime(runtime);
+  }
+
   @Override
   public Boolean getAllowSkippedFiles() {
     return settings.isAllowSkippedFiles();
+  }
+
+  public void setAllowSkippedFiles(Boolean allowSkippedFiles) {
+    settings.setAllowSkippedFiles(allowSkippedFiles);
   }
 
   @Override
@@ -327,9 +364,17 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return settings.isAutomaticRestart();
   }
 
+  public void setAutomaticRestart(Boolean automaticRestart) {
+    settings.setAutomaticRestart(automaticRestart);
+  }
+
   @Override
   public String getDevAppserverLogLevel() {
     return settings.getDevAppserverLogLevel();
+  }
+
+  public void setDevAppserverLogLevel(String devAppserverLogLevel) {
+    settings.setDevAppserverLogLevel(devAppserverLogLevel);
   }
 
   @Override
@@ -337,9 +382,17 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return settings.isSkipSdkUpdateCheck();
   }
 
+  public void setSkipSdkUpdateCheck(Boolean skipSdkUpdateCheck) {
+    settings.setSkipSdkUpdateCheck(skipSdkUpdateCheck);
+  }
+
   @Override
   public String getDefaultGcsBucketName() {
     return settings.getDefaultGcsBucketName();
+  }
+
+  public void setDefaultGcsBucketName(String defaultGcsBucketName) {
+    settings.setDefaultGcsBucketName(defaultGcsBucketName);
   }
 
   /**
@@ -355,7 +408,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     @Tag("artifact")
     private String artifact;
     @Tag("advanced_settings")
-    private Boolean advancedSettings;
+    private boolean advancedSettings;
 
     @Tag("host")
     private String host;
@@ -408,11 +461,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       this.artifact = artifact;
     }
 
-    public Boolean getAdvancedSettings() {
+    public boolean getAdvancedSettings() {
       return advancedSettings;
     }
 
-    public void setAdvancedSettings(Boolean advancedSettings) {
+    public void setAdvancedSettings(boolean advancedSettings) {
       this.advancedSettings = advancedSettings;
     }
 

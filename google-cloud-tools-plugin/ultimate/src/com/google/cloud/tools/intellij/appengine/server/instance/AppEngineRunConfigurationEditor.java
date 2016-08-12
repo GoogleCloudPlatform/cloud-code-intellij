@@ -30,11 +30,11 @@ import com.intellij.ui.PanelWithAnchor;
 import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.ui.components.JBLabel;
 
+import javax.swing.JTabbedPane;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -51,7 +51,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JPanel myMainPanel;
   private JComboBox myArtifactComboBox;
   private JTextField port;
-  private RawCommandLineEditor myServerParametersEditor;
+  private RawCommandLineEditor jvmFlags;
   private JBLabel myWebArtifactToDeployLabel;
   private JBLabel myPortLabel;
   private JBLabel myServerParametersLabel;
@@ -65,6 +65,21 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField adminHost;
   private JTextField adminPort;
   private JTextField apiPort;
+  private JTextField host;
+  private JComboBox logLevel;
+  private JTextField maxModuleInstances;
+  private JCheckBox useMtimeFileWatcher;
+  private JTextField threadsafeOverride;
+  private JTextField pythonStartupScript;
+  private JTextField pythonStartupArguments;
+  private JTextField customEntrypoint;
+  private JTabbedPane tabbedPane1;
+  private JComboBox runtime;
+  private JCheckBox allowSkippedFiles;
+  private JCheckBox automaticRestart;
+  private JComboBox devappserverLogLevel;
+  private JCheckBox skipSdkUpdateCheck;
+  private JTextField gcsBucketName;
 
   public AppEngineRunConfigurationEditor(Project project) {
     myProject = project;
@@ -105,53 +120,81 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     if (artifact == null && myArtifactComboBox.getItemCount() == 1) {
       myArtifactComboBox.setSelectedIndex(0);
     }
-    port.setText(String.valueOf(serverModel.getPort()));
+    port.setText(serverModel.getPort() != null
+        ? String.valueOf(serverModel.getPort()) : "");
     enableAdvanced.setSelected(serverModel.getAdvancedSettings());
+    host.setText(serverModel.getHost());
     adminHost.setText(serverModel.getAdminHost());
-    adminPort.setText(String.valueOf(serverModel.getAdminPort()));
+    adminPort.setText(serverModel.getAdminPort() != null
+        ? String.valueOf(serverModel.getAdminPort()) : "");
     authDomain.setText(serverModel.getAuthDomain());
     storagePath.setText(serverModel.getStoragePath());
-    myServerParametersEditor.setDialogCaption("Server Parameters");
-    myServerParametersEditor.setText(Joiner.on(" ").join(serverModel.getJvmFlags()));
-    apiPort.setText(String.valueOf(serverModel.getApiPort()));
+    logLevel.setSelectedItem(serverModel.getLogLevel());
+    maxModuleInstances.setText(serverModel.getMaxModuleInstances() != null
+        ? String.valueOf(serverModel.getMaxModuleInstances()) : "");
+    useMtimeFileWatcher.setSelected(serverModel.getUseMtimeFileWatcher());
+    threadsafeOverride.setText(serverModel.getThreadsafeOverride());
+    jvmFlags.setDialogCaption("Server Parameters");
+    jvmFlags.setText(Joiner.on(" ").join(serverModel.getJvmFlags()));
+    pythonStartupScript.setText(serverModel.getPythonStartupScript());
+    pythonStartupArguments.setText(serverModel.getPythonStartupArgs());
+    customEntrypoint.setText(serverModel.getCustomEntrypoint());
+    runtime.setSelectedItem(serverModel.getRuntime());
+    allowSkippedFiles.setSelected(serverModel.getAllowSkippedFiles());
+    apiPort.setText(serverModel.getApiPort() != null
+        ? String.valueOf(serverModel.getApiPort()) : "");
+    automaticRestart.setSelected(serverModel.getAutomaticRestart());
+    devappserverLogLevel.setSelectedItem(serverModel.getDevAppserverLogLevel());
+    skipSdkUpdateCheck.setSelected(serverModel.getSkipSdkUpdateCheck());
     advancedSettingsPanel.setVisible(enableAdvanced.isSelected());
+    gcsBucketName.setText(serverModel.getDefaultGcsBucketName());
   }
 
   protected void applyEditorTo(CommonModel commonModel) throws ConfigurationException {
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
-    try {
-      serverModel.setPort(Integer.parseInt(port.getText()));
-    } catch (NumberFormatException nfe) {
-      throw new ConfigurationException("'" + port.getText() + "' is not a valid port "
-          + "number");
-    }
+    serverModel.setPort(validateInteger(port.getText(), "port"));
     serverModel.setArtifact(getSelectedArtifact());
     serverModel.setAdvancedSettings(enableAdvanced.isSelected());
 
     if (enableAdvanced.isSelected()) {
+      serverModel.setHost(host.getText());
       serverModel.setAdminHost(adminHost.getText());
-      try {
-        if (!adminPort.getText().isEmpty()) {
-          serverModel.setAdminPort(Integer.parseInt(adminPort.getText()));
-        }
-      } catch (NumberFormatException nfe) {
-        throw new ConfigurationException("'" + adminPort.getText() + "' is not a valid admin port "
-            + "number.");
+      if (!adminPort.getText().isEmpty()) {
+        serverModel.setAdminPort(validateInteger(adminPort.getText(), "admin port"));
       }
       serverModel.setAuthDomain(authDomain.getText());
       serverModel.setStoragePath(storagePath.getText());
-      serverModel.setJvmFlags(myServerParametersEditor.getText());
-      try {
-        if (!apiPort.getText().isEmpty()) {
-          serverModel.setApiPort(Integer.parseInt(apiPort.getText()));
-        }
-      } catch (NumberFormatException nfe) {
-        throw new ConfigurationException("'" + apiPort.getText() + "' is not a valid API port "
-            + "number.");
+      serverModel.setLogLevel((String) logLevel.getSelectedItem());
+      if (!maxModuleInstances.getText().isEmpty()) {
+        serverModel.setMaxModuleInstances(validateInteger(
+            maxModuleInstances.getText(), "maximum module instances"));
       }
+      serverModel.setUseMtimeFileWatcher(useMtimeFileWatcher.isSelected());
+      serverModel.setThreadsafeOverride(threadsafeOverride.getText());
+      serverModel.setJvmFlags(jvmFlags.getText());
+      serverModel.setPythonStartupScript(pythonStartupScript.getText());
+      serverModel.setPythonStartupArgs(pythonStartupArguments.getText());
+      serverModel.setCustomEntrypoint(customEntrypoint.getText());
+      serverModel.setRuntime((String) runtime.getSelectedItem());
+      serverModel.setAllowSkippedFiles(allowSkippedFiles.isSelected());
+      if (!apiPort.getText().isEmpty()) {
+        serverModel.setApiPort(validateInteger(apiPort.getText(), "API port"));
+      }
+      serverModel.setAutomaticRestart(automaticRestart.isSelected());
+      serverModel.setDevAppserverLogLevel((String) devappserverLogLevel.getSelectedItem());
+      serverModel.setSkipSdkUpdateCheck(skipSdkUpdateCheck.isSelected());
+      serverModel.setDefaultGcsBucketName(gcsBucketName.getText());
     }
-    // TODO(joaomartins): What happens when there are already advanced settings serialized
-    // and we turn advanced settings off?
+  }
+
+  private Integer validateInteger(String intText, String description)
+      throws ConfigurationException {
+    try {
+      return Integer.parseInt(intText);
+    } catch (NumberFormatException nfe) {
+      throw new ConfigurationException(
+          "'" + intText + "' is not a valid " + description + " number.");
+    }
   }
 
   private Artifact getSelectedArtifact() {
