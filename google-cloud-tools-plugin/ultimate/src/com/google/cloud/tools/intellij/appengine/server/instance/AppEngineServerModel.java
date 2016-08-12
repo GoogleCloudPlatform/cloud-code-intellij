@@ -397,7 +397,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   /**
    * This class is used to serialize run/debug config settings. It only supports basic types (e.g.,
-   * int, String, List, etc.).
+   * int, String, etc.).
    *
    * We use this class to store data and use {@link AppEngineServerModel} as an interface to get
    * that data. We need to interface some non-basic types (e.g., File, Path).

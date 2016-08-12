@@ -22,9 +22,8 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
-
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import java.nio.file.Paths;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
