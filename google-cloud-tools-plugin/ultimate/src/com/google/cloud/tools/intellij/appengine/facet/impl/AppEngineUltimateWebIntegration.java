@@ -46,7 +46,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.DependencyScope;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.libraries.Library;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactType;
@@ -57,7 +56,6 @@ import com.intellij.util.descriptors.ConfigFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -155,12 +153,11 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
     final ApplicationServersManager serversManager = ApplicationServersManager.getInstance();
     final AppEngineServerIntegration integration = AppEngineServerIntegration.getInstance();
 
+    // There are no distinguishing features about the App Engine servers so just return
+    // the first one found
     final List<ApplicationServer> servers = serversManager.getApplicationServers(integration);
-    for (ApplicationServer server : servers) {
-      if (FileUtil.filesEqual(new File(CloudSdkService.getInstance().getCloudSdkHomePath()),
-          new File(sdkService.getCloudSdkHomePath()))) {
-        return server;
-      }
+    if (!servers.isEmpty()) {
+      return servers.iterator().next();
     }
 
     return ApplicationServersManager.getInstance()

@@ -195,7 +195,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   @Override
   public boolean isValid() {
-    return getToolsApiJarFile().exists();
+    return !StringUtil.isEmpty(getCloudSdkHomePath()) && getToolsApiJarFile().exists();
   }
 
   private static String findLatestVersion(File dir) {
