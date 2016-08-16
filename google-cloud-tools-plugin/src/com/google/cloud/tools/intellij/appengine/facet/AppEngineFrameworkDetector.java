@@ -24,7 +24,6 @@ import com.intellij.framework.detection.FacetBasedFrameworkDetector;
 import com.intellij.framework.detection.FileContentPattern;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.StdFileTypes;
-import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
 
@@ -48,10 +47,6 @@ public class AppEngineFrameworkDetector extends
   @Override
   public FrameworkType getFrameworkType() {
     return AppEngineFrameworkType.getFrameworkType();
-  }
-
-  @Override
-  public void setupFacet(@NotNull AppEngineFacet facet, ModifiableRootModel model) {
   }
 
   @NotNull
