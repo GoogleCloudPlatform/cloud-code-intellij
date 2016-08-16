@@ -228,7 +228,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
   }
 
   private String getLibUserDirectoryPath() {
-    return getCloudSdkHomePath() + JAVA_TOOLS_BASE_PATH + "/lib/user";
+    return getCloudSdkHomePath() + "/" + JAVA_TOOLS_BASE_PATH + "/lib/user";
   }
 
   private static File[] getJarsFromDirectory(File libFolder) {
