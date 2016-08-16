@@ -52,6 +52,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
 
   private final String analyticsId;
   private String externalPluginName;
+  private String userAgent;
 
   /**
    * Constructs a usage tracker configured with analytics and plugin name configured from its
@@ -59,8 +60,10 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
    */
   public GoogleUsageTracker() {
     analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
-    externalPluginName = ServiceManager.getService(AccountPluginInfoService.class)
-        .getExternalPluginName();
+
+    AccountPluginInfoService pluginInfo = ServiceManager.getService(AccountPluginInfoService.class);
+    externalPluginName = pluginInfo.getExternalPluginName();
+    userAgent = pluginInfo.getUserAgent();
   }
 
   private static final List<BasicNameValuePair> analyticsBaseData = ImmutableList
@@ -111,10 +114,10 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
     return new TrackingEventBuilder(this, externalPluginName, action);
   }
 
-  private static void sendPing(@NotNull final List<? extends NameValuePair> postData) {
+  private void sendPing(@NotNull final List<? extends NameValuePair> postData) {
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
       public void run() {
-        CloseableHttpClient client = HttpClientBuilder.create().build();
+        CloseableHttpClient client = HttpClientBuilder.create().setUserAgent(userAgent).build();
         HttpPost request = new HttpPost(ANALYTICS_URL);
 
         try {
