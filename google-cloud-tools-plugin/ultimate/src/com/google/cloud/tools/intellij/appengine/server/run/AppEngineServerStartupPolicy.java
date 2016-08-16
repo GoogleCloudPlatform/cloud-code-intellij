@@ -16,9 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.server.run;
 
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
-import com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerData;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.JavaParameters;
@@ -38,16 +37,14 @@ import java.io.File;
 public class AppEngineServerStartupPolicy implements JavaCommandLineStartupPolicy {
 
   public JavaParameters createCommandLine(CommonModel commonModel) throws ExecutionException {
-    final AppEngineServerData data = (AppEngineServerData) commonModel.getApplicationServer()
-        .getPersistentData();
-    final AppEngineSdk sdk = data.getSdk();
-    if (StringUtil.isEmpty(sdk.getSdkHomePath())) {
+    final CloudSdkService sdkService = CloudSdkService.getInstance();
+    if (StringUtil.isEmpty(sdkService.getCloudSdkHomePath())) {
       throw new ExecutionException("Path to App Engine SDK isn't specified");
     }
-    final File toolsApiJarFile = sdk.getToolsApiJarFile();
+    final File toolsApiJarFile = sdkService.getToolsApiJarFile();
     if (!toolsApiJarFile.exists()) {
       throw new ExecutionException(
-          "'" + sdk.getSdkHomePath() + "' isn't valid App Engine SDK installation: '"
+          "'" + sdkService.getCloudSdkHomePath() + "' isn't valid App Engine SDK installation: '"
               + toolsApiJarFile.getAbsolutePath() + "' not found");
     }
     final JavaParameters javaParameters = new JavaParameters();
@@ -76,7 +73,7 @@ public class AppEngineServerStartupPolicy implements JavaCommandLineStartupPolic
     parameters.add(explodedPathParameter);
     javaParameters.setWorkingDirectory(explodedPathParameter);
     final ParametersList vmParameters = javaParameters.getVMParametersList();
-    sdk.patchJavaParametersForDevServer(vmParameters);
+    sdkService.patchJavaParametersForDevServer(vmParameters);
     if (SystemInfo.isMac) {
       vmParameters.add("-XstartOnFirstThread");
     }

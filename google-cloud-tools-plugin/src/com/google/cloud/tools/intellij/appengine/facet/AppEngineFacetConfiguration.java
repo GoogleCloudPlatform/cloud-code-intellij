@@ -61,10 +61,6 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
     myProperties = state;
   }
 
-  public String getSdkHomePath() {
-    return myProperties.mySdkHomePath;
-  }
-
   public boolean isRunEnhancerOnMake() {
     return myProperties.myRunEnhancerOnMake;
   }
@@ -75,10 +71,6 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
 
   public PersistenceApi getPersistenceApi() {
     return myProperties.myPersistenceApi;
-  }
-
-  public void setSdkHomePath(String sdkHomePath) {
-    myProperties.mySdkHomePath = sdkHomePath;
   }
 
   public void setPersistenceApi(PersistenceApi persistenceApi) {

@@ -15,9 +15,14 @@
  */
 package com.intellij.appengine;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.facet.FacetManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.module.Module;
@@ -42,6 +47,7 @@ import junit.framework.Assert;
 
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.picocontainer.MutablePicoContainer;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -75,10 +81,30 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
   protected abstract String getBaseDirectoryPath();
 
   private void addAppEngineSupport(Module module) {
-    final AppEngineFacet appEngine = FacetManager.getInstance(module).addFacet(AppEngineFacet.getFacetType(), "AppEngine", null);
-    appEngine.getConfiguration().setSdkHomePath(getSdkPath());
+    CloudSdkService sdkService = mock(CloudSdkService.class);
+    when(sdkService.getWebSchemeFile()).thenReturn(getWebSchemeFile());
+    when(sdkService.getApplicationSchemeFile()).thenReturn(getApplicationSchemeFile());
 
-    ModuleRootModificationUtil.addModuleLibrary(module, VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, getSdkPath()) + "/lib/user/orm/jdo.jar!/");
+    MutablePicoContainer applicationContainer = (MutablePicoContainer)
+        ApplicationManager.getApplication().getPicoContainer();
+    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
+    applicationContainer.registerComponentInstance(
+        CloudSdkService.class.getName(), sdkService);
+
+    FacetManager
+        .getInstance(module).addFacet(AppEngineFacet.getFacetType(), "AppEngine", null);
+
+    ModuleRootModificationUtil.addModuleLibrary(module,
+        VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, getSdkPath())
+            + "/lib/user/orm/jdo.jar!/");
+  }
+
+  public static File getApplicationSchemeFile() {
+    return new File(getTestDataPath(), "sdk/" + DEFAULT_VERSION + "/docs/appengine-application.xsd");
+  }
+
+  public static File getWebSchemeFile() {
+    return new File(getTestDataPath(), "sdk/" + DEFAULT_VERSION + "/docs/appengine-web.xsd");
   }
 
   public static String getSdkPath() {

@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkManager;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
 import com.intellij.facet.FacetType;
@@ -31,8 +29,6 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * @author nik
@@ -56,10 +52,6 @@ public class AppEngineFrameworkDetector extends
 
   @Override
   public void setupFacet(@NotNull AppEngineFacet facet, ModifiableRootModel model) {
-    final List<? extends AppEngineSdk> sdks = AppEngineSdkManager.getInstance().getValidSdks();
-    if (!sdks.isEmpty()) {
-      facet.getConfiguration().setSdkHomePath(sdks.get(0).getSdkHomePath());
-    }
   }
 
   @NotNull

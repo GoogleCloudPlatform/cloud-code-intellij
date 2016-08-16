@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk.impl;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+
 import com.intellij.facet.ui.FacetConfigurationQuickFix;
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.ide.BrowserUtil;
@@ -48,14 +50,7 @@ public class AppEngineSdkUtil {
 
   @NotNull
   public static ValidationResult checkPath(String path) {
-    final AppEngineSdkImpl sdk = new AppEngineSdkImpl(path);
-
-    final File appCfgFile = sdk.getAppCfgFile();
-    if (!appCfgFile.exists()) {
-      return createNotFoundMessage(path, appCfgFile);
-    }
-
-    final File toolsApiJarFile = sdk.getToolsApiJarFile();
+    final File toolsApiJarFile = CloudSdkService.getInstance().getToolsApiJarFile();
     if (!toolsApiJarFile.exists()) {
       return createNotFoundMessage(path, toolsApiJarFile);
     }

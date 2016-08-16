@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
-
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.openapi.components.ServiceManager;
@@ -66,18 +64,14 @@ public abstract class AppEngineWebIntegration {
 
   public abstract void setupJpaSupport(@NotNull Module module, @NotNull VirtualFile persistenceXml);
 
-  public abstract void setupRunConfiguration(@NotNull AppEngineSdk sdk, @Nullable Artifact artifact,
-      @NotNull Project project);
+  public abstract void setupRunConfiguration(@Nullable Artifact artifact, @NotNull Project project);
 
-  public abstract void setupDevServer(@NotNull AppEngineSdk sdk);
+  public abstract void setupDevServer();
 
-  public abstract void addDevServerToModuleDependencies(@NotNull ModifiableRootModel rootModel,
-      @NotNull AppEngineSdk sdk);
+  public abstract void addDevServerToModuleDependencies(@NotNull ModifiableRootModel rootModel);
 
   public abstract void addLibraryToArtifact(@NotNull Library library, @NotNull Artifact artifact,
       @NotNull Project project);
-
-  public abstract List<? extends AppEngineSdk> getSdkForConfiguredDevServers();
 
   public void addDescriptor(@NotNull Artifact artifact, @NotNull Project project,
       @NotNull VirtualFile descriptor) {

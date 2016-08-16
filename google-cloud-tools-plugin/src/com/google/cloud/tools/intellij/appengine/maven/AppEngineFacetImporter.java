@@ -118,17 +118,12 @@ public class AppEngineFacetImporter extends
       List<MavenProjectsProcessorTask> postTasks) {
     String version = getVersion(mavenProject);
     if (version != null) {
-      String relativePath = "/com/google/appengine/appengine-java-sdk/" + version
-          + "/appengine-java-sdk/appengine-java-sdk-" + version;
-      facet.getConfiguration().setSdkHomePath(
-          FileUtil.toSystemIndependentName(mavenProject.getLocalRepository().getPath())
-              + relativePath);
-      AppEngineWebIntegration.getInstance().setupDevServer(facet.getSdk());
+      AppEngineWebIntegration.getInstance().setupDevServer();
       final String artifactName = module.getName() + ":war exploded";
       final Artifact webArtifact = modelsProvider.getModifiableArtifactModel()
           .findArtifact(artifactName);
       AppEngineWebIntegration.getInstance()
-          .setupRunConfiguration(facet.getSdk(), webArtifact, module.getProject());
+          .setupRunConfiguration(webArtifact, module.getProject());
     }
   }
 }

@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
 
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.openapi.diagnostic.Logger;
@@ -82,18 +81,15 @@ public class AppEngineCommunityWebIntegration extends AppEngineWebIntegration {
   }
 
   @Override
-  public void setupRunConfiguration(@NotNull AppEngineSdk sdk,
-      @Nullable Artifact artifact,
-      @NotNull Project project) {
+  public void setupRunConfiguration(@Nullable Artifact artifact, @NotNull Project project) {
   }
 
   @Override
-  public void setupDevServer(@NotNull AppEngineSdk sdk) {
+  public void setupDevServer() {
   }
 
   @Override
-  public void addDevServerToModuleDependencies(@NotNull ModifiableRootModel rootModel,
-      @NotNull AppEngineSdk sdk) {
+  public void addDevServerToModuleDependencies(@NotNull ModifiableRootModel rootModel) {
   }
 
   @Override
@@ -106,11 +102,6 @@ public class AppEngineCommunityWebIntegration extends AppEngineWebIntegration {
           .containsDirectoriesWithClasses() ? "classes" : "lib";
       artifactManager.addElementsToDirectory(artifact, "WEB-INF/" + dir, element);
     }
-  }
-
-  @Override
-  public List<? extends AppEngineSdk> getSdkForConfiguredDevServers() {
-    return Collections.emptyList();
   }
 
   @Override

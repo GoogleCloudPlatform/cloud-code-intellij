@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.jps.model.PersistenceApi;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
@@ -125,7 +124,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
   private void addSupport(final Module module,
       final ModifiableRootModel rootModel,
       FrameworkSupportModel frameworkSupportModel,
-      String sdkPath,
       @Nullable PersistenceApi persistenceApi) {
     FacetType<AppEngineFacet, AppEngineFacetConfiguration> facetType = AppEngineFacet
         .getFacetType();
@@ -134,8 +132,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     AppEngineWebIntegration webIntegration = AppEngineWebIntegration.getInstance();
     webIntegration.registerFrameworkInModel(frameworkSupportModel, appEngineFacet);
     final AppEngineFacetConfiguration facetConfiguration = appEngineFacet.getConfiguration();
-    facetConfiguration.setSdkHomePath(sdkPath);
-    final AppEngineSdk sdk = appEngineFacet.getSdk();
     final Artifact webArtifact = findOrCreateWebArtifact(appEngineFacet);
 
     final VirtualFile webDescriptorDir = webIntegration
@@ -150,9 +146,10 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     }
 
     final Project project = module.getProject();
-    webIntegration.addDevServerToModuleDependencies(rootModel, sdk);
+    webIntegration.addDevServerToModuleDependencies(rootModel);
 
-    final Library apiJar = addProjectLibrary(module, "AppEngine API", sdk.getUserLibraryPaths(),
+    final Library apiJar = addProjectLibrary(module, "AppEngine API",
+        CloudSdkService.getInstance().getUserLibraryPaths(),
         VirtualFile.EMPTY_ARRAY);
     rootModel.addLibraryEntry(apiJar);
     webIntegration.addLibraryToArtifact(apiJar, webArtifact, project);
@@ -187,7 +184,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
         LOG.error(ioe);
       }
       final Library library = addProjectLibrary(module, "AppEngine ORM",
-          Collections.singletonList(sdk.getOrmLibDirectoryPath()), sdk.getOrmLibSources());
+          Collections.singletonList(CloudSdkService.getInstance().getOrmLibDirectoryPath()),
+          CloudSdkService.getInstance().getOrmLibSources());
       rootModel.addLibraryEntry(library);
       webIntegration.addLibraryToArtifact(library, webArtifact, project);
     }
@@ -299,7 +297,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
       AppEngineSupportProvider.this
           .addSupport(module, rootModel, myFrameworkSupportModel,
-              cloudSdkPanel.getCloudSdkDirectory(),
               PersistenceApiComboboxUtil.getSelectedApi(myPersistenceApiComboBox));
     }
 

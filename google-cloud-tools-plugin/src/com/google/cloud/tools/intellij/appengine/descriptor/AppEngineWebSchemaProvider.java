@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.descriptor;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
 import com.intellij.openapi.module.Module;
@@ -47,7 +48,7 @@ import java.util.Set;
  */
 public class AppEngineWebSchemaProvider extends XmlSchemaProvider {
 
-  private static final Set<String> FILE_NAMES = new HashSet<String>(
+  private static final Set<String> FILE_NAMES = new HashSet<>(
       Arrays.asList(AppEngineUtilLegacy.APP_ENGINE_WEB_XML_NAME,
           AppEngineUtilLegacy.APP_ENGINE_APPLICATION_XML_NAME,
           AppEngineUtilLegacy.JDO_CONFIG_XML_NAME));
@@ -73,10 +74,14 @@ public class AppEngineWebSchemaProvider extends XmlSchemaProvider {
       if (facet != null) {
         final File file;
         if (isApplicationXmlFile(baseFile)) {
-          file = facet.getSdk().getApplicationSchemeFile();
+          file = CloudSdkService.getInstance().getApplicationSchemeFile();
         } else {
-          file = facet.getSdk().getWebSchemeFile();
+          file = CloudSdkService.getInstance().getWebSchemeFile();
         }
+        if (file == null) {
+          return null;
+        }
+
         final VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByIoFile(file);
         if (virtualFile != null) {
           final PsiFile psiFile = PsiManager.getInstance(module.getProject()).findFile(virtualFile);

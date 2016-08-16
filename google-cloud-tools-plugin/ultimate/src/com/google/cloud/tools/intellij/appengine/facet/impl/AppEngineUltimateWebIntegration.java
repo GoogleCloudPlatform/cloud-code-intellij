@@ -19,9 +19,8 @@ package com.google.cloud.tools.intellij.appengine.facet.impl;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
-import com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerData;
 import com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerIntegration;
 import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
 
@@ -34,6 +33,7 @@ import com.intellij.javaee.JavaeePersistenceDescriptorsConstants;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
 import com.intellij.javaee.artifact.JavaeeArtifactUtil;
 import com.intellij.javaee.facet.JavaeeFrameworkSupportInfoCollector;
+import com.intellij.javaee.oss.server.JavaeePersistentData;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.configuration.J2EEConfigurationFactory;
 import com.intellij.javaee.serverInstances.ApplicationServersManager;
@@ -58,7 +58,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -109,10 +108,8 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
     }
   }
 
-  public void setupRunConfiguration(@NotNull AppEngineSdk sdk,
-      Artifact artifact,
-      @NotNull Project project) {
-    final ApplicationServer appServer = getOrCreateAppServer(sdk);
+  public void setupRunConfiguration(Artifact artifact, @NotNull Project project) {
+    final ApplicationServer appServer = getOrCreateAppServer();
     if (appServer != null) {
       AppEngineServerConfigurationType configurationType = AppEngineServerConfigurationType
           .getInstance();
@@ -132,9 +129,8 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
   }
 
   @Override
-  public void addDevServerToModuleDependencies(@NotNull ModifiableRootModel rootModel,
-      @NotNull AppEngineSdk sdk) {
-    final ApplicationServer appServer = getOrCreateAppServer(sdk);
+  public void addDevServerToModuleDependencies(@NotNull ModifiableRootModel rootModel) {
+    final ApplicationServer appServer = getOrCreateAppServer();
     if (appServer != null) {
       rootModel.addLibraryEntry(appServer.getLibrary()).setScope(DependencyScope.PROVIDED);
     }
@@ -146,41 +142,29 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
     WebArtifactUtil.getInstance().addLibrary(library, artifact, project);
   }
 
-  public void setupDevServer(@NotNull final AppEngineSdk sdk) {
-    getOrCreateAppServer(sdk);
+  public void setupDevServer() {
+    getOrCreateAppServer();
   }
 
-  private static ApplicationServer getOrCreateAppServer(AppEngineSdk sdk) {
-    if (!sdk.isValid()) {
+  private static ApplicationServer getOrCreateAppServer() {
+    final CloudSdkService sdkService = CloudSdkService.getInstance();
+    if (!sdkService.isValid()) {
       return null;
     }
+
     final ApplicationServersManager serversManager = ApplicationServersManager.getInstance();
     final AppEngineServerIntegration integration = AppEngineServerIntegration.getInstance();
 
     final List<ApplicationServer> servers = serversManager.getApplicationServers(integration);
-    File sdkHomeFile = new File(sdk.getSdkHomePath());
     for (ApplicationServer server : servers) {
-      final String path = ((AppEngineServerData) server.getPersistentData()).getSdkPath();
-      if (FileUtil.filesEqual(sdkHomeFile, new File(path))) {
+      if (FileUtil.filesEqual(new File(CloudSdkService.getInstance().getCloudSdkHomePath()),
+          new File(sdkService.getCloudSdkHomePath()))) {
         return server;
       }
     }
 
     return ApplicationServersManager.getInstance()
-        .createServer(integration, new AppEngineServerData(sdk.getSdkHomePath()));
-  }
-
-  public List<? extends AppEngineSdk> getSdkForConfiguredDevServers() {
-    final List<ApplicationServer> servers = ApplicationServersManager.getInstance()
-        .getApplicationServers(AppEngineServerIntegration.getInstance());
-    List<AppEngineSdk> sdkList = new ArrayList<AppEngineSdk>();
-    for (ApplicationServer server : servers) {
-      final AppEngineSdk sdk = ((AppEngineServerData) server.getPersistentData()).getSdk();
-      if (sdk.isValid()) {
-        sdkList.add(sdk);
-      }
-    }
-    return sdkList;
+        .createServer(integration, new JavaeePersistentData());
   }
 
   @Override

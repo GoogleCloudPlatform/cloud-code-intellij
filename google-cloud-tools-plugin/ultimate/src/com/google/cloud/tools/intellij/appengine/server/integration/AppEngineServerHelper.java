@@ -16,13 +16,14 @@
 
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.javaee.appServerIntegrations.ApplicationServerHelper;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerInfo;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
 import com.intellij.javaee.appServerIntegrations.CantFindApplicationServerJarsException;
+import com.intellij.javaee.oss.server.JavaeePersistentData;
 
 /**
  * @author nik
@@ -32,14 +33,14 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
   public ApplicationServerInfo getApplicationServerInfo(
       ApplicationServerPersistentData persistentData)
       throws CantFindApplicationServerJarsException {
-    final AppEngineSdk sdk = ((AppEngineServerData) persistentData).getSdk();
-    String version = sdk.getVersion();
-    return new ApplicationServerInfo(sdk.getLibraries(),
+    final CloudSdkService sdkService = CloudSdkService.getInstance();
+    String version = sdkService.getVersion();
+    return new ApplicationServerInfo(sdkService.getLibraries(),
         "AppEngine Dev" + (version != null ? " " + version : ""));
   }
 
   public ApplicationServerPersistentData createPersistentDataEmptyInstance() {
-    return new AppEngineServerData("");
+    return new JavaeePersistentData();
   }
 
   public ApplicationServerPersistentDataEditor createConfigurable() {

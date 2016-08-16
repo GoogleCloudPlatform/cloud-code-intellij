@@ -16,8 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.gwt;
 
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
-import com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerData;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 
 import com.intellij.execution.configurations.JavaParameters;
@@ -39,11 +38,8 @@ import javax.swing.Icon;
  */
 public class AppEngineGwtServer extends GwtDevModeServer {
 
-  private final ApplicationServer myServer;
-
   public AppEngineGwtServer(@NotNull ApplicationServer server) {
     super("app-engine:" + server.getName(), server.getName());
-    myServer = server;
   }
 
   @Override
@@ -58,16 +54,17 @@ public class AppEngineGwtServer extends GwtDevModeServer {
     programParameters.add("-server");
     programParameters.add("com.google.appengine.tools.development.gwt.AppEngineLauncher");
 
-    final AppEngineSdk sdk = ((AppEngineServerData) myServer.getPersistentData()).getSdk();
-    sdk.patchJavaParametersForDevServer(parameters.getVMParametersList());
+    final CloudSdkService sdkService = CloudSdkService.getInstance();
+    sdkService.patchJavaParametersForDevServer(parameters.getVMParametersList());
 
     //actually these jars are added by AppEngine dev server automatically. But they need to be
     // added to classpath before gwt-dev.jar, because otherwise wrong jsp compiler version will be
     // used (see IDEA-63068)
-    for (File jar : ArrayUtil.mergeArrays(sdk.getLibraries(), sdk.getJspLibraries())) {
+    for (File jar : ArrayUtil.mergeArrays(sdkService.getLibraries(),
+        sdkService.getJspLibraries())) {
       parameters.getClassPath().addFirst(FileUtil.toSystemIndependentName(jar.getAbsolutePath()));
     }
 
-    parameters.getClassPath().add(sdk.getToolsApiJarFile());
+    parameters.getClassPath().add(sdkService.getToolsApiJarFile());
   }
 }

@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
 import com.intellij.javaee.DeploymentDescriptorsConstants;
@@ -70,9 +69,8 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
       artifactToDeploy = model.getExplodedWarArtifact();
     }
     if (artifactToDeploy != null) {
-      AppEngineSdk sdk = appEngineFacet.getSdk();
       AppEngineWebIntegration.getInstance()
-          .setupRunConfiguration(sdk, artifactToDeploy, model.getProject());
+          .setupRunConfiguration(artifactToDeploy, model.getProject());
     }
   }
 
