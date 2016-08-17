@@ -35,6 +35,8 @@ import org.picocontainer.MutablePicoContainer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private AppEngineCloudConfigurable appEngineCloudConfigurable;
@@ -42,7 +44,7 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private CloudSdkService cloudSdkService;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
-  private static final String CLOUD_SDK_DIR_PATH = new File("/a/b/c/gcloud-sdk").getAbsolutePath();
+  private static final Path CLOUD_SDK_DIR_PATH = Paths.get("/a/b/c/gcloud-sdk");
   private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in this directory.";
 
   @Override
@@ -69,7 +71,7 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
     initCloudConfigurable();
     appEngineCloudConfigurable.reset();
 
-    assertEquals(CLOUD_SDK_DIR_PATH, cloudSdkDirectoryField.getText());
+    assertEquals(CLOUD_SDK_DIR_PATH, Paths.get(cloudSdkDirectoryField.getText()));
   }
 
   public void testApply_validSdk() throws Exception {

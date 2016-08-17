@@ -69,6 +69,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return new AppEngineServerInstance(commonModel);
   }
 
+  // TODO(joaomartins): Consider adding something here so we get a nice log pane
+  // like Tomcat and Jetty.
   @Override
   public DeploymentProvider getDeploymentProvider() {
     return null;
@@ -188,7 +190,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   public List<File> getAppYamls() {
     List<File> appYamls = new ArrayList<>();
-    Path appYaml = Paths.get(artifactPointer.getArtifact().getOutputPath()).resolve("app.yaml");
+    Path appYaml = Paths.get(artifactPointer.getArtifact().getOutputPath());
     appYamls.add(appYaml.toFile());
     return appYamls;
   }
@@ -309,14 +311,17 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setPythonStartupArgs(pythonStartupArgs);
   }
 
+  private final static String SEPARATOR = "!@#";
+
   @Override
   public List<String> getJvmFlags() {
     return Arrays.asList(settings.getJvmFlags() != null
-        ? settings.getJvmFlags().split(" ") : new String[]{});
+        ? settings.getJvmFlags().split(SEPARATOR) : new String[]{});
   }
 
   public void addJvmFlag(String flag) {
-    settings.setJvmFlags(settings.getJvmFlags() + " " + flag);
+    settings.setJvmFlags(settings.getJvmFlags() == null
+        ? flag : settings.getJvmFlags() + SEPARATOR + flag);
   }
 
   public void setJvmFlags(String jvmFlags) {

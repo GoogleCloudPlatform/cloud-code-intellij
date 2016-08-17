@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.intellij.appengine.server.run;
+package com.google.cloud.tools.intellij.appengine.server.run;
 
-import com.google.cloud.tools.appengine.api.devserver.DefaultRunConfiguration;
-import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRunTask;
+import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 
-import com.intellij.appengine.server.instance.AppEngineServerModel;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ProgramRunner;
@@ -34,10 +32,7 @@ import com.intellij.javaee.run.localRun.ScriptsHelper;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -84,7 +79,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 
-            startupProcessHandler = new OSProcessHandler(executor.getProcess());
+            startupProcessHandler = new OSProcessHandler(executor.getProcess(),
+                "Running dev_appserver.py");
             return startupProcessHandler;
           }
         };
@@ -116,7 +112,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
             ProcessBuilder dummyProcess = new ProcessBuilder("true");
             try {
-              return new OSProcessHandler(dummyProcess.start());
+              return new OSProcessHandler(dummyProcess.start(), "Terminating dev_appserver.py.");
             } catch (IOException ioe) {
               return null;
             }

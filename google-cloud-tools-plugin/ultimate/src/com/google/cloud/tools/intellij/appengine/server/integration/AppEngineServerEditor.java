@@ -22,7 +22,6 @@ import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.io.FileUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +35,8 @@ public class AppEngineServerEditor extends
     ApplicationServerPersistentDataEditor<ApplicationServerPersistentData> {
 
   private JPanel myMainPanel;
+  // TODO(joaomartins): Replace with CloudSdkPanel when
+  // https://youtrack.jetbrains.com/issue/IDEA-110316 gets fixed.
   private TextFieldWithBrowseButton mySdkHomeField;
 
   public AppEngineServerEditor() {
@@ -45,13 +46,11 @@ public class AppEngineServerEditor extends
   }
 
   protected void resetEditorFrom(ApplicationServerPersistentData data) {
-    mySdkHomeField.setText(
-        FileUtil.toSystemDependentName(CloudSdkService.getInstance().getSdkHomePath()));
+    mySdkHomeField.setText(CloudSdkService.getInstance().getSdkHomePath().toString());
   }
 
   protected void applyEditorTo(ApplicationServerPersistentData data) {
-    CloudSdkService.getInstance()
-        .setSdkHomePath(FileUtil.toSystemIndependentName(mySdkHomeField.getText()));
+    CloudSdkService.getInstance().setSdkHomePath(mySdkHomeField.getText());
   }
 
   @NotNull
