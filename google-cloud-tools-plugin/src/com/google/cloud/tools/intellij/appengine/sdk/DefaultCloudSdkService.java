@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,8 +63,8 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   private PropertiesComponent propertiesComponent;
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
-  private static final String JAVA_TOOLS_BASE_PATH
-      = "platform/google_appengine/google/appengine/tools/java/";
+  private static final Path JAVA_TOOLS_RELATIVE_PATH
+      = Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
   private Map<String, Set<String>> myMethodsBlackList;
 
   public DefaultCloudSdkService() {
@@ -80,23 +82,37 @@ public class DefaultCloudSdkService extends CloudSdkService {
     propertiesComponent.setValue(CLOUD_SDK_PROPERTY_KEY, cloudSdkHomePath);
   }
 
-  @NotNull
+  @Nullable
+  private Path getJavaToolsBasePath() {
+    return getCloudSdkHomePath() != null
+        ? Paths.get(getCloudSdkHomePath(), JAVA_TOOLS_RELATIVE_PATH.toString())
+        : null;
+  }
+
+  @Nullable
   @Override
   public File getToolsApiJarFile() {
-    return new File(JAVA_TOOLS_BASE_PATH,
-        JpsAppEngineModuleExtensionImpl.LIB_APPENGINE_TOOLS_API_JAR);
+    return getJavaToolsBasePath() != null
+        ? getJavaToolsBasePath().resolve(
+            JpsAppEngineModuleExtensionImpl.LIB_APPENGINE_TOOLS_API_JAR).toFile()
+        : null;
   }
 
   @NotNull
   @Override
   public File[] getLibraries() {
-    return getJarsFromDirectory(new File(JAVA_TOOLS_BASE_PATH, "lib/shared"));
+    return getJavaToolsBasePath() != null
+        ? getJarsFromDirectory(getJavaToolsBasePath().resolve(Paths.get("lib", "shared")).toFile())
+        : new File[0];
   }
 
   @NotNull
   @Override
   public File[] getJspLibraries() {
-    return getJarsFromDirectory(new File(JAVA_TOOLS_BASE_PATH, "lib/shared/jsp"));
+    return getJavaToolsBasePath() != null
+        ? getJarsFromDirectory(
+            getJavaToolsBasePath().resolve(Paths.get("lib", "shared", "jsp")).toFile())
+        : new File[0];
   }
 
   @Override
@@ -122,17 +138,30 @@ public class DefaultCloudSdkService extends CloudSdkService {
   @Override
   public List<String> getUserLibraryPaths() {
     List<String> result = new ArrayList<>();
-    result.add(getLibUserDirectoryPath());
-    File opt = new File(getCloudSdkHomePath(), JAVA_TOOLS_BASE_PATH + "lib/opt/user");
-    ContainerUtil.addIfNotNull(result, findLatestVersion(new File(opt, "appengine-endpoints")));
-    ContainerUtil.addIfNotNull(result, findLatestVersion(new File(opt, "jsr107")));
+    String libUserDirectory = getLibUserDirectoryPath();
+    if (libUserDirectory != null && new File(libUserDirectory).exists()) {
+      result.add(libUserDirectory);
+    }
+
+    if (getJavaToolsBasePath() == null) {
+      return result;
+    }
+
+    Path optPath = getJavaToolsBasePath().resolve(Paths.get("lib", "opt", "user"));
+    File optFile = optPath.toFile();
+
+    ContainerUtil.addIfNotNull(
+        result, findLatestVersion(new File(optFile, "appengine-endpoints")));
+    ContainerUtil.addIfNotNull(result, findLatestVersion(new File(optFile, "jsr107")));
     return result;
   }
 
-  @NotNull
+  @Nullable
   @Override
   public String getOrmLibDirectoryPath() {
-    return getLibUserDirectoryPath() + "/orm";
+    return getLibUserDirectoryPath() != null
+        ? Paths.get(getLibUserDirectoryPath(), "orm").toString()
+        : null;
   }
 
   @NotNull
@@ -140,21 +169,23 @@ public class DefaultCloudSdkService extends CloudSdkService {
   // TODO this path is incorrect. We need to determine an alternate strategy for loading these libs
   // maybe from maven central
   public VirtualFile[] getOrmLibSources() {
-    final File libsDir = new File(JAVA_TOOLS_BASE_PATH, "src/orm");
-    final File[] files = libsDir.listFiles();
     List<VirtualFile> roots = new ArrayList<>();
-    if (files != null) {
-      for (File file : files) {
-        final String url = VfsUtil.getUrlForLibraryRoot(file);
-        final VirtualFile zipRoot = VirtualFileManager.getInstance().findFileByUrl(url);
-        if (zipRoot != null && zipRoot.isDirectory()) {
-          String fileName = file.getName();
-          final String srcDirName = StringUtil.trimEnd(fileName, "-src.zip");
-          final VirtualFile sourcesDir = zipRoot.findFileByRelativePath(srcDirName + "/src/java");
-          if (sourcesDir != null) {
-            roots.add(sourcesDir);
-          } else {
-            roots.add(zipRoot);
+    if (getJavaToolsBasePath() != null) {
+      final File libsDir = getJavaToolsBasePath().resolve(Paths.get("src", "orm")).toFile();
+      final File[] files = libsDir.listFiles();
+      if (files != null) {
+        for (File file : files) {
+          final String url = VfsUtil.getUrlForLibraryRoot(file);
+          final VirtualFile zipRoot = VirtualFileManager.getInstance().findFileByUrl(url);
+          if (zipRoot != null && zipRoot.isDirectory()) {
+            String fileName = file.getName();
+            final String srcDirName = StringUtil.trimEnd(fileName, "-src.zip");
+            final VirtualFile sourcesDir = zipRoot.findFileByRelativePath(srcDirName + "/src/java");
+            if (sourcesDir != null) {
+              roots.add(sourcesDir);
+            } else {
+              roots.add(zipRoot);
+            }
           }
         }
       }
@@ -162,40 +193,54 @@ public class DefaultCloudSdkService extends CloudSdkService {
     return VfsUtilCore.toVirtualFileArray(roots);
   }
 
-  @NotNull
+  @Nullable
   @Override
   public File getApplicationSchemeFile() {
-    return new File(getCloudSdkHomePath(), JAVA_TOOLS_BASE_PATH + "docs/appengine-application.xsd");
+    return getJavaToolsBasePath() != null
+        ? getJavaToolsBasePath().resolve(Paths.get("docs", "appengine-application.xsd")).toFile()
+        : null;
   }
 
-  @NotNull
+  @Nullable
   @Override
   public File getWebSchemeFile() {
-    return new File(getCloudSdkHomePath(), JAVA_TOOLS_BASE_PATH + "docs/appengine-web.xsd");
+    return getJavaToolsBasePath() != null
+        ? getJavaToolsBasePath().resolve(Paths.get("docs", "appengine-web.xsd")).toFile()
+        : null;
   }
 
   @Override
   public void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters) {
-    final String agentPath = JAVA_TOOLS_BASE_PATH + "/lib/agent/appengine-agent.jar";
-    if (new File(FileUtil.toSystemDependentName(agentPath)).exists()) {
-      vmParameters.add("-javaagent:" + agentPath);
-    }
-    String patchPath = JAVA_TOOLS_BASE_PATH + "/lib/override/appengine-dev-jdk-overrides.jar";
-    if (new File(FileUtil.toSystemDependentName(patchPath)).exists()) {
-      vmParameters.add("-Xbootclasspath/p:" + patchPath);
+    if (getJavaToolsBasePath() != null) {
+      File agentPath = getJavaToolsBasePath().resolve(
+          Paths.get("lib", "agent", "appengine-agent.jar")).toFile();
+      if (agentPath.exists()) {
+        vmParameters.add("-javaagent:" + agentPath.getAbsolutePath());
+      }
+      File patchPath = getJavaToolsBasePath().resolve(
+          Paths.get("lib", "override", "appengine-dev-jdk-overrides.jar")).toFile();
+      if (patchPath.exists()) {
+        vmParameters.add("-Xbootclasspath/p:" + patchPath.getAbsolutePath());
+      }
     }
   }
 
-  @Override
   @Nullable
+  @Override
   public String getVersion() {
-    return JarUtil.getJarAttribute(getToolsApiJarFile(), "com/google/appengine/tools/info/",
-        Attributes.Name.SPECIFICATION_VERSION);
+    return getToolsApiJarFile() != null
+        ? JarUtil.getJarAttribute(
+            getToolsApiJarFile(),
+            "com/google/appengine/tools/info/", // The trailing slash is needed so don't use Path
+            Attributes.Name.SPECIFICATION_VERSION)
+        : null;
   }
 
   @Override
   public boolean isValid() {
-    return !StringUtil.isEmpty(getCloudSdkHomePath()) && getToolsApiJarFile().exists();
+    return !StringUtil.isEmpty(getCloudSdkHomePath())
+        && getToolsApiJarFile() != null
+        && getToolsApiJarFile().exists();
   }
 
   private static String findLatestVersion(File dir) {
@@ -227,8 +272,11 @@ public class DefaultCloudSdkService extends CloudSdkService {
     return map;
   }
 
+  @Nullable
   private String getLibUserDirectoryPath() {
-    return getCloudSdkHomePath() + "/" + JAVA_TOOLS_BASE_PATH + "/lib/user";
+    return getJavaToolsBasePath() != null
+        ? getJavaToolsBasePath().resolve(Paths.get("lib", "user")).toString()
+        : null;
   }
 
   private static File[] getJarsFromDirectory(File libFolder) {

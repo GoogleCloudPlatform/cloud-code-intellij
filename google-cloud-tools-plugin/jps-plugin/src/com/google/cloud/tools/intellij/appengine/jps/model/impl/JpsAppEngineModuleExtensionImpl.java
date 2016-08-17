@@ -29,6 +29,8 @@ import org.jetbrains.jps.model.ex.JpsElementBase;
 import org.jetbrains.jps.model.ex.JpsElementChildRoleBase;
 import org.jetbrains.jps.model.module.JpsModule;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -40,7 +42,8 @@ public class JpsAppEngineModuleExtensionImpl extends
 
   public static final JpsElementChildRole<JpsAppEngineModuleExtension> ROLE
       = JpsElementChildRoleBase.create("AppEngine");
-  public static final String LIB_APPENGINE_TOOLS_API_JAR = "/lib/appengine-tools-api.jar";
+  public static final Path LIB_APPENGINE_TOOLS_API_JAR
+      = Paths.get("lib", "appengine-tools-api.jar");
   private AppEngineModuleExtensionProperties myProperties;
 
   public JpsAppEngineModuleExtensionImpl(AppEngineModuleExtensionProperties properties) {
@@ -74,7 +77,7 @@ public class JpsAppEngineModuleExtensionImpl extends
   @Override
   public String getToolsApiJarPath() {
     return FileUtil.toSystemDependentName(
-        JpsArtifactPathUtil.appendToPath(getSdkHomePath(), LIB_APPENGINE_TOOLS_API_JAR));
+        JpsArtifactPathUtil.appendToPath(getSdkHomePath(), LIB_APPENGINE_TOOLS_API_JAR.toString()));
   }
 
   @Override

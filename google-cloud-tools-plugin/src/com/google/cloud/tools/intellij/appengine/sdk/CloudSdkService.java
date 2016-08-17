@@ -40,7 +40,7 @@ public abstract class CloudSdkService {
 
   public abstract void setCloudSdkHomePath(String path);
 
-  @NotNull
+  @Nullable
   public abstract File getToolsApiJarFile();
 
   @NotNull
@@ -57,16 +57,16 @@ public abstract class CloudSdkService {
   @NotNull
   public abstract List<String> getUserLibraryPaths();
 
-  @NotNull
+  @Nullable
   public abstract String getOrmLibDirectoryPath();
 
   @NotNull
   public abstract VirtualFile[] getOrmLibSources();
 
-  @NotNull
+  @Nullable
   public abstract File getApplicationSchemeFile();
 
-  @NotNull
+  @Nullable
   public abstract File getWebSchemeFile();
 
   public abstract void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters);

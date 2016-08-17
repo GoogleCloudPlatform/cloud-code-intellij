@@ -42,10 +42,9 @@ public class AppEngineServerStartupPolicy implements JavaCommandLineStartupPolic
       throw new ExecutionException("Path to App Engine SDK isn't specified");
     }
     final File toolsApiJarFile = sdkService.getToolsApiJarFile();
-    if (!toolsApiJarFile.exists()) {
+    if (toolsApiJarFile == null || !toolsApiJarFile.exists()) {
       throw new ExecutionException(
-          "'" + sdkService.getCloudSdkHomePath() + "' isn't valid App Engine SDK installation: '"
-              + toolsApiJarFile.getAbsolutePath() + "' not found");
+          "'" + sdkService.getCloudSdkHomePath() + "' isn't valid App Engine SDK installation: '");
     }
     final JavaParameters javaParameters = new JavaParameters();
     javaParameters.getClassPath().add(toolsApiJarFile.getAbsolutePath());

@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 /**
  * @author nik
  */
+// TODO get rid of this class
 public class AppEngineSdkUtil {
 
   @NonNls
@@ -51,7 +52,7 @@ public class AppEngineSdkUtil {
   @NotNull
   public static ValidationResult checkPath(String path) {
     final File toolsApiJarFile = CloudSdkService.getInstance().getToolsApiJarFile();
-    if (!toolsApiJarFile.exists()) {
+    if (toolsApiJarFile == null || !toolsApiJarFile.exists()) {
       return createNotFoundMessage(path, toolsApiJarFile);
     }
 
