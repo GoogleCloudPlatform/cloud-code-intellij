@@ -125,17 +125,9 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
     getFacet(AppEngineFacet.ID);
     assertFileExist("web/WEB-INF/web.xml");
     assertFileExist("web/WEB-INF/appengine-web.xml");
-    assertFileExist("META-INF/application.xml");
-    VirtualFile descriptor = assertFileExist("META-INF/appengine-application.xml");
 
     final String moduleName = myModule.getName();
     Artifact artifact = ArtifactsTestUtil.findArtifact(myProject, moduleName + ":ear exploded");
-    ArtifactsTestUtil.assertLayout(artifact.getRootElement(), "<root>\n" +
-                                                              " javaee-resources:javaEEApplication(" + moduleName + ")\n" +
-                                                              " web.war/\n" +
-                                                              "  artifact:" + moduleName + ":war exploded\n" +
-                                                              " META-INF/\n" +
-                                                              "  file:" + descriptor.getPath() + "\n");
     assertRunConfigurationCreated(artifact);
   }
 

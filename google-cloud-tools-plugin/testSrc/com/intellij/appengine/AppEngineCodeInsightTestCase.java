@@ -83,7 +83,6 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
   private void addAppEngineSupport(Module module) {
     CloudSdkService sdkService = mock(CloudSdkService.class);
     when(sdkService.getWebSchemeFile()).thenReturn(getWebSchemeFile());
-    when(sdkService.getApplicationSchemeFile()).thenReturn(getApplicationSchemeFile());
 
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
@@ -97,10 +96,6 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
     ModuleRootModificationUtil.addModuleLibrary(module,
         VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, getSdkPath())
             + "/lib/user/orm/jdo.jar!/");
-  }
-
-  public static File getApplicationSchemeFile() {
-    return new File(getTestDataPath(), "sdk/" + DEFAULT_VERSION + "/docs/appengine-application.xsd");
   }
 
   public static File getWebSchemeFile() {

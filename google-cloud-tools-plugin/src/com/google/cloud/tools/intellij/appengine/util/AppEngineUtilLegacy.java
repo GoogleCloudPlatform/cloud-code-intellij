@@ -45,12 +45,11 @@ import javax.swing.JList;
 /**
  * @author nik
  */
+// TODO remove this or promote these helpers elsewhere
 public class AppEngineUtilLegacy {
 
   @NonNls
   public static final String APP_ENGINE_WEB_XML_NAME = "appengine-web.xml";
-  @NonNls
-  public static final String APP_ENGINE_APPLICATION_XML_NAME = "appengine-application.xml";
   @NonNls
   public static final String JDO_CONFIG_XML_NAME = "jdoconfig.xml";
   @NonNls

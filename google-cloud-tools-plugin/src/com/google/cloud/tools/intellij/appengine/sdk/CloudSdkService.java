@@ -64,9 +64,6 @@ public abstract class CloudSdkService {
   public abstract VirtualFile[] getOrmLibSources();
 
   @Nullable
-  public abstract File getApplicationSchemeFile();
-
-  @Nullable
   public abstract File getWebSchemeFile();
 
   public abstract void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters);

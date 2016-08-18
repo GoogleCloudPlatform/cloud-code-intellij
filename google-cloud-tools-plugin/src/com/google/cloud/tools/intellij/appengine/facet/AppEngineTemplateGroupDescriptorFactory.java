@@ -33,8 +33,6 @@ public class AppEngineTemplateGroupDescriptorFactory implements FileTemplateGrou
   @NonNls
   public static final String APP_ENGINE_WEB_XML_TEMPLATE = "GctAppEngineWeb.xml";
   @NonNls
-  public static final String APP_ENGINE_APPLICATION_XML_TEMPLATE = "GctAppEngineApplication.xml";
-  @NonNls
   public static final String APP_ENGINE_JDO_CONFIG_TEMPLATE = "GctAppEngineJdoConfig.xml";
   @NonNls
   public static final String APP_ENGINE_JPA_CONFIG_TEMPLATE = "GctAppEngineJpaConfig.xml";
@@ -42,14 +40,11 @@ public class AppEngineTemplateGroupDescriptorFactory implements FileTemplateGrou
   public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
     final FileTemplateDescriptor appEngineXml = new FileTemplateDescriptor(
         APP_ENGINE_WEB_XML_TEMPLATE, StdFileTypes.XML.getIcon());
-    final FileTemplateDescriptor appEngineApplicationXml = new FileTemplateDescriptor(
-        APP_ENGINE_APPLICATION_XML_TEMPLATE, StdFileTypes.XML.getIcon());
     final FileTemplateDescriptor jdoConfigXml = new FileTemplateDescriptor(
         APP_ENGINE_JDO_CONFIG_TEMPLATE, StdFileTypes.XML.getIcon());
     final FileTemplateDescriptor jpaConfigXml = new FileTemplateDescriptor(
         APP_ENGINE_JPA_CONFIG_TEMPLATE, StdFileTypes.XML.getIcon());
     return new FileTemplateGroupDescriptor("Google App Engine", GoogleCloudToolsIcons.APP_ENGINE,
-        appEngineXml,
-        appEngineApplicationXml, jdoConfigXml, jpaConfigXml);
+        appEngineXml, jdoConfigXml, jpaConfigXml);
   }
 }

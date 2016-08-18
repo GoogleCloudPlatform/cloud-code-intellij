@@ -17,22 +17,11 @@
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
-import com.intellij.javaee.DeploymentDescriptorsConstants;
-import com.intellij.javaee.application.facet.JavaeeApplicationFacet;
 import com.intellij.javaee.supportProvider.JavaeeFrameworkSupportContributionModel;
 import com.intellij.javaee.supportProvider.JavaeeFrameworkSupportContributor;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.elements.PackagingElement;
-import com.intellij.packaging.elements.PackagingElementFactory;
-import com.intellij.util.descriptors.ConfigFile;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * @author nik
@@ -46,24 +35,6 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
       return;
     }
 
-    Artifact earArtifact = model.getModifiableExplodedEarArtifact();
-    JavaeeApplicationFacet applicationFacet = model.getFacet(JavaeeApplicationFacet.ID);
-    if (earArtifact != null && applicationFacet != null) {
-      VirtualFile applicationDescriptorDir = getParentDirForAppDescriptor(applicationFacet);
-      if (applicationDescriptorDir != null) {
-        VirtualFile descriptor =
-            AppEngineSupportProvider.createFileFromTemplate(
-                AppEngineTemplateGroupDescriptorFactory.APP_ENGINE_APPLICATION_XML_TEMPLATE,
-                applicationDescriptorDir, AppEngineUtilLegacy.APP_ENGINE_APPLICATION_XML_NAME);
-        if (descriptor != null) {
-          PackagingElement<?> packagingElement = PackagingElementFactory.getInstance()
-              .createFileCopy(descriptor.getPath(), null);
-          PackagingElementFactory.getInstance()
-              .getOrCreateDirectory(earArtifact.getRootElement(), "META-INF")
-              .addFirstChild(packagingElement);
-        }
-      }
-    }
     Artifact artifactToDeploy = model.getExplodedEarArtifact();
     if (artifactToDeploy == null) {
       artifactToDeploy = model.getExplodedWarArtifact();
@@ -72,18 +43,5 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
       AppEngineWebIntegration.getInstance()
           .setupRunConfiguration(artifactToDeploy, model.getProject());
     }
-  }
-
-  private static VirtualFile getParentDirForAppDescriptor(
-      @NotNull JavaeeApplicationFacet applicationFacet) {
-    ConfigFile configFile = applicationFacet.getDescriptorsContainer()
-        .getConfigFile(DeploymentDescriptorsConstants.APPLICATION_XML_META_DATA);
-    if (configFile != null) {
-      VirtualFile file = configFile.getVirtualFile();
-      if (file != null) {
-        return file.getParent();
-      }
-    }
-    return null;
   }
 }
