@@ -70,6 +70,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField maxModuleInstances;
   private JCheckBox useMtimeFileWatcher;
   private JTextField threadsafeOverride;
+  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "URF_UNREAD_FIELD")
   private JTabbedPane tabbedPane1;
   private JCheckBox allowSkippedFiles;
   private JCheckBox automaticRestart;

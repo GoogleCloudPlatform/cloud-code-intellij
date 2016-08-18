@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.server.instance;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
@@ -42,6 +43,11 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.xmlb.SkipDefaultValuesSerializationFilters;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Tag;
+
+import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,9 +55,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.jdom.Element;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author nik
@@ -311,7 +314,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setPythonStartupArgs(pythonStartupArgs);
   }
 
-  private final static String SEPARATOR = "!@#";
+  private static final String SEPARATOR = "!@#";
 
   @Override
   public List<String> getJvmFlags() {
@@ -404,7 +407,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
    * This class is used to serialize run/debug config settings. It only supports basic types (e.g.,
    * int, String, etc.).
    *
-   * We use this class to store data and use {@link AppEngineServerModel} as an interface to get
+   * <p>We use this class to store data and use {@link AppEngineServerModel} as an interface to get
    * that data. We need to interface some non-basic types (e.g., File, Path).
    * {@link AppEngineServerModel} translates stored data in its basic form to non-basic form.
    */

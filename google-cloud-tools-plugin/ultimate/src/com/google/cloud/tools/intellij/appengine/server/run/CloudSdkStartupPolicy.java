@@ -58,7 +58,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           }
 
           @Override
-          public OSProcessHandler createProcessHandler(String s, Map<String, String> map)
+          public OSProcessHandler createProcessHandler(String string, Map<String, String> map)
               throws ExecutionException {
             AppEngineServerModel runConfiguration;
             try {
@@ -106,7 +106,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
            * window about "missing shutdown script".
            */
           @Override
-          public OSProcessHandler createProcessHandler(String s, Map<String, String> map)
+          public OSProcessHandler createProcessHandler(String string, Map<String, String> map)
               throws ExecutionException {
             startupProcessHandler.destroyProcess();
 
