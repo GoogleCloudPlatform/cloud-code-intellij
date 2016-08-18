@@ -30,7 +30,7 @@ public abstract class AppEngineTask {
   abstract void execute(ProcessStartListener startListener);
 
   /**
-   * Gets invoked with the task gets cancelled by {@link AppEngineRunner}
+   * Gets invoked when the task gets cancelled by {@link AppEngineRunner}
    */
   void onCancel() {
   }
