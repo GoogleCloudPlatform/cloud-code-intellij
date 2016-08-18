@@ -25,12 +25,13 @@ import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.nio.file.Paths;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -110,8 +111,12 @@ public class CloudSdkPanel {
   }
 
   public boolean isModified() {
-    return !Comparing.strEqual(getCloudSdkDirectory(),
-        CloudSdkService.getInstance().getSdkHomePath().toString());
+    if (getCloudSdkDirectory() != null) {
+      return Paths.get(getCloudSdkDirectory())
+          .compareTo(CloudSdkService.getInstance().getSdkHomePath()) != 0;
+    }
+
+    return CloudSdkService.getInstance().getSdkHomePath() != null;
   }
 
   public void apply() throws ConfigurationException {
@@ -119,7 +124,9 @@ public class CloudSdkPanel {
   }
 
   public void reset() {
-    setCloudSdkDirectoryText(CloudSdkService.getInstance().getSdkHomePath().toString());
+    setCloudSdkDirectoryText(CloudSdkService.getInstance().getSdkHomePath() != null
+        ? CloudSdkService.getInstance().getSdkHomePath().toString()
+        : "");
   }
 
   public String getCloudSdkDirectory() {

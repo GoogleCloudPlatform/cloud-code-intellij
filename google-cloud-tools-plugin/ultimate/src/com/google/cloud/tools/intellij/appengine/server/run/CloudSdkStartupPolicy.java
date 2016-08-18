@@ -17,8 +17,9 @@
 package com.google.cloud.tools.intellij.appengine.server.run;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRunTask;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRunTask;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.OSProcessHandler;
@@ -54,7 +55,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
         return new ExecutableObject() {
           @Override
           public String getDisplayString() {
-            return "App Engine Plugins Core library";
+            return GctBundle.getString("appengine.run.startupscript.name");
           }
 
           @Override
@@ -75,12 +76,12 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               runConfiguration.addJvmFlag(jvmDebugFlag.trim());
             }
 
-            AppEngineRunTask runTask = new AppEngineRunTask(runConfiguration);
+            AppEngineStandardRunTask runTask = new AppEngineStandardRunTask(runConfiguration);
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 
             startupProcessHandler = new OSProcessHandler(executor.getProcess(),
-                "Running dev_appserver.py");
+                GctBundle.getString("appengine.run.startupscript"));
             return startupProcessHandler;
           }
         };
@@ -112,7 +113,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
             ProcessBuilder dummyProcess = new ProcessBuilder("true");
             try {
-              return new OSProcessHandler(dummyProcess.start(), "Terminating dev_appserver.py.");
+              return new OSProcessHandler(dummyProcess.start(),
+                  GctBundle.getString("appengine.run.shutdownscript"));
             } catch (IOException ioe) {
               return null;
             }

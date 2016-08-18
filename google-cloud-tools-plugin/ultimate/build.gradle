@@ -36,7 +36,7 @@ dependencies {
     compile files(project(':google-cloud-tools-plugin').sourceSets.main.output)
     compile files(project(':google-cloud-tools-plugin:jps-plugin').sourceSets.main.output)
     compile files("${System.properties['java.home']}/../lib/tools.jar")
-    compile ('com.google.cloud.tools:appengine-plugins-core:0.1.4') {
+    compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
         exclude group: 'com.google.guava', module: 'guava'
     }
     testCompile project(path: ':google-account-plugin')

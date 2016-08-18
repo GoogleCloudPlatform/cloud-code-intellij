@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
 
 import com.intellij.javaee.run.configuration.CommonModel;
@@ -132,7 +133,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
         ? String.valueOf(serverModel.getMaxModuleInstances()) : "");
     useMtimeFileWatcher.setSelected(serverModel.getUseMtimeFileWatcher());
     threadsafeOverride.setText(serverModel.getThreadsafeOverride());
-    jvmFlags.setDialogCaption("Server Parameters");
+    jvmFlags.setDialogCaption(GctBundle.getString("appengine.run.jvmflags.title"));
     jvmFlags.setText(Joiner.on(" ").join(serverModel.getJvmFlags()));
     allowSkippedFiles.setSelected(serverModel.getAllowSkippedFiles());
     apiPort.setText(serverModel.getApiPort() != null

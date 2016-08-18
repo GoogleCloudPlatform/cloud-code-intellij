@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
+import com.google.cloud.tools.intellij.util.GctBundle;
+
 import com.intellij.javaee.appServerIntegrations.ApplicationServerHelper;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerInfo;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
@@ -33,7 +35,8 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
   public ApplicationServerInfo getApplicationServerInfo(
       ApplicationServerPersistentData persistentData)
       throws CantFindApplicationServerJarsException {
-    return new ApplicationServerInfo(new File[]{}, "Cloud SDK");
+    return new ApplicationServerInfo(new File[]{},
+        GctBundle.getString("appengine.run.server.name"));
   }
 
   public ApplicationServerPersistentData createPersistentDataEmptyInstance() {

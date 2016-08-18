@@ -19,8 +19,6 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
@@ -29,25 +27,12 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents an App Engine Standard run task. (i.e., devappserver)
  */
-public class AppEngineRunTask implements AppEngineTask {
+public class AppEngineStandardRunTask implements AppEngineTask {
 
   private RunConfiguration runConfig;
-  private ProcessOutputLineListener stdOutListener;
-  private ProcessOutputLineListener stdErrListener;
-  private ProcessExitListener exitListener;
 
-  public AppEngineRunTask(@NotNull RunConfiguration runConfig) {
+  public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig) {
     this.runConfig = runConfig;
-  }
-
-  public AppEngineRunTask(@NotNull RunConfiguration runConfig,
-      ProcessOutputLineListener stdOutListener,
-      ProcessOutputLineListener stdErrListener,
-      ProcessExitListener exitListener) {
-    this(runConfig);
-    this.stdOutListener = stdOutListener;
-    this.stdErrListener = stdErrListener;
-    this.exitListener = exitListener;
   }
 
   @Override
@@ -56,16 +41,6 @@ public class AppEngineRunTask implements AppEngineTask {
         .sdkPath(CloudSdkService.getInstance().getCloudSdkHomePath())
         .async(true)
         .startListener(startListener);
-
-    if (stdOutListener != null) {
-      sdkBuilder.addStdOutLineListener(stdOutListener);
-    }
-    if (stdErrListener != null) {
-      sdkBuilder.addStdErrLineListener(stdErrListener);
-    }
-    if (exitListener != null) {
-      sdkBuilder.exitListener(exitListener);
-    }
 
     CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdkBuilder.build());
     devServer.run(runConfig);
