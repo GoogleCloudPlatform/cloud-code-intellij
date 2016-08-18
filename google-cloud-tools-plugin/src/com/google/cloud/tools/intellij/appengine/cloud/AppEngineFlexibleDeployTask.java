@@ -85,6 +85,9 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
 
   @Override
   void onCancel() {
-    UsageTrackerProvider.getInstance().trackEvent(GctTracking.APP_ENGINE_DEPLOY_CANCEL).ping();
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_DEPLOY_CANCEL)
+        .withLabel("flex")
+        .ping();
   }
 }
