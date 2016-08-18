@@ -273,7 +273,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
         : null;
   }
 
-  private static File[] getJarsFromDirectory(File libFolder) {
+  private File[] getJarsFromDirectory(File libFolder) {
     List<File> jars = new ArrayList<>();
     final File[] files = libFolder.listFiles();
     if (files != null) {
