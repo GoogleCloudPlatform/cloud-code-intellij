@@ -20,13 +20,12 @@ import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
-import com.google.cloud.tools.intellij.appengine.sdk.impl.AppEngineSdkUtil;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.facet.FacetType;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.util.io.ZipUtil;
 
@@ -55,6 +54,7 @@ import java.util.Map;
 /**
  * @author nik
  */
+// TODO update this to use the new maven plugin and sdk
 public class AppEngineFacetImporter extends
     FacetImporter<AppEngineFacet, AppEngineFacetConfiguration, AppEngineFacetType> {
 
@@ -77,8 +77,8 @@ public class AppEngineFacetImporter extends
       MavenArtifact artifact = embedder.resolve(artifactInfo, repos);
       File file = artifact.getFile();
       File unpackedSdkPath = new File(file.getParentFile(), "appengine-java-sdk");
-      if (file.exists() && !AppEngineSdkUtil
-          .checkPath(FileUtil.toSystemIndependentName(unpackedSdkPath.getAbsolutePath())).isOk()) {
+      File toolsApiJarFile = CloudSdkService.getInstance().getToolsApiJarFile();
+      if (file.exists() && toolsApiJarFile != null && toolsApiJarFile.exists()) {
         try {
           ZipUtil.extract(file, unpackedSdkPath, null, false);
         } catch (IOException ioe) {
