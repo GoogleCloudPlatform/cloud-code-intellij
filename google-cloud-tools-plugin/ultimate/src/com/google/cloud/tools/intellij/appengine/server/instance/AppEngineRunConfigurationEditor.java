@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
-
 import com.google.common.base.Joiner;
+
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -30,7 +30,6 @@ import com.intellij.ui.PanelWithAnchor;
 import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.ui.components.JBLabel;
 
-import javax.swing.JTabbedPane;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionEvent;
@@ -40,6 +39,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 /**
@@ -70,11 +70,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField maxModuleInstances;
   private JCheckBox useMtimeFileWatcher;
   private JTextField threadsafeOverride;
-  private JTextField pythonStartupScript;
-  private JTextField pythonStartupArguments;
-  private JTextField customEntrypoint;
   private JTabbedPane tabbedPane1;
-  private JComboBox runtime;
   private JCheckBox allowSkippedFiles;
   private JCheckBox automaticRestart;
   private JComboBox devappserverLogLevel;
@@ -137,10 +133,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     threadsafeOverride.setText(serverModel.getThreadsafeOverride());
     jvmFlags.setDialogCaption("Server Parameters");
     jvmFlags.setText(Joiner.on(" ").join(serverModel.getJvmFlags()));
-    pythonStartupScript.setText(serverModel.getPythonStartupScript());
-    pythonStartupArguments.setText(serverModel.getPythonStartupArgs());
-    customEntrypoint.setText(serverModel.getCustomEntrypoint());
-    runtime.setSelectedItem(serverModel.getRuntime());
     allowSkippedFiles.setSelected(serverModel.getAllowSkippedFiles());
     apiPort.setText(serverModel.getApiPort() != null
         ? String.valueOf(serverModel.getApiPort()) : "");
@@ -173,10 +165,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
       serverModel.setUseMtimeFileWatcher(useMtimeFileWatcher.isSelected());
       serverModel.setThreadsafeOverride(threadsafeOverride.getText());
       serverModel.setJvmFlags(jvmFlags.getText());
-      serverModel.setPythonStartupScript(pythonStartupScript.getText());
-      serverModel.setPythonStartupArgs(pythonStartupArguments.getText());
-      serverModel.setCustomEntrypoint(customEntrypoint.getText());
-      serverModel.setRuntime((String) runtime.getSelectedItem());
       serverModel.setAllowSkippedFiles(allowSkippedFiles.isSelected());
       if (!apiPort.getText().isEmpty()) {
         serverModel.setApiPort(validateInteger(apiPort.getText(), "API port"));
