@@ -34,9 +34,6 @@ class OAuthScopeRegistry {
     scopes.add("https://www.googleapis.com/auth/appengine.admin");
     scopes.add("https://www.googleapis.com/auth/cloud-platform");
     scopes.add("https://www.googleapis.com/auth/projecthosting");
-    scopes.add("https://www.googleapis.com/auth/analytics");
-    scopes.add("https://www.googleapis.com/auth/analytics.edit");
-    scopes.add("https://www.googleapis.com/auth/analytics.readonly");
     scopes.add("https://www.googleapis.com/auth/cloud_debugger");
     SCOPES = Collections.unmodifiableSortedSet(scopes);
   }
