@@ -30,7 +30,7 @@ import java.io.IOException;
  * Runnable that executes a task responsible for deploying an application to the App Engine
  * flexible environment.
  */
-public class AppEngineFlexibleDeployTask implements AppEngineTask {
+public class AppEngineFlexibleDeployTask extends AppEngineTask {
   private static final Logger logger = Logger.getInstance(AppEngineFlexibleDeployTask.class);
 
   private AppEngineDeploy deploy;
@@ -81,5 +81,13 @@ public class AppEngineFlexibleDeployTask implements AppEngineTask {
           + GctBundle.message("appengine.action.error.update.message"));
       logger.error(re);
     }
+  }
+
+  @Override
+  void onCancel() {
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_DEPLOY_CANCEL)
+        .withLabel("flex")
+        .ping();
   }
 }
