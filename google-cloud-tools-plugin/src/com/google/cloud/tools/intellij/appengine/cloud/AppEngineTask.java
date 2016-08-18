@@ -21,12 +21,18 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 /**
  * Encapsulates a task to be run on Google App Engine.
  */
-public interface AppEngineTask {
+public abstract class AppEngineTask {
 
   /**
    * Executes an App Engine task.
    * @param startListener a callback for retrieving the running process
    */
-  void execute(ProcessStartListener startListener);
+  abstract void execute(ProcessStartListener startListener);
+
+  /**
+   * Gets invoked with the task gets cancelled by {@link AppEngineRunner}
+   */
+  void onCancel() {
+  }
 
 }
