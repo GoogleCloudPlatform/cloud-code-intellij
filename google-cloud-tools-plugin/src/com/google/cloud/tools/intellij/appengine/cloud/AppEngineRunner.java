@@ -17,8 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
-import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
