@@ -56,6 +56,8 @@ import java.util.jar.Attributes;
 /**
  * Default implementation of {@link CloudSdkService} backed by {@link PropertiesComponent} for
  * serialization.
+ *
+ * // TODO Offload various path logic for retrieving AE libs to the common library once implemented
  */
 public class DefaultCloudSdkService extends CloudSdkService {
 
