@@ -30,7 +30,9 @@ public abstract class AppEngineTask {
   abstract void execute(ProcessStartListener startListener);
 
   /**
-   * Gets invoked when the task gets cancelled by {@link AppEngineRunner}
+   * Gets invoked when the task gets cancelled by {@link AppEngineRunner}.
+   * Intentionally left empty - it is up to implementors to decide if they need extra
+   * action on cancellation.
    */
   void onCancel() {
   }
