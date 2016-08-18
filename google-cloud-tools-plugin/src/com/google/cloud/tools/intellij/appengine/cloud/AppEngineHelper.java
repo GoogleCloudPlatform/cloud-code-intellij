@@ -29,7 +29,6 @@ import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * Provides basic Gcloud based App Engine functionality for our Cloud Tools plugin.
