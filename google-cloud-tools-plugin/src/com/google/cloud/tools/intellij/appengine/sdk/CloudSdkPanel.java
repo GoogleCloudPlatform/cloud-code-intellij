@@ -111,12 +111,14 @@ public class CloudSdkPanel {
   }
 
   public boolean isModified() {
-    if (getCloudSdkDirectory() != null) {
+    if (getCloudSdkDirectory() != null
+        && CloudSdkService.getInstance().getSdkHomePath() != null) {
       return Paths.get(getCloudSdkDirectory())
           .compareTo(CloudSdkService.getInstance().getSdkHomePath()) != 0;
     }
 
-    return CloudSdkService.getInstance().getSdkHomePath() != null;
+    return getCloudSdkDirectory() != null
+        || CloudSdkService.getInstance().getSdkHomePath() != null;
   }
 
   public void apply() throws ConfigurationException {
