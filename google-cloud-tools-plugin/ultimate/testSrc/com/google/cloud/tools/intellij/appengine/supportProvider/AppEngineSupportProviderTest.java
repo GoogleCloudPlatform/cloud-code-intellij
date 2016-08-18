@@ -32,10 +32,6 @@ import com.intellij.execution.RunManager;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.facet.FacetManager;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
-import com.intellij.javaee.JavaeeVersion;
-import com.intellij.javaee.application.facet.JavaeeApplicationFacet;
-import com.intellij.javaee.application.framework.JavaeeApplicationFrameworkType;
-import com.intellij.javaee.application.framework.JavaeeApplicationFrameworkVersion;
 import com.intellij.javaee.model.enums.WebAppVersion;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.web.facet.WebFacet;
@@ -111,23 +107,6 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
                                                               "   module:" + moduleName + "\n" +
                                                               "  lib/\n" +
                                                               "   lib:AppEngine API(project)\n");
-    assertRunConfigurationCreated(artifact);
-  }
-
-  public void testAppEngineWithEar() {
-    setupAppEngine();
-    selectFramework(WebFacet.ID);
-    selectFramework(JavaeeApplicationFacet.ID);
-    selectVersion(WebFrameworkType.getInstance(), new WebFrameworkVersion(WebAppVersion.WebAppVersion_2_5));
-    selectVersion(JavaeeApplicationFrameworkType.getInstance(), new JavaeeApplicationFrameworkVersion(JavaeeVersion.JAVAEE_6));
-    addSupport();
-
-    getFacet(AppEngineFacet.ID);
-    assertFileExist("web/WEB-INF/web.xml");
-    assertFileExist("web/WEB-INF/appengine-web.xml");
-
-    final String moduleName = myModule.getName();
-    Artifact artifact = ArtifactsTestUtil.findArtifact(myProject, moduleName + ":ear exploded");
     assertRunConfigurationCreated(artifact);
   }
 
