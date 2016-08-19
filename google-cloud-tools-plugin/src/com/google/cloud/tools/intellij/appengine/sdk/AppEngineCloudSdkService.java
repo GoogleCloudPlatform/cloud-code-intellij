@@ -140,16 +140,18 @@ public class AppEngineCloudSdkService extends AppEngineSdkService {
   @Override
   public List<String> getUserLibraryPaths() {
     List<String> result = new ArrayList<>();
-    String libUserDirectory = getLibUserDirectoryPath();
-    if (libUserDirectory != null && new File(libUserDirectory).exists()) {
-      result.add(libUserDirectory);
-    }
+    Path javaToolsBasePath = getJavaToolsBasePath();
 
-    if (getJavaToolsBasePath() == null) {
+    if (javaToolsBasePath == null) {
       return result;
     }
 
-    Path optPath = getJavaToolsBasePath().resolve(Paths.get("lib", "opt", "user"));
+    String libUserDirectory = getLibUserDirectoryPath();
+    if (libUserDirectory != null && new File(libUserDirectory).exists()) {
+      result.add(getLibUserDirectoryPath());
+    }
+
+    Path optPath = javaToolsBasePath.resolve(Paths.get("lib", "opt", "user"));
     File optFile = optPath.toFile();
 
     ContainerUtil.addIfNotNull(
