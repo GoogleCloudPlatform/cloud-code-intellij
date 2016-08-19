@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
 
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
@@ -46,12 +46,12 @@ public class AppEngineServerEditor extends
 
   protected void resetEditorFrom(ApplicationServerPersistentData data) {
     mySdkHomeField.setText(
-        FileUtil.toSystemDependentName(CloudSdkService.getInstance().getCloudSdkHomePath()));
+        FileUtil.toSystemDependentName(AppEngineSdkService.getInstance().getSdkHomePath()));
   }
 
   protected void applyEditorTo(ApplicationServerPersistentData data) {
-    CloudSdkService.getInstance()
-        .setCloudSdkHomePath(FileUtil.toSystemIndependentName(mySdkHomeField.getText()));
+    AppEngineSdkService.getInstance()
+        .setSdkHomePath(FileUtil.toSystemIndependentName(mySdkHomeField.getText()));
   }
 
   @NotNull

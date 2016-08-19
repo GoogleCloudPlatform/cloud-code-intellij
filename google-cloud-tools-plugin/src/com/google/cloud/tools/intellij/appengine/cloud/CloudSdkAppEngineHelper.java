@@ -23,7 +23,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListen
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
@@ -203,7 +203,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         ServiceManager.getService(CloudToolsPluginInfoService.class);
 
     return new CloudSdk.Builder()
-        .sdkPath(new File(CloudSdkService.getInstance().getCloudSdkHomePath()).toPath())
+        .sdkPath(new File(AppEngineSdkService.getInstance().getSdkHomePath()).toPath())
         .async(true)
         .addStdErrLineListener(logListener)
         .addStdOutLineListener(outputListener)

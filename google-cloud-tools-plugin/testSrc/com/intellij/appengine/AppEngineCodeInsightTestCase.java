@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
 
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
@@ -81,14 +81,14 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
   protected abstract String getBaseDirectoryPath();
 
   private void addAppEngineSupport(Module module) {
-    CloudSdkService sdkService = mock(CloudSdkService.class);
+    AppEngineSdkService sdkService = mock(AppEngineSdkService.class);
     when(sdkService.getWebSchemeFile()).thenReturn(getWebSchemeFile());
 
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
-    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
+    applicationContainer.unregisterComponent(AppEngineSdkService.class.getName());
     applicationContainer.registerComponentInstance(
-        CloudSdkService.class.getName(), sdkService);
+        AppEngineSdkService.class.getName(), sdkService);
 
     FacetManager
         .getInstance(module).addFacet(AppEngineFacet.getFacetType(), "AppEngine", null);

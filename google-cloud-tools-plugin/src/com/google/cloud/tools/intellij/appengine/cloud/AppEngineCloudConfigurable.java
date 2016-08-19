@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -95,7 +95,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.cloudsdk.location.invalid.message"));
     } else {
-      CloudSdkService.getInstance().setCloudSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
+      AppEngineSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
     }
   }
 
@@ -119,6 +119,6 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
-    cloudSdkPanel = new CloudSdkPanel(CloudSdkService.getInstance());
+    cloudSdkPanel = new CloudSdkPanel(AppEngineSdkService.getInstance());
   }
 }

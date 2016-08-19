@@ -29,16 +29,16 @@ import java.util.List;
 /**
  * IntelliJ configured service for providing the path to the Cloud SDK.
  */
-public abstract class CloudSdkService {
+public abstract class AppEngineSdkService {
 
-  public static CloudSdkService getInstance() {
-    return ServiceManager.getService(CloudSdkService.class);
+  public static AppEngineSdkService getInstance() {
+    return ServiceManager.getService(AppEngineSdkService.class);
   }
 
   @Nullable
-  public abstract String getCloudSdkHomePath();
+  public abstract String getSdkHomePath();
 
-  public abstract void setCloudSdkHomePath(String path);
+  public abstract void setSdkHomePath(String path);
 
   @Nullable
   public abstract File getToolsApiJarFile();

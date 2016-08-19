@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.jps.model.PersistenceApi;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
 import com.intellij.facet.FacetManager;
@@ -149,7 +149,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     webIntegration.addDevServerToModuleDependencies(rootModel);
 
     final Library apiJar = addProjectLibrary(module, "AppEngine API",
-        CloudSdkService.getInstance().getUserLibraryPaths(),
+        AppEngineSdkService.getInstance().getUserLibraryPaths(),
         VirtualFile.EMPTY_ARRAY);
     rootModel.addLibraryEntry(apiJar);
     webIntegration.addLibraryToArtifact(apiJar, webArtifact, project);
@@ -184,8 +184,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
         LOG.error(ioe);
       }
       final Library library = addProjectLibrary(module, "AppEngine ORM",
-          Collections.singletonList(CloudSdkService.getInstance().getOrmLibDirectoryPath()),
-          CloudSdkService.getInstance().getOrmLibSources());
+          Collections.singletonList(AppEngineSdkService.getInstance().getOrmLibDirectoryPath()),
+          AppEngineSdkService.getInstance().getOrmLibSources());
       rootModel.addLibraryEntry(library);
       webIntegration.addLibraryToArtifact(library, webArtifact, project);
     }
@@ -293,7 +293,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     public void addSupport(@NotNull Module module,
         @NotNull ModifiableRootModel rootModel,
         @NotNull ModifiableModelsProvider modifiableModelsProvider) {
-      CloudSdkService.getInstance().setCloudSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
+      AppEngineSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
 
       AppEngineSupportProvider.this
           .addSupport(module, rootModel, myFrameworkSupportModel,
@@ -308,7 +308,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
     @SuppressWarnings("checkstyle:abbreviationaswordinname")
     private void createUIComponents() {
-      cloudSdkPanel = new CloudSdkPanel(CloudSdkService.getInstance());
+      cloudSdkPanel = new CloudSdkPanel(AppEngineSdkService.getInstance());
     }
   }
 }

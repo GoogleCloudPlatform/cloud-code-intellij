@@ -20,7 +20,7 @@ import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
 
 import com.intellij.facet.FacetType;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
@@ -77,7 +77,7 @@ public class AppEngineFacetImporter extends
       MavenArtifact artifact = embedder.resolve(artifactInfo, repos);
       File file = artifact.getFile();
       File unpackedSdkPath = new File(file.getParentFile(), "appengine-java-sdk");
-      File toolsApiJarFile = CloudSdkService.getInstance().getToolsApiJarFile();
+      File toolsApiJarFile = AppEngineSdkService.getInstance().getToolsApiJarFile();
       if (file.exists() && toolsApiJarFile != null && toolsApiJarFile.exists()) {
         try {
           ZipUtil.extract(file, unpackedSdkPath, null, false);

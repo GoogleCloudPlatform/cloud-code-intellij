@@ -54,14 +54,14 @@ import java.util.Set;
 import java.util.jar.Attributes;
 
 /**
- * Default implementation of {@link CloudSdkService} backed by {@link PropertiesComponent} for
+ * Default implementation of {@link AppEngineSdkService} backed by {@link PropertiesComponent} for
  * serialization.
  *
  */
 // TODO Offload various path logic for retrieving AE libs to the common library once implemented
-public class DefaultCloudSdkService extends CloudSdkService {
+public class AppEngineCloudSdkService extends AppEngineSdkService {
 
-  private static final Logger logger = Logger.getInstance(DefaultCloudSdkService.class);
+  private static final Logger logger = Logger.getInstance(AppEngineCloudSdkService.class);
 
   private PropertiesComponent propertiesComponent;
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
@@ -69,25 +69,25 @@ public class DefaultCloudSdkService extends CloudSdkService {
       = Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
   private Map<String, Set<String>> myMethodsBlackList;
 
-  public DefaultCloudSdkService() {
+  public AppEngineCloudSdkService() {
     this.propertiesComponent = PropertiesComponent.getInstance();
   }
 
   @Nullable
   @Override
-  public String getCloudSdkHomePath() {
+  public String getSdkHomePath() {
     return propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY);
   }
 
   @Override
-  public void setCloudSdkHomePath(String cloudSdkHomePath) {
+  public void setSdkHomePath(String cloudSdkHomePath) {
     propertiesComponent.setValue(CLOUD_SDK_PROPERTY_KEY, cloudSdkHomePath);
   }
 
   @Nullable
   private Path getJavaToolsBasePath() {
-    return getCloudSdkHomePath() != null
-        ? Paths.get(getCloudSdkHomePath(), JAVA_TOOLS_RELATIVE_PATH.toString())
+    return getSdkHomePath() != null
+        ? Paths.get(getSdkHomePath(), JAVA_TOOLS_RELATIVE_PATH.toString())
         : null;
   }
 
@@ -232,7 +232,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   @Override
   public boolean isValid() {
-    return !StringUtil.isEmpty(getCloudSdkHomePath())
+    return !StringUtil.isEmpty(getSdkHomePath())
         && getToolsApiJarFile() != null
         && getToolsApiJarFile().exists();
   }
