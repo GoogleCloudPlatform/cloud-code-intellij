@@ -73,7 +73,9 @@ public class AppEngineServerEditor extends
   }
 
   protected void resetEditorFrom(ApplicationServerPersistentData data) {
-    mySdkHomeField.setText(CloudSdkService.getInstance().getSdkHomePath().toString());
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+    mySdkHomeField.setText(sdkService.getSdkHomePath() != null
+        ? sdkService.getSdkHomePath().toString() : "" );
   }
 
   protected void applyEditorTo(ApplicationServerPersistentData data) {
