@@ -78,6 +78,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       .getInstance("#com.intellij.appengine.facet.AppEngineSupportProvider");
   public static final String JPA_FRAMEWORK_ID = "facet:jpa";
 
+  private static final AppEngineSdkService sdkService = AppEngineSdkService.getInstance();
+
   @NotNull
   @Override
   public FrameworkTypeEx getFrameworkType() {
@@ -149,7 +151,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     webIntegration.addDevServerToModuleDependencies(rootModel);
 
     final Library apiJar = addProjectLibrary(module, "AppEngine API",
-        AppEngineSdkService.getInstance().getUserLibraryPaths(),
+        sdkService.getUserLibraryPaths(),
         VirtualFile.EMPTY_ARRAY);
     rootModel.addLibraryEntry(apiJar);
     webIntegration.addLibraryToArtifact(apiJar, webArtifact, project);
@@ -184,8 +186,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
         LOG.error(ioe);
       }
       final Library library = addProjectLibrary(module, "AppEngine ORM",
-          Collections.singletonList(AppEngineSdkService.getInstance().getOrmLibDirectoryPath()),
-          AppEngineSdkService.getInstance().getOrmLibSources());
+          Collections.singletonList(sdkService.getOrmLibDirectoryPath()),
+          sdkService.getOrmLibSources());
       rootModel.addLibraryEntry(library);
       webIntegration.addLibraryToArtifact(library, webArtifact, project);
     }
@@ -293,7 +295,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     public void addSupport(@NotNull Module module,
         @NotNull ModifiableRootModel rootModel,
         @NotNull ModifiableModelsProvider modifiableModelsProvider) {
-      AppEngineSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
+      sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
 
       AppEngineSupportProvider.this
           .addSupport(module, rootModel, myFrameworkSupportModel,
@@ -308,7 +310,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
     @SuppressWarnings("checkstyle:abbreviationaswordinname")
     private void createUIComponents() {
-      cloudSdkPanel = new CloudSdkPanel(AppEngineSdkService.getInstance());
+      cloudSdkPanel = new CloudSdkPanel(sdkService);
     }
   }
 }
