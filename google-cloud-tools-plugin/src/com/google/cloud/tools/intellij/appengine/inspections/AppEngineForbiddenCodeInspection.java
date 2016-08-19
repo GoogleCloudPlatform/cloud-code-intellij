@@ -121,7 +121,8 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
             final String qualifiedName = psiClass.getQualifiedName();
             final String methodName = method.getName();
             if (qualifiedName != null
-                && AppEngineSdkService.getInstance().isMethodInBlacklist(qualifiedName, methodName)) {
+                && AppEngineSdkService.getInstance()
+                  .isMethodInBlacklist(qualifiedName, methodName)) {
               final String message =
                   "AppEngine application should not call '" + StringUtil.getShortName(qualifiedName)
                       + ""

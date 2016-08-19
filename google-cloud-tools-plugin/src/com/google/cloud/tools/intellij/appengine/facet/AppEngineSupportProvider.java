@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.jps.model.PersistenceApi;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
 import com.intellij.facet.FacetManager;
