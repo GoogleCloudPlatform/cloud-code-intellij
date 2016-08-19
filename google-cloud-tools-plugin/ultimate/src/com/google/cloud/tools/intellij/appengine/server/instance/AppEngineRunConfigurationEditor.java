@@ -104,7 +104,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
             .setBuildArtifactBeforeRunOption(myMainPanel, myProject, myLastSelectedArtifact, false);
       }
       if (selectedArtifact != null) {
-        // TODO(joaomartins): Figure out why build artifact tasks aren't being added to the UI.
         BuildArtifactsBeforeRunTaskProvider
             .setBuildArtifactBeforeRunOption(myMainPanel, myProject, selectedArtifact, true);
       }
@@ -118,6 +117,8 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     myArtifactComboBox.setSelectedItem(artifact);
     if (artifact == null && myArtifactComboBox.getItemCount() == 1) {
       myArtifactComboBox.setSelectedIndex(0);
+      BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRun(
+          commonModel.getProject(), commonModel, (Artifact) myArtifactComboBox.getSelectedItem());
     }
     port.setText(serverModel.getPort() != null
         ? String.valueOf(serverModel.getPort()) : "");
