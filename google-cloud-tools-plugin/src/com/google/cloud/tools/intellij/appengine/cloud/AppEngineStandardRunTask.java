@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents an App Engine Standard run task. (i.e., devappserver)
  */
-public class AppEngineStandardRunTask implements AppEngineTask {
+public class AppEngineStandardRunTask extends AppEngineTask {
 
   private RunConfiguration runConfig;
 
