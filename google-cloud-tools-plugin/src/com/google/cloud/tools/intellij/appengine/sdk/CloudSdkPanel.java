@@ -123,9 +123,10 @@ public class CloudSdkPanel {
   }
 
   public void reset() {
-    setCloudSdkDirectoryText(CloudSdkService.getInstance().getSdkHomePath() != null
-        ? CloudSdkService.getInstance().getSdkHomePath().toString()
-        : "");
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+
+    setCloudSdkDirectoryText(sdkService.getSdkHomePath() != null
+        ? sdkService.getSdkHomePath().toString() : "");
   }
 
   public String getCloudSdkDirectory() {
