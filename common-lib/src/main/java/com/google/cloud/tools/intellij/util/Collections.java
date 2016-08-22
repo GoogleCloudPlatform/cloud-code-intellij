@@ -31,12 +31,12 @@ import java.util.List;
 public class Collections {
 
   /**
-   *
    * @return read-only collection consisting of elements from both collections
    */
   @NotNull
-  @Contract(pure=true)
-  public static <T> Collection<T> intersection(@NotNull Collection<? extends T> collection1, @NotNull Collection<? extends T> collection2) {
+  @Contract(pure = true)
+  public static <T> Collection<T> intersection(@NotNull Collection<? extends T> collection1,
+      @NotNull Collection<? extends T> collection2) {
     List<T> result = new ArrayList<T>();
     for (T t : collection1) {
       if (collection2.contains(t)) {
