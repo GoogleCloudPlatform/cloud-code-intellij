@@ -58,7 +58,7 @@ import java.util.jar.Attributes;
  * serialization.
  *
  */
-// TODO Offload various path logic for retrieving AE libs to the common library once implemented
+// TODO (eshaul) Offload various path logic for retrieving AE libs to the common library once implemented
 public class DefaultCloudSdkService extends CloudSdkService {
 
   private static final Logger logger = Logger.getInstance(DefaultCloudSdkService.class);
