@@ -63,15 +63,11 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   private static final Logger logger = Logger.getInstance(DefaultCloudSdkService.class);
 
-  private PropertiesComponent propertiesComponent;
+  private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
   private static final Path JAVA_TOOLS_RELATIVE_PATH
       = Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
   private Map<String, Set<String>> myMethodsBlackList;
-
-  public DefaultCloudSdkService() {
-    this.propertiesComponent = PropertiesComponent.getInstance();
-  }
 
   @Nullable
   @Override
