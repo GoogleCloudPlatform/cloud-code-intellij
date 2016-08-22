@@ -84,7 +84,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   @Nullable
   private Path getJavaToolsBasePath() {
-    // TODO check this works.
     return getSdkHomePath() != null
         ? getSdkHomePath().resolve(JAVA_TOOLS_RELATIVE_PATH.toString())
         : null;
