@@ -118,9 +118,9 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
       if (!Services.getLoginService().isLoggedIn()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
-      } else if (CloudSdkService.getInstance().getCloudSdkHomePath() != null
+      } else if (CloudSdkService.getInstance().getSdkHomePath() != null
           && CloudSdkUtil.isCloudSdkExecutable(CloudSdkUtil.toExecutablePath(
-          CloudSdkService.getInstance().getCloudSdkHomePath().toString()))) {
+          CloudSdkService.getInstance().getSdkHomePath().toString()))) {
         callback.connected(new AppEngineRuntimeInstance());
       } else {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
