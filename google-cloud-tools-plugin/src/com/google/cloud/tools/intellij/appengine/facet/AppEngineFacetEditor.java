@@ -16,15 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
-import com.google.cloud.tools.intellij.appengine.sdk.impl.AppEngineSdkUtil;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
-import com.intellij.facet.ui.FacetEditorValidator;
 import com.intellij.facet.ui.FacetValidatorsManager;
-import com.intellij.facet.ui.ValidationResult;
 import com.intellij.ide.presentation.VirtualFilePresentation;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -67,27 +64,17 @@ public class AppEngineFacetEditor extends FacetEditorTab {
   private final AppEngineFacetConfiguration myFacetConfiguration;
   private final FacetEditorContext myContext;
   private JPanel myMainPanel;
-  private JPanel mySdkEditorPanel;
   private JCheckBox myRunEnhancerOnMakeCheckBox;
   private JPanel myFilesToEnhancePanel;
   private JList myFilesList;
   private JComboBox myPersistenceApiComboBox;
   private JPanel myFilesPanel;
-  private AppEngineSdkEditor mySdkEditor;
   private DefaultListModel myFilesListModel;
 
   public AppEngineFacetEditor(AppEngineFacetConfiguration facetConfiguration,
       FacetEditorContext context, FacetValidatorsManager validatorsManager) {
     myFacetConfiguration = facetConfiguration;
     myContext = context;
-    mySdkEditor = new AppEngineSdkEditor(myContext.getProject());
-    validatorsManager.registerValidator(new FacetEditorValidator() {
-      @NotNull
-      @Override
-      public ValidationResult check() {
-        return AppEngineSdkUtil.checkPath(mySdkEditor.getPath());
-      }
-    }, mySdkEditor.getComboBox());
 
     myRunEnhancerOnMakeCheckBox.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -131,14 +118,12 @@ public class AppEngineFacetEditor extends FacetEditorTab {
 
   @NotNull
   public JComponent createComponent() {
-    mySdkEditorPanel.add(BorderLayout.CENTER, mySdkEditor.getMainComponent());
     return myMainPanel;
   }
 
   @Override
   public boolean isModified() {
     return myRunEnhancerOnMakeCheckBox.isSelected() != myFacetConfiguration.isRunEnhancerOnMake()
-        || !mySdkEditor.getPath().equals(myFacetConfiguration.getSdkHomePath())
         || !getConfiguredFiles().equals(myFacetConfiguration.getFilesToEnhance())
         || PersistenceApiComboboxUtil.getSelectedApi(myPersistenceApiComboBox)
         != myFacetConfiguration.getPersistenceApi();
@@ -154,7 +139,6 @@ public class AppEngineFacetEditor extends FacetEditorTab {
 
   @Override
   public void apply() {
-    myFacetConfiguration.setSdkHomePath(mySdkEditor.getPath());
     myFacetConfiguration.setRunEnhancerOnMake(myRunEnhancerOnMakeCheckBox.isSelected());
     myFacetConfiguration.setFilesToEnhance(getConfiguredFiles());
     myFacetConfiguration
@@ -163,10 +147,6 @@ public class AppEngineFacetEditor extends FacetEditorTab {
 
   @Override
   public void reset() {
-    mySdkEditor.setPath(myFacetConfiguration.getSdkHomePath());
-    if (myContext.isNewFacet() && myFacetConfiguration.getSdkHomePath().length() == 0) {
-      mySdkEditor.setDefaultPath();
-    }
     myFilesListModel.removeAllElements();
     fillFilesList(myFacetConfiguration.getFilesToEnhance());
     myRunEnhancerOnMakeCheckBox.setSelected(myFacetConfiguration.isRunEnhancerOnMake());
@@ -191,7 +171,7 @@ public class AppEngineFacetEditor extends FacetEditorTab {
 
   @Override
   public void onFacetInitialized(@NotNull Facet facet) {
-    AppEngineWebIntegration.getInstance().setupDevServer(((AppEngineFacet) facet).getSdk());
+    AppEngineWebIntegration.getInstance().setupDevServer();
   }
 
   private class FilesListCellRenderer extends DefaultListCellRenderer {

@@ -16,7 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.intellij.execution.configurations.ParametersList;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.vfs.VirtualFile;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * IntelliJ configured service for providing the path to the Cloud SDK.
@@ -27,7 +35,41 @@ public abstract class CloudSdkService {
     return ServiceManager.getService(CloudSdkService.class);
   }
 
-  public abstract String getCloudSdkHomePath();
+  @Nullable
+  public abstract String getSdkHomePath();
 
-  public abstract void setCloudSdkHomePath(String path);
+  public abstract void setSdkHomePath(String path);
+
+  @Nullable
+  public abstract File getToolsApiJarFile();
+
+  @NotNull
+  public abstract File[] getLibraries();
+
+  @NotNull
+  public abstract File[] getJspLibraries();
+
+  public abstract boolean isMethodInBlacklist(
+      @NotNull String className, @NotNull String methodName);
+
+  public abstract boolean isClassInWhiteList(@NotNull String className);
+
+  @NotNull
+  public abstract List<String> getUserLibraryPaths();
+
+  @Nullable
+  public abstract String getOrmLibDirectoryPath();
+
+  @NotNull
+  public abstract VirtualFile[] getOrmLibSources();
+
+  @Nullable
+  public abstract File getWebSchemeFile();
+
+  public abstract void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters);
+
+  @Nullable
+  public abstract String getVersion();
+
+  public abstract boolean isValid();
 }

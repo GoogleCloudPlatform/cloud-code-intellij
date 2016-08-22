@@ -65,7 +65,7 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   }
 
   public void testSetupWithGoogleSettingSdkConfigured() throws Exception {
-    when(cloudSdkService.getCloudSdkHomePath()).thenReturn(CLOUD_SDK_DIR_PATH);
+    when(cloudSdkService.getSdkHomePath()).thenReturn(CLOUD_SDK_DIR_PATH);
     initCloudConfigurable();
     appEngineCloudConfigurable.reset();
 

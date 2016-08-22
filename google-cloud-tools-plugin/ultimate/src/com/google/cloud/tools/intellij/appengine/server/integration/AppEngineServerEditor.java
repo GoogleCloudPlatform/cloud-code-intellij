@@ -16,6 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+
+import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -30,7 +33,7 @@ import javax.swing.JPanel;
  * @author nik
  */
 public class AppEngineServerEditor extends
-    ApplicationServerPersistentDataEditor<AppEngineServerData> {
+    ApplicationServerPersistentDataEditor<ApplicationServerPersistentData> {
 
   private JPanel myMainPanel;
   private TextFieldWithBrowseButton mySdkHomeField;
@@ -41,12 +44,14 @@ public class AppEngineServerEditor extends
             null, FileChooserDescriptorFactory.createSingleFolderDescriptor());
   }
 
-  protected void resetEditorFrom(AppEngineServerData data) {
-    mySdkHomeField.setText(FileUtil.toSystemDependentName(data.getSdkPath()));
+  protected void resetEditorFrom(ApplicationServerPersistentData data) {
+    mySdkHomeField.setText(
+        FileUtil.toSystemDependentName(CloudSdkService.getInstance().getSdkHomePath()));
   }
 
-  protected void applyEditorTo(AppEngineServerData data) {
-    data.setSdkPath(FileUtil.toSystemIndependentName(mySdkHomeField.getText()));
+  protected void applyEditorTo(ApplicationServerPersistentData data) {
+    CloudSdkService.getInstance()
+        .setSdkHomePath(FileUtil.toSystemIndependentName(mySdkHomeField.getText()));
   }
 
   @NotNull

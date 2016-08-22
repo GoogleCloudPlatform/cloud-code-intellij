@@ -16,9 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdk;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkManager;
-
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
@@ -34,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AppEngineFacet extends Facet<AppEngineFacetConfiguration> {
 
-  public static final FacetTypeId<AppEngineFacet> ID = new FacetTypeId<AppEngineFacet>("appEngine");
+  public static final FacetTypeId<AppEngineFacet> ID = new FacetTypeId<>("appEngine");
 
   public AppEngineFacet(@NotNull FacetType facetType,
       @NotNull Module module,
@@ -55,8 +52,4 @@ public class AppEngineFacet extends Facet<AppEngineFacetConfiguration> {
     return FacetManager.getInstance(module).getFacetByType(ID);
   }
 
-  @NotNull
-  public AppEngineSdk getSdk() {
-    return AppEngineSdkManager.getInstance().findSdk(getConfiguration().getSdkHomePath());
-  }
 }
