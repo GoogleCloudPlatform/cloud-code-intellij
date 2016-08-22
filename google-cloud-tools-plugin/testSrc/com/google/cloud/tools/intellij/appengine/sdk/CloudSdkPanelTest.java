@@ -43,7 +43,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   private CloudSdkPanel panel;
 
   private SystemEnvironmentProvider environmentProvider;
-  private AppEngineSdkService appEngineSdkService;
+  private CloudSdkService cloudSdkService;
 
   private JLabel warningMessage;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
@@ -58,15 +58,15 @@ public class CloudSdkPanelTest extends PlatformTestCase {
         ApplicationManager.getApplication().getPicoContainer();
 
     environmentProvider = mock(SystemEnvironmentProvider.class);
-    appEngineSdkService = mock(AppEngineSdkService.class);
+    cloudSdkService = mock(CloudSdkService.class);
 
     applicationContainer.unregisterComponent(SystemEnvironmentProvider.class.getName());
-    applicationContainer.unregisterComponent(AppEngineSdkService.class.getName());
+    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
 
     applicationContainer.registerComponentInstance(
         SystemEnvironmentProvider.class.getName(), environmentProvider);
     applicationContainer.registerComponentInstance(
-        AppEngineSdkService.class.getName(), appEngineSdkService);
+        CloudSdkService.class.getName(), cloudSdkService);
   }
 
   public void testSetupWithoutSdkInPath() {
@@ -111,7 +111,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   }
 
   private void initCloudSdkPanel() {
-    panel = new CloudSdkPanel(appEngineSdkService);
+    panel = new CloudSdkPanel(cloudSdkService);
 
     warningMessage = panel.getWarningMessage();
     cloudSdkDirectoryField = panel.getCloudSdkDirectoryField();

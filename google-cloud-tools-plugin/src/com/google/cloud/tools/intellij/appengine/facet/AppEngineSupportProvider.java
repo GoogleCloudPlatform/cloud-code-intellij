@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.jps.model.PersistenceApi;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
@@ -78,7 +78,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       .getInstance("#com.intellij.appengine.facet.AppEngineSupportProvider");
   public static final String JPA_FRAMEWORK_ID = "facet:jpa";
 
-  private static final AppEngineSdkService sdkService = AppEngineSdkService.getInstance();
+  private static final CloudSdkService sdkService = CloudSdkService.getInstance();
 
   @NotNull
   @Override

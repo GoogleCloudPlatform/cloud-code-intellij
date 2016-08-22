@@ -32,10 +32,10 @@ import javax.swing.JComponent;
 public class CloudSdkConfigurable implements Configurable {
 
   private CloudSdkPanel cloudSdkPanel;
-  private AppEngineSdkService appEngineSdkService;
+  private CloudSdkService cloudSdkService;
 
   public CloudSdkConfigurable() {
-    appEngineSdkService = AppEngineSdkService.getInstance();
+    cloudSdkService = CloudSdkService.getInstance();
   }
 
   @Nls
@@ -54,7 +54,7 @@ public class CloudSdkConfigurable implements Configurable {
   @Override
   public JComponent createComponent() {
     if (cloudSdkPanel == null) {
-      cloudSdkPanel = new CloudSdkPanel(appEngineSdkService);
+      cloudSdkPanel = new CloudSdkPanel(cloudSdkService);
     }
 
     return cloudSdkPanel.getComponent();

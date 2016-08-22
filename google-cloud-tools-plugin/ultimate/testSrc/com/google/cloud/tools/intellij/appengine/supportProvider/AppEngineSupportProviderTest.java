@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
 import com.google.cloud.tools.intellij.compiler.artifacts.ArtifactsTestUtil;
 import com.google.cloud.tools.intellij.javaee.supportProvider.JavaeeFrameworkSupportProviderTestCase;
@@ -68,15 +68,15 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
   }
 
   private void setupAppEngine() {
-    AppEngineSdkService sdkService = mock(AppEngineSdkService.class);
+    CloudSdkService sdkService = mock(CloudSdkService.class);
     when(sdkService.isValid()).thenReturn(true);
     when(sdkService.getLibraries()).thenReturn(new File[]{});
 
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
-    applicationContainer.unregisterComponent(AppEngineSdkService.class.getName());
+    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
     applicationContainer.registerComponentInstance(
-        AppEngineSdkService.class.getName(), sdkService);
+        CloudSdkService.class.getName(), sdkService);
 
     FrameworkSupportInModuleConfigurable configurable = selectFramework(AppEngineFrameworkType.ID);
     AppEngineSupportProvider.setSdkPath(configurable, AppEngineCodeInsightTestCase.getSdkPath());

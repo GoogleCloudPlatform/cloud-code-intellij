@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.inspections;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.codeHighlighting.HighlightDisplayLevel;
 import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
@@ -97,7 +97,7 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
           if (resolved instanceof PsiClass) {
             final String qualifiedName = ((PsiClass) resolved).getQualifiedName();
             if (qualifiedName != null
-                && AppEngineSdkService.getInstance().isMethodInBlacklist(qualifiedName, "new")) {
+                && CloudSdkService.getInstance().isMethodInBlacklist(qualifiedName, "new")) {
               final String message =
                   "App Engine application should not create new instances of '" + qualifiedName
                       + "' class";
@@ -121,7 +121,7 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
             final String qualifiedName = psiClass.getQualifiedName();
             final String methodName = method.getName();
             if (qualifiedName != null
-                && AppEngineSdkService.getInstance()
+                && CloudSdkService.getInstance()
                   .isMethodInBlacklist(qualifiedName, methodName)) {
               final String message =
                   "AppEngine application should not call '" + StringUtil.getShortName(qualifiedName)
@@ -149,7 +149,7 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
                 if (entry instanceof JdkOrderEntry) {
                   final String className = ClassUtil.getJVMClassName((PsiClass) resolved);
                   if (className != null
-                      && !AppEngineSdkService.getInstance().isClassInWhiteList(className)) {
+                      && !CloudSdkService.getInstance().isClassInWhiteList(className)) {
                     problems.add(manager.createProblemDescriptor(reference,
                         "Class '" + className + "' is not included in App Engine JRE White List",
                         isOnTheFly, LocalQuickFix.EMPTY_ARRAY,

@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.facet.impl;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerIntegration;
 import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
@@ -145,7 +145,7 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
   }
 
   private static ApplicationServer getOrCreateAppServer() {
-    final AppEngineSdkService sdkService = AppEngineSdkService.getInstance();
+    final CloudSdkService sdkService = CloudSdkService.getInstance();
     if (!sdkService.isValid()) {
       return null;
     }

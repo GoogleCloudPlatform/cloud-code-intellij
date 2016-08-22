@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.server.run;
 
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 
 import com.intellij.execution.ExecutionException;
@@ -37,7 +37,7 @@ import java.io.File;
 public class AppEngineServerStartupPolicy implements JavaCommandLineStartupPolicy {
 
   public JavaParameters createCommandLine(CommonModel commonModel) throws ExecutionException {
-    final AppEngineSdkService sdkService = AppEngineSdkService.getInstance();
+    final CloudSdkService sdkService = CloudSdkService.getInstance();
     if (StringUtil.isEmpty(sdkService.getSdkHomePath())) {
       throw new ExecutionException("Path to App Engine SDK isn't specified");
     }

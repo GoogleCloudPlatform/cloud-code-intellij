@@ -17,7 +17,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -119,7 +119,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       if (!Services.getLoginService().isLoggedIn()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
       } else if (CloudSdkUtil.isCloudSdkExecutable(
-          CloudSdkUtil.toExecutablePath(AppEngineSdkService.getInstance().getSdkHomePath()))) {
+          CloudSdkUtil.toExecutablePath(CloudSdkService.getInstance().getSdkHomePath()))) {
         callback.connected(new AppEngineRuntimeInstance());
       } else {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));

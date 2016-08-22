@@ -45,16 +45,16 @@ public class CloudSdkPanel {
   private JLabel warningMessage;
   private JPanel cloudSdkPanel;
 
-  public CloudSdkPanel(@NotNull AppEngineSdkService appEngineSdkService) {
+  public CloudSdkPanel(@NotNull CloudSdkService cloudSdkService) {
     warningMessage.setVisible(false);
     warningMessage.setIcon(RunConfigurations.ConfigurationWarning);
 
-    if (appEngineSdkService.getSdkHomePath() == null) {
+    if (cloudSdkService.getSdkHomePath() == null) {
       final String cloudSdkDirectoryPath
           = CloudSdkUtil.findCloudSdkDirectoryPath(SystemEnvironmentProvider.getInstance());
 
       if (cloudSdkDirectoryPath != null) {
-        appEngineSdkService.setSdkHomePath(cloudSdkDirectoryPath);
+        cloudSdkService.setSdkHomePath(cloudSdkDirectoryPath);
         cloudSdkDirectoryField.setText(cloudSdkDirectoryPath);
       }
     }
@@ -111,15 +111,15 @@ public class CloudSdkPanel {
 
   public boolean isModified() {
     return !Comparing.strEqual(getCloudSdkDirectory(),
-        AppEngineSdkService.getInstance().getSdkHomePath());
+        CloudSdkService.getInstance().getSdkHomePath());
   }
 
   public void apply() throws ConfigurationException {
-    AppEngineSdkService.getInstance().setSdkHomePath(getCloudSdkDirectory());
+    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectory());
   }
 
   public void reset() {
-    setCloudSdkDirectoryText(AppEngineSdkService.getInstance().getSdkHomePath());
+    setCloudSdkDirectoryText(CloudSdkService.getInstance().getSdkHomePath());
   }
 
   public String getCloudSdkDirectory() {

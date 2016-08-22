@@ -54,14 +54,14 @@ import java.util.Set;
 import java.util.jar.Attributes;
 
 /**
- * Default implementation of {@link AppEngineSdkService} backed by {@link PropertiesComponent} for
+ * Default implementation of {@link CloudSdkService} backed by {@link PropertiesComponent} for
  * serialization.
  *
  */
 // TODO Offload various path logic for retrieving AE libs to the common library once implemented
-public class AppEngineCloudSdkService extends AppEngineSdkService {
+public class DefaultCloudSdkService extends CloudSdkService {
 
-  private static final Logger logger = Logger.getInstance(AppEngineCloudSdkService.class);
+  private static final Logger logger = Logger.getInstance(DefaultCloudSdkService.class);
 
   private PropertiesComponent propertiesComponent;
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
@@ -69,7 +69,7 @@ public class AppEngineCloudSdkService extends AppEngineSdkService {
       = Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
   private Map<String, Set<String>> myMethodsBlackList;
 
-  public AppEngineCloudSdkService() {
+  public DefaultCloudSdkService() {
     this.propertiesComponent = PropertiesComponent.getInstance();
   }
 

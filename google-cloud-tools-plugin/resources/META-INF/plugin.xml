@@ -67,8 +67,8 @@ Code inspections for App Engine Java code.</description>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService"
                         serviceImplementation="com.google.cloud.tools.intellij.DefaultCloudToolsPluginConfigurationService"/>
 
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.AppEngineCloudSdkService"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkService"/>
 
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineCommunityWebIntegration"/>

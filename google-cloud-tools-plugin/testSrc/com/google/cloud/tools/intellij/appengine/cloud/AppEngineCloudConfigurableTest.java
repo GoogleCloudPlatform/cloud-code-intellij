@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
-import com.google.cloud.tools.intellij.appengine.sdk.AppEngineSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
 
@@ -39,7 +39,7 @@ import java.io.IOException;
 public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private AppEngineCloudConfigurable appEngineCloudConfigurable;
   private SystemEnvironmentProvider environmentProvider;
-  private AppEngineSdkService appEngineSdkService;
+  private CloudSdkService cloudSdkService;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
   private static final String CLOUD_SDK_DIR_PATH = new File("/a/b/c/gcloud-sdk").getAbsolutePath();
@@ -53,19 +53,19 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
         ApplicationManager.getApplication().getPicoContainer();
 
     environmentProvider = mock(SystemEnvironmentProvider.class);
-    appEngineSdkService = mock(AppEngineSdkService.class);
+    cloudSdkService = mock(CloudSdkService.class);
 
     applicationContainer.unregisterComponent(SystemEnvironmentProvider.class.getName());
-    applicationContainer.unregisterComponent(AppEngineSdkService.class.getName());
+    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
 
     applicationContainer.registerComponentInstance(
         SystemEnvironmentProvider.class.getName(), environmentProvider);
     applicationContainer.registerComponentInstance(
-        AppEngineSdkService.class.getName(), appEngineSdkService);
+        CloudSdkService.class.getName(), cloudSdkService);
   }
 
   public void testSetupWithGoogleSettingSdkConfigured() throws Exception {
-    when(appEngineSdkService.getSdkHomePath()).thenReturn(CLOUD_SDK_DIR_PATH);
+    when(cloudSdkService.getSdkHomePath()).thenReturn(CLOUD_SDK_DIR_PATH);
     initCloudConfigurable();
     appEngineCloudConfigurable.reset();
 
