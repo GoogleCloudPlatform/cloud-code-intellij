@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.server.instance;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+import com.google.common.base.Joiner;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
@@ -53,6 +54,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -325,6 +327,12 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   public void addJvmFlag(String flag) {
     settings.setJvmFlags(settings.getJvmFlags() == null
         ? flag : settings.getJvmFlags() + SEPARATOR + flag);
+  }
+
+  public void addAllJvmFlags(Collection<String> flags) {
+    settings.setJvmFlags(settings.getJvmFlags() == null
+        ? Joiner.on(SEPARATOR).join(flags)
+        : settings.getJvmFlags() + SEPARATOR + Joiner.on(SEPARATOR).join(flags));
   }
 
   public void setJvmFlags(String jvmFlags) {

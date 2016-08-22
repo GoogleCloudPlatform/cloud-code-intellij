@@ -34,6 +34,7 @@ import com.intellij.javaee.run.localRun.ScriptsHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -73,7 +74,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             // Startup/Shutdown tab. We need to add it here.
             String jvmDebugFlag = map.get("");
             if (jvmDebugFlag != null) {
-              runConfiguration.addJvmFlag(jvmDebugFlag.trim());
+              runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
             }
 
             AppEngineStandardRunTask runTask = new AppEngineStandardRunTask(runConfiguration);
