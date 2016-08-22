@@ -76,6 +76,7 @@ public class JpsAppEngineModuleExtensionImpl extends
 
   @Override
   public String getToolsApiJarPath() {
+    // TODO (eshaul) use the common library to get this path once implemented
     return FileUtil.toSystemDependentName(
         JpsArtifactPathUtil.appendToPath(getSdkHomePath(), LIB_APPENGINE_TOOLS_API_JAR.toString()));
   }
