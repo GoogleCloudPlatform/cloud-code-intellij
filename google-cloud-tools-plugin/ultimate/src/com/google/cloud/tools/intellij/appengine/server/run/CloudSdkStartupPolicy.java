@@ -73,25 +73,12 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               throw new ExecutionException(ee);
             }
 
-            // If the advanced settings checkbox isn't checked, we only want to use the basic
-            // settings. (i.e., just the port)
-            if (!runConfiguration.getAdvancedSettings()) {
-              Artifact artifact = runConfiguration.getArtifact();
-              int port = runConfiguration.getPort();
-              CommonModel commonModel = runConfiguration.getCommonModel();
-              runConfiguration = new AppEngineServerModel();
-              runConfiguration.setCommonModel(commonModel);
-              runConfiguration.setArtifact(artifact);
-              runConfiguration.setPort(port);
-            } else {
-              // This is the place we have access to the debug jvm flags provided by IJ in the
-              // Startup/Shutdown tab. We need to add it here.
-              String jvmDebugFlag = map.get("");
-              if (jvmDebugFlag != null) {
-                runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
-              }
+            // This is the place we have access to the debug jvm flags provided by IJ in the
+            // Startup/Shutdown tab. We need to add it here.
+            String jvmDebugFlag = map.get("");
+            if (jvmDebugFlag != null) {
+              runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
             }
-
 
             AppEngineStandardRunTask runTask =
                 new AppEngineStandardRunTask(runConfiguration, commonModel.getProject());

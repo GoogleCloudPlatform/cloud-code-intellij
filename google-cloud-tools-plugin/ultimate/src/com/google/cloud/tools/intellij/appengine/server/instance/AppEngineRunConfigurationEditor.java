@@ -56,7 +56,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JBLabel myWebArtifactToDeployLabel;
   private JBLabel myPortLabel;
   private JBLabel myServerParametersLabel;
-  private JCheckBox enableAdvanced;
   private JPanel advancedSettingsPanel;
   private final Project myProject;
   private Artifact myLastSelectedArtifact;
@@ -78,18 +77,13 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JComboBox devappserverLogLevel;
   private JCheckBox skipSdkUpdateCheck;
   private JTextField gcsBucketName;
+  // TODO(joaomartins): Change "Advanced Settings" to a collapsable drop down, like Before Launch.
 
   public AppEngineRunConfigurationEditor(Project project) {
     myProject = project;
     myArtifactComboBox.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         onArtifactChanged();
-      }
-    });
-    enableAdvanced.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent actionEvent) {
-        advancedSettingsPanel.setVisible(enableAdvanced.isSelected());
       }
     });
 
@@ -122,7 +116,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     }
     port.setText(serverModel.getPort() != null
         ? String.valueOf(serverModel.getPort()) : "");
-    enableAdvanced.setSelected(serverModel.getAdvancedSettings());
     host.setText(serverModel.getHost());
     adminHost.setText(serverModel.getAdminHost());
     adminPort.setText(serverModel.getAdminPort() != null
@@ -142,7 +135,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     automaticRestart.setSelected(serverModel.getAutomaticRestart());
     devappserverLogLevel.setSelectedItem(serverModel.getDevAppserverLogLevel());
     skipSdkUpdateCheck.setSelected(serverModel.getSkipSdkUpdateCheck());
-    advancedSettingsPanel.setVisible(enableAdvanced.isSelected());
     gcsBucketName.setText(serverModel.getDefaultGcsBucketName());
   }
 
@@ -150,7 +142,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
     serverModel.setPort(validateInteger(port.getText(), "port"));
     serverModel.setArtifact(getSelectedArtifact());
-    serverModel.setAdvancedSettings(enableAdvanced.isSelected());
 
     serverModel.setHost(host.getText());
     serverModel.setAdminHost(adminHost.getText());

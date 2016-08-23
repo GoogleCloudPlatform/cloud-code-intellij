@@ -204,14 +204,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return appYamls;
   }
 
-  public Boolean getAdvancedSettings() {
-    return settings.getAdvancedSettings();
-  }
-
-  public void setAdvancedSettings(Boolean advancedSettings) {
-    settings.setAdvancedSettings(advancedSettings);
-  }
-
   @Override
   public String getHost() {
     return null;
@@ -427,8 +419,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     @Tag("artifact")
     private String artifact;
-    @Tag("advanced_settings")
-    private boolean advancedSettings;
 
     @Tag("host")
     private String host;
@@ -479,14 +469,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     public void setArtifact(String artifact) {
       this.artifact = artifact;
-    }
-
-    public boolean getAdvancedSettings() {
-      return advancedSettings;
-    }
-
-    public void setAdvancedSettings(boolean advancedSettings) {
-      this.advancedSettings = advancedSettings;
     }
 
     public String getHost() {
