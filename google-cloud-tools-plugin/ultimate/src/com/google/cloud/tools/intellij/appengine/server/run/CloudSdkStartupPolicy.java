@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.server.run;
 
-import com.google.cloud.tools.appengine.api.devserver.DefaultRunConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRunTask;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -31,7 +31,6 @@ import com.intellij.javaee.run.localRun.ExecutableObject;
 import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
 import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
-import com.intellij.packaging.artifacts.Artifact;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +45,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
   // The startup process handler is kept so the process can be explicitly terminated, since we're
   // not delegating that to the framework.
-  OSProcessHandler startupProcessHandler;
+  private OSProcessHandler startupProcessHandler;
 
   @Nullable
   @Override
@@ -62,8 +61,20 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           }
 
           @Override
-          public OSProcessHandler createProcessHandler(String string, Map<String, String> map)
-              throws ExecutionException {
+          public OSProcessHandler createProcessHandler(
+              String workingDirectory, Map<String, String> envVariables) throws ExecutionException {
+            CloudSdkService sdkService = CloudSdkService.getInstance();
+            if (sdkService.getSdkHomePath() == null
+                || sdkService.getSdkHomePath().toString().isEmpty()) {
+              throw new ExecutionException(
+                  GctBundle.message("appengine.cloudsdk.location.missing.message"));
+            }
+
+            if (!sdkService.isValid()) {
+              throw new ExecutionException(
+                  GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
+            }
+
             AppEngineServerModel runConfiguration;
 
             try {
@@ -75,7 +86,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
             // This is the place we have access to the debug jvm flags provided by IJ in the
             // Startup/Shutdown tab. We need to add it here.
-            String jvmDebugFlag = map.get("");
+            String jvmDebugFlag = envVariables.get("");
             if (jvmDebugFlag != null) {
               runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
             }
@@ -85,13 +96,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 
-            Process devappserverProcess = executor.getProcess();
-            if (devappserverProcess == null) {
-              throw new ExecutionException(
-                  GctBundle.message("appengine.cloudsdk.location.missing.message"));
-            }
-
-            startupProcessHandler = new OSProcessHandler(devappserverProcess,
+            startupProcessHandler = new OSProcessHandler(executor.getProcess(),
                 GctBundle.getString("appengine.run.startupscript"));
             return startupProcessHandler;
           }
@@ -118,8 +123,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
            * window about "missing shutdown script".
            */
           @Override
-          public OSProcessHandler createProcessHandler(String string, Map<String, String> map)
-              throws ExecutionException {
+          public OSProcessHandler createProcessHandler(
+              String workingDirectory, Map<String, String> envVariables) throws ExecutionException {
             startupProcessHandler.destroyProcess();
 
             ProcessBuilder dummyProcess = new ProcessBuilder("true");
@@ -127,7 +132,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               return new OSProcessHandler(dummyProcess.start(),
                   GctBundle.getString("appengine.run.shutdownscript"));
             } catch (IOException ioe) {
-              return null;
+              throw new ExecutionException(ioe);
             }
           }
         };

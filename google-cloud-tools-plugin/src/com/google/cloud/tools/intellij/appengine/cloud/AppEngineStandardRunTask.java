@@ -38,9 +38,6 @@ public class AppEngineStandardRunTask extends AppEngineTask {
   @Override
   public void execute(ProcessStartListener startListener) {
     CloudSdkService sdkService = CloudSdkService.getInstance();
-    if (sdkService.getSdkHomePath() == null || sdkService.getSdkHomePath().toString().isEmpty()) {
-      return;
-    }
 
     CloudSdk.Builder sdkBuilder = new CloudSdk.Builder()
         .sdkPath(sdkService.getSdkHomePath())

@@ -48,7 +48,7 @@ public class AppEngineServerEditor extends
 
   public AppEngineServerEditor() {
     mySdkHomeField
-        .addBrowseFolderListener("Google App Engine SDK", "Specify Google App Engine Java SDK home",
+        .addBrowseFolderListener("Google Cloud SDK", "Specify Google Cloud SDK home",
             null, FileChooserDescriptorFactory.createSingleFolderDescriptor());
     mySdkHomeField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override

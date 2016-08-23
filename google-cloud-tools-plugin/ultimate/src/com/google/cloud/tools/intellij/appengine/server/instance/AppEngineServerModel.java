@@ -20,6 +20,7 @@ import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
@@ -53,7 +54,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -76,6 +76,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   // TODO(joaomartins): Consider adding something here so we get a nice log pane
   // like Tomcat and Jetty.
+  // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/836
   @Override
   public DeploymentProvider getDeploymentProvider() {
     return null;
@@ -202,7 +203,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public String getHost() {
-    return null;
+    return settings.getHost();
   }
 
   public void setHost(String host) {
@@ -308,23 +309,24 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setPythonStartupArgs(pythonStartupArgs);
   }
 
-  private static final String DELIMITER = "!@#";
+  public static final String JVM_FLAG_DELIMITER = " ";
 
   @Override
   public List<String> getJvmFlags() {
-    return Arrays.asList(settings.getJvmFlags() != null
-        ? settings.getJvmFlags().split(DELIMITER) : new String[]{});
+    return settings.getJvmFlags() != null
+        ? Splitter.on(JVM_FLAG_DELIMITER).splitToList(settings.getJvmFlags())
+        : new ArrayList<String>();
   }
 
   public void addJvmFlag(String flag) {
     settings.setJvmFlags(settings.getJvmFlags() == null
-        ? flag : settings.getJvmFlags() + DELIMITER + flag);
+        ? flag : settings.getJvmFlags() + JVM_FLAG_DELIMITER + flag);
   }
 
   public void addAllJvmFlags(Collection<String> flags) {
     settings.setJvmFlags(settings.getJvmFlags() == null
-        ? Joiner.on(DELIMITER).join(flags)
-        : settings.getJvmFlags() + DELIMITER + Joiner.on(DELIMITER).join(flags));
+        ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
+        : settings.getJvmFlags() + JVM_FLAG_DELIMITER + Joiner.on(JVM_FLAG_DELIMITER).join(flags));
   }
 
   public void setJvmFlags(String jvmFlags) {

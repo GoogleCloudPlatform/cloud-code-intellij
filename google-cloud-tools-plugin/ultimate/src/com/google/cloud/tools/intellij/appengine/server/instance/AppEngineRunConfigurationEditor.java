@@ -40,7 +40,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 /**
@@ -56,7 +55,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JBLabel myWebArtifactToDeployLabel;
   private JBLabel myPortLabel;
   private JBLabel myServerParametersLabel;
-  private JPanel advancedSettingsPanel;
   private final Project myProject;
   private Artifact myLastSelectedArtifact;
   private JComponent anchor;
@@ -70,8 +68,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField maxModuleInstances;
   private JCheckBox useMtimeFileWatcher;
   private JTextField threadsafeOverride;
-  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "URF_UNREAD_FIELD")
-  private JTabbedPane tabbedPane1;
   private JCheckBox allowSkippedFiles;
   private JCheckBox automaticRestart;
   private JComboBox devappserverLogLevel;
@@ -114,24 +110,21 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
       BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRun(
           commonModel.getProject(), commonModel, (Artifact) myArtifactComboBox.getSelectedItem());
     }
-    port.setText(serverModel.getPort() != null
-        ? String.valueOf(serverModel.getPort()) : "");
+    port.setText(intToString(serverModel.getPort()));
     host.setText(serverModel.getHost());
     adminHost.setText(serverModel.getAdminHost());
-    adminPort.setText(serverModel.getAdminPort() != null
-        ? String.valueOf(serverModel.getAdminPort()) : "");
+    adminPort.setText(intToString(serverModel.getAdminPort()));
     authDomain.setText(serverModel.getAuthDomain());
     storagePath.setText(serverModel.getStoragePath());
     logLevel.setSelectedItem(serverModel.getLogLevel());
-    maxModuleInstances.setText(serverModel.getMaxModuleInstances() != null
-        ? String.valueOf(serverModel.getMaxModuleInstances()) : "");
+    maxModuleInstances.setText(intToString(serverModel.getMaxModuleInstances()));
     useMtimeFileWatcher.setSelected(serverModel.getUseMtimeFileWatcher());
     threadsafeOverride.setText(serverModel.getThreadsafeOverride());
     jvmFlags.setDialogCaption(GctBundle.getString("appengine.run.jvmflags.title"));
-    jvmFlags.setText(Joiner.on(" ").join(serverModel.getJvmFlags()));
+    jvmFlags.setText(Joiner.on(AppEngineServerModel.JVM_FLAG_DELIMITER)
+        .join(serverModel.getJvmFlags()));
     allowSkippedFiles.setSelected(serverModel.getAllowSkippedFiles());
-    apiPort.setText(serverModel.getApiPort() != null
-        ? String.valueOf(serverModel.getApiPort()) : "");
+    apiPort.setText(intToString(serverModel.getApiPort()));
     automaticRestart.setSelected(serverModel.getAutomaticRestart());
     devappserverLogLevel.setSelectedItem(serverModel.getDevAppserverLogLevel());
     skipSdkUpdateCheck.setSelected(serverModel.getSkipSdkUpdateCheck());
@@ -176,6 +169,10 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
       throw new ConfigurationException(
           "'" + intText + "' is not a valid " + description + " number.");
     }
+  }
+
+  private String intToString(Integer value) {
+    return value != null ? String.valueOf(value) : "";
   }
 
   private Artifact getSelectedArtifact() {
