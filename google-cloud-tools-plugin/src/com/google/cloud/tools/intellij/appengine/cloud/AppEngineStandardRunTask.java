@@ -47,11 +47,9 @@ import java.awt.Color;
 public class AppEngineStandardRunTask extends AppEngineTask {
 
   private RunConfiguration runConfig;
-  private Project project;
 
-  public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig, @NotNull Project project) {
+  public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig) {
     this.runConfig = runConfig;
-    this.project = project;
   }
 
   @Override
