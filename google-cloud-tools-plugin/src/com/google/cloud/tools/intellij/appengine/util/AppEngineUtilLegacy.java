@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.util;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
 
-import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootModel;
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

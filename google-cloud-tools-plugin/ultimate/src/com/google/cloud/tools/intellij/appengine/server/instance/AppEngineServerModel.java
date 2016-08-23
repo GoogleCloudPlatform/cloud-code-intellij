@@ -141,10 +141,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     this.commonModel = commonModel;
   }
 
-  public CommonModel getCommonModel() {
-    return commonModel;
-  }
-
   @Override
   public Object clone() throws CloneNotSupportedException {
     AppEngineServerModel clone = (AppEngineServerModel) super.clone();
