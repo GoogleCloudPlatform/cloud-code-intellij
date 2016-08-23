@@ -44,7 +44,7 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private CloudSdkService cloudSdkService;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
-  private static final Path CLOUD_SDK_DIR_PATH = Paths.get("/a/b/c/gcloud-sdk");
+  private static final Path CLOUD_SDK_DIR_PATH = Paths.get("a", "b", "c", "gcloud-sdk");
   private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in this directory.";
 
   @Override

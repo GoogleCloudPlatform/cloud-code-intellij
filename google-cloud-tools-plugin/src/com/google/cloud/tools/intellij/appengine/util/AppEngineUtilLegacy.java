@@ -97,6 +97,7 @@ public class AppEngineUtilLegacy {
   @Nullable
   public static AppEngineFacet findAppEngineFacet(@NotNull Project project,
       @NotNull Artifact artifact) {
+    // TODO(joaomartins): Find out why the GAE facet isn't being added to Gradle projects.
     final Set<Module> modules = ArtifactUtil
         .getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
     for (Module module : modules) {
@@ -106,10 +107,6 @@ public class AppEngineUtilLegacy {
       }
     }
     return null;
-  }
-
-  public static File getAppEngineSystemDir() {
-    return new File(PathManager.getSystemPath(), "GoogleAppEngine");
   }
 
   public static List<String> getDefaultSourceRootsToEnhance(ModuleRootModel rootModel) {

@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.server.run;
 
+import com.google.cloud.tools.appengine.api.devserver.DefaultRunConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRunTask;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
@@ -30,6 +31,7 @@ import com.intellij.javaee.run.localRun.ExecutableObject;
 import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
 import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
+import com.intellij.packaging.artifacts.Artifact;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -63,6 +65,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           public OSProcessHandler createProcessHandler(String string, Map<String, String> map)
               throws ExecutionException {
             AppEngineServerModel runConfiguration;
+
             try {
               // Getting the clone so the debug flags aren't added to the persisted settings.
               runConfiguration = (AppEngineServerModel) commonModel.getServerModel().clone();
@@ -70,18 +73,38 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               throw new ExecutionException(ee);
             }
 
-            // This is the place we have access to the debug jvm flag provided by IJ in the
-            // Startup/Shutdown tab. We need to add it here.
-            String jvmDebugFlag = map.get("");
-            if (jvmDebugFlag != null) {
-              runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
+            // If the advanced settings checkbox isn't checked, we only want to use the basic
+            // settings. (i.e., just the port)
+            if (!runConfiguration.getAdvancedSettings()) {
+              Artifact artifact = runConfiguration.getArtifact();
+              int port = runConfiguration.getPort();
+              CommonModel commonModel = runConfiguration.getCommonModel();
+              runConfiguration = new AppEngineServerModel();
+              runConfiguration.setCommonModel(commonModel);
+              runConfiguration.setArtifact(artifact);
+              runConfiguration.setPort(port);
+            } else {
+              // This is the place we have access to the debug jvm flags provided by IJ in the
+              // Startup/Shutdown tab. We need to add it here.
+              String jvmDebugFlag = map.get("");
+              if (jvmDebugFlag != null) {
+                runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
+              }
             }
 
-            AppEngineStandardRunTask runTask = new AppEngineStandardRunTask(runConfiguration);
+
+            AppEngineStandardRunTask runTask =
+                new AppEngineStandardRunTask(runConfiguration, commonModel.getProject());
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 
-            startupProcessHandler = new OSProcessHandler(executor.getProcess(),
+            Process devappserverProcess = executor.getProcess();
+            if (devappserverProcess == null) {
+              throw new ExecutionException(
+                  GctBundle.message("appengine.cloudsdk.location.missing.message"));
+            }
+
+            startupProcessHandler = new OSProcessHandler(devappserverProcess,
                 GctBundle.getString("appengine.run.startupscript"));
             return startupProcessHandler;
           }

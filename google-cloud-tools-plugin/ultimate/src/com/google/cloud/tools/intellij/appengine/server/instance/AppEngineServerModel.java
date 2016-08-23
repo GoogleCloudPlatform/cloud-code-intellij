@@ -141,6 +141,10 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     this.commonModel = commonModel;
   }
 
+  public CommonModel getCommonModel() {
+    return commonModel;
+  }
+
   @Override
   public Object clone() throws CloneNotSupportedException {
     AppEngineServerModel clone = (AppEngineServerModel) super.clone();
@@ -316,23 +320,23 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setPythonStartupArgs(pythonStartupArgs);
   }
 
-  private static final String SEPARATOR = "!@#";
+  private static final String DELIMITER = "!@#";
 
   @Override
   public List<String> getJvmFlags() {
     return Arrays.asList(settings.getJvmFlags() != null
-        ? settings.getJvmFlags().split(SEPARATOR) : new String[]{});
+        ? settings.getJvmFlags().split(DELIMITER) : new String[]{});
   }
 
   public void addJvmFlag(String flag) {
     settings.setJvmFlags(settings.getJvmFlags() == null
-        ? flag : settings.getJvmFlags() + SEPARATOR + flag);
+        ? flag : settings.getJvmFlags() + DELIMITER + flag);
   }
 
   public void addAllJvmFlags(Collection<String> flags) {
     settings.setJvmFlags(settings.getJvmFlags() == null
-        ? Joiner.on(SEPARATOR).join(flags)
-        : settings.getJvmFlags() + SEPARATOR + Joiner.on(SEPARATOR).join(flags));
+        ? Joiner.on(DELIMITER).join(flags)
+        : settings.getJvmFlags() + DELIMITER + Joiner.on(DELIMITER).join(flags));
   }
 
   public void setJvmFlags(String jvmFlags) {

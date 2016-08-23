@@ -152,31 +152,29 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     serverModel.setArtifact(getSelectedArtifact());
     serverModel.setAdvancedSettings(enableAdvanced.isSelected());
 
-    if (enableAdvanced.isSelected()) {
-      serverModel.setHost(host.getText());
-      serverModel.setAdminHost(adminHost.getText());
-      if (!adminPort.getText().isEmpty()) {
-        serverModel.setAdminPort(validateInteger(adminPort.getText(), "admin port"));
-      }
-      serverModel.setAuthDomain(authDomain.getText());
-      serverModel.setStoragePath(storagePath.getText());
-      serverModel.setLogLevel((String) logLevel.getSelectedItem());
-      if (!maxModuleInstances.getText().isEmpty()) {
-        serverModel.setMaxModuleInstances(validateInteger(
-            maxModuleInstances.getText(), "maximum module instances"));
-      }
-      serverModel.setUseMtimeFileWatcher(useMtimeFileWatcher.isSelected());
-      serverModel.setThreadsafeOverride(threadsafeOverride.getText());
-      serverModel.setJvmFlags(jvmFlags.getText());
-      serverModel.setAllowSkippedFiles(allowSkippedFiles.isSelected());
-      if (!apiPort.getText().isEmpty()) {
-        serverModel.setApiPort(validateInteger(apiPort.getText(), "API port"));
-      }
-      serverModel.setAutomaticRestart(automaticRestart.isSelected());
-      serverModel.setDevAppserverLogLevel((String) devappserverLogLevel.getSelectedItem());
-      serverModel.setSkipSdkUpdateCheck(skipSdkUpdateCheck.isSelected());
-      serverModel.setDefaultGcsBucketName(gcsBucketName.getText());
+    serverModel.setHost(host.getText());
+    serverModel.setAdminHost(adminHost.getText());
+    if (!adminPort.getText().isEmpty()) {
+      serverModel.setAdminPort(validateInteger(adminPort.getText(), "admin port"));
     }
+    serverModel.setAuthDomain(authDomain.getText());
+    serverModel.setStoragePath(storagePath.getText());
+    serverModel.setLogLevel((String) logLevel.getSelectedItem());
+    if (!maxModuleInstances.getText().isEmpty()) {
+      serverModel.setMaxModuleInstances(validateInteger(
+          maxModuleInstances.getText(), "maximum module instances"));
+    }
+    serverModel.setUseMtimeFileWatcher(useMtimeFileWatcher.isSelected());
+    serverModel.setThreadsafeOverride(threadsafeOverride.getText());
+    serverModel.setJvmFlags(jvmFlags.getText());
+    serverModel.setAllowSkippedFiles(allowSkippedFiles.isSelected());
+    if (!apiPort.getText().isEmpty()) {
+      serverModel.setApiPort(validateInteger(apiPort.getText(), "API port"));
+    }
+    serverModel.setAutomaticRestart(automaticRestart.isSelected());
+    serverModel.setDevAppserverLogLevel((String) devappserverLogLevel.getSelectedItem());
+    serverModel.setSkipSdkUpdateCheck(skipSdkUpdateCheck.isSelected());
+    serverModel.setDefaultGcsBucketName(gcsBucketName.getText());
   }
 
   private Integer validateInteger(String intText, String description)
@@ -195,6 +193,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
 
   @NotNull
   protected JComponent createEditor() {
+    // TODO(joaomartins): Switch to AppEngineProjectService and deprecate AppEngineUtilLegacy.
     AppEngineUtilLegacy.setupAppEngineArtifactCombobox(myProject, myArtifactComboBox, false);
     return myMainPanel;
   }
