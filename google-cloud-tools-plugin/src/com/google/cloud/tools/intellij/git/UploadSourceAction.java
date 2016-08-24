@@ -473,7 +473,8 @@ public class UploadSourceAction extends DumbAwareAction {
       Set<VirtualFile> untrackedFilesAsSet = new HashSet<>(untrackedFiles);
       Set<VirtualFile> trackedFilesAsSet = new HashSet<>(trackedFiles);
 
-      Collection<VirtualFile> filesToAdd = Sets.intersection(untrackedFilesAsSet, filesToCommitAsSet);
+      Collection<VirtualFile> filesToAdd
+          = Sets.intersection(untrackedFilesAsSet, filesToCommitAsSet);
       Collection<VirtualFile> filesToRm = Sets.difference(trackedFilesAsSet, filesToCommitAsSet);
       Collection<VirtualFile> modified = new HashSet<VirtualFile>(trackedFiles);
       modified.addAll(filesToCommit);
