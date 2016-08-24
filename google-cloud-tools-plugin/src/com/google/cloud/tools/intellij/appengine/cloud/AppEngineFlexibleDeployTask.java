@@ -73,14 +73,14 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
       return;
     }
 
-    if (!helper.stageCredentials(
-        deploy.getDeploymentConfiguration().getGoogleUsername())) {
-      deploy.getCallback().errorOccurred(
-          GctBundle.message("appengine.staging.credentials.error"));
-      return;
-    }
-
     try {
+      if (!helper.stageCredentials(
+          deploy.getDeploymentConfiguration().getGoogleUsername())) {
+        deploy.getCallback().errorOccurred(
+            GctBundle.message("appengine.staging.credentials.error"));
+        return;
+      }
+
       deploy.deploy(stagingDirectory, startListener);
     } catch (RuntimeException re) {
       deploy.getCallback().errorOccurred(GctBundle.message("appengine.deployment.error") + "\n"

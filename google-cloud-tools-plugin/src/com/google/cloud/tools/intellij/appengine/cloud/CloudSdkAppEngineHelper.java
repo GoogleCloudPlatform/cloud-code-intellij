@@ -252,7 +252,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       Files.write(jsonCredential, credentialsPath, Charset.forName("UTF-8"));
       return true;
     } catch (IOException ex) {
-      return false;
+      throw new RuntimeException(ex);
     }
   }
 
