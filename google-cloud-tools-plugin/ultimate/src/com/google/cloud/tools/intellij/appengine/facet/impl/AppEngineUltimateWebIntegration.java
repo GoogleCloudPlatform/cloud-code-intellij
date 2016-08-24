@@ -150,12 +150,12 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
       return null;
     }
 
-    final ApplicationServersManager serversManager = ApplicationServersManager.getInstance();
     final AppEngineServerIntegration integration = AppEngineServerIntegration.getInstance();
 
     // There are no distinguishing features about the App Engine servers so just return
     // the first one found
-    final List<ApplicationServer> servers = serversManager.getApplicationServers(integration);
+    final List<ApplicationServer> servers =
+        ApplicationServersManager.getInstance().getApplicationServers(integration);
     if (!servers.isEmpty()) {
       return servers.iterator().next();
     }

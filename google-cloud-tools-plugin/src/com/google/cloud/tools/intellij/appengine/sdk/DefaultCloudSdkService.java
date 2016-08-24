@@ -71,8 +71,10 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   @Nullable
   @Override
-  public String getSdkHomePath() {
-    return propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY);
+  public Path getSdkHomePath() {
+    return propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY) != null
+        ? Paths.get(propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY))
+        : null;
   }
 
   @Override
@@ -83,7 +85,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
   @Nullable
   private Path getJavaToolsBasePath() {
     return getSdkHomePath() != null
-        ? Paths.get(getSdkHomePath(), JAVA_TOOLS_RELATIVE_PATH.toString())
+        ? getSdkHomePath().resolve(JAVA_TOOLS_RELATIVE_PATH.toString())
         : null;
   }
 
@@ -230,7 +232,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   @Override
   public boolean isValid() {
-    return !StringUtil.isEmpty(getSdkHomePath())
+    return getSdkHomePath() != null
         && getToolsApiJarFile() != null
         && getToolsApiJarFile().exists();
   }

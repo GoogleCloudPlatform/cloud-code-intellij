@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.base.Joiner;
 
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.options.ConfigurationException;
@@ -34,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -47,14 +50,30 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
 
   private JPanel myMainPanel;
   private JComboBox myArtifactComboBox;
-  private JTextField myPortField;
-  private RawCommandLineEditor myServerParametersEditor;
+  private JTextField port;
+  private RawCommandLineEditor jvmFlags;
   private JBLabel myWebArtifactToDeployLabel;
   private JBLabel myPortLabel;
   private JBLabel myServerParametersLabel;
   private final Project myProject;
   private Artifact myLastSelectedArtifact;
   private JComponent anchor;
+  private JTextField authDomain;
+  private JTextField storagePath;
+  private JTextField adminHost;
+  private JTextField adminPort;
+  private JTextField apiPort;
+  private JTextField host;
+  private JComboBox logLevel;
+  private JTextField maxModuleInstances;
+  private JCheckBox useMtimeFileWatcher;
+  private JTextField threadsafeOverride;
+  private JCheckBox allowSkippedFiles;
+  private JCheckBox automaticRestart;
+  private JComboBox devappserverLogLevel;
+  private JCheckBox skipSdkUpdateCheck;
+  private JTextField gcsBucketName;
+  // TODO(joaomartins): Change "Advanced Settings" to a collapsable drop down, like Before Launch.
 
   public AppEngineRunConfigurationEditor(Project project) {
     myProject = project;
@@ -84,25 +103,76 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
 
   protected void resetEditorFrom(CommonModel commonModel) {
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
-    myPortField.setText(String.valueOf(serverModel.getLocalPort()));
     final Artifact artifact = serverModel.getArtifact();
     myArtifactComboBox.setSelectedItem(artifact);
     if (artifact == null && myArtifactComboBox.getItemCount() == 1) {
       myArtifactComboBox.setSelectedIndex(0);
+      BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRun(
+          commonModel.getProject(), commonModel, (Artifact) myArtifactComboBox.getSelectedItem());
     }
-    myServerParametersEditor.setDialogCaption("Server Parameters");
-    myServerParametersEditor.setText(serverModel.getServerParameters());
+    port.setText(intToString(serverModel.getPort()));
+    host.setText(serverModel.getHost());
+    adminHost.setText(serverModel.getAdminHost());
+    adminPort.setText(intToString(serverModel.getAdminPort()));
+    authDomain.setText(serverModel.getAuthDomain());
+    storagePath.setText(serverModel.getStoragePath());
+    logLevel.setSelectedItem(serverModel.getLogLevel());
+    maxModuleInstances.setText(intToString(serverModel.getMaxModuleInstances()));
+    useMtimeFileWatcher.setSelected(serverModel.getUseMtimeFileWatcher());
+    threadsafeOverride.setText(serverModel.getThreadsafeOverride());
+    jvmFlags.setDialogCaption(GctBundle.getString("appengine.run.jvmflags.title"));
+    jvmFlags.setText(Joiner.on(AppEngineServerModel.JVM_FLAG_DELIMITER)
+        .join(serverModel.getJvmFlags()));
+    allowSkippedFiles.setSelected(serverModel.getAllowSkippedFiles());
+    apiPort.setText(intToString(serverModel.getApiPort()));
+    automaticRestart.setSelected(serverModel.getAutomaticRestart());
+    devappserverLogLevel.setSelectedItem(serverModel.getDevAppserverLogLevel());
+    skipSdkUpdateCheck.setSelected(serverModel.getSkipSdkUpdateCheck());
+    gcsBucketName.setText(serverModel.getDefaultGcsBucketName());
   }
 
   protected void applyEditorTo(CommonModel commonModel) throws ConfigurationException {
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
-    try {
-      serverModel.setPort(Integer.parseInt(myPortField.getText()));
-    } catch (NumberFormatException nfe) {
-      throw new ConfigurationException("'" + myPortField.getText() + "' is not valid port number");
-    }
-    serverModel.setServerParameters(myServerParametersEditor.getText());
+    serverModel.setPort(validateInteger(port.getText(), "port"));
     serverModel.setArtifact(getSelectedArtifact());
+
+    serverModel.setHost(host.getText());
+    serverModel.setAdminHost(adminHost.getText());
+    if (!adminPort.getText().isEmpty()) {
+      serverModel.setAdminPort(validateInteger(adminPort.getText(), "admin port"));
+    }
+    serverModel.setAuthDomain(authDomain.getText());
+    serverModel.setStoragePath(storagePath.getText());
+    serverModel.setLogLevel((String) logLevel.getSelectedItem());
+    if (!maxModuleInstances.getText().isEmpty()) {
+      serverModel.setMaxModuleInstances(validateInteger(
+          maxModuleInstances.getText(), "maximum module instances"));
+    }
+    serverModel.setUseMtimeFileWatcher(useMtimeFileWatcher.isSelected());
+    serverModel.setThreadsafeOverride(threadsafeOverride.getText());
+    serverModel.setJvmFlags(jvmFlags.getText());
+    serverModel.setAllowSkippedFiles(allowSkippedFiles.isSelected());
+    if (!apiPort.getText().isEmpty()) {
+      serverModel.setApiPort(validateInteger(apiPort.getText(), "API port"));
+    }
+    serverModel.setAutomaticRestart(automaticRestart.isSelected());
+    serverModel.setDevAppserverLogLevel((String) devappserverLogLevel.getSelectedItem());
+    serverModel.setSkipSdkUpdateCheck(skipSdkUpdateCheck.isSelected());
+    serverModel.setDefaultGcsBucketName(gcsBucketName.getText());
+  }
+
+  private Integer validateInteger(String intText, String description)
+      throws ConfigurationException {
+    try {
+      return Integer.parseInt(intText);
+    } catch (NumberFormatException nfe) {
+      throw new ConfigurationException(
+          "'" + intText + "' is not a valid " + description + " number.");
+    }
+  }
+
+  private String intToString(Integer value) {
+    return value != null ? String.valueOf(value) : "";
   }
 
   private Artifact getSelectedArtifact() {
@@ -111,6 +181,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
 
   @NotNull
   protected JComponent createEditor() {
+    // TODO(joaomartins): Switch to AppEngineProjectService and deprecate AppEngineUtilLegacy.
     AppEngineUtilLegacy.setupAppEngineArtifactCombobox(myProject, myArtifactComboBox, false);
     return myMainPanel;
   }

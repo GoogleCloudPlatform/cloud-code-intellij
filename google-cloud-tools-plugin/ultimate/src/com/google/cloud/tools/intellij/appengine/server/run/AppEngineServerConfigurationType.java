@@ -48,7 +48,7 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
     final AppEngineServerModel serverModel = new AppEngineServerModel();
     return J2EEConfigurationFactory.getInstance()
         .createJ2EERunConfiguration(factory, project, serverModel,
-            getIntegration(), isLocal, new AppEngineServerStartupPolicy());
+            getIntegration(), isLocal, new CloudSdkStartupPolicy());
   }
 
   public String getDisplayName() {
