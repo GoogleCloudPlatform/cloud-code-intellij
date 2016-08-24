@@ -73,14 +73,14 @@ public class AppEngineStandardDeployTaskTest {
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
-    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(true);
+    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(new File("/some/file"));
 
     task = new AppEngineStandardDeployTask(deploy, stage, false);
   }
 
   @Test
   public void testStageCredentials_error() {
-    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(false);
+    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(null);
     task.execute(startListener);
 
     verify(callback, times(1))
