@@ -22,6 +22,9 @@ import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Sets;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationListener;
@@ -40,7 +43,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.Splitter;
-import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vcs.VcsDataKeys;
 import com.intellij.openapi.vcs.VcsException;
@@ -49,7 +51,6 @@ import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ui.SelectFilesDialog;
 import com.intellij.openapi.vcs.ui.CommitMessage;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.HashSet;
 import com.intellij.vcsUtil.VcsFileUtil;
 
@@ -76,7 +77,6 @@ import git4idea.update.GitFetcher;
 import git4idea.util.GitFileUtils;
 import git4idea.util.GitUIUtil;
 
-import org.codehaus.plexus.util.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,6 +84,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -468,9 +469,12 @@ public class UploadSourceAction extends DumbAwareAction {
         return false;
       }
 
-      Collection<VirtualFile> files2add =
-          CollectionUtils.intersection(untrackedFiles, files2commit);
-      Collection<VirtualFile> files2rm = ContainerUtil.subtract(trackedFiles, files2commit);
+      Set<VirtualFile> files2CommitAsSet = new HashSet<>(files2commit);
+      Set<VirtualFile> untrackedFilesAsSet = new HashSet<>(untrackedFiles);
+      Set<VirtualFile> trackedFilesAsSet = new HashSet<>(trackedFiles);
+
+      Collection<VirtualFile> files2add = Sets.intersection(untrackedFilesAsSet, files2CommitAsSet);
+      Collection<VirtualFile> files2rm = Sets.difference(trackedFilesAsSet, files2CommitAsSet);
       Collection<VirtualFile> modified = new HashSet<VirtualFile>(trackedFiles);
       modified.addAll(files2commit);
 
@@ -508,9 +512,9 @@ public class UploadSourceAction extends DumbAwareAction {
       @NotNull Collection<VirtualFile> files) {
     final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
     final FileIndexFacade fileIndex = FileIndexFacade.getInstance(project);
-    return ContainerUtil.filter(files, new Condition<VirtualFile>() {
+    return Collections2.filter(files, new Predicate<VirtualFile>() {
       @Override
-      public boolean value(VirtualFile file) {
+      public boolean apply(@javax.annotation.Nullable VirtualFile file) {
         return !changeListManager.isIgnoredFile(file) && !fileIndex.isExcludedFile(file);
       }
     });
