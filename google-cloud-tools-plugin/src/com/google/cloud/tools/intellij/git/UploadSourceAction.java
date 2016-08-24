@@ -463,23 +463,23 @@ public class UploadSourceAction extends DumbAwareAction {
       }, indicator.getModalityState());
       final GcpUntrackedFilesDialog dialog = dialogRef.get();
 
-      final Collection<VirtualFile> files2commit = dialog.getSelectedFiles();
-      if (!dialog.isOK() || files2commit.isEmpty()) {
+      final Collection<VirtualFile> filesToCommit = dialog.getSelectedFiles();
+      if (!dialog.isOK() || filesToCommit.isEmpty()) {
         LOG.warn("user canceled out of initial commit.  aborting...");
         return false;
       }
 
-      Set<VirtualFile> files2CommitAsSet = new HashSet<>(files2commit);
+      Set<VirtualFile> filesToCommitAsSet = new HashSet<>(filesToCommit);
       Set<VirtualFile> untrackedFilesAsSet = new HashSet<>(untrackedFiles);
       Set<VirtualFile> trackedFilesAsSet = new HashSet<>(trackedFiles);
 
-      Collection<VirtualFile> files2add = Sets.intersection(untrackedFilesAsSet, files2CommitAsSet);
-      Collection<VirtualFile> files2rm = Sets.difference(trackedFilesAsSet, files2CommitAsSet);
+      Collection<VirtualFile> filesToAdd = Sets.intersection(untrackedFilesAsSet, filesToCommitAsSet);
+      Collection<VirtualFile> filesToRm = Sets.difference(trackedFilesAsSet, filesToCommitAsSet);
       Collection<VirtualFile> modified = new HashSet<VirtualFile>(trackedFiles);
-      modified.addAll(files2commit);
+      modified.addAll(filesToCommit);
 
-      GitFileUtils.addFiles(project, root, files2add);
-      GitFileUtils.deleteFilesFromCache(project, root, files2rm);
+      GitFileUtils.addFiles(project, root, filesToAdd);
+      GitFileUtils.deleteFilesFromCache(project, root, filesToRm);
 
       // commit
       LOG.info("Performing commit");
