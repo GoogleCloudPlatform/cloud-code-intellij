@@ -97,8 +97,8 @@ class AppEngineDeploymentRuntime extends DeploymentRuntime {
     AppEngineStop stop = new AppEngineStop(
         appEngineHelper, loggingHandler, configuration, callback);
 
-    final AppEngineRunner stopRunner =
-        new AppEngineRunner(new AppEngineStopTask(stop, service, version));
+    final AppEngineExecutor stopRunner =
+        new AppEngineExecutor(new AppEngineStopTask(stop, service, version));
 
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(appEngineHelper.getProject(), "Stop App Engine", true,

@@ -145,7 +145,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     }
   }
 
-  private AppEngineRunner createStandardRunner(
+  private AppEngineExecutor createStandardRunner(
       LoggingHandler loggingHandler,
       File artifactToDeploy,
       AppEngineDeploy deploy,
@@ -155,11 +155,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           loggingHandler,
           artifactToDeploy);
 
-    return new AppEngineRunner(
+    return new AppEngineExecutor(
         new AppEngineStandardDeployTask(deploy, standardStage, isFlexCompat));
   }
 
-  private AppEngineRunner createFlexRunner(
+  private AppEngineExecutor createFlexRunner(
       LoggingHandler loggingHandler,
       File artifactToDeploy,
       AppEngineDeploymentConfiguration config,
@@ -170,7 +170,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           artifactToDeploy,
           config);
 
-    return new AppEngineRunner(new AppEngineFlexibleDeployTask(deploy, flexibleStage));
+    return new AppEngineExecutor(new AppEngineFlexibleDeployTask(deploy, flexibleStage));
   }
 
   @Override
@@ -203,7 +203,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         ServiceManager.getService(CloudToolsPluginInfoService.class);
 
     return new CloudSdk.Builder()
-        .sdkPath(new File(CloudSdkService.getInstance().getSdkHomePath()).toPath())
+        .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
         .async(true)
         .addStdErrLineListener(logListener)
         .addStdOutLineListener(outputListener)

@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public abstract class CloudSdkService {
   }
 
   @Nullable
-  public abstract String getSdkHomePath();
+  public abstract Path getSdkHomePath();
 
   public abstract void setSdkHomePath(String path);
 

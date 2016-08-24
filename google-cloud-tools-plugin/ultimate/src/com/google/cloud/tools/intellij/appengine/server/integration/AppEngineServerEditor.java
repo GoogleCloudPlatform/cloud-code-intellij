@@ -17,17 +17,22 @@
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.JBColor;
 
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
 
 /**
  * @author nik
@@ -36,22 +41,45 @@ public class AppEngineServerEditor extends
     ApplicationServerPersistentDataEditor<ApplicationServerPersistentData> {
 
   private JPanel myMainPanel;
+  // TODO(joaomartins): Replace with CloudSdkPanel when
+  // https://youtrack.jetbrains.com/issue/IDEA-110316 gets fixed.
   private TextFieldWithBrowseButton mySdkHomeField;
+  private JLabel warningMessage;
 
   public AppEngineServerEditor() {
     mySdkHomeField
-        .addBrowseFolderListener("Google App Engine SDK", "Specify Google App Engine Java SDK home",
+        .addBrowseFolderListener("Google Cloud SDK", "Specify Google Cloud SDK home",
             null, FileChooserDescriptorFactory.createSingleFolderDescriptor());
+    mySdkHomeField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+      @Override
+      protected void textChanged(DocumentEvent event) {
+        onSdkPathChanged();
+      }
+    });
+  }
+
+  private void onSdkPathChanged() {
+    if (warningMessage.getText().isEmpty()) {
+      warningMessage.setVisible(true);
+      warningMessage.setForeground(JBColor.RED);
+      warningMessage.setText(GctBundle.getString("appengine.cloudsdk.location.missing.message"));
+    } else if (!CloudSdkUtil.containsCloudSdkExecutable(mySdkHomeField.getText())) {
+      warningMessage.setVisible(true);
+      warningMessage.setForeground(JBColor.RED);
+      warningMessage.setText(GctBundle.getString("appengine.cloudsdk.location.invalid.message"));
+    } else {
+      warningMessage.setVisible(false);
+    }
   }
 
   protected void resetEditorFrom(ApplicationServerPersistentData data) {
-    mySdkHomeField.setText(
-        FileUtil.toSystemDependentName(CloudSdkService.getInstance().getSdkHomePath()));
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+    mySdkHomeField.setText(sdkService.getSdkHomePath() != null
+        ? sdkService.getSdkHomePath().toString() : "" );
   }
 
   protected void applyEditorTo(ApplicationServerPersistentData data) {
-    CloudSdkService.getInstance()
-        .setSdkHomePath(FileUtil.toSystemIndependentName(mySdkHomeField.getText()));
+    CloudSdkService.getInstance().setSdkHomePath(mySdkHomeField.getText());
   }
 
   @NotNull
