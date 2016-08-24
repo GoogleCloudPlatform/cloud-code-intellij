@@ -110,7 +110,4 @@ public interface AppEngineHelper {
    * Deletes the locally staged credentials, if they exist.
    */
   void deleteCredentials();
-
-
-  boolean hasValidCredentials();
 }

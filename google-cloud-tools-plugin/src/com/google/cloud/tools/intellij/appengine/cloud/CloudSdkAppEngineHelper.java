@@ -258,16 +258,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @Override
   public void deleteCredentials() {
-    if (hasValidCredentials()) {
+    if (credentialsPath != null && credentialsPath.exists()) {
       if (!credentialsPath.delete()) {
         logger.warn("failed to delete credential file expected at " + credentialsPath.getPath());
       }
     }
-  }
-
-  @Override
-  public boolean hasValidCredentials() {
-    return credentialsPath != null && credentialsPath.exists();
   }
 
   @NotNull
