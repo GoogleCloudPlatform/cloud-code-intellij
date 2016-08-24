@@ -240,12 +240,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
     if (addUserResult == Messages.OK) {
       Services.getLoginService().logIn();
-    }
-
-    if (addUserResult == Messages.CANCEL) {
-      return null;
-    } else {
       return doStageCredentials(googleUserName);
+    } else {
+      return null;
     }
   }
 
