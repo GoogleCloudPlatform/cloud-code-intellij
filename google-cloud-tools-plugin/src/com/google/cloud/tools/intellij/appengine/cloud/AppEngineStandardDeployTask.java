@@ -80,7 +80,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
       if (helper.stageCredentials(
           deploy.getDeploymentConfiguration().getGoogleUsername()) == null) {
         deploy.getCallback().errorOccurred(
-            GctBundle.message("appengine.staging.credentials.error"));
+            GctBundle.message("appengine.staging.credentials.error.message"));
         return;
       }
 

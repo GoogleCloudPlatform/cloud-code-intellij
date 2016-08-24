@@ -50,7 +50,7 @@ public class AppEngineStopTask extends AppEngineTask {
       if (stop.getHelper().stageCredentials(
           stop.getDeploymentConfiguration().getGoogleUsername()) == null) {
         stop.getCallback().errorOccurred(
-            GctBundle.message("appengine.staging.credentials.error"));
+            GctBundle.message("appengine.staging.credentials.error.message"));
         return;
       }
 

@@ -232,10 +232,10 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     }
 
     int addUserResult = Messages.showOkCancelDialog(
-        GctBundle.message("appengine.staging.credentials.error"),
-        "Invalid Credentials",
-        "Add Account",
-        "Cancel",
+        GctBundle.message("appengine.staging.credentials.error.message"),
+        GctBundle.message("appengine.staging.credentials.error.dialog.title"),
+        GctBundle.message("appengine.staging.credentials.error.dialog.addaccount.button"),
+        GctBundle.message("appengine.staging.credentials.error.dialog.cancel.button"),
         Messages.getWarningIcon());
 
     if (addUserResult == Messages.OK) {
