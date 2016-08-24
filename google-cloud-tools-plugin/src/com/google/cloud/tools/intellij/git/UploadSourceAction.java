@@ -20,7 +20,6 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.Collections;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 
@@ -77,6 +76,7 @@ import git4idea.update.GitFetcher;
 import git4idea.util.GitFileUtils;
 import git4idea.util.GitUIUtil;
 
+import org.codehaus.plexus.util.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -468,7 +468,8 @@ public class UploadSourceAction extends DumbAwareAction {
         return false;
       }
 
-      Collection<VirtualFile> files2add = Collections.intersection(untrackedFiles, files2commit);
+      Collection<VirtualFile> files2add =
+          CollectionUtils.intersection(untrackedFiles, files2commit);
       Collection<VirtualFile> files2rm = ContainerUtil.subtract(trackedFiles, files2commit);
       Collection<VirtualFile> modified = new HashSet<VirtualFile>(trackedFiles);
       modified.addAll(files2commit);
