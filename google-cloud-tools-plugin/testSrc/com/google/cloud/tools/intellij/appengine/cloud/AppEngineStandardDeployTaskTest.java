@@ -73,8 +73,18 @@ public class AppEngineStandardDeployTaskTest {
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
+    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(true);
 
     task = new AppEngineStandardDeployTask(deploy, stage, false);
+  }
+
+  @Test
+  public void testStageCredentials_error() {
+    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(false);
+    task.execute(startListener);
+
+    verify(callback, times(1))
+        .errorOccurred("Failed to prepare credentials. Please make sure you are logged in with the correct account.");
   }
 
   @Test

@@ -46,6 +46,15 @@ public class AppEngineStopTask extends AppEngineTask {
   public void execute(ProcessStartListener startListener) {
     UsageTrackerProvider.getInstance().trackEvent(GctTracking.APP_ENGINE_STOP).ping();
 
+    AppEngineHelper helper = stop.getHelper();
+
+    if (!helper.stageCredentials(
+        stop.getDeploymentConfiguration().getGoogleUsername())) {
+      stop.getCallback().errorOccurred(
+          GctBundle.message("appengine.staging.credentials.error"));
+      return;
+    }
+
     try {
       stop.getHelper().stageCredentials(stop.getDeploymentConfiguration().getGoogleUsername());
 

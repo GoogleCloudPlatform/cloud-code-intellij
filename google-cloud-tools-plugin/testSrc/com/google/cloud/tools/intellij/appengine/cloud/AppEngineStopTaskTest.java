@@ -53,8 +53,18 @@ public class AppEngineStopTaskTest {
     when(stop.getCallback()).thenReturn(callback);
     when(stop.getHelper()).thenReturn(helper);
     when(stop.getDeploymentConfiguration()).thenReturn(configuration);
+    when(stop.getHelper().stageCredentials(anyString())).thenReturn(true);
 
     task = new AppEngineStopTask(stop, "myModule", "myVersion");
+  }
+
+  @Test
+  public void testStageCredentials_error() {
+    when(stop.getHelper().stageCredentials(anyString())).thenReturn(false);
+    task.execute(startListener);
+
+    verify(callback, times(1))
+        .errorOccurred("Failed to prepare credentials. Please make sure you are logged in with the correct account.");
   }
 
   @Test

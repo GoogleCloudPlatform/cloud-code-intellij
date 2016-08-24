@@ -101,11 +101,16 @@ public interface AppEngineHelper {
 
   /**
    * Locally stages user credentials to support various App Engine actions.
+   *
+   * @return true if the staging was successful, false otherwise
    */
-  void stageCredentials(String googleUsername);
+  boolean stageCredentials(String googleUsername);
 
   /**
    * Deletes the locally staged credentials, if they exist.
    */
   void deleteCredentials();
+
+
+  boolean hasValidCredentials();
 }

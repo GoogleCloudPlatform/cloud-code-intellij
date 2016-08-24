@@ -223,7 +223,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private static final String GCLOUD_USER_TYPE = "authorized_user";
 
   @Override
-  public void stageCredentials(String googleUsername) {
+  public boolean stageCredentials(String googleUsername) {
     CredentialedUser projectUser = Services.getLoginService().getAllUsers()
         .get(googleUsername);
 
@@ -231,7 +231,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     if (projectUser != null) {
       googleLoginState = projectUser.getGoogleLoginState();
     } else {
-      return;
+      return false;
     }
     String clientId = googleLoginState.fetchOAuth2ClientId();
     String clientSecret = googleLoginState.fetchOAuth2ClientSecret();
@@ -250,18 +250,24 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
               "json",
               true /* deleteOnExit */);
       Files.write(jsonCredential, credentialsPath, Charset.forName("UTF-8"));
+      return true;
     } catch (IOException ex) {
-      throw new RuntimeException(ex);
+      return false;
     }
   }
 
   @Override
   public void deleteCredentials() {
-    if (credentialsPath != null && credentialsPath.exists()) {
+    if (hasValidCredentials()) {
       if (!credentialsPath.delete()) {
         logger.warn("failed to delete credential file expected at " + credentialsPath.getPath());
       }
     }
+  }
+
+  @Override
+  public boolean hasValidCredentials() {
+    return credentialsPath != null && credentialsPath.exists();
   }
 
   @NotNull
