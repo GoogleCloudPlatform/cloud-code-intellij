@@ -22,6 +22,9 @@ import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Sets;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationListener;
@@ -40,7 +43,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.Splitter;
-import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vcs.VcsDataKeys;
 import com.intellij.openapi.vcs.VcsException;
@@ -49,7 +51,6 @@ import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ui.SelectFilesDialog;
 import com.intellij.openapi.vcs.ui.CommitMessage;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.HashSet;
 import com.intellij.vcsUtil.VcsFileUtil;
 
@@ -83,6 +84,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -461,19 +463,24 @@ public class UploadSourceAction extends DumbAwareAction {
       }, indicator.getModalityState());
       final GcpUntrackedFilesDialog dialog = dialogRef.get();
 
-      final Collection<VirtualFile> files2commit = dialog.getSelectedFiles();
-      if (!dialog.isOK() || files2commit.isEmpty()) {
+      final Collection<VirtualFile> filesToCommit = dialog.getSelectedFiles();
+      if (!dialog.isOK() || filesToCommit.isEmpty()) {
         LOG.warn("user canceled out of initial commit.  aborting...");
         return false;
       }
 
-      Collection<VirtualFile> files2add = ContainerUtil.intersection(untrackedFiles, files2commit);
-      Collection<VirtualFile> files2rm = ContainerUtil.subtract(trackedFiles, files2commit);
-      Collection<VirtualFile> modified = new HashSet<VirtualFile>(trackedFiles);
-      modified.addAll(files2commit);
+      Set<VirtualFile> filesToCommitAsSet = new HashSet<>(filesToCommit);
+      Set<VirtualFile> untrackedFilesAsSet = new HashSet<>(untrackedFiles);
+      Set<VirtualFile> trackedFilesAsSet = new HashSet<>(trackedFiles);
 
-      GitFileUtils.addFiles(project, root, files2add);
-      GitFileUtils.deleteFilesFromCache(project, root, files2rm);
+      Collection<VirtualFile> filesToAdd
+          = Sets.intersection(untrackedFilesAsSet, filesToCommitAsSet);
+      Collection<VirtualFile> filesToRm = Sets.difference(trackedFilesAsSet, filesToCommitAsSet);
+      Collection<VirtualFile> modified = new HashSet<VirtualFile>(trackedFiles);
+      modified.addAll(filesToCommit);
+
+      GitFileUtils.addFiles(project, root, filesToAdd);
+      GitFileUtils.deleteFilesFromCache(project, root, filesToRm);
 
       // commit
       LOG.info("Performing commit");
@@ -506,9 +513,9 @@ public class UploadSourceAction extends DumbAwareAction {
       @NotNull Collection<VirtualFile> files) {
     final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
     final FileIndexFacade fileIndex = FileIndexFacade.getInstance(project);
-    return ContainerUtil.filter(files, new Condition<VirtualFile>() {
+    return Collections2.filter(files, new Predicate<VirtualFile>() {
       @Override
-      public boolean value(VirtualFile file) {
+      public boolean apply(@javax.annotation.Nullable VirtualFile file) {
         return !changeListManager.isIgnoredFile(file) && !fileIndex.isExcludedFile(file);
       }
     });
