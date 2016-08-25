@@ -241,9 +241,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     if (addUserResult == Messages.OK) {
       Services.getLoginService().logIn();
       return doStageCredentials(googleUserName);
-    } else {
-      return null;
     }
+
+    return null;
   }
 
   private File doStageCredentials(String googleUsername) {
