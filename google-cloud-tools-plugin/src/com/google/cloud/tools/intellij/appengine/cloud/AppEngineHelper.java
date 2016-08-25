@@ -100,9 +100,11 @@ public interface AppEngineHelper {
       ProcessExitListener exitListener);
 
   /**
-   * Locally stages user credentials to support various App Engine actions.
+   * Attempts to locally stage the user credentials to support various App Engine tasks. If not
+   * successful then the user is shown a dialog opting to add an account. Then the staging is
+   * attempted again.
    */
-  void stageCredentials(String googleUsername);
+  File stageCredentials(String googleUsername);
 
   /**
    * Deletes the locally staged credentials, if they exist.
