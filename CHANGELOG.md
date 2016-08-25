@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.9.7.4-beta] - 2016-08-25
+### Added
+- Check to ensure that deployment is valid for credentialed user with prompt to add a new user if not.
+([837])(https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/837)
+
 ## [0.9.6-beta] - 2016-06-23
 ### Added
 - Deploy to App Engine flexible _compat_ environment support.
