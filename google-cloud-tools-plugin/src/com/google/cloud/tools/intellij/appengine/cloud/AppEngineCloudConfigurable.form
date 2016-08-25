@@ -30,7 +30,7 @@
           <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
       </nested-form>
-      <component id="f5218" class="javax.swing.JTextPane" binding="appEngineFlexMoreInfoLabel">
+      <component id="f5218" class="javax.swing.JTextPane" binding="appEngineMoreInfoLabel">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="-1" height="50"/>
