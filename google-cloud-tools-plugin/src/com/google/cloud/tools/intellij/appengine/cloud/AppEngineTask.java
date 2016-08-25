@@ -27,6 +27,13 @@ public interface AppEngineTask {
    * Executes an App Engine task.
    * @param startListener a callback for retrieving the running process
    */
-  void execute(ProcessStartListener startListener);
+  abstract void execute(ProcessStartListener startListener);
 
+  /**
+   * Gets invoked when the task gets cancelled by {@link AppEngineExecutor}.
+   * Intentionally left empty - it is up to implementors to decide if they need extra
+   * action on cancellation.
+   */
+  void onCancel() {
+  }
 }

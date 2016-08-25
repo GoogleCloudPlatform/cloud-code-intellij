@@ -35,6 +35,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.io.File;
+
 /**
  * Unit tests for {@link AppEngineStopTask}
  */
@@ -53,8 +55,18 @@ public class AppEngineStopTaskTest {
     when(stop.getCallback()).thenReturn(callback);
     when(stop.getHelper()).thenReturn(helper);
     when(stop.getDeploymentConfiguration()).thenReturn(configuration);
+    when(stop.getHelper().stageCredentials(anyString())).thenReturn(new File("/some/file"));
 
     task = new AppEngineStopTask(stop, "myModule", "myVersion");
+  }
+
+  @Test
+  public void testStageCredentials_error() {
+    when(stop.getHelper().stageCredentials(anyString())).thenReturn(null);
+    task.execute(startListener);
+
+    verify(callback, times(1))
+        .errorOccurred("Failed to prepare credentials. Please make sure you are logged in with the correct account.");
   }
 
   @Test
