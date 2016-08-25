@@ -196,7 +196,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       ProcessExitListener exitListener) {
     if (credentialsPath == null) {
       loggingHandler.print(GctBundle.message("appengine.action.credential.not.found") + "\n");
-      throw new AppEngineException("Failed to create application default credentials.");
+      throw new AppEngineException("Credentials file is missing.");
     }
 
     CloudToolsPluginInfoService pluginInfoService =
