@@ -63,9 +63,10 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
         .ping();
 
     File stagingDirectory;
+    AppEngineHelper helper = deploy.getHelper();
 
     try {
-      stagingDirectory = deploy.getHelper().createStagingDirectory(
+      stagingDirectory = helper.createStagingDirectory(
           deploy.getLoggingHandler(),
           deploy.getDeploymentConfiguration().getCloudProjectName());
     } catch (IOException ioe) {
@@ -76,7 +77,12 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
     }
 
     try {
-      deploy.getHelper().stageCredentials(deploy.getDeploymentConfiguration().getGoogleUsername());
+      if (helper.stageCredentials(
+          deploy.getDeploymentConfiguration().getGoogleUsername()) == null) {
+        deploy.getCallback().errorOccurred(
+            GctBundle.message("appengine.staging.credentials.error.message"));
+        return;
+      }
 
       stageStandard.stage(
           stagingDirectory,

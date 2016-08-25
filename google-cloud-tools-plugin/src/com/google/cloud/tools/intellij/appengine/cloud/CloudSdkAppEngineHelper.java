@@ -39,6 +39,7 @@ import com.google.gson.Gson;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
@@ -222,8 +223,30 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private static final String GCLOUD_USER_TYPE_LABEL = "type";
   private static final String GCLOUD_USER_TYPE = "authorized_user";
 
+
   @Override
-  public void stageCredentials(String googleUsername) {
+  public File stageCredentials(String googleUserName) {
+    File credentials = doStageCredentials(googleUserName);
+    if (credentials != null) {
+      return credentials;
+    }
+
+    int addUserResult = Messages.showOkCancelDialog(
+        GctBundle.message("appengine.staging.credentials.error.message"),
+        GctBundle.message("appengine.staging.credentials.error.dialog.title"),
+        GctBundle.message("appengine.staging.credentials.error.dialog.addaccount.button"),
+        GctBundle.message("appengine.staging.credentials.error.dialog.cancel.button"),
+        Messages.getWarningIcon());
+
+    if (addUserResult == Messages.OK) {
+      Services.getLoginService().logIn();
+      return doStageCredentials(googleUserName);
+    }
+
+    return null;
+  }
+
+  private File doStageCredentials(String googleUsername) {
     CredentialedUser projectUser = Services.getLoginService().getAllUsers()
         .get(googleUsername);
 
@@ -231,7 +254,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     if (projectUser != null) {
       googleLoginState = projectUser.getGoogleLoginState();
     } else {
-      return;
+      return null;
     }
     String clientId = googleLoginState.fetchOAuth2ClientId();
     String clientSecret = googleLoginState.fetchOAuth2ClientSecret();
@@ -250,6 +273,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
               "json",
               true /* deleteOnExit */);
       Files.write(jsonCredential, credentialsPath, Charset.forName("UTF-8"));
+
+      return credentialsPath;
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
