@@ -26,7 +26,7 @@ import com.intellij.openapi.diagnostic.Logger;
 /**
  * Runnable that executes task responsible for stopping an App Engine application.
  */
-public class AppEngineStopTask implements AppEngineTask {
+public class AppEngineStopTask extends AppEngineTask {
   private static final Logger logger = Logger.getInstance(AppEngineStopTask.class);
 
   private AppEngineStop stop;

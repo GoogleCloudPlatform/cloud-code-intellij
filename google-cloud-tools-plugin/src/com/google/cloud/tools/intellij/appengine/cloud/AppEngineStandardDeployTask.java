@@ -34,7 +34,7 @@ import java.io.IOException;
  * Runnable that executes task responsible for deploying an application to the App Engine standard
  * environment.
  */
-public class AppEngineStandardDeployTask implements AppEngineTask {
+public class AppEngineStandardDeployTask extends AppEngineTask {
 
   private static final Logger logger = Logger.getInstance(AppEngineStandardDeployTask.class);
 

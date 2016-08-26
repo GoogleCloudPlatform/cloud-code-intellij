@@ -21,7 +21,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 /**
  * Encapsulates a task to be run on Google App Engine.
  */
-public interface AppEngineTask {
+public abstract class AppEngineTask {
 
   /**
    * Executes an App Engine task.
