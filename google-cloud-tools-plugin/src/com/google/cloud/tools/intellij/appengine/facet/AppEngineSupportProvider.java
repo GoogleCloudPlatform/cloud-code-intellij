@@ -21,6 +21,8 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
 
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.FrameworkTypeEx;
@@ -191,6 +193,10 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       rootModel.addLibraryEntry(library);
       webIntegration.addLibraryToArtifact(library, webArtifact, project);
     }
+
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_SUPPORT_ADDED)
+        .ping();
   }
 
   @NotNull
