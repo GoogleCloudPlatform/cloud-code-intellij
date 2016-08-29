@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.9.7.4-beta] - 2016-08-25
+## [0.9.7.5-beta] - 2016-08-29
 ### Added
 - Check to ensure that deployment is valid for credentialed user with prompt to add a new user if not.
 ([837])(https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/837)
