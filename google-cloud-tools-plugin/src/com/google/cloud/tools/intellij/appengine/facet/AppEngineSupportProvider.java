@@ -193,10 +193,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       rootModel.addLibraryEntry(library);
       webIntegration.addLibraryToArtifact(library, webArtifact, project);
     }
-
-    UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_SUPPORT_ADDED)
-        .ping();
   }
 
   @NotNull
@@ -313,6 +309,10 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       AppEngineSupportProvider.this
           .addSupport(module, rootModel, myFrameworkSupportModel,
               PersistenceApiComboboxUtil.getSelectedApi(myPersistenceApiComboBox));
+
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.APP_ENGINE_SUPPORT_ADDED)
+          .ping();
     }
 
     @Nullable
