@@ -36,8 +36,6 @@ public class AppEngineStandardRunTask extends AppEngineTask {
   private String runnerId;
 
   /**
-   * {@link AppEngineStandardRunTask} constructor.
-   *
    * @param runConfig local run configuration to be sent to the common library
    * @param runnerId typically "Run" or "Debug", to indicate type of local run
    */
