@@ -312,6 +312,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
       UsageTrackerProvider.getInstance()
           .trackEvent(GctTracking.APP_ENGINE_SUPPORT_ADDED)
+          .withLabel("newProject")
           .ping();
     }
 
