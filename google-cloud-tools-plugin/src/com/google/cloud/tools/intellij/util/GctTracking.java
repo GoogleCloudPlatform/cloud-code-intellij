@@ -28,8 +28,7 @@ public class GctTracking {
   public static final String APP_ENGINE_DEPLOY_CANCEL = "appengine.deploy.cancel";
   public static final String APP_ENGINE_RUN = "appengine.run";
   public static final String APP_ENGINE_STOP = "appengine.stop";
-  public static final String APP_ENGINE_NEW_PROJECT = "appengine.project.new";
-  public static final String APP_ENGINE_CREATE_FACET = "appengine.facet.create";
+  public static final String APP_ENGINE_ADD_SUPPORT = "appengine.support.add";
   public static final String APP_ENGINE_ADD_FACET = "appengine.facet.add";
 
   public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =

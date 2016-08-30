@@ -175,6 +175,8 @@ public class AppEngineFacetEditor extends FacetEditorTab {
   public void onFacetInitialized(@NotNull Facet facet) {
     AppEngineWebIntegration.getInstance().setupDevServer();
 
+    // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
+    // Framework discovered "Configure" popup.
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_ADD_FACET)
         .ping();

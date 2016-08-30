@@ -40,8 +40,6 @@ public class AppEngineFacet extends Facet<AppEngineFacetConfiguration> {
       @NotNull String name,
       @NotNull AppEngineFacetConfiguration configuration) {
     super(facetType, module, name, configuration, null);
-
-    UsageTrackerProvider.getInstance().trackEvent(GctTracking.APP_ENGINE_CREATE_FACET).ping();
   }
 
   public static FacetType<AppEngineFacet, AppEngineFacetConfiguration> getFacetType() {
