@@ -114,12 +114,12 @@ public class AppEngineUtil {
           projectService.getAppEngineArtifactEnvironment(
               assetProvider.loadAppEngineStandardWebXml(project, module));
 
-      if (environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
-        if (ModuleType.is(module, JavaModuleType.getModuleType())
-            && projectService.isJarOrWarMavenBuild(project, module)) {
-          moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module));
-        }
-      } else {
+      if (ModuleType.is(module, JavaModuleType.getModuleType())
+          && projectService.isJarOrWarMavenBuild(project, module)) {
+        moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module, environment));
+      }
+
+      if (environment == AppEngineEnvironment.APP_ENGINE_STANDARD) {
         hasStandardModules = true;
       }
     }
@@ -143,9 +143,10 @@ public class AppEngineUtil {
 
   private static MavenBuildDeploymentSource createMavenBuildDeploymentSource(
       @NotNull Project project,
-      @NotNull Module module) {
+      @NotNull Module module,
+      @NotNull AppEngineEnvironment environment) {
     return new MavenBuildDeploymentSource(
-        ModulePointerManager.getInstance(project).create(module), project);
+        ModulePointerManager.getInstance(project).create(module), project, environment);
   }
 
   private static UserSpecifiedPathDeploymentSource createUserSpecifiedPathDeploymentSource(
