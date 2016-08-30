@@ -53,9 +53,13 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
     VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
 
     for (VirtualFile contentRoot : contentRoots) {
-      // TODO generalize this path logic - do we have canonical locations we can search?
+      // TODO clean this up - do we need something more robust?
       VirtualFile descriptorFile
           = contentRoot.findFileByRelativePath("web/WEB-INF/appengine-web.xml");
+      if (descriptorFile == null) {
+        descriptorFile
+            = contentRoot.findFileByRelativePath("src/main/webapp/WEB-INF/appengine-web.xml");
+      }
 
       if (descriptorFile != null) {
         return (XmlFile) PsiManager.getInstance(project).findFile(descriptorFile);
