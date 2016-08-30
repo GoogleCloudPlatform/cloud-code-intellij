@@ -16,13 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService;
 
 import com.intellij.facet.Facet;
@@ -33,17 +27,14 @@ import com.intellij.facet.FacetTypeId;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.facet.ui.FacetValidatorsManager;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.testFramework.PlatformTestCase;
@@ -51,7 +42,6 @@ import com.intellij.testFramework.PlatformTestCase;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.picocontainer.MutablePicoContainer;
 
 import java.io.File;
 
@@ -61,19 +51,10 @@ import java.io.File;
 public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
   private AppEngineProjectService appEngineProjectService;
-  private AppEngineAssetProvider appEngineAssetProvider;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
-
-    appEngineAssetProvider = mock(DefaultAppEngineAssetProvider.class);
-    applicationContainer.unregisterComponent(AppEngineAssetProvider.class.getName());
-    applicationContainer.registerComponentInstance(
-        AppEngineAssetProvider.class.getName(), appEngineAssetProvider);
 
     appEngineProjectService = new DefaultAppEngineProjectService();
   }
@@ -81,11 +62,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
   public void testGetAppEngineArtifactEnvironment_Standard() {
     addAppEngineFacet(createModule("myModule"));
 
-    XmlFile flexCompatWebXml = loadTestFlexCompatWebXml("testData/descriptor/appengine-web.xml");
-    // Load "plain" appengine-web.xml
-    when(appEngineAssetProvider
-        .loadAppEngineStandardWebXml(any(Project.class), any(Artifact.class)))
-        .thenReturn(flexCompatWebXml);
+    XmlFile flexCompatWebXml = loadTestWebXml("testData/descriptor/appengine-web.xml");
 
     AppEngineEnvironment environment
         = appEngineProjectService.getAppEngineArtifactEnvironment(flexCompatWebXml);
@@ -109,12 +86,12 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     addAppEngineFacet(createModule("myModule"));
 
     // Load flex-compat appengine-web.xml with vm: true
-    XmlFile vmTrueWebXml = mockLoadWebXml("testData/descriptor/appengine-web_flex-compat_vm.xml");
+    XmlFile vmTrueWebXml = loadTestWebXml("testData/descriptor/appengine-web_flex-compat_vm.xml");
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
         appEngineProjectService.getAppEngineArtifactEnvironment(vmTrueWebXml));
 
     // Load flex-compat appengine-web.xml with env: flex
-    XmlFile envFlexWebXml = mockLoadWebXml("testData/descriptor/appengine-web_flex-compat_env.xml");
+    XmlFile envFlexWebXml = loadTestWebXml("testData/descriptor/appengine-web_flex-compat_env.xml");
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
         appEngineProjectService.getAppEngineArtifactEnvironment(envFlexWebXml));
   }
@@ -129,21 +106,13 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     }.execute();
   }
 
-  private XmlFile loadTestFlexCompatWebXml(String path) {
+  private XmlFile loadTestWebXml(String path) {
     VirtualFile vFile = LocalFileSystem.getInstance().findFileByIoFile(
         new File(path));
 
     return vFile == null
         ? null
         : (XmlFile) PsiManager.getInstance(getProject()).findFile(vFile);
-  }
-
-  private XmlFile mockLoadWebXml(String path) {
-    XmlFile webXml = loadTestFlexCompatWebXml(path);
-    when(appEngineAssetProvider
-        .loadAppEngineStandardWebXml(any(Project.class), any(Artifact.class)))
-        .thenReturn(webXml);
-    return webXml;
   }
 
   @SuppressWarnings("unchecked")
