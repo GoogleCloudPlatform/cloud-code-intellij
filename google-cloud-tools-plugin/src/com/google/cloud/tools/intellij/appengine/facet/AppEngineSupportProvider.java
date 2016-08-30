@@ -311,8 +311,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
               PersistenceApiComboboxUtil.getSelectedApi(myPersistenceApiComboBox));
 
       UsageTrackerProvider.getInstance()
-          .trackEvent(GctTracking.APP_ENGINE_SUPPORT_ADDED)
-          .withLabel("newProject")
+          .trackEvent(GctTracking.APP_ENGINE_NEW_PROJECT)
           .ping();
     }
 

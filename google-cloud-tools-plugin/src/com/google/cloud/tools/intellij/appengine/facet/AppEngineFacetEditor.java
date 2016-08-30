@@ -176,8 +176,7 @@ public class AppEngineFacetEditor extends FacetEditorTab {
     AppEngineWebIntegration.getInstance().setupDevServer();
 
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_SUPPORT_ADDED)
-        .withLabel("addFacet")
+        .trackEvent(GctTracking.APP_ENGINE_ADD_FACET)
         .ping();
   }
 
