@@ -67,13 +67,6 @@ public abstract class AppEngineProjectService {
       @Nullable XmlFile appEngineWebXml);
 
   /**
-   * {@code true} if the artifact is associated with a module that has the App Engine standard
-   * facet.
-   */
-  public abstract boolean hasAppEngineStandardFacet(@NotNull Project project,
-      @NotNull Artifact artifact);
-
-  /**
    * {@code true} if the artifact type is an exploded-war.
    */
   public abstract boolean isAppEngineStandardArtifactType(@NotNull Artifact artifact);

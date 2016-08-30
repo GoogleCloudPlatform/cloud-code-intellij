@@ -18,12 +18,9 @@ package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 
-import com.intellij.facet.Facet;
-import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
@@ -33,9 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
-
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * Implementation of methods for inspecting an App Engine project's structure and configuration.
@@ -101,22 +95,6 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     } else {
       return AppEngineEnvironment.APP_ENGINE_STANDARD;
     }
-  }
-
-  @Override
-  public boolean hasAppEngineStandardFacet(@NotNull Project project, @NotNull Artifact artifact) {
-    Set<Module> modules = ArtifactUtil
-        .getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
-
-    for (Module module : modules) {
-      for (Facet facet : FacetManager.getInstance(module).getAllFacets()) {
-        if (facet != null && APP_ENGINE_STANDARD_FACET_NAME.equals(facet.getName())) {
-          return true;
-        }
-      }
-    }
-
-    return false;
   }
 
   @Override
