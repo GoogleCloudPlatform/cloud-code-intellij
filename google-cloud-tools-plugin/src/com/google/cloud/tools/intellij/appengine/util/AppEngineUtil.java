@@ -104,7 +104,6 @@ public class AppEngineUtil {
     AppEngineProjectService projectService = AppEngineProjectService.getInstance();
     AppEngineAssetProvider assetProvider = AppEngineAssetProvider.getInstance();
 
-
     List<ModuleDeploymentSource> moduleDeploymentSources = Lists.newArrayList();
 
     boolean hasStandardModules = false;
@@ -114,14 +113,14 @@ public class AppEngineUtil {
           projectService.getAppEngineArtifactEnvironment(
               assetProvider.loadAppEngineStandardWebXml(project, module));
 
-        if (environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
-          if (ModuleType.is(module, JavaModuleType.getModuleType())
-              && projectService.isJarOrWarMavenBuild(project, module)) {
-            moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module));
-          }
-        } else {
-          hasStandardModules = true;
+      if (environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
+        if (ModuleType.is(module, JavaModuleType.getModuleType())
+            && projectService.isJarOrWarMavenBuild(project, module)) {
+          moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module));
         }
+      } else {
+        hasStandardModules = true;
+      }
     }
 
     if (!hasStandardModules) {
