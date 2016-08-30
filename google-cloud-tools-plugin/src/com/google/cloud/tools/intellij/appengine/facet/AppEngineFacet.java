@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
@@ -38,6 +40,10 @@ public class AppEngineFacet extends Facet<AppEngineFacetConfiguration> {
       @NotNull String name,
       @NotNull AppEngineFacetConfiguration configuration) {
     super(facetType, module, name, configuration, null);
+
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_SUPPORT_ADDED)
+        .ping();
   }
 
   public static FacetType<AppEngineFacet, AppEngineFacetConfiguration> getFacetType() {
