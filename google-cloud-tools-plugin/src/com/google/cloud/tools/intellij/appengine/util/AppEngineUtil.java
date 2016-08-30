@@ -95,7 +95,8 @@ public class AppEngineUtil {
    * <p>Maven based deployment sources are included if the module is not an App Engine standard
    * module.
    *
-   * <p>User browsable jar/war deployment sources are always available.
+   * <p>User browsable jar/war deployment sources are included only if there are no App Engine
+   * standard modules.
    *
    * @return a list of {@link ModuleDeploymentSource}'s
    */
