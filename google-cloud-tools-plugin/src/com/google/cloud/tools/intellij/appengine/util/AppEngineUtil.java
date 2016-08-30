@@ -89,11 +89,10 @@ public class AppEngineUtil {
   }
 
   /**
-   * Creates a list of module deployment sources available for deployment to App Engine. Currently,
-   * all module based sources target the App Engine flexible environment:
+   * Creates a list of module deployment sources available for deployment to App Engine:
    *
-   * <p>Maven based deployment sources are included if the module is not an App Engine standard
-   * module.
+   * <p>Maven based deployment sources are included for both flexible and standard projects if
+   * applicable.
    *
    * <p>User browsable jar/war deployment sources are included only if there are no App Engine
    * standard modules.
