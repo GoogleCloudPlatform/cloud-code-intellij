@@ -292,6 +292,13 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     }
 
     @Override
+    public void onFrameworkSelectionChanged(boolean selected) {
+      if (selected) {
+        cloudSdkPanel.reset();
+      }
+    }
+
+    @Override
     public void addSupport(@NotNull Module module,
         @NotNull ModifiableRootModel rootModel,
         @NotNull ModifiableModelsProvider modifiableModelsProvider) {
