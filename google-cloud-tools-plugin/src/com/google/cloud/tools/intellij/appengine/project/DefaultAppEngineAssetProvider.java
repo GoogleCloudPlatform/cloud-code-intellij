@@ -16,7 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.project;
 
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactManager;
@@ -42,6 +44,23 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
       return (XmlFile) PsiManager.getInstance(project).findFile(descriptorFile);
     }
 
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public XmlFile loadAppEngineStandardWebXml(@NotNull Project project, @NotNull Module module) {
+    VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+
+    for (VirtualFile contentRoot : contentRoots) {
+      // TODO generalize this path logic - do we have canonical locations we can search?
+      VirtualFile descriptorFile
+          = contentRoot.findFileByRelativePath("web/WEB-INF/appengine-web.xml");
+
+      if (descriptorFile != null) {
+        return (XmlFile) PsiManager.getInstance(project).findFile(descriptorFile);
+      }
+    }
     return null;
   }
 }

@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.psi.xml.XmlFile;
@@ -40,4 +41,7 @@ public abstract class AppEngineAssetProvider {
   public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
       @NotNull Artifact artifact);
 
+  @Nullable
+  public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
+      @NotNull Module module);
 }
