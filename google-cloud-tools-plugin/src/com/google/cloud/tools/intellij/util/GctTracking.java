@@ -24,7 +24,7 @@ public class GctTracking {
   // Event actions
   public static final String APP_ENGINE_DEPLOY = "appengine.deploy";
   public static final String APP_ENGINE_DEPLOY_SUCCESS = "appengine.deploy.success";
-  public static final String APP_ENGINE_DEPLOY_FAIL = "applengine.deploy.fail";
+  public static final String APP_ENGINE_DEPLOY_FAIL = "appengine.deploy.fail";
   public static final String APP_ENGINE_DEPLOY_CANCEL = "appengine.deploy.cancel";
   public static final String APP_ENGINE_STOP = "appengine.stop";
 
