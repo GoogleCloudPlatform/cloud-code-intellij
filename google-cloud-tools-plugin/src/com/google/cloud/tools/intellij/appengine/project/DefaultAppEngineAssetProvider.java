@@ -18,17 +18,19 @@ package com.google.cloud.tools.intellij.appengine.project;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.packaging.elements.PackagingElementResolvingContext;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.xml.XmlFile;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
 
@@ -50,21 +52,16 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
   @Nullable
   @Override
   public XmlFile loadAppEngineStandardWebXml(@NotNull Project project, @NotNull Module module) {
-    VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+    Collection<VirtualFile> appEngineWebXmls
+        = FilenameIndex.getVirtualFilesByName(
+            project, "appengine-web.xml", module.getModuleContentScope());
 
-    for (VirtualFile contentRoot : contentRoots) {
-      // TODO clean this up - do we need something more robust?
-      VirtualFile descriptorFile
-          = contentRoot.findFileByRelativePath("web/WEB-INF/appengine-web.xml");
-      if (descriptorFile == null) {
-        descriptorFile
-            = contentRoot.findFileByRelativePath("src/main/webapp/WEB-INF/appengine-web.xml");
-      }
-
-      if (descriptorFile != null) {
-        return (XmlFile) PsiManager.getInstance(project).findFile(descriptorFile);
+    for (VirtualFile contentRoot : appEngineWebXmls) {
+      if (contentRoot != null) {
+        return (XmlFile) PsiManager.getInstance(project).findFile(contentRoot);
       }
     }
+
     return null;
   }
 }
