@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
@@ -58,7 +59,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
 
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_RUN)
-        .withLabel(runnerId != null ? runnerId : "")
+        .withLabel(Strings.nullToEmpty(runnerId))
         .ping();
 
   }
