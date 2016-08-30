@@ -65,7 +65,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     XmlFile flexCompatWebXml = loadTestWebXml("testData/descriptor/appengine-web.xml");
 
     AppEngineEnvironment environment
-        = appEngineProjectService.getAppEngineArtifactEnvironment(flexCompatWebXml);
+        = appEngineProjectService.getModuleAppEngineEnvironment(flexCompatWebXml);
 
     assertEquals(AppEngineEnvironment.APP_ENGINE_STANDARD, environment);
   }
@@ -75,11 +75,11 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
     // JAR Artifact Type
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getAppEngineArtifactEnvironment(null /**appengine-web.xml*/));
+        appEngineProjectService.getModuleAppEngineEnvironment(null /**appengine-web.xml*/));
 
     // WAR Artifact Type
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getAppEngineArtifactEnvironment(null /**appengine-web.xml*/));
+        appEngineProjectService.getModuleAppEngineEnvironment(null /**appengine-web.xml*/));
   }
 
   public void testGetAppEngineArtifactEnvironment_FlexibleCompat() {
@@ -88,12 +88,12 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     // Load flex-compat appengine-web.xml with vm: true
     XmlFile vmTrueWebXml = loadTestWebXml("testData/descriptor/appengine-web_flex-compat_vm.xml");
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getAppEngineArtifactEnvironment(vmTrueWebXml));
+        appEngineProjectService.getModuleAppEngineEnvironment(vmTrueWebXml));
 
     // Load flex-compat appengine-web.xml with env: flex
     XmlFile envFlexWebXml = loadTestWebXml("testData/descriptor/appengine-web_flex-compat_env.xml");
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getAppEngineArtifactEnvironment(envFlexWebXml));
+        appEngineProjectService.getModuleAppEngineEnvironment(envFlexWebXml));
   }
 
   private void addAppEngineFacet(final Module module) {

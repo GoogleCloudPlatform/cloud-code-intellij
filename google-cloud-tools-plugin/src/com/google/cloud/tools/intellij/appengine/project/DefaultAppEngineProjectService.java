@@ -89,7 +89,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   @NotNull
   @Override
-  public AppEngineEnvironment getAppEngineArtifactEnvironment(@Nullable XmlFile appEngineWebXml) {
+  public AppEngineEnvironment getModuleAppEngineEnvironment(@Nullable XmlFile appEngineWebXml) {
     if (appEngineWebXml == null || isFlexCompat(appEngineWebXml)) {
       return AppEngineEnvironment.APP_ENGINE_FLEX;
     } else {

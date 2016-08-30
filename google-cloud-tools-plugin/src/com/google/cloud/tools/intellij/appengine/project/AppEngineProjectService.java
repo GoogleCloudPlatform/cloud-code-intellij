@@ -58,12 +58,12 @@ public abstract class AppEngineProjectService {
       @NotNull DeploymentSource source);
 
   /**
-   * Determines the {@link AppEngineEnvironment} type of the artifact. This determination is made
+   * Determines the {@link AppEngineEnvironment} type of the module. This determination is made
    * based on the presence of an appengine-web.xml configuration file. If one exists, then it is
    * considered {@link AppEngineEnvironment#APP_ENGINE_STANDARD}.
    */
   @NotNull
-  public abstract AppEngineEnvironment getAppEngineArtifactEnvironment(
+  public abstract AppEngineEnvironment getModuleAppEngineEnvironment(
       @Nullable XmlFile appEngineWebXml);
 
   /**
