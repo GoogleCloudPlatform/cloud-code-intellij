@@ -21,6 +21,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
 
+import icons.MavenIcons;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
@@ -30,7 +32,6 @@ import java.io.File;
 
 import javax.swing.Icon;
 
-import icons.MavenIcons;
 
 /**
  * A deployment source backed by the Maven build system.
