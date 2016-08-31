@@ -27,4 +27,5 @@ public class LoginTracking {
   public static final String LOGIN_START = "user.login.start";
   public static final String LOGIN_CANCELLED = "user.login.cancelled";
   public static final String LOGIN_COMPLETE = "user.login.complete";
+  public static final String LOGOUT_COMPLETE = "user.logout.complete";
 }

@@ -260,7 +260,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     boolean loggedOut = activeUser.getGoogleLoginState().logOut(showPrompt);
     if (loggedOut) {
       logOutAllUsers();
-      UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGIN_COMPLETE).ping();
+      UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGOUT_COMPLETE).ping();
     }
 
     return loggedOut;
