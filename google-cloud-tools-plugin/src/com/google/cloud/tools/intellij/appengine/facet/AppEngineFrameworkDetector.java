@@ -17,9 +17,9 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
-
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
+
 import com.intellij.facet.FacetType;
 import com.intellij.framework.FrameworkType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
