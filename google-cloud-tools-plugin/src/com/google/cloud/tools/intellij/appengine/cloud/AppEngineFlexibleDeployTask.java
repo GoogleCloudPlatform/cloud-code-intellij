@@ -25,6 +25,7 @@ import com.intellij.openapi.diagnostic.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Runnable that executes a task responsible for deploying an application to the App Engine
@@ -50,7 +51,7 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
         .withLabel("flex." + (deploy.getDeploymentConfiguration().isAuto() ? "auto" : "custom"))
         .ping();
 
-    File stagingDirectory;
+    Path stagingDirectory;
     AppEngineHelper helper = deploy.getHelper();
 
     try {

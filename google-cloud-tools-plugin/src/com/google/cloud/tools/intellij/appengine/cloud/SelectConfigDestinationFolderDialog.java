@@ -25,6 +25,8 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.text.StringUtil;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,8 +88,8 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
     return rootPanel;
   }
 
-  public File getDestinationFolder() {
-    return new File(destinationFolderChooser.getText());
+  public Path getDestinationFolder() {
+    return Paths.get(destinationFolderChooser.getText());
   }
 
   @NotNull

@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
-import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
@@ -28,6 +28,8 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.nio.file.Paths;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -59,16 +61,17 @@ public class AppEngineServerEditor extends
   }
 
   private void onSdkPathChanged() {
-    if (warningMessage.getText().isEmpty()) {
-      warningMessage.setVisible(true);
-      warningMessage.setForeground(JBColor.RED);
-      warningMessage.setText(GctBundle.getString("appengine.cloudsdk.location.missing.message"));
-    } else if (!CloudSdkUtil.containsCloudSdkExecutable(mySdkHomeField.getText())) {
-      warningMessage.setVisible(true);
-      warningMessage.setForeground(JBColor.RED);
-      warningMessage.setText(GctBundle.getString("appengine.cloudsdk.location.invalid.message"));
-    } else {
+    CloudSdk sdk = new CloudSdk.Builder()
+        .sdkPath(Paths.get(mySdkHomeField.getText()))
+        .build();
+
+    try {
+      sdk.validate();
       warningMessage.setVisible(false);
+    } catch (AppEngineException aee) {
+      warningMessage.setVisible(true);
+      warningMessage.setForeground(JBColor.RED);
+      warningMessage.setText(aee.getMessage());
     }
   }
 

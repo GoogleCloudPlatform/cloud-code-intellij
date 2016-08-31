@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 
+import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,7 +53,7 @@ public class FileConfirmationDialog extends DialogWrapper {
    * Initialize the dialog of the correct type.
    */
   public FileConfirmationDialog(
-      @Nullable Project project, DialogType dialogType, @NotNull File targetPath) {
+      @Nullable Project project, DialogType dialogType, @NotNull Path targetPath) {
     super(project);
 
     this.dialogType = dialogType;
@@ -76,7 +77,7 @@ public class FileConfirmationDialog extends DialogWrapper {
       default:
         throw new AssertionError();
     }
-    pathDisplay.setText(targetPath.getAbsolutePath());
+    pathDisplay.setText(targetPath.toString());
 
     init();
   }

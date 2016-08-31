@@ -26,6 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.diagnostic.Logger;
 
+import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -63,7 +64,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
         .withLabel(isFlexCompat ? "flex-compat" : "standard")
         .ping();
 
-    File stagingDirectory;
+    Path stagingDirectory;
     AppEngineHelper helper = deploy.getHelper();
 
     try {
@@ -103,7 +104,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
 
   @VisibleForTesting
   ProcessExitListener deploy(
-      @NotNull final File stagingDirectory,
+      @NotNull final Path stagingDirectory,
       @NotNull final ProcessStartListener startListener) {
     return new ProcessExitListener() {
       @Override

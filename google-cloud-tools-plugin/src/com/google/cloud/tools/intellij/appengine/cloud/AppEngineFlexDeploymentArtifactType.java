@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Locale;
 
 /**
@@ -34,11 +34,11 @@ public enum AppEngineFlexDeploymentArtifactType {
    * {@code deployPackage}.
    */
   @NotNull
-  public static AppEngineFlexDeploymentArtifactType typeForPath(@Nullable File deployPackage) {
+  public static AppEngineFlexDeploymentArtifactType typeForPath(@Nullable Path deployPackage) {
     if (deployPackage != null) {
-      if (deployPackage.getPath().endsWith(".jar")) {
+      if (deployPackage.endsWith(".jar")) {
         return JAR;
-      } else if (deployPackage.getPath().endsWith(".war")) {
+      } else if (deployPackage.endsWith(".war")) {
         return WAR;
       }
     }

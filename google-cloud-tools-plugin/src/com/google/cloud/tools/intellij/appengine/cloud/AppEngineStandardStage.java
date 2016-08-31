@@ -26,6 +26,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
+import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -34,12 +35,9 @@ import java.io.File;
  * Stages an application in preparation for deployment to the App Engine flexible environment.
  */
 public class AppEngineStandardStage {
-
-  private static final Logger logger = Logger.getInstance(AppEngineStandardStage.class);
-
   private CloudSdkAppEngineHelper helper;
   private LoggingHandler loggingHandler;
-  private File deploymentArtifactPath;
+  private Path deploymentArtifactPath;
 
 
   /**
@@ -48,7 +46,7 @@ public class AppEngineStandardStage {
   public AppEngineStandardStage(
       @NotNull CloudSdkAppEngineHelper helper,
       @NotNull LoggingHandler loggingHandler,
-      @NotNull File deploymentArtifactPath) {
+      @NotNull Path deploymentArtifactPath) {
     this.helper = helper;
     this.loggingHandler = loggingHandler;
     this.deploymentArtifactPath = deploymentArtifactPath;
@@ -61,7 +59,7 @@ public class AppEngineStandardStage {
    * @param onStageComplete a callback for executing actions on completion of staging
    */
   public void stage(
-      @NotNull File stagingDirectory,
+      @NotNull Path stagingDirectory,
       @NotNull ProcessStartListener startListener,
       @NotNull ProcessExitListener onStageComplete) {
 
@@ -82,8 +80,9 @@ public class AppEngineStandardStage {
     // TODO determine the default set of flags we want to set for AE standard staging
     DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();
     stageConfig.setEnableJarSplitting(true);
-    stageConfig.setStagingDirectory(stagingDirectory);
-    stageConfig.setSourceDirectory(deploymentArtifactPath);
+    // TODO(joaomartins): Change File to Path on library configs.
+    stageConfig.setStagingDirectory(stagingDirectory.toFile());
+    stageConfig.setSourceDirectory(deploymentArtifactPath.toFile());
 
     CloudSdkAppEngineStandardStaging staging = new CloudSdkAppEngineStandardStaging(sdk);
     staging.stageStandard(stageConfig);

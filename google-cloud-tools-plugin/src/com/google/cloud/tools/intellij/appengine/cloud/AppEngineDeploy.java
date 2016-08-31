@@ -35,6 +35,7 @@ import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +54,7 @@ public class AppEngineDeploy {
   private AppEngineHelper helper;
   private LoggingHandler loggingHandler;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
-  private AppEngineEnvironment environment; // TODO change name to AppEngineEnvironment
+  private AppEngineEnvironment environment;
   private DeploymentOperationCallback callback;
 
   /**
@@ -76,13 +77,13 @@ public class AppEngineDeploy {
    * Given a staging directory, deploy the application to Google App Engine.
    */
   public void deploy(
-      @NotNull File stagingDirectory,
+      @NotNull Path stagingDirectory,
       @NotNull ProcessStartListener deployStartListener) {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
     configuration.setDeployables(
-        Collections.singletonList(new File(stagingDirectory, "app.yaml")));
+        Collections.singletonList(stagingDirectory.resolve("app.yaml").toFile()));
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
     configuration.setPromote(deploymentConfiguration.isPromote());

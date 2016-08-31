@@ -17,9 +17,9 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
 
 import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -46,19 +46,9 @@ public class CloudSdkPanel {
   private JLabel warningMessage;
   private JPanel cloudSdkPanel;
 
-  public CloudSdkPanel(@NotNull CloudSdkService cloudSdkService) {
+  public CloudSdkPanel() {
     warningMessage.setVisible(false);
     warningMessage.setIcon(RunConfigurations.ConfigurationWarning);
-
-    if (cloudSdkService.getSdkHomePath() == null) {
-      final String cloudSdkDirectoryPath
-          = CloudSdkUtil.findCloudSdkDirectoryPath(SystemEnvironmentProvider.getInstance());
-
-      if (cloudSdkDirectoryPath != null) {
-        cloudSdkService.setSdkHomePath(cloudSdkDirectoryPath);
-        cloudSdkDirectoryField.setText(cloudSdkDirectoryPath);
-      }
-    }
 
     cloudSdkDirectoryField.addBrowseFolderListener(
         GctBundle.message("appengine.cloudsdk.location.browse.window.title"),
@@ -88,15 +78,20 @@ public class CloudSdkPanel {
       return;
     }
 
-    boolean isValid = CloudSdkUtil.containsCloudSdkExecutable(path);
-    if (isValid) {
+    // TODO(joaomartins): Test
+    CloudSdk sdk = new CloudSdk.Builder()
+        .sdkPath(Paths.get(path))
+        .build();
+
+    try {
+      sdk.validate();
+
       cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
       warningMessage.setVisible(false);
-    } else {
+    } catch (AppEngineException aee) {
       cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
       warningMessage.setVisible(true);
-      warningMessage.setText(
-          GctBundle.message("appengine.cloudsdk.location.invalid.message"));
+      warningMessage.setText(aee.getMessage());
     }
   }
 

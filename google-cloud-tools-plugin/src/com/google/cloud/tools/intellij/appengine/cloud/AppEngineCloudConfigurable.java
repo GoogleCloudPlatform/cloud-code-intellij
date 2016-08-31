@@ -16,9 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
@@ -26,11 +27,12 @@ import com.google.common.annotations.VisibleForTesting;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.RemoteServerConfigurable;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
+
+import java.nio.file.Paths;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -86,16 +88,19 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   }
 
   /**
-   * User's shouldn't be able to save a cloud configuration without a valid Cloud SDK configured.
+   * Users shouldn't be able to save a cloud configuration without a valid Cloud SDK configured.
    */
   @Override
   public void apply() throws ConfigurationException {
-    if (StringUtil.isEmpty(cloudSdkPanel.getCloudSdkDirectory())
-        || !CloudSdkUtil.containsCloudSdkExecutable(cloudSdkPanel.getCloudSdkDirectory())) {
-      throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.cloudsdk.location.invalid.message"));
-    } else {
+    CloudSdk sdk = new CloudSdk.Builder()
+        .sdkPath(Paths.get(cloudSdkPanel.getCloudSdkDirectory()))
+        .build();
+
+    try {
+      sdk.validate();
       CloudSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
+    } catch (AppEngineException aee) {
+      throw new RuntimeConfigurationError(aee.getMessage());
     }
   }
 
@@ -119,6 +124,6 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
-    cloudSdkPanel = new CloudSdkPanel(CloudSdkService.getInstance());
+    cloudSdkPanel = new CloudSdkPanel();
   }
 }
