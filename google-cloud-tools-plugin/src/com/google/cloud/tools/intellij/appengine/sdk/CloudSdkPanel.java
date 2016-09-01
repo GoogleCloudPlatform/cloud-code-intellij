@@ -78,12 +78,11 @@ public class CloudSdkPanel {
       return;
     }
 
-    CloudSdk sdk = new CloudSdk.Builder()
-        .sdkPath(Paths.get(path))
-        .build();
-
     try {
-      sdk.validate();
+      new CloudSdk.Builder()
+          .sdkPath(Paths.get(path))
+          .build()
+          .validate();
 
       cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
       warningMessage.setVisible(false);
