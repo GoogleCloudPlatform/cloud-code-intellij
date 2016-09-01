@@ -23,13 +23,11 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
-import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Stages an application in preparation for deployment to the App Engine flexible environment.

@@ -23,7 +23,6 @@ import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.openapi.diagnostic.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 

@@ -43,7 +43,8 @@ import javax.swing.JTextPane;
  */
 public class AppEngineCloudConfigurable extends RemoteServerConfigurable implements Configurable {
 
-  private static final String MORE_INFO_URI_OPEN_TAG = "<a href='https://cloud.google.com/appengine/'>";
+  private static final String MORE_INFO_URI_OPEN_TAG =
+      "<a href='https://cloud.google.com/appengine/'>";
   private static final String MORE_INFO_URI_CLOSE_TAG = "</a>";
 
   private String displayName = GctBundle.message("appengine.name");

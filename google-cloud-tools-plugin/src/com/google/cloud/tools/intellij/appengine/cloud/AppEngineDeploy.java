@@ -35,12 +35,11 @@ import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 

@@ -36,9 +36,9 @@ public enum AppEngineFlexDeploymentArtifactType {
   @NotNull
   public static AppEngineFlexDeploymentArtifactType typeForPath(@Nullable Path deployPackage) {
     if (deployPackage != null) {
-      if (deployPackage.endsWith(".jar")) {
+      if (deployPackage.toString().endsWith(".jar")) {
         return JAR;
-      } else if (deployPackage.endsWith(".war")) {
+      } else if (deployPackage.toString().endsWith(".war")) {
         return WAR;
       }
     }

@@ -26,11 +26,10 @@ import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.diagnostic.Logger;
 
-import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Runnable that executes task responsible for deploying an application to the App Engine standard
