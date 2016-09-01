@@ -310,7 +310,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
           .addSupport(module, rootModel, myFrameworkSupportModel,
               PersistenceApiComboboxUtil.getSelectedApi(myPersistenceApiComboBox));
 
-      // Called on New Project, New Module or Add Framework Support dialogs.
+      // Called when creating a new App Engine module from the 'new project' or 'new module' wizards
+      // or upon adding App Engine 'Framework Support' to an existing module.
       UsageTrackerProvider.getInstance()
           .trackEvent(GctTracking.APP_ENGINE_ADD_SUPPORT)
           .ping();
