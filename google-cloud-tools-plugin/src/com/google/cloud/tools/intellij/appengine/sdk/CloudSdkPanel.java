@@ -78,7 +78,6 @@ public class CloudSdkPanel {
       return;
     }
 
-    // TODO(joaomartins): Test
     CloudSdk sdk = new CloudSdk.Builder()
         .sdkPath(Paths.get(path))
         .build();
