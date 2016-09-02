@@ -21,8 +21,12 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.base.Strings;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents an App Engine Standard run task. (i.e., devappserver)
@@ -30,9 +34,17 @@ import org.jetbrains.annotations.NotNull;
 public class AppEngineStandardRunTask extends AppEngineTask {
 
   private RunConfiguration runConfig;
+  private String runnerId;
 
-  public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig) {
+  /**
+   * {@link AppEngineStandardRunTask} constructor.
+   *
+   * @param runConfig local run configuration to be sent to the common library
+   * @param runnerId typically "Run" or "Debug", to indicate type of local run
+   */
+  public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig, @Nullable String runnerId) {
     this.runConfig = runConfig;
+    this.runnerId = runnerId;
   }
 
   @Override
@@ -46,5 +58,11 @@ public class AppEngineStandardRunTask extends AppEngineTask {
 
     CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdkBuilder.build());
     devServer.run(runConfig);
+
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_RUN)
+        .withLabel(Strings.nullToEmpty(runnerId))
+        .ping();
+
   }
 }
