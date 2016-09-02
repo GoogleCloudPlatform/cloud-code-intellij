@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
@@ -172,6 +174,13 @@ public class AppEngineFacetEditor extends FacetEditorTab {
   @Override
   public void onFacetInitialized(@NotNull Facet facet) {
     AppEngineWebIntegration.getInstance().setupDevServer();
+
+    // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
+    // Framework discovered "Configure" popup.
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_ADD_FACET)
+        .withLabel("setOnModule")
+        .ping();
   }
 
   private class FilesListCellRenderer extends DefaultListCellRenderer {

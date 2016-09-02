@@ -20,6 +20,8 @@ import com.google.cloud.tools.intellij.appengine.jps.model.PersistenceApi;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
@@ -307,6 +309,12 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       AppEngineSupportProvider.this
           .addSupport(module, rootModel, myFrameworkSupportModel,
               PersistenceApiComboboxUtil.getSelectedApi(myPersistenceApiComboBox));
+
+      // Called when creating a new App Engine module from the 'new project' or 'new module' wizards
+      // or upon adding App Engine 'Framework Support' to an existing module.
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.APP_ENGINE_ADD_SUPPORT)
+          .ping();
     }
 
     @Nullable
