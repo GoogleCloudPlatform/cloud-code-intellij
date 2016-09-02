@@ -25,6 +25,8 @@ import com.intellij.psi.xml.XmlFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 /**
  * Service to retrieve assets used by Google App Engine.
  */
@@ -43,5 +45,5 @@ public abstract class AppEngineAssetProvider {
 
   @Nullable
   public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
-      @NotNull Module module);
+      @NotNull Collection<Module> module);
 }

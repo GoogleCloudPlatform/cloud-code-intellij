@@ -40,6 +40,7 @@ import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -69,7 +70,8 @@ public class AppEngineUtil {
     AppEngineAssetProvider assetProvider = AppEngineAssetProvider.getInstance();
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
-      XmlFile appEngineWebXml = assetProvider.loadAppEngineStandardWebXml(project, module);
+      XmlFile appEngineWebXml
+          = assetProvider.loadAppEngineStandardWebXml(project, Collections.singletonList(module));
       final AppEngineEnvironment environment
           = projectService.getModuleAppEngineEnvironment(appEngineWebXml);
 
@@ -111,7 +113,8 @@ public class AppEngineUtil {
     for (Module module : ModuleManager.getInstance(project).getModules()) {
       AppEngineEnvironment environment =
           projectService.getModuleAppEngineEnvironment(
-              assetProvider.loadAppEngineStandardWebXml(project, module));
+              assetProvider.loadAppEngineStandardWebXml(
+                  project, Collections.singletonList(module)));
 
       if (ModuleType.is(module, JavaModuleType.getModuleType())
           && projectService.isJarOrWarMavenBuild(project, module)) {
