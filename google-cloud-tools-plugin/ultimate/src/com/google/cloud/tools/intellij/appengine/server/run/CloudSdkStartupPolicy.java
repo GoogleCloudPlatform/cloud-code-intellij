@@ -49,7 +49,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
   @Nullable
   @Override
-  public ScriptHelper createStartupScriptHelper(ProgramRunner programRunner) {
+  public ScriptHelper createStartupScriptHelper(final ProgramRunner programRunner) {
     return new ScriptHelper() {
       @Nullable
       @Override
@@ -92,7 +92,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             }
 
             AppEngineStandardRunTask runTask =
-                new AppEngineStandardRunTask(runConfiguration);
+                new AppEngineStandardRunTask(runConfiguration, programRunner.getRunnerId());
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 

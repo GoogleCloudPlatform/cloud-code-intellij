@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.facet.FacetType;
 import com.intellij.framework.FrameworkType;
@@ -24,6 +26,7 @@ import com.intellij.framework.detection.FacetBasedFrameworkDetector;
 import com.intellij.framework.detection.FileContentPattern;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.StdFileTypes;
+import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
 
@@ -37,6 +40,14 @@ public class AppEngineFrameworkDetector extends
 
   public AppEngineFrameworkDetector() {
     super("appengine-java");
+  }
+
+  @Override
+  public void setupFacet(@NotNull AppEngineFacet facet, ModifiableRootModel model) {
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_ADD_FACET)
+        .withLabel("frameworkDetect")
+        .ping();
   }
 
   @Override
