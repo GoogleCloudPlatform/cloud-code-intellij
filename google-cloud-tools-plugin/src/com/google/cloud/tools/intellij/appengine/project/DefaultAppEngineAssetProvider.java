@@ -72,7 +72,7 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
       Collections.sort(appEngineWebXmls, new AppEngineWebXmlOrdering());
 
       logger.warn("The following appengine-web.xml's were found: " + appEngineWebXmls
-          + "\nThe first one in the list will be returned.");
+          + "\nThe first one in the list will be used.");
     }
 
     if (!appEngineWebXmls.isEmpty()) {
