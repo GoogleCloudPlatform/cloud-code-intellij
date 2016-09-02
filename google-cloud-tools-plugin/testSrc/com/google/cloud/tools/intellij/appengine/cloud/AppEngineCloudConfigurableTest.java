@@ -22,16 +22,11 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
-import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.testFramework.PlatformTestCase;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.picocontainer.MutablePicoContainer;
 
 import java.nio.file.Path;
@@ -43,6 +38,7 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
   private static final Path CLOUD_SDK_DIR_PATH = Paths.get("a", "b", "c", "gcloud-sdk");
+  private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in this directory.";
 
   @Override
   public void setUp() throws Exception {
@@ -75,7 +71,7 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
       appEngineCloudConfigurable.apply();
       fail("Applying settings without a valid SDK should throw exception.");
     } catch (ConfigurationException ce) {
-      assertFalse(ce.getMessage().isEmpty());
+      assertEquals(INVALID_SDK_DIR_WARNING, ce.getMessage());
     }
   }
 
