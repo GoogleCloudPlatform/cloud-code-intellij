@@ -32,6 +32,7 @@ import java.io.File;
 
 import javax.swing.Icon;
 
+
 /**
  * A deployment source backed by the Maven build system.
  */
@@ -39,10 +40,14 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
     implements AppEngineDeployable {
 
   private final Project project;
+  private final AppEngineEnvironment environment;
 
-  public MavenBuildDeploymentSource(@NotNull ModulePointer pointer, @NotNull Project project) {
+  public MavenBuildDeploymentSource(@NotNull ModulePointer pointer,
+      @NotNull Project project,
+      @NotNull AppEngineEnvironment environment) {
     super(pointer);
     this.project = project;
+    this.environment = environment;
   }
 
   @NotNull
@@ -79,14 +84,17 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
 
     String targetBuild =
         new File(mavenProject.getBuildDirectory()).getPath() + File.separator
-            + mavenProject.getFinalName() + "."
-            + mavenProject.getPackaging();
+            + mavenProject.getFinalName();
+
+    if (environment.isFlexible()) {
+      targetBuild += "." + mavenProject.getPackaging();
+    }
 
     return new File(targetBuild);
   }
 
   @Override
   public AppEngineEnvironment getEnvironment() {
-    return AppEngineEnvironment.APP_ENGINE_FLEX;
+    return environment;
   }
 }
