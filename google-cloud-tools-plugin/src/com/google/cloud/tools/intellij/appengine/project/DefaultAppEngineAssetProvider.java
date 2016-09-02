@@ -66,10 +66,10 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
     if (appEngineWebXmls.size() > 1) {
       logger.warn(appEngineWebXmls.size() + " appengine-web.xml files were found. "
           + "Only one is expected.");
-    }
 
-    // Prefer the appengine-web.xml located under the WEB-INF directory
-    Collections.sort(appEngineWebXmls, new AppEngineWebXmlOrdering());
+      // Prefer the appengine-web.xml located under the WEB-INF directory
+      Collections.sort(appEngineWebXmls, new AppEngineWebXmlOrdering());
+    }
 
     for (VirtualFile appEngineWebXml : appEngineWebXmls) {
       if (appEngineWebXml != null) {
