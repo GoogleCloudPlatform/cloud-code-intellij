@@ -71,8 +71,8 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
       // Prefer the appengine-web.xml located under the WEB-INF directory
       Collections.sort(appEngineWebXmls, new AppEngineWebXmlOrdering());
 
-      logger.warn(appEngineWebXmls.size() + " appengine-web.xml files were found. "
-          + "Only one is expected.");
+      logger.warn("The following appengine-web.xml's were found: " + appEngineWebXmls
+          + "\nThe first one in the list will be returned.");
     }
 
     if (!appEngineWebXmls.isEmpty()) {
