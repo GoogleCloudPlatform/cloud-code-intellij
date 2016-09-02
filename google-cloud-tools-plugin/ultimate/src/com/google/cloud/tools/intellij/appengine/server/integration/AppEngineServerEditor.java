@@ -16,10 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
-import com.google.cloud.tools.appengine.api.exceptions.AppEngineException;
-import com.google.cloud.tools.appengine.api.exceptions.BadSdkLocationException;
-import com.google.cloud.tools.appengine.api.exceptions.NotAFileException;
-import com.google.cloud.tools.appengine.api.exceptions.NullSdkPathException;
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.api.BadSdkLocationException;
+import com.google.cloud.tools.appengine.api.NotAFileException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -75,9 +74,7 @@ public class AppEngineServerEditor extends
     } catch (AppEngineException aee) {
       warningMessage.setVisible(true);
       warningMessage.setForeground(JBColor.RED);
-      if (aee instanceof NullSdkPathException) {
-        warningMessage.setText(GctBundle.message("appengine.cloudsdk.location.missing.message"));
-      } else if (aee instanceof BadSdkLocationException) {
+      if (aee instanceof BadSdkLocationException) {
         warningMessage.setText(GctBundle.message("appengine.cloudsdk.location.directory.invalid"));
       } else if (aee instanceof NotAFileException) {
         warningMessage.setText(GctBundle.message("appengine.cloudsdk.location.invalid.message"));
