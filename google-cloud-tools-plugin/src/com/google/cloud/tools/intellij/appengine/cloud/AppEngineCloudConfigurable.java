@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.api.exceptions.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
@@ -100,7 +100,8 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
           .validate();
       CloudSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
     } catch (AppEngineException aee) {
-      throw new RuntimeConfigurationError(aee.getMessage());
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.cloudsdk.location.invalid.message"));
     }
   }
 

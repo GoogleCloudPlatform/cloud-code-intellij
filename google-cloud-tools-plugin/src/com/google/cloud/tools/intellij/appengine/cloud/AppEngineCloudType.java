@@ -17,7 +17,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.api.exceptions.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.login.Services;
@@ -41,8 +41,9 @@ import javax.swing.Icon;
 
 
 /**
- * This class hooks into IntelliJ's <a href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a>
- * configurations for infrastructure based deployment flows.
+ * This class hooks into IntelliJ's
+ * <a href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a> configurations for
+ * infrastructure based deployment flows.
  */
 public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration> {
 
