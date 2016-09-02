@@ -41,7 +41,8 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   private JLabel warningMessage;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
-  private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in this directory.";
+  private static final String INVALID_SDK_DIR_WARNING =
+      "The specified Cloud SDK location does not exist.";
 
   @Override
   public void setUp() throws Exception {
