@@ -37,12 +37,18 @@ public abstract class AppEngineAssetProvider {
   }
 
   /**
-   * Returns the project's appengine-web.xml or null if it does not exist.
+   * Returns the project's appengine-web.xml or null if it does not exist. If there are multiple
+   * appengine-web.xml's then it will return one of them with preference given to those under the
+   * WEB-INF directory.
    */
   @Nullable
   public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
       @NotNull Artifact artifact);
 
+  /**
+   * @see AppEngineAssetProvider#loadAppEngineStandardWebXml(Project, Artifact). Loads the
+   *     configuration at the module level.
+   */
   @Nullable
   public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
       @NotNull Collection<Module> module);

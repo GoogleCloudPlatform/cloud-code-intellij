@@ -33,6 +33,7 @@ import com.intellij.psi.xml.XmlFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -84,7 +85,7 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
    * under the WEB-INF directory appear first.
    */
   @VisibleForTesting
-  static class AppEngineWebXmlOrdering extends Ordering<VirtualFile> {
+  static class AppEngineWebXmlOrdering extends Ordering<VirtualFile> implements Serializable {
     @Override
     public int compare(VirtualFile file1, VirtualFile file2) {
       return Booleans.compare(hasWebInfParent(file2), hasWebInfParent(file1));
