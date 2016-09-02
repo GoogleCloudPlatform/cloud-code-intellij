@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Booleans;
 
@@ -63,18 +65,19 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
           project, "appengine-web.xml", module.getModuleContentScope()));
     }
 
-    if (appEngineWebXmls.size() > 1) {
-      logger.warn(appEngineWebXmls.size() + " appengine-web.xml files were found. "
-          + "Only one is expected.");
+    Iterables.filter(appEngineWebXmls, Predicates.notNull());
 
+    if (appEngineWebXmls.size() > 1) {
       // Prefer the appengine-web.xml located under the WEB-INF directory
       Collections.sort(appEngineWebXmls, new AppEngineWebXmlOrdering());
+
+      logger.warn(appEngineWebXmls.size() + " appengine-web.xml files were found. "
+          + "Only one is expected.");
     }
 
-    for (VirtualFile appEngineWebXml : appEngineWebXmls) {
-      if (appEngineWebXml != null) {
-        return (XmlFile) PsiManager.getInstance(project).findFile(appEngineWebXml);
-      }
+    if (!appEngineWebXmls.isEmpty()) {
+      VirtualFile appEngineWebXml = appEngineWebXmls.iterator().next();
+      return (XmlFile) PsiManager.getInstance(project).findFile(appEngineWebXml);
     }
 
     return null;
