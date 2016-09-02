@@ -46,8 +46,8 @@ public abstract class AppEngineAssetProvider {
       @NotNull Artifact artifact);
 
   /**
-   * @see AppEngineAssetProvider#loadAppEngineStandardWebXml(Project, Artifact). Loads the
-   *     configuration at the module level.
+   * Loads the configuration at the module level.
+   * @see AppEngineAssetProvider#loadAppEngineStandardWebXml(Project, Artifact).
    */
   @Nullable
   public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
