@@ -55,9 +55,7 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
     setupAppEngine();
     addSupport();
 
-    final AppEngineFacet appEngineFacet = getFacet(AppEngineFacet.ID);
     assertNull(FacetManager.getInstance(myModule).getFacetByType(WebFacet.ID));
-    assertEmpty(appEngineFacet.getConfiguration().getFilesToEnhance());
     final String moduleName = myModule.getName();
     ArtifactsTestUtil.assertLayout(myProject, moduleName, "<root>\n" +
                                                           " WEB-INF/\n" +
@@ -69,7 +67,6 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
 
   private void setupAppEngine() {
     CloudSdkService sdkService = mock(CloudSdkService.class);
-    when(sdkService.isValid()).thenReturn(true);
     when(sdkService.getLibraries()).thenReturn(new File[]{});
 
     MutablePicoContainer applicationContainer = (MutablePicoContainer)

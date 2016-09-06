@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
-import com.google.cloud.tools.intellij.appengine.jps.model.PersistenceApi;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
@@ -64,10 +63,8 @@ import org.jetbrains.annotations.TestOnly;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -78,7 +75,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
   private static final Logger LOG = Logger
       .getInstance("#com.intellij.appengine.facet.AppEngineSupportProvider");
-  public static final String JPA_FRAMEWORK_ID = "facet:jpa";
 
   private static final CloudSdkService sdkService = CloudSdkService.getInstance();
 
@@ -127,15 +123,13 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
   private void addSupport(final Module module,
       final ModifiableRootModel rootModel,
-      FrameworkSupportModel frameworkSupportModel,
-      @Nullable PersistenceApi persistenceApi) {
+      FrameworkSupportModel frameworkSupportModel) {
     FacetType<AppEngineFacet, AppEngineFacetConfiguration> facetType = AppEngineFacet
         .getFacetType();
     AppEngineFacet appEngineFacet = FacetManager.getInstance(module)
         .addFacet(facetType, facetType.getDefaultFacetName(), null);
     AppEngineWebIntegration webIntegration = AppEngineWebIntegration.getInstance();
     webIntegration.registerFrameworkInModel(frameworkSupportModel, appEngineFacet);
-    final AppEngineFacetConfiguration facetConfiguration = appEngineFacet.getConfiguration();
     final Artifact webArtifact = findOrCreateWebArtifact(appEngineFacet);
 
     final VirtualFile webDescriptorDir = webIntegration
@@ -157,42 +151,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
         VirtualFile.EMPTY_ARRAY);
     rootModel.addLibraryEntry(apiJar);
     webIntegration.addLibraryToArtifact(apiJar, webArtifact, project);
-
-    if (persistenceApi != null) {
-      facetConfiguration.setRunEnhancerOnMake(true);
-      facetConfiguration.setPersistenceApi(persistenceApi);
-      facetConfiguration.getFilesToEnhance()
-          .addAll(AppEngineUtilLegacy.getDefaultSourceRootsToEnhance(rootModel));
-      try {
-        final VirtualFile[] sourceRoots = rootModel.getSourceRoots();
-        final VirtualFile sourceRoot;
-        if (sourceRoots.length > 0) {
-          sourceRoot = sourceRoots[0];
-        } else {
-          sourceRoot = findOrCreateChildDirectory(rootModel.getContentRoots()[0], "src");
-        }
-        VirtualFile metaInf = findOrCreateChildDirectory(sourceRoot, "META-INF");
-        if (persistenceApi == PersistenceApi.JDO || persistenceApi == PersistenceApi.JDO3) {
-          createFileFromTemplate(
-              AppEngineTemplateGroupDescriptorFactory.APP_ENGINE_JDO_CONFIG_TEMPLATE, metaInf,
-              AppEngineUtilLegacy.JDO_CONFIG_XML_NAME);
-        } else {
-          final VirtualFile file = createFileFromTemplate(
-              AppEngineTemplateGroupDescriptorFactory.APP_ENGINE_JPA_CONFIG_TEMPLATE, metaInf,
-              AppEngineUtilLegacy.JPA_CONFIG_XML_NAME);
-          if (file != null) {
-            webIntegration.setupJpaSupport(module, file);
-          }
-        }
-      } catch (IOException ioe) {
-        LOG.error(ioe);
-      }
-      final Library library = addProjectLibrary(module, "AppEngine ORM",
-          Collections.singletonList(sdkService.getOrmLibDirectoryPath()),
-          sdkService.getOrmLibSources());
-      rootModel.addLibraryEntry(library);
-      webIntegration.addLibraryToArtifact(library, webArtifact, project);
-    }
   }
 
   @NotNull
@@ -239,15 +197,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     }.execute().getResultObject();
   }
 
-  private VirtualFile findOrCreateChildDirectory(VirtualFile parent, final String name)
-      throws IOException {
-    VirtualFile child = parent.findChild(name);
-    if (child != null) {
-      return child;
-    }
-    return parent.createChildDirectory(this, name);
-  }
-
   @NotNull
   @Override
   public FrameworkSupportInModuleConfigurable createConfigurable(
@@ -265,28 +214,17 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
     private final FrameworkSupportModel myFrameworkSupportModel;
     private JPanel myMainPanel;
-    private JComboBox myPersistenceApiComboBox;
     private CloudSdkPanel cloudSdkPanel;
 
     private AppEngineSupportConfigurable(FrameworkSupportModel model) {
       myFrameworkSupportModel = model;
-      PersistenceApiComboboxUtil.setComboboxModel(myPersistenceApiComboBox, true);
-      if (model.isFrameworkSelected(JPA_FRAMEWORK_ID)) {
-        myPersistenceApiComboBox.setSelectedItem(PersistenceApi.JPA.getDisplayName());
-      }
       model.addFrameworkListener(this);
     }
 
     public void frameworkSelected(@NotNull FrameworkSupportProvider provider) {
-      if (provider.getId().equals(JPA_FRAMEWORK_ID)) {
-        myPersistenceApiComboBox.setSelectedItem(PersistenceApi.JPA.getDisplayName());
-      }
     }
 
     public void frameworkUnselected(@NotNull FrameworkSupportProvider provider) {
-      if (provider.getId().equals(JPA_FRAMEWORK_ID)) {
-        myPersistenceApiComboBox.setSelectedItem(PersistenceApiComboboxUtil.NONE_ITEM);
-      }
     }
 
     @Override
@@ -307,8 +245,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
 
       AppEngineSupportProvider.this
-          .addSupport(module, rootModel, myFrameworkSupportModel,
-              PersistenceApiComboboxUtil.getSelectedApi(myPersistenceApiComboBox));
+          .addSupport(module, rootModel, myFrameworkSupportModel);
 
       // Called when creating a new App Engine module from the 'new project' or 'new module' wizards
       // or upon adding App Engine 'Framework Support' to an existing module.

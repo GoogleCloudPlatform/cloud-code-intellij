@@ -20,34 +20,22 @@ import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.facet.FacetType;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.util.io.ZipUtil;
 
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.importing.FacetImporter;
 import org.jetbrains.idea.maven.importing.MavenRootModelAdapter;
 import org.jetbrains.idea.maven.model.MavenArtifact;
-import org.jetbrains.idea.maven.model.MavenArtifactInfo;
 import org.jetbrains.idea.maven.model.MavenPlugin;
-import org.jetbrains.idea.maven.model.MavenRemoteRepository;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectChanges;
 import org.jetbrains.idea.maven.project.MavenProjectsProcessorTask;
 import org.jetbrains.idea.maven.project.MavenProjectsTree;
-import org.jetbrains.idea.maven.project.ResolveContext;
-import org.jetbrains.idea.maven.server.MavenEmbedderWrapper;
-import org.jetbrains.idea.maven.server.NativeMavenProjectHolder;
-import org.jetbrains.idea.maven.utils.MavenLog;
-import org.jetbrains.idea.maven.utils.MavenProcessCanceledException;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -61,31 +49,6 @@ public class AppEngineFacetImporter extends
   public AppEngineFacetImporter() {
     super("com.google.appengine", "appengine-maven-plugin",
         FacetType.findInstance(AppEngineFacetType.class));
-  }
-
-  @Override
-  public void resolve(Project project,
-      MavenProject mavenProject,
-      NativeMavenProjectHolder nativeMavenProject,
-      MavenEmbedderWrapper embedder,
-      ResolveContext context) throws MavenProcessCanceledException {
-    String version = getVersion(mavenProject);
-    if (version != null) {
-      List<MavenRemoteRepository> repos = mavenProject.getRemoteRepositories();
-      MavenArtifactInfo artifactInfo = new MavenArtifactInfo("com.google.appengine",
-          "appengine-java-sdk", version, "zip", null);
-      MavenArtifact artifact = embedder.resolve(artifactInfo, repos);
-      File file = artifact.getFile();
-      File unpackedSdkPath = new File(file.getParentFile(), "appengine-java-sdk");
-      File toolsApiJarFile = CloudSdkService.getInstance().getToolsApiJarFile();
-      if (file.exists() && toolsApiJarFile != null && toolsApiJarFile.exists()) {
-        try {
-          ZipUtil.extract(file, unpackedSdkPath, null, false);
-        } catch (IOException ioe) {
-          MavenLog.LOG.warn("cannot unpack AppEngine SDK", ioe);
-        }
-      }
-    }
   }
 
   @Nullable
