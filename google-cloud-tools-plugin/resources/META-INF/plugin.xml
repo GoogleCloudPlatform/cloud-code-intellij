@@ -55,8 +55,8 @@ Code inspections for App Engine Java code.</description>
 
     <implicitUsageProvider implementation="com.google.cloud.tools.intellij.appengine.validation.EndpointImplicitUsageProvider"/>
 
-    <checkoutProvider implementation="com.google.cloud.tools.intellij.git.GcpCheckoutProvider"/>
-    <vcsPopupProvider implementation="com.google.cloud.tools.intellij.git.GcpQuickListContentProvider"/>
+    <checkoutProvider implementation="com.google.cloud.tools.intellij.vcs.GcpCheckoutProvider"/>
+    <vcsPopupProvider implementation="com.google.cloud.tools.intellij.vcs.GcpQuickListContentProvider"/>
 
     <programRunner implementation="com.google.cloud.tools.intellij.debugger.CloudDebuggerRunner"/>
     <xdebugger.breakpointType implementation="com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType"/>
@@ -148,7 +148,7 @@ Code inspections for App Engine Java code.</description>
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">
-    <GitHttpAuthDataProvider implementation="com.google.cloud.tools.intellij.git.GcpHttpAuthDataProvider" />
+    <GitHttpAuthDataProvider implementation="com.google.cloud.tools.intellij.vcs.GcpHttpAuthDataProvider" />
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct.login">
@@ -182,7 +182,7 @@ Code inspections for App Engine Java code.</description>
     </group>
 
     <action id="GoogleCloudTools.UploadSourceToGCP"
-            class="com.google.cloud.tools.intellij.git.UploadSourceAction">
+            class="com.google.cloud.tools.intellij.vcs.UploadSourceAction">
       <add-to-group group-id="Vcs.Import"/>
     </action>
   </actions>
