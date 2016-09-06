@@ -16,32 +16,87 @@
 
 package com.google.cloud.tools.intellij.appengine.project;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
+import com.google.common.primitives.Booleans;
+
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.artifacts.ArtifactManager;
-import com.intellij.packaging.elements.PackagingElementResolvingContext;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.xml.XmlFile;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
+  private static final Logger logger = Logger.getInstance(DefaultAppEngineAssetProvider.class);
 
   @Nullable
   @Override
   public XmlFile loadAppEngineStandardWebXml(@NotNull Project project, @NotNull Artifact artifact) {
-    PackagingElementResolvingContext context = ArtifactManager.getInstance(project)
-        .getResolvingContext();
-    VirtualFile descriptorFile = ArtifactUtil
-        .findSourceFileByOutputPath(artifact, "WEB-INF/appengine-web.xml", context);
+    Set<Module> modules
+        = ArtifactUtil.getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
 
-    if (descriptorFile != null) {
-      return (XmlFile) PsiManager.getInstance(project).findFile(descriptorFile);
+    return loadAppEngineStandardWebXml(project, modules);
+  }
+
+  @Nullable
+  @Override
+  public XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
+      @NotNull Collection<Module> modules) {
+    List<VirtualFile> appEngineWebXmls = new ArrayList<>();
+
+    for (Module module : modules) {
+      appEngineWebXmls.addAll(FilenameIndex.getVirtualFilesByName(
+          project, "appengine-web.xml", module.getModuleContentScope()));
+    }
+
+    Iterables.filter(appEngineWebXmls, Predicates.notNull());
+
+    if (appEngineWebXmls.size() > 1) {
+      // Prefer the appengine-web.xml located under the WEB-INF directory
+      Collections.sort(appEngineWebXmls, new AppEngineWebXmlOrdering());
+
+      logger.warn("The following appengine-web.xml's were found: " + appEngineWebXmls
+          + "\nThe first one in the list will be used.");
+    }
+
+    if (!appEngineWebXmls.isEmpty()) {
+      VirtualFile appEngineWebXml = appEngineWebXmls.iterator().next();
+      return (XmlFile) PsiManager.getInstance(project).findFile(appEngineWebXml);
     }
 
     return null;
+  }
+
+  /**
+   * Provides an ordering for a collection of appengine-web.xml {@link VirtualFile}'s where those
+   * under the WEB-INF directory appear first.
+   */
+  @VisibleForTesting
+  static class AppEngineWebXmlOrdering extends Ordering<VirtualFile> implements Serializable {
+    @Override
+    public int compare(VirtualFile file1, VirtualFile file2) {
+      return Booleans.compare(hasWebInfParent(file2), hasWebInfParent(file1));
+    }
+
+    private boolean hasWebInfParent(VirtualFile file) {
+      return file != null
+          && "WEB-INF".equalsIgnoreCase(file.getParent().getName());
+    }
   }
 }

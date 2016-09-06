@@ -17,12 +17,15 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.psi.xml.XmlFile;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 /**
  * Service to retrieve assets used by Google App Engine.
@@ -34,10 +37,19 @@ public abstract class AppEngineAssetProvider {
   }
 
   /**
-   * Returns the project's appengine-web.xml or null if it does not exist.
+   * Returns the project's appengine-web.xml or null if it does not exist. If there are multiple
+   * appengine-web.xml's then it will return one of them with preference given to those under the
+   * WEB-INF directory.
    */
   @Nullable
   public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
       @NotNull Artifact artifact);
 
+  /**
+   * Loads the configuration at the module level.
+   * @see AppEngineAssetProvider#loadAppEngineStandardWebXml(Project, Artifact).
+   */
+  @Nullable
+  public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
+      @NotNull Collection<Module> module);
 }

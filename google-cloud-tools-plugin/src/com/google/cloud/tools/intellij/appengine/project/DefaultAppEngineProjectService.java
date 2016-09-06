@@ -18,12 +18,9 @@ package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 
-import com.intellij.facet.Facet;
-import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
@@ -33,10 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * Implementation of methods for inspecting an App Engine project's structure and configuration.
@@ -53,19 +46,31 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   public boolean isFlexCompat(@NotNull Project project, @NotNull DeploymentSource source) {
     Artifact artifact = getArtifact(source);
 
-    return artifact != null && isFlexCompat(project, artifact);
+    return artifact != null && isFlexCompat(
+        assetProvider.loadAppEngineStandardWebXml(project, artifact));
   }
 
   @Override
-  public boolean isFlexCompat(@NotNull Project project, @NotNull Artifact artifact) {
-    XmlTag compatConfig = getFlexCompatXmlConfiguration(project, artifact);
+  public boolean isFlexCompat(@Nullable XmlFile appEngineWebXml) {
+    if (appEngineWebXml == null) {
+      return false;
+    }
+
+    XmlTag compatConfig = getFlexCompatXmlConfiguration(appEngineWebXml);
 
     return isFlexCompatEnvFlex(compatConfig) || isFlexCompatVmTrue(compatConfig);
   }
 
   @Override
   public boolean isFlexCompatEnvFlex(@NotNull Project project, @NotNull DeploymentSource source) {
-    XmlTag compatConfig = getFlexCompatXmlConfiguration(project, getArtifact(source));
+    Artifact artifact = getArtifact(source);
+
+    if (artifact == null) {
+      return false;
+    }
+
+    XmlTag compatConfig = getFlexCompatXmlConfiguration(
+        assetProvider.loadAppEngineStandardWebXml(project, artifact));
 
     return isFlexCompatEnvFlex(compatConfig);
   }
@@ -82,61 +87,14 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
         && Boolean.parseBoolean(compatConfig.getValue().getTrimmedText());
   }
 
-  @Nullable
+  @NotNull
   @Override
-  public AppEngineEnvironment getAppEngineArtifactEnvironment(@NotNull Project project,
-      @NotNull Artifact artifact) {
-    if (isAppEngineStandardArtifact(project, artifact)) {
-      return isFlexCompat(project, artifact)
-          ? AppEngineEnvironment.APP_ENGINE_FLEX
-          : AppEngineEnvironment.APP_ENGINE_STANDARD;
-    } else if (isAppEngineFlexArtifactType(artifact)) {
+  public AppEngineEnvironment getModuleAppEngineEnvironment(@Nullable XmlFile appEngineWebXml) {
+    if (appEngineWebXml == null || isFlexCompat(appEngineWebXml)) {
       return AppEngineEnvironment.APP_ENGINE_FLEX;
     } else {
-      return null;
+      return AppEngineEnvironment.APP_ENGINE_STANDARD;
     }
-  }
-
-  @Override
-  public boolean containsAppEngineStandardArtifacts(@NotNull Project project,
-      @NotNull Module module) {
-    return containsAppEngineStandardArtifacts(
-        project, ArtifactUtil.getArtifactsContainingModuleOutput(module));
-  }
-
-  @Override
-  public boolean containsAppEngineStandardArtifacts(Project project,
-      Collection<Artifact> artifacts) {
-    for (Artifact artifact : artifacts) {
-      if (hasAppEngineStandardFacet(project, artifact)
-          && isAppEngineStandardArtifactType(artifact)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  @Override
-  public boolean isAppEngineStandardArtifact(@NotNull Project project, @NotNull Artifact artifact) {
-    return hasAppEngineStandardFacet(project, artifact)
-        && isAppEngineStandardArtifactType(artifact);
-  }
-
-  @Override
-  public boolean hasAppEngineStandardFacet(@NotNull Project project, @NotNull Artifact artifact) {
-    Set<Module> modules = ArtifactUtil
-        .getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
-
-    for (Module module : modules) {
-      for (Facet facet : FacetManager.getInstance(module).getAllFacets()) {
-        if (facet != null && APP_ENGINE_STANDARD_FACET_NAME.equals(facet.getName())) {
-          return true;
-        }
-      }
-    }
-
-    return false;
   }
 
   @Override
@@ -169,14 +127,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
    * appengine-web.xml compat configuration or null if there isn't one.
    */
   @Nullable
-  private XmlTag getFlexCompatXmlConfiguration(@NotNull Project project,
-      @Nullable Artifact artifact) {
-    if (artifact == null || !isAppEngineStandardArtifact(project, artifact)) {
-      return null;
-    }
-
-    XmlFile webXml = assetProvider.loadAppEngineStandardWebXml(project, artifact);
-
+  private XmlTag getFlexCompatXmlConfiguration(@Nullable XmlFile webXml) {
     if (webXml != null) {
       XmlTag root = webXml.getRootTag();
       if (root != null) {

@@ -16,12 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
-import com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService;
 
@@ -33,27 +27,14 @@ import com.intellij.facet.FacetTypeId;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.facet.ui.FacetValidatorsManager;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModulePointer;
-import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.module.ModuleType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.artifacts.ArtifactType;
-import com.intellij.packaging.elements.CompositePackagingElement;
-import com.intellij.packaging.elements.PackagingElementOutputKind;
-import com.intellij.packaging.impl.artifacts.ArtifactImpl;
-import com.intellij.packaging.impl.artifacts.JarArtifactType;
-import com.intellij.packaging.impl.elements.ArtifactRootElementImpl;
-import com.intellij.packaging.impl.elements.ModuleOutputPackagingElementBase;
-import com.intellij.packaging.impl.elements.TestModuleOutputPackagingElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.testFramework.PlatformTestCase;
@@ -61,11 +42,8 @@ import com.intellij.testFramework.PlatformTestCase;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.picocontainer.MutablePicoContainer;
 
 import java.io.File;
-
-import javax.swing.Icon;
 
 /**
  * Unit tests for {@link DefaultAppEngineProjectService}
@@ -73,34 +51,21 @@ import javax.swing.Icon;
 public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
   private AppEngineProjectService appEngineProjectService;
-  private AppEngineAssetProvider appEngineAssetProvider;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
 
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
-
-    appEngineAssetProvider = mock(DefaultAppEngineAssetProvider.class);
-    applicationContainer.unregisterComponent(AppEngineAssetProvider.class.getName());
-    applicationContainer.registerComponentInstance(
-        AppEngineAssetProvider.class.getName(), appEngineAssetProvider);
-
     appEngineProjectService = new DefaultAppEngineProjectService();
   }
 
   public void testGetAppEngineArtifactEnvironment_Standard() {
-    Artifact artifact = createTestArtifact(new ExplodedWarArtifactTestType());
     addAppEngineFacet(createModule("myModule"));
 
-    // Load "plain" appengine-web.xml
-    when(appEngineAssetProvider
-        .loadAppEngineStandardWebXml(any(Project.class), any(Artifact.class)))
-        .thenReturn(loadTestFlexCompatWebXml("testData/descriptor/appengine-web.xml"));
+    XmlFile flexCompatWebXml = loadTestWebXml("testData/descriptor/appengine-web.xml");
 
     AppEngineEnvironment environment
-        = appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), artifact);
+        = appEngineProjectService.getModuleAppEngineEnvironment(flexCompatWebXml);
 
     assertEquals(AppEngineEnvironment.APP_ENGINE_STANDARD, environment);
   }
@@ -109,49 +74,26 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     addAppEngineFacet(createModule("myModule"));
 
     // JAR Artifact Type
-    Artifact jarArtifact = createTestArtifact(new JarArtifactType());
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), jarArtifact));
+        appEngineProjectService.getModuleAppEngineEnvironment(null /**appengine-web.xml*/));
 
     // WAR Artifact Type
-    Artifact warArtifact = createTestArtifact(new JarArtifactType());
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), warArtifact));
+        appEngineProjectService.getModuleAppEngineEnvironment(null /**appengine-web.xml*/));
   }
 
   public void testGetAppEngineArtifactEnvironment_FlexibleCompat() {
-    Artifact artifact = createTestArtifact(new ExplodedWarArtifactTestType());
     addAppEngineFacet(createModule("myModule"));
 
     // Load flex-compat appengine-web.xml with vm: true
-    mockLoadWebXml("testData/descriptor/appengine-web_flex-compat_vm.xml");
+    XmlFile vmTrueWebXml = loadTestWebXml("testData/descriptor/appengine-web_flex-compat_vm.xml");
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), artifact));
+        appEngineProjectService.getModuleAppEngineEnvironment(vmTrueWebXml));
 
     // Load flex-compat appengine-web.xml with env: flex
-    mockLoadWebXml("testData/descriptor/appengine-web_flex-compat_env.xml");
+    XmlFile envFlexWebXml = loadTestWebXml("testData/descriptor/appengine-web_flex-compat_env.xml");
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getAppEngineArtifactEnvironment(getProject(), artifact));
-  }
-
-  public void testIsAppEngineStandardArtifact() {
-    Artifact artifact = createTestArtifact(new ExplodedWarArtifactTestType());
-    addAppEngineFacet(createModule("myModule"));
-
-    assertTrue(appEngineProjectService.isAppEngineStandardArtifact(getProject(), artifact));
-  }
-
-  public void testHasAppEngineStandardFacet_FalseExpected() {
-    Artifact artifact = createTestArtifact(new ExplodedWarArtifactTestType());
-
-    assertFalse(appEngineProjectService.hasAppEngineStandardFacet(getProject(), artifact));
-  }
-
-  public void testHasAppEngineArtifact_TrueExpected() {
-    Artifact artifact = createTestArtifact(new ExplodedWarArtifactTestType());
-    addAppEngineFacet(createModule("myModule"));
-
-    assertTrue(appEngineProjectService.hasAppEngineStandardFacet(getProject(), artifact));
+        appEngineProjectService.getModuleAppEngineEnvironment(envFlexWebXml));
   }
 
   private void addAppEngineFacet(final Module module) {
@@ -164,32 +106,13 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     }.execute();
   }
 
-  private XmlFile loadTestFlexCompatWebXml(String path) {
+  private XmlFile loadTestWebXml(String path) {
     VirtualFile vFile = LocalFileSystem.getInstance().findFileByIoFile(
         new File(path));
 
     return vFile == null
         ? null
         : (XmlFile) PsiManager.getInstance(getProject()).findFile(vFile);
-  }
-
-  private void mockLoadWebXml(String path) {
-    when(appEngineAssetProvider
-        .loadAppEngineStandardWebXml(any(Project.class), any(Artifact.class)))
-        .thenReturn(
-            loadTestFlexCompatWebXml(path));
-  }
-
-  @SuppressWarnings("unchecked")
-  private Artifact createTestArtifact(ArtifactType artifactType) {
-    CompositePackagingElement compositePackage = new ArtifactRootElementImpl();
-    ModulePointer modulePointer =
-        ModulePointerManager.getInstance(getProject()).create("myModule");
-    ModuleOutputPackagingElementBase modulePackagingElement
-        = new TestModuleOutputPackagingElement(getProject(), modulePointer);
-    compositePackage.addFirstChild(modulePackagingElement);
-
-    return new ArtifactImpl("myArtifact", artifactType, true, compositePackage, "/a/b/c");
   }
 
   @SuppressWarnings("unchecked")
@@ -232,31 +155,6 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
         }
       };
-    }
-  }
-
-  private static class ExplodedWarArtifactTestType extends ArtifactType {
-
-    public ExplodedWarArtifactTestType() {
-      super("exploded-war", "exploded-war");
-    }
-
-    @NotNull
-    @Override
-    public Icon getIcon() {
-      return null;
-    }
-
-    @Nullable
-    @Override
-    public String getDefaultPathFor(@NotNull PackagingElementOutputKind kind) {
-      return null;
-    }
-
-    @NotNull
-    @Override
-    public CompositePackagingElement<?> createRootElement(@NotNull String artifactName) {
-      return new ArtifactRootElementImpl();
     }
   }
 }

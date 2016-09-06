@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeployme
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
 
@@ -33,11 +34,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactPointerManager;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
+import com.intellij.psi.xml.XmlFile;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -61,24 +64,24 @@ public class AppEngineUtil {
    * @return a list of {@link AppEngineArtifactDeploymentSource}'s
    */
   public static List<AppEngineArtifactDeploymentSource> createArtifactDeploymentSources(
-      @NotNull Project project) {
+      @NotNull final Project project) {
     List<AppEngineArtifactDeploymentSource> sources = Lists.newArrayList();
-    AppEngineProjectService aeProjectHelper = AppEngineProjectService.getInstance();
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
+    AppEngineAssetProvider assetProvider = AppEngineAssetProvider.getInstance();
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
+      XmlFile appEngineWebXml
+          = assetProvider.loadAppEngineStandardWebXml(project, Collections.singletonList(module));
+      final AppEngineEnvironment environment
+          = projectService.getModuleAppEngineEnvironment(appEngineWebXml);
+
+      boolean isFlexCompat = projectService.isFlexCompat(appEngineWebXml);
+      boolean isStandardModule = environment.isStandard() || isFlexCompat;
+
       Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
-
       for (Artifact artifact : artifacts) {
-        boolean hasStandardArtifacts
-            = aeProjectHelper.containsAppEngineStandardArtifacts(project, artifacts);
-        boolean addFlexArtifact
-            = !hasStandardArtifacts || aeProjectHelper.isFlexCompat(project, artifact);
-        AppEngineEnvironment environment
-            = aeProjectHelper.getAppEngineArtifactEnvironment(project, artifact);
-
-        if (environment != null
-            && (environment.isStandard()
-            || (environment.isFlexible() && addFlexArtifact))) {
+        if ((isStandardModule && projectService.isAppEngineStandardArtifactType(artifact))
+            || (environment.isFlexible() && projectService.isAppEngineFlexArtifactType(artifact))) {
           sources.add(createArtifactDeploymentSource(project, artifact, environment));
         }
       }
@@ -88,30 +91,44 @@ public class AppEngineUtil {
   }
 
   /**
-   * Creates a list of module deployment sources available for deployment to App Engine. Currently,
-   * all module based sources target the App Engine flexible environment:
+   * Creates a list of module deployment sources available for deployment to App Engine:
    *
-   * <p>Maven based deployment sources are included if there are no App Engine standard artifacts
-   * associated with the same module.
+   * <p>Maven based deployment sources are included for both flexible and standard projects if
+   * applicable.
    *
-   * <p>User browsable jar/war deployment sources are always available.
+   * <p>User browsable jar/war deployment sources are included only if there are no App Engine
+   * standard modules.
    *
    * @return a list of {@link ModuleDeploymentSource}'s
    */
   public static List<ModuleDeploymentSource> createModuleDeploymentSources(
       @NotNull Project project) {
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
+    AppEngineAssetProvider assetProvider = AppEngineAssetProvider.getInstance();
+
     List<ModuleDeploymentSource> moduleDeploymentSources = Lists.newArrayList();
-    AppEngineProjectService aeProjectHelper = AppEngineProjectService.getInstance();
+
+    boolean hasStandardModules = false;
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
+      AppEngineEnvironment environment =
+          projectService.getModuleAppEngineEnvironment(
+              assetProvider.loadAppEngineStandardWebXml(
+                  project, Collections.singletonList(module)));
+
       if (ModuleType.is(module, JavaModuleType.getModuleType())
-          && !aeProjectHelper.containsAppEngineStandardArtifacts(project, module)
-          && aeProjectHelper.isJarOrWarMavenBuild(project, module)) {
-        moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module));
+          && projectService.isJarOrWarMavenBuild(project, module)) {
+        moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module, environment));
+      }
+
+      if (environment == AppEngineEnvironment.APP_ENGINE_STANDARD) {
+        hasStandardModules = true;
       }
     }
 
-    moduleDeploymentSources.add(createUserSpecifiedPathDeploymentSource(project));
+    if (!hasStandardModules) {
+      moduleDeploymentSources.add(createUserSpecifiedPathDeploymentSource(project));
+    }
 
     return moduleDeploymentSources;
   }
@@ -128,9 +145,10 @@ public class AppEngineUtil {
 
   private static MavenBuildDeploymentSource createMavenBuildDeploymentSource(
       @NotNull Project project,
-      @NotNull Module module) {
+      @NotNull Module module,
+      @NotNull AppEngineEnvironment environment) {
     return new MavenBuildDeploymentSource(
-        ModulePointerManager.getInstance(project).create(module), project);
+        ModulePointerManager.getInstance(project).create(module), project, environment);
   }
 
   private static UserSpecifiedPathDeploymentSource createUserSpecifiedPathDeploymentSource(
