@@ -91,7 +91,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
             deploymentSource,
             appEngineHelper);
 
-    assertEquals("App Engine standard", editor.getEnvironmentLabel().getText());
+    assertEquals("App Engine standard environment", editor.getEnvironmentLabel().getText());
     assertFalse(editor.getAppEngineFlexConfigPanel().isVisible());
     Disposer.dispose(editor);
   }
@@ -103,7 +103,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
         new AppEngineDeploymentRunConfigurationEditor(
             getProject(), deploymentSource, appEngineHelper);
 
-    assertEquals("App Engine flexible", editor.getEnvironmentLabel().getText());
+    assertEquals("App Engine flexible environment", editor.getEnvironmentLabel().getText());
     assertTrue(editor.getAppEngineFlexConfigPanel().isVisible());
     Disposer.dispose(editor);
   }
