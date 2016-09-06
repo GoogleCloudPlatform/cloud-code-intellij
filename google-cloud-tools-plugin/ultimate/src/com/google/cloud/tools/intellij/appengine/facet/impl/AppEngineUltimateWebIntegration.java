@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
@@ -56,7 +55,7 @@ import com.intellij.util.descriptors.ConfigFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -146,7 +145,7 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
 
   private static ApplicationServer getOrCreateAppServer() {
     final CloudSdkService sdkService = CloudSdkService.getInstance();
-    if (!sdkService.isValid()) {
+    if (sdkService == null) {
       return null;
     }
 
@@ -173,7 +172,6 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
   @Override
   @NotNull
   public List<FrameworkDependency> getAppEngineFrameworkDependencies() {
-    return Arrays.asList(FrameworkDependency.required("web"), FrameworkDependency.optional(
-        AppEngineSupportProvider.JPA_FRAMEWORK_ID));
+    return Collections.singletonList(FrameworkDependency.required("web"));
   }
 }

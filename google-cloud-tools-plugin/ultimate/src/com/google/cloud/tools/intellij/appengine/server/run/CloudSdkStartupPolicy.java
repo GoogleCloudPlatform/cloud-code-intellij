@@ -70,7 +70,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
                   GctBundle.message("appengine.cloudsdk.location.missing.message"));
             }
 
-            if (!sdkService.isValid()) {
+            if (sdkService == null) {
               throw new ExecutionException(
                   GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
             }

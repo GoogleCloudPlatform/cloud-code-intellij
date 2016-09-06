@@ -18,7 +18,4 @@ include 'google-account-plugin'
 include 'google-cloud-tools-plugin'
 include 'common-lib'
 include 'common-test-lib'
-
-include 'google-cloud-tools-plugin:jps-plugin'
-include 'google-cloud-tools-plugin:runtime'
 include 'google-cloud-tools-plugin:ultimate'

@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.vfs.VirtualFile;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,18 +58,7 @@ public abstract class CloudSdkService {
   public abstract List<String> getUserLibraryPaths();
 
   @Nullable
-  public abstract String getOrmLibDirectoryPath();
-
-  @NotNull
-  public abstract VirtualFile[] getOrmLibSources();
-
-  @Nullable
   public abstract File getWebSchemeFile();
 
   public abstract void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters);
-
-  @Nullable
-  public abstract String getVersion();
-
-  public abstract boolean isValid();
 }

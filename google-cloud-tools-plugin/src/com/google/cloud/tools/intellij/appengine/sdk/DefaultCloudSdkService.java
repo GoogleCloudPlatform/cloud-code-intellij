@@ -17,18 +17,12 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
-import com.google.cloud.tools.intellij.appengine.jps.model.impl.JpsAppEngineModuleExtensionImpl;
 
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.util.io.JarUtil;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VfsUtilCore;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.containers.ContainerUtil;
 
 import gnu.trove.THashMap;
@@ -51,7 +45,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.jar.Attributes;
 
 /**
  * Default implementation of {@link CloudSdkService} backed by {@link PropertiesComponent} for
@@ -67,6 +60,11 @@ public class DefaultCloudSdkService extends CloudSdkService {
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
   private static final Path JAVA_TOOLS_RELATIVE_PATH
       = Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
+
+  // Kept around for AppEngineGwtServer
+  public static final Path LIB_APPENGINE_TOOLS_API_JAR
+      = Paths.get("lib", "appengine-tools-api.jar");
+
   private Map<String, Set<String>> myMethodsBlackList;
 
   @Nullable
@@ -91,10 +89,10 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   @Nullable
   @Override
+  // TODO(eshaul) used only by AppEngineGwtServer - can be removed if GWT support is removed
   public File getToolsApiJarFile() {
     return getJavaToolsBasePath() != null
-        ? getJavaToolsBasePath().resolve(
-            JpsAppEngineModuleExtensionImpl.LIB_APPENGINE_TOOLS_API_JAR).toFile()
+        ? getJavaToolsBasePath().resolve(LIB_APPENGINE_TOOLS_API_JAR).toFile()
         : null;
   }
 
@@ -160,43 +158,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   @Nullable
   @Override
-  public String getOrmLibDirectoryPath() {
-    return getLibUserDirectoryPath() != null
-        ? Paths.get(getLibUserDirectoryPath(), "orm").toString()
-        : null;
-  }
-
-  @NotNull
-  @Override
-  // TODO this path is incorrect. We need to determine an alternate strategy for loading these libs
-  // maybe from maven central
-  public VirtualFile[] getOrmLibSources() {
-    List<VirtualFile> roots = new ArrayList<>();
-    if (getJavaToolsBasePath() != null) {
-      final File libsDir = getJavaToolsBasePath().resolve(Paths.get("src", "orm")).toFile();
-      final File[] files = libsDir.listFiles();
-      if (files != null) {
-        for (File file : files) {
-          final String url = VfsUtil.getUrlForLibraryRoot(file);
-          final VirtualFile zipRoot = VirtualFileManager.getInstance().findFileByUrl(url);
-          if (zipRoot != null && zipRoot.isDirectory()) {
-            String fileName = file.getName();
-            final String srcDirName = StringUtil.trimEnd(fileName, "-src.zip");
-            final VirtualFile sourcesDir = zipRoot.findFileByRelativePath(srcDirName + "/src/java");
-            if (sourcesDir != null) {
-              roots.add(sourcesDir);
-            } else {
-              roots.add(zipRoot);
-            }
-          }
-        }
-      }
-    }
-    return VfsUtilCore.toVirtualFileArray(roots);
-  }
-
-  @Nullable
-  @Override
   public File getWebSchemeFile() {
     return getJavaToolsBasePath() != null
         ? getJavaToolsBasePath().resolve(Paths.get("docs", "appengine-web.xsd")).toFile()
@@ -217,24 +178,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
         vmParameters.add("-Xbootclasspath/p:" + patchPath.getAbsolutePath());
       }
     }
-  }
-
-  @Nullable
-  @Override
-  public String getVersion() {
-    return getToolsApiJarFile() != null
-        ? JarUtil.getJarAttribute(
-            getToolsApiJarFile(),
-            "com/google/appengine/tools/info/", // The trailing slash is needed so don't use Path
-            Attributes.Name.SPECIFICATION_VERSION)
-        : null;
-  }
-
-  @Override
-  public boolean isValid() {
-    return getSdkHomePath() != null
-        && getToolsApiJarFile() != null
-        && getToolsApiJarFile().exists();
   }
 
   private static String findLatestVersion(File dir) {
