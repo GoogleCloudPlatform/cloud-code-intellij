@@ -35,7 +35,7 @@ public class GctTracking {
       "project.selection.create.new.project";
 
   public static final String VCS_CHECKOUT = "vcs.checkout";
-  public static final String VCS_UPLOAD = "vcs.uplaod";
+  public static final String VCS_UPLOAD = "vcs.upload";
 
   public static final String CLOUD_DEBUGGER_NEW_RUN_CONFIG = "cloud.debugger.new.run.config";
   public static final String CLOUD_DEBUGGER_CREATE_BREAKPOINT = "cloud.debugger.create.breakpoint";
