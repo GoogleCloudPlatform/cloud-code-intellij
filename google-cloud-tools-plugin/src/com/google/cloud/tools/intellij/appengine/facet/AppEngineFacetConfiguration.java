@@ -16,8 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
-import com.google.cloud.tools.intellij.appengine.jps.model.PersistenceApi;
-import com.google.cloud.tools.intellij.appengine.jps.model.impl.AppEngineModuleExtensionProperties;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration.AppEngineFacetProperties;
 
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
@@ -29,16 +28,14 @@ import com.intellij.openapi.util.WriteExternalException;
 
 import org.jdom.Element;
 
-import java.util.List;
-
 /**
  * @author nik
  */
 public class AppEngineFacetConfiguration implements FacetConfiguration,
-    PersistentStateComponent<AppEngineModuleExtensionProperties> {
+    PersistentStateComponent<AppEngineFacetProperties> {
 
-  private AppEngineModuleExtensionProperties myProperties
-      = new AppEngineModuleExtensionProperties();
+  private AppEngineFacetProperties myProperties
+      = new AppEngineFacetProperties();
 
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
       FacetValidatorsManager validatorsManager) {
@@ -53,35 +50,17 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
   public void writeExternal(Element element) throws WriteExternalException {
   }
 
-  public AppEngineModuleExtensionProperties getState() {
+  @Override
+  public AppEngineFacetProperties getState() {
     return myProperties;
   }
 
-  public void loadState(AppEngineModuleExtensionProperties state) {
+  @Override
+  public void loadState(AppEngineFacetProperties state) {
     myProperties = state;
   }
 
-  public boolean isRunEnhancerOnMake() {
-    return myProperties.myRunEnhancerOnMake;
-  }
-
-  public List<String> getFilesToEnhance() {
-    return myProperties.myFilesToEnhance;
-  }
-
-  public PersistenceApi getPersistenceApi() {
-    return myProperties.myPersistenceApi;
-  }
-
-  public void setPersistenceApi(PersistenceApi persistenceApi) {
-    myProperties.myPersistenceApi = persistenceApi;
-  }
-
-  public void setFilesToEnhance(List<String> filesToEnhance) {
-    myProperties.myFilesToEnhance = filesToEnhance;
-  }
-
-  public void setRunEnhancerOnMake(boolean runEnhancerOnMake) {
-    myProperties.myRunEnhancerOnMake = runEnhancerOnMake;
+  // TODO(eshaul) to be implemented when configurable libraries are added to the facet configuration
+  public static class AppEngineFacetProperties {
   }
 }
