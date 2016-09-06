@@ -95,6 +95,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private ProjectSelector projectSelector;
   private JLabel environmentLabel;
   private JPanel appEngineFlexConfigPanel;
+  private JCheckBox promoteCheckbox;
+  private JCheckBox stopPreviousVersionCheckbox;
 
   private DeploymentSource deploymentSource;
   private AppEngineEnvironment environment;
@@ -107,6 +109,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   public static final String DEFAULT_APP_YAML_DIR = "/src/main/appengine";
   public static final String DEFAULT_DOCKERFILE_DIR = "/src/main/docker";
 
+  public static final boolean PROMOTE_DEFAULT = true;
+  public static final boolean STOP_PREVIOUS_VERSION_DEFAULT = true;
+
   /**
    * Initializes the UI components.
    */
@@ -118,6 +123,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     this.deploymentSource = deploymentSource;
 
     versionIdField.setPlaceholderText(GctBundle.message("appengine.flex.version.placeholder.text"));
+    promoteCheckbox.setSelected(PROMOTE_DEFAULT);
+    stopPreviousVersionCheckbox.setSelected(STOP_PREVIOUS_VERSION_DEFAULT);
+
     resetOverridableFields(versionOverrideCheckBox, versionIdField);
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
@@ -232,6 +240,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     configTypeComboBox.setSelectedItem(configuration.getConfigType());
 
     versionOverrideCheckBox.setSelected(!StringUtil.isEmpty(configuration.getVersion()));
+    promoteCheckbox.setSelected(configuration.isPromote());
+    stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     versionIdField.setEditable(versionOverrideCheckBox.isSelected());
     if (versionOverrideCheckBox.isSelected()) {
       versionIdField.setText(configuration.getVersion());
@@ -256,6 +266,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     configuration.setConfigType(getConfigType());
     configuration.setVersion(
         versionOverrideCheckBox.isSelected() ? versionIdField.getText() : null);
+    configuration.setPromote(promoteCheckbox.isSelected());
+    configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
 
     setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
     updateJarWarSelector();
