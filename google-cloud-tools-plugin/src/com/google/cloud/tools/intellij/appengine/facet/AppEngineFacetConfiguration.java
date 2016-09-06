@@ -61,6 +61,6 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
   }
 
   // TODO(eshaul) to be implemented when configurable libraries are added to the facet configuration
-  public class AppEngineFacetProperties {
+  public static class AppEngineFacetProperties {
   }
 }
