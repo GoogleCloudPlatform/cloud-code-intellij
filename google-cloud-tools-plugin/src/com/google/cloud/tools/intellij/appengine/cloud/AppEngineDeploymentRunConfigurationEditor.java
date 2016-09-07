@@ -297,6 +297,16 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     this.projectSelector = projectSelector;
   }
 
+  @VisibleForTesting
+  JCheckBox getPromoteCheckbox() {
+    return promoteCheckbox;
+  }
+
+  @VisibleForTesting
+  JCheckBox getStopPreviousVersionCheckbox() {
+    return stopPreviousVersionCheckbox;
+  }
+
   /**
    * If a project's appengine-web.xml contains <env>flex</env> then we want to override
    * the default localized label of the environment
