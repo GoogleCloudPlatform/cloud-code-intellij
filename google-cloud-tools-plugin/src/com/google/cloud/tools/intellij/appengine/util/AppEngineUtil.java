@@ -41,7 +41,6 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.ui.ListCellRendererWrapper;
 
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -165,23 +164,6 @@ public class AppEngineUtil {
     }
   }
 
-  public static List<Artifact> collectAppEngineArtifacts(@NotNull Project project,
-      final boolean withAppEngineFacetOnly) {
-    final List<Artifact> artifacts = new ArrayList<Artifact>();
-    if (project.isDefault()) {
-      return artifacts;
-    }
-    for (Artifact artifact : ArtifactManager.getInstance(project).getArtifacts()) {
-      if (AppEngineWebIntegration.getInstance().getAppEngineTargetArtifactTypes()
-          .contains(artifact.getArtifactType())
-          && (!withAppEngineFacetOnly || findAppEngineFacet(project, artifact) != null)) {
-        artifacts.add(artifact);
-      }
-    }
-    Collections.sort(artifacts, ArtifactManager.ARTIFACT_COMPARATOR);
-    return artifacts;
-  }
-
   @Nullable
   public static AppEngineFacet findAppEngineFacet(@NotNull Project project,
       @NotNull Artifact artifact) {
@@ -222,5 +204,22 @@ public class AppEngineUtil {
         ModulePointerManager.getInstance(project).create("userSpecifiedSource");
 
     return new UserSpecifiedPathDeploymentSource(modulePointer);
+  }
+
+  private static List<Artifact> collectAppEngineArtifacts(@NotNull Project project,
+      final boolean withAppEngineFacetOnly) {
+    final List<Artifact> artifacts = new ArrayList<Artifact>();
+    if (project.isDefault()) {
+      return artifacts;
+    }
+    for (Artifact artifact : ArtifactManager.getInstance(project).getArtifacts()) {
+      if (AppEngineWebIntegration.getInstance().getAppEngineTargetArtifactTypes()
+          .contains(artifact.getArtifactType())
+          && (!withAppEngineFacetOnly || findAppEngineFacet(project, artifact) != null)) {
+        artifacts.add(artifact);
+      }
+    }
+    Collections.sort(artifacts, ArtifactManager.ARTIFACT_COMPARATOR);
+    return artifacts;
   }
 }
