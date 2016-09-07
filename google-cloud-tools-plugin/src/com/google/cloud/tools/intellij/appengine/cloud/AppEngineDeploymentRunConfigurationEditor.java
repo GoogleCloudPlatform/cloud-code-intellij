@@ -505,6 +505,10 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
       stopPreviousVersionLabel.setEnabled(isPromoteSelected);
       stopPreviousVersionCheckbox.setEnabled(isPromoteSelected);
+
+      if (!isPromoteSelected) {
+        stopPreviousVersionCheckbox.setSelected(false);
+      }
     }
   }
 }
