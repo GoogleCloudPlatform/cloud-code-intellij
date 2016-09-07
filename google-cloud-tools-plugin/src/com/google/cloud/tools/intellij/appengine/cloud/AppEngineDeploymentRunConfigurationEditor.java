@@ -97,6 +97,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private JPanel appEngineFlexConfigPanel;
   private JCheckBox promoteCheckbox;
   private JCheckBox stopPreviousVersionCheckbox;
+  private JLabel stopPreviousVersionLabel;
 
   private DeploymentSource deploymentSource;
   private AppEngineEnvironment environment;
@@ -145,6 +146,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     } else {
       appEngineCostWarningLabel.setVisible(false);
       environmentLabel.setText(environment.localizedLabel());
+      stopPreviousVersionLabel.setVisible(false);
+      stopPreviousVersionCheckbox.setVisible(false);
     }
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
@@ -225,6 +228,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
             }, dockerFilePathField, userSpecifiedArtifactFileSelector));
     versionOverrideCheckBox.addItemListener(
         new CustomFieldOverrideListener(versionOverrideCheckBox, versionIdField));
+    promoteCheckbox.addItemListener(new PromoteListener());
 
     appEngineFlexConfigPanel.setVisible(
         environment == AppEngineEnvironment.APP_ENGINE_FLEX
@@ -491,6 +495,16 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     @Override
     public void itemStateChanged(ItemEvent itemEvent) {
       resetOverridableFields(overrideCheckbox, field);
+    }
+  }
+
+  private class PromoteListener implements ItemListener {
+    @Override
+    public void itemStateChanged(ItemEvent event) {
+      boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
+
+      stopPreviousVersionLabel.setEnabled(isPromoteSelected);
+      stopPreviousVersionCheckbox.setEnabled(isPromoteSelected);
     }
   }
 }
