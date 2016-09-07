@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 
@@ -137,7 +137,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     if (webDescriptorDir != null) {
       VirtualFile descriptor = createFileFromTemplate(
           AppEngineTemplateGroupDescriptorFactory.APP_ENGINE_WEB_XML_TEMPLATE, webDescriptorDir,
-          AppEngineUtilLegacy.APP_ENGINE_WEB_XML_NAME);
+          AppEngineUtil.APP_ENGINE_WEB_XML_NAME);
       if (descriptor != null) {
         webIntegration.addDescriptor(webArtifact, module.getProject(), descriptor);
       }

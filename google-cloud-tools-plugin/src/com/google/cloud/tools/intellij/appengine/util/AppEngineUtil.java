@@ -20,6 +20,8 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeployme
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
@@ -32,21 +34,32 @@ import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
+import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.packaging.artifacts.ArtifactPointerManager;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
+import com.intellij.ui.ListCellRendererWrapper;
 
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+
+import javax.swing.JComboBox;
+import javax.swing.JList;
 
 /**
  * App Engine utility methods.
  */
 public class AppEngineUtil {
+
+  public static final String APP_ENGINE_WEB_XML_NAME = "appengine-web.xml";
 
   private AppEngineUtil() {
     // Not designed for instantiation
@@ -131,6 +144,58 @@ public class AppEngineUtil {
     }
 
     return moduleDeploymentSources;
+  }
+
+  public static void setupAppEngineArtifactCombobox(@NotNull Project project,
+      final @NotNull JComboBox comboBox, final boolean withAppEngineFacetOnly) {
+    comboBox.setRenderer(new ListCellRendererWrapper<Artifact>() {
+      @Override
+      public void customize(JList list, Artifact value, int index, boolean selected,
+          boolean hasFocus) {
+        if (value != null) {
+          setIcon(value.getArtifactType().getIcon());
+          setText(value.getName());
+        }
+      }
+    });
+
+    comboBox.removeAllItems();
+    for (Artifact artifact : collectAppEngineArtifacts(project, withAppEngineFacetOnly)) {
+      comboBox.addItem(artifact);
+    }
+  }
+
+  public static List<Artifact> collectAppEngineArtifacts(@NotNull Project project,
+      final boolean withAppEngineFacetOnly) {
+    final List<Artifact> artifacts = new ArrayList<Artifact>();
+    if (project.isDefault()) {
+      return artifacts;
+    }
+    for (Artifact artifact : ArtifactManager.getInstance(project).getArtifacts()) {
+      if (AppEngineWebIntegration.getInstance().getAppEngineTargetArtifactTypes()
+          .contains(artifact.getArtifactType())
+          && (!withAppEngineFacetOnly || findAppEngineFacet(project, artifact) != null)) {
+        artifacts.add(artifact);
+      }
+    }
+    Collections.sort(artifacts, ArtifactManager.ARTIFACT_COMPARATOR);
+    return artifacts;
+  }
+
+  @Nullable
+  public static AppEngineFacet findAppEngineFacet(@NotNull Project project,
+      @NotNull Artifact artifact) {
+    // TODO(joaomartins): Find out why the GAE facet isn't being added to Gradle projects.
+    // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/835
+    final Set<Module> modules = ArtifactUtil
+        .getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
+    for (Module module : modules) {
+      final AppEngineFacet appEngineFacet = AppEngineFacet.getAppEngineFacetByModule(module);
+      if (appEngineFacet != null) {
+        return appEngineFacet;
+      }
+    }
+    return null;
   }
 
   private static AppEngineArtifactDeploymentSource createArtifactDeploymentSource(

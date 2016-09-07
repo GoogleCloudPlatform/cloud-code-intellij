@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
@@ -124,7 +124,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       throw new RuntimeConfigurationError("Artifact isn't specified");
     }
 
-    final AppEngineFacet facet = AppEngineUtilLegacy
+    final AppEngineFacet facet = AppEngineUtil
         .findAppEngineFacet(commonModel.getProject(), artifact);
     if (facet == null) {
       throw new RuntimeConfigurationWarning(
