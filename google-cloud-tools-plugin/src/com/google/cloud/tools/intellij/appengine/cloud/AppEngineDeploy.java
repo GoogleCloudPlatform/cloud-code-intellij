@@ -86,7 +86,10 @@ public class AppEngineDeploy {
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
     configuration.setPromote(deploymentConfiguration.isPromote());
-    configuration.setStopPreviousVersion(deploymentConfiguration.isStopPreviousVersion());
+
+    if (deploymentConfiguration.isPromote()) {
+      configuration.setStopPreviousVersion(deploymentConfiguration.isStopPreviousVersion());
+    }
 
     if (!StringUtil.isEmpty(deploymentConfiguration.getVersion())) {
       configuration.setVersion(deploymentConfiguration.getVersion());
