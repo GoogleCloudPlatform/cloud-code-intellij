@@ -87,7 +87,10 @@ public class AppEngineDeploy {
 
     configuration.setPromote(deploymentConfiguration.isPromote());
 
-    if (deploymentConfiguration.isPromote()) {
+    // Only send stopPreviousVersion if the environment is AE flexible (since standard does not
+    // support stop, and if promote is true (since its invalid to stop the previous version without
+    // promoting).
+    if (environment.isFlexible() && deploymentConfiguration.isPromote()) {
       configuration.setStopPreviousVersion(deploymentConfiguration.isStopPreviousVersion());
     }
 
