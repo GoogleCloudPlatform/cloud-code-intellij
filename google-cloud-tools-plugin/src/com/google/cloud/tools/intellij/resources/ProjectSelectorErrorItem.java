@@ -14,48 +14,29 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.elysium;
+package com.google.cloud.tools.intellij.resources;
 
-import com.intellij.ui.UI;
 import com.intellij.ui.components.JBLabel;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
+import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.SwingConstants;
 
 /**
- * Represents a single elysium project ui.
+ * UI for the node that displays error information if a resource manager call fails.
  */
-class ProjectSelectorItem extends JBLabel {
+class ProjectSelectorErrorItem extends JBLabel {
 
-  private Color textSelectionColor;
-  private Color textNonSelectionColor;
-  private Color hoverColor;
-
-  public ProjectSelectorItem(@NotNull Color backgroundNonSelectionColor,
-      @NotNull Color textSelectionColor, @NotNull Color textNonSelectionColor) {
+  public ProjectSelectorErrorItem(@NotNull Color errorForeground) {
     setBorder(BorderFactory.createEmptyBorder(2, 15, 2, 0));
     setOpaque(false);
     setHorizontalAlignment(SwingConstants.LEFT);
     setVerticalAlignment(SwingConstants.CENTER);
-    this.textSelectionColor = textSelectionColor;
-    this.textNonSelectionColor = textNonSelectionColor;
-
-    hoverColor = UI.getColor("link.foreground");
-    setBackground(backgroundNonSelectionColor);
-  }
-
-  public void initialize(String projectName, String projectId, boolean selected, boolean hovered) {
-    setText(projectName + " (" + projectId + ")");
-    if (selected) {
-      setForeground(textSelectionColor);
-    } else if (hovered) {
-      setForeground(hoverColor);
-    } else {
-      setForeground(textNonSelectionColor);
-    }
+    setFont(new Font(getFont().getFontName(), Font.BOLD, getFont().getSize()));
+    setForeground(errorForeground);
   }
 }

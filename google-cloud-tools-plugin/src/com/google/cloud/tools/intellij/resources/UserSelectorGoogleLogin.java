@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.elysium;
+package com.google.cloud.tools.intellij.resources;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 /**
- * This model item represents the "Click here to create a project" node in the project selector.
+ * UI for the node that prompts for signin in the {@link UserSelector}.
  */
-class ElysiumNewProjectModelItem extends DefaultMutableTreeNode {
+class UserSelectorGoogleLogin extends BaseGoogleLoginUi {
 
-  public ElysiumNewProjectModelItem() {
+  public UserSelectorGoogleLogin() {
+    super(GctBundle.message("select.user.signin"));
   }
 }
