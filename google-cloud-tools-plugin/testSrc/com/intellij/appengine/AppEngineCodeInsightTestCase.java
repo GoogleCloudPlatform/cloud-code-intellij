@@ -58,7 +58,6 @@ import java.nio.file.Paths;
  * @author nik
  */
 public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
-  @NonNls private static final String DEFAULT_VERSION = "1.3.7";
   private JavaModuleFixtureBuilder myModuleBuilder;
   private IdeaProjectTestFixture myProjectFixture;
   protected CodeInsightTestFixture myCodeInsightFixture;
@@ -99,11 +98,11 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
   }
 
   public static File getWebSchemeFile() {
-    return new File(getTestDataPath(), "sdk/" + DEFAULT_VERSION + "/docs/appengine-web.xsd");
+    return new File(getTestDataPath(), "sdk/docs/appengine-web.xsd");
   }
 
   public static String getSdkPath() {
-    return FileUtil.toSystemIndependentName(new File(getTestDataPath(), "sdk/" + DEFAULT_VERSION).getAbsolutePath());
+    return FileUtil.toSystemIndependentName(new File(getTestDataPath(), "sdk").getAbsolutePath());
   }
 
   @Override
