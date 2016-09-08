@@ -108,7 +108,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private static final String LABEL_HREF_CLOSE_TAG = "</a>";
 
   private static final String PROMOTE_INFO_HREF_OPEN_TAG =
-      "<a href='https://cloud.google.com/appengine'>";
+      "<a href='https://pantheon.corp.google.com/appengine/versions'>";
   private static final String COST_WARNING_HREF_OPEN_TAG =
       "<a href='https://cloud.google.com/appengine/pricing'>";
 
