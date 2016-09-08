@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.elysium;
+package com.google.cloud.tools.intellij.resources;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,15 +22,15 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * This model item represents a single elysium project.
+ * This model item represents a single GCP project.
  */
-class ElysiumProjectModelItem extends DefaultMutableTreeNode {
+class ResourceProjectModelItem extends DefaultMutableTreeNode {
 
   private String description;
   private String projectId;
   private Long number;
 
-  public ElysiumProjectModelItem(@Nullable String description, @NotNull String id, Long number) {
+  public ResourceProjectModelItem(@Nullable String description, @NotNull String id, Long number) {
     this.number = number;
     setDescription(description);
     setProjectId(id);

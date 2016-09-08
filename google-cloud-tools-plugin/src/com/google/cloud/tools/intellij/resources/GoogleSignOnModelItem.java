@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.elysium;
+package com.google.cloud.tools.intellij.resources;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * UI for the node that prompts for signin in the {@link UserSelector}.
+ * This model item represents the node displayed in the project selector when the user has not yet
+ * signed in.
  */
-class UserSelectorGoogleLogin extends BaseGoogleLoginUi {
+class GoogleSignOnModelItem extends DefaultMutableTreeNode {
 
-  public UserSelectorGoogleLogin() {
-    super(GctBundle.message("select.user.signin"));
+  public GoogleSignOnModelItem() {
   }
 }
