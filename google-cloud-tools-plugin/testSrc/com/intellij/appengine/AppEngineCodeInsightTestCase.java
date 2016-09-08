@@ -26,14 +26,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.roots.ModuleRootModificationUtil;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileFilter;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.builders.JavaModuleFixtureBuilder;
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
@@ -91,10 +88,6 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
 
     FacetManager
         .getInstance(module).addFacet(AppEngineFacet.getFacetType(), "AppEngine", null);
-
-    ModuleRootModificationUtil.addModuleLibrary(module,
-        VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, getSdkPath())
-            + "/lib/user/orm/jdo.jar!/");
   }
 
   public static File getWebSchemeFile() {
