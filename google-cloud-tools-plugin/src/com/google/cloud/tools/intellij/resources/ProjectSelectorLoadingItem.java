@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.elysium;
+package com.google.cloud.tools.intellij.resources;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 
@@ -31,7 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 /**
- * Displays UI similar to "loading..." when an elysium call is in progress.
+ * Displays UI similar to "loading..." when an resource manager call is in progress.
  */
 class ProjectSelectorLoadingItem extends JPanel {
 
