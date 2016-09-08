@@ -26,6 +26,8 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestCase;
 
+import javax.swing.JCheckBox;
+
 public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestCase {
 
   private AppEngineDeploymentRunConfigurationEditor editor;
@@ -105,6 +107,46 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
 
     assertEquals("App Engine flexible environment", editor.getEnvironmentLabel().getText());
     assertTrue(editor.getAppEngineFlexConfigPanel().isVisible());
+    Disposer.dispose(editor);
+  }
+
+  public void testPromote_StopPreviousVersion_Standard() {
+    when(deploymentSource.getEnvironment())
+        .thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
+    AppEngineDeploymentRunConfigurationEditor editor =
+        new AppEngineDeploymentRunConfigurationEditor(
+            getProject(), deploymentSource, appEngineHelper);
+
+    JCheckBox promoteCheckbox = editor.getPromoteCheckbox();
+    JCheckBox stopPreviousVersionCheckbox = editor.getStopPreviousVersionCheckbox();
+
+    assertTrue(promoteCheckbox.isSelected());
+    assertFalse(stopPreviousVersionCheckbox.isVisible());
+
+    Disposer.dispose(editor);
+  }
+
+  public void testPromote_StopPreviousVersion_Flexible() {
+    when(deploymentSource.getEnvironment())
+        .thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
+    AppEngineDeploymentRunConfigurationEditor editor =
+        new AppEngineDeploymentRunConfigurationEditor(
+            getProject(), deploymentSource, appEngineHelper);
+
+    JCheckBox promoteCheckbox = editor.getPromoteCheckbox();
+    JCheckBox stopPreviousVersionCheckbox = editor.getStopPreviousVersionCheckbox();
+
+    assertTrue(promoteCheckbox.isSelected());
+    assertTrue(stopPreviousVersionCheckbox.isSelected());
+    assertTrue(stopPreviousVersionCheckbox.isVisible());
+    assertTrue(stopPreviousVersionCheckbox.isEnabled());
+
+    // Disable the promote checkbox and test that stopPreviousVersion behaves correctly
+    promoteCheckbox.setSelected(false);
+
+    assertFalse(stopPreviousVersionCheckbox.isSelected());
+    assertFalse(stopPreviousVersionCheckbox.isEnabled());
+
     Disposer.dispose(editor);
   }
 
