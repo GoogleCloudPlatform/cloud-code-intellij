@@ -98,15 +98,20 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private JCheckBox promoteCheckbox;
   private JCheckBox stopPreviousVersionCheckbox;
   private JLabel stopPreviousVersionLabel;
+  private JTextPane promoteInfoLabel;
 
   private DeploymentSource deploymentSource;
   private AppEngineEnvironment environment;
 
-  private static final String COST_WARNING_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
-  private static final String COST_WARNING_CLOSE_TAG = "</i></font></html>";
+  private static final String LABEL_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
+  private static final String LABEL_CLOSE_TAG = "</i></font></html>";
+  private static final String LABEL_HREF_CLOSE_TAG = "</a>";
+
+  private static final String PROMOTE_INFO_HREF_OPEN_TAG =
+      "<a href='https://cloud.google.com/appengine'>";
   private static final String COST_WARNING_HREF_OPEN_TAG =
       "<a href='https://cloud.google.com/appengine/pricing'>";
-  private static final String COST_WARNING_HREF_CLOSE_TAG = "</a>";
+
   public static final String DEFAULT_APP_YAML_DIR = "/src/main/appengine";
   public static final String DEFAULT_DOCKERFILE_DIR = "/src/main/docker";
 
@@ -133,13 +138,21 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     environment = deploymentSource.getEnvironment();
 
+    promoteInfoLabel.setText(
+        GctBundle.message("appengine.promote.info.label",
+            LABEL_OPEN_TAG,
+            PROMOTE_INFO_HREF_OPEN_TAG,
+            LABEL_HREF_CLOSE_TAG,
+            LABEL_CLOSE_TAG));
+    promoteInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+
     if (environment.isFlexible()) {
       appEngineCostWarningLabel.setText(
           GctBundle.message("appengine.flex.deployment.cost.warning",
-              COST_WARNING_OPEN_TAG,
+              LABEL_OPEN_TAG,
               COST_WARNING_HREF_OPEN_TAG,
-              COST_WARNING_HREF_CLOSE_TAG,
-              COST_WARNING_CLOSE_TAG));
+              LABEL_HREF_CLOSE_TAG,
+              LABEL_CLOSE_TAG));
       appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
       appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
       environmentLabel.setText(getEnvironmentDisplayableLabel());
