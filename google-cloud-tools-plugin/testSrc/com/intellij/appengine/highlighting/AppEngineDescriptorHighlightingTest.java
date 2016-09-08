@@ -29,11 +29,6 @@ public class AppEngineDescriptorHighlightingTest extends AppEngineCodeInsightTes
     checkXmlHighlighting();
   }
 
-  public void testJdoConfig() throws Exception {
-    myCodeInsightFixture.configureByFile("jdoconfig.xml");
-    checkXmlHighlighting();
-  }
-
   private void checkXmlHighlighting() {
     myCodeInsightFixture.enableInspections(CheckXmlFileWithXercesValidatorInspection.class);
     myCodeInsightFixture.checkHighlighting();

@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
 
@@ -181,8 +181,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
 
   @NotNull
   protected JComponent createEditor() {
-    // TODO(joaomartins): Switch to AppEngineProjectService and deprecate AppEngineUtilLegacy.
-    AppEngineUtilLegacy.setupAppEngineArtifactCombobox(myProject, myArtifactComboBox, false);
+    AppEngineUtil.setupAppEngineArtifactCombobox(myProject, myArtifactComboBox, false);
     return myMainPanel;
   }
 
