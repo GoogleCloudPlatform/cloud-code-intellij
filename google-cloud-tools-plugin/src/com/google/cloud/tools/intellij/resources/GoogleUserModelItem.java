@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.elysium;
+package com.google.cloud.tools.intellij.resources;
 
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -89,14 +89,14 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     return user.getEmail();
   }
 
-  // This method "dirties" the node, indicating that it needs another call to elysium to get its
-  // projects. The call may not happen immediately if the google login is collapsed in the tree
-  // view.
+  // This method "dirties" the node, indicating that it needs another call to resource manager to
+  // get its projects. The call may not happen immediately if the google login is collapsed in the
+  // tree view.
   public void setNeedsSynchronizing() {
     needsSynchronizing = true;
 
     removeAllChildren();
-    add(new ElysiumLoadingModelItem());
+    add(new ResourceLoadingModelItem());
     treeModel.reload(this);
   }
 
@@ -127,13 +127,13 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     return isSynchronizing;
   }
 
-  // If an error occurs during the elysium call, we load a model that shows the error.
+  // If an error occurs during the resource manager call, we load a model that shows the error.
   private void loadErrorState(@NotNull final String errorMessage) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         GoogleUserModelItem.this.removeAllChildren();
-        GoogleUserModelItem.this.add(new ElysiumErrorModelItem("Error: " + errorMessage));
+        GoogleUserModelItem.this.add(new ResourceErrorModelItem("Error: " + errorMessage));
         treeModel.reload(GoogleUserModelItem.this);
       }
     });
@@ -165,7 +165,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
         }
         for (Project pantheonProject : allProjects) {
           if (!Strings.isNullOrEmpty(pantheonProject.getProjectId())) {
-            result.add(new ElysiumProjectModelItem(pantheonProject.getName(),
+            result.add(new ResourceProjectModelItem(pantheonProject.getName(),
                 pantheonProject.getProjectId(),
                 pantheonProject.getProjectNumber()));
           }
@@ -181,7 +181,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
       return;
     }
 
-    result.add(new ElysiumNewProjectModelItem());
+    result.add(new ResourceNewProjectModelItem());
 
     try {
       // We invoke back to the UI thread to update the model and treeview.

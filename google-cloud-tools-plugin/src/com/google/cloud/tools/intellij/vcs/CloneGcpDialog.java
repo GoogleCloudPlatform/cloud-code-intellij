@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.vcs;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.cloud.tools.intellij.elysium.ProjectSelector;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.dvcs.ui.DvcsBundle;

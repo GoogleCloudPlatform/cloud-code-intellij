@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.elysium;
+package com.google.cloud.tools.intellij.resources;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.hash.HashMap;
