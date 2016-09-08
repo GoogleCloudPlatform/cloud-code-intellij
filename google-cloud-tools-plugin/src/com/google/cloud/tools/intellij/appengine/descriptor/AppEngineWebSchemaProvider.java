@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.descriptor;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtilLegacy;
+import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
@@ -38,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,8 +48,7 @@ import java.util.Set;
 public class AppEngineWebSchemaProvider extends XmlSchemaProvider {
 
   private static final Set<String> FILE_NAMES = new HashSet<>(
-      Arrays.asList(AppEngineUtilLegacy.APP_ENGINE_WEB_XML_NAME,
-          AppEngineUtilLegacy.JDO_CONFIG_XML_NAME));
+      Collections.singletonList(AppEngineUtil.APP_ENGINE_WEB_XML_NAME));
 
   @Override
   public boolean isAvailable(@NotNull XmlFile file) {

@@ -84,7 +84,16 @@ public class AppEngineDeploy {
     configuration.setDeployables(
         Collections.singletonList(new File(stagingDirectory, "app.yaml")));
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
-    configuration.setPromote(true);
+
+    configuration.setPromote(deploymentConfiguration.isPromote());
+
+    // Only send stopPreviousVersion if the environment is AE flexible (since standard does not
+    // support stop), and if promote is true (since its invalid to stop the previous version without
+    // promoting).
+    if (environment.isFlexible() && deploymentConfiguration.isPromote()) {
+      configuration.setStopPreviousVersion(deploymentConfiguration.isStopPreviousVersion());
+    }
+
     if (!StringUtil.isEmpty(deploymentConfiguration.getVersion())) {
       configuration.setVersion(deploymentConfiguration.getVersion());
     }
