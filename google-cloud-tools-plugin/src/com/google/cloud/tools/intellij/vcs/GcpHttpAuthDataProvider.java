@@ -17,9 +17,9 @@
 package com.google.cloud.tools.intellij.vcs;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.cloud.tools.intellij.elysium.SelectUserDialog;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.resources.SelectUserDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 

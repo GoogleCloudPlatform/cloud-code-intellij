@@ -14,27 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.elysium;
-
-import org.jetbrains.annotations.NotNull;
+package com.google.cloud.tools.intellij.resources;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * This model item represents a node shown in the project selector when an error occurs attempting
- * to query elysium. The user can recover and try again by hitting refresh at the bottom right. The
- * error message is displayed under the user name.
+ * This model item is shown in the project selector when a resource manager call is outstanding.
  */
-class ElysiumErrorModelItem extends DefaultMutableTreeNode {
+class ResourceLoadingModelItem extends DefaultMutableTreeNode {
 
-  private String errorMessage;
-
-  public ElysiumErrorModelItem(@NotNull String errorMessage) {
-    this.errorMessage = errorMessage;
-  }
-
-  public String getErrorMessage() {
-    return errorMessage;
-  }
 }
 

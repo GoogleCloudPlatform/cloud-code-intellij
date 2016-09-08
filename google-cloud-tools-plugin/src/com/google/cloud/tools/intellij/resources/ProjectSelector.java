@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.elysium;
+package com.google.cloud.tools.intellij.resources;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -69,10 +69,10 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
- * ProjectSelector allows the user to select an Elysium project id. It calls into {@link
- * IntellijGoogleLoginService} to get the set of credentialed users and then into elysium to get the
- * set of projects. The result is displayed in a tree view organized by google login.
- */
+ * ProjectSelector allows the user to select a GCP project id. It calls into {@link
+ * IntellijGoogleLoginService} to get the set of credentialed users and then into
+ * resource manager to get the set of projects. The result is displayed in a tree view organized by
+ * google login. */
 public class ProjectSelector extends CustomizableComboBox implements CustomizableComboBoxPopup {
 
   // An empty marker is used because the template engine validates even
@@ -127,8 +127,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
               .getLastPathComponent();
           for (int index = 0; index < userItem.getChildCount(); index++) {
             DefaultMutableTreeNode loadedItem = (DefaultMutableTreeNode) userItem.getChildAt(index);
-            if (loadedItem instanceof ElysiumProjectModelItem
-                && getText().equals(((ElysiumProjectModelItem) loadedItem).getProjectId())) {
+            if (loadedItem instanceof ResourceProjectModelItem
+                && getText().equals(((ResourceProjectModelItem) loadedItem).getProjectId())) {
               popupPanel.tree.setSelectionPath(new TreePath(loadedItem.getPath()));
             }
           }
@@ -207,8 +207,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       if (node instanceof GoogleUserModelItem) {
         for (int j = 0; j < node.getChildCount(); j++) {
           TreeNode projectNode = node.getChildAt(j);
-          if (projectNode instanceof ElysiumProjectModelItem
-              && getText().equals(((ElysiumProjectModelItem) projectNode).getProjectId())) {
+          if (projectNode instanceof ResourceProjectModelItem
+              && getText().equals(((ResourceProjectModelItem) projectNode).getProjectId())) {
             return ((GoogleUserModelItem) node).getCredentialedUser();
           }
         }
@@ -226,7 +226,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public String getProjectDescription() {
-    ElysiumProjectModelItem modelItem = getCurrentModelItem();
+    ResourceProjectModelItem modelItem = getCurrentModelItem();
     return modelItem != null ? modelItem.getDescription() : null;
   }
 
@@ -238,12 +238,12 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public Long getProjectNumber() {
-    ElysiumProjectModelItem modelItem = getCurrentModelItem();
+    ResourceProjectModelItem modelItem = getCurrentModelItem();
     return modelItem != null ? modelItem.getNumber() : null;
   }
 
   @Nullable
-  private ElysiumProjectModelItem getCurrentModelItem() {
+  private ResourceProjectModelItem getCurrentModelItem() {
     if (Strings.isNullOrEmpty(getText())) {
       return null;
     }
@@ -254,9 +254,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       if (userNode instanceof GoogleUserModelItem) {
         for (int j = 0; j < userNode.getChildCount(); j++) {
           TreeNode projectNode = userNode.getChildAt(j);
-          if (projectNode instanceof ElysiumProjectModelItem
-              && getText().equals(((ElysiumProjectModelItem) projectNode).getProjectId())) {
-            return ((ElysiumProjectModelItem) projectNode);
+          if (projectNode instanceof ResourceProjectModelItem
+              && getText().equals(((ResourceProjectModelItem) projectNode).getProjectId())) {
+            return ((ResourceProjectModelItem) projectNode);
           }
         }
       }
@@ -385,8 +385,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
           .depthFirstEnumeration();
       while (nodes.hasMoreElements()) {
         DefaultMutableTreeNode node = nodes.nextElement();
-        if (node instanceof ElysiumProjectModelItem
-            && str.equalsIgnoreCase(((ElysiumProjectModelItem) node).getProjectId())) {
+        if (node instanceof ResourceProjectModelItem
+            && str.equalsIgnoreCase(((ResourceProjectModelItem) node).getProjectId())) {
           return new TreePath(node.getPath());
         }
       }
@@ -423,11 +423,11 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
           DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
               .getLastSelectedPathComponent();
           if (node != null) {
-            if (node instanceof ElysiumProjectModelItem) {
+            if (node instanceof ResourceProjectModelItem) {
               if (Strings.isNullOrEmpty(ProjectSelector.this.getText())
                   || !ProjectSelector.this.getText()
-                  .equals(((ElysiumProjectModelItem) node).getProjectId())) {
-                ProjectSelector.this.setText(((ElysiumProjectModelItem) node).getProjectId());
+                  .equals(((ResourceProjectModelItem) node).getProjectId())) {
+                ProjectSelector.this.setText(((ResourceProjectModelItem) node).getProjectId());
                 SwingUtilities.invokeLater(new Runnable() {
                   @Override
                   public void run() {

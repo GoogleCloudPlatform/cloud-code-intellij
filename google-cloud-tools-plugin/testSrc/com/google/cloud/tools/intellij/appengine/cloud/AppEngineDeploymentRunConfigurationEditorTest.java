@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
-import com.google.cloud.tools.intellij.elysium.ProjectSelector;
+import com.google.cloud.tools.intellij.resources.ProjectSelector;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
