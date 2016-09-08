@@ -65,6 +65,8 @@ public class AppEngineDeploymentConfiguration extends
   private boolean userSpecifiedArtifact;
   private String userSpecifiedArtifactPath;
   private ConfigType configType;
+  private boolean promote;
+  private boolean stopPreviousVersion;
   private String version;
 
   @Attribute("cloudProjectName")
@@ -107,6 +109,16 @@ public class AppEngineDeploymentConfiguration extends
     return configType == null ? ConfigType.AUTO : configType;
   }
 
+  @Attribute("promote")
+  public boolean isPromote() {
+    return promote;
+  }
+
+  @Attribute("stopPreviousVersion")
+  public boolean isStopPreviousVersion() {
+    return stopPreviousVersion;
+  }
+
   @Attribute("version")
   public String getVersion() {
     return version;
@@ -142,6 +154,14 @@ public class AppEngineDeploymentConfiguration extends
 
   public void setAppYamlPath(String appYamlPath) {
     this.appYamlPath = appYamlPath;
+  }
+
+  public void setPromote(boolean promote) {
+    this.promote = promote;
+  }
+
+  public void setStopPreviousVersion(boolean stopPreviousVersion) {
+    this.stopPreviousVersion = stopPreviousVersion;
   }
 
   public void setVersion(String version) {
