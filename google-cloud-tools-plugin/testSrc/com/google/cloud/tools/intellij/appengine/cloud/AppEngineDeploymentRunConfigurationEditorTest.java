@@ -152,7 +152,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
 
   @Override
   protected void tearDown() throws Exception {
-    super.tearDown();
     Disposer.dispose(editor);
+    super.tearDown();
   }
 }
