@@ -24,7 +24,7 @@ import com.google.api.services.clouddebugger.v2.model.Debuggee;
 import com.google.cloud.tools.intellij.debugger.SyncResult;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
 import com.google.cloud.tools.intellij.debugger.ProjectRepositoryValidator;
-import com.google.cloud.tools.intellij.elysium.ProjectSelector;
+import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.TestUtils;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginService;

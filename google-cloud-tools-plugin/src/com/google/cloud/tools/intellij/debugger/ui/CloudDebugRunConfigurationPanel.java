@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.debugger.ui;
 
-import com.google.cloud.tools.intellij.elysium.ProjectSelector;
+import com.google.cloud.tools.intellij.resources.ProjectSelector;
 
 import javax.swing.JPanel;
 

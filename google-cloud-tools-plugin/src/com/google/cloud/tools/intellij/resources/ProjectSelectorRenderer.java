@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.elysium;
+package com.google.cloud.tools.intellij.resources;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ConcurrencyUtil;
@@ -106,7 +106,7 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
       GoogleUserModelItem userModelItem = (GoogleUserModelItem) rootNode.getChildAt(index);
       if (userModelItem.isSynchronizing()
           && userModelItem.getChildCount() == 1 && userModelItem
-          .getChildAt(0) instanceof ElysiumLoadingModelItem) {
+          .getChildAt(0) instanceof ResourceLoadingModelItem) {
         TreePath path = new TreePath(model.getPathToRoot(userModelItem.getChildAt(0)));
         Rectangle rect = tree.getPathBounds(path);
         if (rect != null) {
@@ -126,9 +126,9 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
   private Component getComponentForNode(Object userObject, boolean selected) {
     if (userObject instanceof GoogleSignOnModelItem) {
       return projectSelectorGoogleLogin;
-    } else if (userObject instanceof ElysiumNewProjectModelItem) {
+    } else if (userObject instanceof ResourceNewProjectModelItem) {
       return projectSelectorNewProjectItem;
-    } else if (userObject instanceof ElysiumLoadingModelItem) {
+    } else if (userObject instanceof ResourceLoadingModelItem) {
       if (ticker == null) {
         ticker = loadingAnimationScheduler.scheduleWithFixedDelay(new Runnable() {
           @Override
@@ -139,13 +139,13 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
       }
       projectSelectorLoadingItem.snap();
       return projectSelectorLoadingItem;
-    } else if (userObject instanceof ElysiumErrorModelItem) {
-      selectorErrorItem.setText(((ElysiumErrorModelItem) userObject).getErrorMessage());
+    } else if (userObject instanceof ResourceErrorModelItem) {
+      selectorErrorItem.setText(((ResourceErrorModelItem) userObject).getErrorMessage());
       return selectorErrorItem;
-    } else if (userObject instanceof ElysiumProjectModelItem) {
+    } else if (userObject instanceof ResourceProjectModelItem) {
       projectSelectorItem
-          .initialize(((ElysiumProjectModelItem) userObject).getDescription(),
-              ((ElysiumProjectModelItem) userObject).getProjectId(), selected,
+          .initialize(((ResourceProjectModelItem) userObject).getDescription(),
+              ((ResourceProjectModelItem) userObject).getProjectId(), selected,
               lastHoveredNode == userObject);
 
       return projectSelectorItem;
