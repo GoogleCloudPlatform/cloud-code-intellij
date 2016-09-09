@@ -1,4 +1,5 @@
 language: java
+script: ./gradlew check --stacktrace
 matrix:
   include:
   - jdk: openjdk7
