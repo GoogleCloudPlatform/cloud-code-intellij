@@ -29,6 +29,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -65,11 +67,13 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
     // Present a canonical target folder as default in the path field.
     if (project != null && project.getBasePath() != null) {
       if (fileType == ConfigFileType.APP_YAML) {
-        destinationFolderChooser.setText(project.getBasePath()
+        Path appYaml = Paths.get(project.getBasePath()
             + AppEngineDeploymentRunConfigurationEditor.DEFAULT_APP_YAML_DIR);
+        destinationFolderChooser.setText(appYaml.toString());
       } else if (fileType == ConfigFileType.DOCKERFILE) {
-        destinationFolderChooser.setText(project.getBasePath()
+        Path dockerfile = Paths.get(project.getBasePath()
             + AppEngineDeploymentRunConfigurationEditor.DEFAULT_DOCKERFILE_DIR);
+        destinationFolderChooser.setText(dockerfile.toString());
       } else {
         destinationFolderChooser.setText(project.getBasePath());
       }
