@@ -67,13 +67,13 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
     // Present a canonical target folder as default in the path field.
     if (project != null && project.getBasePath() != null) {
       if (fileType == ConfigFileType.APP_YAML) {
-        Path appYaml = Paths.get(project.getBasePath()
+        Path appYamlPath = Paths.get(project.getBasePath()
             + AppEngineDeploymentRunConfigurationEditor.DEFAULT_APP_YAML_DIR);
-        destinationFolderChooser.setText(appYaml.toString());
+        destinationFolderChooser.setText(appYamlPath.toString());
       } else if (fileType == ConfigFileType.DOCKERFILE) {
-        Path dockerfile = Paths.get(project.getBasePath()
+        Path dockerfilePath = Paths.get(project.getBasePath()
             + AppEngineDeploymentRunConfigurationEditor.DEFAULT_DOCKERFILE_DIR);
-        destinationFolderChooser.setText(dockerfile.toString());
+        destinationFolderChooser.setText(dockerfilePath.toString());
       } else {
         destinationFolderChooser.setText(project.getBasePath());
       }
