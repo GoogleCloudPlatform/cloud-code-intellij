@@ -18,16 +18,12 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import static org.mockito.Mockito.mock;
 
-import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
-
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.ui.JBColor;
-
-import org.picocontainer.MutablePicoContainer;
-
 import javax.swing.JLabel;
+import org.picocontainer.MutablePicoContainer;
 
 /**
  * Tests for {@link CloudSdkPanel}.
@@ -42,7 +38,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
   private static final String INVALID_SDK_DIR_WARNING =
-      "The specified Cloud SDK location does not exist.";
+      "No Cloud SDK was found in this directory.";
 
   @Override
   public void setUp() throws Exception {
@@ -53,7 +49,6 @@ public class CloudSdkPanelTest extends PlatformTestCase {
 
     cloudSdkService = mock(CloudSdkService.class);
 
-    applicationContainer.unregisterComponent(SystemEnvironmentProvider.class.getName());
     applicationContainer.unregisterComponent(CloudSdkService.class.getName());
 
     applicationContainer.registerComponentInstance(

@@ -20,6 +20,7 @@ import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
@@ -46,14 +47,14 @@ public class AppEngineServerEditor extends
   private JPanel myMainPanel;
   // TODO(joaomartins): Replace with CloudSdkPanel when
   // https://youtrack.jetbrains.com/issue/IDEA-110316 gets fixed.
-  private TextFieldWithBrowseButton mySdkHomeField;
+  private TextFieldWithBrowseButton sdkHomeField;
   private JLabel warningMessage;
 
   public AppEngineServerEditor() {
-    mySdkHomeField
+    sdkHomeField
         .addBrowseFolderListener("Google Cloud SDK", "Specify Google Cloud SDK home",
             null, FileChooserDescriptorFactory.createSingleFolderDescriptor());
-    mySdkHomeField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+    sdkHomeField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
         onSdkPathChanged();
@@ -63,7 +64,7 @@ public class AppEngineServerEditor extends
 
   private void onSdkPathChanged() {
     CloudSdk sdk = new CloudSdk.Builder()
-        .sdkPath(Paths.get(mySdkHomeField.getText()))
+        .sdkPath(Paths.get(sdkHomeField.getText()))
         .build();
 
     try {
@@ -78,16 +79,26 @@ public class AppEngineServerEditor extends
 
   protected void resetEditorFrom(ApplicationServerPersistentData data) {
     CloudSdkService sdkService = CloudSdkService.getInstance();
-    mySdkHomeField.setText(sdkService.getSdkHomePath() != null
+    sdkHomeField.setText(sdkService.getSdkHomePath() != null
         ? sdkService.getSdkHomePath().toString() : "" );
   }
 
   protected void applyEditorTo(ApplicationServerPersistentData data) {
-    CloudSdkService.getInstance().setSdkHomePath(mySdkHomeField.getText());
+    CloudSdkService.getInstance().setSdkHomePath(sdkHomeField.getText());
   }
 
   @NotNull
   protected JComponent createEditor() {
     return myMainPanel;
+  }
+
+  @VisibleForTesting
+  public TextFieldWithBrowseButton getSdkHomeField() {
+    return sdkHomeField;
+  }
+
+  @VisibleForTesting
+  public JLabel getWarningMessage() {
+    return warningMessage;
   }
 }
