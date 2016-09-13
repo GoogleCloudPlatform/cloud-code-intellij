@@ -16,10 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
