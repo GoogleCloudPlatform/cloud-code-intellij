@@ -1,5 +1,5 @@
 ![Google Cloud Platform Logo](https://cloud.google.com/_static/images/gcp-logo.png)
-# Google Cloud Platform IntelliJ IDEA plugin 
+# Google Cloud Tools for IntelliJ plugin
 [![Build Status](https://travis-ci.org/GoogleCloudPlatform/gcloud-intellij.svg?branch=master)](https://travis-ci.org/GoogleCloudPlatform/gcloud-intellij)
 
 **This plugin is BETA quality.**
