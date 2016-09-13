@@ -40,6 +40,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.Deployment;
@@ -56,6 +57,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Map;
 
 /**
@@ -266,7 +268,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     );
     String jsonCredential = new Gson().toJson(credentialMap);
     try {
-      credentialsPath = Files.createTempFile("tmp_google_application_default_credential", "json");
+      credentialsPath = FileUtil.createTempFile(
+          "tmp_google_application_default_credential", "json", true /* deleteOnExit */).toPath();
       Files.write(credentialsPath, jsonCredential.getBytes(Charsets.UTF_8));
 
       return credentialsPath;

@@ -97,7 +97,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
       new CloudSdk.Builder()
           .sdkPath(Paths.get(cloudSdkPanel.getCloudSdkDirectory()))
           .build()
-          .validate();
+          .validateCloudSdk();
       CloudSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
     } catch (AppEngineException aee) {
       throw new RuntimeConfigurationError(

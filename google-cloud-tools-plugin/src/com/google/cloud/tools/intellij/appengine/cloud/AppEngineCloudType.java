@@ -127,7 +127,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
         new CloudSdk.Builder()
             .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
             .build()
-            .validate();
+            .validateCloudSdk();
         callback.connected(new AppEngineRuntimeInstance());
       } catch (AppEngineException aee) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));

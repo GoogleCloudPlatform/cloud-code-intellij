@@ -17,8 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
-import com.google.cloud.tools.appengine.api.BadSdkLocationException;
-import com.google.cloud.tools.appengine.api.NotAFileException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -69,16 +67,12 @@ public class AppEngineServerEditor extends
         .build();
 
     try {
-      sdk.validate();
+      sdk.validateAppEngineJavaComponents();
       warningMessage.setVisible(false);
     } catch (AppEngineException aee) {
       warningMessage.setVisible(true);
       warningMessage.setForeground(JBColor.RED);
-      if (aee instanceof BadSdkLocationException) {
-        warningMessage.setText(GctBundle.message("appengine.cloudsdk.location.directory.invalid"));
-      } else if (aee instanceof NotAFileException) {
-        warningMessage.setText(GctBundle.message("appengine.cloudsdk.location.invalid.message"));
-      }
+      warningMessage.setText(GctBundle.message("appengine.cloudsdk.devappserver.missing"));
     }
   }
 
