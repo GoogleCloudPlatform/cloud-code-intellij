@@ -57,7 +57,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Map;
 
 /**
@@ -182,7 +181,10 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   public Path createStagingDirectory(
       LoggingHandler loggingHandler,
       String cloudProjectName) throws IOException {
-    Path stagingDirectory = Files.createTempDirectory("gae-staging-" + cloudProjectName);
+    Path stagingDirectory = FileUtil.createTempDirectory(
+        "gae-staging-" + cloudProjectName /* prefix */,
+        null /* suffix */,
+        true /* deleteOnExit */).toPath();
     loggingHandler.print(
         "Created temporary staging directory: " + stagingDirectory.toString() + "\n");
 
