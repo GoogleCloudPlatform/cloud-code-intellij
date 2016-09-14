@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
@@ -88,6 +89,10 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
           stagingDirectory,
           startListener,
           deploy(stagingDirectory, startListener));
+    } catch (AppEngineJavaComponentsNotInstalledException ex) {
+      deploy.getCallback().errorOccurred(
+          GctBundle.message("appengine.deployment.error.missing.java.components"));
+      logger.warn(ex);
     } catch (RuntimeException re) {
       deploy.getCallback()
           .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging") + "\n"
