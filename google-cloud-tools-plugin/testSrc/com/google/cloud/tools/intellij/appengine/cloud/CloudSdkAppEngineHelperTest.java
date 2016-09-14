@@ -43,6 +43,8 @@ import org.mockito.Mock;
 
 import java.io.File;
 import java.io.FileReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -81,13 +83,13 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     when(loginState.fetchOAuth2ClientSecret()).thenReturn(clientSecret);
     when(loginState.fetchOAuth2RefreshToken()).thenReturn(refreshToken);
     helper.stageCredentials(username);
-    File credentialFile = helper.getCredentialsPath();
-      Map jsonMap = new Gson().fromJson(new FileReader(credentialFile), Map.class);
+    Path credentialFile = helper.getCredentialsPath();
+    Map jsonMap = new Gson().fromJson(new FileReader(credentialFile.toFile()), Map.class);
     assertEquals(clientId, jsonMap.get("client_id"));
     assertEquals(clientSecret, jsonMap.get("client_secret"));
     assertEquals(refreshToken, jsonMap.get("refresh_token"));
     assertEquals("authorized_user", jsonMap.get("type"));
-    credentialFile.delete();
+    Files.delete(credentialFile);
   }
 
   @Test
