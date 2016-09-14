@@ -1,6 +1,6 @@
 ![Google Cloud Platform Logo](https://cloud.google.com/_static/images/gcp-logo.png)
 # Google Cloud Tools for IntelliJ plugin
-[![Build Status](https://travis-ci.org/GoogleCloudPlatform/gcloud-intellij.svg?branch=master)](https://travis-ci.org/GoogleCloudPlatform/gcloud-intellij)
+[![Build Status](https://travis-ci.org/GoogleCloudPlatform/google-cloud-intellij.svg?branch=master)](https://travis-ci.org/GoogleCloudPlatform/google-cloud-intellij)
 
 **This plugin is BETA quality.**
 
@@ -42,7 +42,7 @@ channel. To install them please perform the following steps:
     1. When installing look for the 'Google Cloud Tools' plugin.
 
 If you wish to build this plugin from source, please see the
-[contributor instructions](https://github.com/GoogleCloudPlatform/gcloud-intellij/blob/master/CONTRIBUTING.md).
+[contributor instructions](https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/master/CONTRIBUTING.md).
 
 ## FAQ
 
