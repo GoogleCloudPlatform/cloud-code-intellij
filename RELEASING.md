@@ -2,7 +2,7 @@
 
 This page describes how to cut releases of our plugin. It's strictly for the owners of the project.
 
-1. Update [CHANGELOG.md](https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/master/CHANGELOG.md) with any major release notes (see [guidelines](http://keepachangelog.com/en/0.3.0/)). Replace the contents of the `<change-notes>` tag in [plugin.xml](https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/master/google-cloud-tools-plugin/resources/META-INF/plugin.xml) with the same notes, in html.
+1. Update [CHANGELOG.md](https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/master/CHANGELOG.md) with any major release notes (see [guidelines](http://keepachangelog.com/en/0.3.0/)). Replace the contents of the `<change-notes>` tag in [plugin.xml](https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/master/google-cloud-tools-plugin/resources/META-INF/plugin.xml) with the same notes compiled from Markdown to html.
 1. Create a new branch named release_v{$version}.  It's critical that you create the branch according to this schema or the release will fail.
 
     ```
