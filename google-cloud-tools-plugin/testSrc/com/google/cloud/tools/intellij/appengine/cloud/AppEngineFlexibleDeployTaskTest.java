@@ -36,8 +36,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Unit tests for {@link AppEngineFlexibleDeployTask}
@@ -56,11 +57,11 @@ public class AppEngineFlexibleDeployTaskTest {
   @Before
   public void setUp() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
-        .thenReturn(new File("myFile.jar"));
+        .thenReturn(Paths.get("myFile.jar"));
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
-    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(new File("/some/file"));
+    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(Paths.get("/some/file"));
 
     task = new AppEngineFlexibleDeployTask(deploy, stage);
   }
@@ -86,7 +87,7 @@ public class AppEngineFlexibleDeployTaskTest {
 
   @Test
   public void stage_error() {
-    doThrow(new RuntimeException("myError")).when(stage).stage(new File("myFile.jar"));
+    doThrow(new RuntimeException("myError")).when(stage).stage(Paths.get("myFile.jar"));
     try {
       task.execute(startListener);
     } catch (AssertionError ae) {
@@ -109,7 +110,7 @@ public class AppEngineFlexibleDeployTaskTest {
   public void deploy_error() {
     doThrow(new RuntimeException())
         .when(deploy)
-        .deploy(any(File.class), any(ProcessStartListener.class));
+        .deploy(any(Path.class), any(ProcessStartListener.class));
 
     try {
       task.execute(startListener);

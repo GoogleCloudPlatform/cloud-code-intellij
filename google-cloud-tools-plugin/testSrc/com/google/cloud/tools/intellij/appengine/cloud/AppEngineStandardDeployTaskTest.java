@@ -38,8 +38,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Unit tests for {@link AppEngineStandardDeployTask}
@@ -68,17 +69,17 @@ public class AppEngineStandardDeployTaskTest {
           + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)";
 
   private static final String JAVA_COMPONENTS_MISSING_FAIL_MSG =
-      "Missing gcloud app Java Extensions.\n"
+      "Selected Cloud SDK does not contain the app-engine-java component.\n"
           + "To install, run 'gcloud components install app-engine-java'.";
 
   @Before
   public void setUp() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
-        .thenReturn(new File("myFile"));
+        .thenReturn(Paths.get("myFile"));
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
-    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(new File("/some/file"));
+    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(Paths.get("/some/file"));
 
     task = new AppEngineStandardDeployTask(deploy, stage, false);
   }
@@ -106,7 +107,7 @@ public class AppEngineStandardDeployTaskTest {
   public void stage_runtime_error() {
     doThrow(new RuntimeException())
         .when(stage)
-        .stage(any(File.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
+        .stage(any(Path.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
     try {
       task.execute(startListener);
     } catch (AssertionError ae) {
@@ -121,7 +122,7 @@ public class AppEngineStandardDeployTaskTest {
   public void stage_missingJavaComponents_error() {
     doThrow(new AppEngineJavaComponentsNotInstalledException(""))
         .when(stage)
-        .stage(any(File.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
+        .stage(any(Path.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
 
     task.execute(startListener);
     verify(callback, times(1)).errorOccurred(JAVA_COMPONENTS_MISSING_FAIL_MSG);
@@ -129,7 +130,7 @@ public class AppEngineStandardDeployTaskTest {
 
   @Test
   public void deploy_success() {
-    task.deploy(new File("myFile.jar"), startListener).onExit(0);
+    task.deploy(Paths.get("myFile.jar"), startListener).onExit(0);
 
     verify(callback, never()).errorOccurred(anyString());
   }
@@ -137,9 +138,9 @@ public class AppEngineStandardDeployTaskTest {
   @Test
   public void deploy_error() {
     doThrow(new RuntimeException())
-        .when(deploy).deploy(any(File.class), any(ProcessStartListener.class));
+        .when(deploy).deploy(any(Path.class), any(ProcessStartListener.class));
     try {
-      task.deploy(new File("myFile.jar"), startListener).onExit(0);
+      task.deploy(Paths.get("myFile.jar"), startListener).onExit(0);
     } catch (AssertionError ae) {
       verify(callback, times(1)).errorOccurred(DEPLOY_FAIL_MSG);
       return;

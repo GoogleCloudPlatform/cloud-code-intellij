@@ -38,8 +38,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class AppEngineDeploy {
   private AppEngineHelper helper;
   private LoggingHandler loggingHandler;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
-  private AppEngineEnvironment environment; // TODO change name to AppEngineEnvironment
+  private AppEngineEnvironment environment;
   private DeploymentOperationCallback callback;
 
   /**
@@ -76,13 +76,13 @@ public class AppEngineDeploy {
    * Given a staging directory, deploy the application to Google App Engine.
    */
   public void deploy(
-      @NotNull File stagingDirectory,
+      @NotNull Path stagingDirectory,
       @NotNull ProcessStartListener deployStartListener) {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
     configuration.setDeployables(
-        Collections.singletonList(new File(stagingDirectory, "app.yaml")));
+        Collections.singletonList(stagingDirectory.resolve("app.yaml").toFile()));
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
     configuration.setPromote(deploymentConfiguration.isPromote());

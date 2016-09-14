@@ -28,7 +28,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -86,8 +85,8 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
     return rootPanel;
   }
 
-  public File getDestinationFolder() {
-    return new File(destinationFolderChooser.getText());
+  public Path getDestinationFolder() {
+    return Paths.get(destinationFolderChooser.getText());
   }
 
   @NotNull
