@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0-beta] - 2016-09-14
+### Added
+- App Engine Standard support ([#767](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/767))
+
 ## [0.9.7.5-beta] - 2016-08-29
 ### Added
 - Check to ensure that deployment is valid for credentialed user with prompt to add a new user if not.
