@@ -44,16 +44,21 @@ public class AppEngineExecutor implements CancellableRunnable {
 
   @Override
   public void cancel() {
-    if (process != null) {
-      // Only destroy the process and signal cancellation if the process hasn't exited
-      // TODO(eshaul) replace this with Process#isAlive when switching to Java 8
-      try {
-        // Throws IllegalThreadStateException when the process has not yet terminated
-        process.exitValue();
-      } catch (IllegalThreadStateException itse) {
-        process.destroy();
-        task.onCancel();
-      }
+    // Only destroy the process and signal cancellation if the process hasn't exited
+    if (process != null && isAlive(process)) {
+      process.destroy();
+      task.onCancel();
+    }
+  }
+
+  // TODO(eshaul) replace this with Process#isAlive when switching to Java 8
+  private boolean isAlive(Process process) {
+    try {
+      // Throws IllegalThreadStateException when the process has not yet terminated
+      process.exitValue();
+      return false;
+    } catch (IllegalThreadStateException itse) {
+      return true;
     }
   }
 
