@@ -61,6 +61,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -176,17 +179,17 @@ public class AppEngineDeploymentRunConfigurationEditor extends
           // if they already exist in their usual directories in the current project.
           if (project != null && project.getBasePath() != null) {
             if (StringUtil.isEmpty(appYamlPathField.getText())) {
-              String defaultAppYamlPath =
-                  project.getBasePath() + DEFAULT_APP_YAML_DIR + "/app.yaml";
-              if (new File(defaultAppYamlPath).exists()) {
-                appYamlPathField.setText(defaultAppYamlPath);
+              Path defaultAppYamlPath = Paths.get(
+                  project.getBasePath() + DEFAULT_APP_YAML_DIR + "/app.yaml");
+              if (Files.exists(defaultAppYamlPath)) {
+                appYamlPathField.setText(defaultAppYamlPath.toString());
               }
             }
             if (StringUtil.isEmpty(dockerFilePathField.getText())) {
-              String defaultDockerfilePath =
-                  project.getBasePath() + DEFAULT_DOCKERFILE_DIR + "/Dockerfile";
-              if (new File(defaultDockerfilePath).exists()) {
-                dockerFilePathField.setText(defaultDockerfilePath);
+              Path defaultDockerfilePath = Paths.get(
+                  project.getBasePath() + DEFAULT_DOCKERFILE_DIR + "/Dockerfile");
+              if (Files.exists(defaultDockerfilePath)) {
+                dockerFilePathField.setText(defaultDockerfilePath.toString());
               }
             }
           }

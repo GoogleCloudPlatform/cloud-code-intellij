@@ -25,6 +25,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 
@@ -66,6 +67,10 @@ public class AppEngineStandardDeployTaskTest {
           + "Run ''gcloud components update'' to update the SDK. "
           + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)";
 
+  private static final String JAVA_COMPONENTS_MISSING_FAIL_MSG =
+      "Missing gcloud app Java Extensions.\n"
+          + "To install, run 'gcloud components install app-engine-java'.";
+
   @Before
   public void setUp() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
@@ -98,7 +103,7 @@ public class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void stage_error() {
+  public void stage_runtime_error() {
     doThrow(new RuntimeException())
         .when(stage)
         .stage(any(File.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
@@ -110,6 +115,16 @@ public class AppEngineStandardDeployTaskTest {
     }
 
     failureExpected();
+  }
+
+  @Test
+  public void stage_missingJavaComponents_error() {
+    doThrow(new AppEngineJavaComponentsNotInstalledException(""))
+        .when(stage)
+        .stage(any(File.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
+
+    task.execute(startListener);
+    verify(callback, times(1)).errorOccurred(JAVA_COMPONENTS_MISSING_FAIL_MSG);
   }
 
   @Test
