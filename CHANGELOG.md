@@ -6,10 +6,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0-beta] - 2016-09-14
 ### Added
 - App Engine standard environment support ([#767](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/767))
-
-### Changed
 - Extra fields now available in the deployment config ([#868](https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/868))
-- Local run debug updated to use the newer tooling ([#811](https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/811))
 
 ## [0.9.7.5-beta] - 2016-08-29
 ### Added
