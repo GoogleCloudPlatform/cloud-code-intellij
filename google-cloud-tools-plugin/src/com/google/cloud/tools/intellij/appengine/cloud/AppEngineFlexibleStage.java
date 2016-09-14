@@ -16,27 +16,25 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
+import com.google.common.collect.ImmutableSet;
 
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
 
 /**
  * Stages an application in preparation for deployment to the App Engine flexible environment.
  */
 public class AppEngineFlexibleStage {
-
-  private static final Logger logger = Logger.getInstance(AppEngineFlexibleStage.class);
-
   private CloudSdkAppEngineHelper helper;
   private LoggingHandler loggingHandler;
-  private File deploymentArtifactPath;
+  private Path deploymentArtifactPath;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
 
   /**
@@ -45,7 +43,7 @@ public class AppEngineFlexibleStage {
   public AppEngineFlexibleStage(
       @NotNull CloudSdkAppEngineHelper helper,
       @NotNull LoggingHandler loggingHandler,
-      @NotNull File deploymentArtifactPath,
+      @NotNull Path deploymentArtifactPath,
       @NotNull AppEngineDeploymentConfiguration deploymentConfiguration) {
     this.helper = helper;
     this.loggingHandler = loggingHandler;
@@ -57,38 +55,31 @@ public class AppEngineFlexibleStage {
    * Given a local staging directory, stage the application in preparation for deployment to the
    * App Engine flexible environment.
    */
-  public void stage(@NotNull File stagingDirectory) {
+  public void stage(@NotNull Path stagingDirectory) {
     try {
-      File stagedArtifactPath =
-          copyFile(
-              stagingDirectory,
-              "target" + AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath),
-              deploymentArtifactPath);
-      stagedArtifactPath.setReadable(true /* readable */, false /* ownerOnly */);
+      Path stagedArtifactPath = stagingDirectory.resolve(
+          "target" + AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath));
+      Files.copy(stagedArtifactPath, deploymentArtifactPath);
+      Files.setPosixFilePermissions(stagedArtifactPath, ImmutableSet.of(
+          PosixFilePermission.OTHERS_READ,
+          PosixFilePermission.GROUP_READ,
+          PosixFilePermission.OWNER_READ
+      ));
 
-      File appYamlPath = deploymentConfiguration.isAuto()
+      Path appYamlPath = deploymentConfiguration.isAuto()
           ? helper.defaultAppYaml()
-          : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getAppYamlPath());
+          : Paths.get(deploymentConfiguration.getAppYamlPath());
 
-      File dockerFilePath = deploymentConfiguration.isAuto()
+      Path dockerFilePath = deploymentConfiguration.isAuto()
           ? helper.defaultDockerfile(
           AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath))
-          : CloudSdkUtil.getFileFromFilePath(deploymentConfiguration.getDockerFilePath());
+          : Paths.get(deploymentConfiguration.getDockerFilePath());
 
-      copyFile(stagingDirectory, "app.yaml", appYamlPath);
-      copyFile(stagingDirectory, "Dockerfile", dockerFilePath);
+      Files.copy(stagingDirectory.resolve("app.yaml"), appYamlPath);
+      Files.copy(stagingDirectory.resolve("Dockerfile"), dockerFilePath);
     } catch (IOException ex) {
       loggingHandler.print(ex.getMessage() + "\n");
       throw new RuntimeException(ex);
     }
-  }
-
-  private File copyFile(File stagingDirectory, String targetFileName, File sourceFilePath)
-      throws IOException {
-    File destinationFilePath = new File(stagingDirectory, targetFileName);
-    FileUtil.copy(sourceFilePath, destinationFilePath);
-    loggingHandler.print(String.format("Copied %s %s to %s", targetFileName,
-        sourceFilePath.getAbsolutePath(), destinationFilePath.getAbsolutePath()) +  "\n");
-    return destinationFilePath;
   }
 }

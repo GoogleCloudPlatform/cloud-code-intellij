@@ -16,9 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
@@ -26,11 +27,12 @@ import com.google.common.annotations.VisibleForTesting;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.RemoteServerConfigurable;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
+
+import java.nio.file.Paths;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -41,7 +43,8 @@ import javax.swing.JTextPane;
  */
 public class AppEngineCloudConfigurable extends RemoteServerConfigurable implements Configurable {
 
-  private static final String MORE_INFO_URI_OPEN_TAG = "<a href='https://cloud.google.com/appengine/'>";
+  private static final String MORE_INFO_URI_OPEN_TAG =
+      "<a href='https://cloud.google.com/appengine/'>";
   private static final String MORE_INFO_URI_CLOSE_TAG = "</a>";
 
   private String displayName = GctBundle.message("appengine.name");
@@ -86,16 +89,19 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   }
 
   /**
-   * User's shouldn't be able to save a cloud configuration without a valid Cloud SDK configured.
+   * Users shouldn't be able to save a cloud configuration without a valid Cloud SDK configured.
    */
   @Override
   public void apply() throws ConfigurationException {
-    if (StringUtil.isEmpty(cloudSdkPanel.getCloudSdkDirectory())
-        || !CloudSdkUtil.containsCloudSdkExecutable(cloudSdkPanel.getCloudSdkDirectory())) {
+    try {
+      new CloudSdk.Builder()
+          .sdkPath(Paths.get(cloudSdkPanel.getCloudSdkDirectory()))
+          .build()
+          .validateCloudSdk();
+      CloudSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
+    } catch (AppEngineException aee) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.cloudsdk.location.invalid.message"));
-    } else {
-      CloudSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
     }
   }
 
@@ -119,6 +125,6 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
-    cloudSdkPanel = new CloudSdkPanel(CloudSdkService.getInstance());
+    cloudSdkPanel = new CloudSdkPanel();
   }
 }

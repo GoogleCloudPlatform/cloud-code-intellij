@@ -17,8 +17,9 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -40,8 +41,9 @@ import javax.swing.Icon;
 
 
 /**
- * This class hooks into IntelliJ's <a href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a>
- * configurations for infrastructure based deployment flows.
+ * This class hooks into IntelliJ's
+ * <a href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a> configurations for
+ * infrastructure based deployment flows.
  */
 public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration> {
 
@@ -118,11 +120,16 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
       if (!Services.getLoginService().isLoggedIn()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
-      } else if (CloudSdkService.getInstance().getSdkHomePath() != null
-          && CloudSdkUtil.isCloudSdkExecutable(CloudSdkUtil.toExecutablePath(
-          CloudSdkService.getInstance().getSdkHomePath().toString()))) {
+        return;
+      }
+
+      try {
+        new CloudSdk.Builder()
+            .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+            .build()
+            .validateCloudSdk();
         callback.connected(new AppEngineRuntimeInstance());
-      } else {
+      } catch (AppEngineException aee) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
         // TODO Consider auto opening configuration panel
       }
