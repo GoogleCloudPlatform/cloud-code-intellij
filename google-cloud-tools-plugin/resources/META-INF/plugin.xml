@@ -31,7 +31,12 @@ Code inspections for App Engine Java code.</description>
       <h2>[1.0-beta] - 2016-09-14</h2>
       <h3>Added</h3>
       <ul>
-        <li>App Engine Standard support (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/767">#767</a>)</li>
+        <li>App Engine standard environment support (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/767">#767</a>)</li>
+      </ul>
+      <h3>Changed</h3>
+      <ul>
+        <li>Extra fields now available in the deployment config (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/868">#868</a>)</li>
+        <li>Local run debug updated to use the newer tooling (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/811">#811</a>)</li>
       </ul>
     </html>]]>
   </change-notes>
