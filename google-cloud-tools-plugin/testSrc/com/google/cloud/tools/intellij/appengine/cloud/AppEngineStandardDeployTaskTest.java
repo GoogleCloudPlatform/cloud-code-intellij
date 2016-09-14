@@ -69,7 +69,7 @@ public class AppEngineStandardDeployTaskTest {
           + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)";
 
   private static final String JAVA_COMPONENTS_MISSING_FAIL_MSG =
-      "Missing gcloud app Java Extensions.\n"
+      "Selected Cloud SDK does not contain the app-engine-java component.\n"
           + "To install, run 'gcloud components install app-engine-java'.";
 
   @Before

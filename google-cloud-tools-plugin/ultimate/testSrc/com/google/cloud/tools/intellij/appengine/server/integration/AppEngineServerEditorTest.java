@@ -39,6 +39,6 @@ public class AppEngineServerEditorTest {
     JLabel warningMessage = editor.getWarningMessage();
 
     sdkHomeField.setText("/some/invalid/location");
-    Assert.assertEquals(warningMessage.getText(), NO_DEVAPPSERVER_IN_GCLOUD);
+    Assert.assertEquals(NO_DEVAPPSERVER_IN_GCLOUD, warningMessage.getText());
   }
 }

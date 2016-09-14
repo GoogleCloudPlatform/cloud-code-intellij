@@ -91,7 +91,8 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
           deploy(stagingDirectory, startListener));
     } catch (AppEngineJavaComponentsNotInstalledException ex) {
       deploy.getCallback().errorOccurred(
-          GctBundle.message("appengine.deployment.error.missing.java.components"));
+          GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
+              + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
       logger.warn(ex);
     } catch (RuntimeException re) {
       deploy.getCallback()

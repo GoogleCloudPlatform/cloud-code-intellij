@@ -73,7 +73,7 @@ public class AppEngineServerEditor extends
     } catch (AppEngineException aee) {
       warningMessage.setVisible(true);
       warningMessage.setForeground(JBColor.RED);
-      warningMessage.setText(GctBundle.message("appengine.cloudsdk.devappserver.missing"));
+      warningMessage.setText(GctBundle.message("appengine.cloudsdk.java.components.missing"));
     }
   }
 
