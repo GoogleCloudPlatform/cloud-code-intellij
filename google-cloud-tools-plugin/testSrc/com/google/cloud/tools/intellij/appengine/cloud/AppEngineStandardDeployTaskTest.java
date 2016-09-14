@@ -122,7 +122,7 @@ public class AppEngineStandardDeployTaskTest {
   public void stage_missingJavaComponents_error() {
     doThrow(new AppEngineJavaComponentsNotInstalledException(""))
         .when(stage)
-        .stage(any(File.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
+        .stage(any(Path.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
 
     task.execute(startListener);
     verify(callback, times(1)).errorOccurred(JAVA_COMPONENTS_MISSING_FAIL_MSG);
