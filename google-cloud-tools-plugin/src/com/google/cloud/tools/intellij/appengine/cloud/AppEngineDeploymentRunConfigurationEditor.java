@@ -42,7 +42,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.SystemInfo;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -227,19 +226,20 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         FileChooserDescriptorFactory.createSingleFileDescriptor());
     generateAppYamlButton.addActionListener(
         new GenerateConfigActionListener(project, "app.yaml", ConfigFileType.APP_YAML,
-            new Supplier<File>() {
+            new Supplier<Path>() {
               @Override
-              public File get() {
+              public Path get() {
                 return appEngineHelper.defaultAppYaml();
               }
             }, appYamlPathField, userSpecifiedArtifactFileSelector));
     generateDockerfileButton.addActionListener(
         new GenerateConfigActionListener(project, "Dockerfile", ConfigFileType.DOCKERFILE,
-            new Supplier<File>() {
+            new Supplier<Path>() {
               @Override
-              public File get() {
+              public Path get() {
                 return appEngineHelper.defaultDockerfile(
-                    AppEngineFlexDeploymentArtifactType.typeForPath(deploymentSource.getFile()));
+                    AppEngineFlexDeploymentArtifactType.typeForPath(
+                        Paths.get(deploymentSource.getFilePath())));
               }
             }, dockerFilePathField, userSpecifiedArtifactFileSelector));
     versionOverrideCheckBox.addItemListener(
@@ -434,14 +434,14 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     private final String fileName;
     private final ConfigFileType configFileType;
     private final TextFieldWithBrowseButton filePicker;
-    private final Supplier<File> sourceFileProvider;
+    private final Supplier<Path> sourceFileProvider;
     private final JPanel fileSelector;
 
     public GenerateConfigActionListener(
         Project project,
         String fileName,
         ConfigFileType configFileType,
-        Supplier<File> sourceFileProvider,
+        Supplier<Path> sourceFileProvider,
         TextFieldWithBrowseButton filePicker,
         JPanel fileSelector) {
       this.project = project;
@@ -476,19 +476,19 @@ public class AppEngineDeploymentRunConfigurationEditor extends
       SelectConfigDestinationFolderDialog destinationFolderDialog = new
           SelectConfigDestinationFolderDialog(project, configFileType);
       if (destinationFolderDialog.showAndGet()) {
-        File destinationFolderPath = destinationFolderDialog.getDestinationFolder();
-        File destinationFilePath = new File(destinationFolderPath, fileName);
+        Path destinationFolderPath = destinationFolderDialog.getDestinationFolder();
+        Path destinationFilePath = destinationFolderPath.resolve(fileName);
 
-        if (destinationFilePath.exists()) {
+        if (Files.exists(destinationFilePath)) {
           if (!new FileConfirmationDialog(
               project, DialogType.CONFIRM_OVERWRITE, destinationFilePath).showAndGet()) {
             return;
           }
-        } else if (destinationFolderPath.isFile()) {
+        } else if (Files.isRegularFile(destinationFolderPath)) {
           new FileConfirmationDialog(
               project, DialogType.NOT_DIRECTORY_ERROR, destinationFolderPath).show();
           return;
-        } else if (!destinationFolderPath.exists()) {
+        } else if (!Files.exists(destinationFolderPath)) {
           if (!new FileConfirmationDialog(
               project, DialogType.CONFIRM_CREATE_DIR, destinationFolderPath).showAndGet()) {
             return;
@@ -496,15 +496,15 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         }
 
         try {
-          FileUtil.copy(sourceFileProvider.get(), destinationFilePath);
-          LocalFileSystem.getInstance().refreshAndFindFileByIoFile(destinationFilePath);
+          Files.copy(sourceFileProvider.get(), destinationFilePath);
+          LocalFileSystem.getInstance().refreshAndFindFileByIoFile(destinationFilePath.toFile());
         } catch (IOException ex) {
           String message = GctBundle.message(
-              "appengine.flex.config.generation.io.error", destinationFilePath.getName());
+              "appengine.flex.config.generation.io.error", destinationFilePath.getFileName());
           Messages.showErrorDialog(project, message + ex.getLocalizedMessage(), "Error");
           return;
         }
-        filePicker.setText(destinationFilePath.getPath());
+        filePicker.setText(destinationFilePath.toString());
       }
     }
   }

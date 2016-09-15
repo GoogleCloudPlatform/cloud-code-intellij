@@ -30,9 +30,9 @@ import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Files;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 
@@ -51,11 +51,12 @@ import com.intellij.remoteServer.runtime.log.LoggingHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 /**
@@ -72,7 +73,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       = "/generation/src/appengine/mvm/war.dockerfile";
 
   private final Project project;
-  private File credentialsPath;
+  private Path credentialsPath;
 
   /**
    * Initialize the helper.
@@ -89,13 +90,13 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public File defaultAppYaml() {
+  public Path defaultAppYaml() {
     return getFileFromResourcePath(DEFAULT_APP_YAML_PATH);
   }
 
   @Nullable
   @Override
-  public File defaultDockerfile(AppEngineFlexDeploymentArtifactType deploymentArtifactType) {
+  public Path defaultDockerfile(AppEngineFlexDeploymentArtifactType deploymentArtifactType) {
     switch (deploymentArtifactType) {
       case WAR:
         return getFileFromResourcePath(DEFAULT_WAR_DOCKERFILE_PATH);
@@ -138,9 +139,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     boolean isFlexCompat = targetEnvironment.isFlexible()
         && AppEngineProjectService.getInstance().isFlexCompat(project, source);
     if (targetEnvironment.isStandard() || isFlexCompat) {
-      return createStandardRunner(loggingHandler, source.getFile(), deploy, isFlexCompat);
+      return createStandardRunner(loggingHandler, Paths.get(source.getFilePath()), deploy,
+          isFlexCompat);
     } else if (targetEnvironment.isFlexible()) {
-      return createFlexRunner(loggingHandler, source.getFile(), deploymentConfiguration, deploy);
+      return createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
+          deploymentConfiguration, deploy);
     } else {
       throw new AssertionError("Invalid App Engine target environment: " + targetEnvironment);
     }
@@ -148,7 +151,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   private AppEngineExecutor createStandardRunner(
       LoggingHandler loggingHandler,
-      File artifactToDeploy,
+      Path artifactToDeploy,
       AppEngineDeploy deploy,
       boolean isFlexCompat) {
     AppEngineStandardStage standardStage = new AppEngineStandardStage(
@@ -162,7 +165,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   private AppEngineExecutor createFlexRunner(
       LoggingHandler loggingHandler,
-      File artifactToDeploy,
+      Path artifactToDeploy,
       AppEngineDeploymentConfiguration config,
       AppEngineDeploy deploy) {
     AppEngineFlexibleStage flexibleStage = new AppEngineFlexibleStage(
@@ -175,15 +178,15 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   @Override
-  public File createStagingDirectory(
+  public Path createStagingDirectory(
       LoggingHandler loggingHandler,
       String cloudProjectName) throws IOException {
-    File stagingDirectory = FileUtil.createTempDirectory(
-        "gae-staging-" + cloudProjectName/* prefix */,
+    Path stagingDirectory = FileUtil.createTempDirectory(
+        "gae-staging-" + cloudProjectName /* prefix */,
         null /* suffix */,
-        true  /* deleteOnExit */);
+        true /* deleteOnExit */).toPath();
     loggingHandler.print(
-        "Created temporary staging directory: " + stagingDirectory.getAbsolutePath() + "\n");
+        "Created temporary staging directory: " + stagingDirectory.toString() + "\n");
 
     return stagingDirectory;
   }
@@ -210,7 +213,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         .addStdOutLineListener(outputListener)
         .exitListener(exitListener)
         .startListener(startListener)
-        .appCommandCredentialFile(credentialsPath)
+        .appCommandCredentialFile(credentialsPath.toFile())
         .appCommandMetricsEnvironment(pluginInfoService.getExternalPluginName())
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
         .appCommandOutputFormat("json")
@@ -225,8 +228,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
 
   @Override
-  public File stageCredentials(String googleUserName) {
-    File credentials = doStageCredentials(googleUserName);
+  public Path stageCredentials(String googleUserName) {
+    Path credentials = doStageCredentials(googleUserName);
     if (credentials != null) {
       return credentials;
     }
@@ -246,7 +249,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     return null;
   }
 
-  private File doStageCredentials(String googleUsername) {
+  private Path doStageCredentials(String googleUsername) {
     CredentialedUser projectUser = Services.getLoginService().getAllUsers()
         .get(googleUsername);
 
@@ -267,12 +270,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     );
     String jsonCredential = new Gson().toJson(credentialMap);
     try {
-      credentialsPath = FileUtil
-          .createTempFile(
-              "tmp_google_application_default_credential",
-              "json",
-              true /* deleteOnExit */);
-      Files.write(jsonCredential, credentialsPath, Charset.forName("UTF-8"));
+      credentialsPath = FileUtil.createTempFile(
+          "tmp_google_application_default_credential", "json", true /* deleteOnExit */).toPath();
+      Files.write(credentialsPath, jsonCredential.getBytes(Charsets.UTF_8));
 
       return credentialsPath;
     } catch (IOException ex) {
@@ -282,9 +282,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @Override
   public void deleteCredentials() {
-    if (credentialsPath != null && credentialsPath.exists()) {
-      if (!credentialsPath.delete()) {
-        logger.warn("failed to delete credential file expected at " + credentialsPath.getPath());
+    if (credentialsPath != null && Files.exists(credentialsPath)) {
+      try {
+        Files.delete(credentialsPath);
+      } catch (IOException ioe) {
+        logger.warn("failed to delete credential file expected at " + credentialsPath);
       }
     }
   }
@@ -331,13 +333,13 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   @NotNull
-  private File getFileFromResourcePath(String resourcePath) {
-    File appYaml;
+  private Path getFileFromResourcePath(String resourcePath) {
+    Path appYaml;
     try {
       URL resource = this.getClass().getClassLoader().getResource(resourcePath);
       Preconditions
           .checkArgument(resource != null, resourcePath + " is not a valid resource path.");
-      appYaml = new File(resource.toURI());
+      appYaml = Paths.get(resource.toURI());
     } catch (URISyntaxException ex) {
       throw new RuntimeException(ex);
     }
@@ -345,7 +347,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   @VisibleForTesting
-  public File getCredentialsPath() {
+  public Path getCredentialsPath() {
     return credentialsPath;
   }
 }

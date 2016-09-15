@@ -26,6 +26,21 @@ Code inspections for App Engine Java code.</description>
   <!-- Setting version to 15.0.6 and up. https://confluence.jetbrains.com/display/IDEADEV/IDEA+15+EAP -->
   <idea-version since-build="143.2370.31" />
 
+  <change-notes>
+    <![CDATA[<html>
+      <h2>[1.0-beta] - 2016-09-14</h2>
+      <h3>Added</h3>
+      <ul>
+        <li>App Engine standard environment support (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/767">#767</a>)</li>
+      </ul>
+      <h3>Changed</h3>
+      <ul>
+        <li>Extra fields now available in the deployment config (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/868">#868</a>)</li>
+        <li>Local run debug updated to use the newer tooling (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/811">#811</a>)</li>
+      </ul>
+    </html>]]>
+  </change-notes>
+
   <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
   <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
   <depends optional="true" config-file="google-app-engine-maven-support.xml">org.jetbrains.idea.maven</depends>

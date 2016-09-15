@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * Test cases for {@link AppEngineFlexDeploymentArtifactType}.
@@ -30,18 +30,18 @@ public class AppEngineFlexDeploymentArtifactTypeTest {
   @Test
   public void testTypeForPath_jar() throws Exception {
     assertEquals(AppEngineFlexDeploymentArtifactType.JAR,
-        AppEngineFlexDeploymentArtifactType.typeForPath(new File("/some/path/to/a.jar")));
+        AppEngineFlexDeploymentArtifactType.typeForPath(Paths.get("some", "path", "to", "a.jar")));
   }
 
   @Test
   public void testTypeForPath_war() throws Exception {
     assertEquals(AppEngineFlexDeploymentArtifactType.WAR,
-        AppEngineFlexDeploymentArtifactType.typeForPath(new File("/some/path/to/a.war")));
+        AppEngineFlexDeploymentArtifactType.typeForPath(Paths.get("some", "path", "to", "a.war")));
   }
 
   @Test
   public void testTypeForPath_anythingElse() throws Exception {
     assertEquals(AppEngineFlexDeploymentArtifactType.UNKNOWN,
-        AppEngineFlexDeploymentArtifactType.typeForPath(new File("/some/path/to/a.txt")));
+        AppEngineFlexDeploymentArtifactType.typeForPath(Paths.get("some", "path", "to", "a.txt")));
   }
 }
