@@ -22,9 +22,9 @@
       <p>Provides support for developing Google App Engine applications. Features include:</p>
       <ul>
         <li>Debug Java applications running in the Google cloud from inside IDEA.</li>
-        <li>Code inspections for App Engine Java code.</li>
-        <li>Running applications on a local development server.</li>
-        <li>Deployment to App Engine's standard and flexible environments.</li>
+        <li>Code inspections for App Engine standard environment Java code.</li>
+        <li>Run and debug applications on a local development server.</li>
+        <li>Deploy to the App Engine standard and flexible environments.</li>
       </ul>
     </html>]]>
   </description>
