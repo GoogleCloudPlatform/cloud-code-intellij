@@ -51,7 +51,7 @@ public class GctTracking {
   public static final String APP_ENGINE_OLD_PLUGIN_NOTIFICATION =
       "appengine.oldplugin.notification";
   public static final String APP_ENGINE_OLD_PLUGIN_NOTIFICATION_CLICK =
-      "appengine.oldplugin.notification.click";
+      "appengine.oldplugin.notification.link.click";
   public static final String APP_ENGINE_OLD_PLUGIN_DEACTIVATED =
       "appengine.oldplugin.deactivated";
 }
