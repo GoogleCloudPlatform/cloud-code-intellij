@@ -1,6 +1,6 @@
 ![Google Cloud Platform Logo](https://cloud.google.com/_static/images/gcp-logo.png)
 # Google Cloud Tools for IntelliJ plugin
-[![Build Status](https://travis-ci.org/GoogleCloudPlatform/google-cloud-intellij.svg?branch=master)](https://travis-ci.org/GoogleCloudPlatform/google-cloud-intellij)
+[![Build Status](https://cloud-tools-for-java-testing.appspot.com/buildStatus/icon?job=google-cloud-intellij master build orb)](https://cloud-tools-for-java-testing.appspot.com/job/google-cloud-intellij%20master%20build%20orb/)
 
 **This plugin is BETA quality.**
 
