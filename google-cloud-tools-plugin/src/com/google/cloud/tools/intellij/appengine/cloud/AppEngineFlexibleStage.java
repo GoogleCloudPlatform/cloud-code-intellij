@@ -59,7 +59,7 @@ public class AppEngineFlexibleStage {
     try {
       Path stagedArtifactPath = stagingDirectory.resolve(
           "target" + AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath));
-      Files.copy(stagedArtifactPath, deploymentArtifactPath);
+      Files.copy(deploymentArtifactPath, stagedArtifactPath);
       Files.setPosixFilePermissions(stagedArtifactPath, ImmutableSet.of(
           PosixFilePermission.OTHERS_READ,
           PosixFilePermission.GROUP_READ,
@@ -75,8 +75,8 @@ public class AppEngineFlexibleStage {
           AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath))
           : Paths.get(deploymentConfiguration.getDockerFilePath());
 
-      Files.copy(stagingDirectory.resolve("app.yaml"), appYamlPath);
-      Files.copy(stagingDirectory.resolve("Dockerfile"), dockerFilePath);
+      Files.copy(appYamlPath, stagingDirectory.resolve("app.yaml"));
+      Files.copy(dockerFilePath, stagingDirectory.resolve("Dockerfile"));
     } catch (IOException ex) {
       loggingHandler.print(ex.getMessage() + "\n");
       throw new RuntimeException(ex);
