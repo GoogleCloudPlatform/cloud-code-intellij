@@ -47,4 +47,11 @@ public class GctTracking {
       "cloud.debugger.close.continue.listen";
   public static final String CLOUD_DEBUGGER_NOTIFY_BREAKPOINT_LIST_CHANGE =
       "cloud.debugger.notify.breakpoint.list.change";
+
+  public static final String APP_ENGINE_OLD_PLUGIN_NOTIFICATION =
+      "appengine.oldplugin.notification";
+  public static final String APP_ENGINE_OLD_PLUGIN_NOTIFICATION_CLICK =
+      "appengine.oldplugin.notification.link.click";
+  public static final String APP_ENGINE_OLD_PLUGIN_DEACTIVATED =
+      "appengine.oldplugin.deactivated";
 }

@@ -16,8 +16,10 @@
 
 package com.google.cloud.tools.intellij;
 
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.DisablePluginWarningDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
@@ -91,6 +93,10 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
             NotificationType.ERROR,
             new IdeaAppEnginePluginLinkListener(project, plugin))
         .notify(project);
+
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_OLD_PLUGIN_NOTIFICATION)
+        .ping();
   }
 
   private static class IdeaAppEnginePluginLinkListener implements NotificationListener {
@@ -109,6 +115,9 @@ public class ConflictingAppEnginePluginCheck implements StartupActivity {
       String href = event.getDescription();
 
       if (DEACTIVATE_LINK_HREF.equals(href)) {
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.APP_ENGINE_OLD_PLUGIN_NOTIFICATION_CLICK)
+            .ping();
         showDisablePluginDialog(project);
         notification.hideBalloon();
       }
