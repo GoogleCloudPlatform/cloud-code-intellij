@@ -85,7 +85,19 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   @Override
   public boolean isModified() {
-    return cloudSdkPanel.isModified();
+    boolean isSdkValid = true;
+    try {
+      new CloudSdk.Builder()
+          .sdkPath(Paths.get(cloudSdkPanel.getCloudSdkDirectory()))
+          .build()
+          .validateCloudSdk();
+    } catch (AppEngineException aee) {
+      isSdkValid = false;
+    }
+
+    // Forces a modify check so the user is unable to save an invalid Cloud SDK configuration from
+    // Other Settings, on the Clouds menu.
+    return cloudSdkPanel.isModified() || !isSdkValid;
   }
 
   /**

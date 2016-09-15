@@ -20,10 +20,15 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
+import com.google.cloud.tools.intellij.login.PropertiesFilePluginFlags;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
@@ -131,6 +136,12 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
         callback.connected(new AppEngineRuntimeInstance());
       } catch (AppEngineException aee) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
+        Notification invalidSdkWarning = new Notification(
+            new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
+            GctBundle.message("settings.menu.item.cloud.sdk.text"),
+            GctBundle.message("appengine.deployment.error.invalid.cloudsdk"),
+            NotificationType.ERROR);
+        Notifications.Bus.notify(invalidSdkWarning);
         // TODO Consider auto opening configuration panel
       }
     }
