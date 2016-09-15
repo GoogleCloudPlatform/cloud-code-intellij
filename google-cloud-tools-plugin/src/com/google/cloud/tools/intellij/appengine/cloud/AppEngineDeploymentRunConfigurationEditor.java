@@ -42,6 +42,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -496,7 +497,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         }
 
         try {
-          Files.copy(sourceFileProvider.get(), destinationFilePath);
+          FileUtil.copy(sourceFileProvider.get().toFile(), destinationFilePath.toFile());
           LocalFileSystem.getInstance().refreshAndFindFileByIoFile(destinationFilePath.toFile());
         } catch (IOException ex) {
           String message = GctBundle.message(
