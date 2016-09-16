@@ -35,6 +35,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.testFramework.PlatformTestCase;
@@ -55,7 +56,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-
+    VfsRootAccess.allowRootAccess(getHomePath());
     appEngineProjectService = new DefaultAppEngineProjectService();
   }
 
@@ -75,11 +76,11 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
     // JAR Artifact Type
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getModuleAppEngineEnvironment(null /**appengine-web.xml*/));
+        appEngineProjectService.getModuleAppEngineEnvironment(null /*appengine-web.xml*/));
 
     // WAR Artifact Type
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getModuleAppEngineEnvironment(null /**appengine-web.xml*/));
+        appEngineProjectService.getModuleAppEngineEnvironment(null /*appengine-web.xml*/));
   }
 
   public void testGetAppEngineArtifactEnvironment_FlexibleCompat() {
