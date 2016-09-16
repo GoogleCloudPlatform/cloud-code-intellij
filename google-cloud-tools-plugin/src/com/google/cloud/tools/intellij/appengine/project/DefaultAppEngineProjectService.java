@@ -123,7 +123,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   @Nullable
   private XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
       @Nullable DeploymentSource source) {
-     if (source instanceof ArtifactDeploymentSource) {
+    if (source instanceof ArtifactDeploymentSource) {
       Artifact artifact = ((ArtifactDeploymentSource) source).getArtifact();
       return artifact != null
           ? assetProvider.loadAppEngineStandardWebXml(project, artifact)
