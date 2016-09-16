@@ -56,7 +56,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    VfsRootAccess.allowRootAccess(getHomePath());
+    VfsRootAccess.allowRootAccess(System.getProperty("user.dir"));
     appEngineProjectService = new DefaultAppEngineProjectService();
   }
 
