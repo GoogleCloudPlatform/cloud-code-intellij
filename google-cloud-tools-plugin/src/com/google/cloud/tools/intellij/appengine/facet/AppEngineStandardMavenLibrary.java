@@ -16,15 +16,19 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import org.apache.commons.lang.WordUtils;
 import org.jetbrains.idea.maven.utils.library.RepositoryLibraryProperties;
+import org.jetbrains.idea.maven.utils.library.RepositoryUtils;
 
 /**
  * Defines the available App Engine standard maven-sources libraries.
  */
 public enum AppEngineStandardMavenLibrary {
-  // TODO get from bundle (in form too)
+  // TODO get display names from bundle (in form too)
   SERVLET_API("Servlet API", new RepositoryLibraryProperties(
-     "javax.servlet", "servlet-api", "2.5"));
+      "javax.servlet", "servlet-api", "2.5")),
+  JSTL("JSP Standard Tag Library (JSTL)", new RepositoryLibraryProperties(
+      "javax.servlet", "jstl", RepositoryUtils.LatestVersionId));
 
   private final String displayName;
   private final RepositoryLibraryProperties libraryProperties;
@@ -50,5 +54,12 @@ public enum AppEngineStandardMavenLibrary {
     }
 
     return null;
+  }
+
+  /**
+   * Certain maven versions like "LATEST" are displayed differently - e.g. "Latest".
+   */
+  public static String toDisplayVersion(String mavenVersion) {
+    return WordUtils.capitalize(mavenVersion.toLowerCase());
   }
 }

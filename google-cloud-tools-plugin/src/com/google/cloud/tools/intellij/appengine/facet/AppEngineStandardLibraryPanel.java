@@ -38,7 +38,8 @@ public class AppEngineStandardLibraryPanel {
 
   private JPanel libraryPanel;
   private JCheckBox servletApi;
-  private List<JCheckBox> libraryGroup = Arrays.asList(servletApi);
+  private JCheckBox jstl;
+  private List<JCheckBox> libraryGroup = Arrays.asList(servletApi, jstl);
 
   public List<AppEngineStandardMavenLibrary> getLibraries() {
     return Lists.newArrayList(Collections2.filter(

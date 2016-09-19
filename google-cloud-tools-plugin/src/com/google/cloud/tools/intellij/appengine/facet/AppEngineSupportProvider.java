@@ -155,8 +155,10 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
       for (AppEngineStandardMavenLibrary library : libraries) {
         Library mavenLibrary = addMavenLibrary(module, library);
-        rootModel.addLibraryEntry(mavenLibrary);
-        webIntegration.addLibraryToArtifact(mavenLibrary, webArtifact, project);
+        if (mavenLibrary != null) {
+          rootModel.addLibraryEntry(mavenLibrary);
+          webIntegration.addLibraryToArtifact(mavenLibrary, webArtifact, project);
+        }
       }
     }
 
@@ -202,7 +204,10 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     LibraryTable libraryTable = LibraryTablesRegistrar.getInstance()
             .getLibraryTable(module.getProject());
 
-    return libraryTable.getLibraryByName(libraryProperties.getMavenId());
+    return libraryTable.getLibraryByName(
+        libraryProperties.getGroupId() + ":"
+            + libraryProperties.getArtifactId() + ":"
+            + AppEngineStandardMavenLibrary.toDisplayVersion(libraryProperties.getVersion()));
   }
 
   private static Library addProjectLibrary(final Module module, final String name,
