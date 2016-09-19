@@ -25,8 +25,12 @@ import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.util.xmlb.annotations.Tag;
 
 import org.jdom.Element;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author nik
@@ -34,13 +38,13 @@ import org.jdom.Element;
 public class AppEngineFacetConfiguration implements FacetConfiguration,
     PersistentStateComponent<AppEngineFacetProperties> {
 
-  private AppEngineFacetProperties myProperties
+  private AppEngineFacetProperties properties
       = new AppEngineFacetProperties();
 
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
       FacetValidatorsManager validatorsManager) {
     return new FacetEditorTab[]{
-        new AppEngineFacetEditor(this, editorContext, validatorsManager)
+        new AppEngineStandardFacetEditor(this, editorContext)
     };
   }
 
@@ -50,17 +54,28 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
   public void writeExternal(Element element) throws WriteExternalException {
   }
 
+  public List<AppEngineStandardMavenLibrary> getLibraries() {
+    return properties.libraries;
+  }
+
+  public void setLibraries(List<AppEngineStandardMavenLibrary> libraries) {
+
+    properties.libraries = libraries;
+  }
+
   @Override
   public AppEngineFacetProperties getState() {
-    return myProperties;
+    return properties;
   }
 
   @Override
   public void loadState(AppEngineFacetProperties state) {
-    myProperties = state;
+    properties = state;
   }
 
-  // TODO(eshaul) to be implemented when configurable libraries are added to the facet configuration
   public static class AppEngineFacetProperties {
+
+    @Tag("libraries")
+    public List<AppEngineStandardMavenLibrary> libraries = new ArrayList<>();
   }
 }

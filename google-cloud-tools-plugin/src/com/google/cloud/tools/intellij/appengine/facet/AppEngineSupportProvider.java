@@ -60,6 +60,8 @@ import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
+import org.jetbrains.idea.maven.utils.library.RepositoryLibraryDescription;
+import org.jetbrains.idea.maven.utils.library.RepositoryLibraryProperties;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -123,7 +125,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
   private void addSupport(final Module module,
       final ModifiableRootModel rootModel,
-      FrameworkSupportModel frameworkSupportModel) {
+      FrameworkSupportModel frameworkSupportModel,
+      List<AppEngineStandardMavenLibrary> libraries) {
     FacetType<AppEngineFacet, AppEngineFacetConfiguration> facetType = AppEngineFacet
         .getFacetType();
     AppEngineFacet appEngineFacet = FacetManager.getInstance(module)
@@ -146,12 +149,27 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     final Project project = module.getProject();
     webIntegration.addDevServerToModuleDependencies(rootModel);
 
+    if (libraries != null && !libraries.isEmpty()) {
+      AppEngineFacetConfiguration facetConfiguration = appEngineFacet.getConfiguration();
+      facetConfiguration.setLibraries(libraries);
+
+      for (AppEngineStandardMavenLibrary library : libraries) {
+        Library mavenLibrary = addMavenLibrary(module, library);
+        rootModel.addLibraryEntry(mavenLibrary);
+        webIntegration.addLibraryToArtifact(mavenLibrary, webArtifact, project);
+      }
+    }
+
+    // TODO move this to fetch from moven like above
     final Library apiJar = addProjectLibrary(module, "AppEngine API",
         sdkService.getUserLibraryPaths(),
         VirtualFile.EMPTY_ARRAY);
+
     rootModel.addLibraryEntry(apiJar);
     webIntegration.addLibraryToArtifact(apiJar, webArtifact, project);
   }
+
+
 
   @NotNull
   private static Artifact findOrCreateWebArtifact(AppEngineFacet appEngineFacet) {
@@ -170,6 +188,21 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     elementFactory.getOrCreateDirectory(root, "WEB-INF/classes")
         .addOrFindChild(elementFactory.createModuleOutput(module));
     return artifactManager.addArtifact(module.getName(), webArtifactType, root);
+  }
+
+  private static Library addMavenLibrary(Module module, AppEngineStandardMavenLibrary library) {
+    RepositoryLibraryProperties libraryProperties = library.getLibraryProperties();
+
+    RepositoryWithVersionAddLibraryAction action = new RepositoryWithVersionAddLibraryAction(
+        module, RepositoryLibraryDescription.findDescription(libraryProperties),
+        libraryProperties.getVersion());
+
+    action.invoke(module.getProject(), null, null);
+
+    LibraryTable libraryTable = LibraryTablesRegistrar.getInstance()
+            .getLibraryTable(module.getProject());
+
+    return libraryTable.getLibraryByName(libraryProperties.getMavenId());
   }
 
   private static Library addProjectLibrary(final Module module, final String name,
@@ -215,6 +248,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     private final FrameworkSupportModel myFrameworkSupportModel;
     private JPanel myMainPanel;
     private CloudSdkPanel cloudSdkPanel;
+    private AppEngineStandardLibraryPanel appEngineStandardLibraryPanel;
 
     private AppEngineSupportConfigurable(FrameworkSupportModel model) {
       myFrameworkSupportModel = model;
@@ -245,7 +279,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
 
       AppEngineSupportProvider.this
-          .addSupport(module, rootModel, myFrameworkSupportModel);
+          .addSupport(module, rootModel, myFrameworkSupportModel,
+              appEngineStandardLibraryPanel.getLibraries());
 
       // Called when creating a new App Engine module from the 'new project' or 'new module' wizards
       // or upon adding App Engine 'Framework Support' to an existing module.

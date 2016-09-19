@@ -22,7 +22,6 @@ import com.google.cloud.tools.intellij.util.GctTracking;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
-import com.intellij.facet.ui.FacetValidatorsManager;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -33,16 +32,19 @@ import javax.swing.JPanel;
 /**
  * @author nik
  */
-public class AppEngineFacetEditor extends FacetEditorTab {
+public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   private final AppEngineFacetConfiguration facetConfiguration;
   private final FacetEditorContext context;
   private JPanel myMainPanel;
+  private AppEngineStandardLibraryPanel appEngineStandardLibraryPanel;
 
-  public AppEngineFacetEditor(AppEngineFacetConfiguration facetConfiguration,
-      FacetEditorContext context, FacetValidatorsManager validatorsManager) {
+  public AppEngineStandardFacetEditor(AppEngineFacetConfiguration facetConfiguration,
+      FacetEditorContext context) {
     this.facetConfiguration = facetConfiguration;
     this.context = context;
+
+    appEngineStandardLibraryPanel.setSelectedLibrary(facetConfiguration.getLibraries());
   }
 
   @Nls
