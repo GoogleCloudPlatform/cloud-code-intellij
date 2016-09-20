@@ -32,8 +32,6 @@ import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModelListener;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportProvider;
-import com.intellij.openapi.application.Result;
-import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -41,15 +39,12 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
-import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
 import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.packaging.artifacts.ArtifactType;
@@ -161,14 +156,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
         }
       }
     }
-
-    // TODO move this to fetch from moven like above
-    final Library apiJar = addProjectLibrary(module, "AppEngine API",
-        sdkService.getUserLibraryPaths(),
-        VirtualFile.EMPTY_ARRAY);
-
-    rootModel.addLibraryEntry(apiJar);
-    webIntegration.addLibraryToArtifact(apiJar, webArtifact, project);
   }
 
 
@@ -208,31 +195,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
         libraryProperties.getGroupId() + ":"
             + libraryProperties.getArtifactId() + ":"
             + AppEngineStandardMavenLibrary.toDisplayVersion(libraryProperties.getVersion()));
-  }
-
-  private static Library addProjectLibrary(final Module module, final String name,
-      final List<String> jarDirectories, final VirtualFile[] sources) {
-    return new WriteAction<Library>() {
-      protected void run(@NotNull final Result<Library> result) {
-        final LibraryTable libraryTable = LibraryTablesRegistrar.getInstance()
-            .getLibraryTable(module.getProject());
-        Library library = libraryTable.getLibraryByName(name);
-        if (library == null) {
-          library = libraryTable.createLibrary(name);
-          final Library.ModifiableModel model = library.getModifiableModel();
-          for (String path : jarDirectories) {
-            String url = VfsUtilCore.pathToUrl(path);
-            VirtualFileManager.getInstance().refreshAndFindFileByUrl(url);
-            model.addJarDirectory(url, false);
-          }
-          for (VirtualFile sourceRoot : sources) {
-            model.addRoot(sourceRoot, OrderRootType.SOURCES);
-          }
-          model.commit();
-        }
-        result.setResult(library);
-      }
-    }.execute().getResultObject();
   }
 
   @NotNull
