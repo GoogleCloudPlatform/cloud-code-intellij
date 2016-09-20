@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.collect.Sets;
 
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
@@ -61,6 +62,7 @@ import org.jetbrains.idea.maven.utils.library.RepositoryLibraryProperties;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -121,7 +123,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
   private void addSupport(final Module module,
       final ModifiableRootModel rootModel,
       FrameworkSupportModel frameworkSupportModel,
-      List<AppEngineStandardMavenLibrary> libraries) {
+      Set<AppEngineStandardMavenLibrary> librariesToAdd) {
     FacetType<AppEngineFacet, AppEngineFacetConfiguration> facetType = AppEngineFacet
         .getFacetType();
     AppEngineFacet appEngineFacet = FacetManager.getInstance(module)
@@ -144,17 +146,19 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     final Project project = module.getProject();
     webIntegration.addDevServerToModuleDependencies(rootModel);
 
-    if (libraries != null && !libraries.isEmpty()) {
-      AppEngineFacetConfiguration facetConfiguration = appEngineFacet.getConfiguration();
-      facetConfiguration.setLibraries(libraries);
-
-      for (AppEngineStandardMavenLibrary library : libraries) {
-        Library mavenLibrary = addMavenLibrary(module, library);
+    if (librariesToAdd != null && !librariesToAdd.isEmpty()) {
+      Set<AppEngineStandardMavenLibrary> addedLibraries = Sets.newHashSet();
+      for (AppEngineStandardMavenLibrary libraryToAdd : librariesToAdd) {
+        Library mavenLibrary = addMavenLibrary(module, libraryToAdd);
         if (mavenLibrary != null) {
           rootModel.addLibraryEntry(mavenLibrary);
           webIntegration.addLibraryToArtifact(mavenLibrary, webArtifact, project);
+          addedLibraries.add(libraryToAdd);
         }
       }
+
+      AppEngineFacetConfiguration facetConfiguration = appEngineFacet.getConfiguration();
+      facetConfiguration.setLibraries(addedLibraries);
     }
   }
 
@@ -247,7 +251,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
       AppEngineSupportProvider.this
           .addSupport(module, rootModel, myFrameworkSupportModel,
-              appEngineStandardLibraryPanel.getLibraries());
+              appEngineStandardLibraryPanel.getSelectedLibraries());
 
       // Called when creating a new App Engine module from the 'new project' or 'new module' wizards
       // or upon adding App Engine 'Framework Support' to an existing module.

@@ -29,8 +29,8 @@ import com.intellij.util.xmlb.annotations.Tag;
 
 import org.jdom.Element;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author nik
@@ -54,12 +54,11 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
   public void writeExternal(Element element) throws WriteExternalException {
   }
 
-  public List<AppEngineStandardMavenLibrary> getLibraries() {
+  public Set<AppEngineStandardMavenLibrary> getLibraries() {
     return properties.libraries;
   }
 
-  public void setLibraries(List<AppEngineStandardMavenLibrary> libraries) {
-
+  public void setLibraries(Set<AppEngineStandardMavenLibrary> libraries) {
     properties.libraries = libraries;
   }
 
@@ -76,6 +75,6 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
   public static class AppEngineFacetProperties {
 
     @Tag("libraries")
-    public List<AppEngineStandardMavenLibrary> libraries = new ArrayList<>();
+    public Set<AppEngineStandardMavenLibrary> libraries = new HashSet<>();
   }
 }

@@ -19,13 +19,16 @@ package com.google.cloud.tools.intellij.appengine.facet;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.swing.JCheckBox;
@@ -45,8 +48,19 @@ public class AppEngineStandardLibraryPanel {
   private List<JCheckBox> libraryGroup = Arrays.asList(servletApi, jstl, appEngineApi, endpoints,
       objectify);
 
-  public List<AppEngineStandardMavenLibrary> getLibraries() {
-    return Lists.newArrayList(Collections2.filter(
+  public AppEngineStandardLibraryPanel() {
+    for (JCheckBox checkBox : libraryGroup) {
+      checkBox.addItemListener(new ItemListener() {
+        @Override
+        public void itemStateChanged(ItemEvent event) {
+
+        }
+      });
+    }
+  }
+
+  public Set<AppEngineStandardMavenLibrary> getSelectedLibraries() {
+    return Sets.newHashSet(Collections2.filter(
         Collections2.transform(libraryGroup, new Function<JCheckBox, AppEngineStandardMavenLibrary>() {
           @Nullable
           @Override
@@ -60,7 +74,7 @@ public class AppEngineStandardLibraryPanel {
     ));
   }
 
-  public void setSelectedLibrary(List<AppEngineStandardMavenLibrary> libraries) {
+  public void setSelectedLibrary(Set<AppEngineStandardMavenLibrary> libraries) {
     Collection<String> availableLibraryNames = Collections2.transform(libraries,
         new Function<AppEngineStandardMavenLibrary, String>() {
           @Nullable

@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.collect.Sets;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
@@ -25,6 +26,9 @@ import com.intellij.facet.ui.FacetEditorTab;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -43,8 +47,6 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
       FacetEditorContext context) {
     this.facetConfiguration = facetConfiguration;
     this.context = context;
-
-    appEngineStandardLibraryPanel.setSelectedLibrary(facetConfiguration.getLibraries());
   }
 
   @Nls
@@ -59,15 +61,29 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   @Override
   public boolean isModified() {
-    return false;
+    Set<AppEngineStandardMavenLibrary> savedLibs = facetConfiguration.getLibraries();
+    Set<AppEngineStandardMavenLibrary> selectedLibs
+        = appEngineStandardLibraryPanel.getSelectedLibraries();
+
+    return !Objects.equals(savedLibs, selectedLibs);
   }
 
   @Override
   public void apply() {
+    Set<AppEngineStandardMavenLibrary> savedLibs = facetConfiguration.getLibraries();
+    Set<AppEngineStandardMavenLibrary> selectedLibs
+        = appEngineStandardLibraryPanel.getSelectedLibraries();
+
+    // TODO need to also add / remove the library from the classpath
+    Set<AppEngineStandardMavenLibrary> libsToAdd = Sets.difference(selectedLibs, savedLibs);
+    Set<AppEngineStandardMavenLibrary> libsToRemove = Sets.difference(savedLibs, selectedLibs);
+
+    facetConfiguration.setLibraries(selectedLibs);
   }
 
   @Override
   public void reset() {
+    appEngineStandardLibraryPanel.setSelectedLibrary(facetConfiguration.getLibraries());
   }
 
   @SuppressWarnings("checkstyle:abbreviationaswordinname")
