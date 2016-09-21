@@ -86,7 +86,6 @@ public class BreakpointUtil {
     dateString = dateString.replaceAll("Z$", "-0000");
 
     SimpleDateFormat iso8601Format = new SimpleDateFormat(ISO_8601_FORMAT);
-    iso8601Format.setLenient(true);
 
     try {
       return iso8601Format.parse(dateString);
