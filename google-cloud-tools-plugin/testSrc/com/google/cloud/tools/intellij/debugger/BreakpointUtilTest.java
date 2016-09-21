@@ -46,8 +46,8 @@ public class BreakpointUtilTest {
     assertEquals(gregorian.getTime(), BreakpointUtil.parseDateTime("2016-09-21T16:39:00Z"));
   }
 
-  @Test
+  @Test(expected = AssertionError.class)
   public void testParseDateTime_unknownFormat() {
-    assertNull(BreakpointUtil.parseDateTime("this is not a date"));
+    BreakpointUtil.parseDateTime("this is not a date");
   }
 }

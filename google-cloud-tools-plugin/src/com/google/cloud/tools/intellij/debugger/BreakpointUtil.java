@@ -101,6 +101,7 @@ public class BreakpointUtil {
         LOG.warn("error parsing datetime " + dateString + " with format " + format);
       }
     }
+    LOG.error("datetime " + dateString + "couldn't be parsed by any formats.");
 
     return null;
   }
