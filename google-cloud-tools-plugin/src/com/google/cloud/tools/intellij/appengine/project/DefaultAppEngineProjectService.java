@@ -25,11 +25,14 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
+
+import java.util.Collections;
 
 /**
  * Implementation of methods for inspecting an App Engine project's structure and configuration.
@@ -44,11 +47,12 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   @Override
   public boolean isFlexCompat(@NotNull Project project, @NotNull DeploymentSource source) {
-    Artifact artifact = getArtifact(source);
+    XmlFile appEngineWebXml = loadAppEngineStandardWebXml(project, source);
 
-    return artifact != null && isFlexCompat(
-        assetProvider.loadAppEngineStandardWebXml(project, artifact));
+    return appEngineWebXml != null && isFlexCompat(appEngineWebXml);
   }
+
+
 
   @Override
   public boolean isFlexCompat(@Nullable XmlFile appEngineWebXml) {
@@ -63,14 +67,8 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   @Override
   public boolean isFlexCompatEnvFlex(@NotNull Project project, @NotNull DeploymentSource source) {
-    Artifact artifact = getArtifact(source);
-
-    if (artifact == null) {
-      return false;
-    }
-
     XmlTag compatConfig = getFlexCompatXmlConfiguration(
-        assetProvider.loadAppEngineStandardWebXml(project, artifact));
+        loadAppEngineStandardWebXml(project, source));
 
     return isFlexCompatEnvFlex(compatConfig);
   }
@@ -122,6 +120,24 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
         || "war".equalsIgnoreCase(mavenProject.getPackaging()));
   }
 
+  @Nullable
+  private XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
+      @Nullable DeploymentSource source) {
+    if (source instanceof ArtifactDeploymentSource) {
+      Artifact artifact = ((ArtifactDeploymentSource) source).getArtifact();
+      return artifact != null
+          ? assetProvider.loadAppEngineStandardWebXml(project, artifact)
+          : null;
+    } else if (source instanceof ModuleDeploymentSource) {
+      Module module = ((ModuleDeploymentSource) source).getModule();
+      return module != null
+          ? assetProvider.loadAppEngineStandardWebXml(project, Collections.singletonList(module))
+          : null;
+    }
+
+    return null;
+  }
+
   /**
    * Given an artifact, returns the xml tag corresponding to the artifact's
    * appengine-web.xml compat configuration or null if there isn't one.
@@ -138,15 +154,6 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
           return root.findFirstSubTag("env");
         }
       }
-    }
-
-    return null;
-  }
-
-  @Nullable
-  private static Artifact getArtifact(@NotNull DeploymentSource source) {
-    if (source instanceof ArtifactDeploymentSource) {
-      return ((ArtifactDeploymentSource) source).getArtifact();
     }
 
     return null;
