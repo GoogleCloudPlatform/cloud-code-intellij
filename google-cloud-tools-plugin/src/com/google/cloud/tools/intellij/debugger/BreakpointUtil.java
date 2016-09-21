@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.debugger;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.model.StatusMessage;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.collect.ImmutableList;
 
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -37,8 +39,12 @@ public class BreakpointUtil {
 
   // 2015-07-23T16:37:33.000Z
   public static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  // TODO(joaomartins): Check with API team on when the rollout to the NO_MS format is done,
+  // so we can remove the ISO_8601_FORMAT check.
   // 2015-07-23T16:37:33Z
   public static final String ISO_8601_FORMAT_NO_MS = "yyyy-MM-dd'T'HH:mm:ssZ";
+  public static final Collection<String> FORMATS =
+      ImmutableList.of(ISO_8601_FORMAT_NO_MS, ISO_8601_FORMAT);
 
   /**
    * This is a helper routine that converts a server {@link StatusMessage} to descriptive text.
@@ -85,16 +91,14 @@ public class BreakpointUtil {
 
     dateString = dateString.replaceAll("Z$", "-0000");
 
-    SimpleDateFormat iso8601Format = new SimpleDateFormat(ISO_8601_FORMAT);
+    SimpleDateFormat dateFormat;
 
-    try {
-      return iso8601Format.parse(dateString);
-    } catch (ParseException pe) {
+    for (String format : FORMATS) {
       try {
-        iso8601Format = new SimpleDateFormat(ISO_8601_FORMAT_NO_MS);
-        return iso8601Format.parse(dateString);
-      } catch (ParseException pe2) {
-        LOG.error("error parsing datetime " + dateString, pe2);
+        dateFormat = new SimpleDateFormat(format);
+        return dateFormat.parse(dateString);
+      } catch (ParseException pe) {
+        LOG.warn("error parsing datetime " + dateString + " with format " + format);
       }
     }
 
