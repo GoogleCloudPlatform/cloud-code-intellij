@@ -37,6 +37,8 @@ public class BreakpointUtil {
 
   // 2015-07-23T16:37:33.000Z
   public static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  // 2015-07-23T16:37:33Z
+  public static final String ISO_8601_FORMAT_NO_MS = "yyyy-MM-dd'T'HH:mm:ssZ";
 
   /**
    * This is a helper routine that converts a server {@link StatusMessage} to descriptive text.
@@ -84,11 +86,17 @@ public class BreakpointUtil {
     dateString = dateString.replaceAll("Z$", "-0000");
 
     SimpleDateFormat iso8601Format = new SimpleDateFormat(ISO_8601_FORMAT);
+    iso8601Format.setLenient(true);
 
     try {
       return iso8601Format.parse(dateString);
-    } catch (ParseException ex) {
-      LOG.error("error parsing datetime " + dateString, ex);
+    } catch (ParseException pe) {
+      try {
+        iso8601Format = new SimpleDateFormat(ISO_8601_FORMAT_NO_MS);
+        return iso8601Format.parse(dateString);
+      } catch (ParseException pe2) {
+        LOG.error("error parsing datetime " + dateString, pe2);
+      }
     }
 
     return null;
