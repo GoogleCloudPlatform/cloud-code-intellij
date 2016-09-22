@@ -93,7 +93,7 @@ public class BreakpointUtil {
 
     for (DateTimeFormatter formatter : FORMATS) {
       try {
-      return formatter.parseDateTime(dateString).toDate();
+        return formatter.parseDateTime(dateString).toDate();
       } catch (IllegalArgumentException iae) {
         // Do nothing, try the next parser.
       }
