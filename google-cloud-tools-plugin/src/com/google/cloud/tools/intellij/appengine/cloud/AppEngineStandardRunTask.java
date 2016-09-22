@@ -22,15 +22,9 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.base.Strings;
-
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +42,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
    *
    * @param runConfig local run configuration to be sent to the common library
    * @param runnerId typically "Run" or "Debug", to indicate type of local run. To be used in
-   * metrics
+   *     metrics
    */
   public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig, @Nullable String runnerId) {
     this.runConfig = runConfig;
