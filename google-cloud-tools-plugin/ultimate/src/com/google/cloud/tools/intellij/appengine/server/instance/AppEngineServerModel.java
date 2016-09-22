@@ -17,8 +17,12 @@
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
@@ -129,6 +133,16 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     if (facet == null) {
       throw new RuntimeConfigurationWarning(
           "App Engine facet not found in '" + artifact.getName() + "' artifact");
+    }
+
+    try {
+      new CloudSdk.Builder()
+          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+          .build()
+          .validateAppEngineJavaComponents();
+    } catch (AppEngineJavaComponentsNotInstalledException ex) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.cloudsdk.java.components.missing"));
     }
   }
 
