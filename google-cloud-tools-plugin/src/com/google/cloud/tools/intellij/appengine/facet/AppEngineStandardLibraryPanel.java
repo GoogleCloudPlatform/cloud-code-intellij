@@ -23,8 +23,6 @@ import com.google.common.collect.Sets;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -47,17 +45,6 @@ public class AppEngineStandardLibraryPanel {
   private JCheckBox objectify;
   private List<JCheckBox> libraryGroup = Arrays.asList(servletApi, jstl, appEngineApi, endpoints,
       objectify);
-
-  public AppEngineStandardLibraryPanel() {
-    for (JCheckBox checkBox : libraryGroup) {
-      checkBox.addItemListener(new ItemListener() {
-        @Override
-        public void itemStateChanged(ItemEvent event) {
-
-        }
-      });
-    }
-  }
 
   public Set<AppEngineStandardMavenLibrary> getSelectedLibraries() {
     return Sets.newHashSet(Collections2.filter(
