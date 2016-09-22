@@ -17,15 +17,12 @@
 package com.google.cloud.tools.intellij.debugger;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 /**
  * {@link BreakpointUtil} unit tests.
@@ -34,16 +31,14 @@ import java.util.TimeZone;
 public class BreakpointUtilTest {
   @Test
   public void testParseDateTime_iso8601() {
-    Calendar gregorian = new GregorianCalendar(2016, 8, 21, 16, 39, 0);
-    gregorian.setTimeZone(TimeZone.getTimeZone("America/New York"));
-    assertEquals(gregorian.getTime(), BreakpointUtil.parseDateTime("2016-09-21T16:39:00.000Z"));
+    DateTime date = new DateTime(2016, 9, 21, 16, 39, 0, DateTimeZone.UTC);
+    assertEquals(date.toDate(), BreakpointUtil.parseDateTime("2016-09-21T16:39:00.000Z"));
   }
 
   @Test
   public void testParseDateTime_iso8601NoMs() {
-    Calendar gregorian = new GregorianCalendar(2016, 8, 21, 16, 39, 0);
-    gregorian.setTimeZone(TimeZone.getTimeZone("America/New York"));
-    assertEquals(gregorian.getTime(), BreakpointUtil.parseDateTime("2016-09-21T16:39:00Z"));
+    DateTime date = new DateTime(2016, 9, 21, 16, 39, 0, DateTimeZone.UTC);
+    assertEquals(date.toDate(), BreakpointUtil.parseDateTime("2016-09-21T16:39:00Z"));
   }
 
   @Test(expected = AssertionError.class)
