@@ -16,9 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
 import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.utils.library.RepositoryLibraryProperties;
 import org.jetbrains.idea.maven.utils.library.RepositoryUtils;
+
+import java.util.Arrays;
 
 /**
  * Defines the available App Engine standard maven-sources libraries.
@@ -57,20 +63,41 @@ public enum AppEngineStandardMavenLibrary {
     return libraryProperties;
   }
 
-  public static AppEngineStandardMavenLibrary getLibraryByDisplayName(String name) {
-    for (AppEngineStandardMavenLibrary library : AppEngineStandardMavenLibrary.values()) {
-      if (library.getDisplayName().equals(name)) {
-        return library;
+  @Nullable
+  public static AppEngineStandardMavenLibrary getLibraryByDisplayName(final String name) {
+    return getLibrary(new Predicate<AppEngineStandardMavenLibrary>() {
+      @Override
+      public boolean apply(AppEngineStandardMavenLibrary library) {
+        return name.equals(library.getDisplayName());
       }
-    }
+    });
+  }
 
-    return null;
+  @Nullable
+  public static AppEngineStandardMavenLibrary getLibraryByMavenDisplayName(final String name) {
+    return getLibrary(new Predicate<AppEngineStandardMavenLibrary>() {
+      @Override
+      public boolean apply(AppEngineStandardMavenLibrary library) {
+        return name.equals(toMavenDisplayVersion(library.getLibraryProperties()));
+      }
+    });
+  }
+
+  public static AppEngineStandardMavenLibrary getLibrary(
+      Predicate<AppEngineStandardMavenLibrary> predicate) {
+    return Iterables.find(
+        Arrays.asList(AppEngineStandardMavenLibrary.values()),
+        predicate,
+        null /*default value*/);
   }
 
   /**
-   * Certain maven versions like "LATEST" are displayed differently - e.g. "Latest".
+   * Certain maven versions like "LATEST" are displayed differently - e.g. "Latest", so we need to
+   * reconstruct the maven display name manually
    */
-  public static String toDisplayVersion(String mavenVersion) {
-    return WordUtils.capitalize(mavenVersion.toLowerCase());
+  public static String toMavenDisplayVersion(RepositoryLibraryProperties libraryProperties) {
+    return libraryProperties.getGroupId() + ":"
+        + libraryProperties.getArtifactId() + ":"
+        + WordUtils.capitalize(libraryProperties.getVersion().toLowerCase());
   }
 }

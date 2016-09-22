@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
-import com.google.common.collect.Sets;
 
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
@@ -37,7 +36,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.libraries.Library;
@@ -143,29 +141,13 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       }
     }
 
-    final Project project = module.getProject();
     webIntegration.addDevServerToModuleDependencies(rootModel);
 
-    if (librariesToAdd != null && !librariesToAdd.isEmpty()) {
-      Set<AppEngineStandardMavenLibrary> addedLibraries = Sets.newHashSet();
-      for (AppEngineStandardMavenLibrary libraryToAdd : librariesToAdd) {
-        Library mavenLibrary = addMavenLibrary(module, libraryToAdd);
-        if (mavenLibrary != null) {
-          rootModel.addLibraryEntry(mavenLibrary);
-          webIntegration.addLibraryToArtifact(mavenLibrary, webArtifact, project);
-          addedLibraries.add(libraryToAdd);
-        }
-      }
-
-      AppEngineFacetConfiguration facetConfiguration = appEngineFacet.getConfiguration();
-      facetConfiguration.setLibraries(addedLibraries);
-    }
+    addMavenLibraries(librariesToAdd, module, rootModel, webArtifact);
   }
 
-
-
   @NotNull
-  private static Artifact findOrCreateWebArtifact(AppEngineFacet appEngineFacet) {
+  static Artifact findOrCreateWebArtifact(AppEngineFacet appEngineFacet) {
     Module module = appEngineFacet.getModule();
     ArtifactType webArtifactType = AppEngineWebIntegration.getInstance()
         .getAppEngineWebArtifactType();
@@ -183,7 +165,29 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     return artifactManager.addArtifact(module.getName(), webArtifactType, root);
   }
 
-  private static Library addMavenLibrary(Module module, AppEngineStandardMavenLibrary library) {
+  static void addMavenLibraries(
+      Set<AppEngineStandardMavenLibrary> librariesToAdd, Module module, ModifiableRootModel rootModel,
+      Artifact webArtifact) {
+    if (librariesToAdd != null && !librariesToAdd.isEmpty()) {
+      for (AppEngineStandardMavenLibrary libraryToAdd : librariesToAdd) {
+        Library mavenLibrary = loadMavenLibrary(module, libraryToAdd);
+        if (mavenLibrary != null) {
+          rootModel.addLibraryEntry(mavenLibrary);
+          AppEngineWebIntegration.getInstance()
+              .addLibraryToArtifact(mavenLibrary, webArtifact, module.getProject());
+        }
+      }
+    }
+
+    // todo need to do from a writable thread? must commit the model after!!!!
+  }
+
+//  static void removeMavenLibraries(Set<AppEngineStandardMavenLibrary librariesToRemove> library,
+//      Project project) {
+//    ProjectLibraryTable.getInstance(project).removeLibrary();
+//  }
+
+  private static Library loadMavenLibrary(Module module, AppEngineStandardMavenLibrary library) {
     RepositoryLibraryProperties libraryProperties = library.getLibraryProperties();
 
     RepositoryWithVersionAddLibraryAction action = new RepositoryWithVersionAddLibraryAction(
@@ -196,9 +200,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
             .getLibraryTable(module.getProject());
 
     return libraryTable.getLibraryByName(
-        libraryProperties.getGroupId() + ":"
-            + libraryProperties.getArtifactId() + ":"
-            + AppEngineStandardMavenLibrary.toDisplayVersion(libraryProperties.getVersion()));
+        AppEngineStandardMavenLibrary.toMavenDisplayVersion(libraryProperties));
   }
 
   @NotNull

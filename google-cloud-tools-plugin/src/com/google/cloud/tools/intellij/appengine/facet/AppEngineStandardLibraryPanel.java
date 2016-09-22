@@ -74,7 +74,7 @@ public class AppEngineStandardLibraryPanel {
     ));
   }
 
-  public void setSelectedLibrary(Set<AppEngineStandardMavenLibrary> libraries) {
+  public void selectLibraries(Set<AppEngineStandardMavenLibrary> libraries) {
     Collection<String> availableLibraryNames = Collections2.transform(libraries,
         new Function<AppEngineStandardMavenLibrary, String>() {
           @Nullable
@@ -86,6 +86,14 @@ public class AppEngineStandardLibraryPanel {
 
     for (JCheckBox libraryCheckbox : libraryGroup) {
       libraryCheckbox.setSelected(availableLibraryNames.contains(libraryCheckbox.getText()));
+    }
+  }
+
+  public void toggleLibrary(AppEngineStandardMavenLibrary library, boolean select) {
+    for (JCheckBox libraryCheckbox : libraryGroup) {
+      if (libraryCheckbox.getText().equals(library.getDisplayName())) {
+        libraryCheckbox.setSelected(select);
+      }
     }
   }
 

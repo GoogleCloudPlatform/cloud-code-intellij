@@ -23,6 +23,9 @@ import com.google.common.collect.Sets;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
+import com.intellij.openapi.roots.libraries.Library;
+import com.intellij.openapi.roots.libraries.LibraryTable.Listener;
+import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +50,31 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
       FacetEditorContext context) {
     this.facetConfiguration = facetConfiguration;
     this.context = context;
+
+    LibraryTablesRegistrar.getInstance()
+        .getLibraryTable(context.getProject()).addListener(new Listener() {
+      @Override
+      public void afterLibraryAdded(Library addedLibrary) {
+        appEngineStandardLibraryPanel.toggleLibrary(
+            AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(addedLibrary.getName()),
+            true);
+      }
+
+      @Override
+      public void afterLibraryRemoved(Library removedLibrary) {
+        appEngineStandardLibraryPanel.toggleLibrary(
+            AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(removedLibrary.getName()),
+            false);
+      }
+
+      @Override
+      public void afterLibraryRenamed(Library library) {
+      }
+
+      @Override
+      public void beforeLibraryRemoved(Library library) {
+      }
+    });
   }
 
   @Nls
@@ -61,7 +89,8 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   @Override
   public boolean isModified() {
-    Set<AppEngineStandardMavenLibrary> savedLibs = facetConfiguration.getLibraries();
+    Set<AppEngineStandardMavenLibrary> savedLibs
+        = facetConfiguration.getLibraries(context.getProject());
     Set<AppEngineStandardMavenLibrary> selectedLibs
         = appEngineStandardLibraryPanel.getSelectedLibraries();
 
@@ -70,20 +99,34 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   @Override
   public void apply() {
-    Set<AppEngineStandardMavenLibrary> savedLibs = facetConfiguration.getLibraries();
+    Set<AppEngineStandardMavenLibrary> savedLibs
+        = facetConfiguration.getLibraries(context.getProject());
     Set<AppEngineStandardMavenLibrary> selectedLibs
         = appEngineStandardLibraryPanel.getSelectedLibraries();
 
-    // TODO need to also add / remove the library from the classpath
     Set<AppEngineStandardMavenLibrary> libsToAdd = Sets.difference(selectedLibs, savedLibs);
     Set<AppEngineStandardMavenLibrary> libsToRemove = Sets.difference(savedLibs, selectedLibs);
 
-    facetConfiguration.setLibraries(selectedLibs);
+    // just need to add the libs. the listener will take care of updating the panel?
+
+//    if (!libsToAdd.isEmpty()) { // TODO verify the addition so it doesn't get out of sync with the module config
+//      ModifiableRootModel rootModel = ModifiableModelsProvider.SERVICE.getInstance()
+//          .getModuleModifiableModel(context.getModule());
+//      AppEngineSupportProvider.addMavenLibraries(libsToAdd, context.getModule(),
+//          rootModel,
+//          AppEngineSupportProvider.findOrCreateWebArtifact((AppEngineFacet) context.getFacet()));
+//    }
+//    if (!libsToRemove.isEmpty()) {
+//      AppEngineSupportProvider.removeMavenLibrary(libsToRemove, context.getProject());
+//    }
+
+//    facetConfiguration.setLibraries(selectedLibs);
   }
 
   @Override
   public void reset() {
-    appEngineStandardLibraryPanel.setSelectedLibrary(facetConfiguration.getLibraries());
+    appEngineStandardLibraryPanel
+        .selectLibraries(facetConfiguration.getLibraries(context.getProject()));
   }
 
   @SuppressWarnings("checkstyle:abbreviationaswordinname")

@@ -17,19 +17,23 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration.AppEngineFacetProperties;
+import com.google.common.collect.Sets;
 
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.libraries.Library;
+import com.intellij.openapi.roots.libraries.LibraryTable;
+import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-import com.intellij.util.xmlb.annotations.Tag;
 
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -54,12 +58,20 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
   public void writeExternal(Element element) throws WriteExternalException {
   }
 
-  public Set<AppEngineStandardMavenLibrary> getLibraries() {
-    return properties.libraries;
-  }
+  public Set<AppEngineStandardMavenLibrary> getLibraries(@NotNull Project project) {
+    LibraryTable libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project);
+    Library[] libraries =  libraryTable.getLibraries();
 
-  public void setLibraries(Set<AppEngineStandardMavenLibrary> libraries) {
-    properties.libraries = libraries;
+    Set<AppEngineStandardMavenLibrary> configuredLibraries = Sets.newHashSet();
+    for (Library configuredLibrary : libraries) {
+      AppEngineStandardMavenLibrary mavenLibrary
+          = AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(configuredLibrary.getName());
+      if (mavenLibrary != null) {
+        configuredLibraries.add(mavenLibrary);
+      }
+    }
+
+    return configuredLibraries;
   }
 
   @Override
@@ -74,7 +86,5 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
 
   public static class AppEngineFacetProperties {
 
-    @Tag("libraries")
-    public Set<AppEngineStandardMavenLibrary> libraries = new HashSet<>();
   }
 }
