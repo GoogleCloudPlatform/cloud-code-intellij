@@ -19,6 +19,8 @@ package com.google.cloud.tools.intellij.appengine.facet;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
+import com.intellij.openapi.roots.DependencyScope;
+
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.utils.library.RepositoryLibraryProperties;
@@ -32,15 +34,18 @@ import java.util.Arrays;
 public enum AppEngineStandardMavenLibrary {
   // TODO get display names from bundle (in form too)
   SERVLET_API("Servlet API", new RepositoryLibraryProperties(
-      "javax.servlet", "servlet-api", "2.5")),
+      "javax.servlet", "servlet-api", "2.5"), DependencyScope.PROVIDED),
   JSTL("JSP Standard Tag Library (JSTL)", new RepositoryLibraryProperties(
-      "javax.servlet", "jstl", RepositoryUtils.LatestVersionId)),
+      "javax.servlet", "jstl", RepositoryUtils.LatestVersionId), DependencyScope.PROVIDED),
   APP_ENGINE_API("App Engine API", new RepositoryLibraryProperties(
-      "com.google.appengine", "appengine-api-1.0-sdk", RepositoryUtils.LatestVersionId)),
+      "com.google.appengine", "appengine-api-1.0-sdk", RepositoryUtils.LatestVersionId),
+      DependencyScope.COMPILE),
   ENDPOINTS("App Engine Endpoints", new RepositoryLibraryProperties(
-      "com.google.appengine", "appengine-endpoints", RepositoryUtils.LatestVersionId)),
+      "com.google.appengine", "appengine-endpoints", RepositoryUtils.LatestVersionId),
+      DependencyScope.COMPILE),
   OBJECTIFY("Objectify", new RepositoryLibraryProperties(
-      "com.googlecode.objectify", "objectify", RepositoryUtils.LatestVersionId));
+      "com.googlecode.objectify", "objectify", RepositoryUtils.LatestVersionId),
+      DependencyScope.COMPILE);
   // TODO: do we need these?
 //  JSR_107_CACHE("JSR 107: Java Temporary Caching API", new RepositoryLibraryProperties(
 //      "net.sf.jsr107cache", "jsr107cache", RepositoryUtils.LatestVersionId)),
@@ -49,10 +54,13 @@ public enum AppEngineStandardMavenLibrary {
 
   private final String displayName;
   private final RepositoryLibraryProperties libraryProperties;
+  private final DependencyScope scope;
 
-  AppEngineStandardMavenLibrary(String displayName, RepositoryLibraryProperties libraryProperties) {
+  AppEngineStandardMavenLibrary(String displayName, RepositoryLibraryProperties libraryProperties,
+      DependencyScope scope) {
     this.displayName = displayName;
     this.libraryProperties = libraryProperties;
+    this.scope = scope;
   }
 
   public String getDisplayName() {
@@ -61,6 +69,10 @@ public enum AppEngineStandardMavenLibrary {
 
   public RepositoryLibraryProperties getLibraryProperties() {
     return libraryProperties;
+  }
+
+  public DependencyScope getScope() {
+    return scope;
   }
 
   @Nullable

@@ -69,7 +69,8 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
         JavaProjectModelModificationService
             .getInstance(module.getProject()).addDependency(module, addedLibrary,
-            DependencyScope.COMPILE); // TODO set proper scope
+            AppEngineStandardMavenLibrary
+                .getLibraryByMavenDisplayName(addedLibrary.getName()).getScope());
         AppEngineWebIntegration.getInstance()
             .addLibraryToArtifact(addedLibrary, artifact, module.getProject());
 

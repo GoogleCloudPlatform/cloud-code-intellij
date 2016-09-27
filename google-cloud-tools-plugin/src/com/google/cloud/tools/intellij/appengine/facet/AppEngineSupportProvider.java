@@ -180,7 +180,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
           for (AppEngineStandardMavenLibrary libraryToAdd : librariesToAdd) {
             Library mavenLibrary = loadMavenLibrary(module, libraryToAdd);
             if (mavenLibrary != null) {
-              rootModel.addLibraryEntry(mavenLibrary); // todo .setScope(blah)
+              rootModel.addLibraryEntry(mavenLibrary).setScope(libraryToAdd.getScope());
               AppEngineWebIntegration.getInstance()
                   .addLibraryToArtifact(mavenLibrary, webArtifact, module.getProject());
             }
