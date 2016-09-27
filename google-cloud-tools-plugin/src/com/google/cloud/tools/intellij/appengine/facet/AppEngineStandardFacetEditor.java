@@ -28,6 +28,7 @@ import com.intellij.openapi.roots.DependencyScope;
 import com.intellij.openapi.roots.JavaProjectModelModificationService;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable.Listener;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
@@ -70,7 +71,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
             .getInstance(module.getProject()).addDependency(module, addedLibrary,
             DependencyScope.COMPILE); // TODO set proper scope
         AppEngineWebIntegration.getInstance()
-                  .addLibraryToArtifact(addedLibrary, artifact, module.getProject());
+            .addLibraryToArtifact(addedLibrary, artifact, module.getProject());
 
         appEngineStandardLibraryPanel.toggleLibrary(
             AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(addedLibrary.getName()),
@@ -79,6 +80,17 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
       @Override
       public void afterLibraryRemoved(Library removedLibrary) {
+        ModuleRootManager manager = ModuleRootManager
+            .getInstance(AppEngineStandardFacetEditor.this.context.getModule());
+        ModifiableRootModel model = manager.getModifiableModel();
+
+        for (OrderEntry orderEntry : model.getOrderEntries()) {
+          if (orderEntry.getPresentableName().equals(removedLibrary.getName())) {
+            model.removeOrderEntry(orderEntry);
+          }
+        }
+        model.commit();
+
         appEngineStandardLibraryPanel.toggleLibrary(
             AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(removedLibrary.getName()),
             false);
@@ -123,11 +135,9 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     final Set<AppEngineStandardMavenLibrary> libsToAdd = Sets.difference(selectedLibs, savedLibs);
     Set<AppEngineStandardMavenLibrary> libsToRemove = Sets.difference(savedLibs, selectedLibs);
-
     if (!libsToAdd.isEmpty()) {
       final ModifiableRootModel rootModel
-          = ModuleRootManager.getInstance(context.getModule()).getModifiableModel();
-
+        = ModuleRootManager.getInstance(context.getModule()).getModifiableModel();
       AppEngineSupportProvider.addMavenLibraries(libsToAdd, context.getModule(),
           rootModel,
           AppEngineSupportProvider
@@ -135,7 +145,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
     }
 
     if (!libsToRemove.isEmpty()) {
-      AppEngineSupportProvider.removeMavenLibraries(libsToRemove, context.getProject());
+      AppEngineSupportProvider.removeMavenLibraries(libsToRemove, context.getModule());
     }
   }
 

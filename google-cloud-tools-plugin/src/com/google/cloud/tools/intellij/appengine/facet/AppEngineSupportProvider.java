@@ -32,15 +32,17 @@ import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModelListener;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportProvider;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
@@ -188,21 +190,29 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     }.execute();
   }
 
-  static void removeMavenLibraries(Set<AppEngineStandardMavenLibrary> librariesToRemove,
-      Project project) {
-    // TODO fix this
-//    for (AppEngineStandardMavenLibrary libraryToRemove : librariesToRemove) {
-//      LibraryTable libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project);
-//      Library library = libraryTable.getLibraryByName(
-//          AppEngineStandardMavenLibrary.toMavenDisplayVersion(
-//              libraryToRemove.getLibraryProperties()));
-//      if (library != null) {
-//        ProjectLibraryTable.getInstance(project).removeLibrary(library);
-//      }
-//    }
+  static void removeMavenLibraries(final Set<AppEngineStandardMavenLibrary> librariesToRemove,
+      final Module module) {
+    for (AppEngineStandardMavenLibrary libraryToRemove : librariesToRemove) {
+      final LibraryTable libraryTable = ProjectLibraryTable.getInstance(module.getProject());
+      final String displayName = AppEngineStandardMavenLibrary
+          .toMavenDisplayVersion(libraryToRemove.getLibraryProperties());
+      final Library library = libraryTable.getLibraryByName(displayName);
+      if (library != null) {
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+          public void run() {
+            new WriteAction() {
+              @Override
+              protected void run(@NotNull Result result) throws Throwable {
+                libraryTable.removeLibrary(library);
+              }
+            }.execute();
+          }
+        }, ModalityState.NON_MODAL);
+      }
+    }
   }
 
-   static Library loadMavenLibrary(Module module, AppEngineStandardMavenLibrary library) {
+  static Library loadMavenLibrary(Module module, AppEngineStandardMavenLibrary library) {
     RepositoryLibraryProperties libraryProperties = library.getLibraryProperties();
 
     RepositoryWithVersionAddLibraryAction action = new RepositoryWithVersionAddLibraryAction(
