@@ -32,10 +32,13 @@ import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModelListener;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportProvider;
+import com.intellij.openapi.application.Result;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.libraries.Library;
@@ -166,28 +169,40 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
   }
 
   static void addMavenLibraries(
-      Set<AppEngineStandardMavenLibrary> librariesToAdd, Module module, ModifiableRootModel rootModel,
-      Artifact webArtifact) {
-    if (librariesToAdd != null && !librariesToAdd.isEmpty()) {
-      for (AppEngineStandardMavenLibrary libraryToAdd : librariesToAdd) {
-        Library mavenLibrary = loadMavenLibrary(module, libraryToAdd);
-        if (mavenLibrary != null) {
-          rootModel.addLibraryEntry(mavenLibrary);
-          AppEngineWebIntegration.getInstance()
-              .addLibraryToArtifact(mavenLibrary, webArtifact, module.getProject());
+      final Set<AppEngineStandardMavenLibrary> librariesToAdd, final Module module,
+      final ModifiableRootModel rootModel, final Artifact webArtifact) {
+    new WriteAction() {
+      @Override
+      protected void run(@NotNull Result result) throws Throwable {
+        if (librariesToAdd != null && !librariesToAdd.isEmpty()) {
+          for (AppEngineStandardMavenLibrary libraryToAdd : librariesToAdd) {
+            Library mavenLibrary = loadMavenLibrary(module, libraryToAdd);
+            if (mavenLibrary != null) {
+              rootModel.addLibraryEntry(mavenLibrary); // todo .setScope(blah)
+              AppEngineWebIntegration.getInstance()
+                  .addLibraryToArtifact(mavenLibrary, webArtifact, module.getProject());
+            }
+          }
         }
       }
-    }
-
-    // todo need to do from a writable thread? must commit the model after!!!!
+    }.execute();
   }
 
-//  static void removeMavenLibraries(Set<AppEngineStandardMavenLibrary librariesToRemove> library,
-//      Project project) {
-//    ProjectLibraryTable.getInstance(project).removeLibrary();
-//  }
+  static void removeMavenLibraries(Set<AppEngineStandardMavenLibrary> librariesToRemove,
+      Project project) {
+    // TODO fix this
+//    for (AppEngineStandardMavenLibrary libraryToRemove : librariesToRemove) {
+//      LibraryTable libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project);
+//      Library library = libraryTable.getLibraryByName(
+//          AppEngineStandardMavenLibrary.toMavenDisplayVersion(
+//              libraryToRemove.getLibraryProperties()));
+//      if (library != null) {
+//        ProjectLibraryTable.getInstance(project).removeLibrary(library);
+//      }
+//    }
+  }
 
-  private static Library loadMavenLibrary(Module module, AppEngineStandardMavenLibrary library) {
+   static Library loadMavenLibrary(Module module, AppEngineStandardMavenLibrary library) {
     RepositoryLibraryProperties libraryProperties = library.getLibraryProperties();
 
     RepositoryWithVersionAddLibraryAction action = new RepositoryWithVersionAddLibraryAction(
@@ -197,7 +212,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     action.invoke(module.getProject(), null, null);
 
     LibraryTable libraryTable = LibraryTablesRegistrar.getInstance()
-            .getLibraryTable(module.getProject());
+        .getLibraryTable(module.getProject());
 
     return libraryTable.getLibraryByName(
         AppEngineStandardMavenLibrary.toMavenDisplayVersion(libraryProperties));

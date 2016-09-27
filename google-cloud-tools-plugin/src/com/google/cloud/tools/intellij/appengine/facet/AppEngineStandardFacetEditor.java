@@ -23,9 +23,15 @@ import com.google.common.collect.Sets;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.roots.DependencyScope;
+import com.intellij.openapi.roots.JavaProjectModelModificationService;
+import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable.Listener;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
+import com.intellij.packaging.artifacts.Artifact;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -55,6 +61,17 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
         .getLibraryTable(context.getProject()).addListener(new Listener() {
       @Override
       public void afterLibraryAdded(Library addedLibrary) {
+        Module module = AppEngineStandardFacetEditor.this.context.getModule();
+        Facet facet = AppEngineStandardFacetEditor.this.context.getFacet();
+        Artifact artifact = AppEngineSupportProvider
+            .findOrCreateWebArtifact((AppEngineFacet) facet);
+
+        JavaProjectModelModificationService
+            .getInstance(module.getProject()).addDependency(module, addedLibrary,
+            DependencyScope.COMPILE); // TODO set proper scope
+        AppEngineWebIntegration.getInstance()
+                  .addLibraryToArtifact(addedLibrary, artifact, module.getProject());
+
         appEngineStandardLibraryPanel.toggleLibrary(
             AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(addedLibrary.getName()),
             true);
@@ -104,23 +121,22 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
     Set<AppEngineStandardMavenLibrary> selectedLibs
         = appEngineStandardLibraryPanel.getSelectedLibraries();
 
-    Set<AppEngineStandardMavenLibrary> libsToAdd = Sets.difference(selectedLibs, savedLibs);
+    final Set<AppEngineStandardMavenLibrary> libsToAdd = Sets.difference(selectedLibs, savedLibs);
     Set<AppEngineStandardMavenLibrary> libsToRemove = Sets.difference(savedLibs, selectedLibs);
 
-    // just need to add the libs. the listener will take care of updating the panel?
+    if (!libsToAdd.isEmpty()) {
+      final ModifiableRootModel rootModel
+          = ModuleRootManager.getInstance(context.getModule()).getModifiableModel();
 
-//    if (!libsToAdd.isEmpty()) { // TODO verify the addition so it doesn't get out of sync with the module config
-//      ModifiableRootModel rootModel = ModifiableModelsProvider.SERVICE.getInstance()
-//          .getModuleModifiableModel(context.getModule());
-//      AppEngineSupportProvider.addMavenLibraries(libsToAdd, context.getModule(),
-//          rootModel,
-//          AppEngineSupportProvider.findOrCreateWebArtifact((AppEngineFacet) context.getFacet()));
-//    }
-//    if (!libsToRemove.isEmpty()) {
-//      AppEngineSupportProvider.removeMavenLibrary(libsToRemove, context.getProject());
-//    }
+      AppEngineSupportProvider.addMavenLibraries(libsToAdd, context.getModule(),
+          rootModel,
+          AppEngineSupportProvider
+              .findOrCreateWebArtifact((AppEngineFacet) context.getFacet()));
+    }
 
-//    facetConfiguration.setLibraries(selectedLibs);
+    if (!libsToRemove.isEmpty()) {
+      AppEngineSupportProvider.removeMavenLibraries(libsToRemove, context.getProject());
+    }
   }
 
   @Override
