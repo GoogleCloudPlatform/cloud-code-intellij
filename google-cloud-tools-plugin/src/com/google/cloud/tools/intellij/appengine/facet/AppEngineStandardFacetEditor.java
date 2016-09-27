@@ -25,6 +25,7 @@ import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.DependencyScope;
+import com.intellij.openapi.roots.ExportableOrderEntry;
 import com.intellij.openapi.roots.JavaProjectModelModificationService;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -66,11 +67,22 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
         Facet facet = AppEngineStandardFacetEditor.this.context.getFacet();
         Artifact artifact = AppEngineSupportProvider
             .findOrCreateWebArtifact((AppEngineFacet) facet);
+        DependencyScope scope = AppEngineStandardMavenLibrary
+                    .getLibraryByMavenDisplayName(addedLibrary.getName()).getScope();
 
-        JavaProjectModelModificationService
-            .getInstance(module.getProject()).addDependency(module, addedLibrary,
-            AppEngineStandardMavenLibrary
-                .getLibraryByMavenDisplayName(addedLibrary.getName()).getScope());
+        JavaProjectModelModificationService.getInstance(module.getProject())
+            .addDependency(module, addedLibrary, scope);
+
+        ModuleRootManager manager = ModuleRootManager
+            .getInstance(AppEngineStandardFacetEditor.this.context.getModule());
+        ModifiableRootModel model = manager.getModifiableModel();
+        for (OrderEntry orderEntry : model.getOrderEntries()) {
+          if (orderEntry.getPresentableName().equals(addedLibrary.getName())) {
+            ((ExportableOrderEntry) orderEntry).setScope(scope);
+          }
+        }
+        model.commit();
+
         AppEngineWebIntegration.getInstance()
             .addLibraryToArtifact(addedLibrary, artifact, module.getProject());
 
