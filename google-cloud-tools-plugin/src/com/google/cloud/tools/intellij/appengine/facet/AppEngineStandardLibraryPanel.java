@@ -48,15 +48,17 @@ public class AppEngineStandardLibraryPanel {
 
   public Set<AppEngineStandardMavenLibrary> getSelectedLibraries() {
     return Sets.newHashSet(Collections2.filter(
-        Collections2.transform(libraryGroup, new Function<JCheckBox, AppEngineStandardMavenLibrary>() {
-          @Nullable
-          @Override
-          public AppEngineStandardMavenLibrary apply(JCheckBox libraryCheckbox) {
-            return libraryCheckbox.isSelected()
-                ? AppEngineStandardMavenLibrary.getLibraryByDisplayName(libraryCheckbox.getText())
-                : null;
-          }
-        }),
+        Collections2.transform(libraryGroup,
+            new Function<JCheckBox, AppEngineStandardMavenLibrary>() {
+              @Nullable
+              @Override
+              public AppEngineStandardMavenLibrary apply(JCheckBox libraryCheckbox) {
+                return libraryCheckbox.isSelected()
+                    ? AppEngineStandardMavenLibrary
+                    .getLibraryByDisplayName(libraryCheckbox.getText())
+                    : null;
+              }
+            }),
         Predicates.notNull()
     ));
   }

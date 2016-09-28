@@ -144,8 +144,6 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     @Override
     public void afterLibraryAdded(Library addedLibrary) {
-      Artifact artifact = AppEngineSupportProvider
-          .findOrCreateWebArtifact((AppEngineFacet) context.getFacet());
       DependencyScope scope = AppEngineStandardMavenLibrary
           .getLibraryByMavenDisplayName(addedLibrary.getName()).getScope();
 
@@ -161,6 +159,8 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
       }
       model.commit();
 
+      Artifact artifact = AppEngineSupportProvider
+          .findOrCreateWebArtifact((AppEngineFacet) context.getFacet());
       AppEngineWebIntegration.getInstance()
           .addLibraryToArtifact(addedLibrary, artifact, context.getProject());
 

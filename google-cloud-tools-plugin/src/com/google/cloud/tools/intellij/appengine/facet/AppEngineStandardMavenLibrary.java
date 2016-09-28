@@ -47,10 +47,11 @@ public enum AppEngineStandardMavenLibrary {
       "com.googlecode.objectify", "objectify", RepositoryUtils.LatestVersionId),
       DependencyScope.COMPILE);
   // TODO: do we need these?
-//  JSR_107_CACHE("JSR 107: Java Temporary Caching API", new RepositoryLibraryProperties(
-//      "net.sf.jsr107cache", "jsr107cache", RepositoryUtils.LatestVersionId)),
-//  APP_ENGINE_JSR_107_CACHE("JSR 107: Java Temporary Caching API", new RepositoryLibraryProperties(
-//      "com.google.appengine", "appengine", RepositoryUtils.LatestVersionId));
+  //  JSR_107_CACHE("JSR 107: Java Temporary Caching API", new RepositoryLibraryProperties(
+  //      "net.sf.jsr107cache", "jsr107cache", RepositoryUtils.LatestVersionId)),
+  //  APP_ENGINE_JSR_107_CACHE("JSR 107: Java Temporary Caching API",
+  //     new RepositoryLibraryProperties("com.google.appengine", "appengine",
+  //        RepositoryUtils.LatestVersionId));
 
   private final String displayName;
   private final RepositoryLibraryProperties libraryProperties;
@@ -79,8 +80,8 @@ public enum AppEngineStandardMavenLibrary {
   public static AppEngineStandardMavenLibrary getLibraryByDisplayName(final String name) {
     return getLibrary(new Predicate<AppEngineStandardMavenLibrary>() {
       @Override
-      public boolean apply(AppEngineStandardMavenLibrary library) {
-        return name.equals(library.getDisplayName());
+      public boolean apply(@Nullable AppEngineStandardMavenLibrary library) {
+        return library != null && name.equals(library.getDisplayName());
       }
     });
   }
@@ -89,8 +90,9 @@ public enum AppEngineStandardMavenLibrary {
   public static AppEngineStandardMavenLibrary getLibraryByMavenDisplayName(final String name) {
     return getLibrary(new Predicate<AppEngineStandardMavenLibrary>() {
       @Override
-      public boolean apply(AppEngineStandardMavenLibrary library) {
-        return name.equals(toMavenDisplayVersion(library.getLibraryProperties()));
+      public boolean apply(@Nullable AppEngineStandardMavenLibrary library) {
+        return library != null
+            && name.equals(toMavenDisplayVersion(library.getLibraryProperties()));
       }
     });
   }
