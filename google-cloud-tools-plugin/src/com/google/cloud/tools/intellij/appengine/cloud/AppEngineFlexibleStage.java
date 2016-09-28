@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.common.collect.ImmutableSet;
-
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermission;
 
 /**
  * Stages an application in preparation for deployment to the App Engine flexible environment.
@@ -60,22 +57,16 @@ public class AppEngineFlexibleStage {
       Path stagedArtifactPath = stagingDirectory.resolve(
           "target" + AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath));
       Files.copy(deploymentArtifactPath, stagedArtifactPath);
-      Files.setPosixFilePermissions(stagedArtifactPath, ImmutableSet.of(
-          PosixFilePermission.OTHERS_READ,
-          PosixFilePermission.GROUP_READ,
-          PosixFilePermission.OWNER_READ
-      ));
 
       Path appYamlPath = deploymentConfiguration.isAuto()
           ? helper.defaultAppYaml()
           : Paths.get(deploymentConfiguration.getAppYamlPath());
+      Files.copy(appYamlPath, stagingDirectory.resolve("app.yaml"));
 
       Path dockerFilePath = deploymentConfiguration.isAuto()
           ? helper.defaultDockerfile(
           AppEngineFlexDeploymentArtifactType.typeForPath(deploymentArtifactPath))
           : Paths.get(deploymentConfiguration.getDockerFilePath());
-
-      Files.copy(appYamlPath, stagingDirectory.resolve("app.yaml"));
       Files.copy(dockerFilePath, stagingDirectory.resolve("Dockerfile"));
     } catch (IOException ex) {
       loggingHandler.print(ex.getMessage() + "\n");
