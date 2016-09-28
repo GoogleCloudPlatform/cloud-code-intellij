@@ -23,7 +23,6 @@ import com.google.common.collect.Sets;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.DependencyScope;
 import com.intellij.openapi.roots.ExportableOrderEntry;
 import com.intellij.openapi.roots.JavaProjectModelModificationService;
@@ -53,70 +52,17 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   private final FacetEditorContext context;
   private JPanel myMainPanel;
   private AppEngineStandardLibraryPanel appEngineStandardLibraryPanel;
+  private Listener libraryListener;
+
 
   public AppEngineStandardFacetEditor(AppEngineFacetConfiguration facetConfiguration,
       FacetEditorContext context) {
     this.facetConfiguration = facetConfiguration;
     this.context = context;
+    libraryListener = new LibraryModificationListener();
 
     LibraryTablesRegistrar.getInstance()
-        .getLibraryTable(context.getProject()).addListener(new Listener() {
-      @Override
-      public void afterLibraryAdded(Library addedLibrary) {
-        Module module = AppEngineStandardFacetEditor.this.context.getModule();
-        Facet facet = AppEngineStandardFacetEditor.this.context.getFacet();
-        Artifact artifact = AppEngineSupportProvider
-            .findOrCreateWebArtifact((AppEngineFacet) facet);
-        DependencyScope scope = AppEngineStandardMavenLibrary
-                    .getLibraryByMavenDisplayName(addedLibrary.getName()).getScope();
-
-        JavaProjectModelModificationService.getInstance(module.getProject())
-            .addDependency(module, addedLibrary, scope);
-
-        ModuleRootManager manager = ModuleRootManager
-            .getInstance(AppEngineStandardFacetEditor.this.context.getModule());
-        ModifiableRootModel model = manager.getModifiableModel();
-        for (OrderEntry orderEntry : model.getOrderEntries()) {
-          if (orderEntry.getPresentableName().equals(addedLibrary.getName())) {
-            ((ExportableOrderEntry) orderEntry).setScope(scope);
-          }
-        }
-        model.commit();
-
-        AppEngineWebIntegration.getInstance()
-            .addLibraryToArtifact(addedLibrary, artifact, module.getProject());
-
-        appEngineStandardLibraryPanel.toggleLibrary(
-            AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(addedLibrary.getName()),
-            true);
-      }
-
-      @Override
-      public void afterLibraryRemoved(Library removedLibrary) {
-        ModuleRootManager manager = ModuleRootManager
-            .getInstance(AppEngineStandardFacetEditor.this.context.getModule());
-        ModifiableRootModel model = manager.getModifiableModel();
-
-        for (OrderEntry orderEntry : model.getOrderEntries()) {
-          if (orderEntry.getPresentableName().equals(removedLibrary.getName())) {
-            model.removeOrderEntry(orderEntry);
-          }
-        }
-        model.commit();
-
-        appEngineStandardLibraryPanel.toggleLibrary(
-            AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(removedLibrary.getName()),
-            false);
-      }
-
-      @Override
-      public void afterLibraryRenamed(Library library) {
-      }
-
-      @Override
-      public void beforeLibraryRemoved(Library library) {
-      }
-    });
+        .getLibraryTable(context.getProject()).addListener(libraryListener);
   }
 
   @Nls
@@ -150,7 +96,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
     Set<AppEngineStandardMavenLibrary> libsToRemove = Sets.difference(savedLibs, selectedLibs);
     if (!libsToAdd.isEmpty()) {
       final ModifiableRootModel rootModel
-        = ModuleRootManager.getInstance(context.getModule()).getModifiableModel();
+          = ModuleRootManager.getInstance(context.getModule()).getModifiableModel();
       AppEngineSupportProvider.addMavenLibraries(libsToAdd, context.getModule(),
           rootModel,
           AppEngineSupportProvider
@@ -170,6 +116,10 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   @SuppressWarnings("checkstyle:abbreviationaswordinname")
   public void disposeUIResources() {
+    if (libraryListener != null) {
+      LibraryTablesRegistrar.getInstance()
+          .getLibraryTable(context.getProject()).removeListener(libraryListener);
+    }
   }
 
   @Override
@@ -187,5 +137,60 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
         .trackEvent(GctTracking.APP_ENGINE_ADD_FACET)
         .withLabel("setOnModule")
         .ping();
+  }
+
+  public class LibraryModificationListener implements Listener {
+
+    @Override
+    public void afterLibraryAdded(Library addedLibrary) {
+      Artifact artifact = AppEngineSupportProvider
+          .findOrCreateWebArtifact((AppEngineFacet) context.getFacet());
+      DependencyScope scope = AppEngineStandardMavenLibrary
+          .getLibraryByMavenDisplayName(addedLibrary.getName()).getScope();
+
+      JavaProjectModelModificationService.getInstance(context.getProject())
+          .addDependency(context.getModule(), addedLibrary, scope);
+
+      ModuleRootManager manager = ModuleRootManager.getInstance(context.getModule());
+      ModifiableRootModel model = manager.getModifiableModel();
+      for (OrderEntry orderEntry : model.getOrderEntries()) {
+        if (orderEntry.getPresentableName().equals(addedLibrary.getName())) {
+          ((ExportableOrderEntry) orderEntry).setScope(scope);
+        }
+      }
+      model.commit();
+
+      AppEngineWebIntegration.getInstance()
+          .addLibraryToArtifact(addedLibrary, artifact, context.getProject());
+
+      appEngineStandardLibraryPanel.toggleLibrary(
+          AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(addedLibrary.getName()),
+          true);
+    }
+
+    @Override
+    public void afterLibraryRemoved(Library removedLibrary) {
+      ModuleRootManager manager = ModuleRootManager.getInstance(context.getModule());
+      ModifiableRootModel model = manager.getModifiableModel();
+
+      for (OrderEntry orderEntry : model.getOrderEntries()) {
+        if (orderEntry.getPresentableName().equals(removedLibrary.getName())) {
+          model.removeOrderEntry(orderEntry);
+        }
+      }
+      model.commit();
+
+      appEngineStandardLibraryPanel.toggleLibrary(
+          AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(removedLibrary.getName()),
+          false);
+    }
+
+    @Override
+    public void afterLibraryRenamed(Library library) {
+    }
+
+    @Override
+    public void beforeLibraryRemoved(Library library) {
+    }
   }
 }
