@@ -60,9 +60,7 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
     ArtifactsTestUtil.assertLayout(myProject, moduleName, "<root>\n" +
                                                           " WEB-INF/\n" +
                                                           "  classes/\n" +
-                                                          "   module:" + moduleName + "\n" +
-                                                          "  lib/\n" +
-                                                          "   lib:AppEngine API(project)\n");
+                                                          "   module:" + moduleName + "\n");
   }
 
   private void setupAppEngine() {
@@ -101,9 +99,7 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
                                                               " javaee-resources:Web(" + moduleName + ")\n" +
                                                               " WEB-INF/\n" +
                                                               "  classes/\n" +
-                                                              "   module:" + moduleName + "\n" +
-                                                              "  lib/\n" +
-                                                              "   lib:AppEngine API(project)\n");
+                                                              "   module:" + moduleName + "\n");
     assertRunConfigurationCreated(artifact);
   }
 
