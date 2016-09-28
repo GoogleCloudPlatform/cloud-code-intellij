@@ -89,6 +89,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             String jvmDebugFlag = envVariables.get("");
             if (jvmDebugFlag != null) {
               runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
+              // prevent multiple JVMs from being created to make debugging deterministic
+              runConfiguration.setMaxModuleInstances(1);
             }
 
             AppEngineStandardRunTask runTask =
