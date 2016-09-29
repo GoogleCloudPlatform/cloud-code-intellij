@@ -36,15 +36,15 @@ public enum AppEngineStandardMavenLibrary {
   SERVLET_API("Servlet API", new RepositoryLibraryProperties(
       "javax.servlet", "servlet-api", "2.5"), DependencyScope.PROVIDED),
   JSTL("JSP Standard Tag Library (JSTL)", new RepositoryLibraryProperties(
-      "javax.servlet", "jstl", RepositoryUtils.LatestVersionId), DependencyScope.PROVIDED),
+      "javax.servlet", "jstl", RepositoryUtils.ReleaseVersionId), DependencyScope.PROVIDED),
   APP_ENGINE_API("App Engine API", new RepositoryLibraryProperties(
-      "com.google.appengine", "appengine-api-1.0-sdk", RepositoryUtils.LatestVersionId),
+      "com.google.appengine", "appengine-api-1.0-sdk", RepositoryUtils.ReleaseVersionId),
       DependencyScope.COMPILE),
   ENDPOINTS("App Engine Endpoints", new RepositoryLibraryProperties(
-      "com.google.appengine", "appengine-endpoints", RepositoryUtils.LatestVersionId),
+      "com.google.appengine", "appengine-endpoints", RepositoryUtils.ReleaseVersionId),
       DependencyScope.COMPILE),
   OBJECTIFY("Objectify", new RepositoryLibraryProperties(
-      "com.googlecode.objectify", "objectify", RepositoryUtils.LatestVersionId),
+      "com.googlecode.objectify", "objectify", RepositoryUtils.ReleaseVersionId),
       DependencyScope.COMPILE);
   // TODO: do we need these?
   //  JSR_107_CACHE("JSR 107: Java Temporary Caching API", new RepositoryLibraryProperties(
