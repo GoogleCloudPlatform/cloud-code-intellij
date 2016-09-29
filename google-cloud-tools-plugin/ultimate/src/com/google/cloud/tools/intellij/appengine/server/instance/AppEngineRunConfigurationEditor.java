@@ -100,6 +100,16 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     }
   }
 
+  /**
+   * Resets the configuration editor form using the settings in the server model. The following
+   * settings have been omitted from the form:
+   * <ul>
+   * <li> maxModuleInstances - we set this on behalf of the user to prevent breaking the dev app
+   * server in debug mode. See
+   * <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/928">#928</a>
+   * </li>
+   * </ul>
+   */
   protected void resetEditorFrom(CommonModel commonModel) {
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
     final Artifact artifact = serverModel.getArtifact();
