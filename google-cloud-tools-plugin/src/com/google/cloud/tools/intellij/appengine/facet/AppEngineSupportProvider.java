@@ -183,6 +183,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
               rootModel.addLibraryEntry(mavenLibrary).setScope(libraryToAdd.getScope());
               AppEngineWebIntegration.getInstance()
                   .addLibraryToArtifact(mavenLibrary, webArtifact, module.getProject());
+            } else {
+              LOG.warn("Failed to load library: " + libraryToAdd.getDisplayName());
             }
           }
         }
