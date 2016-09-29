@@ -63,7 +63,7 @@ public class AppEngineStandardLibraryPanel {
     ));
   }
 
-  public void selectLibraries(Set<AppEngineStandardMavenLibrary> libraries) {
+  public void setSelectLibraries(Set<AppEngineStandardMavenLibrary> libraries) {
     Collection<String> availableLibraryNames = Collections2.transform(libraries,
         new Function<AppEngineStandardMavenLibrary, String>() {
           @Nullable

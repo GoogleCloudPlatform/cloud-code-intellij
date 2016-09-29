@@ -34,7 +34,6 @@ import com.intellij.openapi.roots.libraries.LibraryTable.Listener;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.packaging.artifacts.Artifact;
 
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -50,7 +49,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   private final AppEngineFacetConfiguration facetConfiguration;
   private final FacetEditorContext context;
-  private JPanel myMainPanel;
+  private JPanel mainPanel;
   private AppEngineStandardLibraryPanel appEngineStandardLibraryPanel;
   private Listener libraryListener;
 
@@ -65,14 +64,13 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
         .getLibraryTable(context.getProject()).addListener(libraryListener);
   }
 
-  @Nls
   public String getDisplayName() {
     return "Google App Engine";
   }
 
   @NotNull
   public JComponent createComponent() {
-    return myMainPanel;
+    return mainPanel;
   }
 
   @Override
@@ -112,7 +110,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   @Override
   public void reset() {
     appEngineStandardLibraryPanel
-        .selectLibraries(facetConfiguration.getLibraries(context.getProject()));
+        .setSelectLibraries(facetConfiguration.getLibraries(context.getProject()));
   }
 
   @SuppressWarnings("checkstyle:abbreviationaswordinname")
@@ -166,7 +164,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
       appEngineStandardLibraryPanel.toggleLibrary(
           AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(addedLibrary.getName()),
-          true);
+          true /* select */);
     }
 
     @Override
@@ -188,10 +186,12 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     @Override
     public void afterLibraryRenamed(Library library) {
+      // do nothing
     }
 
     @Override
     public void beforeLibraryRemoved(Library library) {
+      // do nothing
     }
   }
 }
