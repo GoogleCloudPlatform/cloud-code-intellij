@@ -17,11 +17,13 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.intellij.codeInspection.CommonProblemDescriptor;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.IdeaModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.psi.PsiFile;
 
 import org.jetbrains.annotations.NotNull;
@@ -65,14 +67,16 @@ public class RepositoryWithVersionAddLibraryAction extends RepositoryAddLibraryA
         this.libraryDescription, false);
     if (dialog.showAndGet()) {
       IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
-      final ModifiableRootModel modifiableModel = modifiableModelsProvider
-          .getModuleModifiableModel(this.module);
+      final ModifiableRootModel modifiableModel = ModuleRootManager.getInstance(module).getModifiableModel();
       RepositoryLibrarySupport librarySupport = new RepositoryLibrarySupport(project,
           this.libraryDescription, model);
 
-      assert modifiableModel != null;
-
       librarySupport.addSupport(this.module, modifiableModel, modifiableModelsProvider);
+      ApplicationManager.getApplication().runWriteAction(new Runnable() {
+        public void run() {
+          modifiableModel.commit();
+        }
+      });
     }
   }
 }
