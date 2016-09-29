@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.intellij.codeInspection.CommonProblemDescriptor;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -74,11 +73,6 @@ public class RepositoryWithVersionAddLibraryAction extends RepositoryAddLibraryA
       assert modifiableModel != null;
 
       librarySupport.addSupport(this.module, modifiableModel, modifiableModelsProvider);
-      ApplicationManager.getApplication().runWriteAction(new Runnable() {
-        public void run() {
-          modifiableModel.commit();
-        }
-      });
     }
   }
 }

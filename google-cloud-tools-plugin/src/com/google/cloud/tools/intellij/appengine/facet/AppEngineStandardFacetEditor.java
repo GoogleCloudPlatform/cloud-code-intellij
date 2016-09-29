@@ -23,9 +23,10 @@ import com.google.common.collect.Sets;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
+import com.intellij.openapi.application.Result;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.roots.DependencyScope;
 import com.intellij.openapi.roots.ExportableOrderEntry;
-import com.intellij.openapi.roots.JavaProjectModelModificationService;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEntry;
@@ -138,21 +139,26 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   public class LibraryModificationListener implements Listener {
 
     @Override
-    public void afterLibraryAdded(Library addedLibrary) {
-      DependencyScope scope = AppEngineStandardMavenLibrary
+    public void afterLibraryAdded(final Library addedLibrary) {
+      final DependencyScope scope = AppEngineStandardMavenLibrary
           .getLibraryByMavenDisplayName(addedLibrary.getName()).getScope();
 
-      JavaProjectModelModificationService.getInstance(context.getProject())
-          .addDependency(context.getModule(), addedLibrary, scope);
+      new WriteAction() {
+        @Override
+        protected void run(@NotNull Result result) throws Throwable {
+          ModuleRootManager manager = ModuleRootManager.getInstance(context.getModule());
+          ModifiableRootModel model = manager.getModifiableModel();
 
-      ModuleRootManager manager = ModuleRootManager.getInstance(context.getModule());
-      ModifiableRootModel model = manager.getModifiableModel();
-      for (OrderEntry orderEntry : model.getOrderEntries()) {
-        if (orderEntry.getPresentableName().equals(addedLibrary.getName())) {
-          ((ExportableOrderEntry) orderEntry).setScope(scope);
+          model.addLibraryEntry(addedLibrary);
+
+          for (OrderEntry orderEntry : model.getOrderEntries()) {
+            if (orderEntry.getPresentableName().equals(addedLibrary.getName())) {
+              ((ExportableOrderEntry) orderEntry).setScope(scope);
+            }
+          }
+          model.commit();
         }
-      }
-      model.commit();
+      }.execute();
 
       Artifact artifact = AppEngineSupportProvider
           .findOrCreateWebArtifact((AppEngineFacet) context.getFacet());

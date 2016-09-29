@@ -45,7 +45,6 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
-import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -214,19 +213,19 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     }
   }
 
-  static Library loadMavenLibrary(Module module, AppEngineStandardMavenLibrary library) {
+  static Library loadMavenLibrary(final Module module, AppEngineStandardMavenLibrary library) {
     RepositoryLibraryProperties libraryProperties = library.getLibraryProperties();
 
-    RepositoryWithVersionAddLibraryAction action = new RepositoryWithVersionAddLibraryAction(
+    final RepositoryWithVersionAddLibraryAction action = new RepositoryWithVersionAddLibraryAction(
         module, RepositoryLibraryDescription.findDescription(libraryProperties),
         libraryProperties.getVersion());
 
     action.invoke(module.getProject(), null, null);
 
-    LibraryTable libraryTable = LibraryTablesRegistrar.getInstance()
-        .getLibraryTable(module.getProject());
+    LibraryTable.ModifiableModel modifiableModel = ModifiableModelsProvider.SERVICE.getInstance()
+        .getLibraryTableModifiableModel(module.getProject());
 
-    return libraryTable.getLibraryByName(
+    return modifiableModel.getLibraryByName(
         AppEngineStandardMavenLibrary.toMavenDisplayVersion(libraryProperties));
   }
 
