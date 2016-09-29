@@ -94,12 +94,9 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
     Set<AppEngineStandardMavenLibrary> libsToRemove = Sets.difference(savedLibs, selectedLibs);
 
     if (!libsToAdd.isEmpty()) {
-      final ModifiableRootModel rootModel
-          = ModuleRootManager.getInstance(context.getModule()).getModifiableModel();
-      AppEngineSupportProvider.addMavenLibraries(libsToAdd, context.getModule(),
-          rootModel,
-          AppEngineSupportProvider
-              .findOrCreateWebArtifact((AppEngineFacet) context.getFacet()));
+      for (AppEngineStandardMavenLibrary library : libsToAdd) {
+        AppEngineSupportProvider.loadMavenLibrary(context.getModule(), library);
+      }
     }
 
     if (!libsToRemove.isEmpty()) {
