@@ -65,7 +65,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField apiPort;
   private JTextField host;
   private JComboBox logLevel;
-  private JTextField maxModuleInstances;
   private JCheckBox useMtimeFileWatcher;
   private JTextField threadsafeOverride;
   private JCheckBox allowSkippedFiles;
@@ -117,7 +116,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     authDomain.setText(serverModel.getAuthDomain());
     storagePath.setText(serverModel.getStoragePath());
     logLevel.setSelectedItem(serverModel.getLogLevel());
-    maxModuleInstances.setText(intToString(serverModel.getMaxModuleInstances()));
     useMtimeFileWatcher.setSelected(serverModel.getUseMtimeFileWatcher());
     threadsafeOverride.setText(serverModel.getThreadsafeOverride());
     jvmFlags.setDialogCaption(GctBundle.getString("appengine.run.jvmflags.title"));
@@ -144,10 +142,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     serverModel.setAuthDomain(authDomain.getText());
     serverModel.setStoragePath(storagePath.getText());
     serverModel.setLogLevel((String) logLevel.getSelectedItem());
-    if (!maxModuleInstances.getText().isEmpty()) {
-      serverModel.setMaxModuleInstances(validateInteger(
-          maxModuleInstances.getText(), "maximum module instances"));
-    }
     serverModel.setUseMtimeFileWatcher(useMtimeFileWatcher.isSelected());
     serverModel.setThreadsafeOverride(threadsafeOverride.getText());
     serverModel.setJvmFlags(jvmFlags.getText());
