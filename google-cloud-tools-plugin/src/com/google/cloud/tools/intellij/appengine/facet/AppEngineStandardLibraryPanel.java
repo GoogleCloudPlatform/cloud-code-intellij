@@ -23,12 +23,14 @@ import com.google.common.collect.Sets;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.Component;
+import java.awt.GridLayout;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
@@ -37,25 +39,20 @@ import javax.swing.JPanel;
  */
 public class AppEngineStandardLibraryPanel {
 
+  private JPanel mainPanel;
   private JPanel libraryPanel;
-  private JCheckBox servletApi;
-  private JCheckBox jstl;
-  private JCheckBox appEngineApi;
-  private JCheckBox endpoints;
-  private JCheckBox objectify;
-  private List<JCheckBox> libraryGroup = Arrays.asList(servletApi, jstl, appEngineApi, endpoints,
-      objectify);
 
   public Set<AppEngineStandardMavenLibrary> getSelectedLibraries() {
     return Sets.newHashSet(Collections2.filter(
-        Collections2.transform(libraryGroup,
-            new Function<JCheckBox, AppEngineStandardMavenLibrary>() {
+        Collections2.transform(Arrays.asList(libraryPanel.getComponents()),
+            new Function<Component, AppEngineStandardMavenLibrary>() {
               @Nullable
               @Override
-              public AppEngineStandardMavenLibrary apply(JCheckBox libraryCheckbox) {
-                return libraryCheckbox.isSelected()
+              public AppEngineStandardMavenLibrary apply(Component libraryCheckbox) {
+                return libraryCheckbox instanceof JCheckBox
+                    && ((JCheckBox) libraryCheckbox).isSelected()
                     ? AppEngineStandardMavenLibrary
-                    .getLibraryByDisplayName(libraryCheckbox.getText())
+                    .getLibraryByDisplayName(((JCheckBox) libraryCheckbox).getText())
                     : null;
               }
             }),
@@ -73,15 +70,17 @@ public class AppEngineStandardLibraryPanel {
           }
         });
 
-    for (JCheckBox libraryCheckbox : libraryGroup) {
-      libraryCheckbox.setSelected(availableLibraryNames.contains(libraryCheckbox.getText()));
+    for (Component libraryCheckbox : libraryPanel.getComponents()) {
+      ((JCheckBox) libraryCheckbox)
+          .setSelected(availableLibraryNames.contains(((JCheckBox) libraryCheckbox).getText()));
     }
   }
 
   public void toggleLibrary(AppEngineStandardMavenLibrary library, boolean select) {
-    for (JCheckBox libraryCheckbox : libraryGroup) {
-      if (libraryCheckbox.getText().equals(library.getDisplayName())) {
-        libraryCheckbox.setSelected(select);
+    for (Component libraryCheckbox : libraryPanel.getComponents()) {
+      if (libraryCheckbox instanceof JCheckBox
+          && ((JCheckBox) libraryCheckbox).getText().equals(library.getDisplayName())) {
+        ((JCheckBox) libraryCheckbox).setSelected(select);
       }
     }
   }
@@ -89,5 +88,16 @@ public class AppEngineStandardLibraryPanel {
   @NotNull
   public JPanel getComponent() {
     return libraryPanel;
+  }
+
+  private void createUIComponents() {
+    libraryPanel = new JPanel(new GridLayout(AppEngineStandardMavenLibrary.values().length, 1));
+    libraryPanel.setBorder(
+        BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Libraries"));
+
+    for (AppEngineStandardMavenLibrary library : AppEngineStandardMavenLibrary.values()) {
+      final JCheckBox libraryCheckbox = new JCheckBox(library.getDisplayName());
+      libraryPanel.add(libraryCheckbox);
+    }
   }
 }
