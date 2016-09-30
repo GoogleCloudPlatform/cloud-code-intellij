@@ -39,6 +39,10 @@ import com.intellij.javaee.run.execution.DefaultOutputProcessor;
 import com.intellij.javaee.run.execution.OutputProcessor;
 import com.intellij.javaee.serverInstances.J2EEServerInstance;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.WriteExternalException;
@@ -70,8 +74,21 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   private ArtifactPointer artifactPointer;
   private CommonModel commonModel;
+  private Sdk devAppServerJdk;
 
   private AppEngineModelSettings settings = new AppEngineModelSettings();
+
+  public AppEngineServerModel() {
+    initDefaultJdk();
+  }
+
+  private void initDefaultJdk() {
+    Project currentProject = ProjectManager.getInstance().getDefaultProject();
+    Sdk projectJdk = ProjectRootManager.getInstance(currentProject).getProjectSdk();
+    if (projectJdk != null) {
+      setDevAppServerJdk(projectJdk);
+    }
+  }
 
   @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
@@ -419,6 +436,20 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setDefaultGcsBucketName(defaultGcsBucketName);
   }
 
+  @Override
+  public String getJavaHomeDir() {
+    return settings.getJavaHomeDir();
+  }
+
+  public Sdk getDevAppServerJdk() {
+    return devAppServerJdk;
+  }
+
+  public void setDevAppServerJdk(Sdk devAppServerJdk) {
+    this.devAppServerJdk = devAppServerJdk;
+    settings.setJavaHomeDir(devAppServerJdk.getHomePath());
+  }
+
   /**
    * This class is used to serialize run/debug config settings. It only supports basic types (e.g.,
    * int, String, etc.).
@@ -474,6 +505,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private boolean skipSdkUpdateCheck;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
+    @Tag("java_home_directory")
+    private String javaHomeDir;
 
     public String getArtifact() {
       return artifact;
@@ -649,6 +682,14 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     public void setDefaultGcsBucketName(String defaultGcsBucketName) {
       this.defaultGcsBucketName = defaultGcsBucketName;
+    }
+
+    public String getJavaHomeDir() {
+      return javaHomeDir;
+    }
+
+    public void setJavaHomeDir(String javaHomeDir) {
+      this.javaHomeDir = javaHomeDir;
     }
 
     @Override
