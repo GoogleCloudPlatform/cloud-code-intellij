@@ -90,6 +90,7 @@ public class AppEngineStandardLibraryPanel {
     return libraryPanel;
   }
 
+  @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
     libraryPanel = new JPanel(new GridLayout(AppEngineStandardMavenLibrary.values().length, 1));
     libraryPanel.setBorder(

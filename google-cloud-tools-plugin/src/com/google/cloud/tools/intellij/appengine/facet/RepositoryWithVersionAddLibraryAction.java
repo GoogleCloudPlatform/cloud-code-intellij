@@ -67,7 +67,8 @@ public class RepositoryWithVersionAddLibraryAction extends RepositoryAddLibraryA
         this.libraryDescription, false);
     if (dialog.showAndGet()) {
       IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
-      final ModifiableRootModel modifiableModel = ModuleRootManager.getInstance(module).getModifiableModel();
+      final ModifiableRootModel modifiableModel
+          = ModuleRootManager.getInstance(module).getModifiableModel();
       RepositoryLibrarySupport librarySupport = new RepositoryLibrarySupport(project,
           this.libraryDescription, model);
 
