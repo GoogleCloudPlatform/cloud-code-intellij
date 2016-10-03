@@ -82,12 +82,16 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     initDefaultJdk();
   }
 
-  private void initDefaultJdk() {
-    Project currentProject = ProjectUtil.guessCurrentProject(null);
-    ProjectSdksModel sdkModel = new ProjectSdksModel();
-    sdkModel.reset(currentProject);
-    Sdk projectJdk = sdkModel.getProjectSdk();
+  @Nullable
+  private Sdk getCurrentProjectJdk() {
+    Project project = ProjectUtil.guessCurrentProject(null);
+    ProjectSdksModel projectJdksModel = new ProjectSdksModel();
+    projectJdksModel.reset(project);
+    return projectJdksModel.getProjectSdk();
+  }
 
+  private void initDefaultJdk() {
+    Sdk projectJdk = getCurrentProjectJdk();
     if (projectJdk != null) {
       setDevAppServerJdk(projectJdk);
     }
@@ -95,6 +99,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
+    // FIXME: This keeps the dev_appserver's jdk in sync with the project jdk on behalf of the user.
+    // This behavior should be removed once
+    // https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/926 is completed.
+    initDefaultJdk();
+
     return new AppEngineServerInstance(commonModel);
   }
 
