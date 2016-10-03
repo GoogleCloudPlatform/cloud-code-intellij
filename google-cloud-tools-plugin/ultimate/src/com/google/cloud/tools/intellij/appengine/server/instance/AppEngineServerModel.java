@@ -40,9 +40,9 @@ import com.intellij.javaee.run.execution.OutputProcessor;
 import com.intellij.javaee.serverInstances.J2EEServerInstance;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.WriteExternalException;
@@ -83,8 +83,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   private void initDefaultJdk() {
-    Project currentProject = ProjectManager.getInstance().getDefaultProject();
-    Sdk projectJdk = ProjectRootManager.getInstance(currentProject).getProjectSdk();
+    Project currentProject = ProjectUtil.guessCurrentProject(null);
+    ProjectSdksModel sdkModel = new ProjectSdksModel();
+    sdkModel.reset(currentProject);
+    Sdk projectJdk = sdkModel.getProjectSdk();
+
     if (projectJdk != null) {
       setDevAppServerJdk(projectJdk);
     }
