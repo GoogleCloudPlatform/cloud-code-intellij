@@ -96,8 +96,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
-    // FIXME: This keeps the dev_appserver's jdk in sync with the project jdk on behalf of the user.
-    // This behavior should be removed once
+    // TODO(alexsloan): This keeps the dev_appserver's jdk in sync with the project jdk on behalf of
+    // the user. This behavior should be removed once
     // https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/926 is completed.
     initDefaultJdk();
 
