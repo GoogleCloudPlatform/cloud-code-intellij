@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
@@ -241,7 +242,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     ((AppEngineSupportConfigurable) configurable).cloudSdkPanel.setCloudSdkDirectoryText(path);
   }
 
-  private class AppEngineSupportConfigurable extends FrameworkSupportInModuleConfigurable implements
+  @VisibleForTesting
+  public class AppEngineSupportConfigurable extends FrameworkSupportInModuleConfigurable implements
       FrameworkSupportModelListener {
 
     private final FrameworkSupportModel frameworkSupportModel;
@@ -292,6 +294,12 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     @Override
     public JComponent createComponent() {
       return mainPanel;
+    }
+
+    @VisibleForTesting
+    public void setAppEngineStandardLibraryPanel(
+        AppEngineStandardLibraryPanel appEngineStandardLibraryPanel) {
+      this.appEngineStandardLibraryPanel = appEngineStandardLibraryPanel;
     }
 
     @SuppressWarnings("checkstyle:abbreviationaswordinname")

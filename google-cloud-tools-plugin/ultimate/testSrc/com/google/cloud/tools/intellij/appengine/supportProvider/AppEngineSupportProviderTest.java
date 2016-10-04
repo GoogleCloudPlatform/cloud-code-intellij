@@ -21,7 +21,9 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardLibraryPanel;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider.AppEngineSupportConfigurable;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
 import com.google.cloud.tools.intellij.compiler.artifacts.ArtifactsTestUtil;
@@ -74,6 +76,10 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
         CloudSdkService.class.getName(), sdkService);
 
     FrameworkSupportInModuleConfigurable configurable = selectFramework(AppEngineFrameworkType.ID);
+    if (configurable instanceof AppEngineSupportConfigurable) {
+      ((AppEngineSupportConfigurable) configurable).setAppEngineStandardLibraryPanel(
+          new AppEngineStandardLibraryPanel(false /*enabled*/));
+    }
     AppEngineSupportProvider.setSdkPath(configurable, AppEngineCodeInsightTestCase.getSdkPath());
   }
 
