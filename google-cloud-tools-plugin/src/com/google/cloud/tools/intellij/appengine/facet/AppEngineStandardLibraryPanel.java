@@ -99,6 +99,12 @@ public class AppEngineStandardLibraryPanel {
     for (AppEngineStandardMavenLibrary library : AppEngineStandardMavenLibrary.values()) {
       final JCheckBox libraryCheckbox = new JCheckBox(library.getDisplayName());
       libraryPanel.add(libraryCheckbox);
+
+      // The Servlet API is provided by the AE standard runtime. So we are enabling it by default.
+      if (library == AppEngineStandardMavenLibrary.SERVLET_API) {
+        libraryCheckbox.setSelected(true);
+        libraryCheckbox.setEnabled(false);
+      }
     }
   }
 }
