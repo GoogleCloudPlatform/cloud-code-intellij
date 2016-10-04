@@ -419,6 +419,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setDefaultGcsBucketName(defaultGcsBucketName);
   }
 
+  @Override
+  public String getJavaHomeDir() {
+    return settings.getJavaHomeDir();
+  }
+
   /**
    * This class is used to serialize run/debug config settings. It only supports basic types (e.g.,
    * int, String, etc.).
@@ -474,6 +479,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private boolean skipSdkUpdateCheck;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
+    @Tag("java_home_directory")
+    private String javaHomeDir;
 
     public String getArtifact() {
       return artifact;
@@ -649,6 +656,14 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     public void setDefaultGcsBucketName(String defaultGcsBucketName) {
       this.defaultGcsBucketName = defaultGcsBucketName;
+    }
+
+    public String getJavaHomeDir() {
+      return javaHomeDir;
+    }
+
+    public void setJavaHomeDir(String javaHomeDir) {
+      this.javaHomeDir = javaHomeDir;
     }
 
     @Override
