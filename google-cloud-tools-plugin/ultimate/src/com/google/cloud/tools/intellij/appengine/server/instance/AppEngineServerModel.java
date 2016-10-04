@@ -84,9 +84,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Nullable
   private Sdk getCurrentProjectJdk() {
-    Project project = ProjectUtil.guessCurrentProject(null);
     ProjectSdksModel projectJdksModel = new ProjectSdksModel();
-    projectJdksModel.reset(project);
+    projectJdksModel.reset(commonModel.getProject());
     return projectJdksModel.getProjectSdk();
   }
 
