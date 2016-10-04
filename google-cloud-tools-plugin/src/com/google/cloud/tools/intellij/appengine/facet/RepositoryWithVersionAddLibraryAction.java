@@ -35,8 +35,10 @@ import org.jetbrains.idea.maven.utils.library.propertiesEditor.RepositoryLibrary
 import org.jetbrains.idea.maven.utils.library.propertiesEditor.RepositoryLibraryPropertiesModel;
 
 /**
- * Extends {@link RepositoryAddLibraryAction} to allow setting a custom library version in the
- * action.
+ * Downloads a maven library and adds it to a module. Identical to
+ * {@link RepositoryAddLibraryAction} except that whereas the superclass hardcodes the maven library
+ * version to RELEASE, this class allows the setting of a custom version by overriding the
+ * {@link RepositoryAddLibraryAction#applyFix(Project, CommonProblemDescriptor)} method.
  */
 public class RepositoryWithVersionAddLibraryAction extends RepositoryAddLibraryAction {
 
@@ -54,11 +56,6 @@ public class RepositoryWithVersionAddLibraryAction extends RepositoryAddLibraryA
     this.version = version;
   }
 
-  /**
-   * Similar to {@link RepositoryAddLibraryAction#applyFix(Project, CommonProblemDescriptor)}
-   * except that this sets the passed in version string instead of hardcoding it to "RELEASE" as is
-   * done in the overridden method.
-   */
   @Override
   public void applyFix(@NotNull Project project, PsiFile file, @Nullable Editor editor) {
     RepositoryLibraryPropertiesModel model = new RepositoryLibraryPropertiesModel(version, false,
