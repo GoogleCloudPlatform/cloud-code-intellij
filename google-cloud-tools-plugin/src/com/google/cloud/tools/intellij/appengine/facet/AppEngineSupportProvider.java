@@ -244,13 +244,13 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
   private class AppEngineSupportConfigurable extends FrameworkSupportInModuleConfigurable implements
       FrameworkSupportModelListener {
 
-    private final FrameworkSupportModel myFrameworkSupportModel;
-    private JPanel myMainPanel;
+    private final FrameworkSupportModel frameworkSupportModel;
+    private JPanel mainPanel;
     private CloudSdkPanel cloudSdkPanel;
     private AppEngineStandardLibraryPanel appEngineStandardLibraryPanel;
 
     private AppEngineSupportConfigurable(FrameworkSupportModel model) {
-      myFrameworkSupportModel = model;
+      frameworkSupportModel = model;
       model.addFrameworkListener(this);
     }
 
@@ -278,7 +278,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
 
       AppEngineSupportProvider.this
-          .addSupport(module, rootModel, myFrameworkSupportModel,
+          .addSupport(module, rootModel, frameworkSupportModel,
               appEngineStandardLibraryPanel.getSelectedLibraries());
 
       // Called when creating a new App Engine module from the 'new project' or 'new module' wizards
@@ -291,7 +291,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     @Nullable
     @Override
     public JComponent createComponent() {
-      return myMainPanel;
+      return mainPanel;
     }
 
     @SuppressWarnings("checkstyle:abbreviationaswordinname")
