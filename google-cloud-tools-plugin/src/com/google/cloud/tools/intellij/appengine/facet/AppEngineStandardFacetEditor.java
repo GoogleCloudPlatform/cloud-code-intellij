@@ -145,6 +145,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
         .ping();
   }
 
+  @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
     appEngineStandardLibraryPanel = new AppEngineStandardLibraryPanel(isManagedLibrariesEnabled());
   }

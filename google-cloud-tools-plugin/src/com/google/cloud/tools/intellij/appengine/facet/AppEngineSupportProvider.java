@@ -229,8 +229,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
         AppEngineStandardMavenLibrary.toMavenDisplayVersion(libraryProperties));
   }
 
-//  static boolean isManagedLibrariesEnabled()
-
   @NotNull
   @Override
   public FrameworkSupportInModuleConfigurable createConfigurable(
