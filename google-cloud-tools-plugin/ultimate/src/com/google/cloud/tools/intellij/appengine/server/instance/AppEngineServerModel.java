@@ -73,16 +73,16 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   private ArtifactPointer artifactPointer;
   private CommonModel commonModel;
   private Sdk devAppServerJdk;
+  private ProjectSdksModel projectJdksModel;
 
   private AppEngineModelSettings settings = new AppEngineModelSettings();
 
   public AppEngineServerModel() {
-    initDefaultJdk();
+    projectJdksModel = new ProjectSdksModel();
   }
 
   @Nullable
   private Sdk getCurrentProjectJdk() {
-    ProjectSdksModel projectJdksModel = new ProjectSdksModel();
     projectJdksModel.reset(commonModel.getProject());
     return projectJdksModel.getProjectSdk();
   }
