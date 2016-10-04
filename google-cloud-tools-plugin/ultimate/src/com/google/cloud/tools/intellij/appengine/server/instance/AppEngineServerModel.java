@@ -39,6 +39,8 @@ import com.intellij.javaee.run.execution.DefaultOutputProcessor;
 import com.intellij.javaee.run.execution.OutputProcessor;
 import com.intellij.javaee.serverInstances.J2EEServerInstance;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.WriteExternalException;
@@ -70,11 +72,35 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   private ArtifactPointer artifactPointer;
   private CommonModel commonModel;
+  private Sdk devAppServerJdk;
+  private ProjectSdksModel projectJdksModel;
 
   private AppEngineModelSettings settings = new AppEngineModelSettings();
 
+  public AppEngineServerModel() {
+    projectJdksModel = new ProjectSdksModel();
+  }
+
+  @Nullable
+  private Sdk getCurrentProjectJdk() {
+    projectJdksModel.reset(commonModel.getProject());
+    return projectJdksModel.getProjectSdk();
+  }
+
+  private void initDefaultJdk() {
+    Sdk projectJdk = getCurrentProjectJdk();
+    if (projectJdk != null) {
+      setDevAppServerJdk(projectJdk);
+    }
+  }
+
   @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
+    // TODO(alexsloan): This keeps the dev_appserver's jdk in sync with the project jdk on behalf of
+    // the user. This behavior should be removed once
+    // https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/926 is completed.
+    initDefaultJdk();
+
     return new AppEngineServerInstance(commonModel);
   }
 
@@ -422,6 +448,15 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   public String getJavaHomeDir() {
     return settings.getJavaHomeDir();
+  }
+
+  public Sdk getDevAppServerJdk() {
+    return devAppServerJdk;
+  }
+
+  public void setDevAppServerJdk(Sdk devAppServerJdk) {
+    this.devAppServerJdk = devAppServerJdk;
+    settings.setJavaHomeDir(devAppServerJdk.getHomePath());
   }
 
   /**
