@@ -55,12 +55,6 @@ public enum AppEngineStandardMavenLibrary {
       new RepositoryLibraryProperties("com.googlecode.objectify", "objectify",
           RepositoryUtils.ReleaseVersionId),
       DependencyScope.COMPILE);
-  // TODO: do we need these?
-  //  JSR_107_CACHE("JSR 107: Java Temporary Caching API", new RepositoryLibraryProperties(
-  //      "net.sf.jsr107cache", "jsr107cache", RepositoryUtils.LatestVersionId)),
-  //  APP_ENGINE_JSR_107_CACHE("JSR 107: Java Temporary Caching API",
-  //     new RepositoryLibraryProperties("com.google.appengine", "appengine",
-  //        RepositoryUtils.LatestVersionId));
 
   private final String displayName;
   private final RepositoryLibraryProperties libraryProperties;
