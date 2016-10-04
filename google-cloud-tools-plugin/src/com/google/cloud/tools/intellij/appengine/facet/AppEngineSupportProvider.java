@@ -229,6 +229,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
         AppEngineStandardMavenLibrary.toMavenDisplayVersion(libraryProperties));
   }
 
+//  static boolean isManagedLibrariesEnabled()
+
   @NotNull
   @Override
   public FrameworkSupportInModuleConfigurable createConfigurable(
@@ -297,6 +299,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     @SuppressWarnings("checkstyle:abbreviationaswordinname")
     private void createUIComponents() {
       cloudSdkPanel = new CloudSdkPanel();
+      appEngineStandardLibraryPanel = new AppEngineStandardLibraryPanel(true /*enabled*/);
     }
   }
 }

@@ -42,6 +42,12 @@ public class AppEngineStandardLibraryPanel {
   private JPanel mainPanel;
   private JPanel libraryPanel;
 
+  private boolean enabled = true;
+
+  public AppEngineStandardLibraryPanel(boolean enabled) {
+    this.enabled = enabled;
+  }
+
   public Set<AppEngineStandardMavenLibrary> getSelectedLibraries() {
     return Sets.newHashSet(Collections2.filter(
         Collections2.transform(Arrays.asList(libraryPanel.getComponents()),
@@ -90,19 +96,25 @@ public class AppEngineStandardLibraryPanel {
     return libraryPanel;
   }
 
+  public boolean isEnabled() {
+    return enabled;
+  }
+
   @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
     libraryPanel = new JPanel(new GridLayout(AppEngineStandardMavenLibrary.values().length, 1));
-    libraryPanel.setBorder(
-        BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Libraries"));
+    if (enabled) {
+      libraryPanel.setBorder(
+          BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Libraries"));
 
-    for (AppEngineStandardMavenLibrary library : AppEngineStandardMavenLibrary.values()) {
-      final JCheckBox libraryCheckbox = new JCheckBox(library.getDisplayName());
-      libraryPanel.add(libraryCheckbox);
+      for (AppEngineStandardMavenLibrary library : AppEngineStandardMavenLibrary.values()) {
+        final JCheckBox libraryCheckbox = new JCheckBox(library.getDisplayName());
+        libraryPanel.add(libraryCheckbox);
 
-      // The Servlet API is provided by the AE standard runtime. So we are enabling it by default.
-      if (library == AppEngineStandardMavenLibrary.SERVLET_API) {
-        libraryCheckbox.setSelected(true);
+        // The Servlet API is provided by the AE standard runtime. So we are enabling it by default.
+        if (library == AppEngineStandardMavenLibrary.SERVLET_API) {
+          libraryCheckbox.setSelected(true);
+        }
       }
     }
   }

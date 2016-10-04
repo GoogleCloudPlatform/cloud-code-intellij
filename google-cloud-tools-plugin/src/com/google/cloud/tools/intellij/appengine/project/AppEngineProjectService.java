@@ -76,6 +76,12 @@ public abstract class AppEngineProjectService {
    */
   public abstract boolean isAppEngineFlexArtifactType(@NotNull Artifact artifact);
 
+
+  /**
+   * Determines if the module is backed by maven.
+   */
+  public abstract boolean isMavenModule(@NotNull Module module);
+
   /**
    * Determines if the module has jar or war packaging and is buildable by Maven.
    */

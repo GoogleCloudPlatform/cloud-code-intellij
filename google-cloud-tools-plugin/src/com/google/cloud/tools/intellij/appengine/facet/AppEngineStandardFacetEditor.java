@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.collect.Sets;
@@ -76,6 +77,10 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   @Override
   public boolean isModified() {
+    if (!appEngineStandardLibraryPanel.isEnabled()) {
+      return false;
+    }
+
     Set<AppEngineStandardMavenLibrary> savedLibs
         = facetConfiguration.getLibraries(context.getProject());
     Set<AppEngineStandardMavenLibrary> selectedLibs
@@ -86,29 +91,33 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   @Override
   public void apply() {
-    Set<AppEngineStandardMavenLibrary> savedLibs
-        = facetConfiguration.getLibraries(context.getProject());
-    Set<AppEngineStandardMavenLibrary> selectedLibs
-        = appEngineStandardLibraryPanel.getSelectedLibraries();
+    if (appEngineStandardLibraryPanel.isEnabled()) {
+      Set<AppEngineStandardMavenLibrary> savedLibs
+          = facetConfiguration.getLibraries(context.getProject());
+      Set<AppEngineStandardMavenLibrary> selectedLibs
+          = appEngineStandardLibraryPanel.getSelectedLibraries();
 
-    Set<AppEngineStandardMavenLibrary> libsToAdd = Sets.difference(selectedLibs, savedLibs);
-    Set<AppEngineStandardMavenLibrary> libsToRemove = Sets.difference(savedLibs, selectedLibs);
+      Set<AppEngineStandardMavenLibrary> libsToAdd = Sets.difference(selectedLibs, savedLibs);
+      Set<AppEngineStandardMavenLibrary> libsToRemove = Sets.difference(savedLibs, selectedLibs);
 
-    if (!libsToAdd.isEmpty()) {
-      for (AppEngineStandardMavenLibrary library : libsToAdd) {
-        AppEngineSupportProvider.loadMavenLibrary(context.getModule(), library);
+      if (!libsToAdd.isEmpty()) {
+        for (AppEngineStandardMavenLibrary library : libsToAdd) {
+          AppEngineSupportProvider.loadMavenLibrary(context.getModule(), library);
+        }
       }
-    }
 
-    if (!libsToRemove.isEmpty()) {
-      AppEngineSupportProvider.removeMavenLibraries(libsToRemove, context.getModule());
+      if (!libsToRemove.isEmpty()) {
+        AppEngineSupportProvider.removeMavenLibraries(libsToRemove, context.getModule());
+      }
     }
   }
 
   @Override
   public void reset() {
-    appEngineStandardLibraryPanel
-        .setSelectLibraries(facetConfiguration.getLibraries(context.getProject()));
+    if (appEngineStandardLibraryPanel.isEnabled()) {
+      appEngineStandardLibraryPanel
+          .setSelectLibraries(facetConfiguration.getLibraries(context.getProject()));
+    }
   }
 
   @SuppressWarnings("checkstyle:abbreviationaswordinname")
@@ -134,6 +143,14 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
         .trackEvent(GctTracking.APP_ENGINE_ADD_FACET)
         .withLabel("setOnModule")
         .ping();
+  }
+
+  private void createUIComponents() {
+    appEngineStandardLibraryPanel = new AppEngineStandardLibraryPanel(isManagedLibrariesEnabled());
+  }
+
+  private boolean isManagedLibrariesEnabled() {
+    return !AppEngineProjectService.getInstance().isMavenModule(context.getModule());
   }
 
   public class LibraryModificationListener implements Listener {
