@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stats;
+package com.google.cloud.tools.intellij.settings;
 
 import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
 
