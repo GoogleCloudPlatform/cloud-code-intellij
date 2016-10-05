@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
+import com.google.cloud.tools.intellij.startup.CloudToolsPluginInitializationComponent;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import com.intellij.openapi.actionSystem.ActionManager;

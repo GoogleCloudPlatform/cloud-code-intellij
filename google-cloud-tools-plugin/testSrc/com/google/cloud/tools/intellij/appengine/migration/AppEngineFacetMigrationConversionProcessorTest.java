@@ -40,7 +40,7 @@ public class AppEngineFacetMigrationConversionProcessorTest extends PlatformTest
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    // init mocks & test data
+    // startup mocks & test data
     moduleSettingsMock = mock(ModuleSettings.class);
     testFacetElements = Collections.singletonList(mock(Element.class));
 
