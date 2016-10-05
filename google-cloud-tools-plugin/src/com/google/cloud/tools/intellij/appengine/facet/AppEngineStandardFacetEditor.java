@@ -197,7 +197,9 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     @Override
     public void afterLibraryRemoved(Library removedLibrary) {
-      // do nothing
+      appEngineStandardLibraryPanel.toggleLibrary(
+          AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(removedLibrary.getName()),
+          false /* select */);
     }
 
     @Override
