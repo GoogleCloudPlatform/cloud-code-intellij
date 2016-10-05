@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (C) 2014 The Android Open Source Project
+  ~ Copyright 2016 Google Inc. All Rights Reserved.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -48,7 +48,8 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable groupId="google" id="google.settings" instance="com.google.cloud.tools.intellij.stats.GoogleSettingsConfigurable"/>
+    <applicationConfigurable groupId="google" id="google.settings"
+                             instance="com.google.cloud.tools.intellij.settings.GoogleSettingsConfigurable"/>
     <applicationConfigurable parentId="google.settings" provider="com.google.cloud.tools.intellij.stats.UsageTrackerConfigurableProvider"/>
 
     <applicationService serviceInterface="com.google.cloud.tools.intellij.stats.UsageTrackerProvider"
