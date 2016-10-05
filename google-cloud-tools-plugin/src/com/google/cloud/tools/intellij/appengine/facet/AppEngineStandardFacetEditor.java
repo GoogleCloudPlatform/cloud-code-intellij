@@ -150,8 +150,14 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
     appEngineStandardLibraryPanel = new AppEngineStandardLibraryPanel(isManagedLibrariesEnabled());
   }
 
+  /**
+   * Currently, managed AE standard library support is enabled only for native IJ projects and
+   * explicitly disabled for Maven / Gradle projects to avoid dependency conflicts.
+   */
   private boolean isManagedLibrariesEnabled() {
-    return !AppEngineProjectService.getInstance().isMavenModule(context.getModule());
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
+    return !projectService.isMavenModule(context.getModule())
+        && !projectService.isGradleModule(context.getModule());
   }
 
   public class LibraryModificationListener implements Listener {

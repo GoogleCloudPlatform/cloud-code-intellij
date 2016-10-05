@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 
+import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
+import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 /**
  * Implementation of methods for inspecting an App Engine project's structure and configuration.
@@ -116,6 +118,11 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
     return mavenProject != null
         && projectsManager.isMavenizedModule(module);
+  }
+
+  @Override
+  public boolean isGradleModule(@NotNull Module module) {
+    return ExternalSystemApiUtil.isExternalSystemAwareModule(GradleConstants.SYSTEM_ID, module);
   }
 
   @Override
