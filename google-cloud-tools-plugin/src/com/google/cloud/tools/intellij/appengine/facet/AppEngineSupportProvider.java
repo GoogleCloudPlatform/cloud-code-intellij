@@ -200,16 +200,16 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     final ModifiableRootModel model = manager.getModifiableModel();
     final LibraryTable libraryTable = ProjectLibraryTable.getInstance(module.getProject());
 
-    for (AppEngineStandardMavenLibrary libraryToRemove : librariesToRemove) {
-      final String displayName = AppEngineStandardMavenLibrary
-          .toMavenDisplayVersion(libraryToRemove.getLibraryProperties());
-      final Library library = libraryTable.getLibraryByName(displayName);
-      if (library != null) {
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-          public void run() {
-            new WriteAction() {
-              @Override
-              protected void run(@NotNull Result result) throws Throwable {
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
+      public void run() {
+        new WriteAction() {
+          @Override
+          protected void run(@NotNull Result result) throws Throwable {
+            for (AppEngineStandardMavenLibrary libraryToRemove : librariesToRemove) {
+              final String displayName = AppEngineStandardMavenLibrary
+                  .toMavenDisplayVersion(libraryToRemove.getLibraryProperties());
+              final Library library = libraryTable.getLibraryByName(displayName);
+              if (library != null) {
                 libraryTable.removeLibrary(library);
 
                 for (OrderEntry orderEntry : model.getOrderEntries()) {
@@ -217,13 +217,14 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
                     model.removeOrderEntry(orderEntry);
                   }
                 }
-                model.commit();
+
               }
-            }.execute();
+            }
+            model.commit();
           }
-        }, ModalityState.NON_MODAL);
+        }.execute();
       }
-    }
+    }, ModalityState.NON_MODAL);
   }
 
   static Library loadMavenLibrary(final Module module, AppEngineStandardMavenLibrary library) {
