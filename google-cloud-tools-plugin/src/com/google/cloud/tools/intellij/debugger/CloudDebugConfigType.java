@@ -69,7 +69,7 @@ public class CloudDebugConfigType implements ConfigurationType {
 
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.CLOUD;
+    return GoogleCloudToolsIcons.APP_ENGINE;
   }
 
   @NotNull
