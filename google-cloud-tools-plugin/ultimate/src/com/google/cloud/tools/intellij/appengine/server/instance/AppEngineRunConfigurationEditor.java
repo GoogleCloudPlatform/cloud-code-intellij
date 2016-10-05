@@ -26,6 +26,7 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.packaging.artifacts.Artifact;
+import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
 import com.intellij.ui.PanelWithAnchor;
 import com.intellij.ui.RawCommandLineEditor;
@@ -114,11 +115,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
     final Artifact artifact = serverModel.getArtifact();
     myArtifactComboBox.setSelectedItem(artifact);
-    if (artifact == null && myArtifactComboBox.getItemCount() == 1) {
-      myArtifactComboBox.setSelectedIndex(0);
-      BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRun(
-          commonModel.getProject(), commonModel, (Artifact) myArtifactComboBox.getSelectedItem());
-    }
     port.setText(intToString(serverModel.getPort()));
     host.setText(serverModel.getHost());
     adminHost.setText(serverModel.getAdminHost());
