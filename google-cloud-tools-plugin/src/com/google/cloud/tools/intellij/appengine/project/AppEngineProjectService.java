@@ -90,5 +90,5 @@ public abstract class AppEngineProjectService {
   /**
    * Determines if the module has jar or war packaging and is buildable by Maven.
    */
-  public abstract boolean isJarOrWarMavenBuild(@NotNull Project project, @NotNull Module module);
+  public abstract boolean isJarOrWarMavenBuild(@NotNull Module module);
 }

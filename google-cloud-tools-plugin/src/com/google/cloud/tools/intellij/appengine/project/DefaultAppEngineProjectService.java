@@ -126,7 +126,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public boolean isJarOrWarMavenBuild(@NotNull Project project, @NotNull Module module) {
+  public boolean isJarOrWarMavenBuild(@NotNull Module module) {
     MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(module.getProject());
     MavenProject mavenProject = projectsManager.findProject(module);
 
