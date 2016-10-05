@@ -149,7 +149,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
         Content snapshots = layout
             .createContent(timeline.getTabTitle(), (ComponentWithActions) timeline,
                 timeline.getTabTitle(),
-                GoogleCloudToolsIcons.APP_ENGINE, null);
+                GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER, null);
         layout.addContent(snapshots, 0, PlaceInGrid.left, false);
 
         layout.getDefaults().initFocusContent(timeline.getTabTitle(), LayoutViewOptions.STARTUP,
