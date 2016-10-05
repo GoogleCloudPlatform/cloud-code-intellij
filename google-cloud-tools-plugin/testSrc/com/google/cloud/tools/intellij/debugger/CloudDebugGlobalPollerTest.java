@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,21 +23,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees;
+import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees.Breakpoints;
+import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
+
+import com.intellij.notification.Notification;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
-import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees;
-import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees.Breakpoints;
-import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
+import java.io.IOException;
 
 public class CloudDebugGlobalPollerTest extends BasePluginTestCase {
 
@@ -107,6 +108,7 @@ public class CloudDebugGlobalPollerTest extends BasePluginTestCase {
 	ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
 	verify(notificationsHandler).notify(captor.capture());
 	assertEquals(1, captor.getAllValues().size());
-	assertEquals("Error while connecting to Cloud Debugger backend", captor.getValue().getTitle());
+    assertEquals("Error while connecting to the Stackdriver Debugger backend",
+        captor.getValue().getTitle());
   }
 }

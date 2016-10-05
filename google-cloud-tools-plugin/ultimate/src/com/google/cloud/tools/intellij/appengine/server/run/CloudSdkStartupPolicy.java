@@ -89,6 +89,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             String jvmDebugFlag = envVariables.get("");
             if (jvmDebugFlag != null) {
               runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
+              // prevent multiple JVMs from being created to make debugging deterministic
+              runConfiguration.setMaxModuleInstances(1);
             }
 
             AppEngineStandardRunTask runTask =
@@ -96,7 +98,13 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 
-            startupProcessHandler = new OSProcessHandler(executor.getProcess(),
+            Process devappserverProcess = executor.getProcess();
+            if (devappserverProcess == null) {
+              throw new ExecutionException(
+                  GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
+                      + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
+            }
+            startupProcessHandler = new OSProcessHandler(devappserverProcess,
                 GctBundle.getString("appengine.run.startupscript"));
             return startupProcessHandler;
           }

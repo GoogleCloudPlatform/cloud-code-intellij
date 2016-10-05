@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
@@ -40,7 +41,8 @@ public class AppEngineStandardRunTask extends AppEngineTask {
    * {@link AppEngineStandardRunTask} constructor.
    *
    * @param runConfig local run configuration to be sent to the common library
-   * @param runnerId typically "Run" or "Debug", to indicate type of local run
+   * @param runnerId typically "Run" or "Debug", to indicate type of local run. To be used in
+   *     metrics
    */
   public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig, @Nullable String runnerId) {
     this.runConfig = runConfig;
@@ -51,12 +53,19 @@ public class AppEngineStandardRunTask extends AppEngineTask {
   public void execute(ProcessStartListener startListener) {
     CloudSdkService sdkService = CloudSdkService.getInstance();
 
-    CloudSdk.Builder sdkBuilder = new CloudSdk.Builder()
+    CloudSdk sdk = new CloudSdk.Builder()
         .sdkPath(sdkService.getSdkHomePath())
         .async(true)
-        .startListener(startListener);
+        .startListener(startListener)
+        .build();
 
-    CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdkBuilder.build());
+    try {
+      sdk.validateAppEngineJavaComponents();
+    } catch (AppEngineJavaComponentsNotInstalledException ex) {
+      return;
+    }
+
+    CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdk);
     devServer.run(runConfig);
 
     UsageTrackerProvider.getInstance()
