@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
@@ -32,26 +33,26 @@ import java.util.Arrays;
  * Defines the available App Engine standard maven-sourced libraries.
  */
 public enum AppEngineStandardMavenLibrary {
-  // TODO get display names from bundle (in form too)
   SERVLET_API(
-      "Servlet API",
+      GctBundle.message("appengine.library.servlet.api.name"),
       new RepositoryLibraryProperties("javax.servlet", "servlet-api", "2.5"),
       DependencyScope.PROVIDED),
   JSTL(
-      "JSP Standard Tag Library (JSTL)",
+      GctBundle.message("appengine.library.jstl.api.name"),
       new RepositoryLibraryProperties("javax.servlet", "jstl", RepositoryUtils.ReleaseVersionId),
       DependencyScope.PROVIDED),
   APP_ENGINE_API(
-      "App Engine API",
+      GctBundle.message("appengine.library.app.engine.api.name"),
       new RepositoryLibraryProperties("com.google.appengine", "appengine-api-1.0-sdk",
           RepositoryUtils.ReleaseVersionId),
       DependencyScope.COMPILE),
-  ENDPOINTS("App Engine Endpoints",
+  ENDPOINTS(
+      GctBundle.message("appengine.library.endpoints.api.name"),
       new RepositoryLibraryProperties("com.google.appengine", "appengine-endpoints",
           RepositoryUtils.ReleaseVersionId),
       DependencyScope.COMPILE),
   OBJECTIFY(
-      "Objectify",
+      GctBundle.message("appengine.library.objectify.api.name"),
       new RepositoryLibraryProperties("com.googlecode.objectify", "objectify",
           RepositoryUtils.ReleaseVersionId),
       DependencyScope.COMPILE);

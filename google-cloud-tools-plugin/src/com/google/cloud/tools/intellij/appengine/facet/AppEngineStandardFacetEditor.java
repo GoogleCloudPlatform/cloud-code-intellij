@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.collect.Sets;
 
@@ -67,7 +68,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   }
 
   public String getDisplayName() {
-    return "Google App Engine";
+    return GctBundle.message("appengine.facet.name");
   }
 
   @NotNull
