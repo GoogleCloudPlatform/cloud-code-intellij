@@ -43,6 +43,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
@@ -194,8 +196,11 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
   static void removeMavenLibraries(final Set<AppEngineStandardMavenLibrary> librariesToRemove,
       final Module module) {
+    final ModuleRootManager manager = ModuleRootManager.getInstance(module);
+    final ModifiableRootModel model = manager.getModifiableModel();
+    final LibraryTable libraryTable = ProjectLibraryTable.getInstance(module.getProject());
+
     for (AppEngineStandardMavenLibrary libraryToRemove : librariesToRemove) {
-      final LibraryTable libraryTable = ProjectLibraryTable.getInstance(module.getProject());
       final String displayName = AppEngineStandardMavenLibrary
           .toMavenDisplayVersion(libraryToRemove.getLibraryProperties());
       final Library library = libraryTable.getLibraryByName(displayName);
@@ -206,6 +211,13 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
               @Override
               protected void run(@NotNull Result result) throws Throwable {
                 libraryTable.removeLibrary(library);
+
+                for (OrderEntry orderEntry : model.getOrderEntries()) {
+                  if (orderEntry.getPresentableName().equals(library.getName())) {
+                    model.removeOrderEntry(orderEntry);
+                  }
+                }
+                model.commit();
               }
             }.execute();
           }

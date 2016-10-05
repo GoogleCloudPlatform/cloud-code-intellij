@@ -190,19 +190,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     @Override
     public void afterLibraryRemoved(Library removedLibrary) {
-      ModuleRootManager manager = ModuleRootManager.getInstance(context.getModule());
-      ModifiableRootModel model = manager.getModifiableModel();
-
-      for (OrderEntry orderEntry : model.getOrderEntries()) {
-        if (orderEntry.getPresentableName().equals(removedLibrary.getName())) {
-          model.removeOrderEntry(orderEntry);
-        }
-      }
-      model.commit();
-
-      appEngineStandardLibraryPanel.toggleLibrary(
-          AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(removedLibrary.getName()),
-          false);
+      // do nothing
     }
 
     @Override
