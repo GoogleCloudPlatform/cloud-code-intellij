@@ -233,7 +233,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
         module, RepositoryLibraryDescription.findDescription(libraryProperties),
         libraryProperties.getVersion());
 
-    action.invoke(module.getProject(), null, null);
+    action.invoke(module.getProject(), null /*editor*/, null /*file*/);
 
     LibraryTable.ModifiableModel modifiableModel = ModifiableModelsProvider.SERVICE.getInstance()
         .getLibraryTableModifiableModel(module.getProject());
