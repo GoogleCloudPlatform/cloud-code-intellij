@@ -53,8 +53,8 @@ import java.util.List;
  * @author nik
  */
 public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProviderTestCase {
-  public void testAppEngine() {
-    setupAppEngine();
+  public void testAppEngine_noManagedLibrariesSelected() {
+    setupAppEngine(new AppEngineStandardLibraryPanel(false /*enabled*/));
     addSupport();
 
     assertNull(FacetManager.getInstance(myModule).getFacetByType(WebFacet.ID));
@@ -65,32 +65,8 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
                                                           "   module:" + moduleName + "\n");
   }
 
-  private void setupAppEngine() {
-    CloudSdkService sdkService = mock(CloudSdkService.class);
-    when(sdkService.getLibraries()).thenReturn(new File[]{});
-
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
-    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
-    applicationContainer.registerComponentInstance(
-        CloudSdkService.class.getName(), sdkService);
-
-    FrameworkSupportInModuleConfigurable configurable = selectFramework(AppEngineFrameworkType.ID);
-    if (configurable instanceof AppEngineSupportConfigurable) {
-      ((AppEngineSupportConfigurable) configurable).setAppEngineStandardLibraryPanel(
-          new AppEngineStandardLibraryPanel(false /*enabled*/));
-    }
-    AppEngineSupportProvider.setSdkPath(configurable, AppEngineCodeInsightTestCase.getSdkPath());
-  }
-
-  private void assertRunConfigurationCreated(Artifact artifactToDeploy) {
-    List<RunConfiguration> list = RunManager.getInstance(myProject).getConfigurationsList(AppEngineServerConfigurationType.getInstance());
-    CommonModel configuration = assertInstanceOf(assertOneElement(list), CommonModel.class);
-    assertSameElements(configuration.getDeployedArtifacts(), artifactToDeploy);
-  }
-
-  public void testAppEngineWithWeb() {
-    setupAppEngine();
+  public void testAppEngineWithWeb_noManagedLibrariesSelected() {
+    setupAppEngine(new AppEngineStandardLibraryPanel(false /*enabled*/));
     selectFramework(WebFacet.ID);
     selectVersion(WebFrameworkType.getInstance(), new WebFrameworkVersion(WebAppVersion.WebAppVersion_2_5));
     addSupport();
@@ -109,10 +85,47 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
     assertRunConfigurationCreated(artifact);
   }
 
+  public void testAppEngine_defaultManagedLibrariesSelected() {
+    setupAppEngine(new AppEngineStandardLibraryPanel(true /*enabled*/));
+    addSupport();
+
+    assertNull(FacetManager.getInstance(myModule).getFacetByType(WebFacet.ID));
+    final String moduleName = myModule.getName();
+    ArtifactsTestUtil.assertLayout(myProject, moduleName, "<root>\n" +
+                                                          " WEB-INF/\n" +
+                                                          "  classes/\n" +
+                                                          "   module:" + moduleName + "\n" +
+                                                          "  lib/\n" +
+                                                          "   lib:javax.servlet:servlet-api:2.5(project)\n");
+  }
+
+  private void setupAppEngine(AppEngineStandardLibraryPanel libraryPanel) {
+    CloudSdkService sdkService = mock(CloudSdkService.class);
+    when(sdkService.getLibraries()).thenReturn(new File[]{});
+
+    MutablePicoContainer applicationContainer = (MutablePicoContainer)
+        ApplicationManager.getApplication().getPicoContainer();
+    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
+    applicationContainer.registerComponentInstance(
+        CloudSdkService.class.getName(), sdkService);
+
+    FrameworkSupportInModuleConfigurable configurable = selectFramework(AppEngineFrameworkType.ID);
+    if (libraryPanel != null && configurable instanceof AppEngineSupportConfigurable) {
+      ((AppEngineSupportConfigurable) configurable).setAppEngineStandardLibraryPanel(libraryPanel);
+    }
+    AppEngineSupportProvider.setSdkPath(configurable, AppEngineCodeInsightTestCase.getSdkPath());
+  }
+
   @NotNull
   private VirtualFile assertFileExist(String relativePath) {
     VirtualFile file = getContentRoot().findFileByRelativePath(relativePath);
     assertNotNull("File not found: " + relativePath, file);
     return file;
+  }
+
+  private void assertRunConfigurationCreated(Artifact artifactToDeploy) {
+    List<RunConfiguration> list = RunManager.getInstance(myProject).getConfigurationsList(AppEngineServerConfigurationType.getInstance());
+    CommonModel configuration = assertInstanceOf(assertOneElement(list), CommonModel.class);
+    assertSameElements(configuration.getDeployedArtifacts(), artifactToDeploy);
   }
 }
