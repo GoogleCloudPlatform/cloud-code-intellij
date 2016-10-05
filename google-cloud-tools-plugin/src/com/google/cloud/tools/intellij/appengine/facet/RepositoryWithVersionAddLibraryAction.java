@@ -58,11 +58,13 @@ public class RepositoryWithVersionAddLibraryAction extends RepositoryAddLibraryA
 
   @Override
   public void applyFix(@NotNull Project project, PsiFile file, @Nullable Editor editor) {
-    RepositoryLibraryPropertiesModel model = new RepositoryLibraryPropertiesModel(version, false,
-        false);
+    RepositoryLibraryPropertiesModel model = new RepositoryLibraryPropertiesModel(
+        version,
+        true /*downloadSources*/,
+        true /*downloadJavaDocs*/);
     RepositoryLibraryPropertiesDialog dialog = new RepositoryLibraryPropertiesDialog(project, model,
         this.libraryDescription, false);
-    if (dialog.showAndGet()) {
+    if (!dialog.isModal() || dialog.showAndGet()) {
       IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
       final ModifiableRootModel modifiableModel
           = ModuleRootManager.getInstance(module).getModifiableModel();
