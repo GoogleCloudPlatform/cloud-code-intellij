@@ -63,7 +63,7 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
    * {@link AppEngineStandardMavenLibrary} for each configured library matching one of the AE
    * standard managed libraries.
    *
-   * The lookup is performed based on the maven display id consisting of groupId, artifactName,
+   * <p>The lookup is performed based on the maven display id consisting of groupId, artifactName,
    * and version. If the configured lib doesn't entirely match this strategy, then it will not be
    * returned and therefore not considered to be "managed".
    */
