@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,11 @@ import javax.swing.JCheckBox;
 
 public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestCase {
 
+  private static final String PROJECT_NAME = "test-proj";
   private AppEngineDeploymentRunConfigurationEditor editor;
   private AppEngineArtifactDeploymentSource deploymentSource;
   private AppEngineHelper appEngineHelper;
   private ProjectSelector projectSelector;
-
-  private static final String PROJECT_NAME = "test-proj";
 
   @Override
   public void setUp() throws Exception {
@@ -93,7 +92,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
             deploymentSource,
             appEngineHelper);
 
-    assertEquals("App Engine standard environment", editor.getEnvironmentLabel().getText());
+    assertEquals("App Engine Standard Environment", editor.getEnvironmentLabel().getText());
     assertFalse(editor.getAppEngineFlexConfigPanel().isVisible());
     Disposer.dispose(editor);
   }
@@ -105,7 +104,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
         new AppEngineDeploymentRunConfigurationEditor(
             getProject(), deploymentSource, appEngineHelper);
 
-    assertEquals("App Engine flexible environment", editor.getEnvironmentLabel().getText());
+    assertEquals("App Engine Flexible Environment", editor.getEnvironmentLabel().getText());
     assertTrue(editor.getAppEngineFlexConfigPanel().isVisible());
     Disposer.dispose(editor);
   }
