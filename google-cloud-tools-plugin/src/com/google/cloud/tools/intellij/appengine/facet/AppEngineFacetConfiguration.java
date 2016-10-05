@@ -58,6 +58,15 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
   public void writeExternal(Element element) throws WriteExternalException {
   }
 
+  /**
+   * Looks up the user's configured libraries for the project and returns a set of
+   * {@link AppEngineStandardMavenLibrary} for each configured library matching one of the AE
+   * standard managed libraries.
+   *
+   * The lookup is performed based on the maven display id consisting of groupId, artifactName,
+   * and version. If the configured lib doesn't entirely match this strategy, then it will not be
+   * returned and therefore not considered to be "managed".
+   */
   public Set<AppEngineStandardMavenLibrary> getLibraries(@NotNull Project project) {
     LibraryTable libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project);
     Library[] libraries =  libraryTable.getLibraries();
