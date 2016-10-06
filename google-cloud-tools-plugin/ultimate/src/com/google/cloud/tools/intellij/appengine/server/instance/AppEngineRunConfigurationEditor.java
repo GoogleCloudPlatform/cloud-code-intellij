@@ -62,6 +62,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JCheckBox automaticRestartCheckbox;
   private JCheckBox dontNagCheckbox;
   private JCheckBox cleadDatastoreCheckbox;
+  private JPanel appEngineSettingsPanel;
   private Artifact myLastSelectedArtifact;
 
   public AppEngineRunConfigurationEditor(Project project) {
@@ -75,7 +76,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     setAnchor(myWebArtifactToDeployLabel);
 
     jvmFlagsEditor.setDialogCaption(GctBundle.getString("appengine.run.jvmflags.title"));
-    myMainPanel.setBorder(PlainSmallWithoutIndent.createTitledBorder(
+    appEngineSettingsPanel.setBorder(PlainSmallWithoutIndent.createTitledBorder(
         null /* border - ignored */,
         GctBundle.message("appengine.run.settings.title.label"),
         0 /* titleJustification - ignored */,
