@@ -170,7 +170,8 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
     if (activeDebugProcesses.size() > 0) {
       int result = Messages.showOkCancelDialog(project,
           GctBundle.getString("clouddebug.stop.and.create.new.session"),
-          GctBundle.getString("clouddebug.message.title"), GoogleCloudToolsIcons.CLOUD);
+          GctBundle.getString("clouddebug.message.title"),
+          GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER);
       if (result == Messages.OK) {
         for (CloudDebugProcess cdb : activeDebugProcesses) {
           cdb.getProcessHandler().detachProcess();

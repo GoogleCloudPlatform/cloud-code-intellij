@@ -114,11 +114,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
     final Artifact artifact = serverModel.getArtifact();
     myArtifactComboBox.setSelectedItem(artifact);
-    if (artifact == null && myArtifactComboBox.getItemCount() == 1) {
-      myArtifactComboBox.setSelectedIndex(0);
-      BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRun(
-          commonModel.getProject(), commonModel, (Artifact) myArtifactComboBox.getSelectedItem());
-    }
     port.setText(intToString(serverModel.getPort()));
     host.setText(serverModel.getHost());
     adminHost.setText(serverModel.getAdminHost());
