@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.List;
 
 /**
  * IntelliJ configured service for providing the path to the Cloud SDK.
@@ -53,9 +52,6 @@ public abstract class CloudSdkService {
       @NotNull String className, @NotNull String methodName);
 
   public abstract boolean isClassInWhiteList(@NotNull String className);
-
-  @NotNull
-  public abstract List<String> getUserLibraryPaths();
 
   @Nullable
   public abstract File getWebSchemeFile();

@@ -30,6 +30,7 @@ public class GctTracking {
   public static final String APP_ENGINE_STOP = "appengine.stop";
   public static final String APP_ENGINE_ADD_SUPPORT = "appengine.support.add";
   public static final String APP_ENGINE_ADD_FACET = "appengine.facet.add";
+  public static final String APP_ENGINE_ADD_LIBRARY = "appengine.library.add";
 
   public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =
       "project.selection.create.new.project";

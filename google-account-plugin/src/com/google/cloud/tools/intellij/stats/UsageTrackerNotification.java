@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.stats;
 
 import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
+import com.google.cloud.tools.intellij.settings.GoogleSettingsConfigurable;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.Notification;

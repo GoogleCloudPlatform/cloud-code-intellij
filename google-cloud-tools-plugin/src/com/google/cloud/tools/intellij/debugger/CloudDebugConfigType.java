@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,16 +40,16 @@ public class CloudDebugConfigType implements ConfigurationType {
 
   private final ConfigurationFactory factory;
 
+  public CloudDebugConfigType() {
+    factory = new MyConfigurationFactory(this);
+  }
+
   public static boolean isFeatureEnabled() {
     return Boolean.getBoolean(GCT_DEBUGGER_ENABLE);
   }
 
   public static boolean useWaitToken() {
     return !Boolean.getBoolean(GCT_DEBUGGER_USETOKEN);
-  }
-
-  public CloudDebugConfigType() {
-    factory = new MyConfigurationFactory(this);
   }
 
   @Override
@@ -59,7 +59,7 @@ public class CloudDebugConfigType implements ConfigurationType {
 
   @Override
   public String getConfigurationTypeDescription() {
-    return GctBundle.getString("clouddebug.googleclouddebugger");
+    return GctBundle.getString("clouddebug.stackdriver.debugger");
   }
 
   @Override
@@ -69,7 +69,7 @@ public class CloudDebugConfigType implements ConfigurationType {
 
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.CLOUD;
+    return GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER;
   }
 
   @NotNull
