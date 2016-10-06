@@ -21,6 +21,7 @@ import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInsta
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.server.run.CloudSdkStartupPolicy;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
@@ -245,7 +246,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   public String getHost() {
     String host = settings.getAdminHost();
-    if (StringUtil.isEmpty(host.trim())) {
+    if (StringUtil.isEmpty(host)) {
       return "localhost";
     }
 
@@ -268,7 +269,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   public String getAdminHost() {
     String adminHost = settings.getAdminHost();
-    if (StringUtil.isEmpty(adminHost.trim())) {
+    if (StringUtil.isEmpty(adminHost)) {
       return "localhost";
     }
 
@@ -276,7 +277,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   public void setAdminHost(String adminHost) {
-    settings.setAdminHost(adminHost.trim());
+    settings.setAdminHost(adminHost);
   }
 
   @Override
@@ -319,6 +320,10 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setLogLevel(logLevel);
   }
 
+  /**
+   * This value is being ignored for the run configuration.
+   * {@link CloudSdkStartupPolicy}
+   */
   @Override
   public Integer getMaxModuleInstances() {
     return settings.getMaxModuleInstances();
@@ -427,6 +432,9 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public Boolean getAutomaticRestart() {
+    if (settings.isAutomaticRestart() == null) {
+      return true;
+    }
     return settings.isAutomaticRestart();
   }
 
@@ -448,6 +456,9 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public Boolean getSkipSdkUpdateCheck() {
+    if (settings.isSkipSdkUpdateCheck() == null) {
+      return false;
+    }
     return settings.isSkipSdkUpdateCheck();
   }
 
@@ -478,15 +489,10 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setJavaHomeDir(devAppServerJdk.getHomePath());
   }
 
-  public String getAdditionalDevAppserverFlags() {
-    return settings.getAdditionalDevAppserverFlags();
-  }
-
-  public void setAdditionalDevAppserverFlags(String additionalDevAppserverFlags) {
-    settings.setAdditionalDevAppserverFlags(additionalDevAppserverFlags);
-  }
-
   public Boolean getClearDatastore() {
+    if (settings.isClearDatastore() == null) {
+      return false;
+    }
     return settings.isClearDatastore();
   }
 
@@ -544,9 +550,9 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     @Tag("api_port")
     private Integer apiPort;
     @Tag("automatic_restart")
-    private boolean automaticRestart;
+    private Boolean automaticRestart;
     @Tag("clear_datastore")
-    private boolean clearDatastore;
+    private Boolean clearDatastore;
     @Tag("devappserver_log_level")
     private String devAppserverLogLevel;
     @Tag("skip_sdk_update_check")
@@ -556,203 +562,196 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     @Tag("java_home_directory")
     private String javaHomeDir;
 
-    public String getArtifact() {
+    String getArtifact() {
       return artifact;
     }
 
-    public void setArtifact(String artifact) {
+    void setArtifact(String artifact) {
       this.artifact = artifact;
     }
 
-    public String getHost() {
+    String getHost() {
       return host;
     }
 
-    public void setHost(String host) {
+    void setHost(String host) {
       this.host = host;
     }
 
-    public Integer getPort() {
+    Integer getPort() {
       return port;
     }
 
-    public void setPort(Integer port) {
+    void setPort(Integer port) {
       this.port = port;
     }
 
-    public String getAdminHost() {
+    String getAdminHost() {
       return adminHost;
     }
 
-    public void setAdminHost(String adminHost) {
+    void setAdminHost(String adminHost) {
       this.adminHost = adminHost;
     }
 
-    public Integer getAdminPort() {
+    Integer getAdminPort() {
       return adminPort;
     }
 
-    public void setAdminPort(Integer adminPort) {
+    void setAdminPort(Integer adminPort) {
       this.adminPort = adminPort;
     }
 
-    public String getAuthDomain() {
+    String getAuthDomain() {
       return authDomain;
     }
 
-    public void setAuthDomain(String authDomain) {
+    void setAuthDomain(String authDomain) {
       this.authDomain = authDomain;
     }
 
-    public String getStoragePath() {
+    String getStoragePath() {
       return storagePath;
     }
 
-    public void setStoragePath(String storagePath) {
+    void setStoragePath(String storagePath) {
       this.storagePath = storagePath;
     }
 
-    public String getLogLevel() {
+    String getLogLevel() {
       return logLevel;
     }
 
-    public void setLogLevel(String logLevel) {
+    void setLogLevel(String logLevel) {
       this.logLevel = logLevel;
     }
 
-    public Integer getMaxModuleInstances() {
+    Integer getMaxModuleInstances() {
       return maxModuleInstances;
     }
 
-    public void setMaxModuleInstances(Integer maxModuleInstances) {
+    void setMaxModuleInstances(Integer maxModuleInstances) {
       this.maxModuleInstances = maxModuleInstances;
     }
 
-    public boolean isUseMtimeFileWatcher() {
+    Boolean isUseMtimeFileWatcher() {
       return useMtimeFileWatcher;
     }
 
-    public void setUseMtimeFileWatcher(boolean useMtimeFileWatcher) {
+    void setUseMtimeFileWatcher(boolean useMtimeFileWatcher) {
       this.useMtimeFileWatcher = useMtimeFileWatcher;
     }
 
-    public String getThreadsafeOverride() {
+    String getThreadsafeOverride() {
       return threadsafeOverride;
     }
 
-    public void setThreadsafeOverride(String threadsafeOverride) {
+    void setThreadsafeOverride(String threadsafeOverride) {
       this.threadsafeOverride = threadsafeOverride;
     }
 
-    public String getPythonStartupScript() {
+    String getPythonStartupScript() {
       return pythonStartupScript;
     }
 
-    public void setPythonStartupScript(String pythonStartupScript) {
+    void setPythonStartupScript(String pythonStartupScript) {
       this.pythonStartupScript = pythonStartupScript;
     }
 
-    public String getPythonStartupArgs() {
+    String getPythonStartupArgs() {
       return pythonStartupArgs;
     }
 
-    public void setPythonStartupArgs(String pythonStartupArgs) {
+    void setPythonStartupArgs(String pythonStartupArgs) {
       this.pythonStartupArgs = pythonStartupArgs;
     }
 
-    public String getJvmFlags() {
+    String getJvmFlags() {
       return jvmFlags;
     }
 
-    public void setJvmFlags(String jvmFlags) {
+    void setJvmFlags(String jvmFlags) {
       this.jvmFlags = jvmFlags;
     }
 
-    public String getCustomEntrypoint() {
+    String getCustomEntrypoint() {
       return customEntrypoint;
     }
 
-    public void setCustomEntrypoint(String customEntrypoint) {
+    void setCustomEntrypoint(String customEntrypoint) {
       this.customEntrypoint = customEntrypoint;
     }
 
-    public String getRuntime() {
+    String getRuntime() {
       return runtime;
     }
 
-    public void setRuntime(String runtime) {
+    void setRuntime(String runtime) {
       this.runtime = runtime;
     }
 
-    public boolean isAllowSkippedFiles() {
+    Boolean isAllowSkippedFiles() {
       return allowSkippedFiles;
     }
 
-    public void setAllowSkippedFiles(boolean allowSkippedFiles) {
+    void setAllowSkippedFiles(boolean allowSkippedFiles) {
       this.allowSkippedFiles = allowSkippedFiles;
     }
 
-    public Integer getApiPort() {
+    Integer getApiPort() {
       return apiPort;
     }
 
-    public void setApiPort(Integer apiPort) {
+    void setApiPort(Integer apiPort) {
       this.apiPort = apiPort;
     }
 
-    public boolean isAutomaticRestart() {
+    Boolean isAutomaticRestart() {
       return automaticRestart;
     }
 
-    public void setAutomaticRestart(boolean automaticRestart) {
+    void setAutomaticRestart(boolean automaticRestart) {
       this.automaticRestart = automaticRestart;
     }
 
-    public String getDevAppserverLogLevel() {
+    String getDevAppserverLogLevel() {
       return devAppserverLogLevel;
     }
 
-    public void setDevAppserverLogLevel(String devAppserverLogLevel) {
+    void setDevAppserverLogLevel(String devAppserverLogLevel) {
       this.devAppserverLogLevel = devAppserverLogLevel;
     }
 
-    public boolean isSkipSdkUpdateCheck() {
+    Boolean isSkipSdkUpdateCheck() {
       return skipSdkUpdateCheck;
     }
 
-    public void setSkipSdkUpdateCheck(boolean skipSdkUpdateCheck) {
+    void setSkipSdkUpdateCheck(boolean skipSdkUpdateCheck) {
       this.skipSdkUpdateCheck = skipSdkUpdateCheck;
     }
 
-    public String getDefaultGcsBucketName() {
+    String getDefaultGcsBucketName() {
       return defaultGcsBucketName;
     }
 
-    public void setDefaultGcsBucketName(String defaultGcsBucketName) {
+    void setDefaultGcsBucketName(String defaultGcsBucketName) {
       this.defaultGcsBucketName = defaultGcsBucketName;
     }
 
-    public String getJavaHomeDir() {
+    String getJavaHomeDir() {
       return javaHomeDir;
     }
 
-    public void setJavaHomeDir(String javaHomeDir) {
+    void setJavaHomeDir(String javaHomeDir) {
       this.javaHomeDir = javaHomeDir;
     }
 
-    public String getAdditionalDevAppserverFlags() {
-      return additionalDevAppserverFlags;
-    }
-
-    public void setAdditionalDevAppserverFlags(String additionalDevAppserverFlags) {
-      this.additionalDevAppserverFlags = additionalDevAppserverFlags;
-    }
-
-    public boolean isClearDatastore() {
+    Boolean isClearDatastore() {
       return clearDatastore;
     }
 
-    public void setClearDatastore(boolean clearDatastore) {
+
+    void setClearDatastore(boolean clearDatastore) {
       this.clearDatastore = clearDatastore;
     }
 
