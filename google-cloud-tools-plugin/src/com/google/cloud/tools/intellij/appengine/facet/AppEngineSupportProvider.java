@@ -235,17 +235,9 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
   static Library loadMavenLibrary(final Module module, AppEngineStandardMavenLibrary library) {
     RepositoryLibraryProperties libraryProperties = library.getLibraryProperties();
 
-    final RepositoryWithVersionAddLibraryAction action = new RepositoryWithVersionAddLibraryAction(
-        module, RepositoryLibraryDescription.findDescription(libraryProperties),
+    return MavenRepositoryLibraryDownloader.getInstance().downloadLibrary(module,
+        RepositoryLibraryDescription.findDescription(libraryProperties), libraryProperties,
         libraryProperties.getVersion());
-
-    action.invoke(module.getProject(), null /*editor*/, null /*file*/);
-
-    LibraryTable.ModifiableModel modifiableModel = ModifiableModelsProvider.SERVICE.getInstance()
-        .getLibraryTableModifiableModel(module.getProject());
-
-    return modifiableModel.getLibraryByName(
-        AppEngineStandardMavenLibrary.toMavenDisplayVersion(libraryProperties));
   }
 
   @NotNull

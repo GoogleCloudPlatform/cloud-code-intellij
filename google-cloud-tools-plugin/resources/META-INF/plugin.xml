@@ -97,6 +97,7 @@
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.MavenRepositoryLibraryDownloader"/>
 
     <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType"/>
     <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory"/>
