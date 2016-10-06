@@ -17,16 +17,24 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration.AppEngineFacetProperties;
+import com.google.common.collect.Sets;
 
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.libraries.Library;
+import com.intellij.openapi.roots.libraries.LibraryTable;
+import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
 
 /**
  * @author nik
@@ -34,13 +42,13 @@ import org.jdom.Element;
 public class AppEngineFacetConfiguration implements FacetConfiguration,
     PersistentStateComponent<AppEngineFacetProperties> {
 
-  private AppEngineFacetProperties myProperties
+  private AppEngineFacetProperties properties
       = new AppEngineFacetProperties();
 
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
       FacetValidatorsManager validatorsManager) {
     return new FacetEditorTab[]{
-        new AppEngineFacetEditor(this, editorContext, validatorsManager)
+        new AppEngineStandardFacetEditor(this, editorContext)
     };
   }
 
@@ -50,17 +58,42 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
   public void writeExternal(Element element) throws WriteExternalException {
   }
 
+  /**
+   * Looks up the user's configured libraries for the project and returns a set of
+   * {@link AppEngineStandardMavenLibrary} for each configured library matching one of the AE
+   * standard managed libraries.
+   *
+   * <p>The lookup is performed based on the maven display id consisting of groupId, artifactName,
+   * and version. If the configured lib doesn't entirely match this strategy, then it will not be
+   * returned and therefore not considered to be "managed".
+   */
+  public Set<AppEngineStandardMavenLibrary> getLibraries(@NotNull Project project) {
+    LibraryTable libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project);
+    Library[] libraries =  libraryTable.getLibraries();
+
+    Set<AppEngineStandardMavenLibrary> configuredLibraries = Sets.newHashSet();
+    for (Library configuredLibrary : libraries) {
+      AppEngineStandardMavenLibrary mavenLibrary
+          = AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(configuredLibrary.getName());
+      if (mavenLibrary != null) {
+        configuredLibraries.add(mavenLibrary);
+      }
+    }
+
+    return configuredLibraries;
+  }
+
   @Override
   public AppEngineFacetProperties getState() {
-    return myProperties;
+    return properties;
   }
 
   @Override
   public void loadState(AppEngineFacetProperties state) {
-    myProperties = state;
+    properties = state;
   }
 
-  // TODO(eshaul) to be implemented when configurable libraries are added to the facet configuration
   public static class AppEngineFacetProperties {
+
   }
 }

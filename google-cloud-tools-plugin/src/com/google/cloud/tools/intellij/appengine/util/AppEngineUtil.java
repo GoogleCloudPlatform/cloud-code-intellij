@@ -129,7 +129,7 @@ public class AppEngineUtil {
                   project, Collections.singletonList(module)));
 
       if (ModuleType.is(module, JavaModuleType.getModuleType())
-          && projectService.isJarOrWarMavenBuild(project, module)) {
+          && projectService.isJarOrWarMavenBuild(module)) {
         moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module, environment));
       }
 

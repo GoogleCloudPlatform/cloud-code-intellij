@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 
+import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
@@ -31,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
+import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.util.Collections;
 
@@ -108,14 +110,26 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public boolean isJarOrWarMavenBuild(@NotNull Project project, @NotNull Module module) {
-    MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(project);
+  public boolean isMavenModule(@NotNull Module module) {
+    MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(module.getProject());
     MavenProject mavenProject = projectsManager.findProject(module);
 
-    boolean isMavenProject = projectsManager.isMavenizedModule(module)
-        && mavenProject != null;
+    return mavenProject != null
+        && projectsManager.isMavenizedModule(module);
+  }
 
-    return isMavenProject
+  @Override
+  public boolean isGradleModule(@NotNull Module module) {
+    return ExternalSystemApiUtil.isExternalSystemAwareModule(GradleConstants.SYSTEM_ID, module);
+  }
+
+  @Override
+  public boolean isJarOrWarMavenBuild(@NotNull Module module) {
+    MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(module.getProject());
+    MavenProject mavenProject = projectsManager.findProject(module);
+
+    return mavenProject != null
+        && isMavenModule(module)
         && ("jar".equalsIgnoreCase(mavenProject.getPackaging())
         || "war".equalsIgnoreCase(mavenProject.getPackaging()));
   }

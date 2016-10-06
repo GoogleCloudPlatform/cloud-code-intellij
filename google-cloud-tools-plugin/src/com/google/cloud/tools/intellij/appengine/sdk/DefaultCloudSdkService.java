@@ -23,9 +23,7 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.util.containers.ContainerUtil;
 
 import gnu.trove.THashMap;
 import gnu.trove.THashSet;
@@ -42,8 +40,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -141,30 +137,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
     return AppEngineJreWhitelist.contains(className);
   }
 
-  @NotNull
-  @Override
-  public List<String> getUserLibraryPaths() {
-    List<String> result = new ArrayList<>();
-    Path javaToolsBasePath = getJavaToolsBasePath();
-
-    if (javaToolsBasePath == null) {
-      return result;
-    }
-
-    String libUserDirectory = getLibUserDirectoryPath();
-    if (libUserDirectory != null && new File(libUserDirectory).exists()) {
-      result.add(getLibUserDirectoryPath());
-    }
-
-    Path optPath = javaToolsBasePath.resolve(Paths.get("lib", "opt", "user"));
-    File optFile = optPath.toFile();
-
-    ContainerUtil.addIfNotNull(
-        result, findLatestVersion(new File(optFile, "appengine-endpoints")));
-    ContainerUtil.addIfNotNull(result, findLatestVersion(new File(optFile, "jsr107")));
-    return result;
-  }
-
   @Nullable
   @Override
   public File getWebSchemeFile() {
@@ -189,15 +161,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
     }
   }
 
-  private static String findLatestVersion(File dir) {
-    String[] names = dir.list();
-    if (names != null && names.length > 0) {
-      String max = Collections.max(Arrays.asList(names));
-      return FileUtil.toSystemIndependentName(new File(dir, max).getAbsolutePath());
-    }
-    return null;
-  }
-
   private Map<String, Set<String>> loadBlackList() throws IOException {
     final InputStream stream = getClass().getResourceAsStream("/data/methodsBlacklist.txt");
     logger.assertTrue(stream != null, "/data/methodsBlacklist.txt not found");
@@ -216,13 +179,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
       reader.close();
     }
     return map;
-  }
-
-  @Nullable
-  private String getLibUserDirectoryPath() {
-    return getJavaToolsBasePath() != null
-        ? getJavaToolsBasePath().resolve(Paths.get("lib", "user")).toString()
-        : null;
   }
 
   private File[] getJarsFromDirectory(File libFolder) {
