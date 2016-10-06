@@ -45,7 +45,7 @@ public class MavenRepositoryLibraryDownloader {
   @Nullable
   public Library downloadLibrary(Module module, RepositoryLibraryDescription libraryDescription,
       RepositoryLibraryProperties libraryProperties, String version) {
-     RepositoryLibraryPropertiesModel model = new RepositoryLibraryPropertiesModel(
+    RepositoryLibraryPropertiesModel model = new RepositoryLibraryPropertiesModel(
         version,
         true /*downloadSources*/,
         true /*downloadJavaDocs*/);
