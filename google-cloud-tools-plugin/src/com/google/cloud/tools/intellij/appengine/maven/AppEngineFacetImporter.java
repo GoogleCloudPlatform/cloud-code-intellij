@@ -86,7 +86,7 @@ public class AppEngineFacetImporter extends
       final Artifact webArtifact = modelsProvider.getModifiableArtifactModel()
           .findArtifact(artifactName);
       AppEngineWebIntegration.getInstance().setupRunConfiguration(webArtifact, module.getProject(),
-          null);
+          null /* existingConfiguration */);
     }
   }
 }
