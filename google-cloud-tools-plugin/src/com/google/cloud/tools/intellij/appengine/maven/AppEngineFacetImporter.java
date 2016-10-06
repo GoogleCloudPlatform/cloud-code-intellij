@@ -85,7 +85,8 @@ public class AppEngineFacetImporter extends
       final String artifactName = module.getName() + ":war exploded";
       final Artifact webArtifact = modelsProvider.getModifiableArtifactModel()
           .findArtifact(artifactName);
-      AppEngineWebIntegration.getInstance().setupRunConfiguration(webArtifact, module.getProject());
+      AppEngineWebIntegration.getInstance().setupRunConfiguration(webArtifact, module.getProject(),
+          null);
     }
   }
 }
