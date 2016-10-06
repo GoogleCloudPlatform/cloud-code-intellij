@@ -115,16 +115,15 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
 
       CommonModel configuration;
       if (existingConfiguration instanceof CommonModel
-          && ((CommonModel) existingConfiguration).getServerModel() instanceof AppEngineServerModel) {
+          && ((CommonModel) existingConfiguration).getServerModel()
+          instanceof AppEngineServerModel) {
         configuration = (CommonModel) existingConfiguration;
-      }
-      else if (RunManager.getInstance(project)
+      } else if (RunManager.getInstance(project)
           .getConfigurationSettingsList(configurationType).isEmpty()) {
         final RunnerAndConfigurationSettings settings = J2EEConfigurationFactory.getInstance()
             .addAppServerConfiguration(project, configurationType.getLocalFactory(), appServer);
         configuration = (CommonModel) settings.getConfiguration();
-      }
-      else {
+      } else {
         configuration = null;
       }
 
