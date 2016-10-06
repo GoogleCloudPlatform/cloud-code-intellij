@@ -24,7 +24,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.IdeaModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.PsiFile;
 
 import org.jetbrains.annotations.NotNull;
@@ -66,23 +65,19 @@ public class RepositoryWithVersionAddLibraryAction extends RepositoryAddLibraryA
     RepositoryLibraryPropertiesDialog dialog = new RepositoryLibraryPropertiesDialog(project, model,
         this.libraryDescription, false);
 
-    try {
-      if (!dialog.isModal() || dialog.showAndGet()) {
-        IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
-        final ModifiableRootModel modifiableModel
-            = ModuleRootManager.getInstance(module).getModifiableModel();
-        RepositoryLibrarySupport librarySupport = new RepositoryLibrarySupport(project,
-            this.libraryDescription, model);
+    if (!dialog.isModal() || dialog.showAndGet()) {
+      IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
+      final ModifiableRootModel modifiableModel
+          = ModuleRootManager.getInstance(module).getModifiableModel();
+      RepositoryLibrarySupport librarySupport = new RepositoryLibrarySupport(project,
+          this.libraryDescription, model);
 
-        librarySupport.addSupport(this.module, modifiableModel, modifiableModelsProvider);
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
-          public void run() {
-            modifiableModel.commit();
-          }
-        });
-      }
-    } finally {
-      Disposer.dispose(dialog.getDisposable());
+      librarySupport.addSupport(this.module, modifiableModel, modifiableModelsProvider);
+      ApplicationManager.getApplication().runWriteAction(new Runnable() {
+        public void run() {
+          modifiableModel.commit();
+        }
+      });
     }
   }
 }
