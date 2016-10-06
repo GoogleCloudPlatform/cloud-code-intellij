@@ -148,8 +148,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       }
     }
 
-    webIntegration.addDevServerToModuleDependencies(rootModel);
-
     addMavenLibraries(librariesToAdd, module, rootModel, webArtifact);
   }
 
