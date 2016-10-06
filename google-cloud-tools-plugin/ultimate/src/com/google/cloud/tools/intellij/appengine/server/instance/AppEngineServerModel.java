@@ -1,11 +1,11 @@
 /*
- * Copyright 2000-2016 JetBrains s.r.o.
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,6 +44,7 @@ import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactPointer;
 import com.intellij.packaging.artifacts.ArtifactPointerManager;
@@ -70,11 +71,11 @@ import java.util.List;
 public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStartupOnly,
     RunConfiguration, Cloneable {
 
+  public static final String JVM_FLAG_DELIMITER = " ";
   private ArtifactPointer artifactPointer;
   private CommonModel commonModel;
   private Sdk devAppServerJdk;
   private ProjectSdksModel projectJdksModel;
-
   private AppEngineModelSettings settings = new AppEngineModelSettings();
 
   public AppEngineServerModel() {
@@ -243,7 +244,12 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public String getHost() {
-    return settings.getHost();
+    String host = settings.getAdminHost();
+    if (StringUtil.isEmpty(host.trim())) {
+      return "localhost";
+    }
+
+    return settings.getAdminHost();
   }
 
   public void setHost(String host) {
@@ -261,15 +267,24 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public String getAdminHost() {
+    String adminHost = settings.getAdminHost();
+    if (StringUtil.isEmpty(adminHost.trim())) {
+      return "localhost";
+    }
+
     return settings.getAdminHost();
   }
 
   public void setAdminHost(String adminHost) {
-    settings.setAdminHost(adminHost);
+    settings.setAdminHost(adminHost.trim());
   }
 
   @Override
   public Integer getAdminPort() {
+    Integer adminPort = settings.getAdminPort();
+    if (adminPort == null) {
+      return 8000;
+    }
     return settings.getAdminPort();
   }
 
@@ -349,13 +364,15 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setPythonStartupArgs(pythonStartupArgs);
   }
 
-  public static final String JVM_FLAG_DELIMITER = " ";
-
   @Override
   public List<String> getJvmFlags() {
     return settings.getJvmFlags() != null
         ? Splitter.on(JVM_FLAG_DELIMITER).splitToList(settings.getJvmFlags())
         : new ArrayList<String>();
+  }
+
+  public void setJvmFlags(String jvmFlags) {
+    settings.setJvmFlags(jvmFlags);
   }
 
   public void addJvmFlag(String flag) {
@@ -367,10 +384,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setJvmFlags(settings.getJvmFlags() == null
         ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
         : settings.getJvmFlags() + JVM_FLAG_DELIMITER + Joiner.on(JVM_FLAG_DELIMITER).join(flags));
-  }
-
-  public void setJvmFlags(String jvmFlags) {
-    settings.setJvmFlags(jvmFlags);
   }
 
   @Override
@@ -402,6 +415,9 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public Integer getApiPort() {
+    if (settings.getApiPort() == null) {
+      return 0;
+    }
     return settings.getApiPort();
   }
 
@@ -420,6 +436,9 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public String getDevAppserverLogLevel() {
+    if (StringUtil.isEmpty(settings.getDevAppserverLogLevel())) {
+      return "info";
+    }
     return settings.getDevAppserverLogLevel();
   }
 
@@ -459,6 +478,22 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setJavaHomeDir(devAppServerJdk.getHomePath());
   }
 
+  public String getAdditionalDevAppserverFlags() {
+    return settings.getAdditionalDevAppserverFlags();
+  }
+
+  public void setAdditionalDevAppserverFlags(String additionalDevAppserverFlags) {
+    settings.setAdditionalDevAppserverFlags(additionalDevAppserverFlags);
+  }
+
+  public Boolean getClearDatastore() {
+    return settings.isClearDatastore();
+  }
+
+  public void setClearDatastore(Boolean clearDatastore) {
+    settings.setClearDatastore(clearDatastore);
+  }
+
   /**
    * This class is used to serialize run/debug config settings. It only supports basic types (e.g.,
    * int, String, etc.).
@@ -482,6 +517,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private Integer adminPort;
     @Tag("auth_domain")
     private String authDomain;
+    @Tag("additional_dev_appserver_flags")
+    private String additionalDevAppserverFlags;
     @Tag("storage_path")
     private String storagePath;
     @Tag("log_level")
@@ -508,6 +545,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private Integer apiPort;
     @Tag("automatic_restart")
     private boolean automaticRestart;
+    @Tag("clear_datastore")
+    private boolean clearDatastore;
     @Tag("devappserver_log_level")
     private String devAppserverLogLevel;
     @Tag("skip_sdk_update_check")
@@ -699,6 +738,22 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     public void setJavaHomeDir(String javaHomeDir) {
       this.javaHomeDir = javaHomeDir;
+    }
+
+    public String getAdditionalDevAppserverFlags() {
+      return additionalDevAppserverFlags;
+    }
+
+    public void setAdditionalDevAppserverFlags(String additionalDevAppserverFlags) {
+      this.additionalDevAppserverFlags = additionalDevAppserverFlags;
+    }
+
+    public boolean isClearDatastore() {
+      return clearDatastore;
+    }
+
+    public void setClearDatastore(boolean clearDatastore) {
+      this.clearDatastore = clearDatastore;
     }
 
     @Override
