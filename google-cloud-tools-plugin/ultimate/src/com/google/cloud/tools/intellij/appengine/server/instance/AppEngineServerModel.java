@@ -244,7 +244,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public String getHost() {
-    return settings.getAdminHost();
+    return settings.getHost();
   }
 
   public void setHost(String host) {
