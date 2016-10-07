@@ -98,7 +98,7 @@ subprojects {
     }
 
     tasks.withType(FindBugs) {
-        // Jenkins uses the xml formatted report.
+        // Jenkins requires the xml formatted report for publishing.
         reports {
             xml.enabled = true
             html.enabled = false
