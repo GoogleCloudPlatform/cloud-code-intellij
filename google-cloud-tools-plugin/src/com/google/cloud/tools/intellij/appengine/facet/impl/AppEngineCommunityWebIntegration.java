@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet.impl;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
 
+import com.intellij.execution.configurations.ModuleRunConfiguration;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -81,7 +82,8 @@ public class AppEngineCommunityWebIntegration extends AppEngineWebIntegration {
   }
 
   @Override
-  public void setupRunConfiguration(@Nullable Artifact artifact, @NotNull Project project) {
+  public void setupRunConfiguration(@Nullable Artifact artifact, @NotNull Project project,
+      ModuleRunConfiguration existingConfiguration) {
   }
 
   @Override

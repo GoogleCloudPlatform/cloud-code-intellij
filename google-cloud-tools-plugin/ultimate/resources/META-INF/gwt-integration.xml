@@ -17,6 +17,8 @@
 <idea-plugin>
   <extensions defaultExtensionNs="com.intellij">
     <gwt.devModeServerProvider implementation="com.google.cloud.tools.intellij.appengine.gwt.AppEngineGwtServerProvider"/>
+  </extensions>
+  <extensions defaultExtensionNs="com.google.gct">
     <appengine.forbiddenCodeHandler implementation="com.google.cloud.tools.intellij.appengine.gwt.GwtNativeMethodsHandler"/>
   </extensions>
 </idea-plugin>
