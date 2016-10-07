@@ -454,9 +454,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   public Boolean getClearDatastore() {
-    if (settings.isClearDatastore() == null) {
-      return false;
-    }
     return settings.isClearDatastore();
   }
 
