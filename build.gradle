@@ -90,8 +90,6 @@ subprojects {
 
     apply plugin: 'findbugs'
     findbugs {
-        xml.enabled true
-        html.enabled true
         ignoreFailures = false
         sourceSets = [sourceSets.main]
         effort = "max"
@@ -101,8 +99,8 @@ subprojects {
 
     tasks.withType(FindBugs) {
         reports {
-            xml.enabled = false
-            html.enabled = true
+            xml.enabled = true
+            html.enabled = false
         }
     }
 
