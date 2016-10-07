@@ -709,7 +709,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       return clearDatastore;
     }
 
-
     void setClearDatastore(boolean clearDatastore) {
       this.clearDatastore = clearDatastore;
     }
