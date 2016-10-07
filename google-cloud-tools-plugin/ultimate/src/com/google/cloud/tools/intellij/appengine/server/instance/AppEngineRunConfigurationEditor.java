@@ -34,6 +34,9 @@ import com.intellij.ui.components.JBLabel;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -58,7 +61,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField adminPort;
   private JTextField apiPort;
   private JComboBox devAppserverLogLevel;
-  private RawCommandLineEditor jvmFlagsEditor;
   private JCheckBox automaticRestartCheckbox;
   private JCheckBox dontNagCheckbox;
   private JCheckBox cleadDatastoreCheckbox;
@@ -67,15 +69,13 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
 
   public AppEngineRunConfigurationEditor(Project project) {
     myProject = project;
-/*    myArtifactComboBox.addActionListener(new ActionListener() {
+    myArtifactComboBox.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         onArtifactChanged();
       }
-    });*/
+    });
 
     setAnchor(myWebArtifactToDeployLabel);
-
-    jvmFlagsEditor.setDialogCaption(GctBundle.getString("appengine.run.jvmflags.title"));
     appEngineSettingsPanel.setBorder(PlainSmallWithoutIndent.createTitledBorder(
         null /* border - ignored */,
         GctBundle.message("appengine.run.settings.title.label"),
@@ -128,8 +128,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     devAppserverLogLevel.setSelectedItem(serverModel.getDevAppserverLogLevel());
     dontNagCheckbox.setSelected(serverModel.getSkipSdkUpdateCheck());
     cleadDatastoreCheckbox.setSelected(serverModel.getClearDatastore());
-    jvmFlagsEditor.setText(Joiner.on(AppEngineServerModel.JVM_FLAG_DELIMITER)
-        .join(serverModel.getJvmFlags()));
   }
 
   protected void applyEditorTo(CommonModel commonModel) throws ConfigurationException {
@@ -151,7 +149,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     serverModel.setDevAppserverLogLevel((String) devAppserverLogLevel.getSelectedItem());
     serverModel.setSkipSdkUpdateCheck(dontNagCheckbox.isSelected());
     serverModel.setClearDatastore(cleadDatastoreCheckbox.isSelected());
-    serverModel.setJvmFlags(jvmFlagsEditor.getText());
   }
 
   private Integer validateInteger(String intText, String description)

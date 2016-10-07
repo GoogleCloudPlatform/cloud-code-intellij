@@ -376,15 +376,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
         : new ArrayList<String>();
   }
 
-  public void setJvmFlags(String jvmFlags) {
-    settings.setJvmFlags(jvmFlags);
-  }
-
-  public void addJvmFlag(String flag) {
-    settings.setJvmFlags(settings.getJvmFlags() == null
-        ? flag : settings.getJvmFlags() + JVM_FLAG_DELIMITER + flag);
-  }
-
   public void addAllJvmFlags(Collection<String> flags) {
     settings.setJvmFlags(settings.getJvmFlags() == null
         ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
@@ -420,9 +411,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public Integer getApiPort() {
-    if (settings.getApiPort() == null) {
-      return 0;
-    }
     return settings.getApiPort();
   }
 
