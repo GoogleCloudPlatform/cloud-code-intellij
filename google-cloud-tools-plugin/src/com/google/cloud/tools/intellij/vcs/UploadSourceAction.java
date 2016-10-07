@@ -295,7 +295,7 @@ public class UploadSourceAction extends DumbAwareAction {
     GitHandlerUtil.runInCurrentThread(gitLineHandler, indicator, true,
         GitBundle.getString("initializing.title"));
     if (!gitLineHandler.errors().isEmpty()) {
-      GitUIUtil.showOperationErrors(project, gitLineHandler.errors(), "git startup");
+      GitUIUtil.showOperationErrors(project, gitLineHandler.errors(), "git init");
       LOG.info("Failed to create empty git repo: " + gitLineHandler.errors());
       return false;
     }
