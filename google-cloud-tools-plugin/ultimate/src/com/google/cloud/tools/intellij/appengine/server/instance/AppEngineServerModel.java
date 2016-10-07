@@ -511,8 +511,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private Integer adminPort;
     @Tag("auth_domain")
     private String authDomain;
-    @Tag("additional_dev_appserver_flags")
-    private String additionalDevAppserverFlags;
     @Tag("storage_path")
     private String storagePath;
     @Tag("log_level")
