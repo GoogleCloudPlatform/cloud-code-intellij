@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
@@ -62,8 +61,7 @@ public class UnsupportedJavaVersionCheck implements StartupActivity {
     }
   }
 
-  @VisibleForTesting
-  protected boolean shouldWarnUser(Project project) {
+  private boolean shouldWarnUser(Project project) {
     return usesJava8OrGreater(project)
         && containsAnyAppEngineModulesWithoutJava8Support(project);
   }
@@ -133,8 +131,7 @@ public class UnsupportedJavaVersionCheck implements StartupActivity {
         .notify(project);
   }
 
-  @VisibleForTesting
-  static class LanguageLevelLinkListener implements NotificationListener {
+  private static class LanguageLevelLinkListener implements NotificationListener {
     private Project project;
 
     public LanguageLevelLinkListener(Project project) {
