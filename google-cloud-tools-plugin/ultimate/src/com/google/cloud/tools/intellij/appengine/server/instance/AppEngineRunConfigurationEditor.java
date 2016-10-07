@@ -58,7 +58,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField adminHost;
   private JTextField adminPort;
   private JTextField apiPort;
-  private JComboBox devAppserverLogLevel;
+  private JComboBox applicationLogLevel;
   private JCheckBox automaticRestartCheckbox;
   private JCheckBox dontNagCheckbox;
   private JCheckBox cleadDatastoreCheckbox;
@@ -123,7 +123,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     adminPort.setText(intToString(serverModel.getAdminPort()));
     apiPort.setText(intToString(serverModel.getApiPort()));
     automaticRestartCheckbox.setSelected(serverModel.getAutomaticRestart());
-    devAppserverLogLevel.setSelectedItem(serverModel.getDevAppserverLogLevel());
+    applicationLogLevel.setSelectedItem(serverModel.getLogLevel());
     dontNagCheckbox.setSelected(serverModel.getSkipSdkUpdateCheck());
     cleadDatastoreCheckbox.setSelected(serverModel.getClearDatastore());
   }
@@ -144,7 +144,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     }
 
     serverModel.setAutomaticRestart(automaticRestartCheckbox.isSelected());
-    serverModel.setDevAppserverLogLevel((String) devAppserverLogLevel.getSelectedItem());
+    serverModel.setLogLevel((String) applicationLogLevel.getSelectedItem());
     serverModel.setSkipSdkUpdateCheck(dontNagCheckbox.isSelected());
     serverModel.setClearDatastore(cleadDatastoreCheckbox.isSelected());
   }

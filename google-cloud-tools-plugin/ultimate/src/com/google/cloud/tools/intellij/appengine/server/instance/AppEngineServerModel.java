@@ -245,11 +245,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public String getHost() {
-    String host = settings.getAdminHost();
-    if (StringUtil.isEmpty(host)) {
-      return "localhost";
-    }
-
     return settings.getAdminHost();
   }
 
@@ -268,11 +263,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public String getAdminHost() {
-    String adminHost = settings.getAdminHost();
-    if (StringUtil.isEmpty(adminHost)) {
-      return "localhost";
-    }
-
     return settings.getAdminHost();
   }
 
@@ -282,10 +272,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public Integer getAdminPort() {
-    Integer adminPort = settings.getAdminPort();
-    if (adminPort == null) {
-      return 8000;
-    }
     return settings.getAdminPort();
   }
 
@@ -420,9 +406,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public Boolean getAutomaticRestart() {
-    if (settings.isAutomaticRestart() == null) {
-      return true;
-    }
     return settings.isAutomaticRestart();
   }
 
@@ -432,9 +415,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public String getDevAppserverLogLevel() {
-    if (StringUtil.isEmpty(settings.getDevAppserverLogLevel())) {
-      return "info";
-    }
     return settings.getDevAppserverLogLevel();
   }
 
@@ -444,9 +424,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public Boolean getSkipSdkUpdateCheck() {
-    if (settings.isSkipSdkUpdateCheck() == null) {
-      return false;
-    }
     return settings.isSkipSdkUpdateCheck();
   }
 
@@ -502,19 +479,19 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private String artifact;
 
     @Tag("host")
-    private String host;
+    private String host = "localhost";
     @Tag("port")
     private Integer port = 8080;
     @Tag("admin_host")
-    private String adminHost;
+    private String adminHost = "localhost";
     @Tag("admin_port")
-    private Integer adminPort;
+    private Integer adminPort = 8000;
     @Tag("auth_domain")
     private String authDomain;
     @Tag("storage_path")
     private String storagePath;
     @Tag("log_level")
-    private String logLevel;
+    private String logLevel = "info";
     @Tag("max_module_instances")
     private Integer maxModuleInstances;
     @Tag("use_mtime_file_watcher")
@@ -536,13 +513,13 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     @Tag("api_port")
     private Integer apiPort;
     @Tag("automatic_restart")
-    private Boolean automaticRestart;
+    private Boolean automaticRestart = true;
     @Tag("clear_datastore")
-    private Boolean clearDatastore;
+    private Boolean clearDatastore = false;
     @Tag("devappserver_log_level")
     private String devAppserverLogLevel;
     @Tag("skip_sdk_update_check")
-    private boolean skipSdkUpdateCheck;
+    private Boolean skipSdkUpdateCheck = false;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
     @Tag("java_home_directory")
