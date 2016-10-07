@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.startup;
+package com.google.cloud.tools.intellij.appengine.module;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
@@ -30,12 +30,10 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.EffectiveLanguageLevelUtil;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.roots.LanguageLevelModuleExtension;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
@@ -43,51 +41,44 @@ import com.intellij.psi.xml.XmlTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.swing.event.HyperlinkEvent;
 
-/**
- * A StartupActivity that warns the user if they are using an unsupported java version.
- */
-public class UnsupportedJavaVersionCheck implements StartupActivity {
+public class JavaLanguageLevelSupportCheck implements ModuleComponent {
 
+  private static final String COMPONENT_NAME = "App Engine Java Version Support Check";
   private static final String RUNTIME_TAG = "runtime";
   private static final String RUNTIME_TAG_JAVA_8 = "java8";
   private static final String UPDATE_HREF = "#update";
   private static final LanguageLevel HIGHEST_SUPPORTED_LANGUAGE_LEVEL = LanguageLevel.JDK_1_7;
 
+  private Module thisModule;
+
+  public JavaLanguageLevelSupportCheck(Module module) {
+    this.thisModule = module;
+  }
+
   @Override
-  public void runActivity(@NotNull Project project) {
-    List<Module> invalidModules = findModulesUsingUnsupportedLanguageLevel(project);
-    if (!invalidModules.isEmpty()) {
-      warnUser(project, invalidModules);
+  public void moduleAdded() {
+    if (isModuleUsingUnsupportedLanguageLevel(thisModule)) {
+      warnUser(thisModule);
     }
   }
 
-  private List<Module> findModulesUsingUnsupportedLanguageLevel(Project project) {
-    Module[] projectModules = ModuleManager.getInstance(project).getModules();
-    List<Module> invalidModules = new ArrayList<>();
-
-    for (Module module : projectModules) {
-      // if it's not an app engine module, skip it
-      if (!hasAppEngineFacet(module)) {
-        continue;
-      }
-
-      @Nullable
-      XmlFile appengineWebXml = AppEngineAssetProvider.getInstance()
-          .loadAppEngineStandardWebXml(project, Arrays.asList(module));
-
-      if (isAppEngineStandard(appengineWebXml)
-          && usesJava8OrGreater(module)
-          && !declaresJava8Runtime(appengineWebXml)) {
-        invalidModules.add(module);
-      }
+  protected boolean isModuleUsingUnsupportedLanguageLevel(Module module) {
+    // if it's not an app engine module, it's fine
+    if (!hasAppEngineFacet(module)) {
+      return false;
     }
-    return invalidModules;
+
+    @Nullable
+    XmlFile appengineWebXml = AppEngineAssetProvider.getInstance()
+        .loadAppEngineStandardWebXml(module.getProject(), Arrays.asList(module));
+
+    return isAppEngineStandard(appengineWebXml)
+        && usesJava8OrGreater(module)
+        && !declaresJava8Runtime(appengineWebXml);
   }
 
   private boolean usesJava8OrGreater(Module module) {
@@ -129,7 +120,7 @@ public class UnsupportedJavaVersionCheck implements StartupActivity {
     });
   }
 
-  private void warnUser(Project project, List<Module> invalidModules) {
+  private void warnUser(Module module) {
     String message =
         new StringBuilder()
             .append("<p>")
@@ -150,28 +141,44 @@ public class UnsupportedJavaVersionCheck implements StartupActivity {
             GctBundle.message("appengine.support.java.version.alert.title"),
             message,
             NotificationType.WARNING,
-            new LanguageLevelLinkListener(invalidModules))
-        .notify(project);
+            new LanguageLevelLinkListener(module))
+        .notify(module.getProject());
   }
 
   private static class LanguageLevelLinkListener implements NotificationListener {
-    private List<Module> invalidModules;
+    private Module invalidModule;
 
-    public LanguageLevelLinkListener(List<Module> invalidModules) {
-      this.invalidModules = invalidModules;
+    public LanguageLevelLinkListener(Module invalidModule) {
+      this.invalidModule = invalidModule;
     }
 
     @Override
     public void hyperlinkUpdate(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
       String href = event.getDescription();
       if (href.equals(UPDATE_HREF)) {
-
-        // set the language level for all unsupported modules to the latest supported language level
-        for (Module module : invalidModules) {
-          setModuleLanguageLevel(module, HIGHEST_SUPPORTED_LANGUAGE_LEVEL);
-        }
+        // set the language level to the latest supported language level
+        setModuleLanguageLevel(invalidModule, HIGHEST_SUPPORTED_LANGUAGE_LEVEL);
         notification.hideBalloon();
       }
     }
   }
+
+  @NotNull
+  @Override
+  public String getComponentName() {
+    return COMPONENT_NAME;
+  }
+
+  @Override
+  public void projectOpened() {}
+
+  @Override
+  public void projectClosed() {}
+
+  @Override
+  public void initComponent() {}
+
+  @Override
+  public void disposeComponent() {}
+
 }
