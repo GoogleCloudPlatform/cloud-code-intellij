@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.base.Joiner;
 
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.options.ConfigurationException;
@@ -29,7 +28,6 @@ import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
 import com.intellij.ui.IdeBorderFactory.PlainSmallWithoutIndent;
 import com.intellij.ui.PanelWithAnchor;
-import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.ui.components.JBLabel;
 
 import org.jetbrains.annotations.NotNull;
