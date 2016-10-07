@@ -188,6 +188,8 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     myPortLabel.setAnchor(anchor);
   }
 
+  // TODO(paflynn): Globally disable this checkstyle warning.
+  @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
     // TODO: place custom component creation code here
   }
