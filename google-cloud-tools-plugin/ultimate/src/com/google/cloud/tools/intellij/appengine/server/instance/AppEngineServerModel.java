@@ -17,8 +17,12 @@
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
@@ -35,6 +39,8 @@ import com.intellij.javaee.run.execution.DefaultOutputProcessor;
 import com.intellij.javaee.run.execution.OutputProcessor;
 import com.intellij.javaee.serverInstances.J2EEServerInstance;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.WriteExternalException;
@@ -66,11 +72,35 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   private ArtifactPointer artifactPointer;
   private CommonModel commonModel;
+  private Sdk devAppServerJdk;
+  private ProjectSdksModel projectJdksModel;
 
   private AppEngineModelSettings settings = new AppEngineModelSettings();
 
+  public AppEngineServerModel() {
+    projectJdksModel = new ProjectSdksModel();
+  }
+
+  @Nullable
+  private Sdk getCurrentProjectJdk() {
+    projectJdksModel.reset(commonModel.getProject());
+    return projectJdksModel.getProjectSdk();
+  }
+
+  private void initDefaultJdk() {
+    Sdk projectJdk = getCurrentProjectJdk();
+    if (projectJdk != null) {
+      setDevAppServerJdk(projectJdk);
+    }
+  }
+
   @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
+    // TODO(alexsloan): This keeps the dev_appserver's jdk in sync with the project jdk on behalf of
+    // the user. This behavior should be removed once
+    // https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/926 is completed.
+    initDefaultJdk();
+
     return new AppEngineServerInstance(commonModel);
   }
 
@@ -129,6 +159,16 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     if (facet == null) {
       throw new RuntimeConfigurationWarning(
           "App Engine facet not found in '" + artifact.getName() + "' artifact");
+    }
+
+    try {
+      new CloudSdk.Builder()
+          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+          .build()
+          .validateAppEngineJavaComponents();
+    } catch (AppEngineJavaComponentsNotInstalledException ex) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.cloudsdk.java.components.missing"));
     }
   }
 
@@ -405,6 +445,20 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setDefaultGcsBucketName(defaultGcsBucketName);
   }
 
+  @Override
+  public String getJavaHomeDir() {
+    return settings.getJavaHomeDir();
+  }
+
+  public Sdk getDevAppServerJdk() {
+    return devAppServerJdk;
+  }
+
+  public void setDevAppServerJdk(Sdk devAppServerJdk) {
+    this.devAppServerJdk = devAppServerJdk;
+    settings.setJavaHomeDir(devAppServerJdk.getHomePath());
+  }
+
   /**
    * This class is used to serialize run/debug config settings. It only supports basic types (e.g.,
    * int, String, etc.).
@@ -460,6 +514,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private boolean skipSdkUpdateCheck;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
+    @Tag("java_home_directory")
+    private String javaHomeDir;
 
     public String getArtifact() {
       return artifact;
@@ -635,6 +691,14 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     public void setDefaultGcsBucketName(String defaultGcsBucketName) {
       this.defaultGcsBucketName = defaultGcsBucketName;
+    }
+
+    public String getJavaHomeDir() {
+      return javaHomeDir;
+    }
+
+    public void setJavaHomeDir(String javaHomeDir) {
+      this.javaHomeDir = javaHomeDir;
     }
 
     @Override

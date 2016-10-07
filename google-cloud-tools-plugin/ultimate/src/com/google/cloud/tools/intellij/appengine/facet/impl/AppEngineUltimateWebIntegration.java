@@ -25,6 +25,7 @@ import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfi
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.configurations.ModuleRunConfiguration;
 import com.intellij.facet.FacetManager;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider.FrameworkDependency;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
@@ -105,22 +106,31 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
     }
   }
 
-  public void setupRunConfiguration(Artifact artifact, @NotNull Project project) {
+  public void setupRunConfiguration(Artifact artifact, @NotNull Project project,
+      ModuleRunConfiguration existingConfiguration) {
     final ApplicationServer appServer = getOrCreateAppServer();
     if (appServer != null) {
       AppEngineServerConfigurationType configurationType = AppEngineServerConfigurationType
           .getInstance();
-      List<RunnerAndConfigurationSettings> list = RunManager.getInstance(project)
-          .getConfigurationSettingsList(configurationType);
-      if (list.isEmpty()) {
+
+      CommonModel configuration;
+      if (existingConfiguration instanceof CommonModel
+          && ((CommonModel) existingConfiguration).getServerModel()
+          instanceof AppEngineServerModel) {
+        configuration = (CommonModel) existingConfiguration;
+      } else if (RunManager.getInstance(project)
+          .getConfigurationSettingsList(configurationType).isEmpty()) {
         final RunnerAndConfigurationSettings settings = J2EEConfigurationFactory.getInstance()
             .addAppServerConfiguration(project, configurationType.getLocalFactory(), appServer);
-        if (artifact != null) {
-          final CommonModel configuration = (CommonModel) settings.getConfiguration();
-          ((AppEngineServerModel) configuration.getServerModel()).setArtifact(artifact);
-          BuildArtifactsBeforeRunTaskProvider
-              .setBuildArtifactBeforeRun(project, configuration, artifact);
-        }
+        configuration = (CommonModel) settings.getConfiguration();
+      } else {
+        configuration = null;
+      }
+
+      if (artifact != null && configuration != null) {
+        ((AppEngineServerModel) configuration.getServerModel()).setArtifact(artifact);
+        BuildArtifactsBeforeRunTaskProvider
+            .setBuildArtifactBeforeRun(project, configuration, artifact);
       }
     }
   }

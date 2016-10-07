@@ -61,6 +61,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -176,17 +179,17 @@ public class AppEngineDeploymentRunConfigurationEditor extends
           // if they already exist in their usual directories in the current project.
           if (project != null && project.getBasePath() != null) {
             if (StringUtil.isEmpty(appYamlPathField.getText())) {
-              String defaultAppYamlPath =
-                  project.getBasePath() + DEFAULT_APP_YAML_DIR + "/app.yaml";
-              if (new File(defaultAppYamlPath).exists()) {
-                appYamlPathField.setText(defaultAppYamlPath);
+              Path defaultAppYamlPath = Paths.get(
+                  project.getBasePath() + DEFAULT_APP_YAML_DIR + "/app.yaml");
+              if (Files.exists(defaultAppYamlPath)) {
+                appYamlPathField.setText(defaultAppYamlPath.toString());
               }
             }
             if (StringUtil.isEmpty(dockerFilePathField.getText())) {
-              String defaultDockerfilePath =
-                  project.getBasePath() + DEFAULT_DOCKERFILE_DIR + "/Dockerfile";
-              if (new File(defaultDockerfilePath).exists()) {
-                dockerFilePathField.setText(defaultDockerfilePath);
+              Path defaultDockerfilePath = Paths.get(
+                  project.getBasePath() + DEFAULT_DOCKERFILE_DIR + "/Dockerfile");
+              if (Files.exists(defaultDockerfilePath)) {
+                dockerFilePathField.setText(defaultDockerfilePath.toString());
               }
             }
           }
@@ -224,19 +227,20 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         FileChooserDescriptorFactory.createSingleFileDescriptor());
     generateAppYamlButton.addActionListener(
         new GenerateConfigActionListener(project, "app.yaml", ConfigFileType.APP_YAML,
-            new Supplier<File>() {
+            new Supplier<Path>() {
               @Override
-              public File get() {
+              public Path get() {
                 return appEngineHelper.defaultAppYaml();
               }
             }, appYamlPathField, userSpecifiedArtifactFileSelector));
     generateDockerfileButton.addActionListener(
         new GenerateConfigActionListener(project, "Dockerfile", ConfigFileType.DOCKERFILE,
-            new Supplier<File>() {
+            new Supplier<Path>() {
               @Override
-              public File get() {
+              public Path get() {
                 return appEngineHelper.defaultDockerfile(
-                    AppEngineFlexDeploymentArtifactType.typeForPath(deploymentSource.getFile()));
+                    AppEngineFlexDeploymentArtifactType.typeForPath(
+                        Paths.get(deploymentSource.getFilePath())));
               }
             }, dockerFilePathField, userSpecifiedArtifactFileSelector));
     versionOverrideCheckBox.addItemListener(
@@ -431,14 +435,14 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     private final String fileName;
     private final ConfigFileType configFileType;
     private final TextFieldWithBrowseButton filePicker;
-    private final Supplier<File> sourceFileProvider;
+    private final Supplier<Path> sourceFileProvider;
     private final JPanel fileSelector;
 
     public GenerateConfigActionListener(
         Project project,
         String fileName,
         ConfigFileType configFileType,
-        Supplier<File> sourceFileProvider,
+        Supplier<Path> sourceFileProvider,
         TextFieldWithBrowseButton filePicker,
         JPanel fileSelector) {
       this.project = project;
@@ -473,19 +477,19 @@ public class AppEngineDeploymentRunConfigurationEditor extends
       SelectConfigDestinationFolderDialog destinationFolderDialog = new
           SelectConfigDestinationFolderDialog(project, configFileType);
       if (destinationFolderDialog.showAndGet()) {
-        File destinationFolderPath = destinationFolderDialog.getDestinationFolder();
-        File destinationFilePath = new File(destinationFolderPath, fileName);
+        Path destinationFolderPath = destinationFolderDialog.getDestinationFolder();
+        Path destinationFilePath = destinationFolderPath.resolve(fileName);
 
-        if (destinationFilePath.exists()) {
+        if (Files.exists(destinationFilePath)) {
           if (!new FileConfirmationDialog(
               project, DialogType.CONFIRM_OVERWRITE, destinationFilePath).showAndGet()) {
             return;
           }
-        } else if (destinationFolderPath.isFile()) {
+        } else if (Files.isRegularFile(destinationFolderPath)) {
           new FileConfirmationDialog(
               project, DialogType.NOT_DIRECTORY_ERROR, destinationFolderPath).show();
           return;
-        } else if (!destinationFolderPath.exists()) {
+        } else if (!Files.exists(destinationFolderPath)) {
           if (!new FileConfirmationDialog(
               project, DialogType.CONFIRM_CREATE_DIR, destinationFolderPath).showAndGet()) {
             return;
@@ -493,15 +497,15 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         }
 
         try {
-          FileUtil.copy(sourceFileProvider.get(), destinationFilePath);
-          LocalFileSystem.getInstance().refreshAndFindFileByIoFile(destinationFilePath);
+          FileUtil.copy(sourceFileProvider.get().toFile(), destinationFilePath.toFile());
+          LocalFileSystem.getInstance().refreshAndFindFileByIoFile(destinationFilePath.toFile());
         } catch (IOException ex) {
           String message = GctBundle.message(
-              "appengine.flex.config.generation.io.error", destinationFilePath.getName());
+              "appengine.flex.config.generation.io.error", destinationFilePath.getFileName());
           Messages.showErrorDialog(project, message + ex.getLocalizedMessage(), "Error");
           return;
         }
-        filePicker.setText(destinationFilePath.getPath());
+        filePicker.setText(destinationFilePath.toString());
       }
     }
   }

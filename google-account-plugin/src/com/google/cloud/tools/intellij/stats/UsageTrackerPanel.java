@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.stats;
 
 import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
+import com.google.cloud.tools.intellij.settings.GoogleSettingsConfigurable;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
@@ -38,13 +39,11 @@ import javax.swing.JPanel;
  */
 public class UsageTrackerPanel {
 
+  public static final String PRIVACY_POLICY_URL = "http://www.google.com/policies/privacy/";
   private static final Logger LOG = Logger.getInstance(GoogleSettingsConfigurable.class);
-
   private JCheckBox enableUsageTrackerBox;
   private JPanel mainPanel;
   private JLabel privacyPolicyText;
-
-  public static final String PRIVACY_POLICY_URL = "http://www.google.com/policies/privacy/";
   private UsageTrackerManager usageTrackerManager;
 
   public UsageTrackerPanel(UsageTrackerManager usageTrackerManager) {

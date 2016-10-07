@@ -16,24 +16,14 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
-import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.testFramework.PlatformTestCase;
-
-import org.junit.rules.TemporaryFolder;
-import org.picocontainer.MutablePicoContainer;
-
-import java.io.File;
-import java.io.IOException;
-
+import com.intellij.ui.JBColor;
 import javax.swing.JLabel;
+import org.picocontainer.MutablePicoContainer;
 
 /**
  * Tests for {@link CloudSdkPanel}.
@@ -42,13 +32,13 @@ public class CloudSdkPanelTest extends PlatformTestCase {
 
   private CloudSdkPanel panel;
 
-  private SystemEnvironmentProvider environmentProvider;
   private CloudSdkService cloudSdkService;
 
   private JLabel warningMessage;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
-  private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in this directory.";
+  private static final String INVALID_SDK_DIR_WARNING =
+      "No Cloud SDK was found in this directory.";
 
   @Override
   public void setUp() throws Exception {
@@ -57,39 +47,12 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
 
-    environmentProvider = mock(SystemEnvironmentProvider.class);
     cloudSdkService = mock(CloudSdkService.class);
 
-    applicationContainer.unregisterComponent(SystemEnvironmentProvider.class.getName());
     applicationContainer.unregisterComponent(CloudSdkService.class.getName());
 
     applicationContainer.registerComponentInstance(
-        SystemEnvironmentProvider.class.getName(), environmentProvider);
-    applicationContainer.registerComponentInstance(
         CloudSdkService.class.getName(), cloudSdkService);
-  }
-
-  public void testSetupWithoutSdkInPath() {
-    when(environmentProvider.findInPath(anyString())).thenReturn(null);
-    initCloudSdkPanel();
-
-    assertTrue(warningMessage.isVisible());
-    assertEmpty(cloudSdkDirectoryField.getText());
-  }
-
-  public void testSetupWithSdkInPath() throws IOException {
-    TemporaryFolder tempFolder = new TemporaryFolder();
-    tempFolder.create();
-    File executable = new File(tempFolder.newFolder("bin"), CloudSdkUtil.getSystemCommand());
-    executable.createNewFile();
-
-    when(environmentProvider.findInPath(anyString()))
-        .thenReturn(executable);
-    initCloudSdkPanel();
-
-    assertFalse(warningMessage.isVisible());
-    assertEquals(CloudSdkUtil.toSdkHomeDirectory(executable.getPath()),
-        cloudSdkDirectoryField.getText());
   }
 
   public void testSetupWithInvalidSdk() {
@@ -99,6 +62,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     cloudSdkDirectoryField.setText("/some/invalid/path");
 
     assertTrue(warningMessage.isVisible());
+    assertEquals(cloudSdkDirectoryField.getTextField().getForeground(), JBColor.RED);
     assertEquals(INVALID_SDK_DIR_WARNING, warningMessage.getText());
   }
 
@@ -111,7 +75,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   }
 
   private void initCloudSdkPanel() {
-    panel = new CloudSdkPanel(cloudSdkService);
+    panel = new CloudSdkPanel();
 
     warningMessage = panel.getWarningMessage();
     cloudSdkDirectoryField = panel.getCloudSdkDirectoryField();

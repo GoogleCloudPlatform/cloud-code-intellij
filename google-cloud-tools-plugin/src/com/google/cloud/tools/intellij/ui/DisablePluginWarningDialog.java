@@ -16,7 +16,9 @@
 
 package com.google.cloud.tools.intellij.ui;
 
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
@@ -70,17 +72,17 @@ public class DisablePluginWarningDialog extends DialogWrapper {
 
   public void showAndDisablePlugin() {
     show();
-    switch (getExitCode()) {
-      case CANCEL_EXIT_CODE:
-        return;
-      case DISABLE_EXIT_CODE:
-        PluginManagerCore.disablePlugin(pluginId.getIdString());
-        break;
-      case DISABLE_AND_RESTART_EXIT_CODE:
-        PluginManagerCore.disablePlugin(pluginId.getIdString());
-        ApplicationManager.getApplication().restart();
-        break;
-      default:
+
+    int exitCode = getExitCode();
+    if (exitCode == DISABLE_EXIT_CODE || exitCode == DISABLE_AND_RESTART_EXIT_CODE) {
+      PluginManagerCore.disablePlugin(pluginId.getIdString());
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.APP_ENGINE_OLD_PLUGIN_DEACTIVATED)
+          .ping();
+    }
+
+    if (exitCode == DISABLE_AND_RESTART_EXIT_CODE) {
+      ApplicationManager.getApplication().restart();
     }
   }
 

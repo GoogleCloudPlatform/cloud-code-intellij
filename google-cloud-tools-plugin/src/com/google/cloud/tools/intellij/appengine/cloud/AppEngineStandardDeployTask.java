@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
@@ -27,8 +28,8 @@ import com.intellij.openapi.diagnostic.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Runnable that executes task responsible for deploying an application to the App Engine standard
@@ -62,7 +63,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
         .withLabel(isFlexCompat ? "flex-compat" : "standard")
         .ping();
 
-    File stagingDirectory;
+    Path stagingDirectory;
     AppEngineHelper helper = deploy.getHelper();
 
     try {
@@ -88,6 +89,11 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
           stagingDirectory,
           startListener,
           deploy(stagingDirectory, startListener));
+    } catch (AppEngineJavaComponentsNotInstalledException ex) {
+      deploy.getCallback().errorOccurred(
+          GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
+              + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
+      logger.warn(ex);
     } catch (RuntimeException re) {
       deploy.getCallback()
           .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging") + "\n"
@@ -98,7 +104,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
 
   @VisibleForTesting
   ProcessExitListener deploy(
-      @NotNull final File stagingDirectory,
+      @NotNull final Path stagingDirectory,
       @NotNull final ProcessStartListener startListener) {
     return new ProcessExitListener() {
       @Override

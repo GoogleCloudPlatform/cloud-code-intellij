@@ -17,14 +17,34 @@
 <idea-plugin version="2">
   <id>com.google.gct.core</id>
   <name>Google Cloud Tools</name>
-  <description>Debug Java applications running in the Google cloud from inside IDEA.
-Code inspections for App Engine Java code.</description>
+  <description>
+    <![CDATA[<html>
+      <p>Provides support for developing Google App Engine applications. Features include:</p>
+      <ul>
+        <li>Debug Java applications running in the Google cloud from inside IDEA.</li>
+        <li>Code inspections for App Engine standard environment Java code.</li>
+        <li>Run and debug applications on a local development server.</li>
+        <li>Deploy to the App Engine standard and flexible environments.</li>
+      </ul>
+    </html>]]>
+  </description>
   <vendor>Google</vendor>
   <!-- "version" set by gradle-intellij-plugin -->
   <!-- "idea-version since-build" set by gradle-intellij-plugin -->
   <!-- Workaround for gradle-intellij-plugin limitation: https://github.com/JetBrains/gradle-intellij-plugin/issues/66 -->
   <!-- Setting version to 15.0.6 and up. https://confluence.jetbrains.com/display/IDEADEV/IDEA+15+EAP -->
   <idea-version since-build="143.2370.31" />
+
+  <change-notes>
+    <![CDATA[<html>
+      <h2>[1.0-beta] - 2016-09-14</h2>
+      <h3>Added</h3>
+      <ul>
+        <li>App Engine standard environment support (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/767">#767</a>)</li>
+        <li>Extra fields now available in the deployment config (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/868">#868</a>)</li>
+      </ul>
+    </html>]]>
+  </change-notes>
 
   <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
   <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
@@ -77,6 +97,7 @@ Code inspections for App Engine Java code.</description>
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.MavenRepositoryLibraryDownloader"/>
 
     <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType"/>
     <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory"/>

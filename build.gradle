@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,9 +98,17 @@ subprojects {
     }
 
     tasks.withType(FindBugs) {
+        // Jenkins requires the xml formatted report for publishing.
         reports {
-            xml.enabled = false
-            html.enabled = true
+            xml.enabled = true
+            html.enabled = false
+        }
+    }
+
+    apply plugin: 'jacoco'
+    jacocoTestReport {
+        reports {
+            xml.enabled true
         }
     }
 

@@ -41,6 +41,8 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.util.xmlb.XmlSerializer;
 
 import org.jdom.Element;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -94,8 +96,8 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     if (isFinal == Boolean.TRUE) {
       Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
       calendar.add(Calendar.SECOND, finalTimeSeconds);
-      SimpleDateFormat iso8601 = new SimpleDateFormat(BreakpointUtil.ISO_8601_FORMAT);
-      result.setFinalTime(iso8601.format(calendar.getTime()));
+      DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+      result.setFinalTime(formatter.print(calendar.getTimeInMillis()));
     }
     SourceLocation location = new SourceLocation();
     location.setPath(locationPath);

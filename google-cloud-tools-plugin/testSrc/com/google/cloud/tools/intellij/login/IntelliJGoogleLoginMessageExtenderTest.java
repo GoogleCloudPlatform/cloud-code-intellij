@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateCollector;
-import com.google.cloud.tools.intellij.login.IntelliJGoogleLoginMessageExtender;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import org.junit.Before;
@@ -57,7 +56,7 @@ public class IntelliJGoogleLoginMessageExtenderTest extends BasePluginTestCase {
     when(stateCollector.getBackgroundListeningStates())
         .thenReturn(Collections.singletonList(mock(CloudDebugProcessState.class)));
     assertThat(new IntelliJGoogleLoginMessageExtender().additionalLogoutMessage(),
-               is("Any Cloud Debugger sessions listening in the background will be stopped."));
+        is("Any Stackdriver Debug sessions listening in the background will be stopped."));
   }
 
 }

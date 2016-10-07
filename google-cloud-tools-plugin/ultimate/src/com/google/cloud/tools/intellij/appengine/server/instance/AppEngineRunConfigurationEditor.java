@@ -65,7 +65,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField apiPort;
   private JTextField host;
   private JComboBox logLevel;
-  private JTextField maxModuleInstances;
   private JCheckBox useMtimeFileWatcher;
   private JTextField threadsafeOverride;
   private JCheckBox allowSkippedFiles;
@@ -101,6 +100,16 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     }
   }
 
+  /**
+   * Resets the configuration editor form using the settings in the server model. The following
+   * settings have been omitted from the form:
+   * <ul>
+   * <li> maxModuleInstances - we set this on behalf of the user to prevent breaking the dev app
+   * server in debug mode. See
+   * <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/928">#928</a>
+   * </li>
+   * </ul>
+   */
   protected void resetEditorFrom(CommonModel commonModel) {
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
     final Artifact artifact = serverModel.getArtifact();
@@ -117,7 +126,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     authDomain.setText(serverModel.getAuthDomain());
     storagePath.setText(serverModel.getStoragePath());
     logLevel.setSelectedItem(serverModel.getLogLevel());
-    maxModuleInstances.setText(intToString(serverModel.getMaxModuleInstances()));
     useMtimeFileWatcher.setSelected(serverModel.getUseMtimeFileWatcher());
     threadsafeOverride.setText(serverModel.getThreadsafeOverride());
     jvmFlags.setDialogCaption(GctBundle.getString("appengine.run.jvmflags.title"));
@@ -144,10 +152,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     serverModel.setAuthDomain(authDomain.getText());
     serverModel.setStoragePath(storagePath.getText());
     serverModel.setLogLevel((String) logLevel.getSelectedItem());
-    if (!maxModuleInstances.getText().isEmpty()) {
-      serverModel.setMaxModuleInstances(validateInteger(
-          maxModuleInstances.getText(), "maximum module instances"));
-    }
     serverModel.setUseMtimeFileWatcher(useMtimeFileWatcher.isSelected());
     serverModel.setThreadsafeOverride(threadsafeOverride.getText());
     serverModel.setJvmFlags(jvmFlags.getText());

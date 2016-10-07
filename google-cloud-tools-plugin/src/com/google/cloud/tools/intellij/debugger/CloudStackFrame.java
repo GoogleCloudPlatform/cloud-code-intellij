@@ -148,7 +148,7 @@ public class CloudStackFrame extends XStackFrame {
       this.variable = variable.getVarTableIndex() != null ? variableTable
           .get(variable.getVarTableIndex().intValue())
           : variable;
-      members = variable.getMembers();
+      members = this.variable.getMembers();
     }
 
     @Override

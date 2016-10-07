@@ -30,6 +30,7 @@ public class GctTracking {
   public static final String APP_ENGINE_STOP = "appengine.stop";
   public static final String APP_ENGINE_ADD_SUPPORT = "appengine.support.add";
   public static final String APP_ENGINE_ADD_FACET = "appengine.facet.add";
+  public static final String APP_ENGINE_ADD_LIBRARY = "appengine.library.add";
 
   public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =
       "project.selection.create.new.project";
@@ -47,4 +48,11 @@ public class GctTracking {
       "cloud.debugger.close.continue.listen";
   public static final String CLOUD_DEBUGGER_NOTIFY_BREAKPOINT_LIST_CHANGE =
       "cloud.debugger.notify.breakpoint.list.change";
+
+  public static final String APP_ENGINE_OLD_PLUGIN_NOTIFICATION =
+      "appengine.oldplugin.notification";
+  public static final String APP_ENGINE_OLD_PLUGIN_NOTIFICATION_CLICK =
+      "appengine.oldplugin.notification.link.click";
+  public static final String APP_ENGINE_OLD_PLUGIN_DEACTIVATED =
+      "appengine.oldplugin.deactivated";
 }

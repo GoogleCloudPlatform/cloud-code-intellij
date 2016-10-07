@@ -16,31 +16,24 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
-import com.google.cloud.tools.intellij.util.SystemEnvironmentProvider;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.testFramework.PlatformTestCase;
 
-import org.junit.rules.TemporaryFolder;
 import org.picocontainer.MutablePicoContainer;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class AppEngineCloudConfigurableTest extends PlatformTestCase {
   private AppEngineCloudConfigurable appEngineCloudConfigurable;
-  private SystemEnvironmentProvider environmentProvider;
   private CloudSdkService cloudSdkService;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
@@ -54,14 +47,10 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
 
-    environmentProvider = mock(SystemEnvironmentProvider.class);
     cloudSdkService = mock(CloudSdkService.class);
 
-    applicationContainer.unregisterComponent(SystemEnvironmentProvider.class.getName());
     applicationContainer.unregisterComponent(CloudSdkService.class.getName());
 
-    applicationContainer.registerComponentInstance(
-        SystemEnvironmentProvider.class.getName(), environmentProvider);
     applicationContainer.registerComponentInstance(
         CloudSdkService.class.getName(), cloudSdkService);
   }
@@ -74,16 +63,7 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
     assertEquals(CLOUD_SDK_DIR_PATH, Paths.get(cloudSdkDirectoryField.getText()));
   }
 
-  public void testApply_validSdk() throws Exception {
-    when(environmentProvider.findInPath(anyString()))
-        .thenReturn(createTempFile());
-    initCloudConfigurable();
-
-    // No exception should be thrown here
-    appEngineCloudConfigurable.apply();
-  }
-
-  public void testApply_invalidSdk() {
+  public void testApply_invalidSdk() throws ConfigurationException {
     initCloudConfigurable();
     cloudSdkDirectoryField.setText("/some/invalid/path");
 
@@ -107,13 +87,5 @@ public class AppEngineCloudConfigurableTest extends PlatformTestCase {
     CloudSdkPanel panel = appEngineCloudConfigurable.getCloudSdkPanel();
 
     cloudSdkDirectoryField = panel.getCloudSdkDirectoryField();
-  }
-
-  private File createTempFile() throws IOException {
-    TemporaryFolder tempFolder = new TemporaryFolder();
-    tempFolder.create();
-    File executable = new File(tempFolder.newFolder("bin"), CloudSdkUtil.getSystemCommand());
-    executable.createNewFile();
-    return executable;
   }
 }

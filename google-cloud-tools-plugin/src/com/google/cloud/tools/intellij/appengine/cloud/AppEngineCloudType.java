@@ -17,12 +17,17 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.util.CloudSdkUtil;
+import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
@@ -40,8 +45,9 @@ import javax.swing.Icon;
 
 
 /**
- * This class hooks into IntelliJ's <a href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a>
- * configurations for infrastructure based deployment flows.
+ * This class hooks into IntelliJ's
+ * <a href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a> configurations for
+ * infrastructure based deployment flows.
  */
 public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration> {
 
@@ -118,12 +124,23 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
       if (!Services.getLoginService().isLoggedIn()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
-      } else if (CloudSdkService.getInstance().getSdkHomePath() != null
-          && CloudSdkUtil.isCloudSdkExecutable(CloudSdkUtil.toExecutablePath(
-          CloudSdkService.getInstance().getSdkHomePath().toString()))) {
+        return;
+      }
+
+      try {
+        new CloudSdk.Builder()
+            .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+            .build()
+            .validateCloudSdk();
         callback.connected(new AppEngineRuntimeInstance());
-      } else {
+      } catch (AppEngineException aee) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
+        Notification invalidSdkWarning = new Notification(
+            new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
+            GctBundle.message("settings.menu.item.cloud.sdk.text"),
+            GctBundle.message("appengine.deployment.error.invalid.cloudsdk"),
+            NotificationType.ERROR);
+        Notifications.Bus.notify(invalidSdkWarning);
         // TODO Consider auto opening configuration panel
       }
     }

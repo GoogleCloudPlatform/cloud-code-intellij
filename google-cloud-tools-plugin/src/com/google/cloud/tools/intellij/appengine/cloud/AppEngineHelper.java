@@ -27,8 +27,8 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Provides basic Gcloud based App Engine functionality for our Cloud Tools plugin.
@@ -43,7 +43,7 @@ public interface AppEngineHelper {
   /**
    * The default app.yaml to use.
    */
-  File defaultAppYaml();
+  Path defaultAppYaml();
 
   /**
    * The default Dockerfile we suggest for custom flexible deployments.
@@ -52,7 +52,7 @@ public interface AppEngineHelper {
    *                               Dockerfile
    * @return A {@link java.io.File} path to the default Dockerfile
    */
-  File defaultDockerfile(AppEngineFlexDeploymentArtifactType deploymentArtifactType);
+  Path defaultDockerfile(AppEngineFlexDeploymentArtifactType deploymentArtifactType);
 
   /**
    * Creates a {@link Runnable} that will execute the tasks necessary for deployment to an App
@@ -78,7 +78,7 @@ public interface AppEngineHelper {
    * @return the file representing the staging directory
    * @throws IOException if the staging fails
    */
-  File createStagingDirectory(
+  Path createStagingDirectory(
       LoggingHandler loggingHandler,
       String cloudProjectName) throws IOException;
 
@@ -104,7 +104,7 @@ public interface AppEngineHelper {
    * successful then the user is shown a dialog opting to add an account. Then the staging is
    * attempted again.
    */
-  File stageCredentials(String googleUsername);
+  Path stageCredentials(String googleUsername);
 
   /**
    * Deletes the locally staged credentials, if they exist.

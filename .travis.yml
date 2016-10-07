@@ -1,4 +1,5 @@
 language: java
+script: ./gradlew check --stacktrace
 matrix:
   include:
   - jdk: openjdk7
@@ -11,18 +12,3 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-deploy:
-  provider: releases
-  api_key:
-    secure: mYd4zbP9ziojzdZwMxCCTTnvSBdeGCjs+VAFgrm5U5ZEMY9B2q1M8qbP7aYz73/lPIgwqm9gUZ7e/YxSuuH2TDaXSrj1+Yi+9SbxcduR73FsYX13g8ZGywT4ojd1Mae0+qr/mNgcl1lyLBPa09QKHm7t6NiYUpyUYy6IZanrGe9+zdaNXMhG9rhbNpTgqHn5KcQXJK9pHIGcAshAltbV6/b7f/0qzmX1MzxSO9jxx+OWhL44b1Nk2cFZvEPJ9X5ROYPOV9VHXawXNgQrI5RkUwZp3Un7uKzHVFJhhXmxlmcDT9g6m+psqIZOkcnteXlPUmKEjz1x+igCBcsiXBB+ohig0EBqPOOEwPit4xg72P87HlwV0Ya9lUP8phKFRKYbBF01acNpvpRaw1T96zgoNBjEo6fQRQVNE/LjgM3B9OfRK9ZlEFyty5RMhR3cyjWsZFLYRcwnH+vi8X9j+3TRDcXl3YZAlpY7Gshc5TWdWwdr/PEcgNOd1VbxNXE1jQ1FuZy+Q0DCWmhQQOEVUayaiIc4MReJKFqhCwp0XglLBlJQR9x1JpocBzHxuDXB5inWavNPnaJixfxYIxBUM687sIPSPkkc8ei+iBE2nOOLH0JLPl9stjr43faKcdTXZHq/RwnVNwLAsYZwRd/ZcFNrOaoPniRLJ00rW6616Pthjlk=
-  skip_cleanup: true
-  file_glob: true
-  file:
-    - ${HOME}/build/${TRAVIS_REPO_SLUG}/google-account-plugin/build/distributions/google-account-*.zip
-    - ${HOME}/build/${TRAVIS_REPO_SLUG}/google-cloud-tools-plugin/build/distributions/google-cloud-tools-*.zip
-  on:
-    tags: true
-    condition: "$TRAVIS_TAG =~ ^v[0-9]+.*$"
-    condition: "$ORG_GRADLE_PROJECT_ideaVersion = '15.0.6'"
-after_deploy:
-  - ./gradlew publishPlugin
