@@ -27,20 +27,25 @@ import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.EffectiveLanguageLevelUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.LanguageLevelProjectExtension;
+import com.intellij.openapi.roots.LanguageLevelModuleExtension;
+import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.pom.java.LanguageLevel;
-import com.intellij.psi.util.PsiUtil;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.event.HyperlinkEvent;
 
@@ -56,63 +61,75 @@ public class UnsupportedJavaVersionCheck implements StartupActivity {
 
   @Override
   public void runActivity(@NotNull Project project) {
-    if (shouldWarnUser(project)) {
-      warnUser(project);
+    List<Module> invalidModules = findModulesUsingUnsupportedLanguageLevel(project);
+    if (!invalidModules.isEmpty()) {
+      warnUser(project, invalidModules);
     }
   }
 
-  private boolean shouldWarnUser(Project project) {
-    return usesJava8OrGreater(project)
-        && containsAnyAppEngineModulesWithoutJava8Support(project);
-  }
+  private List<Module> findModulesUsingUnsupportedLanguageLevel(Project project) {
+    Module[] projectModules = ModuleManager.getInstance(project).getModules();
+    List<Module> invalidModules = new ArrayList<>();
 
-  private boolean usesJava8OrGreater(Project project) {
-    return PsiUtil.getLanguageLevel(project).compareTo(LanguageLevel.JDK_1_8) >= 0;
-  }
+    for (Module module : projectModules) {
+      // if it's not an app engine module, skip it
+      if (!hasAppEngineFacet(module)) {
+        continue;
+      }
 
-  private boolean containsAnyAppEngineModulesWithoutJava8Support(Project project) {
-    Module[] modules = ModuleManager.getInstance(project).getModules();
-    for (Module module : modules) {
-      if (hasAppEngineFacet(module)) {
-        @Nullable
-        XmlFile appengineWebXml = AppEngineAssetProvider.getInstance()
-            .loadAppEngineStandardWebXml(project, Arrays.asList(module));
+      @Nullable
+      XmlFile appengineWebXml = AppEngineAssetProvider.getInstance()
+          .loadAppEngineStandardWebXml(project, Arrays.asList(module));
 
-        if (isAppEngineStandard(appengineWebXml) && !declaresJava8Runtime(appengineWebXml)) {
-          return true;
-        }
+      if (isAppEngineStandard(appengineWebXml)
+          && usesJava8OrGreater(module)
+          && !declaresJava8Runtime(appengineWebXml)) {
+        invalidModules.add(module);
       }
     }
-    return false;
+    return invalidModules;
+  }
+
+  private boolean usesJava8OrGreater(Module module) {
+    LanguageLevel languageLevel = EffectiveLanguageLevelUtil.getEffectiveLanguageLevel(module);
+    return languageLevel.compareTo(LanguageLevel.JDK_1_8) >= 0;
   }
 
   private boolean hasAppEngineFacet(Module module) {
     return AppEngineFacet.getAppEngineFacetByModule(module) != null;
   }
 
-  private boolean isAppEngineStandard(XmlFile appengineWebXml) {
+  private boolean isAppEngineStandard(@Nullable XmlFile appengineWebXml) {
     AppEngineEnvironment environment = AppEngineProjectService.getInstance()
         .getModuleAppEngineEnvironment(appengineWebXml);
 
     return environment == AppEngineEnvironment.APP_ENGINE_STANDARD;
   }
 
-  private boolean declaresJava8Runtime(@NotNull XmlFile appengineWebXml) {
-    XmlTag rootTag = appengineWebXml.getRootTag();
-    if (rootTag == null) {
+  private boolean declaresJava8Runtime(@Nullable XmlFile appengineWebXml) {
+    XmlTag rootTag;
+    if (appengineWebXml == null || (rootTag = appengineWebXml.getRootTag()) == null) {
       return false;
     }
     String runtime = rootTag.getSubTagText(RUNTIME_TAG);
     return RUNTIME_TAG_JAVA_8.equals(runtime);
   }
 
-  private void warnUser(@NotNull Project project) {
-    NotificationGroup notification =
-        new NotificationGroup(
-            GctBundle.message("plugin.conflict.error.title"),
-            NotificationDisplayType.BALLOON,
-            true);
+  private static void setModuleLanguageLevel(Module module, LanguageLevel languageLevel) {
+    final ModifiableRootModel rootModel = ModuleRootManager.getInstance(module)
+        .getModifiableModel();
+    rootModel.getModuleExtension(LanguageLevelModuleExtension.class)
+        .setLanguageLevel(languageLevel);
 
+    ApplicationManager.getApplication().runWriteAction(new Runnable() {
+      @Override
+      public void run() {
+        rootModel.commit();
+      }
+    });
+  }
+
+  private void warnUser(Project project, List<Module> invalidModules) {
     String message =
         new StringBuilder()
             .append("<p>")
@@ -122,29 +139,37 @@ public class UnsupportedJavaVersionCheck implements StartupActivity {
             .append("</p>")
             .toString();
 
+    NotificationGroup notification =
+        new NotificationGroup(
+            GctBundle.message("appengine.support.java.version.alert.title"),
+            NotificationDisplayType.BALLOON,
+            true);
+
     notification
         .createNotification(
             GctBundle.message("appengine.support.java.version.alert.title"),
             message,
             NotificationType.WARNING,
-            new LanguageLevelLinkListener(project))
+            new LanguageLevelLinkListener(invalidModules))
         .notify(project);
   }
 
   private static class LanguageLevelLinkListener implements NotificationListener {
-    private Project project;
+    private List<Module> invalidModules;
 
-    public LanguageLevelLinkListener(Project project) {
-      this.project = project;
+    public LanguageLevelLinkListener(List<Module> invalidModules) {
+      this.invalidModules = invalidModules;
     }
 
     @Override
     public void hyperlinkUpdate(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
       String href = event.getDescription();
       if (href.equals(UPDATE_HREF)) {
-        // set the project language level to the highest supported level
-        LanguageLevelProjectExtension.getInstance(project)
-            .setLanguageLevel(HIGHEST_SUPPORTED_LANGUAGE_LEVEL);
+
+        // set the language level for all unsupported modules to the latest supported language level
+        for (Module module : invalidModules) {
+          setModuleLanguageLevel(module, HIGHEST_SUPPORTED_LANGUAGE_LEVEL);
+        }
         notification.hideBalloon();
       }
     }
