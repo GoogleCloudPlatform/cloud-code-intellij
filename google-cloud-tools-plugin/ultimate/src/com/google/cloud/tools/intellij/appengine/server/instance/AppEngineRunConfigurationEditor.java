@@ -166,8 +166,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private Artifact getSelectedArtifact() {
     return (Artifact) myArtifactComboBox.getSelectedItem();
   }
-
-
+  
   @NotNull
   protected JComponent createEditor() {
     AppEngineUtil.setupAppEngineArtifactCombobox(myProject, myArtifactComboBox, false);
