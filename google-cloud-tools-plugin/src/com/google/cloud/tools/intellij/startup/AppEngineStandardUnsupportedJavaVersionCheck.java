@@ -53,7 +53,7 @@ import javax.swing.event.HyperlinkEvent;
  * A StartupActivity that warns the user if they are using a Java language level that corresponds
  * to an unsupported jdk version on App Engine standard.
  */
-public class UnsupportedJavaVersionCheck implements StartupActivity {
+public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActivity {
 
   private static final String UPDATE_HREF = "#update";
   private static final LanguageLevel HIGHEST_SUPPORTED_LANGUAGE_LEVEL = LanguageLevel.JDK_1_7;
