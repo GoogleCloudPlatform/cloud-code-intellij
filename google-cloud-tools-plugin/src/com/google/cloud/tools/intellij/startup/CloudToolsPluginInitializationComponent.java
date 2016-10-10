@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij;
+package com.google.cloud.tools.intellij.startup;
 
+import com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService;
+import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSourceType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineToolsMenuAction;

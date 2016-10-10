@@ -101,7 +101,7 @@
 
   <application-components>
     <component>
-      <implementation-class>com.google.cloud.tools.intellij.CloudToolsPluginInitializationComponent</implementation-class>
+      <implementation-class>com.google.cloud.tools.intellij.startup.CloudToolsPluginInitializationComponent</implementation-class>
     </component>
   </application-components>
 
@@ -203,8 +203,9 @@
                      key="unique.rest.signature.name" groupKey="inspections.group.name" enabledByDefault="true"
                      level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.RestSignatureInspection"/>
 
-    <postStartupActivity implementation="com.google.cloud.tools.intellij.PluginCompatibilityCheck"/>
-    <postStartupActivity implementation="com.google.cloud.tools.intellij.ConflictingAppEnginePluginCheck"/>
+    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.PluginCompatibilityCheck"/>
+    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.ConflictingAppEnginePluginCheck"/>
+    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.AppEngineStandardUnsupportedJavaVersionCheck"/>
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">
