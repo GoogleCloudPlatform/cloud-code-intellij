@@ -61,13 +61,13 @@ public class UnsupportedJavaVersionCheck implements StartupActivity {
 
   @Override
   public void runActivity(@NotNull Project project) {
-    List<Module> invalidModules = findModulesUsingUnsupportedLanguageLevel(project);
+    List<Module> invalidModules = findAppEngineModulesUsingUnsupportedLanguageLevel(project);
     if (!invalidModules.isEmpty()) {
       warnUser(project, invalidModules);
     }
   }
 
-  private List<Module> findModulesUsingUnsupportedLanguageLevel(Project project) {
+  private List<Module> findAppEngineModulesUsingUnsupportedLanguageLevel(Project project) {
     Module[] projectModules = ModuleManager.getInstance(project).getModules();
     List<Module> invalidModules = new ArrayList<>();
 
