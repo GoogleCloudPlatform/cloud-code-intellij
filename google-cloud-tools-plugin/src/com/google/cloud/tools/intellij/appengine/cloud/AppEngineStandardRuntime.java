@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import org.jetbrains.annotations.Nullable;
+
 public enum AppEngineStandardRuntime {
 
   JAVA_8("java8");
@@ -28,6 +30,20 @@ public enum AppEngineStandardRuntime {
 
   public boolean isJava8() {
     return this == JAVA_8;
+  }
+
+  public String getLabel() {
+    return this.label;
+  }
+
+  @Nullable
+  public static AppEngineStandardRuntime fromLabel(String label) {
+    switch(label) {
+      case "java8":
+        return AppEngineStandardRuntime.JAVA_8;
+      default:
+        return null;
+    }
   }
 
 }

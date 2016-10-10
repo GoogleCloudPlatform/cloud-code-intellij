@@ -185,8 +185,12 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       return null;
     }
     String runtime = rootTag.getSubTagText(AE_WEB_XML_RUNTIME_TAG);
+    if (runtime == null) {
+      return null;
+    }
+
     try {
-      return AppEngineStandardRuntime.valueOf(runtime);
+      return AppEngineStandardRuntime.fromLabel(runtime);
     } catch (IllegalArgumentException e) {
       // the declared runtime version is invalid, nothing we can do here
       return null;
