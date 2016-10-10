@@ -80,7 +80,7 @@ public class UsageTrackerPanel {
   }
 
   public boolean isModified() {
-    return usageTrackerManager.isTrackingEnabled()
+    return usageTrackerManager.isUsageTrackingAvailable()
         && usageTrackerManager.hasUserOptedIn() != enableUsageTrackerBox.isSelected();
   }
 
