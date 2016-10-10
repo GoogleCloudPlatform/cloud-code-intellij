@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.stats;
 
 import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
-import com.google.cloud.tools.intellij.settings.GoogleSettingsConfigurable;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.Notification;
@@ -26,13 +25,10 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ShowSettingsUtil;
-import com.intellij.openapi.wm.IdeFrame;
-import com.intellij.openapi.wm.ex.WindowManagerEx;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.swing.JFrame;
 import javax.swing.event.HyperlinkEvent;
 
 /**
