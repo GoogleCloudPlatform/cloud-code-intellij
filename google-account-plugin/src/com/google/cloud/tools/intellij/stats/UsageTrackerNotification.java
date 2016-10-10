@@ -78,8 +78,7 @@ public class UsageTrackerNotification {
             notification.expire();
           } else if ("settings".equals(description)) {
             final ShowSettingsUtil util = ShowSettingsUtil.getInstance();
-            IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(null);
-            util.editConfigurable((JFrame) ideFrame, new GoogleSettingsConfigurable());
+            util.showSettingsDialog(null, UsageTrackerConfigurable.class);
             notification.expire();
           }
         }
