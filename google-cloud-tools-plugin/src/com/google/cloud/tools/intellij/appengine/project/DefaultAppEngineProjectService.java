@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRuntime;
 
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
@@ -40,6 +41,8 @@ import java.util.Collections;
  * Implementation of methods for inspecting an App Engine project's structure and configuration.
  */
 public class DefaultAppEngineProjectService extends AppEngineProjectService {
+
+  private static final String AE_WEB_XML_RUNTIME_TAG = "runtime";
 
   private AppEngineAssetProvider assetProvider;
 
@@ -172,4 +175,22 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
     return null;
   }
+
+  @Override
+  @Nullable
+  public AppEngineStandardRuntime getAppEngineStandardDeclaredRuntime(
+      @Nullable XmlFile appengineWebXml) {
+    XmlTag rootTag;
+    if (appengineWebXml == null || (rootTag = appengineWebXml.getRootTag()) == null) {
+      return null;
+    }
+    String runtime = rootTag.getSubTagText(AE_WEB_XML_RUNTIME_TAG);
+    try {
+      return AppEngineStandardRuntime.valueOf(runtime);
+    } catch (IllegalArgumentException e) {
+      // the declared runtime version is invalid, nothing we can do here
+      return null;
+    }
+  }
+
 }

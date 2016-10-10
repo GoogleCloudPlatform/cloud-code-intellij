@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.startup;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRuntime;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
@@ -38,7 +39,6 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.xml.XmlFile;
-import com.intellij.psi.xml.XmlTag;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,12 +50,11 @@ import java.util.List;
 import javax.swing.event.HyperlinkEvent;
 
 /**
- * A StartupActivity that warns the user if they are using an unsupported java version.
+ * A StartupActivity that warns the user if they are using a Java language level that corresponds
+ * to an unsupported jdk version on App Engine standard.
  */
 public class UnsupportedJavaVersionCheck implements StartupActivity {
 
-  private static final String RUNTIME_TAG = "runtime";
-  private static final String RUNTIME_TAG_JAVA_8 = "java8";
   private static final String UPDATE_HREF = "#update";
   private static final LanguageLevel HIGHEST_SUPPORTED_LANGUAGE_LEVEL = LanguageLevel.JDK_1_7;
 
@@ -72,19 +71,18 @@ public class UnsupportedJavaVersionCheck implements StartupActivity {
     List<Module> invalidModules = new ArrayList<>();
 
     for (Module module : projectModules) {
-      // if it's not an app engine module, skip it
-      if (!hasAppEngineFacet(module)) {
-        continue;
-      }
+      // only check app engine modules
+      if (hasAppEngineFacet(module)) {
 
-      @Nullable
-      XmlFile appengineWebXml = AppEngineAssetProvider.getInstance()
-          .loadAppEngineStandardWebXml(project, Arrays.asList(module));
+        @Nullable
+        XmlFile appengineWebXml = AppEngineAssetProvider.getInstance()
+            .loadAppEngineStandardWebXml(project, Arrays.asList(module));
 
-      if (isAppEngineStandard(appengineWebXml)
-          && usesJava8OrGreater(module)
-          && !declaresJava8Runtime(appengineWebXml)) {
-        invalidModules.add(module);
+        if (isAppEngineStandard(appengineWebXml)
+            && usesJava8OrGreater(module)
+            && !declaresJava8Runtime(appengineWebXml)) {
+          invalidModules.add(module);
+        }
       }
     }
     return invalidModules;
@@ -107,12 +105,9 @@ public class UnsupportedJavaVersionCheck implements StartupActivity {
   }
 
   private boolean declaresJava8Runtime(@Nullable XmlFile appengineWebXml) {
-    XmlTag rootTag;
-    if (appengineWebXml == null || (rootTag = appengineWebXml.getRootTag()) == null) {
-      return false;
-    }
-    String runtime = rootTag.getSubTagText(RUNTIME_TAG);
-    return RUNTIME_TAG_JAVA_8.equals(runtime);
+    AppEngineStandardRuntime runtime = AppEngineProjectService.getInstance()
+        .getAppEngineStandardDeclaredRuntime(appengineWebXml);
+    return runtime != null && runtime.isJava8();
   }
 
   private static void setModuleLanguageLevel(Module module, LanguageLevel languageLevel) {
