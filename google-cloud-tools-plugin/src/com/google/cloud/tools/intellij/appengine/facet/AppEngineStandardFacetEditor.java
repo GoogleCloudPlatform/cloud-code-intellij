@@ -165,8 +165,14 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     @Override
     public void afterLibraryAdded(final Library addedLibrary) {
-      final DependencyScope scope = AppEngineStandardMavenLibrary
-          .getLibraryByMavenDisplayName(addedLibrary.getName()).getScope();
+      AppEngineStandardMavenLibrary library = AppEngineStandardMavenLibrary
+          .getLibraryByMavenDisplayName(addedLibrary.getName());
+
+      if (library == null) {
+        return;
+      }
+
+      final DependencyScope scope = library.getScope();
 
       new WriteAction() {
         @Override
@@ -197,9 +203,12 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     @Override
     public void afterLibraryRemoved(Library removedLibrary) {
-      appEngineStandardLibraryPanel.toggleLibrary(
-          AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(removedLibrary.getName()),
-          false /* select */);
+      AppEngineStandardMavenLibrary library = AppEngineStandardMavenLibrary
+          .getLibraryByMavenDisplayName(removedLibrary.getName());
+
+      if (library != null) {
+        appEngineStandardLibraryPanel.toggleLibrary(library, false /* select */);
+      }
     }
 
     @Override

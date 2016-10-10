@@ -8,14 +8,17 @@ minimize the disruption of updates. Also notice we have dropped the 'Beta' label
 - BE AWARE: The local App Engine development server is broken with the latest JDK 8 releases. 
 ([#920](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/920)).
 This should be fixed with the next App Engine SDK release coming soon.
+
 ### Added
 - App Engine Standard Library importer in the Facet and Project wizard.
 ([#866](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/866))
 - Standard App Engine apps using Java 8 language level will be notified to use language level 7
 ([#966](https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/966))
+
 ### Changed
 - Updated run config labels and icons. (Cloud Debugger is now Stackdriver Debug)
 ([#936](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/936))
+
 ### Fixed
 - Local Development server debug mode is fixed.
 ([#928](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/928))

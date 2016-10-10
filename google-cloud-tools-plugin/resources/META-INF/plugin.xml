@@ -37,6 +37,45 @@
 
   <change-notes>
     <![CDATA[<html>
+      <h2>[16.10.1]</h2>
+      <ul>
+        <li>Note we are changing the versioning scheme to YY.MM.i. We plan on a monthly release cadence
+          to minimize the disruption of updates. Also notice we have dropped the 'Beta' label.
+        </li>
+        <li><p>BE AWARE: The local App Engine development server is broken with the latest JDK 8
+          releases.
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/920">#920</a>).
+          This should be fixed with the next App Engine SDK release coming soon.</p>
+
+          <h3>Added</h3></li>
+        <li><p>App Engine Standard Library importer in the Facet and Project wizard.
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/866">#866</a>)
+        </p></li>
+        <li><p>Standard App Engine apps using Java 8 language level will be notified to use language
+          level 7
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/966">#966</a>)
+        </p>
+
+          <h3>Changed</h3></li>
+        <li><p>Updated run config labels and icons. (Cloud Debugger is now Stackdriver Debug)
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/936">#936</a>)
+        </p>
+
+          <h3>Fixed</h3></li>
+        <li><p>Local Development server debug mode is fixed.
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/928">#928</a>)
+        </p></li>
+        <li>Flex deployment broken on Windows 10.
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/937">#937</a>)
+        </li>
+        <li>Cloud Debugger object inspector working again.
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/929">#929</a>)
+        </li>
+        <li>Cloud Debugger snapshot timestamps causing NPE
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/919">#919</a>)
+        </li>
+      </ul>
+
       <h2>[1.0-beta] - 2016-09-14</h2>
       <h3>Added</h3>
       <ul>
