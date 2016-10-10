@@ -191,7 +191,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
     try {
       return AppEngineStandardRuntime.fromLabel(runtime);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException exception) {
       // the declared runtime version is invalid, nothing we can do here
       return null;
     }

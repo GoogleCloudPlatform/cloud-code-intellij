@@ -38,12 +38,13 @@ public enum AppEngineStandardRuntime {
 
   @Nullable
   public static AppEngineStandardRuntime fromLabel(String label) {
-    switch(label) {
+    switch (label) {
       case "java8":
         return AppEngineStandardRuntime.JAVA_8;
       default:
         return null;
     }
+
   }
 
 }
