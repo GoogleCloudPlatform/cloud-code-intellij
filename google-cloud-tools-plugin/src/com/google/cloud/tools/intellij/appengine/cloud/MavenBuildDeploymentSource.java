@@ -98,6 +98,8 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
         new File(mavenProject.getBuildDirectory()).getPath() + File.separator
             + mavenProject.getFinalName();
 
+    // The environment may be null for freshly deserialized deployment sources. In this case, we
+    // need to reload the environment.
     if (environment == null) {
       environment = AppEngineProjectService.getInstance().getModuleAppEngineEnvironment(
           AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(project,
