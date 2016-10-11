@@ -41,7 +41,8 @@ import javax.swing.JComponent;
  * for specific build-systems should extend this providing the build-system specific
  * implementations.
  */
-public abstract class BuildDeploymentSourceType extends DeploymentSourceType<ModuleDeploymentSource> {
+public abstract class BuildDeploymentSourceType
+    extends DeploymentSourceType<ModuleDeploymentSource> {
 
   public BuildDeploymentSourceType(@NotNull String id) {
     super(id);
