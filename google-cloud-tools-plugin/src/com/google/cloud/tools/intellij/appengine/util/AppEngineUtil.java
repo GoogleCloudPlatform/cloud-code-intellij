@@ -93,7 +93,8 @@ public class AppEngineUtil {
       Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
       for (Artifact artifact : artifacts) {
         if ((isStandardModule && projectService.isAppEngineStandardArtifactType(artifact))
-            || (environment.isFlexible() && projectService.isAppEngineFlexArtifactType(artifact))) {
+            || (!isFlexCompat && environment.isFlexible()
+                  && projectService.isAppEngineFlexArtifactType(artifact))) {
           sources.add(createArtifactDeploymentSource(project, artifact, environment));
         }
       }
@@ -123,17 +124,18 @@ public class AppEngineUtil {
     boolean hasStandardModules = false;
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
-      AppEngineEnvironment environment =
-          projectService.getModuleAppEngineEnvironment(
-              assetProvider.loadAppEngineStandardWebXml(
-                  project, Collections.singletonList(module)));
+      XmlFile appEngineWebXml = assetProvider.loadAppEngineStandardWebXml(
+          project, Collections.singletonList(module));
+
+      AppEngineEnvironment environment
+          = projectService.getModuleAppEngineEnvironment(appEngineWebXml);
 
       if (ModuleType.is(module, JavaModuleType.getModuleType())
           && projectService.isJarOrWarMavenBuild(module)) {
         moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module, environment));
       }
 
-      if (environment == AppEngineEnvironment.APP_ENGINE_STANDARD) {
+      if (environment.isStandard() || projectService.isFlexCompat(appEngineWebXml)) {
         hasStandardModules = true;
       }
     }

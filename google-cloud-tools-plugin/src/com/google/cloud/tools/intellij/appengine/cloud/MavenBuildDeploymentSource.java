@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.xml.XmlFile;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
 
@@ -97,15 +98,17 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
         new File(mavenProject.getBuildDirectory()).getPath() + File.separator
             + mavenProject.getFinalName();
 
+    XmlFile appEngineWebXml = AppEngineAssetProvider.getInstance()
+        .loadAppEngineStandardWebXml(project, Collections.singletonList(getModule()));
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
+
     // The environment will be null for newly deserialized deployment sources to ensure freshness.
     // In this case, we need to reload the environment.
     if (environment == null) {
-      environment = AppEngineProjectService.getInstance().getModuleAppEngineEnvironment(
-          AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(project,
-              Collections.singletonList(getModule())));
+      environment = projectService.getModuleAppEngineEnvironment(appEngineWebXml);
     }
 
-    if (environment.isFlexible()) {
+    if (environment.isFlexible() && !projectService.isFlexCompat(appEngineWebXml)) {
       targetBuild += "." + mavenProject.getPackaging();
     }
 
