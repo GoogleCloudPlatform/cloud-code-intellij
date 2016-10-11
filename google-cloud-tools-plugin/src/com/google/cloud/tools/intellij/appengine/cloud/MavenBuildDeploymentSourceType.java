@@ -26,7 +26,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
-import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
 
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
