@@ -24,8 +24,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
 
-import icons.MavenIcons;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
@@ -35,6 +33,8 @@ import java.io.File;
 import java.util.Collections;
 
 import javax.swing.Icon;
+
+import icons.MavenIcons;
 
 
 /**
@@ -98,8 +98,8 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
         new File(mavenProject.getBuildDirectory()).getPath() + File.separator
             + mavenProject.getFinalName();
 
-    // The environment may be null for freshly deserialized deployment sources. In this case, we
-    // need to reload the environment.
+    // The environment will be null for newly deserialized deployment sources to ensure freshness.
+    // In this case, we need to reload the environment.
     if (environment == null) {
       environment = AppEngineProjectService.getInstance().getModuleAppEngineEnvironment(
           AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(project,

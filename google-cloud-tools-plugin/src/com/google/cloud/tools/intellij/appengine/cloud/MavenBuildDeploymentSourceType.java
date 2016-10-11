@@ -82,19 +82,6 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
   @Override
   public MavenBuildDeploymentSource load(@NotNull Element tag, @NotNull Project project) {
     final String moduleName = tag.getAttributeValue(NAME_ATTRIBUTE);
-    Element settings = tag.getChild(DeployToServerRunConfiguration.SETTINGS_ELEMENT);
-
-    if (settings != null) {
-      String environment = settings.getAttributeValue(
-          AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
-
-      if (environment != null) {
-        return new MavenBuildDeploymentSource(
-            ModulePointerManager.getInstance(project).create(moduleName),
-            project,
-            AppEngineEnvironment.valueOf(environment));
-      }
-    }
 
     return new MavenBuildDeploymentSource(
         ModulePointerManager.getInstance(project).create(moduleName), project);
