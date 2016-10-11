@@ -16,14 +16,22 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModulePointerManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
+import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
 
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
@@ -31,6 +39,7 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.idea.maven.tasks.MavenBeforeRunTask;
 import org.jetbrains.idea.maven.tasks.MavenBeforeRunTasksProvider;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,6 +49,12 @@ import java.util.List;
 public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
 
   private static final String MAVEN_TASK_PACKAGE = "package";
+  private static final String SOURCE_TYPE_ID = "maven-build-source";
+  private static final String NAME_ATTRIBUTE = "name";
+
+  public MavenBuildDeploymentSourceType() {
+    super(SOURCE_TYPE_ID);
+  }
 
   @NotNull
   @Override
@@ -65,6 +80,43 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
     } else {
       return null;
     }
+  }
+
+  @NotNull
+  @Override
+  public MavenBuildDeploymentSource load(@NotNull Element tag, @NotNull Project project) {
+    final String moduleName = tag.getAttributeValue(NAME_ATTRIBUTE);
+    Element settings = tag.getChild(DeployToServerRunConfiguration.SETTINGS_ELEMENT);
+
+    if (settings != null) {
+      Module[] modules = ModuleManager.getInstance(project).getModules();
+      Optional<Module> module = Iterables.tryFind(Arrays.asList(modules),
+          new Predicate<Module>() {
+            @Override
+            public boolean apply(Module module) {
+              return module.getName().equals(moduleName);
+            }
+          }
+      );
+
+      String environment = settings.getAttributeValue(
+          AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
+
+      if (module.isPresent() && environment != null) {
+        return new MavenBuildDeploymentSource(
+            ModulePointerManager.getInstance(project).create(module.get()),
+            project,
+            AppEngineEnvironment.valueOf(environment));
+      }
+    }
+
+    return new MavenBuildDeploymentSource(
+        ModulePointerManager.getInstance(project).create(moduleName), project);
+  }
+
+  @Override
+  public void save(@NotNull ModuleDeploymentSource source, @NotNull Element tag) {
+      tag.setAttribute(NAME_ATTRIBUTE, source.getModulePointer().getModuleName());
   }
 
   @Override

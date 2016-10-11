@@ -43,6 +43,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.remoteServer.runtime.Deployment;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
