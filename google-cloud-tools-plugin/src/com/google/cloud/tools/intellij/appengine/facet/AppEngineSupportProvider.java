@@ -57,6 +57,7 @@ import com.intellij.packaging.artifacts.ArtifactType;
 import com.intellij.packaging.elements.ArtifactRootElement;
 import com.intellij.packaging.elements.PackagingElementFactory;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
+import com.intellij.util.PlatformUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,7 +96,11 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
   @Override
   public boolean isEnabledForModuleType(@NotNull ModuleType moduleType) {
-    return moduleType instanceof JavaModuleType;
+    if (PlatformUtils.isIdeaUltimate()) {
+      return moduleType instanceof JavaModuleType;
+    } else {
+      return false;
+    }
   }
 
   @Override
