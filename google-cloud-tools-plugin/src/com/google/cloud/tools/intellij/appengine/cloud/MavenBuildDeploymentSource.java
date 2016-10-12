@@ -16,8 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.xml.XmlFile;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
 
@@ -29,9 +33,9 @@ import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import java.io.File;
+import java.util.Collections;
 
 import javax.swing.Icon;
-
 
 /**
  * A deployment source backed by the Maven build system.
@@ -40,7 +44,15 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
     implements AppEngineDeployable {
 
   private final Project project;
-  private final AppEngineEnvironment environment;
+  private AppEngineEnvironment environment;
+
+  /**
+   * Default constructor used instantiating plain Maven Build Deployment sources.
+   */
+  public MavenBuildDeploymentSource(@NotNull ModulePointer pointer, @NotNull Project project) {
+    super(pointer);
+    this.project = project;
+  }
 
   public MavenBuildDeploymentSource(@NotNull ModulePointer pointer,
       @NotNull Project project,
@@ -86,7 +98,17 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
         new File(mavenProject.getBuildDirectory()).getPath() + File.separator
             + mavenProject.getFinalName();
 
-    if (environment.isFlexible()) {
+    XmlFile appEngineWebXml = AppEngineAssetProvider.getInstance()
+        .loadAppEngineStandardWebXml(project, Collections.singletonList(getModule()));
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
+
+    // The environment will be null for newly deserialized deployment sources to ensure freshness.
+    // In this case, we need to reload the environment.
+    if (environment == null) {
+      environment = projectService.getModuleAppEngineEnvironment(appEngineWebXml);
+    }
+
+    if (environment.isFlexible() && !projectService.isFlexCompat(appEngineWebXml)) {
       targetBuild += "." + mavenProject.getPackaging();
     }
 
