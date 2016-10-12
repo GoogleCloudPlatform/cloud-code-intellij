@@ -66,25 +66,30 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
     }
   }
 
-  private List<Module> findAppEngineModulesUsingUnsupportedLanguageLevel(Project project) {
-    Module[] projectModules = ModuleManager.getInstance(project).getModules();
-    List<Module> invalidModules = new ArrayList<>();
+  private List<Module> findAppEngineModulesUsingUnsupportedLanguageLevel(final Project project) {
+    final Module[] projectModules = ModuleManager.getInstance(project).getModules();
+    final List<Module> invalidModules = new ArrayList<>();
 
-    for (Module module : projectModules) {
-      // only check app engine modules
-      if (hasAppEngineFacet(module)) {
+    ApplicationManager.getApplication().runReadAction(new Runnable() {
+      @Override
+      public void run() {
+        for (Module module : projectModules) {
+          // only check app engine modules
+          if (hasAppEngineFacet(module)) {
 
-        @Nullable
-        XmlFile appengineWebXml = AppEngineAssetProvider.getInstance()
-            .loadAppEngineStandardWebXml(project, Arrays.asList(module));
+            @Nullable
+            XmlFile appengineWebXml = AppEngineAssetProvider.getInstance()
+                .loadAppEngineStandardWebXml(project, Arrays.asList(module));
 
-        if (isAppEngineStandard(appengineWebXml)
-            && usesJava8OrGreater(module)
-            && !declaresJava8Runtime(appengineWebXml)) {
-          invalidModules.add(module);
+            if (isAppEngineStandard(appengineWebXml)
+                && usesJava8OrGreater(module)
+                && !declaresJava8Runtime(appengineWebXml)) {
+              invalidModules.add(module);
+            }
+          }
         }
       }
-    }
+    });
     return invalidModules;
   }
 
