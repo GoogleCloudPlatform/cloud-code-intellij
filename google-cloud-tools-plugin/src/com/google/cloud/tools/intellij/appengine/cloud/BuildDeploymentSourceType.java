@@ -24,9 +24,9 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
-import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceType;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +41,12 @@ import javax.swing.JComponent;
  * for specific build-systems should extend this providing the build-system specific
  * implementations.
  */
-public abstract class BuildDeploymentSourceType extends ModuleDeploymentSourceType {
+public abstract class BuildDeploymentSourceType
+    extends DeploymentSourceType<ModuleDeploymentSource> {
+
+  public BuildDeploymentSourceType(@NotNull String id) {
+    super(id);
+  }
 
   /**
    * Creates a pre-deploy task ({@link BeforeRunTask}) for the given build-system and attaches it to
