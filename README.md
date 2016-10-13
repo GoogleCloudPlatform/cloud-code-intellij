@@ -2,8 +2,6 @@
 # Google Cloud Tools for IntelliJ plugin
 [![Build Status](https://cloud-tools-for-java-testing.appspot.com/buildStatus/icon?job=google-cloud-intellij master build orb)](https://cloud-tools-for-java-testing.appspot.com/job/google-cloud-intellij%20master%20build%20orb/)
 
-**This plugin is BETA quality.**
-
 The plugin integrates the [Google Cloud Platform](https://cloud.google.com/)
 into the IntelliJ IDEA UI. Currently this includes:
 
