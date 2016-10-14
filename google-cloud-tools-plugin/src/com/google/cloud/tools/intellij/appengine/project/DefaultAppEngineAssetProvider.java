@@ -65,21 +65,33 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
           project, "appengine-web.xml", module.getModuleContentScope()));
     }
 
-    Iterables.filter(appEngineWebXmls, Predicates.notNull());
+    VirtualFile appEngineWebXml = findHighestPriorityAppEngineWebXml(appEngineWebXmls);
 
-    if (appEngineWebXmls.size() > 1) {
+    if (appEngineWebXml != null) {
+      return (XmlFile) PsiManager.getInstance(project).findFile(appEngineWebXml);
+    }
+    return null;
+  }
+
+  @Nullable
+  private VirtualFile findHighestPriorityAppEngineWebXml(List<VirtualFile> appEngineWebXmls) {
+    Iterable<VirtualFile> nonNulls = Iterables.filter(appEngineWebXmls, Predicates.notNull());
+    List<VirtualFile> nonNullsAsList = new ArrayList<>();
+    for (VirtualFile file : nonNulls) {
+      nonNullsAsList.add(file);
+    }
+
+    if (nonNullsAsList.size() > 1) {
       // Prefer the appengine-web.xml located under the WEB-INF directory
-      Collections.sort(appEngineWebXmls, new AppEngineWebXmlOrdering());
+      Collections.sort(nonNullsAsList, new AppEngineWebXmlOrdering());
 
-      logger.warn("The following appengine-web.xml's were found: " + appEngineWebXmls
+      logger.warn("The following appengine-web.xml's were found: " + nonNullsAsList
           + "\nThe first one in the list will be used.");
     }
 
-    if (!appEngineWebXmls.isEmpty()) {
-      VirtualFile appEngineWebXml = appEngineWebXmls.iterator().next();
-      return (XmlFile) PsiManager.getInstance(project).findFile(appEngineWebXml);
+    if (!nonNullsAsList.isEmpty()) {
+      return nonNullsAsList.get(0);
     }
-
     return null;
   }
 
