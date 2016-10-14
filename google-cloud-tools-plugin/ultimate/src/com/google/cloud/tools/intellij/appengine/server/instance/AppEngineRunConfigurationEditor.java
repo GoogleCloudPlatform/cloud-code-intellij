@@ -59,7 +59,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField adminPort;
   private JTextField apiPort;
   private JComboBox applicationLogLevel;
-  private JCheckBox automaticRestartCheckbox;
   private JCheckBox dontNagCheckbox;
   private JCheckBox cleadDatastoreCheckbox;
   private JPanel appEngineSettingsPanel;
@@ -106,6 +105,9 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
    * server in debug mode. See
    * <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/928">#928</a>
    * </li>
+   * <li> automaticRestart - it is set to false so that HotSwap doesn't break IJ's debug server.
+   * <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972">#927</a>.
+   * </li>
    * </ul>
    */
   protected void resetEditorFrom(CommonModel commonModel) {
@@ -122,7 +124,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     adminHost.setText(serverModel.getAdminHost());
     adminPort.setText(intToString(serverModel.getAdminPort()));
     apiPort.setText(intToString(serverModel.getApiPort()));
-    automaticRestartCheckbox.setSelected(serverModel.getAutomaticRestart());
     applicationLogLevel.setSelectedItem(serverModel.getLogLevel());
     dontNagCheckbox.setSelected(serverModel.getSkipSdkUpdateCheck());
     cleadDatastoreCheckbox.setSelected(serverModel.getClearDatastore());
@@ -143,7 +144,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
       serverModel.setApiPort(validateInteger(apiPort.getText(), "API port"));
     }
 
-    serverModel.setAutomaticRestart(automaticRestartCheckbox.isSelected());
     serverModel.setLogLevel((String) applicationLogLevel.getSelectedItem());
     serverModel.setSkipSdkUpdateCheck(dontNagCheckbox.isSelected());
     serverModel.setClearDatastore(cleadDatastoreCheckbox.isSelected());
