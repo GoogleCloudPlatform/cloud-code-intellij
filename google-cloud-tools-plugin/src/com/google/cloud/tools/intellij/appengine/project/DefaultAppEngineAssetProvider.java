@@ -17,8 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Booleans;
 
@@ -74,23 +72,25 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
   }
 
   @Nullable
-  private VirtualFile findHighestPriorityAppEngineWebXml(List<VirtualFile> appEngineWebXmls) {
-    Iterable<VirtualFile> nonNulls = Iterables.filter(appEngineWebXmls, Predicates.notNull());
-    List<VirtualFile> nonNullsAsList = new ArrayList<>();
-    for (VirtualFile file : nonNulls) {
-      nonNullsAsList.add(file);
+  @VisibleForTesting
+  VirtualFile findHighestPriorityAppEngineWebXml(List<VirtualFile> appEngineWebXmls) {
+    List<VirtualFile> nonNulls = new ArrayList<>();
+    for (VirtualFile file : appEngineWebXmls) {
+      if (file != null) {
+        nonNulls.add(file);
+      }
     }
 
-    if (nonNullsAsList.size() > 1) {
+    if (nonNulls.size() > 1) {
       // Prefer the appengine-web.xml located under the WEB-INF directory
-      Collections.sort(nonNullsAsList, new AppEngineWebXmlOrdering());
+      Collections.sort(nonNulls, new AppEngineWebXmlOrdering());
 
-      logger.warn("The following appengine-web.xml's were found: " + nonNullsAsList
+      logger.warn("The following appengine-web.xml's were found: " + nonNulls
           + "\nThe first one in the list will be used.");
     }
 
-    if (!nonNullsAsList.isEmpty()) {
-      return nonNullsAsList.get(0);
+    if (!nonNulls.isEmpty()) {
+      return nonNulls.get(0);
     }
     return null;
   }
