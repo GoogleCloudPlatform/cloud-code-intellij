@@ -27,8 +27,6 @@ import java.util.Set;
  * The set of Google Cloud Tools features that we want to be able to conditionally enable.
  */
 public enum GctFeature implements Feature {
-  // DEBUGGER is enabled in IDEA Ultimate and Community, and disabled everywhere else.
-  DEBUGGER(ImmutableSet.of(IntelliJPlatform.IDEA, IntelliJPlatform.IDEA_IC), null, null),
   APPENGINE_FLEX(null, "feature.appengine.flex", "ct4ij.feature.appengine.flex");
 
   private final Set<IntelliJPlatform> supportedPlatforms;
