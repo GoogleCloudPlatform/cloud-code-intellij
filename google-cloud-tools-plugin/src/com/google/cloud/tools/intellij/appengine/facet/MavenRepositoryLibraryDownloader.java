@@ -30,7 +30,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.utils.library.RepositoryLibraryDescription;
 import org.jetbrains.idea.maven.utils.library.RepositoryLibraryProperties;
 import org.jetbrains.idea.maven.utils.library.RepositoryLibrarySupport;
-import org.jetbrains.idea.maven.utils.library.propertiesEditor.RepositoryLibraryPropertiesDialog;
 import org.jetbrains.idea.maven.utils.library.propertiesEditor.RepositoryLibraryPropertiesModel;
 
 /**
@@ -49,28 +48,25 @@ public class MavenRepositoryLibraryDownloader {
         version,
         true /*downloadSources*/,
         true /*downloadJavaDocs*/);
-    RepositoryLibraryPropertiesDialog dialog = new RepositoryLibraryPropertiesDialog(
-        module.getProject(), model, libraryDescription, false /*changesRequired*/);
 
-    if (!dialog.isModal() || dialog.showAndGet()) {
-      IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
-      final ModifiableRootModel modifiableModel
-          = ModuleRootManager.getInstance(module).getModifiableModel();
-      RepositoryLibrarySupport librarySupport = new RepositoryLibrarySupport(module.getProject(),
-          libraryDescription, model);
+    IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
+    final ModifiableRootModel modifiableModel
+        = ModuleRootManager.getInstance(module).getModifiableModel();
+    RepositoryLibrarySupport librarySupport = new RepositoryLibrarySupport(module.getProject(),
+        libraryDescription, model);
 
-      librarySupport.addSupport(module, modifiableModel, modifiableModelsProvider);
-      ApplicationManager.getApplication().runWriteAction(new Runnable() {
-        public void run() {
-          modifiableModel.commit();
-        }
-      });
-    }
+    librarySupport.addSupport(module, modifiableModel, modifiableModelsProvider);
+    ApplicationManager.getApplication().runWriteAction(new Runnable() {
+      public void run() {
+        modifiableModel.commit();
+      }
+    });
 
-    LibraryTable.ModifiableModel modifiableModel = ModifiableModelsProvider.SERVICE.getInstance()
-        .getLibraryTableModifiableModel(module.getProject());
+    LibraryTable.ModifiableModel libraryTableModifiableModel
+        = ModifiableModelsProvider.SERVICE.getInstance()
+          .getLibraryTableModifiableModel(module.getProject());
 
-    return modifiableModel.getLibraryByName(
+    return libraryTableModifiableModel.getLibraryByName(
         AppEngineStandardMavenLibrary.toMavenDisplayVersion(libraryProperties));
   }
 }
