@@ -8,14 +8,65 @@
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="a37cb" binding="libraryPanel" custom-create="true" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="a37cb" binding="libraryPanel" layout-manager="GridLayoutManager" row-count="6" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
         <border type="none"/>
-        <children/>
+        <children>
+          <component id="151e" class="javax.swing.JCheckBox" binding="servletApiCheckbox">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="messages/CloudToolsBundle" key="appengine.library.servlet.api.name"/>
+            </properties>
+          </component>
+          <hspacer id="9ab0e">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </hspacer>
+          <vspacer id="cc5e9">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+          <component id="6cbac" class="javax.swing.JCheckBox" binding="jstlCheckbox">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="messages/CloudToolsBundle" key="appengine.library.jstl.api.name"/>
+            </properties>
+          </component>
+          <component id="925e2" class="javax.swing.JCheckBox" binding="appEngineApiCheckBox">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="messages/CloudToolsBundle" key="appengine.library.app.engine.api.name"/>
+            </properties>
+          </component>
+          <component id="5b1a2" class="javax.swing.JCheckBox" binding="endpointsCheckBox">
+            <constraints>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="messages/CloudToolsBundle" key="appengine.library.endpoints.api.name"/>
+            </properties>
+          </component>
+          <component id="8e35a" class="javax.swing.JCheckBox" binding="objectifyCheckBox" default-binding="true">
+            <constraints>
+              <grid row="4" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="messages/CloudToolsBundle" key="appengine.library.objectify.api.name"/>
+            </properties>
+          </component>
+        </children>
       </grid>
     </children>
   </grid>
