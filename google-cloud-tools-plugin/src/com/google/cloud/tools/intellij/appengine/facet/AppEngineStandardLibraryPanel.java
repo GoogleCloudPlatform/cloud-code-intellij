@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
@@ -90,6 +91,17 @@ public class AppEngineStandardLibraryPanel {
         ((JCheckBox) libraryCheckbox).setSelected(true);
       }
     }
+  }
+
+  @VisibleForTesting
+  JCheckBox getLibraryCheckbox(String name) {
+    for (Component libraryCheckbox : libraryPanel.getComponents()) {
+      if (name.equals(((JCheckBox) libraryCheckbox).getText())) {
+        return (JCheckBox) libraryCheckbox;
+      }
+    }
+
+    return null;
   }
 
   public void toggleLibrary(AppEngineStandardMavenLibrary library, boolean select) {
