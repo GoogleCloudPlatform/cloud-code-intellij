@@ -117,7 +117,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   public void reset() {
     if (appEngineStandardLibraryPanel.isEnabled()) {
       appEngineStandardLibraryPanel
-          .setSelectLibraries(facetConfiguration.getLibraries(context.getProject()));
+          .setSelectedLibraries(facetConfiguration.getLibraries(context.getProject()));
     }
   }
 

@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -66,7 +68,7 @@ public class AppEngineStandardLibraryPanel {
     ));
   }
 
-  public void setSelectLibraries(Set<AppEngineStandardMavenLibrary> libraries) {
+  public void setSelectedLibraries(Set<AppEngineStandardMavenLibrary> libraries) {
     Collection<String> availableLibraryNames = Collections2.transform(libraries,
         new Function<AppEngineStandardMavenLibrary, String>() {
           @Nullable
@@ -79,6 +81,14 @@ public class AppEngineStandardLibraryPanel {
     for (Component libraryCheckbox : libraryPanel.getComponents()) {
       ((JCheckBox) libraryCheckbox)
           .setSelected(availableLibraryNames.contains(((JCheckBox) libraryCheckbox).getText()));
+    }
+  }
+
+  public void selectLibraryByName(String name) {
+    for (Component libraryCheckbox : libraryPanel.getComponents()) {
+      if (name.equals(((JCheckBox) libraryCheckbox).getText())) {
+        ((JCheckBox) libraryCheckbox).setSelected(true);
+      }
     }
   }
 
@@ -111,9 +121,21 @@ public class AppEngineStandardLibraryPanel {
         final JCheckBox libraryCheckbox = new JCheckBox(library.getDisplayName());
         libraryPanel.add(libraryCheckbox);
 
-        // The Servlet API is provided by the AE standard runtime. So we are enabling it by default.
         if (library == AppEngineStandardMavenLibrary.SERVLET_API) {
+          // The Servlet API is provided by the AE standard runtime. So we are enabling it by
+          // default.
           libraryCheckbox.setSelected(true);
+        } else if (library == AppEngineStandardMavenLibrary.OBJECTIFY) {
+          // If the user selects Objectify, then auto select the App Engine API since it is
+          // required.
+          libraryCheckbox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent event) {
+              if (((JCheckBox) event.getItem()).isSelected()) {
+                selectLibraryByName(AppEngineStandardMavenLibrary.APP_ENGINE_API.getDisplayName());
+              }
+            }
+          });
         }
       }
     }
