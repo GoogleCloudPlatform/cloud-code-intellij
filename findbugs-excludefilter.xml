@@ -19,9 +19,9 @@
   <!--
     Suppress the following warnings:
       1. Inefficient 'new String("plain string")' constructor
-      2. Redundant null checking of known non-null value
-      3. Possible null pointer deref
-      4. Missing equals override
+      2-3. Redundant null checking of known non-null value
+      4-8. Possible null pointer deref
+      9. Missing equals override
     The main reason we turn these off is that they don't provide justifiable value
     considering the cost of addressing every single case of them, particularly
     because there doesn't seem to exist *the* best way to mute false alarms.
@@ -34,7 +34,11 @@
       <Bug pattern="DM_STRING_CTOR" />
       <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
       <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
+      <Bug pattern="NP_NULL_ON_SOME_PATH" />
       <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
+      <Bug pattern="NP_NULL_ON_SOME_PATH_MIGHT_BE_INFEASIBLE" />
+      <Bug pattern="NP_NULL_PARAM_DEREF" />
+      <Bug pattern="NP_GUARANTEED_DEREF" />
       <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
     </Or>
   </Match>
