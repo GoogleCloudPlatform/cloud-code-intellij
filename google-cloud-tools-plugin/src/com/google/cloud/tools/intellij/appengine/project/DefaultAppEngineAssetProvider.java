@@ -16,7 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.project;
 
+import com.google.android.collect.Lists;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Booleans;
 
@@ -74,12 +77,9 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
   @Nullable
   @VisibleForTesting
   VirtualFile findHighestPriorityAppEngineWebXml(List<VirtualFile> appEngineWebXmls) {
-    List<VirtualFile> nonNulls = new ArrayList<>();
-    for (VirtualFile file : appEngineWebXmls) {
-      if (file != null) {
-        nonNulls.add(file);
-      }
-    }
+    List<VirtualFile> nonNulls = Lists.newArrayList();
+    // filter null list entries
+    nonNulls.addAll(Collections2.filter(appEngineWebXmls, Predicates.notNull()));
 
     if (nonNulls.size() > 1) {
       // Prefer the appengine-web.xml located under the WEB-INF directory
