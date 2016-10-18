@@ -65,9 +65,19 @@ public class AppEngineStandardLibraryPanel {
     // Objectify and Endpoints are dependencies of the App Engine API.
     objectifyCheckBox.setSelected(false);
     endpointsCheckBox.setSelected(false);
-    appEngineApiCheckBox.addItemListener(new AppEngineApiListener());
-    objectifyCheckBox.addItemListener(new AppEngineApiDependencyListener());
-    endpointsCheckBox.addItemListener(new AppEngineApiDependencyListener());
+    appEngineApiCheckBox.addItemListener(new ItemListener() {
+      @Override
+      public void itemStateChanged(ItemEvent event) {
+        JCheckBox checkbox = (JCheckBox) event.getItem();
+
+        if (!checkbox.isSelected()) {
+          objectifyCheckBox.setSelected(false);
+          endpointsCheckBox.setSelected(false);
+        }
+      }
+    });
+    objectifyCheckBox.addItemListener(new AppEngineApiDependencyCheckboxListener());
+    endpointsCheckBox.addItemListener(new AppEngineApiDependencyCheckboxListener());
   }
 
   public Set<AppEngineStandardMavenLibrary> getSelectedLibraries() {
@@ -143,20 +153,7 @@ public class AppEngineStandardLibraryPanel {
     return libraries;
   }
 
-  private class AppEngineApiListener implements ItemListener {
-
-    @Override
-    public void itemStateChanged(ItemEvent event) {
-      JCheckBox checkbox = (JCheckBox) event.getItem();
-
-      if (!checkbox.isSelected()) {
-        objectifyCheckBox.setSelected(false);
-        endpointsCheckBox.setSelected(false);
-      }
-    }
-  }
-
-  private class AppEngineApiDependencyListener implements ItemListener {
+  private class AppEngineApiDependencyCheckboxListener implements ItemListener {
 
     @Override
     public void itemStateChanged(ItemEvent event) {
