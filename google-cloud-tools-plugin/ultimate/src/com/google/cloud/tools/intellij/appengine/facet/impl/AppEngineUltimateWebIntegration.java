@@ -174,7 +174,8 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
   }
 
   @Override
-  public void registerFrameworkInModel(FrameworkSupportModel model, AppEngineStandardFacet appEngineStandardFacet) {
+  public void registerFrameworkInModel(FrameworkSupportModel model,
+      AppEngineStandardFacet appEngineStandardFacet) {
     JavaeeFrameworkSupportInfoCollector.getOrCreateCollector(model)
         .setFacet(AppEngineStandardFacet.ID, appEngineStandardFacet);
   }

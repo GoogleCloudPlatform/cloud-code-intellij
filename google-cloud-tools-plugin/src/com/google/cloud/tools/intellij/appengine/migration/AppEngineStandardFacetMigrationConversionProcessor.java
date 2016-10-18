@@ -50,7 +50,8 @@ public class AppEngineStandardFacetMigrationConversionProcessor extends
       String facetName = deprecatedTag.getAttributeValue(JpsFacetSerializer.NAME_ATTRIBUTE);
 
       // add a new tag with all the same settings as the old one, but the new facet type id
-      settings.addFacetElement(AppEngineStandardFacetType.STRING_ID, facetName, configuration.clone());
+      settings.addFacetElement(AppEngineStandardFacetType.STRING_ID, facetName,
+          configuration.clone());
     }
   }
 }

@@ -33,7 +33,8 @@ import javax.swing.Icon;
 /**
  * @author nik
  */
-public class AppEngineStandardFacetType extends FacetType<AppEngineStandardFacet,  AppEngineFacetConfiguration> {
+public class AppEngineStandardFacetType
+    extends FacetType<AppEngineStandardFacet,  AppEngineFacetConfiguration> {
   public static final String STRING_ID = "app-engine-standard";
 
   public AppEngineStandardFacetType() {

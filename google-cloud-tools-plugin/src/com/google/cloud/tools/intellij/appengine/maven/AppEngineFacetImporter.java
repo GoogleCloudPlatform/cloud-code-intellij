@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.maven;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
 

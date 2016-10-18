@@ -174,7 +174,8 @@ public class AppEngineUtil {
     final Set<Module> modules = ArtifactUtil
         .getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
     for (Module module : modules) {
-      final AppEngineStandardFacet appEngineStandardFacet = AppEngineStandardFacet.getAppEngineFacetByModule(module);
+      final AppEngineStandardFacet appEngineStandardFacet
+          = AppEngineStandardFacet.getAppEngineFacetByModule(module);
       if (appEngineStandardFacet != null) {
         return appEngineStandardFacet;
       }

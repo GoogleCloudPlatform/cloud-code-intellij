@@ -64,7 +64,8 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
       @NotNull final InspectionManager manager, final boolean isOnTheFly) {
     final Project project = manager.getProject();
     Module module = ModuleUtilCore.findModuleForPsiElement(file);
-    final AppEngineStandardFacet appEngineStandardFacet = AppEngineStandardFacet.getAppEngineFacetByModule(module);
+    final AppEngineStandardFacet appEngineStandardFacet
+        = AppEngineStandardFacet.getAppEngineFacetByModule(module);
     if (appEngineStandardFacet == null) {
       return null;
     }
