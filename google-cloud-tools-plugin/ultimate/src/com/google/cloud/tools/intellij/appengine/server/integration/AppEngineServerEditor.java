@@ -46,7 +46,7 @@ public class AppEngineServerEditor extends
 
   private JPanel myMainPanel;
   // TODO(joaomartins): Replace with CloudSdkPanel when
-  // https://youtrack.jetbrains.com/issue/IDEA-110316 gets fixed.
+  // https://youtrack.jetbrains.com/issue/IDEA-162625 gets fixed.
   private TextFieldWithBrowseButton sdkHomeField;
   private JLabel warningMessage;
 
