@@ -65,24 +65,6 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   }
 
   @Test
-  public void testInitComponent_debuggerIsEnabled() {
-    when(pluginInfoService.shouldEnable(GctFeature.DEBUGGER)).thenReturn(true);
-    testComponent.initComponent();
-    verify(pluginConfigurationService).registerExtension(isA(ExtensionPointName.class),
-        isA(CloudDebugConfigType.class));
-  }
-
-
-  @Test
-  public void testInitComponent_debuggerIsDisabled() {
-    when(pluginInfoService.shouldEnable(GctFeature.DEBUGGER)).thenReturn(false);
-    testComponent.initComponent();
-    verify(pluginConfigurationService, never())
-        .registerExtension(isA(ExtensionPointName.class),
-            isA(CloudDebugConfigType.class));
-  }
-
-  @Test
   public void testInitComponent_managedVmIsEnabled() {
     when(pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)).thenReturn(true);
     when(actionManager.getAction(anyString())).thenReturn(new DefaultActionGroup());
@@ -94,7 +76,6 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
 
   @Test
   public void testInitComponent_managedVmIsDisabled() {
-    when(pluginInfoService.shouldEnable(GctFeature.DEBUGGER)).thenReturn(false);
     testComponent.initComponent();
     verify(pluginConfigurationService, never())
         .registerExtension(isA(ExtensionPointName.class),
