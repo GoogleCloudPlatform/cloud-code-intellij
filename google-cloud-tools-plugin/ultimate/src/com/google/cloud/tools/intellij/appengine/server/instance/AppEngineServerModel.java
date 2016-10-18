@@ -55,6 +55,7 @@ import com.intellij.util.xmlb.SkipDefaultValuesSerializationFilters;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Tag;
 
+import org.apache.commons.lang.StringUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -164,7 +165,9 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
           "App Engine facet not found in '" + artifact.getName() + "' artifact");
     }
 
-    if (CloudSdkService.getInstance().getSdkHomePath() == null) {
+    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+    if (cloudSdkService.getSdkHomePath() == null
+          || StringUtils.isEmpty(cloudSdkService.getSdkHomePath().toString())) {
       throw new RuntimeConfigurationError(
           CloudSdkPanel.createErrorMessageWithLink(
               GctBundle.message("appengine.cloudsdk.location.missing.message")));
@@ -172,7 +175,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     try {
       CloudSdk sdk = new CloudSdk.Builder()
-          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+          .sdkPath(cloudSdkService.getSdkHomePath())
           .build();
       sdk.validateCloudSdk();
       sdk.validateAppEngineJavaComponents();

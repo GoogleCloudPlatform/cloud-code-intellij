@@ -16,8 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.server.run;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRunTask;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -32,6 +36,7 @@ import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
 import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
 
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -64,15 +69,27 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           public OSProcessHandler createProcessHandler(
               String workingDirectory, Map<String, String> envVariables) throws ExecutionException {
             CloudSdkService sdkService = CloudSdkService.getInstance();
-            if (sdkService.getSdkHomePath() == null
-                || sdkService.getSdkHomePath().toString().isEmpty()) {
-              throw new ExecutionException(
-                  GctBundle.message("appengine.cloudsdk.location.missing.message"));
-            }
 
-            if (sdkService == null) {
+            if (sdkService.getSdkHomePath() == null
+                || StringUtils.isEmpty(sdkService.getSdkHomePath().toString())) {
               throw new ExecutionException(
-                  GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
+                  CloudSdkPanel.createErrorMessageWithLink(
+                      GctBundle.message("appengine.cloudsdk.location.missing.message")));
+            }
+            try {
+              CloudSdk sdk = new CloudSdk.Builder()
+                  .sdkPath(sdkService.getSdkHomePath())
+                  .build();
+              sdk.validateCloudSdk();
+              sdk.validateAppEngineJavaComponents();
+            } catch (AppEngineJavaComponentsNotInstalledException ex) {
+              throw new ExecutionException(
+                  GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
+                      + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
+            } catch (AppEngineException ex) {
+              throw new ExecutionException(
+                  CloudSdkPanel.createErrorMessageWithLink(
+                      GctBundle.message("appengine.cloudsdk.location.invalid.message")));
             }
 
             AppEngineServerModel runConfiguration;
@@ -99,11 +116,6 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             executor.run();
 
             Process devappserverProcess = executor.getProcess();
-            if (devappserverProcess == null) {
-              throw new ExecutionException(
-                  GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
-                      + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
-            }
             startupProcessHandler = new OSProcessHandler(devappserverProcess,
                 GctBundle.getString("appengine.run.startupscript"));
             return startupProcessHandler;
