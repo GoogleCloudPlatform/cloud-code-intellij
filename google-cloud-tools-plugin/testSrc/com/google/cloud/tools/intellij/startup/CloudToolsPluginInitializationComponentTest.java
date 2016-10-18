@@ -76,7 +76,6 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
 
   @Test
   public void testInitComponent_managedVmIsDisabled() {
-    when(pluginInfoService.shouldEnable(GctFeature.DEBUGGER)).thenReturn(false);
     testComponent.initComponent();
     verify(pluginConfigurationService, never())
         .registerExtension(isA(ExtensionPointName.class),
