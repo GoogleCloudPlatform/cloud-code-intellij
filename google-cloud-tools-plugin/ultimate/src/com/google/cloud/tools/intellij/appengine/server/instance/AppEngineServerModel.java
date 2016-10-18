@@ -16,10 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.run.CloudSdkStartupPolicy;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
@@ -164,18 +166,24 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     if (CloudSdkService.getInstance().getSdkHomePath() == null) {
       throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.cloudsdk.location.missing.message"));
+          CloudSdkPanel.createErrorMessageWithLink(
+              GctBundle.message("appengine.cloudsdk.location.missing.message")));
     }
 
     try {
-      new CloudSdk.Builder()
+      CloudSdk sdk = new CloudSdk.Builder()
           .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
-          .build()
-          .validateAppEngineJavaComponents();
+          .build();
+      sdk.validateCloudSdk();
+      sdk.validateAppEngineJavaComponents();
     } catch (AppEngineJavaComponentsNotInstalledException ex) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.cloudsdk.java.components.missing") + " "
               + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
+    } catch (AppEngineException ex) {
+      throw new RuntimeConfigurationError(
+          CloudSdkPanel.createErrorMessageWithLink(
+              GctBundle.message("appengine.cloudsdk.location.invalid.message")));
     }
   }
 
