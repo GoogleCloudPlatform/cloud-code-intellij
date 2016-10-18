@@ -162,6 +162,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
           "App Engine facet not found in '" + artifact.getName() + "' artifact");
     }
 
+    if (CloudSdkService.getInstance().getSdkHomePath() == null) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.cloudsdk.location.missing.message"));
+    }
+
     try {
       new CloudSdk.Builder()
           .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
@@ -169,7 +174,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
           .validateAppEngineJavaComponents();
     } catch (AppEngineJavaComponentsNotInstalledException ex) {
       throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.cloudsdk.java.components.missing"));
+          GctBundle.message("appengine.cloudsdk.java.components.missing") + " "
+              + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
     }
   }
 
