@@ -22,8 +22,10 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.ui.JBColor;
-import javax.swing.JLabel;
+
 import org.picocontainer.MutablePicoContainer;
+
+import javax.swing.JTextPane;
 
 /**
  * Tests for {@link CloudSdkPanel}.
@@ -34,11 +36,18 @@ public class CloudSdkPanelTest extends PlatformTestCase {
 
   private CloudSdkService cloudSdkService;
 
-  private JLabel warningMessage;
+  private JTextPane warningMessage;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
-  private static final String INVALID_SDK_DIR_WARNING =
-      "No Cloud SDK was found in this directory.";
+  private static final String INVALID_SDK_DIR_WARNING = "<html>\n"
+      + "  <head>\n"
+      + "    \n"
+      + "  </head>\n"
+      + "  <body>\n"
+      + "    No Cloud SDK was found in this directory. <a href=\"https://cloud.google.com/sdk/docs/#install_the_latest_cloud_tools_version_cloudsdk_current_version\">Click \n"
+      + "    here</a> to download the Cloud SDK.\n"
+      + "  </body>\n"
+      + "</html>\n";
 
   @Override
   public void setUp() throws Exception {
