@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
-import com.google.common.collect.ImmutableSet;
 
 import org.jetbrains.annotations.Nullable;
 
