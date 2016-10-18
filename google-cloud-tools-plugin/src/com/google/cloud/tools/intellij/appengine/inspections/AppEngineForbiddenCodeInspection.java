@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.inspections;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.codeHighlighting.HighlightDisplayLevel;
@@ -64,8 +64,8 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
       @NotNull final InspectionManager manager, final boolean isOnTheFly) {
     final Project project = manager.getProject();
     Module module = ModuleUtilCore.findModuleForPsiElement(file);
-    final AppEngineFacet appEngineFacet = AppEngineFacet.getAppEngineFacetByModule(module);
-    if (appEngineFacet == null) {
+    final AppEngineStandardFacet appEngineStandardFacet = AppEngineStandardFacet.getAppEngineFacetByModule(module);
+    if (appEngineStandardFacet == null) {
       return null;
     }
 

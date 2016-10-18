@@ -79,6 +79,6 @@ public abstract class AppEngineWebIntegration {
       @NotNull VirtualFile descriptor) {
   }
 
-  public void registerFrameworkInModel(FrameworkSupportModel model, AppEngineFacet appEngineFacet) {
+  public void registerFrameworkInModel(FrameworkSupportModel model, AppEngineStandardFacet appEngineStandardFacet) {
   }
 }

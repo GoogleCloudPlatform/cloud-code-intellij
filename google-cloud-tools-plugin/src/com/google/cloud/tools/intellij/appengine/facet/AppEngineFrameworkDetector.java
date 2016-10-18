@@ -36,23 +36,23 @@ import org.jetbrains.annotations.NotNull;
  * @author nik
  */
 public class AppEngineFrameworkDetector extends
-    FacetBasedFrameworkDetector<AppEngineFacet, AppEngineFacetConfiguration> {
+    FacetBasedFrameworkDetector<AppEngineStandardFacet, AppEngineFacetConfiguration> {
 
   public AppEngineFrameworkDetector() {
     super("appengine-java");
   }
 
   @Override
-  public void setupFacet(@NotNull AppEngineFacet facet, ModifiableRootModel model) {
+  public void setupFacet(@NotNull AppEngineStandardFacet facet, ModifiableRootModel model) {
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_ADD_FACET)
+        .trackEvent(GctTracking.APP_ENGINE_ADD_STANDARD_FACET)
         .withLabel("frameworkDetect")
         .ping();
   }
 
   @Override
-  public FacetType<AppEngineFacet, AppEngineFacetConfiguration> getFacetType() {
-    return FacetType.findInstance(AppEngineFacetType.class);
+  public FacetType<AppEngineStandardFacet, AppEngineFacetConfiguration> getFacetType() {
+    return FacetType.findInstance(AppEngineStandardFacetType.class);
   }
 
   @Override

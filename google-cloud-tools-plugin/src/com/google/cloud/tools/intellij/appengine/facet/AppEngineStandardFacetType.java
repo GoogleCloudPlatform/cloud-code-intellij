@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;
@@ -32,22 +33,22 @@ import javax.swing.Icon;
 /**
  * @author nik
  */
-public class AppEngineFacetType extends FacetType<AppEngineFacet,  AppEngineFacetConfiguration> {
+public class AppEngineStandardFacetType extends FacetType<AppEngineStandardFacet,  AppEngineFacetConfiguration> {
   public static final String STRING_ID = "app-engine-standard";
 
-  public AppEngineFacetType() {
-    super(AppEngineFacet.ID, STRING_ID, "Google App Engine");
+  public AppEngineStandardFacetType() {
+    super(AppEngineStandardFacet.ID, STRING_ID, GctBundle.message("appengine.standard.facet.name"));
   }
 
   public AppEngineFacetConfiguration createDefaultConfiguration() {
     return new AppEngineFacetConfiguration();
   }
 
-  public AppEngineFacet createFacet(@NotNull Module module,
+  public AppEngineStandardFacet createFacet(@NotNull Module module,
                                     String name,
                                     @NotNull AppEngineFacetConfiguration configuration,
                                     @Nullable Facet underlyingFacet) {
-    return new AppEngineFacet(this, module, name, configuration);
+    return new AppEngineStandardFacet(this, module, name, configuration);
   }
 
   public boolean isSuitableModuleType(ModuleType moduleType) {
@@ -57,7 +58,7 @@ public class AppEngineFacetType extends FacetType<AppEngineFacet,  AppEngineFace
   @NotNull
   @Override
   public String getDefaultFacetName() {
-    return "Google App Engine";
+    return "Google App Engine Standard";
   }
 
   @Override
