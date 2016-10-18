@@ -22,8 +22,10 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.ui.JBColor;
-import javax.swing.JLabel;
+
 import org.picocontainer.MutablePicoContainer;
+
+import javax.swing.JTextPane;
 
 /**
  * Tests for {@link CloudSdkPanel}.
@@ -34,7 +36,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
 
   private CloudSdkService cloudSdkService;
 
-  private JLabel warningMessage;
+  private JTextPane warningMessage;
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
 
   private static final String INVALID_SDK_DIR_WARNING =
