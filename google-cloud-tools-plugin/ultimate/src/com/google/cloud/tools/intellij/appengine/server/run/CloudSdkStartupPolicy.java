@@ -76,6 +76,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
                   CloudSdkPanel.createErrorMessageWithLink(
                       GctBundle.message("appengine.cloudsdk.location.missing.message")));
             }
+
             try {
               CloudSdk sdk = new CloudSdk.Builder()
                   .sdkPath(sdkService.getSdkHomePath())
