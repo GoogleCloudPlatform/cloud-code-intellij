@@ -36,7 +36,6 @@ import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
 import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
 
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -71,7 +70,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             CloudSdkService sdkService = CloudSdkService.getInstance();
 
             if (sdkService.getSdkHomePath() == null
-                || StringUtils.isEmpty(sdkService.getSdkHomePath().toString())) {
+                || sdkService.getSdkHomePath().toString().isEmpty()) {
               throw new ExecutionException(
                   CloudSdkPanel.createErrorMessageWithLink(
                       GctBundle.message("appengine.cloudsdk.location.missing.message")));

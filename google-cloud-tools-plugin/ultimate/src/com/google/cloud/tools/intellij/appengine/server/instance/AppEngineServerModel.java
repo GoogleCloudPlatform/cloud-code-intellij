@@ -55,7 +55,6 @@ import com.intellij.util.xmlb.SkipDefaultValuesSerializationFilters;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Tag;
 
-import org.apache.commons.lang.StringUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -167,7 +166,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     if (cloudSdkService.getSdkHomePath() == null
-          || StringUtils.isEmpty(cloudSdkService.getSdkHomePath().toString())) {
+          || cloudSdkService.getSdkHomePath().toString().isEmpty()) {
       throw new RuntimeConfigurationError(
           CloudSdkPanel.createErrorMessageWithLink(
               GctBundle.message("appengine.cloudsdk.location.missing.message")));
