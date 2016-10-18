@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.server.instance;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.run.CloudSdkStartupPolicy;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
@@ -155,7 +155,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       throw new RuntimeConfigurationError("Artifact isn't specified");
     }
 
-    final AppEngineFacet facet = AppEngineUtil
+    final AppEngineStandardFacet facet = AppEngineUtil
         .findAppEngineFacet(commonModel.getProject(), artifact);
     if (facet == null) {
       throw new RuntimeConfigurationWarning(

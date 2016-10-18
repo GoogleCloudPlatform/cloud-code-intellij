@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
 
 import com.intellij.javaee.supportProvider.JavaeeFrameworkSupportContributionModel;
@@ -30,8 +30,8 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
 
   @Override
   public void setupFrameworkSupport(JavaeeFrameworkSupportContributionModel model) {
-    AppEngineFacet appEngineFacet = model.getFacet(AppEngineFacet.ID);
-    if (appEngineFacet == null) {
+    AppEngineStandardFacet appEngineStandardFacet = model.getFacet(AppEngineStandardFacet.ID);
+    if (appEngineStandardFacet == null) {
       return;
     }
 
