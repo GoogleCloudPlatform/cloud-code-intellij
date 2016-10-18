@@ -1,16 +1,9 @@
-comment: off
 coverage:
-  precision: 2
-  range: "70...100"
-  round: down
   status:
-    changes: false
-    patch: true
-    project: true
-parsers:
-  gcov:
-    branch_detection:
-      conditional: true
-      loop: true
-      macro: false
-      method: false
+    patch:
+      default:
+        target: 0%
+    project:
+      default:
+        target: 0%
+comment: off
