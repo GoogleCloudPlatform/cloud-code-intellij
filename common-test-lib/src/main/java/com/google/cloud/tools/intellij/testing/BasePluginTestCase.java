@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.testing;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.DefaultPluginDescriptor;
-import com.intellij.openapi.extensions.ExtensionPoint;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.extensions.PluginId;
@@ -75,17 +74,11 @@ public class BasePluginTestCase {
   protected <N, T extends N> ExtensionPointImpl<T> registerExtensionPoint(
       @NotNull ExtensionPointName<N> name,
       @NotNull Class<T> type) {
-    ExtensionPointImpl<T> extensionPoint = new ExtensionPointImpl<T>(
+    extensionsArea.registerExtensionPoint(
         name.getName(),
         type.getName(),
-        ExtensionPoint.Kind.INTERFACE,
-        extensionsArea,
-        null,
-        new Extensions.SimpleLogProvider(),
-        new DefaultPluginDescriptor(PluginId.getId(type.getName()), type.getClassLoader())
-    );
-    extensionsArea.registerExtensionPoint(extensionPoint);
-    return extensionPoint;
+        new DefaultPluginDescriptor(PluginId.getId(type.getName()), type.getClassLoader()));
+    return extensionsArea.getExtensionPoint(name.getName());
   }
 
   @After
