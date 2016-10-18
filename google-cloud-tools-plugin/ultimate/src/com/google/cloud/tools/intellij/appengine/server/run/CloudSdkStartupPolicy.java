@@ -102,12 +102,16 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             }
 
             // This is the place we have access to the debug jvm flags provided by IJ in the
-            // Startup/Shutdown tab. We need to add it here.
+            // Startup/Shutdown tab. We need to add them here.
             String jvmDebugFlag = envVariables.get("");
             if (jvmDebugFlag != null) {
               runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
               // prevent multiple JVMs from being created to make debugging deterministic
               runConfiguration.setMaxModuleInstances(1);
+              // If debuggee JVMs restart after HotSwap, debug connection is lost, debug server
+              // down and doesn't come back up. Flag is set to true by default, need to set it to
+              // false here. https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972
+              runConfiguration.setAutomaticRestart(false);
             }
 
             AppEngineStandardRunTask runTask =
