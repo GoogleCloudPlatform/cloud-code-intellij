@@ -55,6 +55,7 @@ public class CloudSdkPanel {
   public CloudSdkPanel() {
     warningMessage.setVisible(false);
     warningMessage.setBackground(cloudSdkPanel.getBackground());
+    warningMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     warningIcon.setVisible(false);
     warningIcon.setIcon(RunConfigurations.ConfigurationWarning);
 
@@ -85,7 +86,6 @@ public class CloudSdkPanel {
       warningMessage.setText(
           createErrorMessageWithLink(
               GctBundle.message("appengine.cloudsdk.location.missing.message")));
-      warningMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
 
       return;
     }
@@ -106,7 +106,6 @@ public class CloudSdkPanel {
       warningMessage.setText(
           createErrorMessageWithLink(
               GctBundle.message("appengine.cloudsdk.location.invalid.message")));
-      warningMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     }
   }
 
