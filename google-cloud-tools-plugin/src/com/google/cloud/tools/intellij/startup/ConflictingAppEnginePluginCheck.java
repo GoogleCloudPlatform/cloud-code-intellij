@@ -91,7 +91,7 @@ public class ConflictingAppEnginePluginCheck {
             errorMessage,
             NotificationType.ERROR,
             new IdeaAppEnginePluginLinkListener(plugin))
-        .notify(null);
+        .notify(null /*project*/);
 
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_OLD_PLUGIN_NOTIFICATION)
