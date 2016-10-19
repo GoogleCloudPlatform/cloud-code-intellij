@@ -117,6 +117,8 @@
     <checkoutProvider implementation="com.google.cloud.tools.intellij.vcs.GcpCheckoutProvider"/>
     <vcsPopupProvider implementation="com.google.cloud.tools.intellij.vcs.GcpQuickListContentProvider"/>
 
+    <configurationType
+            implementation="com.google.cloud.tools.intellij.debugger.CloudDebugConfigType"/>
     <programRunner implementation="com.google.cloud.tools.intellij.debugger.CloudDebuggerRunner"/>
     <xdebugger.breakpointType implementation="com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType"/>
     <projectService serviceImplementation="com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateSerializer"/>
@@ -140,9 +142,9 @@
 
     <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType"/>
     <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory"/>
-    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineFacetConverterProvider"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineFacetMigrationConverterProvider"/>
+    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacetType"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetConverterProvider"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetMigrationConverterProvider"/>
     <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkDetector"/>
 
     <xml.schemaProvider implementation="com.google.cloud.tools.intellij.appengine.descriptor.AppEngineWebSchemaProvider"/>

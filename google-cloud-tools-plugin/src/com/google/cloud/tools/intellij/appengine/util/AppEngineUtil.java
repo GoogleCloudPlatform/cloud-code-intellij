@@ -20,7 +20,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeployme
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSource;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
@@ -167,16 +167,17 @@ public class AppEngineUtil {
   }
 
   @Nullable
-  public static AppEngineFacet findAppEngineFacet(@NotNull Project project,
+  public static AppEngineStandardFacet findAppEngineFacet(@NotNull Project project,
       @NotNull Artifact artifact) {
     // TODO(joaomartins): Find out why the GAE facet isn't being added to Gradle projects.
     // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/835
     final Set<Module> modules = ArtifactUtil
         .getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
     for (Module module : modules) {
-      final AppEngineFacet appEngineFacet = AppEngineFacet.getAppEngineFacetByModule(module);
-      if (appEngineFacet != null) {
-        return appEngineFacet;
+      final AppEngineStandardFacet appEngineStandardFacet
+          = AppEngineStandardFacet.getAppEngineFacetByModule(module);
+      if (appEngineStandardFacet != null) {
+        return appEngineStandardFacet;
       }
     }
     return null;

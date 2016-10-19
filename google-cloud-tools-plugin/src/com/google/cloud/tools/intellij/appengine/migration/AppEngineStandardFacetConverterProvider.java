@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.migration;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacetType;
 
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionContext;
@@ -38,9 +38,9 @@ import java.util.List;
 /**
  * @author nik
  */
-public class AppEngineFacetConverterProvider extends ConverterProvider {
+public class AppEngineStandardFacetConverterProvider extends ConverterProvider {
 
-  public AppEngineFacetConverterProvider() {
+  public AppEngineStandardFacetConverterProvider() {
     super("google-app-engine-facet");
   }
 
@@ -80,7 +80,7 @@ public class AppEngineFacetConverterProvider extends ConverterProvider {
       if (facetTag != null) {
         String facetName = facetTag.getAttributeValue(JpsFacetSerializer.NAME_ATTRIBUTE);
         Element configuration = facetTag.getChild(JpsFacetSerializer.CONFIGURATION_TAG);
-        settings.addFacetElement(AppEngineFacetType.STRING_ID, facetName,
+        settings.addFacetElement(AppEngineStandardFacetType.STRING_ID, facetName,
             (Element) configuration.clone());
       }
     }
@@ -91,7 +91,7 @@ public class AppEngineFacetConverterProvider extends ConverterProvider {
       for (Element webFacetTag : settings.getFacetElements("web")) {
         for (Element childFacetTag : JDOMUtil
             .getChildren(webFacetTag, JpsFacetSerializer.FACET_TAG)) {
-          if (AppEngineFacetType.STRING_ID
+          if (AppEngineStandardFacetType.STRING_ID
               .equals(childFacetTag.getAttributeValue(JpsFacetSerializer.TYPE_ATTRIBUTE))) {
             appEngineFacetTags.add(childFacetTag);
           }

@@ -124,7 +124,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
       @Override
       protected void run(@NotNull Result result) throws Throwable {
         FacetManager.getInstance(module).addFacet(
-            new AppEngineFacetTestType(), "Google App Engine", null);
+            new AppEngineFacetTestType(), "Google App Engine Standard", null);
       }
     }.execute();
   }

@@ -29,12 +29,12 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Unit tests for {@link AppEngineFacetMigrationConversionProcessor}
+ * Unit tests for {@link AppEngineStandardFacetMigrationConversionProcessor}
  */
-public class AppEngineFacetMigrationConversionProcessorTest extends PlatformTestCase {
+public class AppEngineStandardFacetMigrationConversionProcessorTest extends PlatformTestCase {
 
   private ModuleSettings moduleSettingsMock;
-  private AppEngineFacetMigrationConversionProcessor processor;
+  private AppEngineStandardFacetMigrationConversionProcessor processor;
   private Collection testFacetElements;
 
   @Override
@@ -44,7 +44,7 @@ public class AppEngineFacetMigrationConversionProcessorTest extends PlatformTest
     moduleSettingsMock = mock(ModuleSettings.class);
     testFacetElements = Collections.singletonList(mock(Element.class));
 
-    processor = new AppEngineFacetMigrationConversionProcessor();
+    processor = new AppEngineStandardFacetMigrationConversionProcessor();
   }
 
   public void testIsConversionNeeded_oldFacetsAreNotPresent() {
@@ -57,7 +57,7 @@ public class AppEngineFacetMigrationConversionProcessorTest extends PlatformTest
   }
 
   private String getOldFacetId() {
-    return eq(AppEngineFacetMigrationConversionProcessor.DEPRECATED_APP_ENGINE_FACET_ID);
+    return eq(AppEngineStandardFacetMigrationConversionProcessor.DEPRECATED_APP_ENGINE_FACET_ID);
   }
 
 }
