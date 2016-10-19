@@ -31,11 +31,8 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.ui.popup.util.PopupUtil;
-import com.intellij.openapi.wm.WindowManager;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.awt.Window;
 
 import javax.swing.event.HyperlinkEvent;
 
