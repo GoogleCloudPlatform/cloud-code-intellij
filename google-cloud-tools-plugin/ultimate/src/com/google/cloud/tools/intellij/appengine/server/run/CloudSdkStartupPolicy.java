@@ -21,7 +21,6 @@ import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInsta
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRunTask;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -67,13 +66,11 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           @Override
           public OSProcessHandler createProcessHandler(
               String workingDirectory, Map<String, String> envVariables) throws ExecutionException {
-            CloudSdkService sdkService = CloudSdkService.getInstance();
 
-            if (sdkService.getSdkHomePath() == null
-                || sdkService.getSdkHomePath().toString().isEmpty()) {
+            CloudSdkService sdkService = CloudSdkService.getInstance();
+            if (sdkService.getSdkHomePath() == null) {
               throw new ExecutionException(
-                  CloudSdkPanel.createErrorMessageWithLink(
-                      GctBundle.message("appengine.cloudsdk.location.missing.message")));
+                  GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
             }
 
             try {
@@ -88,8 +85,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
                       + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
             } catch (AppEngineException ex) {
               throw new ExecutionException(
-                  CloudSdkPanel.createErrorMessageWithLink(
-                      GctBundle.message("appengine.cloudsdk.location.invalid.message")));
+                  GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
             }
 
             AppEngineServerModel runConfiguration;

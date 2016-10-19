@@ -21,7 +21,6 @@ import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.run.CloudSdkStartupPolicy;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
@@ -164,17 +163,15 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
           "App Engine facet not found in '" + artifact.getName() + "' artifact");
     }
 
-    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
-    if (cloudSdkService.getSdkHomePath() == null
-          || cloudSdkService.getSdkHomePath().toString().isEmpty()) {
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+    if (sdkService.getSdkHomePath() == null) {
       throw new RuntimeConfigurationError(
-          CloudSdkPanel.createErrorMessageWithLink(
-              GctBundle.message("appengine.cloudsdk.location.missing.message")));
+          GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }
 
     try {
       CloudSdk sdk = new CloudSdk.Builder()
-          .sdkPath(cloudSdkService.getSdkHomePath())
+          .sdkPath(sdkService.getSdkHomePath())
           .build();
       sdk.validateCloudSdk();
       sdk.validateAppEngineJavaComponents();
@@ -184,8 +181,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
               + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
     } catch (AppEngineException ex) {
       throw new RuntimeConfigurationError(
-          CloudSdkPanel.createErrorMessageWithLink(
-              GctBundle.message("appengine.cloudsdk.location.invalid.message")));
+          GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }
   }
 
