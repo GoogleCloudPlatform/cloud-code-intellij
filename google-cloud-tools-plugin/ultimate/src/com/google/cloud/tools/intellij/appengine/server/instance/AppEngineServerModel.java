@@ -166,7 +166,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     CloudSdkService sdkService = CloudSdkService.getInstance();
     if (sdkService.getSdkHomePath() == null) {
       throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
+          GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }
 
     try {
@@ -181,7 +181,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
               + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
     } catch (AppEngineException ex) {
       throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
+          GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }
   }
 
