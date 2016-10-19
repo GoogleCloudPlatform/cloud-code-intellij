@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.DisablePluginWarningDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
@@ -28,7 +29,6 @@ import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.wm.WindowManager;
 
@@ -39,31 +39,21 @@ import java.awt.Window;
 import javax.swing.event.HyperlinkEvent;
 
 /**
- * An ApplicationComponent that runs on application startup, and checks if the bundled (now
- * deprecated) app engine plugin is running. If so, the user is notified to disable it.
+ * Checks if conflicting any conflicting plugins are installed.
  */
-public class ConflictingAppEnginePluginCheck implements ApplicationComponent {
+public class ConflictingAppEnginePluginCheck {
 
   private static final String DEACTIVATE_LINK_HREF = "#deactivate";
   private static final String BUNDLED_PLUGIN_ID = "com.intellij.appengine";
-  private static final String COMPONENT_NAME = "Conflicting App Engine Plugin Check";
 
-  @Override
-  public void initComponent() {
+  /**
+   * Checks if the original bundled "App Engine Integration" plugin is installed. If so, the user is
+   * notified to disable it.
+   */
+  public void notifyIfConflicting() {
     if (isPluginInstalled()) {
       notifyUser(getPlugin());
     }
-  }
-
-  @Override
-  public void disposeComponent() {
-    // Do nothing.
-  }
-
-  @NotNull
-  @Override
-  public String getComponentName() {
-    return COMPONENT_NAME;
   }
 
   private boolean isPluginInstalled() {
@@ -110,7 +100,8 @@ public class ConflictingAppEnginePluginCheck implements ApplicationComponent {
         .ping();
   }
 
-  private static class IdeaAppEnginePluginLinkListener implements NotificationListener {
+  @VisibleForTesting
+  static class IdeaAppEnginePluginLinkListener implements NotificationListener {
 
     private IdeaPluginDescriptor plugin;
 
