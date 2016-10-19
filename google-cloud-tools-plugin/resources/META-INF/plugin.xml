@@ -107,9 +107,6 @@
     <component>
       <implementation-class>com.google.cloud.tools.intellij.startup.CloudToolsPluginInitializationComponent</implementation-class>
     </component>
-    <component>
-      <implementation-class>com.google.cloud.tools.intellij.appengine.AppEngineInitializationComponent</implementation-class>
-    </component>
   </application-components>
 
   <extensionPoints>
