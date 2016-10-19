@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 ## [unreleased]
 
+## [16.10.5]
+
+### Fixed
+- Fixed issue with local development server debug mode when changes are made while the server is running. ([#972](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972))
+
 ## [16.10.1]
 - Note we are changing the versioning scheme to YY.MM.i. We plan on a monthly release cadence to
 minimize the disruption of updates. Also notice we have dropped the 'Beta' label. 

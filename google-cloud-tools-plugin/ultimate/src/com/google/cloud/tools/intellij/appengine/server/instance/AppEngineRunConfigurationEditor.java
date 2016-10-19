@@ -59,7 +59,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField adminPort;
   private JTextField apiPort;
   private JComboBox applicationLogLevel;
-  private JCheckBox dontNagCheckbox;
   private JCheckBox cleadDatastoreCheckbox;
   private JPanel appEngineSettingsPanel;
   private Artifact myLastSelectedArtifact;
@@ -125,7 +124,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     adminPort.setText(intToString(serverModel.getAdminPort()));
     apiPort.setText(intToString(serverModel.getApiPort()));
     applicationLogLevel.setSelectedItem(serverModel.getLogLevel());
-    dontNagCheckbox.setSelected(serverModel.getSkipSdkUpdateCheck());
     cleadDatastoreCheckbox.setSelected(serverModel.getClearDatastore());
   }
 
@@ -145,7 +143,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     }
 
     serverModel.setLogLevel((String) applicationLogLevel.getSelectedItem());
-    serverModel.setSkipSdkUpdateCheck(dontNagCheckbox.isSelected());
     serverModel.setClearDatastore(cleadDatastoreCheckbox.isSelected());
   }
 

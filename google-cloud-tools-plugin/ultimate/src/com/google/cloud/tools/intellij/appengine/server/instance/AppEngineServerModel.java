@@ -527,7 +527,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     @Tag("devappserver_log_level")
     private String devAppserverLogLevel;
     @Tag("skip_sdk_update_check")
-    private Boolean skipSdkUpdateCheck = false;
+    private Boolean skipSdkUpdateCheck;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
     @Tag("java_home_directory")
