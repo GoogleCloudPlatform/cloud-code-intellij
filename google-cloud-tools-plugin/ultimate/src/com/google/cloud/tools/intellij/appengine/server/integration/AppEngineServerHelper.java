@@ -62,7 +62,7 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
       protected void applyEditorTo(ApplicationServerPersistentData data) {
         try {
           cloudSdkPanel.apply();
-        } catch(ConfigurationException ce) {
+        } catch (ConfigurationException ce) {
           // do nothing
         }
       }
