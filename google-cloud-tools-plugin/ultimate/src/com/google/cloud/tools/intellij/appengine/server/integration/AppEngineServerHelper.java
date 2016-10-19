@@ -54,7 +54,7 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
 
     return new ApplicationServerPersistentDataEditor<ApplicationServerPersistentData>() {
       @Override
-      protected void resetEditorFrom(ApplicationServerPersistentData s) {
+      protected void resetEditorFrom(ApplicationServerPersistentData data) {
         cloudSdkPanel.reset();
       }
 
