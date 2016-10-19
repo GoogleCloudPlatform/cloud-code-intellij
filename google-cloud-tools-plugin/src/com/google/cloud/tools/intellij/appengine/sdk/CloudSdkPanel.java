@@ -150,7 +150,7 @@ public class CloudSdkPanel {
     return cloudSdkPanel;
   }
 
-  public static String createErrorMessageWithLink(String error) {
+  private static String createErrorMessageWithLink(String error) {
     String openTag = error
         + " "
         + "<a href='"
