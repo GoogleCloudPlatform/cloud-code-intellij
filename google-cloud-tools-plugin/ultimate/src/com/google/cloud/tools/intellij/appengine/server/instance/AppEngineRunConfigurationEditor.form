@@ -30,9 +30,7 @@
         <constraints>
           <grid row="1" column="0" row-span="10" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties>
-          <visible value="true"/>
-        </properties>
+        <properties/>
         <border type="none"/>
         <children>
           <component id="e3d5c" class="javax.swing.JTextField" binding="host">
