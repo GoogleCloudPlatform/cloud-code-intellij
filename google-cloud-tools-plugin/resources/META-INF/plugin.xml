@@ -37,6 +37,10 @@
 
   <change-notes>
     <![CDATA[<html>
+      <h2>[16.10.5]</h2>
+      <ul>
+        <li>Fixed issue with local development server debug mode when changes are made while the server is running. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972">#972</a>)</li>
+      </ul>
       <h2>[16.10.1]</h2>
       <ul>
         <li>Note we are changing the versioning scheme to YY.MM.i. We plan on a monthly release cadence
