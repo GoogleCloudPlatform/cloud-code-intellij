@@ -105,10 +105,10 @@
 
   <application-components>
     <component>
-      <implementation-class>com.google.cloud.tools.intellij.appengine.AppEngineInitializationComponent</implementation-class>
+      <implementation-class>com.google.cloud.tools.intellij.startup.CloudToolsPluginInitializationComponent</implementation-class>
     </component>
     <component>
-      <implementation-class>com.google.cloud.tools.intellij.startup.ConflictingAppEnginePluginCheck</implementation-class>
+      <implementation-class>com.google.cloud.tools.intellij.appengine.AppEngineInitializationComponent</implementation-class>
     </component>
   </application-components>
 
