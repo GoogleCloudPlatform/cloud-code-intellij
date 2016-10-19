@@ -177,7 +177,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       sdk.validateAppEngineJavaComponents();
     } catch (AppEngineJavaComponentsNotInstalledException ex) {
       throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
+          GctBundle.message("appengine.cloudsdk.java.components.missing") + " "
               + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
     } catch (AppEngineException ex) {
       throw new RuntimeConfigurationError(
