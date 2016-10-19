@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij;
+package com.google.cloud.tools.intellij.startup;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
@@ -22,8 +22,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService;
+import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
+import com.google.cloud.tools.intellij.startup.CloudToolsPluginInitializationComponent;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -61,24 +65,6 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   }
 
   @Test
-  public void testInitComponent_debuggerIsEnabled() {
-    when(pluginInfoService.shouldEnable(GctFeature.DEBUGGER)).thenReturn(true);
-    testComponent.initComponent();
-    verify(pluginConfigurationService).registerExtension(isA(ExtensionPointName.class),
-        isA(CloudDebugConfigType.class));
-  }
-
-
-  @Test
-  public void testInitComponent_debuggerIsDisabled() {
-    when(pluginInfoService.shouldEnable(GctFeature.DEBUGGER)).thenReturn(false);
-    testComponent.initComponent();
-    verify(pluginConfigurationService, never())
-        .registerExtension(isA(ExtensionPointName.class),
-            isA(CloudDebugConfigType.class));
-  }
-
-  @Test
   public void testInitComponent_managedVmIsEnabled() {
     when(pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)).thenReturn(true);
     when(actionManager.getAction(anyString())).thenReturn(new DefaultActionGroup());
@@ -90,7 +76,6 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
 
   @Test
   public void testInitComponent_managedVmIsDisabled() {
-    when(pluginInfoService.shouldEnable(GctFeature.DEBUGGER)).thenReturn(false);
     testComponent.initComponent();
     verify(pluginConfigurationService, never())
         .registerExtension(isA(ExtensionPointName.class),

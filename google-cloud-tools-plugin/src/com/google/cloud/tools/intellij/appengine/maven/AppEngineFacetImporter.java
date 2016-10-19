@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.maven;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
 
 import com.intellij.facet.FacetType;
@@ -44,11 +44,11 @@ import java.util.Map;
  */
 // TODO update this to use the new maven plugin and sdk
 public class AppEngineFacetImporter extends
-    FacetImporter<AppEngineFacet, AppEngineFacetConfiguration, AppEngineFacetType> {
+    FacetImporter<AppEngineStandardFacet, AppEngineFacetConfiguration, AppEngineStandardFacetType> {
 
   public AppEngineFacetImporter() {
     super("com.google.appengine", "appengine-maven-plugin",
-        FacetType.findInstance(AppEngineFacetType.class));
+        FacetType.findInstance(AppEngineStandardFacetType.class));
   }
 
   @Nullable
@@ -65,7 +65,7 @@ public class AppEngineFacetImporter extends
   }
 
   @Override
-  protected void setupFacet(AppEngineFacet facet, MavenProject mavenProject) {
+  protected void setupFacet(AppEngineStandardFacet facet, MavenProject mavenProject) {
 
   }
 
@@ -73,7 +73,7 @@ public class AppEngineFacetImporter extends
   protected void reimportFacet(IdeModifiableModelsProvider modelsProvider,
       Module module,
       MavenRootModelAdapter rootModel,
-      AppEngineFacet facet,
+      AppEngineStandardFacet facet,
       MavenProjectsTree mavenTree,
       MavenProject mavenProject,
       MavenProjectChanges changes,

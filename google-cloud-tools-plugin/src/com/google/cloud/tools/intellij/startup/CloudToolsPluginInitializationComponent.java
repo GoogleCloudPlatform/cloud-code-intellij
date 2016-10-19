@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij;
+package com.google.cloud.tools.intellij.startup;
 
+import com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService;
+import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSourceType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineToolsMenuAction;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSourceType;
 import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSourceType;
-import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
 
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -59,10 +61,6 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
     CloudToolsPluginInfoService pluginInfoService = ServiceManager
         .getService(CloudToolsPluginInfoService.class);
 
-    if (pluginInfoService.shouldEnable(GctFeature.DEBUGGER)) {
-      initDebugger(pluginConfigurationService);
-    }
-
     if (pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)) {
       initAppEngineSupport(pluginConfigurationService);
     }
@@ -70,12 +68,6 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
       initErrorReporting(pluginConfigurationService, pluginInfoService);
     }
-  }
-
-  private void initDebugger(CloudToolsPluginConfigurationService pluginConfigurationService) {
-    pluginConfigurationService
-        .registerExtension(
-            ConfigurationType.CONFIGURATION_TYPE_EP, new CloudDebugConfigType());
   }
 
   private void initAppEngineSupport(

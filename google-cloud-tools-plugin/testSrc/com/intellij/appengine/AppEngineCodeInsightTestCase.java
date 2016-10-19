@@ -18,7 +18,7 @@ package com.intellij.appengine;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.facet.FacetManager;
@@ -87,7 +87,7 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
         CloudSdkService.class.getName(), sdkService);
 
     FacetManager
-        .getInstance(module).addFacet(AppEngineFacet.getFacetType(), "AppEngine", null);
+        .getInstance(module).addFacet(AppEngineStandardFacet.getFacetType(), "AppEngine", null);
   }
 
   public static File getWebSchemeFile() {

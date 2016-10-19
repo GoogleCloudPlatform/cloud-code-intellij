@@ -37,6 +37,49 @@
 
   <change-notes>
     <![CDATA[<html>
+      <h2>[16.10.5]</h2>
+      <ul>
+        <li>Fixed issue with local development server debug mode when changes are made while the server is running. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972">#972</a>)</li>
+      </ul>
+      <h2>[16.10.1]</h2>
+      <ul>
+        <li>Note we are changing the versioning scheme to YY.MM.i. We plan on a monthly release cadence
+          to minimize the disruption of updates. Also notice we have dropped the 'Beta' label.
+        </li>
+        <li><p>BE AWARE: The local App Engine development server is broken with the latest JDK 8
+          releases.
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/920">#920</a>).
+          This should be fixed with the next App Engine SDK release coming soon.</p>
+
+          <h3>Added</h3></li>
+        <li><p>App Engine Standard Library importer in the Facet and Project wizard.
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/866">#866</a>)
+        </p></li>
+        <li><p>Standard App Engine apps using Java 8 language level will be notified to use language
+          level 7
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/966">#966</a>)
+        </p>
+
+          <h3>Changed</h3></li>
+        <li><p>Updated run config labels and icons. (Cloud Debugger is now Stackdriver Debug)
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/936">#936</a>)
+        </p>
+
+          <h3>Fixed</h3></li>
+        <li><p>Local Development server debug mode is fixed.
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/928">#928</a>)
+        </p></li>
+        <li>Flex deployment broken on Windows 10.
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/937">#937</a>)
+        </li>
+        <li>Cloud Debugger object inspector working again.
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/929">#929</a>)
+        </li>
+        <li>Cloud Debugger snapshot timestamps causing NPE
+          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/919">#919</a>)
+        </li>
+      </ul>
+
       <h2>[1.0-beta] - 2016-09-14</h2>
       <h3>Added</h3>
       <ul>
@@ -62,7 +105,7 @@
 
   <application-components>
     <component>
-      <implementation-class>com.google.cloud.tools.intellij.CloudToolsPluginInitializationComponent</implementation-class>
+      <implementation-class>com.google.cloud.tools.intellij.startup.CloudToolsPluginInitializationComponent</implementation-class>
     </component>
   </application-components>
 
@@ -78,6 +121,8 @@
     <checkoutProvider implementation="com.google.cloud.tools.intellij.vcs.GcpCheckoutProvider"/>
     <vcsPopupProvider implementation="com.google.cloud.tools.intellij.vcs.GcpQuickListContentProvider"/>
 
+    <configurationType
+            implementation="com.google.cloud.tools.intellij.debugger.CloudDebugConfigType"/>
     <programRunner implementation="com.google.cloud.tools.intellij.debugger.CloudDebuggerRunner"/>
     <xdebugger.breakpointType implementation="com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType"/>
     <projectService serviceImplementation="com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateSerializer"/>
@@ -101,9 +146,9 @@
 
     <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType"/>
     <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory"/>
-    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetType"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineFacetConverterProvider"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineFacetMigrationConverterProvider"/>
+    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacetType"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetConverterProvider"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetMigrationConverterProvider"/>
     <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkDetector"/>
 
     <xml.schemaProvider implementation="com.google.cloud.tools.intellij.appengine.descriptor.AppEngineWebSchemaProvider"/>
@@ -164,8 +209,9 @@
                      key="unique.rest.signature.name" groupKey="inspections.group.name" enabledByDefault="true"
                      level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.RestSignatureInspection"/>
 
-    <postStartupActivity implementation="com.google.cloud.tools.intellij.PluginCompatibilityCheck"/>
-    <postStartupActivity implementation="com.google.cloud.tools.intellij.ConflictingAppEnginePluginCheck"/>
+    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.PluginCompatibilityCheck"/>
+    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.ConflictingAppEnginePluginCheck"/>
+    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.AppEngineStandardUnsupportedJavaVersionCheck"/>
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">

@@ -1,11 +1,11 @@
 /*
- * Copyright 2000-2016 JetBrains s.r.o.
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,11 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.server.run.CloudSdkStartupPolicy;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
@@ -70,11 +72,11 @@ import java.util.List;
 public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStartupOnly,
     RunConfiguration, Cloneable {
 
+  public static final String JVM_FLAG_DELIMITER = " ";
   private ArtifactPointer artifactPointer;
   private CommonModel commonModel;
   private Sdk devAppServerJdk;
   private ProjectSdksModel projectJdksModel;
-
   private AppEngineModelSettings settings = new AppEngineModelSettings();
 
   public AppEngineServerModel() {
@@ -154,21 +156,32 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       throw new RuntimeConfigurationError("Artifact isn't specified");
     }
 
-    final AppEngineFacet facet = AppEngineUtil
+    final AppEngineStandardFacet facet = AppEngineUtil
         .findAppEngineFacet(commonModel.getProject(), artifact);
     if (facet == null) {
       throw new RuntimeConfigurationWarning(
           "App Engine facet not found in '" + artifact.getName() + "' artifact");
     }
 
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+    if (sdkService.getSdkHomePath() == null) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
+    }
+
     try {
-      new CloudSdk.Builder()
-          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
-          .build()
-          .validateAppEngineJavaComponents();
+      CloudSdk sdk = new CloudSdk.Builder()
+          .sdkPath(sdkService.getSdkHomePath())
+          .build();
+      sdk.validateCloudSdk();
+      sdk.validateAppEngineJavaComponents();
     } catch (AppEngineJavaComponentsNotInstalledException ex) {
       throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.cloudsdk.java.components.missing"));
+          GctBundle.message("appengine.cloudsdk.java.components.missing") + " "
+              + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
+    } catch (AppEngineException ex) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }
   }
 
@@ -304,6 +317,10 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setLogLevel(logLevel);
   }
 
+  /**
+   * This value is being ignored for the run configuration.
+   * {@link CloudSdkStartupPolicy}
+   */
   @Override
   public Integer getMaxModuleInstances() {
     return settings.getMaxModuleInstances();
@@ -349,8 +366,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setPythonStartupArgs(pythonStartupArgs);
   }
 
-  public static final String JVM_FLAG_DELIMITER = " ";
-
   @Override
   public List<String> getJvmFlags() {
     return settings.getJvmFlags() != null
@@ -358,19 +373,10 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
         : new ArrayList<String>();
   }
 
-  public void addJvmFlag(String flag) {
-    settings.setJvmFlags(settings.getJvmFlags() == null
-        ? flag : settings.getJvmFlags() + JVM_FLAG_DELIMITER + flag);
-  }
-
   public void addAllJvmFlags(Collection<String> flags) {
     settings.setJvmFlags(settings.getJvmFlags() == null
         ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
         : settings.getJvmFlags() + JVM_FLAG_DELIMITER + Joiner.on(JVM_FLAG_DELIMITER).join(flags));
-  }
-
-  public void setJvmFlags(String jvmFlags) {
-    settings.setJvmFlags(jvmFlags);
   }
 
   @Override
@@ -459,6 +465,14 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setJavaHomeDir(devAppServerJdk.getHomePath());
   }
 
+  public Boolean getClearDatastore() {
+    return settings.isClearDatastore();
+  }
+
+  public void setClearDatastore(Boolean clearDatastore) {
+    settings.setClearDatastore(clearDatastore);
+  }
+
   /**
    * This class is used to serialize run/debug config settings. It only supports basic types (e.g.,
    * int, String, etc.).
@@ -473,19 +487,19 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private String artifact;
 
     @Tag("host")
-    private String host;
+    private String host = "localhost";
     @Tag("port")
     private Integer port = 8080;
     @Tag("admin_host")
-    private String adminHost;
+    private String adminHost = "localhost";
     @Tag("admin_port")
-    private Integer adminPort;
+    private Integer adminPort = 8000;
     @Tag("auth_domain")
     private String authDomain;
     @Tag("storage_path")
     private String storagePath;
     @Tag("log_level")
-    private String logLevel;
+    private String logLevel = "info";
     @Tag("max_module_instances")
     private Integer maxModuleInstances;
     @Tag("use_mtime_file_watcher")
@@ -507,198 +521,208 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     @Tag("api_port")
     private Integer apiPort;
     @Tag("automatic_restart")
-    private boolean automaticRestart;
+    private Boolean automaticRestart = true;
+    @Tag("clear_datastore")
+    private Boolean clearDatastore = false;
     @Tag("devappserver_log_level")
     private String devAppserverLogLevel;
     @Tag("skip_sdk_update_check")
-    private boolean skipSdkUpdateCheck;
+    private Boolean skipSdkUpdateCheck;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
     @Tag("java_home_directory")
     private String javaHomeDir;
 
-    public String getArtifact() {
+    String getArtifact() {
       return artifact;
     }
 
-    public void setArtifact(String artifact) {
+    void setArtifact(String artifact) {
       this.artifact = artifact;
     }
 
-    public String getHost() {
+    String getHost() {
       return host;
     }
 
-    public void setHost(String host) {
+    void setHost(String host) {
       this.host = host;
     }
 
-    public Integer getPort() {
+    Integer getPort() {
       return port;
     }
 
-    public void setPort(Integer port) {
+    void setPort(Integer port) {
       this.port = port;
     }
 
-    public String getAdminHost() {
+    String getAdminHost() {
       return adminHost;
     }
 
-    public void setAdminHost(String adminHost) {
+    void setAdminHost(String adminHost) {
       this.adminHost = adminHost;
     }
 
-    public Integer getAdminPort() {
+    Integer getAdminPort() {
       return adminPort;
     }
 
-    public void setAdminPort(Integer adminPort) {
+    void setAdminPort(Integer adminPort) {
       this.adminPort = adminPort;
     }
 
-    public String getAuthDomain() {
+    String getAuthDomain() {
       return authDomain;
     }
 
-    public void setAuthDomain(String authDomain) {
+    void setAuthDomain(String authDomain) {
       this.authDomain = authDomain;
     }
 
-    public String getStoragePath() {
+    String getStoragePath() {
       return storagePath;
     }
 
-    public void setStoragePath(String storagePath) {
+    void setStoragePath(String storagePath) {
       this.storagePath = storagePath;
     }
 
-    public String getLogLevel() {
+    String getLogLevel() {
       return logLevel;
     }
 
-    public void setLogLevel(String logLevel) {
+    void setLogLevel(String logLevel) {
       this.logLevel = logLevel;
     }
 
-    public Integer getMaxModuleInstances() {
+    Integer getMaxModuleInstances() {
       return maxModuleInstances;
     }
 
-    public void setMaxModuleInstances(Integer maxModuleInstances) {
+    void setMaxModuleInstances(Integer maxModuleInstances) {
       this.maxModuleInstances = maxModuleInstances;
     }
 
-    public boolean isUseMtimeFileWatcher() {
+    Boolean isUseMtimeFileWatcher() {
       return useMtimeFileWatcher;
     }
 
-    public void setUseMtimeFileWatcher(boolean useMtimeFileWatcher) {
+    void setUseMtimeFileWatcher(boolean useMtimeFileWatcher) {
       this.useMtimeFileWatcher = useMtimeFileWatcher;
     }
 
-    public String getThreadsafeOverride() {
+    String getThreadsafeOverride() {
       return threadsafeOverride;
     }
 
-    public void setThreadsafeOverride(String threadsafeOverride) {
+    void setThreadsafeOverride(String threadsafeOverride) {
       this.threadsafeOverride = threadsafeOverride;
     }
 
-    public String getPythonStartupScript() {
+    String getPythonStartupScript() {
       return pythonStartupScript;
     }
 
-    public void setPythonStartupScript(String pythonStartupScript) {
+    void setPythonStartupScript(String pythonStartupScript) {
       this.pythonStartupScript = pythonStartupScript;
     }
 
-    public String getPythonStartupArgs() {
+    String getPythonStartupArgs() {
       return pythonStartupArgs;
     }
 
-    public void setPythonStartupArgs(String pythonStartupArgs) {
+    void setPythonStartupArgs(String pythonStartupArgs) {
       this.pythonStartupArgs = pythonStartupArgs;
     }
 
-    public String getJvmFlags() {
+    String getJvmFlags() {
       return jvmFlags;
     }
 
-    public void setJvmFlags(String jvmFlags) {
+    void setJvmFlags(String jvmFlags) {
       this.jvmFlags = jvmFlags;
     }
 
-    public String getCustomEntrypoint() {
+    String getCustomEntrypoint() {
       return customEntrypoint;
     }
 
-    public void setCustomEntrypoint(String customEntrypoint) {
+    void setCustomEntrypoint(String customEntrypoint) {
       this.customEntrypoint = customEntrypoint;
     }
 
-    public String getRuntime() {
+    String getRuntime() {
       return runtime;
     }
 
-    public void setRuntime(String runtime) {
+    void setRuntime(String runtime) {
       this.runtime = runtime;
     }
 
-    public boolean isAllowSkippedFiles() {
+    Boolean isAllowSkippedFiles() {
       return allowSkippedFiles;
     }
 
-    public void setAllowSkippedFiles(boolean allowSkippedFiles) {
+    void setAllowSkippedFiles(boolean allowSkippedFiles) {
       this.allowSkippedFiles = allowSkippedFiles;
     }
 
-    public Integer getApiPort() {
+    Integer getApiPort() {
       return apiPort;
     }
 
-    public void setApiPort(Integer apiPort) {
+    void setApiPort(Integer apiPort) {
       this.apiPort = apiPort;
     }
 
-    public boolean isAutomaticRestart() {
+    Boolean isAutomaticRestart() {
       return automaticRestart;
     }
 
-    public void setAutomaticRestart(boolean automaticRestart) {
+    void setAutomaticRestart(boolean automaticRestart) {
       this.automaticRestart = automaticRestart;
     }
 
-    public String getDevAppserverLogLevel() {
+    String getDevAppserverLogLevel() {
       return devAppserverLogLevel;
     }
 
-    public void setDevAppserverLogLevel(String devAppserverLogLevel) {
+    void setDevAppserverLogLevel(String devAppserverLogLevel) {
       this.devAppserverLogLevel = devAppserverLogLevel;
     }
 
-    public boolean isSkipSdkUpdateCheck() {
+    Boolean isSkipSdkUpdateCheck() {
       return skipSdkUpdateCheck;
     }
 
-    public void setSkipSdkUpdateCheck(boolean skipSdkUpdateCheck) {
+    void setSkipSdkUpdateCheck(boolean skipSdkUpdateCheck) {
       this.skipSdkUpdateCheck = skipSdkUpdateCheck;
     }
 
-    public String getDefaultGcsBucketName() {
+    String getDefaultGcsBucketName() {
       return defaultGcsBucketName;
     }
 
-    public void setDefaultGcsBucketName(String defaultGcsBucketName) {
+    void setDefaultGcsBucketName(String defaultGcsBucketName) {
       this.defaultGcsBucketName = defaultGcsBucketName;
     }
 
-    public String getJavaHomeDir() {
+    String getJavaHomeDir() {
       return javaHomeDir;
     }
 
-    public void setJavaHomeDir(String javaHomeDir) {
+    void setJavaHomeDir(String javaHomeDir) {
       this.javaHomeDir = javaHomeDir;
+    }
+
+    Boolean isClearDatastore() {
+      return clearDatastore;
+    }
+
+    void setClearDatastore(boolean clearDatastore) {
+      this.clearDatastore = clearDatastore;
     }
 
     @Override

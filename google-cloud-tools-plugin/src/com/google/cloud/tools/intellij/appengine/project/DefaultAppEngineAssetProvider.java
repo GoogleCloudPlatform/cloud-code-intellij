@@ -18,7 +18,8 @@ package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Booleans;
 
@@ -65,21 +66,32 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
           project, "appengine-web.xml", module.getModuleContentScope()));
     }
 
-    Iterables.filter(appEngineWebXmls, Predicates.notNull());
+    VirtualFile appEngineWebXml = findHighestPriorityAppEngineWebXml(appEngineWebXmls);
 
-    if (appEngineWebXmls.size() > 1) {
+    if (appEngineWebXml != null) {
+      return (XmlFile) PsiManager.getInstance(project).findFile(appEngineWebXml);
+    }
+    return null;
+  }
+
+  @Nullable
+  @VisibleForTesting
+  VirtualFile findHighestPriorityAppEngineWebXml(List<VirtualFile> appEngineWebXmls) {
+    List<VirtualFile> nonNulls = Lists.newArrayList();
+    // filter null list entries
+    nonNulls.addAll(Collections2.filter(appEngineWebXmls, Predicates.notNull()));
+
+    if (nonNulls.size() > 1) {
       // Prefer the appengine-web.xml located under the WEB-INF directory
-      Collections.sort(appEngineWebXmls, new AppEngineWebXmlOrdering());
+      Collections.sort(nonNulls, new AppEngineWebXmlOrdering());
 
-      logger.warn("The following appengine-web.xml's were found: " + appEngineWebXmls
+      logger.warn("The following appengine-web.xml's were found: " + nonNulls
           + "\nThe first one in the list will be used.");
     }
 
-    if (!appEngineWebXmls.isEmpty()) {
-      VirtualFile appEngineWebXml = appEngineWebXmls.iterator().next();
-      return (XmlFile) PsiManager.getInstance(project).findFile(appEngineWebXml);
+    if (!nonNulls.isEmpty()) {
+      return nonNulls.get(0);
     }
-
     return null;
   }
 

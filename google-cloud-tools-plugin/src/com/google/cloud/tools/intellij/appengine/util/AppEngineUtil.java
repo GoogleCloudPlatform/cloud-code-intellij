@@ -20,7 +20,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeployme
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSource;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
@@ -93,7 +93,8 @@ public class AppEngineUtil {
       Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
       for (Artifact artifact : artifacts) {
         if ((isStandardModule && projectService.isAppEngineStandardArtifactType(artifact))
-            || (environment.isFlexible() && projectService.isAppEngineFlexArtifactType(artifact))) {
+            || (!isFlexCompat && environment.isFlexible()
+                  && projectService.isAppEngineFlexArtifactType(artifact))) {
           sources.add(createArtifactDeploymentSource(project, artifact, environment));
         }
       }
@@ -123,17 +124,18 @@ public class AppEngineUtil {
     boolean hasStandardModules = false;
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
-      AppEngineEnvironment environment =
-          projectService.getModuleAppEngineEnvironment(
-              assetProvider.loadAppEngineStandardWebXml(
-                  project, Collections.singletonList(module)));
+      XmlFile appEngineWebXml = assetProvider.loadAppEngineStandardWebXml(
+          project, Collections.singletonList(module));
+
+      AppEngineEnvironment environment
+          = projectService.getModuleAppEngineEnvironment(appEngineWebXml);
 
       if (ModuleType.is(module, JavaModuleType.getModuleType())
           && projectService.isJarOrWarMavenBuild(module)) {
         moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module, environment));
       }
 
-      if (environment == AppEngineEnvironment.APP_ENGINE_STANDARD) {
+      if (environment.isStandard() || projectService.isFlexCompat(appEngineWebXml)) {
         hasStandardModules = true;
       }
     }
@@ -165,16 +167,17 @@ public class AppEngineUtil {
   }
 
   @Nullable
-  public static AppEngineFacet findAppEngineFacet(@NotNull Project project,
+  public static AppEngineStandardFacet findAppEngineFacet(@NotNull Project project,
       @NotNull Artifact artifact) {
     // TODO(joaomartins): Find out why the GAE facet isn't being added to Gradle projects.
     // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/835
     final Set<Module> modules = ArtifactUtil
         .getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
     for (Module module : modules) {
-      final AppEngineFacet appEngineFacet = AppEngineFacet.getAppEngineFacetByModule(module);
-      if (appEngineFacet != null) {
-        return appEngineFacet;
+      final AppEngineStandardFacet appEngineStandardFacet
+          = AppEngineStandardFacet.getAppEngineFacetByModule(module);
+      if (appEngineStandardFacet != null) {
+        return appEngineStandardFacet;
       }
     }
     return null;

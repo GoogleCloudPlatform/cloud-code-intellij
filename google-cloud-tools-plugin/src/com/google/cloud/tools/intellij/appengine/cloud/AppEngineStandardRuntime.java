@@ -13,17 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.cloud.tools.intellij.appengine.migration;
 
-import java.io.IOException;
+package com.google.cloud.tools.intellij.appengine.cloud;
 
-/**
- * Unit tests for {@link com.google.cloud.tools.intellij.appengine.migration.AppEngineFacetConverterProvider}
- */
-public class AppEngineFacetConverterTest extends BaseConverterTest {
+import org.jetbrains.annotations.Nullable;
 
-  public void testConvert() throws IOException {
-    testConvert("conversion/appEngineFacet");
+public enum AppEngineStandardRuntime {
+
+  JAVA_8("java8");
+
+  private String label;
+
+  AppEngineStandardRuntime(String label) {
+    this.label = label;
+  }
+
+  public boolean isJava8() {
+    return this == JAVA_8;
+  }
+
+  public String getLabel() {
+    return this.label;
+  }
+
+  @Nullable
+  public static AppEngineStandardRuntime fromLabel(String label) {
+    switch (label) {
+      case "java8":
+        return AppEngineStandardRuntime.JAVA_8;
+      default:
+        return null;
+    }
+
   }
 
 }

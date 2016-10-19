@@ -16,6 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.server.run;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRunTask;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
@@ -63,16 +66,26 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           @Override
           public OSProcessHandler createProcessHandler(
               String workingDirectory, Map<String, String> envVariables) throws ExecutionException {
+
             CloudSdkService sdkService = CloudSdkService.getInstance();
-            if (sdkService.getSdkHomePath() == null
-                || sdkService.getSdkHomePath().toString().isEmpty()) {
+            if (sdkService.getSdkHomePath() == null) {
               throw new ExecutionException(
-                  GctBundle.message("appengine.cloudsdk.location.missing.message"));
+                  GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
             }
 
-            if (sdkService == null) {
+            try {
+              CloudSdk sdk = new CloudSdk.Builder()
+                  .sdkPath(sdkService.getSdkHomePath())
+                  .build();
+              sdk.validateCloudSdk();
+              sdk.validateAppEngineJavaComponents();
+            } catch (AppEngineJavaComponentsNotInstalledException ex) {
               throw new ExecutionException(
-                  GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
+                  GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
+                      + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
+            } catch (AppEngineException ex) {
+              throw new ExecutionException(
+                  GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
             }
 
             AppEngineServerModel runConfiguration;
@@ -85,12 +98,16 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             }
 
             // This is the place we have access to the debug jvm flags provided by IJ in the
-            // Startup/Shutdown tab. We need to add it here.
+            // Startup/Shutdown tab. We need to add them here.
             String jvmDebugFlag = envVariables.get("");
             if (jvmDebugFlag != null) {
               runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
               // prevent multiple JVMs from being created to make debugging deterministic
               runConfiguration.setMaxModuleInstances(1);
+              // If debuggee JVMs restart after HotSwap, debug connection is lost, debug server
+              // down and doesn't come back up. Flag is set to true by default, need to set it to
+              // false here. https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972
+              runConfiguration.setAutomaticRestart(false);
             }
 
             AppEngineStandardRunTask runTask =
@@ -99,11 +116,6 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             executor.run();
 
             Process devappserverProcess = executor.getProcess();
-            if (devappserverProcess == null) {
-              throw new ExecutionException(
-                  GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
-                      + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
-            }
             startupProcessHandler = new OSProcessHandler(devappserverProcess,
                 GctBundle.getString("appengine.run.startupscript"));
             return startupProcessHandler;

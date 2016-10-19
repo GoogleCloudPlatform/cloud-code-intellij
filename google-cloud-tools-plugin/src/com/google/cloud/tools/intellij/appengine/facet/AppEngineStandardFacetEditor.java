@@ -68,7 +68,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   }
 
   public String getDisplayName() {
-    return GctBundle.message("appengine.facet.name");
+    return GctBundle.message("appengine.standard.facet.name");
   }
 
   @NotNull
@@ -117,7 +117,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   public void reset() {
     if (appEngineStandardLibraryPanel.isEnabled()) {
       appEngineStandardLibraryPanel
-          .setSelectLibraries(facetConfiguration.getLibraries(context.getProject()));
+          .setSelectedLibraries(facetConfiguration.getLibraries(context.getProject()));
     }
   }
 
@@ -141,7 +141,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
     // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
     // Framework discovered "Configure" popup.
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_ADD_FACET)
+        .trackEvent(GctTracking.APP_ENGINE_ADD_STANDARD_FACET)
         .withLabel("setOnModule")
         .ping();
   }
@@ -165,8 +165,14 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     @Override
     public void afterLibraryAdded(final Library addedLibrary) {
-      final DependencyScope scope = AppEngineStandardMavenLibrary
-          .getLibraryByMavenDisplayName(addedLibrary.getName()).getScope();
+      AppEngineStandardMavenLibrary library = AppEngineStandardMavenLibrary
+          .getLibraryByMavenDisplayName(addedLibrary.getName());
+
+      if (library == null) {
+        return;
+      }
+
+      final DependencyScope scope = library.getScope();
 
       new WriteAction() {
         @Override
@@ -186,7 +192,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
       }.execute();
 
       Artifact artifact = AppEngineSupportProvider
-          .findOrCreateWebArtifact((AppEngineFacet) context.getFacet());
+          .findOrCreateWebArtifact((AppEngineStandardFacet) context.getFacet());
       AppEngineWebIntegration.getInstance()
           .addLibraryToArtifact(addedLibrary, artifact, context.getProject());
 
@@ -197,9 +203,12 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     @Override
     public void afterLibraryRemoved(Library removedLibrary) {
-      appEngineStandardLibraryPanel.toggleLibrary(
-          AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(removedLibrary.getName()),
-          false /* select */);
+      AppEngineStandardMavenLibrary library = AppEngineStandardMavenLibrary
+          .getLibraryByMavenDisplayName(removedLibrary.getName());
+
+      if (library != null) {
+        appEngineStandardLibraryPanel.toggleLibrary(library, false /* select */);
+      }
     }
 
     @Override

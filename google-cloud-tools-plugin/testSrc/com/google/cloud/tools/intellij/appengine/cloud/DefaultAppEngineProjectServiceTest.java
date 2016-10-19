@@ -98,12 +98,33 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
         appEngineProjectService.getModuleAppEngineEnvironment(envFlexWebXml));
   }
 
+  public void testGetAppEngineStandardDeclaredRuntime_NullArg() {
+    assertNull(appEngineProjectService.getAppEngineStandardDeclaredRuntime(null));
+  }
+
+  public void testGetAppEngineStandardDeclaredRuntime_NoneDeclared() {
+    XmlFile appEngineWebXml = loadTestWebXml("testData/descriptor/appengine-web.xml");
+    assertNull(appEngineProjectService.getAppEngineStandardDeclaredRuntime(appEngineWebXml));
+  }
+
+  public void testGetAppEngineStandardDeclaredRuntime_Java8() {
+    XmlFile appEngineWebXml = loadTestWebXml("testData/descriptor/appengine-web_runtime-java8.xml");
+    assertEquals(AppEngineStandardRuntime.JAVA_8,
+        appEngineProjectService.getAppEngineStandardDeclaredRuntime(appEngineWebXml));
+  }
+
+  public void testGetAppEngineStandardDeclaredRuntime_Invalid() {
+    XmlFile appEngineWebXml = loadTestWebXml(
+        "testData/descriptor/appengine-web_runtime-invalid.xml");
+    assertNull(appEngineProjectService.getAppEngineStandardDeclaredRuntime(appEngineWebXml));
+  }
+
   private void addAppEngineFacet(final Module module) {
     new WriteAction() {
       @Override
       protected void run(@NotNull Result result) throws Throwable {
         FacetManager.getInstance(module).addFacet(
-            new AppEngineFacetTestType(), "Google App Engine", null);
+            new AppEngineFacetTestType(), "Google App Engine Standard", null);
       }
     }.execute();
   }

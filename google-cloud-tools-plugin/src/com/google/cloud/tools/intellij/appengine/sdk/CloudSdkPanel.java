@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -35,6 +36,7 @@ import java.nio.file.Paths;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 
 /**
@@ -43,12 +45,19 @@ import javax.swing.event.DocumentEvent;
 public class CloudSdkPanel {
 
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
-  private JLabel warningMessage;
+  private JTextPane warningMessage;
   private JPanel cloudSdkPanel;
+  private JLabel warningIcon;
+
+  private static final String CLOUD_SDK_DOWNLOAD_LINK = "https://cloud.google.com/sdk/docs/"
+      + "#install_the_latest_cloud_tools_version_cloudsdk_current_version";
 
   public CloudSdkPanel() {
     warningMessage.setVisible(false);
-    warningMessage.setIcon(RunConfigurations.ConfigurationWarning);
+    warningMessage.setBackground(cloudSdkPanel.getBackground());
+    warningMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+    warningIcon.setVisible(false);
+    warningIcon.setIcon(RunConfigurations.ConfigurationWarning);
 
     cloudSdkDirectoryField.addBrowseFolderListener(
         GctBundle.message("appengine.cloudsdk.location.browse.window.title"),
@@ -72,9 +81,12 @@ public class CloudSdkPanel {
     String path = cloudSdkDirectoryField.getText();
 
     if (StringUtil.isEmpty(path)) {
+      warningIcon.setVisible(true);
       warningMessage.setVisible(true);
       warningMessage.setText(
-          GctBundle.message("appengine.cloudsdk.location.missing.message"));
+          createErrorMessageWithLink(
+              GctBundle.message("appengine.cloudsdk.location.missing.message")));
+
       return;
     }
 
@@ -85,11 +97,15 @@ public class CloudSdkPanel {
           .validateCloudSdk();
 
       cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
+      warningIcon.setVisible(false);
       warningMessage.setVisible(false);
     } catch (AppEngineException aee) {
       cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
+      warningIcon.setVisible(true);
       warningMessage.setVisible(true);
-      warningMessage.setText(GctBundle.message("appengine.cloudsdk.location.invalid.message"));
+      warningMessage.setText(
+          createErrorMessageWithLink(
+              GctBundle.message("appengine.cloudsdk.location.invalid.message")));
     }
   }
 
@@ -99,7 +115,7 @@ public class CloudSdkPanel {
   }
 
   @VisibleForTesting
-  JLabel getWarningMessage() {
+  JTextPane getWarningMessage() {
     return warningMessage;
   }
 
@@ -132,5 +148,16 @@ public class CloudSdkPanel {
   @NotNull
   public JPanel getComponent() {
     return cloudSdkPanel;
+  }
+
+  private static String createErrorMessageWithLink(String error) {
+    String openTag = error
+        + " "
+        + "<a href='"
+        + CLOUD_SDK_DOWNLOAD_LINK
+        + "'>";
+
+    return GctBundle.message("appengine.cloudsdk.download.message",
+        openTag, "</a>");
   }
 }

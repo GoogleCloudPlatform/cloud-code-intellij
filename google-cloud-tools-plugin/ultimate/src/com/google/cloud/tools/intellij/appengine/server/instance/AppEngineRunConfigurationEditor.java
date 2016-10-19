@@ -1,11 +1,11 @@
 /*
- * Copyright 2000-2016 JetBrains s.r.o.
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.base.Joiner;
 
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.options.ConfigurationException;
@@ -27,8 +26,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
+import com.intellij.ui.IdeBorderFactory.PlainSmallWithoutIndent;
 import com.intellij.ui.PanelWithAnchor;
-import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.ui.components.JBLabel;
 
 import org.jetbrains.annotations.NotNull;
@@ -48,31 +47,21 @@ import javax.swing.JTextField;
 public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel> implements
     PanelWithAnchor {
 
-  private JPanel myMainPanel;
-  private JComboBox myArtifactComboBox;
-  private JTextField port;
-  private RawCommandLineEditor jvmFlags;
-  private JBLabel myWebArtifactToDeployLabel;
-  private JBLabel myPortLabel;
-  private JBLabel myServerParametersLabel;
   private final Project myProject;
-  private Artifact myLastSelectedArtifact;
+  private JPanel myMainPanel;
   private JComponent anchor;
-  private JTextField authDomain;
-  private JTextField storagePath;
+  private JBLabel myWebArtifactToDeployLabel;
+  private JComboBox myArtifactComboBox;
+  private JTextField host;
+  private JBLabel myPortLabel;
+  private JTextField port;
   private JTextField adminHost;
   private JTextField adminPort;
   private JTextField apiPort;
-  private JTextField host;
-  private JComboBox logLevel;
-  private JCheckBox useMtimeFileWatcher;
-  private JTextField threadsafeOverride;
-  private JCheckBox allowSkippedFiles;
-  private JCheckBox automaticRestart;
-  private JComboBox devappserverLogLevel;
-  private JCheckBox skipSdkUpdateCheck;
-  private JTextField gcsBucketName;
-  // TODO(joaomartins): Change "Advanced Settings" to a collapsable drop down, like Before Launch.
+  private JComboBox applicationLogLevel;
+  private JCheckBox cleadDatastoreCheckbox;
+  private JPanel appEngineSettingsPanel;
+  private Artifact myLastSelectedArtifact;
 
   public AppEngineRunConfigurationEditor(Project project) {
     myProject = project;
@@ -83,6 +72,13 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     });
 
     setAnchor(myWebArtifactToDeployLabel);
+    appEngineSettingsPanel.setBorder(PlainSmallWithoutIndent.createTitledBorder(
+        null /* border - ignored */,
+        GctBundle.message("appengine.run.settings.title.label"),
+        0 /* titleJustification - ignored */,
+        0 /* titlePosition - ignored */,
+        null /* titleFont - ignored */,
+        null /* titleColor - ignored */));
   }
 
   private void onArtifactChanged() {
@@ -108,6 +104,9 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
    * server in debug mode. See
    * <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/928">#928</a>
    * </li>
+   * <li> automaticRestart - it is set to false so that HotSwap doesn't break IJ's debug server.
+   * <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972">#927</a>.
+   * </li>
    * </ul>
    */
   protected void resetEditorFrom(CommonModel commonModel) {
@@ -123,20 +122,9 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     host.setText(serverModel.getHost());
     adminHost.setText(serverModel.getAdminHost());
     adminPort.setText(intToString(serverModel.getAdminPort()));
-    authDomain.setText(serverModel.getAuthDomain());
-    storagePath.setText(serverModel.getStoragePath());
-    logLevel.setSelectedItem(serverModel.getLogLevel());
-    useMtimeFileWatcher.setSelected(serverModel.getUseMtimeFileWatcher());
-    threadsafeOverride.setText(serverModel.getThreadsafeOverride());
-    jvmFlags.setDialogCaption(GctBundle.getString("appengine.run.jvmflags.title"));
-    jvmFlags.setText(Joiner.on(AppEngineServerModel.JVM_FLAG_DELIMITER)
-        .join(serverModel.getJvmFlags()));
-    allowSkippedFiles.setSelected(serverModel.getAllowSkippedFiles());
     apiPort.setText(intToString(serverModel.getApiPort()));
-    automaticRestart.setSelected(serverModel.getAutomaticRestart());
-    devappserverLogLevel.setSelectedItem(serverModel.getDevAppserverLogLevel());
-    skipSdkUpdateCheck.setSelected(serverModel.getSkipSdkUpdateCheck());
-    gcsBucketName.setText(serverModel.getDefaultGcsBucketName());
+    applicationLogLevel.setSelectedItem(serverModel.getLogLevel());
+    cleadDatastoreCheckbox.setSelected(serverModel.getClearDatastore());
   }
 
   protected void applyEditorTo(CommonModel commonModel) throws ConfigurationException {
@@ -149,20 +137,13 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     if (!adminPort.getText().isEmpty()) {
       serverModel.setAdminPort(validateInteger(adminPort.getText(), "admin port"));
     }
-    serverModel.setAuthDomain(authDomain.getText());
-    serverModel.setStoragePath(storagePath.getText());
-    serverModel.setLogLevel((String) logLevel.getSelectedItem());
-    serverModel.setUseMtimeFileWatcher(useMtimeFileWatcher.isSelected());
-    serverModel.setThreadsafeOverride(threadsafeOverride.getText());
-    serverModel.setJvmFlags(jvmFlags.getText());
-    serverModel.setAllowSkippedFiles(allowSkippedFiles.isSelected());
+
     if (!apiPort.getText().isEmpty()) {
       serverModel.setApiPort(validateInteger(apiPort.getText(), "API port"));
     }
-    serverModel.setAutomaticRestart(automaticRestart.isSelected());
-    serverModel.setDevAppserverLogLevel((String) devappserverLogLevel.getSelectedItem());
-    serverModel.setSkipSdkUpdateCheck(skipSdkUpdateCheck.isSelected());
-    serverModel.setDefaultGcsBucketName(gcsBucketName.getText());
+
+    serverModel.setLogLevel((String) applicationLogLevel.getSelectedItem());
+    serverModel.setClearDatastore(cleadDatastoreCheckbox.isSelected());
   }
 
   private Integer validateInteger(String intText, String description)
@@ -182,7 +163,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private Artifact getSelectedArtifact() {
     return (Artifact) myArtifactComboBox.getSelectedItem();
   }
-
+  
   @NotNull
   protected JComponent createEditor() {
     AppEngineUtil.setupAppEngineArtifactCombobox(myProject, myArtifactComboBox, false);
@@ -199,6 +180,5 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     this.anchor = anchor;
     myWebArtifactToDeployLabel.setAnchor(anchor);
     myPortLabel.setAnchor(anchor);
-    myServerParametersLabel.setAnchor(anchor);
   }
 }

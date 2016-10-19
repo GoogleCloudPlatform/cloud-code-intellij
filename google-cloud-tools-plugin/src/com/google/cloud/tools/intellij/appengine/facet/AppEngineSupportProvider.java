@@ -57,6 +57,7 @@ import com.intellij.packaging.artifacts.ArtifactType;
 import com.intellij.packaging.elements.ArtifactRootElement;
 import com.intellij.packaging.elements.PackagingElementFactory;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
+import com.intellij.util.PlatformUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,13 +96,17 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
   @Override
   public boolean isEnabledForModuleType(@NotNull ModuleType moduleType) {
-    return moduleType instanceof JavaModuleType;
+    if (PlatformUtils.isIdeaUltimate()) {
+      return moduleType instanceof JavaModuleType;
+    } else {
+      return false;
+    }
   }
 
   @Override
   public boolean isSupportAlreadyAdded(@NotNull Module module,
       @NotNull FacetsProvider facetsProvider) {
-    return !facetsProvider.getFacetsByType(module, AppEngineFacet.ID).isEmpty();
+    return !facetsProvider.getFacetsByType(module, AppEngineStandardFacet.ID).isEmpty();
   }
 
   @Nullable
@@ -129,13 +134,13 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       final ModifiableRootModel rootModel,
       FrameworkSupportModel frameworkSupportModel,
       Set<AppEngineStandardMavenLibrary> librariesToAdd) {
-    FacetType<AppEngineFacet, AppEngineFacetConfiguration> facetType = AppEngineFacet
-        .getFacetType();
-    AppEngineFacet appEngineFacet = FacetManager.getInstance(module)
+    FacetType<AppEngineStandardFacet, AppEngineFacetConfiguration> facetType
+        = AppEngineStandardFacet.getFacetType();
+    AppEngineStandardFacet appEngineStandardFacet = FacetManager.getInstance(module)
         .addFacet(facetType, facetType.getDefaultFacetName(), null);
     AppEngineWebIntegration webIntegration = AppEngineWebIntegration.getInstance();
-    webIntegration.registerFrameworkInModel(frameworkSupportModel, appEngineFacet);
-    final Artifact webArtifact = findOrCreateWebArtifact(appEngineFacet);
+    webIntegration.registerFrameworkInModel(frameworkSupportModel, appEngineStandardFacet);
+    final Artifact webArtifact = findOrCreateWebArtifact(appEngineStandardFacet);
 
     final VirtualFile webDescriptorDir = webIntegration
         .suggestParentDirectoryForAppEngineWebXml(module, rootModel);
@@ -152,8 +157,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
   }
 
   @NotNull
-  static Artifact findOrCreateWebArtifact(AppEngineFacet appEngineFacet) {
-    Module module = appEngineFacet.getModule();
+  static Artifact findOrCreateWebArtifact(AppEngineStandardFacet appEngineStandardFacet) {
+    Module module = appEngineStandardFacet.getModule();
     ArtifactType webArtifactType = AppEngineWebIntegration.getInstance()
         .getAppEngineWebArtifactType();
     final Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);

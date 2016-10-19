@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRuntime;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
@@ -67,6 +68,14 @@ public abstract class AppEngineProjectService {
       @Nullable XmlFile appEngineWebXml);
 
   /**
+   * Returns the declared {@link AppEngineStandardRuntime} in appengine-web.xml. If there is no
+   * appengine-web.xml, or if no runtime is declared, returns null.
+   */
+  @Nullable
+  public abstract AppEngineStandardRuntime getAppEngineStandardDeclaredRuntime(
+      @Nullable XmlFile appengineWebXml);
+
+  /**
    * {@code true} if the artifact type is an exploded-war.
    */
   public abstract boolean isAppEngineStandardArtifactType(@NotNull Artifact artifact);
@@ -91,4 +100,5 @@ public abstract class AppEngineProjectService {
    * Determines if the module has jar or war packaging and is buildable by Maven.
    */
   public abstract boolean isJarOrWarMavenBuild(@NotNull Module module);
+
 }
