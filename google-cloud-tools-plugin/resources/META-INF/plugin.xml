@@ -117,6 +117,8 @@
     <checkoutProvider implementation="com.google.cloud.tools.intellij.vcs.GcpCheckoutProvider"/>
     <vcsPopupProvider implementation="com.google.cloud.tools.intellij.vcs.GcpQuickListContentProvider"/>
 
+    <configurationType
+            implementation="com.google.cloud.tools.intellij.debugger.CloudDebugConfigType"/>
     <programRunner implementation="com.google.cloud.tools.intellij.debugger.CloudDebuggerRunner"/>
     <xdebugger.breakpointType implementation="com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType"/>
     <projectService serviceImplementation="com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateSerializer"/>
