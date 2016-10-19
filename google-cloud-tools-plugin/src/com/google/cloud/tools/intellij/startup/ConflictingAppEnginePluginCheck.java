@@ -30,6 +30,7 @@ import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.extensions.PluginId;
+import com.intellij.openapi.ui.popup.util.PopupUtil;
 import com.intellij.openapi.wm.WindowManager;
 
 import org.jetbrains.annotations.NotNull;
@@ -123,9 +124,8 @@ public class ConflictingAppEnginePluginCheck {
     }
 
     private void showDisablePluginDialog() {
-      Window parent = WindowManager.getInstance().suggestParentWindow(null);
       DisablePluginWarningDialog dialog = new DisablePluginWarningDialog(plugin.getPluginId(),
-          parent);
+          PopupUtil.getActiveComponent());
       dialog.showAndDisablePlugin();
     }
   }
