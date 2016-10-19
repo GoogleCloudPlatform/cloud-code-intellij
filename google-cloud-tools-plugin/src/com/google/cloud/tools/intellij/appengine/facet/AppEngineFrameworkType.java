@@ -48,7 +48,7 @@ public class AppEngineFrameworkType extends FrameworkTypeEx {
   @NotNull
   @Override
   public String getPresentableName() {
-    return "Google App Engine";
+    return "Google App Engine Standard";
   }
 
   @NotNull

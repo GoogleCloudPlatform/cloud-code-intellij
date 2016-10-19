@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.startup;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRuntime;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -99,7 +99,7 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
   }
 
   private boolean hasAppEngineFacet(Module module) {
-    return AppEngineFacet.getAppEngineFacetByModule(module) != null;
+    return AppEngineStandardFacet.getAppEngineFacetByModule(module) != null;
   }
 
   private boolean isAppEngineStandard(@Nullable XmlFile appengineWebXml) {

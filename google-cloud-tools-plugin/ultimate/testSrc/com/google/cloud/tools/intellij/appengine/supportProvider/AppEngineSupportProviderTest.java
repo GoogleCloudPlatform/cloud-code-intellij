@@ -21,7 +21,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacet;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardLibraryPanel;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider;
@@ -45,7 +45,6 @@ import com.intellij.javaee.web.framework.WebFrameworkVersion;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;
-import com.intellij.openapi.roots.impl.libraries.LibraryImpl;
 import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -81,7 +80,7 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
     selectVersion(WebFrameworkType.getInstance(), new WebFrameworkVersion(WebAppVersion.WebAppVersion_2_5));
     addSupport();
 
-    getFacet(AppEngineFacet.ID);
+    getFacet(AppEngineStandardFacet.ID);
     assertFileExist("web/WEB-INF/web.xml");
     assertFileExist("web/WEB-INF/appengine-web.xml");
 

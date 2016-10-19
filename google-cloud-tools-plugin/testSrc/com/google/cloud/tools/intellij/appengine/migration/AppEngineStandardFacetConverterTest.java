@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.cloud.tools.intellij.appengine.migration;
 
 import java.io.IOException;
 
 /**
- * Unit tests for {@link AppEngineFacetMigrationConverterProvider}
+ * Unit tests for {@link AppEngineStandardFacetConverterProvider}
  */
-public class AppEngineFacetMigrationConverterProviderTest extends BaseConverterTest {
+public class AppEngineStandardFacetConverterTest extends BaseConverterTest {
 
-  public void testConvertBasic() throws IOException {
-    testConvert("conversion/appEngineFacetMigration");
+  public void testConvert() throws IOException {
+    testConvert("conversion/appEngineFacet");
   }
 
 }
