@@ -16,27 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
-import com.google.cloud.tools.appengine.api.AppEngineException;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.annotations.VisibleForTesting;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.JBColor;
+import com.intellij.openapi.options.ConfigurationException;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Paths;
-
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
 
 /**
  * @author nik
@@ -44,61 +32,26 @@ import javax.swing.event.DocumentEvent;
 public class AppEngineServerEditor extends
     ApplicationServerPersistentDataEditor<ApplicationServerPersistentData> {
 
-  private JPanel myMainPanel;
-  // TODO(joaomartins): Replace with CloudSdkPanel when
-  // https://youtrack.jetbrains.com/issue/IDEA-162625 gets fixed.
-  private TextFieldWithBrowseButton sdkHomeField;
-  private JLabel warningMessage;
+  private CloudSdkPanel cloudSdkPanel;
 
   public AppEngineServerEditor() {
-    sdkHomeField
-        .addBrowseFolderListener("Google Cloud SDK", "Specify Google Cloud SDK home",
-            null, FileChooserDescriptorFactory.createSingleFolderDescriptor());
-    sdkHomeField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        onSdkPathChanged();
-      }
-    });
-  }
-
-  private void onSdkPathChanged() {
-    CloudSdk sdk = new CloudSdk.Builder()
-        .sdkPath(Paths.get(sdkHomeField.getText()))
-        .build();
-
-    try {
-      sdk.validateAppEngineJavaComponents();
-      warningMessage.setVisible(false);
-    } catch (AppEngineException aee) {
-      warningMessage.setVisible(true);
-      warningMessage.setForeground(JBColor.RED);
-      warningMessage.setText(GctBundle.message("appengine.cloudsdk.java.components.missing"));
-    }
+    cloudSdkPanel = new CloudSdkPanel();
   }
 
   protected void resetEditorFrom(ApplicationServerPersistentData data) {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-    sdkHomeField.setText(sdkService.getSdkHomePath() != null
-        ? sdkService.getSdkHomePath().toString() : "" );
+    cloudSdkPanel.reset();
   }
 
   protected void applyEditorTo(ApplicationServerPersistentData data) {
-    CloudSdkService.getInstance().setSdkHomePath(sdkHomeField.getText());
+    try {
+      cloudSdkPanel.apply();
+    } catch (ConfigurationException ce) {
+      // do nothing
+    }
   }
 
   @NotNull
   protected JComponent createEditor() {
-    return myMainPanel;
-  }
-
-  @VisibleForTesting
-  public TextFieldWithBrowseButton getSdkHomeField() {
-    return sdkHomeField;
-  }
-
-  @VisibleForTesting
-  public JLabel getWarningMessage() {
-    return warningMessage;
+    return cloudSdkPanel.getComponent();
   }
 }
