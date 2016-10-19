@@ -163,9 +163,15 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
           "App Engine facet not found in '" + artifact.getName() + "' artifact");
     }
 
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+    if (sdkService.getSdkHomePath() == null) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
+    }
+
     try {
       CloudSdk sdk = new CloudSdk.Builder()
-          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+          .sdkPath(sdkService.getSdkHomePath())
           .build();
       sdk.validateCloudSdk();
       sdk.validateAppEngineJavaComponents();

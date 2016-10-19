@@ -66,9 +66,16 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           @Override
           public OSProcessHandler createProcessHandler(
               String workingDirectory, Map<String, String> envVariables) throws ExecutionException {
+
+            CloudSdkService sdkService = CloudSdkService.getInstance();
+            if (sdkService.getSdkHomePath() == null) {
+              throw new ExecutionException(
+                  GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
+            }
+
             try {
               CloudSdk sdk = new CloudSdk.Builder()
-                  .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+                  .sdkPath(sdkService.getSdkHomePath())
                   .build();
               sdk.validateCloudSdk();
               sdk.validateAppEngineJavaComponents();
