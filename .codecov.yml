@@ -1,11 +1,3 @@
 codecov:
   bot: aslo
-coverage:
-  status:
-    patch:
-      default:
-        target: 0%
-    project:
-      default:
-        target: 0%
 comment: off
