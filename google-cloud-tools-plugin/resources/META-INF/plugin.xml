@@ -57,7 +57,7 @@
         </li>
         <li>
         Update run configuration names to be prefixed with 'Google ..'
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1041">#1043</a>).
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1041">#1041</a>).
         </li>
       </ul>
       <h2>[16.10.1]</h2>
