@@ -37,12 +37,12 @@ import javax.swing.Icon;
 public class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl
     implements AppEngineDeployable {
 
-  private String name =
-      GctBundle.message("appengine.flex.user.specified.deploymentsource.name");
+  private String name;
   private String userSpecifiedFilePath;
 
   public UserSpecifiedPathDeploymentSource(@NotNull ModulePointer pointer) {
     super(pointer);
+    setName(getDefaultName());
   }
 
   @Override
@@ -62,8 +62,14 @@ public class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImp
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public String getDefaultName() {
+    return GctBundle.message("appengine.flex.user.specified.deploymentsource.name");
   }
 
   @Nullable

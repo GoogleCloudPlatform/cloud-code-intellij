@@ -346,17 +346,27 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
   /**
    * The name of the currently selected deployment source is displayed in the Application Servers
-   * window. We want this name to also include the path to the manually chosen archive when one
-   * is selected.
+   * window. We want to disambiguate this name as much as possible so that unique deployments show
+   * up as individual line items in the deployment UI.
    */
   private void setDeploymentSourceName(String filePath) {
+    AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
+
     if (isUserSpecifiedPathDeploymentSource()
         && !StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())) {
-      ((UserSpecifiedPathDeploymentSource) deploymentSource).setName(
-          GctBundle.message(
-              "appengine.flex.user.specified.deploymentsource.name.with.filename",
-              new File(filePath).getName()));
+      deployable.setName(
+          deployable.getDefaultName() + " - " + new File(filePath).getName()
+              + ". Version: " + getDisplayableVersion());
+    } else {
+      deployable.setName(
+          deployable.getDefaultName() + ". Version: " + getDisplayableVersion());
     }
+  }
+
+  private String getDisplayableVersion() {
+    return versionOverrideCheckBox.isSelected()
+        ? versionIdField.getText() : "auto";
+
   }
 
   private void validateConfiguration() throws ConfigurationException {

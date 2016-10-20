@@ -30,12 +30,14 @@ public class AppEngineArtifactDeploymentSource extends ArtifactDeploymentSourceI
     implements AppEngineDeployable {
 
   private AppEngineEnvironment environment;
+  private String name;
 
   /**
    * Default constructor used instantiating plain Artifact Deployment sources.
    */
   public AppEngineArtifactDeploymentSource(@NotNull ArtifactPointer pointer) {
     super(pointer);
+    setName(getDefaultName());
   }
 
   /**
@@ -47,6 +49,23 @@ public class AppEngineArtifactDeploymentSource extends ArtifactDeploymentSourceI
       @NotNull ArtifactPointer pointer) {
     super(pointer);
     this.environment = environment;
+    setName(getDefaultName());
+  }
+
+  @NotNull
+  @Override
+  public String getPresentableName() {
+    return name;
+  }
+
+  @Override
+  public String getDefaultName() {
+    return getArtifactPointer().getArtifactName();
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override

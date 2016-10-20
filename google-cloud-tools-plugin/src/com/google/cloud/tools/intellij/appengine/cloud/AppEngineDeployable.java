@@ -29,4 +29,18 @@ public interface AppEngineDeployable extends DeploymentSource {
    */
   AppEngineEnvironment getEnvironment();
 
+  /**
+   * Set the name of this deployable. Used for display in the Application Server deployment window
+   * and for disambiguation of multiple deployables. This field is mutable so that, at deploy time,
+   * we can append additional information to the name to ensure uniqueness (e.g. version).
+   */
+  void setName(String name);
+
+  /**
+   * Returns the default name for this deployable. The default name represents the name of the
+   * deployment source prior to deploy time. For example, this would not include version information
+   * since it is not yet known.
+   */
+  String getDefaultName();
+
 }
