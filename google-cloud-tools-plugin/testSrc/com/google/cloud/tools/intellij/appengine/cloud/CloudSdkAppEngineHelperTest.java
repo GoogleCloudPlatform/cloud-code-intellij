@@ -167,6 +167,16 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
       return null;
     }
 
+    @Override
+    public void setName(String name) {
+
+    }
+
+    @Override
+    public String getDefaultName() {
+      return null;
+    }
+
     @Nullable
     @Override
     public File getFile() {
