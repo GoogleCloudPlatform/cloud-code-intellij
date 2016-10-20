@@ -22,12 +22,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.ApplicationInfoService;
 import com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
-import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
-import com.google.cloud.tools.intellij.startup.CloudToolsPluginInitializationComponent;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -54,6 +53,9 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   CloudToolsPluginConfigurationService pluginConfigurationService;
   @Mock
   ActionManager actionManager;
+  @Mock
+  ApplicationInfoService applicationInfoService;
+
   CloudToolsPluginInitializationComponent testComponent;
 
   @Before
@@ -61,6 +63,7 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
     registerService(CloudToolsPluginInfoService.class, pluginInfoService);
     registerService(CloudToolsPluginConfigurationService.class, pluginConfigurationService);
     registerService(ActionManager.class, actionManager);
+    registerService(ApplicationInfoService.class, applicationInfoService);
     testComponent = new CloudToolsPluginInitializationComponent();
   }
 

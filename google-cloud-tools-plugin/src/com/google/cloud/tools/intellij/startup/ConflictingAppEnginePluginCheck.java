@@ -16,22 +16,22 @@
 
 package com.google.cloud.tools.intellij.startup;
 
+import com.google.cloud.tools.intellij.ApplicationInfoService;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.DisablePluginWarningDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.extensions.PluginId;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.ui.popup.util.PopupUtil;
-
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.event.HyperlinkEvent;
@@ -49,21 +49,18 @@ public class ConflictingAppEnginePluginCheck {
    * notified to disable it.
    */
   public void notifyIfConflicting() {
-    if (isPluginInstalled()) {
-      notifyUser(getPlugin());
+    ApplicationInfoService applicationInfoService = ServiceManager
+        .getService(ApplicationInfoService.class);
+
+    if (applicationInfoService.isPluginActive(BUNDLED_PLUGIN_ID)) {
+      Optional<IdeaPluginDescriptor> plugin = applicationInfoService.findPlugin(BUNDLED_PLUGIN_ID);
+      if (plugin.isPresent()) {
+        showNotification(plugin.get());
+      }
     }
   }
 
-  private boolean isPluginInstalled() {
-    IdeaPluginDescriptor pluginDescriptor = getPlugin();
-    return pluginDescriptor != null && pluginDescriptor.isEnabled();
-  }
-
-  private IdeaPluginDescriptor getPlugin() {
-    return PluginManager.getPlugin(PluginId.findId(BUNDLED_PLUGIN_ID));
-  }
-
-  private void notifyUser(@NotNull IdeaPluginDescriptor plugin) {
+  private void showNotification(@NotNull IdeaPluginDescriptor plugin) {
     NotificationGroup notification =
         new NotificationGroup(
             GctBundle.message("plugin.conflict.error.title"),
