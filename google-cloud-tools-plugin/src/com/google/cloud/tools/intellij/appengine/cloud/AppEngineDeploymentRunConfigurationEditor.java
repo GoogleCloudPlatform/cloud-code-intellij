@@ -290,7 +290,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     configuration.setPromote(promoteCheckbox.isSelected());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
 
-    setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
+    setDeploymentSourceName();
     updateJarWarSelector();
   }
 
@@ -349,20 +349,18 @@ public class AppEngineDeploymentRunConfigurationEditor extends
    * window. We want to disambiguate this name as much as possible so that unique deployments show
    * up as individual line items in the deployment UI.
    */
-  private void setDeploymentSourceName(String filePath) {
+  private void setDeploymentSourceName() {
     AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
+
+    String projectVersion = ". Project: " + projectSelector.getText()
+        + ". Version: " + getDisplayableVersion();
 
     if (isUserSpecifiedPathDeploymentSource()
         && !StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())) {
-      deployable.setName(
-          deployable.getDefaultName() + " - " + new File(filePath).getName()
-              + ". Project: " + projectSelector.getText()
-              + ". Version: " + getDisplayableVersion());
+      deployable.setName(deployable.getDefaultName() + " - "
+          + new File(userSpecifiedArtifactFileSelector.getText()).getName() + projectVersion);
     } else {
-      deployable.setName(
-          deployable.getDefaultName()
-              + ". Project: " + projectSelector.getText()
-              + ". Version: " + getDisplayableVersion());
+      deployable.setName(deployable.getDefaultName() + projectVersion);
     }
   }
 
