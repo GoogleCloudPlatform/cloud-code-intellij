@@ -27,6 +27,7 @@ intellij {
     publish {
         pluginId '8079'
     }
+    systemProperties = ['compiler.process.debug.port':56666]
 }
 
 project.afterEvaluate {
@@ -46,6 +47,8 @@ project.afterEvaluate {
 dependencies {
     compile(project(':google-account-plugin'))
     compile(project(':common-lib'))
+    compile(project('jps-plugin'))
+    compile(project('cloudsdk-service'))
 
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
     compile 'com.google.apis:google-api-services-cloudresourcemanager:v1beta1-rev12-1.21.0'

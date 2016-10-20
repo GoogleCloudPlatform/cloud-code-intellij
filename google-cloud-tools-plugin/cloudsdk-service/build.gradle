@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-include 'google-account-plugin'
-include 'google-cloud-tools-plugin'
-include 'common-lib'
-include 'common-test-lib'
-include 'google-cloud-tools-plugin:ultimate'
-include 'google-cloud-tools-plugin:jps-plugin'
-include 'google-cloud-tools-plugin:cloudsdk-service'
+sourceSets.main.java.srcDirs = ['src']
+
+dependencies {
+    compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+}
+
+jar.archiveName = "cloudsdk-service.jar"
