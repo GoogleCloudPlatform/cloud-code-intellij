@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.server.run;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
-import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRunTask;
@@ -78,11 +77,6 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
                   .sdkPath(sdkService.getSdkHomePath())
                   .build();
               sdk.validateCloudSdk();
-              sdk.validateAppEngineJavaComponents();
-            } catch (AppEngineJavaComponentsNotInstalledException ex) {
-              throw new ExecutionException(
-                  GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
-                      + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
             } catch (AppEngineException ex) {
               throw new ExecutionException(
                   GctBundle.message("appengine.run.server.sdk.misconfigured.message"));

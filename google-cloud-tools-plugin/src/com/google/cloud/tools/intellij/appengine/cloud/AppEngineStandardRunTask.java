@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
-import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
@@ -58,12 +57,6 @@ public class AppEngineStandardRunTask extends AppEngineTask {
         .async(true)
         .startListener(startListener)
         .build();
-
-    try {
-      sdk.validateAppEngineJavaComponents();
-    } catch (AppEngineJavaComponentsNotInstalledException ex) {
-      return;
-    }
 
     CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdk);
     devServer.run(runConfig);
