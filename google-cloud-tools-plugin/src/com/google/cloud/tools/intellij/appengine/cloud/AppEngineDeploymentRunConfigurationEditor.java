@@ -352,15 +352,15 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private void setDeploymentSourceName() {
     AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
 
-    String projectVersion = ". Project: " + projectSelector.getText()
+    String projectVersionSuffix = ". Project: " + projectSelector.getText()
         + ". Version: " + getDisplayableVersion();
 
     if (isUserSpecifiedPathDeploymentSource()
         && !StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())) {
       deployable.setName(deployable.getDefaultName() + " - "
-          + new File(userSpecifiedArtifactFileSelector.getText()).getName() + projectVersion);
+          + new File(userSpecifiedArtifactFileSelector.getText()).getName() + projectVersionSuffix);
     } else {
-      deployable.setName(deployable.getDefaultName() + projectVersion);
+      deployable.setName(deployable.getDefaultName() + projectVersionSuffix);
     }
   }
 
