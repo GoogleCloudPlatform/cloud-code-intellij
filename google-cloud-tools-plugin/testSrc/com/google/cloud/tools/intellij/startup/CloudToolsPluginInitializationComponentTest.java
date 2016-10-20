@@ -54,7 +54,7 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   @Mock
   ActionManager actionManager;
   @Mock
-  ApplicationInfoService applicationInfoService;
+  ApplicationPluginInfoService applicationInfoService;
 
   CloudToolsPluginInitializationComponent testComponent;
 
