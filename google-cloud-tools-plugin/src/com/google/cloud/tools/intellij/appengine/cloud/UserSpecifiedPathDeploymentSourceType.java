@@ -64,8 +64,8 @@ public class UserSpecifiedPathDeploymentSourceType extends
         userSpecifiedSource.setFilePath(filePath);
         userSpecifiedSource.setName(
             GctBundle.message(
-                "appengine.flex.user.specified.deploymentsource.name.with.filename",
-                new File(filePath).getName()));
+                "appengine.flex.user.specified.deploymentsource.name") + " - "
+                + new File(filePath).getName());
 
         return userSpecifiedSource;
       }
