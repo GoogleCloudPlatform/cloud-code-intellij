@@ -19,20 +19,22 @@ package com.google.cloud.tools.intellij;
 import com.google.common.base.Optional;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
+import com.intellij.openapi.extensions.PluginId;
 
-/**
- * Provides information about the current run of the application.
- */
-public interface ApplicationInfoService {
+public class DefaultApplicationPluginInfoService implements ApplicationPluginInfoService {
 
-  /**
-   * Finds a plugin by its plugin ID.
-   */
-  Optional<IdeaPluginDescriptor> findPlugin(String pluginId);
+  @Override
+  public Optional<IdeaPluginDescriptor> findPlugin(String pluginId) {
+    IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.findId(pluginId));
+    return Optional.fromNullable(plugin);
+  }
 
-  /**
-   * Returns true if a plugin is installed, and currently active.
-   */
-  boolean isPluginActive(String pluginId);
+  @Override
+  public boolean isPluginActive(String pluginId) {
+    Optional<IdeaPluginDescriptor> maybePlugin = findPlugin(pluginId);
+    return maybePlugin.isPresent() && maybePlugin.get().isEnabled();
+  }
 
 }
+

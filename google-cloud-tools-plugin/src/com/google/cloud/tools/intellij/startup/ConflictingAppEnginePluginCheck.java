@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.intellij.ApplicationInfoService;
+import com.google.cloud.tools.intellij.ApplicationPluginInfoService;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.DisablePluginWarningDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -49,8 +49,8 @@ public class ConflictingAppEnginePluginCheck {
    * notified to disable it.
    */
   public void notifyIfConflicting() {
-    ApplicationInfoService applicationInfoService = ServiceManager
-        .getService(ApplicationInfoService.class);
+    ApplicationPluginInfoService applicationInfoService = ServiceManager
+        .getService(ApplicationPluginInfoService.class);
 
     if (applicationInfoService.isPluginActive(BUNDLED_PLUGIN_ID)) {
       Optional<IdeaPluginDescriptor> plugin = applicationInfoService.findPlugin(BUNDLED_PLUGIN_ID);

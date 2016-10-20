@@ -127,8 +127,8 @@
     <xdebugger.breakpointType implementation="com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType"/>
     <projectService serviceImplementation="com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateSerializer"/>
 
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.ApplicationInfoService"
-                        serviceImplementation="com.google.cloud.tools.intellij.ApplicationInfoServiceImpl"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.ApplicationPluginInfoService"
+                        serviceImplementation="com.google.cloud.tools.intellij.DefaultApplicationPluginInfoService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.CloudToolsPluginInfoService"
                         serviceImplementation="com.google.cloud.tools.intellij.IdeaCloudToolsPluginInfoService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService"

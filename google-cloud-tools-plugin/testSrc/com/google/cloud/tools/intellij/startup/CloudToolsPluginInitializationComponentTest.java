@@ -22,7 +22,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.ApplicationInfoService;
+import com.google.cloud.tools.intellij.ApplicationPluginInfoService;
 import com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.GctFeature;
@@ -63,7 +63,7 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
     registerService(CloudToolsPluginInfoService.class, pluginInfoService);
     registerService(CloudToolsPluginConfigurationService.class, pluginConfigurationService);
     registerService(ActionManager.class, actionManager);
-    registerService(ApplicationInfoService.class, applicationInfoService);
+    registerService(ApplicationPluginInfoService.class, applicationInfoService);
     testComponent = new CloudToolsPluginInitializationComponent();
   }
 
