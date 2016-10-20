@@ -15,7 +15,7 @@ running. ([#972](https://github.com/GoogleCloudPlatform/google-cloud-intellij/is
 - Better wording when the development server has an invalid Cloud SDK path. 
 ([#1043](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1043)).
 - Update run configuration names to be prefixed with 'Google ..'
-([#1043](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1041)).
+([#1021](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1021)).
 
 ## [16.10.1]
 - Note we are changing the versioning scheme to YY.MM.i. We plan on a monthly release cadence to
