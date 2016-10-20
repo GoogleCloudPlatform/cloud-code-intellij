@@ -356,10 +356,13 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         && !StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())) {
       deployable.setName(
           deployable.getDefaultName() + " - " + new File(filePath).getName()
+              + ". Project: " + projectSelector.getText()
               + ". Version: " + getDisplayableVersion());
     } else {
       deployable.setName(
-          deployable.getDefaultName() + ". Version: " + getDisplayableVersion());
+          deployable.getDefaultName()
+              + ". Project: " + projectSelector.getText()
+              + ". Version: " + getDisplayableVersion());
     }
   }
 
