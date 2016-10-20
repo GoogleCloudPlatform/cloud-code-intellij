@@ -68,6 +68,8 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
       initErrorReporting(pluginConfigurationService, pluginInfoService);
     }
+
+    new ConflictingAppEnginePluginCheck().notifyIfConflicting();
   }
 
   private void initAppEngineSupport(
