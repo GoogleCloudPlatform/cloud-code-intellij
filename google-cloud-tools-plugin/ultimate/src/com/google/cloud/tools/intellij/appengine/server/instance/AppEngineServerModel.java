@@ -169,10 +169,10 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     }
 
     try {
-      CloudSdk sdk = new CloudSdk.Builder()
+      new CloudSdk.Builder()
           .sdkPath(sdkService.getSdkHomePath())
-          .build();
-      sdk.validateCloudSdk();
+          .build()
+          .validateCloudSdk();
     } catch (AppEngineException ex) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));

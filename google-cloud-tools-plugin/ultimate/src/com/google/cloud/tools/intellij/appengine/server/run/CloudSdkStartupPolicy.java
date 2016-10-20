@@ -73,10 +73,10 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             }
 
             try {
-              CloudSdk sdk = new CloudSdk.Builder()
+              new CloudSdk.Builder()
                   .sdkPath(sdkService.getSdkHomePath())
-                  .build();
-              sdk.validateCloudSdk();
+                  .build()
+                  .validateCloudSdk();
             } catch (AppEngineException ex) {
               throw new ExecutionException(
                   GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
