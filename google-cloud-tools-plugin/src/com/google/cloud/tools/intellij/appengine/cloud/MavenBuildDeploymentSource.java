@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.util.Collections;
@@ -68,7 +69,7 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
   @NotNull
   @Override
   public String getPresentableName() {
-    return name;
+    return String.format("[%s] ", DateTime.now().toString("HH:mm:ss")) + name;
   }
 
   @Override

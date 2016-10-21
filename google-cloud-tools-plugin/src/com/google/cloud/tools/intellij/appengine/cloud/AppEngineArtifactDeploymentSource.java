@@ -21,6 +21,7 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ArtifactDeploymentSourceImpl;
 
 import org.jetbrains.annotations.NotNull;
+import org.joda.time.DateTime;
 
 /**
  * An App Engine implementation of {@link ArtifactDeploymentSourceImpl} that provides its targeted
@@ -55,7 +56,7 @@ public class AppEngineArtifactDeploymentSource extends ArtifactDeploymentSourceI
   @NotNull
   @Override
   public String getPresentableName() {
-    return name;
+    return String.format("[%s] ", DateTime.now().toString("HH:mm:ss")) + name;
   }
 
   @Override

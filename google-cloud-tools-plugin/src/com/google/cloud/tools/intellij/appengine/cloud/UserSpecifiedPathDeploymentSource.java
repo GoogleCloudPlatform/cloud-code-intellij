@@ -25,6 +25,7 @@ import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentS
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joda.time.DateTime;
 
 import java.io.File;
 
@@ -59,7 +60,7 @@ public class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImp
   @NotNull
   @Override
   public String getPresentableName() {
-    return name;
+    return String.format("[%s] ", DateTime.now().toString("HH:mm:ss")) + name;
   }
 
   @Override

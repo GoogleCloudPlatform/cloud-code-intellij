@@ -84,7 +84,7 @@ public class AppEngineArtifactDeploymentSourceType
   @Override
   public void save(@NotNull ArtifactDeploymentSource deploymentSource,
       @NotNull Element tag) {
-    tag.setAttribute(NAME_ATTRIBUTE, deploymentSource.getPresentableName());
+    tag.setAttribute(NAME_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getDefaultName());
   }
 
   @Override

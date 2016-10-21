@@ -79,6 +79,6 @@ public class UserSpecifiedPathDeploymentSourceType extends
 
   @Override
   public void save(@NotNull ModuleDeploymentSource source, @NotNull Element tag) {
-    tag.setAttribute(NAME_ATTRIBUTE, source.getModulePointer().getModuleName());
+    tag.setAttribute(NAME_ATTRIBUTE, ((AppEngineDeployable) source).getDefaultName());
   }
 }
