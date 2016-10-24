@@ -30,7 +30,7 @@ public interface AppEngineDeployable extends DeploymentSource {
   AppEngineEnvironment getEnvironment();
 
   /**
-   * Set the name of this deployable. Used for display in the Application Server deployment window
+   * Sets the name of this deployable. Used for display in the Application Server deployment window
    * and for disambiguation of multiple deployables. This field is mutable so that, at deploy time,
    * we can append additional information to the name to ensure uniqueness (e.g. version).
    */

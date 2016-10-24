@@ -358,7 +358,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     if (isUserSpecifiedPathDeploymentSource()
         && !StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())) {
       deployable.setName(deployable.getDefaultName() + " - "
-          + new File(userSpecifiedArtifactFileSelector.getText()).getName() + projectVersionSuffix);
+          + Paths.get(userSpecifiedArtifactFileSelector.getText()).getFileName()
+          + projectVersionSuffix);
     } else {
       deployable.setName(deployable.getDefaultName() + projectVersionSuffix);
     }

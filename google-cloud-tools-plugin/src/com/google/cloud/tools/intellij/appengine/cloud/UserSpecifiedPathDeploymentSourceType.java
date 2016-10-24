@@ -28,7 +28,7 @@ import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRun
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * A {@link DeploymentSourceType} that supports serialization for a {@link
@@ -65,7 +65,7 @@ public class UserSpecifiedPathDeploymentSourceType extends
         userSpecifiedSource.setName(
             GctBundle.message(
                 "appengine.flex.user.specified.deploymentsource.name") + " - "
-                + new File(filePath).getName());
+                + Paths.get(filePath).getFileName());
 
         return userSpecifiedSource;
       }
