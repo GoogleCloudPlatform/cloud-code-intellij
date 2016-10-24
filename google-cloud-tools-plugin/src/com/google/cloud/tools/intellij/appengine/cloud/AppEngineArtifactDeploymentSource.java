@@ -56,7 +56,7 @@ public class AppEngineArtifactDeploymentSource extends ArtifactDeploymentSourceI
   @NotNull
   @Override
   public String getPresentableName() {
-    return String.format("[%s] ", DateTime.now().toString("HH:mm:ss")) + name;
+    return String.format("[%s] ", DateTime.now().toString("yyyy-MM-dd HH:mm:ss")) + name;
   }
 
   @Override
