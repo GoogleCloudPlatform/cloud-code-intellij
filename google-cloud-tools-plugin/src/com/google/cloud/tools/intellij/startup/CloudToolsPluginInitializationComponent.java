@@ -18,23 +18,9 @@ package com.google.cloud.tools.intellij.startup;
 
 import com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
-import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSourceType;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineToolsMenuAction;
-import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSourceType;
-import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSourceType;
 
-import com.intellij.execution.configurations.ConfigurationType;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.Constraints;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.remoteServer.ServerType;
-import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
-import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationType;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -61,36 +47,11 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
     CloudToolsPluginInfoService pluginInfoService = ServiceManager
         .getService(CloudToolsPluginInfoService.class);
 
-    if (pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)) {
-      initAppEngineSupport(pluginConfigurationService);
-    }
-
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
       initErrorReporting(pluginConfigurationService, pluginInfoService);
     }
 
     new ConflictingAppEnginePluginCheck().notifyIfConflicting();
-  }
-
-  private void initAppEngineSupport(
-      CloudToolsPluginConfigurationService pluginConfigurationService) {
-    AppEngineCloudType appEngineCloudType = new AppEngineCloudType();
-    pluginConfigurationService.registerExtension(ServerType.EP_NAME, appEngineCloudType);
-    pluginConfigurationService.registerExtension(ConfigurationType.CONFIGURATION_TYPE_EP,
-        new DeployToServerConfigurationType(appEngineCloudType));
-    pluginConfigurationService.registerExtension(DeploymentSourceType.EP_NAME,
-        new UserSpecifiedPathDeploymentSourceType());
-    pluginConfigurationService.registerExtension(DeploymentSourceType.EP_NAME,
-        new MavenBuildDeploymentSourceType());
-    pluginConfigurationService.registerExtension(DeploymentSourceType.EP_NAME,
-        new AppEngineArtifactDeploymentSourceType());
-
-    ActionManager actionManager = ActionManager.getInstance();
-    AnAction toolsMenuAction = new AppEngineToolsMenuAction();
-    actionManager.registerAction(AppEngineToolsMenuAction.ID, toolsMenuAction);
-    DefaultActionGroup toolsMenu =
-        (DefaultActionGroup) actionManager.getAction(AppEngineToolsMenuAction.GROUP_ID);
-    toolsMenu.add(toolsMenuAction, Constraints.LAST);
   }
 
   private void initErrorReporting(CloudToolsPluginConfigurationService pluginConfigurationService,
