@@ -74,7 +74,7 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
 
   @Override
   public String getDefaultName() {
-    return "Maven build: " + getModulePointer().getModuleName();
+    return getModulePointer().getModuleName();
   }
 
   @Override
