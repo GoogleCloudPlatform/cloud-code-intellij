@@ -88,7 +88,7 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
 
   @Override
   public void save(@NotNull ModuleDeploymentSource source, @NotNull Element tag) {
-    tag.setAttribute(NAME_ATTRIBUTE, ((AppEngineDeployable) source).getDefaultName());
+    tag.setAttribute(NAME_ATTRIBUTE, source.getModulePointer().getModuleName());
   }
 
   @Override
