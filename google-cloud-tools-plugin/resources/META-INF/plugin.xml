@@ -158,12 +158,21 @@
 
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineCommunityWebIntegration"/>
-
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.MavenRepositoryLibraryDownloader"/>
+
+    <!-- App Engine Cloud and Deployment Sources Configuration-->
+    <remoteServer.type
+            implementation="com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType"/>
+    <remoteServer.deploymentSource.type
+            implementation="com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSourceType"/>
+    <remoteServer.deploymentSource.type
+            implementation="com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSourceType"/>
+    <remoteServer.deploymentSource.type
+            implementation="com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSourceType"/>
 
     <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType"/>
     <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory"/>
@@ -253,6 +262,11 @@
 
   <actions>
     <action id="AddSnapshotLocation" class="com.google.cloud.tools.intellij.debugger.actions.ToggleSnapshotLocationAction"/>
+
+    <action id="GoogleCloudTools.AppEngineDeploy"
+            class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineToolsMenuAction">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
 
     <group id="EditorGutterCloudDebuggerMenu">
       <separator/>
