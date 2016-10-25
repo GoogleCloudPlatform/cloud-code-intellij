@@ -28,6 +28,11 @@ import java.util.Set;
  * <p>Enum elements marked {@link Deprecated} are fully released and no longer hidden behind a flag.
  */
 public enum GctFeature implements Feature {
+
+  /**
+   * Deprecating but not removing this feature as it serves as a useful sample and it's kinda nice
+   * to see the {@code GctFeature} history of flags in this enum.
+   */
   @Deprecated
   APPENGINE_FLEX(null, "feature.appengine.flex", "ct4ij.feature.appengine.flex");
 
