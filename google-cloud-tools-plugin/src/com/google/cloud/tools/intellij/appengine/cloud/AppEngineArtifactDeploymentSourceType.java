@@ -24,6 +24,7 @@ import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactManager;
+import com.intellij.packaging.artifacts.ArtifactPointer;
 import com.intellij.packaging.artifacts.ArtifactPointerManager;
 import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
 import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
@@ -45,6 +46,8 @@ public class AppEngineArtifactDeploymentSourceType
 
   private static final String SOURCE_TYPE_ID = "appengine-artifact-source";
   private static final String NAME_ATTRIBUTE = "name";
+  private static final String PROJECT_ATTRIBUTE = "project";
+  private static final String VERSION_ATTRIBUTE = "version";
 
   public AppEngineArtifactDeploymentSourceType() {
     super(SOURCE_TYPE_ID);
@@ -71,20 +74,33 @@ public class AppEngineArtifactDeploymentSourceType
           AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
 
       if (artifact.isPresent() && environment != null) {
-        return new AppEngineArtifactDeploymentSource(
-            AppEngineEnvironment.valueOf(environment),
-            ArtifactPointerManager.getInstance(project).createPointer(artifact.get()));
+        return createDeploymentSource(AppEngineEnvironment.valueOf(environment),
+            ArtifactPointerManager.getInstance(project).createPointer(artifact.get()), tag);
       }
     }
 
-    return new AppEngineArtifactDeploymentSource(
-        ArtifactPointerManager.getInstance(project).createPointer(artifactName));
+    return createDeploymentSource(
+        null /*environment */,
+        ArtifactPointerManager.getInstance(project).createPointer(artifactName), tag);
   }
 
   @Override
   public void save(@NotNull ArtifactDeploymentSource deploymentSource,
       @NotNull Element tag) {
-    tag.setAttribute(NAME_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getDefaultName());
+    tag.setAttribute(NAME_ATTRIBUTE, deploymentSource.getPresentableName());
+
+    if (deploymentSource instanceof AppEngineDeployable) {
+      AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
+
+      if (deployable.getProjectName() != null) {
+        tag.setAttribute(PROJECT_ATTRIBUTE,
+            ((AppEngineDeployable) deploymentSource).getProjectName());
+      }
+
+      if (deployable.getVersion() != null) {
+        tag.setAttribute(VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
+      }
+    }
   }
 
   @Override
@@ -107,4 +123,15 @@ public class AppEngineArtifactDeploymentSourceType
           runConfigurationEditorComponent, project, artifact, select);
     }
   }
+
+  private AppEngineArtifactDeploymentSource createDeploymentSource(
+      AppEngineEnvironment environment, ArtifactPointer artifactPointer, Element persistedData) {
+    AppEngineArtifactDeploymentSource source
+        = new AppEngineArtifactDeploymentSource(environment, artifactPointer);
+    source.setProjectName(persistedData.getAttributeValue(PROJECT_ATTRIBUTE));
+    source.setVersion(persistedData.getAttributeValue(VERSION_ATTRIBUTE));
+
+    return source;
+  }
+
 }

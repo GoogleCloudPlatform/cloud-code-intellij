@@ -21,7 +21,7 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ArtifactDeploymentSourceImpl;
 
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateTime;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An App Engine implementation of {@link ArtifactDeploymentSourceImpl} that provides its targeted
@@ -31,47 +31,44 @@ public class AppEngineArtifactDeploymentSource extends ArtifactDeploymentSourceI
     implements AppEngineDeployable {
 
   private AppEngineEnvironment environment;
-  private String name;
 
-  /**
-   * Default constructor used instantiating plain Artifact Deployment sources.
-   */
-  public AppEngineArtifactDeploymentSource(@NotNull ArtifactPointer pointer) {
-    super(pointer);
-    setName(getDefaultName());
-  }
+  private String projectName;
+  private String version;
 
   /**
    * Initialize the artifact deployment source given a target App Engine environment, and an
    * artifact pointer.
    */
   public AppEngineArtifactDeploymentSource(
-      @NotNull AppEngineEnvironment environment,
+      @Nullable AppEngineEnvironment environment,
       @NotNull ArtifactPointer pointer) {
     super(pointer);
     this.environment = environment;
-    setName(getDefaultName());
-  }
-
-  @NotNull
-  @Override
-  public String getPresentableName() {
-    return String.format("[%s] ", DateTime.now().toString("yyyy-MM-dd HH:mm:ss")) + name;
-  }
-
-  @Override
-  public String getDefaultName() {
-    return getArtifactPointer().getArtifactName();
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
   }
 
   @Override
   public AppEngineEnvironment getEnvironment() {
     return environment;
+  }
+
+  @Override
+  public String getProjectName() {
+    return projectName;
+  }
+
+  @Override
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  @Override
+  public String getVersion() {
+    return version;
+  }
+
+  @Override
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   @NotNull

@@ -290,7 +290,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     configuration.setPromote(promoteCheckbox.isSelected());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
 
-    setDeploymentSourceName();
+    setDeploymentProjectAndVersion();
     updateJarWarSelector();
   }
 
@@ -345,24 +345,14 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   /**
-   * The name of the currently selected deployment source is displayed in the Application Servers
-   * window. We want to disambiguate this name as much as possible so that unique deployments show
-   * up as individual line items in the deployment UI.
+   * Sets the project / version to allow the deployment line items to be decorated with additional
+   * identifying data. See {@link AppEngineRuntimeInstance#getDeploymentName}.
    */
-  private void setDeploymentSourceName() {
+  private void setDeploymentProjectAndVersion() {
     AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
 
-    String projectVersionSuffix = ". Project: " + projectSelector.getText()
-        + ". Version: " + getDisplayableVersion();
-
-    if (isUserSpecifiedPathDeploymentSource()
-        && !StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())) {
-      deployable.setName(deployable.getDefaultName() + " - "
-          + Paths.get(userSpecifiedArtifactFileSelector.getText()).getFileName()
-          + projectVersionSuffix);
-    } else {
-      deployable.setName(deployable.getDefaultName() + projectVersionSuffix);
-    }
+    deployable.setProjectName(projectSelector.getText());
+    deployable.setVersion(getDisplayableVersion());
   }
 
   private String getDisplayableVersion() {

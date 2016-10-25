@@ -46,6 +46,8 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
   private static final String MAVEN_TASK_PACKAGE = "package";
   private static final String SOURCE_TYPE_ID = "maven-build-source";
   private static final String NAME_ATTRIBUTE = "name";
+  private static final String PROJECT_ATTRIBUTE = "project";
+  private static final String VERSION_ATTRIBUTE = "version";
 
   public MavenBuildDeploymentSourceType() {
     super(SOURCE_TYPE_ID);
@@ -82,13 +84,30 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
   public MavenBuildDeploymentSource load(@NotNull Element tag, @NotNull Project project) {
     final String moduleName = tag.getAttributeValue(NAME_ATTRIBUTE);
 
-    return new MavenBuildDeploymentSource(
+    MavenBuildDeploymentSource source = new MavenBuildDeploymentSource(
         ModulePointerManager.getInstance(project).create(moduleName), project);
+    source.setProjectName(tag.getAttributeValue(PROJECT_ATTRIBUTE));
+    source.setVersion(tag.getAttributeValue(VERSION_ATTRIBUTE));
+
+    return source;
   }
 
   @Override
-  public void save(@NotNull ModuleDeploymentSource source, @NotNull Element tag) {
-    tag.setAttribute(NAME_ATTRIBUTE, source.getModulePointer().getModuleName());
+  public void save(@NotNull ModuleDeploymentSource deploymentSource, @NotNull Element tag) {
+    tag.setAttribute(NAME_ATTRIBUTE, deploymentSource.getModulePointer().getModuleName());
+
+    if (deploymentSource instanceof AppEngineDeployable) {
+      AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
+
+      if (deployable.getProjectName() != null) {
+        tag.setAttribute(PROJECT_ATTRIBUTE,
+            ((AppEngineDeployable) deploymentSource).getProjectName());
+      }
+
+      if (deployable.getVersion() != null) {
+        tag.setAttribute(VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
+      }
+    }
   }
 
   @Override

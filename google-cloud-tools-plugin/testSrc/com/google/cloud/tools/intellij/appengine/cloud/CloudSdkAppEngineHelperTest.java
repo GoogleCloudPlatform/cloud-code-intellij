@@ -168,13 +168,23 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     }
 
     @Override
-    public void setName(String name) {
+    public String getProjectName() {
+      return null;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
 
     }
 
     @Override
-    public String getDefaultName() {
+    public String getVersion() {
       return null;
+    }
+
+    @Override
+    public void setVersion(String version) {
+
     }
 
     @Nullable

@@ -31,7 +31,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
-import org.joda.time.DateTime;
 
 import java.io.File;
 import java.util.Collections;
@@ -47,6 +46,8 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
   private final Project project;
   private AppEngineEnvironment environment;
   private String name;
+  private String projectName;
+  private String version;
 
   /**
    * Default constructor used instantiating plain Maven Build Deployment sources.
@@ -54,7 +55,7 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
   public MavenBuildDeploymentSource(@NotNull ModulePointer pointer, @NotNull Project project) {
     super(pointer);
     this.project = project;
-    setName(getDefaultName());
+    this.name = getDefaultName();
   }
 
   public MavenBuildDeploymentSource(@NotNull ModulePointer pointer,
@@ -63,23 +64,37 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
     super(pointer);
     this.project = project;
     this.environment = environment;
-    setName(getDefaultName());
+    this.name = getDefaultName();
   }
 
   @NotNull
   @Override
   public String getPresentableName() {
-    return String.format("[%s] ", DateTime.now().toString("yyyy-MM-dd HH:mm:ss")) + name;
+    return name;
   }
 
   @Override
-  public String getDefaultName() {
+  public String getProjectName() {
+    return projectName;
+  }
+
+  @Override
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  @Override
+  public String getVersion() {
+    return version;
+  }
+
+  @Override
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  private String getDefaultName() {
     return "Maven build: " + getModulePointer().getModuleName();
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
   }
 
   @Nullable

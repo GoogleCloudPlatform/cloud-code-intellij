@@ -25,7 +25,6 @@ import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentS
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
 
 import java.io.File;
 
@@ -38,12 +37,13 @@ import javax.swing.Icon;
 public class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImpl
     implements AppEngineDeployable {
 
-  private String name;
+  public static final String moduleName = "userSpecifiedSource";
   private String userSpecifiedFilePath;
+  private String projectName;
+  private String version;
 
   public UserSpecifiedPathDeploymentSource(@NotNull ModulePointer pointer) {
     super(pointer);
-    setName(getDefaultName());
   }
 
   @Override
@@ -60,17 +60,27 @@ public class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImp
   @NotNull
   @Override
   public String getPresentableName() {
-    return String.format("[%s] ", DateTime.now().toString("yyyy-MM-dd HH:mm:ss")) + name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public String getDefaultName() {
     return GctBundle.message("appengine.flex.user.specified.deploymentsource.name");
+  }
+
+  @Override
+  public String getProjectName() {
+    return projectName;
+  }
+
+  @Override
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  @Override
+  public String getVersion() {
+    return version;
+  }
+
+  @Override
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   @Nullable
