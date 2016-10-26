@@ -17,22 +17,16 @@
 package com.google.cloud.tools.intellij.startup;
 
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.ApplicationPluginInfoService;
 import com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
-import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
-import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
-import com.google.cloud.tools.intellij.startup.CloudToolsPluginInitializationComponent;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.extensions.ExtensionPointName;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +48,9 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   CloudToolsPluginConfigurationService pluginConfigurationService;
   @Mock
   ActionManager actionManager;
+  @Mock
+  ApplicationPluginInfoService applicationInfoService;
+
   CloudToolsPluginInitializationComponent testComponent;
 
   @Before
@@ -61,25 +58,8 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
     registerService(CloudToolsPluginInfoService.class, pluginInfoService);
     registerService(CloudToolsPluginConfigurationService.class, pluginConfigurationService);
     registerService(ActionManager.class, actionManager);
+    registerService(ApplicationPluginInfoService.class, applicationInfoService);
     testComponent = new CloudToolsPluginInitializationComponent();
-  }
-
-  @Test
-  public void testInitComponent_managedVmIsEnabled() {
-    when(pluginInfoService.shouldEnable(GctFeature.APPENGINE_FLEX)).thenReturn(true);
-    when(actionManager.getAction(anyString())).thenReturn(new DefaultActionGroup());
-    testComponent.initComponent();
-    verify(pluginConfigurationService).registerExtension(isA(ExtensionPointName.class),
-        isA(AppEngineCloudType.class));
-  }
-
-
-  @Test
-  public void testInitComponent_managedVmIsDisabled() {
-    testComponent.initComponent();
-    verify(pluginConfigurationService, never())
-        .registerExtension(isA(ExtensionPointName.class),
-            isA(AppEngineCloudType.class));
   }
 
   @Test
