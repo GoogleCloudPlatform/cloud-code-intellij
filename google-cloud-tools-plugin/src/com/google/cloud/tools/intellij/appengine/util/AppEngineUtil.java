@@ -203,8 +203,8 @@ public class AppEngineUtil {
 
   private static UserSpecifiedPathDeploymentSource createUserSpecifiedPathDeploymentSource(
       @NotNull Project project) {
-    ModulePointer modulePointer =
-        ModulePointerManager.getInstance(project).create("userSpecifiedSource");
+    ModulePointer modulePointer = ModulePointerManager.getInstance(project)
+        .create(UserSpecifiedPathDeploymentSource.moduleName);
 
     return new UserSpecifiedPathDeploymentSource(modulePointer);
   }

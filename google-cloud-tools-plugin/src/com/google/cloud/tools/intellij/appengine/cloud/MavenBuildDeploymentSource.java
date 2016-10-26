@@ -45,6 +45,9 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
 
   private final Project project;
   private AppEngineEnvironment environment;
+  private String name;
+  private String projectName;
+  private String version;
 
   /**
    * Default constructor used instantiating plain Maven Build Deployment sources.
@@ -52,6 +55,7 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
   public MavenBuildDeploymentSource(@NotNull ModulePointer pointer, @NotNull Project project) {
     super(pointer);
     this.project = project;
+    this.name = getDefaultName();
   }
 
   public MavenBuildDeploymentSource(@NotNull ModulePointer pointer,
@@ -60,12 +64,37 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
     super(pointer);
     this.project = project;
     this.environment = environment;
+    this.name = getDefaultName();
   }
 
   @NotNull
   @Override
   public String getPresentableName() {
-    return String.format("Maven build: %s", getModulePointer().getModuleName());
+    return name;
+  }
+
+  @Override
+  public String getProjectName() {
+    return projectName;
+  }
+
+  @Override
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  @Override
+  public String getVersion() {
+    return version;
+  }
+
+  @Override
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  private String getDefaultName() {
+    return "Maven build: " + getModulePointer().getModuleName();
   }
 
   @Nullable

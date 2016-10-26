@@ -290,7 +290,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     configuration.setPromote(promoteCheckbox.isSelected());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
 
-    setDeploymentSourceName(configuration.getUserSpecifiedArtifactPath());
+    setDeploymentProjectAndVersion();
     updateJarWarSelector();
   }
 
@@ -345,18 +345,20 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   /**
-   * The name of the currently selected deployment source is displayed in the Application Servers
-   * window. We want this name to also include the path to the manually chosen archive when one
-   * is selected.
+   * Sets the project / version to allow the deployment line items to be decorated with additional
+   * identifying data. See {@link AppEngineRuntimeInstance#getDeploymentName}.
    */
-  private void setDeploymentSourceName(String filePath) {
-    if (isUserSpecifiedPathDeploymentSource()
-        && !StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())) {
-      ((UserSpecifiedPathDeploymentSource) deploymentSource).setName(
-          GctBundle.message(
-              "appengine.flex.user.specified.deploymentsource.name.with.filename",
-              new File(filePath).getName()));
-    }
+  private void setDeploymentProjectAndVersion() {
+    AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
+
+    deployable.setProjectName(projectSelector.getText());
+    deployable.setVersion(getDisplayableVersion());
+  }
+
+  private String getDisplayableVersion() {
+    return versionOverrideCheckBox.isSelected()
+        ? versionIdField.getText() : "auto";
+
   }
 
   private void validateConfiguration() throws ConfigurationException {
