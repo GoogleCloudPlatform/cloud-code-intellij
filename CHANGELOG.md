@@ -4,8 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [16.10.5]
 
+IMPORTANT: 
+This plugin requires the use of Cloud SDK v 131.0.0 for correct execution of the local
+development server with the latest Java 8 SDK. Please run 'gcloud components update' from your 
+shell to ensure you have the latest Cloud SDK release.
+
 ### Fixed
-- Fixed issue with local development server debug mode when changes are made while the server is running. ([#972](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972))
+- Fixed issue with local development server debug mode when changes are made while the server is 
+running. ([#972](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972))
+- Better wording when the development server has an invalid Cloud SDK path. 
+([#1043](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1043)).
+- Update run configuration names to be prefixed with 'Google ..'
+([#1021](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1021)).
 
 ## [16.10.1]
 - Note we are changing the versioning scheme to YY.MM.i. We plan on a monthly release cadence to
