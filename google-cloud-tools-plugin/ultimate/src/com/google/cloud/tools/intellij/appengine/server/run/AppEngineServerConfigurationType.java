@@ -72,27 +72,27 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
 
   @Override
   public ConfigurationFactory[] getConfigurationFactories() {
-    return new ConfigurationFactory[] {
-       new ConfigurationFactory(this) {
-         @NotNull
-         @Override
-         public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
-           return createJ2EEConfigurationTemplate(this, project, true /*isLocal*/);
-         }
+    return new ConfigurationFactory[]{
+        new ConfigurationFactory(this) {
+          @NotNull
+          @Override
+          public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
+            return createJ2EEConfigurationTemplate(this, project, true /*isLocal*/);
+          }
 
-         /**
-          * If false, then this run configuration shows up under the "irrelevant" section. If it's
-          * not an App Engine Standard project (doesn't have an appengine-web.xml) then the run
-          * config should show up as "irrelevant".
-          */
-         @Override
-         public boolean isApplicable(@NotNull Project project) {
-           XmlFile webXml = AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(
-               project, Arrays.asList(ModuleManager.getInstance(project).getModules()));
+          /**
+           * If false, then this run configuration shows up under the "irrelevant" section. If it's
+           * not an App Engine Standard project (doesn't have an appengine-web.xml) then the run
+           * config should show up as "irrelevant".
+           */
+          @Override
+          public boolean isApplicable(@NotNull Project project) {
+            XmlFile webXml = AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(
+                project, Arrays.asList(ModuleManager.getInstance(project).getModules()));
 
-           return webXml != null;
-         }
-       }
+            return webXml != null;
+          }
+        }
     };
   }
 
