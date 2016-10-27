@@ -82,8 +82,8 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
 
          /**
           * If false, then this run configuration shows up under the "irrelevant" section. If it's
-          * not an App Engine Standard project (has an appengine-web.xml) then the run config should
-          * show up as "irrelevant".
+          * not an App Engine Standard project (doesn't have an appengine-web.xml) then the run
+          * config should show up as "irrelevant".
           */
          @Override
          public boolean isApplicable(@NotNull Project project) {
