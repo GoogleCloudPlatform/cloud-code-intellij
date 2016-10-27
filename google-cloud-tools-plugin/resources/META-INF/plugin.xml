@@ -263,10 +263,19 @@
   <actions>
     <action id="AddSnapshotLocation" class="com.google.cloud.tools.intellij.debugger.actions.ToggleSnapshotLocationAction"/>
 
-    <action id="GoogleCloudTools.AppEngineDeploy"
-            class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineToolsMenuAction">
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    <action id="GoogleCloudTools.UploadSourceToGCP"
+            class="com.google.cloud.tools.intellij.vcs.UploadSourceAction">
+      <add-to-group group-id="Vcs.Import"/>
     </action>
+
+    <group id="GoogleCloudTools" text="Google Cloud Tools" class="com.google.cloud.tools.intellij.CloudToolsMenuGroupAction" popup="true">
+      <action id="GoogleCloudTools.AppEngineDeploy" class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployToolsMenuAction"/>
+      <action id="GoogleCloudTools.AppEngineStandardLocalRun" class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardLocalRunToolsMenuAction"/>
+      <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.debugger.CloudDebuggerToolsMenuAction"/>
+      <reference ref="GoogleCloudTools.UploadSourceToGCP"/>
+
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </group>
 
     <group id="EditorGutterCloudDebuggerMenu">
       <separator/>
@@ -281,11 +290,6 @@
       <reference ref="XDebugger.RemoveWatch"/>
       <reference ref="XDebugger.RemoveAllWatches"/>
     </group>
-
-    <action id="GoogleCloudTools.UploadSourceToGCP"
-            class="com.google.cloud.tools.intellij.vcs.UploadSourceAction">
-      <add-to-group group-id="Vcs.Import"/>
-    </action>
   </actions>
 
 </idea-plugin>

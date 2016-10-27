@@ -36,17 +36,16 @@ import java.util.List;
 /**
  * Creates a shortcut to App Engine flex cloud configuration in the tools menu.
  */
-public class AppEngineToolsMenuAction extends AnAction {
+public class AppEngineDeployToolsMenuAction extends AnAction {
 
-  private static final Logger logger = Logger.getInstance(AppEngineToolsMenuAction.class);
+  private static final Logger logger = Logger.getInstance(AppEngineDeployToolsMenuAction.class);
 
-  public static final String ID = "CloudToolsMenuItem";
-  public static final String GROUP_ID = "ToolsMenu";
+//  public static final String ID = "CloudToolsMenuItem";
 
   /**
    * Initialize the tools menu shortcut.
    */
-  public AppEngineToolsMenuAction() {
+  public AppEngineDeployToolsMenuAction() {
     super(GctBundle.message("appengine.tools.menu.item.label"),
         GctBundle.message("appengine.tools.menu.item.label"),
         GoogleCloudToolsIcons.APP_ENGINE);
