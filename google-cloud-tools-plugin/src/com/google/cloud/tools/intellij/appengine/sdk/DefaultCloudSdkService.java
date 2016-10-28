@@ -19,6 +19,9 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
+import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
+import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.ide.util.PropertiesComponent;
@@ -56,6 +59,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
+  private static final String CLOUD_SDK_REQUIRED_VERSION_KEY = "cloudsdk.required.version";
   private static final Path JAVA_TOOLS_RELATIVE_PATH
       = Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
 
@@ -159,6 +163,28 @@ public class DefaultCloudSdkService extends CloudSdkService {
         vmParameters.add("-Xbootclasspath/p:" + patchPath.getAbsolutePath());
       }
     }
+  }
+
+  @Override
+  public boolean isCloudSdkVersionSupported(CloudSdk sdk) {
+    sdk.validateCloudSdk();
+
+    CloudSdkVersion requiredVersion = getMinimumRequiredCloudSdkVersion();
+    CloudSdkVersion actualVersion;
+    try {
+      actualVersion = sdk.getVersion();
+    } catch (ProcessRunnerException exception) {
+      logger.error("Exception encountered when calling the cloud SDK", exception);
+      return false;
+    }
+
+    return actualVersion.compareTo(requiredVersion) >= 0;
+  }
+
+  @Override
+  public CloudSdkVersion getMinimumRequiredCloudSdkVersion() {
+    String version = new PropertiesFileFlagReader().getFlagString(CLOUD_SDK_REQUIRED_VERSION_KEY);
+    return new CloudSdkVersion(version);
   }
 
   private Map<String, Set<String>> loadBlackList() throws IOException {

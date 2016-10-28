@@ -16,6 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
+
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.openapi.components.ServiceManager;
 
@@ -57,4 +60,9 @@ public abstract class CloudSdkService {
   public abstract File getWebSchemeFile();
 
   public abstract void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters);
+
+  public abstract boolean isCloudSdkVersionSupported(CloudSdk sdk);
+
+  public abstract CloudSdkVersion getMinimumRequiredCloudSdkVersion();
+
 }
