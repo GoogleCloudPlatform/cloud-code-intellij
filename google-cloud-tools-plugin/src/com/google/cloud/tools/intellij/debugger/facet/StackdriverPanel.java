@@ -84,6 +84,7 @@ public class StackdriverPanel extends FacetEditorTab {
       ignoreErrors.setSelected(configuration.getState().isIgnoreErrors());
       return;
     }
+    // If not a StackdriverFacetConfiguration, use defaults, though this should never happen.
     generateSourceContext.setSelected(true);
     ignoreErrors.setSelected(true);
   }
