@@ -29,6 +29,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.xml.XmlFile;
@@ -69,7 +70,14 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
     VirtualFile appEngineWebXml = findHighestPriorityAppEngineWebXml(appEngineWebXmls);
 
     if (appEngineWebXml != null) {
-      return (XmlFile) PsiManager.getInstance(project).findFile(appEngineWebXml);
+      PsiFile psiFile = PsiManager.getInstance(project).findFile(appEngineWebXml);
+
+      if (psiFile instanceof XmlFile) {
+        return (XmlFile) psiFile;
+      } else {
+        logger.error(String.format("appengine-web.xml PSI File %s with name %s is not an XmlFile",
+            psiFile, psiFile != null ? psiFile.getName() : null));
+      }
     }
     return null;
   }
