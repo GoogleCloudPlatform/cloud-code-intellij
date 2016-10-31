@@ -33,7 +33,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
- * Created by joaomartins on 10/28/16.
+ * Stackdriver's facet user interface.
  */
 public class StackdriverPanel extends FacetEditorTab {
 
@@ -43,17 +43,19 @@ public class StackdriverPanel extends FacetEditorTab {
   private FacetEditorContext editorContext;
   private StackdriverFacetConfiguration configuration;
 
-  public StackdriverPanel() {}
-
-  public StackdriverPanel(FacetEditorContext editorContext) {
-    this.editorContext = editorContext;
-    configuration = (StackdriverFacetConfiguration) editorContext.getFacet().getConfiguration();
+  public StackdriverPanel() {
     generateSourceContext.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         ignoreErrors.setEnabled(!ignoreErrors.isEnabled());
       }
     });
+  }
+
+  public StackdriverPanel(FacetEditorContext editorContext) {
+    this();
+    this.editorContext = editorContext;
+    configuration = (StackdriverFacetConfiguration) editorContext.getFacet().getConfiguration();
   }
 
   @NotNull

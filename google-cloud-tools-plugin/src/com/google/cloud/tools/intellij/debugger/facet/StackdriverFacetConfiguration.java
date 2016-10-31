@@ -30,7 +30,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by joaomartins on 10/27/16.
+ * Stores the facet configuration and handles its persistence.
  */
 public class StackdriverFacetConfiguration
     implements FacetConfiguration, PersistentStateComponent<StackdriverProperties> {

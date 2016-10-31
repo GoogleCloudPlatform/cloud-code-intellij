@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.debugger.facet;
 
+import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.facet.Facet;
@@ -28,9 +29,8 @@ import com.intellij.openapi.module.ModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Created by joaomartins on 10/28/16.
- */
+import javax.swing.Icon;
+
 public class StackdriverFacetType
     extends FacetType<StackdriverFacet, StackdriverFacetConfiguration> {
   public static final String STRING_ID = "stackdriver";
@@ -54,5 +54,11 @@ public class StackdriverFacetType
   @Override
   public boolean isSuitableModuleType(ModuleType moduleType) {
     return moduleType instanceof JavaModuleType;
+  }
+
+  @Nullable
+  @Override
+  public Icon getIcon() {
+    return GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER;
   }
 }
