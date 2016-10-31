@@ -16,15 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
-
-import com.intellij.testFramework.LightPlatformTestCase;
+import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultCloudSdkServiceTest extends LightPlatformTestCase {
+public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
   private CloudSdkService service;
 
@@ -41,10 +41,8 @@ public class DefaultCloudSdkServiceTest extends LightPlatformTestCase {
   private CloudSdk mockSdk;
 
   @Before
-  @Override
   public void setUp() throws Exception {
-    super.setUp();
-    service = DefaultCloudSdkService.getInstance();
+    service = new DefaultCloudSdkService();
   }
 
   @Test
@@ -70,9 +68,4 @@ public class DefaultCloudSdkServiceTest extends LightPlatformTestCase {
     assertNotNull(service.getMinimumRequiredCloudSdkVersion());
   }
 
-  @Override
-  protected String getTestName(boolean lowercaseFirstLetter) {
-    // Workaround for NPE thrown by parent class
-    return "DefaultCloudSdkServiceTest";
-  }
 }
