@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
@@ -61,6 +63,11 @@ public class DefaultCloudSdkServiceTest extends LightPlatformTestCase {
   public void testIsCloudSdkSupported_gcloudException() throws ProcessRunnerException {
     when(mockSdk.getVersion()).thenThrow(ProcessRunnerException.class);
     assertFalse(service.isCloudSdkVersionSupported(mockSdk));
+  }
+
+  @Test
+  public void testGetMinimumRequiredCloudSdkVersion() {
+    assertNotNull(service.getMinimumRequiredCloudSdkVersion());
   }
 
   @Override

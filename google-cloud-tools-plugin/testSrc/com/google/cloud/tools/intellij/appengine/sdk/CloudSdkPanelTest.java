@@ -23,6 +23,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.ui.JBColor;
 
+import org.junit.After;
 import org.picocontainer.MutablePicoContainer;
 
 import javax.swing.JTextPane;
@@ -62,6 +63,16 @@ public class CloudSdkPanelTest extends PlatformTestCase {
 
     applicationContainer.registerComponentInstance(
         CloudSdkService.class.getName(), cloudSdkService);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    super.tearDown();
+    MutablePicoContainer applicationContainer = (MutablePicoContainer)
+        ApplicationManager.getApplication().getPicoContainer();
+
+    applicationContainer.unregisterComponent(cloudSdkService);
+
   }
 
   public void testSetupWithInvalidSdk() {

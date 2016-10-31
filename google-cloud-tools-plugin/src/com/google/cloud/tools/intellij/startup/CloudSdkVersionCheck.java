@@ -67,10 +67,10 @@ public class CloudSdkVersionCheck {
             NotificationDisplayType.BALLOON,
             true);
 
-    String message = "<p>" +
-        GctBundle.message("appengine.cloudsdk.version.support.message",
-            found.toString(), required.toString()) +
-        "</p>";
+    String message = "<p>"
+        + GctBundle.message("appengine.cloudsdk.version.support.message",
+            found.toString(), required.toString())
+        + "</p>";
 
     notification
         .createNotification(

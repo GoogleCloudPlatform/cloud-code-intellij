@@ -174,7 +174,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
     try {
       actualVersion = sdk.getVersion();
     } catch (ProcessRunnerException exception) {
-      logger.error("Exception encountered when calling the cloud SDK", exception);
+      logger.warn("Exception encountered when calling the cloud SDK", exception);
       return false;
     }
 
