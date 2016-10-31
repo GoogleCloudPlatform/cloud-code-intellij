@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.JComponent;
 
 /**
- * Created by joaomartins on 10/27/16.
+ * Adds Google Stackdriver support to IntelliJ IDEA Java projects.
  */
 public class StackdriverSupportProvider extends FrameworkSupportInModuleProvider {
 
