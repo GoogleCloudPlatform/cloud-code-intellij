@@ -18,14 +18,10 @@ package com.google.cloud.tools.intellij.debugger.facet;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;
-import com.intellij.facet.FacetTypeId;
 import com.intellij.openapi.module.Module;
 
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Created by joaomartins on 10/27/16.
- */
 public class StackdriverFacet extends Facet<StackdriverFacetConfiguration> {
 
   public StackdriverFacet(@NotNull FacetType facetType,
