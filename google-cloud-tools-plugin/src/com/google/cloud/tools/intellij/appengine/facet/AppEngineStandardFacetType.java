@@ -56,12 +56,6 @@ public class AppEngineStandardFacetType
     return moduleType instanceof JavaModuleType;
   }
 
-  @NotNull
-  @Override
-  public String getDefaultFacetName() {
-    return "Google App Engine Standard";
-  }
-
   @Override
   public Icon getIcon() {
     return GoogleCloudToolsIcons.APP_ENGINE;
