@@ -75,7 +75,7 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
       if (psiFile instanceof XmlFile) {
         return (XmlFile) psiFile;
       } else {
-        logger.error(String.format("appengine-web.xml PSI File %s with name %s is not an XmlFile."
+        logger.error(String.format("appengine-web.xml PSI File %s with name %s is not an XmlFile. "
             + "It was chosen from the following appengine-web.xml's that were found: %s",
             psiFile, psiFile != null ? psiFile.getName() : null, appEngineWebXmls));
       }
