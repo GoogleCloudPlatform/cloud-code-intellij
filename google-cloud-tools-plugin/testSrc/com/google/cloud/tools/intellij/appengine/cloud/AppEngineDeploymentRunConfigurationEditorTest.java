@@ -20,11 +20,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestCase;
+
+import org.picocontainer.MutablePicoContainer;
 
 import javax.swing.JCheckBox;
 
@@ -35,6 +39,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   private AppEngineArtifactDeploymentSource deploymentSource;
   private AppEngineHelper appEngineHelper;
   private ProjectSelector projectSelector;
+  private CloudSdkService cloudSdkService;
 
   @Override
   public void setUp() throws Exception {
@@ -50,6 +55,16 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     projectSelector = mock(ProjectSelector.class);
     when(projectSelector.getText()).thenReturn(PROJECT_NAME);
 
+    cloudSdkService = mock(CloudSdkService.class);
+
+    MutablePicoContainer applicationContainer = (MutablePicoContainer)
+        ApplicationManager.getApplication().getPicoContainer();
+
+    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
+
+    applicationContainer.registerComponentInstance(
+        CloudSdkService.class.getName(), cloudSdkService);
+
     editor = new AppEngineDeploymentRunConfigurationEditor(
         getProject(), deploymentSource, appEngineHelper);
 
@@ -60,6 +75,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
     config.setConfigType(ConfigType.AUTO);
+    when(cloudSdkService.hasJavaComponent()).thenReturn(true);
 
     try {
       editor.applyEditorTo(config);

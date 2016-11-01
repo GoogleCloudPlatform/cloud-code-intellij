@@ -387,18 +387,10 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         throw new ConfigurationException(
             GctBundle.message("appengine.flex.config.custom.dockerfile.error"));
       }
-    } else if (environment.isStandard()) {
-      try {
-        new CloudSdk.Builder()
-            .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
-            .build()
-            .validateAppEngineJavaComponents();
-
-      } catch (AppEngineJavaComponentsNotInstalledException ex) {
-        throw new ConfigurationException(
-            GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
+    } else if (environment.isStandard() && !CloudSdkService.getInstance().hasJavaComponent()) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
               + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
-      }
     }
   }
 
