@@ -191,11 +191,11 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   private AppEngineDeploymentRunConfigurationEditor createEditor(AppEngineEnvironment environment) {
-     when(deploymentSource.getEnvironment()).thenReturn(environment);
+    when(deploymentSource.getEnvironment()).thenReturn(environment);
 
     AppEngineDeploymentRunConfigurationEditor editor
         = new AppEngineDeploymentRunConfigurationEditor(getProject(),
-            deploymentSource, appEngineHelper);
+        deploymentSource, appEngineHelper);
 
     editor.setProjectSelector(projectSelector);
 
