@@ -27,6 +27,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,6 +50,12 @@ public class StackdriverSupportProvider extends FrameworkSupportInModuleProvider
   public FrameworkSupportInModuleConfigurable createConfigurable(
       @NotNull FrameworkSupportModel model) {
     return new StackdriverSupportConfigurable();
+  }
+
+  @Override
+  public boolean isSupportAlreadyAdded(@NotNull Module module,
+      @NotNull FacetsProvider facetsProvider) {
+    return !facetsProvider.getFacetsByType(module, StackdriverFacetType.ID).isEmpty();
   }
 
   @Override

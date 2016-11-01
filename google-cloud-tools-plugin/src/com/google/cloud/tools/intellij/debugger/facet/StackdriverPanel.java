@@ -43,7 +43,13 @@ public class StackdriverPanel extends FacetEditorTab {
   private FacetEditorContext editorContext;
   private StackdriverFacetConfiguration configuration;
 
+  /**
+   * Used from the New Project/Module dialog, through {@link StackdriverSupportProvider}, where a
+   * {@link FacetEditorContext} isn't available, but also doesn't use
+   * {@link StackdriverPanel#apply()} to persist the configuration.
+   */
   public StackdriverPanel() {
+    this(null /* editorContext */);
     generateSourceContext.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -52,10 +58,16 @@ public class StackdriverPanel extends FacetEditorTab {
     });
   }
 
+  /**
+   * Used from the Facets -> Add dialog.
+   *
+   * @param editorContext may contain the Stackdriver facet in the current context
+   */
   public StackdriverPanel(FacetEditorContext editorContext) {
-    this();
     this.editorContext = editorContext;
-    configuration = (StackdriverFacetConfiguration) editorContext.getFacet().getConfiguration();
+    if (editorContext != null) {
+      configuration = (StackdriverFacetConfiguration) editorContext.getFacet().getConfiguration();
+    }
   }
 
   @NotNull
@@ -91,7 +103,7 @@ public class StackdriverPanel extends FacetEditorTab {
 
   @Override
   public void disposeUIResources() {
-
+    // Do nothing.
   }
 
   @Nls

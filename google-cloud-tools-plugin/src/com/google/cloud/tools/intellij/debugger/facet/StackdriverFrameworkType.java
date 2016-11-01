@@ -26,6 +26,12 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 
+/**
+ * Represents Stackdriver support for a project.
+ *
+ * <p>This class makes it possible to show "Google Stackdriver Debugger" as an option in the
+ * New Project dialog, as well as in the Add Facet dialog.
+ */
 public class StackdriverFrameworkType extends FrameworkTypeEx {
 
   public static final String ID = "stackdriver-java";

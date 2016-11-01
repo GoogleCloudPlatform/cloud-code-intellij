@@ -47,10 +47,12 @@ public class StackdriverFacetConfiguration
 
   @Override
   public void readExternal(Element element) throws InvalidDataException {
+    // Deprecated.
   }
 
   @Override
   public void writeExternal(Element element) throws WriteExternalException {
+    // Deprecated.
   }
 
   @Nullable
