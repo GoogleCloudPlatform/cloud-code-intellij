@@ -387,7 +387,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         throw new ConfigurationException(
             GctBundle.message("appengine.flex.config.custom.dockerfile.error"));
       }
-    } else {
+    } else if (environment.isStandard()) {
       try {
         new CloudSdk.Builder()
             .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
