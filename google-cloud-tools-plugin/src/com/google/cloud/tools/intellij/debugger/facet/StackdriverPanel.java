@@ -47,8 +47,6 @@ public class StackdriverPanel extends FacetEditorTab {
     generateSourceContext.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        // e.getSource() has to be used here because generateSourceContext.isSelected() is only
-        // refreshed after this method returns.
         ignoreErrors.setEnabled(((JCheckBox)e.getSource()).isSelected());
       }
     });
