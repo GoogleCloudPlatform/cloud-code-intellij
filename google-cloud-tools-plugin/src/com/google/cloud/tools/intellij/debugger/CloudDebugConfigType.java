@@ -59,7 +59,7 @@ public class CloudDebugConfigType implements ConfigurationType {
 
   @Override
   public String getConfigurationTypeDescription() {
-    return GctBundle.getString("clouddebug.stackdriver.debugger");
+    return GctBundle.getString("clouddebug.text");
   }
 
   @Override
