@@ -39,6 +39,13 @@ import javax.annotation.Nullable;
  */
 public class CloudDebuggerToolsMenuAction extends AnAction {
 
+  private static Predicate<ConfigurationType> isDebugType = new Predicate<ConfigurationType>() {
+    @Override
+    public boolean apply(@Nullable ConfigurationType configurationType) {
+      return configurationType instanceof CloudDebugConfigType;
+    }
+  };
+
   public CloudDebuggerToolsMenuAction() {
     super("Stackdriver Debug...", "Stackdriver Debug...",
         GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER);
@@ -52,17 +59,9 @@ public class CloudDebuggerToolsMenuAction extends AnAction {
       return;
     }
 
-    final RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
+    final RunManagerImpl manager = RunManagerImpl.getInstanceImpl(project);
 
-    Predicate<ConfigurationType> isDebugType = new Predicate<ConfigurationType>() {
-      @Override
-      public boolean apply(@Nullable ConfigurationType configurationType) {
-        return configurationType instanceof CloudDebugConfigType;
-      }
-    };
-
-    ConfigurationType type = FluentIterable.from(
-        Arrays.asList(runManager.getConfigurationFactories()))
+    ConfigurationType type = FluentIterable.from(Arrays.asList(manager.getConfigurationFactories()))
         .firstMatch(isDebugType)
         .orNull();
 
@@ -74,10 +73,10 @@ public class CloudDebuggerToolsMenuAction extends AnAction {
         EditConfigurationsDialog dialog = new EditConfigurationsDialog(project, factory);
 
         if (dialog.showAndGet()) {
-          RunnerAndConfigurationSettings settings = runManager.getSelectedConfiguration();
+          RunnerAndConfigurationSettings settings = manager.getSelectedConfiguration();
 
           if (settings != null) {
-            runManager.addConfiguration(settings, false /*isShared*/);
+            manager.addConfiguration(settings, false /*isShared*/);
           }
         }
       }
