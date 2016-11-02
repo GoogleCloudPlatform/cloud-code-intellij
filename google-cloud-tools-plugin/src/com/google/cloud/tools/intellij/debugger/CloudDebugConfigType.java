@@ -22,6 +22,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
+import com.intellij.execution.configurations.ConfigurationTypeUtil;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
@@ -39,6 +40,10 @@ public class CloudDebugConfigType implements ConfigurationType {
   public static final String GCT_DEBUGGER_USETOKEN = "enable.gct.debugger.token";
 
   private final ConfigurationFactory factory;
+
+  public static CloudDebugConfigType getInstance() {
+    return ConfigurationTypeUtil.findConfigurationType(CloudDebugConfigType.class);
+  }
 
   public CloudDebugConfigType() {
     factory = new MyConfigurationFactory(this);

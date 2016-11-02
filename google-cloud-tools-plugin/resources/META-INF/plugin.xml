@@ -270,7 +270,8 @@
 
     <group id="GoogleCloudTools" text="Google Cloud Tools" class="com.google.cloud.tools.intellij.CloudToolsMenuGroupAction" popup="true">
       <action id="GoogleCloudTools.AppEngineDeploy" class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployToolsMenuAction"/>
-      <action id="GoogleCloudTools.AppEngineStandardLocalRun" class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardLocalRunToolsMenuAction"/>
+      <!--TODO move this to the ultimate module-->
+      <action id="GoogleCloudTools.AppEngineStandardLocalRun" class="com.google.cloud.tools.intellij.appengine.server.run.AppEngineStandardLocalRunToolsMenuAction"/>
       <separator/>
       <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.debugger.CloudDebuggerToolsMenuAction"/>
       <separator/>

@@ -14,28 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.server.run;
 
+import com.google.cloud.tools.intellij.CloudToolsRunConfigurationAction;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-
-import org.apache.commons.lang.NotImplementedException;
-
 /**
- * Created by eshaul on 10/27/16.
+ * Creates a shortcut to the App Engine standard local run configuration in the tools menu.
  */
-public class AppEngineStandardLocalRunToolsMenuAction extends AnAction {
+public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfigurationAction {
 
   public AppEngineStandardLocalRunToolsMenuAction() {
-    super("App Engine Standard Local Dev Server...",
-        "App Engine Standard Local Dev Server...", GoogleCloudToolsIcons.APP_ENGINE);
+    super(AppEngineServerConfigurationType.getInstance(),
+        "App Engine Standard Local Dev Server",
+        "Create or Run an App Engine Standard Local Dev Server Configuration",
+        GoogleCloudToolsIcons.APP_ENGINE);
   }
 
-  @Override
-  public void actionPerformed(AnActionEvent e) {
-    // TODO implement; only show for AE standard apps...
-    throw new NotImplementedException();
-  }
 }
