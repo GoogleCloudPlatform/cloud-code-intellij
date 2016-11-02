@@ -21,7 +21,8 @@ import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
 /**
- * Created by eshaul on 10/27/16.
+ * Creates the tools menu top-level item for Cloud Tools. All relevant shortcuts are sub-menu items
+ * of this.
  */
 public class CloudToolsMenuGroupAction extends DefaultActionGroup {
 

@@ -40,8 +40,6 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
 
   private static final Logger logger = Logger.getInstance(AppEngineDeployToolsMenuAction.class);
 
-//  public static final String ID = "CloudToolsMenuItem";
-
   /**
    * Initialize the tools menu shortcut.
    */
