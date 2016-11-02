@@ -169,10 +169,16 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     }
 
     try {
-      new CloudSdk.Builder()
+      CloudSdk sdk = new CloudSdk.Builder()
           .sdkPath(sdkService.getSdkHomePath())
-          .build()
-          .validateCloudSdk();
+          .build();
+      sdk.validateCloudSdk();
+
+      if (!sdkService.isCloudSdkVersionSupported(sdk)) {
+        throw new RuntimeConfigurationError(
+            GctBundle.message("appengine.cloudsdk.version.support.message",
+                sdkService.getMinimumRequiredCloudSdkVersion()));
+      }
     } catch (AppEngineException ex) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));

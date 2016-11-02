@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
