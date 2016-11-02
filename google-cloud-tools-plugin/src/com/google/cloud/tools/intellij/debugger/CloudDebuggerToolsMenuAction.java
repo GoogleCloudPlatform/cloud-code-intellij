@@ -17,14 +17,25 @@
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 
+import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.configurations.ConfigurationFactory;
+import com.intellij.execution.configurations.ConfigurationType;
+import com.intellij.execution.impl.EditConfigurationsDialog;
+import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 
-import org.apache.commons.lang.NotImplementedException;
+import java.util.Arrays;
+
+import javax.annotation.Nullable;
 
 /**
- * Created by eshaul on 10/27/16.
+ * Creates a shortcut to the Stackdriver debugger configuration in the tools menu.
  */
 public class CloudDebuggerToolsMenuAction extends AnAction {
 
@@ -35,7 +46,41 @@ public class CloudDebuggerToolsMenuAction extends AnAction {
 
   @Override
   public void actionPerformed(AnActionEvent e) {
-    // TODO implement me
-    throw new NotImplementedException();
+    final Project project = e.getProject();
+
+    if (project == null) {
+      return;
+    }
+
+    final RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
+
+    Predicate<ConfigurationType> isDebugType = new Predicate<ConfigurationType>() {
+      @Override
+      public boolean apply(@Nullable ConfigurationType configurationType) {
+        return configurationType instanceof CloudDebugConfigType;
+      }
+    };
+
+    ConfigurationType type = FluentIterable.from(
+        Arrays.asList(runManager.getConfigurationFactories()))
+        .firstMatch(isDebugType)
+        .orNull();
+
+    final ConfigurationFactory factory = type != null ? type.getConfigurationFactories()[0] : null;
+
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        EditConfigurationsDialog dialog = new EditConfigurationsDialog(project, factory);
+
+        if (dialog.showAndGet()) {
+          RunnerAndConfigurationSettings settings = runManager.getSelectedConfiguration();
+
+          if (settings != null) {
+            runManager.addConfiguration(settings, false /*isShared*/);
+          }
+        }
+      }
+    });
   }
 }
