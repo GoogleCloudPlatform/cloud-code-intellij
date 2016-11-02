@@ -52,8 +52,8 @@ public class CloudToolsRunConfigurationAction extends AnAction {
   }
 
   @Override
-  public void actionPerformed(AnActionEvent e) {
-    final Project project = e.getProject();
+  public void actionPerformed(AnActionEvent event) {
+    final Project project = event.getProject();
 
     if (project == null) {
       return;
