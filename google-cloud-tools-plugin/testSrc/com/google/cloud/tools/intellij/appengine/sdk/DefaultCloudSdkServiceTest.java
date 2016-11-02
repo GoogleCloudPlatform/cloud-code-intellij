@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
+import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import org.junit.Before;
@@ -47,13 +49,22 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
   @Test
   public void testIsCloudSdkSupported_priorVersion() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(new CloudSdkVersion("120.0.0"));
+    when(mockSdk.getVersion()).thenReturn(new CloudSdkVersion("1.0.0"));
     assertFalse(service.isCloudSdkVersionSupported(mockSdk));
   }
 
   @Test
   public void testIsCloudSdkSupported_laterVersion() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(new CloudSdkVersion("600.1.1"));
+    // arbitrarily high version number
+    CloudSdkVersion laterVersion = new CloudSdkVersion(Integer.toString(Integer.MAX_VALUE));
+
+    when(mockSdk.getVersion()).thenReturn(laterVersion);
+    assertTrue(service.isCloudSdkVersionSupported(mockSdk));
+  }
+
+  @Test
+  public void testIsCloudSdkSupported_equalVersion() throws ProcessRunnerException {
+    when(mockSdk.getVersion()).thenReturn(new CloudSdkVersion(readRequiredCloudSdkVersion()));
     assertTrue(service.isCloudSdkVersionSupported(mockSdk));
   }
 
@@ -65,7 +76,12 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
   @Test
   public void testGetMinimumRequiredCloudSdkVersion() {
-    assertNotNull(service.getMinimumRequiredCloudSdkVersion());
+    String expected = readRequiredCloudSdkVersion();
+    assertEquals(new CloudSdkVersion(expected), service.getMinimumRequiredCloudSdkVersion());
+  }
+
+  private String readRequiredCloudSdkVersion() {
+    return new PropertiesFileFlagReader().getFlagString("cloudsdk.required.version");
   }
 
 }
