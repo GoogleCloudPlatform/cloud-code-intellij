@@ -40,12 +40,9 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
 
   private static final Logger logger = Logger.getInstance(AppEngineDeployToolsMenuAction.class);
 
-  /**
-   * Initialize the tools menu shortcut.
-   */
   public AppEngineDeployToolsMenuAction() {
-    super(GctBundle.message("appengine.tools.menu.item.label"),
-        GctBundle.message("appengine.tools.menu.item.label"),
+    super(GctBundle.message("appengine.tools.menu.item.text"),
+        GctBundle.message("appengine.tools.menu.item.description"),
         GoogleCloudToolsIcons.APP_ENGINE);
   }
 
