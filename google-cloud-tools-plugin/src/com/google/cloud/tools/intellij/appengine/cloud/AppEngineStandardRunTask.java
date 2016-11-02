@@ -21,7 +21,6 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.startup.CloudSdkVersionCheck;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.base.Strings;
@@ -58,8 +57,6 @@ public class AppEngineStandardRunTask extends AppEngineTask {
         .async(true)
         .startListener(startListener)
         .build();
-
-    new CloudSdkVersionCheck().notifyIfCloudSdkNotSupported(sdk);
 
     CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdk);
     devServer.run(runConfig);
