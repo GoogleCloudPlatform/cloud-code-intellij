@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij;
+package com.google.cloud.tools.intellij.jps;
 
 import com.google.cloud.tools.appengine.api.debug.DefaultGenRepoInfoFileConfiguration;
 import com.google.cloud.tools.appengine.api.debug.GenRepoInfoFile;
@@ -45,7 +45,7 @@ import java.util.List;
 public class GenRepoInfoFileBuildTaskProvider extends ArtifactBuildTaskProvider {
   // Logging information from here goes to build/idea-sandbox/system/log/build-log/build.log.
   private static final Logger LOG =
-      Logger.getInstance("#com.google.cloud.tools.intellij.GenRepoInfoFileBuildTaskProvider");
+      Logger.getInstance("#com.google.cloud.tools.intellij.jps.GenRepoInfoFileBuildTaskProvider");
 
   @NotNull
   @Override
@@ -87,15 +87,15 @@ public class GenRepoInfoFileBuildTaskProvider extends ArtifactBuildTaskProvider 
         return;
       }
 
-      Path sdkPath = CloudSdkService.getInstance().getSdkHomePath();
-      if (sdkPath == null) {
-        LOG.info("No Cloud SDK specified. Skipping source context generation.");
-        return;
-      }
+//      Path sdkPath = CloudSdkService.getInstance().getSdkHomePath();
+//      if (sdkPath == null) {
+//        LOG.info("No Cloud SDK specified. Skipping source context generation.");
+//        return;
+//      }
 
       CloudSdk sdk = new CloudSdk.Builder()
-//          .sdkPath(Paths.get("/usr/local/google/home/joaomartins/Downloads/google-cloud-sdk"))
-          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+          .sdkPath(Paths.get("/usr/local/google/home/joaomartins/Downloads/google-cloud-sdk"))
+//          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
           .exitListener(new ProcessExitListener() {
             @Override
             public void onExit(int exitCode) {
@@ -108,7 +108,7 @@ public class GenRepoInfoFileBuildTaskProvider extends ArtifactBuildTaskProvider 
       DefaultGenRepoInfoFileConfiguration configuration = new DefaultGenRepoInfoFileConfiguration();
       configuration.setSourceDirectory(sourceDirectory.toFile());
       configuration.setOutputDirectory(outputDirectory.toFile());
-      genAction.generate(configuration);
+//      genAction.generate(configuration);
     }
   }
 }

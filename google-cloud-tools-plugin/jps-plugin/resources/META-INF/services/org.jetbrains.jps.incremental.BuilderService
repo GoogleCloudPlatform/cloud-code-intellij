@@ -14,4 +14,4 @@
 # limitations under the License.
 #
 
-com.google.cloud.tools.intellij.jps.GenRepoInfoFileBuildTaskProvider
+com.google.cloud.tools.intellij.jps.StackdriverBuilderService
