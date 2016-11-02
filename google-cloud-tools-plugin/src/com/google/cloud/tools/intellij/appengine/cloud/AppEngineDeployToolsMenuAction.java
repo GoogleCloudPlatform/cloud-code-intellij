@@ -41,8 +41,8 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
   private static final Logger logger = Logger.getInstance(AppEngineDeployToolsMenuAction.class);
 
   public AppEngineDeployToolsMenuAction() {
-    super(GctBundle.message("appengine.tools.menu.item.text"),
-        GctBundle.message("appengine.tools.menu.item.description"),
+    super(GctBundle.message("appengine.tools.menu.deploy.text"),
+        GctBundle.message("appengine.tools.menu.deploy.description"),
         GoogleCloudToolsIcons.APP_ENGINE);
   }
 

@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.server.run;
 
 import com.google.cloud.tools.intellij.CloudToolsRunConfigurationAction;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 /**
  * Creates a shortcut to the App Engine standard local run configuration in the tools menu.
@@ -26,8 +27,8 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
 
   public AppEngineStandardLocalRunToolsMenuAction() {
     super(AppEngineServerConfigurationType.getInstance(),
-        "App Engine Standard Local Dev Server",
-        "Create or Run an App Engine Standard Local Dev Server Configuration",
+        GctBundle.message("appengine.tools.menu.run.server.text"),
+        GctBundle.message("appengine.tools.menu.run.server.description"),
         GoogleCloudToolsIcons.APP_ENGINE);
   }
 
