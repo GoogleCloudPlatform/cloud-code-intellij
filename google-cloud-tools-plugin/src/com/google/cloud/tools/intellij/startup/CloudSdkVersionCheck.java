@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.startup;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
@@ -26,21 +27,46 @@ import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.startup.StartupActivity;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.nio.file.Path;
 
 /**
  * Checks that the configured Cloud SDK's version is supported, and warns the user if the Cloud SDK
  * needs to be updated.
  */
-public class CloudSdkVersionCheck {
+public class CloudSdkVersionCheck implements StartupActivity {
 
   private static final Logger logger = Logger.getInstance(CloudSdkVersionCheck.class);
+
+  @Override
+  public void runActivity(@NotNull Project project) {
+    // If there is a configured Cloud SDK at this time, check that it is supported.
+    Path cloudSdkPath = CloudSdkService.getInstance().getSdkHomePath();
+    if (cloudSdkPath != null) {
+      CloudSdk sdk = new CloudSdk.Builder().sdkPath(cloudSdkPath).build();
+
+      try {
+        sdk.validateCloudSdk();
+      } catch (CloudSdkNotFoundException exception) {
+        // No need to do anything - a valid Cloud SDK is not actually required right now.
+        return;
+      }
+
+      // The user has a configured SDK so we can run the check.
+      notifyIfCloudSdkNotSupported(sdk);
+    }
+  }
 
   /**
    * Notify the user that they need to update their Cloud SDK installation, if it is not supported.
    *
    * @return true if a notification was shown
    */
-  public boolean notifyIfCloudSdkNotSupported(CloudSdk sdk) {
+  public void notifyIfCloudSdkNotSupported(CloudSdk sdk) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     if (!cloudSdkService.isCloudSdkVersionSupported(sdk)) {
 
@@ -51,13 +77,11 @@ public class CloudSdkVersionCheck {
         actualVersion = sdk.getVersion();
       } catch (ProcessRunnerException exception) {
         logger.error("Exception encountered when calling the cloud SDK", exception);
-        return false;
+        return;
       }
 
       showNotification(actualVersion, requiredVersion);
-      return true;
     }
-    return false;
   }
 
   private void showNotification(CloudSdkVersion found, CloudSdkVersion required) {

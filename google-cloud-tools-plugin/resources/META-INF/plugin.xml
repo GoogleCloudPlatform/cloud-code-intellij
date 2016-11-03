@@ -241,6 +241,7 @@
 
     <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.PluginCompatibilityCheck"/>
     <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.AppEngineStandardUnsupportedJavaVersionCheck"/>
+    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.CloudSdkVersionCheck"/>
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">
