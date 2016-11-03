@@ -23,8 +23,6 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkGenRepoInfoFile;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.intellij.jps.model.JpsStackdriverModuleExtension;
 import com.google.cloud.tools.intellij.jps.model.impl.JpsStackdriverModuleExtensionImpl;
-import com.google.cloud.tools.intellij.jps.model.impl.StackdriverProperties;
-import com.google.common.collect.ImmutableList;
 
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -42,7 +40,7 @@ import org.jetbrains.jps.model.module.JpsModule;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Collections;
 
 /**
  * Created by joaomartins on 11/2/16.
@@ -74,7 +72,6 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       }
 
       CloudSdk sdk = new CloudSdk.Builder()
-//          .sdkPath(Paths.get("/usr/local/google/home/joaomartins/Downloads/google-cloud-sdk"))
           .sdkPath(extension.getCloudSdkPath())
           .exitListener(new ProcessExitListener() {
             @Override
@@ -93,11 +90,11 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       outputConsumer.registerOutputFile(
           target,
           outputDirectory.resolve("source-context.json").toFile(),
-          ImmutableList.of());
+          Collections.<String>emptyList());
       outputConsumer.registerOutputFile(
           target,
           outputDirectory.resolve("source-contexts.json").toFile(),
-          ImmutableList.of());
+          Collections.<String>emptyList());
     }
     return ExitCode.OK;
   }
