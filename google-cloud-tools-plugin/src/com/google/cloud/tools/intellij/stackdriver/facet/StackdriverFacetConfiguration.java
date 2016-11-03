@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.debugger.facet;
+package com.google.cloud.tools.intellij.stackdriver.facet;
 
-import com.google.cloud.tools.intellij.debugger.facet.StackdriverFacetConfiguration.StackdriverProperties;
+import com.google.cloud.tools.intellij.stackdriver.facet.StackdriverFacetConfiguration.StackdriverProperties;
 
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;

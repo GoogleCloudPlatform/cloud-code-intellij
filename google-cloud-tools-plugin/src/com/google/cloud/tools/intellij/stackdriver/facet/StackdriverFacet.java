@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.debugger.facet;
+package com.google.cloud.tools.intellij.stackdriver.facet;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;

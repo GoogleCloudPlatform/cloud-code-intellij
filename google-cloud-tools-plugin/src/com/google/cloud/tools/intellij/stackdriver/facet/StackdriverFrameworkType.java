@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.debugger.facet;
+package com.google.cloud.tools.intellij.stackdriver.facet;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -29,8 +29,8 @@ import javax.swing.Icon;
 /**
  * Represents Stackdriver support for a project.
  *
- * <p>This class makes it possible to show "Google Stackdriver Debugger" as an option in the
- * New Project dialog, as well as in the Add Facet dialog.
+ * <p>This class makes it possible to show "Google Stackdriver" as an option in the New Project
+ * dialog, as well as in the Add Facet dialog.
  */
 public class StackdriverFrameworkType extends FrameworkTypeEx {
 
@@ -53,12 +53,13 @@ public class StackdriverFrameworkType extends FrameworkTypeEx {
   @NotNull
   @Override
   public String getPresentableName() {
-    return GctBundle.getString("clouddebug.stackdriver.debugger");
+    return GctBundle.getString("stackdriver.name");
   }
 
   @NotNull
   @Override
   public Icon getIcon() {
+    // TODO(joaomartins): Replace with the generic green Stackdriver logo.
     return GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER;
   }
 }

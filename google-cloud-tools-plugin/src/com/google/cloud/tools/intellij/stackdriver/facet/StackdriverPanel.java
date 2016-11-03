@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.debugger.facet;
+package com.google.cloud.tools.intellij.stackdriver.facet;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -33,7 +33,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
- * Stackdriver's facet user interface.
+ * Stackdriver facet's user interface.
  */
 public class StackdriverPanel extends FacetEditorTab {
 
@@ -109,7 +109,7 @@ public class StackdriverPanel extends FacetEditorTab {
   @Nls
   @Override
   public String getDisplayName() {
-    return GctBundle.getString("clouddebug.stackdriver.debugger");
+    return GctBundle.getString("stackdriver.name");
   }
 
   public boolean isGenerateSourceContextSelected() {

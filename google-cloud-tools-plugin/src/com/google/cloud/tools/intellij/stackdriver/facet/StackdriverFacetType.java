@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.debugger.facet;
+package com.google.cloud.tools.intellij.stackdriver.facet;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -37,7 +37,7 @@ public class StackdriverFacetType
   public static final FacetTypeId<StackdriverFacet> ID = new FacetTypeId<>(STRING_ID);
 
   public StackdriverFacetType() {
-    super(ID, STRING_ID, GctBundle.getString("clouddebug.stackdriver.debugger"));
+    super(ID, STRING_ID, GctBundle.getString("stackdriver.name"));
   }
 
   @Override
@@ -59,6 +59,7 @@ public class StackdriverFacetType
   @Nullable
   @Override
   public Icon getIcon() {
+    // TODO(joaomartins): Replace with the generic green Stackdriver logo.
     return GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER;
   }
 }
