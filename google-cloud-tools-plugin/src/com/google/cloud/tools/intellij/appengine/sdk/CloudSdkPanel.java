@@ -81,32 +81,58 @@ public class CloudSdkPanel {
     String path = cloudSdkDirectoryField.getText();
 
     if (StringUtil.isEmpty(path)) {
-      warningIcon.setVisible(true);
-      warningMessage.setVisible(true);
-      warningMessage.setText(
-          createErrorMessageWithLink(
-              GctBundle.message("appengine.cloudsdk.location.missing.message")));
+      showWarning(createErrorMessageWithLink(
+              GctBundle.message("appengine.cloudsdk.location.missing.message")),
+              false /* setSdkDirectoryErrorState */);
 
       return;
     }
 
-    try {
-      new CloudSdk.Builder()
-          .sdkPath(Paths.get(path))
-          .build()
-          .validateCloudSdk();
+    CloudSdk sdk;
 
-      cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
-      warningIcon.setVisible(false);
-      warningMessage.setVisible(false);
+    // check that the sdk path is valid
+    try {
+      sdk = new CloudSdk.Builder()
+          .sdkPath(Paths.get(path))
+          .build();
+
+      sdk.validateCloudSdk();
+
     } catch (AppEngineException aee) {
-      cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
-      warningIcon.setVisible(true);
-      warningMessage.setVisible(true);
-      warningMessage.setText(
-          createErrorMessageWithLink(
-              GctBundle.message("appengine.cloudsdk.location.invalid.message")));
+      showWarning(createErrorMessageWithLink(
+          GctBundle.message("appengine.cloudsdk.location.invalid.message")),
+          true /* setSdkDirectoryErrorState */);
+
+      return;
     }
+
+    // check that the sdk is a supported version
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+    if (!sdkService.isCloudSdkVersionSupported(sdk)) {
+     showWarning(GctBundle.message("appengine.cloudsdk.version.support.message",
+         sdkService.getMinimumRequiredCloudSdkVersion()),
+         false /* setSdkDirectoryErrorState */);
+      return;
+    }
+
+    hideWarning();
+  }
+
+  private void showWarning(String message, boolean setSdkDirectoryErrorState) {
+    warningIcon.setVisible(true);
+    warningMessage.setVisible(true);
+    warningMessage.setText(message);
+
+    if (setSdkDirectoryErrorState) {
+      cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
+    }
+  }
+
+  private void hideWarning() {
+    cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
+    warningIcon.setVisible(false);
+    warningIcon.setVisible(false);
+    warningMessage.setVisible(false);
   }
 
   @VisibleForTesting

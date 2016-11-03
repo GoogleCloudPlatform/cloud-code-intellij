@@ -16,10 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -28,6 +31,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 
+import com.intellij.execution.configurations.RuntimeConfigurationWarning;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -362,6 +366,22 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   private void validateConfiguration() throws ConfigurationException {
+    // check that the sdk is a supported version
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+    CloudSdk sdk = new CloudSdk.Builder().sdkPath(sdkService.getSdkHomePath()).build();
+
+    try {
+      sdk.validateCloudSdk();
+    } catch (AppEngineException exception) {
+      // TODO
+    }
+
+    if (!sdkService.isCloudSdkVersionSupported(sdk)) {
+     throw new RuntimeConfigurationWarning(
+         GctBundle.message("appengine.cloudsdk.version.support.message",
+         sdkService.getMinimumRequiredCloudSdkVersion()));
+    }
+
     if (isUserSpecifiedPathDeploymentSource()
         && (StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())
             || !isJarOrWar(userSpecifiedArtifactFileSelector.getText()))) {
