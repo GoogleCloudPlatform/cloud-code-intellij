@@ -175,7 +175,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       sdk.validateCloudSdk();
 
       if (!sdkService.isCloudSdkVersionSupported(sdk)) {
-        throw new RuntimeConfigurationError(
+        throw new RuntimeConfigurationWarning(
             GctBundle.message("appengine.cloudsdk.version.support.message",
                 sdkService.getMinimumRequiredCloudSdkVersion()));
       }
