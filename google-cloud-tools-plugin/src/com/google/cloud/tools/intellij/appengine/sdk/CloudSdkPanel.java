@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
@@ -88,30 +89,18 @@ public class CloudSdkPanel {
       return;
     }
 
-    CloudSdk sdk;
-
-    // check that the sdk path is valid
     try {
-      sdk = new CloudSdk.Builder()
-          .sdkPath(Paths.get(path))
-          .build();
-
-      sdk.validateCloudSdk();
-
-    } catch (AppEngineException aee) {
+      CloudSdk sdk = new CloudSdk.Builder().sdkPath(Paths.get(path)).build();
+      CloudSdkService.getInstance().validateCloudSdk(sdk);
+    } catch (CloudSdkNotFoundException exception) {
       showWarning(createErrorMessageWithLink(
           GctBundle.message("appengine.cloudsdk.location.invalid.message")),
           true /* setSdkDirectoryErrorState */);
-
       return;
-    }
-
-    // check that the sdk is a supported version
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-    if (!sdkService.isCloudSdkVersionSupported(sdk)) {
-     showWarning(GctBundle.message("appengine.cloudsdk.version.support.message",
-         sdkService.getMinimumRequiredCloudSdkVersion()),
-         false /* setSdkDirectoryErrorState */);
+    } catch(CloudSdkUnsupportedVersionException exception) {
+      showWarning(GctBundle.message("appengine.cloudsdk.version.support.message",
+          exception.getRequiredVersion()),
+          false /* setSdkDirectoryErrorState */);
       return;
     }
 

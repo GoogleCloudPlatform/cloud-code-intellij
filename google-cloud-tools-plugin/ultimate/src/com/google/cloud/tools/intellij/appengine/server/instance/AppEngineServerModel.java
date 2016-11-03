@@ -21,6 +21,7 @@ import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkUnsupportedVersionException;
 import com.google.cloud.tools.intellij.appengine.server.run.CloudSdkStartupPolicy;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -169,19 +170,14 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     }
 
     try {
-      CloudSdk sdk = new CloudSdk.Builder()
-          .sdkPath(sdkService.getSdkHomePath())
-          .build();
-      sdk.validateCloudSdk();
-
-      if (!sdkService.isCloudSdkVersionSupported(sdk)) {
-        throw new RuntimeConfigurationWarning(
-            GctBundle.message("appengine.cloudsdk.version.support.message",
-                sdkService.getMinimumRequiredCloudSdkVersion()));
-      }
+      sdkService.validateCloudSdk(sdkService.getSdkHomePath());
     } catch (AppEngineException ex) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
+    } catch (CloudSdkUnsupportedVersionException ex) {
+      throw new RuntimeConfigurationWarning(
+          GctBundle.message("appengine.cloudsdk.version.support.message",
+              ex.getRequiredVersion()));
     }
   }
 

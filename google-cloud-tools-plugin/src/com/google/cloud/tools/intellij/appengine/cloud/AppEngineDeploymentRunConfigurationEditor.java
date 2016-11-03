@@ -18,11 +18,13 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkUnsupportedVersionException;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -366,20 +368,19 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   private void validateConfiguration() throws ConfigurationException {
-    // check that the sdk is a supported version
     CloudSdkService sdkService = CloudSdkService.getInstance();
-    CloudSdk sdk = new CloudSdk.Builder().sdkPath(sdkService.getSdkHomePath()).build();
 
+    // Perform cloud sdk validation
+    Path cloudSdkPath = sdkService.getSdkHomePath();
     try {
-      sdk.validateCloudSdk();
-    } catch (AppEngineException exception) {
-      // TODO
-    }
-
-    if (!sdkService.isCloudSdkVersionSupported(sdk)) {
-     throw new RuntimeConfigurationWarning(
-         GctBundle.message("appengine.cloudsdk.version.support.message",
-         sdkService.getMinimumRequiredCloudSdkVersion()));
+      CloudSdk sdk = new CloudSdk.Builder().sdkPath(cloudSdkPath).build();
+      sdkService.validateCloudSdk(sdk);
+    } catch (CloudSdkNotFoundException ex) {
+      // TODO is this possible here?
+    } catch (CloudSdkUnsupportedVersionException ex) {
+      throw new RuntimeConfigurationWarning(
+          GctBundle.message("appengine.cloudsdk.version.support.message",
+              ex.getRequiredVersion()));
     }
 
     if (isUserSpecifiedPathDeploymentSource()

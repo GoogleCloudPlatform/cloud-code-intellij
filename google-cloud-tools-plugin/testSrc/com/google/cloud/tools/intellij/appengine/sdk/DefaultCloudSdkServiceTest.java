@@ -20,9 +20,11 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
@@ -37,6 +39,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
+  private static final CloudSdkVersion unsupportedVersion = new CloudSdkVersion("1.0.0");
+  // arbitrarily high version number
+  private static final CloudSdkVersion supportedVersion =
+      new CloudSdkVersion(Integer.toString(Integer.MAX_VALUE) + ".0.0");
+
   private CloudSdkService service;
 
   @Mock
@@ -49,17 +56,13 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
   @Test
   public void testIsCloudSdkSupported_priorVersion() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(new CloudSdkVersion("1.0.0"));
+    when(mockSdk.getVersion()).thenReturn(unsupportedVersion);
     assertFalse(service.isCloudSdkVersionSupported(mockSdk));
   }
 
   @Test
   public void testIsCloudSdkSupported_laterVersion() throws ProcessRunnerException {
-    // arbitrarily high version number
-    CloudSdkVersion laterVersion =
-        new CloudSdkVersion(Integer.toString(Integer.MAX_VALUE) + ".0.0");
-
-    when(mockSdk.getVersion()).thenReturn(laterVersion);
+    when(mockSdk.getVersion()).thenReturn(supportedVersion);
     assertTrue(service.isCloudSdkVersionSupported(mockSdk));
   }
 
@@ -79,6 +82,26 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   public void testGetMinimumRequiredCloudSdkVersion() {
     String expected = readRequiredCloudSdkVersion();
     assertEquals(new CloudSdkVersion(expected), service.getMinimumRequiredCloudSdkVersion());
+  }
+
+  @Test(expected = CloudSdkNotFoundException.class)
+  public void testValidateCloudSdk_cloudSdkNotFound() throws CloudSdkUnsupportedVersionException {
+    doThrow(CloudSdkNotFoundException.class).when(mockSdk).validateCloudSdk();
+    service.validateCloudSdk(mockSdk);
+  }
+
+  @Test(expected = CloudSdkUnsupportedVersionException.class)
+  public void testValidateCloudSdk_versionUnsupported()
+      throws CloudSdkUnsupportedVersionException, ProcessRunnerException {
+    when(mockSdk.getVersion()).thenReturn(unsupportedVersion);
+    service.validateCloudSdk(mockSdk);
+  }
+
+  @Test
+  public void testValidateCloudSdk_valid()
+      throws CloudSdkUnsupportedVersionException, ProcessRunnerException {
+    when(mockSdk.getVersion()).thenReturn(supportedVersion);
+    service.validateCloudSdk(mockSdk);
   }
 
   private String readRequiredCloudSdkVersion() {

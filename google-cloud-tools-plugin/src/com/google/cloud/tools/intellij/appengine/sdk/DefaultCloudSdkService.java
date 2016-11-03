@@ -20,6 +20,7 @@ import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
@@ -88,6 +89,19 @@ public class DefaultCloudSdkService extends CloudSdkService {
   @Override
   public void setSdkHomePath(String cloudSdkHomePath) {
     propertiesComponent.setValue(CLOUD_SDK_PROPERTY_KEY, cloudSdkHomePath);
+  }
+
+  @Override
+  public void validateCloudSdk(@NotNull CloudSdk sdk) throws CloudSdkNotFoundException,
+      CloudSdkUnsupportedVersionException {
+
+    // throws CloudSdkNotFoundException if path is not valid
+    sdk.validateCloudSdk();
+
+    if (!isCloudSdkVersionSupported(sdk)) {
+      throw new CloudSdkUnsupportedVersionException("Cloud SDK uses an unsupported version",
+          getMinimumRequiredCloudSdkVersion());
+    }
   }
 
   @Nullable
