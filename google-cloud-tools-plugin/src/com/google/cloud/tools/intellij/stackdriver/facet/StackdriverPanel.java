@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.stackdriver.facet;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.facet.ui.FacetEditorContext;
@@ -90,6 +91,8 @@ public class StackdriverPanel extends FacetEditorTab {
   public void apply() throws ConfigurationException {
     configuration.getState().setGenerateSourceContext(isGenerateSourceContextSelected());
     configuration.getState().setIgnoreErrors(isIgnoreErrorsSelected());
+    configuration.getState().setCloudSdkPath(
+        CloudSdkService.getInstance().getSdkHomePath().toString());
   }
 
   @Override

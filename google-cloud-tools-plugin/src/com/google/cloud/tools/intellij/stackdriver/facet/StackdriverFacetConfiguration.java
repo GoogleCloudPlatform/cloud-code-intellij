@@ -16,7 +16,8 @@
 
 package com.google.cloud.tools.intellij.stackdriver.facet;
 
-import com.google.cloud.tools.intellij.stackdriver.facet.StackdriverFacetConfiguration.StackdriverProperties;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.jps.model.impl.StackdriverProperties;
 
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
@@ -35,7 +36,8 @@ import org.jetbrains.annotations.Nullable;
 public class StackdriverFacetConfiguration
     implements FacetConfiguration, PersistentStateComponent<StackdriverProperties> {
 
-  private StackdriverProperties persistedProperties = new StackdriverProperties();
+  private StackdriverProperties persistedProperties =
+      new StackdriverProperties(CloudSdkService.getInstance().getSdkHomePath().toString());
 
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
@@ -64,26 +66,5 @@ public class StackdriverFacetConfiguration
   @Override
   public void loadState(StackdriverProperties state) {
     persistedProperties = state;
-  }
-
-  public static class StackdriverProperties {
-    private boolean generateSourceContext = true;
-    private boolean ignoreErrors = true;
-
-    public boolean isGenerateSourceContext() {
-      return generateSourceContext;
-    }
-
-    public void setGenerateSourceContext(boolean generateSourceContext) {
-      this.generateSourceContext = generateSourceContext;
-    }
-
-    public boolean isIgnoreErrors() {
-      return ignoreErrors;
-    }
-
-    public void setIgnoreErrors(boolean ignoreErrors) {
-      this.ignoreErrors = ignoreErrors;
-    }
   }
 }

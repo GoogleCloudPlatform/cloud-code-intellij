@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.stackdriver.facet;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.FrameworkTypeEx;
@@ -84,6 +86,8 @@ public class StackdriverSupportProvider extends FrameworkSupportInModuleProvider
       configuration.getState().setGenerateSourceContext(
           stackdriverPanel.isGenerateSourceContextSelected());
       configuration.getState().setIgnoreErrors(stackdriverPanel.isIgnoreErrorsSelected());
+      configuration.getState().setCloudSdkPath(
+          CloudSdkService.getInstance().getSdkHomePath().toString());
     }
   }
 }

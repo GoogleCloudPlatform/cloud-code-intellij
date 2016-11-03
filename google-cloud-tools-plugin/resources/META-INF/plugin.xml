@@ -184,7 +184,7 @@
     <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetConverterProvider"/>
     <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetMigrationConverterProvider"/>
     <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkDetector"/>
-    <compileServer.plugin classpath="google-cloud-tools-jps-plugin.jar;appengine-plugins-core-0.1.13.jar;cloudsdk-service.jar"/>
+    <compileServer.plugin classpath="google-cloud-tools-jps-plugin.jar;appengine-plugins-core-0.1.13.jar;"/>
 
     <xml.schemaProvider implementation="com.google.cloud.tools.intellij.appengine.descriptor.AppEngineWebSchemaProvider"/>
 

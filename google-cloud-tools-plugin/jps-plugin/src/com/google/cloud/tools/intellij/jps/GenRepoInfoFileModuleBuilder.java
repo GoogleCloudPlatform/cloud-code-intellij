@@ -21,7 +21,12 @@ import com.google.cloud.tools.appengine.api.debug.GenRepoInfoFile;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkGenRepoInfoFile;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
+import com.google.cloud.tools.intellij.jps.model.JpsStackdriverModuleExtension;
+import com.google.cloud.tools.intellij.jps.model.impl.JpsStackdriverModuleExtensionImpl;
+import com.google.cloud.tools.intellij.jps.model.impl.StackdriverProperties;
 import com.google.common.collect.ImmutableList;
+
+import com.intellij.openapi.diagnostic.Logger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
@@ -44,6 +49,9 @@ import java.nio.file.Paths;
  */
 public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
 
+  private static final Logger LOG =
+      Logger.getInstance("#com.google.cloud.tools.intellij.jps.GenRepoInfoFileModuleBuilder");
+
   public GenRepoInfoFileModuleBuilder() {
     super(BuilderCategory.INITIAL);
   }
@@ -56,10 +64,18 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       ModuleBuildTarget target =
           new ModuleBuildTarget(jpsModule, JavaModuleBuildTargetType.PRODUCTION);
       Path outputDirectory = target.getOutputDir().toPath();
+      JpsStackdriverModuleExtension extension = jpsModule.getContainer().getChild(
+          JpsStackdriverModuleExtensionImpl.ROLE);
+
+      if (extension.getCloudSdkPath() == null) {
+        LOG.warn("No Cloud SDK path specified. Skipping source context generation for module "
+            + jpsModule.getName());
+        continue;
+      }
 
       CloudSdk sdk = new CloudSdk.Builder()
-          .sdkPath(Paths.get("/usr/local/google/home/joaomartins/Downloads/google-cloud-sdk"))
-//          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+//          .sdkPath(Paths.get("/usr/local/google/home/joaomartins/Downloads/google-cloud-sdk"))
+          .sdkPath(extension.getCloudSdkPath())
           .exitListener(new ProcessExitListener() {
             @Override
             public void onExit(int exitCode) {

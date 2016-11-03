@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.jps.model;
 
 import org.jetbrains.jps.model.JpsElement;
 
+import java.nio.file.Path;
+
 /**
  * Created by joaomartins on 11/2/16.
  */
@@ -26,5 +28,5 @@ public interface JpsStackdriverModuleExtension extends JpsElement {
 
   boolean isIgnoreErrors();
 
-  String getCloudSdkPath();
+  Path getCloudSdkPath();
 }

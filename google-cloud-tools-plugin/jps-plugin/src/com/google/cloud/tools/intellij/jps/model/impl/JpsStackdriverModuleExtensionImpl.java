@@ -18,31 +18,64 @@ package com.google.cloud.tools.intellij.jps.model.impl;
 
 import com.google.cloud.tools.intellij.jps.model.JpsStackdriverModuleExtension;
 
+import com.intellij.util.xmlb.XmlSerializerUtil;
+
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.jps.model.JpsElementChildRole;
+import org.jetbrains.jps.model.ex.JpsElementBase;
+import org.jetbrains.jps.model.ex.JpsElementChildRoleBase;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by joaomartins on 11/2/16.
  */
-public class JpsStackdriverModuleExtensionImpl implements JpsStackdriverModuleExtension {
+public class JpsStackdriverModuleExtensionImpl
+    extends JpsElementBase<JpsStackdriverModuleExtensionImpl>
+    implements JpsStackdriverModuleExtension {
+
+  private StackdriverProperties properties;
+  public static final JpsElementChildRole<JpsStackdriverModuleExtension> ROLE =
+      JpsElementChildRoleBase.create("Stackdriver");
+
+  public JpsStackdriverModuleExtensionImpl(StackdriverProperties properties) {
+    this.properties = properties;
+  }
 
   @Override
   public boolean isGenerateSourceContext() {
-    return false;
+    return properties.isGenerateSourceContext();
   }
 
   @Override
   public boolean isIgnoreErrors() {
-    return false;
+    return properties.isIgnoreErrors();
   }
 
   @Override
-  public String getCloudSdkPath() {
-    return null;
+  public Path getCloudSdkPath() {
+    return Paths.get(properties.getCloudSdkPath());
   }
 
   @NotNull
   @Override
   public BulkModificationSupport<?> getBulkModificationSupport() {
     return null;
+  }
+
+  @NotNull
+  @Override
+  public JpsStackdriverModuleExtensionImpl createCopy() {
+    return new JpsStackdriverModuleExtensionImpl(XmlSerializerUtil.createCopy(properties));
+  }
+
+  @Override
+  public void applyChanges(@NotNull JpsStackdriverModuleExtensionImpl modified) {
+    XmlSerializerUtil.copyBean(modified.getProperties(), properties);
+  }
+
+  public StackdriverProperties getProperties() {
+    return properties;
   }
 }
