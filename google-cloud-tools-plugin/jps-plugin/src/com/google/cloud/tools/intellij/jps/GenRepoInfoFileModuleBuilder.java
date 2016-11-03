@@ -20,6 +20,7 @@ import com.google.cloud.tools.appengine.api.debug.DefaultGenRepoInfoFileConfigur
 import com.google.cloud.tools.appengine.api.debug.GenRepoInfoFile;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkGenRepoInfoFile;
+import com.google.cloud.tools.appengine.cloudsdk.internal.process.ExitCodeRecorderProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.intellij.jps.model.JpsStackdriverModuleExtension;
 import com.google.cloud.tools.intellij.jps.model.impl.JpsStackdriverModuleExtensionImpl;
@@ -43,7 +44,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 
 /**
- * Created by joaomartins on 11/2/16.
+ * Generates source context files for a module using the Cloud SDK.
  */
 public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
 
@@ -53,33 +54,51 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
   public GenRepoInfoFileModuleBuilder() {
     super(BuilderCategory.INITIAL);
   }
+
+  /**
+   * Generates source context files for each module in {@param chunk}.
+   *
+   * <p>Generation is parameterized by the Stackdriver facet associated to the module.
+   *
+   * <p>Files are added to the same location as the project's compiled .class files.
+   */
   @Override
   public ExitCode build(CompileContext context, ModuleChunk chunk,
       DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget> dirtyFilesHolder,
       OutputConsumer outputConsumer) throws ProjectBuildException, IOException {
     for (JpsModule jpsModule : chunk.getModules()) {
+      JpsStackdriverModuleExtension extension = jpsModule.getContainer().getChild(
+          JpsStackdriverModuleExtensionImpl.ROLE);
+
+      if (!extension.isGenerateSourceContext()) {
+        continue;
+      }
+
+      if (jpsModule.getSourceRoots().isEmpty()) {
+        LOG.warn("Module " + jpsModule.getName() + " contains no source roots. Moving on to the "
+            + "next module for source generation.");
+        continue;
+      }
+
+      // Only tries the first source root.
+      // There should be a heuristic for choosing the correct source root, like the first one where
+      // source context files are successfully generated.
       Path sourceDirectory = jpsModule.getSourceRoots().iterator().next().getFile().toPath();
       ModuleBuildTarget target =
           new ModuleBuildTarget(jpsModule, JavaModuleBuildTargetType.PRODUCTION);
       Path outputDirectory = target.getOutputDir().toPath();
-      JpsStackdriverModuleExtension extension = jpsModule.getContainer().getChild(
-          JpsStackdriverModuleExtensionImpl.ROLE);
 
       if (extension.getCloudSdkPath() == null) {
-        LOG.warn("No Cloud SDK path specified. Skipping source context generation for module "
-            + jpsModule.getName());
-        continue;
+        LOG.warn("No Cloud SDK path specified. Skipping source context generation.");
+        // Cloud SDK path is a singleton for a project, so if it doesn't exist on the first module,
+        // we can return right away.
+        return ExitCode.NOTHING_DONE;
       }
 
+      ExitCodeRecorderProcessExitListener exitListener = new ExitCodeRecorderProcessExitListener();
       CloudSdk sdk = new CloudSdk.Builder()
           .sdkPath(extension.getCloudSdkPath())
-          .exitListener(new ProcessExitListener() {
-            @Override
-            public void onExit(int exitCode) {
-              // Stop build if error is thrown. Should be off by default.
-
-            }
-          })
+          .exitListener(exitListener)
           .build();
 
       GenRepoInfoFile genAction = new CloudSdkGenRepoInfoFile(sdk);
@@ -87,6 +106,13 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       configuration.setSourceDirectory(sourceDirectory.toFile());
       configuration.setOutputDirectory(outputDirectory.toFile());
       genAction.generate(configuration);
+
+      if (exitListener.getMostRecentExitCode() != 0 && !extension.isIgnoreErrors()) {
+        LOG.warn("gen-repo-info-file command returned with status code "
+            + exitListener.getMostRecentExitCode());
+        return ExitCode.ABORT;
+      }
+
       outputConsumer.registerOutputFile(
           target,
           outputDirectory.resolve("source-context.json").toFile(),

@@ -53,12 +53,6 @@ public class StackdriverPanel extends FacetEditorTab {
    */
   public StackdriverPanel() {
     this(null /* editorContext */);
-    generateSourceContext.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent event) {
-        ignoreErrors.setEnabled(((JCheckBox)event.getSource()).isSelected());
-      }
-    });
   }
 
   /**
@@ -73,6 +67,13 @@ public class StackdriverPanel extends FacetEditorTab {
     }
     stackdriverInfo.setHyperlinkText("Google Stackdriver documentation");
     stackdriverInfo.setHyperlinkTarget("https://cloud.google.com/stackdriver/");
+
+    generateSourceContext.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent event) {
+        ignoreErrors.setEnabled(((JCheckBox)event.getSource()).isSelected());
+      }
+    });
   }
 
   @NotNull
