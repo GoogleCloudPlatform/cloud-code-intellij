@@ -56,7 +56,8 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   @Test
   public void testIsCloudSdkSupported_laterVersion() throws ProcessRunnerException {
     // arbitrarily high version number
-    CloudSdkVersion laterVersion = new CloudSdkVersion(Integer.toString(Integer.MAX_VALUE));
+    CloudSdkVersion laterVersion =
+        new CloudSdkVersion(Integer.toString(Integer.MAX_VALUE) + ".0.0");
 
     when(mockSdk.getVersion()).thenReturn(laterVersion);
     assertTrue(service.isCloudSdkVersionSupported(mockSdk));
