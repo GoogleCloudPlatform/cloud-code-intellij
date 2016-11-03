@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
@@ -185,6 +186,20 @@ public class DefaultCloudSdkService extends CloudSdkService {
   public CloudSdkVersion getMinimumRequiredCloudSdkVersion() {
     String version = new PropertiesFileFlagReader().getFlagString(CLOUD_SDK_REQUIRED_VERSION_KEY);
     return new CloudSdkVersion(version);
+  }
+
+  @Override
+  public boolean hasJavaComponent() {
+    try {
+      new CloudSdk.Builder()
+          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+          .build()
+          .validateAppEngineJavaComponents();
+
+      return true;
+    } catch (AppEngineJavaComponentsNotInstalledException ex) {
+      return false;
+    }
   }
 
   private Map<String, Set<String>> loadBlackList() throws IOException {

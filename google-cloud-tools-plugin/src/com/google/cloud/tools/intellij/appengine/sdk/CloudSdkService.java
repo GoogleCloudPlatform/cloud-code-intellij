@@ -65,4 +65,6 @@ public abstract class CloudSdkService {
 
   public abstract CloudSdkVersion getMinimumRequiredCloudSdkVersion();
 
+  public abstract boolean hasJavaComponent();
+
 }
