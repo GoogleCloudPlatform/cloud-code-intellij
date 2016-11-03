@@ -57,4 +57,6 @@ public abstract class CloudSdkService {
   public abstract File getWebSchemeFile();
 
   public abstract void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters);
+
+  public abstract boolean hasJavaComponent();
 }
