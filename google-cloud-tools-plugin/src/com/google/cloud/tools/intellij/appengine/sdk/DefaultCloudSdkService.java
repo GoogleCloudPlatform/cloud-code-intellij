@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 
 import com.intellij.execution.configurations.ParametersList;
@@ -158,6 +159,20 @@ public class DefaultCloudSdkService extends CloudSdkService {
       if (patchPath.exists()) {
         vmParameters.add("-Xbootclasspath/p:" + patchPath.getAbsolutePath());
       }
+    }
+  }
+
+  @Override
+  public boolean hasJavaComponent() {
+    try {
+      new CloudSdk.Builder()
+          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+          .build()
+          .validateAppEngineJavaComponents();
+
+      return true;
+    } catch (AppEngineJavaComponentsNotInstalledException ex) {
+      return false;
     }
   }
 
