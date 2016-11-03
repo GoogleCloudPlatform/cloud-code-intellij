@@ -28,9 +28,6 @@ import org.jetbrains.jps.model.ex.JpsElementChildRoleBase;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * Created by joaomartins on 11/2/16.
- */
 public class JpsStackdriverModuleExtensionImpl
     extends JpsElementBase<JpsStackdriverModuleExtensionImpl>
     implements JpsStackdriverModuleExtension {

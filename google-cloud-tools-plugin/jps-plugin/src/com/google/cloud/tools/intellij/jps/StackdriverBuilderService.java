@@ -25,7 +25,7 @@ import org.jetbrains.jps.incremental.ModuleLevelBuilder;
 import java.util.List;
 
 /**
- * Created by joaomartins on 11/2/16.
+ * Registers {@link GenRepoInfoFileModuleBuilder} as a {@link ModuleLevelBuilder} with IDEA.
  */
 public class StackdriverBuilderService extends BuilderService {
 

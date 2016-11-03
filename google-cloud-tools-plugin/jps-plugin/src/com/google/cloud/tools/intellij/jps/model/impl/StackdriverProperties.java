@@ -16,10 +16,8 @@
 
 package com.google.cloud.tools.intellij.jps.model.impl;
 
-import java.nio.file.Path;
-
 /**
- * Created by joaomartins on 11/2/16.
+ * Serializable Stackdriver configuration.
  */
 public class StackdriverProperties {
   private boolean generateSourceContext = true;

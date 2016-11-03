@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by joaomartins on 11/3/16.
+ * Called by IDEA to serialize/deserialize the Stackdriver facet.
  */
 public class JpsStackdriverModelSerializerExtension extends JpsModelSerializerExtension {
 

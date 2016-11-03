@@ -21,7 +21,8 @@ import org.jetbrains.jps.model.JpsElement;
 import java.nio.file.Path;
 
 /**
- * Created by joaomartins on 11/2/16.
+ * Stackdriver configuration that lives within a light weight
+ * {@link org.jetbrains.jps.model.module.JpsModule}. Roughly equivalent to the Stackdriver facet.
  */
 public interface JpsStackdriverModuleExtension extends JpsElement {
   boolean isGenerateSourceContext();
