@@ -34,7 +34,7 @@ import com.intellij.util.containers.ContainerUtil;
 import java.util.List;
 
 /**
- * Creates a shortcut to App Engine flex cloud configuration in the tools menu.
+ * Creates a shortcut to App Engine deployment configuration in the tools menu.
  */
 public class AppEngineDeployToolsMenuAction extends AnAction {
 
