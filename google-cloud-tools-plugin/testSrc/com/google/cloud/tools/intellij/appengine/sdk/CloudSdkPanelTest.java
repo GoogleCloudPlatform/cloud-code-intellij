@@ -16,15 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import static org.mockito.Mockito.mock;
-
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.ui.JBColor;
-
-import org.junit.After;
-import org.picocontainer.MutablePicoContainer;
 
 import javax.swing.JTextPane;
 
@@ -49,31 +43,6 @@ public class CloudSdkPanelTest extends PlatformTestCase {
       + "    here</a> to download the Cloud SDK.\n"
       + "  </body>\n"
       + "</html>\n";
-
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
-
-    cloudSdkService = mock(CloudSdkService.class);
-
-    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
-
-    applicationContainer.registerComponentInstance(
-        CloudSdkService.class.getName(), cloudSdkService);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    super.tearDown();
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
-
-    applicationContainer.unregisterComponent(cloudSdkService);
-
-  }
 
   public void testSetupWithInvalidSdk() {
     initCloudSdkPanel();

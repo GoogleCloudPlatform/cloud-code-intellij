@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
@@ -33,6 +32,7 @@ import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Paths;
+import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -81,29 +81,34 @@ public class CloudSdkPanel {
     String path = cloudSdkDirectoryField.getText();
 
     if (StringUtil.isEmpty(path)) {
-      showWarning(createErrorMessageWithLink(
-              GctBundle.message("appengine.cloudsdk.location.missing.message")),
-              false /* setSdkDirectoryErrorState */);
-
+      String warningText = appendCloudSdkDownloadMessage(
+              GctBundle.message("appengine.cloudsdk.location.missing.message"));
+      showWarning(warningText, false /* setSdkDirectoryErrorState */);
       return;
     }
 
-    try {
-      CloudSdk sdk = new CloudSdk.Builder().sdkPath(Paths.get(path)).build();
-      CloudSdkService.getInstance().validateCloudSdk(sdk);
-    } catch (CloudSdkNotFoundException exception) {
-      showWarning(createErrorMessageWithLink(
-          GctBundle.message("appengine.cloudsdk.location.invalid.message")),
-          true /* setSdkDirectoryErrorState */);
-      return;
-    } catch (CloudSdkUnsupportedVersionException exception) {
-      showWarning(GctBundle.message("appengine.cloudsdk.version.support.message",
-          exception.getRequiredVersion()),
-          false /* setSdkDirectoryErrorState */);
-      return;
-    }
+    CloudSdk sdk = new CloudSdk.Builder().sdkPath(Paths.get(path)).build();
+    Set<CloudSdkValidationResult> validationResults =
+        CloudSdkService.getInstance().validateCloudSdk(sdk);
 
-    hideWarning();
+    // if there are any validation errors, show the first one to the user
+    if (validationResults.size() > 0) {
+      CloudSdkValidationResult validationResult = validationResults.iterator().next();
+      String message;
+      switch (validationResult) {
+        case CLOUD_SDK_NOT_FOUND:
+          message = appendCloudSdkDownloadMessage(validationResult.getMessage());
+          break;
+        case CLOUD_SDK_VERSION_NOT_SUPPORTED:
+          message = validationResult.getMessage();
+          break;
+        default:
+          message = validationResult.getMessage();
+      }
+      showWarning(message, validationResult.isError());
+    } else {
+      hideWarning();
+    }
   }
 
   private void showWarning(String message, boolean setSdkDirectoryErrorState) {
@@ -164,14 +169,13 @@ public class CloudSdkPanel {
     return cloudSdkPanel;
   }
 
-  private static String createErrorMessageWithLink(String error) {
-    String openTag = error
-        + " "
-        + "<a href='"
+  private String appendCloudSdkDownloadMessage(String message) {
+    String openTag = "<a href='"
         + CLOUD_SDK_DOWNLOAD_LINK
         + "'>";
 
-    return GctBundle.message("appengine.cloudsdk.download.message",
-        openTag, "</a>");
+    return message + " "
+        + GctBundle.message("appengine.cloudsdk.download.message", openTag, "</a>");
   }
+
 }

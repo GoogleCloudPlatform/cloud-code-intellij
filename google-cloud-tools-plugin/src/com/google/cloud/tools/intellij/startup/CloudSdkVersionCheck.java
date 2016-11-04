@@ -17,10 +17,8 @@
 package com.google.cloud.tools.intellij.startup;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
-import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkUnsupportedVersionException;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -33,6 +31,7 @@ import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
+import java.util.Set;
 
 /**
  * Checks that the configured Cloud SDK's version is supported, and warns the user if the Cloud SDK
@@ -47,20 +46,16 @@ public class CloudSdkVersionCheck implements StartupActivity {
     // If there is a configured Cloud SDK at this time, check that it is supported.
     Path cloudSdkPath = sdkService.getSdkHomePath();
     if (cloudSdkPath != null) {
-      try {
-        CloudSdk sdk = new CloudSdk.Builder().sdkPath(cloudSdkPath).build();
-        sdkService.validateCloudSdk(sdk);
-      } catch (CloudSdkNotFoundException exception) {
-        // No need to do anything - a valid Cloud SDK is not actually required right now.
-        return;
-      } catch (CloudSdkUnsupportedVersionException exception) {
-        showNotification(exception.getRequiredVersion());
+      CloudSdk sdk = new CloudSdk.Builder().sdkPath(cloudSdkPath).build();
+      Set<CloudSdkValidationResult> results = sdkService.validateCloudSdk(sdk);
+      if (results.contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
+        showNotification();
       }
     }
   }
 
   @VisibleForTesting
-  void showNotification(CloudSdkVersion required) {
+  void showNotification() {
     NotificationGroup notification =
         new NotificationGroup(
             GctBundle.message("appengine.cloudsdk.version.support.title"),
@@ -68,7 +63,7 @@ public class CloudSdkVersionCheck implements StartupActivity {
             true);
 
     String message = "<p>"
-        + GctBundle.message("appengine.cloudsdk.version.support.message", required.toString())
+        + CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage()
         + "</p>";
 
     notification

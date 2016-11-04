@@ -45,6 +45,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,14 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   private Map<String, Set<String>> myMethodsBlackList;
 
+  /**
+   * Return the minimum version of the Cloud SDK that is supported by this plugin.
+   */
+  public static CloudSdkVersion getMinimumRequiredCloudSdkVersion() {
+    String version = new PropertiesFileFlagReader().getFlagString(CLOUD_SDK_REQUIRED_VERSION_KEY);
+    return new CloudSdkVersion(version);
+  }
+
   @Nullable
   @Override
   public Path getSdkHomePath() {
@@ -92,16 +101,20 @@ public class DefaultCloudSdkService extends CloudSdkService {
   }
 
   @Override
-  public void validateCloudSdk(@NotNull CloudSdk sdk) throws CloudSdkNotFoundException,
-      CloudSdkUnsupportedVersionException {
-
-    // throws CloudSdkNotFoundException if path is not valid
-    sdk.validateCloudSdk();
+  public Set<CloudSdkValidationResult> validateCloudSdk(@NotNull CloudSdk sdk) {
+    Set<CloudSdkValidationResult> validationResults = new HashSet<>();
+    try {
+      sdk.validateCloudSdk();
+    } catch (CloudSdkNotFoundException exception) {
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+      return validationResults;
+    }
 
     if (!isCloudSdkVersionSupported(sdk)) {
-      throw new CloudSdkUnsupportedVersionException("Cloud SDK uses an unsupported version",
-          getMinimumRequiredCloudSdkVersion());
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
     }
+
+    return validationResults;
   }
 
   @Nullable
@@ -194,12 +207,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
     }
 
     return actualVersion.compareTo(requiredVersion) >= 0;
-  }
-
-  @Override
-  public CloudSdkVersion getMinimumRequiredCloudSdkVersion() {
-    String version = new PropertiesFileFlagReader().getFlagString(CLOUD_SDK_REQUIRED_VERSION_KEY);
-    return new CloudSdkVersion(version);
   }
 
   @Override

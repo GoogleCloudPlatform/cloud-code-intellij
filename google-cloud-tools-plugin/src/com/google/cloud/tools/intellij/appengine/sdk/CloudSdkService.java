@@ -17,8 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
-import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.openapi.components.ServiceManager;
@@ -28,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Set;
 
 /**
  * IntelliJ configured service for providing the path to the Cloud SDK.
@@ -43,9 +42,7 @@ public abstract class CloudSdkService {
 
   public abstract void setSdkHomePath(String path);
 
-  // TODO CloudSdkNotFound is an unchecked exception. change this to a checked?
-  public abstract void validateCloudSdk(@NotNull CloudSdk sdk) throws CloudSdkNotFoundException,
-      CloudSdkUnsupportedVersionException;
+  public abstract Set<CloudSdkValidationResult> validateCloudSdk(@NotNull CloudSdk sdk);
 
   @Nullable
   public abstract File getToolsApiJarFile();
@@ -68,9 +65,6 @@ public abstract class CloudSdkService {
 
   public abstract boolean isCloudSdkVersionSupported(CloudSdk sdk);
 
-  public abstract CloudSdkVersion getMinimumRequiredCloudSdkVersion();
-
   public abstract boolean hasJavaComponent();
-
 
 }

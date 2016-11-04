@@ -19,20 +19,20 @@ package com.google.cloud.tools.intellij.startup;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkUnsupportedVersionException;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
+import com.google.common.collect.Sets;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.util.containers.HashSet;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,35 +61,34 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testNotifyIfCloudSdkNotSupported_isSupported()
-      throws CloudSdkUnsupportedVersionException {
+  public void testNotifyIfCloudSdkNotSupported_isSupported() {
+    when(cloudSdkServiceMock.validateCloudSdk(any(CloudSdk.class)))
+        .thenReturn(new HashSet<CloudSdkValidationResult>());
     checker.runActivity(projectMock);
+
     assertFalse(checker.hasShownNotification());
   }
 
   @Test
-  public void testNotifyIfCloudSdkNotSupported_notSupported()
-      throws CloudSdkUnsupportedVersionException {
-    doThrow(CloudSdkUnsupportedVersionException.class).when(
-        cloudSdkServiceMock).validateCloudSdk(any(CloudSdk.class));
+  public void testNotifyIfCloudSdkNotSupported_notSupported() {
+    when(cloudSdkServiceMock.validateCloudSdk(any(CloudSdk.class)))
+        .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
 
     checker.runActivity(projectMock);
     assertTrue(checker.hasShownNotification());
   }
 
   @Test
-  public void testNotifyIfCloudSdkNotSupported_sdkNotFound()
-      throws CloudSdkUnsupportedVersionException {
-    doThrow(CloudSdkNotFoundException.class).when(
-        cloudSdkServiceMock).validateCloudSdk(any(CloudSdk.class));
+  public void testNotifyIfCloudSdkNotSupported_sdkNotFound() {
+    when(cloudSdkServiceMock.validateCloudSdk(any(CloudSdk.class)))
+        .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
 
     checker.runActivity(projectMock);
     assertFalse(checker.hasShownNotification());
   }
 
   @Test
-  public void testNotifyIfCloudSdkNotSupported_nullSdkPath()
-      throws CloudSdkUnsupportedVersionException {
+  public void testNotifyIfCloudSdkNotSupported_nullSdkPath() {
 
     when(cloudSdkServiceMock.getSdkHomePath()).thenReturn(null);
 
@@ -109,7 +108,7 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
     }
 
     @Override
-    void showNotification(CloudSdkVersion required) {
+    void showNotification() {
       hasShownNotification = true;
     }
 
