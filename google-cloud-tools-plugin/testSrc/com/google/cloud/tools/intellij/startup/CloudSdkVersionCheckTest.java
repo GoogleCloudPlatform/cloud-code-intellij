@@ -18,46 +18,103 @@ package com.google.cloud.tools.intellij.startup;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkUnsupportedVersionException;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
+
+import com.intellij.openapi.project.Project;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class CloudSdkVersionCheckTest extends BasePluginTestCase {
 
-  private CloudSdkVersionCheck checker;
+  private CloudSdkVersionCheckForTesting checker;
+  private Path fakeSdkPath;
 
-  @Mock CloudSdkService cloudSdkServiceMock;
-  @Mock CloudSdk cloudSdkMock;
+  @Mock private CloudSdkService cloudSdkServiceMock;
+  @Mock private Project projectMock;
+
 
   @Before
   public void setUp() throws ProcessRunnerException {
     registerService(CloudSdkService.class, cloudSdkServiceMock);
 
-    when(cloudSdkMock.getVersion()).thenReturn(new CloudSdkVersion("129.0.0"));
+    fakeSdkPath = Paths.get("/");
+    when(cloudSdkServiceMock.getSdkHomePath()).thenReturn(fakeSdkPath);
 
-    checker = new CloudSdkVersionCheck();
+    checker = new CloudSdkVersionCheckForTesting();
   }
 
   @Test
-  public void testNotifyIfCloudSdkNotSupported_isSupported() {
-    when(cloudSdkServiceMock.isCloudSdkVersionSupported(cloudSdkMock)).thenReturn(true);
-    boolean result = checker.notifyIfCloudSdkNotSupported(cloudSdkMock);
-    assertFalse(result);
+  public void testNotifyIfCloudSdkNotSupported_isSupported()
+      throws CloudSdkUnsupportedVersionException {
+    checker.runActivity(projectMock);
+    assertFalse(checker.hasShownNotification());
   }
 
   @Test
-  public void testNotifyIfCloudSdkNotSupported_notSupported() {
-    when(cloudSdkServiceMock.isCloudSdkVersionSupported(cloudSdkMock)).thenReturn(false);
-    when(cloudSdkServiceMock.getMinimumRequiredCloudSdkVersion()).thenReturn(new CloudSdkVersion("131.0.0"));
-    boolean result = checker.notifyIfCloudSdkNotSupported(cloudSdkMock);
-    assertTrue(result);
+  public void testNotifyIfCloudSdkNotSupported_notSupported()
+      throws CloudSdkUnsupportedVersionException {
+    doThrow(CloudSdkUnsupportedVersionException.class).when(
+        cloudSdkServiceMock).validateCloudSdk(any(CloudSdk.class));
+
+    checker.runActivity(projectMock);
+    assertTrue(checker.hasShownNotification());
+  }
+
+  @Test
+  public void testNotifyIfCloudSdkNotSupported_sdkNotFound()
+      throws CloudSdkUnsupportedVersionException {
+    doThrow(CloudSdkNotFoundException.class).when(
+        cloudSdkServiceMock).validateCloudSdk(any(CloudSdk.class));
+
+    checker.runActivity(projectMock);
+    assertFalse(checker.hasShownNotification());
+  }
+
+  @Test
+  public void testNotifyIfCloudSdkNotSupported_nullSdkPath()
+      throws CloudSdkUnsupportedVersionException {
+
+    when(cloudSdkServiceMock.getSdkHomePath()).thenReturn(null);
+
+    checker.runActivity(projectMock);
+
+    // should not even bother trying to validate
+    verify(cloudSdkServiceMock, times(0)).validateCloudSdk(any(CloudSdk.class));
+    assertFalse(checker.hasShownNotification());
+  }
+
+  // Extend the class under test so that we can report whether the notification has been shown
+  class CloudSdkVersionCheckForTesting extends CloudSdkVersionCheck {
+    private boolean hasShownNotification;
+
+    public CloudSdkVersionCheckForTesting() {
+      hasShownNotification = false;
+    }
+
+    @Override
+    void showNotification(CloudSdkVersion required) {
+      hasShownNotification = true;
+    }
+
+    public boolean hasShownNotification() {
+      return hasShownNotification;
+    }
   }
 }

@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -97,7 +96,7 @@ public class CloudSdkPanel {
           GctBundle.message("appengine.cloudsdk.location.invalid.message")),
           true /* setSdkDirectoryErrorState */);
       return;
-    } catch(CloudSdkUnsupportedVersionException exception) {
+    } catch (CloudSdkUnsupportedVersionException exception) {
       showWarning(GctBundle.message("appengine.cloudsdk.version.support.message",
           exception.getRequiredVersion()),
           false /* setSdkDirectoryErrorState */);

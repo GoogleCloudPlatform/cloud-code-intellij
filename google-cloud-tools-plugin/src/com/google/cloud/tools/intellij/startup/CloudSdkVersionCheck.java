@@ -33,7 +33,6 @@ import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Checks that the configured Cloud SDK's version is supported, and warns the user if the Cloud SDK
@@ -68,8 +67,8 @@ public class CloudSdkVersionCheck implements StartupActivity {
             NotificationDisplayType.BALLOON,
             true);
 
-    String message = "<p>" +
-        GctBundle.message("appengine.cloudsdk.version.support.message", required.toString())
+    String message = "<p>"
+        + GctBundle.message("appengine.cloudsdk.version.support.message", required.toString())
         + "</p>";
 
     notification
