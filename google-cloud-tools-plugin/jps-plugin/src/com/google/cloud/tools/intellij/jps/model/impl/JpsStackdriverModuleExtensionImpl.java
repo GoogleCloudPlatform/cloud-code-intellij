@@ -25,6 +25,7 @@ import org.jetbrains.jps.model.JpsElementChildRole;
 import org.jetbrains.jps.model.ex.JpsElementBase;
 import org.jetbrains.jps.model.ex.JpsElementChildRoleBase;
 
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -52,7 +53,17 @@ public class JpsStackdriverModuleExtensionImpl
 
   @Override
   public Path getCloudSdkPath() {
+    // TODO(joaomartins): Validate path.
     return Paths.get(properties.getCloudSdkPath());
+  }
+
+  @Override
+  public Path getModuleSourceDirectory() {
+    try {
+      return Paths.get(properties.getModuleSourceDirectory());
+    } catch (InvalidPathException ipe) {
+      return null;
+    }
   }
 
   @NotNull

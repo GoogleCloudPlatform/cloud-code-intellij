@@ -21,7 +21,6 @@ import com.google.cloud.tools.appengine.api.debug.GenRepoInfoFile;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkGenRepoInfoFile;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ExitCodeRecorderProcessExitListener;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.intellij.jps.model.JpsStackdriverModuleExtension;
 import com.google.cloud.tools.intellij.jps.model.impl.JpsStackdriverModuleExtensionImpl;
 
@@ -80,10 +79,13 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
         continue;
       }
 
-      // Only tries the first source root.
-      // There should be a heuristic for choosing the correct source root, like the first one where
-      // source context files are successfully generated.
-      Path sourceDirectory = jpsModule.getSourceRoots().iterator().next().getFile().toPath();
+      if (extension.getModuleSourceDirectory() == null) {
+        // Possible to happen on Windows, unlikely in Linux.
+        LOG.warn("Invalid module source directory. Check for special characters <>:\"|?*.");
+        continue;
+      }
+
+      Path sourceDirectory = extension.getModuleSourceDirectory();
       ModuleBuildTarget target =
           new ModuleBuildTarget(jpsModule, JavaModuleBuildTargetType.PRODUCTION);
       Path outputDirectory = target.getOutputDir().toPath();

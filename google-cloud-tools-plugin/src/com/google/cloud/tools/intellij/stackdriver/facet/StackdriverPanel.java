@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.stackdriver.facet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
-import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -33,6 +32,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -46,27 +46,14 @@ public class StackdriverPanel extends FacetEditorTab {
   private FacetEditorContext editorContext;
   private HyperlinkLabel stackdriverInfo;
   private TextFieldWithBrowseButton moduleSourceDirectory;
+  private JLabel moduleSourceDirectoryLabel;
   private StackdriverFacetConfiguration configuration;
 
   /**
-   * Used from the New Project/Module dialog, through {@link StackdriverSupportProvider}, where a
-   * {@link FacetEditorContext} isn't available, but also doesn't use
-   * {@link StackdriverPanel#apply()} to persist the configuration.
+   * @param configuration contains Stackdriver parameters
+   * @param fromNewProject if {@code true}, hides the module source directory prompt
    */
-  public StackdriverPanel() {
-    this(new StackdriverFacetConfiguration());
-  }
-
-  /**
-   * Used from the Facets -> Add dialog.
-   *
-   * @param editorContext may contain the Stackdriver facet in the current context
-   */
-  public StackdriverPanel(FacetEditorContext editorContext) {
-    this((StackdriverFacetConfiguration) editorContext.getFacet().getConfiguration());
-  }
-
-  private StackdriverPanel(StackdriverFacetConfiguration configuration) {
+  public StackdriverPanel(StackdriverFacetConfiguration configuration, boolean fromNewProject) {
     this.configuration = configuration;
     stackdriverInfo.setHyperlinkText("Google Stackdriver documentation");
     stackdriverInfo.setHyperlinkTarget("https://cloud.google.com/stackdriver/");
@@ -77,6 +64,11 @@ public class StackdriverPanel extends FacetEditorTab {
         ignoreErrors.setEnabled(((JCheckBox)event.getSource()).isSelected());
       }
     });
+
+    // If panel is summoned from the New Project/Module window, there are no possible module source
+    // directory suggestions, so the directory prompt shouldn't be shown.
+    moduleSourceDirectory.setVisible(!fromNewProject);
+    moduleSourceDirectoryLabel.setVisible(!fromNewProject);
   }
 
   @NotNull
@@ -88,7 +80,8 @@ public class StackdriverPanel extends FacetEditorTab {
   @Override
   public boolean isModified() {
     return isGenerateSourceContextSelected() != configuration.getState().isGenerateSourceContext()
-        || isIgnoreErrorsSelected() != configuration.getState().isIgnoreErrors();
+        || isIgnoreErrorsSelected() != configuration.getState().isIgnoreErrors()
+        || getModuleSourceDirectory() != configuration.getState().getModuleSourceDirectory();
   }
 
   @Override
@@ -97,6 +90,7 @@ public class StackdriverPanel extends FacetEditorTab {
     configuration.getState().setIgnoreErrors(isIgnoreErrorsSelected());
     configuration.getState().setCloudSdkPath(
         CloudSdkService.getInstance().getSdkHomePath().toString());
+    configuration.getState().setModuleSourceDirectory(moduleSourceDirectory.getText());
   }
 
   @Override
@@ -104,6 +98,7 @@ public class StackdriverPanel extends FacetEditorTab {
     generateSourceContext.setSelected(configuration.getState().isGenerateSourceContext());
     ignoreErrors.setEnabled(isGenerateSourceContextSelected());
     ignoreErrors.setSelected(configuration.getState().isIgnoreErrors());
+    moduleSourceDirectory.setText(configuration.getState().getModuleSourceDirectory());
   }
 
   @Override
@@ -123,5 +118,9 @@ public class StackdriverPanel extends FacetEditorTab {
 
   public boolean isIgnoreErrorsSelected() {
     return ignoreErrors.isSelected();
+  }
+
+  public String getModuleSourceDirectory() {
+    return moduleSourceDirectory.getText();
   }
 }

@@ -22,6 +22,8 @@ import com.intellij.openapi.module.Module;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Paths;
+
 /**
  * Stores source context generation settings.
  */
@@ -32,5 +34,7 @@ public class StackdriverFacet extends Facet<StackdriverFacetConfiguration> {
       @NotNull String name,
       @NotNull StackdriverFacetConfiguration configuration) {
     super(facetType, module, name, configuration, null /* underlyingFacet */);
+    configuration.getState().setModuleSourceDirectory(
+        Paths.get(module.getModuleFilePath()).getParent().toString());
   }
 }

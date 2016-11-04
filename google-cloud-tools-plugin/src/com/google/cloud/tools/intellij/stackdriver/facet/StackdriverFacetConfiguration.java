@@ -43,7 +43,8 @@ public class StackdriverFacetConfiguration
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
       FacetValidatorsManager validatorsManager) {
     return new FacetEditorTab[]{
-        new StackdriverPanel(editorContext)
+        new StackdriverPanel(
+            ((StackdriverFacet) editorContext.getFacet()).getConfiguration(), false)
     };
   }
 

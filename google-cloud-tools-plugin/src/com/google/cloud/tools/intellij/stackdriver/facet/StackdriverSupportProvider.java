@@ -67,7 +67,11 @@ public class StackdriverSupportProvider extends FrameworkSupportInModuleProvider
 
   private static class StackdriverSupportConfigurable extends FrameworkSupportInModuleConfigurable {
 
-    private StackdriverPanel stackdriverPanel = new StackdriverPanel();
+    private StackdriverPanel stackdriverPanel;
+
+    public StackdriverSupportConfigurable() {
+      stackdriverPanel = new StackdriverPanel(new StackdriverFacetConfiguration(), true);
+    }
 
     @Nullable
     @Override
@@ -88,6 +92,8 @@ public class StackdriverSupportProvider extends FrameworkSupportInModuleProvider
       configuration.getState().setIgnoreErrors(stackdriverPanel.isIgnoreErrorsSelected());
       configuration.getState().setCloudSdkPath(
           CloudSdkService.getInstance().getSdkHomePath().toString());
+      configuration.getState().setModuleSourceDirectory(
+          stackdriverPanel.getModuleSourceDirectory());
     }
   }
 }

@@ -30,4 +30,6 @@ public interface JpsStackdriverModuleExtension extends JpsElement {
   boolean isIgnoreErrors();
 
   Path getCloudSdkPath();
+
+  Path getModuleSourceDirectory();
 }
