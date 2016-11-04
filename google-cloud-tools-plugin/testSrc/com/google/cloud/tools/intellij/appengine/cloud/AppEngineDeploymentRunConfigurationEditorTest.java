@@ -16,20 +16,25 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.util.containers.HashSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.picocontainer.MutablePicoContainer;
+
+import java.nio.file.Path;
 
 import javax.swing.JCheckBox;
 
@@ -55,6 +60,8 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     when(projectSelector.getText()).thenReturn(PROJECT_NAME);
 
     cloudSdkService = mock(CloudSdkService.class);
+    when(cloudSdkService.validateCloudSdk(any(Path.class)))
+        .thenReturn(new HashSet<CloudSdkValidationResult>());
 
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
