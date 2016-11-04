@@ -44,6 +44,8 @@ public abstract class CloudSdkService {
 
   public abstract Set<CloudSdkValidationResult> validateCloudSdk(@NotNull CloudSdk sdk);
 
+  public abstract Set<CloudSdkValidationResult> validateCloudSdk(@NotNull Path pathToCloudSdk);
+
   @Nullable
   public abstract File getToolsApiJarFile();
 

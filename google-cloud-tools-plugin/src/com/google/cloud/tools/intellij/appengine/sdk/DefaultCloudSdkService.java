@@ -101,6 +101,12 @@ public class DefaultCloudSdkService extends CloudSdkService {
   }
 
   @Override
+  public Set<CloudSdkValidationResult> validateCloudSdk(@NotNull Path pathToCloudSdk) {
+    CloudSdk sdk = new CloudSdk.Builder().sdkPath(pathToCloudSdk).build();
+    return validateCloudSdk(sdk);
+  }
+
+  @Override
   public Set<CloudSdkValidationResult> validateCloudSdk(@NotNull CloudSdk sdk) {
     Set<CloudSdkValidationResult> validationResults = new HashSet<>();
     try {
