@@ -24,6 +24,7 @@ public class StackdriverProperties {
   private boolean ignoreErrors = true;
   // Needs to be serialized here so the build plugin can use the Cloud SDK.
   private String sdkPath;
+  private String moduleSourceDirectory;
 
   public StackdriverProperties() {}
 
@@ -53,5 +54,13 @@ public class StackdriverProperties {
 
   public String getCloudSdkPath() {
     return sdkPath;
+  }
+
+  public void setModuleSourceDirectory(String moduleSourceDirectory) {
+    this.moduleSourceDirectory = moduleSourceDirectory;
+  }
+
+  public String getModuleSourceDirectory() {
+    return moduleSourceDirectory;
   }
 }

@@ -22,6 +22,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.HyperlinkLabel;
 
 import org.jetbrains.annotations.Nls;
@@ -44,6 +45,7 @@ public class StackdriverPanel extends FacetEditorTab {
   private JCheckBox ignoreErrors;
   private FacetEditorContext editorContext;
   private HyperlinkLabel stackdriverInfo;
+  private TextFieldWithBrowseButton moduleSourceDirectory;
   private StackdriverFacetConfiguration configuration;
 
   /**
@@ -52,7 +54,7 @@ public class StackdriverPanel extends FacetEditorTab {
    * {@link StackdriverPanel#apply()} to persist the configuration.
    */
   public StackdriverPanel() {
-    this(null /* editorContext */);
+    this(new StackdriverFacetConfiguration());
   }
 
   /**
@@ -61,10 +63,11 @@ public class StackdriverPanel extends FacetEditorTab {
    * @param editorContext may contain the Stackdriver facet in the current context
    */
   public StackdriverPanel(FacetEditorContext editorContext) {
-    this.editorContext = editorContext;
-    if (editorContext != null) {
-      configuration = (StackdriverFacetConfiguration) editorContext.getFacet().getConfiguration();
-    }
+    this((StackdriverFacetConfiguration) editorContext.getFacet().getConfiguration());
+  }
+
+  private StackdriverPanel(StackdriverFacetConfiguration configuration) {
+    this.configuration = configuration;
     stackdriverInfo.setHyperlinkText("Google Stackdriver documentation");
     stackdriverInfo.setHyperlinkTarget("https://cloud.google.com/stackdriver/");
 
@@ -98,15 +101,9 @@ public class StackdriverPanel extends FacetEditorTab {
 
   @Override
   public void reset() {
-    if (editorContext.getFacet().getConfiguration() instanceof StackdriverFacetConfiguration) {
-      generateSourceContext.setSelected(configuration.getState().isGenerateSourceContext());
-      ignoreErrors.setEnabled(isGenerateSourceContextSelected());
-      ignoreErrors.setSelected(configuration.getState().isIgnoreErrors());
-      return;
-    }
-    // If not a StackdriverFacetConfiguration, use defaults, though this should never happen.
-    generateSourceContext.setSelected(true);
-    ignoreErrors.setSelected(true);
+    generateSourceContext.setSelected(configuration.getState().isGenerateSourceContext());
+    ignoreErrors.setEnabled(isGenerateSourceContextSelected());
+    ignoreErrors.setSelected(configuration.getState().isIgnoreErrors());
   }
 
   @Override
