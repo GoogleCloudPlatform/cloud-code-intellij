@@ -199,8 +199,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
     }
   }
 
-  @Override
-  public boolean isCloudSdkVersionSupported(CloudSdk sdk) {
+  private boolean isCloudSdkVersionSupported(CloudSdk sdk) {
     sdk.validateCloudSdk();
 
     CloudSdkVersion requiredVersion = getMinimumRequiredCloudSdkVersion();

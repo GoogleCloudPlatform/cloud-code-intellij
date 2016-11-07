@@ -56,30 +56,6 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testIsCloudSdkSupported_priorVersion() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(unsupportedVersion);
-    assertFalse(service.isCloudSdkVersionSupported(mockSdk));
-  }
-
-  @Test
-  public void testIsCloudSdkSupported_laterVersion() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(supportedVersion);
-    assertTrue(service.isCloudSdkVersionSupported(mockSdk));
-  }
-
-  @Test
-  public void testIsCloudSdkSupported_equalVersion() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(new CloudSdkVersion(readRequiredCloudSdkVersion()));
-    assertTrue(service.isCloudSdkVersionSupported(mockSdk));
-  }
-
-  @Test
-  public void testIsCloudSdkSupported_gcloudException() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenThrow(ProcessRunnerException.class);
-    assertFalse(service.isCloudSdkVersionSupported(mockSdk));
-  }
-
-  @Test
   public void testGetMinimumRequiredCloudSdkVersion() {
     String expected = readRequiredCloudSdkVersion();
     assertEquals(new CloudSdkVersion(expected),

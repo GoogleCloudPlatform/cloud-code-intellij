@@ -65,8 +65,6 @@ public abstract class CloudSdkService {
 
   public abstract void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters);
 
-  public abstract boolean isCloudSdkVersionSupported(CloudSdk sdk);
-
   public abstract boolean hasJavaComponent();
 
 }
