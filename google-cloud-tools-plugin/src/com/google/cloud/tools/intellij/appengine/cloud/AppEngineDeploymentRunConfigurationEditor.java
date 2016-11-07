@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
@@ -372,8 +371,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
     // Perform cloud sdk validation
     Path cloudSdkPath = sdkService.getSdkHomePath();
-    CloudSdk sdk = new CloudSdk.Builder().sdkPath(cloudSdkPath).build();
-    Set<CloudSdkValidationResult> results = sdkService.validateCloudSdk(sdk);
+    Set<CloudSdkValidationResult> results = sdkService.validateCloudSdk(cloudSdkPath);
 
     if (results.size() > 0) {
       CloudSdkValidationResult result = results.iterator().next();

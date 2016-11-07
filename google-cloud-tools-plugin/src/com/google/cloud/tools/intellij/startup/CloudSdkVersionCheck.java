@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -46,8 +45,7 @@ public class CloudSdkVersionCheck implements StartupActivity {
     // If there is a configured Cloud SDK at this time, check that it is supported.
     Path cloudSdkPath = sdkService.getSdkHomePath();
     if (cloudSdkPath != null) {
-      CloudSdk sdk = new CloudSdk.Builder().sdkPath(cloudSdkPath).build();
-      Set<CloudSdkValidationResult> results = sdkService.validateCloudSdk(sdk);
+      Set<CloudSdkValidationResult> results = sdkService.validateCloudSdk(cloudSdkPath);
       if (results.contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
         showNotification();
       }

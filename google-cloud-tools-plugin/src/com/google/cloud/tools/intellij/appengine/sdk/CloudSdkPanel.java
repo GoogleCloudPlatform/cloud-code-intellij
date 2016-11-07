@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
@@ -87,9 +86,8 @@ public class CloudSdkPanel {
       return;
     }
 
-    CloudSdk sdk = new CloudSdk.Builder().sdkPath(Paths.get(path)).build();
     Set<CloudSdkValidationResult> validationResults =
-        CloudSdkService.getInstance().validateCloudSdk(sdk);
+        CloudSdkService.getInstance().validateCloudSdk(Paths.get(path));
 
     // if there are any validation errors, show the first one to the user
     if (validationResults.size() > 0) {

@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
@@ -169,8 +168,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
           GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }
 
-    CloudSdk sdk = new CloudSdk.Builder().sdkPath(sdkService.getSdkHomePath()).build();
-    Set<CloudSdkValidationResult> results = sdkService.validateCloudSdk(sdk);
+    Set<CloudSdkValidationResult> results =
+        sdkService.validateCloudSdk(sdkService.getSdkHomePath());
 
     for (CloudSdkValidationResult result : results) {
       if (result == CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND) {

@@ -62,7 +62,7 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_isSupported() {
-    when(cloudSdkServiceMock.validateCloudSdk(any(CloudSdk.class)))
+    when(cloudSdkServiceMock.validateCloudSdk(fakeSdkPath))
         .thenReturn(new HashSet<CloudSdkValidationResult>());
     checker.runActivity(projectMock);
 
@@ -71,7 +71,7 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_notSupported() {
-    when(cloudSdkServiceMock.validateCloudSdk(any(CloudSdk.class)))
+    when(cloudSdkServiceMock.validateCloudSdk(fakeSdkPath))
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
 
     checker.runActivity(projectMock);
@@ -80,7 +80,7 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_sdkNotFound() {
-    when(cloudSdkServiceMock.validateCloudSdk(any(CloudSdk.class)))
+    when(cloudSdkServiceMock.validateCloudSdk(fakeSdkPath))
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
 
     checker.runActivity(projectMock);
@@ -96,6 +96,7 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
 
     // should not even bother trying to validate
     verify(cloudSdkServiceMock, times(0)).validateCloudSdk(any(CloudSdk.class));
+    verify(cloudSdkServiceMock, times(0)).validateCloudSdk(any(Path.class));
     assertFalse(checker.hasShownNotification());
   }
 
