@@ -109,10 +109,12 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       configuration.setOutputDirectory(outputDirectory.toFile());
       genAction.generate(configuration);
 
-      if (exitListener.getMostRecentExitCode() != 0 && !extension.isIgnoreErrors()) {
+      if (exitListener.getMostRecentExitCode() != 0) {
         LOG.warn("gen-repo-info-file command returned with status code "
             + exitListener.getMostRecentExitCode());
-        return ExitCode.ABORT;
+        if (!extension.isIgnoreErrors()) {
+          return ExitCode.ABORT;
+        }
       }
 
       outputConsumer.registerOutputFile(

@@ -51,9 +51,10 @@ public class StackdriverPanel extends FacetEditorTab {
 
   /**
    * @param configuration contains Stackdriver parameters
-   * @param fromNewProject if {@code true}, hides the module source directory prompt
+   * @param fromNewProjectDialog if {@code true}, hides the module source directory prompt
    */
-  public StackdriverPanel(StackdriverFacetConfiguration configuration, boolean fromNewProject) {
+  public StackdriverPanel(StackdriverFacetConfiguration configuration,
+      boolean fromNewProjectDialog) {
     this.configuration = configuration;
     stackdriverInfo.setHyperlinkText("Google Stackdriver documentation");
     stackdriverInfo.setHyperlinkTarget("https://cloud.google.com/stackdriver/");
@@ -67,8 +68,8 @@ public class StackdriverPanel extends FacetEditorTab {
 
     // If panel is summoned from the New Project/Module window, there are no possible module source
     // directory suggestions, so the directory prompt shouldn't be shown.
-    moduleSourceDirectory.setVisible(!fromNewProject);
-    moduleSourceDirectoryLabel.setVisible(!fromNewProject);
+    moduleSourceDirectory.setVisible(!fromNewProjectDialog);
+    moduleSourceDirectoryLabel.setVisible(!fromNewProjectDialog);
   }
 
   @NotNull
