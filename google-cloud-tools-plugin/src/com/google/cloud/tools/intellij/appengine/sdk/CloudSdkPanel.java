@@ -21,6 +21,8 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.icons.AllIcons.RunConfigurations;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -69,15 +71,25 @@ public class CloudSdkPanel {
         .addDocumentListener(new DocumentAdapter() {
           @Override
           protected void textChanged(DocumentEvent event) {
-            checkSdk();
+            checkSdkInBackground();
           }
         });
 
-    checkSdk();
+    checkSdkInBackground();
   }
 
-  private void checkSdk() {
-    String path = cloudSdkDirectoryField.getText();
+  private void checkSdkInBackground() {
+    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+      @Override
+      public void run() {
+        checkSdk();
+      }
+    });
+  }
+
+  @VisibleForTesting
+  protected void checkSdk() {
+    final String path = cloudSdkDirectoryField.getText();
 
     if (StringUtil.isEmpty(path)) {
       String warningText = appendCloudSdkDownloadMessage(
@@ -109,21 +121,38 @@ public class CloudSdkPanel {
     }
   }
 
-  private void showWarning(String message, boolean setSdkDirectoryErrorState) {
-    warningIcon.setVisible(true);
-    warningMessage.setVisible(true);
-    warningMessage.setText(message);
+  @VisibleForTesting
+  protected void showWarning(final String message, final boolean setSdkDirectoryErrorState) {
+    invokePanelValidationUpdate(new Runnable() {
+      @Override
+      public void run() {
+        warningIcon.setVisible(true);
+        warningMessage.setVisible(true);
+        warningMessage.setText(message);
 
-    if (setSdkDirectoryErrorState) {
-      cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
-    }
+        if (setSdkDirectoryErrorState) {
+          cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
+        }
+      }
+    });
   }
 
-  private void hideWarning() {
-    cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
-    warningIcon.setVisible(false);
-    warningIcon.setVisible(false);
-    warningMessage.setVisible(false);
+  @VisibleForTesting
+  protected void hideWarning() {
+    invokePanelValidationUpdate(new Runnable() {
+      @Override
+      public void run() {
+        cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
+        warningIcon.setVisible(false);
+        warningIcon.setVisible(false);
+        warningMessage.setVisible(false);
+      }
+    });
+  }
+
+  private void invokePanelValidationUpdate(Runnable runnable) {
+    ApplicationManager.getApplication().invokeLater(runnable,
+        ModalityState.stateForComponent(cloudSdkPanel));
   }
 
   @VisibleForTesting

@@ -149,7 +149,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   private void mockCloudSdkValidationResult(CloudSdkValidationResult... results) {
-    Set<CloudSdkValidationResult> resultSet =new HashSet<>();
+    Set<CloudSdkValidationResult> resultSet = new HashSet<>();
     for (CloudSdkValidationResult result : results) {
       resultSet.add(result);
     }
