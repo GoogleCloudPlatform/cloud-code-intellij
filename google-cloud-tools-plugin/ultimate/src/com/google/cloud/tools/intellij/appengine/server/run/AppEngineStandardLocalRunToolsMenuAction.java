@@ -56,6 +56,10 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
     }
   }
 
+  /**
+   * Determines if the project has at least one module with an appengine-web.xml configuration file.
+   * If it does not, then a notification balloon is shown.
+   */
   private boolean isAppEngineStandardProjectCheck(@NotNull Project project) {
     XmlFile webXml = AppEngineAssetProvider.getInstance()
         .loadAppEngineStandardWebXml(project,
