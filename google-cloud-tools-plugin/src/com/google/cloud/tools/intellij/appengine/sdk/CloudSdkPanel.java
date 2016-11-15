@@ -96,15 +96,12 @@ public class CloudSdkPanel {
         CloudSdkService.getInstance().validateCloudSdk(Paths.get(path));
 
     // if there are any validation errors, show the first one to the user
-    if (validationResults.size() > 0) {
+    if (!validationResults.isEmpty()) {
       CloudSdkValidationResult validationResult = validationResults.iterator().next();
       String message;
       switch (validationResult) {
         case CLOUD_SDK_NOT_FOUND:
           message = appendCloudSdkDownloadMessage(validationResult.getMessage());
-          break;
-        case CLOUD_SDK_VERSION_NOT_SUPPORTED:
-          message = validationResult.getMessage();
           break;
         default:
           message = validationResult.getMessage();

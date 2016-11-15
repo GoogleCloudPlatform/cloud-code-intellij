@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.openapi.components.ServiceManager;
 
@@ -41,8 +39,6 @@ public abstract class CloudSdkService {
   public abstract Path getSdkHomePath();
 
   public abstract void setSdkHomePath(String path);
-
-  public abstract Set<CloudSdkValidationResult> validateCloudSdk(@NotNull CloudSdk sdk);
 
   public abstract Set<CloudSdkValidationResult> validateCloudSdk(@NotNull Path pathToCloudSdk);
 

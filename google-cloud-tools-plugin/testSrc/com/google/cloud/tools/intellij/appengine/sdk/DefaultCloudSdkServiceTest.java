@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -31,8 +32,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.nio.file.Path;
 import java.util.Set;
 
 /**
@@ -46,14 +49,17 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   private static final CloudSdkVersion supportedVersion =
       new CloudSdkVersion(Integer.toString(Integer.MAX_VALUE) + ".0.0");
 
-  private CloudSdkService service;
+  private DefaultCloudSdkService service;
 
   @Mock
   private CloudSdk mockSdk;
 
+  @Mock
+  private Path mockPath;
+
   @Before
   public void setUp() throws Exception {
-    service = new DefaultCloudSdkService();
+    service = new DefaultCloudSdkServiceForTesting();
   }
 
   @Test
@@ -67,7 +73,7 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   public void testValidateCloudSdk_cloudSdkNotFound() throws ProcessRunnerException {
     when(mockSdk.getVersion()).thenReturn(supportedVersion);
     doThrow(CloudSdkNotFoundException.class).when(mockSdk).validateCloudSdk();
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk(mockSdk);
+    Set<CloudSdkValidationResult> results = service.validateCloudSdk(mockPath);
     assertEquals(1, results.size());
     assertEquals(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND, results.iterator().next());
   }
@@ -75,7 +81,7 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   @Test
   public void testValidateCloudSdk_versionUnsupported() throws ProcessRunnerException {
     when(mockSdk.getVersion()).thenReturn(unsupportedVersion);
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk(mockSdk);
+    Set<CloudSdkValidationResult> results = service.validateCloudSdk(mockPath);
     assertEquals(1, results.size());
     assertEquals(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED,
         results.iterator().next());
@@ -84,7 +90,7 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   @Test
   public void testValidateCloudSdk_valid() throws ProcessRunnerException {
     when(mockSdk.getVersion()).thenReturn(supportedVersion);
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk(mockSdk);
+    Set<CloudSdkValidationResult> results = service.validateCloudSdk(mockPath);
     assertEquals(0, results.size());
   }
 
@@ -92,4 +98,11 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
     return new PropertiesFileFlagReader().getFlagString("cloudsdk.min.version");
   }
 
+  // Create a special subclass of DefaultCloudSdkService so we can control some of its methods
+  class DefaultCloudSdkServiceForTesting extends DefaultCloudSdkService {
+    @Override
+    CloudSdk buildCloudSdkWithPath(Path path) {
+      return mockSdk;
+    }
+  }
 }

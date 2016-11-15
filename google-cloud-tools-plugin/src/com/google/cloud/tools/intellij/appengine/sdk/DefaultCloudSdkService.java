@@ -24,6 +24,7 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.ide.util.PropertiesComponent;
@@ -102,13 +103,8 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   @Override
   public Set<CloudSdkValidationResult> validateCloudSdk(@NotNull Path pathToCloudSdk) {
-    CloudSdk sdk = new CloudSdk.Builder().sdkPath(pathToCloudSdk).build();
-    return validateCloudSdk(sdk);
-  }
-
-  @Override
-  public Set<CloudSdkValidationResult> validateCloudSdk(@NotNull CloudSdk sdk) {
     Set<CloudSdkValidationResult> validationResults = new HashSet<>();
+    CloudSdk sdk = buildCloudSdkWithPath(pathToCloudSdk);
     try {
       sdk.validateCloudSdk();
     } catch (CloudSdkNotFoundException exception) {
@@ -217,9 +213,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
   @Override
   public boolean hasJavaComponent() {
     try {
-      new CloudSdk.Builder()
-          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
-          .build()
+      buildCloudSdkWithPath(CloudSdkService.getInstance().getSdkHomePath())
           .validateAppEngineJavaComponents();
 
       return true;
@@ -259,5 +253,11 @@ public class DefaultCloudSdkService extends CloudSdkService {
       }
     }
     return jars.toArray(new File[jars.size()]);
+  }
+
+  @VisibleForTesting
+  CloudSdk buildCloudSdkWithPath(@NotNull Path path) {
+    return new CloudSdk.Builder().sdkPath(path).build();
+
   }
 }

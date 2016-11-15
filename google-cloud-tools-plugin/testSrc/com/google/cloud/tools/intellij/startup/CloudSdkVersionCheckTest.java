@@ -96,7 +96,6 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
     checker.runActivity(projectMock);
 
     // should not even bother trying to validate
-    verify(cloudSdkServiceMock, times(0)).validateCloudSdk(any(CloudSdk.class));
     verify(cloudSdkServiceMock, times(0)).validateCloudSdk(any(Path.class));
     verify(checker, times(0)).showNotification();
   }
