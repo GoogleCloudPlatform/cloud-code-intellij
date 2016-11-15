@@ -79,9 +79,14 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   }
 
   @Test
+  public void testCheckSdk_nullSdk() throws InterruptedException {
+    panel.checkSdk(null);
+    verify(panel, times(1)).showWarning(eq(MISSING_SDK_DIR_WARNING), eq(false));
+    verify(panel, times(0)).hideWarning();
+  }
+  @Test
   public void testCheckSdk_emptySdk() throws InterruptedException {
-    panel.getCloudSdkDirectoryField().setText("");
-    panel.checkSdk();
+    panel.checkSdk("");
     verify(panel, times(1)).showWarning(eq(MISSING_SDK_DIR_WARNING), eq(false));
     verify(panel, times(0)).hideWarning();
   }
@@ -89,8 +94,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   @Test
   public void testCheckSdk_invalidSdk() throws InterruptedException {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
-    panel.getCloudSdkDirectoryField().setText("/non/empty/path");
-    panel.checkSdk();
+    panel.checkSdk("/non/empty/path");
     verify(panel, times(1)).showWarning(eq(INVALID_SDK_DIR_WARNING), eq(true));
     verify(panel, times(0)).hideWarning();
   }
@@ -98,8 +102,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   @Test
   public void testCheckSdk_unsupportedSdk() {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
-    panel.getCloudSdkDirectoryField().setText("/non/empty/path");
-    panel.checkSdk();
+    panel.checkSdk("/non/empty/path");
     verify(panel, times(1)).showWarning(eq(UNSUPPORTED_SDK_WARNING), eq(false));
     verify(panel, times(0)).hideWarning();
   }
@@ -107,8 +110,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   @Test
   public void testCheckSdk_validSdk() {
     setValidateCloudSdkResponse();
-    panel.getCloudSdkDirectoryField().setText("/non/empty/path");
-    panel.checkSdk();
+    panel.checkSdk("/non/empty/path");
     verify(panel, times(0)).showWarning(any(String.class), anyBoolean());
     verify(panel, times(1)).hideWarning();
   }

@@ -79,18 +79,12 @@ public class CloudSdkPanel {
   }
 
   private void checkSdkInBackground() {
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        checkSdk();
-      }
-    });
+    final String path = cloudSdkDirectoryField.getText();
+    ApplicationManager.getApplication().executeOnPooledThread(new CloudSdkChecker(path));
   }
 
   @VisibleForTesting
-  protected void checkSdk() {
-    final String path = cloudSdkDirectoryField.getText();
-
+  protected void checkSdk(String path) {
     if (StringUtil.isEmpty(path)) {
       String warningText = appendCloudSdkDownloadMessage(
               GctBundle.message("appengine.cloudsdk.location.missing.message"));
@@ -203,6 +197,20 @@ public class CloudSdkPanel {
 
     return message + " "
         + GctBundle.message("appengine.cloudsdk.download.message", openTag, "</a>");
+  }
+
+  private class CloudSdkChecker implements Runnable {
+
+    private final String sdkPath;
+
+    public CloudSdkChecker(String sdkPath) {
+      this.sdkPath = sdkPath;
+    }
+
+    @Override
+    public void run() {
+      checkSdk(sdkPath);
+    }
   }
 
 }
