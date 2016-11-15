@@ -18,6 +18,9 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 
+/**
+ * The result of a failed validation of a CloudSdk installation.
+ */
 public enum CloudSdkValidationResult {
 
   CLOUD_SDK_NOT_FOUND(GctBundle.message("appengine.cloudsdk.location.invalid.message"), true),

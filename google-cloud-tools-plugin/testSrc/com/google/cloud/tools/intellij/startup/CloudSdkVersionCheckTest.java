@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,7 +23,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
-import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
@@ -37,14 +34,20 @@ import com.intellij.util.containers.HashSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Spy;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Unit tests for {@link CloudSdkVersionCheck}
+ */
 public class CloudSdkVersionCheckTest extends BasePluginTestCase {
 
-  private CloudSdkVersionCheckForTesting checker;
   private Path fakeSdkPath;
+
+  // Wrap the class under test in a spy so we can perform verifications on it
+  @Spy private CloudSdkVersionCheck checker;
 
   @Mock private CloudSdkService cloudSdkServiceMock;
   @Mock private Project projectMock;
@@ -56,8 +59,6 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
 
     fakeSdkPath = Paths.get("/");
     when(cloudSdkServiceMock.getSdkHomePath()).thenReturn(fakeSdkPath);
-
-    checker = new CloudSdkVersionCheckForTesting();
   }
 
   @Test
@@ -66,7 +67,7 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
         .thenReturn(new HashSet<CloudSdkValidationResult>());
     checker.runActivity(projectMock);
 
-    assertFalse(checker.hasShownNotification());
+    verify(checker, times(0)).showNotification();
   }
 
   @Test
@@ -75,7 +76,7 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
 
     checker.runActivity(projectMock);
-    assertTrue(checker.hasShownNotification());
+    verify(checker, times(1)).showNotification();
   }
 
   @Test
@@ -84,7 +85,7 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
 
     checker.runActivity(projectMock);
-    assertFalse(checker.hasShownNotification());
+    verify(checker, times(0)).showNotification();
   }
 
   @Test
@@ -97,24 +98,7 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
     // should not even bother trying to validate
     verify(cloudSdkServiceMock, times(0)).validateCloudSdk(any(CloudSdk.class));
     verify(cloudSdkServiceMock, times(0)).validateCloudSdk(any(Path.class));
-    assertFalse(checker.hasShownNotification());
+    verify(checker, times(0)).showNotification();
   }
 
-  // Extend the class under test so that we can report whether the notification has been shown
-  class CloudSdkVersionCheckForTesting extends CloudSdkVersionCheck {
-    private boolean hasShownNotification;
-
-    public CloudSdkVersionCheckForTesting() {
-      hasShownNotification = false;
-    }
-
-    @Override
-    void showNotification() {
-      hasShownNotification = true;
-    }
-
-    public boolean hasShownNotification() {
-      return hasShownNotification;
-    }
-  }
 }

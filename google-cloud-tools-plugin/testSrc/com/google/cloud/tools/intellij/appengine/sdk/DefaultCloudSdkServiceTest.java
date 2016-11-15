@@ -35,6 +35,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Set;
 
+/**
+ * Unit tests for {@link DefaultCloudSdkService}
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
