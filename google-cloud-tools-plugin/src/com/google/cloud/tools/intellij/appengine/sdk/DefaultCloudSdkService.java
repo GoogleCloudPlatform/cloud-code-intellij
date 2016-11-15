@@ -62,7 +62,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
-  private static final String CLOUD_SDK_REQUIRED_VERSION_KEY = "cloudsdk.required.version";
+  private static final String CLOUD_SDK_REQUIRED_VERSION_KEY = "cloudsdk.min.version";
   private static final Path JAVA_TOOLS_RELATIVE_PATH
       = Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
 

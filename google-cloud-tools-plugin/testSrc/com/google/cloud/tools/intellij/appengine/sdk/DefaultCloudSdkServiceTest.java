@@ -89,7 +89,7 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   }
 
   private String readRequiredCloudSdkVersion() {
-    return new PropertiesFileFlagReader().getFlagString("cloudsdk.required.version");
+    return new PropertiesFileFlagReader().getFlagString("cloudsdk.min.version");
   }
 
 }
