@@ -16,10 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.appengine.server.run.CloudSdkStartupPolicy;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -63,7 +64,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author nik
@@ -168,20 +168,14 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
           GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }
 
-    Set<CloudSdkValidationResult> results =
-        sdkService.validateCloudSdk(sdkService.getSdkHomePath());
-
-    for (CloudSdkValidationResult result : results) {
-      if (result == CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND) {
-        throw new RuntimeConfigurationError(
-            GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
-      }
-
-      if (result.isWarning()) {
-        throw new RuntimeConfigurationWarning(result.getMessage());
-      } else {
-        throw new RuntimeConfigurationError(result.getMessage());
-      }
+    try {
+      new CloudSdk.Builder()
+          .sdkPath(sdkService.getSdkHomePath())
+          .build()
+          .validateCloudSdk();
+    } catch (AppEngineException ex) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }
   }
 

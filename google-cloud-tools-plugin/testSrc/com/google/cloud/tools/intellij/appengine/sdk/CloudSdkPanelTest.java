@@ -58,7 +58,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in this directory. "
       + CLOUD_SDK_DOWNLOAD_LINK;
   private static final String UNSUPPORTED_SDK_WARNING = "The configured Google Cloud SDK is out of "
-      + "date. Version 131.0.0 or higher is required by the Google Cloud Tools Plugin. To update, "
+      + "date. Version 131.0.0 is the minimum recommended version for use with the Google Cloud Tools Plugin. To update, "
       + "run \"gcloud components update\".";
 
   @Override

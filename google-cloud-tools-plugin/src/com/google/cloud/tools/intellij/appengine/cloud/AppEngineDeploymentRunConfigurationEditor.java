@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.Di
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -30,8 +29,6 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 
-import com.intellij.execution.configurations.RuntimeConfigurationError;
-import com.intellij.execution.configurations.RuntimeConfigurationWarning;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -68,7 +65,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -367,22 +363,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   private void validateConfiguration() throws ConfigurationException {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-
-    // Perform cloud sdk validation
-    Path cloudSdkPath = sdkService.getSdkHomePath();
-    Set<CloudSdkValidationResult> results = sdkService.validateCloudSdk(cloudSdkPath);
-
-    if (results.size() > 0) {
-      CloudSdkValidationResult result = results.iterator().next();
-      String errorMessage = result.getMessage();
-      if (result.isWarning()) {
-        throw new RuntimeConfigurationWarning(errorMessage);
-      } else {
-        throw new RuntimeConfigurationError(errorMessage);
-      }
-    }
-
     if (isUserSpecifiedPathDeploymentSource()
         && (StringUtil.isEmpty(userSpecifiedArtifactFileSelector.getText())
             || !isJarOrWar(userSpecifiedArtifactFileSelector.getText()))) {

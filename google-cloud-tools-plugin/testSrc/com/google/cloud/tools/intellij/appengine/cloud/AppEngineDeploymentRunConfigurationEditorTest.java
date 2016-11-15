@@ -119,44 +119,6 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     }
   }
 
-  public void testValidationFailure_cloudSdkWarning() {
-    CloudSdkValidationResult result = CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED;
-    mockCloudSdkValidationResult(result);
-
-    try {
-      editor.applyEditorTo(mock(AppEngineDeploymentConfiguration.class));
-      fail("Configuration warning expected");
-    } catch (RuntimeConfigurationWarning rcw) {
-      assertEquals(result.getMessage(), rcw.getMessage());
-    } catch (ConfigurationException e) {
-      fail("Thrown wrong Configuration Exception type. Expected RuntimeConfigurationWarning");
-    }
-  }
-
-  public void testValidationFailure_cloudSdkError() {
-    CloudSdkValidationResult result = CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND;
-    mockCloudSdkValidationResult(result);
-
-    try {
-      editor.applyEditorTo(mock(AppEngineDeploymentConfiguration.class));
-      fail("Configuration error expected");
-    } catch (RuntimeConfigurationError rce) {
-      assertEquals(result.getMessage(), rce.getMessage());
-    } catch (ConfigurationException e) {
-      fail("Thrown wrong Configuration Exception type. Expected RuntimeConfigurationError");
-    }
-
-  }
-
-  private void mockCloudSdkValidationResult(CloudSdkValidationResult... results) {
-    Set<CloudSdkValidationResult> resultSet = new HashSet<>();
-    for (CloudSdkValidationResult result : results) {
-      resultSet.add(result);
-    }
-    when(cloudSdkService.validateCloudSdk(any(Path.class)))
-        .thenReturn(resultSet);
-  }
-
   public void testValidationSuccessFlexEnv_missingJavaComponent() {
     AppEngineDeploymentRunConfigurationEditor editor
         = createEditor(AppEngineEnvironment.APP_ENGINE_FLEX);

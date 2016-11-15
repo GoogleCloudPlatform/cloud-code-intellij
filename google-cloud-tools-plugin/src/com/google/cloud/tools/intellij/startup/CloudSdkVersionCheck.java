@@ -28,6 +28,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Set;
@@ -40,12 +41,18 @@ public class CloudSdkVersionCheck implements StartupActivity {
 
   @Override
   public void runActivity(@NotNull Project project) {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
+    Path cloudSdkPath = CloudSdkService.getInstance().getSdkHomePath();
+    performCloudSdkVersionCheck(cloudSdkPath);
+  }
 
+  /**
+   * Performs the logic of checking if the SDK installed at the given path is supported.
+   */
+  public void performCloudSdkVersionCheck(@Nullable Path cloudSdkPath) {
     // If there is a configured Cloud SDK at this time, check that it is supported.
-    Path cloudSdkPath = sdkService.getSdkHomePath();
     if (cloudSdkPath != null) {
-      Set<CloudSdkValidationResult> results = sdkService.validateCloudSdk(cloudSdkPath);
+      Set<CloudSdkValidationResult> results = CloudSdkService.getInstance()
+          .validateCloudSdk(cloudSdkPath);
       if (results.contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
         showNotification();
       }
