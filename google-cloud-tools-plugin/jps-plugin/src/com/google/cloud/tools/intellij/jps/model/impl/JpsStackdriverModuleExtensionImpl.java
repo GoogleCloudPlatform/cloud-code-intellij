@@ -54,13 +54,14 @@ public class JpsStackdriverModuleExtensionImpl
   @Override
   public Path getCloudSdkPath() {
     // TODO(joaomartins): Validate path.
-    return Paths.get(properties.getCloudSdkPath());
+    return properties.getCloudSdkPath() != null ? Paths.get(properties.getCloudSdkPath()) : null;
   }
 
   @Override
   public Path getModuleSourceDirectory() {
     try {
-      return Paths.get(properties.getModuleSourceDirectory());
+      return properties.getModuleSourceDirectory() != null
+          ? Paths.get(properties.getModuleSourceDirectory()) : null;
     } catch (InvalidPathException ipe) {
       return null;
     }

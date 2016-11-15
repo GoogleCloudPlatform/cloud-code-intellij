@@ -28,8 +28,12 @@ public class StackdriverProperties {
 
   public StackdriverProperties() {}
 
-  public StackdriverProperties(String sdkPath) {
+  public StackdriverProperties(boolean generateSourceContext, boolean ignoreErrors, String sdkPath,
+      String moduleSourceDirectory) {
+    this.generateSourceContext = generateSourceContext;
+    this.ignoreErrors = ignoreErrors;
     this.sdkPath = sdkPath;
+    this.moduleSourceDirectory = moduleSourceDirectory;
   }
 
   public boolean isGenerateSourceContext() {

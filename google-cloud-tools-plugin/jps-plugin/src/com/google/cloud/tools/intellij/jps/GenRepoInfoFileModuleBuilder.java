@@ -23,6 +23,7 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkGenRepoInfoFile;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ExitCodeRecorderProcessExitListener;
 import com.google.cloud.tools.intellij.jps.model.JpsStackdriverModuleExtension;
 import com.google.cloud.tools.intellij.jps.model.impl.JpsStackdriverModuleExtensionImpl;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -50,12 +51,21 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
   private static final Logger LOG =
       Logger.getInstance("#com.google.cloud.tools.intellij.jps.GenRepoInfoFileModuleBuilder");
 
+  public static final String NAME = "Stackdriver source context generator";
+  private GenRepoInfoFileActionFactory actionFactory = new GenRepoInfoFileActionFactory();
+
   public GenRepoInfoFileModuleBuilder() {
-    super(BuilderCategory.INITIAL);
+    super(BuilderCategory.CLASS_POST_PROCESSOR);
+  }
+
+  @VisibleForTesting
+  GenRepoInfoFileModuleBuilder(GenRepoInfoFileActionFactory actionFactory) {
+    this();
+    this.actionFactory = actionFactory;
   }
 
   /**
-   * Generates source context files for each module in {@param chunk}.
+   * Generates source context files for each module in {@code chunk}.
    *
    * <p>Generation is parameterized by the Stackdriver facet associated to the module.
    *
@@ -79,6 +89,13 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
         continue;
       }
 
+      if (extension.getCloudSdkPath() == null) {
+        LOG.warn("No Cloud SDK path specified. Skipping source context generation.");
+        // Cloud SDK path is a singleton for a project, so if it doesn't exist on the first module,
+        // we can return right away.
+        return ExitCode.NOTHING_DONE;
+      }
+
       if (extension.getModuleSourceDirectory() == null) {
         // Possible to happen on Windows, unlikely in Linux.
         LOG.warn("Invalid module source directory. Check for special characters <>:\"|?*.");
@@ -90,24 +107,14 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
           new ModuleBuildTarget(jpsModule, JavaModuleBuildTargetType.PRODUCTION);
       Path outputDirectory = target.getOutputDir().toPath();
 
-      if (extension.getCloudSdkPath() == null) {
-        LOG.warn("No Cloud SDK path specified. Skipping source context generation.");
-        // Cloud SDK path is a singleton for a project, so if it doesn't exist on the first module,
-        // we can return right away.
-        return ExitCode.NOTHING_DONE;
-      }
+      GenRepoInfoFile genAction = actionFactory.newAction(extension.getCloudSdkPath());
 
-      ExitCodeRecorderProcessExitListener exitListener = new ExitCodeRecorderProcessExitListener();
-      CloudSdk sdk = new CloudSdk.Builder()
-          .sdkPath(extension.getCloudSdkPath())
-          .exitListener(exitListener)
-          .build();
-
-      GenRepoInfoFile genAction = new CloudSdkGenRepoInfoFile(sdk);
       DefaultGenRepoInfoFileConfiguration configuration = new DefaultGenRepoInfoFileConfiguration();
       configuration.setSourceDirectory(sourceDirectory.toFile());
       configuration.setOutputDirectory(outputDirectory.toFile());
       genAction.generate(configuration);
+
+      ExitCodeRecorderProcessExitListener exitListener = actionFactory.getExitListener();
 
       if (exitListener.getMostRecentExitCode() != 0) {
         LOG.warn("gen-repo-info-file command returned with status code "
@@ -132,6 +139,28 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
   @NotNull
   @Override
   public String getPresentableName() {
-    return "Stackdriver source context generator";
+    return NAME;
+  }
+
+  /**
+   * Makes it possible to mock {@link CloudSdk}.
+   */
+  class GenRepoInfoFileActionFactory {
+
+    private ExitCodeRecorderProcessExitListener exitListener =
+        new ExitCodeRecorderProcessExitListener();
+
+    public GenRepoInfoFile newAction(Path sdkPath) {
+      CloudSdk sdk = new CloudSdk.Builder()
+          .sdkPath(sdkPath)
+          .exitListener(exitListener)
+          .build();
+
+      return new CloudSdkGenRepoInfoFile(sdk);
+    }
+
+    public ExitCodeRecorderProcessExitListener getExitListener() {
+      return exitListener;
+    }
   }
 }

@@ -16,11 +16,14 @@
 
 sourceSets.main.java.srcDirs = ['src']
 sourceSets.main.resources.srcDirs = ['resources']
+sourceSets.test.java.srcDirs = ['testSrc']
+sourceSets.test.resources.srcDirs = ['testData']
 
 dependencies {
     compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
         exclude group: 'com.google.guava', module: 'guava'
     }
+    testCompile group: 'com.jetbrains.intellij.idea', name:'jps-build-test', version: ideaVersion
 }
 
 jar.archiveName = "google-cloud-tools-jps-plugin.jar"
