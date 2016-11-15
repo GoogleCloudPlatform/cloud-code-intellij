@@ -34,21 +34,15 @@ import com.intellij.util.containers.ContainerUtil;
 import java.util.List;
 
 /**
- * Creates a shortcut to App Engine flex cloud configuration in the tools menu.
+ * Creates a shortcut to App Engine deployment configuration in the tools menu.
  */
-public class AppEngineToolsMenuAction extends AnAction {
+public class AppEngineDeployToolsMenuAction extends AnAction {
 
-  private static final Logger logger = Logger.getInstance(AppEngineToolsMenuAction.class);
+  private static final Logger logger = Logger.getInstance(AppEngineDeployToolsMenuAction.class);
 
-  public static final String ID = "CloudToolsMenuItem";
-  public static final String GROUP_ID = "ToolsMenu";
-
-  /**
-   * Initialize the tools menu shortcut.
-   */
-  public AppEngineToolsMenuAction() {
-    super(GctBundle.message("appengine.tools.menu.item.label"),
-        GctBundle.message("appengine.tools.menu.item.label"),
+  public AppEngineDeployToolsMenuAction() {
+    super(GctBundle.message("appengine.tools.menu.deploy.text"),
+        GctBundle.message("appengine.tools.menu.deploy.description"),
         GoogleCloudToolsIcons.APP_ENGINE);
   }
 

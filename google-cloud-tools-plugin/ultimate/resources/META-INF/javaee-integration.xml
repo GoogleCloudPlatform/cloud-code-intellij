@@ -28,4 +28,10 @@
     <javaee.frameworkSupportContributor
         implementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineJavaeeSupportContributor"/>
   </extensions>
+  <actions>
+    <action id="GoogleCloudTools.AppEngineStandardLocalRun"
+            class="com.google.cloud.tools.intellij.appengine.server.run.AppEngineStandardLocalRunToolsMenuAction">
+      <add-to-group group-id="GoogleCloudTools" relative-to-action="GoogleCloudTools.AppEngineDeploy" anchor="before"/>
+    </action>
+  </actions>
 </idea-plugin>
