@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.stackdriver.facet;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.jps.model.impl.StackdriverProperties;
 
 import com.intellij.facet.FacetConfiguration;
@@ -36,8 +35,7 @@ import org.jetbrains.annotations.Nullable;
 public class StackdriverFacetConfiguration
     implements FacetConfiguration, PersistentStateComponent<StackdriverProperties> {
 
-  private StackdriverProperties persistedProperties =
-      new StackdriverProperties(CloudSdkService.getInstance().getSdkHomePath().toString());
+  private StackdriverProperties persistedProperties = new StackdriverProperties();
 
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
