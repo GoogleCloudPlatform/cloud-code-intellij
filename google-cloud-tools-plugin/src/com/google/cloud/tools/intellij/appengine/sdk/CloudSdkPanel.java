@@ -87,9 +87,9 @@ public class CloudSdkPanel {
   @VisibleForTesting
   protected void checkSdk(String path) {
     if (StringUtil.isEmpty(path)) {
-      String warningText = appendCloudSdkDownloadMessage(
-              GctBundle.message("appengine.cloudsdk.location.missing.message"));
-      showWarning(warningText, false /* setSdkDirectoryErrorState */);
+      String warningText = GctBundle.message("appengine.cloudsdk.location.missing.message")
+          + " " + getCloudSdkDownloadMessage();
+      showWarning(warningText , false /* setSdkDirectoryErrorState */);
       return;
     }
 
@@ -111,28 +111,26 @@ public class CloudSdkPanel {
         if (validationResult.isError()) {
           containsErrors = true;
         }
-        if (counter == 0) {
-          builder.append(getMessageForValidationResult(validationResult));
+
+        String message;
+        if (validationResult == CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND) {
+          // if the cloud sdk is not found, provide a download URL
+          message = validationResult.getMessage() + " " + getCloudSdkDownloadMessage();
         } else {
-          builder.append("<p>" + getMessageForValidationResult(validationResult) + "</p>");
+          // otherwise, just use the existing message
+          message = validationResult.getMessage();
+        }
+
+        if (counter == 0) {
+          builder.append(message);
+        } else {
+          builder.append("<p>" + message + "</p>");
         }
         counter++;
       }
 
       showWarning(builder.toString(), containsErrors);
     }
-  }
-
-  private String getMessageForValidationResult(CloudSdkValidationResult cloudSdkValidationResult) {
-    String message;
-    switch (cloudSdkValidationResult) {
-      case CLOUD_SDK_NOT_FOUND:
-        message = appendCloudSdkDownloadMessage(cloudSdkValidationResult.getMessage());
-        break;
-      default:
-        message = cloudSdkValidationResult.getMessage();
-    }
-    return message;
   }
 
   @VisibleForTesting
@@ -211,13 +209,11 @@ public class CloudSdkPanel {
     return cloudSdkPanel;
   }
 
-  private String appendCloudSdkDownloadMessage(String message) {
+  private String getCloudSdkDownloadMessage() {
     String openTag = "<a href='"
         + CLOUD_SDK_DOWNLOAD_LINK
         + "'>";
-
-    return message + " "
-        + GctBundle.message("appengine.cloudsdk.download.message", openTag, "</a>");
+    return GctBundle.message("appengine.cloudsdk.download.message", openTag, "</a>");
   }
 
   private class CloudSdkCheckerRunnable implements Runnable {
