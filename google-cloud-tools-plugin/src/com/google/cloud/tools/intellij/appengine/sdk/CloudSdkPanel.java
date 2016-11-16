@@ -16,13 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.cloud.tools.appengine.api.AppEngineException;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.icons.AllIcons.RunConfigurations;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -33,6 +33,8 @@ import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Paths;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -70,43 +72,100 @@ public class CloudSdkPanel {
         .addDocumentListener(new DocumentAdapter() {
           @Override
           protected void textChanged(DocumentEvent event) {
-            checkSdk();
+            checkSdkInBackground();
           }
         });
 
-    checkSdk();
+    checkSdkInBackground();
   }
 
-  private void checkSdk() {
-    String path = cloudSdkDirectoryField.getText();
+  private void checkSdkInBackground() {
+    final String path = cloudSdkDirectoryField.getText();
+    ApplicationManager.getApplication().executeOnPooledThread(new CloudSdkCheckerRunnable(path));
+  }
 
+  @VisibleForTesting
+  protected void checkSdk(String path) {
     if (StringUtil.isEmpty(path)) {
-      warningIcon.setVisible(true);
-      warningMessage.setVisible(true);
-      warningMessage.setText(
-          createErrorMessageWithLink(
-              GctBundle.message("appengine.cloudsdk.location.missing.message")));
-
+      String warningText = GctBundle.message("appengine.cloudsdk.location.missing.message")
+          + " " + getCloudSdkDownloadMessage();
+      showWarning(warningText , false /* setSdkDirectoryErrorState */);
       return;
     }
 
-    try {
-      new CloudSdk.Builder()
-          .sdkPath(Paths.get(path))
-          .build()
-          .validateCloudSdk();
+    Set<CloudSdkValidationResult> validationResults =
+        CloudSdkService.getInstance().validateCloudSdk(Paths.get(path));
 
-      cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
-      warningIcon.setVisible(false);
-      warningMessage.setVisible(false);
-    } catch (AppEngineException aee) {
-      cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
-      warningIcon.setVisible(true);
-      warningMessage.setVisible(true);
-      warningMessage.setText(
-          createErrorMessageWithLink(
-              GctBundle.message("appengine.cloudsdk.location.invalid.message")));
+    if (validationResults.isEmpty()) {
+      hideWarning();
+    } else {
+      // use a sorted set to guarantee consistent ordering of CloudSdkValidationResults
+      validationResults = new TreeSet<>(validationResults);
+
+      // display all validation results as a list
+      StringBuilder builder = new StringBuilder();
+      boolean containsErrors = false;
+
+      int counter = 0;
+      for (CloudSdkValidationResult validationResult : validationResults) {
+        if (validationResult.isError()) {
+          containsErrors = true;
+        }
+
+        String message;
+        if (validationResult == CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND) {
+          // if the cloud sdk is not found, provide a download URL
+          message = validationResult.getMessage() + " " + getCloudSdkDownloadMessage();
+        } else {
+          // otherwise, just use the existing message
+          message = validationResult.getMessage();
+        }
+
+        if (counter == 0) {
+          builder.append(message);
+        } else {
+          builder.append("<p>" + message + "</p>");
+        }
+        counter++;
+      }
+
+      showWarning(builder.toString(), containsErrors);
     }
+  }
+
+  @VisibleForTesting
+  protected void showWarning(final String message, final boolean setSdkDirectoryErrorState) {
+    invokePanelValidationUpdate(new Runnable() {
+      @Override
+      public void run() {
+        warningMessage.setText(message);
+        warningMessage.setVisible(true);
+        warningMessage.updateUI();
+        warningIcon.setVisible(true);
+        if (setSdkDirectoryErrorState) {
+          cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
+        }
+      }
+    });
+  }
+
+  @VisibleForTesting
+  protected void hideWarning() {
+    invokePanelValidationUpdate(new Runnable() {
+      @Override
+      public void run() {
+        cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
+        warningIcon.setVisible(false);
+        warningIcon.setVisible(false);
+        warningMessage.setVisible(false);
+        cloudSdkPanel.updateUI();
+      }
+    });
+  }
+
+  private void invokePanelValidationUpdate(Runnable runnable) {
+    ApplicationManager.getApplication().invokeLater(runnable,
+        ModalityState.stateForComponent(cloudSdkPanel));
   }
 
   @VisibleForTesting
@@ -150,14 +209,25 @@ public class CloudSdkPanel {
     return cloudSdkPanel;
   }
 
-  private static String createErrorMessageWithLink(String error) {
-    String openTag = error
-        + " "
-        + "<a href='"
+  private String getCloudSdkDownloadMessage() {
+    String openTag = "<a href='"
         + CLOUD_SDK_DOWNLOAD_LINK
         + "'>";
-
-    return GctBundle.message("appengine.cloudsdk.download.message",
-        openTag, "</a>");
+    return GctBundle.message("appengine.cloudsdk.download.message", openTag, "</a>");
   }
+
+  private class CloudSdkCheckerRunnable implements Runnable {
+
+    private final String sdkPath;
+
+    public CloudSdkCheckerRunnable(String sdkPath) {
+      this.sdkPath = sdkPath;
+    }
+
+    @Override
+    public void run() {
+      checkSdk(sdkPath);
+    }
+  }
+
 }

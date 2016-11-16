@@ -20,6 +20,11 @@ import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
+import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
+import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
+import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.ide.util.PropertiesComponent;
@@ -41,6 +46,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +63,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
+  private static final String CLOUD_SDK_REQUIRED_VERSION_KEY = "cloudsdk.min.version";
   private static final Path JAVA_TOOLS_RELATIVE_PATH
       = Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
 
@@ -65,6 +72,14 @@ public class DefaultCloudSdkService extends CloudSdkService {
       = Paths.get("lib", "appengine-tools-api.jar");
 
   private Map<String, Set<String>> myMethodsBlackList;
+
+  /**
+   * Return the minimum version of the Cloud SDK that is supported by this plugin.
+   */
+  public static CloudSdkVersion getMinimumRequiredCloudSdkVersion() {
+    String version = new PropertiesFileFlagReader().getFlagString(CLOUD_SDK_REQUIRED_VERSION_KEY);
+    return new CloudSdkVersion(version);
+  }
 
   @Nullable
   @Override
@@ -84,6 +99,24 @@ public class DefaultCloudSdkService extends CloudSdkService {
   @Override
   public void setSdkHomePath(String cloudSdkHomePath) {
     propertiesComponent.setValue(CLOUD_SDK_PROPERTY_KEY, cloudSdkHomePath);
+  }
+
+  @Override
+  public Set<CloudSdkValidationResult> validateCloudSdk(@NotNull Path pathToCloudSdk) {
+    Set<CloudSdkValidationResult> validationResults = new HashSet<>();
+    CloudSdk sdk = buildCloudSdkWithPath(pathToCloudSdk);
+    try {
+      sdk.validateCloudSdk();
+    } catch (CloudSdkNotFoundException exception) {
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+      return validationResults;
+    }
+
+    if (!isCloudSdkVersionSupported(sdk)) {
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
+    }
+
+    return validationResults;
   }
 
   @Nullable
@@ -162,12 +195,25 @@ public class DefaultCloudSdkService extends CloudSdkService {
     }
   }
 
+  private boolean isCloudSdkVersionSupported(CloudSdk sdk) {
+    sdk.validateCloudSdk();
+
+    CloudSdkVersion requiredVersion = getMinimumRequiredCloudSdkVersion();
+    CloudSdkVersion actualVersion;
+    try {
+      actualVersion = sdk.getVersion();
+    } catch (ProcessRunnerException exception) {
+      logger.warn("Exception encountered when calling the cloud SDK", exception);
+      return false;
+    }
+
+    return actualVersion.compareTo(requiredVersion) >= 0;
+  }
+
   @Override
   public boolean hasJavaComponent() {
     try {
-      new CloudSdk.Builder()
-          .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
-          .build()
+      buildCloudSdkWithPath(CloudSdkService.getInstance().getSdkHomePath())
           .validateAppEngineJavaComponents();
 
       return true;
@@ -207,5 +253,11 @@ public class DefaultCloudSdkService extends CloudSdkService {
       }
     }
     return jars.toArray(new File[jars.size()]);
+  }
+
+  @VisibleForTesting
+  CloudSdk buildCloudSdkWithPath(@NotNull Path path) {
+    return new CloudSdk.Builder().sdkPath(path).build();
+
   }
 }

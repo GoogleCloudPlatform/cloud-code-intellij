@@ -23,6 +23,8 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDeployment;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -118,6 +120,11 @@ public class AppEngineDeploy {
         deployLogListener,
         deployOutputListener,
         deployExitListener);
+
+    // show a warning notification if the cloud sdk version is not supported
+    CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion(
+        CloudSdkService.getInstance().getSdkHomePath());
+
     CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
     deployment.deploy(configuration);
   }
