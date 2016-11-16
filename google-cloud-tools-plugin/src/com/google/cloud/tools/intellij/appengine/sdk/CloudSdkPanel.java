@@ -118,12 +118,12 @@ public class CloudSdkPanel {
       @Override
       public void run() {
         warningIcon.setVisible(true);
-        warningMessage.setVisible(true);
         warningMessage.setText(message);
-
+        warningMessage.setVisible(true);
         if (setSdkDirectoryErrorState) {
           cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
         }
+        cloudSdkPanel.updateUI();
       }
     });
   }
@@ -137,6 +137,7 @@ public class CloudSdkPanel {
         warningIcon.setVisible(false);
         warningIcon.setVisible(false);
         warningMessage.setVisible(false);
+        cloudSdkPanel.updateUI();
       }
     });
   }
