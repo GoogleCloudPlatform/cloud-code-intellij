@@ -98,10 +98,6 @@ public class CloudSdkPanel {
 
     if (validationResults.isEmpty()) {
       hideWarning();
-    } else if (validationResults.size() == 1) {
-      // display the single result
-      CloudSdkValidationResult result = validationResults.iterator().next();
-      showWarning(getMessageForValidationResult(result), result.isError());
     } else {
       // use a sorted set to guarantee consistent ordering of CloudSdkValidationResults
       validationResults = new TreeSet<>(validationResults);
