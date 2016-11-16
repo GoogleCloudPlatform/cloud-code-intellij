@@ -80,7 +80,7 @@ public class CloudSdkPanel {
 
   private void checkSdkInBackground() {
     final String path = cloudSdkDirectoryField.getText();
-    ApplicationManager.getApplication().executeOnPooledThread(new CloudSdkChecker(path));
+    ApplicationManager.getApplication().executeOnPooledThread(new CloudSdkCheckerRunnable(path));
   }
 
   @VisibleForTesting
@@ -196,11 +196,11 @@ public class CloudSdkPanel {
         + GctBundle.message("appengine.cloudsdk.download.message", openTag, "</a>");
   }
 
-  private class CloudSdkChecker implements Runnable {
+  private class CloudSdkCheckerRunnable implements Runnable {
 
     private final String sdkPath;
 
-    public CloudSdkChecker(String sdkPath) {
+    public CloudSdkCheckerRunnable(String sdkPath) {
       this.sdkPath = sdkPath;
     }
 
