@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerIntegration;
@@ -62,7 +62,7 @@ import java.util.List;
 /**
  * @author nik
  */
-public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
+public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWebIntegration {
 
   @NotNull
   @Override

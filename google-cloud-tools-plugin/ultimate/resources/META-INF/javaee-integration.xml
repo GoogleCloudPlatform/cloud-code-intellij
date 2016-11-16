@@ -18,8 +18,8 @@
   <extensions defaultExtensionNs="com.intellij">
     <javaee.appServerIntegration
         implementation="com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerIntegration"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineUltimateWebIntegration"
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineStandardUltimateWebIntegration"
                         overrides="true"/>
 
     <configurationType implementation="com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType"/>

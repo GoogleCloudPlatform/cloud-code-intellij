@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration;
 
 import com.intellij.execution.configurations.ModuleRunConfiguration;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
@@ -45,9 +45,9 @@ import java.util.List;
 /**
  * @author nik.
  */
-public class AppEngineCommunityWebIntegration extends AppEngineWebIntegration {
+public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardWebIntegration {
 
-  private static final Logger LOG = Logger.getInstance(AppEngineCommunityWebIntegration.class);
+  private static final Logger LOG = Logger.getInstance(AppEngineStandardCommunityWebIntegration.class);
 
   @Nullable
   @Override

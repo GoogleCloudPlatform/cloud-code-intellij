@@ -52,10 +52,10 @@ import java.util.List;
 /**
  * @author nik
  */
-public abstract class AppEngineWebIntegration {
+public abstract class AppEngineStandardWebIntegration {
 
-  public static AppEngineWebIntegration getInstance() {
-    return ServiceManager.getService(AppEngineWebIntegration.class);
+  public static AppEngineStandardWebIntegration getInstance() {
+    return ServiceManager.getService(AppEngineStandardWebIntegration.class);
   }
 
   @Nullable
