@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.startup;
+package com.google.cloud.tools.intellij.appengine.sdk;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.common.collect.Sets;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.util.containers.HashSet;
 
 import org.junit.Before;
@@ -40,17 +35,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Unit tests for {@link CloudSdkVersionCheck}
+ * Unit tests for {@link DefaultCloudSdkVersionNotifier}
  */
-public class CloudSdkVersionCheckTest extends BasePluginTestCase {
+public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
 
   private Path fakeSdkPath;
 
   // Wrap the class under test in a spy so we can perform verifications on it
-  @Spy private CloudSdkVersionCheck checker;
+  @Spy private DefaultCloudSdkVersionNotifier checker;
 
   @Mock private CloudSdkService cloudSdkServiceMock;
-  @Mock private Project projectMock;
 
 
   @Before
@@ -58,14 +52,13 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
     registerService(CloudSdkService.class, cloudSdkServiceMock);
 
     fakeSdkPath = Paths.get("/");
-    when(cloudSdkServiceMock.getSdkHomePath()).thenReturn(fakeSdkPath);
   }
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_isSupported() {
     when(cloudSdkServiceMock.validateCloudSdk(fakeSdkPath))
         .thenReturn(new HashSet<CloudSdkValidationResult>());
-    checker.runActivity(projectMock);
+    checker.notifyIfUnsupportedVersion(fakeSdkPath);
 
     verify(checker, times(0)).showNotification();
   }
@@ -75,7 +68,7 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
     when(cloudSdkServiceMock.validateCloudSdk(fakeSdkPath))
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
 
-    checker.runActivity(projectMock);
+    checker.notifyIfUnsupportedVersion(fakeSdkPath);
     verify(checker, times(1)).showNotification();
   }
 
@@ -84,19 +77,14 @@ public class CloudSdkVersionCheckTest extends BasePluginTestCase {
     when(cloudSdkServiceMock.validateCloudSdk(fakeSdkPath))
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
 
-    checker.runActivity(projectMock);
+    checker.notifyIfUnsupportedVersion(fakeSdkPath);
     verify(checker, times(0)).showNotification();
   }
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_nullSdkPath() {
-
     when(cloudSdkServiceMock.getSdkHomePath()).thenReturn(null);
-
-    checker.runActivity(projectMock);
-
-    // should not even bother trying to validate
-    verify(cloudSdkServiceMock, times(0)).validateCloudSdk(any(Path.class));
+    checker.notifyIfUnsupportedVersion(fakeSdkPath);
     verify(checker, times(0)).showNotification();
   }
 

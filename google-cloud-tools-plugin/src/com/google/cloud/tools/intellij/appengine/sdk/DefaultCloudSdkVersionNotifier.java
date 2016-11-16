@@ -14,48 +14,31 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.startup;
+package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.startup.StartupActivity;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Set;
 
 /**
- * Checks that the configured Cloud SDK's version is supported, and warns the user if the Cloud SDK
- * needs to be updated.
+ * Service implementation of {@link CloudSdkVersionNotifier}
  */
-public class CloudSdkVersionCheck implements StartupActivity {
+public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
   @Override
-  public void runActivity(@NotNull Project project) {
-    Path cloudSdkPath = CloudSdkService.getInstance().getSdkHomePath();
-    performCloudSdkVersionCheck(cloudSdkPath);
-  }
-
-  /**
-   * Performs the logic of checking if the SDK installed at the given path is supported.
-   */
-  public void performCloudSdkVersionCheck(@Nullable Path cloudSdkPath) {
-    // If there is a configured Cloud SDK at this time, check that it is supported.
-    if (cloudSdkPath != null) {
-      Set<CloudSdkValidationResult> results = CloudSdkService.getInstance()
-          .validateCloudSdk(cloudSdkPath);
-      if (results.contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
-        showNotification();
-      }
+  public void notifyIfUnsupportedVersion(@NotNull Path cloudSdkPath) {
+    Set<CloudSdkValidationResult> results = CloudSdkService.getInstance()
+        .validateCloudSdk(cloudSdkPath);
+    if (results.contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
+      showNotification();
     }
   }
 
