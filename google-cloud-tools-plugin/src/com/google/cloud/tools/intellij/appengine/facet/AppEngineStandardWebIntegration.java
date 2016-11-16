@@ -100,14 +100,17 @@ public abstract class AppEngineStandardWebIntegration {
 
   protected void setupDeployRunConfiguration(@NotNull Project project) {
     AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
-    RemoteServer<AppEngineServerConfiguration> server =
-        ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
+    RemoteServer<AppEngineServerConfiguration> server
+        = ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
 
-    DeployToServerConfigurationType configurationType = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
+    DeployToServerConfigurationType configurationType
+        = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
     RunManager runManager = RunManager.getInstance(project);
     ConfigurationFactoryEx factory = configurationType.getFactory();
-    RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(configurationType.getDisplayName(), factory);
-    DeployToServerRunConfiguration<?, ?> runConfiguration = (DeployToServerRunConfiguration<?, ?>)settings.getConfiguration();
+    RunnerAndConfigurationSettings settings
+        = runManager.createRunConfiguration(configurationType.getDisplayName(), factory);
+    DeployToServerRunConfiguration<?, ?> runConfiguration
+        = (DeployToServerRunConfiguration<?, ?>)settings.getConfiguration();
 
     if (server != null) {
       runConfiguration.setServerName(server.getName());

@@ -47,7 +47,8 @@ import java.util.List;
  */
 public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardWebIntegration {
 
-  private static final Logger LOG = Logger.getInstance(AppEngineStandardCommunityWebIntegration.class);
+  private static final Logger LOG
+      = Logger.getInstance(AppEngineStandardCommunityWebIntegration.class);
 
   @Nullable
   @Override
