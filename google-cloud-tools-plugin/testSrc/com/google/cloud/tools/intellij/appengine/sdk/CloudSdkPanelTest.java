@@ -24,8 +24,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.util.containers.HashSet;
@@ -104,6 +102,18 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
     panel.checkSdk("/non/empty/path");
     verify(panel, times(1)).showWarning(eq(UNSUPPORTED_SDK_WARNING), eq(false));
+    verify(panel, times(0)).hideWarning();
+  }
+
+  @Test
+  public void testCheckSdk_multipleValidationResults() {
+    setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED,
+        CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+
+    String expectedMessage = INVALID_SDK_DIR_WARNING + "<p>" + UNSUPPORTED_SDK_WARNING + "</p>";
+
+    panel.checkSdk("/non/empty/path");
+    verify(panel, times(1)).showWarning(eq(expectedMessage), eq(true));
     verify(panel, times(0)).hideWarning();
   }
 

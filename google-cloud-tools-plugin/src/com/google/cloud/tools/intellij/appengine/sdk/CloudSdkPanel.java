@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Paths;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -95,21 +96,47 @@ public class CloudSdkPanel {
     Set<CloudSdkValidationResult> validationResults =
         CloudSdkService.getInstance().validateCloudSdk(Paths.get(path));
 
-    // if there are any validation errors, show the first one to the user
-    if (!validationResults.isEmpty()) {
-      CloudSdkValidationResult validationResult = validationResults.iterator().next();
-      String message;
-      switch (validationResult) {
-        case CLOUD_SDK_NOT_FOUND:
-          message = appendCloudSdkDownloadMessage(validationResult.getMessage());
-          break;
-        default:
-          message = validationResult.getMessage();
-      }
-      showWarning(message, validationResult.isError());
-    } else {
+    if (validationResults.isEmpty()) {
       hideWarning();
+    } else if (validationResults.size() == 1) {
+      // display the single result
+      CloudSdkValidationResult result = validationResults.iterator().next();
+      showWarning(getMessageForValidationResult(result), result.isError());
+    } else {
+      // use a sorted set to guarantee consistent ordering of CloudSdkValidationResults
+      validationResults = new TreeSet<>(validationResults);
+
+      // display all validation results as a list
+      StringBuilder builder = new StringBuilder();
+      boolean containsErrors = false;
+
+      int counter = 0;
+      for (CloudSdkValidationResult validationResult : validationResults) {
+        if (validationResult.isError()) {
+          containsErrors = true;
+        }
+        if (counter == 0) {
+          builder.append(getMessageForValidationResult(validationResult));
+        } else {
+          builder.append("<p>" + getMessageForValidationResult(validationResult) + "</p>");
+        }
+        counter++;
+      }
+
+      showWarning(builder.toString(), containsErrors);
     }
+  }
+
+  private String getMessageForValidationResult(CloudSdkValidationResult cloudSdkValidationResult) {
+    String message;
+    switch (cloudSdkValidationResult) {
+      case CLOUD_SDK_NOT_FOUND:
+        message = appendCloudSdkDownloadMessage(cloudSdkValidationResult.getMessage());
+        break;
+      default:
+        message = cloudSdkValidationResult.getMessage();
+    }
+    return message;
   }
 
   @VisibleForTesting
@@ -117,13 +144,13 @@ public class CloudSdkPanel {
     invokePanelValidationUpdate(new Runnable() {
       @Override
       public void run() {
-        warningIcon.setVisible(true);
         warningMessage.setText(message);
         warningMessage.setVisible(true);
+        warningMessage.updateUI();
+        warningIcon.setVisible(true);
         if (setSdkDirectoryErrorState) {
           cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
         }
-        cloudSdkPanel.updateUI();
       }
     });
   }
