@@ -25,7 +25,6 @@ import com.google.cloud.tools.intellij.jps.model.impl.StackdriverProperties;
 import org.jetbrains.jps.builders.JpsBuildTestCase;
 import org.jetbrains.jps.model.module.JpsModule;
 
-
 /**
  * Stackdriver source context generation integration test.
  *
