@@ -119,9 +119,10 @@ public abstract class AppEngineWebIntegration {
   protected void setupDebugRunConfiguration(@NotNull Project project) {
     CloudDebugConfigType debugConfigType = CloudDebugConfigType.getInstance();
     ConfigurationFactory factory = debugConfigType.getConfigurationFactories()[0];
-    RunnerAndConfigurationSettings settings = RunManager.getInstance(project).createConfiguration(
+    RunManager runManager = RunManager.getInstance(project);
+    RunnerAndConfigurationSettings settings = runManager.createConfiguration(
        new CloudDebugRunConfiguration(project, factory).clone(), factory);
 
-    RunManager.getInstance(project).addConfiguration(settings, false /*isShared*/);
+    runManager.addConfiguration(settings, false /*isShared*/);
   }
 }
