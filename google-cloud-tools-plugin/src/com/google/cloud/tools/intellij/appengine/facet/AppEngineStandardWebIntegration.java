@@ -127,7 +127,7 @@ public abstract class AppEngineStandardWebIntegration {
     ConfigurationFactory factory = debugConfigType.getConfigurationFactories()[0];
     RunManager runManager = RunManager.getInstance(project);
     RunnerAndConfigurationSettings settings = runManager.createConfiguration(
-       new CloudDebugRunConfiguration(project, factory).clone(), factory);
+        new CloudDebugRunConfiguration(project, factory).clone(), factory);
 
     runManager.addConfiguration(settings, false /*isShared*/);
   }
