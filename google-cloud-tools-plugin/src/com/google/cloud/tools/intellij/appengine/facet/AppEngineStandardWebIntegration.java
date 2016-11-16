@@ -80,8 +80,11 @@ public abstract class AppEngineStandardWebIntegration {
 
   public abstract void setupJpaSupport(@NotNull Module module, @NotNull VirtualFile persistenceXml);
 
-  public abstract void setupRunConfigurations(@Nullable Artifact artifact, @NotNull Project project,
-      @Nullable ModuleRunConfiguration existingConfiguration);
+  public void setupRunConfigurations(@Nullable Artifact artifact, @NotNull Project project,
+      @Nullable ModuleRunConfiguration existingConfiguration) {
+    setupDebugRunConfiguration(project);
+    setupDeployRunConfiguration(project);
+  }
 
   public abstract void setupDevServer();
 
@@ -98,7 +101,7 @@ public abstract class AppEngineStandardWebIntegration {
       AppEngineStandardFacet appEngineStandardFacet) {
   }
 
-  protected void setupDeployRunConfiguration(@NotNull Project project) {
+  private void setupDeployRunConfiguration(@NotNull Project project) {
     AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
     RemoteServer<AppEngineServerConfiguration> server
         = ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
@@ -119,7 +122,7 @@ public abstract class AppEngineStandardWebIntegration {
     runManager.addConfiguration(settings, false /*isShared*/);
   }
 
-  protected void setupDebugRunConfiguration(@NotNull Project project) {
+  private void setupDebugRunConfiguration(@NotNull Project project) {
     CloudDebugConfigType debugConfigType = CloudDebugConfigType.getInstance();
     ConfigurationFactory factory = debugConfigType.getConfigurationFactories()[0];
     RunManager runManager = RunManager.getInstance(project);

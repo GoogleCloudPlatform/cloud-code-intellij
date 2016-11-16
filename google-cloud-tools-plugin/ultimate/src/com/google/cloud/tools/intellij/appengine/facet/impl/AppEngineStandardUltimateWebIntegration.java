@@ -108,8 +108,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
 
   public void setupRunConfigurations(Artifact artifact, @NotNull Project project,
       ModuleRunConfiguration existingConfiguration) {
-    setupDebugRunConfiguration(project);
-    setupDeployRunConfiguration(project);
+    super.setupRunConfigurations(artifact, project, existingConfiguration);
     setupLocalDevRunConfiguration(artifact, project, existingConfiguration);
   }
 
