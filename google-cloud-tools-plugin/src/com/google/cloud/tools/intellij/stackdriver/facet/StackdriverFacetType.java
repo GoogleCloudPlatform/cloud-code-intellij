@@ -59,7 +59,6 @@ public class StackdriverFacetType
   @Nullable
   @Override
   public Icon getIcon() {
-    // TODO(joaomartins): Replace with the generic green Stackdriver logo.
-    return GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER;
+    return GoogleCloudToolsIcons.STACKDRIVER;
   }
 }
