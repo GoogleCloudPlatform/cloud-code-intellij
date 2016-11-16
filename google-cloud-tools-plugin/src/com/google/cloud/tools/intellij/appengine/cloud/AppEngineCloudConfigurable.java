@@ -86,13 +86,20 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   @Override
   public boolean isModified() {
     boolean isSdkValid = true;
-    try {
-      new CloudSdk.Builder()
-          .sdkPath(Paths.get(cloudSdkPanel.getCloudSdkDirectory()))
-          .build()
-          .validateCloudSdk();
-    } catch (AppEngineException aee) {
+
+    if (System.getProperty("os.name").contains("Windows")
+        && cloudSdkPanel.getCloudSdkDirectory() != null
+        && !cloudSdkPanel.getCloudSdkDirectory().matches(CloudSdkPanel.WIN_PATH_REGEX)) {
       isSdkValid = false;
+    } else {
+      try {
+        new CloudSdk.Builder()
+            .sdkPath(Paths.get(cloudSdkPanel.getCloudSdkDirectory()))
+            .build()
+            .validateCloudSdk();
+      } catch (AppEngineException aee) {
+        isSdkValid = false;
+      }
     }
 
     // Forces a modify check so the user is unable to save an invalid Cloud SDK configuration from

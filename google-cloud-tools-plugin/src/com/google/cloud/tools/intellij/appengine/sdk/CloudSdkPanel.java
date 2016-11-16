@@ -53,6 +53,10 @@ public class CloudSdkPanel {
 
   private static final String CLOUD_SDK_DOWNLOAD_LINK = "https://cloud.google.com/sdk/docs/"
       + "#install_the_latest_cloud_tools_version_cloudsdk_current_version";
+  // Windows implementation of Paths doesn't cope well with reserved characters. This regex is used
+  // to ensure that Windows paths can't start or end with spaces, or contain any of the special
+  // <>:?* (or double quotes) characters, besides the colon for the drive.
+  public static final String WIN_PATH_REGEX = "^[a-zA-Z]:[^<>:\"?*]*[^<>:\"?*\\s]$";
 
   public CloudSdkPanel() {
     warningMessage.setVisible(false);
@@ -181,8 +185,10 @@ public class CloudSdkPanel {
   public boolean isModified() {
     CloudSdkService sdkService = CloudSdkService.getInstance();
 
-    return !Paths.get(getCloudSdkDirectory() != null ? getCloudSdkDirectory() : "")
-        .equals(sdkService.getSdkHomePath() != null ? sdkService.getSdkHomePath() : Paths.get(""));
+    String typedDirectory = getCloudSdkDirectory() != null ? getCloudSdkDirectory() : "";
+    String savedDirectory = sdkService.getSdkHomePath() != null
+        ? sdkService.getSdkHomePath().toString() : "";
+    return !typedDirectory.equals(savedDirectory);
   }
 
   public void apply() throws ConfigurationException {
