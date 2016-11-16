@@ -16,6 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
+import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
+import com.google.cloud.tools.intellij.debugger.CloudDebugRunConfiguration;
+
+import com.intellij.execution.RunManager;
+import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.configuration.ConfigurationFactoryEx;
+import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ModuleRunConfiguration;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
@@ -27,6 +36,12 @@ import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactType;
+import com.intellij.remoteServer.ServerType;
+import com.intellij.remoteServer.configuration.RemoteServer;
+import com.intellij.remoteServer.configuration.RemoteServersManager;
+import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationType;
+import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
+import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
 import com.intellij.util.containers.ContainerUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +80,7 @@ public abstract class AppEngineWebIntegration {
 
   public abstract void setupJpaSupport(@NotNull Module module, @NotNull VirtualFile persistenceXml);
 
-  public abstract void setupRunConfiguration(@Nullable Artifact artifact, @NotNull Project project,
+  public abstract void setupRunConfigurations(@Nullable Artifact artifact, @NotNull Project project,
       @Nullable ModuleRunConfiguration existingConfiguration);
 
   public abstract void setupDevServer();
@@ -81,5 +96,32 @@ public abstract class AppEngineWebIntegration {
 
   public void registerFrameworkInModel(FrameworkSupportModel model,
       AppEngineStandardFacet appEngineStandardFacet) {
+  }
+
+  protected void setupDeployRunConfiguration(@NotNull Project project) {
+    AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
+    RemoteServer<AppEngineServerConfiguration> server =
+        ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
+
+    DeployToServerConfigurationType configurationType = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
+    RunManager runManager = RunManager.getInstance(project);
+    ConfigurationFactoryEx factory = configurationType.getFactory();
+    RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(configurationType.getDisplayName(), factory);
+    DeployToServerRunConfiguration<?, ?> runConfiguration = (DeployToServerRunConfiguration<?, ?>)settings.getConfiguration();
+
+    if (server != null) {
+      runConfiguration.setServerName(server.getName());
+    }
+
+    runManager.addConfiguration(settings, false /*isShared*/);
+  }
+
+  protected void setupDebugRunConfiguration(@NotNull Project project) {
+    CloudDebugConfigType debugConfigType = CloudDebugConfigType.getInstance();
+    ConfigurationFactory factory = debugConfigType.getConfigurationFactories()[0];
+    RunnerAndConfigurationSettings settings = RunManager.getInstance(project).createConfiguration(
+       new CloudDebugRunConfiguration(project, factory).clone(), factory);
+
+    RunManager.getInstance(project).addConfiguration(settings, false /*isShared*/);
   }
 }

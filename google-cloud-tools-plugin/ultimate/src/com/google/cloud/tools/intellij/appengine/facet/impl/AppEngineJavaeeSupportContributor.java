@@ -41,7 +41,7 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
     }
     if (artifactToDeploy != null) {
       AppEngineWebIntegration.getInstance()
-          .setupRunConfiguration(artifactToDeploy, model.getProject(), model.getRunConfiguration());
+          .setupRunConfigurations(artifactToDeploy, model.getProject(), model.getRunConfiguration());
     }
   }
 }

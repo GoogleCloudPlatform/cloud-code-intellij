@@ -106,7 +106,14 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
     }
   }
 
-  public void setupRunConfiguration(Artifact artifact, @NotNull Project project,
+  public void setupRunConfigurations(Artifact artifact, @NotNull Project project,
+      ModuleRunConfiguration existingConfiguration) {
+    setupDebugRunConfiguration(project);
+    setupDeployRunConfiguration(project);
+    setupLocalDevRunConfiguration(artifact, project, existingConfiguration);
+  }
+
+  private void setupLocalDevRunConfiguration(Artifact artifact, @NotNull Project project,
       ModuleRunConfiguration existingConfiguration) {
     final ApplicationServer appServer = getOrCreateAppServer();
     if (appServer != null) {

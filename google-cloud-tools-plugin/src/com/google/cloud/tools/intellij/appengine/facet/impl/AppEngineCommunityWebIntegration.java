@@ -82,8 +82,10 @@ public class AppEngineCommunityWebIntegration extends AppEngineWebIntegration {
   }
 
   @Override
-  public void setupRunConfiguration(@Nullable Artifact artifact, @NotNull Project project,
+  public void setupRunConfigurations(@Nullable Artifact artifact, @NotNull Project project,
       ModuleRunConfiguration existingConfiguration) {
+    setupDebugRunConfiguration(project);
+    setupDeployRunConfiguration(project);
   }
 
   @Override
