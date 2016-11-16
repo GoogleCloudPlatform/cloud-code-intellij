@@ -91,7 +91,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
   @Override
   public List<FrameworkDependency> getDependenciesFrameworkIds() {
-    return AppEngineWebIntegration.getInstance().getAppEngineFrameworkDependencies();
+    return AppEngineStandardWebIntegration.getInstance().getAppEngineFrameworkDependencies();
   }
 
   @Override
@@ -138,7 +138,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
         = AppEngineStandardFacet.getFacetType();
     AppEngineStandardFacet appEngineStandardFacet = FacetManager.getInstance(module)
         .addFacet(facetType, facetType.getDefaultFacetName(), null);
-    AppEngineWebIntegration webIntegration = AppEngineWebIntegration.getInstance();
+    AppEngineStandardWebIntegration webIntegration = AppEngineStandardWebIntegration.getInstance();
     webIntegration.registerFrameworkInModel(frameworkSupportModel, appEngineStandardFacet);
     final Artifact webArtifact = findOrCreateWebArtifact(appEngineStandardFacet);
 
@@ -159,7 +159,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
   @NotNull
   static Artifact findOrCreateWebArtifact(AppEngineStandardFacet appEngineStandardFacet) {
     Module module = appEngineStandardFacet.getModule();
-    ArtifactType webArtifactType = AppEngineWebIntegration.getInstance()
+    ArtifactType webArtifactType = AppEngineStandardWebIntegration.getInstance()
         .getAppEngineWebArtifactType();
     final Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
     for (Artifact artifact : artifacts) {
@@ -186,7 +186,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
             Library mavenLibrary = loadMavenLibrary(module, libraryToAdd);
             if (mavenLibrary != null) {
               rootModel.addLibraryEntry(mavenLibrary).setScope(libraryToAdd.getScope());
-              AppEngineWebIntegration.getInstance()
+              AppEngineStandardWebIntegration.getInstance()
                   .addLibraryToArtifact(mavenLibrary, webArtifact, module.getProject());
 
               UsageTrackerProvider.getInstance()
