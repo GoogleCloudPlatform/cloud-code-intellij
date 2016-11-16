@@ -296,6 +296,11 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
           .addSupport(module, rootModel, frameworkSupportModel,
               appEngineStandardLibraryPanel.getSelectedLibraries());
 
+      AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
+          null /*artifact*/,
+          rootModel.getProject(),
+          null /*existingConfiguration*/);
+
       // Called when creating a new App Engine module from the 'new project' or 'new module' wizards
       // or upon adding App Engine 'Framework Support' to an existing module.
       UsageTrackerProvider.getInstance()
