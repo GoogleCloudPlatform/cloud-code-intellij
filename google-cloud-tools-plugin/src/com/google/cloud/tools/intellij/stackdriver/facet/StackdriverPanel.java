@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.ui.HyperlinkLabel;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +42,7 @@ public class StackdriverPanel extends FacetEditorTab {
   private JCheckBox generateSourceContext;
   private JCheckBox ignoreErrors;
   private FacetEditorContext editorContext;
+  private HyperlinkLabel stackdriverInfo;
   private StackdriverFacetConfiguration configuration;
 
   /**
@@ -68,6 +70,8 @@ public class StackdriverPanel extends FacetEditorTab {
     if (editorContext != null) {
       configuration = (StackdriverFacetConfiguration) editorContext.getFacet().getConfiguration();
     }
+    stackdriverInfo.setHyperlinkText("Google Stackdriver documentation");
+    stackdriverInfo.setHyperlinkTarget("https://cloud.google.com/stackdriver/");
   }
 
   @NotNull
