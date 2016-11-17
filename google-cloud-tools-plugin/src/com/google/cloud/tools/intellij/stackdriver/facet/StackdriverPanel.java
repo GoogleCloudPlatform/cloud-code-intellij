@@ -43,7 +43,6 @@ public class StackdriverPanel extends FacetEditorTab {
   private JPanel stackdriverPanel;
   private JCheckBox generateSourceContext;
   private JCheckBox ignoreErrors;
-  private FacetEditorContext editorContext;
   private HyperlinkLabel stackdriverInfo;
   private TextFieldWithBrowseButton moduleSourceDirectory;
   private JLabel moduleSourceDirectoryLabel;
