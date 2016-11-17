@@ -23,11 +23,6 @@ import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.Path;
-import java.util.Set;
-
 /**
  * Service implementation of {@link CloudSdkVersionNotifier}
  */

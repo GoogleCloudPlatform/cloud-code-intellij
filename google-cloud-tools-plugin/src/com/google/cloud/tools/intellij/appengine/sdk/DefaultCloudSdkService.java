@@ -25,7 +25,6 @@ import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerE
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
 
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.ide.util.PropertiesComponent;
@@ -44,7 +43,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;

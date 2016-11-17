@@ -32,7 +32,6 @@ import com.intellij.ui.JBColor;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 

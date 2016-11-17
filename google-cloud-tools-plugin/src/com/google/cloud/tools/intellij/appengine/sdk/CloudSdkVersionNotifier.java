@@ -18,10 +18,6 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.intellij.openapi.components.ServiceManager;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.Path;
-
 /**
  * Intellij-registered service for notifying the user if their Cloud SDK version is not supported.
  */
