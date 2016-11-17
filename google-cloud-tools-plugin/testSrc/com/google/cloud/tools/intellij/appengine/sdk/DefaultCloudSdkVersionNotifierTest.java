@@ -39,8 +39,6 @@ import java.nio.file.Paths;
  */
 public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
 
-  private Path fakeSdkPath;
-
   // Wrap the class under test in a spy so we can perform verifications on it
   @Spy private DefaultCloudSdkVersionNotifier checker;
 
@@ -50,41 +48,39 @@ public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
   @Before
   public void setUp() throws ProcessRunnerException {
     registerService(CloudSdkService.class, cloudSdkServiceMock);
-
-    fakeSdkPath = Paths.get("/");
   }
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_isSupported() {
-    when(cloudSdkServiceMock.validateCloudSdk(fakeSdkPath))
+    when(cloudSdkServiceMock.validateCloudSdk())
         .thenReturn(new HashSet<CloudSdkValidationResult>());
-    checker.notifyIfUnsupportedVersion(fakeSdkPath);
+    checker.notifyIfUnsupportedVersion();
 
     verify(checker, times(0)).showNotification();
   }
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_notSupported() {
-    when(cloudSdkServiceMock.validateCloudSdk(fakeSdkPath))
+    when(cloudSdkServiceMock.validateCloudSdk())
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
 
-    checker.notifyIfUnsupportedVersion(fakeSdkPath);
+    checker.notifyIfUnsupportedVersion();
     verify(checker, times(1)).showNotification();
   }
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_sdkNotFound() {
-    when(cloudSdkServiceMock.validateCloudSdk(fakeSdkPath))
+    when(cloudSdkServiceMock.validateCloudSdk())
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
 
-    checker.notifyIfUnsupportedVersion(fakeSdkPath);
+    checker.notifyIfUnsupportedVersion();
     verify(checker, times(0)).showNotification();
   }
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_nullSdkPath() {
     when(cloudSdkServiceMock.getSdkHomePath()).thenReturn(null);
-    checker.notifyIfUnsupportedVersion(fakeSdkPath);
+    checker.notifyIfUnsupportedVersion();
     verify(checker, times(0)).showNotification();
   }
 

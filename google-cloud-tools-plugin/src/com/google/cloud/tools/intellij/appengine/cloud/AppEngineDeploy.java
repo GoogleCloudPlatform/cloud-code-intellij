@@ -122,8 +122,7 @@ public class AppEngineDeploy {
         deployExitListener);
 
     // show a warning notification if the cloud sdk version is not supported
-    CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion(
-        CloudSdkService.getInstance().getSdkHomePath());
+    CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
 
     CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
     deployment.deploy(configuration);

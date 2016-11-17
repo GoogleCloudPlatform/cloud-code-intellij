@@ -34,10 +34,9 @@ import java.util.Set;
 public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
   @Override
-  public void notifyIfUnsupportedVersion(@NotNull Path cloudSdkPath) {
-    Set<CloudSdkValidationResult> results = CloudSdkService.getInstance()
-        .validateCloudSdk(cloudSdkPath);
-    if (results.contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
+  public void notifyIfUnsupportedVersion() {
+    if (CloudSdkService.getInstance().validateCloudSdk()
+        .contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
       showNotification();
     }
   }

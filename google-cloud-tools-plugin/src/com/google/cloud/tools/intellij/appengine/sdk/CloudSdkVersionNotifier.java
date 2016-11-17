@@ -35,9 +35,8 @@ public abstract class CloudSdkVersionNotifier {
   }
 
   /**
-   * Checks if the Cloud SDK at the given path is supported, and notifies the user if it is not
-   * supported.
+   * Notifies the user if the saved Cloud SDK is not supported.
    */
-  public abstract void notifyIfUnsupportedVersion(@NotNull Path cloudSdkPath);
+  public abstract void notifyIfUnsupportedVersion();
 
 }

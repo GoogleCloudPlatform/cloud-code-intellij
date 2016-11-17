@@ -139,7 +139,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     for (CloudSdkValidationResult result : results) {
       validationResults.add(result);
     }
-    when(cloudSdkService.validateCloudSdk(any(Path.class))).thenReturn(validationResults);
+    when(cloudSdkService.validateCloudSdk(any(String.class))).thenReturn(validationResults);
   }
 
 }

@@ -53,10 +53,6 @@ public class CloudSdkPanel {
 
   private static final String CLOUD_SDK_DOWNLOAD_LINK = "https://cloud.google.com/sdk/docs/"
       + "#install_the_latest_cloud_tools_version_cloudsdk_current_version";
-  // Windows implementation of Paths doesn't cope well with reserved characters. This regex is used
-  // to ensure that Windows paths can't start or end with spaces, or contain any of the special
-  // <>:?* (or double quotes) characters, besides the colon for the drive.
-  public static final String WIN_PATH_REGEX = "^[a-zA-Z]:[^<>:\"?*]*[^<>:\"?*\\s]$";
 
   public CloudSdkPanel() {
     warningMessage.setVisible(false);
@@ -97,40 +93,38 @@ public class CloudSdkPanel {
       return;
     }
 
-    Set<CloudSdkValidationResult> validationResults =
-        CloudSdkService.getInstance().validateCloudSdk(Paths.get(path));
+    CloudSdkService sdkService = CloudSdkService.getInstance();
 
-    if (validationResults.isEmpty()) {
+    if (sdkService.isValidCloudSdk(path)) {
       hideWarning();
     } else {
-      // use a sorted set to guarantee consistent ordering of CloudSdkValidationResults
-      validationResults = new TreeSet<>(validationResults);
+      // Use a sorted set to guarantee consistent ordering of CloudSdkValidationResults.
+      Set<CloudSdkValidationResult> validationResults =
+          new TreeSet<>(sdkService.validateCloudSdk(path));
 
-      // display all validation results as a list
+      // Display all validation results as a list.
       StringBuilder builder = new StringBuilder();
       boolean containsErrors = false;
 
-      int counter = 0;
+      boolean isFirst = true;
       for (CloudSdkValidationResult validationResult : validationResults) {
-        if (validationResult.isError()) {
-          containsErrors = true;
-        }
+        containsErrors |= validationResult.isError();
 
         String message;
         if (validationResult == CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND) {
-          // if the cloud sdk is not found, provide a download URL
+          // If the cloud sdk is not found, provide a download URL.
           message = validationResult.getMessage() + " " + getCloudSdkDownloadMessage();
         } else {
-          // otherwise, just use the existing message
+          // Otherwise, just use the existing message.
           message = validationResult.getMessage();
         }
 
-        if (counter == 0) {
+        if (isFirst) {
           builder.append(message);
         } else {
           builder.append("<p>" + message + "</p>");
         }
-        counter++;
+        isFirst &= false;
       }
 
       showWarning(builder.toString(), containsErrors);

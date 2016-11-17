@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfig
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.common.collect.ImmutableSet;
 
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationWarning;
@@ -63,8 +64,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     when(projectSelector.getText()).thenReturn(PROJECT_NAME);
 
     cloudSdkService = mock(CloudSdkService.class);
-    when(cloudSdkService.validateCloudSdk(any(Path.class)))
-        .thenReturn(new HashSet<CloudSdkValidationResult>());
+    when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<CloudSdkValidationResult>());
 
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
@@ -81,7 +81,8 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
     config.setConfigType(ConfigType.AUTO);
-    when(cloudSdkService.hasJavaComponent()).thenReturn(true);
+    when(cloudSdkService.validateCloudSdk())
+        .thenReturn(ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
 
     try {
       editor.applyEditorTo(config);

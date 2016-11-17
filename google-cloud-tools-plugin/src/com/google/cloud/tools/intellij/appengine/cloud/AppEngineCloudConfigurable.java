@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.appengine.api.AppEngineException;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -31,8 +29,6 @@ import com.intellij.remoteServer.RemoteServerConfigurable;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
-
-import java.nio.file.Paths;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -85,26 +81,10 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   @Override
   public boolean isModified() {
-    boolean isSdkValid = true;
-
-    if (System.getProperty("os.name").contains("Windows")
-        && cloudSdkPanel.getCloudSdkDirectory() != null
-        && !cloudSdkPanel.getCloudSdkDirectory().matches(CloudSdkPanel.WIN_PATH_REGEX)) {
-      isSdkValid = false;
-    } else {
-      try {
-        new CloudSdk.Builder()
-            .sdkPath(Paths.get(cloudSdkPanel.getCloudSdkDirectory()))
-            .build()
-            .validateCloudSdk();
-      } catch (AppEngineException aee) {
-        isSdkValid = false;
-      }
-    }
-
     // Forces a modify check so the user is unable to save an invalid Cloud SDK configuration from
     // Other Settings, on the Clouds menu.
-    return cloudSdkPanel.isModified() || !isSdkValid;
+    return cloudSdkPanel.isModified()
+        || !CloudSdkService.getInstance().isValidCloudSdk(cloudSdkPanel.getCloudSdkDirectory());
   }
 
   /**
@@ -112,16 +92,14 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
    */
   @Override
   public void apply() throws ConfigurationException {
-    try {
-      new CloudSdk.Builder()
-          .sdkPath(Paths.get(cloudSdkPanel.getCloudSdkDirectory()))
-          .build()
-          .validateCloudSdk();
-      CloudSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
-    } catch (AppEngineException aee) {
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+
+    if (!sdkService.isValidCloudSdk(cloudSdkPanel.getCloudSdkDirectory())) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.cloudsdk.location.invalid.message"));
     }
+
+    CloudSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
   }
 
   @Override

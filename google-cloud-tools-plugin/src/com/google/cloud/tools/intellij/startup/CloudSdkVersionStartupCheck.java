@@ -16,15 +16,12 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.Path;
 
 /**
  * A StartupActivity that checks the configured Cloud SDK's version, and warns the user if the Cloud
@@ -35,10 +32,7 @@ public class CloudSdkVersionStartupCheck implements StartupActivity {
   @Override
   public void runActivity(@NotNull Project project) {
     // If there is a configured Cloud SDK at this time, check that it is supported.
-    Path cloudSdkPath = CloudSdkService.getInstance().getSdkHomePath();
-    if (cloudSdkPath != null) {
-      CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion(cloudSdkPath);
-    }
+    CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
   }
 
 }
