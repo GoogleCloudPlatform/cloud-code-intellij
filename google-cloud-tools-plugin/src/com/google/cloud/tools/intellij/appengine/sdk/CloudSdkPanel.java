@@ -123,7 +123,7 @@ public class CloudSdkPanel {
         } else {
           builder.append("<p>" + message + "</p>");
         }
-        isFirst &= false;
+        isFirst = false;
       }
 
       showWarning(builder.toString(), containsErrors);

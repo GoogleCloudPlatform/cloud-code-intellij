@@ -32,12 +32,12 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestCase;
-import com.intellij.util.containers.HashSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.picocontainer.MutablePicoContainer;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JCheckBox;
@@ -81,8 +81,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
     config.setConfigType(ConfigType.AUTO);
-    when(cloudSdkService.validateCloudSdk())
-        .thenReturn(ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
+    when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<CloudSdkValidationResult>());
 
     try {
       editor.applyEditorTo(config);
@@ -107,6 +106,8 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   public void testValidationFailureStandardEnv_missingJavaComponent() {
+    when(cloudSdkService.validateCloudSdk()).thenReturn(
+        ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
     config.setConfigType(ConfigType.AUTO);
@@ -121,6 +122,8 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   public void testValidationSuccessFlexEnv_missingJavaComponent() {
+    when(cloudSdkService.validateCloudSdk()).thenReturn(
+        ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
     AppEngineDeploymentRunConfigurationEditor editor
         = createEditor(AppEngineEnvironment.APP_ENGINE_FLEX);
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();

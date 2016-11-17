@@ -17,10 +17,12 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
@@ -28,14 +30,15 @@ import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
 
 /**
@@ -76,6 +79,7 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
     Set<CloudSdkValidationResult> results = service.validateCloudSdk();
     assertEquals(1, results.size());
     assertEquals(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND, results.iterator().next());
+    assertFalse(service.isValidCloudSdk());
   }
 
   @Test
@@ -85,6 +89,7 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
     assertEquals(1, results.size());
     assertEquals(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED,
         results.iterator().next());
+    assertFalse(service.isValidCloudSdk());
   }
 
   @Test
@@ -92,6 +97,68 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
     when(mockSdk.getVersion()).thenReturn(supportedVersion);
     Set<CloudSdkValidationResult> results = service.validateCloudSdk();
     assertEquals(0, results.size());
+    assertTrue(service.isValidCloudSdk());
+  }
+
+  @Test
+  public void testValidateCloudSdk_nullPath() {
+    Set<CloudSdkValidationResult> results = service.validateCloudSdk((Path) null);
+    assertEquals(1, results.size());
+    assertEquals(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND, results.iterator().next());
+  }
+
+  @Test
+  public void testValidateCloudSdk_nullString() {
+    Set<CloudSdkValidationResult> results = service.validateCloudSdk((String) null);
+    assertEquals(1, results.size());
+    assertEquals(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND, results.iterator().next());
+  }
+
+  @Test
+  public void testValidateCloudSdk_specialChars() {
+    if (System.getProperty("os.name").contains("Windows")) {
+      Set<CloudSdkValidationResult> results = service.validateCloudSdk(" /path");
+      assertEquals(1, results.size());
+      assertEquals(CloudSdkValidationResult.MALFORMED_PATH, results.iterator().next());
+      assertFalse(service.isValidCloudSdk(" /path"));
+      results = service.validateCloudSdk("/path ");
+      assertEquals(1, results.size());
+      assertEquals(CloudSdkValidationResult.MALFORMED_PATH, results.iterator().next());
+      assertFalse(service.isValidCloudSdk("/path "));
+      results = service.validateCloudSdk("/path/with/<special");
+      assertEquals(1, results.size());
+      assertEquals(CloudSdkValidationResult.MALFORMED_PATH, results.iterator().next());
+      assertFalse(service.isValidCloudSdk("/path/with/<special"));
+    }
+  }
+
+  @Test
+  public void testValidateCloudSdk_goodString() throws ProcessRunnerException {
+    when(mockSdk.getVersion()).thenReturn(supportedVersion);
+    Set<CloudSdkValidationResult> results = service.validateCloudSdk("/good/path");
+    assertEquals(0, results.size());
+    assertTrue(service.isValidCloudSdk("/good/path"));
+  }
+
+  @Test
+  public void testValidateJavaComponents() throws ProcessRunnerException {
+    when(mockSdk.getVersion()).thenReturn(supportedVersion);
+    doThrow(AppEngineJavaComponentsNotInstalledException.class).when(mockSdk)
+        .validateAppEngineJavaComponents();
+    Set<CloudSdkValidationResult> results = service.validateCloudSdk("/good/path");
+    assertEquals(1, results.size());
+    assertEquals(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT, results.iterator().next());
+  }
+
+  @Test
+  public void testValidateCloudSdk_multipleResults() throws ProcessRunnerException {
+    when(mockSdk.getVersion()).thenReturn(unsupportedVersion);
+    doThrow(AppEngineJavaComponentsNotInstalledException.class).when(mockSdk)
+        .validateAppEngineJavaComponents();
+    Set<CloudSdkValidationResult> results = service.validateCloudSdk("/good/path");
+    assertEquals(2, results.size());
+    assertTrue(results.contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
+    assertTrue(results.contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
   }
 
   private String readRequiredCloudSdkVersion() {
@@ -103,6 +170,12 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
     @Override
     CloudSdk buildCloudSdkWithPath(Path path) {
       return mockSdk;
+    }
+
+    @Nullable
+    @Override
+    public Path getSdkHomePath() {
+      return Paths.get("/home/path");
     }
   }
 }

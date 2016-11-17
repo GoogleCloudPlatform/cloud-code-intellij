@@ -78,12 +78,14 @@ public class CloudSdkPanelTest extends PlatformTestCase {
 
   @Test
   public void testCheckSdk_nullSdk() throws InterruptedException {
+    when(cloudSdkService.isValidCloudSdk(null)).thenReturn(false);
     panel.checkSdk(null);
     verify(panel, times(1)).showWarning(eq(MISSING_SDK_DIR_WARNING), eq(false));
     verify(panel, times(0)).hideWarning();
   }
   @Test
   public void testCheckSdk_emptySdk() throws InterruptedException {
+    when(cloudSdkService.isValidCloudSdk("")).thenReturn(false);
     panel.checkSdk("");
     verify(panel, times(1)).showWarning(eq(MISSING_SDK_DIR_WARNING), eq(false));
     verify(panel, times(0)).hideWarning();
@@ -92,6 +94,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   @Test
   public void testCheckSdk_invalidSdk() throws InterruptedException {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+    when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(false);
     panel.checkSdk("/non/empty/path");
     verify(panel, times(1)).showWarning(eq(INVALID_SDK_DIR_WARNING), eq(true));
     verify(panel, times(0)).hideWarning();
@@ -100,6 +103,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   @Test
   public void testCheckSdk_unsupportedSdk() {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
+    when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(false);
     panel.checkSdk("/non/empty/path");
     verify(panel, times(1)).showWarning(eq(UNSUPPORTED_SDK_WARNING), eq(false));
     verify(panel, times(0)).hideWarning();
@@ -109,6 +113,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   public void testCheckSdk_multipleValidationResults() {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED,
         CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+    when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(false);
 
     String expectedMessage = INVALID_SDK_DIR_WARNING + "<p>" + UNSUPPORTED_SDK_WARNING + "</p>";
 
@@ -119,6 +124,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
 
   @Test
   public void testCheckSdk_validSdk() {
+    when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(true);
     setValidateCloudSdkResponse();
     panel.checkSdk("/non/empty/path");
     verify(panel, times(0)).showWarning(any(String.class), anyBoolean());

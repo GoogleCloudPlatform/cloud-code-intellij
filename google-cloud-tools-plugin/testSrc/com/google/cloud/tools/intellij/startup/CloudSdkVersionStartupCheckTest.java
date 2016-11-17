@@ -59,15 +59,7 @@ public class CloudSdkVersionStartupCheckTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testRunActivity_nullPath() {
-    when(cloudSdkService.getSdkHomePath()).thenReturn(null);
-    cloudSdkVersionStartupCheck.runActivity(project);
-
-    verify(cloudSdkVersionNotifier, times(0)).notifyIfUnsupportedVersion();
-  }
-
-  @Test
-  public void testRunActivity_nonNullPath() {
+  public void testRunActivity() {
     Path mockPath = mock(Path.class);
 
     when(cloudSdkService.getSdkHomePath()).thenReturn(mockPath);
