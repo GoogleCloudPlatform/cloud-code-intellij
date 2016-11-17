@@ -49,7 +49,6 @@ public abstract class CloudSdkService {
   /**
    * Checks if the stored path contains a valid Cloud SDK.
    */
-
   public Set<CloudSdkValidationResult> validateCloudSdk() {
     return validateCloudSdk(getSdkHomePath());
   }
@@ -60,11 +59,9 @@ public abstract class CloudSdkService {
    * <p>Windows' implementation of Paths doesn't handle well converting strings with certain special
    * characters to paths. This method should be called before {@code Paths.get(path)}.
    */
-  public Set<CloudSdkValidationResult> validateCloudSdk(@NotNull String path) {
+  public Set<CloudSdkValidationResult> validateCloudSdk(String path) {
     if (path == null) {
-      // Null path happens the first time a user runs the plugin. In that case, the flow should be
-      // interrupted and we shouldn't get here.
-      return ImmutableSet.of();
+      return ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     }
 
     try {
