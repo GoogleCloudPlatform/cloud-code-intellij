@@ -22,6 +22,9 @@ import com.intellij.openapi.module.Module;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Stores source context generation settings.
+ */
 public class StackdriverFacet extends Facet<StackdriverFacetConfiguration> {
 
   public StackdriverFacet(@NotNull FacetType facetType,
