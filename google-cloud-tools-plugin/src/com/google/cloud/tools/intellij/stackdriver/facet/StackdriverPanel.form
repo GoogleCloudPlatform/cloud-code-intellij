@@ -29,6 +29,7 @@
         <properties>
           <selected value="true"/>
           <text value="&amp;Ignore errors"/>
+          <toolTipText value="If unselected, errors during source context generation will abort the artifact build process"/>
         </properties>
       </component>
     </children>

@@ -37,8 +37,8 @@ import javax.swing.JPanel;
  */
 public class StackdriverPanel extends FacetEditorTab {
 
-  private JCheckBox generateSourceContext;
   private JPanel stackdriverPanel;
+  private JCheckBox generateSourceContext;
   private JCheckBox ignoreErrors;
   private FacetEditorContext editorContext;
   private StackdriverFacetConfiguration configuration;
@@ -78,21 +78,21 @@ public class StackdriverPanel extends FacetEditorTab {
 
   @Override
   public boolean isModified() {
-    return generateSourceContext.isSelected() != configuration.getState().isGenerateSourceContext()
-        || ignoreErrors.isSelected() != configuration.getState().isIgnoreErrors();
+    return isGenerateSourceContextSelected() != configuration.getState().isGenerateSourceContext()
+        || isIgnoreErrorsSelected() != configuration.getState().isIgnoreErrors();
   }
 
   @Override
   public void apply() throws ConfigurationException {
-    configuration.getState().setGenerateSourceContext(generateSourceContext.isSelected());
-    configuration.getState().setIgnoreErrors(ignoreErrors.isSelected());
+    configuration.getState().setGenerateSourceContext(isGenerateSourceContextSelected());
+    configuration.getState().setIgnoreErrors(isIgnoreErrorsSelected());
   }
 
   @Override
   public void reset() {
     if (editorContext.getFacet().getConfiguration() instanceof StackdriverFacetConfiguration) {
       generateSourceContext.setSelected(configuration.getState().isGenerateSourceContext());
-      ignoreErrors.setEnabled(generateSourceContext.isSelected());
+      ignoreErrors.setEnabled(isGenerateSourceContextSelected());
       ignoreErrors.setSelected(configuration.getState().isIgnoreErrors());
       return;
     }
