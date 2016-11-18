@@ -84,7 +84,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
     // Forces a modify check so the user is unable to save an invalid Cloud SDK configuration from
     // Other Settings, on the Clouds menu.
     return cloudSdkPanel.isModified()
-        || !CloudSdkService.getInstance().isValidCloudSdk(cloudSdkPanel.getCloudSdkDirectory());
+        || !CloudSdkService.getInstance().isValidCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText());
   }
 
   /**
@@ -94,12 +94,12 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   public void apply() throws ConfigurationException {
     CloudSdkService sdkService = CloudSdkService.getInstance();
 
-    if (!sdkService.isValidCloudSdk(cloudSdkPanel.getCloudSdkDirectory())) {
+    if (!sdkService.isValidCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.cloudsdk.location.invalid.message"));
     }
 
-    sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
+    sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
   }
 
   @Override

@@ -178,14 +178,15 @@ public class CloudSdkPanel {
   public boolean isModified() {
     CloudSdkService sdkService = CloudSdkService.getInstance();
 
-    String typedDirectory = getCloudSdkDirectory() != null ? getCloudSdkDirectory() : "";
-    String savedDirectory = sdkService.getSdkHomePath() != null
+    String cloudSdkDirectoryFieldValue =
+        getCloudSdkDirectoryText() != null ? getCloudSdkDirectoryText() : "";
+    String currentCloudSdkDirectory = sdkService.getSdkHomePath() != null
         ? sdkService.getSdkHomePath().toString() : "";
-    return !typedDirectory.equals(savedDirectory);
+    return !cloudSdkDirectoryFieldValue.equals(currentCloudSdkDirectory);
   }
 
   public void apply() throws ConfigurationException {
-    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectory());
+    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
   }
 
   public void reset() {
@@ -195,7 +196,7 @@ public class CloudSdkPanel {
         ? sdkService.getSdkHomePath().toString() : "");
   }
 
-  public String getCloudSdkDirectory() {
+  public String getCloudSdkDirectoryText() {
     return cloudSdkDirectoryField.getText();
   }
 
