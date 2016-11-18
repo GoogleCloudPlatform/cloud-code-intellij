@@ -290,7 +290,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     public void addSupport(@NotNull Module module,
         @NotNull ModifiableRootModel rootModel,
         @NotNull ModifiableModelsProvider modifiableModelsProvider) {
-      sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
+      sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
 
       AppEngineSupportProvider.this
           .addSupport(module, rootModel, frameworkSupportModel,

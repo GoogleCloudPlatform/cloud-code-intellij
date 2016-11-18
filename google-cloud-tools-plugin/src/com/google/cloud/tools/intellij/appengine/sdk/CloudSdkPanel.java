@@ -32,7 +32,6 @@ import com.intellij.ui.JBColor;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -93,40 +92,38 @@ public class CloudSdkPanel {
       return;
     }
 
-    Set<CloudSdkValidationResult> validationResults =
-        CloudSdkService.getInstance().validateCloudSdk(Paths.get(path));
+    CloudSdkService sdkService = CloudSdkService.getInstance();
 
-    if (validationResults.isEmpty()) {
+    if (sdkService.isValidCloudSdk(path)) {
       hideWarning();
     } else {
-      // use a sorted set to guarantee consistent ordering of CloudSdkValidationResults
-      validationResults = new TreeSet<>(validationResults);
+      // Use a sorted set to guarantee consistent ordering of CloudSdkValidationResults.
+      Set<CloudSdkValidationResult> validationResults =
+          new TreeSet<>(sdkService.validateCloudSdk(path));
 
-      // display all validation results as a list
+      // Display all validation results as a list.
       StringBuilder builder = new StringBuilder();
       boolean containsErrors = false;
 
-      int counter = 0;
+      boolean isFirst = true;
       for (CloudSdkValidationResult validationResult : validationResults) {
-        if (validationResult.isError()) {
-          containsErrors = true;
-        }
+        containsErrors |= validationResult.isError();
 
         String message;
         if (validationResult == CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND) {
-          // if the cloud sdk is not found, provide a download URL
+          // If the cloud sdk is not found, provide a download URL.
           message = validationResult.getMessage() + " " + getCloudSdkDownloadMessage();
         } else {
-          // otherwise, just use the existing message
+          // Otherwise, just use the existing message.
           message = validationResult.getMessage();
         }
 
-        if (counter == 0) {
+        if (isFirst) {
           builder.append(message);
         } else {
           builder.append("<p>" + message + "</p>");
         }
-        counter++;
+        isFirst = false;
       }
 
       showWarning(builder.toString(), containsErrors);
@@ -181,12 +178,15 @@ public class CloudSdkPanel {
   public boolean isModified() {
     CloudSdkService sdkService = CloudSdkService.getInstance();
 
-    return !Paths.get(getCloudSdkDirectory() != null ? getCloudSdkDirectory() : "")
-        .equals(sdkService.getSdkHomePath() != null ? sdkService.getSdkHomePath() : Paths.get(""));
+    String cloudSdkDirectoryFieldValue =
+        getCloudSdkDirectoryText() != null ? getCloudSdkDirectoryText() : "";
+    String currentCloudSdkDirectory = sdkService.getSdkHomePath() != null
+        ? sdkService.getSdkHomePath().toString() : "";
+    return !cloudSdkDirectoryFieldValue.equals(currentCloudSdkDirectory);
   }
 
   public void apply() throws ConfigurationException {
-    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectory());
+    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
   }
 
   public void reset() {
@@ -196,7 +196,7 @@ public class CloudSdkPanel {
         ? sdkService.getSdkHomePath().toString() : "");
   }
 
-  public String getCloudSdkDirectory() {
+  public String getCloudSdkDirectoryText() {
     return cloudSdkDirectoryField.getText();
   }
 

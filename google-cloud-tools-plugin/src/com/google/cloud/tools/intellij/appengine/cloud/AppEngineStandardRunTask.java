@@ -54,7 +54,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
     CloudSdkService sdkService = CloudSdkService.getInstance();
 
     // show a warning notification if the cloud sdk version is not supported
-    CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion(sdkService.getSdkHomePath());
+    CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
 
     CloudSdk sdk = new CloudSdk.Builder()
         .sdkPath(sdkService.getSdkHomePath())

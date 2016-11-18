@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -60,20 +59,12 @@ public class CloudSdkVersionStartupCheckTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testRunActivity_nullPath() {
-    when(cloudSdkService.getSdkHomePath()).thenReturn(null);
-    cloudSdkVersionStartupCheck.runActivity(project);
-
-    verify(cloudSdkVersionNotifier, times(0)).notifyIfUnsupportedVersion(any(Path.class));
-  }
-
-  @Test
-  public void testRunActivity_nonNullPath() {
+  public void testRunActivity() {
     Path mockPath = mock(Path.class);
 
     when(cloudSdkService.getSdkHomePath()).thenReturn(mockPath);
     cloudSdkVersionStartupCheck.runActivity(project);
 
-    verify(cloudSdkVersionNotifier, times(1)).notifyIfUnsupportedVersion(mockPath);
+    verify(cloudSdkVersionNotifier, times(1)).notifyIfUnsupportedVersion();
   }
 }

@@ -26,7 +26,11 @@ public enum CloudSdkValidationResult {
   CLOUD_SDK_NOT_FOUND(GctBundle.message("appengine.cloudsdk.location.invalid.message"), true),
   CLOUD_SDK_VERSION_NOT_SUPPORTED(
       GctBundle.message("appengine.cloudsdk.version.support.message",
-          DefaultCloudSdkService.getMinimumRequiredCloudSdkVersion().toString()), false);
+          DefaultCloudSdkService.getMinimumRequiredCloudSdkVersion().toString()), false),
+  MALFORMED_PATH(GctBundle.message("appengine.cloudsdk.location.badchars.message"), true),
+  NO_APP_ENGINE_COMPONENT(
+      GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
+          + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"), false);
 
   private String message;
   private boolean isError;

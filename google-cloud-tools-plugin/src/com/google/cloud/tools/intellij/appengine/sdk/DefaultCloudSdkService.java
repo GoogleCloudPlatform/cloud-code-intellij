@@ -102,9 +102,15 @@ public class DefaultCloudSdkService extends CloudSdkService {
   }
 
   @Override
-  public Set<CloudSdkValidationResult> validateCloudSdk(@NotNull Path pathToCloudSdk) {
+  protected Set<CloudSdkValidationResult> validateCloudSdk(Path path) {
     Set<CloudSdkValidationResult> validationResults = new HashSet<>();
-    CloudSdk sdk = buildCloudSdkWithPath(pathToCloudSdk);
+
+    if (path == null) {
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+      return validationResults;
+    }
+
+    CloudSdk sdk = buildCloudSdkWithPath(path);
     try {
       sdk.validateCloudSdk();
     } catch (CloudSdkNotFoundException exception) {
@@ -114,6 +120,12 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
     if (!isCloudSdkVersionSupported(sdk)) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
+    }
+
+    try {
+      sdk.validateAppEngineJavaComponents();
+    } catch (AppEngineJavaComponentsNotInstalledException ex) {
+      validationResults.add(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT);
     }
 
     return validationResults;
@@ -208,18 +220,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
     }
 
     return actualVersion.compareTo(requiredVersion) >= 0;
-  }
-
-  @Override
-  public boolean hasJavaComponent() {
-    try {
-      buildCloudSdkWithPath(CloudSdkService.getInstance().getSdkHomePath())
-          .validateAppEngineJavaComponents();
-
-      return true;
-    } catch (AppEngineJavaComponentsNotInstalledException ex) {
-      return false;
-    }
   }
 
   private Map<String, Set<String>> loadBlackList() throws IOException {

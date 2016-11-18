@@ -18,10 +18,6 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.intellij.openapi.components.ServiceManager;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.Path;
-
 /**
  * Intellij-registered service for notifying the user if their Cloud SDK version is not supported.
  */
@@ -35,9 +31,8 @@ public abstract class CloudSdkVersionNotifier {
   }
 
   /**
-   * Checks if the Cloud SDK at the given path is supported, and notifies the user if it is not
-   * supported.
+   * Notifies the user if the saved Cloud SDK is not supported.
    */
-  public abstract void notifyIfUnsupportedVersion(@NotNull Path cloudSdkPath);
+  public abstract void notifyIfUnsupportedVersion();
 
 }

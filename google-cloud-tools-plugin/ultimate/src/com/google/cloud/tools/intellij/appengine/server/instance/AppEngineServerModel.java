@@ -16,9 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
-import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.run.CloudSdkStartupPolicy;
@@ -162,18 +160,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
           "App Engine facet not found in '" + artifact.getName() + "' artifact");
     }
 
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-    if (sdkService.getSdkHomePath() == null) {
-      throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
-    }
-
-    try {
-      new CloudSdk.Builder()
-          .sdkPath(sdkService.getSdkHomePath())
-          .build()
-          .validateCloudSdk();
-    } catch (AppEngineException ex) {
+    if (!CloudSdkService.getInstance().isValidCloudSdk()) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }
