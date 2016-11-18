@@ -54,7 +54,7 @@ public abstract class CloudSdkService {
   }
 
   /**
-   * Checks if a given path is malformed.
+   * Checks if a given path is malformed or if it contains a valid Cloud SDK.
    *
    * <p>Windows' implementation of Paths doesn't handle well converting strings with certain special
    * characters to paths. This method should be called before {@code Paths.get(path)}.
