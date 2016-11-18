@@ -99,7 +99,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
           GctBundle.message("appengine.cloudsdk.location.invalid.message"));
     }
 
-    CloudSdkService.getInstance().setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
+    sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectory());
   }
 
   @Override
