@@ -17,9 +17,11 @@
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.ui.HyperlinkLabel;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -30,10 +32,12 @@ public class CloudDebugRunConfigurationPanel {
   private ProjectSelector elysiumProjectId;
   private JPanel panel;
   private HyperlinkLabel docsLink;
+  private JLabel description;
 
   public CloudDebugRunConfigurationPanel() {
     docsLink.setHyperlinkText("For more details, ", "click here", ".");
-    docsLink.setHyperlinkTarget("https://cloud.google.com/debugger/docs/");
+    docsLink.setHyperlinkTarget(GctBundle.message("clouddebug.documentation.link"));
+    description.setText(GctBundle.message("clouddebug.description"));
   }
 
   public JPanel getMainPanel() {
