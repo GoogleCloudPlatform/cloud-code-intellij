@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.stackdriver.facet;
 
-import com.google.cloud.tools.intellij.stackdriver.facet.StackdriverFacetConfiguration.StackdriverProperties;
+import com.google.cloud.tools.intellij.jps.model.impl.StackdriverProperties;
 
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
@@ -41,7 +41,8 @@ public class StackdriverFacetConfiguration
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
       FacetValidatorsManager validatorsManager) {
     return new FacetEditorTab[]{
-        new StackdriverPanel(editorContext)
+        new StackdriverPanel(
+            ((StackdriverFacet) editorContext.getFacet()).getConfiguration(), false)
     };
   }
 
@@ -64,26 +65,5 @@ public class StackdriverFacetConfiguration
   @Override
   public void loadState(StackdriverProperties state) {
     persistedProperties = state;
-  }
-
-  public static class StackdriverProperties {
-    private boolean generateSourceContext = true;
-    private boolean ignoreErrors = true;
-
-    public boolean isGenerateSourceContext() {
-      return generateSourceContext;
-    }
-
-    public void setGenerateSourceContext(boolean generateSourceContext) {
-      this.generateSourceContext = generateSourceContext;
-    }
-
-    public boolean isIgnoreErrors() {
-      return ignoreErrors;
-    }
-
-    public void setIgnoreErrors(boolean ignoreErrors) {
-      this.ignoreErrors = ignoreErrors;
-    }
   }
 }
