@@ -54,8 +54,8 @@ public class StackdriverPanel extends FacetEditorTab {
     this(null /* editorContext */);
     generateSourceContext.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(ActionEvent e) {
-        ignoreErrors.setEnabled(((JCheckBox)e.getSource()).isSelected());
+      public void actionPerformed(ActionEvent event) {
+        ignoreErrors.setEnabled(((JCheckBox)event.getSource()).isSelected());
       }
     });
   }
