@@ -27,6 +27,8 @@ import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.diagnostic.Logger;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
@@ -145,6 +147,7 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
   /**
    * Makes it possible to mock {@link CloudSdk}.
    */
+  @SuppressFBWarnings
   class GenRepoInfoFileActionFactory {
 
     private ExitCodeRecorderProcessExitListener exitListener =
