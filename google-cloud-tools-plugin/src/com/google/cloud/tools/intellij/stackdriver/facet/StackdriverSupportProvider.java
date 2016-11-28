@@ -63,7 +63,7 @@ public class StackdriverSupportProvider extends FrameworkSupportInModuleProvider
     return moduleType instanceof JavaModuleType;
   }
 
-  private class StackdriverSupportConfigurable extends FrameworkSupportInModuleConfigurable {
+  private static class StackdriverSupportConfigurable extends FrameworkSupportInModuleConfigurable {
 
     private StackdriverPanel stackdriverPanel = new StackdriverPanel();
 
