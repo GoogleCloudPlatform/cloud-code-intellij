@@ -81,7 +81,7 @@ public class StackdriverPanel extends FacetEditorTab {
   public boolean isModified() {
     return isGenerateSourceContextSelected() != configuration.getState().isGenerateSourceContext()
         || isIgnoreErrorsSelected() != configuration.getState().isIgnoreErrors()
-        || getModuleSourceDirectory() != configuration.getState().getModuleSourceDirectory();
+        || !getModuleSourceDirectory().equals(configuration.getState().getModuleSourceDirectory());
   }
 
   @Override
