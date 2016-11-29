@@ -127,6 +127,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     cleadDatastoreCheckbox.setSelected(serverModel.getClearDatastore());
   }
 
+  @Override
   protected void applyEditorTo(CommonModel commonModel) throws ConfigurationException {
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
     serverModel.setPort(validateInteger(port.getText(), "port"));

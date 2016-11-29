@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.Di
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -385,10 +386,10 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         throw new ConfigurationException(
             GctBundle.message("appengine.flex.config.custom.dockerfile.error"));
       }
-    } else if (environment.isStandard() && !CloudSdkService.getInstance().hasJavaComponent()) {
+    } else if (environment.isStandard() && CloudSdkService.getInstance().validateCloudSdk()
+        .contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT)) {
       throw new ConfigurationException(
-          GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
-              + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
+          CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT.getMessage());
     }
   }
 

@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.common.collect.ImmutableSet;
+
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.openapi.components.ServiceManager;
 
@@ -23,7 +25,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Set;
 
 /**
  * IntelliJ configured service for providing the path to the Cloud SDK.
@@ -38,6 +43,47 @@ public abstract class CloudSdkService {
   public abstract Path getSdkHomePath();
 
   public abstract void setSdkHomePath(String path);
+
+  protected abstract Set<CloudSdkValidationResult> validateCloudSdk(Path path);
+
+  /**
+   * Checks if the stored path contains a valid Cloud SDK.
+   */
+  public Set<CloudSdkValidationResult> validateCloudSdk() {
+    return validateCloudSdk(getSdkHomePath());
+  }
+
+  /**
+   * Checks if a given path is malformed or if it contains a valid Cloud SDK.
+   *
+   * <p>Windows' implementation of Paths doesn't handle well converting strings with certain special
+   * characters to paths. This method should be called before {@code Paths.get(path)}.
+   */
+  public Set<CloudSdkValidationResult> validateCloudSdk(String path) {
+    if (path == null) {
+      return ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+    }
+
+    try {
+      return validateCloudSdk(Paths.get(path));
+    } catch (InvalidPathException ipe) {
+      return ImmutableSet.of(CloudSdkValidationResult.MALFORMED_PATH);
+    }
+  }
+
+  /**
+   * Checks if the provided path contains a valid Cloud SDK installation.
+   */
+  public boolean isValidCloudSdk(String path) {
+    return validateCloudSdk(path).isEmpty();
+  }
+
+  /**
+   * Checks if the saved path contains a valid Cloud SDK installation.
+   */
+  public boolean isValidCloudSdk() {
+    return validateCloudSdk(getSdkHomePath()).isEmpty();
+  }
 
   @Nullable
   public abstract File getToolsApiJarFile();
@@ -58,5 +104,4 @@ public abstract class CloudSdkService {
 
   public abstract void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters);
 
-  public abstract boolean hasJavaComponent();
 }

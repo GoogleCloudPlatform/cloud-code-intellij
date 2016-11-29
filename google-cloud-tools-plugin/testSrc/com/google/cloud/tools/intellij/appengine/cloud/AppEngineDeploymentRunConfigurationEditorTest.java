@@ -16,13 +16,18 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.common.collect.ImmutableSet;
 
+import com.intellij.execution.configurations.RuntimeConfigurationError;
+import com.intellij.execution.configurations.RuntimeConfigurationWarning;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
@@ -30,6 +35,10 @@ import com.intellij.testFramework.PlatformTestCase;
 
 import org.apache.commons.lang.StringUtils;
 import org.picocontainer.MutablePicoContainer;
+
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JCheckBox;
 
@@ -55,6 +64,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     when(projectSelector.getText()).thenReturn(PROJECT_NAME);
 
     cloudSdkService = mock(CloudSdkService.class);
+    when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<CloudSdkValidationResult>());
 
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
@@ -71,7 +81,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
     config.setConfigType(ConfigType.AUTO);
-    when(cloudSdkService.hasJavaComponent()).thenReturn(true);
+    when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<CloudSdkValidationResult>());
 
     try {
       editor.applyEditorTo(config);
@@ -96,6 +106,8 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   public void testValidationFailureStandardEnv_missingJavaComponent() {
+    when(cloudSdkService.validateCloudSdk()).thenReturn(
+        ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
     config.setConfigType(ConfigType.AUTO);
@@ -110,6 +122,8 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   }
 
   public void testValidationSuccessFlexEnv_missingJavaComponent() {
+    when(cloudSdkService.validateCloudSdk()).thenReturn(
+        ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
     AppEngineDeploymentRunConfigurationEditor editor
         = createEditor(AppEngineEnvironment.APP_ENGINE_FLEX);
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
