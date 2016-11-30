@@ -34,6 +34,8 @@ import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Paths;
+
 import javax.swing.JComponent;
 
 /**
@@ -93,7 +95,7 @@ public class StackdriverSupportProvider extends FrameworkSupportInModuleProvider
       configuration.getState().setCloudSdkPath(
           CloudSdkService.getInstance().getSdkHomePath().toString());
       configuration.getState().setModuleSourceDirectory(
-          stackdriverPanel.getModuleSourceDirectory());
+          Paths.get(module.getModuleFilePath()).getParent().toString());
     }
   }
 }
