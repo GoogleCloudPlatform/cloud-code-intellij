@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.stackdriver.facet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
+import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -27,6 +28,7 @@ import com.intellij.ui.HyperlinkLabel;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -46,6 +48,7 @@ public class StackdriverPanel extends FacetEditorTab {
   private HyperlinkLabel stackdriverInfo;
   private TextFieldWithBrowseButton moduleSourceDirectory;
   private JLabel moduleSourceDirectoryLabel;
+  private JLabel warning;
   private StackdriverFacetConfiguration configuration;
 
   /**
@@ -55,8 +58,8 @@ public class StackdriverPanel extends FacetEditorTab {
   public StackdriverPanel(StackdriverFacetConfiguration configuration,
       boolean fromNewProjectDialog) {
     this.configuration = configuration;
-    stackdriverInfo.setHyperlinkText("Google Stackdriver documentation");
-    stackdriverInfo.setHyperlinkTarget("https://cloud.google.com/stackdriver/");
+    stackdriverInfo.setHyperlinkText(GctBundle.message("stackdriver.documentation"));
+    stackdriverInfo.setHyperlinkTarget(GctBundle.message("stackdriver.documentation.url"));
 
     generateSourceContext.addActionListener(new ActionListener() {
       @Override
@@ -86,6 +89,9 @@ public class StackdriverPanel extends FacetEditorTab {
 
   @Override
   public void apply() throws ConfigurationException {
+    if (!CloudSdkService.getInstance().isValidCloudSdk()) {
+      throw new RuntimeConfigurationException(GctBundle.message("stackdriver.sdk.misconfigured"));
+    }
     configuration.getState().setGenerateSourceContext(isGenerateSourceContextSelected());
     configuration.getState().setIgnoreErrors(isIgnoreErrorsSelected());
     configuration.getState().setCloudSdkPath(
@@ -95,6 +101,10 @@ public class StackdriverPanel extends FacetEditorTab {
 
   @Override
   public void reset() {
+    if (!CloudSdkService.getInstance().isValidCloudSdk()) {
+      warning.setForeground(Color.RED);
+      warning.setText(GctBundle.message("stackdriver.sdk.misconfigured"));
+    }
     generateSourceContext.setSelected(configuration.getState().isGenerateSourceContext());
     ignoreErrors.setEnabled(isGenerateSourceContextSelected());
     ignoreErrors.setSelected(configuration.getState().isIgnoreErrors());
