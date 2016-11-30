@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.stackdriver.facet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
+import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -88,6 +89,9 @@ public class StackdriverPanel extends FacetEditorTab {
 
   @Override
   public void apply() throws ConfigurationException {
+    if (!CloudSdkService.getInstance().isValidCloudSdk()) {
+      throw new RuntimeConfigurationException(GctBundle.message("stackdriver.sdk.misconfigured"));
+    }
     configuration.getState().setGenerateSourceContext(isGenerateSourceContextSelected());
     configuration.getState().setIgnoreErrors(isIgnoreErrorsSelected());
     configuration.getState().setModuleSourceDirectory(moduleSourceDirectory.getText());
