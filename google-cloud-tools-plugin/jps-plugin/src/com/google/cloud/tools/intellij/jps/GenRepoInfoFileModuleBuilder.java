@@ -62,7 +62,7 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
 
   @VisibleForTesting
   GenRepoInfoFileModuleBuilder(GenRepoInfoFileActionFactory actionFactory) {
-    this();
+    super(BuilderCategory.CLASS_POST_PROCESSOR);
     this.actionFactory = actionFactory;
   }
 
@@ -119,7 +119,7 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       ExitCodeRecorderProcessExitListener exitListener = actionFactory.getExitListener();
 
       if (exitListener.getMostRecentExitCode() != 0) {
-        LOG.warn("gen-repo-info-file command returned with status code "
+        LOG.warn("gcloud beta debug source gen-repo-info-file command returned with status code "
             + exitListener.getMostRecentExitCode());
         if (!extension.isIgnoreErrors()) {
           return ExitCode.ABORT;
