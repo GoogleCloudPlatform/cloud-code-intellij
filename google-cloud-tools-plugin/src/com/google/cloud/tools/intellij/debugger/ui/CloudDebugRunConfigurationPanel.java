@@ -35,9 +35,12 @@ public class CloudDebugRunConfigurationPanel {
   private JLabel description;
 
   public CloudDebugRunConfigurationPanel() {
-    docsLink.setHyperlinkText("For more details, ", "click here", ".");
-    docsLink.setHyperlinkTarget(GctBundle.message("clouddebug.documentation.link"));
-    description.setText(GctBundle.message("clouddebug.description"));
+    docsLink.setHyperlinkText(
+        GctBundle.message("clouddebug.runconfig.formoredetails"),
+        GctBundle.message("clouddebug.runconfig.documentation.url.text"),
+        ".");
+    docsLink.setHyperlinkTarget(GctBundle.message("clouddebug.runconfig.documentation.url"));
+    description.setText(GctBundle.message("clouddebug.runconfig.description"));
   }
 
   public JPanel getMainPanel() {
