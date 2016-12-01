@@ -62,7 +62,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   private String cloudProjectName;
   private volatile CloudDebugProcessState processState = null;
 
-  protected CloudDebugRunConfiguration(Project project, @NotNull ConfigurationFactory factory) {
+  public CloudDebugRunConfiguration(Project project, @NotNull ConfigurationFactory factory) {
     super(project, factory, NAME);
     CloudDebugProcessWatcher.getInstance().ensureWatcher();
   }
