@@ -40,8 +40,8 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
       artifactToDeploy = model.getExplodedWarArtifact();
     }
     if (artifactToDeploy != null) {
-      AppEngineStandardWebIntegration.getInstance()
-          .setupRunConfigurations(artifactToDeploy, model.getProject(), model.getRunConfiguration());
+      AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
+          artifactToDeploy, model.getProject(), model.getRunConfiguration());
     }
   }
 }
