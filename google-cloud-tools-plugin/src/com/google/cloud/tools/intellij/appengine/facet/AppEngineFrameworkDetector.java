@@ -44,6 +44,11 @@ public class AppEngineFrameworkDetector extends
 
   @Override
   public void setupFacet(@NotNull AppEngineStandardFacet facet, ModifiableRootModel model) {
+    AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
+        AppEngineUtil.findOneAppEngineStandardArtifact(facet.getModule()),
+        model.getProject(),
+        null /*existingConfiguration*/);
+
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_ADD_STANDARD_FACET)
         .withLabel("frameworkDetect")
