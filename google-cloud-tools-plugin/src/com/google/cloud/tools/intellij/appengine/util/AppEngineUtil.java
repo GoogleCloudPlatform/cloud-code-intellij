@@ -184,18 +184,22 @@ public class AppEngineUtil {
   }
 
   /**
-   * Returns the first app engine standard artifact found for the given module.
+   * Returns the only app engine standard artifact found for the given module or null if there
+   * aren't any or more than one.
    */
   @Nullable
-  public static Artifact findAppEngineStandardArtifact(@NotNull Module module) {
+  public static Artifact findOneAppEngineStandardArtifact(@NotNull Module module) {
     Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
+    Collection<Artifact> appEngineStandardArtifacts = Lists.newArrayList();
     for (Artifact artifact : artifacts) {
       if (AppEngineProjectService.getInstance().isAppEngineStandardArtifactType(artifact)) {
-        return artifact;
+        appEngineStandardArtifacts.add(artifact);
       }
     }
 
-    return null;
+    return appEngineStandardArtifacts.size() == 1
+        ? appEngineStandardArtifacts.iterator().next()
+        : null;
   }
 
   private static AppEngineArtifactDeploymentSource createArtifactDeploymentSource(

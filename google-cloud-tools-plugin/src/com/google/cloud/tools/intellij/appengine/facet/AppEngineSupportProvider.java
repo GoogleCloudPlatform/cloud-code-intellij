@@ -297,7 +297,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
               appEngineStandardLibraryPanel.getSelectedLibraries());
 
       AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
-          AppEngineUtil.findAppEngineStandardArtifact(module),
+          AppEngineUtil.findOneAppEngineStandardArtifact(module),
           rootModel.getProject(),
           null /*existingConfiguration*/);
 
