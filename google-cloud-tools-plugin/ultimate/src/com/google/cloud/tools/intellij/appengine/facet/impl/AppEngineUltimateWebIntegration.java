@@ -66,7 +66,8 @@ import java.util.List;
  */
 public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
 
-  private static final String JAVA_PROJECT_ROLE_ID = "JAVA_MODULE";
+  private static final FrameworkRole JAVA_PROJECT_ROLE = new FrameworkRole("JAVA_MODULE");
+  private static final FrameworkRole JAVA_EE_PROJECT_ROLE = JavaeeProjectCategory.ROLE;
 
   @NotNull
   @Override
@@ -199,8 +200,6 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
   @NotNull
   @Override
   public FrameworkRole[] getFrameworkRoles() {
-    return new FrameworkRole[] {
-        new FrameworkRole(JAVA_PROJECT_ROLE_ID),
-        JavaeeProjectCategory.ROLE };
+    return new FrameworkRole[] { JAVA_PROJECT_ROLE, JAVA_EE_PROJECT_ROLE };
   }
 }

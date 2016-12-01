@@ -60,14 +60,14 @@ public class AppEngineFrameworkType extends FrameworkTypeEx {
 
   @Override
   public FrameworkRole[] getRoles() {
-    // FrameworkRoles are used to determine which ProjectCategories (the section in the project
-    // creation left nav) where this framework appears.
+    // Determines which ProjectCategory (the sections in the project creation left nav) this
+    // framework appears in
     return AppEngineWebIntegration.getInstance().getFrameworkRoles();
   }
 
   @Override
   public String getUnderlyingFrameworkTypeId() {
-    // determines the parent of this framework in the "Additional Libraries and Frameworks" menu
+    // Determines the parent of this framework in the "Additional Libraries and Frameworks" menu
     return AppEngineWebIntegration.getInstance().getUnderlyingFrameworkTypeId();
   }
 
