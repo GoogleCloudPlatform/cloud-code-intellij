@@ -156,8 +156,8 @@
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkService"/>
 
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineCommunityWebIntegration"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineStandardCommunityWebIntegration"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider"

@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerIntegration;
@@ -64,7 +64,7 @@ import java.util.List;
 /**
  * @author nik
  */
-public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
+public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWebIntegration {
 
   private static final FrameworkRole JAVA_PROJECT_ROLE = new FrameworkRole("JAVA_MODULE");
   private static final FrameworkRole JAVA_EE_PROJECT_ROLE = JavaeeProjectCategory.ROLE;
@@ -111,7 +111,13 @@ public class AppEngineUltimateWebIntegration extends AppEngineWebIntegration {
     }
   }
 
-  public void setupRunConfiguration(Artifact artifact, @NotNull Project project,
+  public void setupRunConfigurations(Artifact artifact, @NotNull Project project,
+      ModuleRunConfiguration existingConfiguration) {
+    super.setupRunConfigurations(artifact, project, existingConfiguration);
+    setupLocalDevRunConfiguration(artifact, project, existingConfiguration);
+  }
+
+  private void setupLocalDevRunConfiguration(Artifact artifact, @NotNull Project project,
       ModuleRunConfiguration existingConfiguration) {
     final ApplicationServer appServer = getOrCreateAppServer();
     if (appServer != null) {

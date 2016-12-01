@@ -62,13 +62,13 @@ public class AppEngineFrameworkType extends FrameworkTypeEx {
   public FrameworkRole[] getRoles() {
     // Determines which ProjectCategory (the sections in the project creation left nav) this
     // framework appears in
-    return AppEngineWebIntegration.getInstance().getFrameworkRoles();
+    return AppEngineStandardWebIntegration.getInstance().getFrameworkRoles();
   }
 
   @Override
   public String getUnderlyingFrameworkTypeId() {
     // Determines the parent of this framework in the "Additional Libraries and Frameworks" menu
-    return AppEngineWebIntegration.getInstance().getUnderlyingFrameworkTypeId();
+    return AppEngineStandardWebIntegration.getInstance().getUnderlyingFrameworkTypeId();
   }
 
 }

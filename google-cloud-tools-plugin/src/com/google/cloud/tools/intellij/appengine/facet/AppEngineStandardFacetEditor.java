@@ -136,7 +136,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   @Override
   public void onFacetInitialized(@NotNull Facet facet) {
-    AppEngineWebIntegration.getInstance().setupDevServer();
+    AppEngineStandardWebIntegration.getInstance().setupDevServer();
 
     // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
     // Framework discovered "Configure" popup.
@@ -193,7 +193,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
       Artifact artifact = AppEngineSupportProvider
           .findOrCreateWebArtifact((AppEngineStandardFacet) context.getFacet());
-      AppEngineWebIntegration.getInstance()
+      AppEngineStandardWebIntegration.getInstance()
           .addLibraryToArtifact(addedLibrary, artifact, context.getProject());
 
       appEngineStandardLibraryPanel.toggleLibrary(
