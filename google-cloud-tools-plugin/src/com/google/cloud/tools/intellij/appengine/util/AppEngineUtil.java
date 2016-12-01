@@ -183,6 +183,21 @@ public class AppEngineUtil {
     return null;
   }
 
+  /**
+   * Returns the first app engine standard artifact found for the given module.
+   */
+  @Nullable
+  public static Artifact findAppEngineStandardArtifact(@NotNull Module module) {
+    Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
+    for (Artifact artifact : artifacts) {
+      if (AppEngineProjectService.getInstance().isAppEngineStandardArtifactType(artifact)) {
+        return artifact;
+      }
+    }
+
+    return null;
+  }
+
   private static AppEngineArtifactDeploymentSource createArtifactDeploymentSource(
       @NotNull Project project,
       @NotNull Artifact artifact,

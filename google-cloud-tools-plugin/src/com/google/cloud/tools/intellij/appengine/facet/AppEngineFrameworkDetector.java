@@ -45,7 +45,7 @@ public class AppEngineFrameworkDetector extends
   @Override
   public void setupFacet(@NotNull AppEngineStandardFacet facet, ModifiableRootModel model) {
     AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
-        null /*artifact*/,
+        AppEngineUtil.findAppEngineStandardArtifact(facet.getModule()),
         model.getProject(),
         null /*existingConfiguration*/);
 
