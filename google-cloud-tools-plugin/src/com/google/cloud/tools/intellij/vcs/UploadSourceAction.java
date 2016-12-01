@@ -36,6 +36,7 @@ import com.intellij.openapi.actionSystem.TypeSafeDataProvider;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -80,7 +81,6 @@ import git4idea.util.GitUIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -310,18 +310,15 @@ public class UploadSourceAction extends DumbAwareAction {
     }
     GitInit.refreshAndConfigureVcsMappings(project, root, root.getPath());
     try {
-      SwingUtilities.invokeAndWait(new Runnable() {
+      ApplicationManager.getApplication().invokeAndWait(new Runnable() {
         @Override
         public void run() {
           project.save();
         }
-      });
-    } catch (InterruptedException ex) {
+      }, indicator.getModalityState());
+    } catch (ProcessCanceledException ex) {
       Thread.currentThread().interrupt();
-      LOG.error("InterruptedException while saving project: " + ex.toString());
-      return false;
-    } catch (InvocationTargetException ex) {
-      LOG.error("InvocationTargetException while saving project: " + ex.toString());
+      LOG.error("ProcessCanceledException while saving project: " + ex.toString());
       return false;
     }
     return true;
