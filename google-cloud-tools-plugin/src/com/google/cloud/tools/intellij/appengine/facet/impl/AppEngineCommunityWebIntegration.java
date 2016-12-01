@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
 
 import com.intellij.execution.configurations.ModuleRunConfiguration;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
+import com.intellij.ide.util.frameworkSupport.FrameworkRole;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -75,6 +76,18 @@ public class AppEngineCommunityWebIntegration extends AppEngineWebIntegration {
   @Override
   public ArtifactType getAppEngineApplicationArtifactType() {
     return null;
+  }
+
+  @Nullable
+  @Override
+  public String getUnderlyingFrameworkTypeId() {
+    return null;
+  }
+
+  @NotNull
+  @Override
+  public FrameworkRole[] getFrameworkRoles() {
+    return new FrameworkRole[0];
   }
 
   @Override

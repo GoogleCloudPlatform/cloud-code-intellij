@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 
 import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
+import com.intellij.ide.util.frameworkSupport.FrameworkRole;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -56,4 +57,18 @@ public class AppEngineFrameworkType extends FrameworkTypeEx {
   public Icon getIcon() {
     return GoogleCloudToolsIcons.APP_ENGINE;
   }
+
+  @Override
+  public FrameworkRole[] getRoles() {
+    // FrameworkRoles are used to determine which ProjectCategories (the section in the project
+    // creation left nav) where this framework appears.
+    return AppEngineWebIntegration.getInstance().getFrameworkRoles();
+  }
+
+  @Override
+  public String getUnderlyingFrameworkTypeId() {
+    // determines the parent of this framework in the "Additional Libraries and Frameworks" menu
+    return AppEngineWebIntegration.getInstance().getUnderlyingFrameworkTypeId();
+  }
+
 }

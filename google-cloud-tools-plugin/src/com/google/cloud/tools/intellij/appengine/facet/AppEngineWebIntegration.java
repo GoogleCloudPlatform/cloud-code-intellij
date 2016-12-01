@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.intellij.execution.configurations.ModuleRunConfiguration;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
+import com.intellij.ide.util.frameworkSupport.FrameworkRole;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
@@ -62,6 +63,12 @@ public abstract class AppEngineWebIntegration {
   @NotNull
   public abstract List<FrameworkSupportInModuleProvider.FrameworkDependency>
       getAppEngineFrameworkDependencies();
+
+  @Nullable
+  public abstract String getUnderlyingFrameworkTypeId();
+
+  @NotNull
+  public abstract FrameworkRole[] getFrameworkRoles();
 
   public abstract void setupJpaSupport(@NotNull Module module, @NotNull VirtualFile persistenceXml);
 
