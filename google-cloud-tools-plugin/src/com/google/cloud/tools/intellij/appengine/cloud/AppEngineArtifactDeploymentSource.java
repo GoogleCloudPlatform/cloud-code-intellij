@@ -21,6 +21,7 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ArtifactDeploymentSourceImpl;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An App Engine implementation of {@link ArtifactDeploymentSourceImpl} that provides its targeted
@@ -31,19 +32,15 @@ public class AppEngineArtifactDeploymentSource extends ArtifactDeploymentSourceI
 
   private AppEngineEnvironment environment;
 
-  /**
-   * Default constructor used instantiating plain Artifact Deployment sources.
-   */
-  public AppEngineArtifactDeploymentSource(@NotNull ArtifactPointer pointer) {
-    super(pointer);
-  }
+  private String projectName;
+  private String version;
 
   /**
    * Initialize the artifact deployment source given a target App Engine environment, and an
    * artifact pointer.
    */
   public AppEngineArtifactDeploymentSource(
-      @NotNull AppEngineEnvironment environment,
+      @Nullable AppEngineEnvironment environment,
       @NotNull ArtifactPointer pointer) {
     super(pointer);
     this.environment = environment;
@@ -52,6 +49,26 @@ public class AppEngineArtifactDeploymentSource extends ArtifactDeploymentSourceI
   @Override
   public AppEngineEnvironment getEnvironment() {
     return environment;
+  }
+
+  @Override
+  public String getProjectName() {
+    return projectName;
+  }
+
+  @Override
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  @Override
+  public String getVersion() {
+    return version;
+  }
+
+  @Override
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   @NotNull

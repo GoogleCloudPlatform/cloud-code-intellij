@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.maven;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacetType;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration;
 
 import com.intellij.facet.FacetType;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
@@ -81,11 +81,13 @@ public class AppEngineFacetImporter extends
       List<MavenProjectsProcessorTask> postTasks) {
     String version = getVersion(mavenProject);
     if (version != null) {
-      AppEngineWebIntegration.getInstance().setupDevServer();
+      AppEngineStandardWebIntegration.getInstance().setupDevServer();
       final String artifactName = module.getName() + ":war exploded";
       final Artifact webArtifact = modelsProvider.getModifiableArtifactModel()
           .findArtifact(artifactName);
-      AppEngineWebIntegration.getInstance().setupRunConfiguration(webArtifact, module.getProject(),
+      AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
+          webArtifact,
+          module.getProject(),
           null /* existingConfiguration */);
     }
   }

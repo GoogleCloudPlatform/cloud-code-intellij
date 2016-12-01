@@ -29,4 +29,26 @@ public interface AppEngineDeployable extends DeploymentSource {
    */
   AppEngineEnvironment getEnvironment();
 
+
+  /**
+   * Returns the targeted cloud project name.
+   */
+  String getProjectName();
+
+  /**
+   * Sets the targeted cloud project. It is mutable because the cloud project is not known until
+   * deploy time where it is then set.
+   */
+  void setProjectName(String projectName);
+
+  /**
+   * Returns the targeted cloud project version.
+   */
+  String getVersion();
+
+  /**
+   * Sets the targeted cloud project version. It is mutable because the cloud project version is
+   * not known until deploy time where it is then set.
+   */
+  void setVersion(String version);
 }

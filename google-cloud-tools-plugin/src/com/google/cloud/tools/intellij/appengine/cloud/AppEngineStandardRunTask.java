@@ -17,11 +17,11 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
-import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.base.Strings;
@@ -53,17 +53,14 @@ public class AppEngineStandardRunTask extends AppEngineTask {
   public void execute(ProcessStartListener startListener) {
     CloudSdkService sdkService = CloudSdkService.getInstance();
 
+    // show a warning notification if the cloud sdk version is not supported
+    CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
+
     CloudSdk sdk = new CloudSdk.Builder()
         .sdkPath(sdkService.getSdkHomePath())
         .async(true)
         .startListener(startListener)
         .build();
-
-    try {
-      sdk.validateAppEngineJavaComponents();
-    } catch (AppEngineJavaComponentsNotInstalledException ex) {
-      return;
-    }
 
     CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdk);
     devServer.run(runConfig);

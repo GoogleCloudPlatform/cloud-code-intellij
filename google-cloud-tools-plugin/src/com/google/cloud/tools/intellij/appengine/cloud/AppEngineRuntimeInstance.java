@@ -25,11 +25,13 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.deployment.DeploymentLogManager;
 import com.intellij.remoteServer.runtime.deployment.DeploymentTask;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance;
 
 import org.jetbrains.annotations.NotNull;
+import org.joda.time.DateTime;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -85,6 +87,38 @@ class AppEngineRuntimeInstance extends
             }
           });
     }
+  }
+
+  /**
+   * Disambiguates running deployment line items by prepending a timestamp. Also appends the
+   * cloud project and version id's to the deployment string.
+   */
+  @NotNull
+  @Override
+  public String getDeploymentName(@NotNull DeploymentSource source,
+      AppEngineDeploymentConfiguration configuration) {
+    String deploymentName = String.format("[%s] ", DateTime.now().toString("yyyy-MM-dd HH:mm:ss"));
+
+    // If its a user specified archive source then we want to label it by the name of the archive
+    if (source instanceof UserSpecifiedPathDeploymentSource && source.getFile() != null) {
+      deploymentName += source.getFile().getName();
+    } else {
+      deploymentName += source.getPresentableName();
+    }
+
+    if (source instanceof AppEngineDeployable) {
+      AppEngineDeployable deployable = (AppEngineDeployable) source;
+
+      if (deployable.getProjectName() != null) {
+        deploymentName += ". Project: " + ((AppEngineDeployable) source).getProjectName();
+      }
+
+      if (deployable.getVersion() != null) {
+        deploymentName += ". Version: " + ((AppEngineDeployable) source).getVersion();
+      }
+    }
+
+    return deploymentName;
   }
 
   @Override

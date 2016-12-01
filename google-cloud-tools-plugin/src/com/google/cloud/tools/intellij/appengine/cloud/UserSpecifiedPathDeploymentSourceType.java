@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -28,8 +26,6 @@ import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRun
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-
 /**
  * A {@link DeploymentSourceType} that supports serialization for a {@link
  * UserSpecifiedPathDeploymentSource}.
@@ -37,8 +33,9 @@ import java.io.File;
 public class UserSpecifiedPathDeploymentSourceType extends
     DeploymentSourceType<ModuleDeploymentSource> {
 
-  private static final String NAME_ATTRIBUTE = "name";
   private static final String SOURCE_TYPE_ID = "filesystem-war-jar-module";
+  private static final String PROJECT_ATTRIBUTE = "project";
+  private static final String VERSION_ATTRIBUTE = "version";
 
   public UserSpecifiedPathDeploymentSourceType() {
     super(SOURCE_TYPE_ID);
@@ -53,7 +50,10 @@ public class UserSpecifiedPathDeploymentSourceType extends
   public ModuleDeploymentSource load(@NotNull Element tag, @NotNull Project project) {
     UserSpecifiedPathDeploymentSource userSpecifiedSource =
         new UserSpecifiedPathDeploymentSource(ModulePointerManager
-            .getInstance(project).create(tag.getAttributeValue(NAME_ATTRIBUTE)));
+            .getInstance(project).create(UserSpecifiedPathDeploymentSource.moduleName));
+
+    userSpecifiedSource.setProjectName(tag.getAttributeValue(PROJECT_ATTRIBUTE));
+    userSpecifiedSource.setVersion(tag.getAttributeValue(VERSION_ATTRIBUTE));
 
     Element settings = tag.getChild(DeployToServerRunConfiguration.SETTINGS_ELEMENT);
     if (settings != null) {
@@ -62,23 +62,27 @@ public class UserSpecifiedPathDeploymentSourceType extends
 
       if (!StringUtil.isEmpty(filePath)) {
         userSpecifiedSource.setFilePath(filePath);
-        userSpecifiedSource.setName(
-            GctBundle.message(
-                "appengine.flex.user.specified.deploymentsource.name.with.filename",
-                new File(filePath).getName()));
 
         return userSpecifiedSource;
       }
     }
 
-    userSpecifiedSource.setName(
-        GctBundle.message("appengine.flex.user.specified.deploymentsource.name"));
-
     return userSpecifiedSource;
   }
 
   @Override
-  public void save(@NotNull ModuleDeploymentSource source, @NotNull Element tag) {
-    tag.setAttribute(NAME_ATTRIBUTE, source.getModulePointer().getModuleName());
+  public void save(@NotNull ModuleDeploymentSource deploymentSource, @NotNull Element tag) {
+    if (deploymentSource instanceof AppEngineDeployable) {
+      AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
+
+      if (deployable.getProjectName() != null) {
+        tag.setAttribute(PROJECT_ATTRIBUTE,
+            ((AppEngineDeployable) deploymentSource).getProjectName());
+      }
+
+      if (deployable.getVersion() != null) {
+        tag.setAttribute(VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
+      }
+    }
   }
 }

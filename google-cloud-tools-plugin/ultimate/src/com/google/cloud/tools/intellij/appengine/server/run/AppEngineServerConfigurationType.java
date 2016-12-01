@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.server.run;
 
+import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerIntegration;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -27,10 +28,14 @@ import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.javaee.appServerIntegrations.AppServerIntegration;
 import com.intellij.javaee.run.configuration.J2EEConfigurationFactory;
 import com.intellij.javaee.run.configuration.J2EEConfigurationType;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.xml.XmlFile;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
 
 import javax.swing.Icon;
 
@@ -67,7 +72,28 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
 
   @Override
   public ConfigurationFactory[] getConfigurationFactories() {
-    return new ConfigurationFactory[]{super.getConfigurationFactories()[0]};
+    return new ConfigurationFactory[]{
+        new ConfigurationFactory(this) {
+          @NotNull
+          @Override
+          public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
+            return createJ2EEConfigurationTemplate(this, project, true /*isLocal*/);
+          }
+
+          /**
+           * If false, then this run configuration shows up under the "irrelevant" section. If it's
+           * not an App Engine Standard project (doesn't have an appengine-web.xml) then the run
+           * config should show up as "irrelevant".
+           */
+          @Override
+          public boolean isApplicable(@NotNull Project project) {
+            XmlFile webXml = AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(
+                project, Arrays.asList(ModuleManager.getInstance(project).getModules()));
+
+            return webXml != null;
+          }
+        }
+    };
   }
 
   public AppServerIntegration getIntegration() {

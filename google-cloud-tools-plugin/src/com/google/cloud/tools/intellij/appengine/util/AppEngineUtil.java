@@ -21,7 +21,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineWebIntegration;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
@@ -183,6 +183,25 @@ public class AppEngineUtil {
     return null;
   }
 
+  /**
+   * Returns the only app engine standard artifact found for the given module or null if there
+   * aren't any or more than one.
+   */
+  @Nullable
+  public static Artifact findOneAppEngineStandardArtifact(@NotNull Module module) {
+    Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
+    Collection<Artifact> appEngineStandardArtifacts = Lists.newArrayList();
+    for (Artifact artifact : artifacts) {
+      if (AppEngineProjectService.getInstance().isAppEngineStandardArtifactType(artifact)) {
+        appEngineStandardArtifacts.add(artifact);
+      }
+    }
+
+    return appEngineStandardArtifacts.size() == 1
+        ? appEngineStandardArtifacts.iterator().next()
+        : null;
+  }
+
   private static AppEngineArtifactDeploymentSource createArtifactDeploymentSource(
       @NotNull Project project,
       @NotNull Artifact artifact,
@@ -203,8 +222,8 @@ public class AppEngineUtil {
 
   private static UserSpecifiedPathDeploymentSource createUserSpecifiedPathDeploymentSource(
       @NotNull Project project) {
-    ModulePointer modulePointer =
-        ModulePointerManager.getInstance(project).create("userSpecifiedSource");
+    ModulePointer modulePointer = ModulePointerManager.getInstance(project)
+        .create(UserSpecifiedPathDeploymentSource.moduleName);
 
     return new UserSpecifiedPathDeploymentSource(modulePointer);
   }
@@ -216,7 +235,7 @@ public class AppEngineUtil {
       return artifacts;
     }
     for (Artifact artifact : ArtifactManager.getInstance(project).getArtifacts()) {
-      if (AppEngineWebIntegration.getInstance().getAppEngineTargetArtifactTypes()
+      if (AppEngineStandardWebIntegration.getInstance().getAppEngineTargetArtifactTypes()
           .contains(artifact.getArtifactType())
           && (!withAppEngineFacetOnly || findAppEngineFacet(project, artifact) != null)) {
         artifacts.add(artifact);

@@ -16,15 +16,29 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.common.collect.ImmutableSet;
 
+import com.intellij.execution.configurations.RuntimeConfigurationError;
+import com.intellij.execution.configurations.RuntimeConfigurationWarning;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestCase;
+
+import org.apache.commons.lang.StringUtils;
+import org.picocontainer.MutablePicoContainer;
+
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JCheckBox;
 
@@ -35,6 +49,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
   private AppEngineArtifactDeploymentSource deploymentSource;
   private AppEngineHelper appEngineHelper;
   private ProjectSelector projectSelector;
+  private CloudSdkService cloudSdkService;
 
   @Override
   public void setUp() throws Exception {
@@ -42,24 +57,31 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
 
     deploymentSource = mock(AppEngineArtifactDeploymentSource.class);
     when(deploymentSource.isValid()).thenReturn(true);
-    when(deploymentSource.getEnvironment())
-        .thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
 
     appEngineHelper = mock(AppEngineHelper.class);
 
     projectSelector = mock(ProjectSelector.class);
     when(projectSelector.getText()).thenReturn(PROJECT_NAME);
 
-    editor = new AppEngineDeploymentRunConfigurationEditor(
-        getProject(), deploymentSource, appEngineHelper);
+    cloudSdkService = mock(CloudSdkService.class);
+    when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<CloudSdkValidationResult>());
 
-    editor.setProjectSelector(projectSelector);
+    MutablePicoContainer applicationContainer = (MutablePicoContainer)
+        ApplicationManager.getApplication().getPicoContainer();
+
+    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
+
+    applicationContainer.registerComponentInstance(
+        CloudSdkService.class.getName(), cloudSdkService);
+
+    editor = createEditor(AppEngineEnvironment.APP_ENGINE_STANDARD);
   }
 
   public void testValidSelections() {
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
     config.setConfigType(ConfigType.AUTO);
+    when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<CloudSdkValidationResult>());
 
     try {
       editor.applyEditorTo(config);
@@ -80,6 +102,39 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
       fail("Expected validation failure");
     } catch (ConfigurationException ce) {
       assertEquals(ConfigType.AUTO, config.getConfigType());
+    }
+  }
+
+  public void testValidationFailureStandardEnv_missingJavaComponent() {
+    when(cloudSdkService.validateCloudSdk()).thenReturn(
+        ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
+    AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
+    config.setCloudProjectName("test-cloud-proj");
+    config.setConfigType(ConfigType.AUTO);
+    when(deploymentSource.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
+
+    try {
+      editor.applyEditorTo(config);
+      fail("Missing Java component validation error expected");
+    } catch (ConfigurationException ce) {
+      assertTrue(!StringUtils.isEmpty(ce.getMessage()));
+    }
+  }
+
+  public void testValidationSuccessFlexEnv_missingJavaComponent() {
+    when(cloudSdkService.validateCloudSdk()).thenReturn(
+        ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
+    AppEngineDeploymentRunConfigurationEditor editor
+        = createEditor(AppEngineEnvironment.APP_ENGINE_FLEX);
+    AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
+    config.setCloudProjectName("test-cloud-proj");
+    config.setConfigType(ConfigType.AUTO);
+    when(deploymentSource.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
+
+    try {
+      editor.applyEditorTo(config);
+    } catch (ConfigurationException ce) {
+      fail("Expected validation failure");
     }
   }
 
@@ -147,6 +202,18 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
     assertFalse(stopPreviousVersionCheckbox.isEnabled());
 
     Disposer.dispose(editor);
+  }
+
+  private AppEngineDeploymentRunConfigurationEditor createEditor(AppEngineEnvironment environment) {
+    when(deploymentSource.getEnvironment()).thenReturn(environment);
+
+    AppEngineDeploymentRunConfigurationEditor editor
+        = new AppEngineDeploymentRunConfigurationEditor(getProject(),
+        deploymentSource, appEngineHelper);
+
+    editor.setProjectSelector(projectSelector);
+
+    return editor;
   }
 
   @Override
