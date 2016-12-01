@@ -92,8 +92,6 @@ public class StackdriverSupportProvider extends FrameworkSupportInModuleProvider
       configuration.getState().setGenerateSourceContext(
           stackdriverPanel.isGenerateSourceContextSelected());
       configuration.getState().setIgnoreErrors(stackdriverPanel.isIgnoreErrorsSelected());
-      configuration.getState().setCloudSdkPath(
-          CloudSdkService.getInstance().getSdkHomePath().toString());
       configuration.getState().setModuleSourceDirectory(
           Paths.get(module.getModuleFilePath()).getParent().toString());
     }

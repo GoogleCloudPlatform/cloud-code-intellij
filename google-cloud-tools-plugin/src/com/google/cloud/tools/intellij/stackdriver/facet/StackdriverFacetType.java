@@ -16,9 +16,11 @@
 
 package com.google.cloud.tools.intellij.stackdriver.facet;
 
+import com.google.cloud.tools.intellij.compiler.StackdriverBuildManagerListener;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
+import com.intellij.compiler.server.BuildManagerListener;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeId;
@@ -48,6 +50,9 @@ public class StackdriverFacetType
   @Override
   public StackdriverFacet createFacet(@NotNull Module module, String name,
       @NotNull StackdriverFacetConfiguration configuration, @Nullable Facet underlyingFacet) {
+    // The following retrieves the Cloud SDK path at build time.
+    module.getProject().getMessageBus().connect()
+        .subscribe(BuildManagerListener.TOPIC, new StackdriverBuildManagerListener());
     return new StackdriverFacet(this, module, name, configuration);
   }
 

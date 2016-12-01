@@ -20,7 +20,10 @@ import com.google.cloud.tools.appengine.api.debug.DefaultGenRepoInfoFileConfigur
 import com.google.cloud.tools.appengine.api.debug.GenRepoInfoFile;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkGenRepoInfoFile;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ExitCodeRecorderProcessExitListener;
+import com.google.cloud.tools.appengine.cloudsdk.internal.process.StringBuilderProcessOutputLineListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.intellij.jps.model.JpsStackdriverModuleExtension;
 import com.google.cloud.tools.intellij.jps.model.impl.JpsStackdriverModuleExtensionImpl;
 import com.google.common.annotations.VisibleForTesting;
@@ -34,6 +37,8 @@ import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
 import org.jetbrains.jps.builders.java.JavaModuleBuildTargetType;
 import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
+import org.jetbrains.jps.builders.logging.BuildLoggingManager;
+import org.jetbrains.jps.builders.logging.ProjectBuilderLogger;
 import org.jetbrains.jps.incremental.BuilderCategory;
 import org.jetbrains.jps.incremental.CompileContext;
 import org.jetbrains.jps.incremental.ModuleBuildTarget;
@@ -81,6 +86,10 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       JpsStackdriverModuleExtension extension = jpsModule.getContainer().getChild(
           JpsStackdriverModuleExtensionImpl.ROLE);
 
+      if (extension == null) {
+        continue;
+      }
+
       if (!extension.isGenerateSourceContext()) {
         continue;
       }
@@ -109,12 +118,22 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
           new ModuleBuildTarget(jpsModule, JavaModuleBuildTargetType.PRODUCTION);
       Path outputDirectory = target.getOutputDir().toPath();
 
-      GenRepoInfoFile genAction = actionFactory.newAction(extension.getCloudSdkPath());
+      try {
+        GenRepoInfoFile genAction = actionFactory.newAction(extension.getCloudSdkPath());
 
-      DefaultGenRepoInfoFileConfiguration configuration = new DefaultGenRepoInfoFileConfiguration();
-      configuration.setSourceDirectory(sourceDirectory.toFile());
-      configuration.setOutputDirectory(outputDirectory.toFile());
-      genAction.generate(configuration);
+        DefaultGenRepoInfoFileConfiguration configuration =
+            new DefaultGenRepoInfoFileConfiguration();
+        configuration.setSourceDirectory(sourceDirectory.toFile());
+        configuration.setOutputDirectory(outputDirectory.toFile());
+        genAction.generate(configuration);
+      } catch (CloudSdkNotFoundException ex) {
+        LOG.warn("The Cloud SDK is misconfigured. To fix, go to Settings -> Google -> Cloud SDK, "
+            + "and specify a valid Cloud SDK location.");
+        if (!extension.isIgnoreErrors()) {
+          return ExitCode.ABORT;
+        }
+        continue;
+      }
 
       ExitCodeRecorderProcessExitListener exitListener = actionFactory.getExitListener();
 
@@ -135,6 +154,7 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
           outputDirectory.resolve("source-contexts.json").toFile(),
           Collections.<String>emptyList());
     }
+
     return ExitCode.OK;
   }
 
@@ -148,6 +168,7 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
    * Makes it possible to mock {@link CloudSdk}.
    */
   @SuppressFBWarnings
+  // We don't want class to be static because we want to mock it (findbugs).
   class GenRepoInfoFileActionFactory {
 
     private ExitCodeRecorderProcessExitListener exitListener =
