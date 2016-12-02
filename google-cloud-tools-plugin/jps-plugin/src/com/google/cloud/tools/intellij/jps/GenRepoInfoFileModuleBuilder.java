@@ -48,6 +48,7 @@ import org.jetbrains.jps.model.module.JpsModule;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 
 /**
@@ -59,6 +60,10 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       Logger.getInstance("#com.google.cloud.tools.intellij.jps.GenRepoInfoFileModuleBuilder");
 
   public static final String NAME = "Stackdriver source context generator";
+  private static final String MISCONFIGURED_SDK = "The Cloud SDK is misconfigured. To fix, go to "
+      + "Settings -> Google -> Cloud SDK, and specify a valid Cloud SDK location.";
+  private static final String ERROR_OCCURRED = "gcloud beta debug source gen-repo-info-file "
+      + "command returned with status code ";
   private GenRepoInfoFileActionFactory actionFactory = new GenRepoInfoFileActionFactory();
 
   public GenRepoInfoFileModuleBuilder() {
@@ -127,10 +132,9 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
         configuration.setOutputDirectory(outputDirectory.toFile());
         genAction.generate(configuration);
       } catch (CloudSdkNotFoundException ex) {
-        LOG.warn("The Cloud SDK is misconfigured. To fix, go to Settings -> Google -> Cloud SDK, "
-            + "and specify a valid Cloud SDK location.");
+        LOG.warn(MISCONFIGURED_SDK);
         if (!extension.isIgnoreErrors()) {
-          return ExitCode.ABORT;
+          throw new ProjectBuildException(MISCONFIGURED_SDK);
         }
         continue;
       }
@@ -138,10 +142,9 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       ExitCodeRecorderProcessExitListener exitListener = actionFactory.getExitListener();
 
       if (exitListener.getMostRecentExitCode() != 0) {
-        LOG.warn("gcloud beta debug source gen-repo-info-file command returned with status code "
-            + exitListener.getMostRecentExitCode());
+        LOG.warn(ERROR_OCCURRED + exitListener.getMostRecentExitCode());
         if (!extension.isIgnoreErrors()) {
-          return ExitCode.ABORT;
+          throw new ProjectBuildException(ERROR_OCCURRED + exitListener.getMostRecentExitCode());
         }
       }
 
