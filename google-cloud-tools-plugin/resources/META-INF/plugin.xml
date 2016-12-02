@@ -53,15 +53,15 @@
         </li>
         <li>
         Check for minimum support Cloud SDK version.
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1051">#1051</a>).
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1051">#1051</a>)
         </li>
         <li>
         Automatically create all relevant run configuration for App Engine Standard apps.
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1063">#1063</a>).
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1063">#1063</a>)
         </li>
         <li>
         App Engine framework is now a child of Web framework in the new project wizard.
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1065">#1065</a>).
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1065">#1065</a>)
         </li>
       </ul>
 
