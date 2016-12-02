@@ -28,11 +28,13 @@ import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.ModuleRunConfiguration;
 import com.intellij.facet.FacetManager;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider.FrameworkDependency;
+import com.intellij.ide.util.frameworkSupport.FrameworkRole;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.javaee.JavaeePersistenceDescriptorsConstants;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
 import com.intellij.javaee.artifact.JavaeeArtifactUtil;
 import com.intellij.javaee.facet.JavaeeFrameworkSupportInfoCollector;
+import com.intellij.javaee.framework.JavaeeProjectCategory;
 import com.intellij.javaee.oss.server.JavaeePersistentData;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.configuration.J2EEConfigurationFactory;
@@ -63,6 +65,9 @@ import java.util.List;
  * @author nik
  */
 public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWebIntegration {
+
+  private static final FrameworkRole JAVA_PROJECT_ROLE = new FrameworkRole("JAVA_MODULE");
+  private static final FrameworkRole JAVA_EE_PROJECT_ROLE = JavaeeProjectCategory.ROLE;
 
   @NotNull
   @Override
@@ -190,5 +195,17 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   @NotNull
   public List<FrameworkDependency> getAppEngineFrameworkDependencies() {
     return Collections.singletonList(FrameworkDependency.required("web"));
+  }
+
+  @Nullable
+  @Override
+  public String getUnderlyingFrameworkTypeId() {
+    return WebFacet.ID.toString();
+  }
+
+  @NotNull
+  @Override
+  public FrameworkRole[] getFrameworkRoles() {
+    return new FrameworkRole[] { JAVA_PROJECT_ROLE, JAVA_EE_PROJECT_ROLE };
   }
 }
