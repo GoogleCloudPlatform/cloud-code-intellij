@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.stackdriver.facet;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.FrameworkTypeEx;
