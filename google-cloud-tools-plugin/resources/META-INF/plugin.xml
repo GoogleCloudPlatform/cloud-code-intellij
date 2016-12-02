@@ -71,6 +71,10 @@
         Unique deployment sources in application server deployment panel now appear as separate line items.
         (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/821">#821</a>)
         </li>
+        <li>
+        Validation of invalid Cloud SDK paths on Windows.
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1091">#1091</a>)
+        </li>
       </ul>
       <h2>[16.10.5]</h2>
       <h3>Fixed</h3>
