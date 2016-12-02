@@ -32,6 +32,7 @@ import com.intellij.ui.JBColor;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -205,7 +206,7 @@ public class CloudSdkPanel {
    * directory field is already equal to the path.
    */
   public void setCloudSdkDirectoryText(String path) {
-    if (!cloudSdkDirectoryField.getText().equals(path)) {
+    if (!Objects.equals(cloudSdkDirectoryField.getText(), path)) {
       cloudSdkDirectoryField.setText(path);
     }
   }
