@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Unique deployment sources in application server deployment panel now appear as separate line items. ([#821](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/821)).
-- Validation of invalid Cloud SDK paths on Windows. ([1091](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1091)). 
+- Validation of invalid Cloud SDK paths on Windows. ([#1091](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1091)). 
 
 ## [16.10.5]
 
