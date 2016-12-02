@@ -17,7 +17,11 @@
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
+import com.intellij.ui.HyperlinkLabel;
+
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -27,8 +31,16 @@ public class CloudDebugRunConfigurationPanel {
 
   private ProjectSelector elysiumProjectId;
   private JPanel panel;
+  private HyperlinkLabel docsLink;
+  private JLabel description;
 
   public CloudDebugRunConfigurationPanel() {
+    docsLink.setHyperlinkText(
+        GctBundle.message("clouddebug.runconfig.formoredetails"),
+        GctBundle.message("clouddebug.runconfig.documentation.url.text"),
+        ".");
+    docsLink.setHyperlinkTarget(GctBundle.message("clouddebug.runconfig.documentation.url"));
+    description.setText(GctBundle.message("clouddebug.runconfig.description"));
   }
 
   public JPanel getMainPanel() {
