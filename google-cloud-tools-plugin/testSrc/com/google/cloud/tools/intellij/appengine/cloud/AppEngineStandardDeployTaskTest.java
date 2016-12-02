@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -69,8 +70,7 @@ public class AppEngineStandardDeployTaskTest {
           + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)";
 
   private static final String JAVA_COMPONENTS_MISSING_FAIL_MSG =
-      "Selected Cloud SDK does not contain the app-engine-java component.\n"
-          + "To install, run 'gcloud components install app-engine-java'.";
+      CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT.getMessage();
 
   @Before
   public void setUp() throws IOException {
