@@ -44,6 +44,38 @@
       shell to ensure you have the latest Cloud SDK release.
       </p>
 
+      <h2>[16.11.1]</h2>
+      <h3>Added</h3>
+      <ul>
+        <li>
+        Expanded Google Cloud Tools menu item with various action shortcuts.
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1061">#1061</a>)
+        </li>
+        <li>
+        Check for minimum support Cloud SDK version.
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1051">#1051</a>)
+        </li>
+        <li>
+        Automatically create all relevant run configuration for App Engine Standard apps.
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1063">#1063</a>)
+        </li>
+        <li>
+        App Engine framework is now a child of Web framework in the new project wizard.
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1065">#1065</a>)
+        </li>
+      </ul>
+
+      <h3>Fixed</h3>
+      <ul>
+        <li>
+        Unique deployment sources in application server deployment panel now appear as separate line items.
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/821">#821</a>)
+        </li>
+        <li>
+        Validation of invalid Cloud SDK paths on Windows.
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1091">#1091</a>)
+        </li>
+      </ul>
       <h2>[16.10.5]</h2>
       <h3>Fixed</h3>
       <ul>
