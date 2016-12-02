@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
@@ -290,7 +291,10 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     public void addSupport(@NotNull Module module,
         @NotNull ModifiableRootModel rootModel,
         @NotNull ModifiableModelsProvider modifiableModelsProvider) {
-      sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
+      if (!sdkService.validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
+          .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
+        sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
+      }
 
       AppEngineSupportProvider.this
           .addSupport(module, rootModel, frameworkSupportModel,

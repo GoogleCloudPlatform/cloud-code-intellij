@@ -187,7 +187,15 @@ public class CloudSdkPanel {
   }
 
   public void apply() throws ConfigurationException {
-    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+
+    if (sdkService.validateCloudSdk(getCloudSdkDirectoryText())
+        .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.cloudsdk.location.badchars.message"));
+    }
+
+    sdkService.setSdkHomePath(getCloudSdkDirectoryText());
   }
 
   public void reset() {
