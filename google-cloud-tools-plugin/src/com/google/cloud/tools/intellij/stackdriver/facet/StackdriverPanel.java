@@ -89,9 +89,6 @@ public class StackdriverPanel extends FacetEditorTab {
 
   @Override
   public void apply() throws ConfigurationException {
-    if (!CloudSdkService.getInstance().isValidCloudSdk()) {
-      throw new RuntimeConfigurationException(GctBundle.message("stackdriver.sdk.misconfigured"));
-    }
     configuration.getState().setGenerateSourceContext(isGenerateSourceContextSelected());
     configuration.getState().setIgnoreErrors(isIgnoreErrorsSelected());
     configuration.getState().setModuleSourceDirectory(moduleSourceDirectory.getText());
