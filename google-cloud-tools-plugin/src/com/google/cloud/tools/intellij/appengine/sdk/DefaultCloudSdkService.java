@@ -84,6 +84,12 @@ public class DefaultCloudSdkService extends CloudSdkService {
   @Nullable
   @Override
   public Path getSdkHomePath() {
+    // For Windows users that persisted the old malformed path.
+    if (validateCloudSdk(propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY))
+        .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
+      return null;
+    }
+
     if (propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY) != null) {
       return Paths.get(propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY));
     }

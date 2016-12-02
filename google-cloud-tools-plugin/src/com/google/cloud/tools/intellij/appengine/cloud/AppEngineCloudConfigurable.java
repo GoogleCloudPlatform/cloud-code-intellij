@@ -92,14 +92,9 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
    */
   @Override
   public void apply() throws ConfigurationException {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-
-    if (!sdkService.isValidCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())) {
-      throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.cloudsdk.location.invalid.message"));
+    if (cloudSdkPanel != null) {
+      cloudSdkPanel.apply();
     }
-
-    sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
   }
 
   @Override
