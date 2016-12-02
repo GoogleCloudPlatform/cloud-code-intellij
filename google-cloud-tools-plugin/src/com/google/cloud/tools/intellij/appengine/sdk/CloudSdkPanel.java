@@ -186,7 +186,14 @@ public class CloudSdkPanel {
   }
 
   public void apply() throws ConfigurationException {
-    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+
+    if (sdkService.isValidCloudSdk(getCloudSdkDirectoryText())) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.cloudsdk.location.invalid.message"));
+    }
+
+    sdkService.setSdkHomePath(getCloudSdkDirectoryText());
   }
 
   public void reset() {
