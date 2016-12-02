@@ -200,8 +200,14 @@ public class CloudSdkPanel {
     return cloudSdkDirectoryField.getText();
   }
 
+  /**
+   * Sets the Cloud SDK directory text. Performs no action if the current value of the Cloud SDK
+   * directory field is already equal to the path.
+   */
   public void setCloudSdkDirectoryText(String path) {
-    cloudSdkDirectoryField.setText(path);
+    if (!cloudSdkDirectoryField.getText().equals(path)) {
+      cloudSdkDirectoryField.setText(path);
+    }
   }
 
   @NotNull
