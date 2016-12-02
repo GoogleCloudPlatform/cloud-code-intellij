@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.javaee.supportProvider;
 
+import com.google.cloud.tools.intellij.debugger.CloudDebugProcessWatcher;
+
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportProviderTestCase;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
 import com.intellij.javaee.module.components.FrameworkVirtualFileSystem;
@@ -46,6 +48,7 @@ public abstract class JavaeeFrameworkSupportProviderTestCase extends FrameworkSu
   protected void tearDown() throws Exception {
     FrameworkVirtualFileSystem.getJ2EEInstance().cleanup();
     deleteApplicationServers();
+    CloudDebugProcessWatcher.getInstance().removeWatcher();
     super.tearDown();
   }
 }
