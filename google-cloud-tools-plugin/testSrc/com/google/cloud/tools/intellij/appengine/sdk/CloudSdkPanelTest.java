@@ -24,6 +24,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.util.GctBundle;
+
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.util.containers.HashSet;
@@ -55,9 +57,6 @@ public class CloudSdkPanelTest extends PlatformTestCase {
           + CLOUD_SDK_DOWNLOAD_LINK;
   private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in this directory. "
       + CLOUD_SDK_DOWNLOAD_LINK;
-  private static final String UNSUPPORTED_SDK_WARNING = "The configured Google Cloud SDK is out of "
-      + "date. Version 131.0.0 is the minimum recommended version for use with the Google Cloud Tools Plugin. To update, "
-      + "run \"gcloud components update\".";
 
   @Override
   public void setUp() throws Exception {
@@ -105,7 +104,8 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
     when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(false);
     panel.checkSdk("/non/empty/path");
-    verify(panel, times(1)).showWarning(eq(UNSUPPORTED_SDK_WARNING), eq(false));
+    verify(panel, times(1)).showWarning(
+        eq(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage()), eq(false));
     verify(panel, times(0)).hideWarning();
   }
 
@@ -115,7 +115,8 @@ public class CloudSdkPanelTest extends PlatformTestCase {
         CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(false);
 
-    String expectedMessage = INVALID_SDK_DIR_WARNING + "<p>" + UNSUPPORTED_SDK_WARNING + "</p>";
+    String expectedMessage = INVALID_SDK_DIR_WARNING + "<p>" +
+        CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage() + "</p>";
 
     panel.checkSdk("/non/empty/path");
     verify(panel, times(1)).showWarning(eq(expectedMessage), eq(true));
