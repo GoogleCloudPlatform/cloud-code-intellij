@@ -79,14 +79,14 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   public void testCheckSdk_nullSdk() throws InterruptedException {
     when(cloudSdkService.isValidCloudSdk(null)).thenReturn(false);
     panel.checkSdk(null);
-    verify(panel, times(1)).showWarning(eq(MISSING_SDK_DIR_WARNING), eq(false));
+    verify(panel, times(1)).showWarning(eq(MISSING_SDK_DIR_WARNING));
     verify(panel, times(0)).hideWarning();
   }
   @Test
   public void testCheckSdk_emptySdk() throws InterruptedException {
     when(cloudSdkService.isValidCloudSdk("")).thenReturn(false);
     panel.checkSdk("");
-    verify(panel, times(1)).showWarning(eq(MISSING_SDK_DIR_WARNING), eq(false));
+    verify(panel, times(1)).showWarning(eq(MISSING_SDK_DIR_WARNING));
     verify(panel, times(0)).hideWarning();
   }
 
@@ -95,7 +95,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(false);
     panel.checkSdk("/non/empty/path");
-    verify(panel, times(1)).showWarning(eq(INVALID_SDK_DIR_WARNING), eq(true));
+    verify(panel, times(1)).showWarning(eq(INVALID_SDK_DIR_WARNING));
     verify(panel, times(0)).hideWarning();
   }
 
@@ -105,7 +105,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(false);
     panel.checkSdk("/non/empty/path");
     verify(panel, times(1)).showWarning(
-        eq(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage()), eq(false));
+        eq(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage()));
     verify(panel, times(0)).hideWarning();
   }
 
@@ -119,7 +119,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
         CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage() + "</p>";
 
     panel.checkSdk("/non/empty/path");
-    verify(panel, times(1)).showWarning(eq(expectedMessage), eq(true));
+    verify(panel, times(1)).showWarning(eq(expectedMessage));
     verify(panel, times(0)).hideWarning();
   }
 
@@ -128,7 +128,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(true);
     setValidateCloudSdkResponse();
     panel.checkSdk("/non/empty/path");
-    verify(panel, times(0)).showWarning(any(String.class), anyBoolean());
+    verify(panel, times(0)).showWarning(any(String.class));
     verify(panel, times(1)).hideWarning();
   }
 
