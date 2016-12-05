@@ -22,23 +22,17 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkGenRepoInfoFile;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ExitCodeRecorderProcessExitListener;
-import com.google.cloud.tools.appengine.cloudsdk.internal.process.StringBuilderProcessOutputLineListener;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.intellij.jps.model.JpsStackdriverModuleExtension;
 import com.google.cloud.tools.intellij.jps.model.impl.JpsStackdriverModuleExtensionImpl;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.diagnostic.Logger;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
 import org.jetbrains.jps.builders.java.JavaModuleBuildTargetType;
 import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
-import org.jetbrains.jps.builders.logging.BuildLoggingManager;
-import org.jetbrains.jps.builders.logging.ProjectBuilderLogger;
 import org.jetbrains.jps.incremental.BuilderCategory;
 import org.jetbrains.jps.incremental.CompileContext;
 import org.jetbrains.jps.incremental.ModuleBuildTarget;
@@ -48,7 +42,6 @@ import org.jetbrains.jps.model.module.JpsModule;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 
 /**
@@ -170,9 +163,7 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
   /**
    * Makes it possible to mock {@link CloudSdk}.
    */
-  @SuppressFBWarnings
-  // We don't want class to be static because we want to mock it (findbugs).
-  class GenRepoInfoFileActionFactory {
+  static class GenRepoInfoFileActionFactory {
 
     private ExitCodeRecorderProcessExitListener exitListener =
         new ExitCodeRecorderProcessExitListener();

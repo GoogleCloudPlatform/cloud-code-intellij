@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.jps;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doNothing;
@@ -182,9 +183,12 @@ public class GenRepoInfoFileModuleBuilderTest {
     when(exitListener1.getMostRecentExitCode()).thenReturn(1);
 
     GenRepoInfoFileModuleBuilder subject = new GenRepoInfoFileModuleBuilder(actionFactory);
-    ExitCode result = subject.build(context, chunk, dirtyFilesHolder, outputConsumer);
-
-    assertEquals(result, ExitCode.ABORT);
+    try {
+      subject.build(context, chunk, dirtyFilesHolder, outputConsumer);
+      fail("ProjectBuildException should have been thrown.");
+    } catch (ProjectBuildException pbe) {
+      assertEquals((Integer) 1, actionFactory.getExitListener().getMostRecentExitCode());
+    }
   }
 
   @Test
