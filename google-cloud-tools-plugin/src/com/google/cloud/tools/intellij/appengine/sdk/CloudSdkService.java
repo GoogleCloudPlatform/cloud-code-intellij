@@ -89,14 +89,12 @@ public abstract class CloudSdkService {
    * Checks for invalid characters that trigger an {@link InvalidPathException} on Windows.
    */
   public boolean isMalformedCloudSdkPath(@Nullable String sdkPath) {
-    if (sdkPath == null) {
-      return false;
-    }
-
-    try {
-      Paths.get(sdkPath);
-    } catch (InvalidPathException ipe) {
-      return true;
+    if (sdkPath != null) {
+      try {
+        Paths.get(sdkPath);
+      } catch (InvalidPathException ipe) {
+        return true;
+      }
     }
     return false;
   }
