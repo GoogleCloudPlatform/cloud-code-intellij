@@ -347,9 +347,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
             if (forceUpdate) {
               node.setNeedsSynchronizing();
             }
-            if ((!queryOnExpand
-                || popupPanel != null)
-                && popupPanel.tree.isExpanded(new TreePath(node.getPath()))) {
+            if (!queryOnExpand ||
+                (popupPanel != null && popupPanel.tree.isExpanded(new TreePath(node.getPath())))) {
               node.synchronize();
             }
           }
