@@ -25,9 +25,8 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
-import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
-import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
@@ -66,14 +66,7 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testGetMinimumRequiredCloudSdkVersion() {
-    String expected = readRequiredCloudSdkVersion();
-    assertEquals(new CloudSdkVersion(expected),
-        DefaultCloudSdkService.getMinimumRequiredCloudSdkVersion());
-  }
-
-  @Test
-  public void testValidateCloudSdk_cloudSdkNotFound() throws ProcessRunnerException {
+  public void testValidateCloudSdk_cloudSdkNotFound() throws  IOException {
     when(mockSdk.getVersion()).thenReturn(supportedVersion);
     doThrow(CloudSdkNotFoundException.class).when(mockSdk).validateCloudSdk();
     Set<CloudSdkValidationResult> results = service.validateCloudSdk();
@@ -83,8 +76,8 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testValidateCloudSdk_versionUnsupported() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(unsupportedVersion);
+  public void testValidateCloudSdk_versionUnsupported() throws IOException {
+    doThrow(CloudSdkOutOfDateException.class).when(mockSdk).validateCloudSdk();
     Set<CloudSdkValidationResult> results = service.validateCloudSdk();
     assertEquals(1, results.size());
     assertEquals(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED,
@@ -93,8 +86,7 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testValidateCloudSdk_valid() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(supportedVersion);
+  public void testValidateCloudSdk_valid() throws IOException {
     Set<CloudSdkValidationResult> results = service.validateCloudSdk();
     assertEquals(0, results.size());
     assertTrue(service.isValidCloudSdk());
@@ -133,16 +125,14 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testValidateCloudSdk_goodString() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(supportedVersion);
+  public void testValidateCloudSdk_goodString() throws IOException {
     Set<CloudSdkValidationResult> results = service.validateCloudSdk("/good/path");
     assertEquals(0, results.size());
     assertTrue(service.isValidCloudSdk("/good/path"));
   }
 
   @Test
-  public void testValidateJavaComponents() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(supportedVersion);
+  public void testValidateJavaComponents() throws IOException {
     doThrow(AppEngineJavaComponentsNotInstalledException.class).when(mockSdk)
         .validateAppEngineJavaComponents();
     Set<CloudSdkValidationResult> results = service.validateCloudSdk("/good/path");
@@ -151,18 +141,15 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testValidateCloudSdk_multipleResults() throws ProcessRunnerException {
-    when(mockSdk.getVersion()).thenReturn(unsupportedVersion);
+  public void testValidateCloudSdk_multipleResults() throws IOException {
     doThrow(AppEngineJavaComponentsNotInstalledException.class).when(mockSdk)
         .validateAppEngineJavaComponents();
+    doThrow(CloudSdkOutOfDateException.class).when(mockSdk).validateCloudSdk();
+
     Set<CloudSdkValidationResult> results = service.validateCloudSdk("/good/path");
     assertEquals(2, results.size());
     assertTrue(results.contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
     assertTrue(results.contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
-  }
-
-  private String readRequiredCloudSdkVersion() {
-    return new PropertiesFileFlagReader().getFlagString("cloudsdk.min.version");
   }
 
   // Create a special subclass of DefaultCloudSdkService so we can control some of its methods
