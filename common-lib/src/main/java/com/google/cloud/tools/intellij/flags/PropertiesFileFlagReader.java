@@ -65,6 +65,7 @@ public class PropertiesFileFlagReader implements FlagReader {
   }
 
   @Nullable
+  @Override
   public String getFlagString(String propertyName) {
     return properties.getProperty(propertyName);
   }

@@ -22,7 +22,7 @@ public enum AppEngineStandardRuntime {
 
   JAVA_8("java8");
 
-  private String label;
+  private final String label;
 
   AppEngineStandardRuntime(String label) {
     this.label = label;

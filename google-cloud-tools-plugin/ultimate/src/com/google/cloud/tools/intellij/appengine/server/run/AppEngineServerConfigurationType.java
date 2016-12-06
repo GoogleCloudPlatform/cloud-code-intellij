@@ -48,7 +48,7 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
     return ConfigurationTypeUtil.findConfigurationType(AppEngineServerConfigurationType.class);
   }
 
-  @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+  @Override
   protected RunConfiguration createJ2EEConfigurationTemplate(ConfigurationFactory factory,
       Project project, boolean isLocal) {
     final AppEngineServerModel serverModel = new AppEngineServerModel();
@@ -57,15 +57,18 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
             getIntegration(), isLocal, new CloudSdkStartupPolicy());
   }
 
+  @Override
   public String getDisplayName() {
     return GctBundle.getString("appengine.run.server.name");
   }
 
+  @Override
   public String getConfigurationTypeDescription() {
     return getDisplayName() + " run configuration";
   }
 
   @Nullable
+  @Override
   public Icon getIcon() {
     return GoogleCloudToolsIcons.APP_ENGINE;
   }
@@ -103,11 +106,13 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
     };
   }
 
+  @Override
   public AppServerIntegration getIntegration() {
     return AppEngineServerIntegration.getInstance();
   }
 
   @NotNull
+  @Override
   public String getId() {
     return "GoogleAppEngineDevServer";
   }

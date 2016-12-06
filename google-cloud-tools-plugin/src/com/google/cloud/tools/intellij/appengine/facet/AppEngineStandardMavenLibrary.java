@@ -58,6 +58,7 @@ public enum AppEngineStandardMavenLibrary {
       DependencyScope.COMPILE);
 
   private final String displayName;
+  // TODO(paflynn): RepositoryLibraryProperties is a mutable type and should not be used in an enum.
   private final RepositoryLibraryProperties libraryProperties;
   private final DependencyScope scope;
 

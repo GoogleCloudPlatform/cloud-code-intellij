@@ -25,7 +25,7 @@ public enum AppEngineEnvironment {
   APP_ENGINE_STANDARD("appengine.environment.name.standard"),
   APP_ENGINE_FLEX("appengine.environment.name.flexible");
 
-  private String label;
+  private final String label;
 
   AppEngineEnvironment(String label) {
     this.label = label;

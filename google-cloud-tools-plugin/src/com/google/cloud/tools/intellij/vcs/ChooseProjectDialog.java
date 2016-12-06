@@ -76,7 +76,6 @@ public class ChooseProjectDialog extends DialogWrapper {
     return "ChooseProjectDialog";
   }
 
-  @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
     projectSelector = new ProjectSelector();
     projectSelector.setMinimumSize(new Dimension(300, 0));

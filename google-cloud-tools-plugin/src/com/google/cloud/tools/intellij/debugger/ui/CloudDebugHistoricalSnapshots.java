@@ -648,7 +648,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       for (int row = 0; row < getModel().getRowCount(); row++) {
         // todo: getModel should be newModel
         Breakpoint bp = getModel().getBreakpoints().get(row);
-        if (bp.getIsFinalState() != Boolean.TRUE) {
+        if (bp.getIsFinalState().equals(Boolean.TRUE)) {
           continue;
         }
         StatusMessage status = bp.getStatus();

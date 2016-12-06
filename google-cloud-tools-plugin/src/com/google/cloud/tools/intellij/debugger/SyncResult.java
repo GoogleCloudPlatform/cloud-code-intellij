@@ -59,7 +59,6 @@ public class SyncResult {
     return targetLocalRepository != null;
   }
 
-  @Nullable
   public boolean hasRemoteRepository() {
     return hasRemoteRepository;
   }

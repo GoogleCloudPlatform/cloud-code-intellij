@@ -41,10 +41,12 @@ public class AppEngineServerIntegration extends AppServerIntegration {
     serverHelper = new AppEngineServerHelper();
   }
 
+  @Override
   public Icon getIcon() {
     return GoogleCloudToolsIcons.APP_ENGINE;
   }
 
+  @Override
   public String getPresentableName() {
     return "Google App Engine Dev Server";
   }

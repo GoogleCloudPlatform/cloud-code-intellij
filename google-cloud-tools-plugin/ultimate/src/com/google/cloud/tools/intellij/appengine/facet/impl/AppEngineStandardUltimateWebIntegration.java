@@ -81,6 +81,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     return JavaeeArtifactUtil.getInstance().getExplodedEarArtifactType();
   }
 
+  @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(@NotNull Module module,
       @NotNull ModifiableRootModel rootModel) {
     final WebFacet webFacet = ContainerUtil.getFirstItem(WebFacet.getInstances(module));
@@ -101,6 +102,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     return webXml.getParent();
   }
 
+  @Override
   public void setupJpaSupport(@NotNull Module module, @NotNull VirtualFile persistenceXml) {
     JpaFacet facet = FacetManager.getInstance(module).getFacetByType(JpaFacet.ID);
     if (facet == null) {
@@ -111,6 +113,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     }
   }
 
+  @Override
   public void setupRunConfigurations(Artifact artifact, @NotNull Project project,
       ModuleRunConfiguration existingConfiguration) {
     super.setupRunConfigurations(artifact, project, existingConfiguration);
@@ -160,6 +163,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     WebArtifactUtil.getInstance().addLibrary(library, artifact, project);
   }
 
+  @Override
   public void setupDevServer() {
     getOrCreateAppServer();
   }

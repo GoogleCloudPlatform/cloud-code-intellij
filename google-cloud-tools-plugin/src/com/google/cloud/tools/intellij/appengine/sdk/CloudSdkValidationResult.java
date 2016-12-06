@@ -33,8 +33,8 @@ public enum CloudSdkValidationResult {
       GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
           + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"), false);
 
-  private String message;
-  private boolean isError;
+  private final String message;
+  private final boolean isError;
 
   CloudSdkValidationResult(String message, boolean isError) {
     this.message = message;

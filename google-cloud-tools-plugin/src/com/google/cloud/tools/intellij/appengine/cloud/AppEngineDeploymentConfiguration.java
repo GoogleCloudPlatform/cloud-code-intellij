@@ -34,7 +34,7 @@ public class AppEngineDeploymentConfiguration extends
     AUTO("appengine.flex.configtype.auto.label"),
     CUSTOM("appengine.flex.configtype.custom.label");
 
-    private String label;
+    private final String label;
 
     ConfigType(String label) {
       this.label = label;

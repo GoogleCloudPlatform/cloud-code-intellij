@@ -210,6 +210,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     final LibraryTable libraryTable = ProjectLibraryTable.getInstance(module.getProject());
 
     ApplicationManager.getApplication().invokeLater(new Runnable() {
+      @Override
       public void run() {
         new WriteAction() {
           @Override
@@ -270,9 +271,11 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       model.addFrameworkListener(this);
     }
 
+    @Override
     public void frameworkSelected(@NotNull FrameworkSupportProvider provider) {
     }
 
+    @Override
     public void frameworkUnselected(@NotNull FrameworkSupportProvider provider) {
     }
 
@@ -324,7 +327,6 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       this.appEngineStandardLibraryPanel = appEngineStandardLibraryPanel;
     }
 
-    @SuppressWarnings("checkstyle:abbreviationaswordinname")
     private void createUIComponents() {
       cloudSdkPanel = new CloudSdkPanel();
       appEngineStandardLibraryPanel = new AppEngineStandardLibraryPanel(true /*enabled*/);

@@ -270,7 +270,6 @@ public class BreakpointConfigurationPanel
     return null;
   }
 
-  @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
     watchPanel = new MyPanel();
   }
