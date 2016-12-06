@@ -34,8 +34,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
