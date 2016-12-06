@@ -55,4 +55,6 @@ public class GctTracking {
       "appengine.oldplugin.notification.link.click";
   public static final String APP_ENGINE_OLD_PLUGIN_DEACTIVATED =
       "appengine.oldplugin.deactivated";
+
+  public static final String CLOUD_SDK_MALFORMED_PATH = "cloudsdk.malformedpath";
 }
