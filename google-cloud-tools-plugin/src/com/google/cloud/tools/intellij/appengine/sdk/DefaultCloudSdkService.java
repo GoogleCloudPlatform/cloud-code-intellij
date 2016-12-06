@@ -21,9 +21,7 @@ import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
-import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
-import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
-import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
@@ -65,7 +63,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
-  private static final String CLOUD_SDK_REQUIRED_VERSION_KEY = "cloudsdk.min.version";
   private static final Path JAVA_TOOLS_RELATIVE_PATH
       = Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
 
@@ -74,14 +71,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
       = Paths.get("lib", "appengine-tools-api.jar");
 
   private Map<String, Set<String>> myMethodsBlackList;
-
-  /**
-   * Return the minimum version of the Cloud SDK that is supported by this plugin.
-   */
-  public static CloudSdkVersion getMinimumRequiredCloudSdkVersion() {
-    String version = new PropertiesFileFlagReader().getFlagString(CLOUD_SDK_REQUIRED_VERSION_KEY);
-    return new CloudSdkVersion(version);
-  }
 
   @Nullable
   @Override
@@ -115,6 +104,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
     if (path == null) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+      // If the Cloud SDK is not found, don't bother checking anything else
       return validationResults;
     }
 
@@ -123,10 +113,9 @@ public class DefaultCloudSdkService extends CloudSdkService {
       sdk.validateCloudSdk();
     } catch (CloudSdkNotFoundException exception) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+      // If the Cloud SDK is not found, don't bother checking anything else
       return validationResults;
-    }
-
-    if (!isCloudSdkVersionSupported(sdk)) {
+    } catch (CloudSdkOutOfDateException exception) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
     }
 
@@ -213,21 +202,6 @@ public class DefaultCloudSdkService extends CloudSdkService {
         vmParameters.add("-Xbootclasspath/p:" + patchPath.getAbsolutePath());
       }
     }
-  }
-
-  private boolean isCloudSdkVersionSupported(CloudSdk sdk) {
-    sdk.validateCloudSdk();
-
-    CloudSdkVersion requiredVersion = getMinimumRequiredCloudSdkVersion();
-    CloudSdkVersion actualVersion;
-    try {
-      actualVersion = sdk.getVersion();
-    } catch (ProcessRunnerException exception) {
-      logger.warn("Exception encountered when calling the cloud SDK", exception);
-      return false;
-    }
-
-    return actualVersion.compareTo(requiredVersion) >= 0;
   }
 
   private Map<String, Set<String>> loadBlackList() throws IOException {
