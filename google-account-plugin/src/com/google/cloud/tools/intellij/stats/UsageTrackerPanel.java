@@ -61,14 +61,17 @@ public class UsageTrackerPanel {
     }
 
     privacyPolicyText.addMouseListener(new MouseAdapter() {
+      @Override
       public void mouseEntered(MouseEvent me) {
         privacyPolicyText.setCursor(new Cursor(Cursor.HAND_CURSOR));
       }
 
+      @Override
       public void mouseExited(MouseEvent me) {
         privacyPolicyText.setCursor(Cursor.getDefaultCursor());
       }
 
+      @Override
       public void mouseClicked(MouseEvent me) {
         try {
           BrowserUtil.browse(new URL(PRIVACY_POLICY_URL));
