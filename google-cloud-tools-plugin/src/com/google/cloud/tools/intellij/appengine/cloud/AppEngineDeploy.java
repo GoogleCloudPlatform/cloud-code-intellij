@@ -208,7 +208,6 @@ public class AppEngineDeploy {
    * Holds de-serialized JSON output of gcloud app deploy. Don't change the field names
    * because Gson uses it for automatic de-serialization.
    */
-  @SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Initialized by Gson")
   static class DeployOutput {
     private static class Version {
       String id;
