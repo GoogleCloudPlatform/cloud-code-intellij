@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-  ~ Copyright (C) 2016 The Android Open Source Project
+  ~ Copyright 2016 Google Inc. All Rights Reserved.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@
 
     <property name="severity" value="warning"/>
 
-    <property name="fileExtensions" value="java, properties, xml"/>
+    <property name="fileExtensions" value="properties, xml"/>
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
     <module name="FileTabCharacter">
