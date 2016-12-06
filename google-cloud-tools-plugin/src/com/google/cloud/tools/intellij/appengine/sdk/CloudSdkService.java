@@ -64,11 +64,11 @@ public abstract class CloudSdkService {
       return ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     }
 
-    try {
-      return validateCloudSdk(Paths.get(path));
-    } catch (InvalidPathException ipe) {
+    if (isMalformedCloudSdkPath(path)) {
       return ImmutableSet.of(CloudSdkValidationResult.MALFORMED_PATH);
     }
+
+    return validateCloudSdk(Paths.get(path));
   }
 
   /**
@@ -83,6 +83,20 @@ public abstract class CloudSdkService {
    */
   public boolean isValidCloudSdk() {
     return validateCloudSdk(getSdkHomePath()).isEmpty();
+  }
+
+  /**
+   * Checks for invalid characters that trigger an {@link InvalidPathException} on Windows.
+   */
+  public boolean isMalformedCloudSdkPath(@Nullable String sdkPath) {
+    if (sdkPath != null) {
+      try {
+        Paths.get(sdkPath);
+      } catch (InvalidPathException ipe) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Nullable

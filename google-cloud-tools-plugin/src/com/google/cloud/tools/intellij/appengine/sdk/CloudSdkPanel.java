@@ -86,34 +86,42 @@ public class CloudSdkPanel {
 
   @VisibleForTesting
   protected void checkSdk(String path) {
+    String message = buildSdkMessage(path, true /*htmlEnabled*/);
+
+    if (!StringUtil.isEmpty(message)) {
+      showWarning(message);
+    } else {
+      hideWarning();
+    }
+  }
+
+  public String buildSdkMessage(String path, boolean htmlEnabled) {
     if (StringUtil.isEmpty(path)) {
-      String warningText = GctBundle.message("appengine.cloudsdk.location.missing.message")
-          + " " + getCloudSdkDownloadMessage();
-      showWarning(warningText , false /* setSdkDirectoryErrorState */);
-      return;
+      String missingMessage = GctBundle.message("appengine.cloudsdk.location.missing.message");
+
+      return htmlEnabled
+          ? missingMessage + " " + getCloudSdkDownloadMessage()
+          : missingMessage;
     }
 
     CloudSdkService sdkService = CloudSdkService.getInstance();
+    // Use a sorted set to guarantee consistent ordering of CloudSdkValidationResults.
+    Set<CloudSdkValidationResult> validationResults =
+        new TreeSet<>(sdkService.validateCloudSdk(path));
 
-    if (sdkService.isValidCloudSdk(path)) {
-      hideWarning();
-    } else {
-      // Use a sorted set to guarantee consistent ordering of CloudSdkValidationResults.
-      Set<CloudSdkValidationResult> validationResults =
-          new TreeSet<>(sdkService.validateCloudSdk(path));
-
+    if (!validationResults.isEmpty()) {
       // Display all validation results as a list.
       StringBuilder builder = new StringBuilder();
-      boolean containsErrors = false;
 
       boolean isFirst = true;
       for (CloudSdkValidationResult validationResult : validationResults) {
-        containsErrors |= validationResult.isError();
 
         String message;
         if (validationResult == CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND) {
           // If the cloud sdk is not found, provide a download URL.
-          message = validationResult.getMessage() + " " + getCloudSdkDownloadMessage();
+          message = htmlEnabled
+              ? validationResult.getMessage() + " " + getCloudSdkDownloadMessage()
+              : validationResult.getMessage();
         } else {
           // Otherwise, just use the existing message.
           message = validationResult.getMessage();
@@ -127,22 +135,21 @@ public class CloudSdkPanel {
         isFirst = false;
       }
 
-      showWarning(builder.toString(), containsErrors);
+      return builder.toString();
     }
+
+    return null;
   }
 
   @VisibleForTesting
-  protected void showWarning(final String message, final boolean setSdkDirectoryErrorState) {
+  protected void showWarning(final String message) {
     invokePanelValidationUpdate(new Runnable() {
       @Override
       public void run() {
         warningMessage.setText(message);
         warningMessage.setVisible(true);
-        warningMessage.updateUI();
         warningIcon.setVisible(true);
-        if (setSdkDirectoryErrorState) {
-          cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
-        }
+        cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
       }
     });
   }
@@ -154,16 +161,13 @@ public class CloudSdkPanel {
       public void run() {
         cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
         warningIcon.setVisible(false);
-        warningIcon.setVisible(false);
         warningMessage.setVisible(false);
-        cloudSdkPanel.updateUI();
       }
     });
   }
 
   private void invokePanelValidationUpdate(Runnable runnable) {
-    ApplicationManager.getApplication().invokeLater(runnable,
-        ModalityState.stateForComponent(cloudSdkPanel));
+    ApplicationManager.getApplication().invokeLater(runnable, ModalityState.any());
   }
 
   @VisibleForTesting

@@ -22,6 +22,8 @@ import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInsta
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.configurations.ParametersList;
@@ -73,13 +75,13 @@ public class DefaultCloudSdkService extends CloudSdkService {
   @Nullable
   @Override
   public Path getSdkHomePath() {
-    // For Windows users that persisted the old malformed path.
-    if (validateCloudSdk(propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY))
-        .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
-      return null;
-    }
-
     if (propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY) != null) {
+      // To let Windows users that persisted the old malformed path save a new one.
+      // TODO(joaomartins): Delete this after a while so gets are faster.
+      if (isMalformedCloudSdkPath(propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY))) {
+        UsageTrackerProvider.getInstance().trackEvent(GctTracking.CLOUD_SDK_MALFORMED_PATH).ping();
+        return null;
+      }
       return Paths.get(propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY));
     }
 
