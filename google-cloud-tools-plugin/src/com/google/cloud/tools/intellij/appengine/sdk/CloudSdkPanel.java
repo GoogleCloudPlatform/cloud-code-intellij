@@ -167,7 +167,7 @@ public class CloudSdkPanel {
   }
 
   private void invokePanelValidationUpdate(Runnable runnable) {
-    ApplicationManager.getApplication().invokeLater(runnable, ModalityState.current());
+    ApplicationManager.getApplication().invokeLater(runnable, ModalityState.any());
   }
 
   @VisibleForTesting
