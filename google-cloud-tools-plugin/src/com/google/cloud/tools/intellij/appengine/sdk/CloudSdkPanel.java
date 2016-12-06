@@ -75,8 +75,6 @@ public class CloudSdkPanel {
             checkSdkInBackground();
           }
         });
-
-    checkSdkInBackground();
   }
 
   private void checkSdkInBackground() {
