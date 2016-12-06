@@ -20,6 +20,7 @@ buildscript {
     }
     dependencies {
         classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.0.43'
+        classpath "com.diffplug.gradle.spotless:spotless:2.4.0"
     }
 }
 
@@ -118,7 +119,7 @@ subprojects {
         sourceSets = [sourceSets.main]
         // Don't use the default ruleset but use a custom ruleset to exclude some PMD rules.
         ruleSets = []
-        ruleSetFiles = rootProject.files('custom-pmd-ruleset.xml');
+        ruleSetFiles = rootProject.files('custom-pmd-ruleset.xml')
     }
 
     apply plugin: 'jdepend'
@@ -128,6 +129,13 @@ subprojects {
             force "jdepend:jdepend:${project.jdepend.toolVersion}"
         }
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
+    apply plugin: "com.diffplug.gradle.spotless"
+    spotless {
+        java {
+            googleJavaFormat()
+        }
     }
 
     apply plugin: 'checkstyle'
