@@ -148,7 +148,6 @@ public class CloudSdkPanel {
       public void run() {
         warningMessage.setText(message);
         warningMessage.setVisible(true);
-        warningMessage.updateUI();
         warningIcon.setVisible(true);
         cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
       }
@@ -162,16 +161,13 @@ public class CloudSdkPanel {
       public void run() {
         cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
         warningIcon.setVisible(false);
-        warningIcon.setVisible(false);
         warningMessage.setVisible(false);
-        cloudSdkPanel.updateUI();
       }
     });
   }
 
   private void invokePanelValidationUpdate(Runnable runnable) {
-    ApplicationManager.getApplication().invokeLater(runnable,
-        ModalityState.stateForComponent(cloudSdkPanel));
+    ApplicationManager.getApplication().invokeLater(runnable, ModalityState.any());
   }
 
   @VisibleForTesting
