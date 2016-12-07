@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,14 +41,36 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Google Usage Tracker that reports to Cloud Tools Analytics backend.
- */
+/** Google Usage Tracker that reports to Cloud Tools Analytics backend. */
 public class GoogleUsageTracker implements UsageTracker, SendsEvents {
 
   private static final Logger logger = Logger.getInstance(GoogleUsageTracker.class);
 
   private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
+  private static final String PROTOCOL_VERSION_KEY = "v";
+  private static final String UNIQUE_CLIENT_ID_KEY = "cid";
+  private static final String IS_NON_INTERACTIVE_KEY = "ni";
+  private static final String HIT_TYPE_KEY = "t";
+  private static final String PAGE_VIEW_VALUE = "pageview";
+  private static final String PROPERTY_ID_KEY = "tid";
+  private static final String EVENT_TYPE_KEY = "cd19";
+  private static final String EVENT_NAME_KEY = "cd20";
+  private static final String IS_INTERNAL_USER_KEY = "cd16";
+  private static final String IS_USER_SIGNED_IN_KEY = "cd17";
+  private static final String PAGE_URL_KEY = "dp";
+  private static final String IS_VIRTUAL_KEY = "cd21";
+  private static final String PAGE_TITLE_KEY = "dt";
+  private static final String STRING_FALSE_VALUE = "0";
+  private static final String STRING_TRUE_VALUE = "1";
+  private static final ImmutableList<BasicNameValuePair> ANALYTICS_BASE_DATA =
+      ImmutableList.of(
+          new BasicNameValuePair(PROTOCOL_VERSION_KEY, "1"),
+          // Apparently the hit type should always be of type 'pageview'.
+          new BasicNameValuePair(HIT_TYPE_KEY, PAGE_VIEW_VALUE),
+          new BasicNameValuePair(IS_NON_INTERACTIVE_KEY, STRING_FALSE_VALUE),
+          new BasicNameValuePair(
+              UNIQUE_CLIENT_ID_KEY,
+              UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
 
   private final String analyticsId;
   private String externalPluginName;
@@ -66,17 +88,9 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
     userAgent = pluginInfo.getUserAgent();
   }
 
-  private static final List<BasicNameValuePair> analyticsBaseData = ImmutableList
-      .of(new BasicNameValuePair("v", "1"),         // Protocol version
-          new BasicNameValuePair("t", "pageview"),  // Note the "pageview" type, not "event"
-          new BasicNameValuePair("ni", "0"),        // Non-interactive? Report as interactive.
-          new BasicNameValuePair("cid",             // UUID for this IntelliJ client
-              UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
-
-  /**
-   * Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property.
-   */
-  public void sendEvent(@NotNull String eventCategory,
+  /** Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property. */
+  public void sendEvent(
+      @NotNull String eventCategory,
       @NotNull String eventAction,
       @Nullable String eventLabel,
       @Nullable Integer eventValue) {
@@ -87,21 +101,22 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         // https://github.com/google/cloud-reporting/blob/master/src/main/java/com/google/cloud/metrics/MetricsUtils.java#L183
         // https://developers.google.com/analytics/devguides/collection/protocol/v1/reference
 
-        List<BasicNameValuePair> postData = Lists.newArrayList(analyticsBaseData);
-        postData.add(new BasicNameValuePair("tid", analyticsId));
-        postData.add(new BasicNameValuePair("cd19", eventCategory));  // Event type
-        postData.add(new BasicNameValuePair("cd20", eventAction));  // Event name
-        postData.add(new BasicNameValuePair("cd16", "0"));  // Internal user? No.
-        postData.add(new BasicNameValuePair("cd17", "0"));  // User signed in? We will ignore this.
+        List<BasicNameValuePair> postData = Lists.newArrayList(ANALYTICS_BASE_DATA);
+        postData.add(new BasicNameValuePair(PROPERTY_ID_KEY, analyticsId));
+        postData.add(new BasicNameValuePair(EVENT_TYPE_KEY, eventCategory));
+        postData.add(new BasicNameValuePair(EVENT_NAME_KEY, eventAction));
+        postData.add(new BasicNameValuePair(IS_INTERNAL_USER_KEY, STRING_FALSE_VALUE));
+        postData.add(new BasicNameValuePair(IS_USER_SIGNED_IN_KEY, STRING_FALSE_VALUE));
 
         // Virtual page information
         String virtualPageUrl = "/virtual/" + eventCategory + "/" + eventAction;
-        postData.add(new BasicNameValuePair("dp", virtualPageUrl));
-        postData.add(new BasicNameValuePair("cd21", "1"));  // Yes, this ping is a virtual "page".
+        postData.add(new BasicNameValuePair(PAGE_URL_KEY, virtualPageUrl));
+        // I think 'virtual' indicates these don't correspond to real web pages.
+        postData.add(new BasicNameValuePair(IS_VIRTUAL_KEY, STRING_TRUE_VALUE));
         if (eventLabel != null) {
           // Event metadata are passed as a (virtual) page title.
           String virtualPageTitle = eventLabel + "=" + (eventValue != null ? eventValue : "null");
-          postData.add(new BasicNameValuePair("dt", virtualPageTitle));
+          postData.add(new BasicNameValuePair(PAGE_TITLE_KEY, virtualPageTitle));
         }
 
         sendPing(postData);
@@ -115,27 +130,31 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   }
 
   private void sendPing(@NotNull final List<? extends NameValuePair> postData) {
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      public void run() {
-        CloseableHttpClient client = HttpClientBuilder.create().setUserAgent(userAgent).build();
-        HttpPost request = new HttpPost(ANALYTICS_URL);
+    ApplicationManager.getApplication()
+        .executeOnPooledThread(
+            new Runnable() {
+              public void run() {
+                CloseableHttpClient client =
+                    HttpClientBuilder.create().setUserAgent(userAgent).build();
+                HttpPost request = new HttpPost(ANALYTICS_URL);
 
-        try {
-          request.setEntity(new UrlEncodedFormEntity(postData));
-          CloseableHttpResponse response = client.execute(request);
-          StatusLine status = response.getStatusLine();
-          if (status.getStatusCode() >= 300) {
-            logger.debug("Non 200 status code : " + status.getStatusCode() + " - " + status
-                .getReasonPhrase());
-          }
-        } catch (IOException ex) {
-          logger.debug("IOException during Analytics Ping", ex.getMessage());
-        } finally {
-          HttpClientUtils.closeQuietly(client);
-        }
-
-      }
-    });
+                try {
+                  request.setEntity(new UrlEncodedFormEntity(postData));
+                  CloseableHttpResponse response = client.execute(request);
+                  StatusLine status = response.getStatusLine();
+                  if (status.getStatusCode() >= 300) {
+                    logger.debug(
+                        "Non 200 status code : "
+                            + status.getStatusCode()
+                            + " - "
+                            + status.getReasonPhrase());
+                  }
+                } catch (IOException ex) {
+                  logger.debug("IOException during Analytics Ping", ex.getMessage());
+                } finally {
+                  HttpClientUtils.closeQuietly(client);
+                }
+              }
+            });
   }
-
 }
