@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <option name="DEFAULT_COMPILER" value="error-prone" />
     <resourceExtensions />
     <wildcardResourcePatterns>
       <entry name="!?*.java" />
@@ -13,17 +12,10 @@
       <entry name="!?*.kt" />
       <entry name="!?*.clj" />
     </wildcardResourcePatterns>
-    <bytecodeTargetLevel>
-      <module name="common-lib_main" target="1.7" />
-      <module name="common-lib_test" target="1.7" />
-      <module name="common-test-lib_main" target="1.7" />
-      <module name="common-test-lib_test" target="1.7" />
-      <module name="google-account-plugin_main" target="1.7" />
-      <module name="google-account-plugin_test" target="1.7" />
-      <module name="google-cloud-tools-plugin_main" target="1.7" />
-      <module name="google-cloud-tools-plugin_test" target="1.7" />
-      <module name="ultimate_main" target="1.7" />
-      <module name="ultimate_test" target="1.7" />
-    </bytecodeTargetLevel>
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+    </annotationProcessing>
   </component>
 </project>
