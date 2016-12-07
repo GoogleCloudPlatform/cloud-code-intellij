@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 ## [unreleased]
 
-## [16.11.3]
+## [16.11.4]
 
 ### Added
 - Expanded Google Cloud Tools menu item with various action shortcuts. ([#1061](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1061)).
