@@ -100,9 +100,6 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private final String analyticsId;
   private final String externalPluginName;
   private final String userAgent;
-  private final String intellijPlatformName;
-  private final String intellijPlatformVersion;
-  private final String cloudToolsPluginVersion;
   private StringBuilder metadataStringBuilder = new StringBuilder();
 
   /**
@@ -115,9 +112,9 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
     AccountPluginInfoService pluginInfo = ServiceManager.getService(AccountPluginInfoService.class);
     externalPluginName = pluginInfo.getExternalPluginName();
     userAgent = pluginInfo.getUserAgent();
-    intellijPlatformName = PlatformUtils.getPlatformPrefix();
-    intellijPlatformVersion = ApplicationInfo.getInstance().getStrictVersion();
-    cloudToolsPluginVersion = pluginInfo.getPluginVersion();
+    String intellijPlatformName = PlatformUtils.getPlatformPrefix();
+    String intellijPlatformVersion = ApplicationInfo.getInstance().getStrictVersion();
+    String cloudToolsPluginVersion = pluginInfo.getPluginVersion();
     Map<String, String> systemMetaDataMap =
         ImmutableMap.of(
             PLATFORM_NAME_KEY, METADATA_ESCAPER.escape(intellijPlatformName),
