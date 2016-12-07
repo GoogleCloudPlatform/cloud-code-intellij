@@ -62,7 +62,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private static final String PAGE_TITLE_KEY = "dt";
   private static final String STRING_FALSE_VALUE = "0";
   private static final String STRING_TRUE_VALUE = "1";
-  private static final List<BasicNameValuePair> analyticsBaseData =
+  private static final ImmutableList<BasicNameValuePair> ANALYTICS_BASE_DATA =
       ImmutableList.of(
           new BasicNameValuePair(PROTOCOL_VERSION_KEY, STRING_TRUE_VALUE),
           // Apparently the page type should always be of type 'pageview'.
@@ -71,6 +71,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           new BasicNameValuePair(
               UNIQUE_CLIENT_ID_KEY,
               UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
+
   private final String analyticsId;
   private String externalPluginName;
   private String userAgent;
@@ -100,7 +101,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         // https://github.com/google/cloud-reporting/blob/master/src/main/java/com/google/cloud/metrics/MetricsUtils.java#L183
         // https://developers.google.com/analytics/devguides/collection/protocol/v1/reference
 
-        List<BasicNameValuePair> postData = Lists.newArrayList(analyticsBaseData);
+        List<BasicNameValuePair> postData = Lists.newArrayList(ANALYTICS_BASE_DATA);
         postData.add(new BasicNameValuePair(PROPERTY_ID_KEY, analyticsId));
         postData.add(new BasicNameValuePair(EVENT_TYPE_KEY, eventCategory));
         postData.add(new BasicNameValuePair(EVENT_NAME_KEY, eventAction));
