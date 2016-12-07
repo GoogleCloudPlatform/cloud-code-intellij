@@ -158,8 +158,6 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           eventMetaDataMap.put(METADATA_ESCAPER.escape(eventLabel), eventValue);
           fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(eventMetaDataMap);
         }
-        // Event metadata are passed as a (virtual) page title.
-        System.out.println(fullMetadataString);
         postData.add(new BasicNameValuePair(PAGE_TITLE_KEY, fullMetadataString));
         sendPing(postData);
       }
