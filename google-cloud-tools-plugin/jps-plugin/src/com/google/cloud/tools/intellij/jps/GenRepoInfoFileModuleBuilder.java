@@ -57,10 +57,10 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       + "Settings -> Google -> Cloud SDK, and specify a valid Cloud SDK location.";
   private static final String ERROR_OCCURRED = "gcloud beta debug source gen-repo-info-file "
       + "command returned with status code ";
-  private GenRepoInfoFileActionFactory actionFactory = new GenRepoInfoFileActionFactory();
+  private GenRepoInfoFileActionFactory actionFactory;
 
   public GenRepoInfoFileModuleBuilder() {
-    super(BuilderCategory.CLASS_POST_PROCESSOR);
+    this(new GenRepoInfoFileActionFactory());
   }
 
   @VisibleForTesting
