@@ -17,14 +17,21 @@
 package com.google.cloud.tools.intellij.stats;
 
 import com.google.cloud.tools.intellij.AccountPluginInfoService;
+import com.google.common.base.Joiner;
+import com.google.common.base.Joiner.MapJoiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.updateSettings.impl.UpdateChecker;
+import com.intellij.openapi.util.SystemInfo;
+import com.intellij.util.PlatformUtils;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -40,12 +47,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /** Google Usage Tracker that reports to Cloud Tools Analytics backend. */
 public class GoogleUsageTracker implements UsageTracker, SendsEvents {
 
+  private static final MapJoiner METADATA_JOINER =
+      Joiner.on(',').useForNull("null").withKeyValueSeparator("=");
   private static final Logger logger = Logger.getInstance(GoogleUsageTracker.class);
-
   private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
   private static final String PROTOCOL_VERSION_KEY = "v";
   private static final String UNIQUE_CLIENT_ID_KEY = "cid";
@@ -62,6 +71,15 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private static final String PAGE_TITLE_KEY = "dt";
   private static final String STRING_FALSE_VALUE = "0";
   private static final String STRING_TRUE_VALUE = "1";
+  // Our plugin metadata keys.
+  private static final String PLATFORM_NAME_KEY = "applicationName";
+  private static final String PLATFORM_VERSION_KEY = "applicationVersion";
+  private static final String JDK_VERSION_KEY = "jdkVersion";
+  private static final String OPERATING_SYSTEM_KEY = "operationSystem";
+  private static final String PLUGIN_VERSION_KEY = "pluginVersion";
+  // Our plugin metadata constant values.
+  private static final String OPERATING_SYSTEM_VALUE = SystemInfo.OS_NAME + SystemInfo.OS_VERSION;
+  private static final String JDK_VERSION_VALUE = SystemInfo.JAVA_VERSION;
   private static final ImmutableList<BasicNameValuePair> ANALYTICS_BASE_DATA =
       ImmutableList.of(
           new BasicNameValuePair(PROTOCOL_VERSION_KEY, "1"),
@@ -71,10 +89,13 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           new BasicNameValuePair(
               UNIQUE_CLIENT_ID_KEY,
               UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
-
   private final String analyticsId;
-  private String externalPluginName;
-  private String userAgent;
+  private final String externalPluginName;
+  private final String userAgent;
+  private final String intellijPlatformName;
+  private final String intellijPlatformVersion;
+  private final String cloudToolsPluginVersion;
+  private StringBuilder metadataStringBuilder = new StringBuilder();
 
   /**
    * Constructs a usage tracker configured with analytics and plugin name configured from its
@@ -86,6 +107,18 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
     AccountPluginInfoService pluginInfo = ServiceManager.getService(AccountPluginInfoService.class);
     externalPluginName = pluginInfo.getExternalPluginName();
     userAgent = pluginInfo.getUserAgent();
+    intellijPlatformName = PlatformUtils.getPlatformPrefix();
+    intellijPlatformVersion = ApplicationInfo.getInstance().getStrictVersion();
+    cloudToolsPluginVersion = pluginInfo.getPluginVersion();
+    Map<String, String> systemMetaDataMap =
+        ImmutableMap.of(
+            PLATFORM_NAME_KEY, intellijPlatformName,
+            PLATFORM_VERSION_KEY, intellijPlatformVersion,
+            JDK_VERSION_KEY, JDK_VERSION_VALUE,
+            OPERATING_SYSTEM_KEY, OPERATING_SYSTEM_VALUE,
+            PLUGIN_VERSION_KEY, cloudToolsPluginVersion);
+
+    metadataStringBuilder = METADATA_JOINER.appendTo(metadataStringBuilder, systemMetaDataMap);
   }
 
   /** Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property. */
@@ -114,11 +147,16 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         // I think 'virtual' indicates these don't correspond to real web pages.
         postData.add(new BasicNameValuePair(IS_VIRTUAL_KEY, STRING_TRUE_VALUE));
         if (eventLabel != null) {
-          // Event metadata are passed as a (virtual) page title.
-          String virtualPageTitle = eventLabel + "=" + (eventValue != null ? eventValue : "null");
-          postData.add(new BasicNameValuePair(PAGE_TITLE_KEY, virtualPageTitle));
+          Map<String, Integer> eventMetaDataMap = Maps.newHashMap();
+          eventMetaDataMap.put(eventLabel, eventValue);
+          metadataStringBuilder =
+              METADATA_JOINER.appendTo(
+                  // I feel like I shouldn't have to do the ',' append here but for some reason
+                  // I do.  Bug?
+                  metadataStringBuilder.append(','), eventMetaDataMap);
         }
-
+        // Event metadata are passed as a (virtual) page title.
+        postData.add(new BasicNameValuePair(PAGE_TITLE_KEY, metadataStringBuilder.toString()));
         sendPing(postData);
       }
     }
