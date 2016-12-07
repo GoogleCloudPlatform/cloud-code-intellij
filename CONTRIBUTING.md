@@ -73,13 +73,16 @@ Other useful targets while developing include:
    If you're a Googler or other corporate contributor, 
    use your corporate email address here, not your personal address.
 1. Read the [Google Java Style Guide](http://google.github.io/styleguide/javaguide.html)
-1. Install the [Google-java-style IntelliJ plugin](https://github.com/google/google-java-format)
-    1. Make sure to run Code -> Reformat with google-java-format at the beginning of every IDE 
-    session.
-    1. Configure the IDE to automatically reformat your code and optimize imports.
-        1. Hint - you can do this by configuring it to do so on git push. 
-    1. If you're not using IntelliJ you can run reformat from the command line using 
-    `gradlew googleJavaFormat`.
+1. Setup IntelliJ IDEA
+    1. Install the [error-prone plugin](http://errorprone.info/docs/installation) from the plugin
+     repo and configure your project compiler to use it.
+    1. Install the [Google-java-style IntelliJ plugin](https://github.com/google/google-java-format)
+        1. Make sure to run Code -> Reformat with google-java-format at the beginning of every IDE 
+        session.
+        1. Configure the IDE to automatically reformat your code and optimize imports.
+            1. Hint - you can do this by configuring it to do so on git push. 
+        1. If you're not using IntelliJ you can run reformat from the command line using 
+        `gradlew googleJavaFormat`.
 1. Fork the repository into your own Github account.
 1. Please include unit tests for all new code. (Yes, we know not all
    existing code has tests. We're slowly fixing that, and contributions of tests
