@@ -49,14 +49,14 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
   private static final String PROTOCOL_VERSION_KEY = "v";
   private static final String UNIQUE_CLIENT_ID_KEY = "cid";
-  private static final String NON_INTERACTIVE_KEY = "ni";
+  private static final String IS_NON_INTERACTIVE_KEY = "ni";
   private static final String PAGE_TYPE_KEY = "t";
   private static final String PAGE_VIEW_VALUE = "pageview";
   private static final String PROPERTY_ID_KEY = "tid";
   private static final String EVENT_TYPE_KEY = "cd19";
   private static final String EVENT_NAME_KEY = "cd20";
-  private static final String INTERNAL_USER_KEY = "cd16";
-  private static final String USER_SIGNED_IN_KEY = "cd17";
+  private static final String IS_INTERNAL_USER_KEY = "cd16";
+  private static final String IS_USER_SIGNED_IN_KEY = "cd17";
   private static final String PAGE_URL_KEY = "dp";
   private static final String IS_VIRTUAL_KEY = "cd21";
   private static final String PAGE_TITLE_KEY = "dt";
@@ -64,10 +64,10 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private static final String STRING_TRUE_VALUE = "1";
   private static final ImmutableList<BasicNameValuePair> ANALYTICS_BASE_DATA =
       ImmutableList.of(
-          new BasicNameValuePair(PROTOCOL_VERSION_KEY, STRING_TRUE_VALUE),
+          new BasicNameValuePair(PROTOCOL_VERSION_KEY, "1"),
           // Apparently the page type should always be of type 'pageview'.
           new BasicNameValuePair(PAGE_TYPE_KEY, PAGE_VIEW_VALUE),
-          new BasicNameValuePair(NON_INTERACTIVE_KEY, STRING_FALSE_VALUE),
+          new BasicNameValuePair(IS_NON_INTERACTIVE_KEY, STRING_FALSE_VALUE),
           new BasicNameValuePair(
               UNIQUE_CLIENT_ID_KEY,
               UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
@@ -105,8 +105,8 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         postData.add(new BasicNameValuePair(PROPERTY_ID_KEY, analyticsId));
         postData.add(new BasicNameValuePair(EVENT_TYPE_KEY, eventCategory));
         postData.add(new BasicNameValuePair(EVENT_NAME_KEY, eventAction));
-        postData.add(new BasicNameValuePair(INTERNAL_USER_KEY, STRING_FALSE_VALUE));
-        postData.add(new BasicNameValuePair(USER_SIGNED_IN_KEY, STRING_FALSE_VALUE));
+        postData.add(new BasicNameValuePair(IS_INTERNAL_USER_KEY, STRING_FALSE_VALUE));
+        postData.add(new BasicNameValuePair(IS_USER_SIGNED_IN_KEY, STRING_FALSE_VALUE));
 
         // Virtual page information
         String virtualPageUrl = "/virtual/" + eventCategory + "/" + eventAction;
