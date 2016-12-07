@@ -2,5 +2,45 @@
 <project version="4">
   <component name="GoogleJavaFormatSettings">
     <option name="state" value="ENABLED" />
+    <option name="moduleStates">
+      <map>
+        <entry key="common-lib" value="ENABLED" />
+        <entry key="common-lib_main" value="ENABLED" />
+        <entry key="common-lib_test" value="ENABLED" />
+        <entry key="common-test-lib" value="ENABLED" />
+        <entry key="common-test-lib_main" value="ENABLED" />
+        <entry key="common-test-lib_test" value="ENABLED" />
+        <entry key="gcloud-intellij" value="ENABLED" />
+        <entry key="google-account-plugin" value="ENABLED" />
+        <entry key="google-account-plugin_main" value="ENABLED" />
+        <entry key="google-account-plugin_test" value="ENABLED" />
+        <entry key="google-cloud-tools-plugin" value="ENABLED" />
+        <entry key="google-cloud-tools-plugin_main" value="ENABLED" />
+        <entry key="google-cloud-tools-plugin_test" value="ENABLED" />
+        <entry key="ultimate" value="ENABLED" />
+        <entry key="ultimate_main" value="ENABLED" />
+        <entry key="ultimate_test" value="ENABLED" />
+      </map>
+    </option>
+    <option name="moduleStyles">
+      <map>
+        <entry key="common-lib" value="GOOGLE" />
+        <entry key="common-lib_main" value="GOOGLE" />
+        <entry key="common-lib_test" value="GOOGLE" />
+        <entry key="common-test-lib" value="GOOGLE" />
+        <entry key="common-test-lib_main" value="GOOGLE" />
+        <entry key="common-test-lib_test" value="GOOGLE" />
+        <entry key="gcloud-intellij" value="GOOGLE" />
+        <entry key="google-account-plugin" value="GOOGLE" />
+        <entry key="google-account-plugin_main" value="GOOGLE" />
+        <entry key="google-account-plugin_test" value="GOOGLE" />
+        <entry key="google-cloud-tools-plugin" value="GOOGLE" />
+        <entry key="google-cloud-tools-plugin_main" value="GOOGLE" />
+        <entry key="google-cloud-tools-plugin_test" value="GOOGLE" />
+        <entry key="ultimate" value="GOOGLE" />
+        <entry key="ultimate_main" value="GOOGLE" />
+        <entry key="ultimate_test" value="GOOGLE" />
+      </map>
+    </option>
   </component>
 </project>
