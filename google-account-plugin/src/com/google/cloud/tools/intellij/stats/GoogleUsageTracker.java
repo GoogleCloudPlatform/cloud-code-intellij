@@ -83,7 +83,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private static final String PLATFORM_NAME_KEY = "applicationName";
   private static final String PLATFORM_VERSION_KEY = "applicationVersion";
   private static final String JDK_VERSION_KEY = "jdkVersion";
-  private static final String OPERATING_SYSTEM_KEY = "operationSystem";
+  private static final String OPERATING_SYSTEM_KEY = "operatingSystem";
   private static final String PLUGIN_VERSION_KEY = "pluginVersion";
   // Our plugin metadata constant values.
   private static final String OPERATING_SYSTEM_VALUE = SystemInfo.OS_NAME + SystemInfo.OS_VERSION;
