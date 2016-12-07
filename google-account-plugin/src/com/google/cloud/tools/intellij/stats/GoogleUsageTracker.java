@@ -50,7 +50,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private static final String PROTOCOL_VERSION_KEY = "v";
   private static final String UNIQUE_CLIENT_ID_KEY = "cid";
   private static final String IS_NON_INTERACTIVE_KEY = "ni";
-  private static final String PAGE_TYPE_KEY = "t";
+  private static final String HIT_TYPE_KEY = "t";
   private static final String PAGE_VIEW_VALUE = "pageview";
   private static final String PROPERTY_ID_KEY = "tid";
   private static final String EVENT_TYPE_KEY = "cd19";
@@ -65,8 +65,8 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private static final ImmutableList<BasicNameValuePair> ANALYTICS_BASE_DATA =
       ImmutableList.of(
           new BasicNameValuePair(PROTOCOL_VERSION_KEY, "1"),
-          // Apparently the page type should always be of type 'pageview'.
-          new BasicNameValuePair(PAGE_TYPE_KEY, PAGE_VIEW_VALUE),
+          // Apparently the hit type should always be of type 'pageview'.
+          new BasicNameValuePair(HIT_TYPE_KEY, PAGE_VIEW_VALUE),
           new BasicNameValuePair(IS_NON_INTERACTIVE_KEY, STRING_FALSE_VALUE),
           new BasicNameValuePair(
               UNIQUE_CLIENT_ID_KEY,
