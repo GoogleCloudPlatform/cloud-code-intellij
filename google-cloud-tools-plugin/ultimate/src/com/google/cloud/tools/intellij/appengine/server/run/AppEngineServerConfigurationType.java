@@ -72,12 +72,19 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
 
   @Override
   public ConfigurationFactory[] getConfigurationFactories() {
+    final ConfigurationFactory configurationFactory = super.getConfigurationFactories()[0];
+
     return new ConfigurationFactory[]{
         new ConfigurationFactory(this) {
+          @Override
+          public String getName() {
+            return configurationFactory.getName();
+          }
+
           @NotNull
           @Override
           public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
-            return createJ2EEConfigurationTemplate(this, project, true /*isLocal*/);
+            return configurationFactory.createTemplateConfiguration(project);
           }
 
           /**
