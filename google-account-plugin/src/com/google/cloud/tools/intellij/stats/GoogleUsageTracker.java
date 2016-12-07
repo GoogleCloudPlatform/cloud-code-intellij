@@ -100,7 +100,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private final String analyticsId;
   private final String externalPluginName;
   private final String userAgent;
-  private StringBuilder metadataStringBuilder = new StringBuilder();
+  private final String systemMetadataKeyValues;
 
   /**
    * Constructs a usage tracker configured with analytics and plugin name configured from its
@@ -123,7 +123,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
             OPERATING_SYSTEM_KEY, METADATA_ESCAPER.escape(OPERATING_SYSTEM_VALUE),
             PLUGIN_VERSION_KEY, METADATA_ESCAPER.escape(cloudToolsPluginVersion));
 
-    metadataStringBuilder = METADATA_JOINER.appendTo(metadataStringBuilder, systemMetaDataMap);
+    systemMetadataKeyValues = METADATA_JOINER.join(systemMetaDataMap);
   }
 
   /** Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property. */
@@ -151,17 +151,16 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         postData.add(new BasicNameValuePair(PAGE_URL_KEY, virtualPageUrl));
         // I think 'virtual' indicates these don't correspond to real web pages.
         postData.add(new BasicNameValuePair(IS_VIRTUAL_KEY, STRING_TRUE_VALUE));
+        String fullMetadataString = systemMetadataKeyValues;
         if (eventLabel != null) {
+          // Not using ImmutableMap.of() because I want to handle null for values.
           Map<String, Integer> eventMetaDataMap = Maps.newHashMap();
           eventMetaDataMap.put(METADATA_ESCAPER.escape(eventLabel), eventValue);
-          metadataStringBuilder =
-              METADATA_JOINER.appendTo(
-                  // I feel like I shouldn't have to do the ',' append here but for some reason
-                  // I do.  Bug?
-                  metadataStringBuilder.append(','), eventMetaDataMap);
+          fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(eventMetaDataMap);
         }
         // Event metadata are passed as a (virtual) page title.
-        postData.add(new BasicNameValuePair(PAGE_TITLE_KEY, metadataStringBuilder.toString()));
+        System.out.println(fullMetadataString);
+        postData.add(new BasicNameValuePair(PAGE_TITLE_KEY, fullMetadataString));
         sendPing(postData);
       }
     }
