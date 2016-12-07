@@ -115,7 +115,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
     String intellijPlatformName = PlatformUtils.getPlatformPrefix();
     String intellijPlatformVersion = ApplicationInfo.getInstance().getStrictVersion();
     String cloudToolsPluginVersion = pluginInfo.getPluginVersion();
-    Map<String, String> systemMetaDataMap =
+    Map<String, String> systemMetadataMap =
         ImmutableMap.of(
             PLATFORM_NAME_KEY, METADATA_ESCAPER.escape(intellijPlatformName),
             PLATFORM_VERSION_KEY, METADATA_ESCAPER.escape(intellijPlatformVersion),
@@ -123,7 +123,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
             OPERATING_SYSTEM_KEY, METADATA_ESCAPER.escape(OPERATING_SYSTEM_VALUE),
             PLUGIN_VERSION_KEY, METADATA_ESCAPER.escape(cloudToolsPluginVersion));
 
-    systemMetadataKeyValues = METADATA_JOINER.join(systemMetaDataMap);
+    systemMetadataKeyValues = METADATA_JOINER.join(systemMetadataMap);
   }
 
   /** Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property. */
@@ -154,9 +154,9 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         String fullMetadataString = systemMetadataKeyValues;
         if (eventLabel != null) {
           // Not using ImmutableMap.of() because I want to handle null for values.
-          Map<String, Integer> eventMetaDataMap = Maps.newHashMap();
-          eventMetaDataMap.put(METADATA_ESCAPER.escape(eventLabel), eventValue);
-          fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(eventMetaDataMap);
+          Map<String, Integer> eventMetadataMap = Maps.newHashMap();
+          eventMetadataMap.put(METADATA_ESCAPER.escape(eventLabel), eventValue);
+          fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(eventMetadataMap);
         }
         postData.add(new BasicNameValuePair(PAGE_TITLE_KEY, fullMetadataString));
         sendPing(postData);
