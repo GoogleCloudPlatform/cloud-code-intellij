@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.escape.CharEscaperBuilder;
+import com.google.common.escape.Escaper;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -54,6 +56,12 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
 
   private static final MapJoiner METADATA_JOINER =
       Joiner.on(',').useForNull("null").withKeyValueSeparator("=");
+  private static final Escaper METADATA_ESCAPER =
+      new CharEscaperBuilder()
+          .addEscape(',', "\\,")
+          .addEscape('=', "\\=")
+          .addEscape('\\', "\\\\")
+          .toEscaper();
   private static final Logger logger = Logger.getInstance(GoogleUsageTracker.class);
   private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
   private static final String PROTOCOL_VERSION_KEY = "v";
@@ -112,11 +120,11 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
     cloudToolsPluginVersion = pluginInfo.getPluginVersion();
     Map<String, String> systemMetaDataMap =
         ImmutableMap.of(
-            PLATFORM_NAME_KEY, intellijPlatformName,
-            PLATFORM_VERSION_KEY, intellijPlatformVersion,
-            JDK_VERSION_KEY, JDK_VERSION_VALUE,
-            OPERATING_SYSTEM_KEY, OPERATING_SYSTEM_VALUE,
-            PLUGIN_VERSION_KEY, cloudToolsPluginVersion);
+            PLATFORM_NAME_KEY, METADATA_ESCAPER.escape(intellijPlatformName),
+            PLATFORM_VERSION_KEY, METADATA_ESCAPER.escape(intellijPlatformVersion),
+            JDK_VERSION_KEY, METADATA_ESCAPER.escape(JDK_VERSION_VALUE),
+            OPERATING_SYSTEM_KEY, METADATA_ESCAPER.escape(OPERATING_SYSTEM_VALUE),
+            PLUGIN_VERSION_KEY, METADATA_ESCAPER.escape(cloudToolsPluginVersion));
 
     metadataStringBuilder = METADATA_JOINER.appendTo(metadataStringBuilder, systemMetaDataMap);
   }
@@ -148,7 +156,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         postData.add(new BasicNameValuePair(IS_VIRTUAL_KEY, STRING_TRUE_VALUE));
         if (eventLabel != null) {
           Map<String, Integer> eventMetaDataMap = Maps.newHashMap();
-          eventMetaDataMap.put(eventLabel, eventValue);
+          eventMetaDataMap.put(METADATA_ESCAPER.escape(eventLabel), eventValue);
           metadataStringBuilder =
               METADATA_JOINER.appendTo(
                   // I feel like I shouldn't have to do the ',' append here but for some reason
