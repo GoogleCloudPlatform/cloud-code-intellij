@@ -20,7 +20,7 @@ buildscript {
     }
     dependencies {
         classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.0.43'
-        classpath "com.diffplug.gradle.spotless:spotless:2.4.0"
+        classpath "gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.5"
     }
 }
 
@@ -131,13 +131,8 @@ subprojects {
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     }
 
-    apply plugin: "com.diffplug.gradle.spotless"
-    spotless {
-        java {
-            googleJavaFormat()
-        }
-    }
-
+    apply plugin: "com.github.sherter.google-java-format"
+    
     apply plugin: 'checkstyle'
     configurations {
         checkstyleConfig
