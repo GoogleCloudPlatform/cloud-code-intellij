@@ -66,6 +66,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -386,10 +387,17 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         throw new ConfigurationException(
             GctBundle.message("appengine.flex.config.custom.dockerfile.error"));
       }
-    } else if (environment.isStandard() && CloudSdkService.getInstance().validateCloudSdk()
-        .contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT)) {
-      throw new ConfigurationException(
-          CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT.getMessage());
+    } else if (environment.isStandard()) {
+      Set<CloudSdkValidationResult> validationResults =
+          CloudSdkService.getInstance().validateCloudSdk();
+      if (validationResults.contains(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
+        throw new ConfigurationException(
+            GctBundle.message("appengine.cloudsdk.location.missing.message.deploy"));
+      }
+      if (validationResults.contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT)) {
+        throw new ConfigurationException(
+            CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT.getMessage());
+      }
     }
   }
 

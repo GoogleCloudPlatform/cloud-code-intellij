@@ -19,6 +19,8 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
@@ -62,6 +64,16 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
         .withLabel(isFlexCompat ? "flex-compat" : "standard")
         .ping();
+
+    if (CloudSdkService.getInstance().validateCloudSdk().contains(
+        CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
+      deploy.getCallback().errorOccurred(
+          GctBundle.message("appengine.cloudsdk.location.invalid.message") + " "
+              + CloudSdkService.getInstance().getSdkHomePath());
+      logger.warn(GctBundle.message("appengine.cloudsdk.location.invalid.message") + " "
+          + CloudSdkService.getInstance().getSdkHomePath());
+      return;
+    }
 
     Path stagingDirectory;
     AppEngineHelper helper = deploy.getHelper();
