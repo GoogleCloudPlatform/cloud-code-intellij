@@ -125,8 +125,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
       callback.errorOccurred(GctBundle.message("appengine.cloudsdk.location.invalid.message") + " "
           + CloudSdkService.getInstance().getSdkHomePath());
-      logger.warn(GctBundle.message("appengine.cloudsdk.location.invalid.message") + " "
-          + CloudSdkService.getInstance().getSdkHomePath());
       return null;
     }
 
