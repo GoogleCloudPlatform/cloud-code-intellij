@@ -387,14 +387,15 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         throw new ConfigurationException(
             GctBundle.message("appengine.flex.config.custom.dockerfile.error"));
       }
-    } else if (environment.isStandard()) {
+    } else {
       Set<CloudSdkValidationResult> validationResults =
           CloudSdkService.getInstance().validateCloudSdk();
       if (validationResults.contains(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
         throw new ConfigurationException(
             GctBundle.message("appengine.cloudsdk.location.missing.message.deployui"));
       }
-      if (validationResults.contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT)) {
+      if (environment.isStandard()
+          && validationResults.contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT)) {
         throw new ConfigurationException(
             CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT.getMessage());
       }

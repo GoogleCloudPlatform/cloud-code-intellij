@@ -65,16 +65,6 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
         .withLabel(isFlexCompat ? "flex-compat" : "standard")
         .ping();
 
-    if (CloudSdkService.getInstance().validateCloudSdk().contains(
-        CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
-      deploy.getCallback().errorOccurred(
-          GctBundle.message("appengine.cloudsdk.location.invalid.message") + " "
-              + CloudSdkService.getInstance().getSdkHomePath());
-      logger.warn(GctBundle.message("appengine.cloudsdk.location.invalid.message") + " "
-          + CloudSdkService.getInstance().getSdkHomePath());
-      return;
-    }
-
     Path stagingDirectory;
     AppEngineHelper helper = deploy.getHelper();
 
