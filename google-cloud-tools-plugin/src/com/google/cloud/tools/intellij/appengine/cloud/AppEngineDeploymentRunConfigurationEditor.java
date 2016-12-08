@@ -392,7 +392,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
           CloudSdkService.getInstance().validateCloudSdk();
       if (validationResults.contains(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
         throw new ConfigurationException(
-            GctBundle.message("appengine.cloudsdk.location.missing.message.deploy"));
+            GctBundle.message("appengine.cloudsdk.location.missing.message.deployui"));
       }
       if (validationResults.contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT)) {
         throw new ConfigurationException(
