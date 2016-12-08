@@ -55,7 +55,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
   private static final String MISSING_SDK_DIR_WARNING =
       "Cloud SDK home directory is not specified. "
           + CLOUD_SDK_DOWNLOAD_LINK;
-  private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in this directory. "
+  private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in the specified directory. "
       + CLOUD_SDK_DOWNLOAD_LINK;
 
   @Override
