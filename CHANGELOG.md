@@ -17,7 +17,7 @@ All notable changes to this project will be documented in this file.
 ## [16.10.5]
 
 IMPORTANT: 
-This plugin requires the use of Cloud SDK v 131.0.0 for correct execution of the local
+This plugin requires the use of Cloud SDK v 133.0.0 for correct execution of the local
 development server with the latest Java 8 SDK. Please run 'gcloud components update' from your 
 shell to ensure you have the latest Cloud SDK release.
 
