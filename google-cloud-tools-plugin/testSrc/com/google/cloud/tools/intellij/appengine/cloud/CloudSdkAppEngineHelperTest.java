@@ -23,10 +23,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 
@@ -45,6 +48,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -60,6 +64,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   @Mock private GoogleLoginState loginState;
   @Mock private LoggingHandler loggingHandler;
   @Mock private DeploymentOperationCallback callback;
+  @Mock private CloudSdkService sdkService;
   CloudSdkAppEngineHelper helper;
 
   @Before
@@ -67,6 +72,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     helper = new CloudSdkAppEngineHelper(getProject());
 
     registerService(GoogleLoginService.class, googleLoginService);
+    registerService(CloudSdkService.class, sdkService);
   }
 
   @Test
@@ -108,6 +114,8 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
   @Test
   public void testCreateDeployRunnerInvalidDeploymentSourceFile_returnsNull() {
+    when(sdkService.validateCloudSdk()).thenReturn(ImmutableSet.<CloudSdkValidationResult>of());
+
     Runnable runner = helper.createDeployRunner(
         loggingHandler,
         new DeployableDeploymentSource(),
@@ -116,6 +124,23 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
     assertNull(runner);
     verify(callback, times(1)).errorOccurred("Deployment source not found: null.");
+  }
+
+  @Test
+  public void testCreateDeployRunnerInvalidSdk() {
+    when(sdkService.validateCloudSdk()).thenReturn(
+        ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
+    when(sdkService.getSdkHomePath()).thenReturn(Paths.get(("/this/path")));
+
+    Runnable runner = helper.createDeployRunner(
+        loggingHandler,
+        new DeployableDeploymentSource(),
+        deploymentConfiguration,
+        callback);
+
+    assertNull(runner);
+    verify(callback, times(1))
+        .errorOccurred("No Cloud SDK was found in the specified directory. /this/path");
   }
 
 

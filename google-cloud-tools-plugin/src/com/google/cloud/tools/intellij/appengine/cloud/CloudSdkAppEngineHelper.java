@@ -24,6 +24,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
@@ -118,6 +119,13 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     if (!(source instanceof AppEngineDeployable)) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.invalid.source.error"));
       throw new RuntimeException("Invalid deployment source selected for deployment");
+    }
+
+    if (CloudSdkService.getInstance().validateCloudSdk().contains(
+        CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
+      callback.errorOccurred(GctBundle.message("appengine.cloudsdk.location.invalid.message") + " "
+          + CloudSdkService.getInstance().getSdkHomePath());
+      return null;
     }
 
     if (source.getFile() == null
