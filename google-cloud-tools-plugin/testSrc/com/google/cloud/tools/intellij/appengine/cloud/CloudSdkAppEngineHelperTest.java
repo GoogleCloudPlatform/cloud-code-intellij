@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,14 +58,21 @@ import javax.swing.Icon;
  */
 public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
-  @Mock private AppEngineDeploymentConfiguration deploymentConfiguration;
-  @Mock private GoogleLoginService googleLoginService;
-  @Mock private CredentialedUser credentialedUser;
-  @Mock private GoogleLoginState loginState;
-  @Mock private LoggingHandler loggingHandler;
-  @Mock private DeploymentOperationCallback callback;
-  @Mock private CloudSdkService sdkService;
   CloudSdkAppEngineHelper helper;
+  @Mock
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
+  @Mock
+  private GoogleLoginService googleLoginService;
+  @Mock
+  private CredentialedUser credentialedUser;
+  @Mock
+  private GoogleLoginState loginState;
+  @Mock
+  private LoggingHandler loggingHandler;
+  @Mock
+  private DeploymentOperationCallback callback;
+  @Mock
+  private CloudSdkService sdkService;
 
   @Before
   public void initialize() {
@@ -90,7 +97,9 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     when(loginState.fetchOAuth2RefreshToken()).thenReturn(refreshToken);
     helper.stageCredentials(username);
     Path credentialFile = helper.getCredentialsPath();
-    Map jsonMap = new Gson().fromJson(new FileReader(credentialFile.toFile()), Map.class);
+    FileReader credentialFileReader = new FileReader(credentialFile.toFile());
+    Map jsonMap = new Gson().fromJson(credentialFileReader, Map.class);
+    credentialFileReader.close();
     assertEquals(clientId, jsonMap.get("client_id"));
     assertEquals(clientSecret, jsonMap.get("client_secret"));
     assertEquals(refreshToken, jsonMap.get("refresh_token"));
@@ -130,7 +139,8 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   public void testCreateDeployRunnerInvalidSdk() {
     when(sdkService.validateCloudSdk()).thenReturn(
         ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
-    when(sdkService.getSdkHomePath()).thenReturn(Paths.get(("/this/path")));
+    Path path = Paths.get(("/this/path"));
+    when(sdkService.getSdkHomePath()).thenReturn(path);
 
     Runnable runner = helper.createDeployRunner(
         loggingHandler,
@@ -140,11 +150,13 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
     assertNull(runner);
     verify(callback, times(1))
-        .errorOccurred("No Cloud SDK was found in the specified directory. /this/path");
+        .errorOccurred(
+            "No Cloud SDK was found in the specified directory. " + path.toString());
   }
 
 
   private static class SimpleDeploymentSource implements DeploymentSource {
+
     @Nullable
     @Override
     public File getFile() {
@@ -187,6 +199,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   }
 
   private static class DeployableDeploymentSource implements DeploymentSource, AppEngineDeployable {
+
     @Override
     public AppEngineEnvironment getEnvironment() {
       return null;
