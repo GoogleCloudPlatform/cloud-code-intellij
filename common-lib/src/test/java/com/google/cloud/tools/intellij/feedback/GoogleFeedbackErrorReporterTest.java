@@ -23,15 +23,13 @@ import com.intellij.errorreport.bean.ErrorBean;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.ex.ApplicationInfoEx;
-
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Map;
 
 /** Test cases for {@link GoogleFeedbackErrorReporter}. */
 @RunWith(MockitoJUnitRunner.class)

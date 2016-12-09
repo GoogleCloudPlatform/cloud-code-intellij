@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.feedback;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
-
 import com.intellij.diagnostic.AbstractMessage;
 import com.intellij.diagnostic.IdeErrorsDialog;
 import com.intellij.diagnostic.ReportMessages;
@@ -45,12 +44,10 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.Consumer;
 import com.intellij.util.SystemProperties;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.Component;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class hooks into IntelliJ's error reporting framework. It's based off of <a

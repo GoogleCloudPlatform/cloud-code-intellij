@@ -17,14 +17,12 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.feedback.GoogleFeedbackErrorReporter;
-
 import com.intellij.ExtensionPoints;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.extensions.PluginId;
-
 import org.jetbrains.annotations.NotNull;
 
 /**

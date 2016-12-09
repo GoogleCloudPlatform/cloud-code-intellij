@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.common.base.Optional;
-
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 
 /** Provides information about the current run of the application. */

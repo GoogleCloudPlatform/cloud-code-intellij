@@ -25,9 +25,7 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.intellij.flags.FlagReader;
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
 import com.google.common.collect.ImmutableSet;
-
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
-
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;

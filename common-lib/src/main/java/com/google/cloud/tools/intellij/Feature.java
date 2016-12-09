@@ -17,10 +17,8 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
-
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Set;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An instance of this class represents a feature in one of our plugins. The sole purpose of a

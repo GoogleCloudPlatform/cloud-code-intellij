@@ -20,16 +20,13 @@ import com.google.cloud.tools.intellij.flags.FlagReader;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
 import com.google.common.annotations.VisibleForTesting;
-
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.util.PlatformUtils;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 
 /** Subclasses of this class will inherit a full implementation of the {@link PluginInfoService}. */
 // Don't expose PluginId in this service's API as it has a private

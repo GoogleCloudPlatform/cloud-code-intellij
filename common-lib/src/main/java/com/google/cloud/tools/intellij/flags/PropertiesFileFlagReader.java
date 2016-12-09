@@ -17,14 +17,11 @@
 package com.google.cloud.tools.intellij.flags;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import com.intellij.openapi.diagnostic.Logger;
-
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Use an instance of this class to read flags provided to your plugin through a {@code

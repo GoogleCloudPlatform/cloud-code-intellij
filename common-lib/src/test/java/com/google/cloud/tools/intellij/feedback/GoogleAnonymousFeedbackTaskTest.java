@@ -24,19 +24,16 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.feedback.GoogleAnonymousFeedbackTask.FeedbackSender;
 import com.google.common.collect.ImmutableMap;
-
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.Consumer;
-
+import java.io.IOException;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.IOException;
-import java.util.Map;
 
 /** Test cases for {@link GoogleAnonymousFeedbackTask}. */
 @RunWith(MockitoJUnitRunner.class)
