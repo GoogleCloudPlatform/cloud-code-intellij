@@ -16,16 +16,23 @@
 
 package com.google.cloud.tools.intellij.stackdriver.facet;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.compiler.StackdriverBuildManagerListener;
+import com.google.cloud.tools.intellij.jps.model.impl.StackdriverProperties;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.compiler.server.BuildManagerListener;
 import com.intellij.facet.Facet;
+import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeId;
+import com.intellij.openapi.compiler.CompileContext;
+import com.intellij.openapi.compiler.CompileTask;
+import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 
 import org.jetbrains.annotations.NotNull;
@@ -51,8 +58,10 @@ public class StackdriverFacetType
   public StackdriverFacet createFacet(@NotNull Module module, String name,
       @NotNull StackdriverFacetConfiguration configuration, @Nullable Facet underlyingFacet) {
     // The following retrieves the Cloud SDK path at build time.
-    module.getProject().getMessageBus().connect()
-        .subscribe(BuildManagerListener.TOPIC, new StackdriverBuildManagerListener());
+//    module.getProject().getMessageBus().connect()
+//        .subscribe(BuildManagerListener.TOPIC, new StackdriverBuildManagerListener());
+    CompilerManager.getInstance(module.getProject())
+        .addBeforeTask(new GetCloudSdkPathCompileTask());
     return new StackdriverFacet(this, module, name, configuration);
   }
 
@@ -65,5 +74,18 @@ public class StackdriverFacetType
   @Override
   public Icon getIcon() {
     return GoogleCloudToolsIcons.STACKDRIVER;
+  }
+
+  class GetCloudSdkPathCompileTask implements CompileTask {
+
+    @Override
+    public boolean execute(CompileContext context) {
+      for (Module module : ModuleManager.getInstance(context.getProject()).getModules()) {
+        StackdriverProperties configuration = FacetManager.getInstance(module)
+            .getFacetByType(StackdriverFacetType.ID).getConfiguration().getState();
+        configuration.setCloudSdkPath(CloudSdkService.getInstance().getSdkHomePath());
+      }
+      return true;
+    }
   }
 }

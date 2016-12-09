@@ -106,8 +106,7 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       }
 
       if (extension.getModuleSourceDirectory() == null) {
-        // Possible to happen on Windows, unlikely in Linux.
-        LOG.warn("Invalid module source directory. Check for special characters <>:\"|?*.");
+        LOG.warn("Module source directory not specified for module " + jpsModule.getName());
         continue;
       }
 

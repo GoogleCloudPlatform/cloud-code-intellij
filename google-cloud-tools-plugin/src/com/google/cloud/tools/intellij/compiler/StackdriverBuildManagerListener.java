@@ -40,7 +40,7 @@ public class StackdriverBuildManagerListener implements BuildManagerListener {
       StackdriverProperties configuration =
           FacetManager.getInstance(module).getFacetByType(StackdriverFacetType.ID)
               .getConfiguration().getState();
-      configuration.setCloudSdkPath(CloudSdkService.getInstance().getSdkHomePath().toString());
+      configuration.setCloudSdkPath(CloudSdkService.getInstance().getSdkHomePath());
     }
   }
 

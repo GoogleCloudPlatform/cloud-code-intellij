@@ -16,6 +16,9 @@
 
 package com.google.cloud.tools.intellij.jps.model.impl;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * Serializable Stackdriver configuration.
  */
@@ -52,12 +55,12 @@ public class StackdriverProperties {
     return ignoreErrors;
   }
 
-  public void setCloudSdkPath(String sdkPath) {
-    this.sdkPath = sdkPath;
+  public void setCloudSdkPath(Path sdkPath) {
+    this.sdkPath = sdkPath.toString();
   }
 
-  public String getCloudSdkPath() {
-    return sdkPath;
+  public Path getCloudSdkPath() {
+    return sdkPath != null ? Paths.get(sdkPath) : null;
   }
 
   public void setModuleSourceDirectory(String moduleSourceDirectory) {

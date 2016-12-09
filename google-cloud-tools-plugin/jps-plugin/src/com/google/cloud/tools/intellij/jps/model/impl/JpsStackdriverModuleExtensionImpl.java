@@ -53,9 +53,7 @@ public class JpsStackdriverModuleExtensionImpl
 
   @Override
   public Path getCloudSdkPath() {
-    // TODO(joaomartins): Validate path when validators are in the common library. Do it here, or
-    // in StackdriverProperties, when path is set.
-    return properties.getCloudSdkPath() != null ? Paths.get(properties.getCloudSdkPath()) : null;
+    return properties.getCloudSdkPath();
   }
 
   @Override
