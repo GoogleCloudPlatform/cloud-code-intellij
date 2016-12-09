@@ -98,20 +98,6 @@ subprojects {
         }
     }
 
-    apply plugin: 'jdepend'
-    configurations.all {
-        resolutionStrategy {
-            // JDepend manages to include a different version of itself in its own transitive closure.
-            force "jdepend:jdepend:${project.jdepend.toolVersion}"
-        }
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-    }
-
-    apply plugin: "com.github.sherter.google-java-format"
-    verifyGoogleJavaFormat {
-        ignoreFailures true
-    }
-
     apply plugin: 'checkstyle'
     configurations {
         checkstyleConfig
