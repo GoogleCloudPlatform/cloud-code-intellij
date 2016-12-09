@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,13 +100,11 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   private static final int WINDOW_HEIGHT_PX =
       8 * JBTable.PREFERRED_SCROLLABLE_VIEWPORT_HEIGHT_IN_ROWS;
   private static final int WINDOW_WIDTH_PX = 200;
-
-  private CloudDebugProcess process;
-
   @VisibleForTesting
   final JBTable table;
   @VisibleForTesting
   Balloon balloon = null;
+  private CloudDebugProcess process;
 
   /**
    * Initialize the panel.
@@ -334,6 +332,42 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     return process.getBreakpointHandler().getXBreakpoint(breakpoint) != null;
   }
 
+  private void selectSnapshot(Breakpoint breakpoint, boolean isSelectedBeforeTrigger) {
+    getModel().unMarkAsNewlyReceived(breakpoint.getId());
+
+    if (isSelectedBeforeTrigger || isNewlySelected(breakpoint)) {
+      process.navigateToSnapshot(breakpoint.getId());
+    }
+  }
+
+  private boolean isNewlySelected(Breakpoint breakpoint) {
+    return process.getCurrentSnapshot() == null
+        || !process.getCurrentSnapshot().getId().equals(breakpoint.getId());
+  }
+
+  private static final class MoreCellRenderer extends DefaultTableCellRenderer {
+
+    MoreCellRenderer() {
+      setHorizontalAlignment(SwingConstants.LEFT);
+      setForeground(UI.getColor("link.foreground"));
+    }
+
+    @Override
+    public Component getTableCellRendererComponent(JTable table,
+        Object value,
+        boolean isSelected,
+        boolean hasFocus,
+        int row,
+        int column) {
+      super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+      setBorder(noFocusBorder);
+      if (value != null) {
+        setText(value.toString());
+      }
+      return this;
+    }
+  }
+
   private final class SnapshotTimeCellRenderer extends DefaultTableCellRenderer {
 
     private final DateFormat dateFormat = DateFormat
@@ -396,29 +430,6 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         setForeground(UIUtil.getActiveTextColor());
       }
 
-      return this;
-    }
-  }
-
-  private static final class MoreCellRenderer extends DefaultTableCellRenderer {
-
-    MoreCellRenderer() {
-      setHorizontalAlignment(SwingConstants.LEFT);
-      setForeground(UI.getColor("link.foreground"));
-    }
-
-    @Override
-    public Component getTableCellRendererComponent(JTable table,
-        Object value,
-        boolean isSelected,
-        boolean hasFocus,
-        int row,
-        int column) {
-      super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-      setBorder(noFocusBorder);
-      if (value != null) {
-        setText(value.toString());
-      }
       return this;
     }
   }
@@ -580,19 +591,6 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
     }
   }
 
-  private void selectSnapshot(Breakpoint breakpoint, boolean isSelectedBeforeTrigger) {
-    getModel().unMarkAsNewlyReceived(breakpoint.getId());
-
-    if (isSelectedBeforeTrigger || isNewlySelected(breakpoint)) {
-      process.navigateToSnapshot(breakpoint.getId());
-    }
-  }
-
-  private boolean isNewlySelected(Breakpoint breakpoint) {
-    return process.getCurrentSnapshot() == null
-        || !process.getCurrentSnapshot().getId().equals(breakpoint.getId());
-  }
-
   /**
    * Create a hand cursor over a link within a table.
    */
@@ -648,7 +646,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       for (int row = 0; row < getModel().getRowCount(); row++) {
         // todo: getModel should be newModel
         Breakpoint bp = getModel().getBreakpoints().get(row);
-        if (bp.getIsFinalState() != Boolean.TRUE) {
+        if (Boolean.FALSE.equals(bp.getIsFinalState())) {
           continue;
         }
         StatusMessage status = bp.getStatus();

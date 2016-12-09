@@ -36,8 +36,6 @@ import com.google.gdt.eclipse.login.common.LoginListener;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
@@ -93,10 +91,6 @@ public class CloudDebuggerClient {
    * function may return null if the user is not logged in.
    */
   @Nullable
-  @SuppressFBWarnings(
-      value = "AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION",
-      justification = "Tolerable; ok to create and use duplicate or dangling Debugger clients"
-  )
   private static Debugger getClient(final @Nullable String userEmail, final int timeout) {
     if (Strings.isNullOrEmpty(userEmail)) {
       LOG.warn("unexpected null email in controller initialize.");

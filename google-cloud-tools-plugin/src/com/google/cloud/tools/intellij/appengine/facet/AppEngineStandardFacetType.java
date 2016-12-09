@@ -41,10 +41,12 @@ public class AppEngineStandardFacetType
     super(AppEngineStandardFacet.ID, STRING_ID, GctBundle.message("appengine.standard.facet.name"));
   }
 
+  @Override
   public AppEngineFacetConfiguration createDefaultConfiguration() {
     return new AppEngineFacetConfiguration();
   }
 
+  @Override
   public AppEngineStandardFacet createFacet(@NotNull Module module,
                                     String name,
                                     @NotNull AppEngineFacetConfiguration configuration,
@@ -52,6 +54,7 @@ public class AppEngineStandardFacetType
     return new AppEngineStandardFacet(this, module, name, configuration);
   }
 
+  @Override
   public boolean isSuitableModuleType(ModuleType moduleType) {
     return moduleType instanceof JavaModuleType;
   }

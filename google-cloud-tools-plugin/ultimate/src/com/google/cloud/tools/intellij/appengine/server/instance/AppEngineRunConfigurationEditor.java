@@ -66,6 +66,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   public AppEngineRunConfigurationEditor(Project project) {
     myProject = project;
     myArtifactComboBox.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent event) {
         onArtifactChanged();
       }
@@ -109,6 +110,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
    * </li>
    * </ul>
    */
+  @Override
   protected void resetEditorFrom(CommonModel commonModel) {
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
     final Artifact artifact = serverModel.getArtifact();
@@ -161,6 +163,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   }
   
   @NotNull
+  @Override
   protected JComponent createEditor() {
     AppEngineUtil.setupAppEngineArtifactCombobox(myProject, myArtifactComboBox, false);
     return myMainPanel;

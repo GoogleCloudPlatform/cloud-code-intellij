@@ -37,6 +37,7 @@ public class CloudDebugHelpAction extends AnAction {
     this.url = url;
   }
 
+  @Override
   public void actionPerformed(AnActionEvent event) {
     openUrl();
   }
@@ -51,6 +52,7 @@ public class CloudDebugHelpAction extends AnAction {
   /**
    * Sets the help button's icon and label text.
    */
+  @Override
   public void update(AnActionEvent event) {
     Presentation presentation = event.getPresentation();
     presentation.setIcon(icon);

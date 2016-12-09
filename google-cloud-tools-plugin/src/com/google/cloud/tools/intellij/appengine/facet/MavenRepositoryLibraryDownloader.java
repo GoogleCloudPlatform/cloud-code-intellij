@@ -57,6 +57,7 @@ public class MavenRepositoryLibraryDownloader {
 
     librarySupport.addSupport(module, modifiableModel, modifiableModelsProvider);
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
+      @Override
       public void run() {
         modifiableModel.commit();
       }

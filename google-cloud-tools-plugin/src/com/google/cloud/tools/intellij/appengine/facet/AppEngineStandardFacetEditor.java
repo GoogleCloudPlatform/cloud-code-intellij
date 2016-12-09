@@ -67,11 +67,13 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
         .getLibraryTable(context.getProject()).addListener(libraryListener);
   }
 
+  @Override
   public String getDisplayName() {
     return GctBundle.message("appengine.standard.facet.name");
   }
 
   @NotNull
+  @Override
   public JComponent createComponent() {
     return mainPanel;
   }
@@ -121,7 +123,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
     }
   }
 
-  @SuppressWarnings("checkstyle:abbreviationaswordinname")
+  @Override
   public void disposeUIResources() {
     if (libraryListener != null) {
       LibraryTablesRegistrar.getInstance()
@@ -146,7 +148,6 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
         .ping();
   }
 
-  @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
     appEngineStandardLibraryPanel = new AppEngineStandardLibraryPanel(isManagedLibrariesEnabled());
   }

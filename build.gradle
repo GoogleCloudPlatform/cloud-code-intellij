@@ -20,6 +20,7 @@ buildscript {
     }
     dependencies {
         classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.0.43'
+        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.8"
         classpath "gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.5"
     }
 }
@@ -47,6 +48,12 @@ subprojects {
       classifier = 'sources'
     }
     assemble.dependsOn jarSources
+
+    apply plugin: "net.ltgt.errorprone"
+    configurations.errorprone {
+        // 2.0.5 is the last version compatible with JDK 7
+        resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.5'
+    }
 
     apply plugin: 'org.jetbrains.intellij'
     intellij {
@@ -79,10 +86,6 @@ subprojects {
         }
     }
 
-    test {
-        jvmArgs += ["-XX:MaxPermSize=256m"] // For our Java 7 test runs.
-    }
-
     dependencies {
         testCompile 'junit:junit:4.+'
         testCompile ('org.mockito:mockito-core:1.9.5') {
@@ -90,25 +93,6 @@ subprojects {
         }
         testCompile 'org.hamcrest:hamcrest-all:1.3'
         compile 'joda-time:joda-time:2.9.2'
-        compile 'com.google.code.findbugs:annotations:2.0.3'
-    }
-
-    apply plugin: 'findbugs'
-
-    findbugs {
-        ignoreFailures = false
-        sourceSets = [sourceSets.main]
-        effort = "max"
-        toolVersion = '3.0.1'
-        excludeFilter = rootProject.file('findbugs-excludefilter.xml')
-    }
-
-    tasks.withType(FindBugs) {
-        // Jenkins requires the xml formatted report for publishing.
-        reports {
-            xml.enabled = true
-            html.enabled = false
-        }
     }
 
     apply plugin: 'jacoco'
@@ -116,30 +100,6 @@ subprojects {
         reports {
             xml.enabled true
         }
-    }
-
-
-    apply plugin: 'pmd'
-    pmd {
-        ignoreFailures = false
-        sourceSets = [sourceSets.main]
-        // Don't use the default ruleset but use a custom ruleset to exclude some PMD rules.
-        ruleSets = []
-        ruleSetFiles = rootProject.files('custom-pmd-ruleset.xml');
-    }
-
-    apply plugin: 'jdepend'
-    configurations.all {
-        resolutionStrategy {
-            // JDepend manages to include a different version of itself in its own transitive closure.
-            force "jdepend:jdepend:${project.jdepend.toolVersion}"
-        }
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-    }
-
-    apply plugin: "com.github.sherter.google-java-format"
-    verifyGoogleJavaFormat {
-        ignoreFailures true
     }
 
     apply plugin: 'checkstyle'

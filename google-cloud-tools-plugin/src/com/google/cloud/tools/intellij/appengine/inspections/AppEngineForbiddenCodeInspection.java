@@ -190,17 +190,20 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
 
   @Nls
   @NotNull
+  @Override
   public String getGroupDisplayName() {
     return "Google App Engine";
   }
 
   @Nls
   @NotNull
+  @Override
   public String getDisplayName() {
     return "Forbidden code in App Engine applications";
   }
 
   @NotNull
+  @Override
   public String getShortName() {
     return "AppEngineForbiddenCode";
   }

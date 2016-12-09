@@ -33,6 +33,7 @@ public class AppEngineTemplateGroupDescriptorFactory implements FileTemplateGrou
   @NonNls
   public static final String APP_ENGINE_WEB_XML_TEMPLATE = "GctAppEngineWeb.xml";
 
+  @Override
   public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
     final FileTemplateDescriptor appEngineXml = new FileTemplateDescriptor(
         APP_ENGINE_WEB_XML_TEMPLATE, StdFileTypes.XML.getIcon());

@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
+import com.google.common.collect.ImmutableSet;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +37,7 @@ public enum GctFeature implements Feature {
   @Deprecated
   APPENGINE_FLEX(null, "feature.appengine.flex", "ct4ij.feature.appengine.flex");
 
-  private final Set<IntelliJPlatform> supportedPlatforms;
+  private final ImmutableSet<IntelliJPlatform> supportedPlatforms;
   private final String resourceFlagName;
   private final String systemFlagName;
 
@@ -56,7 +57,7 @@ public enum GctFeature implements Feature {
    * @param systemFlagName a Java system property name that would be read for the flag value
    */
   GctFeature(
-      Set<IntelliJPlatform> supportedPlatforms, String resourceFlagName, String systemFlagName) {
+      ImmutableSet<IntelliJPlatform> supportedPlatforms, String resourceFlagName, String systemFlagName) {
     this.supportedPlatforms = supportedPlatforms;
     this.resourceFlagName = resourceFlagName;
     this.systemFlagName = systemFlagName;

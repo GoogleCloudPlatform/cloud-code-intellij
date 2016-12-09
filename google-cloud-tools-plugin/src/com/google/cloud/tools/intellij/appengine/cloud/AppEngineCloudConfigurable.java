@@ -123,7 +123,6 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
     return cloudSdkPanel;
   }
 
-  @SuppressWarnings("checkstyle:abbreviationaswordinname")
   private void createUIComponents() {
     cloudSdkPanel = new CloudSdkPanel();
   }

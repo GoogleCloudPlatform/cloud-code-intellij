@@ -45,6 +45,7 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
   private AppEngineFacetProperties properties
       = new AppEngineFacetProperties();
 
+  @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
       FacetValidatorsManager validatorsManager) {
     return new FacetEditorTab[]{
