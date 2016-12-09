@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,17 +31,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-/**
- * Subclasses of this class will inherit a full implementation of the {@link PluginInfoService}.
- */
+/** Subclasses of this class will inherit a full implementation of the {@link PluginInfoService}. */
 // Don't expose PluginId in this service's API as it has a private
 // constructor and makes testing impossible.
 public abstract class BasePluginInfoService implements PluginInfoService {
 
+  private static final String PLUGIN_NAME_EXTERNAL = "gcloud-intellij";
   private final String userAgent;
   private final IdeaPluginDescriptor plugin;
   private final FlagReader flagReader;
-  private static final String PLUGIN_NAME_EXTERNAL = "gcloud-intellij";
 
   protected BasePluginInfoService(@NotNull String pluginUserAgentName, @NotNull String pluginId) {
     this(
@@ -107,8 +105,14 @@ public abstract class BasePluginInfoService implements PluginInfoService {
 
   @VisibleForTesting
   String constructUserAgent(String pluginUserAgentName, String pluginVersion) {
-    return pluginUserAgentName + "/" + pluginVersion + " (" + getCurrentPlatform() + "/"
-        + getCurrentPlatformVersion() + ")";
+    return pluginUserAgentName
+        + "/"
+        + pluginVersion
+        + " ("
+        + getCurrentPlatform()
+        + "/"
+        + getCurrentPlatformVersion()
+        + ")";
   }
 
   @NotNull

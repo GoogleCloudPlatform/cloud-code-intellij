@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.flags.FlagReader;
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
 import com.google.common.collect.ImmutableSet;
-import com.google.cloud.tools.intellij.flags.FlagReader;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 
@@ -35,42 +35,39 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * Tests for {@link BasePluginInfoService}.
- */
+/** Tests for {@link BasePluginInfoService}. */
 @RunWith(MockitoJUnitRunner.class)
 public class BasePluginInfoServiceTest {
 
   private static final String TEST_VERSION = "1.0";
   private static final String USER_AGENT_NAME = "testUserAgentName";
-  @Mock
-  private IdeaPluginDescriptor mockPlugin;
-  @Mock
-  private FlagReader flagReader;
+  @Mock private IdeaPluginDescriptor mockPlugin;
+  @Mock private FlagReader flagReader;
   private BasePluginInfoService underTest;
 
   @Before
   public void setup() {
     when(mockPlugin.getVersion()).thenReturn(TEST_VERSION);
-    underTest = new BasePluginInfoService(USER_AGENT_NAME, mockPlugin, flagReader) {
-      @NotNull
-      @Override
-      IntelliJPlatform getCurrentPlatform() {
-        return IntelliJPlatform.IDEA;
-      }
+    underTest =
+        new BasePluginInfoService(USER_AGENT_NAME, mockPlugin, flagReader) {
+          @NotNull
+          @Override
+          IntelliJPlatform getCurrentPlatform() {
+            return IntelliJPlatform.IDEA;
+          }
 
-      @NotNull
-      @Override
-      String getCurrentPlatformVersion() {
-        return "15.03";
-      }
-    };
+          @NotNull
+          @Override
+          String getCurrentPlatformVersion() {
+            return "15.03";
+          }
+        };
   }
 
   @Test
   public void testGetUserAgent() throws Exception {
-    assertEquals("testUserAgentName/1.0 (IntelliJ IDEA Ultimate Edition/15.03)",
-        underTest.getUserAgent());
+    assertEquals(
+        "testUserAgentName/1.0 (IntelliJ IDEA Ultimate Edition/15.03)", underTest.getUserAgent());
   }
 
   @Test
@@ -101,7 +98,6 @@ public class BasePluginInfoServiceTest {
         .thenReturn(ImmutableSet.<IntelliJPlatform>of());
     assertFalse(underTest.shouldEnable(platformEnabledFeature));
   }
-
 
   @Test
   public void testIsEnabled_configIsNull() throws Exception {

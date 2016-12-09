@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.util;
 
 import com.intellij.util.PlatformUtils;
 
-/**
- * Identifies the current platform based on platform prefix.
- */
+/** Identifies the current platform based on platform prefix. */
 public enum IntelliJPlatform {
   IDEA("IntelliJ IDEA Ultimate Edition", PlatformUtils.IDEA_PREFIX),
   IDEA_IC("IntelliJ IDEA Community Edition", PlatformUtils.IDEA_CE_PREFIX),
@@ -38,23 +36,12 @@ public enum IntelliJPlatform {
   private final String name;
   private final String platformPrefix;
 
-  @Override
-  public String toString() {
-    return name;
-  }
-
-  public String getPlatformPrefix() {
-    return platformPrefix;
-  }
-
   IntelliJPlatform(String name, String platformPrefix) {
     this.name = name;
     this.platformPrefix = platformPrefix;
   }
 
-  /**
-   *  Given a prefix, return the corresponding platform.
-   */
+  /** Given a prefix, return the corresponding platform. */
   public static IntelliJPlatform fromPrefix(String prefix) {
     for (IntelliJPlatform product : values()) {
       if (prefix.equals(product.getPlatformPrefix())) {
@@ -62,5 +49,14 @@ public enum IntelliJPlatform {
       }
     }
     return IDEA;
+  }
+
+  @Override
+  public String toString() {
+    return name;
+  }
+
+  public String getPlatformPrefix() {
+    return platformPrefix;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,14 @@ package com.google.cloud.tools.intellij;
 import com.intellij.openapi.extensions.ExtensionPointName;
 
 /**
- * An IntelliJ Application Service for Google plugins to perform common
- * plugin configurations, such as enabling certain features or turning on/off
- * error reporting.
+ * An IntelliJ Application Service for Google plugins to perform common plugin configurations, such
+ * as enabling certain features or turning on/off error reporting.
  */
 public interface PluginConfigurationService {
 
-  /**
-   * Registers an extension using the IJ API.
-   */
+  /** Registers an extension using the IJ API. */
   <T> void registerExtension(ExtensionPointName<T> extensionPoint, T extension);
 
-  /**
-   * Turn on Google Feedback Error reporting for the pluginId provided.
-   */
+  /** Turn on Google Feedback Error reporting for the pluginId provided. */
   void enabledGoogleFeedbackErrorReporting(String pluginId);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,12 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.ResourceBundle;
 
-/**
- * Resource bundle for messages related to Google Feedback error reporting.
- */
+/** Resource bundle for messages related to Google Feedback error reporting. */
 public class ErrorReporterBundle {
-  @NonNls
-  private static final String BUNDLE_NAME = "messages.ErrorReporterBundle";
+  @NonNls private static final String BUNDLE_NAME = "messages.ErrorReporterBundle";
   private static Reference<ResourceBundle> bundleReference;
+
+  private ErrorReporterBundle() {}
 
   private static synchronized ResourceBundle getBundle() {
     ResourceBundle bundle = com.intellij.reference.SoftReference.dereference(bundleReference);
@@ -43,11 +42,8 @@ public class ErrorReporterBundle {
     return bundle;
   }
 
-  private ErrorReporterBundle() {
-  }
-
-  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key,
-      @NotNull Object... params) {
+  public static String message(
+      @NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params) {
     return CommonBundle.message(getBundle(), key, params);
   }
 }

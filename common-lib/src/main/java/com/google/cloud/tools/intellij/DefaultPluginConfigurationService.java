@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,8 @@ public class DefaultPluginConfigurationService implements PluginConfigurationSer
 
   @Override
   public <T> void registerExtension(
-      @NotNull ExtensionPointName<T> extensionPoint,
-      @NotNull T extension) {
-    Extensions.getRootArea().getExtensionPoint(extensionPoint)
-        .registerExtension(extension);
+      @NotNull ExtensionPointName<T> extensionPoint, @NotNull T extension) {
+    Extensions.getRootArea().getExtensionPoint(extensionPoint).registerExtension(extension);
   }
 
   @Override
@@ -48,7 +46,8 @@ public class DefaultPluginConfigurationService implements PluginConfigurationSer
       throw new IllegalArgumentException(pluginId + " is not a valid plugin ID.");
     }
     errorReporter.setPluginDescriptor(plugin);
-    Extensions.getRootArea().getExtensionPoint(ExtensionPoints.ERROR_HANDLER_EP)
+    Extensions.getRootArea()
+        .getExtensionPoint(ExtensionPoints.ERROR_HANDLER_EP)
         .registerExtension(errorReporter);
   }
 }

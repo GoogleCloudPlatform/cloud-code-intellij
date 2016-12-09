@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,21 +21,17 @@ import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.extensions.PluginId;
 
-/**
- * Handy plugin related methods for Google Feedback integration.
- */
+/** Handy plugin related methods for Google Feedback integration. */
 public final class FeedbackUtil {
 
   private FeedbackUtil() {}
 
-  /**
-   *  Registers an error reporter extension point for the given plugin.
-   */
+  /** Registers an error reporter extension point for the given plugin. */
   public static void enableGoogleFeedbackErrorReporting(String pluginId) {
     GoogleFeedbackErrorReporter errorReporter = new GoogleFeedbackErrorReporter();
-    errorReporter
-        .setPluginDescriptor(PluginManager.getPlugin(PluginId.getId(pluginId)));
-    Extensions.getRootArea().getExtensionPoint(ExtensionPoints.ERROR_HANDLER_EP)
+    errorReporter.setPluginDescriptor(PluginManager.getPlugin(PluginId.getId(pluginId)));
+    Extensions.getRootArea()
+        .getExtensionPoint(ExtensionPoints.ERROR_HANDLER_EP)
         .registerExtension(errorReporter);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,58 +53,31 @@ import java.awt.Component;
 import java.util.Map;
 
 /**
- * This class hooks into IntelliJ's error reporting framework.  It's based off of <a
+ * This class hooks into IntelliJ's error reporting framework. It's based off of <a
  * href="https://android.googlesource.com/platform/tools/adt/idea/+/studio-master-dev/android/src/com/android/tools/idea/diagnostics/error/ErrorReporter.java">
  * ErrorReporter.java </a> in Android Studio.
  */
 public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
 
-  @VisibleForTesting
-  static final String NONE_STRING = "__NONE___";
-  @VisibleForTesting
-  static final String ERROR_MESSAGE_KEY = "error.message";
-  @VisibleForTesting
-  static final String ERROR_STACKTRACE_KEY = "error.stacktrace";
-  @VisibleForTesting
-  static final String ERROR_DESCRIPTION_KEY = "error.description";
-  @VisibleForTesting
-  static final String LAST_ACTION_KEY = "last.action";
-  @VisibleForTesting
-  static final String OS_NAME_KEY = "os.name";
-  @VisibleForTesting
-  static final String JAVA_VERSION_KEY = "java.version";
-  @VisibleForTesting
-  static final String JAVA_VM_VENDOR_KEY = "java.vm.vendor";
-  @VisibleForTesting
-  static final String APP_NAME_KEY = "app.name";
-  @VisibleForTesting
-  static final String APP_CODE_KEY = "app.code";
-  @VisibleForTesting
-  static final String APP_NAME_VERSION_KEY = "app.name.version";
-  @VisibleForTesting
-  static final String APP_EAP_KEY = "app.eap";
-  @VisibleForTesting
-  static final String APP_INTERNAL_KEY = "app.internal";
-  @VisibleForTesting
-  static final String APP_VERSION_MAJOR_KEY = "app.version.major";
-  @VisibleForTesting
-  static final String APP_VERSION_MINOR_KEY = "app.version.minor";
-  @VisibleForTesting
-  static final String PLUGIN_VERSION = "plugin.version";
+  @VisibleForTesting static final String NONE_STRING = "__NONE___";
+  @VisibleForTesting static final String ERROR_MESSAGE_KEY = "error.message";
+  @VisibleForTesting static final String ERROR_STACKTRACE_KEY = "error.stacktrace";
+  @VisibleForTesting static final String ERROR_DESCRIPTION_KEY = "error.description";
+  @VisibleForTesting static final String LAST_ACTION_KEY = "last.action";
+  @VisibleForTesting static final String OS_NAME_KEY = "os.name";
+  @VisibleForTesting static final String JAVA_VERSION_KEY = "java.version";
+  @VisibleForTesting static final String JAVA_VM_VENDOR_KEY = "java.vm.vendor";
+  @VisibleForTesting static final String APP_NAME_KEY = "app.name";
+  @VisibleForTesting static final String APP_CODE_KEY = "app.code";
+  @VisibleForTesting static final String APP_NAME_VERSION_KEY = "app.name.version";
+  @VisibleForTesting static final String APP_EAP_KEY = "app.eap";
+  @VisibleForTesting static final String APP_INTERNAL_KEY = "app.internal";
+  @VisibleForTesting static final String APP_VERSION_MAJOR_KEY = "app.version.major";
+  @VisibleForTesting static final String APP_VERSION_MINOR_KEY = "app.version.minor";
+  @VisibleForTesting static final String PLUGIN_VERSION = "plugin.version";
 
-  @Override
-  public String getReportActionText() {
-    return ErrorReporterBundle.message("error.googlefeedback.message");
-  }
-
-  @Override
-  public boolean submit(@NotNull IdeaLoggingEvent[] events, String additionalInfo,
-      @NotNull Component parentComponent, @NotNull Consumer<SubmittedReportInfo> consumer) {
-    ErrorBean errorBean = new ErrorBean(events[0].getThrowable(), IdeaLogger.ourLastActionId);
-    return doSubmit(events[0], parentComponent, consumer, errorBean, additionalInfo);
-  }
-
-  private static boolean doSubmit(final IdeaLoggingEvent event,
+  private static boolean doSubmit(
+      final IdeaLoggingEvent event,
       final Component parentComponent,
       final Consumer<SubmittedReportInfo> callback,
       final ErrorBean error,
@@ -117,42 +90,61 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
     ApplicationNamesInfo intelliJAppNameInfo = ApplicationNamesInfo.getInstance();
     ApplicationInfoEx intelliJAppExtendedInfo = ApplicationInfoEx.getInstanceEx();
 
-    Map<String, String> params = buildKeyValuesMap(error, intelliJAppNameInfo,
-        intelliJAppExtendedInfo, ApplicationManager.getApplication());
+    Map<String, String> params =
+        buildKeyValuesMap(
+            error,
+            intelliJAppNameInfo,
+            intelliJAppExtendedInfo,
+            ApplicationManager.getApplication());
 
     DataContext dataContext = DataManager.getInstance().getDataContext(parentComponent);
     final Project project = CommonDataKeys.PROJECT.getData(dataContext);
 
-    Consumer<String> successCallback = new Consumer<String>() {
-      @Override
-      public void consume(String token) {
-        final SubmittedReportInfo reportInfo = new SubmittedReportInfo(
-            null, "Issue " + token, SubmittedReportInfo.SubmissionStatus.NEW_ISSUE);
-        callback.consume(reportInfo);
+    Consumer<String> successCallback =
+        new Consumer<String>() {
+          @Override
+          public void consume(String token) {
+            final SubmittedReportInfo reportInfo =
+                new SubmittedReportInfo(
+                    null, "Issue " + token, SubmittedReportInfo.SubmissionStatus.NEW_ISSUE);
+            callback.consume(reportInfo);
 
-        ReportMessages.GROUP.createNotification(ReportMessages.ERROR_REPORT,
-            "Submitted",
-            NotificationType.INFORMATION,
-            null).setImportant(false).notify(project);
-      }
-    };
+            ReportMessages.GROUP
+                .createNotification(
+                    ReportMessages.ERROR_REPORT, "Submitted", NotificationType.INFORMATION, null)
+                .setImportant(false)
+                .notify(project);
+          }
+        };
 
-    Consumer<Exception> errorCallback = new Consumer<Exception>() {
-      @Override
-      public void consume(Exception ex) {
-        String message = ErrorReporterBundle.message("error.googlefeedback.error", ex.getMessage());
-        ReportMessages.GROUP.createNotification(ReportMessages.ERROR_REPORT,
-            message,
-            NotificationType.ERROR,
-            NotificationListener.URL_OPENING_LISTENER).setImportant(false).notify(project);
-      }
-    };
+    Consumer<Exception> errorCallback =
+        new Consumer<Exception>() {
+          @Override
+          public void consume(Exception ex) {
+            String message =
+                ErrorReporterBundle.message("error.googlefeedback.error", ex.getMessage());
+            ReportMessages.GROUP
+                .createNotification(
+                    ReportMessages.ERROR_REPORT,
+                    message,
+                    NotificationType.ERROR,
+                    NotificationListener.URL_OPENING_LISTENER)
+                .setImportant(false)
+                .notify(project);
+          }
+        };
     GoogleAnonymousFeedbackTask task =
-        new GoogleAnonymousFeedbackTask(project, "Submitting error report", true,
-            event.getThrowable(), params,
-            error.getMessage(), error.getDescription(),
+        new GoogleAnonymousFeedbackTask(
+            project,
+            "Submitting error report",
+            true,
+            event.getThrowable(),
+            params,
+            error.getMessage(),
+            error.getDescription(),
             ApplicationInfo.getInstance().getFullVersion(),
-            successCallback, errorCallback);
+            successCallback,
+            errorCallback);
     if (project == null) {
       task.run(new EmptyProgressIndicator());
     } else {
@@ -182,34 +174,51 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
   }
 
   @VisibleForTesting
-  static Map<String, String> buildKeyValuesMap(@NotNull ErrorBean error,
+  static Map<String, String> buildKeyValuesMap(
+      @NotNull ErrorBean error,
       @NotNull ApplicationNamesInfo intelliJAppNameInfo,
       @NotNull ApplicationInfoEx intelliJAppExtendedInfo,
       @NotNull Application application) {
-    Map<String, String> params = ImmutableMap.<String, String>builder()
-        // required parameters
-        .put(ERROR_MESSAGE_KEY, nullToNone(error.getMessage()))
-        .put(ERROR_STACKTRACE_KEY, nullToNone(error.getStackTrace()))
-        // end or required parameters
-        .put(ERROR_DESCRIPTION_KEY, nullToNone(error.getDescription()))
-        .put(LAST_ACTION_KEY, nullToNone(error.getLastAction()))
-        .put(OS_NAME_KEY, SystemProperties.getOsName())
-        .put(JAVA_VERSION_KEY, SystemProperties.getJavaVersion())
-        .put(JAVA_VM_VENDOR_KEY, SystemProperties.getJavaVmVendor())
-        .put(APP_NAME_KEY, intelliJAppNameInfo.getFullProductName())
-        .put(APP_CODE_KEY, intelliJAppExtendedInfo.getPackageCode())
-        .put(APP_NAME_VERSION_KEY, intelliJAppExtendedInfo.getVersionName())
-        .put(APP_EAP_KEY, Boolean.toString(intelliJAppExtendedInfo.isEAP()))
-        .put(APP_INTERNAL_KEY, Boolean.toString(application.isInternal()))
-        .put(APP_VERSION_MAJOR_KEY, intelliJAppExtendedInfo.getMajorVersion())
-        .put(APP_VERSION_MINOR_KEY, intelliJAppExtendedInfo.getMinorVersion())
-        .put(PLUGIN_VERSION, error.getPluginVersion())
-        .build();
+    Map<String, String> params =
+        ImmutableMap.<String, String>builder()
+            // required parameters
+            .put(ERROR_MESSAGE_KEY, nullToNone(error.getMessage()))
+            .put(ERROR_STACKTRACE_KEY, nullToNone(error.getStackTrace()))
+            // end or required parameters
+            .put(ERROR_DESCRIPTION_KEY, nullToNone(error.getDescription()))
+            .put(LAST_ACTION_KEY, nullToNone(error.getLastAction()))
+            .put(OS_NAME_KEY, SystemProperties.getOsName())
+            .put(JAVA_VERSION_KEY, SystemProperties.getJavaVersion())
+            .put(JAVA_VM_VENDOR_KEY, SystemProperties.getJavaVmVendor())
+            .put(APP_NAME_KEY, intelliJAppNameInfo.getFullProductName())
+            .put(APP_CODE_KEY, intelliJAppExtendedInfo.getPackageCode())
+            .put(APP_NAME_VERSION_KEY, intelliJAppExtendedInfo.getVersionName())
+            .put(APP_EAP_KEY, Boolean.toString(intelliJAppExtendedInfo.isEAP()))
+            .put(APP_INTERNAL_KEY, Boolean.toString(application.isInternal()))
+            .put(APP_VERSION_MAJOR_KEY, intelliJAppExtendedInfo.getMajorVersion())
+            .put(APP_VERSION_MINOR_KEY, intelliJAppExtendedInfo.getMinorVersion())
+            .put(PLUGIN_VERSION, error.getPluginVersion())
+            .build();
 
     return params;
   }
 
   static String nullToNone(@Nullable String possiblyNullString) {
     return possiblyNullString == null ? NONE_STRING : possiblyNullString;
+  }
+
+  @Override
+  public String getReportActionText() {
+    return ErrorReporterBundle.message("error.googlefeedback.message");
+  }
+
+  @Override
+  public boolean submit(
+      @NotNull IdeaLoggingEvent[] events,
+      String additionalInfo,
+      @NotNull Component parentComponent,
+      @NotNull Consumer<SubmittedReportInfo> consumer) {
+    ErrorBean errorBean = new ErrorBean(events[0].getThrowable(), IdeaLogger.ourLastActionId);
+    return doSubmit(events[0], parentComponent, consumer, errorBean, additionalInfo);
   }
 }

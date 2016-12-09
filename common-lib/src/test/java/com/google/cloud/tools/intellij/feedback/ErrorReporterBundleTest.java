@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,11 @@
 
 package com.google.cloud.tools.intellij.feedback;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-/**
- * Mundane test to make sure the resource loading is working correctly.
- */
+/** Mundane test to make sure the resource loading is working correctly. */
 public class ErrorReporterBundleTest {
 
   @Test

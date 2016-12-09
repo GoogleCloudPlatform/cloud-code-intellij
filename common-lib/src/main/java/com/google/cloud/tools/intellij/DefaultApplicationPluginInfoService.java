@@ -35,6 +35,4 @@ public class DefaultApplicationPluginInfoService implements ApplicationPluginInf
     Optional<IdeaPluginDescriptor> maybePlugin = findPlugin(pluginId);
     return maybePlugin.isPresent() && maybePlugin.get().isEnabled();
   }
-
 }
-
