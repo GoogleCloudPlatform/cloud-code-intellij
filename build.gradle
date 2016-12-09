@@ -20,6 +20,7 @@ buildscript {
     }
     dependencies {
         classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.0.43'
+        classpath "gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.5"
     }
 }
 
@@ -78,6 +79,10 @@ subprojects {
         }
     }
 
+    test {
+        jvmArgs += ["-XX:MaxPermSize=256m"] // For our Java 7 test runs.
+    }
+
     dependencies {
         testCompile 'junit:junit:4.+'
         testCompile ('org.mockito:mockito-core:1.9.5') {
@@ -89,6 +94,7 @@ subprojects {
     }
 
     apply plugin: 'findbugs'
+
     findbugs {
         ignoreFailures = false
         sourceSets = [sourceSets.main]
@@ -112,6 +118,7 @@ subprojects {
         }
     }
 
+
     apply plugin: 'pmd'
     pmd {
         ignoreFailures = false
@@ -128,6 +135,11 @@ subprojects {
             force "jdepend:jdepend:${project.jdepend.toolVersion}"
         }
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
+    apply plugin: "com.github.sherter.google-java-format"
+    verifyGoogleJavaFormat {
+        ignoreFailures true
     }
 
     apply plugin: 'checkstyle'
