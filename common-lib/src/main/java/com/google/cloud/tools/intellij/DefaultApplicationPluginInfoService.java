@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.common.base.Optional;
-
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.extensions.PluginId;
@@ -35,6 +34,4 @@ public class DefaultApplicationPluginInfoService implements ApplicationPluginInf
     Optional<IdeaPluginDescriptor> maybePlugin = findPlugin(pluginId);
     return maybePlugin.isPresent() && maybePlugin.get().isEnabled();
   }
-
 }
-

@@ -17,22 +17,14 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.common.base.Optional;
-
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 
-/**
- * Provides information about the current run of the application.
- */
+/** Provides information about the current run of the application. */
 public interface ApplicationPluginInfoService {
 
-  /**
-   * Finds a plugin by its plugin ID.
-   */
+  /** Finds a plugin by its plugin ID. */
   Optional<IdeaPluginDescriptor> findPlugin(String pluginId);
 
-  /**
-   * Returns true if a plugin is installed, and currently active.
-   */
+  /** Returns true if a plugin is installed, and currently active. */
   boolean isPluginActive(String pluginId);
-
 }

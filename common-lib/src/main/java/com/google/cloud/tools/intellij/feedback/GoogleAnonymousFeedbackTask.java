@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,25 @@
 
 package com.google.cloud.tools.intellij.feedback;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import com.android.tools.idea.diagnostics.error.AnonymousFeedback;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.Consumer;
 import com.intellij.util.net.HttpConfigurable;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * Reports an error to Google Feedback in the background.
- */
+/** Reports an error to Google Feedback in the background. */
 public class GoogleAnonymousFeedbackTask extends Task.Backgroundable {
 
-  @VisibleForTesting
-  static final String CT4IJ_PRODUCT = "Cloud Tools for IntelliJ";
-  @VisibleForTesting
-  static final String CT4IJ_PACKAGE_NAME = "com.google.gct.idea";
+  @VisibleForTesting static final String CT4IJ_PRODUCT = "Cloud Tools for IntelliJ";
+  @VisibleForTesting static final String CT4IJ_PACKAGE_NAME = "com.google.gct.idea";
+  private static final FeedbackSender DEFAULT_FEEDBACK_SENDER = new NetworkFeedbackSender();
   private final Consumer<String> callback;
   private final Consumer<Exception> errorCallback;
   private final Throwable throwable;
@@ -49,7 +43,6 @@ public class GoogleAnonymousFeedbackTask extends Task.Backgroundable {
   private final String errorDescription;
   private final String appVersion;
   private final FeedbackSender feedbackSender;
-  private static final FeedbackSender DEFAULT_FEEDBACK_SENDER = new NetworkFeedbackSender();
 
   public GoogleAnonymousFeedbackTask(
       @Nullable Project project,
@@ -62,8 +55,18 @@ public class GoogleAnonymousFeedbackTask extends Task.Backgroundable {
       String appVersion,
       final Consumer<String> callback,
       final Consumer<Exception> errorCallback) {
-    this(project, title, canBeCancelled, throwable, params, errorMessage, errorDescription,
-        appVersion, callback, errorCallback, DEFAULT_FEEDBACK_SENDER);
+    this(
+        project,
+        title,
+        canBeCancelled,
+        throwable,
+        params,
+        errorMessage,
+        errorDescription,
+        appVersion,
+        callback,
+        errorCallback,
+        DEFAULT_FEEDBACK_SENDER);
   }
 
   @VisibleForTesting
@@ -94,21 +97,35 @@ public class GoogleAnonymousFeedbackTask extends Task.Backgroundable {
   public void run(@NotNull ProgressIndicator indicator) {
     indicator.setIndeterminate(true);
     try {
-      String token = feedbackSender.sendFeedback(
-          CT4IJ_PRODUCT,
-          CT4IJ_PACKAGE_NAME,
-          throwable,
-          errorMessage,
-          errorDescription,
-          appVersion,
-          params
-      );
+      String token =
+          feedbackSender.sendFeedback(
+              CT4IJ_PRODUCT,
+              CT4IJ_PACKAGE_NAME,
+              throwable,
+              errorMessage,
+              errorDescription,
+              appVersion,
+              params);
       callback.consume(token);
     } catch (IOException ioe) {
       errorCallback.consume(ioe);
     } catch (RuntimeException re) {
       errorCallback.consume(re);
     }
+  }
+
+  /** Interface for sending feedback crash reports. */
+  interface FeedbackSender {
+
+    String sendFeedback(
+        String feedbackProduct,
+        String feedbackPackageName,
+        Throwable cause,
+        String errorMessage,
+        String errorDescription,
+        String applicationVersion,
+        Map<String, String> keyValues)
+        throws IOException;
   }
 
   private static class ProxyHttpConnectionFactory extends AnonymousFeedback.HttpConnectionFactory {
@@ -125,28 +142,24 @@ public class GoogleAnonymousFeedbackTask extends Task.Backgroundable {
         new ProxyHttpConnectionFactory();
 
     @Override
-    public String sendFeedback(String feedbackProduct, String feedbackPackageName, Throwable cause,
-        String errorMessage, String errorDescription, String applicationVersion,
-        Map<String, String> keyValues) throws IOException {
-      return AnonymousFeedback.sendFeedback(CT4IJ_PRODUCT, CT4IJ_PACKAGE_NAME,
-          connectionFactory, cause, keyValues,
-          errorMessage, errorDescription, applicationVersion);
-    }
-  }
-
-  /**
-   * Interface for sending feedback crash reports.
-   */
-  interface FeedbackSender {
-
-    String sendFeedback(
+    public String sendFeedback(
         String feedbackProduct,
         String feedbackPackageName,
         Throwable cause,
         String errorMessage,
         String errorDescription,
         String applicationVersion,
-        Map<String, String> keyValues
-    ) throws IOException;
+        Map<String, String> keyValues)
+        throws IOException {
+      return AnonymousFeedback.sendFeedback(
+          CT4IJ_PRODUCT,
+          CT4IJ_PACKAGE_NAME,
+          connectionFactory,
+          cause,
+          keyValues,
+          errorMessage,
+          errorDescription,
+          applicationVersion);
+    }
   }
 }

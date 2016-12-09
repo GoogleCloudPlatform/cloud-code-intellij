@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,23 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
-
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Set;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An instance of this class represents a feature in one of our plugins. The sole purpose of a
  * {@code feature} is to determine whether to enable the corresponding functionality using the
- * {@link PluginInfoService} and the {@link PluginConfigurationService}.
- * </p>
- * The algorithm that determines whether a given {@code feature} configuration is enabled is as
- * follows:
+ * {@link PluginInfoService} and the {@link PluginConfigurationService}. The algorithm that
+ * determines whether a given {@code feature} configuration is enabled is as follows:
+ *
  * <ol>
- *   <li>If the current platform the plugin is running in is contained in the list of
- * {@link #getSupportedPlatforms()}, then the feature is enabled.</li>
+ *   <li>If the current platform the plugin is running in is contained in the list of {@link
+ *       #getSupportedPlatforms()}, then the feature is enabled.
  *   <li>If the plugin's config.properties file contains a key with {@link #getResourceFlagName()}
- *   set to {@code true}, then the feature is enabled.</li>
+ *       set to {@code true}, then the feature is enabled.
  *   <li>If there is a system environment variable named {@link #getSystemFlagName()} with a value
- *   of "true|TRUE", then it's enabled.</li>
- *   <li>In all other cases, the feature is disabled.</li>
+ *       of "true|TRUE", then it's enabled.
+ *   <li>In all other cases, the feature is disabled.
  * </ol>
  */
 public interface Feature {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@
 package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.feedback.GoogleFeedbackErrorReporter;
-
 import com.intellij.ExtensionPoints;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.extensions.PluginId;
-
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -34,10 +32,8 @@ public class DefaultPluginConfigurationService implements PluginConfigurationSer
 
   @Override
   public <T> void registerExtension(
-      @NotNull ExtensionPointName<T> extensionPoint,
-      @NotNull T extension) {
-    Extensions.getRootArea().getExtensionPoint(extensionPoint)
-        .registerExtension(extension);
+      @NotNull ExtensionPointName<T> extensionPoint, @NotNull T extension) {
+    Extensions.getRootArea().getExtensionPoint(extensionPoint).registerExtension(extension);
   }
 
   @Override
@@ -48,7 +44,8 @@ public class DefaultPluginConfigurationService implements PluginConfigurationSer
       throw new IllegalArgumentException(pluginId + " is not a valid plugin ID.");
     }
     errorReporter.setPluginDescriptor(plugin);
-    Extensions.getRootArea().getExtensionPoint(ExtensionPoints.ERROR_HANDLER_EP)
+    Extensions.getRootArea()
+        .getExtensionPoint(ExtensionPoints.ERROR_HANDLER_EP)
         .registerExtension(errorReporter);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import com.intellij.errorreport.bean.ErrorBean;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.ex.ApplicationInfoEx;
-
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,11 +31,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Map;
-
-/**
- * Test cases for {@link GoogleFeedbackErrorReporter}.
- */
+/** Test cases for {@link GoogleFeedbackErrorReporter}. */
 @RunWith(MockitoJUnitRunner.class)
 public class GoogleFeedbackErrorReporterTest {
 
@@ -48,14 +44,11 @@ public class GoogleFeedbackErrorReporterTest {
   private static final String MINOR_VERSION = "minor version";
   private static final String PLUGIN_VERSION = "plugin version";
 
-  @Mock
-  private ApplicationNamesInfo mockAppNameInfo;
+  @Mock private ApplicationNamesInfo mockAppNameInfo;
 
-  @Mock
-  private ApplicationInfoEx mockAppInfoEx;
+  @Mock private ApplicationInfoEx mockAppInfoEx;
 
-  @Mock
-  private Application mockApplication;
+  @Mock private Application mockApplication;
   private ErrorBean error;
 
   @Before
@@ -73,8 +66,9 @@ public class GoogleFeedbackErrorReporterTest {
   public void testBuildKeyValuesMap_trueFlags() throws Exception {
     when(mockAppInfoEx.isEAP()).thenReturn(true);
     when(mockApplication.isInternal()).thenReturn(true);
-    Map<String, String> result = GoogleFeedbackErrorReporter
-        .buildKeyValuesMap(error, mockAppNameInfo, mockAppInfoEx, mockApplication);
+    Map<String, String> result =
+        GoogleFeedbackErrorReporter.buildKeyValuesMap(
+            error, mockAppNameInfo, mockAppInfoEx, mockApplication);
     assertEquals(TEST_MESSAGE, result.get(GoogleFeedbackErrorReporter.ERROR_MESSAGE_KEY));
     assertEquals(LAST_ACTION, result.get(GoogleFeedbackErrorReporter.LAST_ACTION_KEY));
     assertEquals(FULL_PRODUCT_NAME, result.get(GoogleFeedbackErrorReporter.APP_NAME_KEY));
@@ -90,16 +84,18 @@ public class GoogleFeedbackErrorReporterTest {
   public void testBuildKeyValuesMap_falseFlags() throws Exception {
     when(mockAppInfoEx.isEAP()).thenReturn(false);
     when(mockApplication.isInternal()).thenReturn(false);
-    Map<String, String> result = GoogleFeedbackErrorReporter
-        .buildKeyValuesMap(error, mockAppNameInfo, mockAppInfoEx, mockApplication);
+    Map<String, String> result =
+        GoogleFeedbackErrorReporter.buildKeyValuesMap(
+            error, mockAppNameInfo, mockAppInfoEx, mockApplication);
     assertEquals(Boolean.FALSE.toString(), result.get(GoogleFeedbackErrorReporter.APP_EAP_KEY));
-    assertEquals(Boolean.FALSE.toString(), result.get(GoogleFeedbackErrorReporter.APP_INTERNAL_KEY));
+    assertEquals(
+        Boolean.FALSE.toString(), result.get(GoogleFeedbackErrorReporter.APP_INTERNAL_KEY));
   }
 
   @Test
   public void testNullToNone_nullString() throws Exception {
-    Assert.assertEquals(GoogleFeedbackErrorReporter.NONE_STRING,
-        GoogleFeedbackErrorReporter.nullToNone(null));
+    Assert.assertEquals(
+        GoogleFeedbackErrorReporter.NONE_STRING, GoogleFeedbackErrorReporter.nullToNone(null));
   }
 
   @Test
