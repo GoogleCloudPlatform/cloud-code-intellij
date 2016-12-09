@@ -50,6 +50,10 @@ subprojects {
     assemble.dependsOn jarSources
 
     apply plugin: "net.ltgt.errorprone"
+    configurations.errorprone {
+        // 2.0.5 is the last version compatible with JDK 7
+        resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.5'
+    }
 
     apply plugin: 'org.jetbrains.intellij'
     intellij {
@@ -89,9 +93,6 @@ subprojects {
         }
         testCompile 'org.hamcrest:hamcrest-all:1.3'
         compile 'joda-time:joda-time:2.9.2'
-
-        // 2.0.5 is the last version compatible with JDK 7
-        errorprone 'com.google.errorprone:error_prone_core:2.0.5'
     }
 
     apply plugin: 'jacoco'
