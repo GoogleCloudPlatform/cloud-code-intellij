@@ -94,6 +94,7 @@ subprojects {
     }
 
     apply plugin: 'findbugs'
+
     findbugs {
         ignoreFailures = false
         sourceSets = [sourceSets.main]
