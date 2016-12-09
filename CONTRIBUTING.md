@@ -79,7 +79,7 @@ Other useful targets while developing include:
     1. Configure the IDE to automatically reformat your code and optimize imports.
         1. Hint - you can do this by configuring it to do so on git push. 
     1. If you're not using IntelliJ you can run reformat from the command line using 
-    `gradlew spotlessApply`.
+    `gradlew googleJavaFormat`.
 1. Fork the repository into your own Github account.
 1. Please include unit tests for all new code. (Yes, we know not all
    existing code has tests. We're slowly fixing that, and contributions of tests
