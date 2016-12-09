@@ -114,6 +114,15 @@ subprojects {
     }
 
 
+    apply plugin: 'pmd'
+    pmd {
+        ignoreFailures = false
+        sourceSets = [sourceSets.main]
+        // Don't use the default ruleset but use a custom ruleset to exclude some PMD rules.
+        ruleSets = []
+        ruleSetFiles = rootProject.files('custom-pmd-ruleset.xml');
+    }
+
     apply plugin: 'jdepend'
     configurations.all {
         resolutionStrategy {
@@ -126,6 +135,41 @@ subprojects {
     apply plugin: "com.github.sherter.google-java-format"
     verifyGoogleJavaFormat {
         ignoreFailures true
+    }
+
+    apply plugin: 'checkstyle'
+    configurations {
+        checkstyleConfig
+    }
+    def versions = [
+            checkstyle: '6.17',
+    ]
+    dependencies {
+        checkstyleConfig ("com.puppycrawl.tools:checkstyle:${versions.checkstyle}") {
+            transitive = false
+        }
+        checkstyle "com.puppycrawl.tools:checkstyle:${versions.checkstyle}"
+    }
+    checkstyle {
+        configFile = rootProject.file('google_checks.xml')
+        showViolations true
+        sourceSets = [project.sourceSets.main]
+    }
+
+    // The checkstyle plugin does not provide a way to fail the build on warnings, and
+    // the google_checks.xml sets the severity level to "warning" for all violations. The
+    // following is the workaround.
+    tasks.withType(Checkstyle).each { checkstyleTask ->
+        checkstyleTask.doLast {
+            reports.all { report ->
+                if(report.name == "xml") {
+                    def outputFile = report.destination
+                    if (outputFile.exists() && outputFile.text.contains("<error ")) {
+                        throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
+                    }
+                }
+            }
+        }
     }
 }
 
