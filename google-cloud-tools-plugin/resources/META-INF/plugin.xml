@@ -197,6 +197,10 @@
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.MavenRepositoryLibraryDownloader"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkVersionNotifier"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.application.DefaultAppEngineAdminService"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.resources.GoogleApiClientFactory"
+                        serviceImplementation="com.google.cloud.tools.intellij.resources.DefaultGoogleApiClientFactory"/>
 
     <!-- App Engine Cloud and Deployment Sources Configuration-->
     <remoteServer.type
