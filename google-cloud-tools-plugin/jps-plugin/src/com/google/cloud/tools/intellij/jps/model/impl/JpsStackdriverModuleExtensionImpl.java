@@ -53,7 +53,7 @@ public class JpsStackdriverModuleExtensionImpl
 
   @Override
   public Path getCloudSdkPath() {
-    return properties.getCloudSdkPath();
+    return Paths.get(properties.getCloudSdkPath());
   }
 
   @Override

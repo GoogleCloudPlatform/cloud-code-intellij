@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.jps.model.impl;
 
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -55,12 +56,18 @@ public class StackdriverProperties {
     return ignoreErrors;
   }
 
-  public void setCloudSdkPath(Path sdkPath) {
+  public void setCloudSdkPath(String sdkPath) {
+    try {
+      Paths.get(sdkPath);
+    } catch (InvalidPathException ipe) {
+      throw new RuntimeException("The path contains invalid characters.", ipe);
+    }
+
     this.sdkPath = sdkPath.toString();
   }
 
-  public Path getCloudSdkPath() {
-    return sdkPath != null ? Paths.get(sdkPath) : null;
+  public String getCloudSdkPath() {
+    return sdkPath;
   }
 
   public void setModuleSourceDirectory(String moduleSourceDirectory) {

@@ -83,7 +83,7 @@ public class StackdriverFacetType
       for (Module module : ModuleManager.getInstance(context.getProject()).getModules()) {
         StackdriverProperties configuration = FacetManager.getInstance(module)
             .getFacetByType(StackdriverFacetType.ID).getConfiguration().getState();
-        configuration.setCloudSdkPath(CloudSdkService.getInstance().getSdkHomePath());
+        configuration.setCloudSdkPath(CloudSdkService.getInstance().getSdkHomePath().toString());
       }
       return true;
     }

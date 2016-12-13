@@ -26,6 +26,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 /**
@@ -40,7 +42,12 @@ public class StackdriverBuildManagerListener implements BuildManagerListener {
       StackdriverProperties configuration =
           FacetManager.getInstance(module).getFacetByType(StackdriverFacetType.ID)
               .getConfiguration().getState();
-      configuration.setCloudSdkPath(CloudSdkService.getInstance().getSdkHomePath());
+      try {
+        Paths.get(CloudSdkService.getInstance().getSdkHomePath().toString());
+        configuration.setCloudSdkPath(CloudSdkService.getInstance().getSdkHomePath().toString());
+      } catch (InvalidPathException ipe) {
+        // Do nothing, move on, eventually error out on build, or not if ignore errors on.
+      }
     }
   }
 
