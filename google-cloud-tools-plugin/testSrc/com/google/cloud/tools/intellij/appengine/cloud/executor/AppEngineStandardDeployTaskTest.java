@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -28,6 +28,11 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardStage;
+import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardDeployTask;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
@@ -50,11 +55,15 @@ import java.nio.file.Paths;
 public class AppEngineStandardDeployTaskTest {
 
   private AppEngineStandardDeployTask task;
-  @Mock AppEngineDeploy deploy;
-  @Mock AppEngineStandardStage stage;
+  @Mock
+  AppEngineDeploy deploy;
+  @Mock
+  AppEngineStandardStage stage;
   @Mock DeploymentOperationCallback callback;
-  @Mock AppEngineDeploymentConfiguration deploymentConfiguration;
-  @Mock AppEngineHelper helper;
+  @Mock
+  AppEngineDeploymentConfiguration deploymentConfiguration;
+  @Mock
+  AppEngineHelper helper;
   @Mock ProcessStartListener startListener;
 
   private static final String DEPLOY_FAIL_MSG =
