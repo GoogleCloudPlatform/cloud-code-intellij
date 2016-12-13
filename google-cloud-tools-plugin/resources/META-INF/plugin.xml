@@ -198,7 +198,7 @@
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkVersionNotifier"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.application.DefaultAppEngineAdminService"/>
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.resources.GoogleApiClientFactory"
                         serviceImplementation="com.google.cloud.tools.intellij.resources.DefaultGoogleApiClientFactory"/>
 

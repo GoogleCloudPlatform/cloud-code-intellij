@@ -31,7 +31,11 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 
-public class DefaultAppEngineAdminService extends AppEngineAdminService {
+/**
+ * An implementation of {@link AppEngineAdminService} that uses a Google API Client to communicate
+ * with the App Engine service.
+ */
+public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService {
 
   private final static String APP_ENGINE_RESOURCE_WILDCARD = "-";
   private final long CREATE_APPLICATION_POLLING_INTERVAL_MS = 1000;

@@ -33,7 +33,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.services.appengine.v1.Appengine;
 import com.google.api.services.appengine.v1.model.Application;
 import com.google.api.services.appengine.v1.model.Operation;
-import com.google.cloud.tools.intellij.appengine.application.DefaultAppEngineAdminService;
+import com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineOperationFailedException;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
@@ -48,13 +48,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefaultAppEngineAdminServiceTest extends BasePluginTestCase {
+/**
+ * Tests for {@link GoogleApiClientAppEngineAdminService}
+ */
+public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase {
 
   @Mock private GoogleApiClientFactory apiClientFactoryMock;
 
   private AppengineMock appengineClientMock;
 
-  private DefaultAppEngineAdminService service;
+  private GoogleApiClientAppEngineAdminService service;
 
   @Before
   public void setUp() throws IOException {
@@ -64,7 +67,7 @@ public class DefaultAppEngineAdminServiceTest extends BasePluginTestCase {
     when(apiClientFactoryMock.getAppEngineApiClient(any(HttpRequestInitializer.class)))
         .thenReturn(appengineClientMock);
 
-    service = new DefaultAppEngineAdminService();
+    service = new GoogleApiClientAppEngineAdminService();
   }
 
   @Test
