@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -39,7 +40,7 @@ import java.util.Set;
 /**
  * A {@link ServerRuntimeInstance} for the {@link AppEngineCloudType}.
  */
-class AppEngineRuntimeInstance extends
+public class AppEngineRuntimeInstance extends
     ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
   private final Set<CancellableRunnable> createdDeployments;
@@ -65,28 +66,29 @@ class AppEngineRuntimeInstance extends
 
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
 
-    final CancellableRunnable deployRunner =  appEngineHelper.createDeployRunner(
-        logManager.getMainLoggingHandler(),
-        task.getSource(),
-        deploymentConfig,
-        callback);
+    appEngineHelper
+        .createDeployRunner(
+            logManager.getMainLoggingHandler(), task.getSource(), deploymentConfig, callback)
+        .ifPresent(
+            deployRunner -> {
+              // keep track of any active deployments
+              synchronized (createdDeployments) {
+                createdDeployments.add(deployRunner);
+              }
 
-    if (deployRunner != null) {
-      // keep track of any active deployments
-      synchronized (createdDeployments) {
-        createdDeployments.add(deployRunner);
-      }
-
-      ProgressManager.getInstance()
-          .run(new Task.Backgroundable(task.getProject(), GctBundle.message(
-              "appengine.deployment.status.deploying"), true,
-              null) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-              ApplicationManager.getApplication().invokeLater(deployRunner);
-            }
-          });
-    }
+              ProgressManager.getInstance()
+                  .run(
+                      new Task.Backgroundable(
+                          task.getProject(),
+                          GctBundle.message("appengine.deployment.status.deploying"),
+                          true,
+                          null) {
+                        @Override
+                        public void run(@NotNull ProgressIndicator indicator) {
+                          ApplicationManager.getApplication().invokeLater(deployRunner);
+                        }
+                      });
+            });
   }
 
   /**

@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.resources;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.IGoogleLoginCompletedCallback;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginEmptyPanel;
@@ -40,14 +39,11 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -64,8 +60,6 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -163,6 +157,18 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
     getTextField().setCursor(Cursor.getDefaultCursor());
     getTextField().getEmptyText().setText("Enter a cloud project ID...");
+    // Activate selection listeners when text is typed and focus is lost.
+    getTextField().addFocusListener(new FocusListener() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        // Do nothing.
+      }
+
+      @Override
+      public void focusLost(FocusEvent e) {
+        onSelectionChanged(getCurrentModelItem());
+      }
+    });
 
     // Instead of doing an initial synchronize, we wait until the ui hierarchy
     // is about to be shown.  Then we only synchronize if we are visible.
@@ -170,19 +176,13 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     // the play services activity wizard, but never selects enable cloudsave.
     // In cases outside of the wizard (such as deploy), we will be visible,
     // so the call to elysium will happen immediately when the hierarchy is shown.
-    addHierarchyListener(new HierarchyListener() {
-      @Override
-      public void hierarchyChanged(HierarchyEvent event) {
-        if ((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              if (ProjectSelector.this.isVisible()) {
-                synchronize(false);
-              }
-            }
-          });
-        }
+    addHierarchyListener(event -> {
+      if ((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+        SwingUtilities.invokeLater(() -> {
+          if (ProjectSelector.this.isVisible()) {
+            synchronize(false);
+          }
+        });
       }
     });
 
@@ -344,7 +344,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     // First, clear any users that went away.
 
     // Put all users in a set for fast access.
-    Set<String> emailUsers = new HashSet<String>();
+    Set<String> emailUsers = new HashSet<>();
     if (!needsToSignIn()) {
       for (CredentialedUser user : Services.getLoginService().getAllUsers().values()) {
         emailUsers.add(user.getEmail());
@@ -452,29 +452,21 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       this.getContentPane()
           .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       this.getContentPane().setViewportView(tree);
-      tree.addTreeSelectionListener(new TreeSelectionListener() {
-        @Override
-        public void valueChanged(TreeSelectionEvent event) {
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
-              .getLastSelectedPathComponent();
-          if (node != null) {
-            if (node instanceof ResourceProjectModelItem) {
-              ResourceProjectModelItem projectNode = (ResourceProjectModelItem) node;
-              String oldSelection = ProjectSelector.this.getText();
-              String newSelection = projectNode.getProject().getProjectId();
-              if (Strings.isNullOrEmpty(oldSelection) || !oldSelection.equals(newSelection)) {
-                ProjectSelector.this.setText(newSelection);
-                onSelectionChanged(projectNode);
-                SwingUtilities.invokeLater(new Runnable() {
-                  @Override
-                  public void run() {
-                    ProjectSelector.this.hidePopup();
-                  }
-                });
-              }
-            } else {
-              tree.clearSelection();
+      tree.addTreeSelectionListener(event -> {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
+            .getLastSelectedPathComponent();
+        if (node != null) {
+          if (node instanceof ResourceProjectModelItem) {
+            ResourceProjectModelItem projectNode = (ResourceProjectModelItem) node;
+            String oldSelection = ProjectSelector.this.getText();
+            String newSelection = projectNode.getProject().getProjectId();
+            if (Strings.isNullOrEmpty(oldSelection) || !oldSelection.equals(newSelection)) {
+              ProjectSelector.this.setText(newSelection);
+              onSelectionChanged(projectNode);
+              SwingUtilities.invokeLater(() -> ProjectSelector.this.hidePopup());
             }
+          } else {
+            tree.clearSelection();
           }
         }
       });
@@ -526,12 +518,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       if (!needsToSignIn()) {
         JButton synchronizeButton = new JButton();
         synchronizeButton.setIcon(GoogleCloudToolsIcons.REFRESH);
-        synchronizeButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent event) {
-            if (!needsToSignIn()) {
-              synchronize(true);
-            }
+        synchronizeButton.addActionListener(event -> {
+          if (!needsToSignIn()) {
+            synchronize(true);
           }
         });
 
@@ -546,13 +535,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
     @Override
     protected void doLogin() {
-      Services.getLoginService().logIn(null, new IGoogleLoginCompletedCallback() {
-
-        @Override
-        public void onLoginCompleted() {
-          synchronize(true);
-        }
-      });
+      Services.getLoginService().logIn(null, () -> synchronize(true));
     }
   }
 

@@ -31,8 +31,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardStage;
-import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardDeployTask;
+import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;

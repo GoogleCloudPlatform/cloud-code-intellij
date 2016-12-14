@@ -16,10 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
@@ -35,6 +31,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import javax.swing.JComponent;
 
@@ -61,14 +58,9 @@ public class AppEngineArtifactDeploymentSourceType
 
     if (settings != null) {
       Artifact[] artifacts = ArtifactManager.getInstance(project).getArtifacts();
-      Optional<Artifact> artifact = Iterables.tryFind(Arrays.asList(artifacts),
-          new Predicate<Artifact>() {
-            @Override
-            public boolean apply(Artifact artifact) {
-              return artifact.getName().equals(artifactName);
-            }
-          }
-      );
+      Optional<Artifact> artifact = Arrays.asList(artifacts).stream()
+          .filter(candidate -> candidate.getName().equals(artifactName))
+          .findFirst();
 
       String environment = settings.getAttributeValue(
           AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
@@ -93,12 +85,16 @@ public class AppEngineArtifactDeploymentSourceType
       AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
 
       if (deployable.getProjectName() != null) {
-        tag.setAttribute(PROJECT_ATTRIBUTE,
-            ((AppEngineDeployable) deploymentSource).getProjectName());
+        tag.setAttribute(PROJECT_ATTRIBUTE, deployable.getProjectName());
       }
 
       if (deployable.getVersion() != null) {
-        tag.setAttribute(VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
+        tag.setAttribute(VERSION_ATTRIBUTE, deployable.getVersion());
+      }
+
+      if (deployable.getEnvironment() != null) {
+        tag.setAttribute(AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE,
+            deployable.getEnvironment().name());
       }
     }
   }

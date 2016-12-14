@@ -21,7 +21,6 @@ import com.google.cloud.tools.appengine.api.deploy.DefaultDeployConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDeployment;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -39,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -80,8 +80,12 @@ public class AppEngineDeploy {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
+    String yamlName = deploymentConfiguration.getEnvironment().equals(
+        AppEngineEnvironment.APP_ENGINE_STANDARD.name())
+        ? "app.yaml"
+        : Paths.get(deploymentConfiguration.getAppYamlPath()).getFileName().toString();
     configuration.setDeployables(
-        Collections.singletonList(stagingDirectory.resolve("app.yaml").toFile()));
+        Collections.singletonList(stagingDirectory.resolve(yamlName).toFile()));
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
     configuration.setPromote(deploymentConfiguration.isPromote());
@@ -97,25 +101,13 @@ public class AppEngineDeploy {
       configuration.setVersion(deploymentConfiguration.getVersion());
     }
 
-    ProcessOutputLineListener deployLogListener = new ProcessOutputLineListener() {
-      @Override
-      public void onOutputLine(String line) {
-        loggingHandler.print(line + "\n");
-      }
-    };
-    ProcessOutputLineListener deployOutputListener = new ProcessOutputLineListener() {
-      @Override
-      public void onOutputLine(String output) {
-        rawDeployOutput.append(output);
-      }
-    };
     ProcessExitListener deployExitListener = new DeployExitListener(rawDeployOutput);
 
     CloudSdk sdk = helper.createSdk(
         loggingHandler,
         deployStartListener,
-        deployLogListener,
-        deployOutputListener,
+        line -> loggingHandler.print(line + "\n"),
+        rawDeployOutput::append,
         deployExitListener);
 
     // show a warning notification if the cloud sdk version is not supported

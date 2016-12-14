@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
 
 import com.intellij.javaee.model.xml.web.WebApp;
 import com.intellij.javaee.supportProvider.JavaeeFrameworkSupportContributionModel;
@@ -55,7 +55,7 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
     }
     if (artifactToDeploy != null) {
       AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
-          artifactToDeploy, model.getProject(), model.getRunConfiguration());
+          artifactToDeploy, model.getModule(), model.getRunConfiguration());
     }
   }
 

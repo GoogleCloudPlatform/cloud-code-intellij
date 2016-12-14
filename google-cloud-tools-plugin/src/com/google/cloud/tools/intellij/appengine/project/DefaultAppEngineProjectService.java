@@ -17,8 +17,10 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRuntime;
+import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardRuntime;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 
+import com.intellij.facet.FacetManager;
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -35,7 +37,13 @@ import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Optional;
 
 /**
  * Implementation of methods for inspecting an App Engine project's structure and configuration.
@@ -43,6 +51,11 @@ import java.util.Collections;
 public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   private static final String AE_WEB_XML_RUNTIME_TAG = "runtime";
+  private static final String SERVICE_TAG_YAML = "service:";
+  private static final String RUNTIME_TAG_YAML = "runtime:";
+  private static final String JAVA_RUNTIME = "java";
+  private static final String CUSTOM_RUNTIME = "custom";
+  private static final String DEFAULT_SERVICE = "default";
 
   private AppEngineAssetProvider assetProvider;
 
@@ -57,8 +70,6 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     return appEngineWebXml != null && isFlexCompat(appEngineWebXml);
   }
 
-
-
   @Override
   public boolean isFlexCompat(@Nullable XmlFile appEngineWebXml) {
     if (appEngineWebXml == null) {
@@ -68,14 +79,6 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     XmlTag compatConfig = getFlexCompatXmlConfiguration(appEngineWebXml);
 
     return isFlexCompatEnvFlex(compatConfig) || isFlexCompatVmTrue(compatConfig);
-  }
-
-  @Override
-  public boolean isFlexCompatEnvFlex(@NotNull Project project, @NotNull DeploymentSource source) {
-    XmlTag compatConfig = getFlexCompatXmlConfiguration(
-        loadAppEngineStandardWebXml(project, source));
-
-    return isFlexCompatEnvFlex(compatConfig);
   }
 
   private boolean isFlexCompatEnvFlex(@Nullable XmlTag compatConfig) {
@@ -90,14 +93,10 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
         && Boolean.parseBoolean(compatConfig.getValue().getTrimmedText());
   }
 
-  @NotNull
   @Override
-  public AppEngineEnvironment getModuleAppEngineEnvironment(@Nullable XmlFile appEngineWebXml) {
-    if (appEngineWebXml == null || isFlexCompat(appEngineWebXml)) {
-      return AppEngineEnvironment.APP_ENGINE_FLEX;
-    } else {
-      return AppEngineEnvironment.APP_ENGINE_STANDARD;
-    }
+  public AppEngineEnvironment getModuleAppEngineEnvironment(Module module) {
+    return FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacet.ID) == null
+        ? AppEngineEnvironment.APP_ENGINE_FLEX : AppEngineEnvironment.APP_ENGINE_STANDARD;
   }
 
   @Override
@@ -197,4 +196,72 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     }
   }
 
+  @Override
+  public Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPathString) {
+    return getValueFromAppYaml(appYamlPathString, SERVICE_TAG_YAML);
+  }
+
+  @Override
+  public FlexibleRuntime getFlexibleRuntimeFromAppYaml(@NotNull String appYamlPathString) {
+    return getValueFromAppYaml(appYamlPathString, RUNTIME_TAG_YAML).map(runtimeValue -> {
+      if (runtimeValue.equals(JAVA_RUNTIME)) {
+        return FlexibleRuntime.JAVA;
+      }
+      if (runtimeValue.equals(CUSTOM_RUNTIME)) {
+        return FlexibleRuntime.CUSTOM;
+      }
+      return FlexibleRuntime.UNKNOWN;
+    }).orElse(FlexibleRuntime.UNKNOWN);
+  }
+
+  private Optional<String> getValueFromAppYaml(@NotNull String appYamlPathString,
+      @NotNull String key) {
+    Path appYamlPath;
+    try {
+      appYamlPath = Paths.get(appYamlPathString);
+    } catch (InvalidPathException ipe) {
+      return Optional.empty();
+    }
+
+    try {
+      return Files.readAllLines(appYamlPath).stream()
+          .filter(line -> line.startsWith(key))
+          .map(line -> line.substring(key.length()).trim())
+          .findFirst();
+    } catch (IOException ioe) {
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public String getServiceNameFromAppEngineWebXml(
+      Project project, DeploymentSource deploymentSource) {
+    XmlFile appengineWebXml = loadAppEngineStandardWebXml(project, deploymentSource);
+
+    if (appengineWebXml != null) {
+      XmlTag root = appengineWebXml.getRootTag();
+      if (root != null) {
+        XmlTag serviceTag = root.findFirstSubTag("service");
+        if (serviceTag != null) {
+          return serviceTag.getValue().getText();
+        }
+        XmlTag moduleTag = root.findFirstSubTag("module");
+        if (moduleTag != null) {
+          return moduleTag.getValue().getText();
+        }
+      }
+    }
+
+    return DEFAULT_SERVICE;
+  }
+
+  @Override
+  public String getDefaultAppYamlPath(String moduleRoot) {
+    return moduleRoot + "/src/main/appengine/app.yaml";
+  }
+
+  @Override
+  public String getDefaultDockerfilePath(String moduleRoot) {
+    return moduleRoot + "/src/main/docker/Dockerfile";
+  }
 }

@@ -35,7 +35,6 @@ import java.io.IOException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
@@ -71,6 +70,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     messageText.setContentType("text/html");
     messageText.setEditable(false);
     messageText.setOpaque(false);
+    messageText.setText(GctBundle.getString("appengine.infopanel.noproject"));
 
     add(errorIcon, BorderLayout.WEST);
     add(messageText);

@@ -21,7 +21,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardStage;
+import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
@@ -109,24 +109,21 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
   ProcessExitListener deploy(
       @NotNull final Path stagingDirectory,
       @NotNull final ProcessStartListener startListener) {
-    return new ProcessExitListener() {
-      @Override
-      public void onExit(int exitCode) {
-        if (exitCode == 0) {
-          try {
-            deploy.deploy(stagingDirectory, startListener);
-          } catch (RuntimeException re) {
-            deploy.getCallback()
-                .errorOccurred(GctBundle.message("appengine.deployment.exception") + "\n"
-                    + GctBundle.message("appengine.action.error.update.message"));
-            logger.error(re);
-          }
-        } else {
+    return (exitCode) -> {
+      if (exitCode == 0) {
+        try {
+          deploy.deploy(stagingDirectory, startListener);
+        } catch (RuntimeException re) {
           deploy.getCallback()
-              .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging", exitCode));
-          logger.warn(
-              "App engine standard staging process exited with an error. Exit Code:" + exitCode);
+              .errorOccurred(GctBundle.message("appengine.deployment.exception") + "\n"
+                  + GctBundle.message("appengine.action.error.update.message"));
+          logger.error(re);
         }
+      } else {
+        deploy.getCallback().errorOccurred(
+            GctBundle.message("appengine.deployment.error.during.staging", exitCode));
+        logger.warn(
+            "App engine standard staging process exited with an error. Exit Code:" + exitCode);
       }
     };
   }

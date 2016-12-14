@@ -127,17 +127,15 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
         new File(mavenProject.getBuildDirectory()).getPath() + File.separator
             + mavenProject.getFinalName();
 
-    XmlFile appEngineWebXml = AppEngineAssetProvider.getInstance()
-        .loadAppEngineStandardWebXml(project, Collections.singletonList(getModule()));
     AppEngineProjectService projectService = AppEngineProjectService.getInstance();
 
     // The environment will be null for newly deserialized deployment sources to ensure freshness.
     // In this case, we need to reload the environment.
     if (environment == null) {
-      environment = projectService.getModuleAppEngineEnvironment(appEngineWebXml);
+      environment = projectService.getModuleAppEngineEnvironment(getModule());
     }
 
-    if (environment.isFlexible() && !projectService.isFlexCompat(appEngineWebXml)) {
+    if (environment.isFlexible()) {
       targetBuild += "." + mavenProject.getPackaging();
     }
 

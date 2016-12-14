@@ -25,7 +25,11 @@ import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineFlexibleDeployTask;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardDeployTask;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
+import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -86,8 +90,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   /**
    * Initialize the helper.
    */
-  public CloudSdkAppEngineHelper(
-      @NotNull Project project) {
+  public CloudSdkAppEngineHelper(@NotNull Project project) {
     this.project = project;
   }
 
@@ -98,26 +101,27 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   @Override
-  public Path defaultAppYaml() {
-    return getFileFromResourcePath(DEFAULT_APP_YAML_PATH);
+  public Optional<Path> defaultAppYaml() {
+    return Optional.of(getFileFromResourcePath(DEFAULT_APP_YAML_PATH));
   }
 
   @Nullable
   @Override
-  public Path defaultDockerfile(AppEngineFlexDeploymentArtifactType deploymentArtifactType) {
+  public Optional<Path> defaultDockerfile(
+      AppEngineFlexibleDeploymentArtifactType deploymentArtifactType) {
     switch (deploymentArtifactType) {
       case WAR:
-        return getFileFromResourcePath(DEFAULT_WAR_DOCKERFILE_PATH);
+        return Optional.of(getFileFromResourcePath(DEFAULT_WAR_DOCKERFILE_PATH));
       case JAR:
-        return getFileFromResourcePath(DEFAULT_JAR_DOCKERFILE_PATH);
+        return Optional.of(getFileFromResourcePath(DEFAULT_JAR_DOCKERFILE_PATH));
       default:
-        return null;
+        return Optional.empty();
     }
   }
 
   @Nullable
   @Override
-  public CancellableRunnable createDeployRunner(
+  public Optional<CancellableRunnable> createDeployRunner(
       LoggingHandler loggingHandler,
       DeploymentSource source,
       AppEngineDeploymentConfiguration deploymentConfiguration,
@@ -125,21 +129,20 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
     if (!(source instanceof AppEngineDeployable)) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.invalid.source.error"));
-      throw new RuntimeException("Invalid deployment source selected for deployment");
+      return Optional.empty();
     }
 
     if (CloudSdkService.getInstance().validateCloudSdk().contains(
         CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
       callback.errorOccurred(GctBundle.message("appengine.cloudsdk.location.invalid.message") + " "
           + CloudSdkService.getInstance().getSdkHomePath());
-      return null;
+      return Optional.empty();
     }
 
-    if (source.getFile() == null
-        || !source.getFile().exists()) {
+    if (source.getFile() == null || !source.getFile().exists()) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.source.not.found.error",
           source.getFilePath()));
-      return null;
+      return Optional.empty();
     }
 
     AppEngineEnvironment targetEnvironment = ((AppEngineDeployable) source).getEnvironment();
@@ -153,12 +156,28 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
     boolean isFlexCompat = targetEnvironment.isFlexible()
         && AppEngineProjectService.getInstance().isFlexCompat(project, source);
-    if (targetEnvironment.isStandard() || isFlexCompat) {
-      return createStandardRunner(loggingHandler, Paths.get(source.getFilePath()), deploy,
-          isFlexCompat);
+    if (targetEnvironment.isStandard()) {
+      return Optional.of(createStandardRunner(loggingHandler, Paths.get(source.getFilePath()),
+          deploy, isFlexCompat));
     } else if (targetEnvironment.isFlexible()) {
-      return createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
-          deploymentConfiguration, deploy);
+      // Checks if the Yaml or Dockerfile exist.
+      FlexibleRuntime runtime =
+          AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
+              deploymentConfiguration.getAppYamlPath());
+      if (deploymentConfiguration.isCustom()) {
+        if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
+          callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
+          return Optional.empty();
+        }
+        if (runtime == FlexibleRuntime.CUSTOM
+            && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+          callback.errorOccurred(
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+          return Optional.empty();
+        }
+      }
+      return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
+          deploymentConfiguration, deploy));
     } else {
       throw new AssertionError("Invalid App Engine target environment: " + targetEnvironment);
     }
@@ -236,14 +255,15 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   @Override
-  public Path stageCredentials(String googleUserName) {
+  public Optional<Path> stageCredentials(String googleUserName) {
     if (Services.getLoginService().ensureLoggedIn(googleUserName)) {
       return doStageCredentials(googleUserName);
     }
-    return null;
+
+    return Optional.empty();
   }
 
-  private Path doStageCredentials(String googleUsername) {
+  private Optional<Path> doStageCredentials(String googleUsername) {
     Optional<CredentialedUser> projectUser =
         Services.getLoginService().getLoggedInUser(googleUsername);
 
@@ -251,7 +271,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     if (projectUser.isPresent()) {
       googleLoginState = projectUser.get().getGoogleLoginState();
     } else {
-      return null;
+      return Optional.empty();
     }
 
     String clientId = googleLoginState.fetchOAuth2ClientId();
@@ -271,7 +291,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
               .toPath();
       Files.write(credentialsPath, jsonCredential.getBytes(Charsets.UTF_8));
 
-      return credentialsPath;
+      return Optional.of(credentialsPath);
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }

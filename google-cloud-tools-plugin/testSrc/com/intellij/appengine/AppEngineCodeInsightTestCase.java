@@ -18,7 +18,7 @@ package com.intellij.appengine;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.facet.FacetManager;
@@ -42,7 +42,6 @@ import com.intellij.util.CommonProcessors;
 
 import junit.framework.Assert;
 
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.MutablePicoContainer;
 

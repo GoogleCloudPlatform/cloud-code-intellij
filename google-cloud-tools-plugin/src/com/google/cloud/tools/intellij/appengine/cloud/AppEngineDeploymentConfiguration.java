@@ -47,7 +47,7 @@ public class AppEngineDeploymentConfiguration extends
   }
 
   public static final String USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE = "userSpecifiedArtifactPath";
-  public static final String ENVIRONMENT_ATTRIBUTE = "environment";
+  static final String ENVIRONMENT_ATTRIBUTE = "environment";
 
   private String cloudProjectName;
   private String googleUsername;
@@ -68,6 +68,8 @@ public class AppEngineDeploymentConfiguration extends
   private boolean promote;
   private boolean stopPreviousVersion;
   private String version;
+  private boolean overrideYaml;
+  private boolean overrideDockerfile;
 
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
@@ -106,7 +108,7 @@ public class AppEngineDeploymentConfiguration extends
 
   @Attribute("configType")
   public ConfigType getConfigType() {
-    return configType == null ? ConfigType.AUTO : configType;
+    return configType == null ? ConfigType.CUSTOM : configType;
   }
 
   @Attribute("promote")
@@ -122,6 +124,16 @@ public class AppEngineDeploymentConfiguration extends
   @Attribute("version")
   public String getVersion() {
     return version;
+  }
+
+  @Attribute("overrideYaml")
+  public boolean isOverrideYaml() {
+    return overrideYaml;
+  }
+
+  @Attribute("overrideDockerfile")
+  public boolean isOverrideDockerfile() {
+    return overrideDockerfile;
   }
 
   public void setConfigType(@NotNull ConfigType configType) {
@@ -168,7 +180,19 @@ public class AppEngineDeploymentConfiguration extends
     this.version = version;
   }
 
+  public void setOverrideYaml(boolean overrideYaml) {
+    this.overrideYaml = overrideYaml;
+  }
+
+  public void setOverrideDockerfile(boolean overrideDockerfile) {
+    this.overrideDockerfile = overrideDockerfile;
+  }
+
   public boolean isAuto() {
     return getConfigType() == ConfigType.AUTO;
+  }
+
+  public boolean isCustom() {
+    return getConfigType() == ConfigType.CUSTOM;
   }
 }
