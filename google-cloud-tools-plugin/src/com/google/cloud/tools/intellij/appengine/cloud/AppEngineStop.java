@@ -95,15 +95,15 @@ public class AppEngineStop {
     command.stop(configuration);
   }
 
-  AppEngineHelper getHelper() {
+  public AppEngineHelper getHelper() {
     return helper;
   }
 
-  AppEngineDeploymentConfiguration getDeploymentConfiguration() {
+  public AppEngineDeploymentConfiguration getDeploymentConfiguration() {
     return deploymentConfiguration;
   }
 
-  UndeploymentTaskCallback getCallback() {
+  public UndeploymentTaskCallback getCallback() {
     return callback;
   }
 

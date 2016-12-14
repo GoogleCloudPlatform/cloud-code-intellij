@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -26,6 +26,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStop;
+import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStopTask;
 
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 
@@ -44,9 +48,12 @@ import java.nio.file.Paths;
 public class AppEngineStopTaskTest {
 
   private AppEngineStopTask task;
-  @Mock AppEngineStop stop;
-  @Mock AppEngineDeploymentConfiguration configuration;
-  @Mock AppEngineHelper helper;
+  @Mock
+  AppEngineStop stop;
+  @Mock
+  AppEngineDeploymentConfiguration configuration;
+  @Mock
+  AppEngineHelper helper;
   @Mock UndeploymentTaskCallback callback;
   @Mock ProcessStartListener startListener;
 

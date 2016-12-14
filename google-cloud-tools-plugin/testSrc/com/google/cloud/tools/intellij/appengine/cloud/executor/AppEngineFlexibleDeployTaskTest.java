@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -26,6 +26,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineFlexibleStage;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineFlexibleDeployTask;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -47,11 +52,15 @@ import java.nio.file.Paths;
 public class AppEngineFlexibleDeployTaskTest {
 
   private AppEngineFlexibleDeployTask task;
-  @Mock AppEngineDeploy deploy;
+  @Mock
+  AppEngineDeploy deploy;
   @Mock DeploymentOperationCallback callback;
-  @Mock AppEngineDeploymentConfiguration deploymentConfiguration;
-  @Mock AppEngineFlexibleStage stage;
-  @Mock AppEngineHelper helper;
+  @Mock
+  AppEngineDeploymentConfiguration deploymentConfiguration;
+  @Mock
+  AppEngineFlexibleStage stage;
+  @Mock
+  AppEngineHelper helper;
   @Mock ProcessStartListener startListener;
 
   @Before
