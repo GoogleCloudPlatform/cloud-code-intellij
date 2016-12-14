@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.vcs;
 
-import com.google.api.client.repackaged.com.google.common.base.Joiner;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -40,8 +39,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import git4idea.DialogManager;
