@@ -186,7 +186,8 @@ public class GcpCheckoutProvider implements CheckoutProvider {
       return true;
     }
     VcsNotifier.getInstance(project)
-        .notifyError(GctBundle.message("clonefromgcp.failed"), result.getErrorOutputAsHtmlString());
+        .notifyError(GctBundle.message("clonefromgcp.failed"), result.getErrorOutputAsHtmlString()
+            + " " + result.getOutputAsJoinedString());
     return false;
   }
 
