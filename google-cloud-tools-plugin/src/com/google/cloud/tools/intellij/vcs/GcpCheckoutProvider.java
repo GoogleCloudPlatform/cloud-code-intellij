@@ -16,12 +16,14 @@
 
 package com.google.cloud.tools.intellij.vcs;
 
+import com.google.api.client.repackaged.com.google.common.base.Joiner;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.notification.NotificationListener.UrlOpeningListener;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -46,6 +48,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -187,8 +192,23 @@ public class GcpCheckoutProvider implements CheckoutProvider {
     }
     VcsNotifier.getInstance(project)
         .notifyError(GctBundle.message("clonefromgcp.failed"), result.getErrorOutputAsHtmlString()
-            + " " + result.getOutputAsJoinedString());
+            + "<br>" + resultWithHtmlUrl(result.getOutput()), new UrlOpeningListener(true));
     return false;
   }
 
+  /**
+   * Searches for URLs inside a string list and adds a HTML "a" element, so they're openable from
+   * the notification.
+   */
+  private static String resultWithHtmlUrl(List<String> output) {
+    List<String> result = new ArrayList<>(output);
+    int position = 0;
+    for (String line : result) {
+      if (line.trim().startsWith("http://") || line.trim().startsWith("https://")) {
+        result.set(position, "<a href=\"" + line.trim() + "\">" + line.trim() + "</a>");
+      }
+      position++;
+    }
+    return Joiner.on("<br>").join(result);
+  }
 }
