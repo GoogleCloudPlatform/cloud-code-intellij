@@ -58,6 +58,9 @@ import git4idea.commands.GitStandardProgressAnalyzer;
 public class GcpCheckoutProvider implements CheckoutProvider {
 
   private static final Logger LOG = Logger.getInstance(GcpCheckoutProvider.class);
+  private static final String URL_REGEX =
+      "https?://(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&/"
+          + "/=]*)";
 
   private final Git git;
 
@@ -190,24 +193,10 @@ public class GcpCheckoutProvider implements CheckoutProvider {
       return true;
     }
     VcsNotifier.getInstance(project)
-        .notifyError(GctBundle.message("clonefromgcp.failed"), result.getErrorOutputAsHtmlString()
-            + "<br>" + resultWithHtmlUrl(result.getOutput()), new UrlOpeningListener(true));
+        .notifyError(GctBundle.message("clonefromgcp.failed"),
+            result.getErrorOutputAsHtmlString() + "<br>"
+                + result.getOutputAsJoinedString().replaceAll(URL_REGEX, "<a href=\"$0\">$0</a>"),
+            new UrlOpeningListener(true));
     return false;
-  }
-
-  /**
-   * Searches for URLs inside a string list and adds a HTML "a" element, so they're openable from
-   * the notification.
-   */
-  private static String resultWithHtmlUrl(List<String> output) {
-    List<String> result = new ArrayList<>(output);
-    int position = 0;
-    for (String line : result) {
-      if (line.trim().startsWith("http://") || line.trim().startsWith("https://")) {
-        result.set(position, "<a href=\"" + line.trim() + "\">" + line.trim() + "</a>");
-      }
-      position++;
-    }
-    return Joiner.on("<br>").join(result);
   }
 }
