@@ -22,6 +22,7 @@ import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.JBColor;
 
@@ -119,12 +120,12 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
         }
 
         // Defer to the dispatch thread to invoke the action of closing this dialog
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
+        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
           @Override
           public void run() {
             AppEngineApplicationCreateDialog.this.close(OK_EXIT_CODE);
           }
-        });
+        }, ModalityState.stateForComponent(AppEngineApplicationCreateDialog.this.getContentPane()));
       }
     });
   }

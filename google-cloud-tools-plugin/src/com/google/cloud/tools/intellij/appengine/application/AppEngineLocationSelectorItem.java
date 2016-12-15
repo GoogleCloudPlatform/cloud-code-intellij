@@ -16,19 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.application;
 
+import com.google.api.client.util.Strings;
 import com.google.api.services.appengine.v1.model.Location;
-
-import com.intellij.ui.UI;
-import com.intellij.ui.components.JBLabel;
-import com.yourkit.util.Strings;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
 import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.SwingConstants;
 
 /**
  * Represents a single GCP project ui.
