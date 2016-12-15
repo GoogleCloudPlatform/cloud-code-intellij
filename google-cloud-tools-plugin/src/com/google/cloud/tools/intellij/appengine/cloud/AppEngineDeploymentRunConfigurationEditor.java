@@ -16,6 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.services.appengine.v1.model.Application;
+import com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService;
+import com.google.cloud.tools.intellij.appengine.application.AppEngineApplicationCreateDialog;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
@@ -24,6 +28,8 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.resources.ProjectSelector.ProjectSelectionChangedEvent;
+import com.google.cloud.tools.intellij.resources.ProjectSelector.ProjectSelectionListener;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.PlaceholderTextField;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -50,6 +56,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
 
 import org.apache.commons.lang.StringUtils;
@@ -78,6 +85,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkEvent.EventType;
+import javax.swing.event.HyperlinkListener;
+
+import git4idea.DialogManager;
 
 /**
  * Editor for an App Engine Deployment runtime configuration.
@@ -105,18 +117,21 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private JCheckBox stopPreviousVersionCheckbox;
   private JLabel stopPreviousVersionLabel;
   private JTextPane promoteInfoLabel;
+  private JTextPane regionLabel;
+  private CreateApplicationLinkListener createApplicationListener;
 
   private DeploymentSource deploymentSource;
   private AppEngineEnvironment environment;
 
-  private static final String LABEL_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
-  private static final String LABEL_CLOSE_TAG = "</i></font></html>";
+  private static final String LABEL_OPEN_TAG = "<html><font face='sans' size='-1'>";
+  private static final String LABEL_CLOSE_TAG = "</font></html>";
   private static final String LABEL_HREF_CLOSE_TAG = "</a>";
 
   private static final String PROMOTE_INFO_HREF_OPEN_TAG =
       "<a href='https://console.cloud.google.com/appengine/versions'>";
   private static final String COST_WARNING_HREF_OPEN_TAG =
       "<a href='https://cloud.google.com/appengine/pricing'>";
+  private static final String CREATE_APPLICATION_HREF_OPEN_TAG = "<a href='#'>";
 
   public static final String DEFAULT_APP_YAML_DIR = "/src/main/appengine";
   public static final String DEFAULT_DOCKERFILE_DIR = "/src/main/docker";
@@ -253,6 +268,45 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     appEngineFlexConfigPanel.setVisible(
         environment == AppEngineEnvironment.APP_ENGINE_FLEX
             && !AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
+
+    // TODO updateRegionField() with any persisted configs
+
+    projectSelector.addProjectSelectionListener(new ProjectSelectionListener() {
+      @Override
+      public void selectionChanged(ProjectSelectionChangedEvent event) {
+        updateRegionField(event.getSelectedProject().getProjectId(), event.getUser().getCredential());
+      }
+    });
+
+    createApplicationListener = new CreateApplicationLinkListener();
+    regionLabel.addHyperlinkListener(createApplicationListener);
+  }
+
+  private void updateRegionField(String projectId, Credential credential) {
+    try {
+      Application application =
+          AppEngineAdminService.getInstance().getApplicationForProjectId(projectId, credential);
+
+      if (application != null) {
+        setRegionLabelText(application.getLocationId(), false);
+      } else {
+        createApplicationListener.setCredential(credential);
+        createApplicationListener.setProjectId(projectId);
+        setRegionLabelText(GctBundle.message("appengine.application.not.exist") + " "
+            + GctBundle.message("appengine.application.create",
+            CREATE_APPLICATION_HREF_OPEN_TAG, LABEL_HREF_CLOSE_TAG), true);
+
+        // TODO should the region (or the presence of the application be part of the Configuration?
+        //  TODO  - this might be necessary if we want to use this to mark the config as invalid
+      }
+    } catch (IOException e) {
+      setRegionLabelText(GctBundle.message("appengine.application.region.fetch.error"), true);
+    }
+  }
+
+  private void setRegionLabelText(String text, boolean isErrorState) {
+    regionLabel.setText(LABEL_OPEN_TAG + text + LABEL_CLOSE_TAG);
+    regionLabel.setForeground(isErrorState ? JBColor.red : JBColor.black);
   }
 
   @Override
@@ -552,6 +606,29 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
       if (!isPromoteSelected) {
         stopPreviousVersionCheckbox.setSelected(false);
+      }
+    }
+  }
+
+  private class CreateApplicationLinkListener implements HyperlinkListener {
+
+    private Credential credential;
+    private String projectId;
+
+    public void setCredential(Credential credential) {
+      this.credential = credential;
+    }
+
+    public void setProjectId(String projectId) {
+      this.projectId = projectId;
+    }
+    @Override
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+      if (e.getEventType() == EventType.ACTIVATED) {
+        AppEngineApplicationCreateDialog applicationDialog
+            = new AppEngineApplicationCreateDialog(
+            AppEngineDeploymentRunConfigurationEditor.this.getComponent(), projectId, credential);
+        DialogManager.show(applicationDialog);
       }
     }
   }
