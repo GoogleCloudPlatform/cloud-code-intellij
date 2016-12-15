@@ -19,21 +19,40 @@ package com.google.cloud.tools.intellij.resources;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 
+import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
+import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
+
+import javax.swing.JPanel;
 
 /**
  * Created by eshaul on 12/14/16.
  */
 public class RepositorySelector extends CustomizableComboBox implements CustomizableComboBoxPopup {
 
+  private JBPopup popup;
+  private RepositoryPanel panel;
+
   @Override
   public void showPopup(RelativePoint showTarget) {
+    if (popup == null || popup.isDisposed()) {
+      panel = new RepositoryPanel();
 
+      ComponentPopupBuilder popupBuilder = JBPopupFactory.getInstance()
+          .createComponentPopupBuilder(panel, null); // todo change focus param
+      popup = popupBuilder.createPopup();
+    }
+    if (!popup.isVisible()) {
+      popup.show(showTarget);
+    }
   }
 
   @Override
   public void hidePopup() {
-
+    if (isPopupVisible()) {
+      popup.closeOk(null);
+    }
   }
 
   @Override
@@ -49,5 +68,9 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
   @Override
   protected int getPreferredPopupHeight() {
     return 240;
+  }
+
+  private static class RepositoryPanel extends JPanel {
+
   }
 }

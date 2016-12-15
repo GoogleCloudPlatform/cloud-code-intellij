@@ -74,50 +74,50 @@ public class ChooseProjectDialog extends DialogWrapper {
     setOKActionEnabled(false);
 
 //    Source source = Source.Builde
-    try {
-      final CredentialedUser user = Services.getLoginService().getAllUsers()
-          .get("etansh@gmail.com");
-      final Credential credential = (user != null ? user.getCredential() : null);
-      HttpRequestInitializer initializer = new HttpRequestInitializer() {
-        @Override
-        public void initialize(HttpRequest httpRequest) throws IOException {
-          HttpHeaders headers = new HttpHeaders();
-          httpRequest.setConnectTimeout(5000);
-          httpRequest.setReadTimeout(5000);
-          httpRequest.setHeaders(headers);
-          credential.initialize(httpRequest);
-        }
-      };
-
-      HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-      String userAgent = ServiceManager
-          .getService(CloudToolsPluginInfoService.class).getUserAgent();
-
-      Source source = new Source.Builder(httpTransport, JacksonFactory.getDefaultInstance(),
-          initializer)
-          .setRootUrl("https://source.googleapis.com/")
-          .setServicePath("")
-          // this ends up prefixed to user agent
-          .setApplicationName(userAgent)
-          .build();
-
-      MySourceList sourceList = new MySourceList(source, "test-metrics");
-
-//      ListReposResponse response = source.repos().list("test-metrics").execute();
-      ListReposResponse response = sourceList.execute();
-      for(Repo repo : response.getRepos()) {
-        System.out.println(repo.get("name"));
-      }
-
-//      Repo newRepo = new Repo();
-
-//      newRepo.setName("from-ij");
-//      source.projects().repos().create("test-metrics", newRepo).execute();
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
-    } catch (GeneralSecurityException gse) {
-      gse.printStackTrace();
-    }
+//    try {
+//      final CredentialedUser user = Services.getLoginService().getAllUsers()
+//          .get("etansh@gmail.com");
+//      final Credential credential = (user != null ? user.getCredential() : null);
+//      HttpRequestInitializer initializer = new HttpRequestInitializer() {
+//        @Override
+//        public void initialize(HttpRequest httpRequest) throws IOException {
+//          HttpHeaders headers = new HttpHeaders();
+//          httpRequest.setConnectTimeout(5000);
+//          httpRequest.setReadTimeout(5000);
+//          httpRequest.setHeaders(headers);
+//          credential.initialize(httpRequest);
+//        }
+//      };
+//
+//      HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+//      String userAgent = ServiceManager
+//          .getService(CloudToolsPluginInfoService.class).getUserAgent();
+//
+//      Source source = new Source.Builder(httpTransport, JacksonFactory.getDefaultInstance(),
+//          initializer)
+//          .setRootUrl("https://source.googleapis.com/")
+//          .setServicePath("")
+//          // this ends up prefixed to user agent
+//          .setApplicationName(userAgent)
+//          .build();
+//
+//      MySourceList sourceList = new MySourceList(source, "test-metrics");
+//
+////      ListReposResponse response = source.repos().list("test-metrics").execute();
+//      ListReposResponse response = sourceList.execute();
+//      for(Repo repo : response.getRepos()) {
+//        System.out.println(repo.get("name"));
+//      }
+//
+////      Repo newRepo = new Repo();
+//
+////      newRepo.setName("from-ij");
+////      source.projects().repos().create("test-metrics", newRepo).execute();
+//    } catch (IOException ioe) {
+//      ioe.printStackTrace();
+//    } catch (GeneralSecurityException gse) {
+//      gse.printStackTrace();
+//    }
 
   }
 
