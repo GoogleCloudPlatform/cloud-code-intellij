@@ -18,11 +18,12 @@ package com.google.cloud.tools.intellij.appengine.application;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.services.appengine.v1.Appengine.Apps;
 import com.google.api.services.appengine.v1.model.Application;
 import com.google.api.services.appengine.v1.model.ListLocationsResponse;
 import com.google.api.services.appengine.v1.model.Location;
 import com.google.api.services.appengine.v1.model.Operation;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineOperationFailedException;
+import com.google.api.services.appengine.v1.model.Status;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +44,7 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
   @Override
   @Nullable
   public Application getApplicationForProjectId(@NotNull String projectId,
-      @NotNull Credential credential) throws IOException {
+      @NotNull Credential credential) throws IOException, GoogleApiException {
     try {
       return GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential)
           .apps().get(projectId).execute();
@@ -52,35 +53,46 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
         // the application does not exist
         return null;
       }
-      throw e;
+      throw GoogleApiException.from(e);
     }
   }
 
   @Override
   public Application createApplication(@NotNull String locationId, @NotNull final String projectId,
-      @NotNull final Credential credential) throws IOException, AppEngineOperationFailedException {
+      @NotNull final Credential credential) throws IOException, GoogleApiException {
 
     Application arg = new Application();
     arg.setId(projectId);
     arg.setLocationId(locationId);
-    Operation operation = GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential)
-        .apps().create(arg).execute();
 
-    boolean done = false;
-    while (!done) {
-      try {
-        Thread.sleep(CREATE_APPLICATION_POLLING_INTERVAL_MS);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
+    Apps.Create createRequest
+        = GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential).apps().create(arg);
+
+    Operation operation;
+    try {
+      // make the initial request to create the application
+      operation = createRequest.execute();
+
+      // poll for updates while the application is being created
+      boolean done = false;
+      while (!done) {
+        try {
+          Thread.sleep(CREATE_APPLICATION_POLLING_INTERVAL_MS);
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+        operation = getOperation(projectId, operation.getName(), credential);
+        if (operation.getDone() != null) {
+          done = operation.getDone();
+        }
       }
-      operation = getOperation(projectId, operation.getName(), credential);
-      if (operation.getDone() != null) {
-        done = operation.getDone();
-      }
+    } catch (GoogleJsonResponseException e) {
+      throw GoogleApiException.from(e);
     }
 
     if (operation.getError() != null) {
-      throw new AppEngineOperationFailedException(operation.getError());
+      Status status = operation.getError();
+      throw new GoogleApiException(status.getMessage(), status.getCode());
     } else {
       Application result = new Application();
       result.putAll(operation.getResponse());
@@ -102,24 +114,27 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
   }
 
   @Override
-  public List<Location> getAllAppEngineLocations(Credential credential) throws IOException {
-    ListLocationsResponse response = getAppEngineRegions(credential, null);
-    List<Location> locations = response.getLocations();
+  public List<Location> getAllAppEngineLocations(Credential credential) throws IOException,
+      GoogleApiException {
+    try {
+      ListLocationsResponse response = getAppEngineRegions(credential, null);
+      List<Location> locations = response.getLocations();
 
-    while (response.getNextPageToken() != null) {
-      response = getAppEngineRegions(credential, response.getNextPageToken());
-      locations.addAll(response.getLocations());
+      while (response.getNextPageToken() != null) {
+        response = getAppEngineRegions(credential, response.getNextPageToken());
+        locations.addAll(response.getLocations());
+      }
+      return locations;
+
+    } catch (GoogleJsonResponseException e) {
+      throw GoogleApiException.from(e);
     }
-
-    return locations;
   }
 
   private ListLocationsResponse getAppEngineRegions(Credential credential, @Nullable String
       pageToken) throws IOException {
-     return GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential).apps().locations()
-         .list(APP_ENGINE_RESOURCE_WILDCARD)
-         .setPageToken(pageToken)
-         .execute();
+    return GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential)
+        .apps().locations().list(APP_ENGINE_RESOURCE_WILDCARD).setPageToken(pageToken).execute();
   }
 
 }

@@ -17,24 +17,29 @@
 package com.google.cloud.tools.intellij.application;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.services.appengine.v1.Appengine;
 import com.google.api.services.appengine.v1.model.Application;
 import com.google.api.services.appengine.v1.model.Operation;
+import com.google.api.services.appengine.v1.model.Status;
 import com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineOperationFailedException;
+import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
@@ -71,23 +76,31 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
   }
 
   @Test
-  public void testGetApplicationForProjectId_success() throws IOException {
+  public void testGetApplicationForProjectId_success() throws IOException, GoogleApiException {
     Application result = new Application();
     when(appengineClientMock.getAppsGetQuery().execute()).thenReturn(result);
 
     String projectId = "my-project";
     assertEquals(result, service.getApplicationForProjectId(projectId, mock(Credential.class)));
     verify(appengineClientMock.apps(), times(1)).get(eq(projectId));
+    verify(appengineClientMock.getAppsGetQuery(), times(1)).execute();
+  }
+
+  @Test(expected = GoogleApiException.class)
+  public void testGetApplicationForProjectId_GoogleJsonExceptoin() throws IOException,
+      GoogleApiException {
+    when(appengineClientMock.getAppsGetQuery().execute())
+        .thenThrow(GoogleJsonResponseException.class);
+
+    service.getApplicationForProjectId("my-project", mock(Credential.class));
   }
 
   @Test
-  public void testCreateApplication() throws IOException, AppEngineOperationFailedException {
+  public void testCreateApplication() throws IOException, GoogleApiException {
     String operationId = "my-operation-id";
     String operationName = "apps/-/operations/" + operationId;
 
-    Operation inProgressOperation = new Operation();
-    inProgressOperation.setName(operationName);
-    inProgressOperation.setDone(false);
+    Operation inProgressOperation = buildInProgressOperation(operationName);
     when(appengineClientMock.getAppsCreateQuery().execute()).thenReturn(inProgressOperation);
 
     final String locationId = "us-east1";
@@ -109,7 +122,11 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
 
     Application result = service.createApplication(locationId, projectId, mock(Credential.class));
 
-    // ensure the service call was made with the correct args
+    // ensure the 'getOperation' API call(s) were made correctly
+    verify(appengineClientMock.apps().operations(), atLeastOnce())
+        .get(eq(projectId), eq(operationId));
+
+    // ensure the 'createApplication' API call was made with the correct args
     verify(appengineClientMock.apps(), times(1))
         .create(
             argThat(
@@ -122,10 +139,60 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
                   }
                 }));
 
+    // ensure the 'createApplication' API call was only made once
+    verify(appengineClientMock.getAppsCreateQuery(), times(1)).execute();
+
     assertEquals(projectId, result.getName());
     assertEquals(locationId, result.getLocationId());
   }
 
+  private Operation buildInProgressOperation(String operationName) {
+    Operation inProgressOperation = new Operation();
+    inProgressOperation.setName(operationName);
+    inProgressOperation.setDone(false);
+    return inProgressOperation;
+  }
+
+  @Test
+  public void testCreateApplication_operationFailed() throws IOException, GoogleApiException {
+    String operationName = "apps/-/operations/12345";
+    Operation inProgressOperation = buildInProgressOperation(operationName);
+    when(appengineClientMock.getAppsCreateQuery().execute()).thenReturn(inProgressOperation);
+
+    String errorMessage = "The operation failed.";
+    int errorCode = 400;
+    Status status = new Status();
+    status.setMessage(errorMessage);
+    status.setCode(errorCode);
+    Operation failedOperation = new Operation();
+    failedOperation.setError(status);
+    failedOperation.setDone(true);
+    failedOperation.setName(operationName);
+
+    when(appengineClientMock.getAppsCreateQuery().execute()).thenReturn(inProgressOperation);
+    when(appengineClientMock.getAppsOperationsGetQuery().execute()).thenReturn(failedOperation);
+
+    try {
+      service.createApplication("us-east", "my-project-id", mock(Credential.class));
+    } catch (GoogleApiException expected) {
+      assertEquals(errorCode, expected.getStatusCode());
+      assertEquals(errorMessage, expected.getMessage());
+      return;
+    }
+    fail();
+  }
+
+  @Test(expected = GoogleApiException.class)
+  public void testCreateApplication_GoogleJsonException() throws IOException, GoogleApiException {
+    when(appengineClientMock.getAppsCreateQuery().execute())
+        .thenThrow(GoogleJsonResponseException.class);
+    service.createApplication("us-east", "my-project-id", mock(Credential.class));
+  }
+
+  /**
+   * A mock implementation of {@code Appengine} client lib, to make it easier to mock responses and
+   * perform assertions.
+   */
   private class AppengineMock extends Appengine {
 
     @Mock private Appengine.Apps apps;
@@ -156,11 +223,9 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
     public Apps.Get getAppsGetQuery() {
       return appsGet;
     }
-
     public Apps.Create getAppsCreateQuery() {
       return appsCreate;
     }
-
     public Apps.Operations.Get getAppsOperationsGetQuery() {
       return appsOperationsGet;
     }
