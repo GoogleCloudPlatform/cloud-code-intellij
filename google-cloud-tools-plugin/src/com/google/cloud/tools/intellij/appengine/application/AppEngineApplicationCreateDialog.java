@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.application;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.appengine.v1.model.Location;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -85,11 +84,9 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     regionDetailPane.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     instructionsTextPane.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     instructionsTextPane.setText(HTML_OPEN_TAG
-        + GctBundle.message("appengine.application.create.instructions")
-        + "<p>"
+        + GctBundle.message("appengine.application.create.instructions") + "<p>"
         + GctBundle.message("appengine.application.create.documentation",
-        "<a href=\"" + LOCATIONS_DOCUMENTATION_URL + "\">", "</a>")
-        + "</p>" + HTML_CLOSE_TAG);
+        "<a href=\"" + LOCATIONS_DOCUMENTATION_URL + "\">", "</a>") + "</p>" + HTML_CLOSE_TAG);
   }
 
   @Override
@@ -169,7 +166,9 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     AppEngineLocationSelectorItem item
         = (AppEngineLocationSelectorItem) regionComboBox.getSelectedItem();
 
-    String displayText = HTML_OPEN_TAG + "<ul>";
+    String displayText = HTML_OPEN_TAG +
+        GctBundle.message("appengine.application.region.supported.environments",
+            "<strong>" + item.getLocation().getLocationId() + "</strong>") + "<ul>";
 
     if (item.isStandardSupported()) {
       displayText += "<li>" + GctBundle.message("appengine.application.region.supports.standard",
