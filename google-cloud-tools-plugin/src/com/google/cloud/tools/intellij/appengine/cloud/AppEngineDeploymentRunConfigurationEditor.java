@@ -20,6 +20,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.appengine.v1.model.Application;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineApplicationCreateDialog;
+import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
@@ -299,7 +300,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         // TODO should the region (or the presence of the application be part of the Configuration?
         //  TODO  - this might be necessary if we want to use this to mark the config as invalid
       }
-    } catch (IOException e) {
+    } catch (IOException | GoogleApiException e) {
       setRegionLabelText(GctBundle.message("appengine.application.region.fetch.error"), true);
     }
   }

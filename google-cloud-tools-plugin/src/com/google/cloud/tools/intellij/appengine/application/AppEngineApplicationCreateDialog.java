@@ -17,9 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.application;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.services.appengine.v1.model.Application;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.appengine.v1.model.Location;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineOperationFailedException;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
@@ -106,18 +105,18 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
       @Override
       public void run() {
-        Application result;
         try {
-          result = AppEngineAdminService.getInstance().createApplication(
+          AppEngineAdminService.getInstance().createApplication(
               selectedLocation.getLocationId(), gcpProjectId, userCredential);
 
         } catch (IOException e) {
-          setStatusMessageAsync(GctBundle.message("appengine.application.create.error"), true);
+          setStatusMessageAsync(GctBundle.message("appengine.application.create.error.transient"),
+              true);
           setOKActionEnabled(true);
           return;
 
-        } catch (AppEngineOperationFailedException e) {
-          setStatusMessageAsync(e.getStatus().getMessage(), true);
+        } catch (GoogleApiException e) {
+          setStatusMessageAsync(e.getMessage(), true);
           setOKActionEnabled(true);
           return;
         }
@@ -153,7 +152,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     try {
       appEngineRegions = AppEngineAdminService.getInstance()
           .getAllAppEngineLocations(userCredential);
-    } catch (IOException e) {
+    } catch (IOException | GoogleApiException e) {
       setStatusMessage(GctBundle.message("appengine.application.region.list.fetch.error"), true);
       return;
     }
