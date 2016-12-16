@@ -19,7 +19,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.0.43'
+        classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.1.10'
         classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.8"
         classpath "gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.5"
     }
