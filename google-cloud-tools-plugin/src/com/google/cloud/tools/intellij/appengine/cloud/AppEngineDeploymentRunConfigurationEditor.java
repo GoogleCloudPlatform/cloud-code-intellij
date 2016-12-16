@@ -41,6 +41,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -627,10 +628,16 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
       if (e.getEventType() == EventType.ACTIVATED) {
+        // construct and show the application creation dialog
         AppEngineApplicationCreateDialog applicationDialog
             = new AppEngineApplicationCreateDialog(
             AppEngineDeploymentRunConfigurationEditor.this.getComponent(), projectId, credential);
         DialogManager.show(applicationDialog);
+
+        // if an application was created, update the region field display
+        if (applicationDialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+          updateRegionField(projectId, credential);
+        }
       }
     }
   }

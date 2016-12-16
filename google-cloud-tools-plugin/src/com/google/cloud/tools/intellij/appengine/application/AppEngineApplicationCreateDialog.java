@@ -17,13 +17,17 @@
 package com.google.cloud.tools.intellij.appengine.application;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.services.appengine.v1.model.Application;
 import com.google.api.services.appengine.v1.model.Location;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.ui.JBColor;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +44,9 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
+/**
+ * Dialog that allows creation of an App Engine Application
+ */
 public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
   private final static String LOCATIONS_DOCUMENTATION_URL
@@ -57,9 +64,9 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   private JTextPane statusPane;
   private JTextPane regionDetailPane;
 
-  private Component parent;
-  private Credential userCredential;
-  private String gcpProjectId;
+  private final Component parent;
+  private final Credential userCredential;
+  private final String gcpProjectId;
 
   public AppEngineApplicationCreateDialog(@NotNull Component parent, @NotNull String gcpProjectId,
       @NotNull Credential userCredential) {
@@ -97,37 +104,32 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
     // show loading state
     setOKActionEnabled(false);
-    setStatusMessage(GctBundle.message(
-        "appengine.application.create.loading", selectedLocation.getName()), false);
 
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          AppEngineAdminService.getInstance().createApplication(
+    try {
+      // attempt to create the application, and close the dialog if successful
+      ProgressManager.getInstance().runProcessWithProgressSynchronously(
+          new ThrowableComputable<Application, Exception>() {
+        @Override
+        public Application compute() throws IOException, GoogleApiException {
+          return AppEngineAdminService.getInstance().createApplication(
               selectedLocation.getLocationId(), gcpProjectId, userCredential);
-
-        } catch (IOException e) {
-          setStatusMessageAsync(GctBundle.message("appengine.application.create.error.transient"),
-              true);
-          setOKActionEnabled(true);
-          return;
-
-        } catch (GoogleApiException e) {
-          setStatusMessageAsync(e.getMessage(), true);
-          setOKActionEnabled(true);
-          return;
         }
+      }, "Creating App Engine Application. This can take up to a minute.", true /* cancellable */,
+          ProjectManager.getInstance().getDefaultProject());
 
-        // Defer to the dispatch thread to invoke the action of closing this dialog
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
-          @Override
-          public void run() {
-            AppEngineApplicationCreateDialog.this.close(OK_EXIT_CODE);
-          }
-        }, ModalityState.stateForComponent(AppEngineApplicationCreateDialog.this.getContentPane()));
-      }
-    });
+      close(OK_EXIT_CODE);
+
+    } catch (IOException e) {
+      setStatusMessage(GctBundle.message("appengine.application.create.error.transient"), true);
+      setOKActionEnabled(true);
+      return;
+    } catch (GoogleApiException e) {
+      setStatusMessage(e.getMessage(), true);
+      setOKActionEnabled(true);
+      return;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private void setStatusMessageAsync(final String message, final boolean isError) {
@@ -136,7 +138,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
       public void run() {
         setStatusMessage(message, isError);
       }
-    });
+    }, ModalityState.stateForComponent(AppEngineApplicationCreateDialog.this.getContentPane()));
   }
 
   private void setStatusMessage(String message, boolean isError) {
@@ -146,21 +148,31 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   }
 
   private void refreshLocationsSelector() {
-    List<Location> appEngineRegions;
-    try {
-      appEngineRegions = AppEngineAdminService.getInstance()
-          .getAllAppEngineLocations(userCredential);
-    } catch (IOException | GoogleApiException e) {
-      setStatusMessage(GctBundle.message("appengine.application.region.list.fetch.error"), true);
-      return;
-    }
+    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+      @Override
+      public void run() {
+        final List<Location> appEngineRegions;
+        try {
+          appEngineRegions = AppEngineAdminService.getInstance()
+              .getAllAppEngineLocations(userCredential);
+        } catch (IOException | GoogleApiException e) {
+          setStatusMessageAsync(GctBundle.message("appengine.application.region.list.fetch.error"),
+              true);
+          return;
+        }
 
-    regionComboBox.removeAllItems();
-    for (Location location : appEngineRegions) {
-      regionComboBox.addItem(new AppEngineLocationSelectorItem(location));
-    }
-
-    updateLocationDetailMessage();
+        // perform the actual UI updates on the event dispatch thread
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            regionComboBox.removeAllItems();
+            for (Location location : appEngineRegions) {
+              regionComboBox.addItem(new AppEngineLocationSelectorItem(location));
+            }
+          }
+        }, ModalityState.stateForComponent(AppEngineApplicationCreateDialog.this.getContentPane()));
+      }
+    });
   }
 
   private void updateLocationDetailMessage() {
