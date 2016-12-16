@@ -38,8 +38,8 @@ import java.util.List;
  */
 public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService {
 
-  private final static String APP_ENGINE_RESOURCE_WILDCARD = "-";
-  private final long CREATE_APPLICATION_POLLING_INTERVAL_MS = 1000;
+  private static final String APP_ENGINE_RESOURCE_WILDCARD = "-";
+  private static final long CREATE_APPLICATION_POLLING_INTERVAL_MS = 1000;
 
   @Override
   @Nullable
