@@ -31,8 +31,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class DefaultGoogleApiClientFactory extends GoogleApiClientFactory {
 
-  private static HttpTransport httpTransport = new NetHttpTransport();
-  private static JsonFactory jsonFactory = new JacksonFactory();
+  private static final HttpTransport httpTransport = new NetHttpTransport();
+  private static final JsonFactory jsonFactory = new JacksonFactory();
 
   @Override
   public CloudResourceManager getCloudResourceManagerClient(@Nullable HttpRequestInitializer
