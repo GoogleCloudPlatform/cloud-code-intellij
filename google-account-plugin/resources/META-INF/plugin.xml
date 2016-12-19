@@ -13,15 +13,13 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <idea-plugin version="2">
   <id>com.google.gct.login</id>
   <name>Google Account</name>
   <vendor>Google</vendor>
   <!-- "version" set by gradle-intellij-plugin -->
   <!-- "idea-version since-build" set by gradle-intellij-plugin -->
-  <!-- Workaround for gradle-intellij-plugin limitation: https://github.com/JetBrains/gradle-intellij-plugin/issues/66 -->
-  <!-- Setting version to 15.0.6 and up. https://confluence.jetbrains.com/display/IDEADEV/IDEA+15+EAP -->
-  <idea-version since-build="143.2370.31" />
 
   <description>
     Provides Google account setting and authentication for IntelliJ plugins that need it.
