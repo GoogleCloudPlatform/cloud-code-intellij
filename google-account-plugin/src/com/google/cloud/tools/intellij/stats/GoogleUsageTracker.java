@@ -127,6 +127,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   }
 
   /** Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property. */
+  @Override
   public void sendEvent(
       @NotNull String eventCategory,
       @NotNull String eventAction,
@@ -173,6 +174,8 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
     ApplicationManager.getApplication()
         .executeOnPooledThread(
             new Runnable() {
+
+              @Override
               public void run() {
                 CloseableHttpClient client =
                     HttpClientBuilder.create().setUserAgent(userAgent).build();

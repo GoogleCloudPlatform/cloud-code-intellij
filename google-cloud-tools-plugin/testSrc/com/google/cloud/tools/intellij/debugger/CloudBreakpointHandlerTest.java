@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,14 +85,12 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   private CloudBreakpointHandler handler;
   private CloudDebugProcessStateController stateController;
   private boolean registrationShouldSucceed;
-
+  private XBreakpointManager breakpointManager;
+  private ServerToIdeFileResolver fileResolver;
   @SuppressWarnings("JUnitTestCaseWithNonTrivialConstructors")
   public CloudBreakpointHandlerTest() {
     IdeaTestCase.initPlatformPrefix();
   }
-
-  private XBreakpointManager breakpointManager;
-  private ServerToIdeFileResolver fileResolver;
 
   @Override
   protected void setUp() throws Exception {
@@ -214,7 +212,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     handler.deleteBreakpoint(addedBp.get());
 
     assertNotNull(removedBp.get());
-    assertTrue(removedBp.get() == addedBp.get().getId());
+    assertTrue(removedBp.get().equals(addedBp.get().getId()));
   }
 
   public void testServerCreation() {
