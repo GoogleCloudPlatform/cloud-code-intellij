@@ -55,7 +55,7 @@ subprojects {
     intellij {
         type = ideaEdition
         version = ideaVersion
-        updateSinceUntilBuild = false
+        updateSinceUntilBuild = true
         downloadSources = true
         sandboxDirectory = "${rootProject.buildDir}/idea-sandbox"
 
