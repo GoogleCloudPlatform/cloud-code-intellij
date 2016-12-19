@@ -34,6 +34,7 @@ import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.resources.RepositorySelector;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
@@ -55,70 +56,25 @@ import javax.swing.event.DocumentEvent;
  * Shows a dialog that has one entry value which is a GCP project using the project selector. The
  * title and ok button text is passed into the constructor.
  */
-public class ChooseProjectDialog extends DialogWrapper {
+public class UploadSourceDialog extends DialogWrapper {
 
   private JPanel rootPanel;
   private ProjectSelector projectSelector;
+  private RepositorySelector repositorySelector;
   private String projectId;
+  private String repositoryName;
   private CredentialedUser credentialedUser;
 
   /**
    * Initialize the project selection dialog.
    */
-  public ChooseProjectDialog(@NotNull Project project, @NotNull String title,
+  public UploadSourceDialog(@NotNull Project project, @NotNull String title,
       @NotNull String okText) {
     super(project, true);
     init();
     setTitle(title);
     setOKButtonText(okText);
     setOKActionEnabled(false);
-
-//    Source source = Source.Builde
-//    try {
-//      final CredentialedUser user = Services.getLoginService().getAllUsers()
-//          .get("etansh@gmail.com");
-//      final Credential credential = (user != null ? user.getCredential() : null);
-//      HttpRequestInitializer initializer = new HttpRequestInitializer() {
-//        @Override
-//        public void initialize(HttpRequest httpRequest) throws IOException {
-//          HttpHeaders headers = new HttpHeaders();
-//          httpRequest.setConnectTimeout(5000);
-//          httpRequest.setReadTimeout(5000);
-//          httpRequest.setHeaders(headers);
-//          credential.initialize(httpRequest);
-//        }
-//      };
-//
-//      HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-//      String userAgent = ServiceManager
-//          .getService(CloudToolsPluginInfoService.class).getUserAgent();
-//
-//      Source source = new Source.Builder(httpTransport, JacksonFactory.getDefaultInstance(),
-//          initializer)
-//          .setRootUrl("https://source.googleapis.com/")
-//          .setServicePath("")
-//          // this ends up prefixed to user agent
-//          .setApplicationName(userAgent)
-//          .build();
-//
-//      MySourceList sourceList = new MySourceList(source, "test-metrics");
-//
-////      ListReposResponse response = source.repos().list("test-metrics").execute();
-//      ListReposResponse response = sourceList.execute();
-//      for(Repo repo : response.getRepos()) {
-//        System.out.println(repo.get("name"));
-//      }
-//
-////      Repo newRepo = new Repo();
-//
-////      newRepo.setName("from-ij");
-////      source.projects().repos().create("test-metrics", newRepo).execute();
-//    } catch (IOException ioe) {
-//      ioe.printStackTrace();
-//    } catch (GeneralSecurityException gse) {
-//      gse.printStackTrace();
-//    }
-
   }
 
   /**
@@ -127,6 +83,10 @@ public class ChooseProjectDialog extends DialogWrapper {
   @NotNull
   public String getProjectId() {
     return projectId;
+  }
+
+  @NotNull String getRepositoryName() {
+    return repositoryName;
   }
 
   /**
@@ -139,18 +99,26 @@ public class ChooseProjectDialog extends DialogWrapper {
 
   @Override
   protected String getDimensionServiceKey() {
-    return "ChooseProjectDialog";
+    return "UploadSourceDialog";
   }
 
   private void createUIComponents() {
     projectSelector = new ProjectSelector();
     projectSelector.setMinimumSize(new Dimension(300, 0));
+
+    repositorySelector = new RepositorySelector(projectSelector.getText(), projectSelector.getSelectedUser());
+
     projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
         setOKActionEnabled(projectSelector.getSelectedUser() != null);
+        repositorySelector.setCloudProject(projectSelector.getText());
+        repositorySelector.setUser(projectSelector.getSelectedUser());
       }
     });
+
+    // todo figure out how to disable it when no project is selected
+//    repositorySelector.setEnabled(false);
   }
 
   @Nullable
@@ -167,10 +135,12 @@ public class ChooseProjectDialog extends DialogWrapper {
   @Override
   protected void doOKAction() {
     projectId = projectSelector.getText();
+    repositoryName = repositorySelector.getText();
     credentialedUser = projectSelector.getSelectedUser();
     super.doOKAction();
   }
 
+  // TODO move this and trim it down to what's necessary
   public static class MySourceList extends SourceRequest<ListReposResponse>{
     @Key
     private String projectId;

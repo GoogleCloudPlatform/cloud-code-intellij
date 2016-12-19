@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.resources;
 
+import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 
@@ -23,8 +24,18 @@ import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
+import com.intellij.ui.components.JBScrollPane;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  * Created by eshaul on 12/14/16.
@@ -33,11 +44,27 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
   private JBPopup popup;
   private RepositoryPanel panel;
+  private String cloudProject;
+  private CredentialedUser user;
+
+
+  public RepositorySelector(@Nullable String cloudProject, @Nullable CredentialedUser user) {
+    this.cloudProject = cloudProject;
+    this.user = user;
+  }
+
+  public void setCloudProject(String cloudProject) {
+    this.cloudProject = cloudProject;
+  }
+
+  public void setUser(CredentialedUser user) {
+    this.user = user;
+  }
 
   @Override
   public void showPopup(RelativePoint showTarget) {
     if (popup == null || popup.isDisposed()) {
-      panel = new RepositoryPanel();
+      panel = new RepositoryPanel(cloudProject);
 
       ComponentPopupBuilder popupBuilder = JBPopupFactory.getInstance()
           .createComponentPopupBuilder(panel, null); // todo change focus param
@@ -57,7 +84,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
   @Override
   public boolean isPopupVisible() {
-    return false;
+    return popup != null && !popup.isDisposed() && popup.isVisible();
   }
 
   @Override
@@ -70,7 +97,34 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     return 240;
   }
 
-  private static class RepositoryPanel extends JPanel {
+  private class RepositoryPanel extends JPanel {
 
+    private JTree repositoryTree;
+    private DefaultMutableTreeNode projectRootNode;
+    private DefaultTreeModel treeModel;
+
+    public RepositoryPanel(String cloudProject) {
+      projectRootNode = new DefaultMutableTreeNode("root");
+      treeModel = new DefaultTreeModel(projectRootNode);
+
+      ProjectRepositoriesModelItem repositories = new ProjectRepositoriesModelItem(cloudProject, user);
+      treeModel.insertNodeInto(repositories, projectRootNode, 0);
+
+      repositoryTree = new JTree(treeModel);
+      repositoryTree.setRootVisible(false);
+      repositoryTree.setOpaque(false);
+      repositoryTree.expandRow(0);
+
+      JBScrollPane scrollPane = new JBScrollPane();
+      scrollPane.setViewportView(repositoryTree);
+      // TODO update this
+      scrollPane.setPreferredSize(new Dimension(240, getPreferredPopupHeight()));
+      scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+//          projectRootNode.getChildCount()); // TODO is the count needed?
+
+      this.setPreferredSize(new Dimension(240, getPreferredPopupHeight()));
+      add(scrollPane, BorderLayout.CENTER);
+    }
   }
 }

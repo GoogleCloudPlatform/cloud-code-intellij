@@ -147,8 +147,8 @@ public class UploadSourceAction extends DumbAwareAction {
       externalRemoteDetected = !gitRepository.getRemotes().isEmpty();
     }
 
-    ChooseProjectDialog dialog =
-        new ChooseProjectDialog(project, GctBundle.message("uploadtogcp.selecttext"),
+    UploadSourceDialog dialog =
+        new UploadSourceDialog(project, GctBundle.message("uploadtogcp.selecttext"),
             GctBundle.message("uploadtogcp.oktext"));
     DialogManager.show(dialog);
     if (!dialog.isOK() || dialog.getCredentialedUser() == null || Strings
@@ -157,6 +157,7 @@ public class UploadSourceAction extends DumbAwareAction {
     }
 
     final String projectId = dialog.getProjectId();
+    final String repositoryName = dialog.getRepositoryName();
     final CredentialedUser user = dialog.getCredentialedUser();
 
     // finish the job in background
