@@ -103,8 +103,5 @@ These are relatively small, self-contained changes that are good places to start
 
 ## FAQ
 
-### java.lang.OutOfMemoryError: PermGen space when running the tests inside IDEA
-
-From the Run menu select “Edit Configurations...” In the "VM options" field add -XX:MaxPermSize=256m (and if that doesn't work try 512m instead).
-
+Nothing here yet.
 

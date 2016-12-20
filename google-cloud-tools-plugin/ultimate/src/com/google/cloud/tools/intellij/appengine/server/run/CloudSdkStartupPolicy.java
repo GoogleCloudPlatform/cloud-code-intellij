@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.server.run;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRunTask;
+import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
+import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardRunTask;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
