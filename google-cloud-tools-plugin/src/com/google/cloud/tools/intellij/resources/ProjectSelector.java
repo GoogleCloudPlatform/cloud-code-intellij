@@ -247,6 +247,18 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     return modelItem != null ? modelItem.getNumber() : null;
   }
 
+  /**
+   * Returns the selected project.
+   * <p/>
+   * This has the same limitations as {@link #getSelectedUser()}  in that it may be null even if
+   * getText represents a valid ID if queryOnExpand is true.
+   */
+  @Nullable
+  public Project getProject() {
+    ResourceProjectModelItem modelItem = getCurrentModelItem();
+    return modelItem != null ? modelItem.getProject() : null;
+  }
+
   @Nullable
   private ResourceProjectModelItem getCurrentModelItem() {
     if (Strings.isNullOrEmpty(getText())) {

@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 /**
- * Represents a single GCP project ui.
+ * Represents a single item in an App Engine Location selector UI element.
  */
 class AppEngineLocationSelectorItem {
 

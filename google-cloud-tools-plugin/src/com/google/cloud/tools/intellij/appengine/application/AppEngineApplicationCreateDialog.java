@@ -114,7 +114,9 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
           return AppEngineAdminService.getInstance().createApplication(
               selectedLocation.getLocationId(), gcpProjectId, userCredential);
         }
-      }, "Creating App Engine Application. This can take up to a minute.", true /* cancellable */,
+      }, GctBundle.message("appengine.application.create.loading",
+              selectedLocation.getLocationId()),
+          true /* cancellable */,
           ProjectManager.getInstance().getDefaultProject());
 
       close(OK_EXIT_CODE);

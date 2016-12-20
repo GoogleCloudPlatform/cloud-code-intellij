@@ -271,8 +271,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         environment == AppEngineEnvironment.APP_ENGINE_FLEX
             && !AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
 
-    // TODO updateRegionField() with any persisted configs
-
     projectSelector.addProjectSelectionListener(new ProjectSelectionListener() {
       @Override
       public void selectionChanged(ProjectSelectionChangedEvent event) {
@@ -297,9 +295,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         setRegionLabelText(GctBundle.message("appengine.application.not.exist") + " "
             + GctBundle.message("appengine.application.create",
             CREATE_APPLICATION_HREF_OPEN_TAG, LABEL_HREF_CLOSE_TAG), true);
-
-        // TODO should the region (or the presence of the application be part of the Configuration?
-        //  TODO  - this might be necessary if we want to use this to mark the config as invalid
       }
     } catch (IOException | GoogleApiException e) {
       setRegionLabelText(GctBundle.message("appengine.application.region.fetch.error"), true);
@@ -314,6 +309,10 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   @Override
   protected void resetEditorFrom(AppEngineDeploymentConfiguration configuration) {
     projectSelector.setText(configuration.getCloudProjectName());
+    if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
+      updateRegionField(projectSelector.getProject().getProjectId(),
+          projectSelector.getSelectedUser().getCredential());
+    }
     userSpecifiedArtifactFileSelector.setText(configuration.getUserSpecifiedArtifactPath());
     dockerFilePathField.setText(configuration.getDockerFilePath());
     appYamlPathField.setText(configuration.getAppYamlPath());
@@ -432,6 +431,10 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     } else if (StringUtils.isBlank(projectSelector.getText())) {
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.project.missing.message"));
+    } else if (projectSelector.getProject() != null
+        && !projectHasApplication(projectSelector.getProject())) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.application.required.deployment"));
     } else if (versionOverrideCheckBox.isSelected()
         && StringUtils.isBlank(versionIdField.getText())) {
       throw new ConfigurationException(GctBundle.message("appengine.config.version.error"));
@@ -456,6 +459,11 @@ public class AppEngineDeploymentRunConfigurationEditor extends
             CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT.getMessage());
       }
     }
+  }
+
+  private boolean projectHasApplication(com.google.api.services.cloudresourcemanager.model.Project project) {
+    // TODO determine if the project has an application
+    return false;
   }
 
   private boolean isJarOrWar(String path) {
@@ -629,10 +637,11 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     public void hyperlinkUpdate(HyperlinkEvent e) {
       if (e.getEventType() == EventType.ACTIVATED) {
         // construct and show the application creation dialog
-        AppEngineApplicationCreateDialog applicationDialog
-            = new AppEngineApplicationCreateDialog(
+        AppEngineApplicationCreateDialog applicationDialog = new AppEngineApplicationCreateDialog(
             AppEngineDeploymentRunConfigurationEditor.this.getComponent(), projectId, credential);
         DialogManager.show(applicationDialog);
+
+        // TODO dispose?
 
         // if an application was created, update the region field display
         if (applicationDialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
