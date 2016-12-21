@@ -592,7 +592,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     void selectionChanged(ProjectSelectionChangedEvent event);
   }
 
-  public class ProjectSelectionChangedEvent {
+  public static class ProjectSelectionChangedEvent {
     private Project selectedProject;
     private CredentialedUser user;
 

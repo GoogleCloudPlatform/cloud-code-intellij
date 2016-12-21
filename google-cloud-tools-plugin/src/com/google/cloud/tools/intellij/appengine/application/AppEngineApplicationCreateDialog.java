@@ -64,7 +64,6 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   private JTextPane statusPane;
   private JTextPane regionDetailPane;
 
-  private final Component parent;
   private final Credential userCredential;
   private final String gcpProjectId;
 
@@ -72,7 +71,6 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
       @NotNull Credential userCredential) {
     super(parent, false);
 
-    this.parent = parent;
     this.gcpProjectId = gcpProjectId;
     this.userCredential = userCredential;
 

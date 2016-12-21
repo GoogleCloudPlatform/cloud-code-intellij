@@ -17,9 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.services.appengine.v1.model.Application;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService;
-import com.google.cloud.tools.intellij.appengine.application.AppEngineApplicationCreateDialog;
 import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
@@ -29,21 +27,16 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
-import com.google.cloud.tools.intellij.resources.ProjectSelector.ProjectSelectionChangedEvent;
-import com.google.cloud.tools.intellij.resources.ProjectSelector.ProjectSelectionListener;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.PlaceholderTextField;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -60,7 +53,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
 
 import org.apache.commons.lang.StringUtils;
@@ -89,11 +81,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkEvent.EventType;
-import javax.swing.event.HyperlinkListener;
-
-import git4idea.DialogManager;
 
 /**
  * Editor for an App Engine Deployment runtime configuration.
@@ -121,8 +108,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private JCheckBox stopPreviousVersionCheckbox;
   private JLabel stopPreviousVersionLabel;
   private JTextPane promoteInfoLabel;
-  private JTextPane regionLabel;
-  private CreateApplicationLinkListener createApplicationListener;
+  private AppEngineApplicationInfoPanel applicationInfoPanel;
+  private JPanel regionLabel;
 
   private DeploymentSource deploymentSource;
   private AppEngineEnvironment environment;
@@ -135,7 +122,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
       "<a href='https://console.cloud.google.com/appengine/versions'>";
   private static final String COST_WARNING_HREF_OPEN_TAG =
       "<a href='https://cloud.google.com/appengine/pricing'>";
-  private static final String CREATE_APPLICATION_HREF_OPEN_TAG = "<a href='#'>";
 
   public static final String DEFAULT_APP_YAML_DIR = "/src/main/appengine";
   public static final String DEFAULT_DOCKERFILE_DIR = "/src/main/docker";
@@ -273,56 +259,16 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         environment == AppEngineEnvironment.APP_ENGINE_FLEX
             && !AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
 
-    projectSelector.addProjectSelectionListener(new ProjectSelectionListener() {
-      @Override
-      public void selectionChanged(ProjectSelectionChangedEvent event) {
-        updateRegionField(event.getSelectedProject().getProjectId(), event.getUser().getCredential());
-      }
-    });
-
-    createApplicationListener = new CreateApplicationLinkListener();
-    regionLabel.addHyperlinkListener(createApplicationListener);
-  }
-
-  private void updateRegionField(final String projectId, final Credential credential) {
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          Application application =
-              AppEngineAdminService.getInstance().getApplicationForProjectId(projectId, credential);
-
-          if (application != null) {
-            setRegionLabelText(application.getLocationId(), false);
-          } else {
-            createApplicationListener.setCredential(credential);
-            createApplicationListener.setProjectId(projectId);
-            setRegionLabelText(GctBundle.message("appengine.application.not.exist") + " "
-                + GctBundle.message("appengine.application.create",
-                CREATE_APPLICATION_HREF_OPEN_TAG, LABEL_HREF_CLOSE_TAG), true);
-          }
-        } catch (IOException | GoogleApiException e) {
-          setRegionLabelText(GctBundle.message("appengine.application.region.fetch.error"), true);
-        }
-      }
-    });
-  }
-
-  private void setRegionLabelText(final String text, final boolean isErrorState) {
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        regionLabel.setText(LABEL_OPEN_TAG + text + LABEL_CLOSE_TAG);
-        regionLabel.setForeground(isErrorState ? JBColor.red : JBColor.black);
-      }
-    }, ModalityState.stateForComponent(regionLabel));
+    projectSelector.addProjectSelectionListener((event) ->
+      applicationInfoPanel.displayInfoForProject(event.getSelectedProject().getProjectId(),
+          event.getUser().getCredential()));
   }
 
   @Override
   protected void resetEditorFrom(AppEngineDeploymentConfiguration configuration) {
     projectSelector.setText(configuration.getCloudProjectName());
     if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
-      updateRegionField(projectSelector.getProject().getProjectId(),
+      applicationInfoPanel.displayInfoForProject(projectSelector.getProject().getProjectId(),
           projectSelector.getSelectedUser().getCredential());
     }
     userSpecifiedArtifactFileSelector.setText(configuration.getUserSpecifiedArtifactPath());
@@ -443,8 +389,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     } else if (StringUtils.isBlank(projectSelector.getText())) {
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.project.missing.message"));
-    } else if (projectSelector.getProject() != null
-        && !projectHasApplication(projectSelector.getProject())) {
+    } else if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null
+        && !applicationIsMissing(projectSelector.getProject().getProjectId(),
+        projectSelector.getSelectedUser().getCredential())) {
       throw new ConfigurationException(
           GctBundle.message("appengine.application.required.deployment"));
     } else if (versionOverrideCheckBox.isSelected()
@@ -473,9 +420,17 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     }
   }
 
-  private boolean projectHasApplication(com.google.api.services.cloudresourcemanager.model.Project project) {
-    // TODO determine if the project has an application
-    return false;
+  /**
+   * Return {@code true} if the application definitely does not exist. In cases where we are unsure,
+   * return {@code false} to avoid false positives.
+   */
+  private boolean applicationIsMissing(String projectId, Credential credential) {
+    try {
+      return AppEngineAdminService.getInstance()
+          .getApplicationForProjectId(projectId, credential) != null;
+    } catch (IOException | GoogleApiException e) {
+      return false;
+    }
   }
 
   private boolean isJarOrWar(String path) {
@@ -628,37 +583,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
       if (!isPromoteSelected) {
         stopPreviousVersionCheckbox.setSelected(false);
-      }
-    }
-  }
-
-  private class CreateApplicationLinkListener implements HyperlinkListener {
-
-    private Credential credential;
-    private String projectId;
-
-    public void setCredential(Credential credential) {
-      this.credential = credential;
-    }
-
-    public void setProjectId(String projectId) {
-      this.projectId = projectId;
-    }
-
-    @Override
-    public void hyperlinkUpdate(HyperlinkEvent e) {
-      if (e.getEventType() == EventType.ACTIVATED) {
-        // construct and show the application creation dialog
-        AppEngineApplicationCreateDialog applicationDialog = new AppEngineApplicationCreateDialog(
-            AppEngineDeploymentRunConfigurationEditor.this.getComponent(), projectId, credential);
-        DialogManager.show(applicationDialog);
-
-        // TODO dispose?
-
-        // if an application was created, update the region field display
-        if (applicationDialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-          updateRegionField(projectId, credential);
-        }
       }
     }
   }
