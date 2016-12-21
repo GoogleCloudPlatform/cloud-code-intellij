@@ -22,6 +22,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.notification.NotificationListener.UrlOpeningListener;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -34,6 +35,12 @@ import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import git4idea.DialogManager;
 import git4idea.GitVcs;
 import git4idea.actions.BasicAction;
@@ -42,18 +49,15 @@ import git4idea.commands.GitCommandResult;
 import git4idea.commands.GitLineHandlerListener;
 import git4idea.commands.GitStandardProgressAnalyzer;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * Checkout provider for the Google Cloud Platform.
  */
 public class GcpCheckoutProvider implements CheckoutProvider {
 
   private static final Logger LOG = Logger.getInstance(GcpCheckoutProvider.class);
+  private static final String URL_REGEX =
+      "https?://(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&/"
+          + "/=]*)";
 
   private final Git git;
 
@@ -186,8 +190,10 @@ public class GcpCheckoutProvider implements CheckoutProvider {
       return true;
     }
     VcsNotifier.getInstance(project)
-        .notifyError(GctBundle.message("clonefromgcp.failed"), result.getErrorOutputAsHtmlString());
+        .notifyError(GctBundle.message("clonefromgcp.failed"),
+            result.getErrorOutputAsHtmlString() + "<br>"
+                + result.getOutputAsJoinedString().replaceAll(URL_REGEX, "<a href=\"$0\">$0</a>"),
+            new UrlOpeningListener(true));
     return false;
   }
-
 }

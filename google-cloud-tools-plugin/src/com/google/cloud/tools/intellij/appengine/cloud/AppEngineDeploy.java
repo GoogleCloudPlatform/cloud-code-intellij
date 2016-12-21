@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,19 +125,19 @@ public class AppEngineDeploy {
     deployment.deploy(configuration);
   }
 
-  AppEngineHelper getHelper() {
+  public AppEngineHelper getHelper() {
     return helper;
   }
 
-  LoggingHandler getLoggingHandler() {
+  public LoggingHandler getLoggingHandler() {
     return loggingHandler;
   }
 
-  AppEngineDeploymentConfiguration getDeploymentConfiguration() {
+  public AppEngineDeploymentConfiguration getDeploymentConfiguration() {
     return deploymentConfiguration;
   }
 
-  DeploymentOperationCallback getCallback() {
+  public DeploymentOperationCallback getCallback() {
     return callback;
   }
 
