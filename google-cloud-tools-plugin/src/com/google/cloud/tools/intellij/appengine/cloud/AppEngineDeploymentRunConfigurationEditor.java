@@ -37,6 +37,8 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -282,28 +284,38 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     regionLabel.addHyperlinkListener(createApplicationListener);
   }
 
-  private void updateRegionField(String projectId, Credential credential) {
-    try {
-      Application application =
-          AppEngineAdminService.getInstance().getApplicationForProjectId(projectId, credential);
+  private void updateRegionField(final String projectId, final Credential credential) {
+    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          Application application =
+              AppEngineAdminService.getInstance().getApplicationForProjectId(projectId, credential);
 
-      if (application != null) {
-        setRegionLabelText(application.getLocationId(), false);
-      } else {
-        createApplicationListener.setCredential(credential);
-        createApplicationListener.setProjectId(projectId);
-        setRegionLabelText(GctBundle.message("appengine.application.not.exist") + " "
-            + GctBundle.message("appengine.application.create",
-            CREATE_APPLICATION_HREF_OPEN_TAG, LABEL_HREF_CLOSE_TAG), true);
+          if (application != null) {
+            setRegionLabelText(application.getLocationId(), false);
+          } else {
+            createApplicationListener.setCredential(credential);
+            createApplicationListener.setProjectId(projectId);
+            setRegionLabelText(GctBundle.message("appengine.application.not.exist") + " "
+                + GctBundle.message("appengine.application.create",
+                CREATE_APPLICATION_HREF_OPEN_TAG, LABEL_HREF_CLOSE_TAG), true);
+          }
+        } catch (IOException | GoogleApiException e) {
+          setRegionLabelText(GctBundle.message("appengine.application.region.fetch.error"), true);
+        }
       }
-    } catch (IOException | GoogleApiException e) {
-      setRegionLabelText(GctBundle.message("appengine.application.region.fetch.error"), true);
-    }
+    });
   }
 
-  private void setRegionLabelText(String text, boolean isErrorState) {
-    regionLabel.setText(LABEL_OPEN_TAG + text + LABEL_CLOSE_TAG);
-    regionLabel.setForeground(isErrorState ? JBColor.red : JBColor.black);
+  private void setRegionLabelText(final String text, final boolean isErrorState) {
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        regionLabel.setText(LABEL_OPEN_TAG + text + LABEL_CLOSE_TAG);
+        regionLabel.setForeground(isErrorState ? JBColor.red : JBColor.black);
+      }
+    }, ModalityState.stateForComponent(regionLabel));
   }
 
   @Override
