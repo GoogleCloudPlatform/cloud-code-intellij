@@ -18,8 +18,10 @@ package com.google.cloud.tools.intellij.appengine.application;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.appengine.v1.model.Location;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -98,6 +100,10 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     setOKActionEnabled(false);
 
     try {
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.APP_ENGINE_APPLICATION_CREATE)
+          .ping();
+
       // attempt to create the application, and close the dialog if successful
       ProgressManager.getInstance().runProcessWithProgressSynchronously(() ->
               AppEngineAdminService.getInstance().createApplication(
@@ -107,19 +113,32 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
           true /* cancellable */,
           ProjectManager.getInstance().getDefaultProject());
 
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.APP_ENGINE_APPLICATION_CREATE_SUCCESS)
+          .ping();
+
       close(OK_EXIT_CODE);
 
     } catch (IOException e) {
+      trackApplicationCreateFailure();
       setStatusMessage(GctBundle.message("appengine.application.create.error.transient"), true);
       setOKActionEnabled(true);
       return;
     } catch (GoogleApiException e) {
+      trackApplicationCreateFailure();
       setStatusMessage(e.getMessage(), true);
       setOKActionEnabled(true);
       return;
     } catch (Exception e) {
+      trackApplicationCreateFailure();
       throw new RuntimeException(e);
     }
+  }
+
+  private void trackApplicationCreateFailure() {
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_APPLICATION_CREATE_FAIL)
+        .ping();
   }
 
   private void setStatusMessageAsync(final String message, final boolean isError) {
