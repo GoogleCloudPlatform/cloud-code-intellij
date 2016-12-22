@@ -81,6 +81,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 
 /**
  * Editor for an App Engine Deployment runtime configuration.
@@ -260,17 +262,45 @@ public class AppEngineDeploymentRunConfigurationEditor extends
             && !AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
 
     projectSelector.addProjectSelectionListener((event) ->
-      applicationInfoPanel.displayInfoForProject(event.getSelectedProject().getProjectId(),
+      applicationInfoPanel.refresh(event.getSelectedProject().getProjectId(),
           event.getUser().getCredential()));
+
+    projectSelector.addModelListener(new TreeModelListener() {
+      @Override
+      public void treeNodesChanged(TreeModelEvent e) {
+        // Do nothing.
+      }
+
+      @Override
+      public void treeNodesInserted(TreeModelEvent e) {
+        // Do nothing.
+      }
+
+      @Override
+      public void treeNodesRemoved(TreeModelEvent e) {
+        // Do nothing.
+      }
+
+      @Override
+      public void treeStructureChanged(TreeModelEvent e) {
+        // projects have finished loading
+        refreshApplicationInfoPanel();
+      }
+    });
+  }
+
+  private void refreshApplicationInfoPanel() {
+    if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
+      applicationInfoPanel.refresh(projectSelector.getProject().getProjectId(),
+          projectSelector.getSelectedUser().getCredential());
+    }
   }
 
   @Override
   protected void resetEditorFrom(AppEngineDeploymentConfiguration configuration) {
     projectSelector.setText(configuration.getCloudProjectName());
-    if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
-      applicationInfoPanel.displayInfoForProject(projectSelector.getProject().getProjectId(),
-          projectSelector.getSelectedUser().getCredential());
-    }
+    refreshApplicationInfoPanel();
+
     userSpecifiedArtifactFileSelector.setText(configuration.getUserSpecifiedArtifactPath());
     dockerFilePathField.setText(configuration.getDockerFilePath());
     appYamlPathField.setText(configuration.getAppYamlPath());

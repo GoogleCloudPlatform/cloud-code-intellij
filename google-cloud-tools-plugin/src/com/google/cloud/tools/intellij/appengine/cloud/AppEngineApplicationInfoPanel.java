@@ -69,8 +69,11 @@ public class AppEngineApplicationInfoPanel extends JPanel {
 
   /**
    * Updates the panel to display application info for the given project.
+   *
+   * @param projectId the ID of the project whose application info to display
+   * @param credential the Credential to use to make any required API calls
    */
-  public void displayInfoForProject(final String projectId, final Credential credential) {
+  public void refresh(final String projectId, final Credential credential) {
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
       try {
         Application application =
@@ -137,7 +140,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
 
         // if an application was created, update the region field display
         if (applicationDialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-          displayInfoForProject(projectId, credential);
+          refresh(projectId, credential);
         }
       }
     }
