@@ -561,10 +561,21 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     return popup != null && !popup.isDisposed() && popup.isVisible();
   }
 
+  /**
+   * Adds a {@link ProjectSelectionListener} to this class's internal list of listeners. All
+   * ProjectSelectionListeners are notified when the selection is changed to a valid project.
+   *
+   * @param projectSelectionListener the listener to add
+   */
   public void addProjectSelectionListener(ProjectSelectionListener projectSelectionListener) {
     projectSelectionListeners.add(projectSelectionListener);
   }
 
+  /**
+   * Removes a {@link ProjectSelectionListener} from this class's internal list of listeners.
+   *
+   * @param projectSelectionListener the listener to remove
+   */
   public void removeProjectSelectionListener(ProjectSelectionListener projectSelectionListener) {
     projectSelectionListeners.remove(projectSelectionListener);
   }
@@ -586,10 +597,17 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     }
   }
 
+  /**
+   * Interface that must be implemented in order to be informed of
+   * {@link ProjectSelectionChangedEvent} events.
+   */
   public interface ProjectSelectionListener {
     void selectionChanged(ProjectSelectionChangedEvent event);
   }
 
+  /**
+   * Event for when the selection changes to a valid project.
+   */
   public static class ProjectSelectionChangedEvent {
     private Project selectedProject;
     private CredentialedUser user;
