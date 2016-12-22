@@ -542,8 +542,6 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     if (newSelection.getParent() instanceof GoogleUserModelItem) {
       user = ((GoogleUserModelItem) newSelection.getParent()).getCredentialedUser();
     }
-    // TODO if not, is this an error state? how to proceed with a null user?
-
     ProjectSelectionChangedEvent event
         = new ProjectSelectionChangedEvent(newSelection.getProject(), user);
     for (ProjectSelectionListener listener : projectSelectionListeners) {

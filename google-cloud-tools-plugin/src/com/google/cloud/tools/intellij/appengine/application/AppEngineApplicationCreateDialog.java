@@ -78,12 +78,9 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     setTitle(GctBundle.message("appengine.application.region.select"));
     refreshLocationsSelector();
 
-    regionComboBox.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED) {
-          updateLocationDetailMessage();
-        }
+    regionComboBox.addItemListener((event) -> {
+      if (event.getStateChange() == ItemEvent.SELECTED) {
+        updateLocationDetailMessage();
       }
     });
 
@@ -105,14 +102,10 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
     try {
       // attempt to create the application, and close the dialog if successful
-      ProgressManager.getInstance().runProcessWithProgressSynchronously(
-          new ThrowableComputable<Application, Exception>() {
-        @Override
-        public Application compute() throws IOException, GoogleApiException {
-          return AppEngineAdminService.getInstance().createApplication(
-              selectedLocation.getLocationId(), gcpProjectId, userCredential);
-        }
-      }, GctBundle.message("appengine.application.create.loading",
+      ProgressManager.getInstance().runProcessWithProgressSynchronously(() ->
+              AppEngineAdminService.getInstance().createApplication(
+                  selectedLocation.getLocationId(), gcpProjectId, userCredential),
+      GctBundle.message("appengine.application.create.loading",
               selectedLocation.getLocationId()),
           true /* cancellable */,
           ProjectManager.getInstance().getDefaultProject());
@@ -133,12 +126,8 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   }
 
   private void setStatusMessageAsync(final String message, final boolean isError) {
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        setStatusMessage(message, isError);
-      }
-    }, ModalityState.stateForComponent(AppEngineApplicationCreateDialog.this.getContentPane()));
+    ApplicationManager.getApplication().invokeLater(() -> setStatusMessage(message, isError),
+        ModalityState.stateForComponent(AppEngineApplicationCreateDialog.this.getContentPane()));
   }
 
   private void setStatusMessage(String message, boolean isError) {
@@ -148,30 +137,24 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   }
 
   private void refreshLocationsSelector() {
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        final List<Location> appEngineRegions;
-        try {
-          appEngineRegions = AppEngineAdminService.getInstance()
-              .getAllAppEngineLocations(userCredential);
-        } catch (IOException | GoogleApiException e) {
-          setStatusMessageAsync(GctBundle.message("appengine.application.region.list.fetch.error"),
-              true);
-          return;
-        }
-
-        // perform the actual UI updates on the event dispatch thread
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            regionComboBox.removeAllItems();
-            for (Location location : appEngineRegions) {
-              regionComboBox.addItem(new AppEngineLocationSelectorItem(location));
-            }
-          }
-        }, ModalityState.stateForComponent(AppEngineApplicationCreateDialog.this.getContentPane()));
+    ApplicationManager.getApplication().executeOnPooledThread(() -> {
+      final List<Location> appEngineRegions;
+      try {
+        appEngineRegions = AppEngineAdminService.getInstance()
+            .getAllAppEngineLocations(userCredential);
+      } catch (IOException | GoogleApiException e) {
+        setStatusMessageAsync(GctBundle.message("appengine.application.region.list.fetch.error"),
+            true);
+        return;
       }
+
+      // perform the actual UI updates on the event dispatch thread
+      ApplicationManager.getApplication().invokeLater(() -> {
+        regionComboBox.removeAllItems();
+        for (Location location : appEngineRegions) {
+          regionComboBox.addItem(new AppEngineLocationSelectorItem(location));
+        }
+      }, ModalityState.stateForComponent(AppEngineApplicationCreateDialog.this.getContentPane()));
     });
   }
 
