@@ -41,6 +41,9 @@ import javax.swing.event.HyperlinkListener;
 
 import git4idea.DialogManager;
 
+/**
+ * A {@link JPanel} that displays contextual information about an App Engine Application.
+ */
 public class AppEngineApplicationInfoPanel extends JPanel {
 
   private static final String HTML_OPEN_TAG = "<html><font face='sans' size='-1'>";
@@ -48,27 +51,25 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   private static final String CREATE_APPLICATION_HREF_OPEN_TAG = "<a href='#'>";
   private static final String HREF_CLOSE_TAG = "</a>";
 
-  private final CreateApplicationLinkListener  createApplicationLinkListener;
   private final JLabel errorIcon;
   private final JTextPane messageText;
-  private boolean isApplicationValid;
+
+  // Start in a friendly state before we know whether the application is truly valid.
+  private boolean isApplicationValid = true;
+
+  private CreateApplicationLinkListener  currentLinkListener;
 
   public AppEngineApplicationInfoPanel() {
     super(new FlowLayout(FlowLayout.LEFT));
 
-    createApplicationLinkListener = new CreateApplicationLinkListener();
     errorIcon = new JLabel(AllIcons.Ide.Error);
     errorIcon.setVisible(false);
     messageText = new JTextPane();
     messageText.setContentType("text/html");
     messageText.setEditable(false);
-    messageText.addHyperlinkListener(createApplicationLinkListener);
 
     add(errorIcon);
     add(messageText);
-
-    // start off in a friendly state before we know for sure whether the application is valid
-    isApplicationValid = true;
   }
 
   /**
@@ -97,6 +98,10 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     });
   }
 
+  /**
+   * Returns {@code true} if the currently displayed Application is valid, {@code false} if
+   * otherwise.
+   */
   public boolean isApplicationValid() {
     return isApplicationValid;
   }
@@ -111,11 +116,14 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   }
 
   private void setCreateApplicationMessage(String projectId, Credential credential) {
-    // TODO is this safe? do we need to set these differenrlt
-    createApplicationLinkListener.setCredential(credential);
-    createApplicationLinkListener.setProjectId(projectId);
+    // dispose the old link listener and replace with a new instance that has the current args
+    if (currentLinkListener != null) {
+      // if the listener is not found, this is a no-op
+      messageText.removeHyperlinkListener(currentLinkListener);
+    }
+    currentLinkListener = new CreateApplicationLinkListener(projectId, credential);
+    messageText.addHyperlinkListener(currentLinkListener);
 
-    // TODO invalidate? repaint?
     ApplicationManager.getApplication().invokeLater(() -> {
       String message = GctBundle.message("appengine.application.not.exist") + " "
           + GctBundle.message("appengine.application.create",
@@ -127,17 +135,18 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     }, ModalityState.stateForComponent(this));
   }
 
+  /**
+   * Implementation of {@link HyperlinkListener} that opens a
+   * {@link AppEngineApplicationCreateDialog} when the link is clicked.
+   */
   private class CreateApplicationLinkListener implements HyperlinkListener {
 
-    private Credential credential;
-    private String projectId;
+    private final Credential credential;
+    private final String projectId;
 
-    public void setCredential(Credential credential) {
-      this.credential = credential;
-    }
-
-    public void setProjectId(String projectId) {
+    public CreateApplicationLinkListener(String projectId, Credential credential) {
       this.projectId = projectId;
+      this.credential = credential;
     }
 
     @Override

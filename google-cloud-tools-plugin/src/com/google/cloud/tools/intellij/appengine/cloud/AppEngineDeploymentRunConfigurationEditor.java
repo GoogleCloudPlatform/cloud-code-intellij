@@ -16,9 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService;
-import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.SelectConfigDestinationFolderDialog.ConfigFileType;
