@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.application;
 
 import com.google.api.client.util.Strings;
 import com.google.api.services.appengine.v1.model.Location;
+import com.google.common.annotations.VisibleForTesting;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,8 +29,10 @@ import java.util.Map;
  */
 class AppEngineLocationSelectorItem {
 
-  private final static String STANDARD_ENV_AVAILABLE_KEY = "standardEnvironmentAvailable";
-  private final static String FLEXIBLE_ENV_AVAILABLE_KEY = "flexibleEnvironmentAvailable";
+  @VisibleForTesting
+  final static String STANDARD_ENV_AVAILABLE_KEY = "standardEnvironmentAvailable";
+  @VisibleForTesting
+  final static String FLEXIBLE_ENV_AVAILABLE_KEY = "flexibleEnvironmentAvailable";
 
   private final Location location;
 
@@ -37,7 +40,9 @@ class AppEngineLocationSelectorItem {
     this.location = location;
 
     // TODO(alexsloan) when b/33458530 is addressed, we can just use location.getLocationId()
-    String locationIdLabel = location.getLabels().get("cloud.googleapis.com/region");
+    String locationIdLabel = location.getLabels() != null
+        ? location.getLabels().get("cloud.googleapis.com/region")
+        : null;
     if (Strings.isNullOrEmpty(location.getLocationId())
         && !Strings.isNullOrEmpty(locationIdLabel)) {
       location.setLocationId(locationIdLabel);
@@ -54,11 +59,11 @@ class AppEngineLocationSelectorItem {
   }
 
   public boolean isFlexSupported() {
-    return parseMetadataBoolean(STANDARD_ENV_AVAILABLE_KEY, location.getMetadata());
+    return parseMetadataBoolean(FLEXIBLE_ENV_AVAILABLE_KEY, location.getMetadata());
   }
 
   public boolean isStandardSupported() {
-    return parseMetadataBoolean(FLEXIBLE_ENV_AVAILABLE_KEY, location.getMetadata());
+    return parseMetadataBoolean(STANDARD_ENV_AVAILABLE_KEY, location.getMetadata());
   }
 
   private boolean parseMetadataBoolean(String key, Map<String, Object> metadata) {
