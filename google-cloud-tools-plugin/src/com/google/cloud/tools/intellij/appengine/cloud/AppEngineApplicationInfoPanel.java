@@ -48,9 +48,10 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   private static final String CREATE_APPLICATION_HREF_OPEN_TAG = "<a href='#'>";
   private static final String HREF_CLOSE_TAG = "</a>";
 
-  private CreateApplicationLinkListener  createApplicationLinkListener;
-  private JLabel errorIcon;
-  private JTextPane messageText;
+  private final CreateApplicationLinkListener  createApplicationLinkListener;
+  private final JLabel errorIcon;
+  private final JTextPane messageText;
+  private boolean isApplicationValid;
 
   public AppEngineApplicationInfoPanel() {
     super(new FlowLayout(FlowLayout.LEFT));
@@ -65,6 +66,9 @@ public class AppEngineApplicationInfoPanel extends JPanel {
 
     add(errorIcon);
     add(messageText);
+
+    // start off in a friendly state before we know for sure whether the application is valid
+    isApplicationValid = true;
   }
 
   /**
@@ -81,13 +85,20 @@ public class AppEngineApplicationInfoPanel extends JPanel {
 
         if (application != null) {
           setMessage(application.getLocationId(), false);
+          isApplicationValid = true;
         } else {
           setCreateApplicationMessage(projectId, credential);
+          isApplicationValid = false;
         }
       } catch (IOException | GoogleApiException e) {
         setMessage(GctBundle.message("appengine.application.region.fetch.error"), true);
+        isApplicationValid = false;
       }
     });
+  }
+
+  public boolean isApplicationValid() {
+    return isApplicationValid;
   }
 
   private void setMessage(String message, boolean isError) {

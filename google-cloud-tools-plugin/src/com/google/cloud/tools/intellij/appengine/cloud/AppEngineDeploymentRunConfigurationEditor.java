@@ -262,8 +262,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
             && !AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
 
     projectSelector.addProjectSelectionListener((event) ->
-      applicationInfoPanel.refresh(event.getSelectedProject().getProjectId(),
-          event.getUser().getCredential()));
+        applicationInfoPanel.refresh(event.getSelectedProject().getProjectId(),
+            event.getUser().getCredential()));
 
     projectSelector.addModelListener(new TreeModelListener() {
       @Override
@@ -419,9 +419,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     } else if (StringUtils.isBlank(projectSelector.getText())) {
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.project.missing.message"));
-    } else if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null
-        && !applicationIsMissing(projectSelector.getProject().getProjectId(),
-        projectSelector.getSelectedUser().getCredential())) {
+    } else if (!applicationInfoPanel.isApplicationValid()) {
       throw new ConfigurationException(
           GctBundle.message("appengine.application.required.deployment"));
     } else if (versionOverrideCheckBox.isSelected()
@@ -447,19 +445,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
         throw new ConfigurationException(
             CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT.getMessage());
       }
-    }
-  }
-
-  /**
-   * Return {@code true} if the application definitely does not exist. In cases where we are unsure,
-   * return {@code false} to avoid false positives.
-   */
-  private boolean applicationIsMissing(String projectId, Credential credential) {
-    try {
-      return AppEngineAdminService.getInstance()
-          .getApplicationForProjectId(projectId, credential) != null;
-    } catch (IOException | GoogleApiException e) {
-      return false;
     }
   }
 
