@@ -193,7 +193,7 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
    * A mock implementation of {@code Appengine} client lib, to make it easier to mock responses and
    * perform assertions.
    */
-  private class AppengineMock extends Appengine {
+  private static class AppengineMock extends Appengine {
 
     @Mock private Appengine.Apps apps;
     @Mock private Appengine.Apps.Get appsGet;

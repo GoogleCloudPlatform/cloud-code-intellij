@@ -16,19 +16,15 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
 import com.google.api.services.cloudresourcemanager.model.ListProjectsResponse;
 import com.google.api.services.cloudresourcemanager.model.Project;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -66,11 +62,8 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     this.treeModel = treeModel;
     setNeedsSynchronizing();
 
-    cloudResourceManagerClient = new CloudResourceManager.Builder(
-        new NetHttpTransport(), new JacksonFactory(), user.getCredential())
-        .setApplicationName(
-            ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent())
-        .build();
+    cloudResourceManagerClient
+        = GoogleApiClientFactory.getInstance().getCloudResourceManagerClient(user.getCredential());
   }
 
   public CredentialedUser getCredentialedUser() {
@@ -165,9 +158,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
         }
         for (Project pantheonProject : allProjects) {
           if (!Strings.isNullOrEmpty(pantheonProject.getProjectId())) {
-            result.add(new ResourceProjectModelItem(pantheonProject.getName(),
-                pantheonProject.getProjectId(),
-                pantheonProject.getProjectNumber()));
+            result.add(new ResourceProjectModelItem(pantheonProject));
           }
         }
       }

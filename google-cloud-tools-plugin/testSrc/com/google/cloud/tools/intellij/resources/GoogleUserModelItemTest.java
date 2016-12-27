@@ -16,9 +16,8 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
-import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,7 +38,7 @@ public class GoogleUserModelItemTest extends BasePluginTestCase {
 
   @Mock private CredentialedUser user;
   @Mock private Image image;
-  @Mock private CloudToolsPluginInfoService mockPluginInfoService;
+  @Mock private GoogleApiClientFactory mockApiClientFactory;
 
   private DefaultTreeModel model;
 
@@ -55,7 +54,7 @@ public class GoogleUserModelItemTest extends BasePluginTestCase {
 
   @Test
   public void testGetters() {
-    registerService(CloudToolsPluginInfoService.class, mockPluginInfoService);
+    registerService(GoogleApiClientFactory.class, mockApiClientFactory);
     GoogleUserModelItem item = new GoogleUserModelItem(user, model);
     Assert.assertEquals(user, item.getCredentialedUser());
     Assert.assertEquals("foo@example.com", item.getEmail());
