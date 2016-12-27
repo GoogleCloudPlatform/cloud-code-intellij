@@ -67,6 +67,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     messageText = new JTextPane();
     messageText.setContentType("text/html");
     messageText.setEditable(false);
+    messageText.setOpaque(false);
 
     add(errorIcon);
     add(messageText);
