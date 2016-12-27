@@ -609,8 +609,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    * Event for when the selection changes to a valid project.
    */
   public static class ProjectSelectionChangedEvent {
-    private Project selectedProject;
-    private CredentialedUser user;
+    private final Project selectedProject;
+    private final CredentialedUser user;
 
     public ProjectSelectionChangedEvent(
         Project selectedProject, CredentialedUser user) {

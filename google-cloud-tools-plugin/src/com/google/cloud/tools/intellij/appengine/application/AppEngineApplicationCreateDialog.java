@@ -52,7 +52,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   private final static String LOCATIONS_DOCUMENTATION_URL
       = "https://cloud.google.com/docs/geography-and-regions";
   private final static String FLEX_DOCUMENTATION_URL
-      = "https://cloud.google.com/appengine/docs/flexible/";
+      = "https://cloud.google.com/appengine/docs/flexible";
   private final static String STANDARD_DOCUMENTATION_URL
       = "https://cloud.google.com/appengine/docs/about-the-standard-environment";
   private static final String HTML_OPEN_TAG = "<html><font face='sans' size='-1'>";
