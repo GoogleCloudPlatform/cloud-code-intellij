@@ -20,7 +20,7 @@
           <editable value="false"/>
           <enabled value="true"/>
           <margin top="3" left="3" bottom="10" right="3"/>
-          <text value="&lt;html&gt;&#10;  &lt;head&gt;&#10;    &#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;"/>
+          <text value="&lt;html&gt;&#10;  &lt;head&gt;&#10;&#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;    &lt;p style=&quot;margin-top: 0&quot;&gt;&#10;      &#10;    &lt;/p&gt;&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;"/>
         </properties>
       </component>
       <component id="35fb3" class="javax.swing.JComboBox" binding="regionComboBox">
@@ -32,9 +32,7 @@
         <properties>
           <enabled value="true"/>
           <font/>
-          <model>
-            <item value="Loading available regions..."/>
-          </model>
+          <model/>
         </properties>
       </component>
       <component id="78667" class="javax.swing.JTextPane" binding="statusPane">

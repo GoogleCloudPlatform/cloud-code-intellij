@@ -44,7 +44,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
 /**
- * Dialog that allows creation of an App Engine Application
+ * Dialog that allows creation of an App Engine Application. Instances of this class are scoped to a
+ * single Application.
  */
 public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
@@ -69,11 +70,15 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   public AppEngineApplicationCreateDialog(@NotNull Component parent, @NotNull String gcpProjectId,
       @NotNull Credential userCredential) {
     super(parent, false);
-
     this.gcpProjectId = gcpProjectId;
     this.userCredential = userCredential;
-
     init();
+  }
+
+  @Override
+  protected void init() {
+    super.init();
+
     setTitle(GctBundle.message("appengine.application.region.select"));
     refreshLocationsSelector();
 
@@ -97,7 +102,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
         = ((AppEngineLocationSelectorItem) regionComboBox.getSelectedItem()).getLocation();
 
     // show loading state
-    setOKActionEnabled(false);
+    disable();
 
     try {
       UsageTrackerProvider.getInstance()
@@ -122,16 +127,17 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     } catch (IOException e) {
       trackApplicationCreateFailure();
       setStatusMessage(GctBundle.message("appengine.application.create.error.transient"), true);
-      setOKActionEnabled(true);
-      return;
+
     } catch (GoogleApiException e) {
       trackApplicationCreateFailure();
       setStatusMessage(e.getMessage(), true);
-      setOKActionEnabled(true);
-      return;
+
     } catch (Exception e) {
       trackApplicationCreateFailure();
       throw new RuntimeException(e);
+
+    } finally {
+      enable();
     }
   }
 
@@ -152,7 +158,14 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     statusPane.setVisible(true);
   }
 
+  /**
+   * Refreshes the locations combo box. This method should be called from the event dispatch thread.
+   */
   private void refreshLocationsSelector() {
+    // show loading state
+    disable();
+    regionComboBox.removeAllItems();
+
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
       final List<Location> appEngineRegions;
       try {
@@ -161,17 +174,28 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
       } catch (IOException | GoogleApiException e) {
         setStatusMessageAsync(GctBundle.message("appengine.application.region.list.fetch.error"),
             true);
+        enable();
         return;
       }
 
       // perform the actual UI updates on the event dispatch thread
       ApplicationManager.getApplication().invokeLater(() -> {
-        regionComboBox.removeAllItems();
         for (Location location : appEngineRegions) {
           regionComboBox.addItem(new AppEngineLocationSelectorItem(location));
         }
+        enable();
       }, ModalityState.stateForComponent(AppEngineApplicationCreateDialog.this.getContentPane()));
     });
+  }
+
+  private void disable() {
+    regionComboBox.setEnabled(false);
+    setOKActionEnabled(false);
+  }
+
+  private void enable() {
+    regionComboBox.setEnabled(true);
+    setOKActionEnabled(true);
   }
 
   private void updateLocationDetailMessage() {
