@@ -47,11 +47,15 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
 
   private static final String APP_ENGINE_RESOURCE_WILDCARD = "-";
   private static final long CREATE_APPLICATION_POLLING_INTERVAL_MS = 1000;
+  private static final int APPLICATION_CACHE_MAX_SIZE = 10000;
 
   // Cache of GCP application resources. This assumes that project IDs are globally unique. Null or
   // missing applications are not cached because they cannot be reliably invalidated.
   private final Cache<String, Application> appEngineApplicationCache = CacheBuilder.newBuilder()
-      .maximumSize(10000)
+      // arbitrary size limit
+      .maximumSize(APPLICATION_CACHE_MAX_SIZE)
+      // Even though these values should never change, it won't kill us to refresh once per day.
+      // This also provides some future-proofing.
       .expireAfterWrite(1, TimeUnit.DAYS)
       .build();
 

@@ -27,9 +27,9 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.stub;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -86,6 +86,11 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
     assertEquals(result, service.getApplicationForProjectId(projectId, mock(Credential.class)));
     verify(appengineClientMock.apps(), times(1)).get(eq(projectId));
     verify(appengineClientMock.getAppsGetQuery(), times(1)).execute();
+
+    // make the call again, and assert that the cached result is returned without calling the API
+    service.getApplicationForProjectId(projectId, mock(Credential.class));
+    verifyNoMoreInteractions(appengineClientMock.apps());
+    verifyNoMoreInteractions(appengineClientMock.getAppsGetQuery());
   }
 
   @Test(expected = GoogleApiException.class)
