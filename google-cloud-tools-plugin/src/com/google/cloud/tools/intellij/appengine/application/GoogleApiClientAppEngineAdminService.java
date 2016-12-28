@@ -25,12 +25,19 @@ import com.google.api.services.appengine.v1.model.Location;
 import com.google.api.services.appengine.v1.model.Operation;
 import com.google.api.services.appengine.v1.model.Status;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An implementation of {@link AppEngineAdminService} that uses a Google API Client to communicate
@@ -41,9 +48,48 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
   private static final String APP_ENGINE_RESOURCE_WILDCARD = "-";
   private static final long CREATE_APPLICATION_POLLING_INTERVAL_MS = 1000;
 
+  // Cache of GCP application resources. This assumes that project IDs are globally unique. Null or
+  // missing applications are not cached because they cannot be reliably invalidated.
+  private final Cache<String, Application> appEngineApplicationCache = CacheBuilder.newBuilder()
+      .maximumSize(10000)
+      .expireAfterWrite(1, TimeUnit.DAYS)
+      .build();
+
   @Override
   @Nullable
   public Application getApplicationForProjectId(@NotNull String projectId,
+      @NotNull Credential credential) throws IOException, GoogleApiException {
+    try {
+      // load from the cache if it exists, otherwise fetch from the API
+      return appEngineApplicationCache.get(projectId, () ->
+        fetchApplicationForProjectId(projectId, credential));
+
+    } catch (UncheckedExecutionException e) {
+      if (e.getCause() instanceof NoSuchElementException) {
+        // the value does not exist, return null
+        return null;
+      }
+      throw e;
+
+    } catch (ExecutionException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof IOException) {
+        throw (IOException) cause;
+      } else if (cause instanceof GoogleApiException) {
+        throw (GoogleApiException) cause;
+      } else {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  /*
+   * Fetches an Application from the App Engine API. Throws a NoSuchElementException if the
+   * application does not exist.
+   */
+  @VisibleForTesting
+  @NotNull
+  Application fetchApplicationForProjectId(@NotNull String projectId,
       @NotNull Credential credential) throws IOException, GoogleApiException {
     try {
       return GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential)
@@ -51,7 +97,7 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
     } catch (GoogleJsonResponseException e) {
       if (e.getStatusCode() == 404) {
         // the application does not exist
-        return null;
+        throw new NoSuchElementException();
       }
       throw GoogleApiException.from(e);
     }

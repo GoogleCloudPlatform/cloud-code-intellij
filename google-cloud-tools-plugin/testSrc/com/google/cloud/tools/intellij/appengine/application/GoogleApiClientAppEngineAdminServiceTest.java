@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.application;
+package com.google.cloud.tools.intellij.appengine.application;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -25,6 +26,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.stub;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,8 +41,6 @@ import com.google.api.services.appengine.v1.Appengine;
 import com.google.api.services.appengine.v1.model.Application;
 import com.google.api.services.appengine.v1.model.Operation;
 import com.google.api.services.appengine.v1.model.Status;
-import com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService;
-import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
@@ -52,6 +53,7 @@ import org.mockito.MockitoAnnotations;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Tests for {@link GoogleApiClientAppEngineAdminService}
@@ -72,7 +74,7 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
     when(apiClientFactoryMock.getAppEngineApiClient(any(HttpRequestInitializer.class)))
         .thenReturn(appengineClientMock);
 
-    service = new GoogleApiClientAppEngineAdminService();
+    service = spy(new GoogleApiClientAppEngineAdminService());
   }
 
   @Test
@@ -87,12 +89,28 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
   }
 
   @Test(expected = GoogleApiException.class)
-  public void testGetApplicationForProjectId_GoogleJsonExceptoin() throws IOException,
+  public void testGetApplicationForProjectId_GoogleJsonException() throws IOException,
       GoogleApiException {
     when(appengineClientMock.getAppsGetQuery().execute())
         .thenThrow(GoogleJsonResponseException.class);
 
     service.getApplicationForProjectId("my-project", mock(Credential.class));
+  }
+
+  @Test
+  public void testGetApplicationForProjectId_empty()
+      throws Exception {
+    String projectId = "some-id";
+    doThrow(NoSuchElementException.class).when(service)
+        .fetchApplicationForProjectId(eq(projectId), any(Credential.class));
+
+    // call the method twice, then assert that the result was not cached
+    int calls = 2;
+    for (int i = 0; i < calls; i++) {
+      assertNull(service.getApplicationForProjectId(projectId, mock(Credential.class)));
+    }
+    verify(service, times(calls))
+        .fetchApplicationForProjectId(eq(projectId), any(Credential.class));
   }
 
   @Test
@@ -110,11 +128,11 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
     response.put("name", projectId);
     response.put("locationId", locationId);
 
-    // require polling several times
     Operation doneOperation = new Operation();
     doneOperation.setName(operationName);
     doneOperation.setDone(true);
     doneOperation.setResponse(response);
+    // require polling several times
     when(appengineClientMock.getAppsOperationsGetQuery().execute())
         .thenReturn(inProgressOperation)
         .thenReturn(inProgressOperation)
