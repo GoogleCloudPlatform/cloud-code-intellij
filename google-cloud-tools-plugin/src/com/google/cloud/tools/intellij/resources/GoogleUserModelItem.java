@@ -16,19 +16,15 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
 import com.google.api.services.cloudresourcemanager.model.ListProjectsResponse;
 import com.google.api.services.cloudresourcemanager.model.Project;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +33,6 @@ import java.awt.Image;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -54,6 +49,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
 
   private static final Logger LOG = Logger.getInstance(GoogleUserModelItem.class);
   private static final int PROJECTS_MAX_PAGE_SIZE = 300;
+  private static final String PROJECT_DELETE_REQUESTED = "DELETE_REQUESTED";
 
   private final CredentialedUser user;
   private final DefaultTreeModel treeModel;
@@ -66,11 +62,8 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     this.treeModel = treeModel;
     setNeedsSynchronizing();
 
-    cloudResourceManagerClient = new CloudResourceManager.Builder(
-        new NetHttpTransport(), new JacksonFactory(), user.getCredential())
-        .setApplicationName(
-            ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent())
-        .build();
+    cloudResourceManagerClient
+        = GoogleApiClientFactory.getInstance().getCloudResourceManagerClient(user.getCredential());
   }
 
   public CredentialedUser getCredentialedUser() {
@@ -110,15 +103,12 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     }
     isSynchronizing = true;
 
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          loadUserProjects();
-          needsSynchronizing = false;
-        } finally {
-          isSynchronizing = false;
-        }
+    ApplicationManager.getApplication().executeOnPooledThread(() -> {
+      try {
+        loadUserProjects();
+        needsSynchronizing = false;
+      } finally {
+        isSynchronizing = false;
       }
     });
   }
@@ -140,7 +130,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
   }
 
   private void loadUserProjects() {
-    final List<DefaultMutableTreeNode> result = new ArrayList<DefaultMutableTreeNode>();
+    final List<DefaultMutableTreeNode> result = new ArrayList<>();
 
     try {
 
@@ -148,14 +138,16 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
           .setPageSize(PROJECTS_MAX_PAGE_SIZE).execute();
 
       if (response != null && response.getProjects() != null) {
-        // Sorts the projects list by project ID.
-        Set<Project> allProjects = new TreeSet<Project>(new Comparator<Project>() {
-          @Override
-          public int compare(Project p1, Project p2) {
-            return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase());
-          }
-        });
-        allProjects.addAll(response.getProjects());
+        // Create a sorted set to sort the projects list by project ID.
+        Set<Project> allProjects = new TreeSet<>((Project p1, Project p2) ->
+            p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase()));
+
+        response.getProjects().stream()
+            // Filter out any projects that are scheduled for deletion.
+            .filter((project) -> !PROJECT_DELETE_REQUESTED.equals(project.getLifecycleState()))
+            // Add remaining projects to the set.
+            .forEach(allProjects::add);
+
         while (!Strings.isNullOrEmpty(response.getNextPageToken())) {
           response = cloudResourceManagerClient.projects().list()
               .setPageToken(response.getNextPageToken())
@@ -165,9 +157,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
         }
         for (Project pantheonProject : allProjects) {
           if (!Strings.isNullOrEmpty(pantheonProject.getProjectId())) {
-            result.add(new ResourceProjectModelItem(pantheonProject.getName(),
-                pantheonProject.getProjectId(),
-                pantheonProject.getProjectNumber()));
+            result.add(new ResourceProjectModelItem(pantheonProject));
           }
         }
       }
