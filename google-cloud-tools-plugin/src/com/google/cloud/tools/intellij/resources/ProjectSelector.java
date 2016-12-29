@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.resources;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IGoogleLoginCompletedCallback;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
@@ -45,8 +46,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -90,6 +93,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   private final boolean queryOnExpand;
   private JBPopup popup;
   private PopupPanel popupPanel;
+  private List<ProjectSelectionListener> projectSelectionListeners;
 
   public ProjectSelector() {
     this(false);
@@ -102,6 +106,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     this.queryOnExpand = queryOnExpand;
     modelRoot = new DefaultMutableTreeNode("root");
     treeModel = new SelectorTreeModel(modelRoot);
+    projectSelectionListeners = new ArrayList<>();
 
     // synchronize selection between the treemodel and current text.
     treeModel.addTreeModelListener(new TreeModelListener() {
@@ -240,6 +245,18 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   public Long getProjectNumber() {
     ResourceProjectModelItem modelItem = getCurrentModelItem();
     return modelItem != null ? modelItem.getNumber() : null;
+  }
+
+  /**
+   * Returns the selected project.
+   * <p/>
+   * This has the same limitations as {@link #getSelectedUser()}  in that it may be null even if
+   * getText represents a valid ID if queryOnExpand is true.
+   */
+  @Nullable
+  public Project getProject() {
+    ResourceProjectModelItem modelItem = getCurrentModelItem();
+    return modelItem != null ? modelItem.getProject() : null;
   }
 
   @Nullable
@@ -423,10 +440,12 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
               .getLastSelectedPathComponent();
           if (node != null) {
             if (node instanceof ResourceProjectModelItem) {
-              if (Strings.isNullOrEmpty(ProjectSelector.this.getText())
-                  || !ProjectSelector.this.getText()
-                  .equals(((ResourceProjectModelItem) node).getProjectId())) {
-                ProjectSelector.this.setText(((ResourceProjectModelItem) node).getProjectId());
+              ResourceProjectModelItem projectNode = (ResourceProjectModelItem) node;
+              String oldSelection = ProjectSelector.this.getText();
+              String newSelection = projectNode.getProject().getProjectId();
+              if (Strings.isNullOrEmpty(oldSelection) || !oldSelection.equals(newSelection)) {
+                ProjectSelector.this.setText(newSelection);
+                onSelectionChanged(projectNode);
                 SwingUtilities.invokeLater(new Runnable() {
                   @Override
                   public void run() {
@@ -518,6 +537,18 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     }
   }
 
+  private void onSelectionChanged(ResourceProjectModelItem newSelection) {
+    CredentialedUser user = null;
+    if (newSelection.getParent() instanceof GoogleUserModelItem) {
+      user = ((GoogleUserModelItem) newSelection.getParent()).getCredentialedUser();
+    }
+    ProjectSelectionChangedEvent event
+        = new ProjectSelectionChangedEvent(newSelection.getProject(), user);
+    for (ProjectSelectionListener listener : projectSelectionListeners) {
+      listener.selectionChanged(event);
+    }
+  }
+
   @Override
   public void hidePopup() {
     if (isPopupVisible()) {
@@ -528,6 +559,25 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   @Override
   public boolean isPopupVisible() {
     return popup != null && !popup.isDisposed() && popup.isVisible();
+  }
+
+  /**
+   * Adds a {@link ProjectSelectionListener} to this class's internal list of listeners. All
+   * ProjectSelectionListeners are notified when the selection is changed to a valid project.
+   *
+   * @param projectSelectionListener the listener to add
+   */
+  public void addProjectSelectionListener(ProjectSelectionListener projectSelectionListener) {
+    projectSelectionListeners.add(projectSelectionListener);
+  }
+
+  /**
+   * Removes a {@link ProjectSelectionListener} from this class's internal list of listeners.
+   *
+   * @param projectSelectionListener the listener to remove
+   */
+  public void removeProjectSelectionListener(ProjectSelectionListener projectSelectionListener) {
+    projectSelectionListeners.remove(projectSelectionListener);
   }
 
   static class SelectorTreeModel extends DefaultTreeModel {
@@ -546,4 +596,36 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       this.modelNeedsRefresh = modelNeedsRefresh;
     }
   }
+
+  /**
+   * Interface that must be implemented in order to be informed of
+   * {@link ProjectSelectionChangedEvent} events.
+   */
+  public interface ProjectSelectionListener {
+    void selectionChanged(ProjectSelectionChangedEvent event);
+  }
+
+  /**
+   * Event for when the selection changes to a valid project.
+   */
+  public static class ProjectSelectionChangedEvent {
+    private final Project selectedProject;
+    private final CredentialedUser user;
+
+    public ProjectSelectionChangedEvent(
+        Project selectedProject, CredentialedUser user) {
+      this.selectedProject = selectedProject;
+      this.user = user;
+    }
+
+    public Project getSelectedProject() {
+      return selectedProject;
+    }
+
+    public CredentialedUser getUser() {
+      return user;
+    }
+
+  }
+
 }

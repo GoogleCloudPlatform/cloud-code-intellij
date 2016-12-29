@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.resources;
 
+import com.google.api.services.cloudresourcemanager.model.Project;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,37 +28,29 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 class ResourceProjectModelItem extends DefaultMutableTreeNode {
 
-  private String description;
-  private String projectId;
-  private Long number;
+  private Project project;
 
-  public ResourceProjectModelItem(@Nullable String description, @NotNull String id, Long number) {
-    this.number = number;
-    setDescription(description);
-    setProjectId(id);
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
+  public ResourceProjectModelItem(@NotNull Project project) {
+    this.project = project;
   }
 
   public String getProjectId() {
-    return projectId;
-  }
-
-  public void setProjectId(String projectId) {
-    this.projectId = projectId;
+    return project.getProjectId();
   }
 
   public Long getNumber() {
-    return number;
+    return project.getProjectNumber();
   }
 
-  public void setNumber(Long number) {
-    this.number = number;
+  public String getDescription() {
+    return project.getName();
+  }
+
+  public Project getProject() {
+    return project;
+  }
+
+  public void setProject(Project project) {
+    this.project = project;
   }
 }
