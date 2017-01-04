@@ -33,7 +33,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +48,7 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
   private static final String APP_ENGINE_RESOURCE_WILDCARD = "-";
   private static final long CREATE_APPLICATION_POLLING_INTERVAL_MS = 1000;
   private static final int APPLICATION_CACHE_MAX_SIZE = 10000;
+  private final long LOCATION_CACHE_REFRESH_PERIOD_MILLIS = 1000 * 60 * 60 * 24; // 1 day
 
   // Cache of GCP application resources. This assumes that project IDs are globally unique. Null or
   // missing applications are not cached because they cannot be reliably invalidated.
@@ -55,6 +58,10 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
       // Even though these values should never change, it won't kill us to refresh once per day.
       .expireAfterWrite(1, TimeUnit.DAYS)
       .build();
+
+  // Cache of all available GCP locations. This list is expected to change very infrequently.
+  private final List<Location> appEngineLocationCache = new CopyOnWriteArrayList<>();
+  private Long appEngineLocationCacheLastRefreshedTime;
 
   @Override
   @Nullable
@@ -160,22 +167,33 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
   @Override
   public List<Location> getAllAppEngineLocations(Credential credential) throws IOException,
       GoogleApiException {
-    try {
-      ListLocationsResponse response = getAppEngineRegions(credential, null);
-      List<Location> locations = response.getLocations();
+    // if the cache is still fresh, return cached results
+    if (!appEngineLocationCache.isEmpty()
+        && appEngineLocationCacheLastRefreshedTime != null
+        && System.currentTimeMillis()
+        < appEngineLocationCacheLastRefreshedTime + LOCATION_CACHE_REFRESH_PERIOD_MILLIS) {
+      return new ArrayList<>(appEngineLocationCache);
+    } else {
+      try {
+        ListLocationsResponse response = fetchAppEngineRegions(credential, null);
+        List<Location> locations = new ArrayList<>(response.getLocations());
 
-      while (response.getNextPageToken() != null) {
-        response = getAppEngineRegions(credential, response.getNextPageToken());
-        locations.addAll(response.getLocations());
+        while (response.getNextPageToken() != null) {
+          response = fetchAppEngineRegions(credential, response.getNextPageToken());
+          locations.addAll(response.getLocations());
+        }
+        appEngineLocationCache.clear();
+        appEngineLocationCache.addAll(locations);
+        appEngineLocationCacheLastRefreshedTime = System.currentTimeMillis();
+        return locations;
+
+      } catch (GoogleJsonResponseException e) {
+        throw GoogleApiException.from(e);
       }
-      return locations;
-
-    } catch (GoogleJsonResponseException e) {
-      throw GoogleApiException.from(e);
     }
   }
 
-  private ListLocationsResponse getAppEngineRegions(Credential credential, @Nullable String
+  private ListLocationsResponse fetchAppEngineRegions(Credential credential, @Nullable String
       pageToken) throws IOException {
     return GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential)
         .apps().locations().list(APP_ENGINE_RESOURCE_WILDCARD).setPageToken(pageToken).execute();

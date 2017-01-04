@@ -39,6 +39,8 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.services.appengine.v1.Appengine;
 import com.google.api.services.appengine.v1.model.Application;
+import com.google.api.services.appengine.v1.model.ListLocationsResponse;
+import com.google.api.services.appengine.v1.model.Location;
 import com.google.api.services.appengine.v1.model.Operation;
 import com.google.api.services.appengine.v1.model.Status;
 import com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService.AppEngineApplicationNotFoundException;
@@ -52,8 +54,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 
 /**
  * Tests for {@link GoogleApiClientAppEngineAdminService}
@@ -212,6 +218,47 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
     service.createApplication("us-east", "my-project-id", mock(Credential.class));
   }
 
+  @Test
+  public void testGetAllAppEngineLocations_success() throws IOException, GoogleApiException {
+    String pageToken = "page-token";
+    ListLocationsResponse response1 = new ListLocationsResponse();
+    List<Location> locationsPage1 = Arrays.asList(
+        createMockLocation("location-1"), createMockLocation("location-2"));
+    response1.setLocations(locationsPage1);
+    response1.setNextPageToken(pageToken);
+
+    List<Location> locationsPage2 = Arrays.asList(
+        createMockLocation("location-3"), createMockLocation("location-4"));
+    ListLocationsResponse response2 = new ListLocationsResponse();
+    response2.setLocations(locationsPage2);
+    response2.setNextPageToken(null);
+
+    when(appengineClientMock.getAppsLocationsListQuery().setPageToken(anyString()))
+        .thenReturn(appengineClientMock.getAppsLocationsListQuery());
+    when(appengineClientMock.getAppsLocationsListQuery().execute()).thenReturn(response1);
+
+    Appengine.Apps.Locations.List appsLocationsListQuery2
+        = mock(Appengine.Apps.Locations.List.class);
+    when(appengineClientMock.getAppsLocationsListQuery().setPageToken(eq(pageToken)))
+        .thenReturn(appsLocationsListQuery2);
+    when(appsLocationsListQuery2.execute()).thenReturn(response2);
+
+    List<Location> expectedResults = new ArrayList<>(locationsPage1);
+    expectedResults.addAll(locationsPage2);
+
+    // make the call twice. the service should only be hit once per page
+    assertEquals(expectedResults, service.getAllAppEngineLocations(mock(Credential.class)));
+    assertEquals(expectedResults, service.getAllAppEngineLocations(mock(Credential.class)));
+    verify(appengineClientMock.getAppsLocationsListQuery(), times(1)).execute();
+    verify(appsLocationsListQuery2, times(1)).execute();
+  }
+
+  private Location createMockLocation(String id) {
+    Location location = new Location();
+    location.setLocationId(id);
+    return location;
+  }
+
   /**
    * A mock implementation of {@code Appengine} client lib, to make it easier to mock responses and
    * perform assertions.
@@ -223,6 +270,8 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
     @Mock private Appengine.Apps.Create appsCreate;
     @Mock private Appengine.Apps.Operations appsOperations;
     @Mock private Appengine.Apps.Operations.Get appsOperationsGet;
+    @Mock private Appengine.Apps.Locations appsLocations;
+    @Mock private Appengine.Apps.Locations.List appsLocationsList;
 
     public AppengineMock() {
       super(mock(HttpTransport.class), mock(JsonFactory.class), null);
@@ -232,7 +281,9 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
         when(apps.get(anyString())).thenReturn(appsGet);
         when(apps.create(any(Application.class))).thenReturn(appsCreate);
         when(apps.operations()).thenReturn(appsOperations);
+        when(apps.locations()).thenReturn(appsLocations);
         when(appsOperations.get(anyString(), anyString())).thenReturn(appsOperationsGet);
+        when(appsLocations.list(anyString())).thenReturn(appsLocationsList);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -251,6 +302,9 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
     }
     public Apps.Operations.Get getAppsOperationsGetQuery() {
       return appsOperationsGet;
+    }
+    public Apps.Locations.List getAppsLocationsListQuery() {
+      return appsLocationsList;
     }
   }
 }
