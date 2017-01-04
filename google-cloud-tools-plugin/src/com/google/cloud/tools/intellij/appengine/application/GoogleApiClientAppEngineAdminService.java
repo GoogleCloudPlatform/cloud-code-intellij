@@ -82,7 +82,7 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
 
   /*
    * Fetches an Application from the App Engine API. Throws a AppEngineApplicationNotFoundException
-   * if the application does not exist, such that  Applications that do not exist are not cached.
+   * if the application does not exist, such that Applications that do not exist are not cached.
    */
   @VisibleForTesting
   @NotNull
@@ -184,6 +184,7 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
   /*
    * Private exception type to mark a failed attempt to fetch an Application.
    */
-  private static class AppEngineApplicationNotFoundException extends Exception {}
+  @VisibleForTesting
+  static class AppEngineApplicationNotFoundException extends Exception {}
 
 }
