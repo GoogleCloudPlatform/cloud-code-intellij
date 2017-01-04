@@ -28,14 +28,12 @@ import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -63,20 +61,16 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
   public Application getApplicationForProjectId(@NotNull String projectId,
       @NotNull Credential credential) throws IOException, GoogleApiException {
     try {
-      // load from the cache if it exists, otherwise fetch from the API
+      // Load from the cache if it exists, otherwise fetch from the API.
       return appEngineApplicationCache.get(projectId, () ->
         fetchApplicationForProjectId(projectId, credential));
 
-    } catch (UncheckedExecutionException e) {
-      if (e.getCause() instanceof NoSuchElementException) {
-        // the value does not exist, return null
-        return null;
-      }
-      throw e;
-
     } catch (ExecutionException e) {
       Throwable cause = e.getCause();
-      if (cause instanceof IOException) {
+      if (cause instanceof AppEngineApplicationNotFoundException) {
+        // the value does not exist
+        return null;
+      } else if (cause instanceof IOException) {
         throw (IOException) cause;
       } else if (cause instanceof GoogleApiException) {
         throw (GoogleApiException) cause;
@@ -87,20 +81,21 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
   }
 
   /*
-   * Fetches an Application from the App Engine API. Throws a NoSuchElementException if the
-   * application does not exist.
+   * Fetches an Application from the App Engine API. Throws a AppEngineApplicationNotFoundException
+   * if the application does not exist, such that  Applications that do not exist are not cached.
    */
   @VisibleForTesting
   @NotNull
   Application fetchApplicationForProjectId(@NotNull String projectId,
-      @NotNull Credential credential) throws IOException, GoogleApiException {
+      @NotNull Credential credential)
+      throws IOException, GoogleApiException, AppEngineApplicationNotFoundException {
     try {
       return GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential)
           .apps().get(projectId).execute();
     } catch (GoogleJsonResponseException e) {
       if (e.getStatusCode() == 404) {
         // the application does not exist
-        throw new NoSuchElementException();
+        throw new AppEngineApplicationNotFoundException();
       }
       throw GoogleApiException.from(e);
     }
@@ -185,5 +180,10 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
     return GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential)
         .apps().locations().list(APP_ENGINE_RESOURCE_WILDCARD).setPageToken(pageToken).execute();
   }
+
+  /*
+   * Private exception type to mark a failed attempt to fetch an Application.
+   */
+  private static class AppEngineApplicationNotFoundException extends Exception {}
 
 }
