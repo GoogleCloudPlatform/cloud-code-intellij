@@ -119,8 +119,8 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
             .startsWithIgnoreCase(url, GOOGLE_URL_ALT)));
   }
 
-  public static String getGcpUrl(String projectId) {
-    return "https://source.developers.google.com/p/" + projectId + "/";
+  public static String getGcpUrl(String projectId, String repositoryId) {
+    return "https://source.developers.google.com/p/" + projectId + "/r/" + repositoryId + "/";
   }
 
   /**

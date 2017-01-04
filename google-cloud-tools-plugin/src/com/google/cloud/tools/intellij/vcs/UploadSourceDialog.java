@@ -16,27 +16,17 @@
 
 package com.google.cloud.tools.intellij.vcs;
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponse;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
 import com.google.api.client.util.Preconditions;
 import com.google.api.services.source.Source;
 import com.google.api.services.source.SourceRequest;
 import com.google.api.services.source.model.ListReposResponse;
-import com.google.api.services.source.model.Repo;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.resources.RepositorySelector;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.DocumentAdapter;
@@ -46,7 +36,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.Dimension;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -62,7 +51,7 @@ public class UploadSourceDialog extends DialogWrapper {
   private ProjectSelector projectSelector;
   private RepositorySelector repositorySelector;
   private String projectId;
-  private String repositoryName;
+  private String repositoryId;
   private CredentialedUser credentialedUser;
 
   /**
@@ -85,8 +74,8 @@ public class UploadSourceDialog extends DialogWrapper {
     return projectId;
   }
 
-  @NotNull String getRepositoryName() {
-    return repositoryName;
+  @NotNull String getRepositoryId() {
+    return repositoryId;
   }
 
   /**
@@ -135,7 +124,7 @@ public class UploadSourceDialog extends DialogWrapper {
   @Override
   protected void doOKAction() {
     projectId = projectSelector.getText();
-    repositoryName = repositorySelector.getText();
+    repositoryId = repositorySelector.getText();
     credentialedUser = projectSelector.getSelectedUser();
     super.doOKAction();
   }

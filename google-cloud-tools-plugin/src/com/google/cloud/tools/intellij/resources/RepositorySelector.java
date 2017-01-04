@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -34,6 +35,8 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -115,6 +118,16 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       repositoryTree.setOpaque(false);
       repositoryTree.expandRow(0);
 
+      repositoryTree.addTreeSelectionListener(event -> {
+        DefaultMutableTreeNode node
+            = (DefaultMutableTreeNode) repositoryTree.getLastSelectedPathComponent();
+        if (node != null && node instanceof RepositoryModelItem) {
+          RepositoryModelItem repoNode = (RepositoryModelItem) node;
+          RepositorySelector.this.setText(repoNode.getRepositoryName());
+          ApplicationManager.getApplication().invokeLater(RepositorySelector.this::hidePopup);
+        }
+      });
+
       JBScrollPane scrollPane = new JBScrollPane();
       scrollPane.setViewportView(repositoryTree);
       // TODO update this
@@ -126,5 +139,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       this.setPreferredSize(new Dimension(240, getPreferredPopupHeight()));
       add(scrollPane, BorderLayout.CENTER);
     }
+
+
   }
 }

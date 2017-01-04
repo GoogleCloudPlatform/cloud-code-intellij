@@ -47,6 +47,7 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
   private String cloudProject;
   private CredentialedUser user;
 
+  // TODO user can be null on first instantiation
   public ProjectRepositoriesModelItem(@NotNull String cloudProject, @NotNull CredentialedUser user) {
 //    removeAllChildren();
     this.cloudProject = cloudProject;
@@ -89,7 +90,7 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
       ListReposResponse response = sourceList.execute();
       for(Repo repo : response.getRepos()) {
-        add(new DefaultMutableTreeNode(repo.get("name")));
+        add(new RepositoryModelItem(repo.get("name").toString())); // TODO null check?
       }
 
 //      Repo newRepo = new Repo();

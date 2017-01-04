@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.vcs;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.resources.RepositorySelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.dvcs.ui.DvcsBundle;
@@ -57,10 +58,11 @@ public class CloneGcpDialog extends DialogWrapper {
 
   // Form controls
   private JPanel rootPanel;
-  private ProjectSelector repositoryUrl;
+  private ProjectSelector projectSelector;
   private TextFieldWithBrowseButton parentDirectory;
   private JTextField directoryName;
   private JLabel parentDirectoryLabel;
+  private RepositorySelector repositorySelector;
 
   @NotNull private String defaultDirectoryName = "";
   @NotNull private final Project project;
@@ -95,7 +97,7 @@ public class CloneGcpDialog extends DialogWrapper {
 
   @Nullable
   public String getGcpUserName() {
-    CredentialedUser selectedUser = repositoryUrl.getSelectedUser();
+    CredentialedUser selectedUser = projectSelector.getSelectedUser();
     return selectedUser != null ? selectedUser.getEmail() : null;
   }
 
@@ -174,19 +176,21 @@ public class CloneGcpDialog extends DialogWrapper {
 
   @Nullable
   private String getCurrentUrlText() {
-    CredentialedUser selectedUser = repositoryUrl.getSelectedUser();
+    CredentialedUser selectedUser = projectSelector.getSelectedUser();
 
-    if (selectedUser == null || Strings.isNullOrEmpty(repositoryUrl.getText())) {
+    if (selectedUser == null || Strings.isNullOrEmpty(projectSelector.getText())) {
       return null;
     }
 
-    return GcpHttpAuthDataProvider.getGcpUrl(repositoryUrl.getText());
+    // TODO what if the repo is null??
+    return GcpHttpAuthDataProvider.getGcpUrl(projectSelector.getText(),
+        repositorySelector.getText());
   }
 
   private void createUIComponents() {
-    repositoryUrl = new ProjectSelector();
-    repositoryUrl.setMinimumSize(new Dimension(300, 0));
-    repositoryUrl.getDocument().addDocumentListener(new DocumentAdapter() {
+    projectSelector = new ProjectSelector();
+    projectSelector.setMinimumSize(new Dimension(300, 0));
+    projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @SuppressWarnings("ConstantConditions") // This suppresses an invalid nullref warning for
       // projectDescription.replaceAll.
       @Override
@@ -194,7 +198,7 @@ public class CloneGcpDialog extends DialogWrapper {
         if (defaultDirectoryName.equals(directoryName.getText())
             || directoryName.getText().length() == 0) {
           // modify field if it was unmodified or blank
-          String projectDescription = repositoryUrl.getProjectDescription();
+          String projectDescription = projectSelector.getProjectDescription();
           if (!Strings.isNullOrEmpty(projectDescription)) {
             defaultDirectoryName = projectDescription.replaceAll(INVALID_FILENAME_CHARS, "");
             defaultDirectoryName = defaultDirectoryName.replaceAll("\\s", "");
@@ -207,12 +211,25 @@ public class CloneGcpDialog extends DialogWrapper {
         updateButtons();
       }
     });
+    repositorySelector = new RepositorySelector(projectSelector.getText(),
+        projectSelector.getSelectedUser());
+
+
+    // TODO extract this
+    projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
+      @Override
+      protected void textChanged(DocumentEvent event) {
+        setOKActionEnabled(projectSelector.getSelectedUser() != null);
+        repositorySelector.setCloudProject(projectSelector.getText());
+        repositorySelector.setUser(projectSelector.getSelectedUser());
+      }
+    });
   }
 
   @Nullable
   @Override
   public JComponent getPreferredFocusedComponent() {
-    return repositoryUrl;
+    return projectSelector;
   }
 
   @Override
