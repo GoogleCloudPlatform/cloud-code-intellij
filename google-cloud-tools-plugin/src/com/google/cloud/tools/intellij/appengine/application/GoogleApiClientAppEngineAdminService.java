@@ -55,7 +55,6 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
       // arbitrary size limit
       .maximumSize(APPLICATION_CACHE_MAX_SIZE)
       // Even though these values should never change, it won't kill us to refresh once per day.
-      // This also provides some future-proofing.
       .expireAfterWrite(1, TimeUnit.DAYS)
       .build();
 
