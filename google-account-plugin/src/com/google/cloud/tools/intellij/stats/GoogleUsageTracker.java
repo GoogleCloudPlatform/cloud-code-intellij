@@ -132,7 +132,8 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
       @NotNull String eventCategory,
       @NotNull String eventAction,
       @Nullable String eventLabel,
-      @Nullable Integer eventValue) {
+      @Nullable Integer eventValue,
+      @Nullable String eventMessage) {
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       if (UsageTrackerManager.getInstance().isTrackingEnabled()) {
         // For the semantics of each parameter, consult the followings:
@@ -159,6 +160,11 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           eventMetadataMap.put(METADATA_ESCAPER.escape(eventLabel), eventValue);
           fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(eventMetadataMap);
         }
+        if (eventMessage != null) {
+          Map<String, String> eventMessageMap =
+              ImmutableMap.of("Message", METADATA_ESCAPER.escape(eventMessage));
+          fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(eventMessageMap);
+        }
         postData.add(new BasicNameValuePair(PAGE_TITLE_KEY, fullMetadataString));
         sendPing(postData);
       }
@@ -166,7 +172,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   }
 
   @Override
-  public FluentTrackingEventWithLabel trackEvent(String action) {
+  public FluentTrackingEventWithMetadata trackEvent(String action) {
     return new TrackingEventBuilder(this, externalPluginName, action);
   }
 

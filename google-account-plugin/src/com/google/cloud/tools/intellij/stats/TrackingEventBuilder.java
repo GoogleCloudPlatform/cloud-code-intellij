@@ -17,19 +17,18 @@
 package com.google.cloud.tools.intellij.stats;
 
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
-import com.google.cloud.tools.intellij.stats.UsageTracker.FluentTrackingEventWithLabel;
-import com.google.cloud.tools.intellij.stats.UsageTracker.FluentTrackingEventWithLabel.FluentTrackingEventWithValue;
-import com.google.cloud.tools.intellij.stats.UsageTracker.PingsAnalytics;
+import com.google.cloud.tools.intellij.stats.UsageTracker.FluentTrackingEventWithMetadata;
 
 /**
  * Implements the fluent interface exposed for tracking by {@link UsageTracker}.
  */
-class TrackingEventBuilder implements FluentTrackingEventWithLabel, FluentTrackingEventWithValue {
+class TrackingEventBuilder implements FluentTrackingEventWithMetadata {
 
   private SendsEvents eventSender;
   private String category;
   private String action;
   private String label;
+  private String message;
   private Integer value;
 
   TrackingEventBuilder(SendsEvents eventSender, String category, String action) {
@@ -39,19 +38,26 @@ class TrackingEventBuilder implements FluentTrackingEventWithLabel, FluentTracki
   }
 
   @Override
-  public FluentTrackingEventWithValue withLabel(String label) {
+  public FluentTrackingEventWithMetadata withLabel(String label) {
     this.label = Preconditions.checkNotNull(label);
     return this;
   }
 
   @Override
-  public PingsAnalytics setValue(Integer value) {
+  public FluentTrackingEventWithMetadata withLabel(String label, int value) {
+    this.label = Preconditions.checkNotNull(label);
     this.value = Preconditions.checkNotNull(value);
     return this;
   }
 
   @Override
+  public FluentTrackingEventWithMetadata withMessage(String message) {
+    this.message = message;
+    return this;
+  }
+
+  @Override
   public void ping() {
-    eventSender.sendEvent(category, action, label, value);
+    eventSender.sendEvent(category, action, label, value, message);
   }
 }

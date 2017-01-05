@@ -336,7 +336,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       public void errorOccurred(@NotNull String errorMessage) {
         UsageTrackerProvider.getInstance()
             .trackEvent(GctTracking.APP_ENGINE_DEPLOY_FAIL)
-            .withLabel(eventLabel + ":" + errorMessage)
+            .withLabel(eventLabel)
+            .withMessage(errorMessage)
             .ping();
         deploymentCallback.errorOccurred(errorMessage);
       }

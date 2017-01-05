@@ -64,12 +64,12 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
 
     @Override
     public void sendEvent(@NotNull String eventCategory, @NotNull String eventAction,
-        @Nullable String eventLabel, @Nullable Integer eventValue) {
+        @Nullable String eventLabel, @Nullable Integer eventValue, @Nullable String eventMessage) {
       // Do nothing
     }
 
     @Override
-    public FluentTrackingEventWithLabel trackEvent(String action) {
+    public FluentTrackingEventWithMetadata trackEvent(String action) {
       return new TrackingEventBuilder(this, "no-category", action);
     }
   }

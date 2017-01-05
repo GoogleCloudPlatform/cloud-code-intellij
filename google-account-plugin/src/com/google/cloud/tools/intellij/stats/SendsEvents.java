@@ -31,5 +31,6 @@ interface SendsEvents {
   void sendEvent(@NotNull String eventCategory,
       @NotNull String eventAction,
       @Nullable String eventLabel,
-      @Nullable Integer eventValue);
+      @Nullable Integer eventValue,
+      @Nullable String eventMessage);
 }

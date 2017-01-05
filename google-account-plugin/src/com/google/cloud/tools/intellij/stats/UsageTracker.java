@@ -31,7 +31,7 @@ public interface UsageTracker {
    *               often prefixed with a domain such as 'appengine.' or 'clouddebugger.'
    * @return a fluent interface for setting the remaining parameters of a tracking ping
    */
-  FluentTrackingEventWithLabel trackEvent(String action);
+  FluentTrackingEventWithMetadata trackEvent(String action);
 
   /**
    * Part of the tracking event fluent API. Denotes steps in the API where the event has enough data
@@ -46,34 +46,33 @@ public interface UsageTracker {
   }
 
   /**
-   * Interface that accepts the 'label' optional field for pinging tracking events.
+   * Interface that accepts the 'label' or 'message' optional fields for pinging tracking events.
    */
-  interface FluentTrackingEventWithLabel extends PingsAnalytics {
+  interface FluentTrackingEventWithMetadata extends PingsAnalytics {
 
     /**
-     * Sets the optional 'label' field.
+     * Sets the optional 'label' field without a corresponding scalar 'value'.
      *
      * @param label adds metadata about the 'action' being performed. For example an action of
      *              'appengine.deploy', could qualify the deployment as a flex deployment by passing
      *              'flex' as the {@code label} value.
-     * @return a fluent interface for setting a scalar value attributed to the parameters of the
-     *         tracking ping
+     * @return this fluent interface for further setting of event metadata
      */
-    FluentTrackingEventWithValue withLabel(String label);
+    FluentTrackingEventWithMetadata withLabel(String label);
+
 
     /**
-     * Interface that accepts a scalar Integer value as a metric for the analytics ping.
+     * Sets the optional 'label' together with a corresponding scalar value to be associated with
+     * this tracking ping.
+     *
+     * @param label adds metadata about the 'action' being performed. For example an action of
+     *              'appengine.deploy', could qualify the deployment as a flex deployment by passing
+     *              'flex' as the {@code label} value.
+     * @param value an optional scalar value to be associated with this tracking event.
+     * @return this fluent interface for further setting of event metadata
      */
-    interface FluentTrackingEventWithValue extends PingsAnalytics {
+    FluentTrackingEventWithMetadata withLabel(String label, int value);
 
-      /**
-       * Sets the optional scalar value to be associated with this tracking event.
-       *
-       * @param value an optional scalar value that will be recorded as a metric against this
-       *              tracking event
-       * @return a fluent interface for sending the tracking event ping
-       */
-      PingsAnalytics setValue(Integer value);
-    }
+    FluentTrackingEventWithMetadata withMessage(String message);
   }
 }
