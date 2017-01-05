@@ -62,8 +62,8 @@ public interface UsageTracker {
 
 
     /**
-     * Sets the optional 'label' together with a corresponding scalar value to be associated with
-     * this tracking ping.
+     * Sets the optional 'label' field together with a corresponding scalar value to be associated
+     * with this tracking ping.
      *
      * @param label adds metadata about the 'action' being performed. For example an action of
      *              'appengine.deploy', could qualify the deployment as a flex deployment by passing
@@ -73,6 +73,13 @@ public interface UsageTracker {
      */
     FluentTrackingEventWithMetadata withLabel(String label, int value);
 
+    /**
+     * Sets the optional 'message' field.
+     *
+     * @param message a message metadata such as an error message to be associated with the tracked
+     *                event.
+     * @return this fluent interface for further setting of event metadata
+     */
     FluentTrackingEventWithMetadata withMessage(String message);
   }
 }
