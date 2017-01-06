@@ -46,7 +46,7 @@ public interface UsageTracker {
   }
 
   /**
-   * Interface that accepts the 'label' or 'message' optional fields for pinging tracking events.
+   * Interface that accepts a key/value metadata pair for pinging tracking events.
    */
   interface FluentTrackingEventWithMetadata extends PingsAnalytics {
 
