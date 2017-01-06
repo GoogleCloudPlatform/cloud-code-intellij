@@ -327,7 +327,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       public Deployment succeeded(@NotNull DeploymentRuntime deploymentRuntime) {
         UsageTrackerProvider.getInstance()
             .trackEvent(GctTracking.APP_ENGINE_DEPLOY_SUCCESS)
-            .withMetadata(GctTracking.METADATA_LABEL_KEY, eventLabel)
+            .addMetadata(GctTracking.METADATA_LABEL_KEY, eventLabel)
             .ping();
         return deploymentCallback.succeeded(deploymentRuntime);
       }
@@ -336,8 +336,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       public void errorOccurred(@NotNull String errorMessage) {
         UsageTrackerProvider.getInstance()
             .trackEvent(GctTracking.APP_ENGINE_DEPLOY_FAIL)
-            .withMetadata(GctTracking.METADATA_LABEL_KEY, eventLabel)
-            .withMetadata(GctTracking.METADATA_MESSAGE_KEY, errorMessage)
+            .addMetadata(GctTracking.METADATA_LABEL_KEY, eventLabel)
+            .addMetadata(GctTracking.METADATA_MESSAGE_KEY, errorMessage)
             .ping();
         deploymentCallback.errorOccurred(errorMessage);
       }

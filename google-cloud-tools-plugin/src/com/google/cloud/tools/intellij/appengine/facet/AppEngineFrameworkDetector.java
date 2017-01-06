@@ -51,7 +51,7 @@ public class AppEngineFrameworkDetector extends
 
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_ADD_STANDARD_FACET)
-        .withMetadata(GctTracking.METADATA_LABEL_KEY, "frameworkDetect")
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, "frameworkDetect")
         .ping();
   }
 

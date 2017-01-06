@@ -63,7 +63,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
   public void execute(ProcessStartListener startListener) {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
-        .withMetadata(GctTracking.METADATA_LABEL_KEY, isFlexCompat ? "flex-compat" : "standard")
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, isFlexCompat ? "flex-compat" : "standard")
         .ping();
 
     Path stagingDirectory;
@@ -135,7 +135,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
   void onCancel() {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY_CANCEL)
-        .withMetadata(GctTracking.METADATA_LABEL_KEY, isFlexCompat ? "flex-compat" : "standard")
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, isFlexCompat ? "flex-compat" : "standard")
         .ping();
   }
 }

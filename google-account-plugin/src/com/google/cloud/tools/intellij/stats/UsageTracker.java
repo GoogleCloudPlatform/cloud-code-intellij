@@ -57,6 +57,6 @@ public interface UsageTracker {
      * @param value the value used for this event metadata
      * @return this fluent interface for further setting of event metadata
      */
-    FluentTrackingEventWithMetadata withMetadata(String key, String value);
+    FluentTrackingEventWithMetadata addMetadata(String key, String value);
   }
 }

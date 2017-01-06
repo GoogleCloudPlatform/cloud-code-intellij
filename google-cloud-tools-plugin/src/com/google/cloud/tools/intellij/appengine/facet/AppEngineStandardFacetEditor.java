@@ -144,7 +144,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
     // Framework discovered "Configure" popup.
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_ADD_STANDARD_FACET)
-        .withMetadata(GctTracking.METADATA_LABEL_KEY, "setOnModule")
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, "setOnModule")
         .ping();
   }
 

@@ -39,7 +39,7 @@ class TrackingEventBuilder implements FluentTrackingEventWithMetadata {
   }
 
   @Override
-  public FluentTrackingEventWithMetadata withMetadata(String key, String value) {
+  public FluentTrackingEventWithMetadata addMetadata(String key, String value) {
     metadataMap.put(Preconditions.checkNotNull(key), Preconditions.checkNotNull(value));
     return this;
   }

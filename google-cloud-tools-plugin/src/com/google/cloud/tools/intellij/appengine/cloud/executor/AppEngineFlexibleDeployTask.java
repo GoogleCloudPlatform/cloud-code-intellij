@@ -50,7 +50,7 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
   public void execute(ProcessStartListener startListener) {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
-        .withMetadata(GctTracking.METADATA_LABEL_KEY,
+        .addMetadata(GctTracking.METADATA_LABEL_KEY,
             "flex." + (deploy.getDeploymentConfiguration().isAuto() ? "auto" : "custom"))
         .ping();
 
@@ -97,7 +97,7 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
   void onCancel() {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY_CANCEL)
-        .withMetadata(GctTracking.METADATA_LABEL_KEY, "flex")
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, "flex")
         .ping();
   }
 }
