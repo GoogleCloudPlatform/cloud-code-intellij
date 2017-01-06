@@ -19,6 +19,9 @@ package com.google.cloud.tools.intellij.appengine.application;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.appengine.v1.model.Application;
 import com.google.api.services.appengine.v1.model.Location;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import com.intellij.openapi.components.ServiceManager;
 
@@ -27,13 +30,34 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
- * A Service that handles interactions with the App Engine Admin API. See
- * <a href="https://cloud.google.com/appengine/docs/admin-api/">
- *   https://cloud.google.com/appengine/docs/admin-api/</a>
+ * A Service that handles App Engine Administration. This class provides some general caching logic,
+ * but delegates to extending classes to performing the actual administrative actions.
  */
 public abstract class AppEngineAdminService {
+
+  private static final int APPLICATION_CACHE_MAX_SIZE = 10000;
+  private static final int LOCATION_CACHE_MAX_SIZE = 10000;
+  private static final String ALL_LOCATIONS_KEY = "ALL_LOCATIONS";
+
+  // Cache of GCP application resources. This assumes that project IDs are globally unique. Null or
+  // missing applications are not cached because they cannot be reliably invalidated.
+  private final Cache<String, Application> appEngineApplicationCache = CacheBuilder.newBuilder()
+      // arbitrary size limit
+      .maximumSize(APPLICATION_CACHE_MAX_SIZE)
+      // Even though these values should never change, it won't kill us to refresh once per day.
+      .expireAfterWrite(1, TimeUnit.DAYS)
+      .build();
+
+  // Cache of all available GCP locations. This is expected to change very infrequently.
+  private final Cache<String, List<Location>> appEngineLocationCache = CacheBuilder.newBuilder()
+      // arbitrary size limit
+      .maximumSize(LOCATION_CACHE_MAX_SIZE)
+      .expireAfterWrite(1, TimeUnit.DAYS)
+      .build();
 
   public static AppEngineAdminService getInstance() {
     return ServiceManager.getService(AppEngineAdminService.class);
@@ -49,8 +73,54 @@ public abstract class AppEngineAdminService {
    * @throws IOException if there was a transient error connecting to the API
    */
   @Nullable
-  public abstract Application getApplicationForProjectId(@NotNull String projectId,
-      @NotNull Credential credential) throws IOException, GoogleApiException;
+  public Application getApplicationForProjectId(@NotNull String projectId,
+      @NotNull Credential credential) throws IOException, GoogleApiException {
+    try {
+      // Load from the cache if it exists, otherwise delegate to implementation classes.
+      return appEngineApplicationCache.get(projectId, () ->
+          fetchApplicationForProjectId(projectId, credential));
+
+    } catch (ExecutionException e) {
+      if (e.getCause() instanceof AppEngineApplicationNotFoundException) {
+        return null;
+      } else {
+        handleExecutionException(e);
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  /**
+   * Returns a list of all available App Engine Locations
+   *
+   * @param credential the authenticated user Credential
+   * @throws IOException if there was a transient error connecting to the API
+   * @throws GoogleApiException if the desired operation could not be completed
+   */
+  @NotNull
+  public List<Location> getAllAppEngineLocations(Credential credential) throws IOException,
+      GoogleApiException {
+    try {
+      return appEngineLocationCache.get(ALL_LOCATIONS_KEY, () ->
+          fetchAllAppEngineLocations(credential));
+    } catch (ExecutionException e) {
+      handleExecutionException(e);
+      throw new RuntimeException(e);
+    }
+  }
+
+  /*
+   * Unpacks exceptions thrown by the supplier to propagate correct types to the user.
+   */
+  private void handleExecutionException(ExecutionException e)
+      throws GoogleApiException, IOException {
+    Throwable cause = e.getCause();
+    if (cause instanceof GoogleApiException) {
+      throw (GoogleApiException) cause;
+    } else if (cause instanceof IOException) {
+      throw (IOException) cause;
+    }
+  }
 
   /**
    * Creates an Application for the given project in the given location. This is a long-running
@@ -62,18 +132,40 @@ public abstract class AppEngineAdminService {
    * @throws IOException if there was a transient error connecting to the API
    * @throws GoogleApiException if the desired operation could not be completed
    */
+  @NotNull
   public abstract Application createApplication(@NotNull String locationId,
       @NotNull final String projectId, @NotNull final Credential credential)
       throws IOException, GoogleApiException;
 
   /**
-   * Returns a list of all available App Engine Locations
+   * Fetches a list of all app engine Locations that exist.
    *
    * @param credential the authenticated user Credential
    * @throws IOException if there was a transient error connecting to the API
    * @throws GoogleApiException if the desired operation could not be completed
    */
-  public abstract List<Location> getAllAppEngineLocations(Credential credential) throws IOException,
-      GoogleApiException;
+  protected abstract List<Location> fetchAllAppEngineLocations(Credential credential)
+      throws GoogleApiException, IOException;
+
+  /**
+   * Fetches an Application. Should throw an AppEngineApplicationNotFoundException if the requested
+   * application does not exist.
+   *
+   * @param projectId the GCP project ID
+   * @param credential the authenticated user Credential
+   * @throws IOException if there was a transient error connecting to the API
+   * @throws GoogleApiException if the desired operation could not be completed
+   * @throws AppEngineApplicationNotFoundException if the no application exists in the given project
+   */
+  @NotNull
+  protected abstract Application fetchApplicationForProjectId(@NotNull String projectId,
+      @NotNull Credential credential)
+      throws IOException, GoogleApiException, AppEngineApplicationNotFoundException;
+
+  /**
+   * Exception type to mark a failed attempt to fetch an Application.
+   */
+  @VisibleForTesting
+  static class AppEngineApplicationNotFoundException extends Exception {}
 
 }

@@ -43,7 +43,7 @@ import com.google.api.services.appengine.v1.model.ListLocationsResponse;
 import com.google.api.services.appengine.v1.model.Location;
 import com.google.api.services.appengine.v1.model.Operation;
 import com.google.api.services.appengine.v1.model.Status;
-import com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService.AppEngineApplicationNotFoundException;
+import com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService.AppEngineApplicationNotFoundException;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
