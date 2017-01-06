@@ -156,8 +156,8 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           Map<String, String> escapedMap = metadataMap.entrySet()
               .stream()
               .collect(Collectors.toMap(
-                  key -> METADATA_ESCAPER.escape(key.getKey()),
-                  val -> METADATA_ESCAPER.escape(val.getValue())));
+                  entry -> METADATA_ESCAPER.escape(entry.getKey()),
+                  entry -> METADATA_ESCAPER.escape(entry.getValue())));
 
           fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(escapedMap);
         }
