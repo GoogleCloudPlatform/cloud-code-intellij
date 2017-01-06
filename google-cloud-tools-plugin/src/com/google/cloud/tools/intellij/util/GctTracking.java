@@ -62,4 +62,7 @@ public class GctTracking {
       "appengine.oldplugin.deactivated";
 
   public static final String CLOUD_SDK_MALFORMED_PATH = "cloudsdk.malformedpath";
+
+  public static final String METADATA_LABEL_KEY = "label";
+  public static final String METADATA_MESSAGE_KEY = "message";
 }

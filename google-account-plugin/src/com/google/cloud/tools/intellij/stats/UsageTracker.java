@@ -51,35 +51,12 @@ public interface UsageTracker {
   interface FluentTrackingEventWithMetadata extends PingsAnalytics {
 
     /**
-     * Sets the optional 'label' field without a corresponding scalar 'value'.
+     * Sets an arbitrary key/value pair representing metadata for this event.
      *
-     * @param label adds metadata about the 'action' being performed. For example an action of
-     *              'appengine.deploy', could qualify the deployment as a flex deployment by passing
-     *              'flex' as the {@code label} value.
+     * @param key the key used for this event metadata
+     * @param value the value used for this event metadata
      * @return this fluent interface for further setting of event metadata
      */
-    FluentTrackingEventWithMetadata withLabel(String label);
-
-
-    /**
-     * Sets the optional 'label' field together with a corresponding scalar value to be associated
-     * with this tracking ping.
-     *
-     * @param label adds metadata about the 'action' being performed. For example an action of
-     *              'appengine.deploy', could qualify the deployment as a flex deployment by passing
-     *              'flex' as the {@code label} value.
-     * @param value an optional scalar value to be associated with this tracking event.
-     * @return this fluent interface for further setting of event metadata
-     */
-    FluentTrackingEventWithMetadata withLabel(String label, int value);
-
-    /**
-     * Sets the optional 'message' field.
-     *
-     * @param message a message metadata such as an error message to be associated with the tracked
-     *                event.
-     * @return this fluent interface for further setting of event metadata
-     */
-    FluentTrackingEventWithMetadata withMessage(String message);
+    FluentTrackingEventWithMetadata withMetadata(String key, String value);
   }
 }

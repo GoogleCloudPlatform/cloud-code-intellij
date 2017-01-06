@@ -19,6 +19,8 @@ package com.google.cloud.tools.intellij.stats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 /**
  * Package internal only interface used for providing multiple ping implementations to the
  * {@link TrackingEventBuilder}.
@@ -30,7 +32,5 @@ interface SendsEvents {
    */
   void sendEvent(@NotNull String eventCategory,
       @NotNull String eventAction,
-      @Nullable String eventLabel,
-      @Nullable Integer eventValue,
-      @Nullable String eventMessage);
+      @Nullable Map<String, String> metadataMap);
 }

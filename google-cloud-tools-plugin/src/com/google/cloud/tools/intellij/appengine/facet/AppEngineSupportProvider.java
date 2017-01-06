@@ -192,7 +192,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
               UsageTrackerProvider.getInstance()
                   .trackEvent(GctTracking.APP_ENGINE_ADD_LIBRARY)
-                  .withLabel(libraryToAdd.name())
+                  .withMetadata(GctTracking.METADATA_LABEL_KEY, libraryToAdd.name())
                   .ping();
             } else {
               LOG.warn("Failed to load library: " + libraryToAdd.getDisplayName());
