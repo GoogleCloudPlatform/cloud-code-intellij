@@ -125,7 +125,7 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
   public static class CustomUrlSourceRequest extends SourceRequest<ListReposResponse> {
 
     CustomUrlSourceRequest(Source client, String projectId) {
-      super(client, "GET", "v1/projaects/" + projectId +"/repos", null,
+      super(client, "GET", "v1/projects/" + projectId +"/repos", null,
           ListReposResponse.class);
     }
   }
