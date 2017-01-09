@@ -103,7 +103,7 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
           .setApplicationName(userAgent)
           .build();
 
-      ListReposResponse response = new MySourceList(source, cloudProject).execute();
+      ListReposResponse response = new CustomUrlSourceRequest(source, cloudProject).execute();
 
       List<Repo> repositories = response.getRepos();
       if (!response.isEmpty() && repositories != null) {
@@ -120,14 +120,14 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
   /**
    * The currently used version of the Source API uses an outdated endpoint for listing repos. This
-   * overrides {@link SourceRequest} to set the correct url.
+   * extends {@link SourceRequest} to set the correct url.
    */
-  public static class MySourceList extends SourceRequest<ListReposResponse> {
+  public static class CustomUrlSourceRequest extends SourceRequest<ListReposResponse> {
 
     @Key
     private String projectId;
 
-    MySourceList(Source client, String projectId) {
+    CustomUrlSourceRequest(Source client, String projectId) {
       super(client, "GET", "v1/projects/{projectId}/repos", null,
           ListReposResponse.class);
 
