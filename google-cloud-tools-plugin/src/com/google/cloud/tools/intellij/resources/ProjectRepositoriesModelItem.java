@@ -22,8 +22,6 @@ import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.Key;
-import com.google.api.client.util.Preconditions;
 import com.google.api.services.source.Source;
 import com.google.api.services.source.SourceRequest;
 import com.google.api.services.source.model.ListReposResponse;
@@ -63,7 +61,6 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
     loadRepositories(false);
   }
   public void loadRepositories(boolean empty) {
-    removeAllChildren();
 
     // TODO remove
 //      if (empty) {
@@ -74,11 +71,11 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 //      }
 
     // todo remove this
-//    try {
-//      Thread.sleep(5000);
-//    } catch (InterruptedException e) {
-//      e.printStackTrace();
-//    }
+    try {
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
 
 
     try {
@@ -105,6 +102,7 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
       ListReposResponse response = new CustomUrlSourceRequest(source, cloudProject).execute();
 
+      removeAllChildren();
       List<Repo> repositories = response.getRepos();
       if (!response.isEmpty() && repositories != null) {
         for (Repo repo : repositories) {
@@ -114,25 +112,21 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
         add (new ResourceEmptyModelItem("There are no cloud repositories for this project"));
       }
     } catch (IOException | GeneralSecurityException ex) {
+      removeAllChildren();
       add (new ResourceErrorModelItem("Error loading repositories."));
     }
   }
 
   /**
-   * The currently used version of the Source API uses an outdated endpoint for listing repos. This
-   * extends {@link SourceRequest} to set the correct url.
+   * The currently used version of the Source API in
+   * {@link com.google.api.services.source.Source.Repos.List} uses an outdated endpoint for listing
+   * repos. This extends the base class {@link SourceRequest} to set the correct url.
    */
   public static class CustomUrlSourceRequest extends SourceRequest<ListReposResponse> {
 
-    @Key
-    private String projectId;
-
     CustomUrlSourceRequest(Source client, String projectId) {
-      super(client, "GET", "v1/projects/{projectId}/repos", null,
+      super(client, "GET", "v1/projects/" + projectId +"/repos", null,
           ListReposResponse.class);
-
-      this.projectId = Preconditions
-          .checkNotNull(projectId, "Required parameter projectId must be specified.");
     }
   }
 }
