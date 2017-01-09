@@ -137,6 +137,8 @@ public class UploadSourceAction extends DumbAwareAction {
     final VirtualFile root = gitDetected ? gitRepository.getRoot() : project.getBaseDir();
 
     // check for existing git repo
+    // TODO move and refactor this check; user may end up selecting a different repo
+    // to upload to so its not a valid spot for this
     boolean externalRemoteDetected = false;
     if (gitDetected) {
       final String gcpRemote = GcpHttpAuthDataProvider.findGcpRemoteUrl(gitRepository);
@@ -147,8 +149,8 @@ public class UploadSourceAction extends DumbAwareAction {
       externalRemoteDetected = !gitRepository.getRemotes().isEmpty();
     }
 
-    ChooseProjectDialog dialog =
-        new ChooseProjectDialog(project, GctBundle.message("uploadtogcp.selecttext"),
+    UploadSourceDialog dialog =
+        new UploadSourceDialog(project, GctBundle.message("uploadtogcp.selecttext"),
             GctBundle.message("uploadtogcp.oktext"));
     DialogManager.show(dialog);
     if (!dialog.isOK() || dialog.getCredentialedUser() == null || Strings
@@ -157,6 +159,7 @@ public class UploadSourceAction extends DumbAwareAction {
     }
 
     final String projectId = dialog.getProjectId();
+    final String repositoryId = dialog.getRepositoryId();
     final CredentialedUser user = dialog.getCredentialedUser();
 
     // finish the job in background
@@ -176,19 +179,16 @@ public class UploadSourceAction extends DumbAwareAction {
 
         GitRepositoryManager repositoryManager = GitUtil.getRepositoryManager(project);
         final GitRepository repository = repositoryManager.getRepositoryForRoot(root);
-        LOG.assertTrue(repository != null, "GitRepository is null for root " + root);
         if (repository == null) {
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.failedtocreategit"),
-                  "Google");
-            }
-          });
+          SwingUtilities.invokeLater(() ->
+              Messages.showErrorDialog(project,
+                  GctBundle.message("uploadtogcp.failedtocreategit"), "Google"));
+
+          LOG.error("GitRepository is null for root " + root);
           return;
         }
 
-        final String remoteUrl = GcpHttpAuthDataProvider.getGcpUrl(projectId);
+        final String remoteUrl = GcpHttpAuthDataProvider.getGcpUrl(projectId, repositoryId);
         final String remoteName = finalExternalRemoteDetected ? "cloud-platform" : "origin";
 
         LOG.info("Adding Google as a remote host");

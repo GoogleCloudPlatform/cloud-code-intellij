@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,57 +16,42 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
-
-import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
-import com.intellij.util.ui.UIUtil.FontSize;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
 
 /**
- * UI for the node that prompts for Google Login.
+ * Created by eshaul on 1/4/17.
  */
-class BaseGoogleLoginUi extends JPanel {
+public class AddRepositoryNotificationPanel extends JPanel {
 
   public static final int PREFERRED_HEIGHT = 150;
   public static final int MIN_WIDTH = 450;
 
-  public BaseGoogleLoginUi(@NotNull String signinText) {
+  public AddRepositoryNotificationPanel() {
     setLayout(new GridBagLayout());
-    setPreferredSize(new Dimension(MIN_WIDTH, PREFERRED_HEIGHT));
+//    setPreferredSize(new Dimension(MIN_WIDTH, PREFERRED_HEIGHT));
     setOpaque(false);
 
-    JLabel googleIcon = new JBLabel();
 
     setBorder(BorderFactory.createEmptyBorder(10, 15, 15, 15));
-    googleIcon.setHorizontalAlignment(SwingConstants.CENTER);
-    googleIcon.setVerticalAlignment(SwingConstants.CENTER);
-    googleIcon.setOpaque(false);
-    googleIcon.setIcon(GoogleLoginIcons.GOOGLE_LOGO);
-    googleIcon.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
     constraints.weighty = 0;
-    add(googleIcon, constraints);
 
-    JTextArea signinTextArea = new JTextArea();
-    signinTextArea.setFont(UIUtil.getLabelFont(FontSize.MINI));
-    signinTextArea.setLineWrap(true);
-    signinTextArea.setWrapStyleWord(true);
-    signinTextArea.setOpaque(false);
-    signinTextArea.setText(signinText);
+    JTextArea notificationTextArea = new JTextArea();
+    notificationTextArea.setFont(UIUtil.getLabelFont());
+    notificationTextArea.setLineWrap(false);
+    notificationTextArea.setWrapStyleWord(true);
+    notificationTextArea.setOpaque(false);
+    notificationTextArea.setText("You ain't got no repos");
     constraints.gridx = 0;
     constraints.gridy = 1;
     constraints.weighty = 1;
@@ -74,6 +59,7 @@ class BaseGoogleLoginUi extends JPanel {
     constraints.weightx = 1;
     constraints.fill = GridBagConstraints.BOTH;
     constraints.anchor = GridBagConstraints.CENTER;
-    add(signinTextArea, constraints);
+    add(notificationTextArea, constraints);
   }
+
 }
