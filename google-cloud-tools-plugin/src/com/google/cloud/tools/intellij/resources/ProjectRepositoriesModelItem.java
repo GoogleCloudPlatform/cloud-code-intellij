@@ -71,11 +71,11 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 //      }
 
     // todo remove this
-    try {
-      Thread.sleep(5000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+//    try {
+//      Thread.sleep(5000);
+//    } catch (InterruptedException e) {
+//      e.printStackTrace();
+//    }
 
 
     try {
@@ -125,7 +125,7 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
   public static class CustomUrlSourceRequest extends SourceRequest<ListReposResponse> {
 
     CustomUrlSourceRequest(Source client, String projectId) {
-      super(client, "GET", "v1/projects/" + projectId +"/repos", null,
+      super(client, "GET", "v1/projaects/" + projectId +"/repos", null,
           ListReposResponse.class);
     }
   }
