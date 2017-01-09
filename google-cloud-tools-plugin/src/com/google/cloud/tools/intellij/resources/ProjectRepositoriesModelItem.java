@@ -22,15 +22,15 @@ import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.Key;
+import com.google.api.client.util.Preconditions;
 import com.google.api.services.source.Source;
+import com.google.api.services.source.SourceRequest;
 import com.google.api.services.source.model.ListReposResponse;
 import com.google.api.services.source.model.Repo;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
-import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.vcs.UploadSourceDialog.MySourceList;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,10 +40,10 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
- * Created by eshaul on 12/19/16.
+ * TreeNode representation of the set of available Cloud Source Repositories for a given GCP
+ * project.
  */
 public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
@@ -63,21 +63,23 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
     loadRepositories(false);
   }
   public void loadRepositories(boolean empty) {
+    removeAllChildren();
 
     // TODO remove
 //      if (empty) {
 //        removeAllChildren();
-//        add (new ResourceErrorModelItem("Error loading repositories."));
-////        add (new ResourceEmptyModelItem("There are no cloud repositories for this project"));
+////        add (new ResourceErrorModelItem("Error loading repositories."));
+//        add (new ResourceEmptyModelItem("There are no cloud repositories for this project"));
 //        return;
 //      }
 
     // todo remove this
 //    try {
-//      Thread.sleep(1000);
+//      Thread.sleep(5000);
 //    } catch (InterruptedException e) {
 //      e.printStackTrace();
 //    }
+
 
     try {
       Credential credential = user.getCredential();
@@ -103,7 +105,6 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
       ListReposResponse response = new MySourceList(source, cloudProject).execute();
 
-      removeAllChildren();
       List<Repo> repositories = response.getRepos();
       if (!response.isEmpty() && repositories != null) {
         for (Repo repo : repositories) {
@@ -114,6 +115,24 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
       }
     } catch (IOException | GeneralSecurityException ex) {
       add (new ResourceErrorModelItem("Error loading repositories."));
+    }
+  }
+
+  /**
+   * The currently used version of the Source API uses an outdated endpoint for listing repos. This
+   * overrides {@link SourceRequest} to set the correct url.
+   */
+  public static class MySourceList extends SourceRequest<ListReposResponse> {
+
+    @Key
+    private String projectId;
+
+    MySourceList(Source client, String projectId) {
+      super(client, "GET", "v1/projects/{projectId}/repos", null,
+          ListReposResponse.class);
+
+      this.projectId = Preconditions
+          .checkNotNull(projectId, "Required parameter projectId must be specified.");
     }
   }
 }
