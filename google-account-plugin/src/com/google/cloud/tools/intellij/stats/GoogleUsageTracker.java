@@ -22,7 +22,6 @@ import com.google.common.base.Joiner.MapJoiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.escape.CharEscaperBuilder;
 import com.google.common.escape.Escaper;
 
@@ -50,6 +49,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /** Google Usage Tracker that reports to Cloud Tools Analytics backend. */
 public class GoogleUsageTracker implements UsageTracker, SendsEvents {
@@ -131,8 +131,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   public void sendEvent(
       @NotNull String eventCategory,
       @NotNull String eventAction,
-      @Nullable String eventLabel,
-      @Nullable Integer eventValue) {
+      @Nullable Map<String, String> metadataMap) {
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       if (UsageTrackerManager.getInstance().isTrackingEnabled()) {
         // For the semantics of each parameter, consult the followings:
@@ -153,11 +152,14 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         // I think 'virtual' indicates these don't correspond to real web pages.
         postData.add(new BasicNameValuePair(IS_VIRTUAL_KEY, STRING_TRUE_VALUE));
         String fullMetadataString = systemMetadataKeyValues;
-        if (eventLabel != null) {
-          // Not using ImmutableMap.of() because I want to handle null for values.
-          Map<String, Integer> eventMetadataMap = Maps.newHashMap();
-          eventMetadataMap.put(METADATA_ESCAPER.escape(eventLabel), eventValue);
-          fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(eventMetadataMap);
+        if (metadataMap != null && !metadataMap.isEmpty()) {
+          Map<String, String> escapedMap = metadataMap.entrySet()
+              .stream()
+              .collect(Collectors.toMap(
+                  entry -> METADATA_ESCAPER.escape(entry.getKey()),
+                  entry -> METADATA_ESCAPER.escape(entry.getValue())));
+
+          fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(escapedMap);
         }
         postData.add(new BasicNameValuePair(PAGE_TITLE_KEY, fullMetadataString));
         sendPing(postData);
@@ -166,7 +168,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   }
 
   @Override
-  public FluentTrackingEventWithLabel trackEvent(String action) {
+  public FluentTrackingEventWithMetadata trackEvent(String action) {
     return new TrackingEventBuilder(this, externalPluginName, action);
   }
 
