@@ -24,7 +24,7 @@ import javax.swing.BorderFactory;
 import javax.swing.SwingConstants;
 
 /**
- * Created by eshaul on 1/9/17.
+ * UI for the node that displays information if a resource manager call returns an empty result.
  */
 public class ResourceSelectorEmptyItem extends JBLabel {
 

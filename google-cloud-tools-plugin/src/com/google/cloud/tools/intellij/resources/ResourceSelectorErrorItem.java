@@ -29,7 +29,7 @@ import javax.swing.SwingConstants;
 /**
  * UI for the node that displays error information if a resource manager call fails.
  */
-class ResourceSelectorErrorItem extends JBLabel {
+public class ResourceSelectorErrorItem extends JBLabel {
 
   public ResourceSelectorErrorItem(@NotNull Color errorForeground) {
     setBorder(BorderFactory.createEmptyBorder(2, 15, 2, 0));

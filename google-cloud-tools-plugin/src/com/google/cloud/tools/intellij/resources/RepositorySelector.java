@@ -23,6 +23,7 @@ import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -54,11 +55,15 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class RepositorySelector extends CustomizableComboBox implements CustomizableComboBoxPopup {
 
+  private static final Logger logger = Logger.getInstance(RepositorySelector.class);
+
   private JBPopup popup;
   private RepositoryPanel panel;
   private String cloudProject;
   private CredentialedUser user;
   private boolean canCreateRepository;
+  private static final int SELECTOR_HEIGHT = 140;
+  private static final int SELECTOR_WIDTH = 400;
 
 
   public RepositorySelector(@Nullable String cloudProject,
@@ -83,7 +88,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
         panel = new RepositoryPanel(cloudProject);
 
         ComponentPopupBuilder popupBuilder = JBPopupFactory.getInstance()
-            .createComponentPopupBuilder(panel, null); // todo change focus param
+            .createComponentPopupBuilder(panel, null);
         popup = popupBuilder.createPopup();
       }
       if (!popup.isVisible()) {
@@ -111,7 +116,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
   @Override
   protected int getPreferredPopupHeight() {
-    return 140;
+    return SELECTOR_HEIGHT;
   }
 
   private class RepositoryPanel extends JPanel {
@@ -120,7 +125,6 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     private DefaultMutableTreeNode projectRootNode;
     private DefaultTreeModel treeModel;
     private ProjectRepositoriesModelItem repositories;
-    private String selectedRepositoryId;
 
     RepositoryPanel(String cloudProject) {
       repositories
@@ -137,8 +141,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       repositoryTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
       repositoryTree.expandRow(0);
 
-      RepositorySelectorRenderer renderer = new RepositorySelectorRenderer(repositoryTree);
-//      DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+      RepositorySelectorRenderer renderer = new RepositorySelectorRenderer();
       renderer.setOpenIcon(GoogleCloudToolsIcons.CLOUD);
       renderer.setClosedIcon(GoogleCloudToolsIcons.CLOUD);
       renderer.setLeafIcon(null);
@@ -150,14 +153,12 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
         if (node != null && node instanceof RepositoryModelItem) {
           RepositoryModelItem repoNode = (RepositoryModelItem) node;
           RepositorySelector.this.setText(repoNode.getRepositoryId());
-          selectedRepositoryId = repoNode.getRepositoryId();
           ApplicationManager.getApplication().invokeLater(RepositorySelector.this::hidePopup);
         }
-        // todo handle if its instance of loader or error
       });
 
       JBScrollPane scrollPane = new JBScrollPane();
-      scrollPane.setPreferredSize(new Dimension(400, getPreferredPopupHeight()));
+      scrollPane.setPreferredSize(new Dimension(SELECTOR_WIDTH, getPreferredPopupHeight()));
       scrollPane.setViewportView(repositoryTree);
       scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
@@ -176,9 +177,10 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
         newRepositoryButton.setText("Create a new cloud repository");
         newRepositoryButton.addActionListener(event -> {
           try {
-            Desktop.getDesktop().browse(URI.create("http://www.google.com"));
+            Desktop.getDesktop().browse(URI.create(
+                ProjectRepositoriesModelItem.PANETHEON_CREATE_REPO_URL_PREFIX + cloudProject));
           } catch (IOException e) {
-            // todo
+            logger.error("Failed to load GCP create repository URL.");
           }
         });
 
@@ -188,7 +190,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       JButton refreshButton = new JButton();
       refreshButton.setIcon(GoogleCloudToolsIcons.REFRESH);
       refreshButton.addActionListener(event -> {
-        refresh(true);
+        refresh();
       });
 
       buttonPanel.add(Box.createHorizontalGlue());
@@ -196,14 +198,14 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       bottomPane.add(buttonPanel, BorderLayout.PAGE_END);
       add(bottomPane);
 
-      refresh(false);
+      refresh();
     }
 
-    private void refresh(boolean empty) {
+    private void refresh() {
       setLoader();
 
       ApplicationManager.getApplication().executeOnPooledThread(() -> {
-        repositories.loadRepositories(empty);
+        repositories.loadRepositories();
 
         ApplicationManager.getApplication().invokeAndWait(() -> {
           treeModel.insertNodeInto(repositories, projectRootNode, 0);

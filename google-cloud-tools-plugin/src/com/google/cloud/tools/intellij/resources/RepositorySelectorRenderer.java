@@ -24,7 +24,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
- * Created by eshaul on 1/5/17.
+ * TreeCellRenderer for nodes in the repository selector UI widget.
  */
 public class RepositorySelectorRenderer extends DefaultTreeCellRenderer {
 
@@ -33,7 +33,7 @@ public class RepositorySelectorRenderer extends DefaultTreeCellRenderer {
   private ResourceSelectorErrorItem errorItem;
 
 
-  public RepositorySelectorRenderer(JTree tree) {
+  public RepositorySelectorRenderer() {
     DefaultTreeCellRenderer defaultRenderer = new DefaultTreeCellRenderer();
     loadingItem = new ResourceSelectorLoadingItem(defaultRenderer.getBackgroundNonSelectionColor(),
         defaultRenderer.getTextNonSelectionColor());

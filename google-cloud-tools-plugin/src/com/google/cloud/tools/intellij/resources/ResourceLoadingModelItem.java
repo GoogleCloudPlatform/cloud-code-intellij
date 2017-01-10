@@ -21,13 +21,17 @@ import com.sun.istack.NotNull;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * This model item is shown in the project selector when a resource manager call is outstanding.
+ * This model item is shown when a resource manager call is outstanding.
  */
 class ResourceLoadingModelItem extends DefaultMutableTreeNode {
 
 }
 
+/**
+ * This model item is shown when a resource manager call returns an empty result.
+ */
 class ResourceEmptyModelItem extends DefaultMutableTreeNode {
+
   private String message;
 
   public ResourceEmptyModelItem(@NotNull String message) {
@@ -40,9 +44,8 @@ class ResourceEmptyModelItem extends DefaultMutableTreeNode {
 }
 
 /**
- * This model item represents a node shown in the project selector when an error occurs attempting
- * to query resource manager. The user can recover and try again by hitting refresh at the bottom
- * right. The error message is displayed under the user name.
+ * This model item represents a node shown in when an error occurs attempting to query a resource
+ * manager.
  */
 class ResourceErrorModelItem extends DefaultMutableTreeNode {
 
