@@ -71,6 +71,8 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     this.cloudProject = cloudProject;
     this.user = user;
     this.canCreateRepository = canCreateRepository;
+
+    getTextField().getEmptyText().setText("Enter a cloud repository ID...");
   }
 
   public void setCloudProject(String cloudProject) {
