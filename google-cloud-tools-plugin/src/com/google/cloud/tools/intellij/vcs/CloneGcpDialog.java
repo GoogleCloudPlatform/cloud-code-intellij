@@ -56,7 +56,6 @@ public class CloneGcpDialog extends DialogWrapper {
   private static final Logger LOG = Logger.getInstance(CloneGcpDialog.class);
   public static final String INVALID_FILENAME_CHARS = "[/\\\\?%*:|\"<>]";
 
-  // Form controls
   private JPanel rootPanel;
   private ProjectSelector projectSelector;
   private TextFieldWithBrowseButton parentDirectory;
@@ -67,9 +66,6 @@ public class CloneGcpDialog extends DialogWrapper {
   @NotNull private String defaultDirectoryName = "";
   @NotNull private final Project project;
 
-  /**
-   * Initialize the dialog.
-   */
   public CloneGcpDialog(@NotNull Project project) {
     super(project, true);
     this.project = project;
@@ -215,7 +211,6 @@ public class CloneGcpDialog extends DialogWrapper {
         projectSelector.getSelectedUser(), false /*canCreateRepository*/);
 
 
-    // TODO extract this
     projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {

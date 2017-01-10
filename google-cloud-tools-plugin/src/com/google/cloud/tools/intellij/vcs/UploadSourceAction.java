@@ -136,7 +136,6 @@ public class UploadSourceAction extends DumbAwareAction {
     final boolean gitDetected = gitRepository != null;
     final VirtualFile root = gitDetected ? gitRepository.getRoot() : project.getBaseDir();
 
-    // check for existing git repo
     // TODO move and refactor this check; user may end up selecting a different repo
     // to upload to so its not a valid spot for this
     boolean externalRemoteDetected = false;
