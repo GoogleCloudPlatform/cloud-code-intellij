@@ -168,6 +168,10 @@ public class CloneGcpDialog extends DialogWrapper {
       setOKActionEnabled(false);
       paintSelectionError();
       return;
+    } else if (projectSelector.getSelectedUser() == null
+        || StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
+      setOKActionEnabled(false);
+      return;
     }
     paintSelectionOk();
     setErrorText(null);
@@ -208,23 +212,19 @@ public class CloneGcpDialog extends DialogWrapper {
 
           directoryName.setText(defaultDirectoryName);
         }
+        repositorySelector.setCloudProject(projectSelector.getText());
+        repositorySelector.setUser(projectSelector.getSelectedUser());
+        repositorySelector.setText("");
         updateButtons();
       }
     });
     repositorySelector = new RepositorySelector(projectSelector.getText(),
         projectSelector.getSelectedUser(), false /*canCreateRepository*/);
 
-    projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        repositorySelector.setCloudProject(projectSelector.getText());
-        repositorySelector.setUser(projectSelector.getSelectedUser());
-        repositorySelector.setText("");
-      }
-    });
     repositorySelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent e) {
+        updateButtons();
         setOKActionEnabled(projectSelector.getSelectedUser() != null
             && !StringUtil.isEmpty(repositorySelector.getSelectedRepository()));
       }
