@@ -22,6 +22,7 @@ import com.google.cloud.tools.intellij.resources.RepositorySelector;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
 
 import org.jetbrains.annotations.NotNull;
@@ -94,9 +95,17 @@ public class UploadSourceDialog extends DialogWrapper {
     projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        setOKActionEnabled(projectSelector.getSelectedUser() != null);
         repositorySelector.setCloudProject(projectSelector.getText());
         repositorySelector.setUser(projectSelector.getSelectedUser());
+        repositorySelector.setText("");
+      }
+    });
+
+    repositorySelector.getDocument().addDocumentListener(new DocumentAdapter() {
+      @Override
+      protected void textChanged(DocumentEvent e) {
+        setOKActionEnabled(projectSelector.getSelectedUser() != null
+            && !StringUtil.isEmpty(repositorySelector.getSelectedRepository()));
       }
     });
 

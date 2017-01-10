@@ -27,6 +27,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBScrollPane;
 
@@ -38,6 +39,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -47,6 +49,7 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
@@ -73,6 +76,25 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     this.canCreateRepository = canCreateRepository;
 
     getTextField().getEmptyText().setText("Enter a cloud repository ID...");
+  }
+
+  @Nullable
+  public String getSelectedRepository() {
+    if (StringUtil.isEmpty(getText())) {
+      return null;
+    }
+
+    Enumeration repos = panel.getRepositories().children();
+    while (repos.hasMoreElements()) {
+      TreeNode repo = (TreeNode) repos.nextElement();
+
+      if (repo instanceof RepositoryModelItem
+          && getText().equals(((RepositoryModelItem) repo).getRepositoryId())) {
+        return getText();
+      }
+    }
+
+    return null;
   }
 
   public void setCloudProject(String cloudProject) {
@@ -225,6 +247,10 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
         treeModel.reload();
         repositoryTree.expandRow(0);
       });
+    }
+
+    public ProjectRepositoriesModelItem getRepositories() {
+      return repositories;
     }
   }
 }

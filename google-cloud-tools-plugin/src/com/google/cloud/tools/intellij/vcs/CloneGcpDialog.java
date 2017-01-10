@@ -32,6 +32,7 @@ import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 
@@ -53,6 +54,7 @@ import javax.swing.event.DocumentListener;
  * The dialog that prompts the user to download (git clone) from a GCP project.
  */
 public class CloneGcpDialog extends DialogWrapper {
+
   private static final Logger LOG = Logger.getInstance(CloneGcpDialog.class);
   public static final String INVALID_FILENAME_CHARS = "[/\\\\?%*:|\"<>]";
 
@@ -63,8 +65,10 @@ public class CloneGcpDialog extends DialogWrapper {
   private JLabel parentDirectoryLabel;
   private RepositorySelector repositorySelector;
 
-  @NotNull private String defaultDirectoryName = "";
-  @NotNull private final Project project;
+  @NotNull
+  private String defaultDirectoryName = "";
+  @NotNull
+  private final Project project;
 
   public CloneGcpDialog(@NotNull Project project) {
     super(project, true);
@@ -104,21 +108,21 @@ public class CloneGcpDialog extends DialogWrapper {
     fcd.setDescription(GctBundle.message("clonefromgcp.destination.directory.description"));
     fcd.setHideIgnored(false);
     parentDirectory.addActionListener(new ComponentWithBrowseButton
-          .BrowseFolderActionListener<JTextField>(
-          fcd.getTitle(), fcd.getDescription(), parentDirectory,
-          project, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) {
-        @Override
-        protected VirtualFile getInitialFile() {
-          String text = getComponentText();
-          if (text.length() == 0) {
-            VirtualFile file = project.getBaseDir();
-            if (file != null) {
-              return file;
-            }
-          }
-          return super.getInitialFile();
-        }
-      }
+                                          .BrowseFolderActionListener<JTextField>(
+                                          fcd.getTitle(), fcd.getDescription(), parentDirectory,
+                                          project, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) {
+                                        @Override
+                                        protected VirtualFile getInitialFile() {
+                                          String text = getComponentText();
+                                          if (text.length() == 0) {
+                                            VirtualFile file = project.getBaseDir();
+                                            if (file != null) {
+                                              return file;
+                                            }
+                                          }
+                                          return super.getInitialFile();
+                                        }
+                                      }
     );
 
     final DocumentListener updateOkButtonListener = new DocumentAdapter() {
@@ -210,13 +214,19 @@ public class CloneGcpDialog extends DialogWrapper {
     repositorySelector = new RepositorySelector(projectSelector.getText(),
         projectSelector.getSelectedUser(), false /*canCreateRepository*/);
 
-
     projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        setOKActionEnabled(projectSelector.getSelectedUser() != null);
         repositorySelector.setCloudProject(projectSelector.getText());
         repositorySelector.setUser(projectSelector.getSelectedUser());
+        repositorySelector.setText("");
+      }
+    });
+    repositorySelector.getDocument().addDocumentListener(new DocumentAdapter() {
+      @Override
+      protected void textChanged(DocumentEvent e) {
+        setOKActionEnabled(projectSelector.getSelectedUser() != null
+            && !StringUtil.isEmpty(repositorySelector.getSelectedRepository()));
       }
     });
   }
