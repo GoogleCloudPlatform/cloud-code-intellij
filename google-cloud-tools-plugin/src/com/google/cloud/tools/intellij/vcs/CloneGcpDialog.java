@@ -212,7 +212,7 @@ public class CloneGcpDialog extends DialogWrapper {
       }
     });
     repositorySelector = new RepositorySelector(projectSelector.getText(),
-        projectSelector.getSelectedUser());
+        projectSelector.getSelectedUser(), false /*canCreateRepository*/);
 
 
     // TODO extract this

@@ -30,7 +30,7 @@ public class RepositoryModelItem extends DefaultMutableTreeNode {
     this.repositoryName = repositoryName;
   }
 
-  public String getRepositoryName() {
+  public String getRepositoryId() {
     return repositoryName;
   }
 }

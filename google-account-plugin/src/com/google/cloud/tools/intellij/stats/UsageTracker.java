@@ -31,7 +31,7 @@ public interface UsageTracker {
    *               often prefixed with a domain such as 'appengine.' or 'clouddebugger.'
    * @return a fluent interface for setting the remaining parameters of a tracking ping
    */
-  FluentTrackingEventWithLabel trackEvent(String action);
+  FluentTrackingEventWithMetadata trackEvent(String action);
 
   /**
    * Part of the tracking event fluent API. Denotes steps in the API where the event has enough data
@@ -46,34 +46,17 @@ public interface UsageTracker {
   }
 
   /**
-   * Interface that accepts the 'label' optional field for pinging tracking events.
+   * Interface that accepts a key/value metadata pair for pinging tracking events.
    */
-  interface FluentTrackingEventWithLabel extends PingsAnalytics {
+  interface FluentTrackingEventWithMetadata extends PingsAnalytics {
 
     /**
-     * Sets the optional 'label' field.
+     * Sets an arbitrary key/value pair representing metadata for this event.
      *
-     * @param label adds metadata about the 'action' being performed. For example an action of
-     *              'appengine.deploy', could qualify the deployment as a flex deployment by passing
-     *              'flex' as the {@code label} value.
-     * @return a fluent interface for setting a scalar value attributed to the parameters of the
-     *         tracking ping
+     * @param key the key used for this event metadata
+     * @param value the value used for this event metadata
+     * @return this fluent interface for further setting of event metadata
      */
-    FluentTrackingEventWithValue withLabel(String label);
-
-    /**
-     * Interface that accepts a scalar Integer value as a metric for the analytics ping.
-     */
-    interface FluentTrackingEventWithValue extends PingsAnalytics {
-
-      /**
-       * Sets the optional scalar value to be associated with this tracking event.
-       *
-       * @param value an optional scalar value that will be recorded as a metric against this
-       *              tracking event
-       * @return a fluent interface for sending the tracking event ping
-       */
-      PingsAnalytics setValue(Integer value);
-    }
+    FluentTrackingEventWithMetadata addMetadata(String key, String value);
   }
 }

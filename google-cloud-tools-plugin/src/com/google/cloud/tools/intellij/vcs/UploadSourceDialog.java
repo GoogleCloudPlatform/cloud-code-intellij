@@ -16,13 +16,6 @@
 
 package com.google.cloud.tools.intellij.vcs;
 
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpResponse;
-import com.google.api.client.util.Key;
-import com.google.api.client.util.Preconditions;
-import com.google.api.services.source.Source;
-import com.google.api.services.source.SourceRequest;
-import com.google.api.services.source.model.ListReposResponse;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.resources.RepositorySelector;
@@ -35,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Dimension;
-import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -74,7 +66,8 @@ public class UploadSourceDialog extends DialogWrapper {
     return projectId;
   }
 
-  @NotNull String getRepositoryId() {
+  @NotNull
+  String getRepositoryId() {
     return repositoryId;
   }
 
@@ -95,7 +88,8 @@ public class UploadSourceDialog extends DialogWrapper {
     projectSelector = new ProjectSelector();
     projectSelector.setMinimumSize(new Dimension(300, 0));
 
-    repositorySelector = new RepositorySelector(projectSelector.getText(), projectSelector.getSelectedUser());
+    repositorySelector = new RepositorySelector(projectSelector.getText(),
+        projectSelector.getSelectedUser(), true /*canCreateRepository*/);
 
     projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
@@ -128,68 +122,4 @@ public class UploadSourceDialog extends DialogWrapper {
     credentialedUser = projectSelector.getSelectedUser();
     super.doOKAction();
   }
-
-  // TODO move this and trim it down to what's necessary
-  public static class MySourceList extends SourceRequest<ListReposResponse>{
-    @Key
-    private String projectId;
-
-    public MySourceList(Source client, String projectId) {
-//      super(client, method, uriTemplate, content, responseClass);
-      super(client, "GET", "v1/projects/{projectId}/repos", null, ListReposResponse.class);
-
-      this.projectId = (String) Preconditions.checkNotNull(projectId, "Required parameter projectId must be specified.");
-    }
-
-    public String getProjectId() {
-          return this.projectId;
-        }
-
-        public MySourceList setProjectId(String projectId) {
-          this.projectId = projectId;
-          return this;
-        }
-
-        public MySourceList set(String parameterName, Object value) {
-          return (MySourceList) super.set(parameterName, value);
-        }
-
-      public HttpResponse executeUsingHead() throws IOException {
-        return super.executeUsingHead();
-      }
-
-      public HttpRequest buildHttpRequestUsingHead() throws IOException {
-        return super.buildHttpRequestUsingHead();
-      }
-
-      public MySourceList setAlt(String alt) {
-        return (MySourceList)super.setAlt(alt);
-      }
-
-      public MySourceList setFields(String fields) {
-        return (MySourceList)super.setFields(fields);
-      }
-
-      public MySourceList setKey(String key) {
-        return (MySourceList)super.setKey(key);
-      }
-
-      public MySourceList setOauthToken(String oauthToken) {
-        return (MySourceList)super.setOauthToken(oauthToken);
-      }
-
-      public MySourceList setPrettyPrint(Boolean prettyPrint) {
-        return (MySourceList)super.setPrettyPrint(prettyPrint);
-      }
-
-      public MySourceList setQuotaUser(String quotaUser) {
-        return (MySourceList) super.setQuotaUser(quotaUser);
-      }
-
-      public MySourceList setUserIp(String userIp) {
-        return (MySourceList) super.setUserIp(userIp);
-      }
-
-  }
-
 }

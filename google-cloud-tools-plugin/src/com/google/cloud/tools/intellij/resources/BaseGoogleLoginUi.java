@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
+import com.intellij.util.ui.UIUtil.FontSize;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -61,7 +62,7 @@ class BaseGoogleLoginUi extends JPanel {
     add(googleIcon, constraints);
 
     JTextArea signinTextArea = new JTextArea();
-    signinTextArea.setFont(UIUtil.getLabelFont());
+    signinTextArea.setFont(UIUtil.getLabelFont(FontSize.MINI));
     signinTextArea.setLineWrap(true);
     signinTextArea.setWrapStyleWord(true);
     signinTextArea.setOpaque(false);

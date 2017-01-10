@@ -14,23 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stats;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
+package com.google.cloud.tools.intellij.resources;
 
 /**
- * Package internal only interface used for providing multiple ping implementations to the
- * {@link TrackingEventBuilder}.
+ * Created by eshaul on 1/9/17.
  */
-interface SendsEvents {
-
-  /**
-   * When tracking events, do NOT include any information that can identify the user.
-   */
-  void sendEvent(@NotNull String eventCategory,
-      @NotNull String eventAction,
-      @Nullable Map<String, String> metadataMap);
-}
+public class ListRepositoriesException extends Exception {}

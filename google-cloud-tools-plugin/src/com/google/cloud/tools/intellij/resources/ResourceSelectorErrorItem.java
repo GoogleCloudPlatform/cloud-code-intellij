@@ -16,25 +16,27 @@
 
 package com.google.cloud.tools.intellij.resources;
 
+import com.intellij.ui.components.JBLabel;
+
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.Color;
+import java.awt.Font;
+
+import javax.swing.BorderFactory;
+import javax.swing.SwingConstants;
 
 /**
- * This model item represents a node shown in the project selector when an error occurs attempting
- * to query resource manager. The user can recover and try again by hitting refresh at the bottom
- * right. The error message is displayed under the user name.
+ * UI for the node that displays error information if a resource manager call fails.
  */
-class ResourceErrorModelItem extends DefaultMutableTreeNode {
+class ResourceSelectorErrorItem extends JBLabel {
 
-  private String errorMessage;
-
-  public ResourceErrorModelItem(@NotNull String errorMessage) {
-    this.errorMessage = errorMessage;
-  }
-
-  public String getErrorMessage() {
-    return errorMessage;
+  public ResourceSelectorErrorItem(@NotNull Color errorForeground) {
+    setBorder(BorderFactory.createEmptyBorder(2, 15, 2, 0));
+    setOpaque(false);
+    setHorizontalAlignment(SwingConstants.LEFT);
+    setVerticalAlignment(SwingConstants.CENTER);
+    setFont(new Font(getFont().getFontName(), Font.BOLD, getFont().getSize()));
+    setForeground(errorForeground);
   }
 }
-

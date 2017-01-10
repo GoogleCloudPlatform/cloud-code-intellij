@@ -19,16 +19,15 @@ package com.google.cloud.tools.intellij.resources;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.source.Source;
+import com.google.api.services.source.SourceRequest;
 import com.google.api.services.source.model.ListReposResponse;
 import com.google.api.services.source.model.Repo;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.vcs.UploadSourceDialog.MySourceList;
 
 import com.intellij.openapi.components.ServiceManager;
 
@@ -36,11 +35,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * Created by eshaul on 12/19/16.
+ * TreeNode representation of the set of available Cloud Source Repositories for a given GCP
+ * project.
  */
 public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
@@ -48,30 +49,43 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
   private CredentialedUser user;
 
   // TODO user can be null on first instantiation
-  public ProjectRepositoriesModelItem(@NotNull String cloudProject, @NotNull CredentialedUser user) {
-//    removeAllChildren();
+  public ProjectRepositoriesModelItem(@NotNull String cloudProject,
+      @NotNull CredentialedUser user) {
     this.cloudProject = cloudProject;
     this.user = user;
 
-    setUserObject(cloudProject); // sets the text
-    loadRepositories();
+    setUserObject(cloudProject);
   }
 
-  private void loadRepositories() {
-    // TODO load from API
-    // TODO UI thread?
+  public void loadRepositories() {
+    loadRepositories(false);
+  }
+  public void loadRepositories(boolean empty) {
+
+    // TODO remove
+//      if (empty) {
+//        removeAllChildren();
+////        add (new ResourceErrorModelItem("Error loading repositories."));
+//        add (new ResourceEmptyModelItem("There are no cloud repositories for this project"));
+//        return;
+//      }
+
+    // todo remove this
+//    try {
+//      Thread.sleep(5000);
+//    } catch (InterruptedException e) {
+//      e.printStackTrace();
+//    }
+
 
     try {
-      final Credential credential = (user != null ? user.getCredential() : null);
-      HttpRequestInitializer initializer = new HttpRequestInitializer() {
-        @Override
-        public void initialize(HttpRequest httpRequest) throws IOException {
-          HttpHeaders headers = new HttpHeaders();
-          httpRequest.setConnectTimeout(5000);
-          httpRequest.setReadTimeout(5000);
-          httpRequest.setHeaders(headers);
-          credential.initialize(httpRequest);
-        }
+      Credential credential = user.getCredential();
+      HttpRequestInitializer initializer = httpRequest -> {
+        HttpHeaders headers = new HttpHeaders();
+        httpRequest.setConnectTimeout(5000);
+        httpRequest.setReadTimeout(5000);
+        httpRequest.setHeaders(headers);
+        credential.initialize(httpRequest);
       };
 
       HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
@@ -86,21 +100,33 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
           .setApplicationName(userAgent)
           .build();
 
-      MySourceList sourceList = new MySourceList(source, cloudProject);
+      ListReposResponse response = new CustomUrlSourceRequest(source, cloudProject).execute();
 
-      ListReposResponse response = sourceList.execute();
-      for(Repo repo : response.getRepos()) {
-        add(new RepositoryModelItem(repo.get("name").toString())); // TODO null check?
+      removeAllChildren();
+      List<Repo> repositories = response.getRepos();
+      if (!response.isEmpty() && repositories != null) {
+        for (Repo repo : repositories) {
+          add(new RepositoryModelItem(repo.get("name").toString())); // TODO null check?
+        }
+      } else {
+        add (new ResourceEmptyModelItem("There are no cloud repositories for this project"));
       }
+    } catch (IOException | GeneralSecurityException ex) {
+      removeAllChildren();
+      add (new ResourceErrorModelItem("Error loading repositories."));
+    }
+  }
 
-//      Repo newRepo = new Repo();
+  /**
+   * The currently used version of the Source API in
+   * {@link com.google.api.services.source.Source.Repos.List} uses an outdated endpoint for listing
+   * repos. This extends the base class {@link SourceRequest} to set the correct url.
+   */
+  public static class CustomUrlSourceRequest extends SourceRequest<ListReposResponse> {
 
-//      newRepo.setName("from-ij");
-//      source.projects().repos().create("test-metrics", newRepo).execute();
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
-    } catch (GeneralSecurityException gse) {
-      gse.printStackTrace();
+    CustomUrlSourceRequest(Source client, String projectId) {
+      super(client, "GET", "v1/projects/" + projectId +"/repos", null,
+          ListReposResponse.class);
     }
   }
 }

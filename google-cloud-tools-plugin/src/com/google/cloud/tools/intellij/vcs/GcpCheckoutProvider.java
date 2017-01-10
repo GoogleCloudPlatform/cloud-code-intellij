@@ -183,6 +183,7 @@ public class GcpCheckoutProvider implements CheckoutProvider {
       @NotNull String sourceRepositoryUrl) {
     indicator.setIndeterminate(false);
     GitLineHandlerListener progressListener = GitStandardProgressAnalyzer.createListener(indicator);
+
     GitCommandResult result = git
         .clone(project, new File(parentDirectory), sourceRepositoryUrl, directoryName,
             progressListener);
