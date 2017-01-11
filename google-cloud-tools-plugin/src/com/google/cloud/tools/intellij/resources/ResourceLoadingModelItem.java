@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.sun.istack.NotNull;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
