@@ -55,6 +55,18 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.HashSet;
 import com.intellij.vcsUtil.VcsFileUtil;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+
 import git4idea.DialogManager;
 import git4idea.GitLocalBranch;
 import git4idea.GitRemoteBranch;
@@ -71,6 +83,7 @@ import git4idea.config.GitConfigUtil;
 import git4idea.config.GitVcsApplicationSettings;
 import git4idea.config.GitVersion;
 import git4idea.i18n.GitBundle;
+import git4idea.repo.GitRemote;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
 import git4idea.update.GitFetchResult;
@@ -78,23 +91,14 @@ import git4idea.update.GitFetcher;
 import git4idea.util.GitFileUtils;
 import git4idea.util.GitUIUtil;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
-
 /**
  * Action to trigger an upload to a GCP git repository.
  */
 public class UploadSourceAction extends DumbAwareAction {
 
   private static final Logger LOG = Logger.getInstance(UploadSourceAction.class);
+
+  private static final String CLOUD_SOURCE_REPO_REMOTE_PREFIX = "cloud-platform-";
 
   public UploadSourceAction() {
     super(GctBundle.message("uploadtogcp.text"), GctBundle.message("uploadtogcp.description"),
@@ -136,18 +140,6 @@ public class UploadSourceAction extends DumbAwareAction {
     final boolean gitDetected = gitRepository != null;
     final VirtualFile root = gitDetected ? gitRepository.getRoot() : project.getBaseDir();
 
-    // TODO move and refactor this check; user may end up selecting a different repo
-    // to upload to so its not a valid spot for this
-    boolean externalRemoteDetected = false;
-    if (gitDetected) {
-      final String gcpRemote = GcpHttpAuthDataProvider.findGcpRemoteUrl(gitRepository);
-      if (gcpRemote != null) {
-        Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.alreadyexists"), "Google");
-        return;
-      }
-      externalRemoteDetected = !gitRepository.getRemotes().isEmpty();
-    }
-
     UploadSourceDialog dialog =
         new UploadSourceDialog(project, GctBundle.message("uploadtogcp.selecttext"),
             GctBundle.message("uploadtogcp.oktext"));
@@ -157,12 +149,25 @@ public class UploadSourceAction extends DumbAwareAction {
       return;
     }
 
+    Optional<GitRemote> remote = gitDetected
+        ? findRemote(gitRepository.getRemotes(), dialog.getRepositoryId())
+        : Optional.empty();
+    if (remote.isPresent() && !GcpHttpAuthDataProvider.hasGcpUrl(remote.get().getUrls())) {
+      Messages.showErrorDialog(project,
+          GctBundle.message("uploadtogcp.nongcp.remotename.collision",
+              CLOUD_SOURCE_REPO_REMOTE_PREFIX + dialog.getRepositoryId()), "Google");
+      return;
+    } else if (remote.isPresent()) {
+      Messages.showErrorDialog(project,
+          GctBundle.message("uploadtogcp.alreadyexists", dialog.getRepositoryId()), "Google");
+      return;
+    }
+
     final String projectId = dialog.getProjectId();
     final String repositoryId = dialog.getRepositoryId();
     final CredentialedUser user = dialog.getCredentialedUser();
 
     // finish the job in background
-    final boolean finalExternalRemoteDetected = externalRemoteDetected;
     new Task.Backgroundable(project, GctBundle.message("uploadtogcp.backgroundtitle")) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
@@ -188,7 +193,7 @@ public class UploadSourceAction extends DumbAwareAction {
         }
 
         final String remoteUrl = GcpHttpAuthDataProvider.getGcpUrl(projectId, repositoryId);
-        final String remoteName = finalExternalRemoteDetected ? "cloud-platform" : "origin";
+        final String remoteName = CLOUD_SOURCE_REPO_REMOTE_PREFIX + dialog.getRepositoryId();
 
         LOG.info("Adding Google as a remote host");
         indicator.setText(GctBundle.message("uploadtogcp.addingremote"));
@@ -244,6 +249,15 @@ public class UploadSourceAction extends DumbAwareAction {
     VcsNotifier.getInstance(project)
         .notifyImportantInfo(title, "<a href='" + url + "'>" + message + "</a>",
             NotificationListener.URL_OPENING_LISTENER);
+  }
+
+  private static Optional<GitRemote> findRemote(Collection<GitRemote> remotes, String remoteName) {
+    return remotes
+        .stream()
+        .filter(remote ->
+            (CLOUD_SOURCE_REPO_REMOTE_PREFIX + remoteName)
+                .equals(remote.getName()))
+        .findFirst();
   }
 
   @Nullable
