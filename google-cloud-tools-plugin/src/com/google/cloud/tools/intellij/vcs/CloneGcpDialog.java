@@ -152,7 +152,22 @@ public class CloneGcpDialog extends DialogWrapper {
    * Check fields and display error in the wrapper if there is a problem.
    */
   private void updateButtons() {
-    if (parentDirectory.getText().length() == 0 || directoryName.getText().length() == 0) {
+    if (!StringUtil.isEmpty(projectSelector.getText())
+        && projectSelector.getSelectedUser() == null) {
+      setErrorText("Invalid Cloud Project selected.");
+      setOKActionEnabled(false);
+      return;
+    } else if (!StringUtil.isEmpty(repositorySelector.getText())
+        && StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
+      setErrorText("Invalid Cloud Repository selected.");
+      setOKActionEnabled(false);
+      return;
+    } else if(projectSelector.getSelectedUser() == null
+        || StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
+      setErrorText(null);
+      setOKActionEnabled(false);
+      return;
+    } else if (parentDirectory.getText().length() == 0 || directoryName.getText().length() == 0) {
       setErrorText(null);
       setOKActionEnabled(false);
       return;
@@ -168,11 +183,8 @@ public class CloneGcpDialog extends DialogWrapper {
       setOKActionEnabled(false);
       paintSelectionError();
       return;
-    } else if (projectSelector.getSelectedUser() == null
-        || StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
-      setOKActionEnabled(false);
-      return;
     }
+
     paintSelectionOk();
     setErrorText(null);
     setOKActionEnabled(true);
