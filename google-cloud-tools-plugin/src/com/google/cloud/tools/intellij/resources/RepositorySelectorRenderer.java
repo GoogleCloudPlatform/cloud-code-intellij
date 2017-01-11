@@ -28,13 +28,14 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  */
 public class RepositorySelectorRenderer extends DefaultTreeCellRenderer {
 
+  private RepositoryItem repositoryItem;
   private ResourceSelectorLoadingItem loadingItem;
   private ResourceSelectorEmptyItem emptyItem;
   private ResourceSelectorErrorItem errorItem;
 
-
   public RepositorySelectorRenderer() {
     DefaultTreeCellRenderer defaultRenderer = new DefaultTreeCellRenderer();
+    repositoryItem = new RepositoryItem();
     loadingItem = new ResourceSelectorLoadingItem(defaultRenderer.getBackgroundNonSelectionColor(),
         defaultRenderer.getTextNonSelectionColor());
     emptyItem = new ResourceSelectorEmptyItem();
@@ -44,7 +45,10 @@ public class RepositorySelectorRenderer extends DefaultTreeCellRenderer {
   @Override
   public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
       boolean expanded, boolean leaf, int row, boolean hasFocus) {
-    if (value instanceof ResourceLoadingModelItem) {
+    if (value instanceof RepositoryModelItem) {
+      repositoryItem.setText(((RepositoryModelItem) value).getRepositoryId());
+      return repositoryItem;
+    } else if (value instanceof ResourceLoadingModelItem) {
       loadingItem.snap();
       return loadingItem;
     } else if (value instanceof ResourceEmptyModelItem) {
