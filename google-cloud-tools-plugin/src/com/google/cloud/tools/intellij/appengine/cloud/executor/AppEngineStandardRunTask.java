@@ -67,7 +67,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
 
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_RUN)
-        .withLabel(Strings.nullToEmpty(runnerId))
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, Strings.nullToEmpty(runnerId))
         .ping();
 
   }

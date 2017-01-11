@@ -22,6 +22,8 @@ import com.intellij.util.PlatformUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 /**
  * Implementation of {@link UsageTrackerProvider} for obtaining {@link UsageTracker} implementations
  * declared in plugin.xml with {@link UsageTrackerExtensionPointBean}.
@@ -64,12 +66,12 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
 
     @Override
     public void sendEvent(@NotNull String eventCategory, @NotNull String eventAction,
-        @Nullable String eventLabel, @Nullable Integer eventValue) {
+        @Nullable Map<String, String> metadataMap) {
       // Do nothing
     }
 
     @Override
-    public FluentTrackingEventWithLabel trackEvent(String action) {
+    public FluentTrackingEventWithMetadata trackEvent(String action) {
       return new TrackingEventBuilder(this, "no-category", action);
     }
   }
