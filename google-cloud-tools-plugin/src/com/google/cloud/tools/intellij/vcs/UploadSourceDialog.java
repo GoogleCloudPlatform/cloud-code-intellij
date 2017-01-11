@@ -98,19 +98,41 @@ public class UploadSourceDialog extends DialogWrapper {
         repositorySelector.setCloudProject(projectSelector.getText());
         repositorySelector.setUser(projectSelector.getSelectedUser());
         repositorySelector.setText("");
+        updateButtons();
       }
     });
 
     repositorySelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent e) {
-        setOKActionEnabled(projectSelector.getSelectedUser() != null
-            && !StringUtil.isEmpty(repositorySelector.getSelectedRepository()));
+        updateButtons();
       }
     });
 
     // todo figure out how to disable it when no project is selected
 //    repositorySelector.setEnabled(false);
+  }
+
+  private void updateButtons() {
+    if (!StringUtil.isEmpty(projectSelector.getText())
+        && projectSelector.getSelectedUser() == null) {
+      setErrorText("Invalid Cloud Project selected.");
+      setOKActionEnabled(false);
+      return;
+    } else if (!StringUtil.isEmpty(repositorySelector.getText())
+        && StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
+      setErrorText("Invalid Cloud Repository selected.");
+      setOKActionEnabled(false);
+      return;
+    } else if(projectSelector.getSelectedUser() == null
+        || StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
+      setErrorText(null);
+      setOKActionEnabled(false);
+      return;
+    }
+
+    setErrorText(null);
+    setOKActionEnabled(true);
   }
 
   @Nullable
