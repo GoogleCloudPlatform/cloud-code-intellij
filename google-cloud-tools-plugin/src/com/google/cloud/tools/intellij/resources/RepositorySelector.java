@@ -29,6 +29,7 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.awt.RelativePoint;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +38,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Enumeration;
@@ -45,6 +47,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -61,7 +64,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
   private static final Logger logger = Logger.getInstance(RepositorySelector.class);
 
   private JBPopup popup;
-  private RepositoryPanel panel;
+  private JPanel panel;
   private String cloudProject;
   private CredentialedUser user;
   private boolean canCreateRepository;
@@ -84,7 +87,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       return null;
     }
 
-    Enumeration repos = panel.getRepositories().children();
+    Enumeration repos = ((RepositoryPanel) panel).getRepositories().children();
     while (repos.hasMoreElements()) {
       TreeNode repo = (TreeNode) repos.nextElement();
 
@@ -118,6 +121,13 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       if (!popup.isVisible()) {
         popup.show(showTarget);
       }
+    } else {
+      panel = new ProjectNotSelectedPanel();
+
+      ComponentPopupBuilder popupBuilder = JBPopupFactory.getInstance()
+            .createComponentPopupBuilder(panel, null);
+      popup = popupBuilder.createPopup();
+      popup.show(showTarget);
     }
   }
 
@@ -138,9 +148,31 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     return this;
   }
 
+  /**
+   * Returns the width of the repository select popup to show. The popup show have a minimum width
+   * and then expand with the repository textfield if the user manually stretches the dialog.
+   */
+  private int getPopupWidth() {
+    int actualWidth = RepositorySelector.this.getTextField().getWidth();
+    return Math.max(SELECTOR_WIDTH, actualWidth);
+  }
+
   @Override
   protected int getPreferredPopupHeight() {
     return SELECTOR_HEIGHT;
+  }
+
+  private class ProjectNotSelectedPanel extends JPanel {
+
+    private static final int HEIGHT = 30;
+
+    ProjectNotSelectedPanel() {
+      setPreferredSize(new Dimension(RepositorySelector.this.getTextField().getWidth(), HEIGHT));
+      JLabel warning = new JBLabel();
+      warning.setFont(new Font(getFont().getFontName(), Font.ITALIC, getFont().getSize()));
+      warning.setText("Select a Google Cloud project.");
+      add(warning);
+    }
   }
 
   private class RepositoryPanel extends JPanel {
@@ -182,7 +214,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       });
 
       JBScrollPane scrollPane = new JBScrollPane();
-      scrollPane.setPreferredSize(new Dimension(SELECTOR_WIDTH, getPreferredPopupHeight()));
+      scrollPane.setPreferredSize(new Dimension(getPopupWidth(), getPreferredPopupHeight()));
       scrollPane.setViewportView(repositoryTree);
       scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
