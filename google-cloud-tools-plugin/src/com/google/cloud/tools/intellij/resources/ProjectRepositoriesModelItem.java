@@ -30,6 +30,7 @@ import com.google.api.services.source.model.ListReposResponse;
 import com.google.api.services.source.model.Repo;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.components.ServiceManager;
 
@@ -100,11 +101,11 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
           }
         }
       } else {
-        add(new ResourceEmptyModelItem("There are no cloud repositories for this project"));
+        add(new ResourceEmptyModelItem(GctBundle.message("cloud.repositories.list.empty")));
       }
     } catch (IOException | GeneralSecurityException ex) {
       removeAllChildren();
-      add(new ResourceErrorModelItem("Error loading repositories."));
+      add(new ResourceErrorModelItem(GctBundle.message("cloud.repositories.list.error")));
     }
   }
 
