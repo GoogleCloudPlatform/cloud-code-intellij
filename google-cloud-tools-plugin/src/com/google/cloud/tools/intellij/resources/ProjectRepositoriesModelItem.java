@@ -65,26 +65,6 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
   }
 
   public void loadRepositories() {
-    loadRepositories(false);
-  }
-
-  public void loadRepositories(boolean empty) {
-
-    // TODO remove
-//      if (empty) {
-//        removeAllChildren();
-////        add (new ResourceErrorModelItem("Error loading repositories."));
-//        add (new ResourceEmptyModelItem("There are no cloud repositories for this project"));
-//        return;
-//      }
-
-    // todo remove this
-//    try {
-//      Thread.sleep(5000);
-//    } catch (InterruptedException e) {
-//      e.printStackTrace();
-//    }
-
     try {
       Credential credential = user.getCredential();
       HttpRequestInitializer initializer = httpRequest -> {

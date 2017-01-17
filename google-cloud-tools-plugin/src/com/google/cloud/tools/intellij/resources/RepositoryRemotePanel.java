@@ -30,8 +30,8 @@ import git4idea.repo.GitRepository;
  */
 public class RepositoryRemotePanel {
 
-  private JTextField remoteNameField;
   private JPanel remotePanel;
+  private JTextField remoteNameField;
 
   private GitRepository gitRepository;
 

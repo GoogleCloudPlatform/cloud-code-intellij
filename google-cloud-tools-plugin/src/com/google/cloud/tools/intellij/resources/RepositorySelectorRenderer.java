@@ -48,13 +48,19 @@ public class RepositorySelectorRenderer extends DefaultTreeCellRenderer {
     if (value instanceof RepositoryModelItem) {
       repositoryItem.setText(((RepositoryModelItem) value).getRepositoryId());
       return repositoryItem;
-    } else if (value instanceof ResourceLoadingModelItem) {
+    }
+
+    if (value instanceof ResourceLoadingModelItem) {
       loadingItem.snap();
       return loadingItem;
-    } else if (value instanceof ResourceEmptyModelItem) {
+    }
+
+    if (value instanceof ResourceEmptyModelItem) {
       emptyItem.setText(((ResourceEmptyModelItem) value).getMessage());
       return emptyItem;
-    } else if (value instanceof ResourceErrorModelItem) {
+    }
+
+    if (value instanceof ResourceErrorModelItem) {
       errorItem.setText(((ResourceErrorModelItem) value).getErrorMessage());
       return errorItem;
     }
