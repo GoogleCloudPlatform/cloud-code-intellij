@@ -101,11 +101,11 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
           }
         }
       } else {
-        add(new ResourceEmptyModelItem(GctBundle.message("cloud.repositories.list.empty")));
+        add(new ResourceEmptyModelItem(GctBundle.message("cloud.repository.list.empty")));
       }
     } catch (IOException | GeneralSecurityException ex) {
       removeAllChildren();
-      add(new ResourceErrorModelItem(GctBundle.message("cloud.repositories.list.error")));
+      add(new ResourceErrorModelItem(GctBundle.message("cloud.repository.list.error")));
     }
   }
 

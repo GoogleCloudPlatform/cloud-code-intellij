@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -170,7 +171,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       setPreferredSize(new Dimension(RepositorySelector.this.getTextField().getWidth(), HEIGHT));
       JLabel warning = new JBLabel();
       warning.setFont(new Font(getFont().getFontName(), Font.ITALIC, getFont().getSize()));
-      warning.setText("Select a Google Cloud project.");
+      warning.setText(GctBundle.message("cloud.repository.selector.missing.project.error"));
       add(warning);
     }
   }
@@ -230,13 +231,13 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
       if (canCreateRepository) {
         JButton newRepositoryButton = new JButton();
-        newRepositoryButton.setText("Create a new cloud repository");
+        newRepositoryButton.setText(GctBundle.message("cloud.repository.selector.create.button"));
         newRepositoryButton.addActionListener(event -> {
           try {
             Desktop.getDesktop().browse(URI.create(
                 ProjectRepositoriesModelItem.PANETHEON_CREATE_REPO_URL_PREFIX + cloudProject));
           } catch (IOException e) {
-            logger.error("Failed to load GCP create repository URL.");
+            logger.error(GctBundle.message("cloud.repository.selector.create.url.error"));
           }
         });
 
