@@ -79,7 +79,8 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     this.user = user;
     this.canCreateRepository = canCreateRepository;
 
-    getTextField().getEmptyText().setText("Enter a cloud repository ID...");
+    getTextField().getEmptyText()
+        .setText(GctBundle.message("cloud.repository.selector.placeholder.text"));
   }
 
   @Nullable
