@@ -146,13 +146,13 @@ public class UploadSourceDialog extends DialogWrapper {
       setErrorText("Invalid Cloud Repository selected.");
       setOKActionEnabled(false);
       return;
-    } else if(StringUtil.isEmpty(remoteNameSelector.getText())) {
-      setErrorText("Enter a remote name.");
-      setOKActionEnabled(false);
-      return;
     } else if(projectSelector.getSelectedUser() == null
         || StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
       setErrorText(null);
+      setOKActionEnabled(false);
+      return;
+    } else if(StringUtil.isEmpty(remoteNameSelector.getText())) {
+      setErrorText("Enter a remote name.");
       setOKActionEnabled(false);
       return;
     }
