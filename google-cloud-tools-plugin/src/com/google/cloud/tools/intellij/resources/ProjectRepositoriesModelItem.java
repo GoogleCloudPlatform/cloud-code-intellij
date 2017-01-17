@@ -50,8 +50,6 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
   private static final String CLOUD_SOURCE_API_ROOT_URL = "https://source.googleapis.com/";
   private static final String CLOUD_SOURCE_API_LIST_URL = "v1/projects/{projectId}/repos";
-  static final String PANETHEON_CREATE_REPO_URL_PREFIX
-      = "https://pantheon.corp.google.com/code/develop/repo?project=";
   private static int LIST_TIMEOUT_MS = 5000;
 
 

@@ -72,6 +72,8 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
   private static final int SELECTOR_HEIGHT = 140;
   private static final int SELECTOR_WIDTH = 400;
 
+  private static final String PANETHEON_CREATE_REPO_URL_PREFIX
+      = "https://pantheon.corp.google.com/code/develop/repo?project=";
 
   public RepositorySelector(@Nullable String cloudProject,
       @Nullable CredentialedUser user, boolean canCreateRepository) {
@@ -235,8 +237,8 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
         newRepositoryButton.setText(GctBundle.message("cloud.repository.selector.create.button"));
         newRepositoryButton.addActionListener(event -> {
           try {
-            Desktop.getDesktop().browse(URI.create(
-                ProjectRepositoriesModelItem.PANETHEON_CREATE_REPO_URL_PREFIX + cloudProject));
+            Desktop.getDesktop()
+                .browse(URI.create(PANETHEON_CREATE_REPO_URL_PREFIX + cloudProject));
           } catch (IOException e) {
             logger.error(GctBundle.message("cloud.repository.selector.create.url.error"));
           }
