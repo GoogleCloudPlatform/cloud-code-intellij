@@ -40,7 +40,8 @@ public class RepositoryRemotePanel {
   public RepositoryRemotePanel(@Nullable GitRepository gitRepository) {
     this.gitRepository = gitRepository;
 
-    remoteNameField.setEnabled(false);
+
+    disableRemoteNameField();
   }
 
   public void update(String cloudRepository) {
@@ -48,8 +49,7 @@ public class RepositoryRemotePanel {
       remoteNameField.setEnabled(true);
       remoteNameField.setText(getRemoteNameSuggestion(cloudRepository));
     } else {
-      remoteNameField.setEnabled(false);
-      remoteNameField.setText("");
+      disableRemoteNameField();
     }
   }
 
@@ -59,6 +59,11 @@ public class RepositoryRemotePanel {
 
   public String getText() {
     return remoteNameField.getText();
+  }
+
+  private void disableRemoteNameField() {
+    remoteNameField.setText("origin");
+    remoteNameField.setEnabled(false);
   }
 
   /**
