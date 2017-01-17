@@ -137,7 +137,7 @@ public class UploadSourceAction extends DumbAwareAction {
     final VirtualFile root = gitDetected ? gitRepository.getRoot() : project.getBaseDir();
 
     UploadSourceDialog dialog =
-        new UploadSourceDialog(project, gitRepository, GctBundle.message("uploadtogcp.selecttext"),
+        new UploadSourceDialog(project, gitRepository, GctBundle.message("uploadtogcp.title"),
             GctBundle.message("uploadtogcp.oktext"));
     DialogManager.show(dialog);
     if (!dialog.isOK() || dialog.getCredentialedUser() == null || Strings
