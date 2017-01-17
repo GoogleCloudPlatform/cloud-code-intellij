@@ -51,6 +51,7 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
   private static final String CLOUD_SOURCE_API_LIST_URL = "v1/projects/{projectId}/repos";
   static final String PANETHEON_CREATE_REPO_URL_PREFIX
       = "https://pantheon.corp.google.com/code/develop/repo?project=";
+  private static int LIST_TIMEOUT_MS = 5000;
 
 
   private String cloudProject;
@@ -69,8 +70,8 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
       Credential credential = user.getCredential();
       HttpRequestInitializer initializer = httpRequest -> {
         HttpHeaders headers = new HttpHeaders();
-        httpRequest.setConnectTimeout(5000);
-        httpRequest.setReadTimeout(5000);
+        httpRequest.setConnectTimeout(LIST_TIMEOUT_MS);
+        httpRequest.setReadTimeout(LIST_TIMEOUT_MS);
         httpRequest.setHeaders(headers);
         credential.initialize(httpRequest);
       };
