@@ -40,7 +40,6 @@ public class RepositoryRemotePanel {
   public RepositoryRemotePanel(@Nullable GitRepository gitRepository) {
     this.gitRepository = gitRepository;
 
-
     disableRemoteNameField();
   }
 
@@ -62,8 +61,8 @@ public class RepositoryRemotePanel {
   }
 
   private void disableRemoteNameField() {
-    remoteNameField.setText("origin");
     remoteNameField.setEnabled(false);
+    remoteNameField.setText("origin");
   }
 
   /**
