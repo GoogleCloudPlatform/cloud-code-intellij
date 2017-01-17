@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.resources.RepositoryRemotePanel;
 import com.google.cloud.tools.intellij.resources.RepositorySelector;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -138,12 +139,12 @@ public class UploadSourceDialog extends DialogWrapper {
   private void updateButtons() {
     if (!StringUtil.isEmpty(projectSelector.getText())
         && projectSelector.getSelectedUser() == null) {
-      setErrorText("Invalid Cloud Project selected.");
+      setErrorText(GctBundle.message("uploadtogcp.dialog.invalid.project"));
       setOKActionEnabled(false);
       return;
     } else if (!StringUtil.isEmpty(repositorySelector.getText())
         && StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
-      setErrorText("Invalid Cloud Repository selected.");
+      setErrorText(GctBundle.message("uploadtogcp.dialog.invalid.repository"));
       setOKActionEnabled(false);
       return;
     } else if(projectSelector.getSelectedUser() == null
@@ -152,7 +153,7 @@ public class UploadSourceDialog extends DialogWrapper {
       setOKActionEnabled(false);
       return;
     } else if(StringUtil.isEmpty(remoteNameSelector.getText())) {
-      setErrorText("Enter a remote name.");
+      setErrorText(GctBundle.message("uploadtogcp.dialog.missing.remote"));
       setOKActionEnabled(false);
       return;
     }
