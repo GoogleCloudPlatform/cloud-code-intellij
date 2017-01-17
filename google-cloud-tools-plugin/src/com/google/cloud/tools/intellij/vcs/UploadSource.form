@@ -13,7 +13,7 @@
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="messages/CloudToolsBundle" key="clonefromgcp.projectid"/>
+          <text resource-bundle="messages/CloudToolsBundle" key="cloud.repository.dialog.project.label"/>
         </properties>
       </component>
       <vspacer id="86a0f">
@@ -39,7 +39,7 @@
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Cloud Repository:"/>
+          <text resource-bundle="messages/CloudToolsBundle" key="cloud.repository.dialog.repository.label"/>
         </properties>
       </component>
       <component id="9f463" class="com.google.cloud.tools.intellij.resources.RepositorySelector" binding="repositorySelector" custom-create="true">
@@ -58,7 +58,7 @@
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Remote Name:"/>
+          <text resource-bundle="messages/CloudToolsBundle" key="cloud.repository.dialog.remote.label"/>
         </properties>
       </component>
     </children>
