@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.vcs;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.resources.RepositoryRemotePanel;
 import com.google.cloud.tools.intellij.resources.RepositorySelector;
 
 import com.intellij.openapi.project.Project;
@@ -34,6 +35,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 
+import git4idea.repo.GitRepository;
+
 /**
  * Shows a dialog that has one entry value which is a GCP project using the project selector. The
  * title and ok button text is passed into the constructor.
@@ -43,16 +46,22 @@ public class UploadSourceDialog extends DialogWrapper {
   private JPanel rootPanel;
   private ProjectSelector projectSelector;
   private RepositorySelector repositorySelector;
+  private RepositoryRemotePanel remoteNameSelector;
   private String projectId;
   private String repositoryId;
+  private String remoteName;
   private CredentialedUser credentialedUser;
+  private GitRepository gitRepository;
 
   /**
    * Initialize the project selection dialog.
    */
-  public UploadSourceDialog(@NotNull Project project, @NotNull String title,
-      @NotNull String okText) {
+  public UploadSourceDialog(@NotNull Project project, @Nullable GitRepository gitReository,
+      @NotNull String title, @NotNull String okText) {
     super(project, true);
+
+    this.gitRepository = gitReository;
+
     init();
     setTitle(title);
     setOKButtonText(okText);
@@ -70,6 +79,11 @@ public class UploadSourceDialog extends DialogWrapper {
   @NotNull
   String getRepositoryId() {
     return repositoryId;
+  }
+
+  @NotNull
+  public String getRemoteName() {
+    return remoteName;
   }
 
   /**
@@ -92,6 +106,8 @@ public class UploadSourceDialog extends DialogWrapper {
     repositorySelector = new RepositorySelector(projectSelector.getText(),
         projectSelector.getSelectedUser(), true /*canCreateRepository*/);
 
+    remoteNameSelector = new RepositoryRemotePanel(gitRepository);
+
     projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
@@ -105,12 +121,18 @@ public class UploadSourceDialog extends DialogWrapper {
     repositorySelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent e) {
+        remoteNameSelector.update(repositorySelector.getSelectedRepository());
         updateButtons();
       }
     });
 
-    // todo figure out how to disable it when no project is selected
-//    repositorySelector.setEnabled(false);
+    remoteNameSelector.getRemoteNameField().getDocument().addDocumentListener(
+        new DocumentAdapter() {
+          @Override
+          protected void textChanged(DocumentEvent e) {
+            updateButtons();
+          }
+        });
   }
 
   private void updateButtons() {
@@ -122,6 +144,10 @@ public class UploadSourceDialog extends DialogWrapper {
     } else if (!StringUtil.isEmpty(repositorySelector.getText())
         && StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
       setErrorText("Invalid Cloud Repository selected.");
+      setOKActionEnabled(false);
+      return;
+    } else if(StringUtil.isEmpty(remoteNameSelector.getText())) {
+      setErrorText("Enter a remote name.");
       setOKActionEnabled(false);
       return;
     } else if(projectSelector.getSelectedUser() == null
@@ -150,6 +176,7 @@ public class UploadSourceDialog extends DialogWrapper {
   protected void doOKAction() {
     projectId = projectSelector.getText();
     repositoryId = repositorySelector.getText();
+    remoteName = remoteNameSelector.getText();
     credentialedUser = projectSelector.getSelectedUser();
     super.doOKAction();
   }

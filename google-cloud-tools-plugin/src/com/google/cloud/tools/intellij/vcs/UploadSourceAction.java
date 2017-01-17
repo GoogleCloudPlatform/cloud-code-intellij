@@ -61,7 +61,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.JComponent;
@@ -69,7 +68,6 @@ import javax.swing.SwingUtilities;
 
 import git4idea.DialogManager;
 import git4idea.GitLocalBranch;
-import git4idea.GitRemoteBranch;
 import git4idea.GitUtil;
 import git4idea.actions.BasicAction;
 import git4idea.actions.GitInit;
@@ -97,8 +95,6 @@ import git4idea.util.GitUIUtil;
 public class UploadSourceAction extends DumbAwareAction {
 
   private static final Logger LOG = Logger.getInstance(UploadSourceAction.class);
-
-  private static final String CLOUD_SOURCE_REPO_REMOTE_PREFIX = "cloud-platform-";
 
   public UploadSourceAction() {
     super(GctBundle.message("uploadtogcp.text"), GctBundle.message("uploadtogcp.description"),
@@ -141,7 +137,7 @@ public class UploadSourceAction extends DumbAwareAction {
     final VirtualFile root = gitDetected ? gitRepository.getRoot() : project.getBaseDir();
 
     UploadSourceDialog dialog =
-        new UploadSourceDialog(project, GctBundle.message("uploadtogcp.selecttext"),
+        new UploadSourceDialog(project, gitRepository, GctBundle.message("uploadtogcp.selecttext"),
             GctBundle.message("uploadtogcp.oktext"));
     DialogManager.show(dialog);
     if (!dialog.isOK() || dialog.getCredentialedUser() == null || Strings
@@ -149,17 +145,11 @@ public class UploadSourceAction extends DumbAwareAction {
       return;
     }
 
-    Optional<GitRemote> remote = gitDetected
-        ? findRemote(gitRepository.getRemotes(), dialog.getRepositoryId())
-        : Optional.empty();
-    if (remote.isPresent() && !GcpHttpAuthDataProvider.hasGcpUrl(remote.get().getUrls())) {
+    String remoteName = dialog.getRemoteName();
+
+    if (gitRepository != null && hasRemote(gitRepository.getRemotes(), remoteName)) {
       Messages.showErrorDialog(project,
-          GctBundle.message("uploadtogcp.nongcp.remotename.collision",
-              CLOUD_SOURCE_REPO_REMOTE_PREFIX + dialog.getRepositoryId()), "Google");
-      return;
-    } else if (remote.isPresent()) {
-      Messages.showErrorDialog(project,
-          GctBundle.message("uploadtogcp.alreadyexists", dialog.getRepositoryId()), "Google");
+          GctBundle.message("uploadtogcp.nongcp.remotename.collision", remoteName), "Google");
       return;
     }
 
@@ -193,7 +183,6 @@ public class UploadSourceAction extends DumbAwareAction {
         }
 
         final String remoteUrl = GcpHttpAuthDataProvider.getGcpUrl(projectId, repositoryId);
-        final String remoteName = CLOUD_SOURCE_REPO_REMOTE_PREFIX + dialog.getRepositoryId();
 
         LOG.info("Adding Google as a remote host");
         indicator.setText(GctBundle.message("uploadtogcp.addingremote"));
@@ -208,8 +197,7 @@ public class UploadSourceAction extends DumbAwareAction {
 
           LOG.info("Fetching from Google remote");
           indicator.setText(GctBundle.message("uploadtogcp.fetching"));
-          if (!fetchGit(project, indicator, repository, remoteName) || hasRemoteBranch(project,
-              repository, remoteName, projectId)) {
+          if (!fetchGit(project, indicator, repository, remoteName)) {
             return;
           }
 
@@ -251,13 +239,11 @@ public class UploadSourceAction extends DumbAwareAction {
             NotificationListener.URL_OPENING_LISTENER);
   }
 
-  private static Optional<GitRemote> findRemote(Collection<GitRemote> remotes, String remoteName) {
+  private static boolean hasRemote(@NotNull Collection<GitRemote> remotes,
+      @NotNull String remoteName) {
     return remotes
         .stream()
-        .filter(remote ->
-            (CLOUD_SOURCE_REPO_REMOTE_PREFIX + remoteName)
-                .equals(remote.getName()))
-        .findFirst();
+        .anyMatch(remote -> remoteName.equals(remote.getName()));
   }
 
   @Nullable
@@ -357,28 +343,6 @@ public class UploadSourceAction extends DumbAwareAction {
     }
     repository.update();
     return true;
-  }
-
-  private static boolean hasRemoteBranch(final @NotNull Project project,
-      @NotNull GitRepository repository,
-      @NotNull String remoteName,
-      final @NotNull String projectId) {
-    for (GitRemoteBranch remoteBranch : repository.getInfo().getRemoteBranches()) {
-      if (remoteBranch.getRemote().getName().equalsIgnoreCase(remoteName)) {
-        LOG.warn("git repo is not empty, bailing");
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            Messages.showErrorDialog(project,
-                GctBundle.message("uploadtogcp.remotenotempty", projectId),
-                GctBundle.message("uploadtogcp.remotenotemptytitle"));
-          }
-        });
-        return true;
-      }
-    }
-
-    return false;
   }
 
   private static boolean addGitRemote(final @NotNull Project project,
