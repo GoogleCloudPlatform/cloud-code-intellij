@@ -25,33 +25,82 @@ import com.google.api.services.appengine.v1.model.Location;
 import com.google.api.services.appengine.v1.model.Operation;
 import com.google.api.services.appengine.v1.model.Status;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An implementation of {@link AppEngineAdminService} that uses a Google API Client to communicate
  * with the App Engine service.
+ *
+ * <p>See <a href="https://cloud.google.com/appengine/docs/admin-api/">
+ *   https://cloud.google.com/appengine/docs/admin-api/</a></p>
  */
 public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService {
 
   private static final String APP_ENGINE_RESOURCE_WILDCARD = "-";
   private static final long CREATE_APPLICATION_POLLING_INTERVAL_MS = 1000;
+  private static final int APPLICATION_CACHE_MAX_SIZE = 10000;
+  private static final int LOCATION_CACHE_MAX_SIZE = 10000;
+  private static final String ALL_LOCATIONS_KEY = "ALL_LOCATIONS";
 
-  @Override
+  // Cache of GCP application resources. This assumes that project IDs are globally unique. Null or
+  // missing applications are not cached because they cannot be reliably invalidated.
+  private final Cache<String, Application> appEngineApplicationCache = CacheBuilder.newBuilder()
+      // arbitrary size limit
+      .maximumSize(APPLICATION_CACHE_MAX_SIZE)
+      // Even though these values should never change, it won't kill us to refresh once per day.
+      .expireAfterWrite(1, TimeUnit.DAYS)
+      .build();
+
+  // Cache of all available GCP locations. This is expected to change very infrequently.
+  private final Cache<String, List<Location>> appEngineLocationCache = CacheBuilder.newBuilder()
+      // arbitrary size limit
+      .maximumSize(LOCATION_CACHE_MAX_SIZE)
+      .expireAfterWrite(1, TimeUnit.DAYS)
+      .build();
+
+
   @Nullable
+  @Override
   public Application getApplicationForProjectId(@NotNull String projectId,
       @NotNull Credential credential) throws IOException, GoogleApiException {
+    try {
+      // Load from the cache if it exists, otherwise delegate to implementation classes.
+      return appEngineApplicationCache.get(projectId, () ->
+          fetchApplicationForProjectId(projectId, credential));
+
+    } catch (ExecutionException e) {
+      if (e.getCause() instanceof AppEngineApplicationNotFoundException) {
+        return null;
+      } else {
+        handleExecutionException(e);
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  @NotNull
+  @VisibleForTesting
+  Application fetchApplicationForProjectId(@NotNull String projectId,
+      @NotNull Credential credential)
+      throws IOException, GoogleApiException, AppEngineApplicationNotFoundException {
     try {
       return GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential)
           .apps().get(projectId).execute();
     } catch (GoogleJsonResponseException e) {
       if (e.getStatusCode() == 404) {
         // the application does not exist
-        return null;
+        throw new AppEngineApplicationNotFoundException();
       }
       throw GoogleApiException.from(e);
     }
@@ -113,15 +162,27 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
         .operations().get(projectId, id).execute();
   }
 
+  @NotNull
   @Override
   public List<Location> getAllAppEngineLocations(Credential credential) throws IOException,
       GoogleApiException {
     try {
-      ListLocationsResponse response = getAppEngineRegions(credential, null);
-      List<Location> locations = response.getLocations();
+      return appEngineLocationCache.get(ALL_LOCATIONS_KEY, () ->
+          fetchAllAppEngineLocations(credential));
+    } catch (ExecutionException e) {
+      handleExecutionException(e);
+      throw new RuntimeException(e);
+    }
+  }
+
+  private List<Location> fetchAllAppEngineLocations(Credential credential)
+      throws GoogleApiException, IOException {
+    try {
+      ListLocationsResponse response = fetchAppEngineLocationPage(credential, null);
+      List<Location> locations = new ArrayList<>(response.getLocations());
 
       while (response.getNextPageToken() != null) {
-        response = getAppEngineRegions(credential, response.getNextPageToken());
+        response = fetchAppEngineLocationPage(credential, response.getNextPageToken());
         locations.addAll(response.getLocations());
       }
       return locations;
@@ -131,10 +192,29 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
     }
   }
 
-  private ListLocationsResponse getAppEngineRegions(Credential credential, @Nullable String
+  /*
+   * Unpacks exceptions thrown by a cache to propagate correct types to the user.
+   */
+  private void handleExecutionException(ExecutionException e)
+      throws GoogleApiException, IOException {
+    Throwable cause = e.getCause();
+    if (cause instanceof GoogleApiException) {
+      throw (GoogleApiException) cause;
+    } else if (cause instanceof IOException) {
+      throw (IOException) cause;
+    }
+  }
+
+  private ListLocationsResponse fetchAppEngineLocationPage(Credential credential, @Nullable String
       pageToken) throws IOException {
     return GoogleApiClientFactory.getInstance().getAppEngineApiClient(credential)
         .apps().locations().list(APP_ENGINE_RESOURCE_WILDCARD).setPageToken(pageToken).execute();
   }
+
+  /**
+   * Exception type to mark a failed attempt to fetch an Application.
+   */
+  @VisibleForTesting
+  static class AppEngineApplicationNotFoundException extends Exception {}
 
 }
