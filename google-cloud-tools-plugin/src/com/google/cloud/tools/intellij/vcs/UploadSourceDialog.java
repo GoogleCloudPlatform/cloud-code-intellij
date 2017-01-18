@@ -139,12 +139,12 @@ public class UploadSourceDialog extends DialogWrapper {
   private void updateButtons() {
     if (!StringUtil.isEmpty(projectSelector.getText())
         && projectSelector.getSelectedUser() == null) {
-      setErrorText(GctBundle.message("uploadtogcp.dialog.invalid.project"));
+      setErrorText(GctBundle.message("cloud.repository.dialog.invalid.project"));
       setOKActionEnabled(false);
       return;
     } else if (!StringUtil.isEmpty(repositorySelector.getText())
         && StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
-      setErrorText(GctBundle.message("uploadtogcp.dialog.invalid.repository"));
+      setErrorText(GctBundle.message("cloud.repository.dialog.invalid.repository"));
       setOKActionEnabled(false);
       return;
     } else if(projectSelector.getSelectedUser() == null

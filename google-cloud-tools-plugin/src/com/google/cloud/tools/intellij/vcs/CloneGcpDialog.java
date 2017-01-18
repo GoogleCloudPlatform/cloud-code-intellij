@@ -152,14 +152,14 @@ public class CloneGcpDialog extends DialogWrapper {
   private void updateButtons() {
     if (!StringUtil.isEmpty(projectSelector.getText())
         && projectSelector.getSelectedUser() == null) {
-      setErrorText("Invalid Cloud Project selected.");
+      setErrorText(GctBundle.message("cloud.repository.dialog.invalid.project"));
       setOKActionEnabled(false);
       return;
     }
 
     if (!StringUtil.isEmpty(repositorySelector.getText())
         && StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
-      setErrorText("Invalid Cloud Repository selected.");
+      setErrorText(GctBundle.message("cloud.repository.dialog.invalid.repository"));
       setOKActionEnabled(false);
       return;
     }
