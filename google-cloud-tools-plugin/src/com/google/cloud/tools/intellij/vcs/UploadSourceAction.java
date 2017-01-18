@@ -184,9 +184,14 @@ public class UploadSourceAction extends DumbAwareAction {
         GitRepositoryManager repositoryManager = GitUtil.getRepositoryManager(project);
         final GitRepository repository = repositoryManager.getRepositoryForRoot(root);
         if (repository == null) {
-          SwingUtilities.invokeLater(() ->
-              Messages.showErrorDialog(project,
-                  GctBundle.message("uploadtogcp.failedtocreategit"), "Google"));
+          SwingUtilities.invokeLater(() -> {
+            Notification notification = new Notification(
+                NOTIFICATION_GROUP_ID,
+                GctBundle.message("uploadtogcp.generic.failure.title"),
+                GctBundle.message("uploadtogcp.failedtocreategit"),
+                NotificationType.ERROR);
+            notification.notify(project);
+          });
 
           LOG.error("GitRepository is null for root " + root);
           return;
@@ -342,12 +347,13 @@ public class UploadSourceAction extends DumbAwareAction {
     GitFetchResult result = fetcher.fetch(repository);
 
     if (!result.isSuccess()) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.fetchfailed", remote),
-              GctBundle.message("uploadtogcp.fetchfailedtitle"));
-        }
+      SwingUtilities.invokeLater(() -> {
+        Notification notification = new Notification(
+            NOTIFICATION_GROUP_ID,
+            GctBundle.message("uploadtogcp.fetchfailedtitle"),
+            GctBundle.message("uploadtogcp.fetchfailed", remote),
+            NotificationType.ERROR);
+        notification.notify(project);
       });
       return false;
     }
@@ -366,13 +372,13 @@ public class UploadSourceAction extends DumbAwareAction {
       handler.addParameters("add", remote, url);
       handler.run();
       if (handler.getExitCode() != 0) {
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            Messages.showErrorDialog(project,
-                GctBundle.message("uploadtogcp.addremotefailed", url, handler.getStderr()),
-                GctBundle.message("uploadtogcp.addremotefailedtitle"));
-          }
+        SwingUtilities.invokeLater(() -> {
+          Notification notification = new Notification(
+              NOTIFICATION_GROUP_ID,
+              GctBundle.message("uploadtogcp.addremotefailedtitle"),
+              GctBundle.message("uploadtogcp.addremotefailed", url, handler.getStderr()),
+              NotificationType.ERROR);
+          notification.notify(project);
         });
         return false;
       }
@@ -380,13 +386,13 @@ public class UploadSourceAction extends DumbAwareAction {
       repository.update();
       return true;
     } catch (final VcsException ex) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(project,
-              GctBundle.message("uploadtogcp.addremotefailed", url, ex.toString()),
-              GctBundle.message("uploadtogcp.addremotefailedtitle"));
-        }
+      SwingUtilities.invokeLater(() -> {
+        Notification notification = new Notification(
+            NOTIFICATION_GROUP_ID,
+            GctBundle.message("uploadtogcp.addremotefailedtitle"),
+            GctBundle.message("uploadtogcp.addremotefailed", url, ex.toString()),
+            NotificationType.ERROR);
+        notification.notify(project);
       });
       return false;
     }
@@ -478,13 +484,13 @@ public class UploadSourceAction extends DumbAwareAction {
       VcsFileUtil.markFilesDirty(project, modified);
     } catch (final VcsException ex) {
       LOG.warn(ex);
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(project,
-              GctBundle.message("uploadtogcp.initialcommitfailed", ex.toString()),
-              GctBundle.message("uploadtogcp.initialcommitfailedtitle"));
-        }
+      SwingUtilities.invokeLater(() -> {
+        Notification notification = new Notification(
+            NOTIFICATION_GROUP_ID,
+            GctBundle.message("uploadtogcp.initialcommitfailedtitle"),
+            GctBundle.message("uploadtogcp.initialcommitfailed", ex.toString()),
+            NotificationType.ERROR);
+        notification.notify(project);
       });
       return false;
     }
