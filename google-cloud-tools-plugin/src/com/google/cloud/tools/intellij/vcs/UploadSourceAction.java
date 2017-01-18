@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.vcs;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -27,7 +28,9 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataKey;
@@ -62,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -95,6 +99,8 @@ import git4idea.util.GitUIUtil;
 public class UploadSourceAction extends DumbAwareAction {
 
   private static final Logger LOG = Logger.getInstance(UploadSourceAction.class);
+  private static final String NOTIFICATION_GROUP_ID
+      = new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid");
 
   public UploadSourceAction() {
     super(GctBundle.message("uploadtogcp.text"), GctBundle.message("uploadtogcp.description"),
@@ -503,12 +509,13 @@ public class UploadSourceAction extends DumbAwareAction {
 
     GitLocalBranch currentBranch = repository.getCurrentBranch();
     if (currentBranch == null) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.initialpushfailed"),
-              GctBundle.message("uploadtogcp.initialpushfailedtitle"));
-        }
+      SwingUtilities.invokeLater(() -> {
+        Notification notification = new Notification(
+            NOTIFICATION_GROUP_ID,
+            GctBundle.message("uploadtogcp.initialpushfailedtitle"),
+            GctBundle.message("uploadtogcp.initialpushfailed"),
+            NotificationType.ERROR);
+        notification.notify(project);
       });
       return false;
     }
@@ -516,16 +523,22 @@ public class UploadSourceAction extends DumbAwareAction {
         .push(repository, remoteName, remoteUrl, currentBranch.getName(), true);
     if (!result.success()) {
       LOG.warn(result.getErrorOutputAsJoinedString());
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.initialpushfailed"),
-              GctBundle.message("uploadtogcp.initialpushfailedtitle"));
-        }
+      SwingUtilities.invokeLater(() -> {
+        Notification notification = new Notification(
+            NOTIFICATION_GROUP_ID,
+            GctBundle.message("uploadtogcp.initialpushfailedtitle"),
+            result.getErrorOutputAsHtmlString()
+                + "<br/>" + joinAsErrorHtmlString(result.getOutput()),
+            NotificationType.ERROR);
+        notification.notify(project);
       });
       return false;
     }
     return true;
+  }
+
+  private static String joinAsErrorHtmlString(List<String> error) {
+    return error.stream().collect(Collectors.joining("<br/>"));
   }
 
   private static class GcpUntrackedFilesDialog extends SelectFilesDialog implements
