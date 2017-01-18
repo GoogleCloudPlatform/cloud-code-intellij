@@ -44,7 +44,7 @@ class ResourceEmptyModelItem extends DefaultMutableTreeNode {
 }
 
 /**
- * This model item represents a node shown in when an error occurs attempting to query a resource
+ * This model item represents a node shown when an error occurs attempting to query a resource
  * manager.
  */
 class ResourceErrorModelItem extends DefaultMutableTreeNode {
