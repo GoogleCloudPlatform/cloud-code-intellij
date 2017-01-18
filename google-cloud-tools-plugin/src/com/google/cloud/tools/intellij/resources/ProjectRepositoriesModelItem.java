@@ -91,12 +91,12 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
       removeAllChildren();
       List<Repo> repositories = response.getRepos();
       if (!response.isEmpty() && repositories != null) {
-        for (Repo repo : repositories) {
+        repositories.forEach(repo -> {
           Object name = repo.get("name");
           if (name != null) {
             add(new RepositoryModelItem(name.toString()));
           }
-        }
+        });
       } else {
         add(new ResourceEmptyModelItem(GctBundle.message("cloud.repository.list.empty")));
       }
