@@ -154,8 +154,12 @@ public class UploadSourceAction extends DumbAwareAction {
     String remoteName = dialog.getRemoteName();
 
     if (gitRepository != null && hasRemote(gitRepository.getRemotes(), remoteName)) {
-      Messages.showErrorDialog(project,
-          GctBundle.message("uploadtogcp.nongcp.remotename.collision", remoteName), "Google");
+      Notification notification = new Notification(
+          NOTIFICATION_GROUP_ID,
+          GctBundle.message("uploadtogcp.remotename.collision.title"),
+          GctBundle.message("uploadtogcp.remotename.collision", remoteName),
+          NotificationType.ERROR);
+      notification.notify(project);
       return;
     }
 
