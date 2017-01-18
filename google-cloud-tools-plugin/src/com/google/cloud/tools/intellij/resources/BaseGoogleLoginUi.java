@@ -62,7 +62,7 @@ class BaseGoogleLoginUi extends JPanel {
     add(googleIcon, constraints);
 
     JTextArea signinTextArea = new JTextArea();
-    signinTextArea.setFont(UIUtil.getLabelFont(FontSize.MINI));
+    signinTextArea.setFont(UIUtil.getLabelFont());
     signinTextArea.setLineWrap(true);
     signinTextArea.setWrapStyleWord(true);
     signinTextArea.setOpaque(false);
