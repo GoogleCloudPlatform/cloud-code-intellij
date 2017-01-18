@@ -52,7 +52,6 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
   private static final String CLOUD_SOURCE_API_LIST_URL = "v1/projects/{projectId}/repos";
   private static int LIST_TIMEOUT_MS = 5000;
 
-
   private String cloudProject;
   private CredentialedUser user;
 
