@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,8 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRuntime;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
-import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -38,25 +33,29 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.pom.java.LanguageLevel;
-import com.intellij.psi.xml.XmlFile;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
 import javax.swing.event.HyperlinkEvent;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * A StartupActivity that warns the user if they are using a Java language level that corresponds
- * to an unsupported jdk version on App Engine standard.
+ * A StartupActivity that warns the user if they are using a Java language level that corresponds to
+ * an unsupported jdk version on App Engine standard.
  */
 public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActivity {
 
   private static final String UPDATE_HREF = "#update";
   private static final LanguageLevel HIGHEST_SUPPORTED_LANGUAGE_LEVEL = LanguageLevel.JDK_1_7;
+
+  private static void setModuleLanguageLevel(Module module, LanguageLevel languageLevel) {
+    final ModifiableRootModel rootModel =
+        ModuleRootManager.getInstance(module).getModifiableModel();
+    rootModel
+        .getModuleExtension(LanguageLevelModuleExtension.class)
+        .setLanguageLevel(languageLevel);
+
+    ApplicationManager.getApplication().runWriteAction(() -> rootModel.commit());
+  }
 
   @Override
   public void runActivity(@NotNull Project project) {
@@ -70,26 +69,26 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
     final Module[] projectModules = ModuleManager.getInstance(project).getModules();
     final List<Module> invalidModules = new ArrayList<>();
 
-    ApplicationManager.getApplication().runReadAction(new Runnable() {
-      @Override
-      public void run() {
-        for (Module module : projectModules) {
-          // only check app engine modules
-          if (hasAppEngineFacet(module)) {
-
-            @Nullable
-            XmlFile appengineWebXml = AppEngineAssetProvider.getInstance()
-                .loadAppEngineStandardWebXml(project, Arrays.asList(module));
-
-            if (isAppEngineStandard(appengineWebXml)
-                && usesJava8OrGreater(module)
-                && !declaresJava8Runtime(appengineWebXml)) {
-              invalidModules.add(module);
-            }
-          }
-        }
-      }
-    });
+    ApplicationManager.getApplication()
+        .runReadAction(
+            () -> {
+              for (Module module : projectModules) {
+                AppEngineStandardFacet appEngineFacet =
+                    AppEngineStandardFacet.getAppEngineFacetByModule(module);
+                if (appEngineFacet != null) {
+                  // this is a standard app
+                  if (!appEngineFacet.isNonStandardCompatEnvironment()) {
+                    // this is targeting the standard environment
+                    if (!appEngineFacet.isJava8Runtime()) {
+                      // The runtime only supports Java 7 or below.
+                      if (usesJava8OrGreater(module)) {
+                        invalidModules.add(module);
+                      }
+                    }
+                  }
+                }
+              }
+            });
     return invalidModules;
   }
 
@@ -98,44 +97,15 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
     return languageLevel.compareTo(LanguageLevel.JDK_1_8) >= 0;
   }
 
-  private boolean hasAppEngineFacet(Module module) {
-    return AppEngineStandardFacet.getAppEngineFacetByModule(module) != null;
-  }
-
-  private boolean isAppEngineStandard(@Nullable XmlFile appengineWebXml) {
-    AppEngineEnvironment environment = AppEngineProjectService.getInstance()
-        .getModuleAppEngineEnvironment(appengineWebXml);
-
-    return environment == AppEngineEnvironment.APP_ENGINE_STANDARD;
-  }
-
-  private boolean declaresJava8Runtime(@Nullable XmlFile appengineWebXml) {
-    AppEngineStandardRuntime runtime = AppEngineProjectService.getInstance()
-        .getAppEngineStandardDeclaredRuntime(appengineWebXml);
-    return runtime != null && runtime.isJava8();
-  }
-
-  private static void setModuleLanguageLevel(Module module, LanguageLevel languageLevel) {
-    final ModifiableRootModel rootModel = ModuleRootManager.getInstance(module)
-        .getModifiableModel();
-    rootModel.getModuleExtension(LanguageLevelModuleExtension.class)
-        .setLanguageLevel(languageLevel);
-
-    ApplicationManager.getApplication().runWriteAction(new Runnable() {
-      @Override
-      public void run() {
-        rootModel.commit();
-      }
-    });
-  }
-
   private void warnUser(Project project, List<Module> invalidModules) {
     String message =
         new StringBuilder()
             .append("<p>")
-            .append(GctBundle.message("appengine.support.java.version.alert.detail",
-                "<a href=\"" + UPDATE_HREF + "\">",
-                "</a>"))
+            .append(
+                GctBundle.message(
+                    "appengine.support.java.version.alert.detail",
+                    "<a href=\"" + UPDATE_HREF + "\">",
+                    "</a>"))
             .append("</p>")
             .toString();
 

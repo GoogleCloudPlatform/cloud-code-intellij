@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2016 Google Inc. All Rights Reserved.
+  ~ Copyright 2017 Google Inc. All Rights Reserved.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -168,6 +168,9 @@
 
     <checkoutProvider implementation="com.google.cloud.tools.intellij.vcs.GcpCheckoutProvider"/>
     <vcsPopupProvider implementation="com.google.cloud.tools.intellij.vcs.GcpQuickListContentProvider"/>
+
+    <dom.fileDescription
+            implementation="com.google.cloud.tools.intellij.appengine.descriptor.dom.AppEngineStandardWebFileDescriptor"/>
 
     <configurationType
             implementation="com.google.cloud.tools.intellij.debugger.CloudDebugConfigType"/>
