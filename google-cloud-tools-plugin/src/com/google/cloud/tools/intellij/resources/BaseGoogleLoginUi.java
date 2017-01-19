@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
-import com.intellij.util.ui.UIUtil.FontSize;
 
 import org.jetbrains.annotations.NotNull;
 
