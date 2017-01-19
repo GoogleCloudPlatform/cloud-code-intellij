@@ -202,11 +202,12 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
   private String getCurrentUrlText() {
     CredentialedUser selectedUser = projectSelector.getSelectedUser();
 
-    if (selectedUser == null || Strings.isNullOrEmpty(projectSelector.getText())) {
+    if (selectedUser == null
+        || StringUtil.isEmpty(projectSelector.getText())
+        || StringUtil.isEmpty(repositorySelector.getText())) {
       return null;
     }
 
-    // TODO what if the repo is null??
     return GcpHttpAuthDataProvider.getGcpUrl(projectSelector.getText(),
         repositorySelector.getText());
   }
