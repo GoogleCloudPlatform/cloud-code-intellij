@@ -39,8 +39,8 @@ import javax.swing.event.DocumentEvent;
 import git4idea.repo.GitRepository;
 
 /**
- * Shows a dialog that has one entry value which is a GCP project using the project selector. The
- * title and ok button text is passed into the constructor.
+ * Shows the upload to Google Cloud Source Repositories dialog for initializing a project on
+ * a GCP repository.
  */
 public class UploadSourceDialog extends DialogWrapper {
 
@@ -54,9 +54,6 @@ public class UploadSourceDialog extends DialogWrapper {
   private CredentialedUser credentialedUser;
   private GitRepository gitRepository;
 
-  /**
-   * Initialize the project selection dialog.
-   */
   public UploadSourceDialog(@NotNull Project project, @Nullable GitRepository gitReository,
       @NotNull String title, @NotNull String okText) {
     super(project, true);
@@ -142,17 +139,23 @@ public class UploadSourceDialog extends DialogWrapper {
       setErrorText(GctBundle.message("cloud.repository.dialog.invalid.project"));
       setOKActionEnabled(false);
       return;
-    } else if (!StringUtil.isEmpty(repositorySelector.getText())
+    }
+
+    if (!StringUtil.isEmpty(repositorySelector.getText())
         && StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
       setErrorText(GctBundle.message("cloud.repository.dialog.invalid.repository"));
       setOKActionEnabled(false);
       return;
-    } else if(projectSelector.getSelectedUser() == null
+    }
+
+    if(projectSelector.getSelectedUser() == null
         || StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
       setErrorText(null);
       setOKActionEnabled(false);
       return;
-    } else if(StringUtil.isEmpty(remoteNameSelector.getText())) {
+    }
+
+    if(StringUtil.isEmpty(remoteNameSelector.getText())) {
       setErrorText(GctBundle.message("uploadtogcp.dialog.missing.remote"));
       setOKActionEnabled(false);
       return;
