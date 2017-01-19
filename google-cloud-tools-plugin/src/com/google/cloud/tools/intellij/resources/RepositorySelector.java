@@ -33,6 +33,7 @@ import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.BorderLayout;
@@ -285,6 +286,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       });
     }
 
+    @NotNull
     public ProjectRepositoriesModelItem getRepositories() {
       return repositories;
     }
