@@ -188,8 +188,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     private ProjectRepositoriesModelItem repositories;
 
     RepositoryPanel(String cloudProject) {
-      repositories
-          = new ProjectRepositoriesModelItem(cloudProject, user);
+      repositories = new ProjectRepositoriesModelItem(cloudProject, user);
       projectRootNode = new DefaultMutableTreeNode("root");
       treeModel = new DefaultTreeModel(projectRootNode);
 
