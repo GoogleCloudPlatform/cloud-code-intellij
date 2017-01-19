@@ -39,7 +39,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.Window;
 import java.io.IOException;
-import java.util.List;
 
 import git4idea.DialogManager;
 import git4idea.remote.GitHttpAuthDataProvider;
@@ -115,10 +114,6 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
     return (url != null
         && (StringUtil.startsWithIgnoreCase(url, GOOGLE_URL) || StringUtil
             .startsWithIgnoreCase(url, GOOGLE_URL_ALT)));
-  }
-
-  public static boolean hasGcpUrl(List<String> urls) {
-    return urls.stream().anyMatch(GcpHttpAuthDataProvider::isGcpUrl);
   }
 
   public static String getGcpUrl(String projectId, String repositoryId) {
