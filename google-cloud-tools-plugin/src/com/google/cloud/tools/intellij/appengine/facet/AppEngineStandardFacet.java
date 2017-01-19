@@ -60,7 +60,7 @@ public class AppEngineStandardFacet extends Facet<AppEngineFacetConfiguration> {
    * Returns {@code true} if this app is targeting the Flexible Environment instead of the Standard
    * Environment.
    */
-  public boolean isFlexEnvironment() {
+  public boolean isFlexCompatEnvironment() {
     AppEngineStandardWebApp appEngineStandardWebApp = getAppEngineStandardWebXml();
     return appEngineStandardWebApp != null
         && "flex".equalsIgnoreCase(appEngineStandardWebApp.getEnv().getStringValue());
@@ -70,7 +70,7 @@ public class AppEngineStandardFacet extends Facet<AppEngineFacetConfiguration> {
    * Returns {@code true} if this app is targeting the Managed VM environment instead of the
    * Standard Environment.
    */
-  public boolean isManagedVmEnvironment() {
+  public boolean isManagedVmCompatEnvironment() {
     AppEngineStandardWebApp appEngineStandardWebApp = getAppEngineStandardWebXml();
     return appEngineStandardWebApp != null
         && "true".equalsIgnoreCase(appEngineStandardWebApp.getVm().getStringValue());
@@ -80,8 +80,8 @@ public class AppEngineStandardFacet extends Facet<AppEngineFacetConfiguration> {
    * Returns {@code true} if this app is targeting some environment other than the Standard
    * Environment.
    */
-  public boolean isNonStandardEnvironment() {
-    return isFlexEnvironment() || isManagedVmEnvironment();
+  public boolean isNonStandardCompatEnvironment() {
+    return isFlexCompatEnvironment() || isManagedVmCompatEnvironment();
   }
 
   public boolean isJava8Runtime() {

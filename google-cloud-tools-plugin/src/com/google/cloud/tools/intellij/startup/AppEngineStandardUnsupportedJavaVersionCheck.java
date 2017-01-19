@@ -77,7 +77,7 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
                     AppEngineStandardFacet.getAppEngineFacetByModule(module);
                 if (appEngineFacet != null) {
                   // this is a standard app
-                  if (!appEngineFacet.isNonStandardEnvironment()) {
+                  if (!appEngineFacet.isNonStandardCompatEnvironment()) {
                     // this is targeting the standard environment
                     if (!appEngineFacet.isJava8Runtime()) {
                       // The runtime only supports Java 7 or below.
