@@ -300,7 +300,7 @@
     <action id="AddSnapshotLocation" class="com.google.cloud.tools.intellij.debugger.actions.ToggleSnapshotLocationAction"/>
 
     <action id="GoogleCloudTools.UploadSourceToGCP"
-            class="com.google.cloud.tools.intellij.vcs.UploadSourceAction">
+            class="com.google.cloud.tools.intellij.vcs.SetupCloudRepositoryAction">
       <add-to-group group-id="Vcs.Import"/>
     </action>
 

@@ -42,7 +42,7 @@ import git4idea.repo.GitRepository;
  * Shows the upload to Google Cloud Source Repositories dialog for initializing a project on
  * a GCP repository.
  */
-public class UploadSourceDialog extends DialogWrapper {
+public class SetupCloudRepositoryDialog extends DialogWrapper {
 
   private JPanel rootPanel;
   private ProjectSelector projectSelector;
@@ -54,7 +54,7 @@ public class UploadSourceDialog extends DialogWrapper {
   private CredentialedUser credentialedUser;
   private GitRepository gitRepository;
 
-  public UploadSourceDialog(@NotNull Project project, @Nullable GitRepository gitReository,
+  public SetupCloudRepositoryDialog(@NotNull Project project, @Nullable GitRepository gitReository,
       @NotNull String title, @NotNull String okText) {
     super(project, true);
 
@@ -94,7 +94,7 @@ public class UploadSourceDialog extends DialogWrapper {
 
   @Override
   protected String getDimensionServiceKey() {
-    return "UploadSourceDialog";
+    return "SetupCloudRepositoryDialog";
   }
 
   private void createUIComponents() {
@@ -118,7 +118,7 @@ public class UploadSourceDialog extends DialogWrapper {
 
     repositorySelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
-      protected void textChanged(DocumentEvent e) {
+      protected void textChanged(DocumentEvent event) {
         remoteNameSelector.update(repositorySelector.getSelectedRepository());
         updateButtons();
       }
@@ -127,7 +127,7 @@ public class UploadSourceDialog extends DialogWrapper {
     remoteNameSelector.getRemoteNameField().getDocument().addDocumentListener(
         new DocumentAdapter() {
           @Override
-          protected void textChanged(DocumentEvent e) {
+          protected void textChanged(DocumentEvent event) {
             updateButtons();
           }
         });

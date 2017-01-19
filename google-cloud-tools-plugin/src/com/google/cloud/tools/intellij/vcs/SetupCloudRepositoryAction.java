@@ -96,13 +96,13 @@ import git4idea.util.GitUIUtil;
 /**
  * Action to trigger an upload to a GCP git repository.
  */
-public class UploadSourceAction extends DumbAwareAction {
+public class SetupCloudRepositoryAction extends DumbAwareAction {
 
-  private static final Logger LOG = Logger.getInstance(UploadSourceAction.class);
+  private static final Logger LOG = Logger.getInstance(SetupCloudRepositoryAction.class);
   private static final String NOTIFICATION_GROUP_ID
       = new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid");
 
-  public UploadSourceAction() {
+  public SetupCloudRepositoryAction() {
     super(GctBundle.message("uploadtogcp.text"), GctBundle.message("uploadtogcp.description"),
         GoogleCloudToolsIcons.CLOUD);
   }
@@ -142,8 +142,8 @@ public class UploadSourceAction extends DumbAwareAction {
     final boolean gitDetected = gitRepository != null;
     final VirtualFile root = gitDetected ? gitRepository.getRoot() : project.getBaseDir();
 
-    UploadSourceDialog dialog =
-        new UploadSourceDialog(project, gitRepository, GctBundle.message("uploadtogcp.title"),
+    SetupCloudRepositoryDialog dialog =
+        new SetupCloudRepositoryDialog(project, gitRepository, GctBundle.message("uploadtogcp.title"),
             GctBundle.message("uploadtogcp.oktext"));
     DialogManager.show(dialog);
     if (!dialog.isOK() || dialog.getCredentialedUser() == null || Strings

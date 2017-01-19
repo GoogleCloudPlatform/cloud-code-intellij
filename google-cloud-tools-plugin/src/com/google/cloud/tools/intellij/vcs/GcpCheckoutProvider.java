@@ -75,7 +75,7 @@ public class GcpCheckoutProvider implements CheckoutProvider {
     UsageTrackerProvider.getInstance().trackEvent(GctTracking.VCS_CHECKOUT).ping();
 
     BasicAction.saveAll();
-    CloneGcpDialog dialog = new CloneGcpDialog(project);
+    CloneCloudRepositoryDialog dialog = new CloneCloudRepositoryDialog(project);
     DialogManager.show(dialog);
     if (!dialog.isOK()
         || Strings.isNullOrEmpty(dialog.getParentDirectory())

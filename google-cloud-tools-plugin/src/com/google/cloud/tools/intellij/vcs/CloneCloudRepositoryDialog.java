@@ -52,7 +52,7 @@ import javax.swing.event.DocumentListener;
 /**
  * The dialog that prompts the user to download (git clone) from a GCP project.
  */
-public class CloneGcpDialog extends DialogWrapper {
+public class CloneCloudRepositoryDialog extends DialogWrapper {
 
   private static final String INVALID_FILENAME_CHARS = "[/\\\\?%*:|\"<>]";
 
@@ -68,7 +68,7 @@ public class CloneGcpDialog extends DialogWrapper {
   @NotNull
   private final Project project;
 
-  public CloneGcpDialog(@NotNull Project project) {
+  public CloneCloudRepositoryDialog(@NotNull Project project) {
     super(project, true);
     this.project = project;
     parentDirectoryLabel.setText(DvcsBundle.message("clone.parent.dir"));
