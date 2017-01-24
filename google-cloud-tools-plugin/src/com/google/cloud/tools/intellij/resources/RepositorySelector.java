@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -117,7 +118,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
   public void showPopup(RelativePoint showTarget) {
     if (user != null) {
       if (popup == null || popup.isDisposed()) {
-        panel = new RepositoryPanel(cloudProject);
+        panel = new RepositoryPanel();
 
         ComponentPopupBuilder popupBuilder = JBPopupFactory.getInstance()
             .createComponentPopupBuilder(panel, null);
@@ -167,7 +168,13 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     return SELECTOR_HEIGHT;
   }
 
-  private class ProjectNotSelectedPanel extends JPanel {
+  @VisibleForTesting
+  public JPanel getPanel() {
+    return panel;
+  }
+
+  @VisibleForTesting
+  public class ProjectNotSelectedPanel extends JPanel {
 
     private static final int HEIGHT = 30;
 
@@ -180,14 +187,15 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     }
   }
 
-  private class RepositoryPanel extends JPanel {
+  @VisibleForTesting
+  public class RepositoryPanel extends JPanel {
 
     private JTree repositoryTree;
     private DefaultMutableTreeNode projectRootNode;
     private DefaultTreeModel treeModel;
     private ProjectRepositoriesModelItem repositories;
 
-    RepositoryPanel(String cloudProject) {
+    RepositoryPanel() {
       repositories = new ProjectRepositoriesModelItem(cloudProject, user);
       projectRootNode = new DefaultMutableTreeNode("root");
       treeModel = new DefaultTreeModel(projectRootNode);

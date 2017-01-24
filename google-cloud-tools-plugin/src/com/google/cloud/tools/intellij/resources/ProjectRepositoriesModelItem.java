@@ -16,21 +16,11 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.repackaged.com.google.common.base.Preconditions;
-import com.google.api.client.util.Key;
-import com.google.api.services.source.Source;
-import com.google.api.services.source.SourceRequest;
 import com.google.api.services.source.model.ListReposResponse;
 import com.google.api.services.source.model.Repo;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.vcs.CloudRepositoryService;
 
 import com.intellij.openapi.components.ServiceManager;
 
@@ -48,45 +38,24 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
-  private static final String CLOUD_SOURCE_API_ROOT_URL = "https://source.googleapis.com/";
-  private static final String CLOUD_SOURCE_API_LIST_URL = "v1/projects/{projectId}/repos";
-  private static int LIST_TIMEOUT_MS = 5000;
 
   private String cloudProject;
   private CredentialedUser user;
+  private CloudRepositoryService cloudRepositoryService;
 
   public ProjectRepositoriesModelItem(@NotNull String cloudProject,
       @NotNull CredentialedUser user) {
     this.cloudProject = cloudProject;
     this.user = user;
 
+    cloudRepositoryService = ServiceManager.getService(CloudRepositoryService.class);
+
     setUserObject(cloudProject);
   }
 
   public void loadRepositories() {
     try {
-      Credential credential = user.getCredential();
-      HttpRequestInitializer initializer = httpRequest -> {
-        HttpHeaders headers = new HttpHeaders();
-        httpRequest.setConnectTimeout(LIST_TIMEOUT_MS);
-        httpRequest.setReadTimeout(LIST_TIMEOUT_MS);
-        httpRequest.setHeaders(headers);
-        credential.initialize(httpRequest);
-      };
-
-      HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-      String userAgent = ServiceManager
-          .getService(CloudToolsPluginInfoService.class).getUserAgent();
-
-      Source source = new Source.Builder(httpTransport, JacksonFactory.getDefaultInstance(),
-          initializer)
-          .setRootUrl(CLOUD_SOURCE_API_ROOT_URL)
-          .setServicePath("")
-          // this ends up prefixed to user agent
-          .setApplicationName(userAgent)
-          .build();
-
-      ListReposResponse response = new CustomUrlSourceRequest(source, cloudProject).execute();
+      ListReposResponse response = cloudRepositoryService.list(user, cloudProject);
 
       removeAllChildren();
       List<Repo> repositories = response.getRepos();
@@ -106,21 +75,4 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
     }
   }
 
-  /**
-   * The currently used version of the Source API in
-   * {@link com.google.api.services.source.Source.Repos.List} uses an outdated endpoint for listing
-   * repos. This extends the base class {@link SourceRequest} to set the correct url.
-   */
-  public static class CustomUrlSourceRequest extends SourceRequest<ListReposResponse> {
-
-    @Key
-    private String projectId;
-
-    CustomUrlSourceRequest(Source client, String projectId) {
-      super(client, "GET", CLOUD_SOURCE_API_LIST_URL, null, ListReposResponse.class);
-
-      this.projectId = Preconditions
-          .checkNotNull(projectId, "Required parameter projectId must be specified.");
-    }
-  }
 }
