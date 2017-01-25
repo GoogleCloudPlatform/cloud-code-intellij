@@ -53,11 +53,8 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
     cloudRepositoryService
         .listAsync(user, cloudProject)
         .thenAccept(response -> {
-          if (response == null) {
-            return;
-          }
-
           removeAllChildren();
+
           List<Repo> repositories = response.getRepos();
           if (!response.isEmpty() && repositories != null) {
             repositories.forEach(repo -> {
