@@ -34,6 +34,7 @@ import com.intellij.openapi.components.ServiceManager;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Service for interacting with Google Cloud Source Repositories.
@@ -45,29 +46,38 @@ public class CloudRepositoryService {
   private static int LIST_TIMEOUT_MS = 5000;
 
   public ListReposResponse list(CredentialedUser user, String cloudProject)
-      throws IOException, GeneralSecurityException {
-    Credential credential = user.getCredential();
-    HttpRequestInitializer initializer = httpRequest -> {
-      HttpHeaders headers = new HttpHeaders();
-      httpRequest.setConnectTimeout(LIST_TIMEOUT_MS);
-      httpRequest.setReadTimeout(LIST_TIMEOUT_MS);
-      httpRequest.setHeaders(headers);
-      credential.initialize(httpRequest);
-    };
+      throws CloudRepositoryServiceException {
+    try {
+      Credential credential = user.getCredential();
+      HttpRequestInitializer initializer = httpRequest -> {
+        HttpHeaders headers = new HttpHeaders();
+        httpRequest.setConnectTimeout(LIST_TIMEOUT_MS);
+        httpRequest.setReadTimeout(LIST_TIMEOUT_MS);
+        httpRequest.setHeaders(headers);
+        credential.initialize(httpRequest);
+      };
 
-    HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-    String userAgent = ServiceManager
-        .getService(CloudToolsPluginInfoService.class).getUserAgent();
+      HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+      String userAgent = ServiceManager
+          .getService(CloudToolsPluginInfoService.class).getUserAgent();
 
-    Source source = new Source.Builder(httpTransport, JacksonFactory.getDefaultInstance(),
-        initializer)
-        .setRootUrl(CLOUD_SOURCE_API_ROOT_URL)
-        .setServicePath("")
-        // this ends up prefixed to user agent
-        .setApplicationName(userAgent)
-        .build();
+      Source source = new Source.Builder(httpTransport, JacksonFactory.getDefaultInstance(),
+          initializer)
+          .setRootUrl(CLOUD_SOURCE_API_ROOT_URL)
+          .setServicePath("")
+          // this ends up prefixed to user agent
+          .setApplicationName(userAgent)
+          .build();
 
-    return new CustomUrlSourceRequest(source, cloudProject).execute();
+      return new CustomUrlSourceRequest(source, cloudProject).execute();
+    } catch (IOException | GeneralSecurityException ex) {
+      throw new CloudRepositoryServiceException();
+    }
+  }
+
+  public CompletableFuture<ListReposResponse> listAsync(CredentialedUser user, String cloudProject)
+    throws CloudRepositoryServiceException {
+    return CompletableFuture.supplyAsync(() -> list(user, cloudProject));
   }
 
   /**
@@ -87,4 +97,7 @@ public class CloudRepositoryService {
           .checkNotNull(projectId, "Required parameter projectId must be specified.");
     }
   }
+}
+
+class CloudRepositoryServiceException extends RuntimeException {
 }

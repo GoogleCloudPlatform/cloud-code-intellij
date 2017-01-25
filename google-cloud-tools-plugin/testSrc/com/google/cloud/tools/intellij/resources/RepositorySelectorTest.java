@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.api.services.source.model.ListReposResponse;
+import com.google.api.services.source.model.Repo;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.RepositorySelector.ProjectNotSelectedPanel;
 import com.google.cloud.tools.intellij.resources.RepositorySelector.RepositoryPanel;
@@ -36,11 +37,17 @@ import org.picocontainer.MutablePicoContainer;
 import java.awt.Point;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import javax.swing.JPanel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
- * Tests for {@link RepositorySelector}
+ * Tests for {@link RepositorySelector}.
  */
 public class RepositorySelectorTest extends PlatformTestCase {
 
@@ -61,23 +68,99 @@ public class RepositorySelectorTest extends PlatformTestCase {
   }
 
   public void testShowsMissingProjectPanel_WhenProjectIsMissing() {
-    RepositorySelector selector = new RepositorySelector(null, null, false);
-    selector.showPopup(new RelativePoint(selector, new Point(0,0)));
-    JPanel panel = selector.getPanel();
+
+    JPanel panel = getMissingProjectPanel();
 
     // Shows the project not selected panel
     assertInstanceOf(panel, ProjectNotSelectedPanel.class);
   }
 
-  public void testShowsRepositoryPanel_WhenProjectSelected()
+  public void testShowsNoRepositoriesMessage_WhenNoCloudReposFound()
       throws IOException, GeneralSecurityException {
-    when(repositoryService.list(any(CredentialedUser.class), anyString())).thenReturn(new ListReposResponse());
-    RepositorySelector selector = new RepositorySelector("my-project", mock(CredentialedUser.class), false);
-    selector.showPopup(new RelativePoint(selector, new Point(0,0)));
-    JPanel panel = selector.getPanel();
+    JPanel panel = getEmptyRepositoriesPanel();
 
-    // Shows the project not selected panel
+    // Shows a 'no repositories' message
+    assertInstanceOf(getPanelObject(panel), ResourceEmptyModelItem.class);
+  }
+
+  public void testListsRepositories() throws IOException, GeneralSecurityException {
+    JPanel panel = getPopulatedRepositoriesPanel();
+
+    // Contains a repository item
+    assertInstanceOf(getPanelObject(panel), RepositoryModelItem.class);
+  }
+
+  private JPanel getMissingProjectPanel() {
+    RepositorySelector selector = new RepositorySelector(
+        null /*cloudProject*/,
+        null /*user*/,
+        false /*canCreateRepository*/);
+
+    selector.showPopup(new RelativePoint(selector, new Point(0, 0)));
+
+    return selector.getPanel();
+  }
+
+  /**
+   * Extracts the content of the repository tree
+   * e.g. a missing repositories message, or the repositories themseleves (only the first item).
+   */
+  private Object getPanelObject(JPanel panel) {
+    // Shows the repositories panel
     assertInstanceOf(panel, RepositoryPanel.class);
+
+    DefaultTreeModel treeModel = ((RepositoryPanel) panel).getTreeModel();
+    Enumeration root = ((DefaultMutableTreeNode) treeModel.getRoot()).children();
+    assertTrue(root.hasMoreElements());
+
+    Object repositories = root.nextElement();
+
+    assertInstanceOf(repositories, ProjectRepositoriesModelItem.class);
+
+    Enumeration children = ((ProjectRepositoriesModelItem) repositories).children();
+    assertTrue(children.hasMoreElements());
+
+    return children.nextElement();
+  }
+
+  private JPanel getEmptyRepositoriesPanel() throws IOException, GeneralSecurityException {
+    when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
+        .thenReturn(CompletableFuture.completedFuture(new ListReposResponse()));
+
+    RepositorySelector selector = createInitializedSelector();
+    selector.showPopup(new RelativePoint(selector, new Point(0, 0)));
+
+    return selector.getPanel();
+  }
+
+  private JPanel getPopulatedRepositoriesPanel() throws IOException, GeneralSecurityException {
+    ListReposResponse reposResponse = new ListReposResponse();
+    reposResponse.setRepos(createRepos());
+
+    when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
+        .thenReturn(CompletableFuture.completedFuture(reposResponse));
+
+    RepositorySelector selector = createInitializedSelector();
+    selector.showPopup(new RelativePoint(selector, new Point(0, 0)));
+
+    return selector.getPanel();
+  }
+
+  private List<Repo> createRepos() {
+    Repo repo1 = new Repo();
+    repo1.set("name", "repo1");
+
+    Repo repo2 = new Repo();
+    repo2.set("name", "repo2");
+
+    return Arrays.asList(repo1, repo2);
+  }
+
+  private RepositorySelector createInitializedSelector() {
+    return new RepositorySelector(
+        "my-project",
+        mock(CredentialedUser.class),
+        false /*canCreateRepository*/);
   }
 
   @Override

@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.google.api.services.source.model.ListReposResponse;
 import com.google.api.services.source.model.Repo;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -26,8 +25,6 @@ import com.intellij.openapi.components.ServiceManager;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -53,26 +50,36 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
     setUserObject(cloudProject);
   }
 
-  public void loadRepositories() {
-    try {
-      ListReposResponse response = cloudRepositoryService.list(user, cloudProject);
-
-      removeAllChildren();
-      List<Repo> repositories = response.getRepos();
-      if (!response.isEmpty() && repositories != null) {
-        repositories.forEach(repo -> {
-          Object name = repo.get("name");
-          if (name != null) {
-            add(new RepositoryModelItem(name.toString()));
+  public void loadRepositories(Runnable onComplete) {
+    cloudRepositoryService
+        .listAsync(user, cloudProject)
+        .thenAccept(response -> {
+          if (response == null) {
+            return;
           }
+
+          removeAllChildren();
+          List<Repo> repositories = response.getRepos();
+          if (!response.isEmpty() && repositories != null) {
+            repositories.forEach(repo -> {
+              Object name = repo.get("name");
+              if (name != null) {
+                add(new RepositoryModelItem(name.toString()));
+              }
+            });
+          } else {
+            add(new ResourceEmptyModelItem(GctBundle.message("cloud.repository.list.empty")));
+          }
+
+          onComplete.run();
+        })
+        .exceptionally(response -> {
+          removeAllChildren();
+          add(new ResourceErrorModelItem(GctBundle.message("cloud.repository.list.error")));
+
+          onComplete.run();
+          return null;
         });
-      } else {
-        add(new ResourceEmptyModelItem(GctBundle.message("cloud.repository.list.empty")));
-      }
-    } catch (IOException | GeneralSecurityException ex) {
-      removeAllChildren();
-      add(new ResourceErrorModelItem(GctBundle.message("cloud.repository.list.error")));
-    }
   }
 
 }

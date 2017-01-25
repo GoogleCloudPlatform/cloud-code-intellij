@@ -272,15 +272,13 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     private void refresh() {
       setLoader();
 
-      ApplicationManager.getApplication().executeOnPooledThread(() -> {
-        repositories.loadRepositories();
-
-        ApplicationManager.getApplication().invokeAndWait(() -> {
-          treeModel.insertNodeInto(repositories, projectRootNode, 0);
-          treeModel.reload();
-          repositoryTree.expandRow(0);
-        }, ModalityState.stateForComponent(RepositorySelector.this));
-      });
+      repositories.loadRepositories(() ->
+          ApplicationManager.getApplication().invokeAndWait(() -> {
+            treeModel.insertNodeInto(repositories, projectRootNode, 0);
+            treeModel.reload();
+            repositoryTree.expandRow(0);
+          }, ModalityState.stateForComponent(RepositorySelector.this))
+      );
     }
 
     private void setLoader() {
@@ -296,6 +294,11 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     @NotNull
     public ProjectRepositoriesModelItem getRepositories() {
       return repositories;
+    }
+
+    @VisibleForTesting
+    public DefaultTreeModel getTreeModel() {
+      return treeModel;
     }
   }
 }
