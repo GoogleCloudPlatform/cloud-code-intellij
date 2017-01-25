@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.SelectUserDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.ide.DataManager;
 import com.intellij.ide.util.PropertiesComponent;
@@ -117,7 +116,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
   }
 
   public static String getGcpUrl(String projectId, String repositoryId) {
-    return "https://source.developers.google.com/p/" + projectId + "/r/" + repositoryId + "/";
+    return GOOGLE_URL + "/p/" + projectId + "/r/" + repositoryId + "/";
   }
 
   @NotNull
@@ -158,11 +157,6 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
           .getData(DataManager.getInstance().getDataContext(activeWindow));
     }
     return result != null ? result : currentProject;
-  }
-
-  @VisibleForTesting
-  static void setCurrentProject(Project project) {
-    currentProject = project;
   }
 
   /**

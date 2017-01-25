@@ -54,11 +54,11 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
   private CredentialedUser credentialedUser;
   private GitRepository gitRepository;
 
-  public SetupCloudRepositoryDialog(@NotNull Project project, @Nullable GitRepository gitReository,
+  public SetupCloudRepositoryDialog(@NotNull Project project, @Nullable GitRepository gitRepository,
       @NotNull String title, @NotNull String okText) {
     super(project, true);
 
-    this.gitRepository = gitReository;
+    this.gitRepository = gitRepository;
 
     init();
     setTitle(title);
@@ -85,7 +85,7 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
   }
 
   /**
-   * Return the credentialeduser that owns the ID returned from {@link #getProjectId()}.
+   * Return the credentialed user that owns the ID returned from {@link #getProjectId()}.
    */
   @Nullable
   public CredentialedUser getCredentialedUser() {

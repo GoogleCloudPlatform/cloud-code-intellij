@@ -35,7 +35,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
-
   private String cloudProject;
   private CredentialedUser user;
   private CloudRepositoryService cloudRepositoryService;
