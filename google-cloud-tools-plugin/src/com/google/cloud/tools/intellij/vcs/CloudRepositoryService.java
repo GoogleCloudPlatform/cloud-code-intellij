@@ -32,6 +32,8 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 
 import com.intellij.openapi.components.ServiceManager;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.CompletableFuture;
@@ -45,6 +47,7 @@ public class CloudRepositoryService {
   private static final String CLOUD_SOURCE_API_LIST_URL = "v1/projects/{projectId}/repos";
   private static int LIST_TIMEOUT_MS = 5000;
 
+  @NotNull
   public ListReposResponse list(CredentialedUser user, String cloudProject)
       throws CloudRepositoryServiceException {
     try {
