@@ -29,12 +29,13 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.JBColor;
 
-import java.awt.FlowLayout;
+import java.awt.BorderLayout;
 import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
@@ -50,6 +51,8 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   private static final String HTML_CLOSE_TAG = "</font></html>";
   private static final String CREATE_APPLICATION_HREF_OPEN_TAG = "<a href='#'>";
   private static final String HREF_CLOSE_TAG = "</a>";
+  private static final int COMPONENTS_HORIZONTAL_PADDING = 5;
+  private static final int COMPONENTS_VERTICAL_PADDING = 0;
 
   private final JLabel errorIcon;
   private final JTextPane messageText;
@@ -60,16 +63,17 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   private CreateApplicationLinkListener  currentLinkListener;
 
   public AppEngineApplicationInfoPanel() {
-    super(new FlowLayout(FlowLayout.LEFT));
+    super(new BorderLayout(COMPONENTS_HORIZONTAL_PADDING, COMPONENTS_VERTICAL_PADDING));
 
     errorIcon = new JLabel(AllIcons.Ide.Error);
     errorIcon.setVisible(false);
+    errorIcon.setBorder(new EmptyBorder(0, COMPONENTS_HORIZONTAL_PADDING, 0, 0));
     messageText = new JTextPane();
     messageText.setContentType("text/html");
     messageText.setEditable(false);
     messageText.setOpaque(false);
 
-    add(errorIcon);
+    add(errorIcon, BorderLayout.WEST);
     add(messageText);
   }
 
