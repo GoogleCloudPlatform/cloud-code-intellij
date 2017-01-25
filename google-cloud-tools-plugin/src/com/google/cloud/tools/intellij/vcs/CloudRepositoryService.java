@@ -75,8 +75,8 @@ public class CloudRepositoryService {
     }
   }
 
-  public CompletableFuture<ListReposResponse> listAsync(CredentialedUser user, String cloudProject)
-    throws CloudRepositoryServiceException {
+  public CompletableFuture<ListReposResponse> listAsync(CredentialedUser user,
+      String cloudProject) {
     return CompletableFuture.supplyAsync(() -> list(user, cloudProject));
   }
 
@@ -97,7 +97,8 @@ public class CloudRepositoryService {
           .checkNotNull(projectId, "Required parameter projectId must be specified.");
     }
   }
-}
 
-class CloudRepositoryServiceException extends RuntimeException {
+  public static class CloudRepositoryServiceException extends RuntimeException {
+
+  }
 }

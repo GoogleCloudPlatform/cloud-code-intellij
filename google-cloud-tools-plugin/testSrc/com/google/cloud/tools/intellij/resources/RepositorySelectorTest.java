@@ -27,6 +27,7 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.RepositorySelector.ProjectNotSelectedPanel;
 import com.google.cloud.tools.intellij.resources.RepositorySelector.RepositoryPanel;
 import com.google.cloud.tools.intellij.vcs.CloudRepositoryService;
+import com.google.cloud.tools.intellij.vcs.CloudRepositoryService.CloudRepositoryServiceException;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
@@ -68,7 +69,6 @@ public class RepositorySelectorTest extends PlatformTestCase {
   }
 
   public void testShowsMissingProjectPanel_WhenProjectIsMissing() {
-
     JPanel panel = getMissingProjectPanel();
 
     // Shows the project not selected panel
@@ -88,6 +88,13 @@ public class RepositorySelectorTest extends PlatformTestCase {
 
     // Contains a repository item
     assertInstanceOf(getPanelObject(panel), RepositoryModelItem.class);
+  }
+
+  public void testShowsListError_WhenServiceThrowsException() {
+    JPanel panel = getErrorRepositoryPanel();
+
+    // Contains an error item
+    assertInstanceOf(getPanelObject(panel), ResourceErrorModelItem.class);
   }
 
   private JPanel getMissingProjectPanel() {
@@ -127,10 +134,7 @@ public class RepositorySelectorTest extends PlatformTestCase {
     when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
         .thenReturn(CompletableFuture.completedFuture(new ListReposResponse()));
 
-    RepositorySelector selector = createInitializedSelector();
-    selector.showPopup(new RelativePoint(selector, new Point(0, 0)));
-
-    return selector.getPanel();
+    return getPanel();
   }
 
   private JPanel getPopulatedRepositoriesPanel() throws IOException, GeneralSecurityException {
@@ -140,6 +144,19 @@ public class RepositorySelectorTest extends PlatformTestCase {
     when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
         .thenReturn(CompletableFuture.completedFuture(reposResponse));
 
+    return getPanel();
+  }
+
+  private JPanel getErrorRepositoryPanel() {
+    when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
+        .thenReturn(CompletableFuture.supplyAsync(() -> {
+          throw new CloudRepositoryServiceException();
+        }));
+
+    return getPanel();
+  }
+
+  private JPanel getPanel() {
     RepositorySelector selector = createInitializedSelector();
     selector.showPopup(new RelativePoint(selector, new Point(0, 0)));
 
