@@ -51,7 +51,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
 
   public static final String GOOGLE_URL = "https://source.developers.google.com";
   public static final String GCP_USER = "com.google.gct.idea.git.username";
-  private static final String GOOGLE_URL_ALT = "http://source.developers.google.com";
+  public static final String GOOGLE_URL_ALT = "http://source.developers.google.com";
 
   private String selectedUser;
   private boolean chooseManualLogin;

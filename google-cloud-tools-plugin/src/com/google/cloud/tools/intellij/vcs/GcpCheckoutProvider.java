@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 
+import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationListener.UrlOpeningListener;
 import com.intellij.openapi.diagnostic.Logger;
@@ -29,11 +30,14 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerListener;
+import com.intellij.openapi.util.Couple;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vcs.CheckoutProvider;
 import com.intellij.openapi.vcs.VcsNotifier;
 import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.UriUtil;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,8 +50,10 @@ import git4idea.GitVcs;
 import git4idea.actions.BasicAction;
 import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
+import git4idea.commands.GitHttpAuthenticator;
 import git4idea.commands.GitLineHandlerListener;
 import git4idea.commands.GitStandardProgressAnalyzer;
+import git4idea.remote.GitRememberedInputs;
 
 /**
  * Checkout provider for the Google Cloud Platform.
@@ -104,6 +110,16 @@ public class GcpCheckoutProvider implements CheckoutProvider {
         parentDirectory, gcpUserName);
   }
 
+  private static String makeKey(@NotNull String url, @Nullable String login) {
+        if(login == null) {
+            return url;
+        } else {
+            Couple pair = UriUtil.splitScheme(url);
+            String scheme = (String)pair.getFirst();
+            return !StringUtil.isEmpty(scheme)?scheme + "://" + login + "@" + (String)pair.getSecond():login + "@" + url;
+        }
+    }
+
   private static void clone(@NotNull final Project project, @NotNull final Git git,
       @Nullable final Listener listener,
       @NotNull final VirtualFile destinationParent, @NotNull final String sourceRepositoryUrl,
@@ -115,6 +131,12 @@ public class GcpCheckoutProvider implements CheckoutProvider {
         GctBundle.message("clonefromgcp.repository", sourceRepositoryUrl)) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
+         PasswordSafe passwordSafe = PasswordSafe.getInstance();
+        String user = GitRememberedInputs.getInstance().getUserNameForUrl(GcpHttpAuthDataProvider.GOOGLE_URL_ALT);
+        String key = makeKey(GcpHttpAuthDataProvider.GOOGLE_URL_ALT, user);
+
+        passwordSafe.setPassword(GitHttpAuthenticator.class, key == null ? "" : key, null);
+
         GcpHttpAuthDataProvider.Context context = GcpHttpAuthDataProvider
             .createContext(gcpUserName);
         try {
