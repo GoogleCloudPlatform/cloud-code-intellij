@@ -54,7 +54,6 @@ dependencies {
         exclude group: 'com.google.guava', module: 'guava'
     }
     compile files('lib/google-api-services-source.jar')
-//    compile files('lib/libsource-v1-java.jar')
 
     testCompile(project(':common-test-lib'))
     testRuntime files('../google-account-plugin/lib/google-gct-login-context-ij-pg.jar')
