@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.vcs;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -27,7 +28,9 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataKey;
@@ -55,9 +58,20 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.HashSet;
 import com.intellij.vcsUtil.VcsFileUtil;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+
 import git4idea.DialogManager;
 import git4idea.GitLocalBranch;
-import git4idea.GitRemoteBranch;
 import git4idea.GitUtil;
 import git4idea.actions.BasicAction;
 import git4idea.actions.GitInit;
@@ -71,6 +85,7 @@ import git4idea.config.GitConfigUtil;
 import git4idea.config.GitVcsApplicationSettings;
 import git4idea.config.GitVersion;
 import git4idea.i18n.GitBundle;
+import git4idea.repo.GitRemote;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
 import git4idea.update.GitFetchResult;
@@ -78,25 +93,16 @@ import git4idea.update.GitFetcher;
 import git4idea.util.GitFileUtils;
 import git4idea.util.GitUIUtil;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
-
 /**
  * Action to trigger an upload to a GCP git repository.
  */
-public class UploadSourceAction extends DumbAwareAction {
+public class SetupCloudRepositoryAction extends DumbAwareAction {
 
-  private static final Logger LOG = Logger.getInstance(UploadSourceAction.class);
+  private static final Logger LOG = Logger.getInstance(SetupCloudRepositoryAction.class);
+  private static final String NOTIFICATION_GROUP_ID
+      = new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid");
 
-  public UploadSourceAction() {
+  public SetupCloudRepositoryAction() {
     super(GctBundle.message("uploadtogcp.text"), GctBundle.message("uploadtogcp.description"),
         GoogleCloudToolsIcons.CLOUD);
   }
@@ -136,19 +142,8 @@ public class UploadSourceAction extends DumbAwareAction {
     final boolean gitDetected = gitRepository != null;
     final VirtualFile root = gitDetected ? gitRepository.getRoot() : project.getBaseDir();
 
-    // check for existing git repo
-    boolean externalRemoteDetected = false;
-    if (gitDetected) {
-      final String gcpRemote = GcpHttpAuthDataProvider.findGcpRemoteUrl(gitRepository);
-      if (gcpRemote != null) {
-        Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.alreadyexists"), "Google");
-        return;
-      }
-      externalRemoteDetected = !gitRepository.getRemotes().isEmpty();
-    }
-
-    ChooseProjectDialog dialog =
-        new ChooseProjectDialog(project, GctBundle.message("uploadtogcp.selecttext"),
+    SetupCloudRepositoryDialog dialog =
+        new SetupCloudRepositoryDialog(project, gitRepository, GctBundle.message("uploadtogcp.title"),
             GctBundle.message("uploadtogcp.oktext"));
     DialogManager.show(dialog);
     if (!dialog.isOK() || dialog.getCredentialedUser() == null || Strings
@@ -156,11 +151,23 @@ public class UploadSourceAction extends DumbAwareAction {
       return;
     }
 
+    String remoteName = dialog.getRemoteName();
+
+    if (gitRepository != null && hasRemote(gitRepository.getRemotes(), remoteName)) {
+      Notification notification = new Notification(
+          NOTIFICATION_GROUP_ID,
+          GctBundle.message("uploadtogcp.remotename.collision.title"),
+          GctBundle.message("uploadtogcp.remotename.collision", remoteName),
+          NotificationType.ERROR);
+      notification.notify(project);
+      return;
+    }
+
     final String projectId = dialog.getProjectId();
+    final String repositoryId = dialog.getRepositoryId();
     final CredentialedUser user = dialog.getCredentialedUser();
 
     // finish the job in background
-    final boolean finalExternalRemoteDetected = externalRemoteDetected;
     new Task.Backgroundable(project, GctBundle.message("uploadtogcp.backgroundtitle")) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
@@ -176,20 +183,21 @@ public class UploadSourceAction extends DumbAwareAction {
 
         GitRepositoryManager repositoryManager = GitUtil.getRepositoryManager(project);
         final GitRepository repository = repositoryManager.getRepositoryForRoot(root);
-        LOG.assertTrue(repository != null, "GitRepository is null for root " + root);
         if (repository == null) {
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.failedtocreategit"),
-                  "Google");
-            }
+          SwingUtilities.invokeLater(() -> {
+            Notification notification = new Notification(
+                NOTIFICATION_GROUP_ID,
+                GctBundle.message("uploadtogcp.generic.failure.title"),
+                GctBundle.message("uploadtogcp.failedtocreategit"),
+                NotificationType.ERROR);
+            notification.notify(project);
           });
+
+          LOG.error("GitRepository is null for root " + root);
           return;
         }
 
-        final String remoteUrl = GcpHttpAuthDataProvider.getGcpUrl(projectId);
-        final String remoteName = finalExternalRemoteDetected ? "cloud-platform" : "origin";
+        final String remoteUrl = GcpHttpAuthDataProvider.getGcpUrl(projectId, repositoryId);
 
         LOG.info("Adding Google as a remote host");
         indicator.setText(GctBundle.message("uploadtogcp.addingremote"));
@@ -204,8 +212,7 @@ public class UploadSourceAction extends DumbAwareAction {
 
           LOG.info("Fetching from Google remote");
           indicator.setText(GctBundle.message("uploadtogcp.fetching"));
-          if (!fetchGit(project, indicator, repository, remoteName) || hasRemoteBranch(project,
-              repository, remoteName, projectId)) {
+          if (!fetchGit(project, indicator, repository, remoteName)) {
             return;
           }
 
@@ -245,6 +252,13 @@ public class UploadSourceAction extends DumbAwareAction {
     VcsNotifier.getInstance(project)
         .notifyImportantInfo(title, "<a href='" + url + "'>" + message + "</a>",
             NotificationListener.URL_OPENING_LISTENER);
+  }
+
+  private static boolean hasRemote(@NotNull Collection<GitRemote> remotes,
+      @NotNull String remoteName) {
+    return remotes
+        .stream()
+        .anyMatch(remote -> remoteName.equals(remote.getName()));
   }
 
   @Nullable
@@ -333,39 +347,18 @@ public class UploadSourceAction extends DumbAwareAction {
     GitFetchResult result = fetcher.fetch(repository);
 
     if (!result.isSuccess()) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.fetchfailed", remote),
-              GctBundle.message("uploadtogcp.fetchfailedtitle"));
-        }
+      SwingUtilities.invokeLater(() -> {
+        Notification notification = new Notification(
+            NOTIFICATION_GROUP_ID,
+            GctBundle.message("uploadtogcp.fetchfailedtitle"),
+            GctBundle.message("uploadtogcp.fetchfailed", remote),
+            NotificationType.ERROR);
+        notification.notify(project);
       });
       return false;
     }
     repository.update();
     return true;
-  }
-
-  private static boolean hasRemoteBranch(final @NotNull Project project,
-      @NotNull GitRepository repository,
-      @NotNull String remoteName,
-      final @NotNull String projectId) {
-    for (GitRemoteBranch remoteBranch : repository.getInfo().getRemoteBranches()) {
-      if (remoteBranch.getRemote().getName().equalsIgnoreCase(remoteName)) {
-        LOG.warn("git repo is not empty, bailing");
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            Messages.showErrorDialog(project,
-                GctBundle.message("uploadtogcp.remotenotempty", projectId),
-                GctBundle.message("uploadtogcp.remotenotemptytitle"));
-          }
-        });
-        return true;
-      }
-    }
-
-    return false;
   }
 
   private static boolean addGitRemote(final @NotNull Project project,
@@ -379,13 +372,13 @@ public class UploadSourceAction extends DumbAwareAction {
       handler.addParameters("add", remote, url);
       handler.run();
       if (handler.getExitCode() != 0) {
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            Messages.showErrorDialog(project,
-                GctBundle.message("uploadtogcp.addremotefailed", url, handler.getStderr()),
-                GctBundle.message("uploadtogcp.addremotefailedtitle"));
-          }
+        SwingUtilities.invokeLater(() -> {
+          Notification notification = new Notification(
+              NOTIFICATION_GROUP_ID,
+              GctBundle.message("uploadtogcp.addremotefailedtitle"),
+              GctBundle.message("uploadtogcp.addremotefailed", url, handler.getStderr()),
+              NotificationType.ERROR);
+          notification.notify(project);
         });
         return false;
       }
@@ -393,13 +386,13 @@ public class UploadSourceAction extends DumbAwareAction {
       repository.update();
       return true;
     } catch (final VcsException ex) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(project,
-              GctBundle.message("uploadtogcp.addremotefailed", url, ex.toString()),
-              GctBundle.message("uploadtogcp.addremotefailedtitle"));
-        }
+      SwingUtilities.invokeLater(() -> {
+        Notification notification = new Notification(
+            NOTIFICATION_GROUP_ID,
+            GctBundle.message("uploadtogcp.addremotefailedtitle"),
+            GctBundle.message("uploadtogcp.addremotefailed", url, ex.toString()),
+            NotificationType.ERROR);
+        notification.notify(project);
       });
       return false;
     }
@@ -491,13 +484,13 @@ public class UploadSourceAction extends DumbAwareAction {
       VcsFileUtil.markFilesDirty(project, modified);
     } catch (final VcsException ex) {
       LOG.warn(ex);
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(project,
-              GctBundle.message("uploadtogcp.initialcommitfailed", ex.toString()),
-              GctBundle.message("uploadtogcp.initialcommitfailedtitle"));
-        }
+      SwingUtilities.invokeLater(() -> {
+        Notification notification = new Notification(
+            NOTIFICATION_GROUP_ID,
+            GctBundle.message("uploadtogcp.initialcommitfailedtitle"),
+            GctBundle.message("uploadtogcp.initialcommitfailed", ex.toString()),
+            NotificationType.ERROR);
+        notification.notify(project);
       });
       return false;
     }
@@ -526,12 +519,13 @@ public class UploadSourceAction extends DumbAwareAction {
 
     GitLocalBranch currentBranch = repository.getCurrentBranch();
     if (currentBranch == null) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.initialpushfailed"),
-              GctBundle.message("uploadtogcp.initialpushfailedtitle"));
-        }
+      SwingUtilities.invokeLater(() -> {
+        Notification notification = new Notification(
+            NOTIFICATION_GROUP_ID,
+            GctBundle.message("uploadtogcp.initialpushfailedtitle"),
+            GctBundle.message("uploadtogcp.initialpushfailed"),
+            NotificationType.ERROR);
+        notification.notify(project);
       });
       return false;
     }
@@ -539,16 +533,22 @@ public class UploadSourceAction extends DumbAwareAction {
         .push(repository, remoteName, remoteUrl, currentBranch.getName(), true);
     if (!result.success()) {
       LOG.warn(result.getErrorOutputAsJoinedString());
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.initialpushfailed"),
-              GctBundle.message("uploadtogcp.initialpushfailedtitle"));
-        }
+      SwingUtilities.invokeLater(() -> {
+        Notification notification = new Notification(
+            NOTIFICATION_GROUP_ID,
+            GctBundle.message("uploadtogcp.initialpushfailedtitle"),
+            result.getErrorOutputAsHtmlString()
+                + "<br/>" + joinAsErrorHtmlString(result.getOutput()),
+            NotificationType.ERROR);
+        notification.notify(project);
       });
       return false;
     }
     return true;
+  }
+
+  private static String joinAsErrorHtmlString(List<String> error) {
+    return error.stream().collect(Collectors.joining("<br/>"));
   }
 
   private static class GcpUntrackedFilesDialog extends SelectFilesDialog implements

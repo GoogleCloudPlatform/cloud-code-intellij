@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,21 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * This model item represents a node shown in the project selector when an error occurs attempting
- * to query resource manager. The user can recover and try again by hitting refresh at the bottom
- * right. The error message is displayed under the user name.
+ * TreeNode representing a single GCP repository.
  */
-class ResourceErrorModelItem extends DefaultMutableTreeNode {
+public class RepositoryModelItem extends DefaultMutableTreeNode {
 
-  private String errorMessage;
+  private String repositoryName;
 
-  public ResourceErrorModelItem(@NotNull String errorMessage) {
-    this.errorMessage = errorMessage;
+  public RepositoryModelItem(String repositoryName) {
+    super(repositoryName);
+    this.repositoryName = repositoryName;
   }
 
-  public String getErrorMessage() {
-    return errorMessage;
+  public String getRepositoryId() {
+    return repositoryName;
   }
 }
-

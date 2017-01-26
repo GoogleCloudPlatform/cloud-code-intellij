@@ -33,11 +33,11 @@ import javax.swing.SwingConstants;
 /**
  * Displays UI similar to "loading..." when an resource manager call is in progress.
  */
-class ProjectSelectorLoadingItem extends JPanel {
+class ResourceSelectorLoadingItem extends JPanel {
 
   private JLabel progressIcon;
 
-  public ProjectSelectorLoadingItem(@NotNull Color backgroundNonSelectionColor,
+  public ResourceSelectorLoadingItem(@NotNull Color backgroundNonSelectionColor,
       @NotNull Color textNonSelectionColor) {
     this.setLayout(new FlowLayout());
     this.setOpaque(false);

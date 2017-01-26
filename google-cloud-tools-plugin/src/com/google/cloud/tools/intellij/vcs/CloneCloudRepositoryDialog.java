@@ -19,11 +19,11 @@ package com.google.cloud.tools.intellij.vcs;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.resources.RepositorySelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.dvcs.ui.DvcsBundle;
 import com.intellij.ide.impl.ProjectUtil;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
@@ -31,6 +31,7 @@ import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 
@@ -51,24 +52,23 @@ import javax.swing.event.DocumentListener;
 /**
  * The dialog that prompts the user to download (git clone) from a GCP project.
  */
-public class CloneGcpDialog extends DialogWrapper {
-  private static final Logger LOG = Logger.getInstance(CloneGcpDialog.class);
-  public static final String INVALID_FILENAME_CHARS = "[/\\\\?%*:|\"<>]";
+public class CloneCloudRepositoryDialog extends DialogWrapper {
 
-  // Form controls
+  private static final String INVALID_FILENAME_CHARS = "[/\\\\?%*:|\"<>]";
+
   private JPanel rootPanel;
-  private ProjectSelector repositoryUrl;
+  private ProjectSelector projectSelector;
   private TextFieldWithBrowseButton parentDirectory;
   private JTextField directoryName;
   private JLabel parentDirectoryLabel;
+  private RepositorySelector repositorySelector;
 
-  @NotNull private String defaultDirectoryName = "";
-  @NotNull private final Project project;
+  @NotNull
+  private String defaultDirectoryName = "";
+  @NotNull
+  private final Project project;
 
-  /**
-   * Initialize the dialog.
-   */
-  public CloneGcpDialog(@NotNull Project project) {
+  public CloneCloudRepositoryDialog(@NotNull Project project) {
     super(project, true);
     this.project = project;
     parentDirectoryLabel.setText(DvcsBundle.message("clone.parent.dir"));
@@ -95,7 +95,7 @@ public class CloneGcpDialog extends DialogWrapper {
 
   @Nullable
   public String getGcpUserName() {
-    CredentialedUser selectedUser = repositoryUrl.getSelectedUser();
+    CredentialedUser selectedUser = projectSelector.getSelectedUser();
     return selectedUser != null ? selectedUser.getEmail() : null;
   }
 
@@ -150,23 +150,49 @@ public class CloneGcpDialog extends DialogWrapper {
    * Check fields and display error in the wrapper if there is a problem.
    */
   private void updateButtons() {
-    if (parentDirectory.getText().length() == 0 || directoryName.getText().length() == 0) {
+    if (!StringUtil.isEmpty(projectSelector.getText())
+        && projectSelector.getSelectedUser() == null) {
+      setErrorText(GctBundle.message("cloud.repository.dialog.invalid.project"));
+      setOKActionEnabled(false);
+      return;
+    }
+
+    if (!StringUtil.isEmpty(repositorySelector.getText())
+        && StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
+      setErrorText(GctBundle.message("cloud.repository.dialog.invalid.repository"));
+      setOKActionEnabled(false);
+      return;
+    }
+
+    if(projectSelector.getSelectedUser() == null
+        || StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
       setErrorText(null);
       setOKActionEnabled(false);
       return;
     }
+
+    if (StringUtil.isEmpty(parentDirectory.getText())
+        || StringUtil.isEmpty(directoryName.getText())) {
+      setErrorText(null);
+      setOKActionEnabled(false);
+      return;
+    }
+
     File file = new File(parentDirectory.getText(), directoryName.getText());
     if (file.exists()) {
       setErrorText(GctBundle.message("clonefromgcp.destination.exists.error"));
       setOKActionEnabled(false);
       paintSelectionError();
       return;
-    } else if (!file.getParentFile().exists()) {
+    }
+
+    if (!file.getParentFile().exists()) {
       setErrorText(GctBundle.message("clonefromgcp.parent.missing.error"));
       setOKActionEnabled(false);
       paintSelectionError();
       return;
     }
+
     paintSelectionOk();
     setErrorText(null);
     setOKActionEnabled(true);
@@ -174,27 +200,28 @@ public class CloneGcpDialog extends DialogWrapper {
 
   @Nullable
   private String getCurrentUrlText() {
-    CredentialedUser selectedUser = repositoryUrl.getSelectedUser();
+    CredentialedUser selectedUser = projectSelector.getSelectedUser();
 
-    if (selectedUser == null || Strings.isNullOrEmpty(repositoryUrl.getText())) {
+    if (selectedUser == null
+        || StringUtil.isEmpty(projectSelector.getText())
+        || StringUtil.isEmpty(repositorySelector.getText())) {
       return null;
     }
 
-    return GcpHttpAuthDataProvider.getGcpUrl(repositoryUrl.getText());
+    return GcpHttpAuthDataProvider.getGcpUrl(projectSelector.getText(),
+        repositorySelector.getText());
   }
 
   private void createUIComponents() {
-    repositoryUrl = new ProjectSelector();
-    repositoryUrl.setMinimumSize(new Dimension(300, 0));
-    repositoryUrl.getDocument().addDocumentListener(new DocumentAdapter() {
-      @SuppressWarnings("ConstantConditions") // This suppresses an invalid nullref warning for
-      // projectDescription.replaceAll.
+    projectSelector = new ProjectSelector();
+    projectSelector.setMinimumSize(new Dimension(300, 0));
+    projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
         if (defaultDirectoryName.equals(directoryName.getText())
             || directoryName.getText().length() == 0) {
           // modify field if it was unmodified or blank
-          String projectDescription = repositoryUrl.getProjectDescription();
+          String projectDescription = projectSelector.getProjectDescription();
           if (!Strings.isNullOrEmpty(projectDescription)) {
             defaultDirectoryName = projectDescription.replaceAll(INVALID_FILENAME_CHARS, "");
             defaultDirectoryName = defaultDirectoryName.replaceAll("\\s", "");
@@ -204,7 +231,21 @@ public class CloneGcpDialog extends DialogWrapper {
 
           directoryName.setText(defaultDirectoryName);
         }
+        repositorySelector.setCloudProject(projectSelector.getText());
+        repositorySelector.setUser(projectSelector.getSelectedUser());
+        repositorySelector.setText("");
         updateButtons();
+      }
+    });
+    repositorySelector = new RepositorySelector(projectSelector.getText(),
+        projectSelector.getSelectedUser(), false /*canCreateRepository*/);
+
+    repositorySelector.getDocument().addDocumentListener(new DocumentAdapter() {
+      @Override
+      protected void textChanged(DocumentEvent event) {
+        updateButtons();
+        setOKActionEnabled(projectSelector.getSelectedUser() != null
+            && !StringUtil.isEmpty(repositorySelector.getSelectedRepository()));
       }
     });
   }
@@ -212,7 +253,7 @@ public class CloneGcpDialog extends DialogWrapper {
   @Nullable
   @Override
   public JComponent getPreferredFocusedComponent() {
-    return repositoryUrl;
+    return projectSelector;
   }
 
   @Override
