@@ -110,16 +110,6 @@ public class GcpCheckoutProvider implements CheckoutProvider {
         parentDirectory, gcpUserName);
   }
 
-  private static String makeKey(@NotNull String url, @Nullable String login) {
-        if(login == null) {
-            return url;
-        } else {
-            Couple pair = UriUtil.splitScheme(url);
-            String scheme = (String)pair.getFirst();
-            return !StringUtil.isEmpty(scheme)?scheme + "://" + login + "@" + (String)pair.getSecond():login + "@" + url;
-        }
-    }
-
   private static void clone(@NotNull final Project project, @NotNull final Git git,
       @Nullable final Listener listener,
       @NotNull final VirtualFile destinationParent, @NotNull final String sourceRepositoryUrl,
@@ -131,11 +121,7 @@ public class GcpCheckoutProvider implements CheckoutProvider {
         GctBundle.message("clonefromgcp.repository", sourceRepositoryUrl)) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
-         PasswordSafe passwordSafe = PasswordSafe.getInstance();
-        String user = GitRememberedInputs.getInstance().getUserNameForUrl(GcpHttpAuthDataProvider.GOOGLE_URL_ALT);
-        String key = makeKey(GcpHttpAuthDataProvider.GOOGLE_URL_ALT, user);
-
-        passwordSafe.setPassword(GitHttpAuthenticator.class, key == null ? "" : key, null);
+        GcpHttpAuthDataProvider.clearIdeStoredGcpCredentials();
 
         GcpHttpAuthDataProvider.Context context = GcpHttpAuthDataProvider
             .createContext(gcpUserName);
