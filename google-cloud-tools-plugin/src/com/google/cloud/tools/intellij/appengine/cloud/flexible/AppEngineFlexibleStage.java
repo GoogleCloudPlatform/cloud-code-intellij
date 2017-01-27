@@ -67,39 +67,26 @@ public class AppEngineFlexibleStage {
       FlexibleRuntime runtime =
           AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
               deploymentConfiguration.getAppYamlPath());
-      if (deploymentConfiguration.isCustom()) {
-        if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
-          throw new RuntimeException(
-              GctBundle.getString("appengine.deployment.error.staging.yaml"));
-        }
-        if (runtime == FlexibleRuntime.CUSTOM
-            && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
-          throw new RuntimeException(
-              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
-        }
+
+      if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
+        throw new RuntimeException(
+            GctBundle.getString("appengine.deployment.error.staging.yaml"));
+      }
+      if (runtime == FlexibleRuntime.CUSTOM
+          && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+        throw new RuntimeException(
+            GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
       }
 
       Path stagedArtifactPath = stagingDirectory.resolve(
           "target" + AppEngineFlexibleDeploymentArtifactType.typeForPath(deploymentArtifactPath));
       Files.copy(deploymentArtifactPath, stagedArtifactPath);
 
-      Path appYamlPath = deploymentConfiguration.isAuto()
-          ? helper.defaultAppYaml().get()
-          : Paths.get(deploymentConfiguration.getAppYamlPath());
+      Path appYamlPath = Paths.get(deploymentConfiguration.getAppYamlPath());
       Files.copy(appYamlPath, stagingDirectory.resolve(appYamlPath.getFileName()));
 
       if (runtime == FlexibleRuntime.CUSTOM) {
-        Path dockerFilePath =
-            deploymentConfiguration.isAuto()
-                ? helper
-                    .defaultDockerfile(
-                        AppEngineFlexibleDeploymentArtifactType.typeForPath(deploymentArtifactPath))
-                    .orElseThrow(
-                        () ->
-                            new RuntimeException(
-                                GctBundle.getString(
-                                    "appengine.deployment.error.deployable.notjarorwar")))
-                : Paths.get(deploymentConfiguration.getDockerFilePath());
+        Path dockerFilePath = Paths.get(deploymentConfiguration.getDockerFilePath());
         Files.copy(dockerFilePath, stagingDirectory.resolve(dockerFilePath.getFileName()));
       }
     } catch (IOException | InvalidPathException ex) {

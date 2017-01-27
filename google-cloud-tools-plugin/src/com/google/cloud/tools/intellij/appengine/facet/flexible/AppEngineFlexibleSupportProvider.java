@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
@@ -150,7 +149,6 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
           new AppEngineDeploymentConfiguration();
       deployConfiguration.setAppYamlPath(facet.getConfiguration().getAppYamlPath());
       deployConfiguration.setDockerFilePath(facet.getConfiguration().getDockerfilePath());
-      deployConfiguration.setConfigType(ConfigType.CUSTOM);
 
       // Set logged in user.
       CredentialedUser user = Services.getLoginService().getActiveUser();

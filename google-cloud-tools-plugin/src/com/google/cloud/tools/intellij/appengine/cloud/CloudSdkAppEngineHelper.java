@@ -164,17 +164,16 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       FlexibleRuntime runtime =
           AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
               deploymentConfiguration.getAppYamlPath());
-      if (deploymentConfiguration.isCustom()) {
-        if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
-          callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
-          return Optional.empty();
-        }
-        if (runtime == FlexibleRuntime.CUSTOM
-            && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
-          callback.errorOccurred(
-              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
-          return Optional.empty();
-        }
+
+      if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
+        callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
+        return Optional.empty();
+      }
+      if (runtime == FlexibleRuntime.CUSTOM
+          && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+        callback.errorOccurred(
+            GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+        return Optional.empty();
       }
       return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
           deploymentConfiguration, deploy));
@@ -319,12 +318,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       labelBuilder.append("standard");
     } else {
       labelBuilder.append("flex");
-
-      if (deploymentConfiguration.isAuto()) {
-        labelBuilder.append(".auto");
-      } else {
-        labelBuilder.append(".custom");
-      }
     }
     final String eventLabel = labelBuilder.toString();
 

@@ -50,8 +50,7 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
   public void execute(ProcessStartListener startListener) {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
-        .addMetadata(GctTracking.METADATA_LABEL_KEY,
-            "flex." + (deploy.getDeploymentConfiguration().isAuto() ? "auto" : "custom"))
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, "flex")
         .ping();
 
     Path stagingDirectory;
