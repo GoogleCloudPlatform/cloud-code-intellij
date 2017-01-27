@@ -126,7 +126,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
         .getUserNameForUrl(GcpHttpAuthDataProvider.GOOGLE_URL_ALT);
     String key = makeKey(GcpHttpAuthDataProvider.GOOGLE_URL_ALT, user);
 
-    passwordSafe.setPassword(GitHttpAuthenticator.class, key == null ? "" : key, null);
+    passwordSafe.setPassword(GitHttpAuthenticator.class, key == null ? "" : key, null /*value*/);
   }
 
   /**
