@@ -16,14 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
-import static java.util.stream.Collectors.toList;
-
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.ModulePathPair.ConfigurationFileType;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.ModulePathPair.ModulePathPairRenderer;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
@@ -34,13 +35,13 @@ import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
-import com.intellij.facet.impl.ui.FacetEditorFacade;
+import com.intellij.facet.FacetManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.SystemInfo;
@@ -48,13 +49,14 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.util.ui.tree.TreeModelAdapter;
 
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -74,9 +76,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 
 /**
  * Flexible deployment run configuration user interface.
@@ -116,6 +116,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JComboBox<ModulePathPair> presetDockerfiles;
   private JCheckBox dockerfileOverrideCheckBox;
   private JButton yamlModuleSettings;
+  private JButton dockerfileModuleSettings;
   private DeploymentSource deploymentSource;
 
   public AppEngineFlexibleDeploymentEditor(Project project, DeploymentSource deploymentSource) {
@@ -181,6 +182,10 @@ public class AppEngineFlexibleDeploymentEditor extends
           boolean isYamlOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
           presetYamls.setEnabled(!isYamlOverrideSelected);
           yamlTextField.setVisible(isYamlOverrideSelected);
+          setDockerfileVisibility();
+          if (isYamlOverrideSelected) {
+            checkConfigurationFiles();
+          }
         });
 
     dockerfileOverrideCheckBox.addActionListener(
@@ -188,30 +193,16 @@ public class AppEngineFlexibleDeploymentEditor extends
           boolean isDockerfileOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
           presetDockerfiles.setEnabled(!isDockerfileOverrideSelected);
           dockerfileTextField.setVisible(isDockerfileOverrideSelected);
+          if (isDockerfileOverrideSelected) {
+            checkConfigurationFiles();
+          }
         });
 
-    yamlTextField.getTextField().getDocument().addDocumentListener(new DocumentListener() {
+    yamlTextField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
-      public void insertUpdate(DocumentEvent event) {
+      protected void textChanged(DocumentEvent e) {
         updateServiceName();
-        setDockerfileVisibility(APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-            yamlTextField.getText()).equals(FlexibleRuntime.CUSTOM));
-        checkConfigurationFiles();
-      }
-
-      @Override
-      public void removeUpdate(DocumentEvent event) {
-        updateServiceName();
-        setDockerfileVisibility(APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-            yamlTextField.getText()).equals(FlexibleRuntime.CUSTOM));
-        checkConfigurationFiles();
-      }
-
-      @Override
-      public void changedUpdate(DocumentEvent event) {
-        updateServiceName();
-        setDockerfileVisibility(APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-            yamlTextField.getText()).equals(FlexibleRuntime.CUSTOM));
+        setDockerfileVisibility();
         checkConfigurationFiles();
       }
     });
@@ -228,22 +219,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     gcpProjectSelector.addProjectSelectionListener(event ->
         appInfoPanel.refresh(event.getSelectedProject().getProjectId(),
             event.getUser().getCredential()));
-    gcpProjectSelector.addModelListener(new TreeModelListener() {
-      @Override
-      public void treeNodesChanged(TreeModelEvent event) {
-        // Do nothing.
-      }
-
-      @Override
-      public void treeNodesInserted(TreeModelEvent event) {
-        // Do nothing.
-      }
-
-      @Override
-      public void treeNodesRemoved(TreeModelEvent event) {
-        // Do nothing.
-      }
-
+    gcpProjectSelector.addModelListener(new TreeModelAdapter() {
       @Override
       public void treeStructureChanged(TreeModelEvent event) {
         // projects have finished loading
@@ -272,52 +248,56 @@ public class AppEngineFlexibleDeploymentEditor extends
 
     presetYamls.setModel(getComboBoxModelForFileType(ConfigurationFileType.APP_YAML, project));
     presetYamls.setRenderer(new ModulePathPairRenderer());
+    presetYamls.addItemListener(event -> {
+      checkConfigurationFiles();
+      setDockerfileVisibility();
+    });
 
     presetDockerfiles.setModel(
         getComboBoxModelForFileType(ConfigurationFileType.DOCKERFILE, project));
     presetDockerfiles.setRenderer(new ModulePathPairRenderer());
+    presetDockerfiles.addItemListener(event -> checkConfigurationFiles());
 
     filesWarningLabel.setForeground(Color.RED);
 
-//    yamlModuleSettings.addMouseListener(new MouseListener() {
-//      @Override
-//      public void mouseClicked(MouseEvent e) {
-//        FacetEditorFacade
-//        ShowSettingsUtil.getInstance().editConfigurable(project, )
-//      }
-//
-//      @Override
-//      public void mousePressed(MouseEvent e) {
-//
-//      }
-//
-//      @Override
-//      public void mouseReleased(MouseEvent e) {
-//
-//      }
-//
-//      @Override
-//      public void mouseEntered(MouseEvent e) {
-//
-//      }
-//
-//      @Override
-//      public void mouseExited(MouseEvent e) {
-//
-//      }
-//    });
+    yamlModuleSettings.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        AppEngineFlexibleFacet flexFacet =
+            FacetManager.getInstance(
+                ((ModulePathPair) presetYamls.getSelectedItem()).getModule()).getFacetByType(
+                AppEngineFlexibleFacetType.ID);
+        ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
+        checkConfigurationFiles();
+      }
+    });
+
+    dockerfileModuleSettings.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent event) {
+        AppEngineFlexibleFacet flexFacet =
+            FacetManager.getInstance(
+                ((ModulePathPair) presetDockerfiles.getSelectedItem()).getModule()).getFacetByType(
+                AppEngineFlexibleFacetType.ID);
+        ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
+        checkConfigurationFiles();
+      }
+    });
 
     updateSelectors();
     checkConfigurationFiles();
+    setDockerfileVisibility();
   }
 
   private ComboBoxModel<ModulePathPair> getComboBoxModelForFileType(ConfigurationFileType fileType,
       Project project) {
     return new DefaultComboBoxModel<>(
         Arrays.stream(ModuleManager.getInstance(project).getModules())
+            .filter(module ->
+                FacetManager.getInstance(module)
+                    .getFacetByType(AppEngineFlexibleFacetType.ID) != null)
             .map(module -> new ModulePathPair(module, fileType))
-            .collect(toList())
-            .toArray(new ModulePathPair[ModuleManager.getInstance(project).getModules().length])
+            .toArray(ModulePathPair[]::new)
     );
   }
 
@@ -347,8 +327,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     presetYamls.setEnabled(!configuration.isOverrideYaml());
     presetDockerfiles.setEnabled(!configuration.isOverrideDockerfile());
 
-    setDockerfileVisibility(APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-        yamlTextField.getText()).equals(FlexibleRuntime.CUSTOM));
+    setDockerfileVisibility();
     updateServiceName();
     refreshApplicationInfoPanel();
     checkConfigurationFiles();
@@ -370,8 +349,13 @@ public class AppEngineFlexibleDeploymentEditor extends
       configuration.setGoogleUsername(user.getEmail());
     }
     configuration.setConfigType((ConfigType) configurationTypeComboBox.getSelectedItem());
-    configuration.setEnvironment(
-        ((AppEngineArtifactDeploymentSource) deploymentSource).getEnvironment().name());
+    String environment = "";
+    if (deploymentSource instanceof UserSpecifiedPathDeploymentSource) {
+      environment = AppEngineEnvironment.APP_ENGINE_FLEX.name();
+    } else if (deploymentSource instanceof AppEngineArtifactDeploymentSource) {
+      environment = ((AppEngineArtifactDeploymentSource) deploymentSource).getEnvironment().name();
+    }
+    configuration.setEnvironment(environment);
     configuration.setUserSpecifiedArtifact(
         deploymentSource instanceof UserSpecifiedPathDeploymentSource);
     configuration.setUserSpecifiedArtifactPath(archiveSelector.getText());
@@ -448,8 +432,8 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   private void updateServiceName() {
-    Optional<String> service = APP_ENGINE_PROJECT_SERVICE.getServiceNameFromAppYaml(
-        yamlTextField.getText());
+    Optional<String> service =
+        APP_ENGINE_PROJECT_SERVICE.getServiceNameFromAppYaml(getYamlPath());
     serviceLabel.setText(service.orElse(DEFAULT_SERVICE));
   }
 
@@ -470,23 +454,26 @@ public class AppEngineFlexibleDeploymentEditor extends
   /**
    * Hides the Dockerfile section of the UI. For example, when app.yaml contains "runtime: java".
    */
-  private void setDockerfileVisibility(boolean visible) {
+  private void setDockerfileVisibility() {
+    boolean visible = APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
+        getYamlPath()).equals(FlexibleRuntime.CUSTOM);
     dockerfileLabel.setVisible(visible);
     presetDockerfiles.setVisible(visible);
     dockerfileOverrideCheckBox.setVisible(visible);
     dockerfileTextField.setVisible(dockerfileOverrideCheckBox.isSelected());
+    dockerfileModuleSettings.setVisible(visible);
   }
 
   private void checkConfigurationFiles() {
     checkConfigurationFile(getYamlPath(), yamlTextField.getTextField(), yamlLabel);
-    if (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yamlTextField.getText())
+    if (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(getYamlPath())
         .equals(FlexibleRuntime.CUSTOM)) {
       checkConfigurationFile(getDockerfilePath(), dockerfileTextField.getTextField(),
           dockerfileLabel);
     }
 
     filesWarningLabel.setVisible(yamlTextField.getTextField().getForeground().equals(Color.RED)
-        || (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yamlTextField.getText())
+        || (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(getYamlPath())
         .equals(FlexibleRuntime.CUSTOM)
         && dockerfileTextField.getTextField().getForeground().equals(Color.RED)));
   }

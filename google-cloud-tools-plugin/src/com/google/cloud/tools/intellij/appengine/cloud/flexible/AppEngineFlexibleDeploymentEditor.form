@@ -195,7 +195,9 @@
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <visible value="false"/>
+            </properties>
           </component>
           <component id="9e96a" class="javax.swing.JLabel" binding="dockerfileLabel">
             <constraints>
@@ -225,7 +227,9 @@
             <constraints>
               <grid row="4" column="1" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <visible value="false"/>
+            </properties>
           </component>
           <component id="6cda7" class="javax.swing.JTextPane" binding="filesWarningLabel">
             <constraints>
@@ -237,20 +241,20 @@
               <visible value="false"/>
             </properties>
           </component>
-          <component id="eca6a" class="javax.swing.JLabel">
-            <constraints>
-              <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Module Settings"/>
-            </properties>
-          </component>
           <component id="5ca93" class="javax.swing.JButton" binding="yamlModuleSettings">
             <constraints>
               <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Module Settings"/>
+              <text value="Module Settings..."/>
+            </properties>
+          </component>
+          <component id="fb861" class="javax.swing.JButton" binding="dockerfileModuleSettings">
+            <constraints>
+              <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Module Settings..."/>
             </properties>
           </component>
         </children>

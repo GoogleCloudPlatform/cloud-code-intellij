@@ -16,17 +16,14 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSourceType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 
@@ -45,12 +42,9 @@ import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.RemoteServersManager;
-import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationType;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
@@ -58,8 +52,6 @@ import com.intellij.util.containers.ContainerUtil;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -151,20 +143,6 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
           ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
       if (server != null) {
         runConfiguration.setServerName(server.getName());
-      }
-
-      // Sets the first found Flex deployable, if any exists, in the run config.
-      AppEngineProjectService projectService = AppEngineProjectService.getInstance();
-      Optional<Artifact> artifact = ArtifactUtil.getArtifactsContainingModuleOutput(module).stream()
-          .filter(projectService::isAppEngineFlexArtifactType)
-          .findFirst();
-      if (artifact.isPresent()) {
-        ArtifactDeploymentSource deploymentSource = AppEngineUtil.createArtifactDeploymentSource(
-            module.getProject(), artifact.get(), AppEngineEnvironment.APP_ENGINE_FLEX);
-        runConfiguration.setDeploymentSource(deploymentSource);
-        AppEngineArtifactDeploymentSourceType sourceType =
-            (AppEngineArtifactDeploymentSourceType) deploymentSource.getType();
-        sourceType.setBuildBeforeRunTask(runConfiguration, deploymentSource);
       }
 
       // Copies the specified app.yaml and Dockerfile paths to the deployment run config.

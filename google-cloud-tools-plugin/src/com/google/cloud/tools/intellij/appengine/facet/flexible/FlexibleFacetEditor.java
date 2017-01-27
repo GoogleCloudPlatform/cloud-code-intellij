@@ -103,8 +103,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     yaml.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        setDockerfileVisibility(APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-            yaml.getText()).equals(FlexibleRuntime.CUSTOM));
+        setDockerfileVisibility();
         validateConfiguration();
       }
     });
@@ -112,8 +111,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     dockerfile.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        setDockerfileVisibility(APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-            yaml.getText()).equals(FlexibleRuntime.CUSTOM));
+        setDockerfileVisibility();
         validateConfiguration();
       }
     });
@@ -157,8 +155,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     dockerfile.setText(deploymentConfiguration.getDockerFilePath());
     cloudSdkPanel.reset();
 
-    setDockerfileVisibility(APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-        deploymentConfiguration.getAppYamlPath()).equals(FlexibleRuntime.CUSTOM));
+    setDockerfileVisibility();
     validateConfiguration();
   }
 
@@ -170,8 +167,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     deploymentConfiguration.setDockerFilePath(dockerfile.getText());
     cloudSdkPanel.apply();
 
-    setDockerfileVisibility(APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-        yaml.getText()).equals(FlexibleRuntime.CUSTOM));
+    setDockerfileVisibility();
   }
 
   @Override
@@ -193,13 +189,11 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       if (!Files.exists(Paths.get(yaml.getText()))
           || !Files.isRegularFile(Paths.get(yaml.getText()))) {
         yaml.getTextField().setForeground(Color.RED);
-        filesWarningLabel.setVisible(true);
       } else {
         yaml.getTextField().setForeground(Color.BLACK);
       }
     } catch (InvalidPathException ipe) {
       yaml.getTextField().setForeground(Color.RED);
-      filesWarningLabel.setVisible(true);
     }
 
     try {
@@ -208,24 +202,23 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           && (!Files.exists(Paths.get(dockerfile.getText()))
           || !Files.isRegularFile(Paths.get(dockerfile.getText())))) {
         dockerfile.getTextField().setForeground(Color.RED);
-        filesWarningLabel.setVisible(true);
       } else {
         dockerfile.getTextField().setForeground(Color.BLACK);
       }
     } catch (InvalidPathException ipe) {
       dockerfile.getTextField().setForeground(Color.RED);
-      filesWarningLabel.setVisible(true);
     }
 
-    if (!yaml.getTextField().getForeground().equals(Color.RED)
-        && APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yaml.getText())
+    // Shows the error label if one of the file checks failed.
+    filesWarningLabel.setVisible(yaml.getTextField().getForeground().equals(Color.RED)
+        || (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yaml.getText())
         .equals(FlexibleRuntime.CUSTOM)
-        && !dockerfile.getTextField().getForeground().equals(Color.RED)) {
-      filesWarningLabel.setVisible(false);
-    }
+        && dockerfile.getTextField().getForeground().equals(Color.RED)));
   }
 
-  private void setDockerfileVisibility(boolean visible) {
+  private void setDockerfileVisibility() {
+    boolean visible = APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
+        yaml.getText()).equals(FlexibleRuntime.CUSTOM);
     dockerfileLabel.setVisible(visible);
     dockerfile.setVisible(visible);
     genDockerfileButton.setVisible(visible);

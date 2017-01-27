@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;

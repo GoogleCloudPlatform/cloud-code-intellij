@@ -26,7 +26,8 @@ import com.intellij.ui.ListCellRendererWrapper;
 import javax.swing.JList;
 
 /**
- * Created by joaomartins on 1/19/17.
+ * IntelliJ module - file path tuple to populate file combo boxes in
+ * {@link AppEngineFlexibleDeploymentEditor}.
  */
 public class ModulePathPair {
   private Module module;

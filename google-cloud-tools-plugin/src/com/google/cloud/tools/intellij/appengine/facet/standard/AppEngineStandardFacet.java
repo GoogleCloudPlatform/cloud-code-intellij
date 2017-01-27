@@ -1,13 +1,5 @@
 /*
-<<<<<<< HEAD
-<<<<<<< HEAD:google-cloud-tools-plugin/src/com/google/cloud/tools/intellij/appengine/facet/AppEngineStandardFacet.java
- * Copyright 2017 Google Inc. All Rights Reserved.
-=======
- * Copyright 2016 Google Inc. All Rights Reserved.
->>>>>>> Relocates standard facet to standard package. Removes flexible framework detector for good.:google-cloud-tools-plugin/src/com/google/cloud/tools/intellij/appengine/facet/standard/AppEngineStandardFacet.java
-=======
  * Copyright 2000-2016 JetBrains s.r.o.
->>>>>>> Reverted to Jetbrains copyrights.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
