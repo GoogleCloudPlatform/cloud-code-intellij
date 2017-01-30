@@ -417,8 +417,12 @@ public class AppEngineFlexibleDeploymentEditor extends
   private void toggleDockerfileSection() {
     boolean isCustomRuntime = APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
         getYamlPath()).equals(FlexibleRuntime.CUSTOM);
-    dockerfileOverrideCheckBox.setEnabled(isCustomRuntime);
-    dockerfileTextField.setEnabled(dockerfileOverrideCheckBox.isSelected());
+    dockerfileOverrideCheckBox.setVisible(isCustomRuntime);
+    dockerfileTextField.setVisible(isCustomRuntime);
+    dockerfileLabel.setVisible(isCustomRuntime);
+    if (isCustomRuntime) {
+      dockerfileTextField.setEnabled(dockerfileOverrideCheckBox.isSelected());
+    }
   }
 
   private void checkConfigurationFiles() {
