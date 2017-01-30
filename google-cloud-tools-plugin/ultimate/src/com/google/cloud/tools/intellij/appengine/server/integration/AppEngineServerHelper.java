@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.javaee.appServerIntegrations.ApplicationServerHelper;
@@ -63,10 +64,13 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
 
       @Override
       protected void applyEditorTo(ApplicationServerPersistentData data) {
-        try {
-          cloudSdkPanel.apply();
-        } catch (ConfigurationException ce) {
-          // do nothing
+        if (CloudSdkService.getInstance().isValidCloudSdk(
+            cloudSdkPanel.getCloudSdkDirectoryText())) {
+          try {
+            cloudSdkPanel.apply();
+          } catch (ConfigurationException ce) {
+            // do nothing
+          }
         }
       }
 
