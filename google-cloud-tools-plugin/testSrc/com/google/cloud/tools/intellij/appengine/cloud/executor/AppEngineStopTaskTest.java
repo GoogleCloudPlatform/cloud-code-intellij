@@ -40,6 +40,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.nio.file.Paths;
+import java.util.Optional;
 
 /**
  * Unit tests for {@link AppEngineStopTask}
@@ -62,7 +63,7 @@ public class AppEngineStopTaskTest {
     when(stop.getCallback()).thenReturn(callback);
     when(stop.getHelper()).thenReturn(helper);
     when(stop.getDeploymentConfiguration()).thenReturn(configuration);
-    when(stop.getHelper().stageCredentials(anyString())).thenReturn(Paths.get("/some/file"));
+    when(stop.getHelper().stageCredentials(anyString())).thenReturn(Optional.of(Paths.get("/some/file")));
 
     task = new AppEngineStopTask(stop, "myModule", "myVersion");
   }

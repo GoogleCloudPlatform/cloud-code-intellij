@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ConfigType;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
@@ -79,7 +78,6 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
   public void testValidSelections() {
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
-    config.setConfigType(ConfigType.AUTO);
     when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<>());
 
     try {
@@ -146,7 +144,6 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
         ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
-    config.setConfigType(ConfigType.AUTO);
 
     try {
       editor.applyEditorTo(config);

@@ -32,6 +32,7 @@ import com.intellij.testFramework.PlatformTestCase;
 import org.picocontainer.MutablePicoContainer;
 
 import java.util.HashSet;
+import java.util.Optional;
 
 import javax.swing.JCheckBox;
 
@@ -53,8 +54,12 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<>());
 
     projectService = mock(AppEngineProjectService.class);
-    when(projectService.getFlexibleRuntimeFromAppYaml(isA(String.class))).thenReturn(
-        FlexibleRuntime.CUSTOM);
+    when(projectService.getFlexibleRuntimeFromAppYaml(isA(String.class)))
+        .thenReturn(FlexibleRuntime.CUSTOM);
+    when(projectService.getServiceNameFromAppYaml("custom")).thenReturn(Optional.of("customService"));
+    when(projectService.getServiceNameFromAppYaml("java")).thenReturn(Optional.of("javaService"));
+    when(projectService.getFlexibleRuntimeFromAppYaml("custom")).thenReturn(FlexibleRuntime.CUSTOM);
+    when(projectService.getFlexibleRuntimeFromAppYaml("java")).thenReturn(FlexibleRuntime.JAVA);
 
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
@@ -65,33 +70,27 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
         CloudSdkService.class.getName(), cloudSdkService);
 
     editor = new AppEngineFlexibleDeploymentEditor(getProject(), deploymentSource);
-    editor.getYamlTextField().setText("app yaml 1");
+    editor.getYamlTextField().setText("java");
     editor.getDockerfileTextField().setText("dockerfile 1");
   }
 
-  public void testUpdateFileOverrides() {
-    editor.getOverrideFileLocationsCheckBox().setSelected(true);
-    editor.getYamlTextField().setText("new app.yaml location");
-    editor.getDockerfileTextField().setText("new dockerfile location");
-    // Check that the override is properly memorized.
-    assertEquals("new app.yaml location", editor.getYamlPathOverride());
-    assertEquals("new dockerfile location", editor.getDockerfilePathOverride());
+  public void testUpdateServiceName() {
+    assertEquals(editor.getServiceLabel().getText(), "javaService");
+    editor.getYamlTextField().setText("custom");
+    assertEquals(editor.getServiceLabel().getText(), "customService");
+  }
 
-    editor.getOverrideFileLocationsCheckBox().setSelected(false);
-    // Check that the field is switched back when override is disabled.
-    assertEquals("app yaml 1", editor.getYamlTextField().getText());
-    assertEquals("dockerfile 1", editor.getDockerfileTextField().getText());
-
-    // Check that override works.
-    editor.getOverrideFileLocationsCheckBox().setSelected(true);
-    assertEquals("new app.yaml location", editor.getYamlPathOverride());
-    assertEquals("new dockerfile location", editor.getDockerfilePathOverride());
+  public void testDockerfileSectionToggle() {
+    assertFalse(editor.getDockerfileLabel().isVisible());
+    assertFalse(editor.getDockerfileTextField().isVisible());
+    assertFalse(editor.getDockerfileOverrideCheckBox().isVisible());
+    editor.getYamlTextField().setText("custom");
+    assertTrue(editor.getDockerfileLabel().isVisible());
+    assertTrue(editor.getDockerfileTextField().isVisible());
+    assertTrue(editor.getDockerfileOverrideCheckBox().isVisible());
   }
 
   public void testPromote_StopPreviousVersion_Flexible() {
-//    when(deploymentSource.getEnvironment())
-//        .thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
-
     JCheckBox promoteCheckbox = editor.getPromoteVersionCheckBox();
     JCheckBox stopPreviousVersionCheckbox = editor.getStopPreviousVersionCheckBox();
 

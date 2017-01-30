@@ -129,7 +129,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
     if (!(source instanceof AppEngineDeployable)) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.invalid.source.error"));
-      return Optional.empty();
+      throw new RuntimeException("Invalid deployment source selected for deployment");
     }
 
     if (CloudSdkService.getInstance().validateCloudSdk().contains(
@@ -152,7 +152,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         loggingHandler,
         deploymentConfiguration,
         targetEnvironment,
-        wrapCallbackForUsageTracking(callback, deploymentConfiguration, targetEnvironment));
+        wrapCallbackForUsageTracking(callback, targetEnvironment));
 
     boolean isFlexCompat = targetEnvironment.isFlexible()
         && AppEngineProjectService.getInstance().isFlexCompat(project, source);
@@ -310,7 +310,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @NotNull
   private DeploymentOperationCallback wrapCallbackForUsageTracking(
       final DeploymentOperationCallback deploymentCallback,
-      AppEngineDeploymentConfiguration deploymentConfiguration,
       AppEngineEnvironment environment) {
 
     StringBuilder labelBuilder = new StringBuilder();

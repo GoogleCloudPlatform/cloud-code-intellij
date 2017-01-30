@@ -420,9 +420,6 @@ public class AppEngineFlexibleDeploymentEditor extends
     dockerfileOverrideCheckBox.setVisible(isCustomRuntime);
     dockerfileTextField.setVisible(isCustomRuntime);
     dockerfileLabel.setVisible(isCustomRuntime);
-    if (isCustomRuntime) {
-      dockerfileTextField.setEnabled(dockerfileOverrideCheckBox.isSelected());
-    }
   }
 
   private void checkConfigurationFiles() {
@@ -467,6 +464,10 @@ public class AppEngineFlexibleDeploymentEditor extends
       return yamlTextField.getText();
     }
 
+    if (modulesWithFlexFacetComboBox.getSelectedItem() == null) {
+      return "";
+    }
+
     return Optional.ofNullable(
         FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
         .getFacetByType(AppEngineFlexibleFacetType.ID))
@@ -492,5 +493,20 @@ public class AppEngineFlexibleDeploymentEditor extends
   @VisibleForTesting
   TextFieldWithBrowseButton getDockerfileTextField() {
     return dockerfileTextField;
+  }
+
+  @VisibleForTesting
+  JLabel getDockerfileLabel() {
+    return dockerfileLabel;
+  }
+
+  @VisibleForTesting
+  JCheckBox getDockerfileOverrideCheckBox() {
+    return dockerfileOverrideCheckBox;
+  }
+
+  @VisibleForTesting
+  JLabel getServiceLabel() {
+    return serviceLabel;
   }
 }
