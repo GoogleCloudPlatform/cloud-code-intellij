@@ -511,7 +511,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private Boolean skipSdkUpdateCheck;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
-    @Tag("java_home_directory")
     private String javaHomeDir;
 
     String getArtifact() {
