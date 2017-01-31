@@ -506,7 +506,42 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
+  JLabel getYamlLabel() {
+    return yamlLabel;
+  }
+
+  @VisibleForTesting
+  JCheckBox getYamlOverrideCheckBox() {
+    return yamlOverrideCheckBox;
+  }
+
+  @VisibleForTesting
   JLabel getServiceLabel() {
     return serviceLabel;
+  }
+
+  @VisibleForTesting
+  JTextPane getFilesWarningLabel() {
+    return filesWarningLabel;
+  }
+
+  @VisibleForTesting
+  JComboBox getModulesWithFlexFacetComboBox() {
+    return modulesWithFlexFacetComboBox;
+  }
+
+  @VisibleForTesting
+  TextFieldWithBrowseButton getArchiveSelector() {
+    return archiveSelector;
+  }
+
+  @VisibleForTesting
+  ProjectSelector getGcpProjectSelector() {
+    return gcpProjectSelector;
+  }
+
+  @VisibleForTesting
+  void setAppInfoPanel(AppEngineApplicationInfoPanel appInfoPanel) {
+    this.appInfoPanel = appInfoPanel;
   }
 }
