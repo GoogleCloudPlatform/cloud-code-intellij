@@ -446,6 +446,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     settings.setJavaHomeDir(devAppServerJdk.getHomePath());
   }
 
+  @Override
   public Boolean getClearDatastore() {
     return settings.isClearDatastore();
   }
