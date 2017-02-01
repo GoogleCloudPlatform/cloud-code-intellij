@@ -87,7 +87,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     this.deploymentConfiguration = deploymentConfiguration;
     cloudSdkPanel.reset();
 
-    yaml.setText(deploymentConfiguration.getAppYamlPath());
+    yaml.setText(deploymentConfiguration.getYamlPath());
     dockerfile.setText(deploymentConfiguration.getDockerFilePath());
 
     yaml.addBrowseFolderListener(
@@ -142,7 +142,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   @Override
   public boolean isModified() {
-    return !yaml.getText().equals(deploymentConfiguration.getAppYamlPath())
+    return !yaml.getText().equals(deploymentConfiguration.getYamlPath())
         || !dockerfile.getText().equals(deploymentConfiguration.getDockerFilePath())
         || !CloudSdkService.getInstance().getSdkHomePath().toString().equals(
             cloudSdkPanel.getCloudSdkDirectoryText()
@@ -151,7 +151,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   @Override
   public void reset() {
-    yaml.setText(deploymentConfiguration.getAppYamlPath());
+    yaml.setText(deploymentConfiguration.getYamlPath());
     dockerfile.setText(deploymentConfiguration.getDockerFilePath());
     cloudSdkPanel.reset();
 
@@ -163,7 +163,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   public void apply() throws ConfigurationException {
     validateConfiguration();
 
-    deploymentConfiguration.setAppYamlPath(yaml.getText());
+    deploymentConfiguration.setYamlPath(yaml.getText());
     deploymentConfiguration.setDockerFilePath(dockerfile.getText());
     cloudSdkPanel.apply();
 
@@ -227,7 +227,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @Override
   public void onFacetInitialized(@NotNull Facet facet) {
     if (facet instanceof AppEngineFlexibleFacet) {
-      ((AppEngineFlexibleFacet) facet).getConfiguration().setAppYamlPath(yaml.getText());
+      ((AppEngineFlexibleFacet) facet).getConfiguration().setYamlPath(yaml.getText());
       ((AppEngineFlexibleFacet) facet).getConfiguration().setDockerfilePath(dockerfile.getText());
     }
   }

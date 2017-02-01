@@ -41,7 +41,7 @@ public class AppEngineDeploymentConfiguration extends
   private String environment;
 
   private String dockerFilePath;
-  private String appYamlPath;
+  private String yamlPath;
   private boolean userSpecifiedArtifact;
   private String userSpecifiedArtifactPath;
   private boolean promote;
@@ -81,8 +81,8 @@ public class AppEngineDeploymentConfiguration extends
   }
 
   @Attribute("appYamlPath")
-  public String getAppYamlPath() {
-    return appYamlPath;
+  public String getYamlPath() {
+    return yamlPath;
   }
 
   @Attribute("promote")
@@ -134,8 +134,8 @@ public class AppEngineDeploymentConfiguration extends
     this.dockerFilePath = dockerFilePath;
   }
 
-  public void setAppYamlPath(String appYamlPath) {
-    this.appYamlPath = appYamlPath;
+  public void setYamlPath(String yamlPath) {
+    this.yamlPath = yamlPath;
   }
 
   public void setPromote(boolean promote) {

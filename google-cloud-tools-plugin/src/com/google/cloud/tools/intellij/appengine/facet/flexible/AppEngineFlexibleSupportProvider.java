@@ -107,7 +107,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       VirtualFile[] contentRoots = rootModel.getContentRoots();
       AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
       if (contentRoots.length > 0) {
-        facet.getConfiguration().setAppYamlPath(
+        facet.getConfiguration().setYamlPath(
             appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
         facet.getConfiguration().setDockerfilePath(
             appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
@@ -147,7 +147,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       // Copies the specified app.yaml and Dockerfile paths to the deployment run config.
       AppEngineDeploymentConfiguration deployConfiguration =
           new AppEngineDeploymentConfiguration();
-      deployConfiguration.setAppYamlPath(facet.getConfiguration().getAppYamlPath());
+      deployConfiguration.setYamlPath(facet.getConfiguration().getYamlPath());
       deployConfiguration.setDockerFilePath(facet.getConfiguration().getDockerfilePath());
 
       // Set logged in user.

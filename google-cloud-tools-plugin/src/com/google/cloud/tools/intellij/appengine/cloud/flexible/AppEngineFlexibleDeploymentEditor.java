@@ -42,6 +42,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Comparing;
+import com.intellij.openapi.util.Factory;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
@@ -116,6 +117,13 @@ public class AppEngineFlexibleDeploymentEditor extends
   private DeploymentSource deploymentSource;
 
   public AppEngineFlexibleDeploymentEditor(Project project, DeploymentSource deploymentSource) {
+    this(project, deploymentSource, null /* settingsFactory */);
+  }
+
+  @VisibleForTesting
+  AppEngineFlexibleDeploymentEditor(Project project, DeploymentSource deploymentSource,
+      Factory<AppEngineDeploymentConfiguration> settingsFactory) {
+    super(settingsFactory);
     this.deploymentSource = deploymentSource;
     version.getEmptyText().setText(GctBundle.getString("appengine.flex.version.placeholder.text"));
     yamlTextField.addBrowseFolderListener(
@@ -142,7 +150,7 @@ public class AppEngineFlexibleDeploymentEditor extends
             virtualFile ->
                 Comparing.equal(
                     virtualFile.getExtension(), "jar", SystemInfo.isFileSystemCaseSensitive)
-                || Comparing.equal(
+                    || Comparing.equal(
                     virtualFile.getExtension(), "war", SystemInfo.isFileSystemCaseSensitive)
         )
     );
@@ -180,9 +188,16 @@ public class AppEngineFlexibleDeploymentEditor extends
 
     yamlTextField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
-      protected void textChanged(DocumentEvent e) {
+      protected void textChanged(DocumentEvent event) {
         updateServiceName();
         toggleDockerfileSection();
+        checkConfigurationFiles();
+      }
+    });
+
+    dockerfileTextField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+      @Override
+      protected void textChanged(DocumentEvent event) {
         checkConfigurationFiles();
       }
     });
@@ -278,7 +293,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     version.setText(configuration.getVersion());
     promoteVersionCheckBox.setSelected(configuration.isPromote());
     stopPreviousVersionCheckBox.setSelected(configuration.isStopPreviousVersion());
-    yamlTextField.setText(configuration.getAppYamlPath());
+    yamlTextField.setText(configuration.getYamlPath());
     dockerfileTextField.setText(configuration.getDockerFilePath());
     gcpProjectSelector.setText(configuration.getCloudProjectName());
     yamlTextField.setVisible(configuration.isOverrideYaml());
@@ -302,8 +317,8 @@ public class AppEngineFlexibleDeploymentEditor extends
     configuration.setVersion(version.getText());
     configuration.setPromote(promoteVersionCheckBox.isSelected());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckBox.isSelected());
-    configuration.setAppYamlPath(getYamlPath());
-    configuration.setDockerFilePath(dockerfileTextField.getText());
+    configuration.setYamlPath(getYamlPath());
+    configuration.setDockerFilePath(getDockerfilePath());
     configuration.setCloudProjectName(gcpProjectSelector.getText());
     CredentialedUser user = gcpProjectSelector.getSelectedUser();
     if (user != null) {
@@ -347,35 +362,33 @@ public class AppEngineFlexibleDeploymentEditor extends
       throw new ConfigurationException(GctBundle.message(
           "appengine.cloudsdk.deploymentconfiguration.location.invalid.message"));
     }
-    if (yamlOverrideCheckBox.isSelected()) {
-      if (StringUtils.isBlank(yamlTextField.getText())) {
+    if (StringUtils.isBlank(getYamlPath())) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.flex.config.browse.app.yaml"));
+    }
+    try {
+      if (!Files.exists(Paths.get(getYamlPath()))) {
         throw new ConfigurationException(
-            GctBundle.message("appengine.flex.config.browse.app.yaml"));
+            GctBundle.getString("appengine.deployment.error.staging.yaml"));
+      }
+    } catch (InvalidPathException ipe) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.flex.config.badchars", "Yaml"));
+    }
+    if (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
+        getYamlPath()).equals(FlexibleRuntime.CUSTOM)) {
+      if (StringUtils.isBlank(getDockerfilePath())) {
+        throw new ConfigurationException(
+            GctBundle.message("appengine.flex.config.browse.dockerfile"));
       }
       try {
-        if (!Files.exists(Paths.get(getYamlPath()))) {
+        if (!Files.exists(Paths.get(getDockerfilePath()))) {
           throw new ConfigurationException(
-              GctBundle.getString("appengine.deployment.error.staging.yaml"));
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
         }
       } catch (InvalidPathException ipe) {
         throw new ConfigurationException(
-            GctBundle.message("appengine.flex.config.badchars", "Yaml"));
-      }
-      if (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-          getYamlPath()).equals(FlexibleRuntime.CUSTOM)) {
-        if (StringUtils.isBlank(dockerfileTextField.getText())) {
-          throw new ConfigurationException(
-              GctBundle.message("appengine.flex.config.browse.dockerfile"));
-        }
-        try {
-          if (!Files.exists(Paths.get(dockerfileTextField.getText()))) {
-            throw new ConfigurationException(
-                GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
-          }
-        } catch (InvalidPathException ipe) {
-          throw new ConfigurationException(
-              GctBundle.message("appengine.flex.config.badchars", "Dockerfile"));
-        }
+            GctBundle.message("appengine.flex.config.badchars", "Dockerfile"));
       }
     }
     if (!appInfoPanel.isApplicationValid()) {
@@ -451,7 +464,7 @@ public class AppEngineFlexibleDeploymentEditor extends
       }
     } catch (InvalidPathException ipe) {
       textField.setForeground(Color.RED);
-      label.setForeground(Color.BLACK);
+      label.setForeground(Color.RED);
     }
   }
 
@@ -471,7 +484,23 @@ public class AppEngineFlexibleDeploymentEditor extends
     return Optional.ofNullable(
         FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
         .getFacetByType(AppEngineFlexibleFacetType.ID))
-        .map(flexFacet -> flexFacet.getConfiguration().getAppYamlPath())
+        .map(flexFacet -> flexFacet.getConfiguration().getYamlPath())
+        .orElse("");
+  }
+
+  private String getDockerfilePath() {
+    if (dockerfileOverrideCheckBox.isSelected()) {
+      return dockerfileTextField.getText();
+    }
+
+    if (modulesWithFlexFacetComboBox.getSelectedItem() == null) {
+      return "";
+    }
+
+    return Optional.ofNullable(
+        FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
+            .getFacetByType(AppEngineFlexibleFacetType.ID))
+        .map(flexFacet -> flexFacet.getConfiguration().getDockerfilePath())
         .orElse("");
   }
 
@@ -543,5 +572,10 @@ public class AppEngineFlexibleDeploymentEditor extends
   @VisibleForTesting
   void setAppInfoPanel(AppEngineApplicationInfoPanel appInfoPanel) {
     this.appInfoPanel = appInfoPanel;
+  }
+
+  @VisibleForTesting
+  void setDeploymentSource(DeploymentSource deploymentSource) {
+    this.deploymentSource = deploymentSource;
   }
 }

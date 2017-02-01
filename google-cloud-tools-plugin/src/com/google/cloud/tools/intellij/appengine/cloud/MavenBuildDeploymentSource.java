@@ -16,16 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.xml.XmlFile;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
-
-import icons.MavenIcons;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,9 +29,10 @@ import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import java.io.File;
-import java.util.Collections;
 
 import javax.swing.Icon;
+
+import icons.MavenIcons;
 
 /**
  * A deployment source backed by the Maven build system.

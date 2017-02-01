@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     PersistentStateComponent<AppEngineFlexibleFacetConfiguration> {
 
-  private String appYamlPath = "";
+  private String yamlPath = "";
   private String dockerfilePath = "";
 
   @Override
@@ -45,7 +45,7 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
       FacetValidatorsManager validatorsManager) {
     AppEngineDeploymentConfiguration deploymentConfiguration =
         new AppEngineDeploymentConfiguration();
-    deploymentConfiguration.setAppYamlPath(appYamlPath);
+    deploymentConfiguration.setYamlPath(yamlPath);
     deploymentConfiguration.setDockerFilePath(dockerfilePath);
     return new FacetEditorTab[]{
       new FlexibleFacetEditor(deploymentConfiguration, editorContext.getProject())
@@ -70,20 +70,20 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
 
   @Override
   public void loadState(AppEngineFlexibleFacetConfiguration state) {
-    appYamlPath = state.getAppYamlPath();
+    yamlPath = state.getYamlPath();
     dockerfilePath = state.getDockerfilePath();
   }
 
-  public String getAppYamlPath() {
-    return appYamlPath;
+  public String getYamlPath() {
+    return yamlPath;
   }
 
   public String getDockerfilePath() {
     return dockerfilePath;
   }
 
-  public void setAppYamlPath(String appYamlPath) {
-    this.appYamlPath = appYamlPath;
+  public void setYamlPath(String yamlPath) {
+    this.yamlPath = yamlPath;
   }
 
   public void setDockerfilePath(String dockerfilePath) {

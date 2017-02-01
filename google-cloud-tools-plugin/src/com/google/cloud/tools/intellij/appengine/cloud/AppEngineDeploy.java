@@ -83,7 +83,7 @@ public class AppEngineDeploy {
     String yamlName = deploymentConfiguration.getEnvironment().equals(
         AppEngineEnvironment.APP_ENGINE_STANDARD.name())
         ? "app.yaml"
-        : Paths.get(deploymentConfiguration.getAppYamlPath()).getFileName().toString();
+        : Paths.get(deploymentConfiguration.getYamlPath()).getFileName().toString();
     configuration.setDeployables(
         Collections.singletonList(stagingDirectory.resolve(yamlName).toFile()));
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
