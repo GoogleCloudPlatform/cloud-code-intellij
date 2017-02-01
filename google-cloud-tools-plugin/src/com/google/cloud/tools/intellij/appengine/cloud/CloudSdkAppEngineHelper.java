@@ -201,13 +201,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       Path artifactToDeploy,
       AppEngineDeploymentConfiguration config,
       AppEngineDeploy deploy) {
-    AppEngineFlexibleStage flexibleStage = new AppEngineFlexibleStage(
-          this,
-          loggingHandler,
-          artifactToDeploy,
-          config);
-
-    return new AppEngineExecutor(new AppEngineFlexibleDeployTask(deploy, flexibleStage));
+    return new AppEngineExecutor(
+        new AppEngineFlexibleDeployTask(deploy,
+            new AppEngineFlexibleStage(loggingHandler, artifactToDeploy, config)));
   }
 
   @Override

@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -36,7 +35,6 @@ import java.nio.file.Paths;
  * Stages an application in preparation for deployment to the App Engine flexible environment.
  */
 public class AppEngineFlexibleStage {
-  private CloudSdkAppEngineHelper helper;
   private LoggingHandler loggingHandler;
   private Path deploymentArtifactPath;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
@@ -45,11 +43,9 @@ public class AppEngineFlexibleStage {
    * Initialize the staging dependencies.
    */
   public AppEngineFlexibleStage(
-      @NotNull CloudSdkAppEngineHelper helper,
       @NotNull LoggingHandler loggingHandler,
       @NotNull Path deploymentArtifactPath,
       @NotNull AppEngineDeploymentConfiguration deploymentConfiguration) {
-    this.helper = helper;
     this.loggingHandler = loggingHandler;
     this.deploymentArtifactPath = deploymentArtifactPath;
     this.deploymentConfiguration = deploymentConfiguration;
