@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -60,13 +61,15 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
     );
 
     // Suggests the parent of the specified file as directory.
-    try {
-      Path file = Paths.get(filePath);
-      if (file.getParent() != null) {
-        destinationFolderChooser.setText(file.getParent().toString());
+    if (filePath != null) {
+      try {
+        Path file = Paths.get(filePath);
+        if (file.getParent() != null) {
+          destinationFolderChooser.setText(file.getParent().toString());
+        }
+      } catch (InvalidPathException ipe) {
+        // Do not assume any default directory and let the user specify one.
       }
-    } catch (InvalidPathException ipe) {
-      // Do not assume any default directory and let the user specify one.
     }
   }
 
