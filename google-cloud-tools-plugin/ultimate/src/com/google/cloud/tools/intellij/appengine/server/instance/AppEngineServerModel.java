@@ -437,6 +437,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return devAppServerJdk.getHomePath();
   }
 
+  @Override
   public Boolean getClearDatastore() {
     return settings.isClearDatastore();
   }
