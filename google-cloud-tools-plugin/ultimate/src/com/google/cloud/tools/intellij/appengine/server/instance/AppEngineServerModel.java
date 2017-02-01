@@ -434,16 +434,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public String getJavaHomeDir() {
-    return settings.getJavaHomeDir();
-  }
-
-  public Sdk getDevAppServerJdk() {
-    return devAppServerJdk;
-  }
-
-  public void setDevAppServerJdk(Sdk devAppServerJdk) {
-    this.devAppServerJdk = devAppServerJdk;
-    settings.setJavaHomeDir(devAppServerJdk.getHomePath());
+    return devAppServerJdk.getHomePath();
   }
 
   @Override
@@ -453,6 +444,10 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   public void setClearDatastore(Boolean clearDatastore) {
     settings.setClearDatastore(clearDatastore);
+  }
+
+  private void setDevAppServerJdk(Sdk devAppServerJdk) {
+    this.devAppServerJdk = devAppServerJdk;
   }
 
   /**
@@ -512,8 +507,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private Boolean skipSdkUpdateCheck;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
-    @Tag("java_home_directory")
-    private String javaHomeDir;
 
     String getArtifact() {
       return artifact;
@@ -689,14 +682,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     void setDefaultGcsBucketName(String defaultGcsBucketName) {
       this.defaultGcsBucketName = defaultGcsBucketName;
-    }
-
-    String getJavaHomeDir() {
-      return javaHomeDir;
-    }
-
-    void setJavaHomeDir(String javaHomeDir) {
-      this.javaHomeDir = javaHomeDir;
     }
 
     Boolean isClearDatastore() {
