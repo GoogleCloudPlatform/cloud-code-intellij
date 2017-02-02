@@ -372,10 +372,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
    * the default localized label of the environment
    */
   private String getEnvironmentDisplayableLabel() {
-    if (AppEngineProjectService.getInstance().isFlexCompatEnvFlex(project, deploymentSource)) {
-      return GctBundle.message("appengine.environment.name.mvm");
-    }
-
     return environment.localizedLabel();
   }
 
