@@ -16,14 +16,20 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.standard;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.common.collect.ImmutableSet;
 
@@ -33,6 +39,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestCase;
 
 import org.apache.commons.lang.StringUtils;
+import org.mockito.Mock;
 import org.picocontainer.MutablePicoContainer;
 
 import java.util.HashSet;
@@ -44,7 +51,12 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
   private AppEngineArtifactDeploymentSource deploymentSource;
   private ProjectSelector projectSelector;
   private CloudSdkService cloudSdkService;
+  @Mock
   private AppEngineApplicationInfoPanel infoPanel;
+  @Mock
+  private Project gcpProject;
+  @Mock
+  private CredentialedUser gcpUser;
 
   @Override
   public void setUp() throws Exception {
@@ -52,6 +64,8 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
 
     deploymentSource = mock(AppEngineArtifactDeploymentSource.class);
     when(deploymentSource.isValid()).thenReturn(true);
+
+    gcpProject = mock(Project.class);
 
     projectSelector = mock(ProjectSelector.class);
     when(projectSelector.getText()).thenReturn(PROJECT_NAME);
@@ -61,6 +75,7 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
 
     infoPanel = mock(AppEngineApplicationInfoPanel.class);
     when(infoPanel.isApplicationValid()).thenReturn(true);
+    doNothing().when(infoPanel).refresh(anyString(), isA(Credential.class));
 
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();
@@ -75,19 +90,15 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
     editor.setApplicationInfoPanel(infoPanel);
   }
 
-  public void testValidSelections() {
+  public void testValidateConfiguration() throws ConfigurationException {
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     config.setCloudProjectName("test-cloud-proj");
     when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<>());
 
-    try {
-      editor.applyEditorTo(config);
-    } catch (ConfigurationException ce) {
-      fail("No validation error expected");
-    }
+    editor.applyEditorTo(config);
   }
 
-  public void testInvalidDeploymentSource() {
+  public void testValidateConfiguration_invalidDeploymentSource() {
     when(deploymentSource.isValid()).thenReturn(false);
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
 
@@ -99,7 +110,7 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
     }
   }
 
-  public void testBlankProjectSelector() {
+  public void testValidateConfiguration_blankProjectSelector() {
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     when(projectSelector.getText()).thenReturn("");
 
@@ -111,7 +122,7 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
     }
   }
 
-  public void testInvalidApplication() {
+  public void testValidateConfiguration_invalidApplication() {
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
     when(infoPanel.isApplicationValid()).thenReturn(false);
 
@@ -124,7 +135,7 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
     }
   }
 
-  public void testInvalidCloudSdk() {
+  public void testValidateConfiguration_invalidCloudSdk() {
     when(cloudSdkService.validateCloudSdk()).thenReturn(
         ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
@@ -139,7 +150,7 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
     }
   }
 
-  public void testMissingJavaComponent() {
+  public void testValidateConfiguration_missingJavaComponent() {
     when(cloudSdkService.validateCloudSdk()).thenReturn(
         ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
     AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
@@ -159,8 +170,6 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
     editor.getPromoteCheckbox().setSelected(false);
     assertFalse(editor.getStopPreviousVersionCheckbox().isEnabled());
     assertFalse(editor.getStopPreviousVersionCheckbox().isSelected());
-
-    Disposer.dispose(editor);
   }
 
   @Override

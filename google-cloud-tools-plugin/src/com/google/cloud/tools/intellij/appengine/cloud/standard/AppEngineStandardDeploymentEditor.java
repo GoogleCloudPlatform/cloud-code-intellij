@@ -36,6 +36,7 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.util.ui.tree.TreeModelAdapter;
 
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -110,24 +111,9 @@ public class AppEngineStandardDeploymentEditor extends
         applicationInfoPanel.refresh(event.getSelectedProject().getProjectId(),
             event.getUser().getCredential()));
 
-    projectSelector.addModelListener(new TreeModelListener() {
+    projectSelector.addModelListener(new TreeModelAdapter() {
       @Override
-      public void treeNodesChanged(TreeModelEvent e) {
-        // Do nothing.
-      }
-
-      @Override
-      public void treeNodesInserted(TreeModelEvent e) {
-        // Do nothing.
-      }
-
-      @Override
-      public void treeNodesRemoved(TreeModelEvent e) {
-        // Do nothing.
-      }
-
-      @Override
-      public void treeStructureChanged(TreeModelEvent e) {
+      public void treeStructureChanged(TreeModelEvent event) {
         // projects have finished loading
         refreshApplicationInfoPanel();
       }

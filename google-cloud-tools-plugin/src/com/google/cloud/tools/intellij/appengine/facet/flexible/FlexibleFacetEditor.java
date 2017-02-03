@@ -28,6 +28,7 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorTab;
@@ -60,6 +61,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 
 /**
@@ -81,7 +83,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private AppEngineDeploymentConfiguration deploymentConfiguration;
   private AppEngineHelper appEngineHelper;
 
-  public FlexibleFacetEditor(@Nullable AppEngineDeploymentConfiguration deploymentConfiguration,
+  FlexibleFacetEditor(@Nullable AppEngineDeploymentConfiguration deploymentConfiguration,
       @Nullable Project project) {
     this.appEngineHelper = new CloudSdkAppEngineHelper(project);
     this.deploymentConfiguration = deploymentConfiguration;
@@ -198,12 +200,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     try {
       if (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yaml.getText())
-          .equals(FlexibleRuntime.CUSTOM)
-          && (!Files.exists(Paths.get(dockerfile.getText()))
-          || !Files.isRegularFile(Paths.get(dockerfile.getText())))) {
-        dockerfile.getTextField().setForeground(Color.RED);
-      } else {
-        dockerfile.getTextField().setForeground(Color.BLACK);
+          .equals(FlexibleRuntime.CUSTOM)) {
+        if (!Files.exists(Paths.get(dockerfile.getText()))
+            || !Files.isRegularFile(Paths.get(dockerfile.getText()))) {
+          dockerfile.getTextField().setForeground(Color.RED);
+        } else {
+          dockerfile.getTextField().setForeground(Color.BLACK);
+        }
       }
     } catch (InvalidPathException ipe) {
       dockerfile.getTextField().setForeground(Color.RED);
@@ -219,6 +222,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private void setDockerfileVisibility() {
     boolean visible = APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
         yaml.getText()).equals(FlexibleRuntime.CUSTOM);
+    // TODO(joaomartins): Gotta disable the Dockerfile box instead of hiding it
     dockerfileLabel.setVisible(visible);
     dockerfile.setVisible(visible);
     genDockerfileButton.setVisible(visible);
@@ -297,5 +301,30 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         callback.run();
       }
     }
+  }
+
+  @VisibleForTesting
+  TextFieldWithBrowseButton getYaml() {
+    return yaml;
+  }
+
+  @VisibleForTesting
+  TextFieldWithBrowseButton getDockerfile() {
+    return dockerfile;
+  }
+
+  @VisibleForTesting
+  JButton getGenDockerfileButton() {
+    return genDockerfileButton;
+  }
+
+  @VisibleForTesting
+  JLabel getDockerfileLabel() {
+    return dockerfileLabel;
+  }
+
+  @VisibleForTesting
+  JTextPane getFilesWarningLabel() {
+    return filesWarningLabel;
   }
 }
