@@ -172,6 +172,10 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
     assertFalse(editor.getStopPreviousVersionCheckbox().isSelected());
   }
 
+  public void testStopPreviousVersionCheckbox() {
+
+  }
+
   @Override
   protected void tearDown() throws Exception {
     Disposer.dispose(editor);

@@ -49,7 +49,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 
 /**
  * Editor for an App Engine Deployment runtime configuration.
@@ -65,6 +64,7 @@ public class AppEngineStandardDeploymentEditor extends
   private AppEngineApplicationInfoPanel applicationInfoPanel;
   private JLabel serviceLabel;
 
+  private Project project;
   private DeploymentSource deploymentSource;
 
   private static final String LABEL_OPEN_TAG = "<html><font face='sans' size='-1'>";
@@ -82,11 +82,15 @@ public class AppEngineStandardDeploymentEditor extends
    */
   public AppEngineStandardDeploymentEditor(Project project,
       final AppEngineDeployable deploymentSource) {
+    this.project = project;
     this.deploymentSource = deploymentSource;
 
     versionIdField.getEmptyText().setText(
         GctBundle.message("appengine.flex.version.placeholder.text"));
     promoteCheckbox.setSelected(PROMOTE_DEFAULT);
+    stopPreviousVersionCheckbox.setVisible(
+        AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource)
+    );
     stopPreviousVersionCheckbox.setSelected(STOP_PREVIOUS_VERSION_DEFAULT);
 
     promoteInfoLabel.setText(
@@ -136,6 +140,9 @@ public class AppEngineStandardDeploymentEditor extends
     refreshApplicationInfoPanel();
 
     promoteCheckbox.setSelected(configuration.isPromote());
+    stopPreviousVersionCheckbox.setVisible(
+        AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource)
+    );
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     versionIdField.setText(configuration.getVersion());
   }
@@ -150,10 +157,16 @@ public class AppEngineStandardDeploymentEditor extends
     if (selectedUser != null) {
       configuration.setGoogleUsername(selectedUser.getEmail());
     }
-    configuration.setEnvironment(AppEngineEnvironment.APP_ENGINE_STANDARD.name());
+    boolean isFlexCompat =
+        AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource);
+    configuration.setEnvironment(
+        isFlexCompat ? AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT.name()
+            : AppEngineEnvironment.APP_ENGINE_STANDARD.name());
+    if (isFlexCompat) {
+      configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
+    }
     configuration.setVersion(versionIdField.getText());
     configuration.setPromote(promoteCheckbox.isSelected());
-    configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
 
     setDeploymentProjectAndVersion();
   }
@@ -199,11 +212,6 @@ public class AppEngineStandardDeploymentEditor extends
   @Override
   protected JComponent createEditor() {
     return editorPanel;
-  }
-
-  @VisibleForTesting
-  JBTextField getVersionIdField() {
-    return versionIdField;
   }
 
   @VisibleForTesting

@@ -154,11 +154,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         targetEnvironment,
         wrapCallbackForUsageTracking(callback, targetEnvironment));
 
-    boolean isFlexCompat = targetEnvironment.isFlexible()
-        && AppEngineProjectService.getInstance().isFlexCompat(project, source);
-    if (targetEnvironment.isStandard()) {
+    if (targetEnvironment.isStandard() || targetEnvironment.isFlexCompat()) {
       return Optional.of(createStandardRunner(loggingHandler, Paths.get(source.getFilePath()),
-          deploy, isFlexCompat));
+          deploy, targetEnvironment.isFlexCompat()));
     } else if (targetEnvironment.isFlexible()) {
       // Checks if the Yaml or Dockerfile exist.
       FlexibleRuntime runtime =

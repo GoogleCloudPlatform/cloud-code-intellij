@@ -80,10 +80,15 @@ public class AppEngineDeploy {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
-    String yamlName = deploymentConfiguration.getEnvironment().equals(
-        AppEngineEnvironment.APP_ENGINE_STANDARD.name())
-        ? "app.yaml"
-        : Paths.get(deploymentConfiguration.getYamlPath()).getFileName().toString();
+    String yamlName =
+        deploymentConfiguration
+            .getEnvironment()
+            .equals(AppEngineEnvironment.APP_ENGINE_STANDARD.name())
+            || deploymentConfiguration
+            .getEnvironment()
+            .equals(AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT.name())
+            ? "app.yaml"
+            : Paths.get(deploymentConfiguration.getYamlPath()).getFileName().toString();
     configuration.setDeployables(
         Collections.singletonList(stagingDirectory.resolve(yamlName).toFile()));
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
@@ -93,7 +98,8 @@ public class AppEngineDeploy {
     // Only send stopPreviousVersion if the environment is AE flexible (since standard does not
     // support stop), and if promote is true (since its invalid to stop the previous version without
     // promoting).
-    if (environment.isFlexible() && deploymentConfiguration.isPromote()) {
+    if ((environment.isFlexible() || environment.isFlexCompat())
+        && deploymentConfiguration.isPromote()) {
       configuration.setStopPreviousVersion(deploymentConfiguration.isStopPreviousVersion());
     }
 

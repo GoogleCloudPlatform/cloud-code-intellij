@@ -23,7 +23,8 @@ import com.google.cloud.tools.intellij.util.GctBundle;
  */
 public enum AppEngineEnvironment {
   APP_ENGINE_STANDARD("appengine.environment.name.standard"),
-  APP_ENGINE_FLEX("appengine.environment.name.flexible");
+  APP_ENGINE_FLEX("appengine.environment.name.flexible"),
+  APP_ENGINE_FLEX_COMPAT("appengine.environment.name.flexcompat");
 
   private final String label;
 
@@ -39,8 +40,8 @@ public enum AppEngineEnvironment {
     return this == APP_ENGINE_FLEX;
   }
 
-  public String localizedLabel() {
-    return GctBundle.message(label);
+  public boolean isFlexCompat() {
+    return this == APP_ENGINE_FLEX_COMPAT;
   }
 }
 
