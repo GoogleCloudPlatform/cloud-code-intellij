@@ -85,6 +85,7 @@ public abstract class AppEngineStandardWebIntegration {
   @NotNull
   public abstract FrameworkRole[] getFrameworkRoles();
 
+  // TODO(joaomartins): Delete unused code.
   public abstract void setupJpaSupport(@NotNull Module module, @NotNull VirtualFile persistenceXml);
 
   public void setupRunConfigurations(@Nullable Artifact artifact, @Nullable Module module,
@@ -95,6 +96,7 @@ public abstract class AppEngineStandardWebIntegration {
 
   public abstract void setupDevServer();
 
+  // TODO(joaomartins): Delete unused code.
   public abstract void addDevServerToModuleDependencies(@NotNull ModifiableRootModel rootModel);
 
   public abstract void addLibraryToArtifact(@NotNull Library library, @NotNull Artifact artifact,
@@ -119,7 +121,7 @@ public abstract class AppEngineStandardWebIntegration {
     RunManager runManager = RunManager.getInstance(module.getProject());
     ConfigurationFactoryEx factory = configurationType.getFactory();
     RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
-        configurationType.getDisplayName() + " " + module.getName(), factory);
+        configurationType.getDisplayName(), factory);
     DeployToServerRunConfiguration<?, ?> runConfiguration
         = (DeployToServerRunConfiguration<?, ?>)settings.getConfiguration();
 

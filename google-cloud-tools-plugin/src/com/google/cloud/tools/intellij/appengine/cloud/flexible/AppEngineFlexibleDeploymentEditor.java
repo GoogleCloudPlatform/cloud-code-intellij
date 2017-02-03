@@ -113,17 +113,11 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JComboBox<Module> modulesWithFlexFacetComboBox;
   private JCheckBox yamlOverrideCheckBox;
   private JCheckBox dockerfileOverrideCheckBox;
+  private String dockerfileOverride = "";
   private JButton yamlModuleSettings;
   private DeploymentSource deploymentSource;
 
   public AppEngineFlexibleDeploymentEditor(Project project, DeploymentSource deploymentSource) {
-    this(project, deploymentSource, null /* settingsFactory */);
-  }
-
-  @VisibleForTesting
-  AppEngineFlexibleDeploymentEditor(Project project, DeploymentSource deploymentSource,
-      Factory<AppEngineDeploymentConfiguration> settingsFactory) {
-    super(settingsFactory);
     this.deploymentSource = deploymentSource;
     version.getEmptyText().setText(GctBundle.getString("appengine.flex.version.placeholder.text"));
     yamlTextField.addBrowseFolderListener(
@@ -167,7 +161,7 @@ public class AppEngineFlexibleDeploymentEditor extends
         }
     );
 
-    yamlOverrideCheckBox.addActionListener(
+    yamlOverrideCheckBox.addChangeListener(
         event -> {
           boolean isYamlOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
           yamlTextField.setVisible(isYamlOverrideSelected);
@@ -177,14 +171,22 @@ public class AppEngineFlexibleDeploymentEditor extends
           }
         });
 
-    dockerfileOverrideCheckBox.addActionListener(
+    dockerfileOverrideCheckBox.addChangeListener(
         event -> {
           boolean isDockerfileOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
           dockerfileTextField.setEnabled(isDockerfileOverrideSelected);
           if (isDockerfileOverrideSelected) {
+            if (dockerfileOverride.isEmpty()) {
+              dockerfileOverride = dockerfileTextField.getText();
+            }
+            dockerfileTextField.setText(dockerfileOverride);
             checkConfigurationFiles();
+          } else {
+            dockerfileOverride = dockerfileTextField.getText();
+            dockerfileTextField.setText(getDockerfilePath());
           }
-        });
+        }
+    );
 
     yamlTextField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
@@ -297,7 +299,6 @@ public class AppEngineFlexibleDeploymentEditor extends
     dockerfileTextField.setText(configuration.getDockerFilePath());
     gcpProjectSelector.setText(configuration.getCloudProjectName());
     yamlTextField.setVisible(configuration.isOverrideYaml());
-    dockerfileTextField.setEnabled(configuration.isOverrideDockerfile());
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
     yamlOverrideCheckBox.setSelected(configuration.isOverrideYaml());
     dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile());
@@ -373,7 +374,7 @@ public class AppEngineFlexibleDeploymentEditor extends
       }
     } catch (InvalidPathException ipe) {
       throw new ConfigurationException(
-          GctBundle.message("appengine.flex.config.badchars", "Yaml"));
+          GctBundle.message("appengine.flex.config.badchars", "YAML"));
     }
     if (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
         getYamlPath()).equals(FlexibleRuntime.CUSTOM)) {
@@ -432,7 +433,11 @@ public class AppEngineFlexibleDeploymentEditor extends
         getYamlPath()).equals(FlexibleRuntime.CUSTOM);
     dockerfileOverrideCheckBox.setVisible(isCustomRuntime);
     dockerfileTextField.setVisible(isCustomRuntime);
+    dockerfileTextField.setEnabled(dockerfileOverrideCheckBox.isSelected());
     dockerfileLabel.setVisible(isCustomRuntime);
+    if (isCustomRuntime) {
+      dockerfileTextField.setText(getDockerfilePath());
+    }
   }
 
   private void checkConfigurationFiles() {

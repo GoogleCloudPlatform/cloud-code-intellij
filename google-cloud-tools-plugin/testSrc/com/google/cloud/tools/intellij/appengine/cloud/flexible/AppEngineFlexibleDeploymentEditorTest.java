@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableSet;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
@@ -307,7 +308,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       editor.applyEditorTo(templateConfig);
       fail("Blank yaml.");
     } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a Yaml file.", cfe.getMessage());
+      assertEquals("Browse to a YAML file.", cfe.getMessage());
     }
   }
 
@@ -318,7 +319,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       editor.applyEditorTo(templateConfig);
       fail("Null yaml.");
     } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a Yaml file.", cfe.getMessage());
+      assertEquals("Browse to a YAML file.", cfe.getMessage());
     }
   }
 
@@ -329,7 +330,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       editor.applyEditorTo(templateConfig);
       fail("The yaml file doesn't exist.");
     } catch (ConfigurationException cfe) {
-      assertEquals("The specified Yaml configuration file does not exist.", cfe.getMessage());
+      assertEquals("The specified YAML configuration file does not exist.", cfe.getMessage());
     }
   }
 
@@ -393,6 +394,32 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
 
     assertFalse(stopPreviousVersionCheckbox.isSelected());
     assertFalse(stopPreviousVersionCheckbox.isEnabled());
+  }
+
+  public void testDockerfileOverride() {
+    editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
+    String previousDockerfile = editor.getDockerfileTextField().getText();
+    editor.getDockerfileOverrideCheckBox().setSelected(true);
+    // Tests that the first override will be the previous value
+    assertEquals(previousDockerfile, editor.getDockerfileTextField().getText());
+
+    editor.getDockerfileTextField().setText("an override");
+    editor.getDockerfileOverrideCheckBox().setSelected(false);
+    // When override is unselected, value goes back to module setting
+    assertEquals(previousDockerfile, editor.getDockerfileTextField().getText());
+
+    editor.getDockerfileOverrideCheckBox().setSelected(true);
+    // Override is memorized and gets restored
+    assertEquals("an override", editor.getDockerfileTextField().getText());
+  }
+
+  public void testDockerfileStartsDisabledAndWithModuleSetting() {
+    ApplicationManager.getApplication().runWriteAction(
+        () -> ModuleManager.getInstance(getProject()).disposeModule(javaModule));
+    editor = new AppEngineFlexibleDeploymentEditor(getProject(), deploymentSource);
+    assertEquals(1, editor.getModulesWithFlexFacetComboBox().getItemCount());
+    assertFalse(editor.getDockerfileTextField().isEnabled());
+    assertEquals(dockerfile.getPath(), editor.getDockerfileTextField().getText());
   }
 
   @Override

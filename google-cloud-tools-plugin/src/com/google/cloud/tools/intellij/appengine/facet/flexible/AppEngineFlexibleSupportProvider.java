@@ -131,8 +131,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
           = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
 
       RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
-          configurationType.getDisplayName() + " " + module.getName(),
-          configurationType.getFactory());
+          configurationType.getDisplayName(), configurationType.getFactory());
 
       // Sets the GAE Flex server, if any exists, in the run config.
       DeployToServerRunConfiguration<?, AppEngineDeploymentConfiguration> runConfiguration =

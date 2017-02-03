@@ -61,7 +61,7 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
       stage.stage(stagingDirectory);
       fail("No yaml file.");
     } catch (RuntimeException re) {
-      assertEquals("The specified Yaml configuration file does not exist.", re.getMessage());
+      assertEquals("The specified YAML configuration file does not exist.", re.getMessage());
     }
   }
 
