@@ -77,11 +77,13 @@ public class AppEngineDeploymentConfigurator extends
       return null;
     }
 
-    AppEngineEnvironment environment = ((AppEngineDeployable) source).getEnvironment();
+    AppEngineDeployable gaeSource = (AppEngineDeployable) source;
+
+    AppEngineEnvironment environment = gaeSource.getEnvironment();
     if (environment != null && environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
-      return new AppEngineFlexibleDeploymentEditor(project, source);
+      return new AppEngineFlexibleDeploymentEditor(project, gaeSource);
     }
 
-    return new AppEngineStandardDeploymentEditor(project, (AppEngineDeployable) source);
+    return new AppEngineStandardDeploymentEditor(project, gaeSource);
   }
 }

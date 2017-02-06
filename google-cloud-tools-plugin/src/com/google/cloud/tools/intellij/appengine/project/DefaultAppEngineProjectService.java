@@ -18,7 +18,9 @@ package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardRuntime;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.common.collect.ImmutableList;
 
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
@@ -94,9 +96,21 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public AppEngineEnvironment getModuleAppEngineEnvironment(Module module) {
-    return FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacet.ID) == null
-        ? AppEngineEnvironment.APP_ENGINE_FLEX : AppEngineEnvironment.APP_ENGINE_STANDARD;
+  public Optional<AppEngineEnvironment> getModuleAppEngineEnvironment(Module module) {
+    if (FacetManager.getInstance(module).getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
+      return Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX);
+    }
+
+    if (FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacet.ID) != null) {
+      if (isFlexCompat(AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(
+          module.getProject(), ImmutableList.of(module)))) {
+        return Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT);
+      }
+
+      return Optional.of(AppEngineEnvironment.APP_ENGINE_STANDARD);
+    }
+
+    return Optional.empty();
   }
 
   @Override

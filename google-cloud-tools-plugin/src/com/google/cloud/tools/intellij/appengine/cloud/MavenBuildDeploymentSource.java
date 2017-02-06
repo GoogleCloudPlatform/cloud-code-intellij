@@ -129,7 +129,9 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
     // The environment will be null for newly deserialized deployment sources to ensure freshness.
     // In this case, we need to reload the environment.
     if (environment == null) {
-      environment = projectService.getModuleAppEngineEnvironment(getModule());
+      environment = projectService.getModuleAppEngineEnvironment(getModule()).orElseThrow(
+          () -> new RuntimeException("No environment.")
+      );
     }
 
     if (environment.isFlexible()) {

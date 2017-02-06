@@ -22,11 +22,13 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeployme
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
 
+import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -50,6 +52,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.JComboBox;
@@ -81,16 +84,29 @@ public class AppEngineUtil {
     AppEngineProjectService projectService = AppEngineProjectService.getInstance();
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
-      final AppEngineEnvironment environment = projectService.getModuleAppEngineEnvironment(module);
+      FacetManager facetManager = FacetManager.getInstance(module);
+      if (facetManager.getFacetByType(AppEngineStandardFacet.ID) != null
+          || facetManager.getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
+        final AppEngineEnvironment environment =
+            projectService.getModuleAppEngineEnvironment(module).orElseThrow(
+                () -> new RuntimeException("No environment."));
 
-      Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
-      sources.addAll(artifacts.stream().filter(artifact ->
-          (environment.isStandard() && projectService.isAppEngineStandardArtifactType(artifact))
-              || (!environment.isStandard() && projectService.isAppEngineFlexArtifactType(
-                  artifact)))
-          .map(artifact ->
-              AppEngineUtil.createArtifactDeploymentSource(project, artifact, environment))
-          .collect(toList()));
+        Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
+        sources.addAll(
+            artifacts
+                .stream()
+                .filter(
+                    artifact ->
+                        ((environment.isStandard() || environment.isFlexCompat())
+                                && projectService.isAppEngineStandardArtifactType(artifact))
+                            || (environment.isFlexible()
+                                && projectService.isAppEngineFlexArtifactType(artifact)))
+                .map(
+                    artifact ->
+                        AppEngineUtil.createArtifactDeploymentSource(
+                            project, artifact, environment))
+                .collect(toList()));
+      }
     }
 
     return sources;
@@ -116,15 +132,21 @@ public class AppEngineUtil {
     boolean hasStandardModules = false;
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
-      AppEngineEnvironment environment = projectService.getModuleAppEngineEnvironment(module);
+      FacetManager facetManager = FacetManager.getInstance(module);
+      if (facetManager.getFacetByType(AppEngineStandardFacet.ID) != null
+          || facetManager.getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
+        AppEngineEnvironment environment = projectService.getModuleAppEngineEnvironment(module)
+            .orElseThrow(() -> new RuntimeException("No environment."));
 
-      if (ModuleType.is(module, JavaModuleType.getModuleType())
-          && projectService.isJarOrWarMavenBuild(module)) {
-        moduleDeploymentSources.add(createMavenBuildDeploymentSource(project, module, environment));
-      }
+        if (ModuleType.is(module, JavaModuleType.getModuleType())
+            && projectService.isJarOrWarMavenBuild(module)) {
+          moduleDeploymentSources
+              .add(createMavenBuildDeploymentSource(project, module, environment));
+        }
 
-      if (environment.isStandard()) {
-        hasStandardModules = true;
+        if (environment.isStandard()) {
+          hasStandardModules = true;
+        }
       }
     }
 
@@ -149,18 +171,17 @@ public class AppEngineUtil {
     });
 
     comboBox.removeAllItems();
-    collectAppEngineArtifacts(project, withAppEngineFacetOnly).stream().forEach(comboBox::addItem);
+    collectAppEngineArtifacts(project, withAppEngineFacetOnly).forEach(comboBox::addItem);
   }
 
-  @Nullable
-  public static AppEngineStandardFacet findAppEngineStandardFacet(@NotNull Project project,
-      @NotNull Artifact artifact) {
+  public static Optional<AppEngineStandardFacet> findAppEngineStandardFacet(
+      @NotNull Project project, @NotNull Artifact artifact) {
     // TODO(joaomartins): Find out why the GAE facet isn't being added to Gradle projects.
     // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/835
-    final Set<Module> modules = ArtifactUtil
-        .getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
-    return modules.stream().map(module -> AppEngineStandardFacet.getAppEngineFacetByModule(module))
-        .findFirst().orElse(null);
+    return ArtifactUtil.getModulesIncludedInArtifacts(Collections.singletonList(artifact), project)
+        .stream()
+        .map(AppEngineStandardFacet::getAppEngineFacetByModule)
+        .findFirst();
   }
 
   /**
@@ -218,9 +239,11 @@ public class AppEngineUtil {
     List<ArtifactType> artifactTypes =
         AppEngineStandardWebIntegration.getInstance().getAppEngineTargetArtifactTypes();
 
-    return Arrays.asList(ArtifactManager.getInstance(project).getArtifacts()).stream()
-        .filter(artifact -> artifactTypes.contains(artifact)
-        && (!withAppEngineFacetOnly || findAppEngineStandardFacet(project, artifact) != null))
+    // TODO(joaomartins): Is a flexible facet check required here as well?
+    return Arrays.stream(ArtifactManager.getInstance(project).getArtifacts())
+        .filter(artifactTypes::contains)
+        .filter(artifact ->
+            !withAppEngineFacetOnly || findAppEngineStandardFacet(project, artifact).isPresent())
         .sorted(ArtifactManager.ARTIFACT_COMPARATOR)
         .collect(toList());
   }

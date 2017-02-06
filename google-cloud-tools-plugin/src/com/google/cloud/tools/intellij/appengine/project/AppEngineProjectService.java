@@ -63,12 +63,13 @@ public abstract class AppEngineProjectService {
 
   /**
    * Determines the {@link AppEngineEnvironment} type of the module. If {@code module} contains an
-   * {@link com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet}, it is
-   * considered Standard. If it contains an
    * {@link com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet}, it is
-   * considered Flexible. Otherwise, it is considered unknown.
+   * considered Flexible. If it contains an
+   * {@link com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet}, it is
+   * considered Standard if its appengine-web.xml doesn't contain <vm>true</vm> or <env>flex</env>.
+   *
    */
-  public abstract AppEngineEnvironment getModuleAppEngineEnvironment(Module module);
+  public abstract Optional<AppEngineEnvironment> getModuleAppEngineEnvironment(Module module);
 
   /**
    * Returns the declared {@link AppEngineStandardRuntime} in appengine-web.xml. If there is no

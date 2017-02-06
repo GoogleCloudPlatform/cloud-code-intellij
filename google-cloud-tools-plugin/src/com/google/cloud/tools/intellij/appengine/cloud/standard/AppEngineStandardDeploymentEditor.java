@@ -63,6 +63,8 @@ public class AppEngineStandardDeploymentEditor extends
   private JTextPane promoteInfoLabel;
   private AppEngineApplicationInfoPanel applicationInfoPanel;
   private JLabel serviceLabel;
+  private JLabel environmentLabel;
+  private JTextPane appEngineCostWarningLabel;
 
   private Project project;
   private DeploymentSource deploymentSource;
@@ -70,7 +72,8 @@ public class AppEngineStandardDeploymentEditor extends
   private static final String LABEL_OPEN_TAG = "<html><font face='sans' size='-1'>";
   private static final String LABEL_CLOSE_TAG = "</font></html>";
   private static final String LABEL_HREF_CLOSE_TAG = "</a>";
-
+  private static final String COST_WARNING_HREF_OPEN_TAG =
+      "<a href='https://cloud.google.com/appengine/pricing'>";
   private static final String PROMOTE_INFO_HREF_OPEN_TAG =
       "<a href='https://console.cloud.google.com/appengine/versions'>";
 
@@ -125,6 +128,20 @@ public class AppEngineStandardDeploymentEditor extends
 
     serviceLabel.setText(AppEngineProjectService.getInstance()
         .getServiceNameFromAppEngineWebXml(project, deploymentSource));
+
+    if (deploymentSource.getEnvironment().isFlexCompat()) {
+      appEngineCostWarningLabel.setText(
+          GctBundle.message("appengine.flex.deployment.cost.warning",
+              LABEL_OPEN_TAG,
+              COST_WARNING_HREF_OPEN_TAG,
+              LABEL_HREF_CLOSE_TAG,
+              LABEL_CLOSE_TAG));
+      appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+      appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
+    } else {
+      appEngineCostWarningLabel.setVisible(false);
+    }
+    environmentLabel.setText(deploymentSource.getEnvironment().localizedLabel());
   }
 
   private void refreshApplicationInfoPanel() {

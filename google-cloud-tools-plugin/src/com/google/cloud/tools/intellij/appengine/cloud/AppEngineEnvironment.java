@@ -43,5 +43,9 @@ public enum AppEngineEnvironment {
   public boolean isFlexCompat() {
     return this == APP_ENGINE_FLEX_COMPAT;
   }
+
+  public String localizedLabel() {
+    return GctBundle.message(label);
+  }
 }
 

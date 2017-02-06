@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
@@ -115,9 +116,10 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JCheckBox dockerfileOverrideCheckBox;
   private String dockerfileOverride = "";
   private JButton yamlModuleSettings;
+  private JLabel environmentLabel;
   private DeploymentSource deploymentSource;
 
-  public AppEngineFlexibleDeploymentEditor(Project project, DeploymentSource deploymentSource) {
+  public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
     this.deploymentSource = deploymentSource;
     version.getEmptyText().setText(GctBundle.getString("appengine.flex.version.placeholder.text"));
     yamlTextField.addBrowseFolderListener(

@@ -149,12 +149,9 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       throw new RuntimeConfigurationError("Artifact isn't specified");
     }
 
-    final AppEngineStandardFacet facet = AppEngineUtil
-        .findAppEngineStandardFacet(commonModel.getProject(), artifact);
-    if (facet == null) {
-      throw new RuntimeConfigurationWarning(
-          "App Engine facet not found in '" + artifact.getName() + "' artifact");
-    }
+    AppEngineUtil.findAppEngineStandardFacet(commonModel.getProject(), artifact)
+        .orElseThrow(() -> new RuntimeConfigurationWarning(
+            "App Engine facet not found in '" + artifact.getName() + "' artifact"));
 
     if (!CloudSdkService.getInstance().isValidCloudSdk()) {
       throw new RuntimeConfigurationError(
