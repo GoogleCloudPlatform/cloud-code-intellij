@@ -68,7 +68,7 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
       for (WebFacet webFacet : WebFacet.getInstances(module)) {
         final WebApp webApp = webFacet.getRoot();
         if (webApp == null) {
-          return;
+          continue;
         }
 
         new WriteCommandAction.Simple(module.getProject()) {
