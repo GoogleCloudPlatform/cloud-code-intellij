@@ -35,6 +35,7 @@ import com.intellij.psi.xml.XmlTag;
  */
 public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportContributor {
 
+  private static final String SERVLET_VERSION = "2.5";
   private static final String SERVLET_NAMESPACE = "http://java.sun.com/xml/ns/javaee";
   private static final String SERVLET_SCHEMA_URL
       = "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd";
@@ -74,7 +75,7 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
           new WriteCommandAction.Simple(module.getProject()) {
             @Override
             protected void run() throws Throwable {
-              webApp.getVersion().setStringValue("2.5");
+              webApp.getVersion().setStringValue(SERVLET_VERSION);
 
               XmlTag webAppTag = webApp.getXmlTag();
               XmlAttribute xmlns = webAppTag.getAttribute("xmlns");
