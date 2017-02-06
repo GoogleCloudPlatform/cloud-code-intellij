@@ -40,10 +40,6 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
   private static final String SERVLET_SCHEMA_URL
       = "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd";
 
-  public AppEngineJavaeeSupportContributor() {
-
-  }
-
   @Override
   public void setupFrameworkSupport(JavaeeFrameworkSupportContributionModel model) {
     AppEngineStandardFacet appEngineStandardFacet = model.getFacet(AppEngineStandardFacet.ID);
