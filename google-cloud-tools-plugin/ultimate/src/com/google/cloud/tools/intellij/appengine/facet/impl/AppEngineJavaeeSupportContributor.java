@@ -67,25 +67,27 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
     StartupManager.getInstance(module.getProject()).runWhenProjectIsInitialized(() -> {
       for (WebFacet webFacet : WebFacet.getInstances(module)) {
         final WebApp webApp = webFacet.getRoot();
-        if (webApp != null) {
-          new WriteCommandAction.Simple(module.getProject()) {
-            @Override
-            protected void run() throws Throwable {
-              webApp.getVersion().setStringValue(SERVLET_VERSION);
-
-              XmlTag webAppTag = webApp.getXmlTag();
-              XmlAttribute xmlns = webAppTag.getAttribute("xmlns");
-              XmlAttribute schemaLocation = webAppTag.getAttribute("xsi:schemaLocation");
-
-              if (xmlns != null) {
-                xmlns.setValue(SERVLET_NAMESPACE);
-              }
-              if (schemaLocation != null) {
-                schemaLocation.setValue(SERVLET_SCHEMA_URL);
-              }
-            }
-          }.execute();
+        if (webApp == null) {
+          return;
         }
+
+        new WriteCommandAction.Simple(module.getProject()) {
+          @Override
+          protected void run() throws Throwable {
+            webApp.getVersion().setStringValue(SERVLET_VERSION);
+
+            XmlTag webAppTag = webApp.getXmlTag();
+            XmlAttribute xmlns = webAppTag.getAttribute("xmlns");
+            XmlAttribute schemaLocation = webAppTag.getAttribute("xsi:schemaLocation");
+
+            if (xmlns != null) {
+              xmlns.setValue(SERVLET_NAMESPACE);
+            }
+            if (schemaLocation != null) {
+              schemaLocation.setValue(SERVLET_SCHEMA_URL);
+            }
+          }
+        }.execute();
       }
     });
   }
