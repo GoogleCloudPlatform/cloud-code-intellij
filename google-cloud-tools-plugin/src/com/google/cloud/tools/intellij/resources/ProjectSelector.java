@@ -185,6 +185,23 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         }
       }
     });
+
+    getTextField().addFocusListener(new FocusListener() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        // do nothing
+      }
+
+      @Override
+      public void focusLost(FocusEvent event) {
+        if (!event.isTemporary()) {
+          ResourceProjectModelItem node = getCurrentModelItem();
+          if (node != null) {
+            onSelectionChanged(node);
+          }
+        }
+      }
+    });
   }
 
   public void addModelListener(TreeModelListener listener) {
@@ -391,25 +408,6 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     if (!popup.isVisible()) {
       popup.show(showTarget);
     }
-  }
-
-  @Override
-  public void addFocusListener() {
-    super.addFocusListener();
-
-    getTextField().addFocusListener(new FocusListener() {
-      @Override
-      public void focusGained(FocusEvent e) {
-        // do nothing
-      }
-
-      @Override
-      public void focusLost(FocusEvent event) {
-        if (!event.isTemporary()) {
-          onSelectionChanged(getCurrentModelItem());
-        }
-      }
-    });
   }
 
   private class PopupPanel extends GoogleLoginEmptyPanel {

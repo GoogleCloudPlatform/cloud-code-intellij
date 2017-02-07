@@ -96,16 +96,6 @@ public abstract class CustomizableComboBox extends JPanel {
     PopupMouseListener listener = new PopupMouseListener();
     textField.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
     textField.addMouseListener(listener);
-    addFocusListener();
-
-    JButton popupButton = createArrowButton();
-    popupButton.addMouseListener(listener);
-
-    this.add(popupButton, BorderLayout.EAST);
-    this.add(textField, BorderLayout.CENTER);
-  }
-
-  public void addFocusListener() {
     textField.addFocusListener(new FocusListener() {
       @Override
       public void focusGained(FocusEvent event) {
@@ -117,6 +107,12 @@ public abstract class CustomizableComboBox extends JPanel {
         // no-op
       }
     });
+
+    JButton popupButton = createArrowButton();
+    popupButton.addMouseListener(listener);
+
+    this.add(popupButton, BorderLayout.EAST);
+    this.add(textField, BorderLayout.CENTER);
   }
 
   @Override
