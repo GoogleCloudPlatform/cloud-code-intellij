@@ -127,14 +127,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           public OSProcessHandler createProcessHandler(
               String workingDirectory, Map<String, String> envVariables) throws ExecutionException {
             startupProcessHandler.destroyProcess();
-
-            ProcessBuilder dummyProcess = new ProcessBuilder("true");
-            try {
-              return new OSProcessHandler(dummyProcess.start(),
-                  GctBundle.getString("appengine.run.shutdownscript"));
-            } catch (IOException ioe) {
-              throw new ExecutionException(ioe);
-            }
+            return null;
           }
         };
       }
