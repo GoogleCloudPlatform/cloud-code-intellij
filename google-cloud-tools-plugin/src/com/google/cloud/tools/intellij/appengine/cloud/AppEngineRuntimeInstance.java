@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.base.Strings;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -62,9 +63,19 @@ public class AppEngineRuntimeInstance extends
       return;
     }
 
-    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(task.getProject());
-
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
+
+    AppEngineEnvironment environment =
+        AppEngineEnvironment.valueOf(deploymentConfig.getEnvironment());
+    if ((environment == AppEngineEnvironment.APP_ENGINE_FLEX
+        || environment == AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT)
+        && Strings.isNullOrEmpty(deploymentConfig.getYamlPath())) {
+      callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml")
+          + "\n" + GctBundle.getString("appengine.deployment.error.suggestflexfacet"));
+      return;
+    }
+
+    AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(task.getProject());
 
     appEngineHelper
         .createDeployRunner(
