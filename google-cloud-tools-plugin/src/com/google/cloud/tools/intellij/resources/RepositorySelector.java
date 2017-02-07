@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,17 +65,15 @@ import javax.swing.tree.TreeSelectionModel;
 public class RepositorySelector extends CustomizableComboBox implements CustomizableComboBoxPopup {
 
   private static final Logger logger = Logger.getInstance(RepositorySelector.class);
-
+  private static final int SELECTOR_HEIGHT = 140;
+  private static final int SELECTOR_WIDTH = 400;
+  private static final String PANETHEON_CREATE_REPO_URL_PREFIX
+      = "https://console.cloud.google.com/code/develop/repo?project=";
   private JBPopup popup;
   private JPanel panel;
   private String cloudProject;
   private CredentialedUser user;
   private boolean canCreateRepository;
-  private static final int SELECTOR_HEIGHT = 140;
-  private static final int SELECTOR_WIDTH = 400;
-
-  private static final String PANETHEON_CREATE_REPO_URL_PREFIX
-      = "https://pantheon.corp.google.com/code/develop/repo?project=";
 
   public RepositorySelector(@Nullable String cloudProject,
       @Nullable CredentialedUser user, boolean canCreateRepository) {
