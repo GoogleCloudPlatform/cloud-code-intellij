@@ -266,7 +266,6 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
    * Default dialog state.
    */
   private void paintSelectionOk() {
-    parentDirectory.setBackground(Color.getColor("ECECEC"));
     parentDirectoryLabel.setForeground(Color.BLACK);
     directoryNameLabel.setForeground(Color.BLACK);
   }
@@ -278,7 +277,6 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
    */
   private void paintParentDirectorySelectionError() {
     paintSelectionOk();
-    parentDirectory.setBackground(Color.RED);
     parentDirectoryLabel.setForeground(Color.RED);
   }
 
