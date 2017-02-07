@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,8 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private static final String PAGE_URL_KEY = "dp";
   private static final String IS_VIRTUAL_KEY = "cd21";
   private static final String PAGE_TITLE_KEY = "dt";
+  private static final String PAGE_HOST_KEY = "dh";
+  private static final String PAGE_HOST_VALUE = "virtual.intellij";
   private static final String STRING_FALSE_VALUE = "0";
   private static final String STRING_TRUE_VALUE = "1";
   // Our plugin metadata keys.
@@ -96,7 +98,8 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           new BasicNameValuePair(IS_NON_INTERACTIVE_KEY, STRING_FALSE_VALUE),
           new BasicNameValuePair(
               UNIQUE_CLIENT_ID_KEY,
-              UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
+              UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())),
+          new BasicNameValuePair(PAGE_HOST_KEY, PAGE_HOST_VALUE));
   private final String analyticsId;
   private final String externalPluginName;
   private final String userAgent;
@@ -153,11 +156,14 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         postData.add(new BasicNameValuePair(IS_VIRTUAL_KEY, STRING_TRUE_VALUE));
         String fullMetadataString = systemMetadataKeyValues;
         if (metadataMap != null && !metadataMap.isEmpty()) {
-          Map<String, String> escapedMap = metadataMap.entrySet()
-              .stream()
-              .collect(Collectors.toMap(
-                  entry -> METADATA_ESCAPER.escape(entry.getKey()),
-                  entry -> METADATA_ESCAPER.escape(entry.getValue())));
+          Map<String, String> escapedMap =
+              metadataMap
+                  .entrySet()
+                  .stream()
+                  .collect(
+                      Collectors.toMap(
+                          entry -> METADATA_ESCAPER.escape(entry.getKey()),
+                          entry -> METADATA_ESCAPER.escape(entry.getValue())));
 
           fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(escapedMap);
         }
