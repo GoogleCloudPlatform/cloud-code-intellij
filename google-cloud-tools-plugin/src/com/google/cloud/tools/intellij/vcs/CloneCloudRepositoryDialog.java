@@ -245,8 +245,6 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
       @Override
       protected void textChanged(DocumentEvent event) {
         updateButtons();
-        setOKActionEnabled(projectSelector.getSelectedUser() != null
-            && !StringUtil.isEmpty(repositorySelector.getSelectedRepository()));
       }
     });
   }
