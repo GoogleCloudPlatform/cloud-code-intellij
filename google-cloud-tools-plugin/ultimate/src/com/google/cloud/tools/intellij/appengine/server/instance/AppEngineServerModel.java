@@ -80,17 +80,9 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     projectJdksModel = new ProjectSdksModel();
   }
 
-  @Nullable
-  private Sdk getCurrentProjectJdk() {
+  void initJdk() {
     projectJdksModel.reset(commonModel.getProject());
-    return projectJdksModel.getProjectSdk();
-  }
-
-  private void initDefaultJdk() {
-    Sdk projectJdk = getCurrentProjectJdk();
-    if (projectJdk != null) {
-      setDevAppServerJdk(projectJdk);
-    }
+    setDevAppServerJdk(projectJdksModel.getProjectSdk());
   }
 
   @Override
@@ -98,7 +90,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     // TODO(alexsloan): This keeps the dev_appserver's jdk in sync with the project jdk on behalf of
     // the user. This behavior should be removed once
     // https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/926 is completed.
-    initDefaultJdk();
+    initJdk();
+
+    if (devAppServerJdk == null) {
+      throw new ExecutionException(GctBundle.getString("appengine.run.server.nosdk"));
+    }
 
     return new AppEngineServerInstance(commonModel);
   }
@@ -163,6 +159,10 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     if (!CloudSdkService.getInstance().isValidCloudSdk()) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
+    }
+
+    if (devAppServerJdk == null) {
+      throw new RuntimeConfigurationError(GctBundle.getString("appengine.run.server.nosdk"));
     }
   }
 
