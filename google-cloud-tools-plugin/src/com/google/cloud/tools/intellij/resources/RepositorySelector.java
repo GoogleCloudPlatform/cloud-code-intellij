@@ -85,8 +85,6 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
         .setText(GctBundle.message("cloud.repository.selector.placeholder.text"));
   }
 
-
-
   @Nullable
   public String getSelectedRepository() {
     if (StringUtil.isEmpty(getText()) || repositories == null) {
@@ -183,6 +181,11 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
   @VisibleForTesting
   public JPanel getPanel() {
     return panel;
+  }
+
+  @VisibleForTesting
+  public ProjectRepositoriesModelItem getRepositories() {
+    return repositories;
   }
 
   @VisibleForTesting
