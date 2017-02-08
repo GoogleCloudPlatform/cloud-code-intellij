@@ -122,6 +122,8 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     apiPort.setText(intToString(serverModel.getApiPort()));
     applicationLogLevel.setSelectedItem(serverModel.getLogLevel());
     cleadDatastoreCheckbox.setSelected(serverModel.getClearDatastore());
+
+    serverModel.initJdk();
   }
 
   @Override
