@@ -91,13 +91,15 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       return null;
     }
 
-    Enumeration repos = ((RepositoryPanel) panel).getRepositories().children();
-    while (repos.hasMoreElements()) {
-      TreeNode repo = (TreeNode) repos.nextElement();
+    if (panel instanceof RepositoryPanel) {
+      Enumeration repos = ((RepositoryPanel) panel).getRepositories().children();
+      while (repos.hasMoreElements()) {
+        TreeNode repo = (TreeNode) repos.nextElement();
 
-      if (repo instanceof RepositoryModelItem
-          && getText().equals(((RepositoryModelItem) repo).getRepositoryId())) {
-        return getText();
+        if (repo instanceof RepositoryModelItem
+            && getText().equals(((RepositoryModelItem) repo).getRepositoryId())) {
+          return getText();
+        }
       }
     }
 
