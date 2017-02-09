@@ -42,8 +42,8 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
     cloudRepositoryService = ServiceManager.getService(CloudRepositoryService.class);
   }
 
-  public void loadRepositories(@Nullable Runnable onComplete, @NotNull String cloudProject,
-      @NotNull CredentialedUser user) {
+  public void loadRepositories(@NotNull String cloudProject, @NotNull CredentialedUser user,
+      @Nullable Runnable onComplete) {
     setUserObject(cloudProject);
 
     cloudRepositoryService

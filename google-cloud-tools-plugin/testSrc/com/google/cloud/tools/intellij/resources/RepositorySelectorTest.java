@@ -178,7 +178,7 @@ public class RepositorySelectorTest extends PlatformTestCase {
     if (openPopup) { // Simulates a user click
       selector.showPopup(new RelativePoint(selector, new Point(0, 0)));
     } else { // Simulates a "silent entry" - e.g. manual typing
-      selector.loadRepositories(null /*onComplete*/);
+      selector.loadRepositories();
     }
 
     return selector;
