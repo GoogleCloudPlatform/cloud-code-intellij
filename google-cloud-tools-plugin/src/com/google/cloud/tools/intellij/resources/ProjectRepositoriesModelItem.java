@@ -36,21 +36,16 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
-  private String cloudProject;
-  private CredentialedUser user;
   private CloudRepositoryService cloudRepositoryService;
 
-  public ProjectRepositoriesModelItem(@NotNull String cloudProject,
-      @NotNull CredentialedUser user) {
-    this.cloudProject = cloudProject;
-    this.user = user;
-
+  public ProjectRepositoriesModelItem() {
     cloudRepositoryService = ServiceManager.getService(CloudRepositoryService.class);
-
-    setUserObject(cloudProject);
   }
 
-  public void loadRepositories(@Nullable Runnable onComplete) {
+  public void loadRepositories(@Nullable Runnable onComplete, @NotNull String cloudProject,
+      @NotNull CredentialedUser user) {
+    setUserObject(cloudProject);
+
     cloudRepositoryService
         .listAsync(user, cloudProject)
         .thenAccept(response -> {

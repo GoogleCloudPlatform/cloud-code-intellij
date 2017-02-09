@@ -118,10 +118,10 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     }
 
     if (repositories == null) {
-      repositories = new ProjectRepositoriesModelItem(cloudProject, user);
+      repositories = new ProjectRepositoriesModelItem();
     }
 
-    repositories.loadRepositories(onComplete);
+    repositories.loadRepositories(onComplete, cloudProject, user);
   }
 
   @Override
@@ -284,7 +284,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
     private void refresh() {
       if (repositories == null) {
-        repositories = new ProjectRepositoriesModelItem(cloudProject, user);
+        repositories = new ProjectRepositoriesModelItem();
       }
 
       setLoader();
