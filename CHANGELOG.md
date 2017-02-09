@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [17.2.1]
 
-Happy new year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance
+Happy New Year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance
 release. If you are having authentication problems using Cloud Source Repositories and our 
 plugin, check out [this possible solution](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1174).
 
@@ -15,8 +15,7 @@ Here is a list of the visible changes:
   - App Engine initialization and region selection. ([#1232](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1232))
   
 ### Fixed
-  - Stopping dev_appserver on Windows always fails with com.intellij.execution
-  .ExecutionException. ([#1215](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1215))
+  - Stopping dev_appserver on Windows always fails with com.intellij.execution.ExecutionException. ([#1215](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1215))
   - New AE standard project wizard should generate web.xml with servlet 2.5. ([#1194](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1194))
   - Clear datastore checkbox for app engine standard local server does not work. ([#1188](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1188))
   - Don't show projects scheduled for deletion in the project selector. ([#1119](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1119))
