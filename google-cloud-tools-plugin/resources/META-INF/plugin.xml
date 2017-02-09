@@ -33,13 +33,42 @@
   <!-- "idea-version since-build" set by gradle-intellij-plugin -->
 
   <change-notes>
-    <![CDATA[<html>
+    <![CDATA[
+    <html>
       <p>
       IMPORTANT:
       This plugin requires the use of Cloud SDK v 133.0.0 for correct execution of the local
       development server with the latest Java 8 SDK. Please run 'gcloud components update' from your
       shell to ensure you have the latest Cloud SDK release.
       </p>
+
+      <h2>[17.2.1]</h2>
+
+      <p>Happy new year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance
+        release.  If you are having authentication problems using Cloud Source Repositories and our
+        plugin, check out <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1174">this possible solution</a>.</p>
+
+      <p>Here is a list of the visible changes:</p>
+
+      <h3>Added</h3>
+
+      <ul>
+        <li>Support for multiple cloud source repositories for a single GCP project. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1024">#1024</a>)</li>
+        <li>App Engine initialization and region selection. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1232">#1232</a>)</li>
+      </ul>
+
+      <h3>Fixed</h3>
+
+      <ul>
+        <li>Stopping dev_appserver on Windows always fails with com.intellij.execution
+          .ExecutionException. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1215">#1215</a>)</li>
+        <li>New AE standard project wizard should generate web.xml with servlet 2.5. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1194">#1194</a>)</li>
+        <li>Clear datastore checkbox for app engine standard local server does not work. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1188">#1188</a>)</li>
+        <li>Don't show projects scheduled for deletion in the project selector. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1119">#1119</a>)</li>
+      </ul>
+
+      <p>Visit our <a href="https://github
+.com/GoogleCloudPlatform/google-cloud-intellij/milestone/19?closed=1">17.2 Release Milestone</a> for complete details.</p>
 
       <h2>[16.11.6]</h2>
       <h3>Added</h3>
@@ -134,7 +163,8 @@
         <li>App Engine standard environment support (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/767">#767</a>)</li>
         <li>Extra fields now available in the deployment config (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/868">#868</a>)</li>
       </ul>
-    </html>]]>
+    </html>
+    ]]>
   </change-notes>
 
   <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
