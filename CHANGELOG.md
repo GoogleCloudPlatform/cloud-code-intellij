@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [17.2.1]
 
 Happy new year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance
-release.  If you are having authentication problems using Cloud Source Repositories and our 
+release. If you are having authentication problems using Cloud Source Repositories and our 
 plugin, check out [this possible solution](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1174).
 
 Here is a list of the visible changes:
@@ -21,8 +21,7 @@ Here is a list of the visible changes:
   - Clear datastore checkbox for app engine standard local server does not work. ([#1188](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1188))
   - Don't show projects scheduled for deletion in the project selector. ([#1119](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1119))
   
-Visit our [17.2 Release Milestone](https://github
-.com/GoogleCloudPlatform/google-cloud-intellij/milestone/19?closed=1) for complete details.
+Visit our [17.2 Release Milestone](https://github.com/GoogleCloudPlatform/google-cloud-intellij/milestone/19?closed=1) for complete details.
 
 ## [16.11.6]
 
