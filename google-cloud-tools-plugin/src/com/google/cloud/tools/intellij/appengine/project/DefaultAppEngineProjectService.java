@@ -40,7 +40,7 @@ import java.util.Collections;
 /**
  * Implementation of methods for inspecting an App Engine project's structure and configuration.
  */
-public class DefaultAppEngineProjectService extends AppEngineProjectService {
+public class DefaultAppEngineProjectService implements AppEngineProjectService {
 
   private static final String AE_WEB_XML_RUNTIME_TAG = "runtime";
 
