@@ -34,7 +34,6 @@ import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.BorderLayout;
@@ -71,6 +70,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       = "https://console.cloud.google.com/code/develop/repo?project=";
   private JBPopup popup;
   private JPanel panel;
+  private ProjectRepositoriesModelItem repositories;
   private String cloudProject;
   private CredentialedUser user;
   private boolean canCreateRepository;
@@ -87,19 +87,17 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
   @Nullable
   public String getSelectedRepository() {
-    if (StringUtil.isEmpty(getText())) {
+    if (StringUtil.isEmpty(getText()) || repositories == null) {
       return null;
     }
 
-    if (panel instanceof RepositoryPanel) {
-      Enumeration repos = ((RepositoryPanel) panel).getRepositories().children();
-      while (repos.hasMoreElements()) {
-        TreeNode repo = (TreeNode) repos.nextElement();
+    Enumeration repos = repositories.children();
+    while (repos.hasMoreElements()) {
+      TreeNode repo = (TreeNode) repos.nextElement();
 
-        if (repo instanceof RepositoryModelItem
-            && getText().equals(((RepositoryModelItem) repo).getRepositoryId())) {
-          return getText();
-        }
+      if (repo instanceof RepositoryModelItem
+          && getText().equals(((RepositoryModelItem) repo).getRepositoryId())) {
+        return getText();
       }
     }
 
@@ -112,6 +110,22 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
   public void setUser(CredentialedUser user) {
     this.user = user;
+  }
+
+  public void loadRepositories() {
+    loadRepositories(null /*onComplete*/);
+  }
+
+  public void loadRepositories(@Nullable Runnable onComplete) {
+    if (user == null || cloudProject == null) {
+      return;
+    }
+
+    if (repositories == null) {
+      repositories = new ProjectRepositoriesModelItem();
+    }
+
+    repositories.loadRepositories(cloudProject, user, onComplete);
   }
 
   @Override
@@ -159,7 +173,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
    * and then expand with the repository textfield if the user manually stretches the dialog.
    */
   private int getPopupWidth() {
-    int actualWidth = RepositorySelector.this.getTextField().getWidth();
+    int actualWidth = this.getTextField().getWidth();
     return Math.max(SELECTOR_WIDTH, actualWidth);
   }
 
@@ -171,6 +185,11 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
   @VisibleForTesting
   public JPanel getPanel() {
     return panel;
+  }
+
+  @VisibleForTesting
+  public ProjectRepositoriesModelItem getRepositories() {
+    return repositories;
   }
 
   @VisibleForTesting
@@ -193,10 +212,8 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     private JTree repositoryTree;
     private DefaultMutableTreeNode projectRootNode;
     private DefaultTreeModel treeModel;
-    private ProjectRepositoriesModelItem repositories;
 
     RepositoryPanel() {
-      repositories = new ProjectRepositoriesModelItem(cloudProject, user);
       projectRootNode = new DefaultMutableTreeNode("root");
       treeModel = new DefaultTreeModel(projectRootNode);
 
@@ -270,9 +287,13 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     }
 
     private void refresh() {
+      if (repositories == null) {
+        repositories = new ProjectRepositoriesModelItem();
+      }
+
       setLoader();
 
-      repositories.loadRepositories(() ->
+      loadRepositories(() ->
           ApplicationManager.getApplication().invokeAndWait(() -> {
             treeModel.insertNodeInto(repositories, projectRootNode, 0);
             treeModel.reload();
@@ -289,11 +310,6 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
         treeModel.reload();
         repositoryTree.expandRow(0);
       });
-    }
-
-    @NotNull
-    public ProjectRepositoriesModelItem getRepositories() {
-      return repositories;
     }
 
     @VisibleForTesting
