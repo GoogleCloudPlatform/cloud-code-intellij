@@ -265,19 +265,19 @@ public class AppEngineFlexibleDeploymentEditor extends
         }
       }
     });
+    if (modulesWithFlexFacetComboBox.getItemCount() == 0) {
+      yamlModuleSettings.setEnabled(false);
+    }
 
     filesWarningLabel.setForeground(Color.RED);
 
-    yamlModuleSettings.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        AppEngineFlexibleFacet flexFacet =
-            FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
-                .getFacetByType(AppEngineFlexibleFacetType.ID);
-        ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
-        checkConfigurationFiles();
-        toggleDockerfileSection();
-      }
+    yamlModuleSettings.addActionListener(event -> {
+      AppEngineFlexibleFacet flexFacet =
+          FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
+              .getFacetByType(AppEngineFlexibleFacetType.ID);
+      ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
+      checkConfigurationFiles();
+      toggleDockerfileSection();
     });
 
     updateSelectors();
