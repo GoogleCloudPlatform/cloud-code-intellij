@@ -50,8 +50,8 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   private static final int COMPONENTS_HORIZONTAL_PADDING = 5;
   private static final int COMPONENTS_VERTICAL_PADDING = 0;
 
-  private final JLabel errorIcon = new JLabel(AllIcons.Ide.Error);
-  private final HyperlinkLabel messageText = new HyperlinkLabel();
+  private final JLabel errorIcon;
+  private final HyperlinkLabel messageText;
 
   // Start in a friendly state before we know whether the application is truly valid.
   private boolean isApplicationValid = true;
@@ -61,16 +61,13 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   public AppEngineApplicationInfoPanel() {
     super(new BorderLayout(COMPONENTS_HORIZONTAL_PADDING, COMPONENTS_VERTICAL_PADDING));
 
+    errorIcon = new JLabel(AllIcons.Ide.Error);
     errorIcon.setVisible(false);
+    messageText = new HyperlinkLabel();
     messageText.setOpaque(false);
 
     add(errorIcon, BorderLayout.WEST);
     add(messageText);
-    refresh();
-  }
-
-  private void refresh() {
-    refresh(null);
   }
 
   public void refresh(final ProjectSelectionChangedEvent event) {
