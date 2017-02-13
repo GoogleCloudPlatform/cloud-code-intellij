@@ -25,8 +25,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmation
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.SelectConfigDestinationFolderDialog;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -75,11 +73,11 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JPanel mainPanel;
   private TextFieldWithBrowseButton yaml;
   private TextFieldWithBrowseButton dockerfile;
-  private CloudSdkPanel cloudSdkPanel;
   private JButton genYamlButton;
   private JButton genDockerfileButton;
   private javax.swing.JTextPane filesWarningLabel;
   private JLabel dockerfileLabel;
+  private JLabel noDockerfileLabel;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
   private AppEngineHelper appEngineHelper;
 
@@ -87,7 +85,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       @Nullable Project project) {
     this.appEngineHelper = new CloudSdkAppEngineHelper(project);
     this.deploymentConfiguration = deploymentConfiguration;
-    cloudSdkPanel.reset();
 
     yaml.setText(deploymentConfiguration.getYamlPath());
     dockerfile.setText(deploymentConfiguration.getDockerFilePath());
@@ -145,17 +142,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @Override
   public boolean isModified() {
     return !yaml.getText().equals(deploymentConfiguration.getYamlPath())
-        || !dockerfile.getText().equals(deploymentConfiguration.getDockerFilePath())
-        || !CloudSdkService.getInstance().getSdkHomePath().toString().equals(
-            cloudSdkPanel.getCloudSdkDirectoryText()
-    );
+        || !dockerfile.getText().equals(deploymentConfiguration.getDockerFilePath());
   }
 
   @Override
   public void reset() {
     yaml.setText(deploymentConfiguration.getYamlPath());
     dockerfile.setText(deploymentConfiguration.getDockerFilePath());
-    cloudSdkPanel.reset();
 
     setDockerfileVisibility();
     validateConfiguration();
@@ -167,7 +160,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     deploymentConfiguration.setYamlPath(yaml.getText());
     deploymentConfiguration.setDockerFilePath(dockerfile.getText());
-    cloudSdkPanel.apply();
 
     setDockerfileVisibility();
   }
@@ -183,49 +175,55 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     return GctBundle.getString("appengine.flexible.facet.name");
   }
 
+  private boolean isRuntimeCustom() {
+    return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yaml.getText())
+        .equals(FlexibleRuntime.CUSTOM);
+  }
+
+  /**
+   * Tests if a file is valid by checking whether it exists, is a regular file and is well formed.
+   */
+  private boolean validateFile(String path) {
+    try {
+      if (!Files.exists(Paths.get(path))
+          || !Files.isRegularFile(Paths.get(path))) {
+        return false;
+      }
+    } catch (InvalidPathException ipe) {
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * Validates the configuration and turns on/off any necessary warnings.
    */
   private void validateConfiguration() {
-    try {
-      if (!Files.exists(Paths.get(yaml.getText()))
-          || !Files.isRegularFile(Paths.get(yaml.getText()))) {
-        yaml.getTextField().setForeground(Color.RED);
-      } else {
-        yaml.getTextField().setForeground(Color.BLACK);
-      }
-    } catch (InvalidPathException ipe) {
+    boolean isYAMLValid = validateFile(yaml.getText());
+    if (isYAMLValid) {
+      yaml.getTextField().setForeground(Color.BLACK);
+    } else {
       yaml.getTextField().setForeground(Color.RED);
     }
 
-    try {
-      if (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yaml.getText())
-          .equals(FlexibleRuntime.CUSTOM)) {
-        if (!Files.exists(Paths.get(dockerfile.getText()))
-            || !Files.isRegularFile(Paths.get(dockerfile.getText()))) {
-          dockerfile.getTextField().setForeground(Color.RED);
-        } else {
-          dockerfile.getTextField().setForeground(Color.BLACK);
-        }
-      }
-    } catch (InvalidPathException ipe) {
+    boolean isDockerfileValid = validateFile(dockerfile.getText());
+    if (isRuntimeCustom() && isDockerfileValid) {
+      dockerfile.getTextField().setForeground(Color.BLACK);
+    } else {
       dockerfile.getTextField().setForeground(Color.RED);
     }
 
     // Shows the error label if one of the file checks failed.
-    filesWarningLabel.setVisible(yaml.getTextField().getForeground().equals(Color.RED)
-        || (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yaml.getText())
-        .equals(FlexibleRuntime.CUSTOM)
-        && dockerfile.getTextField().getForeground().equals(Color.RED)));
+    filesWarningLabel.setVisible(!isYAMLValid || (isRuntimeCustom() && !isDockerfileValid));
   }
 
   private void setDockerfileVisibility() {
-    boolean visible = APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-        yaml.getText()).equals(FlexibleRuntime.CUSTOM);
-    // TODO(joaomartins): Gotta disable the Dockerfile box instead of hiding it
-    dockerfileLabel.setVisible(visible);
-    dockerfile.setVisible(visible);
-    genDockerfileButton.setVisible(visible);
+    boolean enabled = isRuntimeCustom();
+    dockerfile.setEnabled(enabled);
+    genDockerfileButton.setEnabled(enabled);
+    // Shows no Dockerfile label if runtime is Java and yaml is valid.
+    noDockerfileLabel.setVisible(!enabled && validateFile(yaml.getText()));
   }
 
   @Override
@@ -319,12 +317,12 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  JLabel getDockerfileLabel() {
-    return dockerfileLabel;
+  JTextPane getFilesWarningLabel() {
+    return filesWarningLabel;
   }
 
   @VisibleForTesting
-  JTextPane getFilesWarningLabel() {
-    return filesWarningLabel;
+  JLabel getNoDockerfileLabel() {
+    return noDockerfileLabel;
   }
 }

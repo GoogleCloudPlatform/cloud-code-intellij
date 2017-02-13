@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 
-import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.testFramework.PlatformTestCase;
 
 import java.awt.Color;
@@ -43,25 +43,27 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
   }
 
-  public void testSetDockerfileVisibility() {
+  public void testSetDockerfileVisibility() throws ConfigurationException {
     // no yaml
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getDockerfile().isVisible());
-    assertFalse(editor.getGenDockerfileButton().isVisible());
+    editor.apply();
+    assertFalse(editor.getDockerfile().isEnabled());
+    assertFalse(editor.getGenDockerfileButton().isEnabled());
+    assertFalse(editor.getNoDockerfileLabel().isVisible());
     // java yaml
     editor.getYaml().setText(javaYaml.getPath());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getGenDockerfileButton().isVisible());
+    assertFalse(editor.getDockerfile().isEnabled());
+    assertFalse(editor.getGenDockerfileButton().isEnabled());
+    assertTrue(editor.getNoDockerfileLabel().isVisible());
     // custom yaml
     editor.getYaml().setText(customYaml.getPath());
-    assertTrue(editor.getDockerfileLabel().isVisible());
-    assertTrue(editor.getDockerfileLabel().isVisible());
-    assertTrue(editor.getGenDockerfileButton().isVisible());
+    assertTrue(editor.getDockerfile().isEnabled());
+    assertTrue(editor.getGenDockerfileButton().isEnabled());
+    assertFalse(editor.getNoDockerfileLabel().isVisible());
   }
 
-  public void testValidateConfiguration() {
+  public void testValidateConfiguration() throws ConfigurationException {
     // no yaml
+    editor.apply();
     assertEquals(Color.RED, editor.getYaml().getTextField().getForeground());
     assertTrue(editor.getFilesWarningLabel().isVisible());
     // java yaml

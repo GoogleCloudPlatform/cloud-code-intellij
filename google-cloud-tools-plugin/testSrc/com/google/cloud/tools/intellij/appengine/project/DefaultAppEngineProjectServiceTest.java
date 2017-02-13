@@ -55,10 +55,8 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     Module module = createModule("myModule");
     addAppEngineStandardFacet(module);
 
-    AppEngineEnvironment environment
-        = appEngineProjectService.getModuleAppEngineEnvironment(module);
-
-    assertEquals(AppEngineEnvironment.APP_ENGINE_STANDARD, environment);
+    assertEquals(AppEngineEnvironment.APP_ENGINE_STANDARD,
+        appEngineProjectService.getModuleAppEngineEnvironment(module).get());
   }
 
   public void testGetAppEngineArtifactEnvironment_Flexible() {
