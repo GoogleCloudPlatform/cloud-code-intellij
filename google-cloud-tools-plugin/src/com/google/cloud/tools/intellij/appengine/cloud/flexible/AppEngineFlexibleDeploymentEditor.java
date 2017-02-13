@@ -215,9 +215,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appEngineCostWarningLabel.setBackground(mainPanel.getBackground());
 
-    gcpProjectSelector.addProjectSelectionListener(event ->
-        appInfoPanel.refresh(event.getSelectedProject().getProjectId(),
-            event.getUser().getCredential()));
+    gcpProjectSelector.addProjectSelectionListener(appInfoPanel::refresh);
     gcpProjectSelector.addModelListener(new TreeModelAdapter() {
       @Override
       public void treeStructureChanged(TreeModelEvent event) {

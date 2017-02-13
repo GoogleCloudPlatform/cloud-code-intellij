@@ -177,9 +177,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       public void focusLost(FocusEvent event) {
         if (!event.isTemporary()) {
           ResourceProjectModelItem node = getCurrentModelItem();
-          if (node != null) {
-            onSelectionChanged(node);
-          }
+          onSelectionChanged(node);
         }
       }
     });
@@ -522,11 +520,13 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
   private void onSelectionChanged(ResourceProjectModelItem newSelection) {
     CredentialedUser user = null;
-    if (newSelection.getParent() instanceof GoogleUserModelItem) {
-      user = ((GoogleUserModelItem) newSelection.getParent()).getCredentialedUser();
+    ProjectSelectionChangedEvent event = null;
+    if (newSelection != null) {
+      if (newSelection.getParent() instanceof GoogleUserModelItem) {
+        user = ((GoogleUserModelItem) newSelection.getParent()).getCredentialedUser();
+      }
+      event = new ProjectSelectionChangedEvent(newSelection.getProject(), user);
     }
-    ProjectSelectionChangedEvent event
-        = new ProjectSelectionChangedEvent(newSelection.getProject(), user);
     for (ProjectSelectionListener listener : projectSelectionListeners) {
       listener.selectionChanged(event);
     }

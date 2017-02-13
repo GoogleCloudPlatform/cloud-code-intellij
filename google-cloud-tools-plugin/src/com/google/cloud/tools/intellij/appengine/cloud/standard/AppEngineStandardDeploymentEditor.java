@@ -114,9 +114,7 @@ public class AppEngineStandardDeploymentEditor extends
       }
     });
 
-    projectSelector.addProjectSelectionListener(event ->
-        applicationInfoPanel.refresh(event.getSelectedProject().getProjectId(),
-            event.getUser().getCredential()));
+    projectSelector.addProjectSelectionListener(applicationInfoPanel::refresh);
 
     projectSelector.addModelListener(new TreeModelAdapter() {
       @Override

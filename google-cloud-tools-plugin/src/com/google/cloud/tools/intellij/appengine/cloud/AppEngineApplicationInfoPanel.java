@@ -21,6 +21,7 @@ import com.google.api.services.appengine.v1.model.Application;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineApplicationCreateDialog;
 import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
+import com.google.cloud.tools.intellij.resources.ProjectSelector.ProjectSelectionChangedEvent;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.icons.AllIcons;
@@ -70,10 +71,23 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     messageText.setContentType("text/html");
     messageText.setEditable(false);
     messageText.setOpaque(false);
-    messageText.setText(GctBundle.getString("appengine.infopanel.noproject"));
 
     add(errorIcon, BorderLayout.WEST);
     add(messageText);
+    refresh();
+  }
+
+  private void refresh() {
+    refresh(null);
+  }
+
+  public void refresh(final ProjectSelectionChangedEvent event) {
+    if (event == null) {
+      setMessage(GctBundle.getString("appengine.infopanel.noproject"), true /* isError*/);
+      return;
+    }
+
+    refresh(event.getSelectedProject().getProjectId(), event.getUser().getCredential());
   }
 
   /**
@@ -112,11 +126,9 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   }
 
   private void setMessage(String message, boolean isError) {
-    ApplicationManager.getApplication().invokeLater(() -> {
-      errorIcon.setVisible(false);
+    ApplicationManager.getApplication().invokeAndWait(() -> {
+      errorIcon.setVisible(isError);
       messageText.setText(HTML_OPEN_TAG + message + HTML_CLOSE_TAG);
-      messageText.setForeground(isError ? JBColor.red : JBColor.black);
-
     }, ModalityState.stateForComponent(this));
   }
 
