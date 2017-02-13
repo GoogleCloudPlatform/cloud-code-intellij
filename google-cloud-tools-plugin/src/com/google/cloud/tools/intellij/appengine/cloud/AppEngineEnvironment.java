@@ -24,7 +24,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 public enum AppEngineEnvironment {
   APP_ENGINE_STANDARD("appengine.environment.name.standard"),
   APP_ENGINE_FLEX("appengine.environment.name.flexible"),
-  APP_ENGINE_FLEX_COMPAT("appengine.environment.name.flexcompat");
+  APP_ENGINE_FLEX_COMPAT("appengine.environment.name.flexible");
 
   private final String label;
 

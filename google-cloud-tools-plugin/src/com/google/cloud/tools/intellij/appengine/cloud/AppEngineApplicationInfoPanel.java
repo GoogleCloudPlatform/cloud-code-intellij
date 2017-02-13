@@ -28,7 +28,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.ui.JBColor;
+import com.intellij.ui.HyperlinkLabel;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
@@ -47,29 +47,21 @@ import git4idea.DialogManager;
  */
 public class AppEngineApplicationInfoPanel extends JPanel {
 
-  private static final String HTML_OPEN_TAG = "<html><font face='sans' size='-1'>";
-  private static final String HTML_CLOSE_TAG = "</font></html>";
-  private static final String CREATE_APPLICATION_HREF_OPEN_TAG = "<a href='#'>";
-  private static final String HREF_CLOSE_TAG = "</a>";
   private static final int COMPONENTS_HORIZONTAL_PADDING = 5;
   private static final int COMPONENTS_VERTICAL_PADDING = 0;
 
-  private final JLabel errorIcon;
-  private final JTextPane messageText;
+  private final JLabel errorIcon = new JLabel(AllIcons.Ide.Error);
+  private final HyperlinkLabel messageText = new HyperlinkLabel();
 
   // Start in a friendly state before we know whether the application is truly valid.
   private boolean isApplicationValid = true;
 
-  private CreateApplicationLinkListener  currentLinkListener;
+  private CreateApplicationLinkListener currentLinkListener;
 
   public AppEngineApplicationInfoPanel() {
     super(new BorderLayout(COMPONENTS_HORIZONTAL_PADDING, COMPONENTS_VERTICAL_PADDING));
 
-    errorIcon = new JLabel(AllIcons.Ide.Error);
     errorIcon.setVisible(false);
-    messageText = new JTextPane();
-    messageText.setContentType("text/html");
-    messageText.setEditable(false);
     messageText.setOpaque(false);
 
     add(errorIcon, BorderLayout.WEST);
@@ -125,10 +117,15 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     return isApplicationValid;
   }
 
-  private void setMessage(String message, boolean isError) {
+  private void setMessage(String text, boolean isError) {
+    setMessage(text, "", "", isError);
+  }
+
+  private void setMessage(String beforeLinkText, String linkText, String afterLinkText,
+      boolean isError) {
     ApplicationManager.getApplication().invokeAndWait(() -> {
       errorIcon.setVisible(isError);
-      messageText.setText(HTML_OPEN_TAG + message + HTML_CLOSE_TAG);
+      messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText);
     }, ModalityState.stateForComponent(this));
   }
 
@@ -141,15 +138,10 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     currentLinkListener = new CreateApplicationLinkListener(projectId, credential);
     messageText.addHyperlinkListener(currentLinkListener);
 
-    ApplicationManager.getApplication().invokeLater(() -> {
-      String message = GctBundle.message("appengine.application.not.exist") + " "
-          + GctBundle.message("appengine.application.create",
-          CREATE_APPLICATION_HREF_OPEN_TAG, HREF_CLOSE_TAG);
-
-      messageText.setText(HTML_OPEN_TAG + message + HTML_CLOSE_TAG);
-      messageText.setForeground(JBColor.red);
-      errorIcon.setVisible(true);
-    }, ModalityState.stateForComponent(this));
+    setMessage(GctBundle.getString("appengine.application.not.exist") + " ",
+        GctBundle.getString("appengine.application.create.linkText"),
+        " " + GctBundle.getString("appengine.application.create.afterLinkText"),
+        true);
   }
 
   /**
