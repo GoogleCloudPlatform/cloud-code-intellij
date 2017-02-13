@@ -163,17 +163,14 @@ public class AppEngineFlexibleDeploymentEditor extends
         }
     );
 
-    yamlOverrideCheckBox.addChangeListener(
-        event -> {
-          boolean isYamlOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
-          yamlTextField.setVisible(isYamlOverrideSelected);
-          toggleDockerfileSection();
-          if (isYamlOverrideSelected) {
-            checkConfigurationFiles();
-          }
-        });
+    yamlOverrideCheckBox.addActionListener(event -> {
+      boolean isYamlOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
+      yamlTextField.setVisible(isYamlOverrideSelected);
+      toggleDockerfileSection();
+      checkConfigurationFiles();
+    });
 
-    dockerfileOverrideCheckBox.addChangeListener(
+    dockerfileOverrideCheckBox.addActionListener(
         event -> {
           boolean isDockerfileOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
           dockerfileTextField.setEnabled(isDockerfileOverrideSelected);
