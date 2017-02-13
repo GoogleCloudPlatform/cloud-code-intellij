@@ -35,6 +35,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.tree.TreeModelAdapter;
 
@@ -47,7 +48,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 import javax.swing.event.TreeModelEvent;
 
 /**
@@ -60,22 +60,14 @@ public class AppEngineStandardDeploymentEditor extends
   private ProjectSelector projectSelector;
   private JCheckBox promoteCheckbox;
   private JCheckBox stopPreviousVersionCheckbox;
-  private JTextPane promoteInfoLabel;
+  private HyperlinkLabel promoteInfoLabel;
   private AppEngineApplicationInfoPanel applicationInfoPanel;
   private JLabel serviceLabel;
   private JLabel environmentLabel;
-  private JTextPane appEngineCostWarningLabel;
+  private HyperlinkLabel appEngineCostWarningLabel;
 
   private Project project;
   private DeploymentSource deploymentSource;
-
-  private static final String LABEL_OPEN_TAG = "<html><font face='sans' size='-1'>";
-  private static final String LABEL_CLOSE_TAG = "</font></html>";
-  private static final String LABEL_HREF_CLOSE_TAG = "</a>";
-  private static final String COST_WARNING_HREF_OPEN_TAG =
-      "<a href='https://cloud.google.com/appengine/pricing'>";
-  private static final String PROMOTE_INFO_HREF_OPEN_TAG =
-      "<a href='https://console.cloud.google.com/appengine/versions'>";
 
   private static final boolean PROMOTE_DEFAULT = true;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = true;
@@ -96,13 +88,12 @@ public class AppEngineStandardDeploymentEditor extends
     );
     stopPreviousVersionCheckbox.setSelected(STOP_PREVIOUS_VERSION_DEFAULT);
 
-    promoteInfoLabel.setText(
-        GctBundle.message("appengine.promote.info.label",
-            LABEL_OPEN_TAG,
-            PROMOTE_INFO_HREF_OPEN_TAG,
-            LABEL_HREF_CLOSE_TAG,
-            LABEL_CLOSE_TAG));
+    promoteInfoLabel.setHyperlinkText(
+        GctBundle.getString("appengine.promote.info.label.beforeLink") + " ",
+        GctBundle.getString("appengine.promote.info.label.link"),
+        "");
     promoteInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+    promoteInfoLabel.setHyperlinkTarget(GctBundle.getString("appengine.promoteinfo.url"));
 
     promoteCheckbox.addItemListener(event -> {
       boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
@@ -128,14 +119,12 @@ public class AppEngineStandardDeploymentEditor extends
         .getServiceNameFromAppEngineWebXml(project, deploymentSource));
 
     if (deploymentSource.getEnvironment().isFlexCompat()) {
-      appEngineCostWarningLabel.setText(
-          GctBundle.message("appengine.flex.deployment.cost.warning",
-              LABEL_OPEN_TAG,
-              COST_WARNING_HREF_OPEN_TAG,
-              LABEL_HREF_CLOSE_TAG,
-              LABEL_CLOSE_TAG));
+      appEngineCostWarningLabel.setHyperlinkText(
+          GctBundle.getString("appengine.flex.deployment.cost.warning.beforeLink"),
+          GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
+          " " + GctBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
       appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-      appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
+      appEngineCostWarningLabel.setHyperlinkTarget(GctBundle.getString("appengine.pricing.url"));
     } else {
       appEngineCostWarningLabel.setVisible(false);
     }

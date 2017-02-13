@@ -43,11 +43,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Comparing;
-import com.intellij.openapi.util.Factory;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.tree.TreeModelAdapter;
@@ -56,8 +56,6 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -85,13 +83,6 @@ import javax.swing.event.TreeModelEvent;
 public class AppEngineFlexibleDeploymentEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
   private static final String DEFAULT_SERVICE = "default";
-  private static final String LABEL_OPEN_TAG = "<html><font face='sans' size='-1'>";
-  private static final String LABEL_CLOSE_TAG = "</font></html>";
-  private static final String LABEL_HREF_CLOSE_TAG = "</a>";
-  private static final String COST_WARNING_HREF_OPEN_TAG =
-      "<a href='https://cloud.google.com/appengine/pricing'>";
-  private static final String PROMOTE_INFO_HREF_OPEN_TAG =
-      "<a href='https://console.cloud.google.com/appengine/versions'>";
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
       AppEngineProjectService.getInstance();
 
@@ -104,10 +95,10 @@ public class AppEngineFlexibleDeploymentEditor extends
   private TextFieldWithBrowseButton yamlTextField;
   private TextFieldWithBrowseButton dockerfileTextField;
   private TextFieldWithBrowseButton archiveSelector;
-  private JTextPane appEngineCostWarningLabel;
+  private HyperlinkLabel appEngineCostWarningLabel;
   private AppEngineApplicationInfoPanel appInfoPanel;
   private JPanel archiveSelectorPanel;
-  private JTextPane promoteInfoLabel;
+  private HyperlinkLabel promoteInfoLabel;
   private JLabel dockerfileLabel;
   private JTextPane filesWarningLabel;
   private JLabel yamlLabel;
@@ -203,14 +194,12 @@ public class AppEngineFlexibleDeploymentEditor extends
       }
     });
 
-    appEngineCostWarningLabel.setText(
-        GctBundle.message("appengine.flex.deployment.cost.warning",
-            LABEL_OPEN_TAG,
-            COST_WARNING_HREF_OPEN_TAG,
-            LABEL_HREF_CLOSE_TAG,
-            LABEL_CLOSE_TAG));
+    appEngineCostWarningLabel.setHyperlinkText(
+        GctBundle.getString("appengine.flex.deployment.cost.warning.beforeLink"),
+        GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
+        " " + GctBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
     appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    appEngineCostWarningLabel.setBackground(mainPanel.getBackground());
+    appEngineCostWarningLabel.setHyperlinkTarget(GctBundle.getString("appengine.pricing.url"));
 
     gcpProjectSelector.addProjectSelectionListener(appInfoPanel::refresh);
     gcpProjectSelector.addModelListener(new TreeModelAdapter() {
@@ -221,13 +210,12 @@ public class AppEngineFlexibleDeploymentEditor extends
       }
     });
 
-    promoteInfoLabel.setText(
-        GctBundle.message("appengine.promote.info.label",
-            LABEL_OPEN_TAG,
-            PROMOTE_INFO_HREF_OPEN_TAG,
-            LABEL_HREF_CLOSE_TAG,
-            LABEL_CLOSE_TAG));
+    promoteInfoLabel.setHyperlinkText(
+        GctBundle.getString("appengine.promote.info.label.beforeLink") + " ",
+        GctBundle.getString("appengine.promote.info.label.link"),
+        "");
     promoteInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+    promoteInfoLabel.setHyperlinkTarget(GctBundle.getString("appengine.promoteinfo.url"));
 
     promoteVersionCheckBox.addItemListener(event -> {
       boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();

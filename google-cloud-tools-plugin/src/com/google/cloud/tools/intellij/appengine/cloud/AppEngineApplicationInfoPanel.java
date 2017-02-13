@@ -35,7 +35,6 @@ import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
@@ -114,16 +113,19 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     return isApplicationValid;
   }
 
-  private void setMessage(String text, boolean isError) {
-    setMessage(text, "", "", isError);
-  }
-
-  private void setMessage(String beforeLinkText, String linkText, String afterLinkText,
-      boolean isError) {
+  private void setMessage(Runnable messagePrinter, boolean isError) {
     ApplicationManager.getApplication().invokeAndWait(() -> {
       errorIcon.setVisible(isError);
-      messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText);
+      messagePrinter.run();
     }, ModalityState.stateForComponent(this));
+  }
+
+  private void setMessage(String text, boolean isError) {
+    setMessage(() -> messageText.setText(text), isError);
+  }
+
+  private void setMessage(String beforeLinkText, String linkText, String afterLinkText) {
+    setMessage(() -> messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText), true);
   }
 
   private void setCreateApplicationMessage(String projectId, Credential credential) {
@@ -137,8 +139,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
 
     setMessage(GctBundle.getString("appengine.application.not.exist") + " ",
         GctBundle.getString("appengine.application.create.linkText"),
-        " " + GctBundle.getString("appengine.application.create.afterLinkText"),
-        true);
+        " " + GctBundle.getString("appengine.application.create.afterLinkText"));
   }
 
   /**

@@ -30,13 +30,11 @@
         <properties/>
         <border type="none" title="Remote configuration"/>
         <children>
-          <component id="8dac6" class="javax.swing.JTextPane" binding="promoteInfoLabel">
+          <component id="275c0" class="com.intellij.ui.HyperlinkLabel" binding="promoteInfoLabel">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <contentType value="text/html"/>
-              <editable value="false"/>
               <opaque value="false"/>
             </properties>
           </component>
@@ -98,17 +96,14 @@
               <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
           </hspacer>
-          <component id="6bd2c" class="javax.swing.JTextPane" binding="appEngineCostWarningLabel">
+          <component id="9344e" class="com.intellij.ui.HyperlinkLabel" binding="appEngineCostWarningLabel">
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="5" vsize-policy="6" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="20"/>
               </grid>
             </constraints>
             <properties>
-              <contentType value="text/html"/>
-              <editable value="false"/>
               <font/>
-              <text value="&lt;html&gt;&#10;  &lt;head&gt;&#10;    &#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;"/>
             </properties>
           </component>
         </children>
