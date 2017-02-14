@@ -72,7 +72,7 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
       flexibleStage.stage(stagingDirectory);
     } catch (RuntimeException re) {
       deploy.getCallback()
-          .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
+          .errorOccurred(GctBundle.message("appengine.deployment.exception.during.staging"));
       logger.error(re);
       return;
     }
@@ -87,7 +87,7 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
 
       deploy.deploy(stagingDirectory, startListener);
     } catch (RuntimeException re) {
-      deploy.getCallback().errorOccurred(GctBundle.message("appengine.deployment.error") + "\n"
+      deploy.getCallback().errorOccurred(GctBundle.message("appengine.deployment.exception") + "\n"
           + GctBundle.message("appengine.action.error.update.message"));
       logger.error(re);
     }
