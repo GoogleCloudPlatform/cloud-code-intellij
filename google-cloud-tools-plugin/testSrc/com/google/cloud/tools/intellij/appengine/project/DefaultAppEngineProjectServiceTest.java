@@ -64,7 +64,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     addAppEngineFlexibleFacet(module);
 
     assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
-        appEngineProjectService.getModuleAppEngineEnvironment(module));
+        appEngineProjectService.getModuleAppEngineEnvironment(module).get());
   }
 
   public void testGetAppEngineStandardDeclaredRuntime_NullArg() {

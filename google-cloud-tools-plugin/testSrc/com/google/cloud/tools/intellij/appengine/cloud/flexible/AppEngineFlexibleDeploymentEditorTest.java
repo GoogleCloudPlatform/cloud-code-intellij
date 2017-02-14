@@ -142,64 +142,6 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertTrue(editor.getDockerfileOverrideCheckBox().isVisible());
   }
 
-  public void testCheckConfigurationFiles() {
-    // runtime: java
-    assertEquals(Color.BLACK, editor.getYamlTextField().getTextField().getForeground());
-    assertEquals(Color.BLACK, editor.getYamlLabel().getForeground());
-    assertFalse(editor.getFilesWarningLabel().isVisible());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getDockerfileTextField().isVisible());
-    assertFalse(editor.getDockerfileOverrideCheckBox().isVisible());
-    assertFalse(editor.getFilesWarningLabel().isVisible());
-    // non existing file
-    editor.getYamlOverrideCheckBox().setSelected(true);
-    editor.getYamlTextField().setText("I don't exist");
-    assertEquals(Color.RED, editor.getYamlTextField().getTextField().getForeground());
-    assertEquals(Color.RED, editor.getYamlLabel().getForeground());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getDockerfileTextField().isVisible());
-    assertFalse(editor.getDockerfileOverrideCheckBox().isVisible());
-    assertTrue(editor.getFilesWarningLabel().isVisible());
-    // runtime: custom, no good dockerfile
-    editor.getYamlTextField().setText(customYaml.getPath());
-    assertEquals(Color.BLACK, editor.getYamlTextField().getTextField().getForeground());
-    assertEquals(Color.BLACK, editor.getYamlLabel().getForeground());
-    assertTrue(editor.getDockerfileLabel().isVisible());
-    assertTrue(editor.getDockerfileTextField().isVisible());
-    assertTrue(editor.getDockerfileOverrideCheckBox().isVisible());
-    assertEquals(Color.RED, editor.getDockerfileLabel().getForeground());
-    assertTrue(editor.getFilesWarningLabel().isVisible());
-    // runtime: custom, good dockerfile
-    editor.getDockerfileOverrideCheckBox().setSelected(true);
-    editor.getDockerfileTextField().setText(dockerfile.getPath());
-    assertEquals(Color.BLACK, editor.getYamlTextField().getTextField().getForeground());
-    assertEquals(Color.BLACK, editor.getYamlLabel().getForeground());
-    assertTrue(editor.getDockerfileLabel().isVisible());
-    assertTrue(editor.getDockerfileTextField().isVisible());
-    assertTrue(editor.getDockerfileOverrideCheckBox().isVisible());
-    assertEquals(Color.BLACK, editor.getDockerfileLabel().getForeground());
-    assertFalse(editor.getFilesWarningLabel().isVisible());
-    // second module from combobox
-    editor.getYamlOverrideCheckBox().setSelected(false);
-    editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
-    assertEquals(Color.BLACK, editor.getYamlTextField().getTextField().getForeground());
-    assertEquals(Color.BLACK, editor.getYamlLabel().getForeground());
-    assertTrue(editor.getDockerfileLabel().isVisible());
-    assertTrue(editor.getDockerfileTextField().isVisible());
-    assertTrue(editor.getDockerfileOverrideCheckBox().isVisible());
-    assertEquals(Color.BLACK, editor.getDockerfileLabel().getForeground());
-    assertFalse(editor.getFilesWarningLabel().isVisible());
-    // back to first module
-    editor.getModulesWithFlexFacetComboBox().setSelectedItem(javaModule);
-    assertEquals(Color.BLACK, editor.getYamlTextField().getTextField().getForeground());
-    assertEquals(Color.BLACK, editor.getYamlLabel().getForeground());
-    assertFalse(editor.getFilesWarningLabel().isVisible());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getDockerfileTextField().isVisible());
-    assertFalse(editor.getDockerfileOverrideCheckBox().isVisible());
-    assertFalse(editor.getFilesWarningLabel().isVisible());
-  }
-
   public void testValidateConfiguration() throws ConfigurationException {
     // javaModule
     editor.applyEditorTo(templateConfig);
@@ -330,7 +272,24 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       editor.applyEditorTo(templateConfig);
       fail("The yaml file doesn't exist.");
     } catch (ConfigurationException cfe) {
-      assertEquals("The specified YAML configuration file does not exist.", cfe.getMessage());
+      assertEquals(
+          "The specified YAML configuration file does not exist or is not a valid file."
+              + " Set a valid file in Module Settings or use another one.",
+          cfe.getMessage());
+    }
+  }
+
+  public void testValidateConfiguration_directoryYaml() {
+    editor.getYamlOverrideCheckBox().setSelected(true);
+    editor.getYamlTextField().setText(javaYaml.getParentFile().getPath());
+    try {
+      editor.applyEditorTo(templateConfig);
+      fail("The yaml file is a directory.");
+    } catch (ConfigurationException cfe) {
+      assertEquals(
+          "The specified YAML configuration file does not exist or is not a valid file."
+              + " Set a valid file in Module Settings or use another one.",
+          cfe.getMessage());
     }
   }
 
@@ -366,7 +325,25 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       editor.applyEditorTo(templateConfig);
       fail("Unexisting dockerfile.");
     } catch (ConfigurationException cfe) {
-      assertEquals("The specified Dockerfile configuration file does not exist.", cfe.getMessage());
+      assertEquals(
+          "The specified Dockerfile configuration file does not exist or is not a valid file."
+          + " Set a valid file in Module Settings or use another one.",
+          cfe.getMessage());
+    }
+  }
+
+  public void testValidateConfiguration_directoryDockerfile() {
+    editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
+    editor.getDockerfileOverrideCheckBox().setSelected(true);
+    editor.getDockerfileTextField().setText(dockerfile.getParentFile().getPath());
+    try {
+      editor.applyEditorTo(templateConfig);
+      fail("Dockerfile is a directory.");
+    } catch (ConfigurationException cfe) {
+      assertEquals(
+          "The specified Dockerfile configuration file does not exist or is not a valid file."
+          + " Set a valid file in Module Settings or use another one.",
+          cfe.getMessage());
     }
   }
 
@@ -399,16 +376,16 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   public void testDockerfileOverride() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
     String previousDockerfile = editor.getDockerfileTextField().getText();
-    editor.getDockerfileOverrideCheckBox().setSelected(true);
+    editor.getDockerfileOverrideCheckBox().doClick();
     // Tests that the first override will be the previous value
     assertEquals(previousDockerfile, editor.getDockerfileTextField().getText());
 
     editor.getDockerfileTextField().setText("an override");
-    editor.getDockerfileOverrideCheckBox().setSelected(false);
+    editor.getDockerfileOverrideCheckBox().doClick();
     // When override is unselected, value goes back to module setting
     assertEquals(previousDockerfile, editor.getDockerfileTextField().getText());
 
-    editor.getDockerfileOverrideCheckBox().setSelected(true);
+    editor.getDockerfileOverrideCheckBox().doClick();
     // Override is memorized and gets restored
     assertEquals("an override", editor.getDockerfileTextField().getText());
   }

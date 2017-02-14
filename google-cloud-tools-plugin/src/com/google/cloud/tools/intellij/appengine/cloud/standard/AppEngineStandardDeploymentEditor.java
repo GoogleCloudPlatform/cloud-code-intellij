@@ -118,17 +118,18 @@ public class AppEngineStandardDeploymentEditor extends
     serviceLabel.setText(AppEngineProjectService.getInstance()
         .getServiceNameFromAppEngineWebXml(project, deploymentSource));
 
-    if (deploymentSource.getEnvironment().isFlexCompat()) {
+    if (deploymentSource.getEnvironment() != null
+        && deploymentSource.getEnvironment().isFlexCompat()) {
       appEngineCostWarningLabel.setHyperlinkText(
           GctBundle.getString("appengine.flex.deployment.cost.warning.beforeLink"),
           GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
           " " + GctBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
       appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
       appEngineCostWarningLabel.setHyperlinkTarget(GctBundle.getString("appengine.pricing.url"));
+      environmentLabel.setText(deploymentSource.getEnvironment().localizedLabel());
     } else {
       appEngineCostWarningLabel.setVisible(false);
     }
-    environmentLabel.setText(deploymentSource.getEnvironment().localizedLabel());
   }
 
   private void refreshApplicationInfoPanel() {

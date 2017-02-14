@@ -30,6 +30,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorTab;
+import com.intellij.icons.AllIcons.Ide;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
@@ -43,7 +44,6 @@ import com.intellij.ui.DocumentAdapter;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -59,7 +59,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 
 /**
@@ -75,9 +74,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private TextFieldWithBrowseButton dockerfile;
   private JButton genYamlButton;
   private JButton genDockerfileButton;
-  private javax.swing.JTextPane filesWarningLabel;
-  private JLabel dockerfileLabel;
   private JLabel noDockerfileLabel;
+  private JLabel errorIcon;
+  private JLabel errorMessage;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
   private AppEngineHelper appEngineHelper;
 
@@ -85,9 +84,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       @Nullable Project project) {
     this.appEngineHelper = new CloudSdkAppEngineHelper(project);
     this.deploymentConfiguration = deploymentConfiguration;
-
-    yaml.setText(deploymentConfiguration.getYamlPath());
-    dockerfile.setText(deploymentConfiguration.getDockerFilePath());
 
     yaml.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
@@ -102,7 +98,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     yaml.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        setDockerfileVisibility();
+        toggleDockerfileSection();
         validateConfiguration();
       }
     });
@@ -110,7 +106,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     dockerfile.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        setDockerfileVisibility();
+        toggleDockerfileSection();
         validateConfiguration();
       }
     });
@@ -130,7 +126,15 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         dockerfile, this::validateConfiguration
     ));
 
-    filesWarningLabel.setForeground(Color.RED);
+    yaml.setText(deploymentConfiguration.getYamlPath());
+    dockerfile.setText(deploymentConfiguration.getDockerFilePath());
+
+    errorIcon.setIcon(Ide.Error);
+    errorIcon.setVisible(false);
+    errorMessage.setVisible(false);
+
+    validateConfiguration();
+    toggleDockerfileSection();
   }
 
   @NotNull
@@ -150,18 +154,26 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     yaml.setText(deploymentConfiguration.getYamlPath());
     dockerfile.setText(deploymentConfiguration.getDockerFilePath());
 
-    setDockerfileVisibility();
-    validateConfiguration();
+    toggleDockerfileSection();
   }
 
   @Override
   public void apply() throws ConfigurationException {
     validateConfiguration();
+    if (!isValidConfigurationFile(yaml.getText())) {
+      throw new ConfigurationException(
+          GctBundle.getString("appengine.deployment.error.staging.yaml"));
+    }
+
+    if (isRuntimeCustom() && !isValidConfigurationFile(dockerfile.getText())) {
+      throw new ConfigurationException(
+          GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+    }
 
     deploymentConfiguration.setYamlPath(yaml.getText());
     deploymentConfiguration.setDockerFilePath(dockerfile.getText());
 
-    setDockerfileVisibility();
+    toggleDockerfileSection();
   }
 
   @Override
@@ -177,13 +189,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private boolean isRuntimeCustom() {
     return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yaml.getText())
-        .equals(FlexibleRuntime.CUSTOM);
+        == FlexibleRuntime.CUSTOM;
   }
 
   /**
    * Tests if a file is valid by checking whether it exists, is a regular file and is well formed.
    */
-  private boolean validateFile(String path) {
+  private boolean isValidConfigurationFile(String path) {
     try {
       if (!Files.exists(Paths.get(path))
           || !Files.isRegularFile(Paths.get(path))) {
@@ -200,30 +212,32 @@ public class FlexibleFacetEditor extends FacetEditorTab {
    * Validates the configuration and turns on/off any necessary warnings.
    */
   private void validateConfiguration() {
-    boolean isYAMLValid = validateFile(yaml.getText());
-    if (isYAMLValid) {
-      yaml.getTextField().setForeground(Color.BLACK);
-    } else {
-      yaml.getTextField().setForeground(Color.RED);
+    boolean showError = false;
+
+    if (!isValidConfigurationFile(yaml.getText())) {
+      errorIcon.setVisible(true);
+      errorMessage.setVisible(true);
+      errorMessage.setText(GctBundle.getString("appengine.deployment.error.staging.yaml"));
+      showError = true;
     }
 
-    boolean isDockerfileValid = validateFile(dockerfile.getText());
-    if (isRuntimeCustom() && isDockerfileValid) {
-      dockerfile.getTextField().setForeground(Color.BLACK);
-    } else {
-      dockerfile.getTextField().setForeground(Color.RED);
+    if (isRuntimeCustom() && !isValidConfigurationFile(dockerfile.getText())) {
+      errorIcon.setVisible(true);
+      errorMessage.setVisible(true);
+      errorMessage.setText(GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+      showError = true;
     }
 
-    // Shows the error label if one of the file checks failed.
-    filesWarningLabel.setVisible(!isYAMLValid || (isRuntimeCustom() && !isDockerfileValid));
+    errorIcon.setVisible(showError);
+    errorMessage.setVisible(showError);
   }
 
-  private void setDockerfileVisibility() {
+  private void toggleDockerfileSection() {
     boolean enabled = isRuntimeCustom();
     dockerfile.setEnabled(enabled);
     genDockerfileButton.setEnabled(enabled);
     // Shows no Dockerfile label if runtime is Java and yaml is valid.
-    noDockerfileLabel.setVisible(!enabled && validateFile(yaml.getText()));
+    noDockerfileLabel.setVisible(!enabled && isValidConfigurationFile(yaml.getText()));
   }
 
   @Override
@@ -317,12 +331,17 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  JTextPane getFilesWarningLabel() {
-    return filesWarningLabel;
+  JLabel getNoDockerfileLabel() {
+    return noDockerfileLabel;
   }
 
   @VisibleForTesting
-  JLabel getNoDockerfileLabel() {
-    return noDockerfileLabel;
+  public JLabel getErrorIcon() {
+    return errorIcon;
+  }
+
+  @VisibleForTesting
+  public JLabel getErrorMessage() {
+    return errorMessage;
   }
 }

@@ -53,10 +53,6 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
   private CloudSdkService cloudSdkService;
   @Mock
   private AppEngineApplicationInfoPanel infoPanel;
-  @Mock
-  private Project gcpProject;
-  @Mock
-  private CredentialedUser gcpUser;
 
   @Override
   public void setUp() throws Exception {
@@ -64,8 +60,6 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
 
     deploymentSource = mock(AppEngineArtifactDeploymentSource.class);
     when(deploymentSource.isValid()).thenReturn(true);
-
-    gcpProject = mock(Project.class);
 
     projectSelector = mock(ProjectSelector.class);
     when(projectSelector.getText()).thenReturn(PROJECT_NAME);

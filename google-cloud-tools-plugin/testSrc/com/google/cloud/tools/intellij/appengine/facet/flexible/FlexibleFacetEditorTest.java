@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfig
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.testFramework.PlatformTestCase;
 
-import java.awt.Color;
 import java.io.File;
 
 public class FlexibleFacetEditorTest extends PlatformTestCase {
@@ -30,6 +29,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   private File customYaml;
   private File dockerfile;
   private FlexibleFacetEditor editor;
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
 
   public void setUp() throws Exception {
     super.setUp();
@@ -38,14 +38,13 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     customYaml = createTempFile("custom.yaml", "runtime: custom");
     dockerfile = createTempFile("Dockerfile", "");
 
-    AppEngineDeploymentConfiguration deploymentConfiguration =
-        new AppEngineDeploymentConfiguration();
-    editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
+    deploymentConfiguration = new AppEngineDeploymentConfiguration();
   }
 
-  public void testSetDockerfileVisibility() throws ConfigurationException {
+  public void testToggleDockerfileSection() throws ConfigurationException {
+    deploymentConfiguration.setYamlPath("");
+    editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
     // no yaml
-    editor.apply();
     assertFalse(editor.getDockerfile().isEnabled());
     assertFalse(editor.getGenDockerfileButton().isEnabled());
     assertFalse(editor.getNoDockerfileLabel().isVisible());
@@ -61,29 +60,143 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertFalse(editor.getNoDockerfileLabel().isVisible());
   }
 
-  public void testValidateConfiguration() throws ConfigurationException {
-    // no yaml
-    editor.apply();
-    assertEquals(Color.RED, editor.getYaml().getTextField().getForeground());
-    assertTrue(editor.getFilesWarningLabel().isVisible());
-    // java yaml
+  public void testValidateConfiguration_noYAML() {
+    deploymentConfiguration.setYamlPath("");
+    editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
+    assertTrue(editor.getErrorIcon().isVisible());
+    assertTrue(editor.getErrorMessage().isVisible());
+    assertEquals("The specified YAML configuration file does not exist or is not a valid file.",
+        editor.getErrorMessage().getText());
+
+    try {
+      editor.apply();
+      fail("YAML can't be empty");
+    } catch (ConfigurationException ce) {
+      assertEquals(
+          "The specified YAML configuration file does not exist or is not a valid file.",
+          ce.getMessage());
+    }
+  }
+
+  public void testValidateConfiguration_nullYAML() {
+    deploymentConfiguration.setYamlPath(null);
+    editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
+    assertTrue(editor.getErrorIcon().isVisible());
+    assertTrue(editor.getErrorMessage().isVisible());
+    assertEquals("The specified YAML configuration file does not exist or is not a valid file.",
+        editor.getErrorMessage().getText());
+
+    try {
+      editor.apply();
+      fail("YAML can't be empty");
+    } catch (ConfigurationException ce) {
+      assertEquals(
+          "The specified YAML configuration file does not exist or is not a valid file.",
+          ce.getMessage());
+    }
+  }
+
+  public void testValidateConfiguration_YAMLIsDirectory() {
+    editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
+    editor.getYaml().setText(javaYaml.getParentFile().getPath());
+    assertTrue(editor.getErrorIcon().isVisible());
+    assertTrue(editor.getErrorMessage().isVisible());
+    assertEquals("The specified YAML configuration file does not exist or is not a valid file.",
+        editor.getErrorMessage().getText());
+
+    try {
+      editor.apply();
+      fail("YAML can't be empty");
+    } catch (ConfigurationException ce) {
+      assertEquals(
+          "The specified YAML configuration file does not exist or is not a valid file.",
+          ce.getMessage());
+    }
+  }
+
+  public void testValidateConfiguration_javaRuntime() throws ConfigurationException {
+    editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
     editor.getYaml().setText(javaYaml.getPath());
-    assertEquals(Color.BLACK, editor.getYaml().getTextField().getForeground());
-    assertFalse(editor.getFilesWarningLabel().isVisible());
-    // custom yaml, no dockerfile
+    assertFalse(editor.getDockerfile().isEnabled());
+    assertFalse(editor.getErrorIcon().isVisible());
+    assertFalse(editor.getErrorMessage().isVisible());
+    assertTrue(editor.getNoDockerfileLabel().isVisible());
+    editor.apply();
+  }
+
+  public void testValidateConfiguration_customRuntimeNoDockerfile() {
+    editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
     editor.getYaml().setText(customYaml.getPath());
-    assertEquals(Color.BLACK, editor.getYaml().getTextField().getForeground());
-    assertEquals(Color.RED, editor.getDockerfile().getTextField().getForeground());
-    assertTrue(editor.getFilesWarningLabel().isVisible());
-    // custom yaml, dockerfile is a directory
+    editor.getDockerfile().setText("");
+    assertTrue(editor.getDockerfile().isEnabled());
+    assertTrue(editor.getErrorIcon().isVisible());
+    assertTrue(editor.getErrorMessage().isVisible());
+    assertEquals(
+        "The specified Dockerfile configuration file does not exist or is not a valid file.",
+        editor.getErrorMessage().getText());
+    assertFalse(editor.getNoDockerfileLabel().isVisible());
+
+    try {
+      editor.apply();
+      fail("Can't have runtime custom and no dockerfile.");
+    } catch (ConfigurationException ce) {
+      assertEquals(
+          "The specified Dockerfile configuration file does not exist or is not a valid file.",
+          ce.getMessage());
+    }
+  }
+
+  public void testValidateConfiguration_customRuntimeNullDockerfile() {
+    editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
+    editor.getYaml().setText(customYaml.getPath());
+    editor.getDockerfile().setText(null);
+    assertTrue(editor.getDockerfile().isEnabled());
+    assertTrue(editor.getErrorIcon().isVisible());
+    assertTrue(editor.getErrorMessage().isVisible());
+    assertEquals(
+        "The specified Dockerfile configuration file does not exist or is not a valid file.",
+        editor.getErrorMessage().getText());
+    assertFalse(editor.getNoDockerfileLabel().isVisible());
+
+    try {
+      editor.apply();
+      fail("Can't have runtime custom and no dockerfile.");
+    } catch (ConfigurationException ce) {
+      assertEquals(
+          "The specified Dockerfile configuration file does not exist or is not a valid file.",
+          ce.getMessage());
+    }
+  }
+
+  public void testValidateConfiguration_customRuntimeDockerfileIsDirectory() {
+    editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
+    editor.getYaml().setText(customYaml.getPath());
     editor.getDockerfile().setText(dockerfile.getParentFile().getPath());
-    assertEquals(Color.BLACK, editor.getYaml().getTextField().getForeground());
-    assertEquals(Color.RED, editor.getDockerfile().getTextField().getForeground());
-    assertTrue(editor.getFilesWarningLabel().isVisible());
-    // custom yaml, correct dockerfile
+    assertTrue(editor.getDockerfile().isEnabled());
+    assertTrue(editor.getErrorIcon().isVisible());
+    assertTrue(editor.getErrorMessage().isVisible());
+    assertEquals("The specified Dockerfile configuration file does not exist or is not a valid file.",
+        editor.getErrorMessage().getText());
+    assertFalse(editor.getNoDockerfileLabel().isVisible());
+
+    try {
+      editor.apply();
+      fail("Dockerfile can't be a directory.");
+    } catch (ConfigurationException ce) {
+      assertEquals(
+          "The specified Dockerfile configuration file does not exist or is not a valid file.",
+          ce.getMessage());
+    }
+  }
+
+  public void testValidateConfiguration_customRuntime() throws ConfigurationException {
+    editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
+    editor.getYaml().setText(customYaml.getPath());
     editor.getDockerfile().setText(dockerfile.getPath());
-    assertEquals(Color.BLACK, editor.getYaml().getTextField().getForeground());
-    assertEquals(Color.BLACK, editor.getDockerfile().getTextField().getForeground());
-    assertFalse(editor.getFilesWarningLabel().isVisible());
+    assertTrue(editor.getDockerfile().isEnabled());
+    assertFalse(editor.getErrorIcon().isVisible());
+    assertFalse(editor.getErrorMessage().isVisible());
+    assertFalse(editor.getNoDockerfileLabel().isVisible());
+    editor.apply();
   }
 }

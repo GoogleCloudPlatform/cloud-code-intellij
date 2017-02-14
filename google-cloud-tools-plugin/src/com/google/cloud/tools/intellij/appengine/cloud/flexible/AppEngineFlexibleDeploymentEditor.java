@@ -55,7 +55,6 @@ import com.intellij.util.ui.tree.TreeModelAdapter;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -72,8 +71,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.TreeModelEvent;
 
@@ -100,14 +97,11 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JPanel archiveSelectorPanel;
   private HyperlinkLabel promoteInfoLabel;
   private JLabel dockerfileLabel;
-  private JTextPane filesWarningLabel;
-  private JLabel yamlLabel;
   private JComboBox<Module> modulesWithFlexFacetComboBox;
   private JCheckBox yamlOverrideCheckBox;
   private JCheckBox dockerfileOverrideCheckBox;
   private String dockerfileOverride = "";
   private JButton yamlModuleSettings;
-  private JLabel environmentLabel;
   private DeploymentSource deploymentSource;
 
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
@@ -158,7 +152,6 @@ public class AppEngineFlexibleDeploymentEditor extends
       boolean isYamlOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
       yamlTextField.setVisible(isYamlOverrideSelected);
       toggleDockerfileSection();
-      checkConfigurationFiles();
     });
 
     dockerfileOverrideCheckBox.addActionListener(
@@ -170,7 +163,6 @@ public class AppEngineFlexibleDeploymentEditor extends
               dockerfileOverride = dockerfileTextField.getText();
             }
             dockerfileTextField.setText(dockerfileOverride);
-            checkConfigurationFiles();
           } else {
             dockerfileOverride = dockerfileTextField.getText();
             dockerfileTextField.setText(getDockerfilePath());
@@ -183,14 +175,6 @@ public class AppEngineFlexibleDeploymentEditor extends
       protected void textChanged(DocumentEvent event) {
         updateServiceName();
         toggleDockerfileSection();
-        checkConfigurationFiles();
-      }
-    });
-
-    dockerfileTextField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        checkConfigurationFiles();
       }
     });
 
@@ -236,7 +220,6 @@ public class AppEngineFlexibleDeploymentEditor extends
             .toArray(Module[]::new)
     ));
     modulesWithFlexFacetComboBox.addItemListener(event -> {
-      checkConfigurationFiles();
       toggleDockerfileSection();
     });
     modulesWithFlexFacetComboBox.setRenderer(new ListCellRendererWrapper<Module>() {
@@ -252,19 +235,15 @@ public class AppEngineFlexibleDeploymentEditor extends
       yamlModuleSettings.setEnabled(false);
     }
 
-    filesWarningLabel.setForeground(Color.RED);
-
     yamlModuleSettings.addActionListener(event -> {
       AppEngineFlexibleFacet flexFacet =
           FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
               .getFacetByType(AppEngineFlexibleFacetType.ID);
       ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
-      checkConfigurationFiles();
       toggleDockerfileSection();
     });
 
     updateSelectors();
-    checkConfigurationFiles();
     toggleDockerfileSection();
   }
 
@@ -272,6 +251,9 @@ public class AppEngineFlexibleDeploymentEditor extends
     if (gcpProjectSelector.getProject() != null && gcpProjectSelector.getSelectedUser() != null) {
       appInfoPanel.refresh(gcpProjectSelector.getProject().getProjectId(),
           gcpProjectSelector.getSelectedUser().getCredential());
+    } else {
+      appInfoPanel.setMessage(GctBundle.getString("appengine.infopanel.noproject"),
+          true /* isError*/);
     }
   }
 
@@ -292,7 +274,6 @@ public class AppEngineFlexibleDeploymentEditor extends
     toggleDockerfileSection();
     updateServiceName();
     refreshApplicationInfoPanel();
-    checkConfigurationFiles();
   }
 
   @Override
@@ -323,7 +304,6 @@ public class AppEngineFlexibleDeploymentEditor extends
     configuration.setOverrideYaml(yamlOverrideCheckBox.isSelected());
     configuration.setOverrideDockerfile(dockerfileOverrideCheckBox.isSelected());
     updateSelectors();
-    checkConfigurationFiles();
   }
 
   private void validateConfiguration() throws ConfigurationException {
@@ -352,29 +332,20 @@ public class AppEngineFlexibleDeploymentEditor extends
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.browse.app.yaml"));
     }
-    try {
-      if (!Files.exists(Paths.get(getYamlPath()))) {
-        throw new ConfigurationException(
-            GctBundle.getString("appengine.deployment.error.staging.yaml"));
-      }
-    } catch (InvalidPathException ipe) {
+    if (!isValidConfigurationFile(getYamlPath())) {
       throw new ConfigurationException(
-          GctBundle.message("appengine.flex.config.badchars", "YAML"));
+          GctBundle.getString("appengine.deployment.error.staging.yaml") + " "
+              + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
     }
-    if (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-        getYamlPath()).equals(FlexibleRuntime.CUSTOM)) {
+    if (isCustomRuntime()) {
       if (StringUtils.isBlank(getDockerfilePath())) {
         throw new ConfigurationException(
             GctBundle.message("appengine.flex.config.browse.dockerfile"));
       }
-      try {
-        if (!Files.exists(Paths.get(getDockerfilePath()))) {
-          throw new ConfigurationException(
-              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
-        }
-      } catch (InvalidPathException ipe) {
+      if (!isValidConfigurationFile(getDockerfilePath())) {
         throw new ConfigurationException(
-            GctBundle.message("appengine.flex.config.badchars", "Dockerfile"));
+            GctBundle.getString("appengine.deployment.error.staging.dockerfile") + " "
+                + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
       }
     }
     if (!appInfoPanel.isApplicationValid()) {
@@ -409,13 +380,17 @@ public class AppEngineFlexibleDeploymentEditor extends
     }
   }
 
+  private boolean isCustomRuntime() {
+    return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(getYamlPath())
+        == FlexibleRuntime.CUSTOM;
+  }
+
   /**
    * Enables the Dockerfile section of the UI if the Yaml file contains "runtime: custom". Disables
    * it otherwise.
    */
   private void toggleDockerfileSection() {
-    boolean isCustomRuntime = APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(
-        getYamlPath()).equals(FlexibleRuntime.CUSTOM);
+    boolean isCustomRuntime = isCustomRuntime();
     dockerfileOverrideCheckBox.setVisible(isCustomRuntime);
     dockerfileTextField.setVisible(isCustomRuntime);
     dockerfileTextField.setEnabled(dockerfileOverrideCheckBox.isSelected());
@@ -425,37 +400,19 @@ public class AppEngineFlexibleDeploymentEditor extends
     }
   }
 
-  private void checkConfigurationFiles() {
-    checkConfigurationFile(getYamlPath(), yamlTextField.getTextField(), yamlLabel);
-    if (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(getYamlPath())
-        .equals(FlexibleRuntime.CUSTOM)) {
-      checkConfigurationFile(dockerfileTextField.getText(), dockerfileTextField.getTextField(),
-          dockerfileLabel);
-    }
-
-    filesWarningLabel.setVisible(yamlTextField.getTextField().getForeground().equals(Color.RED)
-        || (APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(getYamlPath())
-        .equals(FlexibleRuntime.CUSTOM)
-        && dockerfileTextField.getTextField().getForeground().equals(Color.RED)));
-  }
-
   /**
-   * Checks if a specified configuration file is valid or not and triggers UI warnings
-   * accordingly.
+   * Checks if a configuration file is valid by checking if it exists and is a regular file.
    */
-  private void checkConfigurationFile(String path, JTextField textField, JLabel label) {
+  private boolean isValidConfigurationFile(String path) {
     try {
       if (!Files.exists(Paths.get(path)) || !Files.isRegularFile(Paths.get(path))) {
-        textField.setForeground(Color.RED);
-        label.setForeground(Color.RED);
-      } else {
-        textField.setForeground(Color.BLACK);
-        label.setForeground(Color.BLACK);
+        return false;
       }
     } catch (InvalidPathException ipe) {
-      textField.setForeground(Color.RED);
-      label.setForeground(Color.RED);
+      return false;
     }
+
+    return true;
   }
 
   /**
@@ -525,11 +482,6 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
-  JLabel getYamlLabel() {
-    return yamlLabel;
-  }
-
-  @VisibleForTesting
   JCheckBox getYamlOverrideCheckBox() {
     return yamlOverrideCheckBox;
   }
@@ -537,11 +489,6 @@ public class AppEngineFlexibleDeploymentEditor extends
   @VisibleForTesting
   JLabel getServiceLabel() {
     return serviceLabel;
-  }
-
-  @VisibleForTesting
-  JTextPane getFilesWarningLabel() {
-    return filesWarningLabel;
   }
 
   @VisibleForTesting

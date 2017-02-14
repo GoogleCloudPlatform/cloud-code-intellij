@@ -71,7 +71,9 @@ public class AppEngineApplicationInfoPanel extends JPanel {
 
   public void refresh(final ProjectSelectionChangedEvent event) {
     if (event == null) {
-      setMessage(GctBundle.getString("appengine.infopanel.noproject"), true /* isError*/);
+      ApplicationManager.getApplication().executeOnPooledThread(
+          () -> setMessage(GctBundle.getString("appengine.infopanel.noproject"),
+              true /* isError*/));
       return;
     }
 
@@ -87,6 +89,11 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   @SuppressWarnings("FutureReturnValueIgnored")
   public void refresh(final String projectId, final Credential credential) {
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
+      if (projectId == null || credential == null) {
+        setMessage(GctBundle.getString("appengine.infopanel.noproject"),
+            true /* isError*/);
+      }
+
       try {
         Application application =
             AppEngineAdminService.getInstance().getApplicationForProjectId(projectId, credential);
@@ -120,8 +127,11 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     }, ModalityState.stateForComponent(this));
   }
 
-  private void setMessage(String text, boolean isError) {
-    setMessage(() -> messageText.setText(text), isError);
+  public void setMessage(String text, boolean isError) {
+    setMessage(() -> {
+      messageText.setText(text);
+      messageText.revalidate();
+    }, isError);
   }
 
   private void setMessage(String beforeLinkText, String linkText, String afterLinkText) {

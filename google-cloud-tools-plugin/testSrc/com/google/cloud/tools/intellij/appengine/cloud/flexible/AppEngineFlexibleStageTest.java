@@ -61,7 +61,7 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
       stage.stage(stagingDirectory);
       fail("No yaml file.");
     } catch (RuntimeException re) {
-      assertEquals("The specified YAML configuration file does not exist.", re.getMessage());
+      assertEquals("The specified YAML configuration file does not exist or is not a valid file.", re.getMessage());
     }
   }
 
@@ -73,7 +73,7 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
       stage.stage(stagingDirectory);
       fail("No Dockerfile.");
     } catch (RuntimeException re) {
-      assertEquals("The specified Dockerfile configuration file does not exist.", re.getMessage());
+      assertEquals("The specified Dockerfile configuration file does not exist or is not a valid file.", re.getMessage());
     }
   }
 
