@@ -46,15 +46,6 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
   private String projectName;
   private String version;
 
-  /**
-   * Default constructor used instantiating plain Maven Build Deployment sources.
-   */
-  public MavenBuildDeploymentSource(@NotNull ModulePointer pointer, @NotNull Project project) {
-    super(pointer);
-    this.project = project;
-    this.name = getDefaultName();
-  }
-
   public MavenBuildDeploymentSource(@NotNull ModulePointer pointer,
       @NotNull Project project,
       @NotNull AppEngineEnvironment environment) {

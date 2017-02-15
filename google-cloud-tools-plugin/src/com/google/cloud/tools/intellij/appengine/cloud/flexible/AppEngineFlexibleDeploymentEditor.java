@@ -314,10 +314,8 @@ public class AppEngineFlexibleDeploymentEditor extends
       configuration.setGoogleUsername(user.getEmail());
     }
     String environment = "";
-    if (deploymentSource instanceof UserSpecifiedPathDeploymentSource) {
-      environment = AppEngineEnvironment.APP_ENGINE_FLEX.name();
-    } else if (deploymentSource instanceof AppEngineArtifactDeploymentSource) {
-      environment = ((AppEngineArtifactDeploymentSource) deploymentSource).getEnvironment().name();
+    if (deploymentSource instanceof AppEngineDeployable) {
+      environment = ((AppEngineDeployable) deploymentSource).getEnvironment().name();
     }
     configuration.setEnvironment(environment);
     configuration.setUserSpecifiedArtifact(
