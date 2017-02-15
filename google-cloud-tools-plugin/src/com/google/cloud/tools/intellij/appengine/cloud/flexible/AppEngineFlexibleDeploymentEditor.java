@@ -102,6 +102,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JCheckBox dockerfileOverrideCheckBox;
   private String dockerfileOverride = "";
   private JButton yamlModuleSettings;
+  private JCheckBox hiddenValidationTrigger;
   private DeploymentSource deploymentSource;
 
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
@@ -231,8 +232,15 @@ public class AppEngineFlexibleDeploymentEditor extends
         }
       }
     });
+
+    // For the case Flex isn't enabled for any modules, the user can still deploy filesystem
+    // jars/wars.
     if (modulesWithFlexFacetComboBox.getItemCount() == 0) {
+      modulesWithFlexFacetComboBox.setEnabled(false);
       yamlModuleSettings.setEnabled(false);
+      yamlOverrideCheckBox.setSelected(true);
+      yamlOverrideCheckBox.setEnabled(false);
+      yamlTextField.setVisible(true);
     }
 
     yamlModuleSettings.addActionListener(event -> {
@@ -240,6 +248,11 @@ public class AppEngineFlexibleDeploymentEditor extends
           FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
               .getFacetByType(AppEngineFlexibleFacetType.ID);
       ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
+      // When we get out of the dialog window, we want to re-eval the configuration.
+      // validateConfiguration() can't be used here because the ConfigurationException isn't caught
+      // anywhere, and fireEditorStateChanged() doesn't trigger any listeners called from here.
+      // Emulating a user action triggers apply(), so that's what we're doing here.
+      hiddenValidationTrigger.doClick();
       toggleDockerfileSection();
     });
 
@@ -265,11 +278,14 @@ public class AppEngineFlexibleDeploymentEditor extends
     yamlTextField.setText(configuration.getYamlPath());
     dockerfileTextField.setText(configuration.getDockerFilePath());
     gcpProjectSelector.setText(configuration.getCloudProjectName());
-    yamlTextField.setVisible(configuration.isOverrideYaml());
+    yamlTextField.setVisible(configuration.isOverrideYaml()
+        || modulesWithFlexFacetComboBox.getItemCount() == 0);
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
-    yamlOverrideCheckBox.setSelected(configuration.isOverrideYaml());
+    yamlOverrideCheckBox.setSelected(configuration.isOverrideYaml()
+        || modulesWithFlexFacetComboBox.getItemCount() == 0);
     dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile());
-    modulesWithFlexFacetComboBox.setEnabled(!configuration.isOverrideYaml());
+    modulesWithFlexFacetComboBox.setEnabled(!configuration.isOverrideYaml()
+        && modulesWithFlexFacetComboBox.getItemCount() != 0);
 
     toggleDockerfileSection();
     updateServiceName();

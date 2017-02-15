@@ -67,8 +67,7 @@ public class AppEngineRuntimeInstance extends
 
     AppEngineEnvironment environment =
         AppEngineEnvironment.valueOf(deploymentConfig.getEnvironment());
-    if ((environment == AppEngineEnvironment.APP_ENGINE_FLEX
-        || environment == AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT)
+    if (environment == AppEngineEnvironment.APP_ENGINE_FLEX
         && Strings.isNullOrEmpty(deploymentConfig.getYamlPath())) {
       callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml")
           + "\n" + GctBundle.getString("appengine.deployment.error.suggestflexfacet"));

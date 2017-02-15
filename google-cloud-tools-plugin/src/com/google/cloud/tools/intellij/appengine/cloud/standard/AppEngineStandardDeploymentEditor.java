@@ -67,7 +67,7 @@ public class AppEngineStandardDeploymentEditor extends
   private HyperlinkLabel appEngineCostWarningLabel;
 
   private Project project;
-  private DeploymentSource deploymentSource;
+  private AppEngineDeployable deploymentSource;
 
   private static final boolean PROMOTE_DEFAULT = true;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = true;
@@ -118,15 +118,16 @@ public class AppEngineStandardDeploymentEditor extends
     serviceLabel.setText(AppEngineProjectService.getInstance()
         .getServiceNameFromAppEngineWebXml(project, deploymentSource));
 
-    if (deploymentSource.getEnvironment() != null
-        && deploymentSource.getEnvironment().isFlexCompat()) {
-      appEngineCostWarningLabel.setHyperlinkText(
-          GctBundle.getString("appengine.flex.deployment.cost.warning.beforeLink"),
-          GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
-          " " + GctBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
-      appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-      appEngineCostWarningLabel.setHyperlinkTarget(GctBundle.getString("appengine.pricing.url"));
+    if (deploymentSource.getEnvironment() != null) {
       environmentLabel.setText(deploymentSource.getEnvironment().localizedLabel());
+      if (deploymentSource.getEnvironment().isFlexCompat()) {
+        appEngineCostWarningLabel.setHyperlinkText(
+            GctBundle.getString("appengine.flex.deployment.cost.warning.beforeLink"),
+            GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
+            " " + GctBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
+        appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+        appEngineCostWarningLabel.setHyperlinkTarget(GctBundle.getString("appengine.pricing.url"));
+      }
     } else {
       appEngineCostWarningLabel.setVisible(false);
     }
@@ -150,6 +151,9 @@ public class AppEngineStandardDeploymentEditor extends
     );
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     versionIdField.setText(configuration.getVersion());
+    if (deploymentSource.getEnvironment() != null) {
+      environmentLabel.setText(deploymentSource.getEnvironment().localizedLabel());
+    }
   }
 
   @Override
@@ -181,10 +185,8 @@ public class AppEngineStandardDeploymentEditor extends
    * identifying data. See {@link AppEngineRuntimeInstance#getDeploymentName}.
    */
   private void setDeploymentProjectAndVersion() {
-    AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
-
-    deployable.setProjectName(projectSelector.getText());
-    deployable.setVersion(versionIdField.getText());
+    deploymentSource.setProjectName(projectSelector.getText());
+    deploymentSource.setVersion(versionIdField.getText());
   }
 
   private void validateConfiguration() throws ConfigurationException {
