@@ -127,13 +127,21 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     }, ModalityState.stateForComponent(this));
   }
 
+  /**
+   * Prints a message that doesn't contain a hyperlink.
+   */
   public void setMessage(String text, boolean isError) {
     setMessage(() -> {
       messageText.setText(text);
+      // HyperlinkLabels require that revalidate() be called after setText(), in order for text to
+      // actually show up. setHyperlinkText() calls revalidate() internally.
       messageText.revalidate();
     }, isError);
   }
 
+  /**
+   * Prints a message with a hyperlink.
+   */
   private void setMessage(String beforeLinkText, String linkText, String afterLinkText) {
     setMessage(() -> messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText), true);
   }

@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
@@ -81,7 +82,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   @Override
   public boolean isSupportAlreadyAdded(@NotNull Module module,
       @NotNull FacetsProvider facetsProvider) {
-    return !facetsProvider.getFacetsByType(module, AppEngineFlexibleFacetType.ID).isEmpty();
+    return !facetsProvider.getFacetsByType(module, AppEngineFlexibleFacetType.ID).isEmpty()
+        || !facetsProvider.getFacetsByType(module, AppEngineStandardFacet.ID).isEmpty();
   }
 
   static class AppEngineFlexibleSupportConfigurable extends FrameworkSupportInModuleConfigurable {

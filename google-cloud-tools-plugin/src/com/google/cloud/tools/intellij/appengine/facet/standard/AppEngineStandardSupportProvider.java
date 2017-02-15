@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.standard;
 
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
@@ -105,7 +106,8 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
   @Override
   public boolean isSupportAlreadyAdded(@NotNull Module module,
       @NotNull FacetsProvider facetsProvider) {
-    return !facetsProvider.getFacetsByType(module, AppEngineStandardFacet.ID).isEmpty();
+    return !facetsProvider.getFacetsByType(module, AppEngineStandardFacet.ID).isEmpty()
+        || !facetsProvider.getFacetsByType(module, AppEngineFlexibleFacetType.ID).isEmpty();
   }
 
   @Nullable

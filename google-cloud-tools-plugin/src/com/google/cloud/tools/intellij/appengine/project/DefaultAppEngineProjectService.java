@@ -97,10 +97,6 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   @Override
   public Optional<AppEngineEnvironment> getModuleAppEngineEnvironment(Module module) {
-    if (FacetManager.getInstance(module).getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
-      return Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX);
-    }
-
     if (FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacet.ID) != null) {
       if (isFlexCompat(AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(
           module.getProject(), ImmutableList.of(module)))) {
@@ -108,6 +104,10 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       }
 
       return Optional.of(AppEngineEnvironment.APP_ENGINE_STANDARD);
+    }
+
+    if (FacetManager.getInstance(module).getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
+      return Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX);
     }
 
     return Optional.empty();
