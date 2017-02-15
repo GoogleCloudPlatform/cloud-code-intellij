@@ -144,7 +144,7 @@ public class AppEngineUtil {
               .add(createMavenBuildDeploymentSource(project, module, environment));
         }
 
-        if (environment.isStandard()) {
+        if (environment.isStandard() || environment.isFlexCompat()) {
           hasStandardModules = true;
         }
       }
