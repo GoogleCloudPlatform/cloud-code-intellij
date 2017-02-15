@@ -30,11 +30,11 @@ import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.tree.TreeModelAdapter;
@@ -186,7 +186,8 @@ public class AppEngineStandardDeploymentEditor extends
    */
   private void setDeploymentProjectAndVersion() {
     deploymentSource.setProjectName(projectSelector.getText());
-    deploymentSource.setVersion(versionIdField.getText());
+    deploymentSource.setVersion(Strings.isNullOrEmpty(versionIdField.getText())
+        ? "auto" : versionIdField.getText());
   }
 
   private void validateConfiguration() throws ConfigurationException {

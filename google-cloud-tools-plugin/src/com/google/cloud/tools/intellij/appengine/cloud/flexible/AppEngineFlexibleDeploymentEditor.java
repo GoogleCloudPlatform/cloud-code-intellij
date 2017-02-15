@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeployme
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRuntimeInstance;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
@@ -32,6 +33,7 @@ import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -241,6 +243,9 @@ public class AppEngineFlexibleDeploymentEditor extends
       yamlOverrideCheckBox.setSelected(true);
       yamlOverrideCheckBox.setEnabled(false);
       yamlTextField.setVisible(true);
+      dockerfileOverrideCheckBox.setSelected(true);
+      dockerfileOverrideCheckBox.setEnabled(false);
+      dockerfileTextField.setEnabled(true);
     }
 
     yamlModuleSettings.addActionListener(event -> {
@@ -283,7 +288,8 @@ public class AppEngineFlexibleDeploymentEditor extends
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
     yamlOverrideCheckBox.setSelected(configuration.isOverrideYaml()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
-    dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile());
+    dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile()
+        || modulesWithFlexFacetComboBox.getItemCount() == 0);
     modulesWithFlexFacetComboBox.setEnabled(!configuration.isOverrideYaml()
         && modulesWithFlexFacetComboBox.getItemCount() != 0);
 
@@ -320,6 +326,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     configuration.setOverrideYaml(yamlOverrideCheckBox.isSelected());
     configuration.setOverrideDockerfile(dockerfileOverrideCheckBox.isSelected());
     updateSelectors();
+    setDeploymentProjectAndVersion();
   }
 
   private void validateConfiguration() throws ConfigurationException {
@@ -465,6 +472,18 @@ public class AppEngineFlexibleDeploymentEditor extends
             .getFacetByType(AppEngineFlexibleFacetType.ID))
         .map(flexFacet -> flexFacet.getConfiguration().getDockerfilePath())
         .orElse("");
+  }
+
+  /**
+   * Sets the project / version to allow the deployment line items to be decorated with additional
+   * identifying data. See {@link AppEngineRuntimeInstance#getDeploymentName}.
+   */
+  private void setDeploymentProjectAndVersion() {
+    if (deploymentSource instanceof AppEngineDeployable) {
+      ((AppEngineDeployable) deploymentSource).setProjectName(gcpProjectSelector.getText());
+      ((AppEngineDeployable) deploymentSource).setVersion(
+          Strings.isNullOrEmpty(version.getText()) ? "auto" : version.getText());
+    }
   }
 
   @VisibleForTesting
