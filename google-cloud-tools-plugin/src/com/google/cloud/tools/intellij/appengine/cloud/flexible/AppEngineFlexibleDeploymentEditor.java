@@ -103,8 +103,9 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JCheckBox yamlOverrideCheckBox;
   private JCheckBox dockerfileOverrideCheckBox;
   private String dockerfileOverride = "";
-  private JButton yamlModuleSettings;
+  private JButton moduleSettingsButton;
   private JCheckBox hiddenValidationTrigger;
+  private JLabel noSupportedModulesWarning;
   private DeploymentSource deploymentSource;
 
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
@@ -238,17 +239,19 @@ public class AppEngineFlexibleDeploymentEditor extends
     // For the case Flex isn't enabled for any modules, the user can still deploy filesystem
     // jars/wars.
     if (modulesWithFlexFacetComboBox.getItemCount() == 0) {
-      modulesWithFlexFacetComboBox.setEnabled(false);
-      yamlModuleSettings.setEnabled(false);
-      yamlOverrideCheckBox.setSelected(true);
-      yamlOverrideCheckBox.setEnabled(false);
+      modulesWithFlexFacetComboBox.setVisible(false);
+      moduleSettingsButton.setVisible(false);
+      yamlOverrideCheckBox.setVisible(false);
+      dockerfileOverrideCheckBox.setVisible(false);
+      noSupportedModulesWarning.setVisible(true);
       yamlTextField.setVisible(true);
+      dockerfileTextField.setVisible(true);
+      // These checks are important so getYamlPath() and getDockerfilePath() work correctly.
+      yamlOverrideCheckBox.setSelected(true);
       dockerfileOverrideCheckBox.setSelected(true);
-      dockerfileOverrideCheckBox.setEnabled(false);
-      dockerfileTextField.setEnabled(true);
     }
 
-    yamlModuleSettings.addActionListener(event -> {
+    moduleSettingsButton.addActionListener(event -> {
       AppEngineFlexibleFacet flexFacet =
           FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
               .getFacetByType(AppEngineFlexibleFacetType.ID);
@@ -286,12 +289,9 @@ public class AppEngineFlexibleDeploymentEditor extends
     yamlTextField.setVisible(configuration.isOverrideYaml()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
-    yamlOverrideCheckBox.setSelected(configuration.isOverrideYaml()
-        || modulesWithFlexFacetComboBox.getItemCount() == 0);
-    dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile()
-        || modulesWithFlexFacetComboBox.getItemCount() == 0);
-    modulesWithFlexFacetComboBox.setEnabled(!configuration.isOverrideYaml()
-        && modulesWithFlexFacetComboBox.getItemCount() != 0);
+    yamlOverrideCheckBox.setSelected(configuration.isOverrideYaml());
+    dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile());
+    modulesWithFlexFacetComboBox.setEnabled(!configuration.isOverrideYaml());
 
     toggleDockerfileSection();
     updateServiceName();
@@ -413,12 +413,13 @@ public class AppEngineFlexibleDeploymentEditor extends
    * it otherwise.
    */
   private void toggleDockerfileSection() {
-    boolean isCustomRuntime = isCustomRuntime();
-    dockerfileOverrideCheckBox.setVisible(isCustomRuntime);
-    dockerfileTextField.setVisible(isCustomRuntime);
+    boolean visible = isCustomRuntime();
+    dockerfileOverrideCheckBox.setVisible(
+        visible && modulesWithFlexFacetComboBox.getItemCount() != 0);
+    dockerfileTextField.setVisible(visible);
     dockerfileTextField.setEnabled(dockerfileOverrideCheckBox.isSelected());
-    dockerfileLabel.setVisible(isCustomRuntime);
-    if (isCustomRuntime) {
+    dockerfileLabel.setVisible(visible);
+    if (visible) {
       dockerfileTextField.setText(getDockerfilePath());
     }
   }
