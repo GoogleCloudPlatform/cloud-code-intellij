@@ -61,7 +61,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   private AppEngineAssetProvider assetProvider;
 
-  public DefaultAppEngineProjectService() {
+  DefaultAppEngineProjectService() {
     assetProvider = AppEngineAssetProvider.getInstance();
   }
 
@@ -97,6 +97,8 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   @Override
   public Optional<AppEngineEnvironment> getModuleAppEngineEnvironment(Module module) {
+    // The order here is important -- Standard must come before Flexible so that when both Standard
+    // and Flexible are selected from the New Project/Module dialog, Standard takes precedence.
     if (FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacet.ID) != null) {
       if (isFlexCompat(AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(
           module.getProject(), ImmutableList.of(module)))) {

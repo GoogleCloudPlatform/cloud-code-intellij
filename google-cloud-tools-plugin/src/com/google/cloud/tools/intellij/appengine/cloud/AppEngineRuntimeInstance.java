@@ -46,7 +46,7 @@ public class AppEngineRuntimeInstance extends
 
   private final Set<CancellableRunnable> createdDeployments;
 
-  public AppEngineRuntimeInstance() {
+  AppEngineRuntimeInstance() {
     this.createdDeployments = new HashSet<>();
   }
 
@@ -91,8 +91,8 @@ public class AppEngineRuntimeInstance extends
                       new Task.Backgroundable(
                           task.getProject(),
                           GctBundle.message("appengine.deployment.status.deploying"),
-                          true,
-                          null) {
+                          true /* canBeCancelled */,
+                          null /* backgroundOption */) {
                         @Override
                         public void run(@NotNull ProgressIndicator indicator) {
                           ApplicationManager.getApplication().invokeLater(deployRunner);

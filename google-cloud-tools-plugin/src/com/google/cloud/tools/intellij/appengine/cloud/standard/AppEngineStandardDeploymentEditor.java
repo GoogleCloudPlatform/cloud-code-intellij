@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRuntimeInstance;
+import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
@@ -126,7 +127,8 @@ public class AppEngineStandardDeploymentEditor extends
             GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
             " " + GctBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
         appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-        appEngineCostWarningLabel.setHyperlinkTarget(GctBundle.getString("appengine.pricing.url"));
+        appEngineCostWarningLabel.setHyperlinkTarget(
+            CloudSdkAppEngineHelper.APP_ENGINE_BILLING_URL);
       }
     } else {
       appEngineCostWarningLabel.setVisible(false);

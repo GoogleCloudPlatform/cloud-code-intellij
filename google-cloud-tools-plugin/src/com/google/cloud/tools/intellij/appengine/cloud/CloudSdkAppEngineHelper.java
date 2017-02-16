@@ -84,6 +84,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private static final String REFRESH_TOKEN_LABEL = "refresh_token";
   private static final String GCLOUD_USER_TYPE_LABEL = "type";
   private static final String GCLOUD_USER_TYPE = "authorized_user";
+  public static final String APP_ENGINE_BILLING_URL = "https://cloud.google.com/appengine/pricing";
+
   private final Project project;
   private Path credentialsPath;
 
@@ -99,13 +101,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     return project;
   }
 
-  @NotNull
   @Override
   public Optional<Path> defaultAppYaml() {
     return Optional.of(getFileFromResourcePath(DEFAULT_APP_YAML_PATH));
   }
 
-  @Nullable
   @Override
   public Optional<Path> defaultDockerfile(
       AppEngineFlexibleDeploymentArtifactType deploymentArtifactType) {
@@ -119,7 +119,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     }
   }
 
-  @Nullable
   @Override
   public Optional<CancellableRunnable> createDeployRunner(
       LoggingHandler loggingHandler,
@@ -355,7 +354,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   @VisibleForTesting
-  public Path getCredentialsPath() {
+  Path getCredentialsPath() {
     return credentialsPath;
   }
 }

@@ -52,7 +52,7 @@ public interface AppEngineHelper {
    *
    * @param deploymentArtifactType depending on the artifact type we provide a different default
    *                               Dockerfile
-   * @return An {@link Optional} containing a {@link Path} to the default Dockerfile
+   * @return an {@link Optional} containing a {@link Path} to the default Dockerfile
    */
   Optional<Path> defaultDockerfile(AppEngineFlexibleDeploymentArtifactType deploymentArtifactType);
 

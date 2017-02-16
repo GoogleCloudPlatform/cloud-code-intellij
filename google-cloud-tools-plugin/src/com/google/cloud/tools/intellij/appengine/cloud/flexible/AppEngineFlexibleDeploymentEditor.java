@@ -17,11 +17,10 @@
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRuntimeInstance;
+import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
@@ -187,7 +186,7 @@ public class AppEngineFlexibleDeploymentEditor extends
         GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
         " " + GctBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
     appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    appEngineCostWarningLabel.setHyperlinkTarget(GctBundle.getString("appengine.pricing.url"));
+    appEngineCostWarningLabel.setHyperlinkTarget(CloudSdkAppEngineHelper.APP_ENGINE_BILLING_URL);
 
     gcpProjectSelector.addProjectSelectionListener(appInfoPanel::refresh);
     gcpProjectSelector.addModelListener(new TreeModelAdapter() {
@@ -223,9 +222,7 @@ public class AppEngineFlexibleDeploymentEditor extends
                     .getFacetByType(AppEngineFlexibleFacetType.ID) != null)
             .toArray(Module[]::new)
     ));
-    modulesWithFlexFacetComboBox.addItemListener(event -> {
-      toggleDockerfileSection();
-    });
+    modulesWithFlexFacetComboBox.addItemListener(event -> toggleDockerfileSection());
     modulesWithFlexFacetComboBox.setRenderer(new ListCellRendererWrapper<Module>() {
       @Override
       public void customize(JList list, Module value, int index, boolean selected,
