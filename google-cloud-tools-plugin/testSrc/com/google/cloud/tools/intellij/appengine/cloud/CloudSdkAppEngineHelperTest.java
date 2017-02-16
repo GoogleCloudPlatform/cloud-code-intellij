@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
@@ -50,6 +49,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.swing.Icon;
 
@@ -89,8 +89,9 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     String clientSecret = "clientSecret";
     String refreshToken = "refreshToken";
     when(deploymentConfiguration.getGoogleUsername()).thenReturn(username);
-    when(googleLoginService.getAllUsers())
-        .thenReturn(ImmutableMap.of(username, credentialedUser));
+    when(googleLoginService.ensureLoggedIn(username)).thenReturn(true);
+    when(googleLoginService.getLoggedInUser(username))
+        .thenReturn(Optional.of(credentialedUser));
     when(credentialedUser.getGoogleLoginState()).thenReturn(loginState);
     when(loginState.fetchOAuth2ClientId()).thenReturn(clientId);
     when(loginState.fetchOAuth2ClientSecret()).thenReturn(clientSecret);
@@ -123,7 +124,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
   @Test
   public void testCreateDeployRunnerInvalidDeploymentSourceFile_returnsNull() {
-    when(sdkService.validateCloudSdk()).thenReturn(ImmutableSet.<CloudSdkValidationResult>of());
+    when(sdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
 
     Runnable runner = helper.createDeployRunner(
         loggingHandler,
