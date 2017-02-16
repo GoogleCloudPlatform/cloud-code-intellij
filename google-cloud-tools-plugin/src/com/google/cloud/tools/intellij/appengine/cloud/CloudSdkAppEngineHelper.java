@@ -247,8 +247,12 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     Optional<CredentialedUser> projectUser =
         Services.getLoginService().getLoggedInUser(googleUsername);
 
-    GoogleLoginState googleLoginState =
-        projectUser.map(CredentialedUser::getGoogleLoginState).orElse(null);
+    GoogleLoginState googleLoginState;
+    if (projectUser.isPresent()) {
+      googleLoginState = projectUser.get().getGoogleLoginState();
+    } else {
+      return null;
+    }
 
     String clientId = googleLoginState.fetchOAuth2ClientId();
     String clientSecret = googleLoginState.fetchOAuth2ClientSecret();
