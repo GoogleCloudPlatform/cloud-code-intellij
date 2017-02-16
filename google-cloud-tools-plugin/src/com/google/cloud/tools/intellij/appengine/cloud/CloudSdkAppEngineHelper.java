@@ -244,27 +244,27 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   private Path doStageCredentials(String googleUsername) {
-    Optional<CredentialedUser> projectUser = Services.getLoginService().getLoggedInUser(googleUsername);
+    Optional<CredentialedUser> projectUser =
+        Services.getLoginService().getLoggedInUser(googleUsername);
 
-    GoogleLoginState googleLoginState;
-    if (projectUser.isPresent()) {
-      googleLoginState = projectUser.get().getGoogleLoginState();
-    } else {
-      return null;
-    }
+    GoogleLoginState googleLoginState =
+        projectUser.map(CredentialedUser::getGoogleLoginState).orElse(null);
+
     String clientId = googleLoginState.fetchOAuth2ClientId();
     String clientSecret = googleLoginState.fetchOAuth2ClientSecret();
     String refreshToken = googleLoginState.fetchOAuth2RefreshToken();
-    Map<String, String> credentialMap = ImmutableMap.of(
-        CLIENT_ID_LABEL, clientId,
-        CLIENT_SECRET_LABEL, clientSecret,
-        REFRESH_TOKEN_LABEL, refreshToken,
-        GCLOUD_USER_TYPE_LABEL, GCLOUD_USER_TYPE
-    );
+    Map<String, String> credentialMap =
+        ImmutableMap.of(
+            CLIENT_ID_LABEL, clientId,
+            CLIENT_SECRET_LABEL, clientSecret,
+            REFRESH_TOKEN_LABEL, refreshToken,
+            GCLOUD_USER_TYPE_LABEL, GCLOUD_USER_TYPE);
     String jsonCredential = new Gson().toJson(credentialMap);
     try {
-      credentialsPath = FileUtil.createTempFile(
-          "tmp_google_application_default_credential", "json", true /* deleteOnExit */).toPath();
+      credentialsPath =
+          FileUtil.createTempFile(
+                  "tmp_google_application_default_credential", "json", true /* deleteOnExit */)
+              .toPath();
       Files.write(credentialsPath, jsonCredential.getBytes(Charsets.UTF_8));
 
       return credentialsPath;

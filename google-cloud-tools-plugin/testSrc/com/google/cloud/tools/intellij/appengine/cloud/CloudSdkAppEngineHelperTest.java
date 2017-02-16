@@ -83,7 +83,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testCreateApplicationDefaultCredentials() throws Exception {
+  public void testStageCredentials_withValidCreds() throws Exception {
     String username = "jones@gmail.com";
     String clientId = "clientId";
     String clientSecret = "clientSecret";
@@ -106,6 +106,14 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     assertEquals(refreshToken, jsonMap.get("refresh_token"));
     assertEquals("authorized_user", jsonMap.get("type"));
     Files.delete(credentialFile);
+  }
+
+  @Test
+  public void testStageCredentials_withoutValidCreds() throws Exception {
+    String username = "jones@gmail.com";
+    when(deploymentConfiguration.getGoogleUsername()).thenReturn(username);
+    when(googleLoginService.ensureLoggedIn(username)).thenReturn(false);
+    assertNull(helper.stageCredentials(username));
   }
 
   @Test
