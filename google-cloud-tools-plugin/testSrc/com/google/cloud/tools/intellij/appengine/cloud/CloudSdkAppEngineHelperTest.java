@@ -106,7 +106,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     String username = "jones@gmail.com";
     when(deploymentConfiguration.getGoogleUsername()).thenReturn(username);
     when(googleLoginService.ensureLoggedIn(username)).thenReturn(false);
-    assertNull(helper.stageCredentials(username));
+    assertFalse(helper.stageCredentials(username).isPresent());
   }
 
   @Test
