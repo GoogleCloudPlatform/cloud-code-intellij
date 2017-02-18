@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
     cloudRepositoryService = ServiceManager.getService(CloudRepositoryService.class);
   }
 
+  @SuppressWarnings("FutureReturnValueIgnored")
   public void loadRepositories(@NotNull String cloudProject, @NotNull CredentialedUser user,
       @Nullable Runnable onComplete) {
     setUserObject(cloudProject);
