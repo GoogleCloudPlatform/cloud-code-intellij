@@ -167,50 +167,42 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     @Override
     public void afterLibraryAdded(final Library addedLibrary) {
-      AppEngineStandardMavenLibrary library = AppEngineStandardMavenLibrary
-          .getLibraryByMavenDisplayName(addedLibrary.getName());
+      AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(addedLibrary.getName()).ifPresent(
+          library -> {
+            final DependencyScope scope = library.getScope();
 
-      if (library == null) {
-        return;
-      }
+            new WriteAction() {
+              @Override
+              protected void run(@NotNull Result result) throws Throwable {
+                ModuleRootManager manager = ModuleRootManager.getInstance(context.getModule());
+                ModifiableRootModel model = manager.getModifiableModel();
 
-      final DependencyScope scope = library.getScope();
+                model.addLibraryEntry(addedLibrary);
 
-      new WriteAction() {
-        @Override
-        protected void run(@NotNull Result result) throws Throwable {
-          ModuleRootManager manager = ModuleRootManager.getInstance(context.getModule());
-          ModifiableRootModel model = manager.getModifiableModel();
+                for (OrderEntry orderEntry : model.getOrderEntries()) {
+                  if (orderEntry.getPresentableName().equals(addedLibrary.getName())) {
+                    ((ExportableOrderEntry) orderEntry).setScope(scope);
+                  }
+                }
+                model.commit();
+              }
+            }.execute();
 
-          model.addLibraryEntry(addedLibrary);
+            Artifact artifact = AppEngineSupportProvider
+                .findOrCreateWebArtifact((AppEngineStandardFacet) context.getFacet());
+            AppEngineStandardWebIntegration.getInstance()
+                .addLibraryToArtifact(addedLibrary, artifact, context.getProject());
 
-          for (OrderEntry orderEntry : model.getOrderEntries()) {
-            if (orderEntry.getPresentableName().equals(addedLibrary.getName())) {
-              ((ExportableOrderEntry) orderEntry).setScope(scope);
-            }
+            appEngineStandardLibraryPanel.toggleLibrary(library, true /* select */);
           }
-          model.commit();
-        }
-      }.execute();
-
-      Artifact artifact = AppEngineSupportProvider
-          .findOrCreateWebArtifact((AppEngineStandardFacet) context.getFacet());
-      AppEngineStandardWebIntegration.getInstance()
-          .addLibraryToArtifact(addedLibrary, artifact, context.getProject());
-
-      appEngineStandardLibraryPanel.toggleLibrary(
-          AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(addedLibrary.getName()),
-          true /* select */);
+      );
     }
 
     @Override
     public void afterLibraryRemoved(Library removedLibrary) {
-      AppEngineStandardMavenLibrary library = AppEngineStandardMavenLibrary
-          .getLibraryByMavenDisplayName(removedLibrary.getName());
-
-      if (library != null) {
-        appEngineStandardLibraryPanel.toggleLibrary(library, false /* select */);
-      }
+      AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(removedLibrary.getName())
+          .ifPresent(
+              library -> appEngineStandardLibraryPanel.toggleLibrary(library, false /* select */));
     }
 
     @Override

@@ -47,6 +47,7 @@ import javax.swing.JTextPane;
  * Dialog that allows creation of an App Engine Application. Instances of this class are scoped to a
  * single Application.
  */
+@SuppressWarnings("FutureReturnValueIgnored")
 public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
   private final static String LOCATIONS_DOCUMENTATION_URL
@@ -147,8 +148,8 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
         .ping();
   }
 
-  private void setStatusMessageAsync(final String message, final boolean isError) {
-    ApplicationManager.getApplication().invokeLater(() -> setStatusMessage(message, isError),
+  private void setStatusMessageAsync(final String message) {
+    ApplicationManager.getApplication().invokeLater(() -> setStatusMessage(message, true),
         ModalityState.stateForComponent(AppEngineApplicationCreateDialog.this.getContentPane()));
   }
 
@@ -173,8 +174,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
         appEngineRegions = AppEngineAdminService.getInstance()
             .getAllAppEngineLocations(userCredential);
       } catch (IOException | GoogleApiException e) {
-        setStatusMessageAsync(GctBundle.message("appengine.application.region.list.fetch.error"),
-            true);
+        setStatusMessageAsync(GctBundle.message("appengine.application.region.list.fetch.error"));
         enable();
         return;
       }

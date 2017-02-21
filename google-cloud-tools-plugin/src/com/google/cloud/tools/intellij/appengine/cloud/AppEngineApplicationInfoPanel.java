@@ -45,6 +45,7 @@ import git4idea.DialogManager;
 /**
  * A {@link JPanel} that displays contextual information about an App Engine Application.
  */
+@SuppressWarnings("FutureReturnValueIgnored")
 public class AppEngineApplicationInfoPanel extends JPanel {
 
   private static final String HTML_OPEN_TAG = "<html><font face='sans' size='-1'>";

@@ -34,6 +34,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * TreeNode representation of the set of available Cloud Source Repositories for a given GCP
  * project.
  */
+@SuppressWarnings("FutureReturnValueIgnored")
 public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
   private CloudRepositoryService cloudRepositoryService;

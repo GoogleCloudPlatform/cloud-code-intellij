@@ -34,6 +34,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.containers.HashMap;
+import com.intellij.util.ui.tree.TreeModelAdapter;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,10 +53,11 @@ import javax.swing.event.TreeModelListener;
  * This binding between the project and debuggee is refactored out to make it reusable in the
  * future.
  */
+@SuppressWarnings("FutureReturnValueIgnored")
 class ProjectDebuggeeBinding {
 
   private static final Logger LOG = Logger.getInstance(ProjectDebuggeeBinding.class);
-  private final JComboBox targetSelector;
+  private final JComboBox<DebugTargetSelectorItem> targetSelector;
   private final ProjectSelector projectSelector;
   private final Action okAction;
   private Debugger cloudDebuggerClient = null;
@@ -81,19 +83,7 @@ class ProjectDebuggeeBinding {
       }
     });
 
-    this.projectSelector.addModelListener(new TreeModelListener() {
-      @Override
-      public void treeNodesChanged(TreeModelEvent event) {
-      }
-
-      @Override
-      public void treeNodesInserted(TreeModelEvent event) {
-      }
-
-      @Override
-      public void treeNodesRemoved(TreeModelEvent event) {
-      }
-
+    this.projectSelector.addModelListener(new TreeModelAdapter() {
       @Override
       public void treeStructureChanged(TreeModelEvent event) {
         refreshDebugTargetList();
@@ -149,73 +139,74 @@ class ProjectDebuggeeBinding {
   @SuppressWarnings("FutureReturnValueIgnored")
   private void refreshDebugTargetList() {
     targetSelector.removeAllItems();
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          if (projectSelector.getProjectNumber() != null && getCloudDebuggerClient() != null) {
-            final ListDebuggeesResponse debuggees = getCloudDebuggerClient().debuggees().list()
-                .setProject(projectSelector.getProjectNumber().toString())
-                .setClientVersion(ServiceManager.getService(CloudToolsPluginInfoService.class)
-                    .getClientVersionForCloudDebugger())
-                .execute();
-            isCdbQueried = true;
+    ApplicationManager.getApplication()
+        .executeOnPooledThread(
+            () -> {
+              try {
+                if (projectSelector.getProjectNumber() != null
+                    && getCloudDebuggerClient() != null) {
+                  final ListDebuggeesResponse debuggees =
+                      getCloudDebuggerClient()
+                          .debuggees()
+                          .list()
+                          .setProject(projectSelector.getProjectNumber().toString())
+                          .setClientVersion(
+                              ServiceManager.getService(CloudToolsPluginInfoService.class)
+                                  .getClientVersionForCloudDebugger())
+                          .execute();
+                  isCdbQueried = true;
 
-            SwingUtilities.invokeLater(new Runnable() {
-              @Override
-              public void run() {
-                DebugTarget targetSelection = null;
+                  SwingUtilities.invokeLater(
+                      () -> {
+                        DebugTarget targetSelection = null;
 
-                if (debuggees == null || debuggees.getDebuggees() == null || debuggees
-                    .getDebuggees().isEmpty()) {
-                  disableTargetSelector(GctBundle.getString("clouddebug.nomodulesfound"));
-                } else {
-                  targetSelector.setEnabled(true);
-                  Map<String, DebugTarget> perModuleCache = new HashMap<String, DebugTarget>();
+                        if (debuggees == null
+                            || debuggees.getDebuggees() == null
+                            || debuggees.getDebuggees().isEmpty()) {
+                          disableTargetSelector(GctBundle.getString("clouddebug.nomodulesfound"));
+                        } else {
+                          targetSelector.setEnabled(true);
+                          Map<String, DebugTarget> perModuleCache = new HashMap<>();
 
-                  for (Debuggee debuggee : debuggees.getDebuggees()) {
-                    DebugTarget item = new DebugTarget(debuggee, projectSelector.getText());
-                    if (!Strings.isNullOrEmpty(item.getModule())
-                        && !Strings.isNullOrEmpty(item.getVersion())) {
-                      //If we already have an existing item for that module+version, compare the
-                      // minor versions and only use the latest minor version.
-                      String key = String.format("%s:%s", item.getModule(), item.getVersion());
-                      DebugTarget existing = perModuleCache.get(key);
-                      if (existing != null && existing.getMinorVersion() > item.getMinorVersion()) {
-                        continue;
-                      }
-                      if (existing != null) {
-                        targetSelector.removeItem(existing);
-                      }
-                      perModuleCache.put(key, item);
-                    }
-                    if (inputState != null && !Strings.isNullOrEmpty(inputState.getDebuggeeId())) {
-                      if (inputState.getDebuggeeId().equals(item.getId())) {
-                        targetSelection = item;
-                      }
-                    }
-                    targetSelector.addItem(item);
-                    okAction.setEnabled(true);
-                  }
+                          for (Debuggee debuggee : debuggees.getDebuggees()) {
+                            DebugTarget item = new DebugTarget(debuggee, projectSelector.getText());
+                            if (!Strings.isNullOrEmpty(item.getModule())
+                                && !Strings.isNullOrEmpty(item.getVersion())) {
+                              // If we already have an existing item for that module+version,
+                              // compare the minor versions and only use the latest minor version.
+                              String key =
+                                  String.format("%s:%s", item.getModule(), item.getVersion());
+                              DebugTarget existing = perModuleCache.get(key);
+                              if (existing != null
+                                  && existing.getMinorVersion() > item.getMinorVersion()) {
+                                continue;
+                              }
+                              if (existing != null) {
+                                targetSelector.removeItem(existing);
+                              }
+                              perModuleCache.put(key, item);
+                            }
+                            if (inputState != null
+                                && !Strings.isNullOrEmpty(inputState.getDebuggeeId())) {
+                              if (inputState.getDebuggeeId().equals(item.getId())) {
+                                targetSelection = item;
+                              }
+                            }
+                            targetSelector.addItem(item);
+                            okAction.setEnabled(true);
+                          }
+                        }
+                        if (targetSelection != null) {
+                          targetSelector.setSelectedItem(targetSelection);
+                        }
+                      });
                 }
-                if (targetSelection != null) {
-                  targetSelector.setSelectedItem(targetSelection);
-                }
+              } catch (final IOException ex) {
+                SwingUtilities.invokeLater(() -> disableTargetSelector(ex));
+
+                LOG.warn("Error listing debuggees from Cloud Debugger API", ex);
               }
             });
-          }
-        } catch (final IOException ex) {
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              disableTargetSelector(ex);
-            }
-          });
-
-          LOG.warn("Error listing debuggees from Cloud Debugger API", ex);
-        }
-      }
-    });
   }
 
   private void disableTargetSelector(Throwable reason) {
