@@ -31,16 +31,12 @@ public abstract class JavaeeFrameworkSupportProviderTestCase extends
   public static void deleteApplicationServers() {
     final ApplicationServersManager manager = ApplicationServersManager.getInstance();
     final List<ApplicationServer> servers = manager.getApplicationServers();
-    final ApplicationServersManager.ApplicationServersManagerModifiableModel model = manager.createModifiableModel();
+    final ApplicationServersManager.ApplicationServersManagerModifiableModel model =
+        manager.createModifiableModel();
     for (ApplicationServer server : servers) {
       model.deleteApplicationServer(server);
     }
-    ApplicationManager.getApplication().runWriteAction(new Runnable() {
-      @Override
-      public void run() {
-        model.commit();
-      }
-    });
+    ApplicationManager.getApplication().runWriteAction(model::commit);
   }
 
 
