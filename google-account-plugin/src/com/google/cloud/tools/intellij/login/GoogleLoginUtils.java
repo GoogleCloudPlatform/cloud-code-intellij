@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ public class GoogleLoginUtils {
    * @param userInfo the class to be parsed
    * @param pictureCallback the user image will be set on this callback
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   public static void provideUserPicture(Userinfoplus userInfo,
       final IUserPropertyCallback pictureCallback) {
     // set the size of the image before it is served
@@ -80,6 +81,7 @@ public class GoogleLoginUtils {
   /**
    * Sets the user info on the callback.
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   public static void getUserInfo(@NotNull final Credential credential,
       final IUserPropertyCallback callback) {
     final Oauth2 userInfoService =
