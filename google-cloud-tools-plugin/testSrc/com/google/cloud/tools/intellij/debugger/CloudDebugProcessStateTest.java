@@ -92,7 +92,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     Breakpoint result = new Breakpoint();
     result.setId(id);
     result.setIsFinalState(isFinal);
-    if (isFinal.equals(Boolean.TRUE)) {
+    if (Boolean.TRUE.equals(isFinal)) {
       Calendar calendar =
           Calendar.getInstance(); // gets a calendar using the default time zone and locale.
       calendar.add(Calendar.SECOND, finalTimeSeconds);
