@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,7 @@ import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 import org.junit.Ignore;
 import org.junit.Test;
 
-/**
- * Unit tests for {@link ServerToIdeFileResolver}.
- */
+/** Unit tests for {@link ServerToIdeFileResolver}. */
 public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase {
   private Project project;
   private PsiClass class1;
@@ -52,12 +50,12 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
     super.tearDown();
   }
 
-  @Test
   public void testGetCloudPathFromJavaFile() {
     PsiJavaFile psiJavaFile = mock(PsiJavaFile.class);
     when(psiJavaFile.getPackageName()).thenReturn("com.java.package");
     when(psiJavaFile.getName()).thenReturn("Class.java");
-    assertEquals(ServerToIdeFileResolver.getCloudPathFromJavaFile(psiJavaFile),
+    assertEquals(
+        ServerToIdeFileResolver.getCloudPathFromJavaFile(psiJavaFile),
         "com/java/package/Class.java");
   }
 
@@ -66,61 +64,59 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
   public void ignore_testGetFileFromPath_fullPath() {
     // TODO(joaomartins): Find out why project.getBaseDir() is returning a different tempDir to
     // myFixture.
-    file1 = this.myFixture.addFileToProject(
-        "path/to/prj/src/main/com/java/package/Class.java", "");
-    file2 = this.myFixture.addFileToProject(
-            "path/to/prj/src/test/com/java/package/ClassTest.java", "");
+    file1 = this.myFixture.addFileToProject("path/to/prj/src/main/com/java/package/Class.java", "");
+    file2 =
+        this.myFixture.addFileToProject("path/to/prj/src/test/com/java/package/ClassTest.java", "");
 
     ServerToIdeFileResolver fileResolver = new ServerToIdeFileResolver();
     assertEquals(
-        fileResolver.getFileFromPath(
-            project, "path/to/prj/src/main/com/java/package/Class.java"),
+        fileResolver.getFileFromPath(project, "path/to/prj/src/main/com/java/package/Class.java"),
         file1.getVirtualFile());
   }
 
   // When searching for the package and class name.
-  @Test
+
   public void testGetFileFromPath_packageClass() {
     ServerToIdeFileResolver fileResolver = new ServerToIdeFileResolver();
 
-    assertEquals(class1.getContainingFile().getVirtualFile(),
+    assertEquals(
+        class1.getContainingFile().getVirtualFile(),
         fileResolver.getFileFromPath(project, "com/java/pkg/Class.java"));
   }
 
   // When searching for file name only.
-  @Test
+
   public void testGetFileFromPath_fileName() {
     ServerToIdeFileResolver fileResolver = new ServerToIdeFileResolver();
 
-    assertEquals(class1.getContainingFile().getVirtualFile(),
+    assertEquals(
+        class1.getContainingFile().getVirtualFile(),
         fileResolver.getFileFromPath(project, "Class.java"));
   }
 
-  @Test
   public void testGetPackageFromPath() {
-    assertEquals("com.java.package",
+    assertEquals(
+        "com.java.package",
         ServerToIdeFileResolver.getPackageFromPath("/com/java/package/Class.java"));
-    assertEquals("",
-        ServerToIdeFileResolver.getPackageFromPath("Class.java"));
-    assertEquals("package",
-        ServerToIdeFileResolver.getPackageFromPath("/package/Class.java"));
-    assertEquals("com.java.package",
+    assertEquals("", ServerToIdeFileResolver.getPackageFromPath("Class.java"));
+    assertEquals("package", ServerToIdeFileResolver.getPackageFromPath("/package/Class.java"));
+    assertEquals(
+        "com.java.package",
         ServerToIdeFileResolver.getPackageFromPath("/com//java/package//Class.java"));
-    assertEquals("com.java.package",
+    assertEquals(
+        "com.java.package",
         ServerToIdeFileResolver.getPackageFromPath("com/java/package/Class.java"));
     assertEquals("", ServerToIdeFileResolver.getPackageFromPath(""));
   }
 
-  @Test
   public void testGetClassNameFromPath() {
-    assertEquals("Class",
-        ServerToIdeFileResolver.getClassNameFromPath("com/java/package/Class.java"));
-    assertEquals("Class",
-        ServerToIdeFileResolver.getClassNameFromPath("com/java/package/Class"));
+    assertEquals(
+        "Class", ServerToIdeFileResolver.getClassNameFromPath("com/java/package/Class.java"));
+    assertEquals("Class", ServerToIdeFileResolver.getClassNameFromPath("com/java/package/Class"));
     assertEquals("", ServerToIdeFileResolver.getClassNameFromPath(""));
     assertEquals("Class", ServerToIdeFileResolver.getClassNameFromPath("Class"));
-    assertEquals("Class",
-        ServerToIdeFileResolver.getClassNameFromPath("com.java/package/Class.java"));
+    assertEquals(
+        "Class", ServerToIdeFileResolver.getClassNameFromPath("com.java/package/Class.java"));
     assertEquals("Class", ServerToIdeFileResolver.getClassNameFromPath("com.java/package/Class"));
   }
 }
