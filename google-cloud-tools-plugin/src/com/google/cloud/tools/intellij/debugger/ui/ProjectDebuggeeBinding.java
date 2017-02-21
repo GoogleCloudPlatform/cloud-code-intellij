@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,7 +146,7 @@ class ProjectDebuggeeBinding {
   /**
    * Refreshes the list of attachable debug targets based on the project selection.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void refreshDebugTargetList() {
     targetSelector.removeAllItems();
     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {

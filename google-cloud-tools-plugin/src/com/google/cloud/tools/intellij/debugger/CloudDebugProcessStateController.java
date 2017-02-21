@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,7 @@ public class CloudDebugProcessStateController {
    *
    * @param breakpointId the {@link Breakpoint} Id to delete
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void deleteBreakpoint(@NotNull final String breakpointId, boolean performAsync) {
     if (state == null) {
       throw new IllegalStateException();
@@ -157,6 +158,7 @@ public class CloudDebugProcessStateController {
   /**
    * Returns a fully realized {@link Breakpoint} with all results possibly asynchronously.
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   public void resolveBreakpointAsync(@NotNull final String id,
       @NotNull final ResolveBreakpointHandler handler) {
 
@@ -213,6 +215,7 @@ public class CloudDebugProcessStateController {
   /**
    * Called from the {@link CloudDebugProcessHandler} to set a breakpoint.
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   void setBreakpointAsync(@NotNull final Breakpoint serverBreakpoint,
       @NotNull final SetBreakpointHandler handler) {
 

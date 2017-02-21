@@ -178,6 +178,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
     return new TrackingEventBuilder(this, externalPluginName, action);
   }
 
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void sendPing(@NotNull final List<? extends NameValuePair> postData) {
     ApplicationManager.getApplication()
         .executeOnPooledThread(
