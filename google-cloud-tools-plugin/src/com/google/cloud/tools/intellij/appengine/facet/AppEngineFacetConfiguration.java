@@ -42,8 +42,7 @@ import java.util.Set;
 public class AppEngineFacetConfiguration implements FacetConfiguration,
     PersistentStateComponent<AppEngineFacetProperties> {
 
-  private AppEngineFacetProperties properties
-      = new AppEngineFacetProperties();
+  private AppEngineFacetProperties properties = new AppEngineFacetProperties();
 
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
