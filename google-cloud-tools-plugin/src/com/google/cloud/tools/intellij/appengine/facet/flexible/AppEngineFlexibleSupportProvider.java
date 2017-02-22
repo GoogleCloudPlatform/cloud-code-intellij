@@ -115,8 +115,9 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
             appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
       }
 
-      // Only adds deployment run configuration for now. Stackdriver debugger to follow.
-      setupDeploymentRunConfiguration(module, facet);
+      // TODO(joaomartins): Add other run configurations here too.
+      // https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1260
+      setupDeploymentRunConfiguration(module);
 
       CloudSdkService sdkService = CloudSdkService.getInstance();
       if (!sdkService.validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
@@ -125,7 +126,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       }
     }
 
-    private void setupDeploymentRunConfiguration(Module module, AppEngineFlexibleFacet facet) {
+    private void setupDeploymentRunConfiguration(Module module) {
       RunManager runManager = RunManager.getInstance(module.getProject());
       AppEngineCloudType serverType =
           ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
@@ -144,20 +145,6 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       if (server != null) {
         runConfiguration.setServerName(server.getName());
       }
-
-      // Copies the specified app.yaml and Dockerfile paths to the deployment run config.
-      AppEngineDeploymentConfiguration deployConfiguration =
-          new AppEngineDeploymentConfiguration();
-      deployConfiguration.setYamlPath(facet.getConfiguration().getYamlPath());
-      deployConfiguration.setDockerFilePath(facet.getConfiguration().getDockerfilePath());
-
-      // Set logged in user.
-      CredentialedUser user = Services.getLoginService().getActiveUser();
-      if (user != null) {
-        deployConfiguration.setGoogleUsername(user.getEmail());
-      }
-
-      runConfiguration.setDeploymentConfiguration(deployConfiguration);
 
       runManager.addConfiguration(settings, false /* shared */);
     }
