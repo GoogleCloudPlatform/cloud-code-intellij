@@ -17,13 +17,14 @@
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
-import com.google.cloud.tools.intellij.debugger.BreakpointUtil;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import org.jetbrains.annotations.NotNull;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -152,7 +153,11 @@ class SnapshotsModel extends AbstractTableModel {
         if (!Boolean.TRUE.equals(breakpoint.getIsFinalState())) {
           return GctBundle.getString("clouddebug.pendingstatus");
         }
-        return BreakpointUtil.parseDateTime(breakpoint.getFinalTime());
+        try {
+          return ISODateTimeFormat.dateTime().parseDateTime(breakpoint.getFinalTime()).toDate();
+        } catch (IllegalArgumentException iae) {
+          return new Date();
+        }
       case 2:
         String path = breakpoint.getLocation().getPath();
         int startIndex = path.lastIndexOf('/');
