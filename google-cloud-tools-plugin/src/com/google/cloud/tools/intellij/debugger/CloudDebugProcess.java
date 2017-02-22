@@ -68,6 +68,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -332,10 +333,13 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   }
 
   private void navigateToBreakpoint(@NotNull Breakpoint target) {
-    Date snapshotTime = BreakpointUtil.parseDateTime(target.getFinalTime());
-    if (snapshotTime == null) {
+    Date snapshotTime;
+    try {
+      snapshotTime = ISODateTimeFormat.dateTime().parseDateTime(target.getFinalTime()).toDate();
+    } catch (IllegalArgumentException iae) {
       snapshotTime = new Date();
     }
+
     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     currentSnapshot = target;
     if (!getXDebugSession().isStopped()) {
