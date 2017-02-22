@@ -47,7 +47,6 @@ import javax.swing.JTextPane;
  * Dialog that allows creation of an App Engine Application. Instances of this class are scoped to a
  * single Application.
  */
-@SuppressWarnings("FutureReturnValueIgnored")
 public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
   private final static String LOCATIONS_DOCUMENTATION_URL

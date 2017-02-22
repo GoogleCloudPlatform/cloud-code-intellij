@@ -40,7 +40,6 @@ import java.net.URL;
 /**
  * Utility methods of Google Login.
  */
-@SuppressWarnings("FutureReturnValueIgnored")
 public class GoogleLoginUtils {
 
   public static final Logger LOG = Logger.getInstance(GoogleLoginUtils.class);
