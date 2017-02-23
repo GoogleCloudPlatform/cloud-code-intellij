@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ import com.google.gson.Gson;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
@@ -62,6 +61,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A Cloud SDK (gcloud) based implementation of the {@link AppEngineHelper} interface.
@@ -75,7 +75,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       = "/generation/src/appengine/mvm/jar.dockerfile";
   private static final String DEFAULT_WAR_DOCKERFILE_PATH
       = "/generation/src/appengine/mvm/war.dockerfile";
-
+  private static final String CLIENT_ID_LABEL = "client_id";
+  private static final String CLIENT_SECRET_LABEL = "client_secret";
+  private static final String REFRESH_TOKEN_LABEL = "refresh_token";
+  private static final String GCLOUD_USER_TYPE_LABEL = "type";
+  private static final String GCLOUD_USER_TYPE = "authorized_user";
   private final Project project;
   private Path credentialsPath;
 
@@ -231,58 +235,40 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         .build();
   }
 
-  private static final String CLIENT_ID_LABEL = "client_id";
-  private static final String CLIENT_SECRET_LABEL = "client_secret";
-  private static final String REFRESH_TOKEN_LABEL = "refresh_token";
-  private static final String GCLOUD_USER_TYPE_LABEL = "type";
-  private static final String GCLOUD_USER_TYPE = "authorized_user";
-
-
   @Override
   public Path stageCredentials(String googleUserName) {
-    Path credentials = doStageCredentials(googleUserName);
-    if (credentials != null) {
-      return credentials;
-    }
-
-    int addUserResult = Messages.showOkCancelDialog(
-        GctBundle.message("appengine.staging.credentials.error.message"),
-        GctBundle.message("appengine.staging.credentials.error.dialog.title"),
-        GctBundle.message("appengine.staging.credentials.error.dialog.addaccount.button"),
-        GctBundle.message("appengine.staging.credentials.error.dialog.cancel.button"),
-        Messages.getWarningIcon());
-
-    if (addUserResult == Messages.OK) {
-      Services.getLoginService().logIn();
+    if (Services.getLoginService().ensureLoggedIn(googleUserName)) {
       return doStageCredentials(googleUserName);
     }
-
     return null;
   }
 
   private Path doStageCredentials(String googleUsername) {
-    CredentialedUser projectUser = Services.getLoginService().getAllUsers()
-        .get(googleUsername);
+    Optional<CredentialedUser> projectUser =
+        Services.getLoginService().getLoggedInUser(googleUsername);
 
     GoogleLoginState googleLoginState;
-    if (projectUser != null) {
-      googleLoginState = projectUser.getGoogleLoginState();
+    if (projectUser.isPresent()) {
+      googleLoginState = projectUser.get().getGoogleLoginState();
     } else {
       return null;
     }
+
     String clientId = googleLoginState.fetchOAuth2ClientId();
     String clientSecret = googleLoginState.fetchOAuth2ClientSecret();
     String refreshToken = googleLoginState.fetchOAuth2RefreshToken();
-    Map<String, String> credentialMap = ImmutableMap.of(
-        CLIENT_ID_LABEL, clientId,
-        CLIENT_SECRET_LABEL, clientSecret,
-        REFRESH_TOKEN_LABEL, refreshToken,
-        GCLOUD_USER_TYPE_LABEL, GCLOUD_USER_TYPE
-    );
+    Map<String, String> credentialMap =
+        ImmutableMap.of(
+            CLIENT_ID_LABEL, clientId,
+            CLIENT_SECRET_LABEL, clientSecret,
+            REFRESH_TOKEN_LABEL, refreshToken,
+            GCLOUD_USER_TYPE_LABEL, GCLOUD_USER_TYPE);
     String jsonCredential = new Gson().toJson(credentialMap);
     try {
-      credentialsPath = FileUtil.createTempFile(
-          "tmp_google_application_default_credential", "json", true /* deleteOnExit */).toPath();
+      credentialsPath =
+          FileUtil.createTempFile(
+                  "tmp_google_application_default_credential", "json", true /* deleteOnExit */)
+              .toPath();
       Files.write(credentialsPath, jsonCredential.getBytes(Charsets.UTF_8));
 
       return credentialsPath;

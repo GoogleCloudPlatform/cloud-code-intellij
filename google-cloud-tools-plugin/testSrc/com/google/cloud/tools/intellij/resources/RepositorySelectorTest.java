@@ -39,6 +39,7 @@ import java.awt.Point;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -77,24 +78,40 @@ public class RepositorySelectorTest extends PlatformTestCase {
 
   public void testShowsNoRepositoriesMessage_WhenNoCloudReposFound()
       throws IOException, GeneralSecurityException {
-    JPanel panel = getEmptyRepositoriesPanel();
+    RepositorySelector selector = getEmptyRepositoriesPanel();
 
     // Shows a 'no repositories' message
-    assertInstanceOf(getPanelObject(panel), ResourceEmptyModelItem.class);
+    assertInstanceOf(getPanelObject(selector.getPanel()), ResourceEmptyModelItem.class);
   }
 
   public void testListsRepositories() throws IOException, GeneralSecurityException {
-    JPanel panel = getPopulatedRepositoriesPanel();
+    RepositorySelector selector = getPopulatedRepositoriesPanel(true /*openPopup*/);
+
+    // Contains a repository item panel
+    assertInstanceOf(getPanelObject(selector.getPanel()), RepositoryModelItem.class);
 
     // Contains a repository item
-    assertInstanceOf(getPanelObject(panel), RepositoryModelItem.class);
+    assertNotNull(selector.getRepositories());
+    assertNotEmpty(Collections.list(selector.getRepositories().children()));
   }
 
   public void testShowsListError_WhenServiceThrowsException() {
-    JPanel panel = getErrorRepositoryPanel();
+    RepositorySelector selector = getErrorRepositoryPanel();
 
-    // Contains an error item
-    assertInstanceOf(getPanelObject(panel), ResourceErrorModelItem.class);
+    // Contains an error item panel
+    assertInstanceOf(getPanelObject(selector.getPanel()), ResourceErrorModelItem.class);
+  }
+
+  public void testListsRepositories_onValidProjectSelection()
+      throws IOException, GeneralSecurityException {
+    RepositorySelector selector = getPopulatedRepositoriesPanel(false /*openPopup*/);
+
+    // Panel was not opened
+    assertNull(selector.getPanel());
+
+    // Contains a repository item
+    assertNotNull(selector.getRepositories());
+    assertNotEmpty(Collections.list(selector.getRepositories().children()));
   }
 
   private JPanel getMissingProjectPanel() {
@@ -130,37 +147,41 @@ public class RepositorySelectorTest extends PlatformTestCase {
     return children.nextElement();
   }
 
-  private JPanel getEmptyRepositoriesPanel() throws IOException, GeneralSecurityException {
+  private RepositorySelector getEmptyRepositoriesPanel() throws IOException, GeneralSecurityException {
     when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
         .thenReturn(CompletableFuture.completedFuture(new ListReposResponse()));
 
-    return getPanel();
+    return getSelector(true /*openPopup*/);
   }
 
-  private JPanel getPopulatedRepositoriesPanel() throws IOException, GeneralSecurityException {
+  private RepositorySelector getPopulatedRepositoriesPanel(boolean openPopup) throws IOException, GeneralSecurityException {
     ListReposResponse reposResponse = new ListReposResponse();
     reposResponse.setRepos(createRepos());
 
     when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
         .thenReturn(CompletableFuture.completedFuture(reposResponse));
 
-    return getPanel();
+    return getSelector(openPopup);
   }
 
-  private JPanel getErrorRepositoryPanel() {
+  private RepositorySelector getErrorRepositoryPanel() {
     when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
         .thenReturn(CompletableFuture.supplyAsync(() -> {
           throw new CloudRepositoryServiceException();
         }));
 
-    return getPanel();
+    return getSelector(true /*openPopup*/);
   }
 
-  private JPanel getPanel() {
+  private RepositorySelector getSelector(boolean openPopup) {
     RepositorySelector selector = createInitializedSelector();
-    selector.showPopup(new RelativePoint(selector, new Point(0, 0)));
+    if (openPopup) { // Simulates a user click
+      selector.showPopup(new RelativePoint(selector, new Point(0, 0)));
+    } else { // Simulates a "silent entry" - e.g. manual typing
+      selector.loadRepositories();
+    }
 
-    return selector.getPanel();
+    return selector;
   }
 
   private List<Repo> createRepos() {

@@ -76,7 +76,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
     } catch (IOException ioe) {
       deploy.getCallback().errorOccurred(
           GctBundle.message("appengine.deployment.error.creating.staging.directory"));
-      logger.warn(ioe);
+      logger.error(ioe);
       return;
     }
 
@@ -99,7 +99,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
       logger.warn(ex);
     } catch (RuntimeException re) {
       deploy.getCallback()
-          .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging") + "\n"
+          .errorOccurred(GctBundle.message("appengine.deployment.exception.during.staging") + "\n"
               + GctBundle.message("appengine.action.error.update.message"));
       logger.error(re);
     }
@@ -117,13 +117,13 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
             deploy.deploy(stagingDirectory, startListener);
           } catch (RuntimeException re) {
             deploy.getCallback()
-                .errorOccurred(GctBundle.message("appengine.deployment.error") + "\n"
+                .errorOccurred(GctBundle.message("appengine.deployment.exception") + "\n"
                     + GctBundle.message("appengine.action.error.update.message"));
             logger.error(re);
           }
         } else {
           deploy.getCallback()
-              .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
+              .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging", exitCode));
           logger.warn(
               "App engine standard staging process exited with an error. Exit Code:" + exitCode);
         }

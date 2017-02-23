@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.vcs.CloudRepositoryService;
 import com.intellij.openapi.components.ServiceManager;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -35,21 +36,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
 
-  private String cloudProject;
-  private CredentialedUser user;
   private CloudRepositoryService cloudRepositoryService;
 
-  public ProjectRepositoriesModelItem(@NotNull String cloudProject,
-      @NotNull CredentialedUser user) {
-    this.cloudProject = cloudProject;
-    this.user = user;
-
+  public ProjectRepositoriesModelItem() {
     cloudRepositoryService = ServiceManager.getService(CloudRepositoryService.class);
-
-    setUserObject(cloudProject);
   }
 
-  public void loadRepositories(Runnable onComplete) {
+  @SuppressWarnings("FutureReturnValueIgnored")
+  public void loadRepositories(@NotNull String cloudProject, @NotNull CredentialedUser user,
+      @Nullable Runnable onComplete) {
+    setUserObject(cloudProject);
+
     cloudRepositoryService
         .listAsync(user, cloudProject)
         .thenAccept(response -> {
@@ -67,13 +64,17 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
             add(new ResourceEmptyModelItem(GctBundle.message("cloud.repository.list.empty")));
           }
 
-          onComplete.run();
+          if (onComplete != null) {
+            onComplete.run();
+          }
         })
         .exceptionally(response -> {
           removeAllChildren();
           add(new ResourceErrorModelItem(GctBundle.message("cloud.repository.list.error")));
 
-          onComplete.run();
+          if (onComplete != null) {
+            onComplete.run();
+          }
           return null;
         });
   }

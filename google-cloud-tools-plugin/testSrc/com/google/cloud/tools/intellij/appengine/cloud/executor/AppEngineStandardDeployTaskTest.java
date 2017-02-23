@@ -66,14 +66,14 @@ public class AppEngineStandardDeployTaskTest {
   AppEngineHelper helper;
   @Mock ProcessStartListener startListener;
 
-  private static final String DEPLOY_FAIL_MSG =
-      "Deployment failed due to an unexpected error.\n"
+  private static final String DEPLOY_EXCEPTION_MSG =
+      "Deployment failed with an exception.\n"
           + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
           + "Run ''gcloud components update'' to update the SDK. "
           + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)";
 
-  private static final String STAGE_FAIL_MSG =
-      "Deployment failed due to an unexpected error while staging the project.\n"
+  private static final String STAGE_EXCEPTION_MSG =
+      "Deployment failed due to an exception while staging the project.\n"
           + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
           + "Run ''gcloud components update'' to update the SDK. "
           + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)";
@@ -103,24 +103,30 @@ public class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void createStagingDirectory_error() throws IOException {
+  public void createStagingDirectory_exception() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
         .thenThrow(new IOException());
 
-    task.execute(startListener);
-    verify(callback, times(1))
-        .errorOccurred("There was an unexpected error creating the staging directory");
+    try {
+      task.execute(startListener);
+    } catch (AssertionError ae) {
+      verify(callback, times(1))
+          .errorOccurred("There was an unexpected error creating the staging directory");
+      return;
+    }
+
+    failureExpected();
   }
 
   @Test
-  public void stage_runtime_error() {
+  public void stage_runtime_exception() {
     doThrow(new RuntimeException())
         .when(stage)
         .stage(any(Path.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
     try {
       task.execute(startListener);
     } catch (AssertionError ae) {
-      verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
+      verify(callback, times(1)).errorOccurred(STAGE_EXCEPTION_MSG);
       return;
     }
 
@@ -145,13 +151,13 @@ public class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void deploy_error() {
+  public void deploy_exception() {
     doThrow(new RuntimeException())
         .when(deploy).deploy(any(Path.class), any(ProcessStartListener.class));
     try {
       task.deploy(Paths.get("myFile.jar"), startListener).onExit(0);
     } catch (AssertionError ae) {
-      verify(callback, times(1)).errorOccurred(DEPLOY_FAIL_MSG);
+      verify(callback, times(1)).errorOccurred(DEPLOY_EXCEPTION_MSG);
       return;
     }
 

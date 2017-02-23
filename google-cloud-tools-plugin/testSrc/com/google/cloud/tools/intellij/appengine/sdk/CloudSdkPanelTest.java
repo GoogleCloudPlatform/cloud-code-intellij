@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,13 +38,10 @@ import org.picocontainer.MutablePicoContainer;
 import java.nio.file.Path;
 import java.util.Set;
 
-/**
- * Tests for {@link CloudSdkPanel}.
- */
+/** Tests for {@link CloudSdkPanel}. */
 public class CloudSdkPanelTest extends PlatformTestCase {
 
-  @Spy
-  private CloudSdkPanel panel;
+  @Spy private CloudSdkPanel panel;
 
   private CloudSdkService cloudSdkService;
 
@@ -53,10 +50,9 @@ public class CloudSdkPanelTest extends PlatformTestCase {
           + "#install_the_latest_cloud_tools_version_cloudsdk_current_version'>Click here</a> to "
           + "download the Cloud SDK.";
   private static final String MISSING_SDK_DIR_WARNING =
-      "Cloud SDK home directory is not specified. "
-          + CLOUD_SDK_DOWNLOAD_LINK;
-  private static final String INVALID_SDK_DIR_WARNING = "No Cloud SDK was found in the specified directory. "
-      + CLOUD_SDK_DOWNLOAD_LINK;
+      "Cloud SDK home directory is not specified. " + CLOUD_SDK_DOWNLOAD_LINK;
+  private static final String INVALID_SDK_DIR_WARNING =
+      "No Cloud SDK was found in the specified directory. " + CLOUD_SDK_DOWNLOAD_LINK;
 
   @Override
   public void setUp() throws Exception {
@@ -64,8 +60,8 @@ public class CloudSdkPanelTest extends PlatformTestCase {
 
     MockitoAnnotations.initMocks(this);
 
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
+    MutablePicoContainer applicationContainer =
+        (MutablePicoContainer) ApplicationManager.getApplication().getPicoContainer();
 
     cloudSdkService = mock(CloudSdkService.class);
 
@@ -75,14 +71,13 @@ public class CloudSdkPanelTest extends PlatformTestCase {
         CloudSdkService.class.getName(), cloudSdkService);
   }
 
-  @Test
   public void testCheckSdk_nullSdk() throws InterruptedException {
     when(cloudSdkService.isValidCloudSdk(null)).thenReturn(false);
     panel.checkSdk(null);
     verify(panel, times(1)).showWarning(eq(MISSING_SDK_DIR_WARNING));
     verify(panel, times(0)).hideWarning();
   }
-  @Test
+
   public void testCheckSdk_emptySdk() throws InterruptedException {
     when(cloudSdkService.isValidCloudSdk("")).thenReturn(false);
     panel.checkSdk("");
@@ -90,7 +85,6 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     verify(panel, times(0)).hideWarning();
   }
 
-  @Test
   public void testCheckSdk_invalidSdk() throws InterruptedException {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(false);
@@ -99,31 +93,32 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     verify(panel, times(0)).hideWarning();
   }
 
-  @Test
   public void testCheckSdk_unsupportedSdk() {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
     when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(false);
     panel.checkSdk("/non/empty/path");
-    verify(panel, times(1)).showWarning(
-        eq(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage()));
+    verify(panel, times(1))
+        .showWarning(eq(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage()));
     verify(panel, times(0)).hideWarning();
   }
 
-  @Test
   public void testCheckSdk_multipleValidationResults() {
-    setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED,
+    setValidateCloudSdkResponse(
+        CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED,
         CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(false);
 
-    String expectedMessage = INVALID_SDK_DIR_WARNING + "<p>" +
-        CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage() + "</p>";
+    String expectedMessage =
+        INVALID_SDK_DIR_WARNING
+            + "<p>"
+            + CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage()
+            + "</p>";
 
     panel.checkSdk("/non/empty/path");
     verify(panel, times(1)).showWarning(eq(expectedMessage));
     verify(panel, times(0)).hideWarning();
   }
 
-  @Test
   public void testCheckSdk_validSdk() {
     when(cloudSdkService.isValidCloudSdk("/non/empty/path")).thenReturn(true);
     setValidateCloudSdkResponse();
@@ -132,7 +127,6 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     verify(panel, times(1)).hideWarning();
   }
 
-  @Test
   public void testApplyWith_invalidSdk() throws Exception {
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     panel.getCloudSdkDirectoryField().setText("/non/empty/path");
@@ -148,5 +142,4 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     }
     when(cloudSdkService.validateCloudSdk(any(String.class))).thenReturn(validationResults);
   }
-
 }

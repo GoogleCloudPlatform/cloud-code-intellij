@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginActionButton;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Provides Google user authentication services.
@@ -100,6 +102,24 @@ public interface GoogleLoginService {
   boolean logOut(boolean showPrompt);
 
   /**
+   * Returns a copy of the map of the current logged in users.
+   */
+  Map<String, CredentialedUser> getAllUsers();
+
+  /**
+   * Returns the {@link CredentialedUser} for the provided username, <em>if</em> that user is
+   * currently logged in.
+   */
+  @NotNull
+  Optional<CredentialedUser> getLoggedInUser(String username);
+
+  /**
+   * Returns the active user.
+   */
+  @Nullable
+  CredentialedUser getActiveUser();
+
+  /**
    * Sets the active user to <code>userEmail</code> if <code>userEmail</code> is a logged
    * in user.
    * @param userEmail The user to be set as active.
@@ -107,17 +127,6 @@ public interface GoogleLoginService {
    *     not a logged in user.
    */
   void setActiveUser(String userEmail) throws IllegalArgumentException;
-
-  /**
-   * Returns a copy of the map of the current logged in users.
-   */
-  Map<String, CredentialedUser> getAllUsers();
-
-  /**
-   * Returns the active user.
-   */
-  @Nullable
-  CredentialedUser getActiveUser();
 
   /**
    * When the login menu item is instantiated by the UI, it calls this method so that
@@ -132,4 +141,14 @@ public interface GoogleLoginService {
    * Initializes the service from the persisted credential store.
    */
   void loadPersistedCredentials();
+
+  /**
+   * Ensures that the provided {@code username} is logged into the IDE. If the user is not logged in
+   * a login flow is triggered until the user has logged in the correct user or cancelled the flow.
+   *
+   * @param username the user want to ensure is currently logged in
+   * @return {@code true} if the user has been logged in, {@code false} if the user has opted not to
+   *     login.
+   */
+  boolean ensureLoggedIn(String username);
 }

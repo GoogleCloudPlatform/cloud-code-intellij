@@ -20,6 +20,8 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 
+import org.joda.time.format.ISODateTimeFormat;
+
 import java.util.Comparator;
 import java.util.Date;
 
@@ -75,14 +77,16 @@ public class BreakpointComparer implements Comparator<Breakpoint> {
       }
       return s1.getPath().compareTo(s2.getPath());
     }
-    Date d1 = BreakpointUtil.parseDateTime(o1.getFinalTime());
-    Date d2 = BreakpointUtil.parseDateTime(o2.getFinalTime());
-    if (d1 == null) {
+
+    Date d1, d2;
+    try {
+      d1 = ISODateTimeFormat.dateTime().parseDateTime(o1.getFinalTime()).toDate();
+      d2 = ISODateTimeFormat.dateTime().parseDateTime(o2.getFinalTime()).toDate();
+    } catch (IllegalArgumentException iae) {
       d1 = MINIMUM_DATE;
-    }
-    if (d2 == null) {
       d2 = MINIMUM_DATE;
     }
+
     return d2.compareTo(d1);
   }
 

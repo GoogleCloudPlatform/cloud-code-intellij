@@ -95,13 +95,13 @@ public class AppEngineFlexibleDeployTaskTest {
   }
 
   @Test
-  public void stage_error() {
+  public void stage_exception() {
     doThrow(new RuntimeException("myError")).when(stage).stage(Paths.get("myFile.jar"));
     try {
       task.execute(startListener);
     } catch (AssertionError ae) {
       verify(callback, times(1))
-          .errorOccurred("Deployment failed due to an unexpected error while staging the project.");
+          .errorOccurred("Deployment failed due to an exception while staging the project.");
       return;
     }
 
@@ -116,7 +116,7 @@ public class AppEngineFlexibleDeployTaskTest {
   }
 
   @Test
-  public void deploy_error() {
+  public void deploy_exception() {
     doThrow(new RuntimeException())
         .when(deploy)
         .deploy(any(Path.class), any(ProcessStartListener.class));
@@ -125,7 +125,7 @@ public class AppEngineFlexibleDeployTaskTest {
       task.execute(startListener);
     } catch (AssertionError ae) {
       verify(callback, times(1))
-          .errorOccurred("Deployment failed due to an unexpected error.\n"
+          .errorOccurred("Deployment failed with an exception.\n"
           + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
           + "Run ''gcloud components update'' to update the SDK. "
           + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)");

@@ -39,7 +39,7 @@ public enum AppEngineStandardMavenLibrary {
       DependencyScope.PROVIDED),
   JSTL(
       GctBundle.message("appengine.library.jstl.api.name"),
-      new RepositoryLibraryProperties("javax.servlet", "jstl", RepositoryUtils.ReleaseVersionId),
+      new RepositoryLibraryProperties("javax.servlet", "jstl", "1.2"),
       DependencyScope.PROVIDED),
   APP_ENGINE_API(
       GctBundle.message("appengine.library.app.engine.api.name"),
