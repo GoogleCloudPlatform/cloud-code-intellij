@@ -16,15 +16,13 @@
 
 package com.google.cloud.tools.intellij.stats;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.login.PluginFlags;
 
 import com.intellij.ide.util.PropertiesComponent;
+
+import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  * Tests for {@link UsageTrackerManager}.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class UsageTrackerManagerTest {
+public class UsageTrackerManagerTest extends TestCase {
 
   @Mock
   private PropertiesComponent mockComponent;
