@@ -46,6 +46,7 @@ import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 
 /**
  * This binding between the project and debuggee is refactored out to make it reusable in the
