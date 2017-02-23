@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ItemEvent;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.JCheckBox;
@@ -68,8 +69,8 @@ public class AppEngineStandardLibraryPanel {
         endpointsCheckBox.setSelected(false);
       }
     });
-    objectifyCheckBox.addItemListener(this::listenAppEngineApiDependencyCheckbox);
-    endpointsCheckBox.addItemListener(this::listenAppEngineApiDependencyCheckbox);
+    objectifyCheckBox.addItemListener(this::handleAppEngineApiDependencyCheckboxEvent);
+    endpointsCheckBox.addItemListener(this::handleAppEngineApiDependencyCheckboxEvent);
   }
 
   public Set<AppEngineStandardMavenLibrary> getSelectedLibraries() {
@@ -77,7 +78,9 @@ public class AppEngineStandardLibraryPanel {
         .filter(JCheckBox::isSelected)
         .map(
             library ->
-                AppEngineStandardMavenLibrary.getLibraryByDisplayName(library.getText()).get())
+                AppEngineStandardMavenLibrary.getLibraryByDisplayName(library.getText()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toSet());
   }
 
@@ -86,9 +89,8 @@ public class AppEngineStandardLibraryPanel {
         .map(AppEngineStandardMavenLibrary::getDisplayName)
         .collect(toSet());
 
-    libraries.stream()
-        .filter(library -> availableLibraryNames.contains(library.getText()))
-        .forEach(checkbox -> checkbox.setSelected(true));
+    libraries.forEach(
+        checkbox -> checkbox.setSelected(availableLibraryNames.contains(checkbox.getText())));
   }
 
   public void selectLibraryByName(String name) {
@@ -125,7 +127,7 @@ public class AppEngineStandardLibraryPanel {
     return libraries;
   }
 
-  private void listenAppEngineApiDependencyCheckbox(ItemEvent event) {
+  private void handleAppEngineApiDependencyCheckboxEvent(ItemEvent event) {
     JCheckBox appEngineApiDependencyCheckbox = (JCheckBox) event.getSource();
 
     if (appEngineApiDependencyCheckbox.isSelected()) {

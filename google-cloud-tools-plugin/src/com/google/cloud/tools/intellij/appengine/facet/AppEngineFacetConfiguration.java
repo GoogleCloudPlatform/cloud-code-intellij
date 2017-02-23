@@ -36,6 +36,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -74,7 +75,9 @@ public class AppEngineFacetConfiguration implements FacetConfiguration,
     return Arrays.stream(
         LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraries())
         .map(library ->
-            AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(library.getName()).get())
+            AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(library.getName()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toSet());
   }
 
