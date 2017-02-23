@@ -412,6 +412,10 @@ public class CloudAttachDialog extends DialogWrapper {
     // So when we do the git operations, we want the document and file timestamps to match exactly.
     BasicAction.saveAll();
 
+    if (syncResult == null) {
+      checkSyncStashState();
+    }
+
     sourceRepository = syncResult.getLocalRepository();
 
     if (syncResult.needsStash() || syncResult.needsSync()) {
