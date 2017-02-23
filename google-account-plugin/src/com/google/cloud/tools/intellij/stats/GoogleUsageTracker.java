@@ -28,6 +28,7 @@ import com.google.common.escape.Escaper;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.PermanentInstallationID;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.updateSettings.impl.UpdateChecker;
@@ -98,7 +99,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           new BasicNameValuePair(IS_NON_INTERACTIVE_KEY, STRING_FALSE_VALUE),
           new BasicNameValuePair(
               UNIQUE_CLIENT_ID_KEY,
-              UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())),
+              PermanentInstallationID.get()),
           new BasicNameValuePair(PAGE_HOST_KEY, PAGE_HOST_VALUE));
   private final String analyticsId;
   private final String externalPluginName;
