@@ -81,7 +81,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private AppEngineHelper appEngineHelper;
 
   FlexibleFacetEditor(@Nullable AppEngineDeploymentConfiguration deploymentConfiguration,
-      @Nullable Project project) {
+      @NotNull Project project) {
     this.appEngineHelper = new CloudSdkAppEngineHelper(project);
     this.deploymentConfiguration = deploymentConfiguration;
 
@@ -171,8 +171,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     deploymentConfiguration.setYamlPath(yaml.getText());
     deploymentConfiguration.setDockerFilePath(dockerfile.getText());
-
-    toggleDockerfileSection();
   }
 
   @Override
@@ -196,8 +194,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
    */
   private boolean isValidConfigurationFile(String path) {
     try {
-      if (!Files.exists(Paths.get(path))
-          || !Files.isRegularFile(Paths.get(path))) {
+      if (!Files.isRegularFile(Paths.get(path))) {
         return false;
       }
     } catch (InvalidPathException ipe) {
@@ -214,15 +211,11 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     boolean showError = false;
 
     if (!isValidConfigurationFile(yaml.getText())) {
-      errorIcon.setVisible(true);
-      errorMessage.setVisible(true);
       errorMessage.setText(GctBundle.getString("appengine.deployment.error.staging.yaml"));
       showError = true;
     }
 
     if (isRuntimeCustom() && !isValidConfigurationFile(dockerfile.getText())) {
-      errorIcon.setVisible(true);
-      errorMessage.setVisible(true);
       errorMessage.setText(GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
       showError = true;
     }

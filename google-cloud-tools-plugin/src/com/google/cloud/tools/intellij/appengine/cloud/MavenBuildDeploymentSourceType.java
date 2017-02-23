@@ -85,7 +85,10 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
     final String moduleName = tag.getAttributeValue(NAME_ATTRIBUTE);
     String environmentName = tag.getAttributeValue(
         AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
-    AppEngineEnvironment environment = AppEngineEnvironment.valueOf(environmentName);
+    AppEngineEnvironment environment = null;
+    if (environmentName != null) {
+      environment = AppEngineEnvironment.valueOf(environmentName);
+    }
 
     MavenBuildDeploymentSource source = new MavenBuildDeploymentSource(
         ModulePointerManager.getInstance(project).create(moduleName), project, environment);

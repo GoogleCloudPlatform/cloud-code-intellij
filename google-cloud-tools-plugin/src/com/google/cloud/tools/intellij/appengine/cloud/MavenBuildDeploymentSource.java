@@ -48,7 +48,7 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
 
   public MavenBuildDeploymentSource(@NotNull ModulePointer pointer,
       @NotNull Project project,
-      @NotNull AppEngineEnvironment environment) {
+      @Nullable AppEngineEnvironment environment) {
     super(pointer);
     this.project = project;
     this.environment = environment;
