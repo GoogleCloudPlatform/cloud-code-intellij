@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ public class TestUtils {
 
   static class PluginMockApplication extends MockApplicationEx {
 
-    private final ListeningExecutorService executor = MoreExecutors.sameThreadExecutor();
+    private final ListeningExecutorService executor = MoreExecutors.newDirectExecutorService();
 
     public PluginMockApplication(@NotNull Disposable parentDisposable) {
       super(parentDisposable);
