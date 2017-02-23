@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.login;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
@@ -53,6 +52,7 @@ public class GoogleLoginUtils {
    * @param userInfo the class to be parsed
    * @param pictureCallback the user image will be set on this callback
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   public static void provideUserPicture(Userinfoplus userInfo,
       final IUserPropertyCallback pictureCallback) {
     // set the size of the image before it is served
@@ -80,6 +80,7 @@ public class GoogleLoginUtils {
   /**
    * Sets the user info on the callback.
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   public static void getUserInfo(@NotNull final Credential credential,
       final IUserPropertyCallback callback) {
     final Oauth2 userInfoService =
@@ -129,28 +130,5 @@ public class GoogleLoginUtils {
         }
       }, ModalityState.defaultModalityState());
     }
-  }
-
-  /**
-   * Returns a {@link Credential} object for a fake user. Used for testing.
-   *
-   * @return a {@link Credential} object for the fake user.
-   */
-  @NotNull
-  public static Credential makeFakeUserCredential() {
-    String clientId = System.getenv().get("ANDROID_CLIENT_ID");
-    String clientSecret = System.getenv().get("ANDROID_CLIENT_SECRET");
-    String refreshToken = System.getenv().get("FAKE_USER_REFRESH_TOKEN");
-    String accessToken = System.getenv().get("FAKE_USER_ACCESS_TOKEN");
-
-    Credential cred =
-        new GoogleCredential.Builder()
-            .setJsonFactory(new JacksonFactory())
-            .setTransport(new NetHttpTransport())
-            .setClientSecrets(clientId, clientSecret)
-            .build();
-    cred.setAccessToken(accessToken);
-    cred.setRefreshToken(refreshToken);
-    return cred;
   }
 }

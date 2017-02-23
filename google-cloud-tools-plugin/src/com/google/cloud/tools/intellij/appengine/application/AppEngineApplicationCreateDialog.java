@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,6 +161,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   /**
    * Refreshes the locations combo box. This method should be called from the event dispatch thread.
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void refreshLocationsSelector() {
     // show loading state
     disable();

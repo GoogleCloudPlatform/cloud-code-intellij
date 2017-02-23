@@ -105,7 +105,8 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
       if (!libsToAdd.isEmpty()) {
         for (AppEngineStandardMavenLibrary library : libsToAdd) {
-          AppEngineSupportProvider.loadMavenLibrary(context.getModule(), library);
+          MavenRepositoryLibraryDownloader.getInstance().downloadLibrary(
+              context.getModule(), library);
         }
       }
 
