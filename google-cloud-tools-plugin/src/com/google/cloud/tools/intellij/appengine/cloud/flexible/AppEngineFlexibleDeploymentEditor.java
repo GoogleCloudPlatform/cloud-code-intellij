@@ -286,8 +286,10 @@ public class AppEngineFlexibleDeploymentEditor extends
     yamlTextField.setVisible(configuration.isOverrideYaml()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
-    yamlOverrideCheckBox.setSelected(configuration.isOverrideYaml());
-    dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile());
+    yamlOverrideCheckBox.setSelected(configuration.isOverrideYaml()
+        || modulesWithFlexFacetComboBox.getItemCount() == 0);
+    dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile()
+        || modulesWithFlexFacetComboBox.getItemCount() == 0);
     modulesWithFlexFacetComboBox.setEnabled(!configuration.isOverrideYaml());
 
     toggleDockerfileSection();

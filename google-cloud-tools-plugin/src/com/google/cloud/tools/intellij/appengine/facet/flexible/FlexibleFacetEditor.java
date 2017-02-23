@@ -106,7 +106,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     dockerfile.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        toggleDockerfileSection();
         validateConfiguration();
       }
     });
