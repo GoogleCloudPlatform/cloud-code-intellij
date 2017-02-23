@@ -42,10 +42,13 @@ public class MavenRepositoryLibraryDownloader {
   }
 
   @Nullable
-  public Library downloadLibrary(Module module, RepositoryLibraryDescription libraryDescription,
-      RepositoryLibraryProperties libraryProperties, String version) {
+  public Library downloadLibrary(Module module, AppEngineStandardMavenLibrary library) {
+    RepositoryLibraryProperties libraryProperties = new RepositoryLibraryProperties(
+        library.getGroupId(), library.getArtifactId(), library.getVersion());
+    RepositoryLibraryDescription libraryDescription =
+        RepositoryLibraryDescription.findDescription(libraryProperties);
     RepositoryLibraryPropertiesModel model = new RepositoryLibraryPropertiesModel(
-        version,
+        library.getVersion(),
         true /*downloadSources*/,
         true /*downloadJavaDocs*/);
 
@@ -56,18 +59,12 @@ public class MavenRepositoryLibraryDownloader {
         libraryDescription, model);
 
     librarySupport.addSupport(module, modifiableModel, modifiableModelsProvider);
-    ApplicationManager.getApplication().runWriteAction(new Runnable() {
-      @Override
-      public void run() {
-        modifiableModel.commit();
-      }
-    });
+    ApplicationManager.getApplication().runWriteAction(modifiableModel::commit);
 
     LibraryTable.ModifiableModel libraryTableModifiableModel
         = ModifiableModelsProvider.SERVICE.getInstance()
           .getLibraryTableModifiableModel(module.getProject());
 
-    return libraryTableModifiableModel.getLibraryByName(
-        AppEngineStandardMavenLibrary.toMavenDisplayVersion(libraryProperties));
-  }
+    return libraryTableModifiableModel.getLibraryByName(library.toMavenDisplayVersion());
+ }
 }

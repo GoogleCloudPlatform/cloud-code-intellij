@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.login;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
@@ -131,28 +130,5 @@ public class GoogleLoginUtils {
         }
       }, ModalityState.defaultModalityState());
     }
-  }
-
-  /**
-   * Returns a {@link Credential} object for a fake user. Used for testing.
-   *
-   * @return a {@link Credential} object for the fake user.
-   */
-  @NotNull
-  public static Credential makeFakeUserCredential() {
-    String clientId = System.getenv().get("ANDROID_CLIENT_ID");
-    String clientSecret = System.getenv().get("ANDROID_CLIENT_SECRET");
-    String refreshToken = System.getenv().get("FAKE_USER_REFRESH_TOKEN");
-    String accessToken = System.getenv().get("FAKE_USER_ACCESS_TOKEN");
-
-    Credential cred =
-        new GoogleCredential.Builder()
-            .setJsonFactory(new JacksonFactory())
-            .setTransport(new NetHttpTransport())
-            .setClientSecrets(clientId, clientSecret)
-            .build();
-    cred.setAccessToken(accessToken);
-    cred.setRefreshToken(refreshToken);
-    return cred;
   }
 }

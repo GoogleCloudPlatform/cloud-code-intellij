@@ -45,7 +45,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;

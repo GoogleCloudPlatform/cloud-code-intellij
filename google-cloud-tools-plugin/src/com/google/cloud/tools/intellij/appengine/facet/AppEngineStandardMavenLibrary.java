@@ -24,7 +24,6 @@ import com.intellij.openapi.roots.DependencyScope;
 
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.idea.maven.utils.library.RepositoryLibraryProperties;
 import org.jetbrains.idea.maven.utils.library.RepositoryUtils;
 
 import java.util.Arrays;
@@ -35,46 +34,55 @@ import java.util.Arrays;
 public enum AppEngineStandardMavenLibrary {
   SERVLET_API(
       GctBundle.message("appengine.library.servlet.api.name"),
-      new RepositoryLibraryProperties("javax.servlet", "servlet-api", "2.5"),
+      "javax.servlet",
+      "servlet-api",
+      "2.5",
       DependencyScope.PROVIDED),
   JSTL(
       GctBundle.message("appengine.library.jstl.api.name"),
-      new RepositoryLibraryProperties("javax.servlet", "jstl", "1.2"),
+      "javax.servlet",
+      "jstl",
+      "1.2",
       DependencyScope.PROVIDED),
   APP_ENGINE_API(
       GctBundle.message("appengine.library.app.engine.api.name"),
-      new RepositoryLibraryProperties("com.google.appengine", "appengine-api-1.0-sdk",
-          RepositoryUtils.ReleaseVersionId),
+      "com.google.appengine",
+      "appengine-api-1.0-sdk",
+      RepositoryUtils.ReleaseVersionId,
       DependencyScope.COMPILE),
   ENDPOINTS(
       GctBundle.message("appengine.library.endpoints.api.name"),
-      new RepositoryLibraryProperties("com.google.appengine", "appengine-endpoints",
-          RepositoryUtils.ReleaseVersionId),
+      "com.google.appengine",
+      "appengine-endpoints",
+      RepositoryUtils.ReleaseVersionId,
       DependencyScope.COMPILE),
   OBJECTIFY(
       GctBundle.message("appengine.library.objectify.api.name"),
-      new RepositoryLibraryProperties("com.googlecode.objectify", "objectify",
-          RepositoryUtils.ReleaseVersionId),
+      "com.googlecode.objectify",
+      "objectify",
+      RepositoryUtils.ReleaseVersionId,
       DependencyScope.COMPILE);
 
   private final String displayName;
-  // TODO(paflynn): RepositoryLibraryProperties is a mutable type and should not be used in an enum.
-  private final RepositoryLibraryProperties libraryProperties;
+  private final String groupId;
+  private final String artifactId;
+  private final String version;
   private final DependencyScope scope;
 
-  AppEngineStandardMavenLibrary(String displayName, RepositoryLibraryProperties libraryProperties,
+  AppEngineStandardMavenLibrary(String displayName,
+      String groupId,
+      String artifactId,
+      String version,
       DependencyScope scope) {
     this.displayName = displayName;
-    this.libraryProperties = libraryProperties;
+    this.groupId = groupId;
+    this.artifactId = artifactId;
+    this.version = version;
     this.scope = scope;
   }
 
   public String getDisplayName() {
     return displayName;
-  }
-
-  public RepositoryLibraryProperties getLibraryProperties() {
-    return libraryProperties;
   }
 
   public DependencyScope getScope() {
@@ -97,7 +105,7 @@ public enum AppEngineStandardMavenLibrary {
       @Override
       public boolean apply(@Nullable AppEngineStandardMavenLibrary library) {
         return library != null
-            && name.equals(toMavenDisplayVersion(library.getLibraryProperties()));
+            && name.equals(library.toMavenDisplayVersion());
       }
     });
   }
@@ -114,9 +122,19 @@ public enum AppEngineStandardMavenLibrary {
    * Certain maven versions like "LATEST" are displayed differently - e.g. "Latest", so we need to
    * reconstruct the maven display name manually
    */
-  public static String toMavenDisplayVersion(RepositoryLibraryProperties libraryProperties) {
-    return libraryProperties.getGroupId() + ":"
-        + libraryProperties.getArtifactId() + ":"
-        + WordUtils.capitalize(libraryProperties.getVersion().toLowerCase());
+  public String toMavenDisplayVersion() {
+    return groupId + ":" + artifactId + ":" + WordUtils.capitalize(version.toLowerCase());
+  }
+
+  public String getGroupId() {
+    return groupId;
+  }
+
+  public String getArtifactId() {
+    return artifactId;
+  }
+
+  public String getVersion() {
+    return version;
   }
 }
