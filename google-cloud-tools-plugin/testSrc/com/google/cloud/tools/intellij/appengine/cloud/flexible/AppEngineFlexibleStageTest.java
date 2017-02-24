@@ -48,13 +48,13 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
 
     artifact = createTempFile("artifact.war", "").toPath();
     deploymentConfiguration = new AppEngineDeploymentConfiguration();
-    deploymentConfiguration.setYamlPath(createTempFile("custom.yaml", "runtime: custom").getPath());
+    deploymentConfiguration.setAppYamlPath(createTempFile("custom.yaml", "runtime: custom").getPath());
     deploymentConfiguration.setDockerFilePath(createTempFile("Dockerfile", "").getPath());
     stagingDirectory = createTempDirectory().toPath();
   }
 
   public void testStage_noYaml() {
-    deploymentConfiguration.setYamlPath("I don't exist.");
+    deploymentConfiguration.setAppYamlPath("I don't exist.");
     AppEngineFlexibleStage stage =
         new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration);
     try {
@@ -79,7 +79,7 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
 
   public void testStage_javaRuntime() throws IOException {
     deploymentConfiguration.setDockerFilePath("I don't exist.");
-    deploymentConfiguration.setYamlPath(createTempFile("java.yaml", "runtime: java").getPath());
+    deploymentConfiguration.setAppYamlPath(createTempFile("java.yaml", "runtime: java").getPath());
     AppEngineFlexibleStage stage =
         new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration);
     stage.stage(stagingDirectory);

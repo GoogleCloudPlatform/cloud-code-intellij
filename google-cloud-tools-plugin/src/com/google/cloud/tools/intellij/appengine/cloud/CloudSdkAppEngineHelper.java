@@ -163,9 +163,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       // Checks if the Yaml or Dockerfile exist.
       Optional<FlexibleRuntime> runtimeOptional =
           AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
-              deploymentConfiguration.getYamlPath());
+              deploymentConfiguration.getAppYamlPath());
 
-      if (!Files.exists(Paths.get(deploymentConfiguration.getYamlPath()))) {
+      if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
         callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
         return Optional.empty();
       }

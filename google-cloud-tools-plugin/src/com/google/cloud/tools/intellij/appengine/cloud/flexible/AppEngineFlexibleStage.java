@@ -62,11 +62,11 @@ public class AppEngineFlexibleStage {
       // run config from being ran is the specified configuration files don't exist.
       boolean isCustomRuntime =
           AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
-              deploymentConfiguration.getYamlPath())
+              deploymentConfiguration.getAppYamlPath())
           .filter(runtime -> runtime == FlexibleRuntime.custom)
           .isPresent();
 
-      if (!Files.exists(Paths.get(deploymentConfiguration.getYamlPath()))) {
+      if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.yaml"));
       }
@@ -80,7 +80,7 @@ public class AppEngineFlexibleStage {
           "target" + AppEngineFlexibleDeploymentArtifactType.typeForPath(deploymentArtifactPath));
       Files.copy(deploymentArtifactPath, stagedArtifactPath);
 
-      Path appYamlPath = Paths.get(deploymentConfiguration.getYamlPath());
+      Path appYamlPath = Paths.get(deploymentConfiguration.getAppYamlPath());
       Files.copy(appYamlPath, stagingDirectory.resolve(appYamlPath.getFileName()));
 
       if (isCustomRuntime) {

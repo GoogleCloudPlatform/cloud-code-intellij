@@ -40,7 +40,6 @@ import com.intellij.testFramework.PlatformTestCase;
 import org.mockito.Mock;
 import org.picocontainer.MutablePicoContainer;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -79,13 +78,13 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
         () -> {
           AppEngineFlexibleFacet flexJavaFacet = FacetManager.getInstance(javaModule).addFacet(
               AppEngineFlexibleFacet.getFacetType(), "flex facet", null /* underlyingFacet */);
-          flexJavaFacet.getConfiguration().setYamlPath(javaYaml.getPath());
+          flexJavaFacet.getConfiguration().setAppYamlPath(javaYaml.getPath());
         });
     customModule = createModule("flex module 2");
     ApplicationManager.getApplication().runWriteAction(() -> {
       AppEngineFlexibleFacet flexCustomFacet = FacetManager.getInstance(customModule).addFacet(
           AppEngineFlexibleFacet.getFacetType(), "flex facet", null /* underlyingFacet */);
-      flexCustomFacet.getConfiguration().setYamlPath(customYaml.getPath());
+      flexCustomFacet.getConfiguration().setAppYamlPath(customYaml.getPath());
       flexCustomFacet.getConfiguration().setDockerfilePath(dockerfile.getPath());
     });
     createModule("non flex module");
@@ -126,8 +125,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
 
   public void testUpdateServiceName() {
     assertEquals("default", editor.getServiceLabel().getText());
-    editor.getYamlOverrideCheckBox().setSelected(true);
-    editor.getYamlTextField().setText(customYaml.getPath());
+    editor.getAppYamlOverrideCheckBox().setSelected(true);
+    editor.getAppYamlTextField().setText(customYaml.getPath());
     assertEquals("flexService", editor.getServiceLabel().getText());
   }
 
@@ -135,8 +134,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertFalse(editor.getDockerfileLabel().isVisible());
     assertFalse(editor.getDockerfileTextField().isVisible());
     assertFalse(editor.getDockerfileOverrideCheckBox().isVisible());
-    editor.getYamlOverrideCheckBox().setSelected(true);
-    editor.getYamlTextField().setText(customYaml.getPath());
+    editor.getAppYamlOverrideCheckBox().setSelected(true);
+    editor.getAppYamlTextField().setText(customYaml.getPath());
     assertTrue(editor.getDockerfileLabel().isVisible());
     assertTrue(editor.getDockerfileTextField().isVisible());
     assertTrue(editor.getDockerfileOverrideCheckBox().isVisible());
@@ -244,8 +243,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testValidateConfiguration_blankYaml() {
-    editor.getYamlOverrideCheckBox().setSelected(true);
-    editor.getYamlTextField().setText("");
+    editor.getAppYamlOverrideCheckBox().setSelected(true);
+    editor.getAppYamlTextField().setText("");
     try {
       editor.applyEditorTo(templateConfig);
       fail("Blank yaml.");
@@ -255,8 +254,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testValidateConfiguration_nullYaml() {
-    editor.getYamlOverrideCheckBox().setSelected(true);
-    editor.getYamlTextField().setText(null);
+    editor.getAppYamlOverrideCheckBox().setSelected(true);
+    editor.getAppYamlTextField().setText(null);
     try {
       editor.applyEditorTo(templateConfig);
       fail("Null yaml.");
@@ -266,8 +265,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testValidateConfiguration_unexistingYaml() {
-    editor.getYamlOverrideCheckBox().setSelected(true);
-    editor.getYamlTextField().setText("I don't exist");
+    editor.getAppYamlOverrideCheckBox().setSelected(true);
+    editor.getAppYamlTextField().setText("I don't exist");
     try {
       editor.applyEditorTo(templateConfig);
       fail("The yaml file doesn't exist.");
@@ -280,8 +279,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testValidateConfiguration_directoryYaml() {
-    editor.getYamlOverrideCheckBox().setSelected(true);
-    editor.getYamlTextField().setText(javaYaml.getParentFile().getPath());
+    editor.getAppYamlOverrideCheckBox().setSelected(true);
+    editor.getAppYamlTextField().setText(javaYaml.getParentFile().getPath());
     try {
       editor.applyEditorTo(templateConfig);
       fail("The yaml file is a directory.");

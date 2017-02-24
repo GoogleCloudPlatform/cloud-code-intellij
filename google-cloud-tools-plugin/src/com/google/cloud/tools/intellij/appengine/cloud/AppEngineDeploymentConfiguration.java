@@ -41,13 +41,13 @@ public class AppEngineDeploymentConfiguration extends
   private String environment;
 
   private String dockerFilePath;
-  private String yamlPath;
+  private String appYamlPath;
   private boolean userSpecifiedArtifact;
   private String userSpecifiedArtifactPath;
   private boolean promote;
   private boolean stopPreviousVersion;
   private String version;
-  private boolean overrideYaml;
+  private boolean overrideAppYaml;
   private boolean overrideDockerfile;
 
   @Attribute("cloudProjectName")
@@ -81,8 +81,8 @@ public class AppEngineDeploymentConfiguration extends
   }
 
   @Attribute("appYamlPath")
-  public String getYamlPath() {
-    return yamlPath;
+  public String getAppYamlPath() {
+    return appYamlPath;
   }
 
   @Attribute("promote")
@@ -100,9 +100,9 @@ public class AppEngineDeploymentConfiguration extends
     return version;
   }
 
-  @Attribute("overrideYaml")
-  public boolean isOverrideYaml() {
-    return overrideYaml;
+  @Attribute("overrideAppYaml")
+  public boolean isOverrideAppYaml() {
+    return overrideAppYaml;
   }
 
   @Attribute("overrideDockerfile")
@@ -134,8 +134,8 @@ public class AppEngineDeploymentConfiguration extends
     this.dockerFilePath = dockerFilePath;
   }
 
-  public void setYamlPath(String yamlPath) {
-    this.yamlPath = yamlPath;
+  public void setAppYamlPath(String appYamlPath) {
+    this.appYamlPath = appYamlPath;
   }
 
   public void setPromote(boolean promote) {
@@ -150,8 +150,8 @@ public class AppEngineDeploymentConfiguration extends
     this.version = version;
   }
 
-  public void setOverrideYaml(boolean overrideYaml) {
-    this.overrideYaml = overrideYaml;
+  public void setOverrideAppYaml(boolean overrideAppYaml) {
+    this.overrideAppYaml = overrideAppYaml;
   }
 
   public void setOverrideDockerfile(boolean overrideDockerfile) {

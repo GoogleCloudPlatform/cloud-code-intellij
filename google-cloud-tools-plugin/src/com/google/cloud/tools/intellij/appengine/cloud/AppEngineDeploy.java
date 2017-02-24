@@ -80,7 +80,7 @@ public class AppEngineDeploy {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
-    String yamlName =
+    String appYamlName =
         deploymentConfiguration
             .getEnvironment()
             .equals(AppEngineEnvironment.APP_ENGINE_STANDARD.name())
@@ -88,9 +88,9 @@ public class AppEngineDeploy {
             .getEnvironment()
             .equals(AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT.name())
             ? "app.yaml"
-            : Paths.get(deploymentConfiguration.getYamlPath()).getFileName().toString();
+            : Paths.get(deploymentConfiguration.getAppYamlPath()).getFileName().toString();
     configuration.setDeployables(
-        Collections.singletonList(stagingDirectory.resolve(yamlName).toFile()));
+        Collections.singletonList(stagingDirectory.resolve(appYamlName).toFile()));
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
     configuration.setPromote(deploymentConfiguration.isPromote());

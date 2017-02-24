@@ -70,9 +70,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       AppEngineProjectService.getInstance();
 
   private JPanel mainPanel;
-  private TextFieldWithBrowseButton yaml;
+  private TextFieldWithBrowseButton appYaml;
   private TextFieldWithBrowseButton dockerfile;
-  private JButton genYamlButton;
+  private JButton genAppYamlButton;
   private JButton genDockerfileButton;
   private JLabel noDockerfileLabel;
   private JLabel errorIcon;
@@ -85,7 +85,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     this.appEngineHelper = new CloudSdkAppEngineHelper(project);
     this.deploymentConfiguration = deploymentConfiguration;
 
-    yaml.addBrowseFolderListener(
+    appYaml.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
         null /* description */,
         project,
@@ -95,7 +95,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         )
     );
 
-    yaml.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+    appYaml.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
         toggleDockerfileSection();
@@ -117,15 +117,15 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         FileChooserDescriptorFactory.createSingleFileDescriptor()
     );
 
-    genYamlButton.addActionListener(new GenerateConfigActionListener(project, "app.yaml",
-        appEngineHelper::defaultAppYaml, yaml, this::validateConfiguration));
+    genAppYamlButton.addActionListener(new GenerateConfigActionListener(project, "app.yaml",
+        appEngineHelper::defaultAppYaml, appYaml, this::validateConfiguration));
 
     genDockerfileButton.addActionListener(new GenerateConfigActionListener(project, "Dockerfile",
         () -> appEngineHelper.defaultDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR),
         dockerfile, this::validateConfiguration
     ));
 
-    yaml.setText(deploymentConfiguration.getYamlPath());
+    appYaml.setText(deploymentConfiguration.getAppYamlPath());
     dockerfile.setText(deploymentConfiguration.getDockerFilePath());
 
     errorIcon.setIcon(Ide.Error);
@@ -144,13 +144,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   @Override
   public boolean isModified() {
-    return !yaml.getText().equals(deploymentConfiguration.getYamlPath())
+    return !appYaml.getText().equals(deploymentConfiguration.getAppYamlPath())
         || !dockerfile.getText().equals(deploymentConfiguration.getDockerFilePath());
   }
 
   @Override
   public void reset() {
-    yaml.setText(deploymentConfiguration.getYamlPath());
+    appYaml.setText(deploymentConfiguration.getAppYamlPath());
     dockerfile.setText(deploymentConfiguration.getDockerFilePath());
 
     toggleDockerfileSection();
@@ -159,7 +159,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @Override
   public void apply() throws ConfigurationException {
     validateConfiguration();
-    if (!isValidConfigurationFile(yaml.getText())) {
+    if (!isValidConfigurationFile(appYaml.getText())) {
       throw new ConfigurationException(
           GctBundle.getString("appengine.deployment.error.staging.yaml"));
     }
@@ -169,7 +169,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
     }
 
-    deploymentConfiguration.setYamlPath(yaml.getText());
+    deploymentConfiguration.setAppYamlPath(appYaml.getText());
     deploymentConfiguration.setDockerFilePath(dockerfile.getText());
   }
 
@@ -185,7 +185,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   private boolean isRuntimeCustom() {
-    return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yaml.getText())
+    return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(appYaml.getText())
         .filter(runtime -> runtime == FlexibleRuntime.custom)
         .isPresent();
   }
@@ -211,7 +211,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private void validateConfiguration() {
     boolean showError = false;
 
-    if (!isValidConfigurationFile(yaml.getText())) {
+    if (!isValidConfigurationFile(appYaml.getText())) {
       errorMessage.setText(GctBundle.getString("appengine.deployment.error.staging.yaml"));
       showError = true;
     }
@@ -229,14 +229,14 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     boolean enabled = isRuntimeCustom();
     dockerfile.setEnabled(enabled);
     genDockerfileButton.setEnabled(enabled);
-    // Shows no Dockerfile label if runtime is Java and yaml is valid.
-    noDockerfileLabel.setVisible(!enabled && isValidConfigurationFile(yaml.getText()));
+    // Shows no Dockerfile label if runtime is Java and appYaml is valid.
+    noDockerfileLabel.setVisible(!enabled && isValidConfigurationFile(appYaml.getText()));
   }
 
   @Override
   public void onFacetInitialized(@NotNull Facet facet) {
     if (facet instanceof AppEngineFlexibleFacet) {
-      ((AppEngineFlexibleFacet) facet).getConfiguration().setYamlPath(yaml.getText());
+      ((AppEngineFlexibleFacet) facet).getConfiguration().setAppYamlPath(appYaml.getText());
       ((AppEngineFlexibleFacet) facet).getConfiguration().setDockerfilePath(dockerfile.getText());
     }
   }
@@ -309,8 +309,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  TextFieldWithBrowseButton getYaml() {
-    return yaml;
+  TextFieldWithBrowseButton getAppYaml() {
+    return appYaml;
   }
 
   @VisibleForTesting

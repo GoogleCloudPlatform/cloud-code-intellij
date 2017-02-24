@@ -90,7 +90,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JCheckBox stopPreviousVersionCheckBox;
   private ProjectSelector gcpProjectSelector;
   private JLabel serviceLabel;
-  private TextFieldWithBrowseButton yamlTextField;
+  private TextFieldWithBrowseButton appYamlTextField;
   private TextFieldWithBrowseButton dockerfileTextField;
   private TextFieldWithBrowseButton archiveSelector;
   private HyperlinkLabel appEngineCostWarningLabel;
@@ -99,7 +99,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   private HyperlinkLabel promoteInfoLabel;
   private JLabel dockerfileLabel;
   private JComboBox<Module> modulesWithFlexFacetComboBox;
-  private JCheckBox yamlOverrideCheckBox;
+  private JCheckBox appYamlOverrideCheckBox;
   private JCheckBox dockerfileOverrideCheckBox;
   private String dockerfileOverride = "";
   private JButton moduleSettingsButton;
@@ -110,7 +110,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
     this.deploymentSource = deploymentSource;
     version.getEmptyText().setText(GctBundle.getString("appengine.flex.version.placeholder.text"));
-    yamlTextField.addBrowseFolderListener(
+    appYamlTextField.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
         null /* description */,
         project,
@@ -151,9 +151,9 @@ public class AppEngineFlexibleDeploymentEditor extends
         }
     );
 
-    yamlOverrideCheckBox.addActionListener(event -> {
-      boolean isYamlOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
-      yamlTextField.setVisible(isYamlOverrideSelected);
+    appYamlOverrideCheckBox.addActionListener(event -> {
+      boolean isAppYamlOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
+      appYamlTextField.setVisible(isAppYamlOverrideSelected);
       toggleDockerfileSection();
     });
 
@@ -173,7 +173,7 @@ public class AppEngineFlexibleDeploymentEditor extends
         }
     );
 
-    yamlTextField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+    appYamlTextField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
         updateServiceName();
@@ -238,13 +238,13 @@ public class AppEngineFlexibleDeploymentEditor extends
     if (modulesWithFlexFacetComboBox.getItemCount() == 0) {
       modulesWithFlexFacetComboBox.setVisible(false);
       moduleSettingsButton.setVisible(false);
-      yamlOverrideCheckBox.setVisible(false);
+      appYamlOverrideCheckBox.setVisible(false);
       dockerfileOverrideCheckBox.setVisible(false);
       noSupportedModulesWarning.setVisible(true);
-      yamlTextField.setVisible(true);
+      appYamlTextField.setVisible(true);
       dockerfileTextField.setVisible(true);
-      // These checks are important so getYamlPath() and getDockerfilePath() work correctly.
-      yamlOverrideCheckBox.setSelected(true);
+      // These checks are important so getAppYamlPath() and getDockerfilePath() work correctly.
+      appYamlOverrideCheckBox.setSelected(true);
       dockerfileOverrideCheckBox.setSelected(true);
     }
 
@@ -280,17 +280,17 @@ public class AppEngineFlexibleDeploymentEditor extends
     version.setText(configuration.getVersion());
     promoteVersionCheckBox.setSelected(configuration.isPromote());
     stopPreviousVersionCheckBox.setSelected(configuration.isStopPreviousVersion());
-    yamlTextField.setText(configuration.getYamlPath());
+    appYamlTextField.setText(configuration.getAppYamlPath());
     dockerfileTextField.setText(configuration.getDockerFilePath());
     gcpProjectSelector.setText(configuration.getCloudProjectName());
-    yamlTextField.setVisible(configuration.isOverrideYaml()
+    appYamlTextField.setVisible(configuration.isOverrideAppYaml()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
-    yamlOverrideCheckBox.setSelected(configuration.isOverrideYaml()
+    appYamlOverrideCheckBox.setSelected(configuration.isOverrideAppYaml()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
     dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
-    modulesWithFlexFacetComboBox.setEnabled(!configuration.isOverrideYaml());
+    modulesWithFlexFacetComboBox.setEnabled(!configuration.isOverrideAppYaml());
 
     toggleDockerfileSection();
     updateServiceName();
@@ -305,7 +305,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     configuration.setVersion(version.getText());
     configuration.setPromote(promoteVersionCheckBox.isSelected());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckBox.isSelected());
-    configuration.setYamlPath(getYamlPath());
+    configuration.setAppYamlPath(getAppYamlPath());
     configuration.setDockerFilePath(getDockerfilePath());
     configuration.setCloudProjectName(gcpProjectSelector.getText());
     CredentialedUser user = gcpProjectSelector.getSelectedUser();
@@ -320,7 +320,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     configuration.setUserSpecifiedArtifact(
         deploymentSource instanceof UserSpecifiedPathDeploymentSource);
     configuration.setUserSpecifiedArtifactPath(archiveSelector.getText());
-    configuration.setOverrideYaml(yamlOverrideCheckBox.isSelected());
+    configuration.setOverrideAppYaml(appYamlOverrideCheckBox.isSelected());
     configuration.setOverrideDockerfile(dockerfileOverrideCheckBox.isSelected());
     updateSelectors();
     setDeploymentProjectAndVersion();
@@ -348,11 +348,11 @@ public class AppEngineFlexibleDeploymentEditor extends
       throw new ConfigurationException(GctBundle.message(
           "appengine.cloudsdk.deploymentconfiguration.location.invalid.message"));
     }
-    if (StringUtils.isBlank(getYamlPath())) {
+    if (StringUtils.isBlank(getAppYamlPath())) {
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.browse.app.yaml"));
     }
-    if (!isValidConfigurationFile(getYamlPath())) {
+    if (!isValidConfigurationFile(getAppYamlPath())) {
       throw new ConfigurationException(
           GctBundle.getString("appengine.deployment.error.staging.yaml") + " "
               + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
@@ -382,7 +382,7 @@ public class AppEngineFlexibleDeploymentEditor extends
 
   private void updateServiceName() {
     Optional<String> service =
-        APP_ENGINE_PROJECT_SERVICE.getServiceNameFromAppYaml(getYamlPath());
+        APP_ENGINE_PROJECT_SERVICE.getServiceNameFromAppYaml(getAppYamlPath());
     serviceLabel.setText(service.orElse(DEFAULT_SERVICE));
   }
 
@@ -401,7 +401,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   private boolean isCustomRuntime() {
-    return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(getYamlPath())
+    return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(getAppYamlPath())
         .filter(runtime -> runtime == FlexibleRuntime.custom)
         .isPresent();
   }
@@ -441,9 +441,9 @@ public class AppEngineFlexibleDeploymentEditor extends
    * Returns the final Yaml file path from the combobox or text field, depending on if it's
    * overridden.
    */
-  private String getYamlPath() {
-    if (yamlOverrideCheckBox.isSelected()) {
-      return yamlTextField.getText();
+  private String getAppYamlPath() {
+    if (appYamlOverrideCheckBox.isSelected()) {
+      return appYamlTextField.getText();
     }
 
     if (modulesWithFlexFacetComboBox.getSelectedItem() == null) {
@@ -453,7 +453,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     return Optional.ofNullable(
         FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
         .getFacetByType(AppEngineFlexibleFacetType.ID))
-        .map(flexFacet -> flexFacet.getConfiguration().getYamlPath())
+        .map(flexFacet -> flexFacet.getConfiguration().getAppYamlPath())
         .orElse("");
   }
 
@@ -496,8 +496,8 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
-  TextFieldWithBrowseButton getYamlTextField() {
-    return yamlTextField;
+  TextFieldWithBrowseButton getAppYamlTextField() {
+    return appYamlTextField;
   }
 
   @VisibleForTesting
@@ -516,8 +516,8 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
-  JCheckBox getYamlOverrideCheckBox() {
-    return yamlOverrideCheckBox;
+  JCheckBox getAppYamlOverrideCheckBox() {
+    return appYamlOverrideCheckBox;
   }
 
   @VisibleForTesting

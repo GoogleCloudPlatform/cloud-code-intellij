@@ -29,7 +29,7 @@
               <text value="YAML file"/>
             </properties>
           </component>
-          <component id="f61f3" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="yaml">
+          <component id="f61f3" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="appYaml">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -49,7 +49,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="34f49" class="javax.swing.JButton" binding="genYamlButton">
+          <component id="34f49" class="javax.swing.JButton" binding="genAppYamlButton">
             <constraints>
               <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>

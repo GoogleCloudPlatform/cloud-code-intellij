@@ -42,26 +42,26 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   }
 
   public void testToggleDockerfileSection() throws ConfigurationException {
-    deploymentConfiguration.setYamlPath("");
+    deploymentConfiguration.setAppYamlPath("");
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
     // no yaml
     assertFalse(editor.getDockerfile().isEnabled());
     assertFalse(editor.getGenDockerfileButton().isEnabled());
     assertFalse(editor.getNoDockerfileLabel().isVisible());
     // java yaml
-    editor.getYaml().setText(javaYaml.getPath());
+    editor.getAppYaml().setText(javaYaml.getPath());
     assertFalse(editor.getDockerfile().isEnabled());
     assertFalse(editor.getGenDockerfileButton().isEnabled());
     assertTrue(editor.getNoDockerfileLabel().isVisible());
     // custom yaml
-    editor.getYaml().setText(customYaml.getPath());
+    editor.getAppYaml().setText(customYaml.getPath());
     assertTrue(editor.getDockerfile().isEnabled());
     assertTrue(editor.getGenDockerfileButton().isEnabled());
     assertFalse(editor.getNoDockerfileLabel().isVisible());
   }
 
   public void testValidateConfiguration_noYAML() {
-    deploymentConfiguration.setYamlPath("");
+    deploymentConfiguration.setAppYamlPath("");
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
@@ -79,7 +79,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   }
 
   public void testValidateConfiguration_nullYAML() {
-    deploymentConfiguration.setYamlPath(null);
+    deploymentConfiguration.setAppYamlPath(null);
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
@@ -98,7 +98,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
 
   public void testValidateConfiguration_YAMLIsDirectory() {
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
-    editor.getYaml().setText(javaYaml.getParentFile().getPath());
+    editor.getAppYaml().setText(javaYaml.getParentFile().getPath());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
     assertEquals("The specified YAML configuration file does not exist or is not a valid file.",
@@ -116,7 +116,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
 
   public void testValidateConfiguration_javaRuntime() throws ConfigurationException {
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
-    editor.getYaml().setText(javaYaml.getPath());
+    editor.getAppYaml().setText(javaYaml.getPath());
     assertFalse(editor.getDockerfile().isEnabled());
     assertFalse(editor.getErrorIcon().isVisible());
     assertFalse(editor.getErrorMessage().isVisible());
@@ -126,7 +126,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
 
   public void testValidateConfiguration_customRuntimeNoDockerfile() {
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
-    editor.getYaml().setText(customYaml.getPath());
+    editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerfile().setText("");
     assertTrue(editor.getDockerfile().isEnabled());
     assertTrue(editor.getErrorIcon().isVisible());
@@ -148,7 +148,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
 
   public void testValidateConfiguration_customRuntimeNullDockerfile() {
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
-    editor.getYaml().setText(customYaml.getPath());
+    editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerfile().setText(null);
     assertTrue(editor.getDockerfile().isEnabled());
     assertTrue(editor.getErrorIcon().isVisible());
@@ -170,7 +170,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
 
   public void testValidateConfiguration_customRuntimeDockerfileIsDirectory() {
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
-    editor.getYaml().setText(customYaml.getPath());
+    editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerfile().setText(dockerfile.getParentFile().getPath());
     assertTrue(editor.getDockerfile().isEnabled());
     assertTrue(editor.getErrorIcon().isVisible());
@@ -191,7 +191,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
 
   public void testValidateConfiguration_customRuntime() throws ConfigurationException {
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
-    editor.getYaml().setText(customYaml.getPath());
+    editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerfile().setText(dockerfile.getPath());
     assertTrue(editor.getDockerfile().isEnabled());
     assertFalse(editor.getErrorIcon().isVisible());

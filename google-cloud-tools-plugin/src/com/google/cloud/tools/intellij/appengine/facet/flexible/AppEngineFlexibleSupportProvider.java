@@ -24,8 +24,6 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.Services;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -109,7 +107,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       VirtualFile[] contentRoots = rootModel.getContentRoots();
       AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
       if (contentRoots.length > 0) {
-        facet.getConfiguration().setYamlPath(
+        facet.getConfiguration().setAppYamlPath(
             appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
         facet.getConfiguration().setDockerfilePath(
             appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));

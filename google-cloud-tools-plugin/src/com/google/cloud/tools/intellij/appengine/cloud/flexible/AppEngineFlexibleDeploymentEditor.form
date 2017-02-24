@@ -172,7 +172,7 @@
               <text value="YAML from module:"/>
             </properties>
           </component>
-          <component id="aa677" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="yamlTextField">
+          <component id="aa677" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="appYamlTextField">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="7" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -196,7 +196,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="28b70" class="javax.swing.JCheckBox" binding="yamlOverrideCheckBox">
+              <component id="28b70" class="javax.swing.JCheckBox" binding="appYamlOverrideCheckBox">
                 <constraints>
                   <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
