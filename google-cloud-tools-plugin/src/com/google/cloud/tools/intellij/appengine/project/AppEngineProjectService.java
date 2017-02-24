@@ -37,9 +37,8 @@ import java.util.Optional;
 public abstract class AppEngineProjectService {
 
   public enum FlexibleRuntime {
-    JAVA,
     CUSTOM,
-    UNKNOWN
+    JAVA
   }
 
   public static AppEngineProjectService getInstance() {
@@ -106,11 +105,13 @@ public abstract class AppEngineProjectService {
 
   public abstract Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPath);
 
-  public abstract FlexibleRuntime getFlexibleRuntimeFromAppYaml(@NotNull String appYamlPathString);
+  public abstract Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(
+      @NotNull String appYamlPathString);
 
   /**
    * Gets the service specified in an appengine-web.xml file, in its first found service or module
-   * tag. Service has precedence over module.
+   * XML tag, associated to the module of {@code deploymentSource}. Service has precedence over
+   * module.
    *
    * @return the value of the first found service tag, or else the value of the first found module
    * tag, or else "default"

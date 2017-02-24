@@ -218,16 +218,14 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public FlexibleRuntime getFlexibleRuntimeFromAppYaml(@NotNull String appYamlPathString) {
-    return getValueFromAppYaml(appYamlPathString, RUNTIME_TAG_YAML).map(runtimeValue -> {
-      if (runtimeValue.equals(JAVA_RUNTIME)) {
-        return FlexibleRuntime.JAVA;
-      }
-      if (runtimeValue.equals(CUSTOM_RUNTIME)) {
-        return FlexibleRuntime.CUSTOM;
-      }
-      return FlexibleRuntime.UNKNOWN;
-    }).orElse(FlexibleRuntime.UNKNOWN);
+  public Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(
+      @NotNull String appYamlPathString) {
+    try {
+      return getValueFromAppYaml(appYamlPathString, RUNTIME_TAG_YAML)
+          .map(FlexibleRuntime::valueOf);
+    } catch (IllegalArgumentException iae) {
+      return Optional.empty();
+    }
   }
 
   private Optional<String> getValueFromAppYaml(@NotNull String appYamlPathString,

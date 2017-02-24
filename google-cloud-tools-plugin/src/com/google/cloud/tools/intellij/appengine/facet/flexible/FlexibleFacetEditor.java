@@ -186,7 +186,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private boolean isRuntimeCustom() {
     return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yaml.getText())
-        == FlexibleRuntime.CUSTOM;
+        .filter(runtime -> runtime == FlexibleRuntime.CUSTOM)
+        .isPresent();
   }
 
   /**
@@ -268,7 +269,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     @Override
     public void actionPerformed(ActionEvent event) {
       Path sourceFile = sourceFileProvider.get().orElseThrow(
-          () -> new AssertionError("appengine.deployment.error.deployable.notjarorwar"));
+          () -> new AssertionError("Invalid location for " + fileName));
 
       SelectConfigDestinationFolderDialog destinationFolderDialog = new
           SelectConfigDestinationFolderDialog(project, filePicker.getText());

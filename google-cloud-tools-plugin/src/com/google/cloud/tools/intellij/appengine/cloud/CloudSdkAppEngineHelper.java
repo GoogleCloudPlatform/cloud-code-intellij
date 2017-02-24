@@ -162,7 +162,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           deploy, isFlexCompat));
     } else if (targetEnvironment.isFlexible()) {
       // Checks if the Yaml or Dockerfile exist.
-      FlexibleRuntime runtime =
+      Optional<FlexibleRuntime> runtimeOptional =
           AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
               deploymentConfiguration.getYamlPath());
 
@@ -170,7 +170,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
         return Optional.empty();
       }
-      if (runtime == FlexibleRuntime.CUSTOM
+      if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.CUSTOM).isPresent()
           && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
         callback.errorOccurred(
             GctBundle.getString("appengine.deployment.error.staging.dockerfile"));

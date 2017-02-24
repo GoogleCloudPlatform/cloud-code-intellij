@@ -60,15 +60,17 @@ public class AppEngineFlexibleStage {
       // Checks if the Yaml or Dockerfile exist before staging.
       // This should only happen in special circumstances, since the deployment UI prevents the
       // run config from being ran is the specified configuration files don't exist.
-      FlexibleRuntime runtime =
+      boolean isCustomRuntime =
           AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
-              deploymentConfiguration.getYamlPath());
+              deploymentConfiguration.getYamlPath())
+          .map(runtime -> runtime == FlexibleRuntime.CUSTOM)
+          .isPresent();
 
       if (!Files.exists(Paths.get(deploymentConfiguration.getYamlPath()))) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.yaml"));
       }
-      if (runtime == FlexibleRuntime.CUSTOM
+      if (isCustomRuntime
           && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
@@ -81,7 +83,7 @@ public class AppEngineFlexibleStage {
       Path appYamlPath = Paths.get(deploymentConfiguration.getYamlPath());
       Files.copy(appYamlPath, stagingDirectory.resolve(appYamlPath.getFileName()));
 
-      if (runtime == FlexibleRuntime.CUSTOM) {
+      if (isCustomRuntime) {
         Path dockerFilePath = Paths.get(deploymentConfiguration.getDockerFilePath());
         Files.copy(dockerFilePath, stagingDirectory.resolve(dockerFilePath.getFileName()));
       }
