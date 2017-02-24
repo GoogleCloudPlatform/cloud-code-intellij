@@ -402,7 +402,7 @@ public class AppEngineFlexibleDeploymentEditor extends
 
   private boolean isCustomRuntime() {
     return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(getYamlPath())
-        .map(runtime -> runtime == FlexibleRuntime.CUSTOM)
+        .filter(runtime -> runtime == FlexibleRuntime.custom)
         .isPresent();
   }
 

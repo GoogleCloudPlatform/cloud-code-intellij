@@ -63,7 +63,7 @@ public class AppEngineFlexibleStage {
       boolean isCustomRuntime =
           AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
               deploymentConfiguration.getYamlPath())
-          .map(runtime -> runtime == FlexibleRuntime.CUSTOM)
+          .filter(runtime -> runtime == FlexibleRuntime.custom)
           .isPresent();
 
       if (!Files.exists(Paths.get(deploymentConfiguration.getYamlPath()))) {

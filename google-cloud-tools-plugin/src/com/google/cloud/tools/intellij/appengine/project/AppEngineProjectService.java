@@ -37,8 +37,8 @@ import java.util.Optional;
 public abstract class AppEngineProjectService {
 
   public enum FlexibleRuntime {
-    CUSTOM,
-    JAVA
+    custom,
+    java
   }
 
   public static AppEngineProjectService getInstance() {

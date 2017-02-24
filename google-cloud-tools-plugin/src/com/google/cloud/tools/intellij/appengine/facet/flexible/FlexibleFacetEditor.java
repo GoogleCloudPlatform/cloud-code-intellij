@@ -186,7 +186,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private boolean isRuntimeCustom() {
     return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(yaml.getText())
-        .filter(runtime -> runtime == FlexibleRuntime.CUSTOM)
+        .filter(runtime -> runtime == FlexibleRuntime.custom)
         .isPresent();
   }
 

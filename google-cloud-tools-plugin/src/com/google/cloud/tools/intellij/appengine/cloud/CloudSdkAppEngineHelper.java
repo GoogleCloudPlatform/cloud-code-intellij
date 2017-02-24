@@ -56,7 +56,6 @@ import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.Deploy
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -170,7 +169,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
         return Optional.empty();
       }
-      if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.CUSTOM).isPresent()
+      if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.custom).isPresent()
           && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
         callback.errorOccurred(
             GctBundle.getString("appengine.deployment.error.staging.dockerfile"));

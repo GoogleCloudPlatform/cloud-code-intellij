@@ -65,7 +65,7 @@ public class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
     when(projectService.getServiceNameFromAppEngineWebXml(project, deployable))
         .thenReturn("service");
     when(projectService.getFlexibleRuntimeFromAppYaml(isA(String.class))).thenReturn(
-        Optional.of(FlexibleRuntime.JAVA));
+        Optional.of(FlexibleRuntime.java));
     when(project.getComponent(ModuleManager.class)).thenReturn(moduleManager);
     when(moduleManager.getModules()).thenReturn(new Module[]{module});
     when(module.getComponent(FacetManager.class)).thenReturn(facetManager);
