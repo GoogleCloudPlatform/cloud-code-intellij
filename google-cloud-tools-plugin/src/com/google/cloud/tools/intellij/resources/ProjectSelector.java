@@ -514,7 +514,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
     @Override
     protected void doLogin() {
-      Services.getLoginService().logIn(null, () -> synchronize(true));
+      Services.getLoginService().logIn(
+          null /* message */, () -> synchronize(true) /* onLoginCompleted */);
     }
   }
 

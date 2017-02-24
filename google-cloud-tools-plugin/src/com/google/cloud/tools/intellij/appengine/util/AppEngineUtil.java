@@ -93,23 +93,24 @@ public class AppEngineUtil {
 
         Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
         sources.addAll(
-            artifacts
-                .stream()
-                .filter(
-                    artifact ->
-                        ((environment.isStandard() || environment.isFlexCompat())
-                                && projectService.isAppEngineStandardArtifactType(artifact))
-                            || (environment.isFlexible()
-                                && projectService.isAppEngineFlexArtifactType(artifact)))
-                .map(
-                    artifact ->
-                        AppEngineUtil.createArtifactDeploymentSource(
-                            project, artifact, environment))
+            artifacts.stream()
+                .filter(artifact -> doesArtifactMatchEnvironment(artifact, environment))
+                .map(artifact ->
+                    AppEngineUtil.createArtifactDeploymentSource(project, artifact, environment))
                 .collect(toList()));
       }
     }
 
     return sources;
+  }
+
+  private static boolean doesArtifactMatchEnvironment(Artifact artifact,
+      AppEngineEnvironment environment) {
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
+
+    return ((environment.isStandard() || environment.isFlexCompat())
+        && projectService.isAppEngineStandardArtifactType(artifact))
+        || (environment.isFlexible() && projectService.isAppEngineFlexArtifactType(artifact));
   }
 
   /**

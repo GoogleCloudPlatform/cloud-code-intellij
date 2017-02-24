@@ -55,8 +55,6 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   private static final String AE_WEB_XML_RUNTIME_TAG = "runtime";
   private static final String SERVICE_TAG_YAML = "service:";
   private static final String RUNTIME_TAG_YAML = "runtime:";
-  private static final String JAVA_RUNTIME = "java";
-  private static final String CUSTOM_RUNTIME = "custom";
   private static final String DEFAULT_SERVICE = "default";
 
   private AppEngineAssetProvider assetProvider;

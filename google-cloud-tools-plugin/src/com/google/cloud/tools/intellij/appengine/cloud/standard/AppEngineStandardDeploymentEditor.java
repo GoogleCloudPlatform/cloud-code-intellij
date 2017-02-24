@@ -51,11 +51,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.TreeModelEvent;
 
-/**
- * Editor for an App Engine Deployment runtime configuration.
- */
-public class AppEngineStandardDeploymentEditor extends
-    SettingsEditor<AppEngineDeploymentConfiguration> {
+/** Editor for an App Engine Deployment runtime configuration. */
+public class AppEngineStandardDeploymentEditor
+    extends SettingsEditor<AppEngineDeploymentConfiguration> {
   private JPanel editorPanel;
   private JBTextField versionIdField;
   private ProjectSelector projectSelector;
@@ -73,20 +71,18 @@ public class AppEngineStandardDeploymentEditor extends
   private static final boolean PROMOTE_DEFAULT = true;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = true;
 
-  /**
-   * Initializes the UI components.
-   */
-  public AppEngineStandardDeploymentEditor(Project project,
-      final AppEngineDeployable deploymentSource) {
+  /** Initializes the UI components. */
+  public AppEngineStandardDeploymentEditor(
+      Project project, final AppEngineDeployable deploymentSource) {
     this.project = project;
     this.deploymentSource = deploymentSource;
 
-    versionIdField.getEmptyText().setText(
-        GctBundle.message("appengine.flex.version.placeholder.text"));
+    versionIdField
+        .getEmptyText()
+        .setText(GctBundle.message("appengine.flex.version.placeholder.text"));
     promoteCheckbox.setSelected(PROMOTE_DEFAULT);
     stopPreviousVersionCheckbox.setVisible(
-        AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource)
-    );
+        AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
     stopPreviousVersionCheckbox.setSelected(STOP_PREVIOUS_VERSION_DEFAULT);
 
     promoteInfoLabel.setHyperlinkText(
@@ -96,28 +92,31 @@ public class AppEngineStandardDeploymentEditor extends
     promoteInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     promoteInfoLabel.setHyperlinkTarget(GctBundle.getString("appengine.promoteinfo.url"));
 
-    promoteCheckbox.addItemListener(event -> {
-      boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
+    promoteCheckbox.addItemListener(
+        event -> {
+          boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
 
-      stopPreviousVersionCheckbox.setEnabled(isPromoteSelected);
+          stopPreviousVersionCheckbox.setEnabled(isPromoteSelected);
 
-      if (!isPromoteSelected) {
-        stopPreviousVersionCheckbox.setSelected(false);
-      }
-    });
+          if (!isPromoteSelected) {
+            stopPreviousVersionCheckbox.setSelected(false);
+          }
+        });
 
     projectSelector.addProjectSelectionListener(applicationInfoPanel::refresh);
 
-    projectSelector.addModelListener(new TreeModelAdapter() {
-      @Override
-      public void treeStructureChanged(TreeModelEvent event) {
-        // projects have finished loading
-        refreshApplicationInfoPanel();
-      }
-    });
+    projectSelector.addModelListener(
+        new TreeModelAdapter() {
+          @Override
+          public void treeStructureChanged(TreeModelEvent event) {
+            // projects have finished loading
+            refreshApplicationInfoPanel();
+          }
+        });
 
-    serviceLabel.setText(AppEngineProjectService.getInstance()
-        .getServiceNameFromAppEngineWebXml(project, deploymentSource));
+    serviceLabel.setText(
+        AppEngineProjectService.getInstance()
+            .getServiceNameFromAppEngineWebXml(project, deploymentSource));
 
     if (deploymentSource.getEnvironment() != null) {
       environmentLabel.setText(deploymentSource.getEnvironment().localizedLabel());
@@ -137,7 +136,8 @@ public class AppEngineStandardDeploymentEditor extends
 
   private void refreshApplicationInfoPanel() {
     if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
-      applicationInfoPanel.refresh(projectSelector.getProject().getProjectId(),
+      applicationInfoPanel.refresh(
+          projectSelector.getProject().getProjectId(),
           projectSelector.getSelectedUser().getCredential());
     }
   }
@@ -149,8 +149,7 @@ public class AppEngineStandardDeploymentEditor extends
 
     promoteCheckbox.setSelected(configuration.isPromote());
     stopPreviousVersionCheckbox.setVisible(
-        AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource)
-    );
+        AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     versionIdField.setText(configuration.getVersion());
     if (deploymentSource.getEnvironment() != null) {
@@ -171,7 +170,8 @@ public class AppEngineStandardDeploymentEditor extends
     boolean isFlexCompat =
         AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource);
     configuration.setEnvironment(
-        isFlexCompat ? AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT.name()
+        isFlexCompat
+            ? AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT.name()
             : AppEngineEnvironment.APP_ENGINE_STANDARD.name());
     if (isFlexCompat) {
       configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
@@ -188,8 +188,8 @@ public class AppEngineStandardDeploymentEditor extends
    */
   private void setDeploymentProjectAndVersion() {
     deploymentSource.setProjectName(projectSelector.getText());
-    deploymentSource.setVersion(Strings.isNullOrEmpty(versionIdField.getText())
-        ? "auto" : versionIdField.getText());
+    deploymentSource.setVersion(
+        Strings.isNullOrEmpty(versionIdField.getText()) ? "auto" : versionIdField.getText());
   }
 
   private void validateConfiguration() throws ConfigurationException {
@@ -209,8 +209,8 @@ public class AppEngineStandardDeploymentEditor extends
     Set<CloudSdkValidationResult> validationResults =
         CloudSdkService.getInstance().validateCloudSdk();
     if (validationResults.contains(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
-      throw new ConfigurationException(GctBundle.message(
-            "appengine.cloudsdk.deploymentconfiguration.location.invalid.message"));
+      throw new ConfigurationException(
+          GctBundle.message("appengine.cloudsdk.deploymentconfiguration.location.invalid.message"));
     }
     if (validationResults.contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT)) {
       throw new ConfigurationException(

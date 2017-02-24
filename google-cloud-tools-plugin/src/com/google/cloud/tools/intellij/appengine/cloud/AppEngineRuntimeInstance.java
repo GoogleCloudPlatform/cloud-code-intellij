@@ -65,15 +65,6 @@ public class AppEngineRuntimeInstance extends
 
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
 
-    AppEngineEnvironment environment =
-        AppEngineEnvironment.valueOf(deploymentConfig.getEnvironment());
-    if (environment == AppEngineEnvironment.APP_ENGINE_FLEX
-        && Strings.isNullOrEmpty(deploymentConfig.getYamlPath())) {
-      callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml")
-          + "\n" + GctBundle.getString("appengine.deployment.error.suggestflexfacet"));
-      return;
-    }
-
     AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(task.getProject());
 
     appEngineHelper
