@@ -66,5 +66,5 @@ public class MavenRepositoryLibraryDownloader {
           .getLibraryTableModifiableModel(module.getProject());
 
     return libraryTableModifiableModel.getLibraryByName(library.toMavenDisplayVersion());
- }
+  }
 }

@@ -75,7 +75,6 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
   }
 
   // When searching for the package and class name.
-
   public void testGetFileFromPath_packageClass() {
     ServerToIdeFileResolver fileResolver = new ServerToIdeFileResolver();
 
@@ -85,7 +84,6 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
   }
 
   // When searching for file name only.
-
   public void testGetFileFromPath_fileName() {
     ServerToIdeFileResolver fileResolver = new ServerToIdeFileResolver();
 

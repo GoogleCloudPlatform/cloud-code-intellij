@@ -44,6 +44,7 @@ import javax.swing.event.DocumentEvent;
 /**
  * Reusable panel for configuring the path to the Cloud SDK from various contexts.
  */
+@SuppressWarnings("FutureReturnValueIgnored")
 public class CloudSdkPanel {
 
   private TextFieldWithBrowseButton cloudSdkDirectoryField;

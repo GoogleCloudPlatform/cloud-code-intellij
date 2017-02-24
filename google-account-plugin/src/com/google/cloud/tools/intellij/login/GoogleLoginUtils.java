@@ -54,10 +54,10 @@ public class GoogleLoginUtils {
    */
   @SuppressWarnings("FutureReturnValueIgnored")
   public static void provideUserPicture(Userinfoplus userInfo,
-      final IUserPropertyCallback pictureCallback) {
+      final IUserPropertyCallback<Image> pictureCallback) {
     // set the size of the image before it is served
     String urlString = userInfo.getPicture() + "?sz=" + DEFAULT_PICTURE_SIZE;
-    URL url = null;
+    URL url;
     try {
       url = new URL(urlString);
     } catch (MalformedURLException ex) {
@@ -67,14 +67,13 @@ public class GoogleLoginUtils {
 
     final URL newUrl = url;
 
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        Image image = Toolkit.getDefaultToolkit().getImage(newUrl);
-        Toolkit.getDefaultToolkit().prepareImage(image, -1, -1, null);
-        pictureCallback.setProperty(image);
-      }
-    });
+    ApplicationManager.getApplication()
+        .executeOnPooledThread(
+            () -> {
+              Image image = Toolkit.getDefaultToolkit().getImage(newUrl);
+              Toolkit.getDefaultToolkit().prepareImage(image, -1, -1, null);
+              pictureCallback.setProperty(image);
+            });
   }
 
   /**
@@ -82,34 +81,33 @@ public class GoogleLoginUtils {
    */
   @SuppressWarnings("FutureReturnValueIgnored")
   public static void getUserInfo(@NotNull final Credential credential,
-      final IUserPropertyCallback callback) {
+      final IUserPropertyCallback<Userinfoplus> callback) {
     final Oauth2 userInfoService =
         new Oauth2.Builder(new NetHttpTransport(), new JacksonFactory(), credential)
             .setApplicationName(
                 ServiceManager.getService(AccountPluginInfoService.class).getUserAgent())
             .build();
 
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        Userinfoplus userInfo = null;
-        try {
-          userInfo = userInfoService.userinfo().get().execute();
-        } catch (IOException ex) {
-          //The core IDE functionality still works, so this does
-          //not affect anything right now. The user will receive
-          //error messages when they attempt to do something that
-          //requires a logged in state.
-          LOG.warn("Error retrieving user information.", ex);
-        }
+    ApplicationManager.getApplication()
+        .executeOnPooledThread(
+            () -> {
+              Userinfoplus userInfo = null;
+              try {
+                userInfo = userInfoService.userinfo().get().execute();
+              } catch (IOException ex) {
+                //The core IDE functionality still works, so this does
+                //not affect anything right now. The user will receive
+                //error messages when they attempt to do something that
+                //requires a logged in state.
+                LOG.warn("Error retrieving user information.", ex);
+              }
 
-        if (userInfo != null && userInfo.getId() != null) {
-          callback.setProperty(userInfo);
-        } else {
-          callback.setProperty(null);
-        }
-      }
-    });
+              if (userInfo != null && userInfo.getId() != null) {
+                callback.setProperty(userInfo);
+              } else {
+                callback.setProperty(null);
+              }
+            });
   }
 
   /**
@@ -123,12 +121,9 @@ public class GoogleLoginUtils {
     if (ApplicationManager.getApplication().isDispatchThread()) {
       Messages.showErrorDialog(message, title);
     } else {
-      ApplicationManager.getApplication().invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(message, title);
-        }
-      }, ModalityState.defaultModalityState());
+      ApplicationManager.getApplication()
+          .invokeLater(
+              () -> Messages.showErrorDialog(message, title), ModalityState.defaultModalityState());
     }
   }
 }

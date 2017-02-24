@@ -181,30 +181,26 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private void sendPing(@NotNull final List<? extends NameValuePair> postData) {
     ApplicationManager.getApplication()
         .executeOnPooledThread(
-            new Runnable() {
+            () -> {
+              CloseableHttpClient client =
+                  HttpClientBuilder.create().setUserAgent(userAgent).build();
+              HttpPost request = new HttpPost(ANALYTICS_URL);
 
-              @Override
-              public void run() {
-                CloseableHttpClient client =
-                    HttpClientBuilder.create().setUserAgent(userAgent).build();
-                HttpPost request = new HttpPost(ANALYTICS_URL);
-
-                try {
-                  request.setEntity(new UrlEncodedFormEntity(postData));
-                  CloseableHttpResponse response = client.execute(request);
-                  StatusLine status = response.getStatusLine();
-                  if (status.getStatusCode() >= 300) {
-                    logger.debug(
-                        "Non 200 status code : "
-                            + status.getStatusCode()
-                            + " - "
-                            + status.getReasonPhrase());
-                  }
-                } catch (IOException ex) {
-                  logger.debug("IOException during Analytics Ping", ex.getMessage());
-                } finally {
-                  HttpClientUtils.closeQuietly(client);
+              try {
+                request.setEntity(new UrlEncodedFormEntity(postData));
+                CloseableHttpResponse response = client.execute(request);
+                StatusLine status = response.getStatusLine();
+                if (status.getStatusCode() >= 300) {
+                  logger.debug(
+                      "Non 200 status code : "
+                          + status.getStatusCode()
+                          + " - "
+                          + status.getReasonPhrase());
                 }
+              } catch (IOException ex) {
+                logger.debug("IOException during Analytics Ping", ex.getMessage());
+              } finally {
+                HttpClientUtils.closeQuietly(client);
               }
             });
   }
