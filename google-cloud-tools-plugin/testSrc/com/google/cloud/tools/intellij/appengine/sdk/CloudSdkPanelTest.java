@@ -17,25 +17,21 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.util.containers.HashSet;
 
-import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.picocontainer.MutablePicoContainer;
 
-import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Set;
 
 /** Tests for {@link CloudSdkPanel}. */
@@ -137,9 +133,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
 
   private void setValidateCloudSdkResponse(CloudSdkValidationResult... results) {
     Set<CloudSdkValidationResult> validationResults = new HashSet<>();
-    for (CloudSdkValidationResult result : results) {
-      validationResults.add(result);
-    }
+    Collections.addAll(validationResults, results);
     when(cloudSdkService.validateCloudSdk(any(String.class))).thenReturn(validationResults);
   }
 }

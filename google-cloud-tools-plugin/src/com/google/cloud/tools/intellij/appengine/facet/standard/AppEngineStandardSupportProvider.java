@@ -212,30 +212,27 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
     final ModifiableRootModel model = manager.getModifiableModel();
     final LibraryTable libraryTable = ProjectLibraryTable.getInstance(module.getProject());
 
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        new WriteAction() {
-          @Override
-          protected void run(@NotNull Result result) throws Throwable {
-            for (AppEngineStandardMavenLibrary libraryToRemove : librariesToRemove) {
-              final String displayName = libraryToRemove.toMavenDisplayVersion();
-              final Library library = libraryTable.getLibraryByName(displayName);
-              if (library != null) {
-                libraryTable.removeLibrary(library);
+    ApplicationManager.getApplication().invokeLater(() -> {
+      new WriteAction() {
+        @Override
+        protected void run(@NotNull Result result) throws Throwable {
+          for (AppEngineStandardMavenLibrary libraryToRemove : librariesToRemove) {
+            final String displayName = libraryToRemove.toMavenDisplayVersion();
+            final Library library = libraryTable.getLibraryByName(displayName);
+            if (library != null) {
+              libraryTable.removeLibrary(library);
 
-                for (OrderEntry orderEntry : model.getOrderEntries()) {
-                  if (orderEntry.getPresentableName().equals(library.getName())) {
-                    model.removeOrderEntry(orderEntry);
-                  }
+              for (OrderEntry orderEntry : model.getOrderEntries()) {
+                if (orderEntry.getPresentableName().equals(library.getName())) {
+                  model.removeOrderEntry(orderEntry);
                 }
-
               }
+
             }
-            model.commit();
           }
-        }.execute();
-      }
+          model.commit();
+        }
+      }.execute();
     }, ModalityState.NON_MODAL);
   }
 

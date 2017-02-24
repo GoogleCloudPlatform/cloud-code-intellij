@@ -17,8 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.facet.standard;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 import com.intellij.openapi.roots.DependencyScope;
 
@@ -27,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.utils.library.RepositoryUtils;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Defines the available App Engine standard maven-sourced libraries.
@@ -89,33 +88,17 @@ public enum AppEngineStandardMavenLibrary {
     return scope;
   }
 
-  @Nullable
-  public static AppEngineStandardMavenLibrary getLibraryByDisplayName(final String name) {
-    return getLibrary(new Predicate<AppEngineStandardMavenLibrary>() {
-      @Override
-      public boolean apply(@Nullable AppEngineStandardMavenLibrary library) {
-        return library != null && name.equals(library.getDisplayName());
-      }
-    });
+  public static Optional<AppEngineStandardMavenLibrary> getLibraryByDisplayName(final String name) {
+    return Arrays.stream(AppEngineStandardMavenLibrary.values())
+        .filter(library -> name.equals(library.getDisplayName()))
+        .findAny();
   }
 
-  @Nullable
-  public static AppEngineStandardMavenLibrary getLibraryByMavenDisplayName(final String name) {
-    return getLibrary(new Predicate<AppEngineStandardMavenLibrary>() {
-      @Override
-      public boolean apply(@Nullable AppEngineStandardMavenLibrary library) {
-        return library != null
-            && name.equals(library.toMavenDisplayVersion());
-      }
-    });
-  }
-
-  public static AppEngineStandardMavenLibrary getLibrary(
-      Predicate<AppEngineStandardMavenLibrary> predicate) {
-    return Iterables.find(
-        Arrays.asList(AppEngineStandardMavenLibrary.values()),
-        predicate,
-        null /*default value*/);
+  public static Optional<AppEngineStandardMavenLibrary> getLibraryByMavenDisplayName(
+      final String name) {
+    return Arrays.stream(AppEngineStandardMavenLibrary.values())
+        .filter(library -> name.equals(library.toMavenDisplayVersion()))
+        .findAny();
   }
 
   /**

@@ -16,7 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.standard;
 
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetConfiguration.AppEngineStandardFacetProperties;
+import static java.util.stream.Collectors.toSet;
+
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration.AppEngineFacetProperties;
 import com.google.common.collect.Sets;
 
 import com.intellij.facet.FacetConfiguration;
@@ -34,6 +36,8 @@ import com.intellij.openapi.util.WriteExternalException;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -69,20 +73,21 @@ public class AppEngineStandardFacetConfiguration implements FacetConfiguration,
    * returned and therefore not considered to be "managed".
    */
   public Set<AppEngineStandardMavenLibrary> getLibraries(@NotNull Project project) {
-    LibraryTable libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project);
-    Library[] libraries =  libraryTable.getLibraries();
-
-    Set<AppEngineStandardMavenLibrary> configuredLibraries = Sets.newHashSet();
-    for (Library configuredLibrary : libraries) {
-      AppEngineStandardMavenLibrary mavenLibrary
-          = AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(configuredLibrary.getName());
-      if (mavenLibrary != null) {
-        configuredLibraries.add(mavenLibrary);
-      }
-    }
-
-    return configuredLibraries;
+    return Arrays.stream(
+        LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraries())
+        .map(library ->
+            AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(library.getName()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toSet());
   }
+    return Arrays.stream(
+        LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraries())
+        .map(library ->
+            AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(library.getName()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toSet());
 
   @Override
   public AppEngineStandardFacetProperties getState() {
