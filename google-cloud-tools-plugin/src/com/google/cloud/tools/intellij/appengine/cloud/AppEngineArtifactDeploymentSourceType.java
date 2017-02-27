@@ -58,7 +58,7 @@ public class AppEngineArtifactDeploymentSourceType
 
     if (settings != null) {
       Artifact[] artifacts = ArtifactManager.getInstance(project).getArtifacts();
-      Optional<Artifact> artifact = Arrays.asList(artifacts).stream()
+      Optional<Artifact> artifact = Arrays.stream(artifacts)
           .filter(candidate -> candidate.getName().equals(artifactName))
           .findFirst();
 
@@ -90,11 +90,6 @@ public class AppEngineArtifactDeploymentSourceType
 
       if (deployable.getVersion() != null) {
         tag.setAttribute(VERSION_ATTRIBUTE, deployable.getVersion());
-      }
-
-      if (deployable.getEnvironment() != null) {
-        tag.setAttribute(AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE,
-            deployable.getEnvironment().name());
       }
     }
   }
