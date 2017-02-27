@@ -31,6 +31,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   private FlexibleFacetEditor editor;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
 
+  @Override
   public void setUp() throws Exception {
     super.setUp();
 
@@ -65,15 +66,15 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
-    assertEquals("The specified YAML configuration file does not exist or is not a valid file.",
+    assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
         editor.getErrorMessage().getText());
 
     try {
       editor.apply();
-      fail("YAML can't be empty");
+      fail("app.yaml can't be empty");
     } catch (ConfigurationException ce) {
       assertEquals(
-          "The specified YAML configuration file does not exist or is not a valid file.",
+          "The specified app.yaml configuration file does not exist or is not a valid file.",
           ce.getMessage());
     }
   }
@@ -83,15 +84,15 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor = new FlexibleFacetEditor(deploymentConfiguration, getProject());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
-    assertEquals("The specified YAML configuration file does not exist or is not a valid file.",
+    assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
         editor.getErrorMessage().getText());
 
     try {
       editor.apply();
-      fail("YAML can't be empty");
+      fail("app.yaml can't be empty");
     } catch (ConfigurationException ce) {
       assertEquals(
-          "The specified YAML configuration file does not exist or is not a valid file.",
+          "The specified app.yaml configuration file does not exist or is not a valid file.",
           ce.getMessage());
     }
   }
@@ -101,15 +102,15 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor.getAppYaml().setText(javaYaml.getParentFile().getPath());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
-    assertEquals("The specified YAML configuration file does not exist or is not a valid file.",
+    assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
         editor.getErrorMessage().getText());
 
     try {
       editor.apply();
-      fail("YAML can't be empty");
+      fail("app.yaml can't be empty");
     } catch (ConfigurationException ce) {
       assertEquals(
-          "The specified YAML configuration file does not exist or is not a valid file.",
+          "The specified app.yaml configuration file does not exist or is not a valid file.",
           ce.getMessage());
     }
   }

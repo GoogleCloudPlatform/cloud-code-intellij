@@ -98,6 +98,7 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
 
     try {
       editor.applyEditorTo(config);
+      fail("Invalid deployment source.");
     } catch (ConfigurationException e) {
       assertTrue(e.getMessage().equals("Select a valid deployment source."));
       assertNull(config.getVersion());
@@ -110,6 +111,7 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
 
     try {
       editor.applyEditorTo(config);
+      fail("No project selected.");
     } catch (ConfigurationException e) {
       assertTrue(e.getMessage().equals("Please select a project."));
       assertNull(config.getVersion());
@@ -122,6 +124,7 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
 
     try {
       editor.applyEditorTo(config);
+      fail("Invalid application.");
     } catch (ConfigurationException e) {
       assertTrue(e.getMessage().equals(
           "An App Engine application must be created before you can deploy to App Engine."));

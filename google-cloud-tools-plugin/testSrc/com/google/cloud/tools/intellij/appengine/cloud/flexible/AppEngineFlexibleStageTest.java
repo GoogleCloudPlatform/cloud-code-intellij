@@ -40,6 +40,7 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
   private AppEngineDeploymentConfiguration deploymentConfiguration;
   private Path stagingDirectory;
 
+  @Override
   public void setUp() throws Exception {
     super.setUp();
 
@@ -61,7 +62,7 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
       stage.stage(stagingDirectory);
       fail("No yaml file.");
     } catch (RuntimeException re) {
-      assertEquals("The specified YAML configuration file does not exist or is not a valid file.", re.getMessage());
+      assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.", re.getMessage());
     }
   }
 

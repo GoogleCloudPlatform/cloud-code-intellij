@@ -18,8 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 
 import static java.util.stream.Collectors.toSet;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration.AppEngineFacetProperties;
-import com.google.common.collect.Sets;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetConfiguration.AppEngineStandardFacetProperties;
 
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
@@ -27,8 +26,6 @@ import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.libraries.Library;
-import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
@@ -81,13 +78,6 @@ public class AppEngineStandardFacetConfiguration implements FacetConfiguration,
         .map(Optional::get)
         .collect(toSet());
   }
-    return Arrays.stream(
-        LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraries())
-        .map(library ->
-            AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(library.getName()))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .collect(toSet());
 
   @Override
   public AppEngineStandardFacetProperties getState() {

@@ -24,6 +24,7 @@ public class SelectConfigDestinationFolderDialogTest extends PlatformTestCase {
 
   private File file;
 
+  @Override
   public void setUp() throws Exception {
     super.setUp();
 

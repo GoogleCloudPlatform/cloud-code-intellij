@@ -249,7 +249,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       editor.applyEditorTo(templateConfig);
       fail("Blank yaml.");
     } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a YAML file.", cfe.getMessage());
+      assertEquals("Browse to an app.yaml file.", cfe.getMessage());
     }
   }
 
@@ -260,7 +260,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       editor.applyEditorTo(templateConfig);
       fail("Null yaml.");
     } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a YAML file.", cfe.getMessage());
+      assertEquals("Browse to an app.yaml file.", cfe.getMessage());
     }
   }
 
@@ -272,7 +272,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       fail("The yaml file doesn't exist.");
     } catch (ConfigurationException cfe) {
       assertEquals(
-          "The specified YAML configuration file does not exist or is not a valid file."
+          "The specified app.yaml configuration file does not exist or is not a valid file."
               + " Set a valid file in Module Settings or use another one.",
           cfe.getMessage());
     }
@@ -286,7 +286,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       fail("The yaml file is a directory.");
     } catch (ConfigurationException cfe) {
       assertEquals(
-          "The specified YAML configuration file does not exist or is not a valid file."
+          "The specified app.yaml configuration file does not exist or is not a valid file."
               + " Set a valid file in Module Settings or use another one.",
           cfe.getMessage());
     }
