@@ -41,8 +41,11 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -229,7 +232,8 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       @NotNull String key) {
     Yaml yamlParser = new Yaml();
     try {
-      Object parseResult = yamlParser.load(new FileReader(appYamlPathString));
+      Object parseResult = yamlParser.load(
+          Files.newBufferedReader(Paths.get(appYamlPathString), Charset.defaultCharset()));
 
       if (!(parseResult instanceof Map)) {
         return Optional.empty();
@@ -240,7 +244,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       Map<String, String> yamlMap = (Map<String, String>) parseResult;
 
       return yamlMap.containsKey(key) ? Optional.of(yamlMap.get(key)) : Optional.empty();
-    } catch (FileNotFoundException fnfe) {
+    } catch (InvalidPathException | IOException ioe) {
       return Optional.empty();
     }
   }
