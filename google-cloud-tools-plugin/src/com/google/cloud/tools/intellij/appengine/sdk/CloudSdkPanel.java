@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import javax.swing.event.DocumentEvent;
 /**
  * Reusable panel for configuring the path to the Cloud SDK from various contexts.
  */
+@SuppressWarnings("FutureReturnValueIgnored")
 public class CloudSdkPanel {
 
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
@@ -77,6 +78,7 @@ public class CloudSdkPanel {
         });
   }
 
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void checkSdkInBackground() {
     final String path = cloudSdkDirectoryField.getText();
     ApplicationManager.getApplication().executeOnPooledThread(new CloudSdkCheckerRunnable(path));

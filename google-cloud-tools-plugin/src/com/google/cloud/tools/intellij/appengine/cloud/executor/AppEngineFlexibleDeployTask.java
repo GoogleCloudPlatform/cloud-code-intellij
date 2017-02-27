@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineFlexibleStage;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
@@ -47,7 +50,8 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
   public void execute(ProcessStartListener startListener) {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
-        .withLabel("flex." + (deploy.getDeploymentConfiguration().isAuto() ? "auto" : "custom"))
+        .addMetadata(GctTracking.METADATA_LABEL_KEY,
+            "flex." + (deploy.getDeploymentConfiguration().isAuto() ? "auto" : "custom"))
         .ping();
 
     Path stagingDirectory;
@@ -68,7 +72,7 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
       flexibleStage.stage(stagingDirectory);
     } catch (RuntimeException re) {
       deploy.getCallback()
-          .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
+          .errorOccurred(GctBundle.message("appengine.deployment.exception.during.staging"));
       logger.error(re);
       return;
     }
@@ -83,7 +87,7 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
 
       deploy.deploy(stagingDirectory, startListener);
     } catch (RuntimeException re) {
-      deploy.getCallback().errorOccurred(GctBundle.message("appengine.deployment.error") + "\n"
+      deploy.getCallback().errorOccurred(GctBundle.message("appengine.deployment.exception") + "\n"
           + GctBundle.message("appengine.action.error.update.message"));
       logger.error(re);
     }
@@ -93,7 +97,7 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
   void onCancel() {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY_CANCEL)
-        .withLabel("flex")
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, "flex")
         .ping();
   }
 }

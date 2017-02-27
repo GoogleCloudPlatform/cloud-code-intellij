@@ -25,8 +25,7 @@ import com.google.common.collect.Sets;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
-import com.intellij.openapi.application.Result;
-import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.roots.DependencyScope;
 import com.intellij.openapi.roots.ExportableOrderEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
@@ -39,7 +38,9 @@ import com.intellij.packaging.artifacts.Artifact;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.JComponent;
@@ -105,7 +106,8 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
       if (!libsToAdd.isEmpty()) {
         for (AppEngineStandardMavenLibrary library : libsToAdd) {
-          AppEngineSupportProvider.loadMavenLibrary(context.getModule(), library);
+          MavenRepositoryLibraryDownloader.getInstance().downloadLibrary(
+              context.getModule(), library);
         }
       }
 
@@ -144,7 +146,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
     // Framework discovered "Configure" popup.
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_ADD_STANDARD_FACET)
-        .withLabel("setOnModule")
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, "setOnModule")
         .ping();
   }
 
@@ -166,50 +168,42 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     @Override
     public void afterLibraryAdded(final Library addedLibrary) {
-      AppEngineStandardMavenLibrary library = AppEngineStandardMavenLibrary
-          .getLibraryByMavenDisplayName(addedLibrary.getName());
+      Optional<AppEngineStandardMavenLibrary> libraryOptional =
+          AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(addedLibrary.getName());
 
-      if (library == null) {
-        return;
-      }
+      libraryOptional.ifPresent(
+          library -> {
+            final DependencyScope scope = library.getScope();
 
-      final DependencyScope scope = library.getScope();
+            ApplicationManager.getApplication().runWriteAction(() -> {
+              ModifiableRootModel model =
+                  ModuleRootManager.getInstance(context.getModule()).getModifiableModel();
 
-      new WriteAction() {
-        @Override
-        protected void run(@NotNull Result result) throws Throwable {
-          ModuleRootManager manager = ModuleRootManager.getInstance(context.getModule());
-          ModifiableRootModel model = manager.getModifiableModel();
+              model.addLibraryEntry(addedLibrary);
 
-          model.addLibraryEntry(addedLibrary);
+              Arrays.stream(model.getOrderEntries())
+                  .filter(
+                      orderEntry -> orderEntry.getPresentableName().equals(addedLibrary.getName()))
+                  .forEach(orderEntry -> ((ExportableOrderEntry) orderEntry).setScope(scope));
 
-          for (OrderEntry orderEntry : model.getOrderEntries()) {
-            if (orderEntry.getPresentableName().equals(addedLibrary.getName())) {
-              ((ExportableOrderEntry) orderEntry).setScope(scope);
-            }
+              model.commit();
+            });
+
+            Artifact artifact = AppEngineSupportProvider
+                .findOrCreateWebArtifact((AppEngineStandardFacet) context.getFacet());
+            AppEngineStandardWebIntegration.getInstance()
+                .addLibraryToArtifact(addedLibrary, artifact, context.getProject());
+
+            appEngineStandardLibraryPanel.toggleLibrary(library, true /* select */);
           }
-          model.commit();
-        }
-      }.execute();
-
-      Artifact artifact = AppEngineSupportProvider
-          .findOrCreateWebArtifact((AppEngineStandardFacet) context.getFacet());
-      AppEngineStandardWebIntegration.getInstance()
-          .addLibraryToArtifact(addedLibrary, artifact, context.getProject());
-
-      appEngineStandardLibraryPanel.toggleLibrary(
-          AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(addedLibrary.getName()),
-          true /* select */);
+      );
     }
 
     @Override
     public void afterLibraryRemoved(Library removedLibrary) {
-      AppEngineStandardMavenLibrary library = AppEngineStandardMavenLibrary
-          .getLibraryByMavenDisplayName(removedLibrary.getName());
-
-      if (library != null) {
-        appEngineStandardLibraryPanel.toggleLibrary(library, false /* select */);
-      }
+      AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(removedLibrary.getName())
+          .ifPresent(
+              library -> appEngineStandardLibraryPanel.toggleLibrary(library, false /* select */));
     }
 
     @Override

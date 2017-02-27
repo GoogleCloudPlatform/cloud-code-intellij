@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -25,10 +25,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineFlexibleStage;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineFlexibleDeployTask;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -44,44 +46,33 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Unit tests for {@link AppEngineStandardDeployTask}
+ * Unit tests for {@link AppEngineFlexibleDeployTask}
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AppEngineStandardDeployTaskTest {
+public class AppEngineFlexibleDeployTaskTest {
 
-  private AppEngineStandardDeployTask task;
-  @Mock AppEngineDeploy deploy;
-  @Mock AppEngineStandardStage stage;
+  private AppEngineFlexibleDeployTask task;
+  @Mock
+  AppEngineDeploy deploy;
   @Mock DeploymentOperationCallback callback;
-  @Mock AppEngineDeploymentConfiguration deploymentConfiguration;
-  @Mock AppEngineHelper helper;
+  @Mock
+  AppEngineDeploymentConfiguration deploymentConfiguration;
+  @Mock
+  AppEngineFlexibleStage stage;
+  @Mock
+  AppEngineHelper helper;
   @Mock ProcessStartListener startListener;
-
-  private static final String DEPLOY_FAIL_MSG =
-      "Deployment failed due to an unexpected error.\n"
-          + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
-          + "Run ''gcloud components update'' to update the SDK. "
-          + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)";
-
-  private static final String STAGE_FAIL_MSG =
-      "Deployment failed due to an unexpected error while staging the project.\n"
-          + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
-          + "Run ''gcloud components update'' to update the SDK. "
-          + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)";
-
-  private static final String JAVA_COMPONENTS_MISSING_FAIL_MSG =
-      CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT.getMessage();
 
   @Before
   public void setUp() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
-        .thenReturn(Paths.get("myFile"));
+        .thenReturn(Paths.get("myFile.jar"));
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
     when(deploy.getHelper().stageCredentials(anyString())).thenReturn(Paths.get("/some/file"));
 
-    task = new AppEngineStandardDeployTask(deploy, stage, false);
+    task = new AppEngineFlexibleDeployTask(deploy, stage);
   }
 
   @Test
@@ -94,7 +85,7 @@ public class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void createStagingDirectory_error() throws IOException {
+  public void testCreateStagingDirectory_error() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
         .thenThrow(new IOException());
 
@@ -104,14 +95,13 @@ public class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void stage_runtime_error() {
-    doThrow(new RuntimeException())
-        .when(stage)
-        .stage(any(Path.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
+  public void stage_exception() {
+    doThrow(new RuntimeException("myError")).when(stage).stage(Paths.get("myFile.jar"));
     try {
       task.execute(startListener);
     } catch (AssertionError ae) {
-      verify(callback, times(1)).errorOccurred(STAGE_FAIL_MSG);
+      verify(callback, times(1))
+          .errorOccurred("Deployment failed due to an exception while staging the project.");
       return;
     }
 
@@ -119,30 +109,26 @@ public class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void stage_missingJavaComponents_error() {
-    doThrow(new AppEngineJavaComponentsNotInstalledException(""))
-        .when(stage)
-        .stage(any(Path.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
-
-    task.execute(startListener);
-    verify(callback, times(1)).errorOccurred(JAVA_COMPONENTS_MISSING_FAIL_MSG);
-  }
-
-  @Test
   public void deploy_success() {
-    task.deploy(Paths.get("myFile.jar"), startListener).onExit(0);
+    task.execute(startListener);
 
     verify(callback, never()).errorOccurred(anyString());
   }
 
   @Test
-  public void deploy_error() {
+  public void deploy_exception() {
     doThrow(new RuntimeException())
-        .when(deploy).deploy(any(Path.class), any(ProcessStartListener.class));
+        .when(deploy)
+        .deploy(any(Path.class), any(ProcessStartListener.class));
+
     try {
-      task.deploy(Paths.get("myFile.jar"), startListener).onExit(0);
+      task.execute(startListener);
     } catch (AssertionError ae) {
-      verify(callback, times(1)).errorOccurred(DEPLOY_FAIL_MSG);
+      verify(callback, times(1))
+          .errorOccurred("Deployment failed with an exception.\n"
+          + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
+          + "Run ''gcloud components update'' to update the SDK. "
+          + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)");
       return;
     }
 

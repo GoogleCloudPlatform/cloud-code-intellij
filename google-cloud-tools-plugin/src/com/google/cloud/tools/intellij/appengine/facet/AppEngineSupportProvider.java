@@ -63,8 +63,6 @@ import com.intellij.util.PlatformUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
-import org.jetbrains.idea.maven.utils.library.RepositoryLibraryDescription;
-import org.jetbrains.idea.maven.utils.library.RepositoryLibraryProperties;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -154,6 +152,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       }
     }
 
+    webIntegration.addDevServerToModuleDependencies(rootModel);
+
     addMavenLibraries(librariesToAdd, module, rootModel, webArtifact);
   }
 
@@ -184,7 +184,8 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
       protected void run(@NotNull Result result) throws Throwable {
         if (librariesToAdd != null && !librariesToAdd.isEmpty()) {
           for (AppEngineStandardMavenLibrary libraryToAdd : librariesToAdd) {
-            Library mavenLibrary = loadMavenLibrary(module, libraryToAdd);
+            Library mavenLibrary = MavenRepositoryLibraryDownloader.getInstance()
+                .downloadLibrary(module, libraryToAdd);
             if (mavenLibrary != null) {
               rootModel.addLibraryEntry(mavenLibrary).setScope(libraryToAdd.getScope());
               AppEngineStandardWebIntegration.getInstance()
@@ -192,7 +193,7 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
 
               UsageTrackerProvider.getInstance()
                   .trackEvent(GctTracking.APP_ENGINE_ADD_LIBRARY)
-                  .withLabel(libraryToAdd.name())
+                  .addMetadata(GctTracking.METADATA_LABEL_KEY, libraryToAdd.name())
                   .ping();
             } else {
               LOG.warn("Failed to load library: " + libraryToAdd.getDisplayName());
@@ -209,40 +210,28 @@ public class AppEngineSupportProvider extends FrameworkSupportInModuleProvider {
     final ModifiableRootModel model = manager.getModifiableModel();
     final LibraryTable libraryTable = ProjectLibraryTable.getInstance(module.getProject());
 
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        new WriteAction() {
-          @Override
-          protected void run(@NotNull Result result) throws Throwable {
-            for (AppEngineStandardMavenLibrary libraryToRemove : librariesToRemove) {
-              final String displayName = AppEngineStandardMavenLibrary
-                  .toMavenDisplayVersion(libraryToRemove.getLibraryProperties());
-              final Library library = libraryTable.getLibraryByName(displayName);
-              if (library != null) {
-                libraryTable.removeLibrary(library);
+    ApplicationManager.getApplication().invokeLater(() -> {
+      new WriteAction() {
+        @Override
+        protected void run(@NotNull Result result) throws Throwable {
+          for (AppEngineStandardMavenLibrary libraryToRemove : librariesToRemove) {
+            final String displayName = libraryToRemove.toMavenDisplayVersion();
+            final Library library = libraryTable.getLibraryByName(displayName);
+            if (library != null) {
+              libraryTable.removeLibrary(library);
 
-                for (OrderEntry orderEntry : model.getOrderEntries()) {
-                  if (orderEntry.getPresentableName().equals(library.getName())) {
-                    model.removeOrderEntry(orderEntry);
-                  }
+              for (OrderEntry orderEntry : model.getOrderEntries()) {
+                if (orderEntry.getPresentableName().equals(library.getName())) {
+                  model.removeOrderEntry(orderEntry);
                 }
-
               }
+
             }
-            model.commit();
           }
-        }.execute();
-      }
+          model.commit();
+        }
+      }.execute();
     }, ModalityState.NON_MODAL);
-  }
-
-  static Library loadMavenLibrary(final Module module, AppEngineStandardMavenLibrary library) {
-    RepositoryLibraryProperties libraryProperties = library.getLibraryProperties();
-
-    return MavenRepositoryLibraryDownloader.getInstance().downloadLibrary(module,
-        RepositoryLibraryDescription.findDescription(libraryProperties), libraryProperties,
-        libraryProperties.getVersion());
   }
 
   @NotNull

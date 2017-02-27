@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.server.run;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineExecutor;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRunTask;
+import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
+import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardRunTask;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -34,7 +34,6 @@ import com.intellij.javaee.run.localRun.ScriptsHelper;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -127,14 +126,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
           public OSProcessHandler createProcessHandler(
               String workingDirectory, Map<String, String> envVariables) throws ExecutionException {
             startupProcessHandler.destroyProcess();
-
-            ProcessBuilder dummyProcess = new ProcessBuilder("true");
-            try {
-              return new OSProcessHandler(dummyProcess.start(),
-                  GctBundle.getString("appengine.run.shutdownscript"));
-            } catch (IOException ioe) {
-              throw new ExecutionException(ioe);
-            }
+            return null;
           }
         };
       }

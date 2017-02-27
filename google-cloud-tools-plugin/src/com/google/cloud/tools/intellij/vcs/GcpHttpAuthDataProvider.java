@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.SelectUserDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.ide.DataManager;
 import com.intellij.ide.util.PropertiesComponent;
@@ -30,21 +29,18 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 import com.intellij.util.AuthData;
-
-import git4idea.DialogManager;
-import git4idea.remote.GitHttpAuthDataProvider;
-import git4idea.repo.GitRemote;
-import git4idea.repo.GitRepository;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Window;
 import java.io.IOException;
+
+import git4idea.DialogManager;
+import git4idea.remote.GitHttpAuthDataProvider;
 
 /**
  * Provides credential information for URLs pointing to Google's cloud source.
@@ -65,7 +61,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
   @Override
   public AuthData getAuthData(@NotNull String url) {
     final Project currentProject = getCurrentProject();
-    if ((currentProject != null || Context.currentContext != null) && isUrlGcp(url)) {
+    if ((currentProject != null || Context.currentContext != null) && isGcpUrl(url)) {
       Context currentContext = Context.currentContext; //always prefer context over project setting.
       String userEmail = currentContext != null ? currentContext.userName : null;
 
@@ -113,41 +109,14 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
   /**
    * Check if url is a Google Cloud Platform URL.
    */
-  public static boolean isUrlGcp(@Nullable String url) {
+  public static boolean isGcpUrl(@Nullable String url) {
     return (url != null
         && (StringUtil.startsWithIgnoreCase(url, GOOGLE_URL) || StringUtil
             .startsWithIgnoreCase(url, GOOGLE_URL_ALT)));
   }
 
-  public static String getGcpUrl(String projectId) {
-    return "https://source.developers.google.com/p/" + projectId + "/";
-  }
-
-  /**
-   * Find the remote repository url from the given git repo.
-   */
-  @Nullable
-  public static String findGcpRemoteUrl(@NotNull GitRepository repository) {
-    Pair<GitRemote, String> remote = findGcpRemote(repository);
-    if (remote == null) {
-      return null;
-    }
-    return remote.getSecond();
-  }
-
-  /**
-   * Find the remote repository and its url.
-   */
-  @Nullable
-  public static Pair<GitRemote, String> findGcpRemote(@NotNull GitRepository repository) {
-    for (GitRemote gitRemote : repository.getRemotes()) {
-      for (String remoteUrl : gitRemote.getUrls()) {
-        if (isUrlGcp(remoteUrl)) {
-          return Pair.create(gitRemote, remoteUrl);
-        }
-      }
-    }
-    return null;
+  public static String getGcpUrl(String projectId, String repositoryId) {
+    return GOOGLE_URL + "/p/" + projectId + "/r/" + repositoryId + "/";
   }
 
   @NotNull
@@ -188,11 +157,6 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
           .getData(DataManager.getInstance().getDataContext(activeWindow));
     }
     return result != null ? result : currentProject;
-  }
-
-  @VisibleForTesting
-  static void setCurrentProject(Project project) {
-    currentProject = project;
   }
 
   /**

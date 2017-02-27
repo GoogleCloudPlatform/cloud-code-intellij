@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
@@ -60,7 +63,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
   public void execute(ProcessStartListener startListener) {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
-        .withLabel(isFlexCompat ? "flex-compat" : "standard")
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, isFlexCompat ? "flex-compat" : "standard")
         .ping();
 
     Path stagingDirectory;
@@ -73,7 +76,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
     } catch (IOException ioe) {
       deploy.getCallback().errorOccurred(
           GctBundle.message("appengine.deployment.error.creating.staging.directory"));
-      logger.warn(ioe);
+      logger.error(ioe);
       return;
     }
 
@@ -96,7 +99,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
       logger.warn(ex);
     } catch (RuntimeException re) {
       deploy.getCallback()
-          .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging") + "\n"
+          .errorOccurred(GctBundle.message("appengine.deployment.exception.during.staging") + "\n"
               + GctBundle.message("appengine.action.error.update.message"));
       logger.error(re);
     }
@@ -114,13 +117,13 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
             deploy.deploy(stagingDirectory, startListener);
           } catch (RuntimeException re) {
             deploy.getCallback()
-                .errorOccurred(GctBundle.message("appengine.deployment.error") + "\n"
+                .errorOccurred(GctBundle.message("appengine.deployment.exception") + "\n"
                     + GctBundle.message("appengine.action.error.update.message"));
             logger.error(re);
           }
         } else {
           deploy.getCallback()
-              .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging"));
+              .errorOccurred(GctBundle.message("appengine.deployment.error.during.staging", exitCode));
           logger.warn(
               "App engine standard staging process exited with an error. Exit Code:" + exitCode);
         }
@@ -132,7 +135,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
   void onCancel() {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY_CANCEL)
-        .withLabel(isFlexCompat ? "flex-compat" : "standard")
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, isFlexCompat ? "flex-compat" : "standard")
         .ping();
   }
 }

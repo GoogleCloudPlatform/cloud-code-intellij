@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.login;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
@@ -53,11 +52,12 @@ public class GoogleLoginUtils {
    * @param userInfo the class to be parsed
    * @param pictureCallback the user image will be set on this callback
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   public static void provideUserPicture(Userinfoplus userInfo,
-      final IUserPropertyCallback pictureCallback) {
+      final IUserPropertyCallback<Image> pictureCallback) {
     // set the size of the image before it is served
     String urlString = userInfo.getPicture() + "?sz=" + DEFAULT_PICTURE_SIZE;
-    URL url = null;
+    URL url;
     try {
       url = new URL(urlString);
     } catch (MalformedURLException ex) {
@@ -67,48 +67,47 @@ public class GoogleLoginUtils {
 
     final URL newUrl = url;
 
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        Image image = Toolkit.getDefaultToolkit().getImage(newUrl);
-        Toolkit.getDefaultToolkit().prepareImage(image, -1, -1, null);
-        pictureCallback.setProperty(image);
-      }
-    });
+    ApplicationManager.getApplication()
+        .executeOnPooledThread(
+            () -> {
+              Image image = Toolkit.getDefaultToolkit().getImage(newUrl);
+              Toolkit.getDefaultToolkit().prepareImage(image, -1, -1, null);
+              pictureCallback.setProperty(image);
+            });
   }
 
   /**
    * Sets the user info on the callback.
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   public static void getUserInfo(@NotNull final Credential credential,
-      final IUserPropertyCallback callback) {
+      final IUserPropertyCallback<Userinfoplus> callback) {
     final Oauth2 userInfoService =
         new Oauth2.Builder(new NetHttpTransport(), new JacksonFactory(), credential)
             .setApplicationName(
                 ServiceManager.getService(AccountPluginInfoService.class).getUserAgent())
             .build();
 
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        Userinfoplus userInfo = null;
-        try {
-          userInfo = userInfoService.userinfo().get().execute();
-        } catch (IOException ex) {
-          //The core IDE functionality still works, so this does
-          //not affect anything right now. The user will receive
-          //error messages when they attempt to do something that
-          //requires a logged in state.
-          LOG.warn("Error retrieving user information.", ex);
-        }
+    ApplicationManager.getApplication()
+        .executeOnPooledThread(
+            () -> {
+              Userinfoplus userInfo = null;
+              try {
+                userInfo = userInfoService.userinfo().get().execute();
+              } catch (IOException ex) {
+                //The core IDE functionality still works, so this does
+                //not affect anything right now. The user will receive
+                //error messages when they attempt to do something that
+                //requires a logged in state.
+                LOG.warn("Error retrieving user information.", ex);
+              }
 
-        if (userInfo != null && userInfo.getId() != null) {
-          callback.setProperty(userInfo);
-        } else {
-          callback.setProperty(null);
-        }
-      }
-    });
+              if (userInfo != null && userInfo.getId() != null) {
+                callback.setProperty(userInfo);
+              } else {
+                callback.setProperty(null);
+              }
+            });
   }
 
   /**
@@ -122,35 +121,9 @@ public class GoogleLoginUtils {
     if (ApplicationManager.getApplication().isDispatchThread()) {
       Messages.showErrorDialog(message, title);
     } else {
-      ApplicationManager.getApplication().invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          Messages.showErrorDialog(message, title);
-        }
-      }, ModalityState.defaultModalityState());
+      ApplicationManager.getApplication()
+          .invokeLater(
+              () -> Messages.showErrorDialog(message, title), ModalityState.defaultModalityState());
     }
-  }
-
-  /**
-   * Returns a {@link Credential} object for a fake user. Used for testing.
-   *
-   * @return a {@link Credential} object for the fake user.
-   */
-  @NotNull
-  public static Credential makeFakeUserCredential() {
-    String clientId = System.getenv().get("ANDROID_CLIENT_ID");
-    String clientSecret = System.getenv().get("ANDROID_CLIENT_SECRET");
-    String refreshToken = System.getenv().get("FAKE_USER_REFRESH_TOKEN");
-    String accessToken = System.getenv().get("FAKE_USER_ACCESS_TOKEN");
-
-    Credential cred =
-        new GoogleCredential.Builder()
-            .setJsonFactory(new JacksonFactory())
-            .setTransport(new NetHttpTransport())
-            .setClientSecrets(clientId, clientSecret)
-            .build();
-    cred.setAccessToken(accessToken);
-    cred.setRefreshToken(refreshToken);
-    return cred;
   }
 }

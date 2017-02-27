@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardLibraryPanel;
+import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardMavenLibrary;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineSupportProvider.AppEngineSupportConfigurable;
 import com.google.cloud.tools.intellij.appengine.facet.MavenRepositoryLibraryDownloader;
@@ -120,8 +121,8 @@ public class AppEngineSupportProviderTest extends JavaeeFrameworkSupportProvider
     when(sdkService.getLibraries()).thenReturn(new File[]{});
 
     MavenRepositoryLibraryDownloader libraryDownloader = mock(MavenRepositoryLibraryDownloader.class);
-    when(libraryDownloader.downloadLibrary(any(Module.class), any(RepositoryLibraryDescription.class),
-        any(RepositoryLibraryProperties.class), anyString())).thenReturn(library);
+    when(libraryDownloader.downloadLibrary(any(Module.class),
+        any(AppEngineStandardMavenLibrary.class))).thenReturn(library);
 
     MutablePicoContainer applicationContainer = (MutablePicoContainer)
         ApplicationManager.getApplication().getPicoContainer();

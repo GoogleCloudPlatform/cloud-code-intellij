@@ -61,8 +61,8 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
   private ProjectSelectorItem projectSelectorItem;
   private ProjectSelectorCredentialedUser projectSelectorCredentialedUser =
       new ProjectSelectorCredentialedUser();
-  private ProjectSelectorLoadingItem projectSelectorLoadingItem;
-  private ProjectSelectorErrorItem selectorErrorItem;
+  private ResourceSelectorLoadingItem resourceSelectorLoadingItem;
+  private ResourceSelectorErrorItem selectorErrorItem;
   private DefaultMutableTreeNode lastHoveredNode;
 
   public ProjectSelectorRenderer(@NotNull JTree tree) {
@@ -71,10 +71,10 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
     Color textNonSelectionColor = defaultRenderer.getTextNonSelectionColor();
     projectSelectorItem = new ProjectSelectorItem(backgroundNonSelectionColor,
         defaultRenderer.getTextSelectionColor(), textNonSelectionColor);
-    projectSelectorLoadingItem = new ProjectSelectorLoadingItem(backgroundNonSelectionColor,
+    resourceSelectorLoadingItem = new ResourceSelectorLoadingItem(backgroundNonSelectionColor,
         textNonSelectionColor);
     projectSelectorNewProjectItem = new ProjectSelectorNewProjectItem(tree);
-    selectorErrorItem = new ProjectSelectorErrorItem(ERROR_COLOR);
+    selectorErrorItem = new ResourceSelectorErrorItem(ERROR_COLOR);
   }
 
   @Override
@@ -137,8 +137,8 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
           }
         }, 100, 100, TimeUnit.MILLISECONDS);
       }
-      projectSelectorLoadingItem.snap();
-      return projectSelectorLoadingItem;
+      resourceSelectorLoadingItem.snap();
+      return resourceSelectorLoadingItem;
     } else if (userObject instanceof ResourceErrorModelItem) {
       selectorErrorItem.setText(((ResourceErrorModelItem) userObject).getErrorMessage());
       return selectorErrorItem;

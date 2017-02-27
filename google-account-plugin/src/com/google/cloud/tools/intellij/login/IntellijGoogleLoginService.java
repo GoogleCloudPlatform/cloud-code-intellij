@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ import java.awt.Window;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -68,12 +69,11 @@ import java.util.Map;
  */
 public class IntellijGoogleLoginService implements GoogleLoginService {
 
+  private static final Logger LOG = Logger.getInstance(IntellijGoogleLoginService.class);
   private ClientInfo clientInfo;
   private AndroidUiFacade uiFacade;
   private AndroidPreferencesOAuthDataStore dataStore;
   private CredentialedUserRoster users;
-
-  private static final Logger LOG = Logger.getInstance(IntellijGoogleLoginService.class);
 
   private IntellijGoogleLoginService() {
     this.clientInfo = getClientInfo();
@@ -81,6 +81,37 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     this.users = new CredentialedUserRoster();
     this.dataStore =  new AndroidPreferencesOAuthDataStore();
     addLoginListenersFromExtensionPoints();
+  }
+
+  @Nullable
+  private static Project getCurrentProject() {
+    Window activeWindow = WindowManagerEx.getInstanceEx().getMostRecentFocusedWindow();
+    if (activeWindow == null) {
+      return null;
+    }
+    return CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(activeWindow));
+  }
+
+  /**
+   * Returns the Client Info for Android Studio in a {@link ClientInfo}.
+   */
+  private static ClientInfo getClientInfo() {
+    String id = LoginContext.getId();
+    String info = LoginContext.getInfo();
+    if (id != null && id.trim().length() > 0
+        && info != null && info.trim().length() > 0) {
+      return new ClientInfo(id, info);
+    }
+
+    throw new IllegalStateException("The client information for Android Studio was not found");
+  }
+
+  // TODO: update code to specify parent
+  private static void logErrorAndDisplayDialog(
+      @NotNull final String title,
+      @NotNull final Exception exception) {
+    LOG.error(exception.getMessage(), exception);
+    GoogleLoginUtils.showErrorDialog(exception.getMessage(), title);
   }
 
   /**
@@ -241,15 +272,6 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     }.queue();
   }
 
-  @Nullable
-  private static Project getCurrentProject() {
-    Window activeWindow = WindowManagerEx.getInstanceEx().getMostRecentFocusedWindow();
-    if (activeWindow == null) {
-      return null;
-    }
-    return CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(activeWindow));
-  }
-
   @Override
   public boolean logOut(boolean showPrompt) {
     CredentialedUser activeUser = users.getActiveUser();
@@ -282,20 +304,26 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
   }
 
   @Override
-  public void setActiveUser(String userEmail) throws IllegalArgumentException {
-    users.setActiveUser(userEmail);
-    uiFacade.notifyStatusIndicator();
-  }
-
-  @Override
   public Map<String, CredentialedUser> getAllUsers() {
     return users.getAllUsers();
+  }
+
+  @NotNull
+  @Override
+  public Optional<CredentialedUser> getLoggedInUser(String username) {
+    return Optional.ofNullable(getAllUsers().get(username));
   }
 
   @Override
   @Nullable
   public CredentialedUser getActiveUser() {
     return users.getActiveUser();
+  }
+
+  @Override
+  public void setActiveUser(String userEmail) throws IllegalArgumentException {
+    users.setActiveUser(userEmail);
+    uiFacade.notifyStatusIndicator();
   }
 
   @Override
@@ -306,6 +334,26 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
   @Override
   public void loadPersistedCredentials() {
     dataStore.initializeUsers();
+  }
+
+  @Override
+  public boolean ensureLoggedIn(String username) {
+    Optional<CredentialedUser> projectUser = getLoggedInUser(username);
+    while (!projectUser.isPresent()) {
+      int addUserResult = Messages.showOkCancelDialog(
+          AccountMessageBundle.message("login.credentials.missing.message", username),
+          AccountMessageBundle.message("login.credentials.missing.dialog.title"),
+          AccountMessageBundle.message("login.credentials.missing.dialog.addaccount.button"),
+          AccountMessageBundle.message("login.credentials.missing.dialog.cancel.button"),
+          Messages.getWarningIcon());
+      if (addUserResult == Messages.OK) {
+        logIn();
+        projectUser = getLoggedInUser(username);
+      } else {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -353,28 +401,6 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
   }
 
   /**
-   * Returns the Client Info for Android Studio in a {@link ClientInfo}.
-   */
-  private static ClientInfo getClientInfo() {
-    String id = LoginContext.getId();
-    String info = LoginContext.getInfo();
-    if (id != null && id.trim().length() > 0
-        && info != null && info.trim().length() > 0) {
-      return new ClientInfo(id, info);
-    }
-
-    throw new IllegalStateException("The client information for Android Studio was not found");
-  }
-
-  // TODO: update code to specify parent
-  private static void logErrorAndDisplayDialog(
-      @NotNull final String title,
-      @NotNull final Exception exception) {
-    LOG.error(exception.getMessage(), exception);
-    GoogleLoginUtils.showErrorDialog(exception.getMessage(), title);
-  }
-
-  /**
    * The client information for an application.
    */
   @Immutable
@@ -393,6 +419,18 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
 
     public String getInfo() {
       return info;
+    }
+  }
+
+  private static class AndroidLoggerFacade implements LoggerFacade {
+    @Override
+    public void logError(String msg, Throwable throwable) {
+      LOG.error(msg, throwable);
+    }
+
+    @Override
+    public void logWarning(String msg) {
+      LOG.warn(msg);
     }
   }
 
@@ -611,18 +649,6 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
             + removedUsers
             + "and have been logged out.");
       }
-    }
-  }
-
-  private static class AndroidLoggerFacade implements LoggerFacade {
-    @Override
-    public void logError(String msg, Throwable throwable) {
-      LOG.error(msg, throwable);
-    }
-
-    @Override
-    public void logWarning(String msg) {
-      LOG.warn(msg);
     }
   }
 }

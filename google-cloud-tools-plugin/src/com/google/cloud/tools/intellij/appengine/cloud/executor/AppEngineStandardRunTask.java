@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.cloud;
+package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
@@ -67,7 +67,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
 
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_RUN)
-        .withLabel(Strings.nullToEmpty(runnerId))
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, Strings.nullToEmpty(runnerId))
         .ping();
 
   }

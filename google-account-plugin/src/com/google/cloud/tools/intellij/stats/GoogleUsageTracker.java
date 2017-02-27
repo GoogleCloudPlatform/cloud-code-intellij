@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,14 @@ import com.google.common.base.Joiner.MapJoiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.escape.CharEscaperBuilder;
 import com.google.common.escape.Escaper;
 
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.PermanentInstallationID;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.updateSettings.impl.UpdateChecker;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.PlatformUtils;
 
@@ -50,6 +48,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /** Google Usage Tracker that reports to Cloud Tools Analytics backend. */
 public class GoogleUsageTracker implements UsageTracker, SendsEvents {
@@ -77,6 +76,8 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   private static final String PAGE_URL_KEY = "dp";
   private static final String IS_VIRTUAL_KEY = "cd21";
   private static final String PAGE_TITLE_KEY = "dt";
+  private static final String PAGE_HOST_KEY = "dh";
+  private static final String PAGE_HOST_VALUE = "virtual.intellij";
   private static final String STRING_FALSE_VALUE = "0";
   private static final String STRING_TRUE_VALUE = "1";
   // Our plugin metadata keys.
@@ -96,7 +97,8 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           new BasicNameValuePair(IS_NON_INTERACTIVE_KEY, STRING_FALSE_VALUE),
           new BasicNameValuePair(
               UNIQUE_CLIENT_ID_KEY,
-              UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())));
+              PermanentInstallationID.get()),
+          new BasicNameValuePair(PAGE_HOST_KEY, PAGE_HOST_VALUE));
   private final String analyticsId;
   private final String externalPluginName;
   private final String userAgent;
@@ -127,11 +129,11 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   }
 
   /** Send a (virtual) "pageview" ping to the Cloud-platform-wide Google Analytics Property. */
+  @Override
   public void sendEvent(
       @NotNull String eventCategory,
       @NotNull String eventAction,
-      @Nullable String eventLabel,
-      @Nullable Integer eventValue) {
+      @Nullable Map<String, String> metadataMap) {
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       if (UsageTrackerManager.getInstance().isTrackingEnabled()) {
         // For the semantics of each parameter, consult the followings:
@@ -152,11 +154,17 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         // I think 'virtual' indicates these don't correspond to real web pages.
         postData.add(new BasicNameValuePair(IS_VIRTUAL_KEY, STRING_TRUE_VALUE));
         String fullMetadataString = systemMetadataKeyValues;
-        if (eventLabel != null) {
-          // Not using ImmutableMap.of() because I want to handle null for values.
-          Map<String, Integer> eventMetadataMap = Maps.newHashMap();
-          eventMetadataMap.put(METADATA_ESCAPER.escape(eventLabel), eventValue);
-          fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(eventMetadataMap);
+        if (metadataMap != null && !metadataMap.isEmpty()) {
+          Map<String, String> escapedMap =
+              metadataMap
+                  .entrySet()
+                  .stream()
+                  .collect(
+                      Collectors.toMap(
+                          entry -> METADATA_ESCAPER.escape(entry.getKey()),
+                          entry -> METADATA_ESCAPER.escape(entry.getValue())));
+
+          fullMetadataString = fullMetadataString + "," + METADATA_JOINER.join(escapedMap);
         }
         postData.add(new BasicNameValuePair(PAGE_TITLE_KEY, fullMetadataString));
         sendPing(postData);
@@ -165,35 +173,34 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   }
 
   @Override
-  public FluentTrackingEventWithLabel trackEvent(String action) {
+  public FluentTrackingEventWithMetadata trackEvent(String action) {
     return new TrackingEventBuilder(this, externalPluginName, action);
   }
 
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void sendPing(@NotNull final List<? extends NameValuePair> postData) {
     ApplicationManager.getApplication()
         .executeOnPooledThread(
-            new Runnable() {
-              public void run() {
-                CloseableHttpClient client =
-                    HttpClientBuilder.create().setUserAgent(userAgent).build();
-                HttpPost request = new HttpPost(ANALYTICS_URL);
+            () -> {
+              CloseableHttpClient client =
+                  HttpClientBuilder.create().setUserAgent(userAgent).build();
+              HttpPost request = new HttpPost(ANALYTICS_URL);
 
-                try {
-                  request.setEntity(new UrlEncodedFormEntity(postData));
-                  CloseableHttpResponse response = client.execute(request);
-                  StatusLine status = response.getStatusLine();
-                  if (status.getStatusCode() >= 300) {
-                    logger.debug(
-                        "Non 200 status code : "
-                            + status.getStatusCode()
-                            + " - "
-                            + status.getReasonPhrase());
-                  }
-                } catch (IOException ex) {
-                  logger.debug("IOException during Analytics Ping", ex.getMessage());
-                } finally {
-                  HttpClientUtils.closeQuietly(client);
+              try {
+                request.setEntity(new UrlEncodedFormEntity(postData));
+                CloseableHttpResponse response = client.execute(request);
+                StatusLine status = response.getStatusLine();
+                if (status.getStatusCode() >= 300) {
+                  logger.debug(
+                      "Non 200 status code : "
+                          + status.getStatusCode()
+                          + " - "
+                          + status.getReasonPhrase());
                 }
+              } catch (IOException ex) {
+                logger.debug("IOException during Analytics Ping", ex.getMessage());
+              } finally {
+                HttpClientUtils.closeQuietly(client);
               }
             });
   }

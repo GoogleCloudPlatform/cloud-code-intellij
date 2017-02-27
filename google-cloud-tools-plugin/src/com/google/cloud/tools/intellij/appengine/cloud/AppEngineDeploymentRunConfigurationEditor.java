@@ -78,6 +78,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 
 /**
  * Editor for an App Engine Deployment runtime configuration.
@@ -105,12 +107,14 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private JCheckBox stopPreviousVersionCheckbox;
   private JLabel stopPreviousVersionLabel;
   private JTextPane promoteInfoLabel;
+  private AppEngineApplicationInfoPanel applicationInfoPanel;
+  private JPanel regionLabel;
 
   private DeploymentSource deploymentSource;
   private AppEngineEnvironment environment;
 
-  private static final String LABEL_OPEN_TAG = "<html><font face='sans' size='-1'><i>";
-  private static final String LABEL_CLOSE_TAG = "</i></font></html>";
+  private static final String LABEL_OPEN_TAG = "<html><font face='sans' size='-1'>";
+  private static final String LABEL_CLOSE_TAG = "</font></html>";
   private static final String LABEL_HREF_CLOSE_TAG = "</a>";
 
   private static final String PROMOTE_INFO_HREF_OPEN_TAG =
@@ -253,11 +257,47 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     appEngineFlexConfigPanel.setVisible(
         environment == AppEngineEnvironment.APP_ENGINE_FLEX
             && !AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
+
+    projectSelector.addProjectSelectionListener((event) ->
+        applicationInfoPanel.refresh(event.getSelectedProject().getProjectId(),
+            event.getUser().getCredential()));
+
+    projectSelector.addModelListener(new TreeModelListener() {
+      @Override
+      public void treeNodesChanged(TreeModelEvent e) {
+        // Do nothing.
+      }
+
+      @Override
+      public void treeNodesInserted(TreeModelEvent e) {
+        // Do nothing.
+      }
+
+      @Override
+      public void treeNodesRemoved(TreeModelEvent e) {
+        // Do nothing.
+      }
+
+      @Override
+      public void treeStructureChanged(TreeModelEvent e) {
+        // projects have finished loading
+        refreshApplicationInfoPanel();
+      }
+    });
+  }
+
+  private void refreshApplicationInfoPanel() {
+    if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
+      applicationInfoPanel.refresh(projectSelector.getProject().getProjectId(),
+          projectSelector.getSelectedUser().getCredential());
+    }
   }
 
   @Override
   protected void resetEditorFrom(AppEngineDeploymentConfiguration configuration) {
     projectSelector.setText(configuration.getCloudProjectName());
+    refreshApplicationInfoPanel();
+
     userSpecifiedArtifactFileSelector.setText(configuration.getUserSpecifiedArtifactPath());
     dockerFilePathField.setText(configuration.getDockerFilePath());
     appYamlPathField.setText(configuration.getAppYamlPath());
@@ -332,10 +372,6 @@ public class AppEngineDeploymentRunConfigurationEditor extends
    * the default localized label of the environment
    */
   private String getEnvironmentDisplayableLabel() {
-    if (AppEngineProjectService.getInstance().isFlexCompatEnvFlex(project, deploymentSource)) {
-      return GctBundle.message("appengine.environment.name.mvm");
-    }
-
     return environment.localizedLabel();
   }
 
@@ -376,6 +412,9 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     } else if (StringUtils.isBlank(projectSelector.getText())) {
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.project.missing.message"));
+    } else if (!applicationInfoPanel.isApplicationValid()) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.application.required.deployment"));
     } else if (versionOverrideCheckBox.isSelected()
         && StringUtils.isBlank(versionIdField.getText())) {
       throw new ConfigurationException(GctBundle.message("appengine.config.version.error"));

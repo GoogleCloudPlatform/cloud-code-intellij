@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,25 +18,22 @@ package com.google.cloud.tools.intellij.resources;
 
 import com.intellij.ui.components.JBLabel;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.awt.Color;
 import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.SwingConstants;
 
 /**
- * UI for the node that displays error information if a resource manager call fails.
+ * UI for the node that displays information if a resource manager call returns an empty result.
  */
-class ProjectSelectorErrorItem extends JBLabel {
+public class ResourceSelectorEmptyItem extends JBLabel {
 
-  public ProjectSelectorErrorItem(@NotNull Color errorForeground) {
+  public ResourceSelectorEmptyItem() {
     setBorder(BorderFactory.createEmptyBorder(2, 15, 2, 0));
     setOpaque(false);
     setHorizontalAlignment(SwingConstants.LEFT);
     setVerticalAlignment(SwingConstants.CENTER);
-    setFont(new Font(getFont().getFontName(), Font.BOLD, getFont().getSize()));
-    setForeground(errorForeground);
+    setFont(new Font(getFont().getFontName(), Font.ITALIC, getFont().getSize()));
   }
+
 }
