@@ -251,19 +251,19 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     private final TextFieldWithBrowseButton filePicker;
     private final Supplier<Optional<Path>> sourceFileProvider;
     // Used to refresh the warnings.
-    private final Runnable callback;
+    private final Runnable configurationValidator;
 
     GenerateConfigActionListener(
         Project project,
         String fileName,
         Supplier<Optional<Path>> sourceFileProvider,
         TextFieldWithBrowseButton filePicker,
-        Runnable callback) {
+        Runnable configurationValidator) {
       this.project = project;
       this.fileName = fileName;
       this.sourceFileProvider = sourceFileProvider;
       this.filePicker = filePicker;
-      this.callback = callback;
+      this.configurationValidator = configurationValidator;
     }
 
     @Override
@@ -303,7 +303,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           return;
         }
         filePicker.setText(destinationFilePath.toString());
-        callback.run();
+        configurationValidator.run();
       }
     }
   }
