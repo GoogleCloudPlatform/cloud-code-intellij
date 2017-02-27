@@ -69,6 +69,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     add(messageText);
   }
 
+  @SuppressWarnings("FutureReturnValueIgnored")
   public void refresh(final ProjectSelectionChangedEvent event) {
     if (event == null) {
       ApplicationManager.getApplication().executeOnPooledThread(

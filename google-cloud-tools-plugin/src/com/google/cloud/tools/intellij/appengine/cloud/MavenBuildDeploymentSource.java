@@ -23,6 +23,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
 
+import icons.MavenIcons;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
@@ -31,8 +33,6 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import java.io.File;
 
 import javax.swing.Icon;
-
-import icons.MavenIcons;
 
 /**
  * A deployment source backed by the Maven build system.
@@ -46,9 +46,18 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
   private String projectName;
   private String version;
 
+  /**
+   * Default constructor used instantiating plain Maven Build Deployment sources.
+   */
+  public MavenBuildDeploymentSource(@NotNull ModulePointer pointer, @NotNull Project project) {
+    super(pointer);
+    this.project = project;
+    this.name = getDefaultName();
+  }
+
   public MavenBuildDeploymentSource(@NotNull ModulePointer pointer,
       @NotNull Project project,
-      @Nullable AppEngineEnvironment environment) {
+      @NotNull AppEngineEnvironment environment) {
     super(pointer);
     this.project = project;
     this.environment = environment;
@@ -121,8 +130,7 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
     // In this case, we need to reload the environment.
     if (environment == null) {
       environment = projectService.getModuleAppEngineEnvironment(getModule()).orElseThrow(
-          () -> new RuntimeException("No environment.")
-      );
+          () -> new RuntimeException("No environment."));
     }
 
     if (environment.isFlexible()) {

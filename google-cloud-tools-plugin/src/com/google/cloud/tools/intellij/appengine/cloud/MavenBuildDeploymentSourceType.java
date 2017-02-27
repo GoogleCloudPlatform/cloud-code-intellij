@@ -83,15 +83,9 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
   @Override
   public MavenBuildDeploymentSource load(@NotNull Element tag, @NotNull Project project) {
     final String moduleName = tag.getAttributeValue(NAME_ATTRIBUTE);
-    String environmentName = tag.getAttributeValue(
-        AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
-    AppEngineEnvironment environment = null;
-    if (environmentName != null) {
-      environment = AppEngineEnvironment.valueOf(environmentName);
-    }
 
     MavenBuildDeploymentSource source = new MavenBuildDeploymentSource(
-        ModulePointerManager.getInstance(project).create(moduleName), project, environment);
+        ModulePointerManager.getInstance(project).create(moduleName), project);
     source.setProjectName(tag.getAttributeValue(PROJECT_ATTRIBUTE));
     source.setVersion(tag.getAttributeValue(VERSION_ATTRIBUTE));
 
@@ -112,11 +106,6 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
 
       if (deployable.getVersion() != null) {
         tag.setAttribute(VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
-      }
-
-      if (deployable.getEnvironment() != null) {
-        tag.setAttribute(AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE,
-            deployable.getEnvironment().name());
       }
     }
   }
