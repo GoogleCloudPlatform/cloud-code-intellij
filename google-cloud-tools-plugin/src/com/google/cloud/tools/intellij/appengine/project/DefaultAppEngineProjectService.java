@@ -235,6 +235,8 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
         return Optional.empty();
       }
 
+      // It's possible to get rid of this unchecked cast using a loadAs(file,
+      // AppEngineYamlWebApp.class) sort of approach.
       Map<String, String> yamlMap = (Map<String, String>) parseResult;
 
       return yamlMap.containsKey(key) ? Optional.of(yamlMap.get(key)) : Optional.empty();
