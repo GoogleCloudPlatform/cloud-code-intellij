@@ -20,7 +20,9 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardRuntime;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 
+import com.intellij.appengine.AppEngineCodeInsightTestCase;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
@@ -35,13 +37,17 @@ import com.intellij.testFramework.PlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 
 /**
  * Unit tests for {@link DefaultAppEngineProjectService}
  */
 public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
-  private AppEngineProjectService appEngineProjectService;
+  private DefaultAppEngineProjectService appEngineProjectService;
 
   @Override
   protected void setUp() throws Exception {
@@ -115,5 +121,62 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     return vFile == null
         ? null
         : (XmlFile) PsiManager.getInstance(getProject()).findFile(vFile);
+  }
+
+  public void testGetServiceNameFromAppYaml() {
+    assertEquals("javaService",
+        appEngineProjectService.getServiceNameFromAppYaml(
+            Paths.get(getTestDataPath().toString(), "java.yaml").toString()).get());
+  }
+
+  public void testGetServiceNameFromAppYaml_noService() {
+    assertFalse(appEngineProjectService.getServiceNameFromAppYaml(
+        Paths.get(getTestDataPath().toString(), "noservice.yaml").toString()).isPresent());
+  }
+
+  public void testGetFlexibleRuntimeFromAppYaml_javaRuntime() {
+    assertEquals(FlexibleRuntime.java,
+        appEngineProjectService.getFlexibleRuntimeFromAppYaml(
+            Paths.get(getTestDataPath().toString(), "java.yaml").toString()).get());
+  }
+
+  public void testGetFlexibleRuntimeFromAppYaml_customRuntime() {
+    assertEquals(FlexibleRuntime.custom,
+        appEngineProjectService.getFlexibleRuntimeFromAppYaml(
+            Paths.get(getTestDataPath().toString(), "custom.yaml").toString()).get());
+  }
+
+  public void testGetFlexibleRuntimeFromAppYaml_irregularFormat() throws IOException {
+    assertEquals(FlexibleRuntime.custom,
+        appEngineProjectService.getFlexibleRuntimeFromAppYaml(
+            createTempFile("app.yaml", "   runtime :    custom ").getAbsolutePath()).get());
+  }
+
+  public void testGetServiceNameFromAppEngineWebXml() {
+    assertEquals("java8Service",
+        appEngineProjectService.getServiceNameFromAppEngineWebXml(
+            loadTestWebXml("testData/descriptor/appengine-web_runtime-java8.xml")));
+  }
+
+  public void testGetServiceNameFromAppEngineWebXml_module() {
+    assertEquals("java8Service",
+        appEngineProjectService.getServiceNameFromAppEngineWebXml(
+            loadTestWebXml("testData/descriptor/appengine-web_runtime-java8-module.xml")));
+  }
+
+  public void testGetServiceNameFromAppEngineWebXml_serviceAndModule() {
+    assertEquals("java8Service",
+        appEngineProjectService.getServiceNameFromAppEngineWebXml(
+            loadTestWebXml(
+                "testData/descriptor/appengine-web_runtime-java8-serviceandmodule.xml")));
+  }
+
+  public static File getTestDataPath() {
+    try {
+      URL resource = AppEngineCodeInsightTestCase.class.getResource("/project");
+      return Paths.get(resource.toURI()).toFile();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

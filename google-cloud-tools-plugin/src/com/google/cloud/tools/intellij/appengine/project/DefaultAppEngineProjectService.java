@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardRuntime;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 import com.intellij.facet.FacetManager;
@@ -38,13 +39,12 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
+import org.yaml.snakeyaml.Yaml;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -52,9 +52,8 @@ import java.util.Optional;
  */
 public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
-  private static final String AE_WEB_XML_RUNTIME_TAG = "runtime";
-  private static final String SERVICE_TAG_YAML = "service:";
-  private static final String RUNTIME_TAG_YAML = "runtime:";
+  private static final String RUNTIME_TAG_NAME = "runtime";
+  private static final String SERVICE_TAG_NAME = "service";
   private static final String DEFAULT_SERVICE = "default";
 
   private AppEngineAssetProvider assetProvider;
@@ -197,7 +196,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     if (appengineWebXml == null || (rootTag = appengineWebXml.getRootTag()) == null) {
       return null;
     }
-    String runtime = rootTag.getSubTagText(AE_WEB_XML_RUNTIME_TAG);
+    String runtime = rootTag.getSubTagText(RUNTIME_TAG_NAME);
     if (runtime == null) {
       return null;
     }
@@ -212,14 +211,14 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   @Override
   public Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPathString) {
-    return getValueFromAppYaml(appYamlPathString, SERVICE_TAG_YAML);
+    return getValueFromAppYaml(appYamlPathString, SERVICE_TAG_NAME);
   }
 
   @Override
   public Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(
       @NotNull String appYamlPathString) {
     try {
-      return getValueFromAppYaml(appYamlPathString, RUNTIME_TAG_YAML)
+      return getValueFromAppYaml(appYamlPathString, RUNTIME_TAG_NAME)
           .map(FlexibleRuntime::valueOf);
     } catch (IllegalArgumentException iae) {
       return Optional.empty();
@@ -228,19 +227,18 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   private Optional<String> getValueFromAppYaml(@NotNull String appYamlPathString,
       @NotNull String key) {
-    Path appYamlPath;
+    Yaml yamlParser = new Yaml();
     try {
-      appYamlPath = Paths.get(appYamlPathString);
-    } catch (InvalidPathException ipe) {
-      return Optional.empty();
-    }
+      Object parseResult = yamlParser.load(new FileReader(appYamlPathString));
 
-    try {
-      return Files.readAllLines(appYamlPath).stream()
-          .filter(line -> line.startsWith(key))
-          .map(line -> line.substring(key.length()).trim())
-          .findFirst();
-    } catch (IOException ioe) {
+      if (!(parseResult instanceof Map)) {
+        return Optional.empty();
+      }
+
+      Map<String, String> yamlMap = (Map<String, String>) parseResult;
+
+      return yamlMap.containsKey(key) ? Optional.of(yamlMap.get(key)) : Optional.empty();
+    } catch (FileNotFoundException fnfe) {
       return Optional.empty();
     }
   }
@@ -249,6 +247,12 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   public String getServiceNameFromAppEngineWebXml(
       Project project, DeploymentSource deploymentSource) {
     XmlFile appengineWebXml = loadAppEngineStandardWebXml(project, deploymentSource);
+
+    return getServiceNameFromAppEngineWebXml(appengineWebXml);
+  }
+
+  @VisibleForTesting
+  String getServiceNameFromAppEngineWebXml(XmlFile appengineWebXml) {
 
     if (appengineWebXml != null) {
       XmlTag root = appengineWebXml.getRootTag();
