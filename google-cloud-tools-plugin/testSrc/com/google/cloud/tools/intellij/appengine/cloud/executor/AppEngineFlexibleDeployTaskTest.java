@@ -28,9 +28,8 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineFlexibleStage;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
-import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineFlexibleDeployTask;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -44,6 +43,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 /**
  * Unit tests for {@link AppEngineFlexibleDeployTask}
@@ -70,7 +70,7 @@ public class AppEngineFlexibleDeployTaskTest {
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
-    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(Paths.get("/some/file"));
+    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(Optional.of(Paths.get("/some/file")));
 
     task = new AppEngineFlexibleDeployTask(deploy, stage);
   }

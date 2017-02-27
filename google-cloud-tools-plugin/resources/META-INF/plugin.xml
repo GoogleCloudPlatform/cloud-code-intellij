@@ -218,13 +218,13 @@
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkService"/>
 
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.impl.AppEngineStandardCommunityWebIntegration"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration"
+                        serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.standard.impl.AppEngineStandardCommunityWebIntegration"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.MavenRepositoryLibraryDownloader"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.standard.MavenRepositoryLibraryDownloader"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkVersionNotifier"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService"
@@ -237,18 +237,20 @@
     <remoteServer.type
             implementation="com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType"/>
     <remoteServer.deploymentSource.type
-            implementation="com.google.cloud.tools.intellij.appengine.cloud.UserSpecifiedPathDeploymentSourceType"/>
+            implementation="com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSourceType"/>
     <remoteServer.deploymentSource.type
             implementation="com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSourceType"/>
     <remoteServer.deploymentSource.type
             implementation="com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSourceType"/>
 
-    <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkType"/>
-    <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineTemplateGroupDescriptorFactory"/>
-    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacetType"/>
+    <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkType"/>
+    <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFrameworkType"/>
+    <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineTemplateGroupDescriptorFactory"/>
+    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType"/>
+    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType"/>
     <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetConverterProvider"/>
     <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetMigrationConverterProvider"/>
-    <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.AppEngineFrameworkDetector"/>
+    <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkDetector"/>
 
     <xml.schemaProvider implementation="com.google.cloud.tools.intellij.appengine.descriptor.AppEngineWebSchemaProvider"/>
 

@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.inspections;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.codeHighlighting.HighlightDisplayLevel;

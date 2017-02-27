@@ -25,7 +25,11 @@ import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineFlexibleDeployTask;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardDeployTask;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
+import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -52,7 +56,6 @@ import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.Deploy
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -80,14 +83,15 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private static final String REFRESH_TOKEN_LABEL = "refresh_token";
   private static final String GCLOUD_USER_TYPE_LABEL = "type";
   private static final String GCLOUD_USER_TYPE = "authorized_user";
+  public static final String APP_ENGINE_BILLING_URL = "https://cloud.google.com/appengine/pricing";
+
   private final Project project;
   private Path credentialsPath;
 
   /**
    * Initialize the helper.
    */
-  public CloudSdkAppEngineHelper(
-      @NotNull Project project) {
+  public CloudSdkAppEngineHelper(@NotNull Project project) {
     this.project = project;
   }
 
@@ -96,28 +100,26 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     return project;
   }
 
-  @NotNull
   @Override
-  public Path defaultAppYaml() {
-    return getFileFromResourcePath(DEFAULT_APP_YAML_PATH);
+  public Optional<Path> defaultAppYaml() {
+    return Optional.of(getFileFromResourcePath(DEFAULT_APP_YAML_PATH));
   }
 
-  @Nullable
   @Override
-  public Path defaultDockerfile(AppEngineFlexDeploymentArtifactType deploymentArtifactType) {
+  public Optional<Path> defaultDockerfile(
+      AppEngineFlexibleDeploymentArtifactType deploymentArtifactType) {
     switch (deploymentArtifactType) {
       case WAR:
-        return getFileFromResourcePath(DEFAULT_WAR_DOCKERFILE_PATH);
+        return Optional.of(getFileFromResourcePath(DEFAULT_WAR_DOCKERFILE_PATH));
       case JAR:
-        return getFileFromResourcePath(DEFAULT_JAR_DOCKERFILE_PATH);
+        return Optional.of(getFileFromResourcePath(DEFAULT_JAR_DOCKERFILE_PATH));
       default:
-        return null;
+        return Optional.empty();
     }
   }
 
-  @Nullable
   @Override
-  public CancellableRunnable createDeployRunner(
+  public Optional<CancellableRunnable> createDeployRunner(
       LoggingHandler loggingHandler,
       DeploymentSource source,
       AppEngineDeploymentConfiguration deploymentConfiguration,
@@ -132,14 +134,13 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
       callback.errorOccurred(GctBundle.message("appengine.cloudsdk.location.invalid.message") + " "
           + CloudSdkService.getInstance().getSdkHomePath());
-      return null;
+      return Optional.empty();
     }
 
-    if (source.getFile() == null
-        || !source.getFile().exists()) {
+    if (source.getFile() == null || !source.getFile().exists()) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.source.not.found.error",
           source.getFilePath()));
-      return null;
+      return Optional.empty();
     }
 
     AppEngineEnvironment targetEnvironment = ((AppEngineDeployable) source).getEnvironment();
@@ -149,16 +150,33 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         loggingHandler,
         deploymentConfiguration,
         targetEnvironment,
-        wrapCallbackForUsageTracking(callback, deploymentConfiguration, targetEnvironment));
+        wrapCallbackForUsageTracking(callback, targetEnvironment));
 
-    boolean isFlexCompat = targetEnvironment.isFlexible()
-        && AppEngineProjectService.getInstance().isFlexCompat(project, source);
-    if (targetEnvironment.isStandard() || isFlexCompat) {
-      return createStandardRunner(loggingHandler, Paths.get(source.getFilePath()), deploy,
-          isFlexCompat);
+    if (targetEnvironment.isStandard() || targetEnvironment.isFlexCompat()) {
+      // We need this fresh check in case appengine-web.xml gets modified to turn compat<->standard,
+      // or vice-versa, and that change gets picked up.
+      boolean isFlexCompat = AppEngineProjectService.getInstance().isFlexCompat(project, source);
+
+      return Optional.of(createStandardRunner(loggingHandler, Paths.get(source.getFilePath()),
+          deploy, isFlexCompat));
     } else if (targetEnvironment.isFlexible()) {
-      return createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
-          deploymentConfiguration, deploy);
+      // Checks if the Yaml or Dockerfile exist.
+      Optional<FlexibleRuntime> runtimeOptional =
+          AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
+              deploymentConfiguration.getAppYamlPath());
+
+      if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
+        callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
+        return Optional.empty();
+      }
+      if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.custom).isPresent()
+          && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+        callback.errorOccurred(
+            GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+        return Optional.empty();
+      }
+      return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
+          deploymentConfiguration, deploy));
     } else {
       throw new AssertionError("Invalid App Engine target environment: " + targetEnvironment);
     }
@@ -183,13 +201,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       Path artifactToDeploy,
       AppEngineDeploymentConfiguration config,
       AppEngineDeploy deploy) {
-    AppEngineFlexibleStage flexibleStage = new AppEngineFlexibleStage(
-          this,
-          loggingHandler,
-          artifactToDeploy,
-          config);
-
-    return new AppEngineExecutor(new AppEngineFlexibleDeployTask(deploy, flexibleStage));
+    return new AppEngineExecutor(
+        new AppEngineFlexibleDeployTask(deploy,
+            new AppEngineFlexibleStage(loggingHandler, artifactToDeploy, config)));
   }
 
   @Override
@@ -236,14 +250,15 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   @Override
-  public Path stageCredentials(String googleUserName) {
+  public Optional<Path> stageCredentials(String googleUserName) {
     if (Services.getLoginService().ensureLoggedIn(googleUserName)) {
       return doStageCredentials(googleUserName);
     }
-    return null;
+
+    return Optional.empty();
   }
 
-  private Path doStageCredentials(String googleUsername) {
+  private Optional<Path> doStageCredentials(String googleUsername) {
     Optional<CredentialedUser> projectUser =
         Services.getLoginService().getLoggedInUser(googleUsername);
 
@@ -251,7 +266,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     if (projectUser.isPresent()) {
       googleLoginState = projectUser.get().getGoogleLoginState();
     } else {
-      return null;
+      return Optional.empty();
     }
 
     String clientId = googleLoginState.fetchOAuth2ClientId();
@@ -271,7 +286,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
               .toPath();
       Files.write(credentialsPath, jsonCredential.getBytes(Charsets.UTF_8));
 
-      return credentialsPath;
+      return Optional.of(credentialsPath);
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
@@ -291,7 +306,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @NotNull
   private DeploymentOperationCallback wrapCallbackForUsageTracking(
       final DeploymentOperationCallback deploymentCallback,
-      AppEngineDeploymentConfiguration deploymentConfiguration,
       AppEngineEnvironment environment) {
 
     StringBuilder labelBuilder = new StringBuilder();
@@ -299,12 +313,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       labelBuilder.append("standard");
     } else {
       labelBuilder.append("flex");
-
-      if (deploymentConfiguration.isAuto()) {
-        labelBuilder.append(".auto");
-      } else {
-        labelBuilder.append(".custom");
-      }
     }
     final String eventLabel = labelBuilder.toString();
 
@@ -345,7 +353,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   @VisibleForTesting
-  public Path getCredentialsPath() {
+  Path getCredentialsPath() {
     return credentialsPath;
   }
 }

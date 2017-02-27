@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.times;
@@ -32,6 +33,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 
+import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
@@ -104,7 +106,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     String username = "jones@gmail.com";
     when(deploymentConfiguration.getGoogleUsername()).thenReturn(username);
     when(googleLoginService.ensureLoggedIn(username)).thenReturn(false);
-    assertNull(helper.stageCredentials(username));
+    assertFalse(helper.stageCredentials(username).isPresent());
   }
 
   @Test
@@ -122,11 +124,11 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   public void testCreateDeployRunnerInvalidDeploymentSourceFile_returnsNull() {
     when(sdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
 
-    Runnable runner =
+    Optional<CancellableRunnable> runner =
         helper.createDeployRunner(
             loggingHandler, new DeployableDeploymentSource(), deploymentConfiguration, callback);
 
-    assertNull(runner);
+    assertFalse(runner.isPresent());
     verify(callback, times(1)).errorOccurred("Deployment source not found: null.");
   }
 
@@ -137,11 +139,11 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     Path path = Paths.get(("/this/path"));
     when(sdkService.getSdkHomePath()).thenReturn(path);
 
-    Runnable runner =
+    Optional<CancellableRunnable> runner =
         helper.createDeployRunner(
             loggingHandler, new DeployableDeploymentSource(), deploymentConfiguration, callback);
 
-    assertNull(runner);
+    assertFalse(runner.isPresent());
     verify(callback, times(1))
         .errorOccurred("No Cloud SDK was found in the specified directory. " + path.toString());
   }

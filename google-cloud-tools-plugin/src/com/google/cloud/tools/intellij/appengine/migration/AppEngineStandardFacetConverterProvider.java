@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.migration;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionContext;

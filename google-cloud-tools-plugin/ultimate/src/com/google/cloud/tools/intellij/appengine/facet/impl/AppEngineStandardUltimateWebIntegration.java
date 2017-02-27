@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.appengine.server.integration.AppEngineServerIntegration;
@@ -114,10 +114,10 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   }
 
   @Override
-  public void setupRunConfigurations(Artifact artifact, @NotNull Project project,
+  public void setupRunConfigurations(Artifact artifact, @Nullable Module module,
       ModuleRunConfiguration existingConfiguration) {
-    super.setupRunConfigurations(artifact, project, existingConfiguration);
-    setupLocalDevRunConfiguration(artifact, project, existingConfiguration);
+    super.setupRunConfigurations(artifact, module, existingConfiguration);
+    setupLocalDevRunConfiguration(artifact, module.getProject(), existingConfiguration);
   }
 
   private void setupLocalDevRunConfiguration(Artifact artifact, @NotNull Project project,
