@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
@@ -232,8 +233,13 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       @NotNull String key) {
     Yaml yamlParser = new Yaml();
     try {
-      Object parseResult = yamlParser.load(
-          Files.newBufferedReader(Paths.get(appYamlPathString), Charset.defaultCharset()));
+      Path appYamlPath = Paths.get(appYamlPathString);
+      if (!Files.isRegularFile(appYamlPath)) {
+        return Optional.empty();
+      }
+
+      Object parseResult =
+          yamlParser.load(Files.newBufferedReader(appYamlPath, Charset.defaultCharset()));
 
       if (!(parseResult instanceof Map)) {
         return Optional.empty();
