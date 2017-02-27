@@ -80,7 +80,7 @@ public class AppEngineDeploymentConfigurator extends
     AppEngineDeployable gaeSource = (AppEngineDeployable) source;
 
     AppEngineEnvironment environment = gaeSource.getEnvironment();
-    if (environment != null && environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
+    if (environment != null && environment.isFlexible()) {
       return new AppEngineFlexibleDeploymentEditor(project, gaeSource);
     }
 

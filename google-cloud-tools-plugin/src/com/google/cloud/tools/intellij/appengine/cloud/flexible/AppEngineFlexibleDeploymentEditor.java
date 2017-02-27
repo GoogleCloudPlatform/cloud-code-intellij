@@ -407,8 +407,8 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   /**
-   * Enables the Dockerfile section of the UI if the Yaml file contains "runtime: custom". Disables
-   * it otherwise.
+   * Enables the Dockerfile section of the UI if the app.yaml file contains "runtime: custom".
+   * Disables it otherwise.
    */
   private void toggleDockerfileSection() {
     boolean visible = isCustomRuntime();
@@ -438,7 +438,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   /**
-   * Returns the final Yaml file path from the combobox or text field, depending on if it's
+   * Returns the final app.yaml file path from the combobox or text field, depending on if it's
    * overridden.
    */
   private String getAppYamlPath() {

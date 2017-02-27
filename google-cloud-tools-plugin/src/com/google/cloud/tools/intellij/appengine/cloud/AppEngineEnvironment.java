@@ -20,6 +20,15 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 
 /**
  * Specifies an App Engine environment.
+ *
+ * <p>The App Engine service only contemplates two environments: Standard and Flexible. We're
+ * considering a third one here, flexible compatible, which represents a project whose source layout
+ * is Standard (e.g., exploded war), but is finally deployed to the Flexible environment in a Docker
+ * container.
+ *
+ * <p>This distinction is useful, e.g., to select the deploy runner for a compat project (i.e.,
+ * the standard runner) and to tell a user which environment the app is being deployed to (i.e.,
+ * flexible environment).
  */
 public enum AppEngineEnvironment {
   APP_ENGINE_STANDARD("appengine.environment.name.standard"),
