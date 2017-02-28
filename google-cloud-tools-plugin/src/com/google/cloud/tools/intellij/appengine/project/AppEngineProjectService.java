@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardRuntime;
+import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardRuntime;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
@@ -29,12 +29,17 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 /**
  * A set of helper methods for inspecting an App Engine project's structure and configuration.
  */
 public abstract class AppEngineProjectService {
 
-  public static final String APP_ENGINE_STANDARD_FACET_NAME = "Google App Engine";
+  public enum FlexibleRuntime {
+    custom,
+    java
+  }
 
   public static AppEngineProjectService getInstance() {
     return ServiceManager.getService(AppEngineProjectService.class);
@@ -55,17 +60,15 @@ public abstract class AppEngineProjectService {
 
   public abstract boolean isFlexCompat(@NotNull Project project, @NotNull DeploymentSource source);
 
-  public abstract boolean isFlexCompatEnvFlex(@NotNull Project project,
-      @NotNull DeploymentSource source);
-
   /**
-   * Determines the {@link AppEngineEnvironment} type of the module. This determination is made
-   * based on the presence of an appengine-web.xml configuration file. If one exists, then it is
-   * considered {@link AppEngineEnvironment#APP_ENGINE_STANDARD}.
+   * Determines the {@link AppEngineEnvironment} type of the module. If {@code module} contains an
+   * {@link com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet}, it is
+   * considered Flexible. If it contains an
+   * {@link com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet}, it is
+   * considered Standard if its appengine-web.xml doesn't contain <vm>true</vm> or <env>flex</env>.
+   *
    */
-  @NotNull
-  public abstract AppEngineEnvironment getModuleAppEngineEnvironment(
-      @Nullable XmlFile appEngineWebXml);
+  public abstract Optional<AppEngineEnvironment> getModuleAppEngineEnvironment(Module module);
 
   /**
    * Returns the declared {@link AppEngineStandardRuntime} in appengine-web.xml. If there is no
@@ -85,7 +88,6 @@ public abstract class AppEngineProjectService {
    */
   public abstract boolean isAppEngineFlexArtifactType(@NotNull Artifact artifact);
 
-
   /**
    * Determines if the module is backed by maven.
    */
@@ -101,4 +103,31 @@ public abstract class AppEngineProjectService {
    */
   public abstract boolean isJarOrWarMavenBuild(@NotNull Module module);
 
+  public abstract Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPath);
+
+  public abstract Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(
+      @NotNull String appYamlPathString);
+
+  /**
+   * Gets the service specified in an appengine-web.xml file, in its first found service or module
+   * XML tag, associated to the module of {@code deploymentSource}. Service has precedence over
+   * module.
+   *
+   * @return the value of the first found service tag, or else the value of the first found module
+   * tag, or else "default"
+   */
+  public abstract String getServiceNameFromAppEngineWebXml(
+      Project project, DeploymentSource deploymentSource);
+
+  /**
+   * Returns the default location of the app.yaml configuration file, relative to a module content
+   * root location.
+   */
+  public abstract String getDefaultAppYamlPath(String moduleRoot);
+
+  /**
+   * Returns the default location of the Dockerfile configuration file, relative to a module content
+   * root location.
+   */
+  public abstract String getDefaultDockerfilePath(String moduleRoot);
 }

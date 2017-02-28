@@ -44,6 +44,7 @@ import javax.swing.event.DocumentEvent;
 /**
  * Reusable panel for configuring the path to the Cloud SDK from various contexts.
  */
+@SuppressWarnings("FutureReturnValueIgnored")
 public class CloudSdkPanel {
 
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
@@ -204,6 +205,8 @@ public class CloudSdkPanel {
   public void reset() {
     CloudSdkService sdkService = CloudSdkService.getInstance();
 
+    // TODO(joaomartins): Suggest Cloud SDK location (by resorting to PathResolver) if the path is
+    // empty? Or create a suggest button?
     setCloudSdkDirectoryText(sdkService.getSdkHomePath() != null
         ? sdkService.getSdkHomePath().toString() : "");
   }

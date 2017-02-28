@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.times;
@@ -33,6 +33,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 
+import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
@@ -46,6 +47,7 @@ import org.mockito.Mock;
 
 import java.io.File;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -89,7 +91,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     when(loginState.fetchOAuth2RefreshToken()).thenReturn(refreshToken);
     helper.stageCredentials(username);
     Path credentialFile = helper.getCredentialsPath();
-    Reader credentialFileReader = Files.newBufferedReader(credentialFile, UTF_8);
+    Reader credentialFileReader = Files.newBufferedReader(credentialFile, Charset.defaultCharset());
     Map jsonMap = new Gson().fromJson(credentialFileReader, Map.class);
     credentialFileReader.close();
     assertEquals(clientId, jsonMap.get("client_id"));
@@ -104,7 +106,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     String username = "jones@gmail.com";
     when(deploymentConfiguration.getGoogleUsername()).thenReturn(username);
     when(googleLoginService.ensureLoggedIn(username)).thenReturn(false);
-    assertNull(helper.stageCredentials(username));
+    assertFalse(helper.stageCredentials(username).isPresent());
   }
 
   @Test
@@ -122,11 +124,11 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   public void testCreateDeployRunnerInvalidDeploymentSourceFile_returnsNull() {
     when(sdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
 
-    Runnable runner =
+    Optional<CancellableRunnable> runner =
         helper.createDeployRunner(
             loggingHandler, new DeployableDeploymentSource(), deploymentConfiguration, callback);
 
-    assertNull(runner);
+    assertFalse(runner.isPresent());
     verify(callback, times(1)).errorOccurred("Deployment source not found: null.");
   }
 
@@ -137,11 +139,11 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     Path path = Paths.get(("/this/path"));
     when(sdkService.getSdkHomePath()).thenReturn(path);
 
-    Runnable runner =
+    Optional<CancellableRunnable> runner =
         helper.createDeployRunner(
             loggingHandler, new DeployableDeploymentSource(), deploymentConfiguration, callback);
 
-    assertNull(runner);
+    assertFalse(runner.isPresent());
     verify(callback, times(1))
         .errorOccurred("No Cloud SDK was found in the specified directory. " + path.toString());
   }

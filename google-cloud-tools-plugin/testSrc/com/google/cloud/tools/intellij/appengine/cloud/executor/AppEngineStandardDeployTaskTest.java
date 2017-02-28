@@ -31,8 +31,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStandardStage;
-import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardDeployTask;
+import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
@@ -47,6 +46,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 /**
  * Unit tests for {@link AppEngineStandardDeployTask}
@@ -88,7 +88,8 @@ public class AppEngineStandardDeployTaskTest {
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
-    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(Paths.get("/some/file"));
+    when(deploy.getHelper().stageCredentials(anyString()))
+        .thenReturn(Optional.of(Paths.get("/some/file")));
 
     task = new AppEngineStandardDeployTask(deploy, stage, false);
   }
@@ -98,8 +99,7 @@ public class AppEngineStandardDeployTaskTest {
     when(deploy.getHelper().stageCredentials(anyString())).thenReturn(null);
     task.execute(startListener);
 
-    verify(callback, times(1))
-        .errorOccurred("Failed to prepare credentials. Please make sure you are logged in with the correct account.");
+    verify(callback, times(1)).errorOccurred("Failed to prepare credentials. Please make sure you are logged in with the correct account.");
   }
 
   @Test

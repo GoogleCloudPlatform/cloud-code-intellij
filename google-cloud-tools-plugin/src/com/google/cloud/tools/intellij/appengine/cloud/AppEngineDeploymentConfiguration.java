@@ -16,12 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.remoteServer.util.CloudDeploymentNameConfiguration;
 import com.intellij.util.xmlb.annotations.Attribute;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * The model for a App Engine based deployment configuration.  This state is specific to the
@@ -30,24 +26,8 @@ import org.jetbrains.annotations.NotNull;
 public class AppEngineDeploymentConfiguration extends
     CloudDeploymentNameConfiguration<AppEngineDeploymentConfiguration> {
 
-  public enum ConfigType {
-    AUTO("appengine.flex.configtype.auto.label"),
-    CUSTOM("appengine.flex.configtype.custom.label");
-
-    private final String label;
-
-    ConfigType(String label) {
-      this.label = label;
-    }
-
-    @Override
-    public String toString() {
-      return GctBundle.message(label);
-    }
-  }
-
   public static final String USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE = "userSpecifiedArtifactPath";
-  public static final String ENVIRONMENT_ATTRIBUTE = "environment";
+  static final String ENVIRONMENT_ATTRIBUTE = "environment";
 
   private String cloudProjectName;
   private String googleUsername;
@@ -64,10 +44,11 @@ public class AppEngineDeploymentConfiguration extends
   private String appYamlPath;
   private boolean userSpecifiedArtifact;
   private String userSpecifiedArtifactPath;
-  private ConfigType configType;
   private boolean promote;
   private boolean stopPreviousVersion;
   private String version;
+  private boolean overrideAppYaml;
+  private boolean overrideDockerfile;
 
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
@@ -104,11 +85,6 @@ public class AppEngineDeploymentConfiguration extends
     return appYamlPath;
   }
 
-  @Attribute("configType")
-  public ConfigType getConfigType() {
-    return configType == null ? ConfigType.AUTO : configType;
-  }
-
   @Attribute("promote")
   public boolean isPromote() {
     return promote;
@@ -124,8 +100,14 @@ public class AppEngineDeploymentConfiguration extends
     return version;
   }
 
-  public void setConfigType(@NotNull ConfigType configType) {
-    this.configType = configType;
+  @Attribute("overrideAppYaml")
+  public boolean isOverrideAppYaml() {
+    return overrideAppYaml;
+  }
+
+  @Attribute("overrideDockerfile")
+  public boolean isOverrideDockerfile() {
+    return overrideDockerfile;
   }
 
   public void setCloudProjectName(String cloudProjectName) {
@@ -168,7 +150,11 @@ public class AppEngineDeploymentConfiguration extends
     this.version = version;
   }
 
-  public boolean isAuto() {
-    return getConfigType() == ConfigType.AUTO;
+  public void setOverrideAppYaml(boolean overrideAppYaml) {
+    this.overrideAppYaml = overrideAppYaml;
+  }
+
+  public void setOverrideDockerfile(boolean overrideDockerfile) {
+    this.overrideDockerfile = overrideDockerfile;
   }
 }
