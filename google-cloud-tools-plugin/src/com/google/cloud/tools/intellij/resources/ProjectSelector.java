@@ -33,6 +33,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
+import com.intellij.util.ui.tree.TreeModelAdapter;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -40,14 +41,11 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -111,19 +109,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     projectSelectionListeners = new ArrayList<>();
 
     // synchronize selection between the treemodel and current text.
-    treeModel.addTreeModelListener(new TreeModelListener() {
-      @Override
-      public void treeNodesChanged(TreeModelEvent event) {
-      }
-
-      @Override
-      public void treeNodesInserted(TreeModelEvent event) {
-      }
-
-      @Override
-      public void treeNodesRemoved(TreeModelEvent event) {
-      }
-
+    treeModel.addTreeModelListener(new TreeModelAdapter() {
       @Override
       public void treeStructureChanged(TreeModelEvent event) {
         if (!Strings.isNullOrEmpty(getText())
@@ -170,21 +156,16 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     // the play services activity wizard, but never selects enable cloudsave.
     // In cases outside of the wizard (such as deploy), we will be visible,
     // so the call to elysium will happen immediately when the hierarchy is shown.
-    addHierarchyListener(new HierarchyListener() {
-      @Override
-      public void hierarchyChanged(HierarchyEvent event) {
-        if ((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
+    addHierarchyListener(
+        event -> {
+          if ((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+            SwingUtilities.invokeLater(() -> {
               if (ProjectSelector.this.isVisible()) {
                 synchronize(false);
               }
-            }
-          });
-        }
-      }
-    });
+            });
+          }
+        });
 
     getTextField().addFocusListener(new FocusListener() {
       @Override
@@ -196,9 +177,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       public void focusLost(FocusEvent event) {
         if (!event.isTemporary()) {
           ResourceProjectModelItem node = getCurrentModelItem();
-          if (node != null) {
-            onSelectionChanged(node);
-          }
+          onSelectionChanged(node);
         }
       }
     });
@@ -344,7 +323,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     // First, clear any users that went away.
 
     // Put all users in a set for fast access.
-    Set<String> emailUsers = new HashSet<String>();
+    Set<String> emailUsers = new HashSet<>();
     if (!needsToSignIn()) {
       for (CredentialedUser user : Services.getLoginService().getAllUsers().values()) {
         emailUsers.add(user.getEmail());
@@ -452,9 +431,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       this.getContentPane()
           .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       this.getContentPane().setViewportView(tree);
-      tree.addTreeSelectionListener(new TreeSelectionListener() {
-        @Override
-        public void valueChanged(TreeSelectionEvent event) {
+      tree.addTreeSelectionListener(event -> {
           DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
               .getLastSelectedPathComponent();
           if (node != null) {
@@ -465,18 +442,12 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
               if (Strings.isNullOrEmpty(oldSelection) || !oldSelection.equals(newSelection)) {
                 ProjectSelector.this.setText(newSelection);
                 onSelectionChanged(projectNode);
-                SwingUtilities.invokeLater(new Runnable() {
-                  @Override
-                  public void run() {
-                    ProjectSelector.this.hidePopup();
-                  }
-                });
+                SwingUtilities.invokeLater(ProjectSelector.this::hidePopup);
               }
             } else {
               tree.clearSelection();
             }
           }
-        }
       });
 
       if (queryOnExpand) {
@@ -526,12 +497,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       if (!needsToSignIn()) {
         JButton synchronizeButton = new JButton();
         synchronizeButton.setIcon(GoogleCloudToolsIcons.REFRESH);
-        synchronizeButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent event) {
-            if (!needsToSignIn()) {
-              synchronize(true);
-            }
+        synchronizeButton.addActionListener(event -> {
+          if (!needsToSignIn()) {
+            synchronize(true);
           }
         });
 
@@ -546,23 +514,20 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
     @Override
     protected void doLogin() {
-      Services.getLoginService().logIn(null, new IGoogleLoginCompletedCallback() {
-
-        @Override
-        public void onLoginCompleted() {
-          synchronize(true);
-        }
-      });
+      Services.getLoginService().logIn(
+          null /* message */, () -> synchronize(true) /* onLoginCompleted */);
     }
   }
 
   private void onSelectionChanged(ResourceProjectModelItem newSelection) {
     CredentialedUser user = null;
-    if (newSelection.getParent() instanceof GoogleUserModelItem) {
-      user = ((GoogleUserModelItem) newSelection.getParent()).getCredentialedUser();
+    ProjectSelectionChangedEvent event = null;
+    if (newSelection != null) {
+      if (newSelection.getParent() instanceof GoogleUserModelItem) {
+        user = ((GoogleUserModelItem) newSelection.getParent()).getCredentialedUser();
+      }
+      event = new ProjectSelectionChangedEvent(newSelection.getProject(), user);
     }
-    ProjectSelectionChangedEvent event
-        = new ProjectSelectionChangedEvent(newSelection.getProject(), user);
     for (ProjectSelectionListener listener : projectSelectionListeners) {
       listener.selectionChanged(event);
     }

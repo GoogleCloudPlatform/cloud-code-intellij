@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentEditor;
+import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardDeploymentEditor;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 
 import com.intellij.openapi.diagnostic.Logger;
@@ -34,14 +36,14 @@ import java.util.List;
 /**
  * Sets up the configuration elements for an AppEngine Cloud deployment.
  */
-class AppEngineDeploymentConfigurator extends
+public class AppEngineDeploymentConfigurator extends
     DeploymentConfigurator<AppEngineDeploymentConfiguration, AppEngineServerConfiguration> {
 
   private static final Logger logger = Logger.getInstance(AppEngineDeploymentConfigurator.class);
 
   private final Project project;
 
-  public AppEngineDeploymentConfigurator(Project project) {
+  AppEngineDeploymentConfigurator(Project project) {
     this.project = project;
   }
 
@@ -75,10 +77,13 @@ class AppEngineDeploymentConfigurator extends
       return null;
     }
 
-    return new AppEngineDeploymentRunConfigurationEditor(
-        project,
-        (AppEngineDeployable) source,
-        new CloudSdkAppEngineHelper(project)
-    );
+    AppEngineDeployable gaeSource = (AppEngineDeployable) source;
+
+    AppEngineEnvironment environment = gaeSource.getEnvironment();
+    if (environment != null && environment.isFlexible()) {
+      return new AppEngineFlexibleDeploymentEditor(project, gaeSource);
+    }
+
+    return new AppEngineStandardDeploymentEditor(project, gaeSource);
   }
 }

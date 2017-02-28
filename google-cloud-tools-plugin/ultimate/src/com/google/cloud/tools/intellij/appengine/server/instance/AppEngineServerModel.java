@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.run.CloudSdkStartupPolicy;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
@@ -149,12 +149,9 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       throw new RuntimeConfigurationError("Artifact isn't specified");
     }
 
-    final AppEngineStandardFacet facet = AppEngineUtil
-        .findAppEngineFacet(commonModel.getProject(), artifact);
-    if (facet == null) {
-      throw new RuntimeConfigurationWarning(
-          "App Engine facet not found in '" + artifact.getName() + "' artifact");
-    }
+    AppEngineUtil.findAppEngineStandardFacet(commonModel.getProject(), artifact)
+        .orElseThrow(() -> new RuntimeConfigurationWarning(
+            "App Engine facet not found in '" + artifact.getName() + "' artifact"));
 
     if (!CloudSdkService.getInstance().isValidCloudSdk()) {
       throw new RuntimeConfigurationError(

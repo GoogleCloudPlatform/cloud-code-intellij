@@ -16,10 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.maven;
 
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineFacetConfiguration;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacetType;
-import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardWebIntegration;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetConfiguration;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
 
 import com.intellij.facet.FacetType;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
@@ -44,7 +44,7 @@ import java.util.Map;
  */
 // TODO update this to use the new maven plugin and sdk
 public class AppEngineFacetImporter extends
-    FacetImporter<AppEngineStandardFacet, AppEngineFacetConfiguration, AppEngineStandardFacetType> {
+    FacetImporter<AppEngineStandardFacet, AppEngineStandardFacetConfiguration, AppEngineStandardFacetType> {
 
   public AppEngineFacetImporter() {
     super("com.google.appengine", "appengine-maven-plugin",
@@ -87,7 +87,7 @@ public class AppEngineFacetImporter extends
           .findArtifact(artifactName);
       AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
           webArtifact,
-          module.getProject(),
+          module,
           null /* existingConfiguration */);
     }
   }

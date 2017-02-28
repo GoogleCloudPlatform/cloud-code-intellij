@@ -19,4 +19,5 @@
     <application>app</application>
     <version>1</version>
     <runtime>java8</runtime>
+    <service>java8Service</service>
 </appengine-web-app>

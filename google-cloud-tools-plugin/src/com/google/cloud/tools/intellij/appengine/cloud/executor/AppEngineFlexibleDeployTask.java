@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineFlexibleStage;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -50,8 +50,7 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
   public void execute(ProcessStartListener startListener) {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
-        .addMetadata(GctTracking.METADATA_LABEL_KEY,
-            "flex." + (deploy.getDeploymentConfiguration().isAuto() ? "auto" : "custom"))
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, "flex")
         .ping();
 
     Path stagingDirectory;

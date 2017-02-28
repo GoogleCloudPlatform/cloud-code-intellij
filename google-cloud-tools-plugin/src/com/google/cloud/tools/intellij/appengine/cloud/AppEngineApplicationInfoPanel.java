@@ -21,21 +21,20 @@ import com.google.api.services.appengine.v1.model.Application;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineApplicationCreateDialog;
 import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
+import com.google.cloud.tools.intellij.resources.ProjectSelector.ProjectSelectionChangedEvent;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.ui.JBColor;
+import com.intellij.ui.HyperlinkLabel;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
@@ -47,33 +46,39 @@ import git4idea.DialogManager;
  */
 public class AppEngineApplicationInfoPanel extends JPanel {
 
-  private static final String HTML_OPEN_TAG = "<html><font face='sans' size='-1'>";
-  private static final String HTML_CLOSE_TAG = "</font></html>";
-  private static final String CREATE_APPLICATION_HREF_OPEN_TAG = "<a href='#'>";
-  private static final String HREF_CLOSE_TAG = "</a>";
   private static final int COMPONENTS_HORIZONTAL_PADDING = 5;
   private static final int COMPONENTS_VERTICAL_PADDING = 0;
 
   private final JLabel errorIcon;
-  private final JTextPane messageText;
+  private final HyperlinkLabel messageText;
 
   // Start in a friendly state before we know whether the application is truly valid.
   private boolean isApplicationValid = true;
 
-  private CreateApplicationLinkListener  currentLinkListener;
+  private CreateApplicationLinkListener currentLinkListener;
 
   public AppEngineApplicationInfoPanel() {
     super(new BorderLayout(COMPONENTS_HORIZONTAL_PADDING, COMPONENTS_VERTICAL_PADDING));
 
     errorIcon = new JLabel(AllIcons.Ide.Error);
     errorIcon.setVisible(false);
-    messageText = new JTextPane();
-    messageText.setContentType("text/html");
-    messageText.setEditable(false);
+    messageText = new HyperlinkLabel();
     messageText.setOpaque(false);
 
     add(errorIcon, BorderLayout.WEST);
     add(messageText);
+  }
+
+  @SuppressWarnings("FutureReturnValueIgnored")
+  public void refresh(final ProjectSelectionChangedEvent event) {
+    if (event == null) {
+      ApplicationManager.getApplication().executeOnPooledThread(
+          () -> setMessage(GctBundle.getString("appengine.infopanel.noproject"),
+              true /* isError*/));
+      return;
+    }
+
+    refresh(event.getSelectedProject().getProjectId(), event.getUser().getCredential());
   }
 
   /**
@@ -85,6 +90,11 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   @SuppressWarnings("FutureReturnValueIgnored")
   public void refresh(final String projectId, final Credential credential) {
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
+      if (projectId == null || credential == null) {
+        setMessage(GctBundle.getString("appengine.infopanel.noproject"),
+            true /* isError*/);
+      }
+
       try {
         Application application =
             AppEngineAdminService.getInstance().getApplicationForProjectId(projectId, credential);
@@ -111,13 +121,30 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     return isApplicationValid;
   }
 
-  private void setMessage(String message, boolean isError) {
-    ApplicationManager.getApplication().invokeLater(() -> {
-      errorIcon.setVisible(false);
-      messageText.setText(HTML_OPEN_TAG + message + HTML_CLOSE_TAG);
-      messageText.setForeground(isError ? JBColor.red : JBColor.black);
-
+  private void setMessage(Runnable messagePrinter, boolean isError) {
+    ApplicationManager.getApplication().invokeAndWait(() -> {
+      errorIcon.setVisible(isError);
+      messagePrinter.run();
     }, ModalityState.stateForComponent(this));
+  }
+
+  /**
+   * Prints a message that doesn't contain a hyperlink.
+   */
+  public void setMessage(String text, boolean isError) {
+    setMessage(() -> {
+      messageText.setText(text);
+      // HyperlinkLabels require that revalidate() be called after setText(), in order for text to
+      // actually show up. setHyperlinkText() calls revalidate() internally.
+      messageText.revalidate();
+    }, isError);
+  }
+
+  /**
+   * Prints a message with a hyperlink.
+   */
+  private void setMessage(String beforeLinkText, String linkText, String afterLinkText) {
+    setMessage(() -> messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText), true);
   }
 
   private void setCreateApplicationMessage(String projectId, Credential credential) {
@@ -129,15 +156,9 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     currentLinkListener = new CreateApplicationLinkListener(projectId, credential);
     messageText.addHyperlinkListener(currentLinkListener);
 
-    ApplicationManager.getApplication().invokeLater(() -> {
-      String message = GctBundle.message("appengine.application.not.exist") + " "
-          + GctBundle.message("appengine.application.create",
-          CREATE_APPLICATION_HREF_OPEN_TAG, HREF_CLOSE_TAG);
-
-      messageText.setText(HTML_OPEN_TAG + message + HTML_CLOSE_TAG);
-      messageText.setForeground(JBColor.red);
-      errorIcon.setVisible(true);
-    }, ModalityState.stateForComponent(this));
+    setMessage(GctBundle.getString("appengine.application.not.exist") + " ",
+        GctBundle.getString("appengine.application.create.linkText"),
+        " " + GctBundle.getString("appengine.application.create.afterLinkText"));
   }
 
   /**

@@ -20,6 +20,7 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
@@ -29,6 +30,7 @@ import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * Provides basic Gcloud based App Engine functionality for our Cloud Tools plugin.
@@ -43,16 +45,16 @@ public interface AppEngineHelper {
   /**
    * The default app.yaml to use.
    */
-  Path defaultAppYaml();
+  Optional<Path> defaultAppYaml();
 
   /**
    * The default Dockerfile we suggest for custom flexible deployments.
    *
    * @param deploymentArtifactType depending on the artifact type we provide a different default
    *                               Dockerfile
-   * @return A {@link java.io.File} path to the default Dockerfile
+   * @return an {@link Optional} containing a {@link Path} to the default Dockerfile
    */
-  Path defaultDockerfile(AppEngineFlexDeploymentArtifactType deploymentArtifactType);
+  Optional<Path> defaultDockerfile(AppEngineFlexibleDeploymentArtifactType deploymentArtifactType);
 
   /**
    * Creates a {@link Runnable} that will execute the tasks necessary for deployment to an App
@@ -62,9 +64,9 @@ public interface AppEngineHelper {
    * @param source the deployment source to be deployed
    * @param deploymentConfiguration the configuration specifying the deployment
    * @param callback a callback for handling completions of the operation
-   * @return the runnable that will perform the deployment operation
+   * @return an {@link Optional} containing the runnable that will perform the deployment operation
    */
-  CancellableRunnable createDeployRunner(
+  Optional<CancellableRunnable> createDeployRunner(
       LoggingHandler loggingHandler,
       DeploymentSource source,
       AppEngineDeploymentConfiguration deploymentConfiguration,
@@ -104,7 +106,7 @@ public interface AppEngineHelper {
    * successful then the user is shown a dialog opting to add an account. Then the staging is
    * attempted again.
    */
-  Path stageCredentials(String googleUsername);
+  Optional<Path> stageCredentials(String googleUsername);
 
   /**
    * Deletes the locally staged credentials, if they exist.
