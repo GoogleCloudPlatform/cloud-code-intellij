@@ -250,6 +250,7 @@
     <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType"/>
     <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetConverterProvider"/>
     <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetMigrationConverterProvider"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineDeploymentRunConfigurationConverterProvider"/>
     <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkDetector"/>
 
     <xml.schemaProvider implementation="com.google.cloud.tools.intellij.appengine.descriptor.AppEngineWebSchemaProvider"/>
