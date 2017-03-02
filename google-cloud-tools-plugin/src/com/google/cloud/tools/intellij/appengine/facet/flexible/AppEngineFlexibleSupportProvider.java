@@ -61,6 +61,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -122,7 +123,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       AppEngineFlexibleFacet facet = FacetManager.getInstance(module).addFacet(
           facetType, facetType.getPresentableName(), null /* underlyingFacet */);
 
-      // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
+      // Check if an app.yaml file already exists in the default location.
       VirtualFile[] contentRoots = rootModel.getContentRoots();
       AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
 
@@ -132,53 +133,12 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
         Path dockerfilePath = Paths.get(
             appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
 
+        generateConfigurationFiles(appYamlPath, dockerfilePath,
+            new CloudSdkAppEngineHelper(module.getProject()));
+
+        // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
         facet.getConfiguration().setAppYamlPath(appYamlPath.toString());
         facet.getConfiguration().setDockerfilePath(dockerfilePath.toString());
-
-        CloudSdkAppEngineHelper helper = new CloudSdkAppEngineHelper(module.getProject());
-
-        helper
-            .defaultAppYaml((FlexibleRuntime) runtimeComboBox.getSelectedItem())
-            .ifPresent(
-                appYaml -> {
-                  try {
-                    if (Files.exists(appYamlPath)) {
-                      int choice = Messages.showYesNoDialog("An app.yaml already exists at the "
-                              + "suggested location. Do you want to keep it or generate a new one?",
-                          "File already exists",
-                          "Keep it",
-                          "Generate new one",
-                          GoogleCloudToolsIcons.APP_ENGINE);
-                      if (choice == Messages.YES) {
-                        return;
-                      }
-                    }
-                    FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
-                  } catch (IOException ioe) {
-                    // Do nothing for now.
-                  }
-                });
-        if (runtimeComboBox.getSelectedItem() == FlexibleRuntime.custom) {
-          helper.defaultDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR)
-              .ifPresent(dockerfile -> {
-                try {
-                  if (Files.exists(dockerfilePath)) {
-                    int choice = Messages.showYesNoDialog("A Dockerfile already exists at the "
-                            + "suggested location. Do you want to keep it or generate a new one?",
-                        "File already exists",
-                        "Keep it",
-                        "Generate new one",
-                        GoogleCloudToolsIcons.APP_ENGINE);
-                    if (choice == Messages.YES) {
-                      return;
-                    }
-                  }
-                  FileUtil.copy(dockerfile.toFile(), dockerfilePath.toFile());
-                } catch (IOException ioe) {
-                  // Do nothing for now.
-                }
-              });
-        }
       }
 
       // TODO(joaomartins): Add other run configurations here too.
@@ -213,6 +173,70 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       }
 
       runManager.addConfiguration(settings, false /* shared */);
+    }
+
+    /**
+     * Asks the user if new configuration files should be generated and generates them if so.
+     */
+    private void generateConfigurationFiles(Path defaultAppYamlPath, Path defaultDockerfilePath,
+        CloudSdkAppEngineHelper helper) {
+      AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
+      // If app.yaml exists, ask user if they want to reuse files or generate new ones.
+      if (Files.exists(defaultAppYamlPath)) {
+        Optional<FlexibleRuntime> optionalRuntime =
+            appEngineProjectService.getFlexibleRuntimeFromAppYaml(defaultAppYamlPath.toString());
+
+        if (optionalRuntime.isPresent()) {
+          int choice = Messages.showYesNoDialog(
+              "An app.yaml with runtime " + optionalRuntime.get().name() + " already exists at "
+                  + "the default app.yaml location. Do you want to keep the existing files "
+                  + "or generate new ones for runtime "
+                  + ((FlexibleRuntime) runtimeComboBox.getSelectedItem()).name() + "?",
+              "app.yaml file already exists",
+              "Keep them",
+              "Generate new ones",
+              GoogleCloudToolsIcons.APP_ENGINE);
+
+          if (choice == Messages.YES) {
+            // Don't generate files.
+            return;
+          }
+
+          // Create backups of the files.
+          try {
+            Files.move(defaultAppYamlPath,
+                defaultAppYamlPath.getParent().resolve(
+                    defaultAppYamlPath.getFileName().toString() + ".bak"));
+            Files.move(defaultDockerfilePath,
+                defaultDockerfilePath.getParent().resolve(
+                    defaultDockerfilePath.getFileName().toString() + ".bak"));
+          } catch (IOException e) {
+            // Do nothing for now.
+          }
+        }
+      }
+
+      // Generate files.
+      helper
+          .defaultAppYaml((FlexibleRuntime) runtimeComboBox.getSelectedItem())
+          .ifPresent(
+              appYaml -> {
+                try {
+                  FileUtil.copy(appYaml.toFile(), defaultAppYamlPath.toFile());
+                } catch (IOException ioe) {
+                  // Do nothing for now.
+                }
+              });
+      if (runtimeComboBox.getSelectedItem() == FlexibleRuntime.custom) {
+        helper.defaultDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR)
+            .ifPresent(dockerfile -> {
+              try {
+                FileUtil.copy(dockerfile.toFile(), defaultDockerfilePath.toFile());
+              } catch (IOException ioe) {
+                // Do nothing for now.
+              }
+            });
+      }
     }
 
     private void createUIComponents() {
