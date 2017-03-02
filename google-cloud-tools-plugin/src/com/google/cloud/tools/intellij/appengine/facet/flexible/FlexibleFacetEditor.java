@@ -118,7 +118,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     );
 
     genAppYamlButton.addActionListener(new GenerateConfigActionListener(project, "app.yaml",
-        appEngineHelper::defaultAppYaml, appYaml, this::validateConfiguration));
+        () -> appEngineHelper.defaultAppYaml(FlexibleRuntime.java), appYaml,
+        this::validateConfiguration));
 
     genDockerfileButton.addActionListener(new GenerateConfigActionListener(project, "Dockerfile",
         () -> appEngineHelper.defaultDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR),

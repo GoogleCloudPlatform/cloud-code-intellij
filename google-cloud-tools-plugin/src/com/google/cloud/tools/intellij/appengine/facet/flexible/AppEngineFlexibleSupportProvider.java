@@ -19,11 +19,15 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -39,6 +43,8 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
@@ -51,6 +57,13 @@ import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -88,6 +101,12 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
 
     private JPanel mainPanel;
     private CloudSdkPanel cloudSdkPanel;
+    private JComboBox<FlexibleRuntime> runtimeComboBox;
+
+    AppEngineFlexibleSupportConfigurable() {
+      runtimeComboBox.setModel(new DefaultComboBoxModel<>(FlexibleRuntime.values()));
+      runtimeComboBox.setSelectedItem(FlexibleRuntime.java);
+    }
 
     @Nullable
     @Override
@@ -106,11 +125,60 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
       VirtualFile[] contentRoots = rootModel.getContentRoots();
       AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
+
       if (contentRoots.length > 0) {
-        facet.getConfiguration().setAppYamlPath(
+        Path appYamlPath = Paths.get(
             appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
-        facet.getConfiguration().setDockerfilePath(
+        Path dockerfilePath = Paths.get(
             appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
+
+        facet.getConfiguration().setAppYamlPath(appYamlPath.toString());
+        facet.getConfiguration().setDockerfilePath(dockerfilePath.toString());
+
+        CloudSdkAppEngineHelper helper = new CloudSdkAppEngineHelper(module.getProject());
+
+        helper
+            .defaultAppYaml((FlexibleRuntime) runtimeComboBox.getSelectedItem())
+            .ifPresent(
+                appYaml -> {
+                  try {
+                    if (Files.exists(appYamlPath)) {
+                      int choice = Messages.showYesNoDialog("An app.yaml already exists at the "
+                              + "suggested location. Do you want to keep it or generate a new one?",
+                          "File already exists",
+                          "Keep it",
+                          "Generate new one",
+                          GoogleCloudToolsIcons.APP_ENGINE);
+                      if (choice == Messages.YES) {
+                        return;
+                      }
+                    }
+                    FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
+                  } catch (IOException ioe) {
+                    // Do nothing for now.
+                  }
+                });
+        if (runtimeComboBox.getSelectedItem() == FlexibleRuntime.custom) {
+          helper.defaultDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR)
+              .ifPresent(dockerfile -> {
+                try {
+                  if (Files.exists(dockerfilePath)) {
+                    int choice = Messages.showYesNoDialog("A Dockerfile already exists at the "
+                            + "suggested location. Do you want to keep it or generate a new one?",
+                        "File already exists",
+                        "Keep it",
+                        "Generate new one",
+                        GoogleCloudToolsIcons.APP_ENGINE);
+                    if (choice == Messages.YES) {
+                      return;
+                    }
+                  }
+                  FileUtil.copy(dockerfile.toFile(), dockerfilePath.toFile());
+                } catch (IOException ioe) {
+                  // Do nothing for now.
+                }
+              });
+        }
       }
 
       // TODO(joaomartins): Add other run configurations here too.
