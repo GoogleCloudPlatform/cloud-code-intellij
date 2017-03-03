@@ -20,14 +20,12 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
-import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -43,7 +41,6 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.ServerType;
@@ -61,11 +58,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -119,19 +113,17 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       AppEngineFlexibleFacet facet = FacetManager.getInstance(module).addFacet(
           facetType, facetType.getPresentableName(), null /* underlyingFacet */);
 
-      // Check if an app.yaml file already exists in the default location.
       VirtualFile[] contentRoots = rootModel.getContentRoots();
       AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
 
       if (contentRoots.length > 0) {
         Path appYamlPath = Paths.get(
             appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
-        Path dockerfilePath = Paths.get(
-            appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
 
         // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
         facet.getConfiguration().setAppYamlPath(appYamlPath.toString());
-        facet.getConfiguration().setDockerfilePath(dockerfilePath.toString());
+        facet.getConfiguration().setDockerfilePath(
+            appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
 
         if (generateConfigurationFilesCheckBox.isSelected()) {
           if (Files.exists(appYamlPath)) {
