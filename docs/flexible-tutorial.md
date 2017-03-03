@@ -1,4 +1,5 @@
 # New Projects
+
 To create a new IDEA project with App Engine Flexible support by default, go to File -> New -> Project… and check the “Google App Engine Flexible” check box from the Additional Libraries and Frameworks pane.
 
 ![](https://googlecloudplatform.github.io/google-cloud-intellij/images/flexible/new-project.png)
@@ -6,6 +7,7 @@ To create a new IDEA project with App Engine Flexible support by default, go to 
 _Warning_: Due to the way the New Project/Module is designed, it is possible to create a project or module with both Google App Engine Flexible and Google App Engine Standard options selected. If a project or module is created with both check boxes checked, App Engine support will be Standard only.
 
 # Imported projects or modules
+
 App Engine Flexible support needs to be explicitly added to an existing module. No automatic framework detection exists for Flexible like there is for Standard, but this will be addressed soon.
 
 In the meantime, you can add Flexible support to an existing module by right-clicking the module name, selecting Add Framework Support and checking the Google App Engine Flexible option, on the left-hand side menu, then pressing OK.
@@ -13,6 +15,7 @@ In the meantime, you can add Flexible support to an existing module by right-cli
 ![](https://googlecloudplatform.github.io/google-cloud-intellij/images/flexible/add-framework.png)
 
 # App Engine Flexible configuration
+
 After Flexible support is added to a module, the application is configurable through the Google App Engine Flexible facet. The facet is available through the Project Structure -> Facets menu.
 
 ![](https://googlecloudplatform.github.io/google-cloud-intellij/images/flexible/facet.png)
@@ -22,6 +25,7 @@ From the Google App Engine Flexible facet, it is possible to configure the locat
 If the files don’t exist, it is also possible to generate them from there, or choose other existing ones from the file system.
 
 # Deployment
+
 Adding Flexible support to a module automatically creates a Flexible deployment run configuration.
 
 ![](https://googlecloudplatform.github.io/google-cloud-intellij/images/flexible/runconfig-outside.png)
