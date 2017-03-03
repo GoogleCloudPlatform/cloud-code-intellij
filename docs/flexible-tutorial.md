@@ -37,24 +37,35 @@ Running the run configuration deploys your local artifact to a version on Google
 Following is an explanation of the customizable fields in the App Engine Flexible Deployment run configuration:
 
 * Server: Application server that runs the app.
-   * Google App Engine is the only option. A new application server instance has to be created if none exists.
+  * Google App Engine is the only option. A new application server instance has to be created if none exists.
+
 * Deployment: Artifact to be deployed. 
-   * The _Filesystem JAR or WAR file_ option should always appear. In this case, a Deployment Archive (JAR or WAR file) must also be selected from the file system.
-   * _[moduleName]:war_ appears for Web-supported modules. IDEA’s build system is used to build these artifacts. It is possible, under certain circumstances, for a Web-supported module to have no such artifacts, in which case they can be manually created from Project Structure -> Facets or Project Structure -> Artifacts.
-   * _Maven build: [moduleName]_ appears for Maven-supported modules. Maven is used to build these artifacts.
+  * The _Filesystem JAR or WAR file_ option should always appear. In this case, a Deployment Archive (JAR or WAR file) must also be selected from the file system.
+  * _[moduleName]:war_ appears for Web-supported modules. IDEA’s build system is used to build these artifacts. It is possible, under certain circumstances, for a Web-supported module to have no such artifacts, in which case they can be manually created from Project Structure -> Facets or Project Structure -> Artifacts.
+  * _Maven build: [moduleName]_ appears for Maven-supported modules. Maven is used to build these artifacts.
+
 * Service: The App Engine service to which this version will be deployed to.
    * This value is read from the app.yaml file.
+ 
 * Version: Google App Engine version to deploy to.
+
 * Promote version: If checked, version becomes the default version, with all production traffic migrated to it by default.
+
 * Stop previous version: Stops the previous default version, turning off all instances.
+
 * app.yaml from module: Selects the app.yaml file from the Flexible facet of a module in the project.
-   * If no module has Flexible support, an app.yaml file has to be selected from the file system.
+  * If no module has Flexible support, an app.yaml file has to be selected from the file system.
+
 * Module Settings…: Allows setting an app.yaml and Dockerfile for the selected module.
+
 * Use a different app.yaml file: Allows the selection of another app.yaml file from the file system.
+
 * Dockerfile: Dockerfile to be used for this deployment.
-   * Only visible if runtime is set to “custom” in the selected app.yaml.
-   * Default value is selected from the Flexible facet configuration of the selected module in the modules combo box.
+  * Only visible if runtime is set to “custom” in the selected app.yaml.
+  * Default value is selected from the Flexible facet configuration of the selected module in the modules combo box.
+
 * Use a different Dockerfile: Allows the selection of another Dockerfile file from the file system.
+
 
 In order to be runnable, a run configuration cannot contain any errors. Trying to save a run configuration with errors will result in an error.
 
