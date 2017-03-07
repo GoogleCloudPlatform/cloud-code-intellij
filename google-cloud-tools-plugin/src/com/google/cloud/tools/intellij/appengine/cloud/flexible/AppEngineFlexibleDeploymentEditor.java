@@ -252,6 +252,8 @@ public class AppEngineFlexibleDeploymentEditor extends
       dockerfileOverrideCheckBox.setSelected(true);
     }
 
+    appYamlTextField.setText(getAppYamlPath());
+
     moduleSettingsButton.addActionListener(event -> {
       AppEngineFlexibleFacet flexFacet =
           FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
