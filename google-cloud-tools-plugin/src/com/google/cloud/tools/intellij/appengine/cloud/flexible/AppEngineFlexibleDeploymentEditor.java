@@ -211,10 +211,7 @@ public class AppEngineFlexibleDeploymentEditor extends
       boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
 
       stopPreviousVersionCheckBox.setEnabled(isPromoteSelected);
-
-      if (!isPromoteSelected) {
-        stopPreviousVersionCheckBox.setSelected(false);
-      }
+      stopPreviousVersionCheckBox.setSelected(isPromoteSelected);
     });
     promoteVersionCheckBox.setSelected(PROMOTE_DEFAULT);
     stopPreviousVersionCheckBox.setEnabled(STOP_PREVIOUS_VERSION_DEFAULT);
