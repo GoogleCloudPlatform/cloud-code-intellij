@@ -43,6 +43,7 @@ import com.intellij.ui.DocumentAdapter;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,7 +55,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;

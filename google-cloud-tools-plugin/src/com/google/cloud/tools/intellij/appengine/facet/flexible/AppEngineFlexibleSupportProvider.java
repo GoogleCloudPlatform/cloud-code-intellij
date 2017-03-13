@@ -26,6 +26,8 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -41,6 +43,7 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.ServerType;
@@ -125,27 +128,38 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
         facet.getConfiguration().setDockerfilePath(
             appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
 
+        int override = Messages.YES;
         if (generateConfigurationFilesCheckBox.isSelected()) {
           if (Files.exists(appYamlPath)) {
             try {
-              Files.move(appYamlPath,
-                  appYamlPath.getParent().resolve(
-                      appYamlPath.getFileName().toString() + ".bak"));
+              override = Messages.showYesNoDialog(module.getProject(),
+                  GctBundle.message("appengine.support.appyaml.existing"),
+                  GctBundle.message("appengine.support.appyaml.existing.title"),
+                  GoogleCloudToolsIcons.APP_ENGINE
+                  );
+
+              if (override == Messages.YES) {
+                Files.move(appYamlPath,
+                    appYamlPath.getParent().resolve(
+                        appYamlPath.getFileName().toString() + ".bak"));
+              }
             } catch (IOException e) {
               // Do nothing for now.
             }
           }
 
-          new CloudSdkAppEngineHelper(module.getProject())
-              .defaultAppYaml(FlexibleRuntime.java)
-              .ifPresent(
-                  appYaml -> {
-                    try {
-                      FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
-                    } catch (IOException ioe) {
-                      // Do nothing for now.
-                    }
-                  });
+          if (override == Messages.YES) {
+            new CloudSdkAppEngineHelper(module.getProject())
+                .defaultAppYaml(FlexibleRuntime.java)
+                .ifPresent(
+                    appYaml -> {
+                      try {
+                        FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
+                      } catch (IOException ioe) {
+                        // Do nothing for now.
+                      }
+                    });
+          }
         }
       }
 
