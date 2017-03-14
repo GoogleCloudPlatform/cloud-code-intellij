@@ -81,7 +81,7 @@ import javax.swing.event.TreeModelEvent;
 public class AppEngineFlexibleDeploymentEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
   private static final String DEFAULT_SERVICE = "default";
-  private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
+  private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
 
   private JPanel mainPanel;
@@ -385,7 +385,7 @@ public class AppEngineFlexibleDeploymentEditor extends
 
   private void updateServiceName() {
     Optional<String> service =
-        APP_ENGINE_PROJECT_SERVICE.getServiceNameFromAppYaml(getAppYamlPath());
+        appEngineProjectService.getServiceNameFromAppYaml(getAppYamlPath());
     serviceLabel.setText(service.orElse(DEFAULT_SERVICE));
   }
 
@@ -404,7 +404,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   private boolean isCustomRuntime() {
-    return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(getAppYamlPath())
+    return appEngineProjectService.getFlexibleRuntimeFromAppYaml(getAppYamlPath())
         .filter(runtime -> runtime == FlexibleRuntime.custom)
         .isPresent();
   }
@@ -486,6 +486,11 @@ public class AppEngineFlexibleDeploymentEditor extends
       ((AppEngineDeployable) deploymentSource).setVersion(
           Strings.isNullOrEmpty(version.getText()) ? "auto" : version.getText());
     }
+  }
+
+  @Override
+  protected void disposeEditor() {
+    super.disposeEditor();
   }
 
   @VisibleForTesting
