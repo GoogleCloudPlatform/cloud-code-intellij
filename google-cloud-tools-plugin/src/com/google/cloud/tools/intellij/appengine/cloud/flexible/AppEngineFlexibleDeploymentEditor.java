@@ -488,11 +488,6 @@ public class AppEngineFlexibleDeploymentEditor extends
     }
   }
 
-  @Override
-  protected void disposeEditor() {
-    super.disposeEditor();
-  }
-
   @VisibleForTesting
   JCheckBox getPromoteVersionCheckBox() {
     return promoteVersionCheckBox;
