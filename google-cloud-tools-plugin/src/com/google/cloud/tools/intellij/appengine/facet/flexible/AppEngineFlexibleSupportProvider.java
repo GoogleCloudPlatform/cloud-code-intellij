@@ -38,6 +38,7 @@ import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -64,6 +65,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -77,6 +79,8 @@ import javax.swing.JPanel;
  * Adds Flexible support to new or existing IJ modules.
  */
 public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModuleProvider {
+
+  private static Logger logger = Logger.getInstance(AppEngineFlexibleSupportProvider.class);
 
   @NotNull
   @Override
@@ -150,9 +154,10 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
                               .getDocument(appYamlPsiFile);
                       if (appYamlDocument != null) {
                         try {
-                          appYamlDocument.setText(new String(Files.readAllBytes(appYaml)));
+                          appYamlDocument.setText(
+                              new String(Files.readAllBytes(appYaml), Charset.defaultCharset()));
                         } catch (IOException ioe) {
-                          // Do nothing for now.
+                          logger.debug("Could not copy app.yaml text. " + ioe.getMessage());
                         }
                       }
                     }
@@ -165,7 +170,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
                   try {
                     FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
                   } catch (IOException ioe) {
-                    // Do nothing for now.
+                    logger.debug("Cloud not copy app.yaml file. " + ioe.getMessage());
                   }
                 });
           }
@@ -201,7 +206,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
     runManager.addConfiguration(settings, false /* shared */);
   }
 
-  class AppEngineFlexibleSupportConfigurable extends FrameworkSupportInModuleConfigurable {
+  static class AppEngineFlexibleSupportConfigurable extends FrameworkSupportInModuleConfigurable {
 
     private JPanel mainPanel;
     private CloudSdkPanel cloudSdkPanel;
