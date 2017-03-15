@@ -67,6 +67,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -105,7 +106,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   /** Initializes the Flexible facet by settings the default paths for app.yaml and Dockerfile
    * and generating the necessary run configurations.
    */
-  public void setupFacet(@NotNull AppEngineFlexibleFacet facet,
+  public static void addSupport(@NotNull AppEngineFlexibleFacet facet,
       @NotNull ModifiableRootModel rootModel,
       boolean generateConfigFiles) {
     // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
@@ -122,6 +123,10 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
 
       // Configuration file generation.
       Project project = facet.getModule().getProject();
+      Optional<Path> defaultAppYaml =
+          new CloudSdkAppEngineHelper(project)
+              .defaultAppYaml(FlexibleRuntime.java);
+
       if (generateConfigFiles) {
         if (Files.exists(appYamlPath)) {
           int override = Messages.showYesNoDialog(project,
@@ -131,42 +136,38 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
           );
 
           if (override == Messages.YES) {
-            new CloudSdkAppEngineHelper(project)
-                .defaultAppYaml(FlexibleRuntime.java)
-                .ifPresent(
-                    appYaml -> WriteCommandAction.runWriteCommandAction(project,
-                        () -> {
-                          VirtualFile appYamlVirtualFile = contentRoots[0]
-                              .findFileByRelativePath("/src/main/appengine/app.yaml");
-                          if (appYamlVirtualFile != null) {
-                            PsiFile appYamlPsiFile =
-                                PsiManager.getInstance(project).findFile(appYamlVirtualFile);
-                            if (appYamlPsiFile != null) {
-                              Document appYamlDocument =
-                                  PsiDocumentManager.getInstance(project)
-                                      .getDocument(appYamlPsiFile);
-                              if (appYamlDocument != null) {
-                                try {
-                                  appYamlDocument.setText(new String(Files.readAllBytes(appYaml)));
-                                } catch (IOException ioe) {
-                                  // Do nothing for now.
-                                }
-                              }
-                            }
-                          }
-                        }));
-          } else {
-            // Just copy the file.
-            new CloudSdkAppEngineHelper(project)
-                .defaultAppYaml(FlexibleRuntime.java)
-                .ifPresent(
-                    appYaml -> {
-                      try {
-                        FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
-                      } catch (IOException ioe) {
-                        // Do nothing for now.
+            defaultAppYaml.ifPresent(
+                appYaml -> WriteCommandAction.runWriteCommandAction(project,
+                    () -> {
+                  VirtualFile appYamlVirtualFile = contentRoots[0]
+                      .findFileByRelativePath("/src/main/appengine/app.yaml");
+                  if (appYamlVirtualFile != null) {
+                    PsiFile appYamlPsiFile =
+                        PsiManager.getInstance(project).findFile(appYamlVirtualFile);
+                    if (appYamlPsiFile != null) {
+                      Document appYamlDocument =
+                          PsiDocumentManager.getInstance(project)
+                              .getDocument(appYamlPsiFile);
+                      if (appYamlDocument != null) {
+                        try {
+                          appYamlDocument.setText(new String(Files.readAllBytes(appYaml)));
+                        } catch (IOException ioe) {
+                          // Do nothing for now.
+                        }
                       }
-                    });
+                    }
+                  }
+                    }));
+          } else { // override == Message.YES
+            // Just copy the file.
+            defaultAppYaml.ifPresent(
+                appYaml -> {
+                  try {
+                    FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
+                  } catch (IOException ioe) {
+                    // Do nothing for now.
+                  }
+                });
           }
         }
       }
@@ -177,7 +178,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
     setupDeploymentRunConfiguration(facet.getModule());
   }
 
-  private void setupDeploymentRunConfiguration(Module module) {
+  private static void setupDeploymentRunConfiguration(Module module) {
     RunManager runManager = RunManager.getInstance(module.getProject());
     AppEngineCloudType serverType =
         ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
@@ -220,8 +221,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       AppEngineFlexibleFacet facet = FacetManager.getInstance(module).addFacet(
           facetType, facetType.getPresentableName(), null /* underlyingFacet */);
 
-      AppEngineFlexibleSupportProvider.this.setupFacet(
-          facet, rootModel, generateConfigurationFilesCheckBox.isSelected());
+      AppEngineFlexibleSupportProvider
+          .addSupport(facet, rootModel, generateConfigurationFilesCheckBox.isSelected());
 
       CloudSdkService sdkService = CloudSdkService.getInstance();
       if (!sdkService.validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
