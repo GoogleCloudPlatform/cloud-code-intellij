@@ -107,6 +107,9 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JLabel noSupportedModulesWarning;
   private DeploymentSource deploymentSource;
 
+  private static final boolean PROMOTE_DEFAULT = false;
+  private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
+
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
     this.deploymentSource = deploymentSource;
     version.getEmptyText().setText(GctBundle.getString("appengine.flex.version.placeholder.text"));
@@ -208,12 +211,10 @@ public class AppEngineFlexibleDeploymentEditor extends
       boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
 
       stopPreviousVersionCheckBox.setEnabled(isPromoteSelected);
-
-      if (!isPromoteSelected) {
-        stopPreviousVersionCheckBox.setSelected(false);
-      }
+      stopPreviousVersionCheckBox.setSelected(isPromoteSelected);
     });
-    stopPreviousVersionCheckBox.setEnabled(false);
+    promoteVersionCheckBox.setSelected(PROMOTE_DEFAULT);
+    stopPreviousVersionCheckBox.setEnabled(STOP_PREVIOUS_VERSION_DEFAULT);
 
     modulesWithFlexFacetComboBox.setModel(new DefaultComboBoxModel<>(
         Arrays.stream(ModuleManager.getInstance(project).getModules())
@@ -247,6 +248,8 @@ public class AppEngineFlexibleDeploymentEditor extends
       appYamlOverrideCheckBox.setSelected(true);
       dockerfileOverrideCheckBox.setSelected(true);
     }
+
+    appYamlTextField.setText(getAppYamlPath());
 
     moduleSettingsButton.addActionListener(event -> {
       AppEngineFlexibleFacet flexFacet =
