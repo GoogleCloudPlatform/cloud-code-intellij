@@ -37,15 +37,21 @@ import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.RemoteServersManager;
@@ -59,7 +65,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -97,48 +106,68 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
    * and generating the necessary run configurations.
    */
   public void setupFacet(@NotNull AppEngineFlexibleFacet facet,
-      @NotNull ModifiableRootModel rootModel) {
+      @NotNull ModifiableRootModel rootModel,
+      boolean generateConfigFiles) {
     // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
     VirtualFile[] contentRoots = rootModel.getContentRoots();
     AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
     if (contentRoots.length > 0) {
-      facet.getConfiguration().setAppYamlPath(
+      Path appYamlPath = Paths.get(
           appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
-      facet.getConfiguration().setDockerfilePath(
+      Path dockerfilePath = Paths.get(
           appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
 
+      facet.getConfiguration().setAppYamlPath(appYamlPath.toString());
+      facet.getConfiguration().setDockerfilePath(dockerfilePath.toString());
+
       // Configuration file generation.
-      int override = Messages.YES;
-      if (generateConfigurationFilesCheckBox.isSelected()) {
+      Project project = facet.getModule().getProject();
+      if (generateConfigFiles) {
         if (Files.exists(appYamlPath)) {
-          try {
-            override = Messages.showYesNoDialog(module.getProject(),
-                GctBundle.message("appengine.support.appyaml.existing"),
-                GctBundle.message("appengine.support.appyaml.existing.title"),
-                GoogleCloudToolsIcons.APP_ENGINE
-            );
+          int override = Messages.showYesNoDialog(project,
+              GctBundle.message("appengine.support.appyaml.existing"),
+              GctBundle.message("appengine.support.appyaml.existing.title"),
+              GoogleCloudToolsIcons.APP_ENGINE
+          );
 
-            if (override == Messages.YES) {
-              Files.move(appYamlPath,
-                  appYamlPath.getParent().resolve(
-                      appYamlPath.getFileName().toString() + ".bak"));
-            }
-          } catch (IOException e) {
-            // Do nothing for now.
+          if (override == Messages.YES) {
+            new CloudSdkAppEngineHelper(project)
+                .defaultAppYaml(FlexibleRuntime.java)
+                .ifPresent(
+                    appYaml -> WriteCommandAction.runWriteCommandAction(project,
+                        () -> {
+                          VirtualFile appYamlVirtualFile = contentRoots[0]
+                              .findFileByRelativePath("/src/main/appengine/app.yaml");
+                          if (appYamlVirtualFile != null) {
+                            PsiFile appYamlPsiFile =
+                                PsiManager.getInstance(project).findFile(appYamlVirtualFile);
+                            if (appYamlPsiFile != null) {
+                              Document appYamlDocument =
+                                  PsiDocumentManager.getInstance(project)
+                                      .getDocument(appYamlPsiFile);
+                              if (appYamlDocument != null) {
+                                try {
+                                  appYamlDocument.setText(new String(Files.readAllBytes(appYaml)));
+                                } catch (IOException ioe) {
+                                  // Do nothing for now.
+                                }
+                              }
+                            }
+                          }
+                        }));
+          } else {
+            // Just copy the file.
+            new CloudSdkAppEngineHelper(project)
+                .defaultAppYaml(FlexibleRuntime.java)
+                .ifPresent(
+                    appYaml -> {
+                      try {
+                        FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
+                      } catch (IOException ioe) {
+                        // Do nothing for now.
+                      }
+                    });
           }
-        }
-
-        if (override == Messages.YES) {
-          new CloudSdkAppEngineHelper(module.getProject())
-              .defaultAppYaml(FlexibleRuntime.java)
-              .ifPresent(
-                  appYaml -> {
-                    try {
-                      FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
-                    } catch (IOException ioe) {
-                      // Do nothing for now.
-                    }
-                  });
         }
       }
     }
@@ -175,6 +204,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
 
     private JPanel mainPanel;
     private CloudSdkPanel cloudSdkPanel;
+    private JCheckBox generateConfigurationFilesCheckBox;
 
     @Nullable
     @Override
@@ -190,7 +220,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       AppEngineFlexibleFacet facet = FacetManager.getInstance(module).addFacet(
           facetType, facetType.getPresentableName(), null /* underlyingFacet */);
 
-      AppEngineFlexibleSupportProvider.this.setupFacet(facet, rootModel);
+      AppEngineFlexibleSupportProvider.this.setupFacet(
+          facet, rootModel, generateConfigurationFilesCheckBox.isSelected());
 
       CloudSdkService sdkService = CloudSdkService.getInstance();
       if (!sdkService.validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
