@@ -25,7 +25,8 @@ intellij {
     // the others are transitive dependencies of these and need to be defined explicitly
     plugins 'JavaEE', 'GwtStudio', 'Groovy', 'junit', 'git4idea',
             'maven', 'gradle', 'properties', 'java-i18n',
-            'DatabaseTools', 'PersistenceSupport', 'JavaScriptLanguage', 'CSS', 'jsp'
+            'DatabaseTools', 'PersistenceSupport', 'JavaScriptLanguage', 'CSS', 'jsp',
+            'yaml'
 }
 
 //todo: we need to manually add dependency on 'app-engine-plugin' project because
