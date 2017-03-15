@@ -143,37 +143,38 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
             defaultAppYaml.ifPresent(
                 appYaml -> WriteCommandAction.runWriteCommandAction(project,
                     () -> {
-                  VirtualFile appYamlVirtualFile = contentRoots[0]
-                      .findFileByRelativePath("/src/main/appengine/app.yaml");
-                  if (appYamlVirtualFile != null) {
-                    PsiFile appYamlPsiFile =
-                        PsiManager.getInstance(project).findFile(appYamlVirtualFile);
-                    if (appYamlPsiFile != null) {
-                      Document appYamlDocument =
-                          PsiDocumentManager.getInstance(project)
-                              .getDocument(appYamlPsiFile);
-                      if (appYamlDocument != null) {
-                        try {
-                          appYamlDocument.setText(
-                              new String(Files.readAllBytes(appYaml), Charset.defaultCharset()));
-                        } catch (IOException ioe) {
-                          logger.debug("Could not copy app.yaml text. " + ioe.getMessage());
+                      VirtualFile appYamlVirtualFile = contentRoots[0]
+                          .findFileByRelativePath("/src/main/appengine/app.yaml");
+                      if (appYamlVirtualFile != null) {
+                        PsiFile appYamlPsiFile =
+                            PsiManager.getInstance(project).findFile(appYamlVirtualFile);
+                        if (appYamlPsiFile != null) {
+                          Document appYamlDocument =
+                              PsiDocumentManager.getInstance(project)
+                                  .getDocument(appYamlPsiFile);
+                          if (appYamlDocument != null) {
+                            try {
+                              appYamlDocument.setText(
+                                  new String(Files.readAllBytes(appYaml),
+                                      Charset.defaultCharset()));
+                            } catch (IOException ioe) {
+                              logger.debug("Could not copy app.yaml text. " + ioe.getMessage());
+                            }
+                          }
                         }
                       }
-                    }
-                  }
                     }));
-          } else { // override == Message.YES
-            // Just copy the file.
-            defaultAppYaml.ifPresent(
-                appYaml -> {
-                  try {
-                    FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
-                  } catch (IOException ioe) {
-                    logger.debug("Cloud not copy app.yaml file. " + ioe.getMessage());
-                  }
-                });
           }
+        } else { // !Files.exists(appYamlPath)
+          // Just copy the file.
+          defaultAppYaml.ifPresent(
+              appYaml -> {
+                try {
+                  FileUtil.copy(appYaml.toFile(), appYamlPath.toFile());
+                } catch (IOException ioe) {
+                  logger.debug("Cloud not copy app.yaml file. " + ioe.getMessage());
+                }
+              });
         }
       }
     }
