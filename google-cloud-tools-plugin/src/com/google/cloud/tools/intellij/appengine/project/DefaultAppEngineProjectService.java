@@ -40,6 +40,7 @@ import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.scanner.ScannerException;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -213,11 +214,17 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     }
   }
 
+  /**
+   * @throws ScannerException when an app.yaml isn't syntactically well formed
+   */
   @Override
   public Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPathString) {
     return getValueFromAppYaml(appYamlPathString, SERVICE_TAG_NAME);
   }
 
+  /**
+   * @throws ScannerException when an app.yaml isn't syntactically well formed
+   */
   @Override
   public Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(
       @NotNull String appYamlPathString) {
@@ -229,6 +236,13 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     }
   }
 
+  /**
+   * Returns the value of a key-value pair for a given {@code key}, on the file located at
+   * {@code appYamlPathString}.
+   * @return a String with the value, or an empty Optional if app.yaml isn't a regular file, or
+   * if there is any error getting the value
+   * @throws ScannerException when an app.yaml isn't syntactically well formed
+   */
   private Optional<String> getValueFromAppYaml(@NotNull String appYamlPathString,
       @NotNull String key) {
     Yaml yamlParser = new Yaml();

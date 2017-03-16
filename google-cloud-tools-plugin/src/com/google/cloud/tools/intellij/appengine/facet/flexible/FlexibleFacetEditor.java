@@ -43,6 +43,7 @@ import com.intellij.ui.DocumentAdapter;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.yaml.snakeyaml.scanner.ScannerException;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -164,9 +165,14 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           GctBundle.getString("appengine.deployment.error.staging.yaml"));
     }
 
-    if (isRuntimeCustom() && !isValidConfigurationFile(dockerfile.getText())) {
+    try {
+      if (isRuntimeCustom() && !isValidConfigurationFile(dockerfile.getText())) {
+        throw new ConfigurationException(
+            GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+      }
+    } catch (ScannerException se) {
       throw new ConfigurationException(
-          GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+          GctBundle.getString("appengine.appyaml.malformed"));
     }
 
     deploymentConfiguration.setAppYamlPath(appYaml.getText());
@@ -216,8 +222,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       showError = true;
     }
 
-    if (isRuntimeCustom() && !isValidConfigurationFile(dockerfile.getText())) {
-      errorMessage.setText(GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+    try {
+      if (isRuntimeCustom() && !isValidConfigurationFile(dockerfile.getText())) {
+        errorMessage.setText(GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+        showError = true;
+      }
+    } catch (ScannerException se) {
+      errorMessage.setText(GctBundle.getString("appengine.appyaml.malformed"));
       showError = true;
     }
 
@@ -226,11 +237,16 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   private void toggleDockerfileSection() {
-    boolean enabled = isRuntimeCustom();
+    boolean enabled = false;
+    try {
+      enabled = isRuntimeCustom();
+      // Shows no Dockerfile label if runtime is Java and appYaml is valid.
+      noDockerfileLabel.setVisible(!enabled && isValidConfigurationFile(appYaml.getText()));
+    } catch (ScannerException se) {
+      noDockerfileLabel.setVisible(false);
+    }
     dockerfile.setEnabled(enabled);
     genDockerfileButton.setEnabled(enabled);
-    // Shows no Dockerfile label if runtime is Java and appYaml is valid.
-    noDockerfileLabel.setVisible(!enabled && isValidConfigurationFile(appYaml.getText()));
   }
 
   @Override

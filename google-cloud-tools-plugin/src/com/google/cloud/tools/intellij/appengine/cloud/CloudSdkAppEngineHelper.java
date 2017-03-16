@@ -56,6 +56,7 @@ import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.Deploy
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.yaml.snakeyaml.scanner.ScannerException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -160,23 +161,29 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       return Optional.of(createStandardRunner(loggingHandler, Paths.get(source.getFilePath()),
           deploy, isFlexCompat));
     } else if (targetEnvironment.isFlexible()) {
-      // Checks if the Yaml or Dockerfile exist.
-      Optional<FlexibleRuntime> runtimeOptional =
-          AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
-              deploymentConfiguration.getAppYamlPath());
+      try {
+        // Checks if the Yaml or Dockerfile exist.
+        Optional<FlexibleRuntime> runtimeOptional =
+            AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
+                deploymentConfiguration.getAppYamlPath());
 
-      if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
-        callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
-        return Optional.empty();
-      }
-      if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.custom).isPresent()
-          && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+        if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
+          callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
+          return Optional.empty();
+        }
+        if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.custom).isPresent()
+            && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+          callback.errorOccurred(
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+          return Optional.empty();
+        }
+        return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
+            deploymentConfiguration, deploy));
+      } catch (ScannerException se) {
         callback.errorOccurred(
-            GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+            GctBundle.message("appengine.appyaml.malformed") + "\n" + se.getMessage());
         return Optional.empty();
       }
-      return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
-          deploymentConfiguration, deploy));
     } else {
       throw new AssertionError("Invalid App Engine target environment: " + targetEnvironment);
     }

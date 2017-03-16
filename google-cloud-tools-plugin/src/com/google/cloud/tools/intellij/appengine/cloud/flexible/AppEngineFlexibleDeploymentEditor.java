@@ -55,6 +55,7 @@ import com.intellij.util.ui.tree.TreeModelAdapter;
 
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.yaml.snakeyaml.scanner.ScannerException;
 
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -360,16 +361,21 @@ public class AppEngineFlexibleDeploymentEditor extends
           GctBundle.getString("appengine.deployment.error.staging.yaml") + " "
               + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
     }
-    if (isCustomRuntime()) {
-      if (StringUtils.isBlank(getDockerfilePath())) {
-        throw new ConfigurationException(
-            GctBundle.message("appengine.flex.config.browse.dockerfile"));
+    try {
+      if (isCustomRuntime()) {
+        if (StringUtils.isBlank(getDockerfilePath())) {
+          throw new ConfigurationException(
+              GctBundle.message("appengine.flex.config.browse.dockerfile"));
+        }
+        if (!isValidConfigurationFile(getDockerfilePath())) {
+          throw new ConfigurationException(
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile") + " "
+                  + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
+        }
       }
-      if (!isValidConfigurationFile(getDockerfilePath())) {
-        throw new ConfigurationException(
-            GctBundle.getString("appengine.deployment.error.staging.dockerfile") + " "
-                + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
-      }
+    } catch (ScannerException se) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.appyaml.malformed"));
     }
     if (!appInfoPanel.isApplicationValid()) {
       throw new ConfigurationException(
@@ -384,9 +390,13 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   private void updateServiceName() {
-    Optional<String> service =
-        appEngineProjectService.getServiceNameFromAppYaml(getAppYamlPath());
-    serviceLabel.setText(service.orElse(DEFAULT_SERVICE));
+    try {
+      Optional<String> service =
+          appEngineProjectService.getServiceNameFromAppYaml(getAppYamlPath());
+      serviceLabel.setText(service.orElse(DEFAULT_SERVICE));
+    } catch (ScannerException se) {
+      serviceLabel.setText("");
+    }
   }
 
   private void updateSelectors() {
@@ -414,7 +424,12 @@ public class AppEngineFlexibleDeploymentEditor extends
    * Disables it otherwise.
    */
   private void toggleDockerfileSection() {
-    boolean visible = isCustomRuntime();
+    boolean visible = false;
+    try {
+      visible = isCustomRuntime();
+    } catch (ScannerException se) {
+      // Do nothing, don't blow up, let visible stay false.
+    }
     dockerfileOverrideCheckBox.setVisible(
         visible && modulesWithFlexFacetComboBox.getItemCount() != 0);
     dockerfileTextField.setVisible(visible);

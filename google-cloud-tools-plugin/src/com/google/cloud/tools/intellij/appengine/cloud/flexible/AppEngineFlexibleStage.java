@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.yaml.snakeyaml.scanner.ScannerException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -87,7 +88,7 @@ public class AppEngineFlexibleStage {
         Path dockerFilePath = Paths.get(deploymentConfiguration.getDockerFilePath());
         Files.copy(dockerFilePath, stagingDirectory.resolve(dockerFilePath.getFileName()));
       }
-    } catch (IOException | InvalidPathException ex) {
+    } catch (IOException | InvalidPathException | ScannerException ex) {
       loggingHandler.print(ex.getMessage() + "\n");
       throw new RuntimeException(ex);
     }
