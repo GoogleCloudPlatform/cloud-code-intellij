@@ -177,6 +177,7 @@
   <depends>com.intellij.modules.xml</depends>
   <depends>com.intellij.modules.xdebugger</depends>
   <depends>org.jetbrains.plugins.gradle</depends>
+  <depends>org.jetbrains.plugins.yaml</depends>
   <depends>com.google.gct.login</depends>
   <depends>Git4Idea</depends>
   <depends>org.jetbrains.idea.maven</depends>
@@ -251,6 +252,7 @@
     <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetConverterProvider"/>
     <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineConverterProvider"/>
     <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkDetector"/>
+    <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFrameworkDetector"/>
 
     <xml.schemaProvider implementation="com.google.cloud.tools.intellij.appengine.descriptor.AppEngineWebSchemaProvider"/>
 

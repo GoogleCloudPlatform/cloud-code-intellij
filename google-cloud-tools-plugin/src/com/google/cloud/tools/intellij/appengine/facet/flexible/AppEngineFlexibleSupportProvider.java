@@ -84,7 +84,50 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
         || !facetsProvider.getFacetsByType(module, AppEngineStandardFacet.ID).isEmpty();
   }
 
-  static class AppEngineFlexibleSupportConfigurable extends FrameworkSupportInModuleConfigurable {
+  /** Initializes the Flexible facet by settings the default paths for app.yaml and Dockerfile
+   * and generating the necessary run configurations.
+   */
+  public void setupFacet(@NotNull AppEngineFlexibleFacet facet,
+      @NotNull ModifiableRootModel rootModel) {
+    // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
+    VirtualFile[] contentRoots = rootModel.getContentRoots();
+    AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
+    if (contentRoots.length > 0) {
+      facet.getConfiguration().setAppYamlPath(
+          appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
+      facet.getConfiguration().setDockerfilePath(
+          appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
+    }
+
+    // TODO(joaomartins): Add other run configurations here too.
+    // https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1260
+    setupDeploymentRunConfiguration(facet.getModule());
+  }
+
+  private void setupDeploymentRunConfiguration(Module module) {
+    RunManager runManager = RunManager.getInstance(module.getProject());
+    AppEngineCloudType serverType =
+        ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
+    DeployToServerConfigurationType configurationType
+        = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
+
+    RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
+        configurationType.getDisplayName(), configurationType.getFactory());
+
+    // Sets the GAE Flex server, if any exists, in the run config.
+    DeployToServerRunConfiguration<?, AppEngineDeploymentConfiguration> runConfiguration =
+        (DeployToServerRunConfiguration<?, AppEngineDeploymentConfiguration>)
+            settings.getConfiguration();
+    RemoteServer<AppEngineServerConfiguration> server =
+        ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
+    if (server != null) {
+      runConfiguration.setServerName(server.getName());
+    }
+
+    runManager.addConfiguration(settings, false /* shared */);
+  }
+
+  class AppEngineFlexibleSupportConfigurable extends FrameworkSupportInModuleConfigurable {
 
     private JPanel mainPanel;
     private CloudSdkPanel cloudSdkPanel;
@@ -103,48 +146,13 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       AppEngineFlexibleFacet facet = FacetManager.getInstance(module).addFacet(
           facetType, facetType.getPresentableName(), null /* underlyingFacet */);
 
-      // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
-      VirtualFile[] contentRoots = rootModel.getContentRoots();
-      AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
-      if (contentRoots.length > 0) {
-        facet.getConfiguration().setAppYamlPath(
-            appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
-        facet.getConfiguration().setDockerfilePath(
-            appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
-      }
-
-      // TODO(joaomartins): Add other run configurations here too.
-      // https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1260
-      setupDeploymentRunConfiguration(module);
+      AppEngineFlexibleSupportProvider.this.setupFacet(facet, rootModel);
 
       CloudSdkService sdkService = CloudSdkService.getInstance();
       if (!sdkService.validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
         sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
       }
-    }
-
-    private void setupDeploymentRunConfiguration(Module module) {
-      RunManager runManager = RunManager.getInstance(module.getProject());
-      AppEngineCloudType serverType =
-          ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
-      DeployToServerConfigurationType configurationType
-          = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
-
-      RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
-          configurationType.getDisplayName(), configurationType.getFactory());
-
-      // Sets the GAE Flex server, if any exists, in the run config.
-      DeployToServerRunConfiguration<?, AppEngineDeploymentConfiguration> runConfiguration =
-          (DeployToServerRunConfiguration<?, AppEngineDeploymentConfiguration>)
-              settings.getConfiguration();
-      RemoteServer<AppEngineServerConfiguration> server =
-          ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
-      if (server != null) {
-        runConfiguration.setServerName(server.getName());
-      }
-
-      runManager.addConfiguration(settings, false /* shared */);
     }
 
     private void createUIComponents() {
