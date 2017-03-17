@@ -49,6 +49,7 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
@@ -155,8 +156,9 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
                           if (appYamlDocument != null) {
                             try {
                               appYamlDocument.setText(
-                                  new String(Files.readAllBytes(appYaml),
-                                      Charset.defaultCharset()));
+                                  StringUtil.convertLineSeparators(
+                                      new String(Files.readAllBytes(appYaml),
+                                          Charset.defaultCharset())));
                             } catch (IOException ioe) {
                               logger.debug("Could not copy app.yaml text. " + ioe.getMessage());
                             }
