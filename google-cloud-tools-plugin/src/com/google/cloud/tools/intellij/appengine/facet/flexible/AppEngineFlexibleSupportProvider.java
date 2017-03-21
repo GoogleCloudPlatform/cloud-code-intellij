@@ -188,8 +188,16 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
     runManager.addConfiguration(settings, false /* shared */);
   }
 
+  /** Overwrites an existing app.yaml file with the contents of the template app.yaml stored in
+   * the plugin.
+   *
+   * <p>IntelliJ's {@link Document}/{@link PsiFile} framework is used here so the changes are
+   * effective as soon as possible, and no "file system content differs from memory" warnings are
+   * thrown.
+   */
   private static void overwriteAppYaml(
       Path sourceAppYaml, VirtualFile targetAppYaml, Project project) {
+    // WriteCommandAction so app.yaml changes are undo-able.
     WriteCommandAction.runWriteCommandAction(project,
         () -> {
           if (targetAppYaml != null) {
