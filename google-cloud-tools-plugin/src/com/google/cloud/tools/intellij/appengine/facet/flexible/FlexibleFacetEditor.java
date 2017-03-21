@@ -44,6 +44,7 @@ import com.intellij.ui.DocumentAdapter;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.scanner.ScannerException;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,7 +56,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -119,7 +119,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     );
 
     genAppYamlButton.addActionListener(new GenerateConfigActionListener(project, "app.yaml",
-        appEngineHelper::defaultAppYaml, appYaml, this::validateConfiguration));
+        () -> appEngineHelper.defaultAppYaml(FlexibleRuntime.java), appYaml,
+        this::validateConfiguration));
 
     genDockerfileButton.addActionListener(new GenerateConfigActionListener(project, "Dockerfile",
         () -> appEngineHelper.defaultDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR),

@@ -39,7 +39,7 @@ public class AppEngineFlexibleFrameworkDetector
 
   @Override
   public void setupFacet(@NotNull AppEngineFlexibleFacet facet, ModifiableRootModel model) {
-    new AppEngineFlexibleSupportProvider().setupFacet(facet, model);
+    AppEngineFlexibleSupportProvider.addSupport(facet, model, false /* generateConfigFiles */);
   }
 
   @NotNull
