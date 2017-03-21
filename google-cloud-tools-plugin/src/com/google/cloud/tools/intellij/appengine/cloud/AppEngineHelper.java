@@ -21,6 +21,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
@@ -44,8 +45,9 @@ public interface AppEngineHelper {
 
   /**
    * The default app.yaml to use.
+   * @param runtime Determines the runtime value in the file
    */
-  Optional<Path> defaultAppYaml();
+  Optional<Path> defaultAppYaml(FlexibleRuntime runtime);
 
   /**
    * The default Dockerfile we suggest for custom flexible deployments.
