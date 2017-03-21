@@ -503,12 +503,8 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
       @NotNull Collection<VirtualFile> files) {
     final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
     final FileIndexFacade fileIndex = FileIndexFacade.getInstance(project);
-    return Collections2.filter(files, new Predicate<VirtualFile>() {
-      @Override
-      public boolean apply(@javax.annotation.Nullable VirtualFile file) {
-        return !changeListManager.isIgnoredFile(file) && !fileIndex.isExcludedFile(file);
-      }
-    });
+    return Collections2.filter(files,
+        file -> !changeListManager.isIgnoredFile(file) && !fileIndex.isExcludedFile(file));
   }
 
   private static boolean pushCurrentBranch(final @NotNull Project project,
