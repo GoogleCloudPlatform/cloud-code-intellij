@@ -141,31 +141,10 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
           );
 
           if (override == Messages.YES) {
-            defaultAppYaml.ifPresent(
-                appYaml -> WriteCommandAction.runWriteCommandAction(project,
-                    () -> {
-                      VirtualFile appYamlVirtualFile = contentRoots[0]
-                          .findFileByRelativePath("/src/main/appengine/app.yaml");
-                      if (appYamlVirtualFile != null) {
-                        PsiFile appYamlPsiFile =
-                            PsiManager.getInstance(project).findFile(appYamlVirtualFile);
-                        if (appYamlPsiFile != null) {
-                          Document appYamlDocument =
-                              PsiDocumentManager.getInstance(project)
-                                  .getDocument(appYamlPsiFile);
-                          if (appYamlDocument != null) {
-                            try {
-                              appYamlDocument.setText(
-                                  StringUtil.convertLineSeparators(
-                                      new String(Files.readAllBytes(appYaml),
-                                          Charset.defaultCharset())));
-                            } catch (IOException ioe) {
-                              logger.debug("Could not copy app.yaml text. " + ioe.getMessage());
-                            }
-                          }
-                        }
-                      }
-                    }));
+            defaultAppYaml.ifPresent(appYaml ->
+                overwriteAppYaml(appYaml,
+                    contentRoots[0].findFileByRelativePath("/src/main/appengine/app.yaml"),
+                    project));
           }
         } else { // !Files.exists(appYamlPath)
           // Just copy the file.
@@ -207,6 +186,32 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
     }
 
     runManager.addConfiguration(settings, false /* shared */);
+  }
+
+  private static void overwriteAppYaml(
+      Path sourceAppYaml, VirtualFile targetAppYaml, Project project) {
+    WriteCommandAction.runWriteCommandAction(project,
+        () -> {
+          if (targetAppYaml != null) {
+            PsiFile appYamlPsiFile =
+                PsiManager.getInstance(project).findFile(targetAppYaml);
+            if (appYamlPsiFile != null) {
+              Document appYamlDocument =
+                  PsiDocumentManager.getInstance(project)
+                      .getDocument(appYamlPsiFile);
+              if (appYamlDocument != null) {
+                try {
+                  appYamlDocument.setText(
+                      StringUtil.convertLineSeparators(
+                          new String(Files.readAllBytes(sourceAppYaml),
+                              Charset.defaultCharset())));
+                } catch (IOException ioe) {
+                  logger.debug("Could not copy app.yaml text. " + ioe.getMessage());
+                }
+              }
+            }
+          }
+        });
   }
 
   static class AppEngineFlexibleSupportConfigurable extends FrameworkSupportInModuleConfigurable {
