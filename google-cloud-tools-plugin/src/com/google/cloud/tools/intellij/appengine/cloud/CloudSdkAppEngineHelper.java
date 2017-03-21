@@ -30,6 +30,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
+import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFile;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -186,9 +187,9 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         }
         return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
             deploymentConfiguration, deploy));
-      } catch (ScannerException se) {
+      } catch (MalformedYamlFile myf) {
         callback.errorOccurred(
-            GctBundle.message("appengine.appyaml.malformed") + "\n" + se.getMessage());
+            GctBundle.message("appengine.appyaml.malformed") + "\n" + myf.getMessage());
         return Optional.empty();
       }
     } else {

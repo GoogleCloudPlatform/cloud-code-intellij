@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
+import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFile;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -88,7 +89,7 @@ public class AppEngineFlexibleStage {
         Path dockerFilePath = Paths.get(deploymentConfiguration.getDockerFilePath());
         Files.copy(dockerFilePath, stagingDirectory.resolve(dockerFilePath.getFileName()));
       }
-    } catch (IOException | InvalidPathException | ScannerException ex) {
+    } catch (IOException | InvalidPathException | MalformedYamlFile ex) {
       loggingHandler.print(ex.getMessage() + "\n");
       throw new RuntimeException(ex);
     }

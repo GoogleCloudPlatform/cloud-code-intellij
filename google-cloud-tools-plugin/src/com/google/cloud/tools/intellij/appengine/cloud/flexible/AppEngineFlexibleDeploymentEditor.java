@@ -25,6 +25,7 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
+import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFile;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -373,7 +374,7 @@ public class AppEngineFlexibleDeploymentEditor extends
                   + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
         }
       }
-    } catch (ScannerException se) {
+    } catch (MalformedYamlFile myf) {
       throw new ConfigurationException(
           GctBundle.message("appengine.appyaml.malformed"));
     }
@@ -394,7 +395,7 @@ public class AppEngineFlexibleDeploymentEditor extends
       Optional<String> service =
           appEngineProjectService.getServiceNameFromAppYaml(getAppYamlPath());
       serviceLabel.setText(service.orElse(DEFAULT_SERVICE));
-    } catch (ScannerException se) {
+    } catch (MalformedYamlFile myf) {
       serviceLabel.setText("");
     }
   }
@@ -413,7 +414,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     }
   }
 
-  private boolean isCustomRuntime() {
+  private boolean isCustomRuntime() throws MalformedYamlFile {
     return appEngineProjectService.getFlexibleRuntimeFromAppYaml(getAppYamlPath())
         .filter(runtime -> runtime == FlexibleRuntime.custom)
         .isPresent();
@@ -427,7 +428,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     boolean visible = false;
     try {
       visible = isCustomRuntime();
-    } catch (ScannerException se) {
+    } catch (MalformedYamlFile myf) {
       // Do nothing, don't blow up, let visible stay false.
     }
     dockerfileOverrideCheckBox.setVisible(
