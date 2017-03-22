@@ -20,7 +20,7 @@ import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
-import com.intellij.execution.executors.DefaultRunExecutor;
+import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.impl.EditConfigurationsDialog;
 import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -77,7 +77,7 @@ public class CloudToolsRunConfigurationAction extends AnAction {
 
   private void runExistingConfiguration(Project project, RunnerAndConfigurationSettings settings) {
     ProgramRunnerUtil
-        .executeConfiguration(project, settings, DefaultRunExecutor.getRunExecutorInstance());
+        .executeConfiguration(project, settings, DefaultDebugExecutor.getDebugExecutorInstance());
   }
 
   private void createNewConfiguration(Project project) {
