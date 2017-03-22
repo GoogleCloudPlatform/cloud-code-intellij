@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -31,7 +32,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
