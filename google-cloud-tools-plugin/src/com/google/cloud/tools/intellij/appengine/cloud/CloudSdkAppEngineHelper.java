@@ -30,6 +30,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
+import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -167,23 +168,29 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       return Optional.of(createStandardRunner(loggingHandler, Paths.get(source.getFilePath()),
           deploy, isFlexCompat));
     } else if (targetEnvironment.isFlexible()) {
-      // Checks if the Yaml or Dockerfile exist.
-      Optional<FlexibleRuntime> runtimeOptional =
-          AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
-              deploymentConfiguration.getAppYamlPath());
+      try {
+        // Checks if the Yaml or Dockerfile exist.
+        Optional<FlexibleRuntime> runtimeOptional =
+            AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
+                deploymentConfiguration.getAppYamlPath());
 
-      if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
-        callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
-        return Optional.empty();
-      }
-      if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.custom).isPresent()
-          && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+        if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
+          callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
+          return Optional.empty();
+        }
+        if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.custom).isPresent()
+            && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+          callback.errorOccurred(
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+          return Optional.empty();
+        }
+        return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
+            deploymentConfiguration, deploy));
+      } catch (MalformedYamlFileException myf) {
         callback.errorOccurred(
-            GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+            GctBundle.message("appengine.appyaml.malformed") + "\n" + myf.getMessage());
         return Optional.empty();
       }
-      return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
-          deploymentConfiguration, deploy));
     } else {
       throw new AssertionError("Invalid App Engine target environment: " + targetEnvironment);
     }

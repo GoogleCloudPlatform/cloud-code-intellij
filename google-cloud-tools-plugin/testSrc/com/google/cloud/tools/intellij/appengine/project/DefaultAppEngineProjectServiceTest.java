@@ -123,33 +123,46 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
         : (XmlFile) PsiManager.getInstance(getProject()).findFile(vFile);
   }
 
-  public void testGetServiceNameFromAppYaml() {
+  public void testGetServiceNameFromAppYaml() throws MalformedYamlFileException {
     assertEquals("javaService",
         appEngineProjectService.getServiceNameFromAppYaml(
             Paths.get(getTestDataPath().toString(), "java.yaml").toString()).get());
   }
 
-  public void testGetServiceNameFromAppYaml_noService() {
+  public void testGetServiceNameFromAppYaml_noService() throws MalformedYamlFileException {
     assertFalse(appEngineProjectService.getServiceNameFromAppYaml(
         Paths.get(getTestDataPath().toString(), "noservice.yaml").toString()).isPresent());
   }
 
-  public void testGetFlexibleRuntimeFromAppYaml_javaRuntime() {
+  public void testGetFlexibleRuntimeFromAppYaml_javaRuntime() throws MalformedYamlFileException {
     assertEquals(FlexibleRuntime.java,
         appEngineProjectService.getFlexibleRuntimeFromAppYaml(
             Paths.get(getTestDataPath().toString(), "java.yaml").toString()).get());
   }
 
-  public void testGetFlexibleRuntimeFromAppYaml_customRuntime() {
+  public void testGetFlexibleRuntimeFromAppYaml_customRuntime() throws MalformedYamlFileException {
     assertEquals(FlexibleRuntime.custom,
         appEngineProjectService.getFlexibleRuntimeFromAppYaml(
             Paths.get(getTestDataPath().toString(), "custom.yaml").toString()).get());
   }
 
-  public void testGetFlexibleRuntimeFromAppYaml_irregularFormat() throws IOException {
+  public void testGetFlexibleRuntimeFromAppYaml_irregularFormatButValid()
+      throws IOException, MalformedYamlFileException {
     assertEquals(FlexibleRuntime.custom,
         appEngineProjectService.getFlexibleRuntimeFromAppYaml(
             createTempFile("app.yaml", "   runtime :    custom ").getAbsolutePath()).get());
+  }
+
+  public void testGetFlexibleRuntimeFromAppYaml_malformedYaml() throws IOException {
+    try {
+      assertEquals(FlexibleRuntime.custom,
+          appEngineProjectService.getFlexibleRuntimeFromAppYaml(
+              createTempFile("app.yaml", "runtime: custom\nenv_variables:\n  'DBG_ENAB")
+                  .getAbsolutePath()).get());
+      fail("YAML is malformed.");
+    } catch (MalformedYamlFileException myf) {
+      // Success.
+    }
   }
 
   public void testGetServiceNameFromAppEngineWebXml() {

@@ -39,6 +39,7 @@ dependencies {
     compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
         exclude group: 'com.google.guava', module: 'guava'
     }
+    testCompile 'org.yaml:snakeyaml:1.18'
     testCompile project(path: ':google-account-plugin')
     testCompile project(path: ':google-cloud-tools-plugin', configuration: 'tests')
     testRuntime files(project(':google-cloud-tools-plugin').sourceSets.test.resources.srcDirs)
