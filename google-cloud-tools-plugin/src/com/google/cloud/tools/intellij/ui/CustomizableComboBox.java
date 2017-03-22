@@ -219,7 +219,8 @@ public abstract class CustomizableComboBox extends JPanel {
     super.paint(graphics);
     if ((textField.isFocusOwner() || (getPopup() != null && getPopup().isPopupVisible()))) {
       if (isUsingDarculaUiFlavor()) {
-        DarculaUIUtil.paintFocusRing(graphics, 3, 3, getWidth() - 4, getHeight() - 4);
+        DarculaUIUtil.paintFocusRing(graphics,
+            new Rectangle(3, 3, getWidth() - 4, getHeight() - 4));
       }
     }
   }

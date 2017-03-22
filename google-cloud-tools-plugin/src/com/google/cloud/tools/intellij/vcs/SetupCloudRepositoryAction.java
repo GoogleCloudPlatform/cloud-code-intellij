@@ -23,7 +23,6 @@ import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 
@@ -503,12 +502,9 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
       @NotNull Collection<VirtualFile> files) {
     final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
     final FileIndexFacade fileIndex = FileIndexFacade.getInstance(project);
-    return Collections2.filter(files, new Predicate<VirtualFile>() {
-      @Override
-      public boolean apply(@javax.annotation.Nullable VirtualFile file) {
-        return !changeListManager.isIgnoredFile(file) && !fileIndex.isExcludedFile(file);
-      }
-    });
+    return Collections2.filter(files,
+        file -> !changeListManager.isIgnoredFile(file) && !fileIndex.isExcludedFile(file)
+    );
   }
 
   private static boolean pushCurrentBranch(final @NotNull Project project,
