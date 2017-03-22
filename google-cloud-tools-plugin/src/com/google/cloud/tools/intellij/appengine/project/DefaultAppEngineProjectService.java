@@ -219,7 +219,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
    */
   @Override
   public Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPathString)
-      throws MalformedYamlFile {
+      throws MalformedYamlFileException {
     return getValueFromAppYaml(appYamlPathString, SERVICE_TAG_NAME);
   }
 
@@ -228,7 +228,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
    */
   @Override
   public Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(
-      @NotNull String appYamlPathString) throws MalformedYamlFile {
+      @NotNull String appYamlPathString) throws MalformedYamlFileException {
     try {
       return getValueFromAppYaml(appYamlPathString, RUNTIME_TAG_NAME)
           .map(FlexibleRuntime::valueOf);
@@ -245,7 +245,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
    * @throws ScannerException when an app.yaml isn't syntactically well formed
    */
   private Optional<String> getValueFromAppYaml(@NotNull String appYamlPathString,
-      @NotNull String key) throws MalformedYamlFile {
+      @NotNull String key) throws MalformedYamlFileException {
     Yaml yamlParser = new Yaml();
     try {
       Path appYamlPath = Paths.get(appYamlPathString);
@@ -266,7 +266,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
       return yamlMap.containsKey(key) ? Optional.of(yamlMap.get(key)) : Optional.empty();
     } catch (ScannerException se) {
-      throw new MalformedYamlFile();
+      throw new MalformedYamlFileException(se);
     } catch (InvalidPathException | IOException ioe) {
       return Optional.empty();
     }

@@ -25,7 +25,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
-import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFile;
+import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 
 import com.intellij.facet.FacetManager;
@@ -60,7 +60,7 @@ public class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
   FacetManager facetManager;
 
   @Before
-  public void setUp() throws MalformedYamlFile {
+  public void setUp() throws MalformedYamlFileException {
     registerService(AppEngineProjectService.class, projectService);
 
     when(projectService.getServiceNameFromAppEngineWebXml(project, deployable))

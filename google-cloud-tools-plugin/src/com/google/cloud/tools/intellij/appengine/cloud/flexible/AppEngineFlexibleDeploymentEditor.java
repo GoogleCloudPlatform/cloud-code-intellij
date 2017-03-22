@@ -25,7 +25,7 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
-import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFile;
+import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -56,7 +56,6 @@ import com.intellij.util.ui.tree.TreeModelAdapter;
 
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.yaml.snakeyaml.scanner.ScannerException;
 
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -374,7 +373,7 @@ public class AppEngineFlexibleDeploymentEditor extends
                   + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
         }
       }
-    } catch (MalformedYamlFile myf) {
+    } catch (MalformedYamlFileException myf) {
       throw new ConfigurationException(
           GctBundle.message("appengine.appyaml.malformed"));
     }
@@ -395,7 +394,7 @@ public class AppEngineFlexibleDeploymentEditor extends
       Optional<String> service =
           appEngineProjectService.getServiceNameFromAppYaml(getAppYamlPath());
       serviceLabel.setText(service.orElse(DEFAULT_SERVICE));
-    } catch (MalformedYamlFile myf) {
+    } catch (MalformedYamlFileException myf) {
       serviceLabel.setText("");
     }
   }
@@ -414,7 +413,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     }
   }
 
-  private boolean isCustomRuntime() throws MalformedYamlFile {
+  private boolean isCustomRuntime() throws MalformedYamlFileException {
     return appEngineProjectService.getFlexibleRuntimeFromAppYaml(getAppYamlPath())
         .filter(runtime -> runtime == FlexibleRuntime.custom)
         .isPresent();
@@ -428,7 +427,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     boolean visible = false;
     try {
       visible = isCustomRuntime();
-    } catch (MalformedYamlFile myf) {
+    } catch (MalformedYamlFileException myf) {
       // Do nothing, don't blow up, let visible stay false.
     }
     dockerfileOverrideCheckBox.setVisible(

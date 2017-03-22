@@ -123,31 +123,31 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
         : (XmlFile) PsiManager.getInstance(getProject()).findFile(vFile);
   }
 
-  public void testGetServiceNameFromAppYaml() throws MalformedYamlFile {
+  public void testGetServiceNameFromAppYaml() throws MalformedYamlFileException {
     assertEquals("javaService",
         appEngineProjectService.getServiceNameFromAppYaml(
             Paths.get(getTestDataPath().toString(), "java.yaml").toString()).get());
   }
 
-  public void testGetServiceNameFromAppYaml_noService() throws MalformedYamlFile {
+  public void testGetServiceNameFromAppYaml_noService() throws MalformedYamlFileException {
     assertFalse(appEngineProjectService.getServiceNameFromAppYaml(
         Paths.get(getTestDataPath().toString(), "noservice.yaml").toString()).isPresent());
   }
 
-  public void testGetFlexibleRuntimeFromAppYaml_javaRuntime() throws MalformedYamlFile {
+  public void testGetFlexibleRuntimeFromAppYaml_javaRuntime() throws MalformedYamlFileException {
     assertEquals(FlexibleRuntime.java,
         appEngineProjectService.getFlexibleRuntimeFromAppYaml(
             Paths.get(getTestDataPath().toString(), "java.yaml").toString()).get());
   }
 
-  public void testGetFlexibleRuntimeFromAppYaml_customRuntime() throws MalformedYamlFile {
+  public void testGetFlexibleRuntimeFromAppYaml_customRuntime() throws MalformedYamlFileException {
     assertEquals(FlexibleRuntime.custom,
         appEngineProjectService.getFlexibleRuntimeFromAppYaml(
             Paths.get(getTestDataPath().toString(), "custom.yaml").toString()).get());
   }
 
   public void testGetFlexibleRuntimeFromAppYaml_irregularFormatButValid()
-      throws IOException, MalformedYamlFile {
+      throws IOException, MalformedYamlFileException {
     assertEquals(FlexibleRuntime.custom,
         appEngineProjectService.getFlexibleRuntimeFromAppYaml(
             createTempFile("app.yaml", "   runtime :    custom ").getAbsolutePath()).get());
@@ -160,7 +160,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
               createTempFile("app.yaml", "runtime: custom\nenv_variables:\n  'DBG_ENAB")
                   .getAbsolutePath()).get());
       fail("YAML is malformed.");
-    } catch (MalformedYamlFile myf) {
+    } catch (MalformedYamlFileException myf) {
       // Success.
     }
   }
