@@ -215,7 +215,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   /**
-   * @throws ScannerException when an app.yaml isn't syntactically well formed
+   * @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed
    */
   @Override
   public Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPathString)
@@ -224,7 +224,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   /**
-   * @throws ScannerException when an app.yaml isn't syntactically well formed
+   * @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed
    */
   @Override
   public Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(
@@ -242,7 +242,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
    * {@code appYamlPathString}.
    * @return a String with the value, or an empty Optional if app.yaml isn't a regular file, or
    * if there is any error getting the value
-   * @throws ScannerException when an app.yaml isn't syntactically well formed
+   * @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed
    */
   private Optional<String> getValueFromAppYaml(@NotNull String appYamlPathString,
       @NotNull String key) throws MalformedYamlFileException {
