@@ -52,7 +52,7 @@ public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
     finally {
       super.tearDown();
 
-      if (myFixture !=null && getProject() != null && !getProject().isDisposed()) {
+      if (myFixture != null && getProject() != null && !getProject().isDisposed()) {
         Disposer.dispose(getProject());
       }
     }
