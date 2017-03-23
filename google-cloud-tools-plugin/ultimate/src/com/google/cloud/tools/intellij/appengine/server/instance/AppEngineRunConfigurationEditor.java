@@ -61,16 +61,12 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JComboBox applicationLogLevel;
   private JCheckBox cleadDatastoreCheckbox;
   private JPanel appEngineSettingsPanel;
+  private JCheckBox useDevappserver2CheckBox;
   private Artifact myLastSelectedArtifact;
 
   public AppEngineRunConfigurationEditor(Project project) {
     myProject = project;
-    myArtifactComboBox.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent event) {
-        onArtifactChanged();
-      }
-    });
+    myArtifactComboBox.addActionListener(event -> onArtifactChanged());
 
     setAnchor(myWebArtifactToDeployLabel);
     appEngineSettingsPanel.setBorder(PlainSmallWithoutIndent.createTitledBorder(
@@ -144,6 +140,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
 
     serverModel.setLogLevel((String) applicationLogLevel.getSelectedItem());
     serverModel.setClearDatastore(cleadDatastoreCheckbox.isSelected());
+    serverModel.setUseDevappserver2(useDevappserver2CheckBox.isSelected());
   }
 
   private Integer validateInteger(String intText, String description)

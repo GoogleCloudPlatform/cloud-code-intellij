@@ -91,7 +91,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             }
 
             AppEngineStandardRunTask runTask =
-                new AppEngineStandardRunTask(runConfiguration, programRunner.getRunnerId());
+                new AppEngineStandardRunTask(runConfiguration, programRunner.getRunnerId(),
+                    runConfiguration.isUseDevappserver2());
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 

@@ -16,9 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
+import com.google.cloud.tools.appengine.api.devserver.AppEngineDevServer;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer1;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
@@ -36,6 +38,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
 
   private RunConfiguration runConfig;
   private String runnerId;
+  private boolean useDevappserver2;
 
   /**
    * {@link AppEngineStandardRunTask} constructor.
@@ -44,9 +47,11 @@ public class AppEngineStandardRunTask extends AppEngineTask {
    * @param runnerId typically "Run" or "Debug", to indicate type of local run. To be used in
    *     metrics
    */
-  public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig, @Nullable String runnerId) {
+  public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig, @Nullable String runnerId,
+      boolean useDevappserver2) {
     this.runConfig = runConfig;
     this.runnerId = runnerId;
+    this.useDevappserver2 = useDevappserver2;
   }
 
   @Override
@@ -62,7 +67,9 @@ public class AppEngineStandardRunTask extends AppEngineTask {
         .startListener(startListener)
         .build();
 
-    CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdk);
+    AppEngineDevServer devServer = useDevappserver2
+        ? new CloudSdkAppEngineDevServer(sdk)
+        : new CloudSdkAppEngineDevServer1(sdk);
     devServer.run(runConfig);
 
     UsageTrackerProvider.getInstance()

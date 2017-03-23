@@ -242,7 +242,7 @@ public class AppEngineUtil {
 
     // TODO(joaomartins): Is a flexible facet check required here as well?
     return Arrays.stream(ArtifactManager.getInstance(project).getArtifacts())
-        .filter(artifactTypes::contains)
+        .filter(artifact -> artifactTypes.contains(artifact.getArtifactType()))
         .filter(artifact ->
             !withAppEngineFacetOnly || findAppEngineStandardFacet(project, artifact).isPresent())
         .sorted(ArtifactManager.ARTIFACT_COMPARATOR)
