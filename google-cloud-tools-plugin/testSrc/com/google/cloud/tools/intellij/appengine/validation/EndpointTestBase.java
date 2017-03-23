@@ -22,7 +22,6 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -51,10 +50,6 @@ public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
     }
     finally {
       super.tearDown();
-
-      if (myFixture != null && getProject() != null && !getProject().isDisposed()) {
-        Disposer.dispose(getProject());
-      }
     }
   }
 
