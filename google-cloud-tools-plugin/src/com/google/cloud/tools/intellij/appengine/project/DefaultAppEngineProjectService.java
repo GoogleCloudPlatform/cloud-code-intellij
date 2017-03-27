@@ -254,9 +254,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       return Optional.empty();
     }
 
-    try (
-        BufferedReader reader = Files.newBufferedReader(appYamlPath, Charset.defaultCharset());
-    ) {
+    try (BufferedReader reader = Files.newBufferedReader(appYamlPath, Charset.defaultCharset())) {
       Object parseResult = yamlParser.load(reader);
 
       if (!(parseResult instanceof Map)) {
