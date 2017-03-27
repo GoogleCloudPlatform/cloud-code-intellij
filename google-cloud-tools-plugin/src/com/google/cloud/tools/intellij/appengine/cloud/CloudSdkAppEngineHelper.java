@@ -43,6 +43,8 @@ import com.google.gson.Gson;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
@@ -62,6 +64,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A Cloud SDK (gcloud) based implementation of the {@link AppEngineHelper} interface.
@@ -217,7 +220,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     CloudToolsPluginInfoService pluginInfoService =
         ServiceManager.getService(CloudToolsPluginInfoService.class);
 
-    return new CloudSdk.Builder()
+    CloudSdk.Builder sdkBuilder = new CloudSdk.Builder()
         .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
         .async(true)
         .addStdErrLineListener(logListener)
@@ -227,8 +230,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         .appCommandCredentialFile(credentialsPath.toFile())
         .appCommandMetricsEnvironment(pluginInfoService.getExternalPluginName())
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
-        .appCommandOutputFormat("json")
-        .build();
+        .appCommandOutputFormat("json");
+
+    getProjectJavaSdk(project).ifPresent(sdkBuilder::javaSdkPath);
+
+    return sdkBuilder.build();
   }
 
   private static final String CLIENT_ID_LABEL = "client_id";
@@ -356,6 +362,18 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       throw new RuntimeException(ex);
     }
     return appYaml;
+  }
+
+  private Optional<Path> getProjectJavaSdk(Project project) {
+    ProjectSdksModel projectSdksModel = new ProjectSdksModel();
+    projectSdksModel.reset(project);
+    Sdk projectJavaSdk = projectSdksModel.getProjectSdk();
+
+    if (projectJavaSdk == null || projectJavaSdk.getHomePath() == null) {
+      return Optional.empty();
+    }
+
+    return Optional.of(Paths.get(projectJavaSdk.getHomePath()));
   }
 
   @VisibleForTesting

@@ -236,6 +236,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   @Override
+  public List<File> getServices() {
+    return null;
+  }
+
+  @Override
   public String getHost() {
     return settings.getHost();
   }
