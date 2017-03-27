@@ -42,6 +42,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.scanner.ScannerException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -247,14 +248,16 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   private Optional<String> getValueFromAppYaml(@NotNull String appYamlPathString,
       @NotNull String key) throws MalformedYamlFileException {
     Yaml yamlParser = new Yaml();
-    try {
-      Path appYamlPath = Paths.get(appYamlPathString);
-      if (!Files.isRegularFile(appYamlPath)) {
-        return Optional.empty();
-      }
 
-      Object parseResult =
-          yamlParser.load(Files.newBufferedReader(appYamlPath, Charset.defaultCharset()));
+    Path appYamlPath = Paths.get(appYamlPathString);
+    if (!Files.isRegularFile(appYamlPath)) {
+      return Optional.empty();
+    }
+
+    try (
+        BufferedReader reader = Files.newBufferedReader(appYamlPath, Charset.defaultCharset());
+    ) {
+      Object parseResult = yamlParser.load(reader);
 
       if (!(parseResult instanceof Map)) {
         return Optional.empty();
