@@ -219,6 +219,8 @@ public class AppEngineFlexibleDeploymentEditor extends
     promoteVersionCheckBox.setSelected(PROMOTE_DEFAULT);
     stopPreviousVersionCheckBox.setEnabled(STOP_PREVIOUS_VERSION_DEFAULT);
 
+
+    resetModuleConfigSelection();
     modulesWithFlexFacetComboBox.addItemListener(event -> toggleDockerfileSection());
     modulesWithFlexFacetComboBox.setRenderer(new ListCellRendererWrapper<Module>() {
       @Override
@@ -248,7 +250,6 @@ public class AppEngineFlexibleDeploymentEditor extends
 
     updateSelectors();
     toggleDockerfileSection();
-    resetModuleConfigSelection();
   }
 
   private void resetModuleConfigSelection() {
