@@ -82,7 +82,6 @@ import javax.swing.event.TreeModelEvent;
 public class AppEngineFlexibleDeploymentEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
   private static final String DEFAULT_SERVICE = "default";
-  private Project project;
   private DeploymentSource deploymentSource;
   private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
@@ -113,7 +112,6 @@ public class AppEngineFlexibleDeploymentEditor extends
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
 
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
-    this.project = project;
     this.deploymentSource = deploymentSource;
     version.getEmptyText().setText(GctBundle.getString("appengine.flex.version.placeholder.text"));
     appYamlTextField.addBrowseFolderListener(
@@ -220,7 +218,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     stopPreviousVersionCheckBox.setEnabled(STOP_PREVIOUS_VERSION_DEFAULT);
 
 
-    resetModuleConfigSelection();
+    resetModuleConfigSelection(project);
     modulesWithFlexFacetComboBox.addItemListener(event -> toggleDockerfileSection());
     modulesWithFlexFacetComboBox.setRenderer(new ListCellRendererWrapper<Module>() {
       @Override
@@ -245,14 +243,14 @@ public class AppEngineFlexibleDeploymentEditor extends
       // Emulating a user action triggers apply(), so that's what we're doing here.
       hiddenValidationTrigger.doClick();
       toggleDockerfileSection();
-      resetModuleConfigSelection();
+      resetModuleConfigSelection(project);
     });
 
     updateSelectors();
     toggleDockerfileSection();
   }
 
-  private void resetModuleConfigSelection() {
+  private void resetModuleConfigSelection(Project project) {
     modulesWithFlexFacetComboBox.setModel(new DefaultComboBoxModel<>(
         Arrays.stream(ModuleManager.getInstance(project).getModules())
             .filter(module ->
