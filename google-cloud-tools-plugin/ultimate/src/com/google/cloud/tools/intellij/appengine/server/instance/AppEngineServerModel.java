@@ -233,6 +233,12 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   @Override
+  public List<File> getServices() {
+    // Needed by devappserver1. Will be implemented when devappserver1 is integrated.
+    return null;
+  }
+
+  @Override
   public String getHost() {
     return settings.getHost();
   }
