@@ -389,13 +389,12 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertEquals("an override", editor.getDockerfileTextField().getText());
   }
 
-  public void testDockerfileStartsDisabledAndWithModuleSetting() {
+  public void testDockerfileStartsDisabled() {
     ApplicationManager.getApplication().runWriteAction(
         () -> ModuleManager.getInstance(getProject()).disposeModule(javaModule));
     editor = new AppEngineFlexibleDeploymentEditor(getProject(), deploymentSource);
     assertEquals(1, editor.getModulesWithFlexFacetComboBox().getItemCount());
     assertFalse(editor.getDockerfileTextField().isEnabled());
-    assertEquals(dockerfile.getPath(), editor.getDockerfileTextField().getText());
   }
 
   @Override
