@@ -83,7 +83,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JCheckBox ignoreErrorsCheckBox;
   private AppEngineHelper appEngineHelper;
 
-  FlexibleFacetEditor(@Nullable AppEngineFlexibleFacetConfiguration facetConfiguration,
+  FlexibleFacetEditor(AppEngineFlexibleFacetConfiguration facetConfiguration,
       @NotNull Project project) {
     this.appEngineHelper = new CloudSdkAppEngineHelper(project);
     this.facetConfiguration = facetConfiguration;
