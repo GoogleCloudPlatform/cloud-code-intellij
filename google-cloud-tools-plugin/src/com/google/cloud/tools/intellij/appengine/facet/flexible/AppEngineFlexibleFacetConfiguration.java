@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.facet.FacetConfiguration;
@@ -40,8 +39,8 @@ import java.nio.file.Path;
 public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     PersistentStateComponent<AppEngineFlexibleFacetConfiguration> {
 
-  private String appYamlPath = "";
-  private String dockerfilePath = "";
+  private String appYamlPath;
+  private String dockerfilePath;
   // Source context configuration for Stackdriver Debugger.
   private boolean generateSourceContext;
   private boolean ignoreErrors;
@@ -50,12 +49,8 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
       FacetValidatorsManager validatorsManager) {
-    AppEngineDeploymentConfiguration deploymentConfiguration =
-        new AppEngineDeploymentConfiguration();
-    deploymentConfiguration.setAppYamlPath(appYamlPath);
-    deploymentConfiguration.setDockerFilePath(dockerfilePath);
     return new FacetEditorTab[]{
-      new FlexibleFacetEditor(deploymentConfiguration, editorContext.getProject())
+      new FlexibleFacetEditor(this, editorContext.getProject())
     };
   }
 
