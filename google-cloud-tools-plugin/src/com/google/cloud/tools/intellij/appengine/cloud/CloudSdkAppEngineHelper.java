@@ -44,7 +44,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
@@ -365,9 +365,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   private Optional<Path> getProjectJavaSdk(Project project) {
-    ProjectSdksModel projectSdksModel = new ProjectSdksModel();
-    projectSdksModel.reset(project);
-    Sdk projectJavaSdk = projectSdksModel.getProjectSdk();
+    Sdk projectJavaSdk = ProjectRootManager.getInstance(project).getProjectSdk();
 
     if (projectJavaSdk == null || projectJavaSdk.getHomePath() == null) {
       return Optional.empty();
