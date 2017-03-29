@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
@@ -37,18 +35,14 @@ import org.jetbrains.annotations.Nullable;
 public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     PersistentStateComponent<AppEngineFlexibleFacetConfiguration> {
 
-  private String appYamlPath = "";
-  private String dockerfilePath = "";
+  private String appYamlPath;
+  private String dockerfilePath;
 
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
       FacetValidatorsManager validatorsManager) {
-    AppEngineDeploymentConfiguration deploymentConfiguration =
-        new AppEngineDeploymentConfiguration();
-    deploymentConfiguration.setAppYamlPath(appYamlPath);
-    deploymentConfiguration.setDockerFilePath(dockerfilePath);
     return new FacetEditorTab[]{
-      new FlexibleFacetEditor(deploymentConfiguration, editorContext.getProject())
+      new FlexibleFacetEditor(this, editorContext.getProject())
     };
   }
 

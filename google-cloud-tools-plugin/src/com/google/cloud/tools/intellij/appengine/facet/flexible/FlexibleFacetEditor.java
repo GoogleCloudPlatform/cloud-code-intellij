@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
@@ -78,13 +77,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JLabel noDockerfileLabel;
   private JLabel errorIcon;
   private JLabel errorMessage;
-  private AppEngineDeploymentConfiguration deploymentConfiguration;
+  private AppEngineFlexibleFacetConfiguration facetConfiguration;
   private AppEngineHelper appEngineHelper;
 
-  FlexibleFacetEditor(@Nullable AppEngineDeploymentConfiguration deploymentConfiguration,
+  FlexibleFacetEditor(@Nullable AppEngineFlexibleFacetConfiguration facetConfiguration,
       @NotNull Project project) {
     this.appEngineHelper = new CloudSdkAppEngineHelper(project);
-    this.deploymentConfiguration = deploymentConfiguration;
+    this.facetConfiguration = facetConfiguration;
 
     appYaml.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
@@ -100,14 +99,14 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       @Override
       protected void textChanged(DocumentEvent event) {
         toggleDockerfileSection();
-        validateConfiguration();
+        toggleWarnings();
       }
     });
 
     dockerfile.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        validateConfiguration();
+        toggleWarnings();
       }
     });
 
@@ -120,21 +119,21 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     genAppYamlButton.addActionListener(new GenerateConfigActionListener(project, "app.yaml",
         () -> appEngineHelper.defaultAppYaml(FlexibleRuntime.java), appYaml,
-        this::validateConfiguration));
+        this::toggleWarnings));
 
     genDockerfileButton.addActionListener(new GenerateConfigActionListener(project, "Dockerfile",
         () -> appEngineHelper.defaultDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR),
-        dockerfile, this::validateConfiguration
+        dockerfile, this::toggleWarnings
     ));
 
-    appYaml.setText(deploymentConfiguration.getAppYamlPath());
-    dockerfile.setText(deploymentConfiguration.getDockerFilePath());
+    appYaml.setText(facetConfiguration.getAppYamlPath());
+    dockerfile.setText(facetConfiguration.getDockerfilePath());
 
     errorIcon.setIcon(Ide.Error);
     errorIcon.setVisible(false);
     errorMessage.setVisible(false);
 
-    validateConfiguration();
+    toggleWarnings();
     toggleDockerfileSection();
   }
 
@@ -146,21 +145,21 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   @Override
   public boolean isModified() {
-    return !appYaml.getText().equals(deploymentConfiguration.getAppYamlPath())
-        || !dockerfile.getText().equals(deploymentConfiguration.getDockerFilePath());
+    return !appYaml.getText().equals(facetConfiguration.getAppYamlPath())
+        || !dockerfile.getText().equals(facetConfiguration.getDockerfilePath());
   }
 
   @Override
   public void reset() {
-    appYaml.setText(deploymentConfiguration.getAppYamlPath());
-    dockerfile.setText(deploymentConfiguration.getDockerFilePath());
+    appYaml.setText(facetConfiguration.getAppYamlPath());
+    dockerfile.setText(facetConfiguration.getDockerfilePath());
 
     toggleDockerfileSection();
   }
 
   @Override
   public void apply() throws ConfigurationException {
-    validateConfiguration();
+    toggleWarnings();
     if (!isValidConfigurationFile(appYaml.getText())) {
       throw new ConfigurationException(
           GctBundle.getString("appengine.deployment.error.staging.yaml"));
@@ -175,9 +174,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       throw new ConfigurationException(
           GctBundle.getString("appengine.appyaml.malformed"));
     }
-
-    deploymentConfiguration.setAppYamlPath(appYaml.getText());
-    deploymentConfiguration.setDockerFilePath(dockerfile.getText());
   }
 
   @Override
@@ -215,7 +211,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   /**
    * Validates the configuration and turns on/off any necessary warnings.
    */
-  private void validateConfiguration() {
+  private void toggleWarnings() {
     boolean showError = false;
 
     if (!isValidConfigurationFile(appYaml.getText())) {
