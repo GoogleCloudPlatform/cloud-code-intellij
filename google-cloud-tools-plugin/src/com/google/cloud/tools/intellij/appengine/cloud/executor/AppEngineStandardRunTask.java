@@ -70,7 +70,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
         .startListener(startListener);
 
     if (javaSdk.getHomePath() != null) {
-      sdkBuilder.javaSdkPath(Paths.get(javaSdk.getHomePath()));
+      sdkBuilder.javaHome(Paths.get(javaSdk.getHomePath()));
     }
 
     CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdkBuilder.build());

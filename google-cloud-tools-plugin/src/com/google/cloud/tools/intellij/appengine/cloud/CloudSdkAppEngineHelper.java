@@ -232,7 +232,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
         .appCommandOutputFormat("json");
 
-    getProjectJavaSdk(project).ifPresent(sdkBuilder::javaSdkPath);
+    getProjectJavaSdk(project).ifPresent(sdkBuilder::javaHome);
 
     return sdkBuilder.build();
   }
