@@ -56,6 +56,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -77,6 +78,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JLabel noDockerfileLabel;
   private JLabel errorIcon;
   private JLabel errorMessage;
+  private JCheckBox generateSourceContextFilesCheckBox;
+  private JCheckBox ignoreErrorsCheckBox;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
   private AppEngineHelper appEngineHelper;
 
@@ -169,8 +172,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
     }
 
-    deploymentConfiguration.setAppYamlPath(appYaml.getText());
-    deploymentConfiguration.setDockerFilePath(dockerfile.getText());
+//    deploymentConfiguration.setAppYamlPath(appYaml.getText());
+//    deploymentConfiguration.setDockerFilePath(dockerfile.getText());
   }
 
   @Override

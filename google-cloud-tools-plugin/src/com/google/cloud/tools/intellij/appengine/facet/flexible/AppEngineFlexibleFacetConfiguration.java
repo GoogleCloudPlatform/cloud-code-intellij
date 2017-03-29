@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
@@ -29,6 +30,8 @@ import com.intellij.openapi.util.WriteExternalException;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
+
 /**
  * The Flexible facet configuration.
  *
@@ -39,6 +42,10 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
 
   private String appYamlPath = "";
   private String dockerfilePath = "";
+  // Source context configuration for Stackdriver Debugger.
+  private boolean generateSourceContext;
+  private boolean ignoreErrors;
+  private Path cloudSdkPath = CloudSdkService.getInstance().getSdkHomePath();
 
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
@@ -72,6 +79,8 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
   public void loadState(AppEngineFlexibleFacetConfiguration state) {
     appYamlPath = state.getAppYamlPath();
     dockerfilePath = state.getDockerfilePath();
+    generateSourceContext = state.isGenerateSourceContext();
+    ignoreErrors = state.isIgnoreErrors();
   }
 
   public String getAppYamlPath() {
@@ -82,11 +91,35 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     return dockerfilePath;
   }
 
+  public boolean isGenerateSourceContext() {
+    return generateSourceContext;
+  }
+
+  public boolean isIgnoreErrors() {
+    return ignoreErrors;
+  }
+
+  public Path getCloudSdkPath() {
+    return cloudSdkPath;
+  }
+
   public void setAppYamlPath(String appYamlPath) {
     this.appYamlPath = appYamlPath;
   }
 
   public void setDockerfilePath(String dockerfilePath) {
     this.dockerfilePath = dockerfilePath;
+  }
+
+  public void setGenerateSourceContext(boolean generateSourceContext) {
+    this.generateSourceContext = generateSourceContext;
+  }
+
+  public void setIgnoreErrors(boolean ignoreErrors) {
+    this.ignoreErrors = ignoreErrors;
+  }
+
+  public void setCloudSdkPath(Path cloudSdkPath) {
+    this.cloudSdkPath = cloudSdkPath;
   }
 }

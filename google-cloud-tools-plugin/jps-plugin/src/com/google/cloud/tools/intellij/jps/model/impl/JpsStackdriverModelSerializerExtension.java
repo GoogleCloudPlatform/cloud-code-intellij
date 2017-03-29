@@ -45,7 +45,8 @@ public class JpsStackdriverModelSerializerExtension extends JpsModelSerializerEx
       extends JpsFacetConfigurationSerializer<JpsStackdriverModuleExtension> {
 
     public JpsStackdriverModuleExtensionSerializer() {
-      super(JpsStackdriverModuleExtensionImpl.ROLE, "stackdriver", "Google Stackdriver Debugger");
+      // Keep app-engine-flexible in sync with AppEngineFlexibleFacetType.STRING_ID
+      super(JpsStackdriverModuleExtensionImpl.ROLE, "app-engine-flexible", "Google App Engine Flexible");
     }
 
     @Override
