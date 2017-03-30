@@ -236,6 +236,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   @Override
+  public List<File> getServices() {
+    return null;
+  }
+
+  @Override
   public String getHost() {
     return settings.getHost();
   }
@@ -430,11 +435,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   public void setDefaultGcsBucketName(String defaultGcsBucketName) {
     settings.setDefaultGcsBucketName(defaultGcsBucketName);
-  }
-
-  @Override
-  public String getJavaHomeDir() {
-    return devAppServerJdk.getHomePath();
   }
 
   @Override
