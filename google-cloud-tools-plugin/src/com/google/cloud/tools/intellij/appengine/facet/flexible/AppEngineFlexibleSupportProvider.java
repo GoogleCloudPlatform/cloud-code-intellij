@@ -138,36 +138,37 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
     FileTemplate appYamlTemplate = FileTemplateManager.getInstance(project)
         .getInternalTemplate(AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE);
 
-    try {
-      VirtualFile virtualFile = contentRoot.findFileByRelativePath("src/main");
+    VirtualFile virtualFile = contentRoot.findFileByRelativePath("src/main");
 
-      if (virtualFile != null) {
-        PsiDirectory directory = PsiManager.getInstance(project)
-            .findDirectory(virtualFile);
+    if (virtualFile != null) {
+      PsiDirectory directory = PsiManager.getInstance(project)
+          .findDirectory(virtualFile);
 
-        if (directory != null) {
-          PsiDirectory appEngineDirectory;
+      if (directory != null) {
+        PsiDirectory appEngineDirectory;
+        try {
+          directory.checkCreateSubdirectory(CONFIG_DIR_NAME);
+          appEngineDirectory = directory.createSubdirectory(CONFIG_DIR_NAME);
+        } catch (IncorrectOperationException ioe) {
+          // checkCreateSubdirectory threw an exception suggesting that the directory may already
+          // exist. Skip creating the directory and attempt to write file.
+          appEngineDirectory = directory.findSubdirectory(CONFIG_DIR_NAME);
+        }
+
+        if (appEngineDirectory != null
+            && FileTemplateUtil.canCreateFromTemplate(
+            new PsiDirectory[]{appEngineDirectory}, appYamlTemplate)) {
           try {
-            directory.checkCreateSubdirectory(CONFIG_DIR_NAME);
-            appEngineDirectory = directory.createSubdirectory(CONFIG_DIR_NAME);
-          } catch (IncorrectOperationException ioe) {
-            // checkCreateSubdirectory threw an exception suggesting that the directory may already
-            // exist. Skip creating the directory and attempt to write file.
-            appEngineDirectory = directory.findSubdirectory(CONFIG_DIR_NAME);
-          }
-
-          if (appEngineDirectory != null
-              && FileTemplateUtil.canCreateFromTemplate(
-                  new PsiDirectory[]{appEngineDirectory}, appYamlTemplate)) {
             FileTemplateUtil.createFromTemplate(appYamlTemplate, "app.yaml",
                 FileTemplateManager.getInstance(project).getDefaultProperties(),
                 appEngineDirectory);
+          } catch (Exception e) {
+            logger.error("Failed to create app yaml from template. " + e.getMessage());
           }
         }
       }
-    } catch (Exception e) {
-      logger.debug("Could not create app yaml. " + e.getMessage());
     }
+
   }
 
   private static void setupDeploymentRunConfiguration(Module module) {
