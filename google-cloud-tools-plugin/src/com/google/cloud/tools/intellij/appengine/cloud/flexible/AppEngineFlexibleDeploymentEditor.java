@@ -82,6 +82,7 @@ import javax.swing.event.TreeModelEvent;
 public class AppEngineFlexibleDeploymentEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
   private static final String DEFAULT_SERVICE = "default";
+  private DeploymentSource deploymentSource;
   private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
 
@@ -106,7 +107,6 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JButton moduleSettingsButton;
   private JCheckBox hiddenValidationTrigger;
   private JLabel noSupportedModulesWarning;
-  private DeploymentSource deploymentSource;
 
   private static final boolean PROMOTE_DEFAULT = false;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
@@ -217,13 +217,8 @@ public class AppEngineFlexibleDeploymentEditor extends
     promoteVersionCheckBox.setSelected(PROMOTE_DEFAULT);
     stopPreviousVersionCheckBox.setEnabled(STOP_PREVIOUS_VERSION_DEFAULT);
 
-    modulesWithFlexFacetComboBox.setModel(new DefaultComboBoxModel<>(
-        Arrays.stream(ModuleManager.getInstance(project).getModules())
-            .filter(module ->
-                FacetManager.getInstance(module)
-                    .getFacetByType(AppEngineFlexibleFacetType.ID) != null)
-            .toArray(Module[]::new)
-    ));
+
+    resetModuleConfigSelection(project);
     modulesWithFlexFacetComboBox.addItemListener(event -> toggleDockerfileSection());
     modulesWithFlexFacetComboBox.setRenderer(new ListCellRendererWrapper<Module>() {
       @Override
@@ -234,6 +229,35 @@ public class AppEngineFlexibleDeploymentEditor extends
         }
       }
     });
+
+    appYamlTextField.setText(getAppYamlPath());
+
+    moduleSettingsButton.addActionListener(event -> {
+      AppEngineFlexibleFacet flexFacet =
+          FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
+              .getFacetByType(AppEngineFlexibleFacetType.ID);
+      ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
+      // When we get out of the dialog window, we want to re-eval the configuration.
+      // validateConfiguration() can't be used here because the ConfigurationException isn't caught
+      // anywhere, and fireEditorStateChanged() doesn't trigger any listeners called from here.
+      // Emulating a user action triggers apply(), so that's what we're doing here.
+      hiddenValidationTrigger.doClick();
+      toggleDockerfileSection();
+      resetModuleConfigSelection(project);
+    });
+
+    updateSelectors();
+    toggleDockerfileSection();
+  }
+
+  private void resetModuleConfigSelection(Project project) {
+    modulesWithFlexFacetComboBox.setModel(new DefaultComboBoxModel<>(
+        Arrays.stream(ModuleManager.getInstance(project).getModules())
+            .filter(module ->
+                FacetManager.getInstance(module)
+                    .getFacetByType(AppEngineFlexibleFacetType.ID) != null)
+            .toArray(Module[]::new)
+    ));
 
     // For the case Flex isn't enabled for any modules, the user can still deploy filesystem
     // jars/wars.
@@ -249,24 +273,6 @@ public class AppEngineFlexibleDeploymentEditor extends
       appYamlOverrideCheckBox.setSelected(true);
       dockerfileOverrideCheckBox.setSelected(true);
     }
-
-    appYamlTextField.setText(getAppYamlPath());
-
-    moduleSettingsButton.addActionListener(event -> {
-      AppEngineFlexibleFacet flexFacet =
-          FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
-              .getFacetByType(AppEngineFlexibleFacetType.ID);
-      ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
-      // When we get out of the dialog window, we want to re-eval the configuration.
-      // validateConfiguration() can't be used here because the ConfigurationException isn't caught
-      // anywhere, and fireEditorStateChanged() doesn't trigger any listeners called from here.
-      // Emulating a user action triggers apply(), so that's what we're doing here.
-      hiddenValidationTrigger.doClick();
-      toggleDockerfileSection();
-    });
-
-    updateSelectors();
-    toggleDockerfileSection();
   }
 
   private void refreshApplicationInfoPanel() {
