@@ -130,7 +130,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
 
   /**
    * Generates an app.yaml configuration file in the src/main/appengine directory. If an app.yaml
-   * already exists it will not override the file.
+   * already exists it will not overwrite the file.
    */
   private static void generateAppYaml(@NotNull AppEngineFlexibleFacet facet,
       @NotNull ModifiableRootModel rootModel) {
