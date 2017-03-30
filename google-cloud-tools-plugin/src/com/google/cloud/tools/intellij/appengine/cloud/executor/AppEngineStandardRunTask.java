@@ -38,7 +38,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
 
   private RunConfiguration runConfig;
   private String runnerId;
-  private boolean useDevappserver2;
+  private boolean useDevAppServer2;
 
   /**
    * {@link AppEngineStandardRunTask} constructor.
@@ -48,10 +48,10 @@ public class AppEngineStandardRunTask extends AppEngineTask {
    *     metrics
    */
   public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig, @Nullable String runnerId,
-      boolean useDevappserver2) {
+      boolean useDevAppServer2) {
     this.runConfig = runConfig;
     this.runnerId = runnerId;
-    this.useDevappserver2 = useDevappserver2;
+    this.useDevAppServer2 = useDevAppServer2;
   }
 
   @Override
@@ -67,7 +67,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
         .startListener(startListener)
         .build();
 
-    AppEngineDevServer devServer = useDevappserver2
+    AppEngineDevServer devServer = useDevAppServer2
         ? new CloudSdkAppEngineDevServer(sdk)
         : new CloudSdkAppEngineDevServer1(sdk);
     devServer.run(runConfig);
