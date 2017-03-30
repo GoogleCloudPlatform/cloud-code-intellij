@@ -80,7 +80,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
   private AppEngineHelper appEngineHelper;
 
-  FlexibleFacetEditor(AppEngineFlexibleFacetConfiguration facetConfiguration,
+  FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
       @NotNull Project project) {
     this.appEngineHelper = new CloudSdkAppEngineHelper(project);
     this.facetConfiguration = facetConfiguration;
