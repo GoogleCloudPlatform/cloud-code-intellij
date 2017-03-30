@@ -31,6 +31,8 @@ import com.intellij.javaee.run.localRun.ExecutableObject;
 import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
 import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ProjectRootManager;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -68,6 +70,11 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
                   GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
             }
 
+            Sdk javaSdk = ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk();
+            if (javaSdk == null || javaSdk.getHomePath() == null) {
+              throw new ExecutionException(GctBundle.message("appengine.run.server.nosdk"));
+            }
+
             AppEngineServerModel runConfiguration;
 
             try {
@@ -91,7 +98,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             }
 
             AppEngineStandardRunTask runTask =
-                new AppEngineStandardRunTask(runConfiguration, programRunner.getRunnerId());
+                new AppEngineStandardRunTask(
+                    runConfiguration, javaSdk, programRunner.getRunnerId());
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 
