@@ -163,7 +163,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
                 FileTemplateManager.getInstance(project).getDefaultProperties(),
                 appEngineDirectory);
           } catch (Exception e) {
-            logger.error("Failed to create app yaml from template. " + e.getMessage());
+            // If the file already exists, this exception will be thrown by createFromTemplate
+            logger.warn("Failed to create app yaml from template. " + e.getMessage());
           }
         }
       }
