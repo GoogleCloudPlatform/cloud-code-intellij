@@ -29,8 +29,6 @@ import com.intellij.openapi.util.WriteExternalException;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
-
 /**
  * The Flexible facet configuration.
  *
@@ -44,7 +42,7 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
   // Source context configuration for Stackdriver Debugger.
   private boolean generateSourceContext;
   private boolean ignoreErrors;
-  private Path cloudSdkPath = CloudSdkService.getInstance().getSdkHomePath();
+  private String cloudSdkPath = CloudSdkService.getInstance().getSdkHomePath().toString();
 
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
@@ -76,6 +74,7 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     dockerfilePath = state.getDockerfilePath();
     generateSourceContext = state.isGenerateSourceContext();
     ignoreErrors = state.isIgnoreErrors();
+    cloudSdkPath = CloudSdkService.getInstance().getSdkHomePath().toString();
   }
 
   public String getAppYamlPath() {
@@ -94,7 +93,7 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     return ignoreErrors;
   }
 
-  public Path getCloudSdkPath() {
+  public String getCloudSdkPath() {
     return cloudSdkPath;
   }
 
@@ -114,7 +113,7 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     this.ignoreErrors = ignoreErrors;
   }
 
-  public void setCloudSdkPath(Path cloudSdkPath) {
+  public void setCloudSdkPath(String cloudSdkPath) {
     this.cloudSdkPath = cloudSdkPath;
   }
 }

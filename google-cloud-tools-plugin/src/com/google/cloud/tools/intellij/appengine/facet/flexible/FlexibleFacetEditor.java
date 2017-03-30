@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
@@ -25,7 +24,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmation
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.SelectConfigDestinationFolderDialog;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
-import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -44,7 +42,6 @@ import com.intellij.ui.DocumentAdapter;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -57,6 +54,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -79,8 +77,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JLabel errorIcon;
   private JLabel errorMessage;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
-  private JCheckBox generateSourceContextFilesCheckBox;
-  private JCheckBox ignoreErrorsCheckBox;
+  private JCheckBox generateSourceContextFiles;
+  private JCheckBox ignoreErrors;
   private AppEngineHelper appEngineHelper;
 
   FlexibleFacetEditor(AppEngineFlexibleFacetConfiguration facetConfiguration,
@@ -155,6 +153,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   public void reset() {
     appYaml.setText(facetConfiguration.getAppYamlPath());
     dockerfile.setText(facetConfiguration.getDockerfilePath());
+    generateSourceContextFiles.setSelected(facetConfiguration.isGenerateSourceContext());
+    ignoreErrors.setSelected(facetConfiguration.isIgnoreErrors());
 
     toggleDockerfileSection();
   }

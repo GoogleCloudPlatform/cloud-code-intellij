@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.jps.model.impl;
 
 import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -27,16 +26,16 @@ public class StackdriverProperties {
   private boolean generateSourceContext = true;
   private boolean ignoreErrors = true;
   // Needs to be serialized here so the build plugin can use the Cloud SDK.
-  private String sdkPath;
+  private String cloudSdkPath;
   private String moduleSourceDirectory;
 
   public StackdriverProperties() {}
 
-  public StackdriverProperties(boolean generateSourceContext, boolean ignoreErrors, String sdkPath,
-      String moduleSourceDirectory) {
+  public StackdriverProperties(boolean generateSourceContext, boolean ignoreErrors,
+      String cloudSdkPath, String moduleSourceDirectory) {
     this.generateSourceContext = generateSourceContext;
     this.ignoreErrors = ignoreErrors;
-    this.sdkPath = sdkPath;
+    this.cloudSdkPath = cloudSdkPath;
     this.moduleSourceDirectory = moduleSourceDirectory;
   }
 
@@ -63,11 +62,11 @@ public class StackdriverProperties {
       throw new RuntimeException("The path contains invalid characters.", ipe);
     }
 
-    this.sdkPath = sdkPath.toString();
+    this.cloudSdkPath = sdkPath.toString();
   }
 
   public String getCloudSdkPath() {
-    return sdkPath;
+    return cloudSdkPath;
   }
 
   public void setModuleSourceDirectory(String moduleSourceDirectory) {

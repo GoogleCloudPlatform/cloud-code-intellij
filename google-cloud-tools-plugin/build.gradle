@@ -27,6 +27,7 @@ intellij {
     publish {
         pluginId '8079'
     }
+    systemProperties = ['compiler.process.debug.port':56666]
 }
 
 project.afterEvaluate {

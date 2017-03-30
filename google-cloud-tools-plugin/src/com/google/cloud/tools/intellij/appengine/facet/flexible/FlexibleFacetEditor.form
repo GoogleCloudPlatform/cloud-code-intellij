@@ -106,7 +106,7 @@
           </grid>
         </children>
       </grid>
-      <component id="2c41d" class="javax.swing.JCheckBox" binding="generateSourceContextFilesCheckBox" default-binding="true">
+      <component id="2c41d" class="javax.swing.JCheckBox" binding="generateSourceContextFiles">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -114,7 +114,7 @@
           <text value="Generate source context files"/>
         </properties>
       </component>
-      <component id="898aa" class="javax.swing.JCheckBox" binding="ignoreErrorsCheckBox" default-binding="true">
+      <component id="898aa" class="javax.swing.JCheckBox" binding="ignoreErrors">
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="4" use-parent-layout="false"/>
         </constraints>
