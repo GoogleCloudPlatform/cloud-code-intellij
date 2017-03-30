@@ -43,7 +43,6 @@ import com.intellij.ui.DocumentAdapter;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -99,14 +98,14 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       @Override
       protected void textChanged(DocumentEvent event) {
         toggleDockerfileSection();
-        toggleWarnings();
+        showWarnings();
       }
     });
 
     dockerfile.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        toggleWarnings();
+        showWarnings();
       }
     });
 
@@ -119,11 +118,11 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     genAppYamlButton.addActionListener(new GenerateConfigActionListener(project, "app.yaml",
         () -> appEngineHelper.defaultAppYaml(FlexibleRuntime.java), appYaml,
-        this::toggleWarnings));
+        this::showWarnings));
 
     genDockerfileButton.addActionListener(new GenerateConfigActionListener(project, "Dockerfile",
         () -> appEngineHelper.defaultDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR),
-        dockerfile, this::toggleWarnings
+        dockerfile, this::showWarnings
     ));
 
     appYaml.setText(facetConfiguration.getAppYamlPath());
@@ -133,7 +132,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     errorIcon.setVisible(false);
     errorMessage.setVisible(false);
 
-    toggleWarnings();
+    showWarnings();
     toggleDockerfileSection();
   }
 
@@ -159,7 +158,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   @Override
   public void apply() throws ConfigurationException {
-    toggleWarnings();
+    showWarnings();
     if (!isValidConfigurationFile(appYaml.getText())) {
       throw new ConfigurationException(
           GctBundle.getString("appengine.deployment.error.staging.yaml"));
@@ -211,7 +210,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   /**
    * Validates the configuration and turns on/off any necessary warnings.
    */
-  private void toggleWarnings() {
+  private void showWarnings() {
     boolean showError = false;
 
     if (!isValidConfigurationFile(appYaml.getText())) {
