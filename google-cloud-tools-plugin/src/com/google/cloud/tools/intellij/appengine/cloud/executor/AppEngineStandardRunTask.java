@@ -26,8 +26,12 @@ import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.base.Strings;
 
+import com.intellij.openapi.projectRoots.Sdk;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.nio.file.Paths;
 
 /**
  * Represents an App Engine Standard run task. (i.e., devappserver)
@@ -35,17 +39,21 @@ import org.jetbrains.annotations.Nullable;
 public class AppEngineStandardRunTask extends AppEngineTask {
 
   private RunConfiguration runConfig;
+  private Sdk javaSdk;
   private String runnerId;
 
   /**
    * {@link AppEngineStandardRunTask} constructor.
    *
    * @param runConfig local run configuration to be sent to the common library
+   * @param javaSdk JRE to run devappserver with
    * @param runnerId typically "Run" or "Debug", to indicate type of local run. To be used in
    *     metrics
    */
-  public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig, @Nullable String runnerId) {
+  public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig, @NotNull Sdk javaSdk,
+      @Nullable String runnerId) {
     this.runConfig = runConfig;
+    this.javaSdk = javaSdk;
     this.runnerId = runnerId;
   }
 
@@ -56,13 +64,16 @@ public class AppEngineStandardRunTask extends AppEngineTask {
     // show a warning notification if the cloud sdk version is not supported
     CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
 
-    CloudSdk sdk = new CloudSdk.Builder()
+    CloudSdk.Builder sdkBuilder = new CloudSdk.Builder()
         .sdkPath(sdkService.getSdkHomePath())
         .async(true)
-        .startListener(startListener)
-        .build();
+        .startListener(startListener);
 
-    CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdk);
+    if (javaSdk.getHomePath() != null) {
+      sdkBuilder.javaHome(Paths.get(javaSdk.getHomePath()));
+    }
+
+    CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdkBuilder.build());
     devServer.run(runConfig);
 
     UsageTrackerProvider.getInstance()

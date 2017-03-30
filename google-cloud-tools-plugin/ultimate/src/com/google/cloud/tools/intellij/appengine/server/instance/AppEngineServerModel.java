@@ -39,6 +39,7 @@ import com.intellij.javaee.run.execution.OutputProcessor;
 import com.intellij.javaee.serverInstances.J2EEServerInstance;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
@@ -72,27 +73,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   public static final String JVM_FLAG_DELIMITER = " ";
   private ArtifactPointer artifactPointer;
   private CommonModel commonModel;
-  private Sdk devAppServerJdk;
-  private ProjectSdksModel projectJdksModel;
   private AppEngineModelSettings settings = new AppEngineModelSettings();
-
-  public AppEngineServerModel() {
-    projectJdksModel = new ProjectSdksModel();
-  }
-
-  void initJdk() {
-    projectJdksModel.reset(commonModel.getProject());
-    setDevAppServerJdk(projectJdksModel.getProjectSdk());
-  }
 
   @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
-    // TODO(alexsloan): This keeps the dev_appserver's jdk in sync with the project jdk on behalf of
-    // the user. This behavior should be removed once
-    // https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/926 is completed.
-    initJdk();
-
-    if (devAppServerJdk == null) {
+    if (ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk() == null) {
       throw new ExecutionException(GctBundle.getString("appengine.run.server.nosdk"));
     }
 
@@ -161,7 +146,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
           GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }
 
-    if (devAppServerJdk == null) {
+    if (ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk() == null) {
       throw new RuntimeConfigurationError(GctBundle.getString("appengine.run.server.nosdk"));
     }
   }
@@ -444,10 +429,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   public void setClearDatastore(Boolean clearDatastore) {
     settings.setClearDatastore(clearDatastore);
-  }
-
-  private void setDevAppServerJdk(Sdk devAppServerJdk) {
-    this.devAppServerJdk = devAppServerJdk;
   }
 
   /**
