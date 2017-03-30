@@ -119,7 +119,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       facet.getConfiguration().setDockerfilePath(dockerfilePath.toString());
 
       if (generateConfigFiles) {
-        generateAppYaml(facet, contentRoots);
+        generateAppYaml(facet, contentRoots[0]);
       }
     }
 
@@ -133,13 +133,13 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
    * already exists it will not overwrite the file.
    */
   private static void generateAppYaml(@NotNull AppEngineFlexibleFacet facet,
-      @NotNull VirtualFile[] contentRoots) {
+      @NotNull VirtualFile contentRoot) {
     Project project = facet.getModule().getProject();
     FileTemplate appYamlTemplate = FileTemplateManager.getInstance(project)
         .getInternalTemplate(AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE);
 
     try {
-      VirtualFile virtualFile = contentRoots[0].findFileByRelativePath("src/main");
+      VirtualFile virtualFile = contentRoot.findFileByRelativePath("src/main");
 
       if (virtualFile != null) {
         PsiDirectory directory = PsiManager.getInstance(project)
