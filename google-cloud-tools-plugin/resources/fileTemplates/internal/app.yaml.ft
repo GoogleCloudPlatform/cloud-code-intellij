@@ -1,4 +1,3 @@
 runtime: java
 env: flex
-env_variables:
-  'DBG_ENABLE': 'true'
+
