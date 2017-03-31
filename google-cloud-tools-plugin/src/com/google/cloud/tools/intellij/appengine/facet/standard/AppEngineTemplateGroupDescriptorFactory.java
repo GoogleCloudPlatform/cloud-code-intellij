@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
+import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 
 import org.jetbrains.annotations.NonNls;
@@ -32,12 +33,19 @@ public class AppEngineTemplateGroupDescriptorFactory implements FileTemplateGrou
 
   @NonNls
   public static final String APP_ENGINE_WEB_XML_TEMPLATE = "GctAppEngineWeb.xml";
+  @NonNls
+  public static final String APP_YAML_TEMPLATE = "app.yaml";
 
   @Override
   public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
     final FileTemplateDescriptor appEngineXml = new FileTemplateDescriptor(
         APP_ENGINE_WEB_XML_TEMPLATE, StdFileTypes.XML.getIcon());
+
+    final FileTemplateDescriptor appYaml = new FileTemplateDescriptor(
+        APP_YAML_TEMPLATE, FileTypeManager.getInstance().getStdFileType("YAML").getIcon());
+
     return new FileTemplateGroupDescriptor("Google App Engine", GoogleCloudToolsIcons.APP_ENGINE,
-        appEngineXml);
+        appEngineXml,
+        appYaml);
   }
 }
