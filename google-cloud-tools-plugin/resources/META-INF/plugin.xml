@@ -42,6 +42,15 @@
       shell to ensure you have the latest Cloud SDK release.
       </p>
 
+
+      <h2>[17.2.2]</h2>
+
+      <p>This is another maintenance release to address the invalid Java Runtime Environment (JRE)
+      on standard staging <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1316">#1316</a>
+      issue:</p>
+
+      <blockquote>Unable to stage app: Cannot get the System Java Compiler. Please use a JDK, not a JRE.</blockquote>
+
       <h2>[17.2.1]</h2>
 
       <p>Happy new year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance
