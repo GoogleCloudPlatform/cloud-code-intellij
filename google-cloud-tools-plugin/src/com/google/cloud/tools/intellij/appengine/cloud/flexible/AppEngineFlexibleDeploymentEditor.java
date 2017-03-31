@@ -25,6 +25,7 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
+import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -81,7 +82,8 @@ import javax.swing.event.TreeModelEvent;
 public class AppEngineFlexibleDeploymentEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
   private static final String DEFAULT_SERVICE = "default";
-  private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
+  private DeploymentSource deploymentSource;
+  private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
 
   private JPanel mainPanel;
@@ -105,7 +107,9 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JButton moduleSettingsButton;
   private JCheckBox hiddenValidationTrigger;
   private JLabel noSupportedModulesWarning;
-  private DeploymentSource deploymentSource;
+
+  private static final boolean PROMOTE_DEFAULT = false;
+  private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
 
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
     this.deploymentSource = deploymentSource;
@@ -208,20 +212,13 @@ public class AppEngineFlexibleDeploymentEditor extends
       boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
 
       stopPreviousVersionCheckBox.setEnabled(isPromoteSelected);
-
-      if (!isPromoteSelected) {
-        stopPreviousVersionCheckBox.setSelected(false);
-      }
+      stopPreviousVersionCheckBox.setSelected(isPromoteSelected);
     });
-    stopPreviousVersionCheckBox.setEnabled(false);
+    promoteVersionCheckBox.setSelected(PROMOTE_DEFAULT);
+    stopPreviousVersionCheckBox.setEnabled(STOP_PREVIOUS_VERSION_DEFAULT);
 
-    modulesWithFlexFacetComboBox.setModel(new DefaultComboBoxModel<>(
-        Arrays.stream(ModuleManager.getInstance(project).getModules())
-            .filter(module ->
-                FacetManager.getInstance(module)
-                    .getFacetByType(AppEngineFlexibleFacetType.ID) != null)
-            .toArray(Module[]::new)
-    ));
+
+    resetModuleConfigSelection(project);
     modulesWithFlexFacetComboBox.addItemListener(event -> toggleDockerfileSection());
     modulesWithFlexFacetComboBox.setRenderer(new ListCellRendererWrapper<Module>() {
       @Override
@@ -232,6 +229,35 @@ public class AppEngineFlexibleDeploymentEditor extends
         }
       }
     });
+
+    appYamlTextField.setText(getAppYamlPath());
+
+    moduleSettingsButton.addActionListener(event -> {
+      AppEngineFlexibleFacet flexFacet =
+          FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
+              .getFacetByType(AppEngineFlexibleFacetType.ID);
+      ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
+      // When we get out of the dialog window, we want to re-eval the configuration.
+      // validateConfiguration() can't be used here because the ConfigurationException isn't caught
+      // anywhere, and fireEditorStateChanged() doesn't trigger any listeners called from here.
+      // Emulating a user action triggers apply(), so that's what we're doing here.
+      hiddenValidationTrigger.doClick();
+      toggleDockerfileSection();
+      resetModuleConfigSelection(project);
+    });
+
+    updateSelectors();
+    toggleDockerfileSection();
+  }
+
+  private void resetModuleConfigSelection(Project project) {
+    modulesWithFlexFacetComboBox.setModel(new DefaultComboBoxModel<>(
+        Arrays.stream(ModuleManager.getInstance(project).getModules())
+            .filter(module ->
+                FacetManager.getInstance(module)
+                    .getFacetByType(AppEngineFlexibleFacetType.ID) != null)
+            .toArray(Module[]::new)
+    ));
 
     // For the case Flex isn't enabled for any modules, the user can still deploy filesystem
     // jars/wars.
@@ -247,22 +273,6 @@ public class AppEngineFlexibleDeploymentEditor extends
       appYamlOverrideCheckBox.setSelected(true);
       dockerfileOverrideCheckBox.setSelected(true);
     }
-
-    moduleSettingsButton.addActionListener(event -> {
-      AppEngineFlexibleFacet flexFacet =
-          FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
-              .getFacetByType(AppEngineFlexibleFacetType.ID);
-      ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
-      // When we get out of the dialog window, we want to re-eval the configuration.
-      // validateConfiguration() can't be used here because the ConfigurationException isn't caught
-      // anywhere, and fireEditorStateChanged() doesn't trigger any listeners called from here.
-      // Emulating a user action triggers apply(), so that's what we're doing here.
-      hiddenValidationTrigger.doClick();
-      toggleDockerfileSection();
-    });
-
-    updateSelectors();
-    toggleDockerfileSection();
   }
 
   private void refreshApplicationInfoPanel() {
@@ -357,16 +367,21 @@ public class AppEngineFlexibleDeploymentEditor extends
           GctBundle.getString("appengine.deployment.error.staging.yaml") + " "
               + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
     }
-    if (isCustomRuntime()) {
-      if (StringUtils.isBlank(getDockerfilePath())) {
-        throw new ConfigurationException(
-            GctBundle.message("appengine.flex.config.browse.dockerfile"));
+    try {
+      if (isCustomRuntime()) {
+        if (StringUtils.isBlank(getDockerfilePath())) {
+          throw new ConfigurationException(
+              GctBundle.message("appengine.flex.config.browse.dockerfile"));
+        }
+        if (!isValidConfigurationFile(getDockerfilePath())) {
+          throw new ConfigurationException(
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile") + " "
+                  + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
+        }
       }
-      if (!isValidConfigurationFile(getDockerfilePath())) {
-        throw new ConfigurationException(
-            GctBundle.getString("appengine.deployment.error.staging.dockerfile") + " "
-                + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
-      }
+    } catch (MalformedYamlFileException myf) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.appyaml.malformed"));
     }
     if (!appInfoPanel.isApplicationValid()) {
       throw new ConfigurationException(
@@ -381,9 +396,13 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   private void updateServiceName() {
-    Optional<String> service =
-        APP_ENGINE_PROJECT_SERVICE.getServiceNameFromAppYaml(getAppYamlPath());
-    serviceLabel.setText(service.orElse(DEFAULT_SERVICE));
+    try {
+      Optional<String> service =
+          appEngineProjectService.getServiceNameFromAppYaml(getAppYamlPath());
+      serviceLabel.setText(service.orElse(DEFAULT_SERVICE));
+    } catch (MalformedYamlFileException myf) {
+      serviceLabel.setText("");
+    }
   }
 
   private void updateSelectors() {
@@ -400,8 +419,8 @@ public class AppEngineFlexibleDeploymentEditor extends
     }
   }
 
-  private boolean isCustomRuntime() {
-    return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(getAppYamlPath())
+  private boolean isCustomRuntime() throws MalformedYamlFileException {
+    return appEngineProjectService.getFlexibleRuntimeFromAppYaml(getAppYamlPath())
         .filter(runtime -> runtime == FlexibleRuntime.custom)
         .isPresent();
   }
@@ -411,7 +430,12 @@ public class AppEngineFlexibleDeploymentEditor extends
    * Disables it otherwise.
    */
   private void toggleDockerfileSection() {
-    boolean visible = isCustomRuntime();
+    boolean visible = false;
+    try {
+      visible = isCustomRuntime();
+    } catch (MalformedYamlFileException myf) {
+      // Do nothing, don't blow up, let visible stay false.
+    }
     dockerfileOverrideCheckBox.setVisible(
         visible && modulesWithFlexFacetComboBox.getItemCount() != 0);
     dockerfileTextField.setVisible(visible);

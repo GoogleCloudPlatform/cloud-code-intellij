@@ -30,6 +30,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
+import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -73,11 +74,14 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   private static final Logger logger = Logger.getInstance(CloudSdkAppEngineHelper.class);
 
-  private static final String DEFAULT_APP_YAML_PATH = "/generation/src/appengine/mvm/app.yaml";
+  private static final String DEFAULT_CUSTOM_APP_YAML_PATH =
+      "/generation/src/appengine/flexible/custom/app.yaml";
+  private static final String DEFAULT_JAVA_APP_YAML_PATH =
+      "/generation/src/appengine/flexible/java/app.yaml";
   private static final String DEFAULT_JAR_DOCKERFILE_PATH
-      = "/generation/src/appengine/mvm/jar.dockerfile";
+      = "/generation/src/appengine/flexible/custom/jar.dockerfile";
   private static final String DEFAULT_WAR_DOCKERFILE_PATH
-      = "/generation/src/appengine/mvm/war.dockerfile";
+      = "/generation/src/appengine/flexible/custom/war.dockerfile";
   private static final String CLIENT_ID_LABEL = "client_id";
   private static final String CLIENT_SECRET_LABEL = "client_secret";
   private static final String REFRESH_TOKEN_LABEL = "refresh_token";
@@ -101,8 +105,12 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   @Override
-  public Optional<Path> defaultAppYaml() {
-    return Optional.of(getFileFromResourcePath(DEFAULT_APP_YAML_PATH));
+  public Optional<Path> defaultAppYaml(FlexibleRuntime runtime) {
+    if (runtime == FlexibleRuntime.custom) {
+      return Optional.of(getFileFromResourcePath(DEFAULT_CUSTOM_APP_YAML_PATH));
+    }
+
+    return Optional.of(getFileFromResourcePath(DEFAULT_JAVA_APP_YAML_PATH));
   }
 
   @Override
@@ -160,23 +168,29 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       return Optional.of(createStandardRunner(loggingHandler, Paths.get(source.getFilePath()),
           deploy, isFlexCompat));
     } else if (targetEnvironment.isFlexible()) {
-      // Checks if the Yaml or Dockerfile exist.
-      Optional<FlexibleRuntime> runtimeOptional =
-          AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
-              deploymentConfiguration.getAppYamlPath());
+      try {
+        // Checks if the Yaml or Dockerfile exist.
+        Optional<FlexibleRuntime> runtimeOptional =
+            AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
+                deploymentConfiguration.getAppYamlPath());
 
-      if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
-        callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
-        return Optional.empty();
-      }
-      if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.custom).isPresent()
-          && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+        if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
+          callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
+          return Optional.empty();
+        }
+        if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.custom).isPresent()
+            && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+          callback.errorOccurred(
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+          return Optional.empty();
+        }
+        return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
+            deploymentConfiguration, deploy));
+      } catch (MalformedYamlFileException myf) {
         callback.errorOccurred(
-            GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+            GctBundle.message("appengine.appyaml.malformed") + "\n" + myf.getMessage());
         return Optional.empty();
       }
-      return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
-          deploymentConfiguration, deploy));
     } else {
       throw new AssertionError("Invalid App Engine target environment: " + targetEnvironment);
     }

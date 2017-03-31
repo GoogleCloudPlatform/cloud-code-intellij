@@ -103,10 +103,11 @@ public abstract class AppEngineProjectService {
    */
   public abstract boolean isJarOrWarMavenBuild(@NotNull Module module);
 
-  public abstract Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPath);
+  public abstract Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPath)
+      throws MalformedYamlFileException;
 
   public abstract Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(
-      @NotNull String appYamlPathString);
+      @NotNull String appYamlPathString) throws MalformedYamlFileException;
 
   /**
    * Gets the service specified in an appengine-web.xml file, in its first found service or module

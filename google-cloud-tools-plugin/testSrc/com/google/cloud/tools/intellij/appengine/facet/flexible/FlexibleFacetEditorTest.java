@@ -25,6 +25,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
 
   private File javaYaml;
   private File customYaml;
+  private File invalidYaml;
   private File dockerfile;
   private FlexibleFacetEditor editor;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
@@ -35,6 +36,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
 
     javaYaml = createTempFile("java.yaml", "runtime: java");
     customYaml = createTempFile("custom.yaml", "runtime: custom");
+    invalidYaml = createTempFile("invalid.yaml", "runtime: custom\nenv_variables:\n  'ASD");
     dockerfile = createTempFile("Dockerfile", "");
 
     facetConfiguration = new AppEngineFlexibleFacetConfiguration();
@@ -91,6 +93,19 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     } catch (ConfigurationException ce) {
       assertEquals(
           "The specified app.yaml configuration file does not exist or is not a valid file.",
+          ce.getMessage());
+    }
+  }
+
+  public void testValidateConfiguration_malformedYAML() {
+    editor = new FlexibleFacetEditor(facetConfiguration, getProject());
+    editor.getAppYaml().setText(invalidYaml.getPath());
+
+    try {
+      editor.apply();
+      fail("YAML is malformed.");
+    } catch (ConfigurationException ce) {
+      assertEquals("The selected app.yaml file is malformed.",
           ce.getMessage());
     }
   }

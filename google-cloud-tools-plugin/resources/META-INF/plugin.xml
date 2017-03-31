@@ -177,6 +177,7 @@
   <depends>com.intellij.modules.xml</depends>
   <depends>com.intellij.modules.xdebugger</depends>
   <depends>org.jetbrains.plugins.gradle</depends>
+  <depends>org.jetbrains.plugins.yaml</depends>
   <depends>com.google.gct.login</depends>
   <depends>Git4Idea</depends>
   <depends>org.jetbrains.idea.maven</depends>
@@ -249,8 +250,9 @@
     <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType"/>
     <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType"/>
     <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetConverterProvider"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetMigrationConverterProvider"/>
+    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineConverterProvider"/>
     <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkDetector"/>
+    <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFrameworkDetector"/>
     <buildProcess.parametersProvider implementation="com.google.cloud.tools.intellij.compiler.StackdriverBuildProcessParametersProvider"/>
     <compileServer.plugin classpath="google-cloud-tools-jps-plugin.jar;"/>
 

@@ -25,7 +25,8 @@ intellij {
     // the others are transitive dependencies of these and need to be defined explicitly
     plugins 'JavaEE', 'GwtStudio', 'Groovy', 'junit', 'git4idea',
             'maven', 'gradle', 'properties', 'java-i18n',
-            'DatabaseTools', 'PersistenceSupport', 'JavaScriptLanguage', 'CSS', 'jsp'
+            'DatabaseTools', 'PersistenceSupport', 'JavaScriptLanguage', 'CSS', 'jsp',
+            'yaml'
 }
 
 //todo: we need to manually add dependency on 'app-engine-plugin' project because
@@ -37,7 +38,9 @@ dependencies {
     compile files("${System.properties['java.home']}/../lib/tools.jar")
     compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
         exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'org.yaml', module: 'snakeyaml'
     }
+    testCompile 'org.yaml:snakeyaml:1.18'
     testCompile project(path: ':google-account-plugin')
     testCompile project(path: ':google-cloud-tools-plugin', configuration: 'tests')
     testRuntime files(project(':google-cloud-tools-plugin').sourceSets.test.resources.srcDirs)

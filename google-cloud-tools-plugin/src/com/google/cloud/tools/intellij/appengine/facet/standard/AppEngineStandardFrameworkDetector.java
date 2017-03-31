@@ -39,7 +39,7 @@ public class AppEngineStandardFrameworkDetector extends
     FacetBasedFrameworkDetector<AppEngineStandardFacet, AppEngineStandardFacetConfiguration> {
 
   public AppEngineStandardFrameworkDetector() {
-    super("appengine-java");
+    super("appengine-java-standard");
   }
 
   @Override

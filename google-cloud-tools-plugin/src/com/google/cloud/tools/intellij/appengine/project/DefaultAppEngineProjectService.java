@@ -40,7 +40,9 @@ import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.scanner.ScannerException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -213,14 +215,21 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     }
   }
 
+  /**
+   * @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed
+   */
   @Override
-  public Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPathString) {
+  public Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPathString)
+      throws MalformedYamlFileException {
     return getValueFromAppYaml(appYamlPathString, SERVICE_TAG_NAME);
   }
 
+  /**
+   * @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed
+   */
   @Override
   public Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(
-      @NotNull String appYamlPathString) {
+      @NotNull String appYamlPathString) throws MalformedYamlFileException {
     try {
       return getValueFromAppYaml(appYamlPathString, RUNTIME_TAG_NAME)
           .map(FlexibleRuntime::valueOf);
@@ -229,17 +238,24 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     }
   }
 
+  /**
+   * Returns the value of a key-value pair for a given {@code key}, on the file located at
+   * {@code appYamlPathString}.
+   * @return a String with the value, or an empty Optional if app.yaml isn't a regular file, or
+   * if there is any error getting the value
+   * @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed
+   */
   private Optional<String> getValueFromAppYaml(@NotNull String appYamlPathString,
-      @NotNull String key) {
+      @NotNull String key) throws MalformedYamlFileException {
     Yaml yamlParser = new Yaml();
-    try {
-      Path appYamlPath = Paths.get(appYamlPathString);
-      if (!Files.isRegularFile(appYamlPath)) {
-        return Optional.empty();
-      }
 
-      Object parseResult =
-          yamlParser.load(Files.newBufferedReader(appYamlPath, Charset.defaultCharset()));
+    Path appYamlPath = Paths.get(appYamlPathString);
+    if (!Files.isRegularFile(appYamlPath)) {
+      return Optional.empty();
+    }
+
+    try (BufferedReader reader = Files.newBufferedReader(appYamlPath, Charset.defaultCharset())) {
+      Object parseResult = yamlParser.load(reader);
 
       if (!(parseResult instanceof Map)) {
         return Optional.empty();
@@ -250,6 +266,8 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       Map<String, String> yamlMap = (Map<String, String>) parseResult;
 
       return yamlMap.containsKey(key) ? Optional.of(yamlMap.get(key)) : Optional.empty();
+    } catch (ScannerException se) {
+      throw new MalformedYamlFileException(se);
     } catch (InvalidPathException | IOException ioe) {
       return Optional.empty();
     }

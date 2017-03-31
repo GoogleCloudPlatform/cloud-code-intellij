@@ -68,8 +68,8 @@ public class AppEngineStandardDeploymentEditor
   private Project project;
   private AppEngineDeployable deploymentSource;
 
-  private static final boolean PROMOTE_DEFAULT = true;
-  private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = true;
+  private static final boolean PROMOTE_DEFAULT = false;
+  private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
 
   /** Initializes the UI components. */
   public AppEngineStandardDeploymentEditor(
