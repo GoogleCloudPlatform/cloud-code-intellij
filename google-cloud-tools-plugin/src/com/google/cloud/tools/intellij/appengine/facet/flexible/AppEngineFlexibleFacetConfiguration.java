@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
@@ -40,9 +38,12 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
   private String appYamlPath;
   private String dockerfilePath;
   // Source context configuration for Stackdriver Debugger.
+  // The names and types of these members must be kept equal to jps-module/StackdriverProperties.
   private boolean generateSourceContext;
   private boolean ignoreErrors;
-  private String cloudSdkPath = CloudSdkService.getInstance().getSdkHomePath().toString();
+  private String cloudSdkPath;
+  private String moduleSourceDirectory;
+  // End of Stackdriver Debugger properties.
 
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
@@ -74,7 +75,8 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     dockerfilePath = state.getDockerfilePath();
     generateSourceContext = state.isGenerateSourceContext();
     ignoreErrors = state.isIgnoreErrors();
-    cloudSdkPath = CloudSdkService.getInstance().getSdkHomePath().toString();
+    cloudSdkPath = state.getCloudSdkPath();
+    moduleSourceDirectory = state.getModuleSourceDirectory();
   }
 
   public String getAppYamlPath() {
@@ -97,6 +99,10 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     return cloudSdkPath;
   }
 
+  public String getModuleSourceDirectory() {
+    return moduleSourceDirectory;
+  }
+
   public void setAppYamlPath(String appYamlPath) {
     this.appYamlPath = appYamlPath;
   }
@@ -115,5 +121,9 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
 
   public void setCloudSdkPath(String cloudSdkPath) {
     this.cloudSdkPath = cloudSdkPath;
+  }
+
+  public void setModuleSourceDirectory(String moduleSourceDirectory) {
+    this.moduleSourceDirectory = moduleSourceDirectory;
   }
 }

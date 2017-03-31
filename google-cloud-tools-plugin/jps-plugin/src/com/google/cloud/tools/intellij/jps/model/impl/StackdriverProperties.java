@@ -21,10 +21,14 @@ import java.nio.file.Paths;
 
 /**
  * Serializable Stackdriver configuration.
+ *
+ * <p>This class mirrors AppEngineFlexibleFacetConfiguration in the main module, since the latter
+ * isn't in jps-module's classpath. Any changes to the members there must be reflected here.</p>
  */
 public class StackdriverProperties {
-  private boolean generateSourceContext = true;
-  private boolean ignoreErrors = true;
+
+  private boolean generateSourceContext;
+  private boolean ignoreErrors;
   // Needs to be serialized here so the build plugin can use the Cloud SDK.
   private String cloudSdkPath;
   private String moduleSourceDirectory;

@@ -143,11 +143,11 @@ public class GenRepoInfoFileModuleBuilder extends ModuleLevelBuilder {
       outputConsumer.registerOutputFile(
           target,
           outputDirectory.resolve("source-context.json").toFile(),
-          Collections.<String>emptyList());
+          Collections.emptyList());
       outputConsumer.registerOutputFile(
           target,
           outputDirectory.resolve("source-contexts.json").toFile(),
-          Collections.<String>emptyList());
+          Collections.emptyList());
     }
 
     return ExitCode.OK;
