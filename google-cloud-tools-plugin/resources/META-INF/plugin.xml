@@ -37,11 +37,11 @@
     <html>
       <p>
       IMPORTANT:
-      This plugin requires the use of Cloud SDK v 133.0.0 for correct execution of the local
+      This plugin requires the use of Cloud SDK v 145.0.0 for correct execution of the local
       development server with the latest Java 8 SDK. Please run 'gcloud components update' from your
       shell to ensure you have the latest Cloud SDK release.
       </p>
-
+      <br/>
 
       <h2>[17.2.2]</h2>
 
@@ -80,6 +80,7 @@
 .com/GoogleCloudPlatform/google-cloud-intellij/milestone/19?closed=1">17.2 Release Milestone</a> for complete details.</p>
 
       <h2>[16.11.6]</h2>
+
       <h3>Added</h3>
       <ul>
         <li>
