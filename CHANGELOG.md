@@ -1,6 +1,6 @@
 # Change Log
 All notable changes to this project will be documented in this file.
-## [17.2.2-2017]
+## [17.2.2_2017]
 
 ### Fixed
   - Invalid Java Runtime Environment (JRE) on 
