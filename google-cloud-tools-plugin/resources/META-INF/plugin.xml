@@ -37,11 +37,24 @@
     <html>
       <p>
       IMPORTANT:
-      This plugin requires the use of Cloud SDK v 133.0.0 for correct execution of the local
+      This plugin requires the use of Cloud SDK v 145.0.0 for correct execution of the local
       development server with the latest Java 8 SDK. Please run 'gcloud components update' from your
       shell to ensure you have the latest Cloud SDK release.
       </p>
+      <br/>
 
+      <h2>[17.2.2_2017]</h2>
+
+      <h3>Fixed</h3>
+
+      <ul>
+        <li>Invalid Java Runtime Environment (JRE) on staging an App Engine standard app
+        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1316">#1316</a>):
+
+        <blockquote>Unable to stage app: Cannot get the System Java Compiler. Please use a JDK, not a JRE.</blockquote>
+        </li>
+
+      </ul>
       <h2>[17.2.1]</h2>
 
       <p>Happy new year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance
@@ -71,6 +84,7 @@
 .com/GoogleCloudPlatform/google-cloud-intellij/milestone/19?closed=1">17.2 Release Milestone</a> for complete details.</p>
 
       <h2>[16.11.6]</h2>
+
       <h3>Added</h3>
       <ul>
         <li>

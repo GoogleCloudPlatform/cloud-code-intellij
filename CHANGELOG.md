@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 ## [unreleased]
 
+## [17.2.2_2017]
+
+### Fixed
+  - Invalid Java Runtime Environment (JRE) on 
+staging an App Engine standard app ([#1316](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1316)):
+
+        > Unable to stage app: Cannot get the System Java Compiler. Please use a JDK, not a JRE.
+
 ## [17.2.1]
 
 Happy New Year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance
