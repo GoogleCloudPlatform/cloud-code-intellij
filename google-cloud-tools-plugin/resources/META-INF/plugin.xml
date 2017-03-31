@@ -46,7 +46,7 @@
       <h2>[17.2.2]</h2>
 
       <p>This is another maintenance release to address the invalid Java Runtime Environment (JRE)
-      on standard staging <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1316">#1316</a>
+      on staging an App Engine standard app <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1316">#1316</a>
       issue:</p>
 
       <blockquote>Unable to stage app: Cannot get the System Java Compiler. Please use a JDK, not a JRE.</blockquote>
