@@ -24,15 +24,16 @@ import org.jetbrains.annotations.NotNull;
  * Barebones implementation for the Docker language required by {@link DockerFileType}.
  */
 public class DockerFileLanguage extends Language {
-    static final DockerFileLanguage INSTANCE = new DockerFileLanguage();
 
-    private DockerFileLanguage() {
-        super("Docker");
-    }
+  static final DockerFileLanguage INSTANCE = new DockerFileLanguage();
 
-    @NotNull
-    @Override
-    public String getDisplayName() {
-        return "Docker";
-    }
+  private DockerFileLanguage() {
+    super("Docker");
+  }
+
+  @NotNull
+  @Override
+  public String getDisplayName() {
+    return "Docker";
+  }
 }

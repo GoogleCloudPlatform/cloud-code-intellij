@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.file;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.intellij.openapi.fileTypes.StdFileTypes;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,34 +28,36 @@ import javax.swing.Icon;
  * Representation of the Docker configuration file type.
  */
 public class DockerFileType extends LanguageFileType {
-    static final DockerFileType INSTANCE = new DockerFileType();
-    static final String DEFAULT_EXTENSION = "docker";
 
-    private DockerFileType() {
-        super(DockerFileLanguage.INSTANCE);
-    }
+  public static final DockerFileType INSTANCE = new DockerFileType();
+  static final String DEFAULT_EXTENSION = "docker";
 
-    @NotNull
-    @Override
-    public String getName() {
-        return "Docker";
-    }
+  private DockerFileType() {
+    super(DockerFileLanguage.INSTANCE);
+  }
 
-    @NotNull
-    @Override
-    public String getDefaultExtension() {
-        return DEFAULT_EXTENSION;
-    }
+  @NotNull
+  @Override
+  public String getName() {
+    return "Docker";
+  }
 
-    @NotNull
-    @Override
-    public String getDescription() {
-        return "Dockerfile";
-    }
+  @NotNull
+  @Override
+  public String getDefaultExtension() {
+    return DEFAULT_EXTENSION;
+  }
 
-    @Nullable
-    @Override
-    public Icon getIcon() {
-        return null;
-    }
+  @NotNull
+  @Override
+  public String getDescription() {
+    return "Dockerfile";
+  }
+
+  @Nullable
+  @Override
+  public Icon getIcon() {
+    // TODO Better icon for Dockerfiles?
+    return StdFileTypes.PLAIN_TEXT.getIcon();
+  }
 }
