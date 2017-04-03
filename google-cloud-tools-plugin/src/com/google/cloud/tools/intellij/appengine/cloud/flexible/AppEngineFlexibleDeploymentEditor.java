@@ -161,6 +161,7 @@ public class AppEngineFlexibleDeploymentEditor extends
 
       setModuleComboBoxAndButtonEnabled(
           !(isAppYamlOverrideSelected && dockerfileOverrideCheckBox.isSelected()));
+      updateServiceName();
       toggleDockerfileSection();
     });
 
