@@ -159,7 +159,8 @@ public class AppEngineFlexibleDeploymentEditor extends
       boolean isAppYamlOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
       appYamlTextField.setVisible(isAppYamlOverrideSelected);
 
-      setModuleControls(!(isAppYamlOverrideSelected && dockerfileOverrideCheckBox.isSelected()));
+      setModuleControlsEnabled(
+          !(isAppYamlOverrideSelected && dockerfileOverrideCheckBox.isSelected()));
       updateServiceName();
       toggleDockerfileSection();
     });
@@ -178,7 +179,7 @@ public class AppEngineFlexibleDeploymentEditor extends
             dockerfileTextField.setText(getDockerfilePath());
           }
 
-          setModuleControls(
+          setModuleControlsEnabled(
               !(isDockerfileOverrideSelected && appYamlOverrideCheckBox.isSelected()));
         }
     );
@@ -307,7 +308,8 @@ public class AppEngineFlexibleDeploymentEditor extends
     dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
 
-    setModuleControls(!(configuration.isOverrideAppYaml() && configuration.isOverrideDockerfile()));
+    setModuleControlsEnabled(
+        !(configuration.isOverrideAppYaml() && configuration.isOverrideDockerfile()));
 
     toggleDockerfileSection();
     updateServiceName();
@@ -521,7 +523,7 @@ public class AppEngineFlexibleDeploymentEditor extends
    * disabled if both app.yaml and Dockerfile override check boxes are checked and enabled
    * otherwise.
    */
-  private void setModuleControls(boolean enabled) {
+  private void setModuleControlsEnabled(boolean enabled) {
     modulesWithFlexFacetComboBox.setEnabled(enabled);
     moduleSettingsButton.setEnabled(enabled);
   }
