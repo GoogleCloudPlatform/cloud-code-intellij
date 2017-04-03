@@ -42,7 +42,7 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
       FacetValidatorsManager validatorsManager) {
     return new FacetEditorTab[]{
-      new FlexibleFacetEditor(this, editorContext.getProject())
+      new FlexibleFacetEditor(this, editorContext.getModule())
     };
   }
 

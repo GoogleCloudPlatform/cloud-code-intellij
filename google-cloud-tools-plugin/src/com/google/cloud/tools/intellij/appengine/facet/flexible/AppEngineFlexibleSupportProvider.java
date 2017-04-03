@@ -20,8 +20,8 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineTemplateGroupDescriptorFactory;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
@@ -33,28 +33,21 @@ import com.intellij.facet.FacetType;
 import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
-import com.intellij.ide.fileTemplates.FileTemplate;
-import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.ide.fileTemplates.FileTemplateUtil;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiManager;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.RemoteServersManager;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationType;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
-import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.ContainerUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +66,6 @@ import javax.swing.JPanel;
 public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModuleProvider {
 
   private static Logger logger = Logger.getInstance(AppEngineFlexibleSupportProvider.class);
-  private static final String CONFIG_DIR_NAME = "appengine";
 
   @NotNull
   @Override
@@ -119,58 +111,13 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       facet.getConfiguration().setDockerfilePath(dockerfilePath.toString());
 
       if (generateConfigFiles) {
-        generateAppYaml(facet, contentRoots[0]);
+        appEngineProjectService.generateAppYaml(FlexibleRuntime.java, facet.getModule());
       }
     }
 
     // TODO(joaomartins): Add other run configurations here too.
     // https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1260
     setupDeploymentRunConfiguration(facet.getModule());
-  }
-
-  /**
-   * Generates an app.yaml configuration file in the src/main/appengine directory. If an app.yaml
-   * already exists it will not overwrite the file.
-   */
-  private static void generateAppYaml(@NotNull AppEngineFlexibleFacet facet,
-      @NotNull VirtualFile contentRoot) {
-    Project project = facet.getModule().getProject();
-    FileTemplate appYamlTemplate = FileTemplateManager.getInstance(project)
-        .getInternalTemplate(AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE);
-
-    VirtualFile virtualFile = contentRoot.findFileByRelativePath("src/main");
-
-    if (virtualFile != null) {
-      PsiDirectory directory = PsiManager.getInstance(project)
-          .findDirectory(virtualFile);
-
-      if (directory != null) {
-        PsiDirectory appEngineDirectory;
-        try {
-          directory.checkCreateSubdirectory(CONFIG_DIR_NAME);
-          appEngineDirectory = directory.createSubdirectory(CONFIG_DIR_NAME);
-        } catch (IncorrectOperationException ioe) {
-          // checkCreateSubdirectory threw an exception suggesting that the directory may already
-          // exist. Skip creating the directory and attempt to write file.
-          appEngineDirectory = directory.findSubdirectory(CONFIG_DIR_NAME);
-        }
-
-        if (appEngineDirectory != null
-            && FileTemplateUtil.canCreateFromTemplate(
-            new PsiDirectory[]{appEngineDirectory}, appYamlTemplate)) {
-          try {
-            FileTemplateUtil.createFromTemplate(appYamlTemplate, "app.yaml",
-                FileTemplateManager.getInstance(project).getDefaultProperties(),
-                appEngineDirectory);
-          } catch (Exception e) {
-            // If the file already exists, this exception will be thrown by createFromTemplate
-            // We want to silently skip the generation in this case.
-            logger.debug("Failed to create app yaml from template. " + e.getMessage());
-          }
-        }
-      }
-    }
-
   }
 
   private static void setupDeploymentRunConfiguration(Module module) {

@@ -35,6 +35,10 @@ public class AppEngineTemplateGroupDescriptorFactory implements FileTemplateGrou
   public static final String APP_ENGINE_WEB_XML_TEMPLATE = "GctAppEngineWeb.xml";
   @NonNls
   public static final String APP_YAML_TEMPLATE = "app.yaml";
+  @NonNls
+  public static final String DOCKERFILE_WAR_TEMPLATE = "WarDockerfile";
+  @NonNls
+  public static final String DOCKERFILE_JAR_TEMPLATE = "JarDockerfile";
 
   @Override
   public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
@@ -44,8 +48,18 @@ public class AppEngineTemplateGroupDescriptorFactory implements FileTemplateGrou
     final FileTemplateDescriptor appYaml = new FileTemplateDescriptor(
         APP_YAML_TEMPLATE, FileTypeManager.getInstance().getStdFileType("YAML").getIcon());
 
+    // TODO Better icon for Dockerfiles?
+
+    final FileTemplateDescriptor warDockerfile = new FileTemplateDescriptor(
+        DOCKERFILE_WAR_TEMPLATE, StdFileTypes.PLAIN_TEXT.getIcon());
+
+    final FileTemplateDescriptor jarDockerfile = new FileTemplateDescriptor(
+        DOCKERFILE_JAR_TEMPLATE, StdFileTypes.PLAIN_TEXT.getIcon());
+
     return new FileTemplateGroupDescriptor("Google App Engine", GoogleCloudToolsIcons.APP_ENGINE,
         appEngineXml,
-        appYaml);
+        appYaml,
+        warDockerfile,
+        jarDockerfile);
   }
 }

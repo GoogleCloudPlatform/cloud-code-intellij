@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardRuntime;
 
 import com.intellij.openapi.components.ServiceManager;
@@ -38,7 +39,11 @@ public abstract class AppEngineProjectService {
 
   public enum FlexibleRuntime {
     custom,
-    java
+    java;
+
+    public String configLabel() {
+      return name().toLowerCase();
+    }
   }
 
   public static AppEngineProjectService getInstance() {
@@ -119,6 +124,21 @@ public abstract class AppEngineProjectService {
    */
   public abstract String getServiceNameFromAppEngineWebXml(
       Project project, DeploymentSource deploymentSource);
+
+
+  /**
+   * Generates an app.yaml configuration file in the src/main/appengine directory. If an app.yaml
+   * already exists it will not overwrite the file.
+   */
+  public abstract void generateAppYaml(FlexibleRuntime runtime, Module module);
+
+
+  /**
+   * Generates a Dockerfile in the src/main/docker directory. If a Dockerfile already exists it
+   * will not overwrite the file.
+   */
+  public abstract void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type,
+      Module module);
 
   /**
    * Returns the default location of the app.yaml configuration file, relative to a module content

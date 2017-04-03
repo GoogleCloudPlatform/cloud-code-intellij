@@ -17,22 +17,33 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardRuntime;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineTemplateGroupDescriptorFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 import com.intellij.facet.FacetManager;
+import com.intellij.ide.fileTemplates.FileTemplate;
+import com.intellij.ide.fileTemplates.FileTemplateManager;
+import com.intellij.ide.fileTemplates.FileTemplateUtil;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
+import com.intellij.util.IncorrectOperationException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,11 +63,14 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Implementation of methods for inspecting an App Engine project's structure and configuration.
  */
 public class DefaultAppEngineProjectService extends AppEngineProjectService {
+
+  private static Logger logger = Logger.getInstance(DefaultAppEngineProjectService.class);
 
   private static final String RUNTIME_TAG_NAME = "runtime";
   private static final String SERVICE_TAG_NAME = "service";
@@ -299,6 +313,75 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     }
 
     return DEFAULT_SERVICE;
+  }
+
+  @Override
+  public void generateAppYaml(FlexibleRuntime runtime, Module module) {
+    Properties templateProperties =
+        FileTemplateManager.getDefaultInstance().getDefaultProperties();
+    templateProperties.put("RUNTIME", runtime.configLabel());
+
+    generateFromTemplate(
+        AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE,
+        "appengine",
+        "app.yaml",
+        templateProperties,
+        module);
+  }
+
+  @Override
+  public void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module) {
+    // TODO handle unknown artifact types
+    generateFromTemplate(
+        type == AppEngineFlexibleDeploymentArtifactType.JAR
+            ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
+            : AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_WAR_TEMPLATE,
+        "docker",
+        "Dockerfile",
+        FileTemplateManager.getDefaultInstance().getDefaultProperties(),
+        module);
+  }
+
+  private void generateFromTemplate(String templateName, String templateDirectoryName,
+      String fileName, Properties templateProperties, Module module) {
+    FileTemplate configTemplate = FileTemplateManager.getDefaultInstance().getInternalTemplate(
+        templateName);
+    VirtualFile virtualFile = ModuleRootManager.getInstance(module).getContentRoots()[0]
+        .findFileByRelativePath("src/main");
+
+    if (virtualFile != null) {
+      PsiDirectory directory = PsiManager.getInstance(module.getProject())
+          .findDirectory(virtualFile);
+
+      if (directory != null) {
+        PsiDirectory configDirectory;
+        try {
+          directory.checkCreateSubdirectory(templateDirectoryName);
+          configDirectory = directory.createSubdirectory(templateDirectoryName);
+        } catch (IncorrectOperationException ioe) {
+          // checkCreateSubdirectory threw an exception suggesting that the directory may already
+          // exist. Skip creating the directory and attempt to write file.
+          configDirectory = directory.findSubdirectory(templateDirectoryName);
+        }
+
+        if (configDirectory != null
+            && FileTemplateUtil.canCreateFromTemplate(
+            new PsiDirectory[]{configDirectory}, configTemplate)) {
+          try {
+            FileTemplateUtil.createFromTemplate(
+                configTemplate,
+                fileName,
+                templateProperties,
+                configDirectory);
+          } catch (Exception e) {
+            // If the file already exists, this exception will be thrown by createFromTemplate
+            // We want to silently skip the generation in this case.
+            logger.debug("Failed to create app yaml from template. " + e.getMessage());
+          }
+        }
+      }
+    }
+
   }
 
   @Override

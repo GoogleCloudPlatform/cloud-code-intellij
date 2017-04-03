@@ -74,10 +74,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   private static final Logger logger = Logger.getInstance(CloudSdkAppEngineHelper.class);
 
-  private static final String DEFAULT_CUSTOM_APP_YAML_PATH =
-      "/generation/src/appengine/flexible/custom/app.yaml";
-  private static final String DEFAULT_JAVA_APP_YAML_PATH =
-      "/generation/src/appengine/flexible/java/app.yaml";
   private static final String DEFAULT_JAR_DOCKERFILE_PATH
       = "/generation/src/appengine/flexible/custom/jar.dockerfile";
   private static final String DEFAULT_WAR_DOCKERFILE_PATH
@@ -102,15 +98,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @Override
   public Project getProject() {
     return project;
-  }
-
-  @Override
-  public Optional<Path> defaultAppYaml(FlexibleRuntime runtime) {
-    if (runtime == FlexibleRuntime.custom) {
-      return Optional.of(getFileFromResourcePath(DEFAULT_CUSTOM_APP_YAML_PATH));
-    }
-
-    return Optional.of(getFileFromResourcePath(DEFAULT_JAVA_APP_YAML_PATH));
   }
 
   @Override
