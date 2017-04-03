@@ -37,12 +37,15 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
+import com.intellij.refactoring.rename.RenamePsiElementProcessor;
 import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
+import com.intellij.usageView.UsageInfo;
 import com.intellij.util.IncorrectOperationException;
 
 import org.jetbrains.annotations.NotNull;
@@ -332,7 +335,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   @Override
   public void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module) {
     // TODO handle unknown artifact types
-    generateFromTemplate(
+    PsiElement element = generateFromTemplate(
         type == AppEngineFlexibleDeploymentArtifactType.JAR
             ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
             : AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_WAR_TEMPLATE,
@@ -340,9 +343,14 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
         "Dockerfile",
         FileTemplateManager.getDefaultInstance().getDefaultProperties(),
         module);
+
+    if (element != null) {
+      RenamePsiElementProcessor.DEFAULT.renameElement(element, "Dockerfile", UsageInfo.EMPTY_ARRAY, null);
+    }
   }
 
-  private void generateFromTemplate(String templateName, String templateDirectoryName,
+  @Nullable
+  private PsiElement generateFromTemplate(String templateName, String templateDirectoryName,
       String fileName, Properties templateProperties, Module module) {
     FileTemplate configTemplate = FileTemplateManager.getDefaultInstance().getInternalTemplate(
         templateName);
@@ -368,7 +376,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
             && FileTemplateUtil.canCreateFromTemplate(
             new PsiDirectory[]{configDirectory}, configTemplate)) {
           try {
-            FileTemplateUtil.createFromTemplate(
+            return FileTemplateUtil.createFromTemplate(
                 configTemplate,
                 fileName,
                 templateProperties,
@@ -382,6 +390,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       }
     }
 
+    return null;
   }
 
   @Override
