@@ -158,6 +158,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     appYamlOverrideCheckBox.addActionListener(event -> {
       boolean isAppYamlOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
       appYamlTextField.setVisible(isAppYamlOverrideSelected);
+      updateServiceName();
       toggleDockerfileSection();
     });
 
