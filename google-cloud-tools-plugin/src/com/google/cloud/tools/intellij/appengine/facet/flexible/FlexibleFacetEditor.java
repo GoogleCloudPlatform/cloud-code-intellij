@@ -288,8 +288,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         Path destinationFilePath = destinationFolderPath.resolve(fileName);
 
         if (Files.exists(destinationFilePath)) {
-          // TODO bundleize
-          Messages.showErrorDialog(project, "File already exists", "Error");
+          Messages.showErrorDialog(project,
+              GctBundle.message("appengine.flex.config.generation.file.exists.error",
+                  destinationFilePath.getFileName().toString()), "Error");
           return;
         } else if (Files.isRegularFile(destinationFolderPath)) {
           new FileConfirmationDialog(
