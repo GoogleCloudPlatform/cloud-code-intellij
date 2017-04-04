@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmationDialog;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmationDialog.DialogType;
@@ -73,11 +71,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JLabel errorIcon;
   private JLabel errorMessage;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
-  private AppEngineHelper appEngineHelper;
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
       @NotNull Module module) {
-    this.appEngineHelper = new CloudSdkAppEngineHelper(module.getProject());
     this.facetConfiguration = facetConfiguration;
 
     appYaml.addBrowseFolderListener(
