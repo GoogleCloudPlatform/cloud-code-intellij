@@ -210,11 +210,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   @Override
-  public List<File> getAppYamls() {
-    return null;
-  }
-
-  @Override
   public List<File> getServices() {
     return ImmutableList.of(Paths.get(artifactPointer.getArtifact().getOutputPath()).toFile());
   }
@@ -253,7 +248,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   @Override
-  public String getStoragePath() {
+  public File getStoragePath() {
     return null;
   }
 
@@ -342,6 +337,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   public void setDefaultGcsBucketName(String defaultGcsBucketName) {
     settings.setDefaultGcsBucketName(defaultGcsBucketName);
+  }
+
+  @Override
+  public File getDatastorePath() {
+    return null;
   }
 
   @Override
