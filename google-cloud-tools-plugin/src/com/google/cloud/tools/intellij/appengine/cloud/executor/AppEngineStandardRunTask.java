@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer1;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
@@ -73,7 +73,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
       sdkBuilder.javaHome(Paths.get(javaSdk.getHomePath()));
     }
 
-    CloudSdkAppEngineDevServer devServer = new CloudSdkAppEngineDevServer(sdkBuilder.build());
+    CloudSdkAppEngineDevServer1 devServer = new CloudSdkAppEngineDevServer1(sdkBuilder.build());
     devServer.run(runConfig);
 
     UsageTrackerProvider.getInstance()
