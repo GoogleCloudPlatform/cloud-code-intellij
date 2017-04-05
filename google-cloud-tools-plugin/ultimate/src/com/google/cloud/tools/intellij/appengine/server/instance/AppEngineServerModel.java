@@ -346,11 +346,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public Boolean getClearDatastore() {
-    return settings.isClearDatastore();
-  }
-
-  public void setClearDatastore(Boolean clearDatastore) {
-    settings.setClearDatastore(clearDatastore);
+    return null;
   }
 
   /**
@@ -372,8 +368,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private Integer port = 8080;
     @Tag("jvm_flags")
     private String jvmFlags;
-    @Tag("clear_datastore")
-    private Boolean clearDatastore = false;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
 
@@ -415,14 +409,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     void setDefaultGcsBucketName(String defaultGcsBucketName) {
       this.defaultGcsBucketName = defaultGcsBucketName;
-    }
-
-    Boolean isClearDatastore() {
-      return clearDatastore;
-    }
-
-    void setClearDatastore(boolean clearDatastore) {
-      this.clearDatastore = clearDatastore;
     }
 
     @Override
