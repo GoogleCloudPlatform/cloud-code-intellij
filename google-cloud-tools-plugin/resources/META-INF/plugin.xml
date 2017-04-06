@@ -43,18 +43,22 @@
       </p>
       <br/>
 
+      <h2>[17.2.2]</h2>
+      <h3>Changed</h3>
+      <ul>
+        <li>Removed the Clear Datastore flag from the App Engine standard local development server configuration since the current version of the server doesn't support it. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1345">#1345</a>)</li>
+      </ul>
+
       <h2>[17.2.2_2017]</h2>
-
       <h3>Fixed</h3>
-
       <ul>
         <li>Invalid Java Runtime Environment (JRE) on staging an App Engine standard app
         (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1316">#1316</a>):
 
         <blockquote>Unable to stage app: Cannot get the System Java Compiler. Please use a JDK, not a JRE.</blockquote>
         </li>
-
       </ul>
+
       <h2>[17.2.1]</h2>
 
       <p>Happy new year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance
@@ -84,7 +88,6 @@
 .com/GoogleCloudPlatform/google-cloud-intellij/milestone/19?closed=1">17.2 Release Milestone</a> for complete details.</p>
 
       <h2>[16.11.6]</h2>
-
       <h3>Added</h3>
       <ul>
         <li>
