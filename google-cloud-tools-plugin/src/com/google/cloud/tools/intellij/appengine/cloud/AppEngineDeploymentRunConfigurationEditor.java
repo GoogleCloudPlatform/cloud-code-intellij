@@ -86,8 +86,6 @@ import javax.swing.event.TreeModelListener;
  */
 public class AppEngineDeploymentRunConfigurationEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
-
-  public static final boolean DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT = false;
   private Project project;
 
   private JComboBox configTypeComboBox;
@@ -131,6 +129,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
 
   public static final boolean PROMOTE_DEFAULT = true;
   public static final boolean STOP_PREVIOUS_VERSION_DEFAULT = true;
+  private static final boolean DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT = false;
 
   /**
    * Initializes the UI components.
