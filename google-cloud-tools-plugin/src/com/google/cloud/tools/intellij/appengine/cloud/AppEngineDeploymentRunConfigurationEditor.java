@@ -86,6 +86,8 @@ import javax.swing.event.TreeModelListener;
  */
 public class AppEngineDeploymentRunConfigurationEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
+
+  public static final boolean DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT = false;
   private Project project;
 
   private JComboBox configTypeComboBox;
@@ -108,6 +110,8 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   private JLabel stopPreviousVersionLabel;
   private JTextPane promoteInfoLabel;
   private AppEngineApplicationInfoPanel applicationInfoPanel;
+  private JCheckBox deployAllAppEngineConfigsCheckBox;
+  private JLabel deployAllConfigsCheckboxLabel;
   private JPanel regionLabel;
 
   private DeploymentSource deploymentSource;
@@ -141,7 +145,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     versionIdField.setPlaceholderText(GctBundle.message("appengine.flex.version.placeholder.text"));
     promoteCheckbox.setSelected(PROMOTE_DEFAULT);
     stopPreviousVersionCheckbox.setSelected(STOP_PREVIOUS_VERSION_DEFAULT);
-
+    deployAllAppEngineConfigsCheckBox.setSelected(DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT);
     resetOverridableFields(versionOverrideCheckBox, versionIdField);
     updateJarWarSelector();
     userSpecifiedArtifactFileSelector.setVisible(true);
@@ -166,11 +170,13 @@ public class AppEngineDeploymentRunConfigurationEditor extends
       appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
       appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
       environmentLabel.setText(getEnvironmentDisplayableLabel());
+      deployAllAppEngineConfigsCheckBox.setVisible(false);
     } else {
       appEngineCostWarningLabel.setVisible(false);
       environmentLabel.setText(environment.localizedLabel());
       stopPreviousVersionLabel.setVisible(false);
       stopPreviousVersionCheckbox.setVisible(false);
+      deployAllAppEngineConfigsCheckBox.setVisible(true);
     }
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
@@ -304,6 +310,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     configTypeComboBox.setSelectedItem(configuration.getConfigType());
 
     versionOverrideCheckBox.setSelected(!StringUtil.isEmpty(configuration.getVersion()));
+    deployAllAppEngineConfigsCheckBox.setSelected(configuration.isDeployAllConfigs());
     promoteCheckbox.setSelected(configuration.isPromote());
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     versionIdField.setEditable(versionOverrideCheckBox.isSelected());
@@ -330,6 +337,7 @@ public class AppEngineDeploymentRunConfigurationEditor extends
     configuration.setConfigType(getConfigType());
     configuration.setVersion(
         versionOverrideCheckBox.isSelected() ? versionIdField.getText() : null);
+    configuration.setDeployAllConfigs(deployAllAppEngineConfigsCheckBox.isSelected());
     configuration.setPromote(promoteCheckbox.isSelected());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
 
