@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 ## [unreleased]
 
+## [17.2.2]
+
+### Changed
+  - Removed the Clear Datastore flag from the App Engine standard local development server configuration since the current version of the server doesn't support it. ([#1345](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1345))
+
 ## [17.2.1]
 
 Happy New Year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance

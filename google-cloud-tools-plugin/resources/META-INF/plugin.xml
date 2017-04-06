@@ -42,6 +42,12 @@
       shell to ensure you have the latest Cloud SDK release.
       </p>
 
+      <h2>[17.2.2]</h2>
+      <h3>Changed</h3>
+      <ul>
+        <li>Removed the Clear Datastore flag from the App Engine standard local development server configuration since the current version of the server doesn't support it. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1345">#1345</a>)</li>
+      </ul>
+
       <h2>[17.2.1]</h2>
 
       <p>Happy new year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance
