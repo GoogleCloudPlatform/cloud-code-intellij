@@ -19,11 +19,11 @@ package com.google.cloud.tools.intellij.appengine.server.instance;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.server.run.CloudSdkStartupPolicy;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
@@ -38,9 +38,7 @@ import com.intellij.javaee.run.execution.DefaultOutputProcessor;
 import com.intellij.javaee.run.execution.OutputProcessor;
 import com.intellij.javaee.serverInstances.J2EEServerInstance;
 import com.intellij.openapi.options.SettingsEditor;
-import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.WriteExternalException;
@@ -57,7 +55,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -213,16 +210,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   @Override
-  public List<File> getAppYamls() {
-    List<File> appYamls = new ArrayList<>();
-    Path appYaml = Paths.get(artifactPointer.getArtifact().getOutputPath());
-    appYamls.add(appYaml.toFile());
-    return appYamls;
-  }
-
-  @Override
   public List<File> getServices() {
-    return null;
+    return ImmutableList.of(Paths.get(artifactPointer.getArtifact().getOutputPath()).toFile());
   }
 
   @Override
@@ -245,96 +234,52 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public String getAdminHost() {
-    return settings.getAdminHost();
-  }
-
-  public void setAdminHost(String adminHost) {
-    settings.setAdminHost(adminHost);
+    return null;
   }
 
   @Override
   public Integer getAdminPort() {
-    return settings.getAdminPort();
-  }
-
-  public void setAdminPort(Integer adminPort) {
-    settings.setAdminPort(adminPort);
+    return null;
   }
 
   @Override
   public String getAuthDomain() {
-    return settings.getAuthDomain();
-  }
-
-  public void setAuthDomain(String authDomain) {
-    settings.setAuthDomain(authDomain);
+    return null;
   }
 
   @Override
-  public String getStoragePath() {
-    return settings.getStoragePath();
-  }
-
-  public void setStoragePath(String storagePath) {
-    settings.setStoragePath(storagePath);
+  public File getStoragePath() {
+    return null;
   }
 
   @Override
   public String getLogLevel() {
-    return settings.getLogLevel();
+    return null;
   }
 
-  public void setLogLevel(String logLevel) {
-    settings.setLogLevel(logLevel);
-  }
-
-  /**
-   * This value is being ignored for the run configuration.
-   * {@link CloudSdkStartupPolicy}
-   */
   @Override
   public Integer getMaxModuleInstances() {
-    return settings.getMaxModuleInstances();
-  }
-
-  public void setMaxModuleInstances(Integer maxModuleInstances) {
-    settings.setMaxModuleInstances(maxModuleInstances);
+    return null;
   }
 
   @Override
   public Boolean getUseMtimeFileWatcher() {
-    return settings.isUseMtimeFileWatcher();
-  }
-
-  public void setUseMtimeFileWatcher(Boolean useMtimeFileWatcher) {
-    settings.setUseMtimeFileWatcher(useMtimeFileWatcher);
+    return null;
   }
 
   @Override
   public String getThreadsafeOverride() {
-    return settings.getThreadsafeOverride();
-  }
-
-  public void setThreadsafeOverride(String threadsafeOverride) {
-    settings.setThreadsafeOverride(threadsafeOverride);
+    return null;
   }
 
   @Override
   public String getPythonStartupScript() {
-    return settings.getPythonStartupScript();
-  }
-
-  public void setPythonStartupScript(String pythonStartupScript) {
-    settings.setPythonStartupScript(pythonStartupScript);
+    return null;
   }
 
   @Override
   public String getPythonStartupArgs() {
-    return settings.getPythonStartupArgs();
-  }
-
-  public void setPythonStartupArgs(String pythonStartupArgs) {
-    settings.setPythonStartupArgs(pythonStartupArgs);
+    return null;
   }
 
   @Override
@@ -344,73 +289,45 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
         : new ArrayList<String>();
   }
 
-  public void addAllJvmFlags(Collection<String> flags) {
-    settings.setJvmFlags(settings.getJvmFlags() == null
-        ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
-        : settings.getJvmFlags() + JVM_FLAG_DELIMITER + Joiner.on(JVM_FLAG_DELIMITER).join(flags));
+  @Override
+  public String getRuntime() {
+    return null;
   }
 
   @Override
   public String getCustomEntrypoint() {
-    return settings.getCustomEntrypoint();
-  }
-
-  public void setCustomEntrypoint(String customEntrypoint) {
-    settings.setCustomEntrypoint(customEntrypoint);
-  }
-
-  @Override
-  public String getRuntime() {
-    return settings.getRuntime();
-  }
-
-  public void setRuntime(String runtime) {
-    settings.setRuntime(runtime);
+    return null;
   }
 
   @Override
   public Boolean getAllowSkippedFiles() {
-    return settings.isAllowSkippedFiles();
-  }
-
-  public void setAllowSkippedFiles(Boolean allowSkippedFiles) {
-    settings.setAllowSkippedFiles(allowSkippedFiles);
+    return null;
   }
 
   @Override
   public Integer getApiPort() {
-    return settings.getApiPort();
-  }
-
-  public void setApiPort(Integer apiPort) {
-    settings.setApiPort(apiPort);
+    return null;
   }
 
   @Override
   public Boolean getAutomaticRestart() {
-    return settings.isAutomaticRestart();
-  }
-
-  public void setAutomaticRestart(Boolean automaticRestart) {
-    settings.setAutomaticRestart(automaticRestart);
+    return null;
   }
 
   @Override
   public String getDevAppserverLogLevel() {
-    return settings.getDevAppserverLogLevel();
-  }
-
-  public void setDevAppserverLogLevel(String devAppserverLogLevel) {
-    settings.setDevAppserverLogLevel(devAppserverLogLevel);
+    return null;
   }
 
   @Override
   public Boolean getSkipSdkUpdateCheck() {
-    return settings.isSkipSdkUpdateCheck();
+    return null;
   }
 
-  public void setSkipSdkUpdateCheck(Boolean skipSdkUpdateCheck) {
-    settings.setSkipSdkUpdateCheck(skipSdkUpdateCheck);
+  public void addAllJvmFlags(Collection<String> flags) {
+    settings.setJvmFlags(settings.getJvmFlags() == null
+        ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
+        : settings.getJvmFlags() + JVM_FLAG_DELIMITER + Joiner.on(JVM_FLAG_DELIMITER).join(flags));
   }
 
   @Override
@@ -423,12 +340,13 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   @Override
-  public Boolean getClearDatastore() {
-    return settings.isClearDatastore();
+  public File getDatastorePath() {
+    return null;
   }
 
-  public void setClearDatastore(Boolean clearDatastore) {
-    settings.setClearDatastore(clearDatastore);
+  @Override
+  public Boolean getClearDatastore() {
+    return null;
   }
 
   /**
@@ -448,44 +366,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private String host = "localhost";
     @Tag("port")
     private Integer port = 8080;
-    @Tag("admin_host")
-    private String adminHost = "localhost";
-    @Tag("admin_port")
-    private Integer adminPort = 8000;
-    @Tag("auth_domain")
-    private String authDomain;
-    @Tag("storage_path")
-    private String storagePath;
-    @Tag("log_level")
-    private String logLevel = "info";
-    @Tag("max_module_instances")
-    private Integer maxModuleInstances;
-    @Tag("use_mtime_file_watcher")
-    private boolean useMtimeFileWatcher;
-    @Tag("threadsafe_override")
-    private String threadsafeOverride;
-    @Tag("python_startup_script")
-    private String pythonStartupScript;
-    @Tag("python_startup_args")
-    private String pythonStartupArgs;
     @Tag("jvm_flags")
     private String jvmFlags;
-    @Tag("custom_entrypoint")
-    private String customEntrypoint;
-    @Tag("runtime")
-    private String runtime;
-    @Tag("allow_skipped_files")
-    private boolean allowSkippedFiles;
-    @Tag("api_port")
-    private Integer apiPort;
-    @Tag("automatic_restart")
-    private Boolean automaticRestart = true;
-    @Tag("clear_datastore")
-    private Boolean clearDatastore = false;
-    @Tag("devappserver_log_level")
-    private String devAppserverLogLevel;
-    @Tag("skip_sdk_update_check")
-    private Boolean skipSdkUpdateCheck;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
 
@@ -513,86 +395,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       this.port = port;
     }
 
-    String getAdminHost() {
-      return adminHost;
-    }
-
-    void setAdminHost(String adminHost) {
-      this.adminHost = adminHost;
-    }
-
-    Integer getAdminPort() {
-      return adminPort;
-    }
-
-    void setAdminPort(Integer adminPort) {
-      this.adminPort = adminPort;
-    }
-
-    String getAuthDomain() {
-      return authDomain;
-    }
-
-    void setAuthDomain(String authDomain) {
-      this.authDomain = authDomain;
-    }
-
-    String getStoragePath() {
-      return storagePath;
-    }
-
-    void setStoragePath(String storagePath) {
-      this.storagePath = storagePath;
-    }
-
-    String getLogLevel() {
-      return logLevel;
-    }
-
-    void setLogLevel(String logLevel) {
-      this.logLevel = logLevel;
-    }
-
-    Integer getMaxModuleInstances() {
-      return maxModuleInstances;
-    }
-
-    void setMaxModuleInstances(Integer maxModuleInstances) {
-      this.maxModuleInstances = maxModuleInstances;
-    }
-
-    Boolean isUseMtimeFileWatcher() {
-      return useMtimeFileWatcher;
-    }
-
-    void setUseMtimeFileWatcher(boolean useMtimeFileWatcher) {
-      this.useMtimeFileWatcher = useMtimeFileWatcher;
-    }
-
-    String getThreadsafeOverride() {
-      return threadsafeOverride;
-    }
-
-    void setThreadsafeOverride(String threadsafeOverride) {
-      this.threadsafeOverride = threadsafeOverride;
-    }
-
-    String getPythonStartupScript() {
-      return pythonStartupScript;
-    }
-
-    void setPythonStartupScript(String pythonStartupScript) {
-      this.pythonStartupScript = pythonStartupScript;
-    }
-
-    String getPythonStartupArgs() {
-      return pythonStartupArgs;
-    }
-
-    void setPythonStartupArgs(String pythonStartupArgs) {
-      this.pythonStartupArgs = pythonStartupArgs;
-    }
-
     String getJvmFlags() {
       return jvmFlags;
     }
@@ -601,76 +403,12 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
       this.jvmFlags = jvmFlags;
     }
 
-    String getCustomEntrypoint() {
-      return customEntrypoint;
-    }
-
-    void setCustomEntrypoint(String customEntrypoint) {
-      this.customEntrypoint = customEntrypoint;
-    }
-
-    String getRuntime() {
-      return runtime;
-    }
-
-    void setRuntime(String runtime) {
-      this.runtime = runtime;
-    }
-
-    Boolean isAllowSkippedFiles() {
-      return allowSkippedFiles;
-    }
-
-    void setAllowSkippedFiles(boolean allowSkippedFiles) {
-      this.allowSkippedFiles = allowSkippedFiles;
-    }
-
-    Integer getApiPort() {
-      return apiPort;
-    }
-
-    void setApiPort(Integer apiPort) {
-      this.apiPort = apiPort;
-    }
-
-    Boolean isAutomaticRestart() {
-      return automaticRestart;
-    }
-
-    void setAutomaticRestart(boolean automaticRestart) {
-      this.automaticRestart = automaticRestart;
-    }
-
-    String getDevAppserverLogLevel() {
-      return devAppserverLogLevel;
-    }
-
-    void setDevAppserverLogLevel(String devAppserverLogLevel) {
-      this.devAppserverLogLevel = devAppserverLogLevel;
-    }
-
-    Boolean isSkipSdkUpdateCheck() {
-      return skipSdkUpdateCheck;
-    }
-
-    void setSkipSdkUpdateCheck(boolean skipSdkUpdateCheck) {
-      this.skipSdkUpdateCheck = skipSdkUpdateCheck;
-    }
-
     String getDefaultGcsBucketName() {
       return defaultGcsBucketName;
     }
 
     void setDefaultGcsBucketName(String defaultGcsBucketName) {
       this.defaultGcsBucketName = defaultGcsBucketName;
-    }
-
-    Boolean isClearDatastore() {
-      return clearDatastore;
-    }
-
-    void setClearDatastore(boolean clearDatastore) {
-      this.clearDatastore = clearDatastore;
     }
 
     @Override

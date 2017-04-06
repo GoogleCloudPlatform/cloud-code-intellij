@@ -35,7 +35,6 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -55,11 +54,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JTextField host;
   private JBLabel myPortLabel;
   private JTextField port;
-  private JTextField adminHost;
-  private JTextField adminPort;
-  private JTextField apiPort;
-  private JComboBox applicationLogLevel;
-  private JCheckBox cleadDatastoreCheckbox;
   private JPanel appEngineSettingsPanel;
   private Artifact myLastSelectedArtifact;
 
@@ -117,11 +111,6 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     myArtifactComboBox.setSelectedItem(artifact);
     port.setText(intToString(serverModel.getPort()));
     host.setText(serverModel.getHost());
-    adminHost.setText(serverModel.getAdminHost());
-    adminPort.setText(intToString(serverModel.getAdminPort()));
-    apiPort.setText(intToString(serverModel.getApiPort()));
-    applicationLogLevel.setSelectedItem(serverModel.getLogLevel());
-    cleadDatastoreCheckbox.setSelected(serverModel.getClearDatastore());
   }
 
   @Override
@@ -129,19 +118,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     final AppEngineServerModel serverModel = (AppEngineServerModel) commonModel.getServerModel();
     serverModel.setPort(validateInteger(port.getText(), "port"));
     serverModel.setArtifact(getSelectedArtifact());
-
     serverModel.setHost(host.getText());
-    serverModel.setAdminHost(adminHost.getText());
-    if (!adminPort.getText().isEmpty()) {
-      serverModel.setAdminPort(validateInteger(adminPort.getText(), "admin port"));
-    }
-
-    if (!apiPort.getText().isEmpty()) {
-      serverModel.setApiPort(validateInteger(apiPort.getText(), "API port"));
-    }
-
-    serverModel.setLogLevel((String) applicationLogLevel.getSelectedItem());
-    serverModel.setClearDatastore(cleadDatastoreCheckbox.isSelected());
   }
 
   private Integer validateInteger(String intText, String description)
