@@ -360,6 +360,11 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   }
 
   @VisibleForTesting
+  JCheckBox getDeployAllAppEngineConfigsCheckBox() {
+    return deployAllAppEngineConfigsCheckBox;
+  }
+
+  @VisibleForTesting
   void setProjectSelector(ProjectSelector projectSelector) {
     this.projectSelector = projectSelector;
   }
