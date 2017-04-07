@@ -53,8 +53,8 @@ public class AppEngineDeploy {
   private static final Logger logger = Logger.getInstance(AppEngineDeploy.class);
   private static final String APPENGINE_GENERATED_DIR = "WEB-INF/appengine-generated/";
   private static final ImmutableList<String> APPENGINE_CONFIG_FILE_PATHS = ImmutableList.of(
-      APPENGINE_GENERATED_DIR + "index.yaml", // Deploy indexes first since the app needs them.
       "app.yaml",
+      APPENGINE_GENERATED_DIR + "index.yaml",
       APPENGINE_GENERATED_DIR + "cron.yaml",
       APPENGINE_GENERATED_DIR + "dos.yaml",
       APPENGINE_GENERATED_DIR + "dispatch.yaml",
