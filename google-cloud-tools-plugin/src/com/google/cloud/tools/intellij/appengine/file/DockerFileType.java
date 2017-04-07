@@ -57,7 +57,6 @@ public class DockerFileType extends LanguageFileType {
   @Nullable
   @Override
   public Icon getIcon() {
-    // TODO Better icon for Dockerfiles?
     return StdFileTypes.PLAIN_TEXT.getIcon();
   }
 }

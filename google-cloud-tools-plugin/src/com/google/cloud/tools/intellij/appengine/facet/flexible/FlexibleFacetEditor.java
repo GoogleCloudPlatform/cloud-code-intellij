@@ -303,7 +303,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           }
         }
 
-        // TODO error handling on this run
         configFileGenerator.run();
 
         filePicker.setText(destinationFilePath.toString());

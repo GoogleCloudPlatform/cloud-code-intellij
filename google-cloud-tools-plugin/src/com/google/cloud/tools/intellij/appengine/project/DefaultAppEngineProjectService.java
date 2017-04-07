@@ -334,7 +334,10 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   @Override
   public void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module) {
-    // TODO handle unknown artifact types
+    if (type == AppEngineFlexibleDeploymentArtifactType.UNKNOWN) {
+      throw new RuntimeException("Cannot generate Dockerfile for unknown artifact type.");
+    }
+
     PsiElement element = generateFromTemplate(
         type == AppEngineFlexibleDeploymentArtifactType.JAR
             ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
