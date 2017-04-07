@@ -68,6 +68,8 @@ public class AppEngineDeploymentConfiguration extends
   private boolean promote;
   private boolean stopPreviousVersion;
   private String version;
+  private boolean deployAllConfigs;
+
 
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
@@ -122,6 +124,15 @@ public class AppEngineDeploymentConfiguration extends
   @Attribute("version")
   public String getVersion() {
     return version;
+  }
+
+  @Attribute("deployAllConfigs")
+  public boolean isDeployAllConfigs() {
+    return deployAllConfigs;
+  }
+
+  public void setDeployAllConfigs(boolean deployAllConfigs) {
+    this.deployAllConfigs = deployAllConfigs;
   }
 
   public void setConfigType(@NotNull ConfigType configType) {
