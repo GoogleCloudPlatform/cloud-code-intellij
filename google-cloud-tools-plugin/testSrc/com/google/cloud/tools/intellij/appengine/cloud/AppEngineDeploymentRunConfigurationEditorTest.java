@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,8 +25,6 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.common.collect.ImmutableSet;
 
-import com.intellij.execution.configurations.RuntimeConfigurationError;
-import com.intellij.execution.configurations.RuntimeConfigurationWarning;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
@@ -36,9 +33,7 @@ import com.intellij.testFramework.PlatformTestCase;
 import org.apache.commons.lang.StringUtils;
 import org.picocontainer.MutablePicoContainer;
 
-import java.nio.file.Path;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.swing.JCheckBox;
 
@@ -149,6 +144,8 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
 
     assertEquals("App Engine Standard Environment", editor.getEnvironmentLabel().getText());
     assertFalse(editor.getAppEngineFlexConfigPanel().isVisible());
+    assertTrue(editor.getDeployAllAppEngineConfigsCheckBox().isVisible());
+    assertFalse(editor.getDeployAllAppEngineConfigsCheckBox().isSelected());
     Disposer.dispose(editor);
   }
 
@@ -161,6 +158,7 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
 
     assertEquals("App Engine Flexible Environment", editor.getEnvironmentLabel().getText());
     assertTrue(editor.getAppEngineFlexConfigPanel().isVisible());
+    assertFalse(editor.getDeployAllAppEngineConfigsCheckBox().isVisible());
     Disposer.dispose(editor);
   }
 
