@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 ## [unreleased]
 
+## [17.2.4_2017]
+
+### Added
+  - Added a checkbox to deploy all App Engine config files during service deployment. [#1346](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1346)
+
 ## [17.2.3_2017]
 
 ### Changed

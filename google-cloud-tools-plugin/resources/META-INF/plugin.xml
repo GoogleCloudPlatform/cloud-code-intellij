@@ -43,7 +43,13 @@
       </p>
       <br/>
 
-      <h2>[17.2.2]</h2>
+      <h2>[17.2.4_2017]</h2>
+      <h3>Added</h3>
+      <ul>
+        <li>Added a checkbox to deploy all App Engine config files during service deployment. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1346">#1346</a>)</li>
+      </ul>
+
+      <h2>[17.2.3_2017]</h2>
       <h3>Changed</h3>
       <ul>
         <li>Removed the Clear Datastore flag from the App Engine standard local development server configuration since the current version of the server doesn't support it. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1345">#1345</a>)</li>
