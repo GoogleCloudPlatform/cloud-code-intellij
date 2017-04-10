@@ -4,6 +4,7 @@
 .idea/misc.xml
 .idea/gradle.xml
 .idea/libraries/
+.idea/shelf/
 **/*.iml
 .gradle/
 **/build/
