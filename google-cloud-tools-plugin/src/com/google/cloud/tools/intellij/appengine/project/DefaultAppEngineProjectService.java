@@ -29,6 +29,7 @@ import com.intellij.facet.FacetManager;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.FileTemplateUtil;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
@@ -351,11 +352,12 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       // Remove the .docker extension to satisfy the Docker convention. This extension was added
       // since the templating mechanism requires an extension or else a default template type of
       // "java" will be assumed.
-      RenamePsiElementProcessor.DEFAULT.renameElement(
-          element,
-          "Dockerfile" /*newName*/,
-          UsageInfo.EMPTY_ARRAY,
-          null /*listener*/);
+      ApplicationManager.getApplication().runWriteAction(() ->
+          RenamePsiElementProcessor.DEFAULT.renameElement(
+              element,
+              "Dockerfile" /*newName*/,
+              UsageInfo.EMPTY_ARRAY,
+              null /*listener*/));
     }
   }
 
