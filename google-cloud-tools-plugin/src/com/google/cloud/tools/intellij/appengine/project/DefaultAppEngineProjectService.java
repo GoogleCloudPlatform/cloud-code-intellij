@@ -35,6 +35,7 @@ import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.psi.PsiDirectory;
@@ -374,34 +375,37 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
           .findDirectory(virtualFile);
 
       if (directory != null) {
-        PsiDirectory configDirectory;
-        try {
-          directory.checkCreateSubdirectory(templateDirectoryName);
-          configDirectory = directory.createSubdirectory(templateDirectoryName);
-        } catch (IncorrectOperationException ioe) {
-          // checkCreateSubdirectory threw an exception suggesting that the directory may already
-          // exist. Skip creating the directory and attempt to write file.
-          configDirectory = directory.findSubdirectory(templateDirectoryName);
-        }
-
-        if (configDirectory != null
-            && FileTemplateUtil.canCreateFromTemplate(
-            new PsiDirectory[]{configDirectory}, configTemplate)) {
+        ApplicationManager.getApplication().runWriteAction((Computable<PsiElement>) () -> {
+          PsiDirectory configDirectory;
           try {
-            return FileTemplateUtil.createFromTemplate(
-                configTemplate,
-                fileName,
-                templateProperties,
-                configDirectory);
-          } catch (Exception e) {
-            // If the file already exists, this exception will be thrown by createFromTemplate
-            // We want to silently skip the generation in this case.
-            logger.debug("Failed to create app yaml from template. " + e.getMessage());
+            directory.checkCreateSubdirectory(templateDirectoryName);
+            configDirectory = directory.createSubdirectory(templateDirectoryName);
+          } catch (IncorrectOperationException ioe) {
+            // checkCreateSubdirectory threw an exception suggesting that the directory may already
+            // exist. Skip creating the directory and attempt to write file.
+            configDirectory = directory.findSubdirectory(templateDirectoryName);
           }
-        }
+
+          if (configDirectory != null
+              && FileTemplateUtil.canCreateFromTemplate(
+              new PsiDirectory[]{configDirectory}, configTemplate)) {
+            try {
+              return FileTemplateUtil.createFromTemplate(
+                  configTemplate,
+                  fileName,
+                  templateProperties,
+                  configDirectory);
+            } catch (Exception e) {
+              // If the file already exists, this exception will be thrown by createFromTemplate
+              // We want to silently skip the generation in this case.
+              logger.debug("Failed to create app yaml from template. " + e.getMessage());
+            }
+          }
+
+          return null;
+        });
       }
     }
-
     return null;
   }
 
