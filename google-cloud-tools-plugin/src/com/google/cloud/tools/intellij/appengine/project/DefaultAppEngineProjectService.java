@@ -35,7 +35,6 @@ import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.psi.PsiDirectory;
@@ -326,12 +325,14 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
         FileTemplateManager.getDefaultInstance().getDefaultProperties();
     templateProperties.put("RUNTIME", runtime.configLabel());
 
-    generateFromTemplate(
-        AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE,
-        "appengine",
-        "app.yaml",
-        templateProperties,
-        module);
+    ApplicationManager.getApplication().runWriteAction(() -> {
+      generateFromTemplate(
+          AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE,
+          "appengine",
+          "app.yaml",
+          templateProperties,
+          module);
+    });
   }
 
   @Override
@@ -340,26 +341,27 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       throw new RuntimeException("Cannot generate Dockerfile for unknown artifact type.");
     }
 
-    PsiElement element = generateFromTemplate(
-        type == AppEngineFlexibleDeploymentArtifactType.JAR
-            ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
-            : AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_WAR_TEMPLATE,
-        "docker",
-        "Dockerfile",
-        FileTemplateManager.getDefaultInstance().getDefaultProperties(),
-        module);
+    ApplicationManager.getApplication().runWriteAction(() -> {
+      PsiElement element = generateFromTemplate(
+          type == AppEngineFlexibleDeploymentArtifactType.JAR
+              ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
+              : AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_WAR_TEMPLATE,
+          "docker",
+          "Dockerfile",
+          FileTemplateManager.getDefaultInstance().getDefaultProperties(),
+          module);
 
-    if (element != null) {
-      // Remove the .docker extension to satisfy the Docker convention. This extension was added
-      // since the templating mechanism requires an extension or else a default template type of
-      // "java" will be assumed.
-      ApplicationManager.getApplication().runWriteAction(() ->
-          RenamePsiElementProcessor.DEFAULT.renameElement(
-              element,
-              "Dockerfile" /*newName*/,
-              UsageInfo.EMPTY_ARRAY,
-              null /*listener*/));
-    }
+      if (element != null) {
+        // Remove the .docker extension to satisfy the Docker convention. This extension was added
+        // since the templating mechanism requires an extension or else a default template type of
+        // "java" will be assumed.
+        RenamePsiElementProcessor.DEFAULT.renameElement(
+            element,
+            "Dockerfile" /*newName*/,
+            UsageInfo.EMPTY_ARRAY,
+            null /*listener*/);
+      }
+    });
   }
 
   @Nullable
@@ -375,37 +377,34 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
           .findDirectory(virtualFile);
 
       if (directory != null) {
-        ApplicationManager.getApplication().runWriteAction((Computable<PsiElement>) () -> {
-          PsiDirectory configDirectory;
+        PsiDirectory configDirectory;
+        try {
+          directory.checkCreateSubdirectory(templateDirectoryName);
+          configDirectory = directory.createSubdirectory(templateDirectoryName);
+        } catch (IncorrectOperationException ioe) {
+          // checkCreateSubdirectory threw an exception suggesting that the directory may already
+          // exist. Skip creating the directory and attempt to write file.
+          configDirectory = directory.findSubdirectory(templateDirectoryName);
+        }
+
+        if (configDirectory != null
+            && FileTemplateUtil.canCreateFromTemplate(
+            new PsiDirectory[]{configDirectory}, configTemplate)) {
           try {
-            directory.checkCreateSubdirectory(templateDirectoryName);
-            configDirectory = directory.createSubdirectory(templateDirectoryName);
-          } catch (IncorrectOperationException ioe) {
-            // checkCreateSubdirectory threw an exception suggesting that the directory may already
-            // exist. Skip creating the directory and attempt to write file.
-            configDirectory = directory.findSubdirectory(templateDirectoryName);
+            return FileTemplateUtil.createFromTemplate(
+                configTemplate,
+                fileName,
+                templateProperties,
+                configDirectory);
+          } catch (Exception e) {
+            // If the file already exists, this exception will be thrown by createFromTemplate
+            // We want to silently skip the generation in this case.
+            logger.debug("Failed to create app yaml from template. " + e.getMessage());
           }
-
-          if (configDirectory != null
-              && FileTemplateUtil.canCreateFromTemplate(
-              new PsiDirectory[]{configDirectory}, configTemplate)) {
-            try {
-              return FileTemplateUtil.createFromTemplate(
-                  configTemplate,
-                  fileName,
-                  templateProperties,
-                  configDirectory);
-            } catch (Exception e) {
-              // If the file already exists, this exception will be thrown by createFromTemplate
-              // We want to silently skip the generation in this case.
-              logger.debug("Failed to create app yaml from template. " + e.getMessage());
-            }
-          }
-
-          return null;
-        });
+        }
       }
     }
+
     return null;
   }
 
