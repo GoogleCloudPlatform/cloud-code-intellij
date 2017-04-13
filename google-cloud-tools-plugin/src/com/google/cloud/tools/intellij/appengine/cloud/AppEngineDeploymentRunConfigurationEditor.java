@@ -170,12 +170,14 @@ public class AppEngineDeploymentRunConfigurationEditor extends
       appEngineCostWarningLabel.setBackground(editorPanel.getBackground());
       environmentLabel.setText(getEnvironmentDisplayableLabel());
       deployAllAppEngineConfigsCheckBox.setVisible(false);
+      deployAllConfigsCheckboxLabel.setVisible(false);
     } else {
       appEngineCostWarningLabel.setVisible(false);
       environmentLabel.setText(environment.localizedLabel());
       stopPreviousVersionLabel.setVisible(false);
       stopPreviousVersionCheckbox.setVisible(false);
       deployAllAppEngineConfigsCheckBox.setVisible(true);
+      deployAllConfigsCheckboxLabel.setVisible(true);
     }
 
     configTypeComboBox.setModel(new DefaultComboBoxModel(ConfigType.values()));
@@ -362,6 +364,11 @@ public class AppEngineDeploymentRunConfigurationEditor extends
   @VisibleForTesting
   JCheckBox getDeployAllAppEngineConfigsCheckBox() {
     return deployAllAppEngineConfigsCheckBox;
+  }
+
+  @VisibleForTesting
+  public JLabel getDeployAllConfigsCheckboxLabel() {
+    return deployAllConfigsCheckboxLabel;
   }
 
   @VisibleForTesting
