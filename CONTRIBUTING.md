@@ -61,7 +61,9 @@ Other useful targets while developing include:
 1. Select the root build.gradle file to import
 1. Git revert changes to the .idea folder because IDEA Gradle import blows it away
  (https://youtrack.jetbrains.com/issue/IDEA-146295)
-1. Run or debug the **Cloud Tools on IntelliJ** run configuration
+
+### Run/Debug
+The **Cloud Tools on IntelliJ** run configuration can be use to run or debug the project. To set which IntelliJ IDEA edition to launch when running or debugging, update the ideaEdition flag in [gradle.properties](https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/c5bbf8d018806f370d664622b70d5744480edc86/gradle.properties#L17) using IU for Ultimate Edition and IC for Community Edition.
 
 ## Contributing code
 
