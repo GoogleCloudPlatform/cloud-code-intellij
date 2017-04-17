@@ -42,7 +42,7 @@ public class DockerFileType extends LanguageFileType {
   @NotNull
   @Override
   public String getName() {
-    return "App Engine Dockerfile";
+    return "App Engine Dockerfile Template";
   }
 
   @NotNull
