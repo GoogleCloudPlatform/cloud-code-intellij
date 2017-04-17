@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineTemplateGroupDescriptorFactory;
@@ -28,6 +29,7 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.FrameworkTypeEx;
@@ -51,6 +53,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.RemoteServersManager;
+import com.intellij.remoteServer.configuration.deployment.DeploymentConfiguration;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationType;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
@@ -62,6 +65,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -175,25 +179,47 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
 
   private static void setupDeploymentRunConfiguration(Module module) {
     RunManager runManager = RunManager.getInstance(module.getProject());
-    AppEngineCloudType serverType =
-        ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
-    DeployToServerConfigurationType configurationType
-        = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
 
-    RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
-        configurationType.getDisplayName(), configurationType.getFactory());
+    if (!hasFlexibleDeploymentConfiguration(runManager.getAllConfigurationsList())) {
+      AppEngineCloudType serverType =
+          ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
+      DeployToServerConfigurationType configurationType
+          = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
 
-    // Sets the GAE Flex server, if any exists, in the run config.
-    DeployToServerRunConfiguration<?, AppEngineDeploymentConfiguration> runConfiguration =
-        (DeployToServerRunConfiguration<?, AppEngineDeploymentConfiguration>)
-            settings.getConfiguration();
-    RemoteServer<AppEngineServerConfiguration> server =
-        ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
-    if (server != null) {
-      runConfiguration.setServerName(server.getName());
+      RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
+          configurationType.getDisplayName(), configurationType.getFactory());
+
+      // Sets the GAE Flex server, if any exists, in the run config.
+      DeployToServerRunConfiguration<?, AppEngineDeploymentConfiguration> runConfiguration =
+          (DeployToServerRunConfiguration<?, AppEngineDeploymentConfiguration>)
+              settings.getConfiguration();
+      RemoteServer<AppEngineServerConfiguration> server =
+          ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
+      if (server != null) {
+        runConfiguration.setServerName(server.getName());
+      }
+
+      runManager.addConfiguration(settings, false /* shared */);
     }
+  }
 
-    runManager.addConfiguration(settings, false /* shared */);
+  private static boolean hasFlexibleDeploymentConfiguration(List<RunConfiguration> runConfigs) {
+    return runConfigs.stream()
+        .anyMatch(runConfig -> {
+          if (runConfig instanceof DeployToServerRunConfiguration) {
+            DeploymentConfiguration deployConfig
+                = ((DeployToServerRunConfiguration) runConfig).getDeploymentConfiguration();
+
+            if (deployConfig instanceof AppEngineDeploymentConfiguration) {
+              String environment
+                  = ((AppEngineDeploymentConfiguration) deployConfig).getEnvironment();
+
+              return AppEngineEnvironment.APP_ENGINE_FLEX.name().equals(environment);
+            }
+          }
+
+          return false;
+        });
   }
 
   static class AppEngineFlexibleSupportConfigurable extends FrameworkSupportInModuleConfigurable {
