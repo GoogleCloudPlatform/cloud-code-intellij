@@ -18,8 +18,6 @@ package com.google.cloud.tools.intellij.appengine.file;
 
 import com.intellij.lang.Language;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Barebones implementation for the Docker language required by {@link DockerFileType}.
  */
@@ -29,11 +27,5 @@ public class DockerFileLanguage extends Language {
 
   private DockerFileLanguage() {
     super("Docker");
-  }
-
-  @NotNull
-  @Override
-  public String getDisplayName() {
-    return "Docker";
   }
 }

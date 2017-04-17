@@ -37,9 +37,9 @@ public class AppEngineTemplateGroupDescriptorFactory implements FileTemplateGrou
   @NonNls
   public static final String APP_YAML_TEMPLATE = "app.yaml";
   @NonNls
-  public static final String DOCKERFILE_WAR_TEMPLATE = "WarDockerfile.docker";
+  public static final String DOCKERFILE_WAR_TEMPLATE = "WarDockerfile.gaedocker";
   @NonNls
-  public static final String DOCKERFILE_JAR_TEMPLATE = "JarDockerfile.docker";
+  public static final String DOCKERFILE_JAR_TEMPLATE = "JarDockerfile.gaedocker";
 
   @Override
   public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {

@@ -25,12 +25,15 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.Icon;
 
 /**
- * Representation of the Docker configuration file type.
+ * Representation of the Docker configuration file type used for generation of Dockerfile's from
+ * templates. The "dummy" extension is needed so that the template system will work. It is up to the
+ * generating code to handle this - i.e. remove the extension after generation to comply with the
+ * extension'less Dockerfile convention.
  */
 public class DockerFileType extends LanguageFileType {
 
   public static final DockerFileType INSTANCE = new DockerFileType();
-  static final String DEFAULT_EXTENSION = "docker";
+  static final String DEFAULT_EXTENSION = "gaedocker";
 
   private DockerFileType() {
     super(DockerFileLanguage.INSTANCE);
@@ -39,7 +42,7 @@ public class DockerFileType extends LanguageFileType {
   @NotNull
   @Override
   public String getName() {
-    return "Docker";
+    return "App Engine Dockerfile";
   }
 
   @NotNull
@@ -51,7 +54,7 @@ public class DockerFileType extends LanguageFileType {
   @NotNull
   @Override
   public String getDescription() {
-    return "Dockerfile";
+    return "App Engine Dockerfile Template";
   }
 
   @Nullable
