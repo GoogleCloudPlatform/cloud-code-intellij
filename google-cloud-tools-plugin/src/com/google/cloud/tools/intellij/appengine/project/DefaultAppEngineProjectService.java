@@ -399,10 +399,14 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
           } catch (Exception e) {
             // If the file already exists, this exception will be thrown by createFromTemplate
             // We want to silently skip the generation in this case.
-            logger.debug("Failed to create app yaml from template. " + e.getMessage());
+            logger.debug("Failed to create app.yaml from template. " + e.getMessage());
           }
+        } else {
+          logger.error("Failed to create app.yaml from template in directory: " + configDirectory);
         }
       }
+    } else {
+      logger.error("Failed to located source root for app.yaml creation.");
     }
 
     return null;
