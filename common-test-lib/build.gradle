@@ -17,4 +17,5 @@
 dependencies {
     compile 'junit:junit:4.+'
     compile 'org.mockito:mockito-all:1.9.5'
+    compile fileTree(dir: 'third_party/fest', include: '*.jar')
 }
