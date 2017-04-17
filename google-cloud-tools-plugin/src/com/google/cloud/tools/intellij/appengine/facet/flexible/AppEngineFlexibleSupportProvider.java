@@ -204,7 +204,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   }
 
   private static boolean hasFlexibleDeploymentConfiguration(List<RunConfiguration> runConfigs) {
-    return runConfigs.stream()
+    return runConfigs
+        .stream()
         .anyMatch(runConfig -> {
           if (runConfig instanceof DeployToServerRunConfiguration) {
             DeploymentConfiguration deployConfig
