@@ -1,2 +1,2 @@
-runtime: java
+runtime: ${RUNTIME}
 env: flex

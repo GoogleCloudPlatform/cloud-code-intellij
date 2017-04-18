@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmationDialog;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmationDialog.DialogType;
@@ -32,13 +30,12 @@ import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.icons.AllIcons.Ide;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Comparing;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.ui.DocumentAdapter;
 
 import org.jetbrains.annotations.Nls;
@@ -46,13 +43,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -77,17 +71,15 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JLabel errorIcon;
   private JLabel errorMessage;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
-  private AppEngineHelper appEngineHelper;
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
-      @NotNull Project project) {
-    this.appEngineHelper = new CloudSdkAppEngineHelper(project);
+      @NotNull Module module) {
     this.facetConfiguration = facetConfiguration;
 
     appYaml.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
         null /* description */,
-        project,
+        module.getProject(),
         FileChooserDescriptorFactory.createSingleFileDescriptor().withFileFilter(
             virtualFile -> Comparing.equal(virtualFile.getExtension(), "yaml")
                 || Comparing.equal(virtualFile.getExtension(), "yml")
@@ -112,17 +104,26 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     dockerfile.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.dockerfile"),
         null /* description */,
-        project,
+        module.getProject(),
         FileChooserDescriptorFactory.createSingleFileDescriptor()
     );
 
-    genAppYamlButton.addActionListener(new GenerateConfigActionListener(project, "app.yaml",
-        () -> appEngineHelper.defaultAppYaml(FlexibleRuntime.java), appYaml,
-        this::showWarnings));
+    genAppYamlButton.addActionListener(
+        new GenerateConfigActionListener(
+            module.getProject(),
+            "app.yaml",
+            () -> APP_ENGINE_PROJECT_SERVICE.generateAppYaml(FlexibleRuntime.JAVA, module),
+            appYaml,
+            this::showWarnings));
 
-    genDockerfileButton.addActionListener(new GenerateConfigActionListener(project, "Dockerfile",
-        () -> appEngineHelper.defaultDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR),
-        dockerfile, this::showWarnings
+    genDockerfileButton.addActionListener(
+        new GenerateConfigActionListener(
+            module.getProject(),
+            "Dockerfile",
+            () -> APP_ENGINE_PROJECT_SERVICE
+                .generateDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR, module),
+            dockerfile,
+            this::showWarnings
     ));
 
     appYaml.setText(facetConfiguration.getAppYamlPath());
@@ -188,7 +189,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private boolean isRuntimeCustom() throws MalformedYamlFileException {
     return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(appYaml.getText())
-        .filter(runtime -> runtime == FlexibleRuntime.custom)
+        .filter(runtime -> runtime == FlexibleRuntime.CUSTOM)
         .isPresent();
   }
 
@@ -261,28 +262,25 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     private final Project project;
     private final String fileName;
     private final TextFieldWithBrowseButton filePicker;
-    private final Supplier<Optional<Path>> sourceFileProvider;
+    private final Runnable configFileGenerator;
     // Used to refresh the warnings.
     private final Runnable configurationValidator;
 
     GenerateConfigActionListener(
         Project project,
         String fileName,
-        Supplier<Optional<Path>> sourceFileProvider,
+        Runnable configFileGenerator,
         TextFieldWithBrowseButton filePicker,
         Runnable configurationValidator) {
       this.project = project;
       this.fileName = fileName;
-      this.sourceFileProvider = sourceFileProvider;
+      this.configFileGenerator = configFileGenerator;
       this.filePicker = filePicker;
       this.configurationValidator = configurationValidator;
     }
 
     @Override
     public void actionPerformed(ActionEvent event) {
-      Path sourceFile = sourceFileProvider.get().orElseThrow(
-          () -> new AssertionError("Invalid location for " + fileName));
-
       SelectConfigDestinationFolderDialog destinationFolderDialog = new
           SelectConfigDestinationFolderDialog(project, filePicker.getText());
       if (destinationFolderDialog.showAndGet()) {
@@ -290,10 +288,10 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         Path destinationFilePath = destinationFolderPath.resolve(fileName);
 
         if (Files.exists(destinationFilePath)) {
-          if (!new FileConfirmationDialog(
-              project, DialogType.CONFIRM_OVERWRITE, destinationFilePath).showAndGet()) {
-            return;
-          }
+          Messages.showErrorDialog(project,
+              GctBundle.message("appengine.flex.config.generation.file.exists.error",
+                  destinationFilePath.getFileName().toString()), "Error");
+          return;
         } else if (Files.isRegularFile(destinationFolderPath)) {
           new FileConfirmationDialog(
               project, DialogType.NOT_DIRECTORY_ERROR, destinationFolderPath).show();
@@ -305,15 +303,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           }
         }
 
-        try {
-          FileUtil.copy(sourceFile.toFile(), destinationFilePath.toFile());
-          LocalFileSystem.getInstance().refreshAndFindFileByIoFile(destinationFilePath.toFile());
-        } catch (IOException ex) {
-          String message = GctBundle.message(
-              "appengine.flex.config.generation.io.error", destinationFilePath.getFileName());
-          Messages.showErrorDialog(project, message + ex.getLocalizedMessage(), "Error");
-          return;
-        }
+        configFileGenerator.run();
+
         filePicker.setText(destinationFilePath.toString());
         configurationValidator.run();
       }
