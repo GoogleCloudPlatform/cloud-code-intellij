@@ -52,6 +52,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.event.DocumentEvent;
 
 /**
@@ -70,6 +71,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JLabel noDockerfileLabel;
   private JLabel errorIcon;
   private JLabel errorMessage;
+  private JRadioButton jarRadioButton;
+  private JRadioButton warRadioButton;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
