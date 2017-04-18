@@ -48,6 +48,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -62,6 +63,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
       AppEngineProjectService.getInstance();
+
+  private static final boolean IS_WAR_DOCKERFILE_DEFAULT = true;
 
   private JPanel mainPanel;
   private TextFieldWithBrowseButton appYaml;
@@ -131,6 +134,12 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     appYaml.setText(facetConfiguration.getAppYamlPath());
     dockerfile.setText(facetConfiguration.getDockerfilePath());
+
+    ButtonGroup dockerFileTypeGroup = new ButtonGroup();
+    dockerFileTypeGroup.add(jarRadioButton);
+    dockerFileTypeGroup.add(warRadioButton);
+    warRadioButton.setSelected(IS_WAR_DOCKERFILE_DEFAULT);
+    jarRadioButton.setSelected(!IS_WAR_DOCKERFILE_DEFAULT);
 
     errorIcon.setIcon(Ide.Error);
     errorIcon.setVisible(false);
@@ -342,5 +351,15 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @VisibleForTesting
   public JLabel getErrorMessage() {
     return errorMessage;
+  }
+
+  @VisibleForTesting
+  public JRadioButton getJarRadioButton() {
+    return jarRadioButton;
+  }
+
+  @VisibleForTesting
+  public JRadioButton getWarRadioButton() {
+    return warRadioButton;
   }
 }
