@@ -147,7 +147,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
           return Optional.empty();
         }
-        if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.custom).isPresent()
+        if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.CUSTOM).isPresent()
             && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
           callback.errorOccurred(
               GctBundle.getString("appengine.deployment.error.staging.dockerfile"));

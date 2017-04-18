@@ -30,13 +30,13 @@ import javax.swing.Icon;
  * generating code to handle this - i.e. remove the extension after generation to comply with the
  * extension'less Dockerfile convention.
  */
-public class DockerFileType extends LanguageFileType {
+public class DockerFileTemplateType extends LanguageFileType {
 
-  public static final DockerFileType INSTANCE = new DockerFileType();
+  public static final DockerFileTemplateType INSTANCE = new DockerFileTemplateType();
   static final String DEFAULT_EXTENSION = "gaedocker";
 
-  private DockerFileType() {
-    super(DockerFileLanguage.INSTANCE);
+  private DockerFileTemplateType() {
+    super(DockerFileTemplateLanguage.INSTANCE);
   }
 
   @NotNull

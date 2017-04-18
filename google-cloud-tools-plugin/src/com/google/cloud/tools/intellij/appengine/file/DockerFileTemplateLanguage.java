@@ -16,18 +16,16 @@
 
 package com.google.cloud.tools.intellij.appengine.file;
 
-import com.intellij.openapi.fileTypes.FileTypeConsumer;
-import com.intellij.openapi.fileTypes.FileTypeFactory;
-
-import org.jetbrains.annotations.NotNull;
+import com.intellij.lang.Language;
 
 /**
- * Factory for producing the Docker file type, registered in plugin.xml.
+ * Barebones implementation for the Docker language required by {@link DockerFileTemplateType}.
  */
-public class DockerFileTypeFactory extends FileTypeFactory {
+public class DockerFileTemplateLanguage extends Language {
 
-  @Override
-  public void createFileTypes(@NotNull FileTypeConsumer consumer) {
-    consumer.consume(DockerFileType.INSTANCE, DockerFileType.DEFAULT_EXTENSION);
+  static final DockerFileTemplateLanguage INSTANCE = new DockerFileTemplateLanguage();
+
+  private DockerFileTemplateLanguage() {
+    super("Docker");
   }
 }

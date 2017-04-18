@@ -323,7 +323,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   public void generateAppYaml(FlexibleRuntime runtime, Module module) {
     Properties templateProperties =
         FileTemplateManager.getDefaultInstance().getDefaultProperties();
-    templateProperties.put("RUNTIME", runtime.configLabel());
+    templateProperties.put("RUNTIME", runtime.toString());
 
     ApplicationManager.getApplication().runWriteAction(() -> {
       generateFromTemplate(

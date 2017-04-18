@@ -135,27 +135,27 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
   }
 
   public void testGetFlexibleRuntimeFromAppYaml_javaRuntime() throws MalformedYamlFileException {
-    assertEquals(FlexibleRuntime.java,
+    assertEquals(FlexibleRuntime.JAVA,
         appEngineProjectService.getFlexibleRuntimeFromAppYaml(
             Paths.get(getTestDataPath().toString(), "java.yaml").toString()).get());
   }
 
   public void testGetFlexibleRuntimeFromAppYaml_customRuntime() throws MalformedYamlFileException {
-    assertEquals(FlexibleRuntime.custom,
+    assertEquals(FlexibleRuntime.CUSTOM,
         appEngineProjectService.getFlexibleRuntimeFromAppYaml(
             Paths.get(getTestDataPath().toString(), "custom.yaml").toString()).get());
   }
 
   public void testGetFlexibleRuntimeFromAppYaml_irregularFormatButValid()
       throws IOException, MalformedYamlFileException {
-    assertEquals(FlexibleRuntime.custom,
+    assertEquals(FlexibleRuntime.CUSTOM,
         appEngineProjectService.getFlexibleRuntimeFromAppYaml(
             createTempFile("app.yaml", "   runtime :    custom ").getAbsolutePath()).get());
   }
 
   public void testGetFlexibleRuntimeFromAppYaml_malformedYaml() throws IOException {
     try {
-      assertEquals(FlexibleRuntime.custom,
+      assertEquals(FlexibleRuntime.CUSTOM,
           appEngineProjectService.getFlexibleRuntimeFromAppYaml(
               createTempFile("app.yaml", "runtime: custom\nenv_variables:\n  'DBG_ENAB")
                   .getAbsolutePath()).get());

@@ -111,7 +111,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       facet.getConfiguration().setDockerfilePath(dockerfilePath.toString());
 
       if (generateConfigFiles) {
-        appEngineProjectService.generateAppYaml(FlexibleRuntime.java, facet.getModule());
+        appEngineProjectService.generateAppYaml(FlexibleRuntime.JAVA, facet.getModule());
       }
     }
 

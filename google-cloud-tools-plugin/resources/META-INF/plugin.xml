@@ -256,7 +256,7 @@
 
     <xml.schemaProvider implementation="com.google.cloud.tools.intellij.appengine.descriptor.AppEngineWebSchemaProvider"/>
 
-    <fileTypeFactory implementation="com.google.cloud.tools.intellij.appengine.file.DockerFileTypeFactory"/>
+    <fileTypeFactory implementation="com.google.cloud.tools.intellij.appengine.file.DockerFileTemplateTypeFactory"/>
 
     <localInspection language="JAVA" shortName="AppEngineForbiddenCode" displayName="Forbidden code in App Engine applications"
                      groupName="Google App Engine" enabledByDefault="true" level="ERROR"

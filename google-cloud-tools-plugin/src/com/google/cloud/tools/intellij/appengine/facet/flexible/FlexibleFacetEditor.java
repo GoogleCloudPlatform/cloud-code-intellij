@@ -112,7 +112,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         new GenerateConfigActionListener(
             module.getProject(),
             "app.yaml",
-            () -> APP_ENGINE_PROJECT_SERVICE.generateAppYaml(FlexibleRuntime.java, module),
+            () -> APP_ENGINE_PROJECT_SERVICE.generateAppYaml(FlexibleRuntime.JAVA, module),
             appYaml,
             this::showWarnings));
 
@@ -189,7 +189,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private boolean isRuntimeCustom() throws MalformedYamlFileException {
     return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(appYaml.getText())
-        .filter(runtime -> runtime == FlexibleRuntime.custom)
+        .filter(runtime -> runtime == FlexibleRuntime.CUSTOM)
         .isPresent();
   }
 

@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.standard;
 
-import com.google.cloud.tools.intellij.appengine.file.DockerFileType;
+import com.google.cloud.tools.intellij.appengine.file.DockerFileTemplateType;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
@@ -50,10 +50,10 @@ public class AppEngineTemplateGroupDescriptorFactory implements FileTemplateGrou
         APP_YAML_TEMPLATE, FileTypeManager.getInstance().getStdFileType("YAML").getIcon());
 
     final FileTemplateDescriptor warDockerfile = new FileTemplateDescriptor(
-        DOCKERFILE_WAR_TEMPLATE, DockerFileType.INSTANCE.getIcon());
+        DOCKERFILE_WAR_TEMPLATE, DockerFileTemplateType.INSTANCE.getIcon());
 
     final FileTemplateDescriptor jarDockerfile = new FileTemplateDescriptor(
-        DOCKERFILE_JAR_TEMPLATE, DockerFileType.INSTANCE.getIcon());
+        DOCKERFILE_JAR_TEMPLATE, DockerFileTemplateType.INSTANCE.getIcon());
 
     return new FileTemplateGroupDescriptor("Google App Engine", GoogleCloudToolsIcons.APP_ENGINE,
         appEngineXml,

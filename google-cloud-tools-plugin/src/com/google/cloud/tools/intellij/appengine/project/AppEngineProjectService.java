@@ -37,11 +37,16 @@ import java.util.Optional;
  */
 public abstract class AppEngineProjectService {
 
+  /**
+   * Represents the target App Engine runtime as defined in the app.yaml configuration file via
+   * the 'runtime: [custom|java]' field.
+   */
   public enum FlexibleRuntime {
-    custom,
-    java;
+    CUSTOM,
+    JAVA;
 
-    public String configLabel() {
+    @Override
+    public String toString() {
       return name().toLowerCase();
     }
   }
