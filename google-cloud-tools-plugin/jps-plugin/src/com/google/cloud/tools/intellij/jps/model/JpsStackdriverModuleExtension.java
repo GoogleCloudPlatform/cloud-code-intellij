@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,22 @@
  * limitations under the License.
  */
 
-include 'google-account-plugin'
-include 'google-cloud-tools-plugin'
-include 'common-lib'
-include 'common-test-lib'
-include 'google-cloud-tools-plugin:ultimate'
-include 'google-cloud-tools-plugin:jps-plugin'
+package com.google.cloud.tools.intellij.jps.model;
+
+import org.jetbrains.jps.model.JpsElement;
+
+import java.nio.file.Path;
+
+/**
+ * Stackdriver configuration that lives within a light weight
+ * {@link org.jetbrains.jps.model.module.JpsModule}. Roughly equivalent to the Stackdriver facet.
+ */
+public interface JpsStackdriverModuleExtension extends JpsElement {
+  boolean isGenerateSourceContext();
+
+  boolean isIgnoreErrors();
+
+  Path getCloudSdkPath();
+
+  Path getModuleSourceDirectory();
+}

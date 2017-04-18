@@ -37,6 +37,13 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
 
   private String appYamlPath;
   private String dockerfilePath;
+  // Source context configuration for Stackdriver Debugger.
+  // The names and types of these members must be kept equal to jps-module/StackdriverProperties.
+  private boolean generateSourceContext;
+  private boolean ignoreErrors;
+  private String cloudSdkPath;
+  private String moduleSourceDirectory;
+  // End of Stackdriver Debugger properties.
 
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
@@ -66,6 +73,10 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
   public void loadState(AppEngineFlexibleFacetConfiguration state) {
     appYamlPath = state.getAppYamlPath();
     dockerfilePath = state.getDockerfilePath();
+    generateSourceContext = state.isGenerateSourceContext();
+    ignoreErrors = state.isIgnoreErrors();
+    cloudSdkPath = state.getCloudSdkPath();
+    moduleSourceDirectory = state.getModuleSourceDirectory();
   }
 
   public String getAppYamlPath() {
@@ -76,11 +87,43 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     return dockerfilePath;
   }
 
+  public boolean isGenerateSourceContext() {
+    return generateSourceContext;
+  }
+
+  public boolean isIgnoreErrors() {
+    return ignoreErrors;
+  }
+
+  public String getCloudSdkPath() {
+    return cloudSdkPath;
+  }
+
+  public String getModuleSourceDirectory() {
+    return moduleSourceDirectory;
+  }
+
   public void setAppYamlPath(String appYamlPath) {
     this.appYamlPath = appYamlPath;
   }
 
   public void setDockerfilePath(String dockerfilePath) {
     this.dockerfilePath = dockerfilePath;
+  }
+
+  public void setGenerateSourceContext(boolean generateSourceContext) {
+    this.generateSourceContext = generateSourceContext;
+  }
+
+  public void setIgnoreErrors(boolean ignoreErrors) {
+    this.ignoreErrors = ignoreErrors;
+  }
+
+  public void setCloudSdkPath(String cloudSdkPath) {
+    this.cloudSdkPath = cloudSdkPath;
+  }
+
+  public void setModuleSourceDirectory(String moduleSourceDirectory) {
+    this.moduleSourceDirectory = moduleSourceDirectory;
   }
 }

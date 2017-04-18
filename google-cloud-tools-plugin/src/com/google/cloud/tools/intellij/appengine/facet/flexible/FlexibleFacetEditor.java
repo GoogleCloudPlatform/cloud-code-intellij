@@ -25,6 +25,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.flexible.SelectConfigDest
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -55,6 +56,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -77,6 +79,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JLabel errorIcon;
   private JLabel errorMessage;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
+  private JCheckBox generateSourceContextFiles;
+  private JCheckBox ignoreErrors;
   private AppEngineHelper appEngineHelper;
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
@@ -145,13 +149,17 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @Override
   public boolean isModified() {
     return !appYaml.getText().equals(facetConfiguration.getAppYamlPath())
-        || !dockerfile.getText().equals(facetConfiguration.getDockerfilePath());
+        || !dockerfile.getText().equals(facetConfiguration.getDockerfilePath())
+        || generateSourceContextFiles.isSelected() != facetConfiguration.isGenerateSourceContext()
+        || ignoreErrors.isSelected() != facetConfiguration.isIgnoreErrors();
   }
 
   @Override
   public void reset() {
     appYaml.setText(facetConfiguration.getAppYamlPath());
     dockerfile.setText(facetConfiguration.getDockerfilePath());
+    generateSourceContextFiles.setSelected(facetConfiguration.isGenerateSourceContext());
+    ignoreErrors.setSelected(facetConfiguration.isIgnoreErrors());
 
     toggleDockerfileSection();
   }
@@ -248,8 +256,16 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @Override
   public void onFacetInitialized(@NotNull Facet facet) {
     if (facet instanceof AppEngineFlexibleFacet) {
-      ((AppEngineFlexibleFacet) facet).getConfiguration().setAppYamlPath(appYaml.getText());
-      ((AppEngineFlexibleFacet) facet).getConfiguration().setDockerfilePath(dockerfile.getText());
+      AppEngineFlexibleFacetConfiguration configuration =
+          ((AppEngineFlexibleFacet) facet).getConfiguration();
+      configuration.setAppYamlPath(appYaml.getText());
+      configuration.setDockerfilePath(dockerfile.getText());
+      configuration.setGenerateSourceContext(generateSourceContextFiles.isSelected());
+      configuration.setIgnoreErrors(ignoreErrors.isSelected());
+      configuration.setCloudSdkPath(CloudSdkService.getInstance().getSdkHomePath().toString());
+      // Gets the module's source directory, where the Git repo will hopefully be.
+      configuration.setModuleSourceDirectory(
+          Paths.get(facet.getModule().getModuleFilePath()).getParent().toString());
     }
   }
 
