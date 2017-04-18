@@ -250,7 +250,8 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       @NotNull String appYamlPathString) throws MalformedYamlFileException {
     try {
       return getValueFromAppYaml(appYamlPathString, RUNTIME_TAG_NAME)
-          .map(runtimeValue -> FlexibleRuntime.valueOf(runtimeValue.toUpperCase()));
+          .map(String::toUpperCase)
+          .map(FlexibleRuntime::valueOf);
     } catch (IllegalArgumentException iae) {
       return Optional.empty();
     }
