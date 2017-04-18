@@ -137,9 +137,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     appYaml.setText(facetConfiguration.getAppYamlPath());
     dockerfile.setText(facetConfiguration.getDockerfilePath());
 
-    ButtonGroup dockerFileTypeGroup = new ButtonGroup();
-    dockerFileTypeGroup.add(jarRadioButton);
-    dockerFileTypeGroup.add(warRadioButton);
+    ButtonGroup dockerfileTypeGroup = new ButtonGroup();
+    dockerfileTypeGroup.add(jarRadioButton);
+    dockerfileTypeGroup.add(warRadioButton);
     warRadioButton.setSelected(IS_WAR_DOCKERFILE_DEFAULT);
     jarRadioButton.setSelected(!IS_WAR_DOCKERFILE_DEFAULT);
 
