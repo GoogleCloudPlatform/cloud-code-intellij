@@ -206,20 +206,14 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   private static boolean hasFlexibleDeploymentConfiguration(List<RunConfiguration> runConfigs) {
     return runConfigs
         .stream()
-        .anyMatch(runConfig -> {
-          if (runConfig instanceof DeployToServerRunConfiguration) {
-            DeploymentConfiguration deployConfig
-                = ((DeployToServerRunConfiguration) runConfig).getDeploymentConfiguration();
+        .filter(runConfig -> runConfig instanceof DeployToServerRunConfiguration)
+        .map(runConfig -> ((DeployToServerRunConfiguration) runConfig).getDeploymentConfiguration())
+        .filter(deployConfig -> deployConfig instanceof AppEngineDeploymentConfiguration)
+        .anyMatch(deployConfig -> {
+          String environment
+              = ((AppEngineDeploymentConfiguration) deployConfig).getEnvironment();
 
-            if (deployConfig instanceof AppEngineDeploymentConfiguration) {
-              String environment
-                  = ((AppEngineDeploymentConfiguration) deployConfig).getEnvironment();
-
-              return AppEngineEnvironment.APP_ENGINE_FLEX.name().equals(environment);
-            }
-          }
-
-          return false;
+          return AppEngineEnvironment.APP_ENGINE_FLEX.name().equals(environment);
         });
   }
 
