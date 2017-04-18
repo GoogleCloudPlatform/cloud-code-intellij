@@ -127,7 +127,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
             module.getProject(),
             "Dockerfile",
             () -> APP_ENGINE_PROJECT_SERVICE
-                .generateDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR, module),
+                .generateDockerfile(warRadioButton.isSelected()
+                    ? AppEngineFlexibleDeploymentArtifactType.WAR
+                    : AppEngineFlexibleDeploymentArtifactType.JAR, module),
             dockerfile,
             this::showWarnings
     ));
