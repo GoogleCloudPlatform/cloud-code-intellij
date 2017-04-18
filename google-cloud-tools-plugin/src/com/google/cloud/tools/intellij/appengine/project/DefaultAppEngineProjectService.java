@@ -406,7 +406,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
         }
       }
     } else {
-      logger.error("Failed to located source root for app.yaml creation.");
+      logger.warn("Failed to located source root for app.yaml creation.");
     }
 
     return null;
