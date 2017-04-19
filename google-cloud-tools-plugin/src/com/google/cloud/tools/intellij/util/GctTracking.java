@@ -29,13 +29,16 @@ public class GctTracking {
   public static final String APP_ENGINE_RUN = "appengine.run";
   public static final String APP_ENGINE_STOP = "appengine.stop";
   public static final String APP_ENGINE_ADD_SUPPORT = "appengine.support.add";
-  public static final String APP_ENGINE_ADD_STANDARD_FACET = "appengine.standard.facet.add";
   public static final String APP_ENGINE_ADD_LIBRARY = "appengine.library.add";
   public static final String APP_ENGINE_APPLICATION_CREATE = "appengine.application.create";
   public static final String APP_ENGINE_APPLICATION_CREATE_SUCCESS
       = "appengine.application.create.success";
   public static final String APP_ENGINE_APPLICATION_CREATE_FAIL
       = "appengine.application.create.fail";
+
+  public static final String APP_ENGINE_ADD_STANDARD_FACET = "appengine.standard.facet.add";
+
+  public static final String APP_ENGINE_ADD_FLEX_FACET = "appengine.flex.facet.add";
 
   public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =
       "project.selection.create.new.project";

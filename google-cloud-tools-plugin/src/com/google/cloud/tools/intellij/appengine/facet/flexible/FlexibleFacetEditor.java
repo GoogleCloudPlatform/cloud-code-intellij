@@ -24,7 +24,9 @@ import com.google.cloud.tools.intellij.appengine.cloud.flexible.SelectConfigDest
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.facet.Facet;
@@ -271,6 +273,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       ((AppEngineFlexibleFacet) facet).getConfiguration().setDockerDirectory(
           dockerDirectoryField.getText());
     }
+
+    // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
+    // Framework discovered "Configure" popup.
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_ADD_FLEX_FACET)
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, "setOnModule")
+        .ping();
   }
 
   private class AppYamlGenerateActionListener implements HyperlinkListener {
