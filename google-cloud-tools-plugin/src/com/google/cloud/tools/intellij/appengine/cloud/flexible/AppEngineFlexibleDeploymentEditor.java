@@ -430,7 +430,7 @@ public class AppEngineFlexibleDeploymentEditor extends
 
   private boolean isCustomRuntime() throws MalformedYamlFileException {
     return appEngineProjectService.getFlexibleRuntimeFromAppYaml(getAppYamlPath())
-        .filter(runtime -> runtime == FlexibleRuntime.custom)
+        .filter(runtime -> runtime == FlexibleRuntime.CUSTOM)
         .isPresent();
   }
 
