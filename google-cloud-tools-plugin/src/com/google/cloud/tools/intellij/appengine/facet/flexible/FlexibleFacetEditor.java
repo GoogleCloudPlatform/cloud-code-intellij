@@ -75,7 +75,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JButton genDockerfileButton;
   private JLabel errorIcon;
   private JLabel errorMessage;
-  private JLabel dockerFileLabel;
+  private JLabel dockerfileLabel;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
   private AppEngineHelper appEngineHelper;
 
@@ -239,9 +239,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     } catch (MalformedYamlFileException myf) {
       // do nothing
     }
-    dockerFileLabel.setEnabled(enabled);
-    dockerfile.setEnabled(enabled);
-    genDockerfileButton.setEnabled(enabled);
+    dockerfileLabel.setVisible(enabled);
+    dockerfile.setVisible(enabled);
+    genDockerfileButton.setVisible(enabled);
   }
 
   @Override
@@ -335,8 +335,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  JLabel getNoDockerfileLabel() {
-    return dockerFileLabel;
+  JLabel getDockerfileLabel() {
+    return dockerfileLabel;
   }
 
   @VisibleForTesting
