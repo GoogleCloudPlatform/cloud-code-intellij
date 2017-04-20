@@ -66,7 +66,7 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
     Module module = ModuleUtilCore.findModuleForPsiElement(file);
     final AppEngineStandardFacet appEngineStandardFacet
         = AppEngineStandardFacet.getAppEngineFacetByModule(module);
-    if (appEngineStandardFacet == null) {
+    if (appEngineStandardFacet == null || !appEngineStandardFacet.isJava8Runtime()) {
       return null;
     }
 
