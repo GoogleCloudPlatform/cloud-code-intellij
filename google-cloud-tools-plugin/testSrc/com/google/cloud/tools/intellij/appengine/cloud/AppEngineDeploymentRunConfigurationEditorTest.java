@@ -159,8 +159,8 @@ public class AppEngineDeploymentRunConfigurationEditorTest extends PlatformTestC
 
     assertEquals("App Engine Flexible Environment", editor.getEnvironmentLabel().getText());
     assertTrue(editor.getAppEngineFlexConfigPanel().isVisible());
-    assertFalse(editor.getDeployAllAppEngineConfigsCheckBox().isVisible());
-    assertFalse(editor.getDeployAllConfigsCheckboxLabel().isVisible());
+    assertTrue(editor.getDeployAllAppEngineConfigsCheckBox().isVisible());
+    assertTrue(editor.getDeployAllConfigsCheckboxLabel().isVisible());
     Disposer.dispose(editor);
   }
 
