@@ -234,14 +234,20 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private void toggleDockerfileSection() {
     boolean enabled = false;
+    boolean visible = true;
     try {
       enabled = isRuntimeCustom();
+      visible = enabled;
     } catch (MalformedYamlFileException myf) {
       // do nothing
     }
-    dockerfileLabel.setVisible(enabled);
-    dockerfile.setVisible(enabled);
-    genDockerfileButton.setVisible(enabled);
+    dockerfileLabel.setEnabled(enabled);
+    dockerfile.setEnabled(enabled);
+    genDockerfileButton.setEnabled(enabled);
+
+    dockerfileLabel.setVisible(visible);
+    dockerfile.setVisible(visible);
+    genDockerfileButton.setVisible(visible);
   }
 
   @Override
