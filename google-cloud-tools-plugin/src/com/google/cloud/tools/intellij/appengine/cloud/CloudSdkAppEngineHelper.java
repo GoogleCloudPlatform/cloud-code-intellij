@@ -25,7 +25,6 @@ import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineFlexibleDeployTask;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardDeployTask;
-import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
@@ -74,14 +73,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   private static final Logger logger = Logger.getInstance(CloudSdkAppEngineHelper.class);
 
-  private static final String DEFAULT_CUSTOM_APP_YAML_PATH =
-      "/generation/src/appengine/flexible/custom/app.yaml";
-  private static final String DEFAULT_JAVA_APP_YAML_PATH =
-      "/generation/src/appengine/flexible/java/app.yaml";
-  private static final String DEFAULT_JAR_DOCKERFILE_PATH
-      = "/generation/src/appengine/flexible/custom/jar.dockerfile";
-  private static final String DEFAULT_WAR_DOCKERFILE_PATH
-      = "/generation/src/appengine/flexible/custom/war.dockerfile";
   private static final String CLIENT_ID_LABEL = "client_id";
   private static final String CLIENT_SECRET_LABEL = "client_secret";
   private static final String REFRESH_TOKEN_LABEL = "refresh_token";
@@ -102,28 +93,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   @Override
   public Project getProject() {
     return project;
-  }
-
-  @Override
-  public Optional<Path> defaultAppYaml(FlexibleRuntime runtime) {
-    if (runtime == FlexibleRuntime.custom) {
-      return Optional.of(getFileFromResourcePath(DEFAULT_CUSTOM_APP_YAML_PATH));
-    }
-
-    return Optional.of(getFileFromResourcePath(DEFAULT_JAVA_APP_YAML_PATH));
-  }
-
-  @Override
-  public Optional<Path> defaultDockerfile(
-      AppEngineFlexibleDeploymentArtifactType deploymentArtifactType) {
-    switch (deploymentArtifactType) {
-      case WAR:
-        return Optional.of(getFileFromResourcePath(DEFAULT_WAR_DOCKERFILE_PATH));
-      case JAR:
-        return Optional.of(getFileFromResourcePath(DEFAULT_JAR_DOCKERFILE_PATH));
-      default:
-        return Optional.empty();
-    }
   }
 
   @Override
@@ -178,7 +147,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
           return Optional.empty();
         }
-        if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.custom).isPresent()
+        if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.CUSTOM).isPresent()
             && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
           callback.errorOccurred(
               GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
