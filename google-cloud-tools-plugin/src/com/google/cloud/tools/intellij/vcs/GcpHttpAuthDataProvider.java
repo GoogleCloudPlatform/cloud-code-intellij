@@ -23,15 +23,18 @@ import com.google.cloud.tools.intellij.resources.SelectUserDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.ide.DataManager;
+import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Couple;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 import com.intellij.util.AuthData;
+import com.intellij.util.UriUtil;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +43,9 @@ import java.awt.Window;
 import java.io.IOException;
 
 import git4idea.DialogManager;
+import git4idea.commands.GitHttpAuthenticator;
 import git4idea.remote.GitHttpAuthDataProvider;
+import git4idea.remote.GitRememberedInputs;
 
 /**
  * Provides credential information for URLs pointing to Google's cloud source.
@@ -107,6 +112,24 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
   }
 
   /**
+   * Clears out IDE managed Cloud Repository credentials.
+   *
+   * This is needed to force the Git integration to use the {@link GcpHttpAuthDataProvider}. There
+   * is a default auth provider that is created by the integration that will override this one if
+   * there exist IDE managed credentials (i.e. retrievable via {@link PasswordSafe}).
+   *
+   * The
+   */
+  public static void clearIdeStoredGcpCredentials() {
+    PasswordSafe passwordSafe = PasswordSafe.getInstance();
+    String user = GitRememberedInputs.getInstance()
+        .getUserNameForUrl(GcpHttpAuthDataProvider.GOOGLE_URL_ALT);
+    String key = makeKey(GcpHttpAuthDataProvider.GOOGLE_URL_ALT, user);
+
+    passwordSafe.setPassword(GitHttpAuthenticator.class, key == null ? "" : key, null /*value*/);
+  }
+
+  /**
    * Check if url is a Google Cloud Platform URL.
    */
   public static boolean isGcpUrl(@Nullable String url) {
@@ -157,6 +180,23 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
           .getData(DataManager.getInstance().getDataContext(activeWindow));
     }
     return result != null ? result : currentProject;
+  }
+
+  /**
+   * Creates a String used a key for the password store in the form of:
+   * http[s]://{login}@{url}
+   */
+  private static String makeKey(@NotNull String url, @Nullable String login) {
+    if (login == null) {
+      return url;
+    } else {
+      Couple pair = UriUtil.splitScheme(url);
+      String scheme = (String) pair.getFirst();
+
+      return !StringUtil.isEmpty(scheme)
+          ? scheme + "://" + login + "@" + pair.getSecond()
+          : login + "@" + url;
+    }
   }
 
   /**

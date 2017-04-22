@@ -171,6 +171,8 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
     new Task.Backgroundable(project, GctBundle.message("uploadtogcp.backgroundtitle")) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
+        GcpHttpAuthDataProvider.clearIdeStoredGcpCredentials();
+
         // creating empty git repo if git is not initialized
         LOG.info("Binding local project with Git");
         if (!gitDetected) {

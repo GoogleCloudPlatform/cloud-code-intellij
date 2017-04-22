@@ -115,6 +115,8 @@ public class GcpCheckoutProvider implements CheckoutProvider {
         GctBundle.message("clonefromgcp.repository", sourceRepositoryUrl)) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
+        GcpHttpAuthDataProvider.clearIdeStoredGcpCredentials();
+
         GcpHttpAuthDataProvider.Context context = GcpHttpAuthDataProvider
             .createContext(gcpUserName);
         try {
