@@ -39,6 +39,8 @@ public class GctTracking {
   public static final String APP_ENGINE_ADD_STANDARD_FACET = "appengine.standard.facet.add";
 
   public static final String APP_ENGINE_ADD_FLEX_FACET = "appengine.flex.facet.add";
+  public static final String APP_ENGINE_FLEX_APP_YAML_CREATE = "appengine.flex.app.yaml.create";
+  public static final String APP_ENGINE_FLEX_DOCKERFILE_CREATE = "appengine.flex.dockerfile.create";
 
   public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =
       "project.selection.create.new.project";
