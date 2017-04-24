@@ -16,6 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
+
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
 import com.intellij.framework.detection.FileContentPattern;
@@ -40,6 +43,13 @@ public class AppEngineFlexibleFrameworkDetector
   @Override
   public void setupFacet(@NotNull AppEngineFlexibleFacet facet, ModifiableRootModel model) {
     AppEngineFlexibleSupportProvider.addSupport(facet, model, false /* generateConfigFiles */);
+
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_ADD_FLEX_FACET)
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, "frameworkDetect")
+        .ping();
+    // TODO: remove
+    System.out.print("Flex facet add on frameworkDetect");
   }
 
   @NotNull
