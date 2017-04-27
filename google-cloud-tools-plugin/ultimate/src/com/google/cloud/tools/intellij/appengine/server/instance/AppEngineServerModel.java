@@ -290,7 +290,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
         : new ArrayList<String>();
   }
 
-  public void setJvmFlags(Collection<String> flags) {
+  public void appendJvmFlags(Collection<String> flags) {
     settings.setJvmFlags(settings.getJvmFlags() == null
         ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
         : settings.getJvmFlags() + JVM_FLAG_DELIMITER + Joiner.on(JVM_FLAG_DELIMITER).join(flags));

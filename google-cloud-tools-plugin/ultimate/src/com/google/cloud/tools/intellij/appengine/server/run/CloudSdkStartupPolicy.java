@@ -92,7 +92,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             // Startup/Shutdown tab. We need to add them here.
             String jvmDebugFlag = environment.get(JVM_DEBUG_FLAGS_ENVIRONMENT_KEY);
             if (jvmDebugFlag != null) {
-              runConfiguration.setJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
+              runConfiguration.appendJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
             }
             // We don't want to pass the jvm flags to the dev server environment
             environment.remove(JVM_DEBUG_FLAGS_ENVIRONMENT_KEY);
