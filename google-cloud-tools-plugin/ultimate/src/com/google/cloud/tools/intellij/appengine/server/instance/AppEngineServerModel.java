@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author nik
@@ -289,6 +290,12 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
         : new ArrayList<String>();
   }
 
+  public void setJvmFlags(Collection<String> flags) {
+    settings.setJvmFlags(settings.getJvmFlags() == null
+        ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
+        : settings.getJvmFlags() + JVM_FLAG_DELIMITER + Joiner.on(JVM_FLAG_DELIMITER).join(flags));
+  }
+
   @Override
   public String getRuntime() {
     return null;
@@ -324,12 +331,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return null;
   }
 
-  public void addAllJvmFlags(Collection<String> flags) {
-    settings.setJvmFlags(settings.getJvmFlags() == null
-        ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
-        : settings.getJvmFlags() + JVM_FLAG_DELIMITER + Joiner.on(JVM_FLAG_DELIMITER).join(flags));
-  }
-
   @Override
   public String getDefaultGcsBucketName() {
     return settings.getDefaultGcsBucketName();
@@ -342,6 +343,15 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   public File getDatastorePath() {
     return null;
+  }
+
+  @Override
+  public Map<String, String> getEnvironment() {
+    return settings.getEnvironment();
+  }
+
+  public void setEnvironment(Map<String, String> environment) {
+    settings.setEnvironment(environment);
   }
 
   @Override
@@ -368,6 +378,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     private Integer port = 8080;
     @Tag("jvm_flags")
     private String jvmFlags;
+    @Tag("environment")
+    private Map<String, String> environment;
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
 
@@ -405,6 +417,14 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     String getDefaultGcsBucketName() {
       return defaultGcsBucketName;
+    }
+
+    public Map<String, String> getEnvironment() {
+      return environment;
+    }
+
+    public void setEnvironment(Map<String, String> environment) {
+      this.environment = environment;
     }
 
     void setDefaultGcsBucketName(String defaultGcsBucketName) {
