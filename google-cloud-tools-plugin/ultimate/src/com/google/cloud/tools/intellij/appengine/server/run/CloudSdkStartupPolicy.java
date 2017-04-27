@@ -48,7 +48,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
   // The startup process handler is kept so the process can be explicitly terminated, since we're
   // not delegating that to the framework.
   private OSProcessHandler startupProcessHandler;
-  private static final String JVM_DEBUG_FLAGS_ENVIRONMENT_KEY = "";
+  private static final String JVM_FLAGS_ENVIRONMENT_KEY = "";
 
   @Nullable
   @Override
@@ -88,14 +88,14 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
             Map<String, String> environment = Maps.newHashMap(configuredEnvironment);
 
-            // This is the place we have access to the debug jvm flags provided by IJ in the
-            // Startup/Shutdown tab. We need to add them here.
-            String jvmDebugFlag = environment.get(JVM_DEBUG_FLAGS_ENVIRONMENT_KEY);
-            if (jvmDebugFlag != null) {
-              runConfiguration.appendJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
+            // IntelliJ appends the JVM flags to the environment variables, keyed by an empty
+            // string; so we need extract them here.
+            String jvmFlags = environment.get(JVM_FLAGS_ENVIRONMENT_KEY);
+            if (jvmFlags != null) {
+              runConfiguration.appendJvmFlags(Arrays.asList(jvmFlags.trim().split(" ")));
             }
             // We don't want to pass the jvm flags to the dev server environment
-            environment.remove(JVM_DEBUG_FLAGS_ENVIRONMENT_KEY);
+            environment.remove(JVM_FLAGS_ENVIRONMENT_KEY);
 
             runConfiguration.setEnvironment(environment);
 
