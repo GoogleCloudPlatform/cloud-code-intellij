@@ -32,4 +32,3 @@ cd github/google-cloud-intellij
 gradlew.bat check --stacktrace
 
 exit /b %ERRORLEVEL%
-+
