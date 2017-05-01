@@ -45,8 +45,8 @@
       <h2>[17.2.4]</h2>
       <h3>Added</h3>
       <ul>
-        <li>Environment variables in the App Engine standard local run configuration are now passed in to the dev server. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1364">#1364/a>)</li>
-        <li>Environment variables configured in appengine-web.xml are now honored and passed in to the dev server. (<a href="https://github.com/GoogleCloudPlatform/appengine-plugins-core/issues/377">#377)</li>
+        <li>Environment variables in the App Engine standard local run configuration are now passed in to the dev server. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1364">#1364</a>)</li>
+        <li>Environment variables configured in appengine-web.xml are now honored and passed in to the dev server. (<a href="https://github.com/GoogleCloudPlatform/appengine-plugins-core/issues/377">#377</a>)</li>
       </ul>
 
       <h2>[17.2.3]</h2>
