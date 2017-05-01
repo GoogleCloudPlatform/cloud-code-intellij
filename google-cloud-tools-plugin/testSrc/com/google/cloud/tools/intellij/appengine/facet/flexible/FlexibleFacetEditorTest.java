@@ -45,19 +45,13 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     facetConfiguration.setAppYamlPath("");
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     // no yaml
-    assertFalse(editor.getDockerfile().isVisible());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getGenDockerfileButton().isVisible());
+    assertFalse(editor.getDockerfilePanel().isVisible());
     // java yaml
     editor.getAppYaml().setText(javaYaml.getPath());
-    assertFalse(editor.getDockerfile().isVisible());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getGenDockerfileButton().isVisible());
+    assertFalse(editor.getDockerfilePanel().isVisible());
     // custom yaml
     editor.getAppYaml().setText(customYaml.getPath());
-    assertTrue(editor.getDockerfile().isVisible());
-    assertTrue(editor.getDockerfileLabel().isVisible());
-    assertTrue(editor.getGenDockerfileButton().isVisible());
+    assertTrue(editor.getDockerfilePanel().isVisible());
   }
 
   public void testValidateConfiguration_noYAML() {
@@ -67,9 +61,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertTrue(editor.getErrorMessage().isVisible());
     assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
         editor.getErrorMessage().getText());
-    assertFalse(editor.getDockerfile().isVisible());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getGenDockerfileButton().isVisible());
+    assertFalse(editor.getDockerfilePanel().isVisible());
 
     try {
       editor.apply();
@@ -88,9 +80,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertTrue(editor.getErrorMessage().isVisible());
     assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
         editor.getErrorMessage().getText());
-    assertFalse(editor.getDockerfile().isVisible());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getGenDockerfileButton().isVisible());
+    assertFalse(editor.getDockerfilePanel().isVisible());
 
     try {
       editor.apply();
@@ -114,9 +104,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
           ce.getMessage());
     }
 
-    assertFalse(editor.getDockerfile().isVisible());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getGenDockerfileButton().isVisible());
+    assertFalse(editor.getDockerfilePanel().isVisible());
   }
 
   public void testValidateConfiguration_YAMLIsDirectory() {
@@ -140,9 +128,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   public void testValidateConfiguration_javaRuntime() throws ConfigurationException {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(javaYaml.getPath());
-    assertFalse(editor.getDockerfile().isVisible());
-    assertFalse(editor.getDockerfileLabel().isVisible());
-    assertFalse(editor.getGenDockerfileButton().isVisible());
+    assertFalse(editor.getDockerfilePanel().isVisible());
     assertFalse(editor.getErrorIcon().isVisible());
     assertFalse(editor.getErrorMessage().isVisible());
     editor.apply();
@@ -152,9 +138,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerfile().setText("");
-    assertTrue(editor.getDockerfile().isVisible());
-    assertTrue(editor.getDockerfileLabel().isVisible());
-    assertTrue(editor.getGenDockerfileButton().isVisible());
+    assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
     assertEquals(
@@ -175,9 +159,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerfile().setText(null);
-    assertTrue(editor.getDockerfile().isVisible());
-    assertTrue(editor.getDockerfileLabel().isVisible());
-    assertTrue(editor.getGenDockerfileButton().isVisible());
+    assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
     assertEquals(
@@ -198,9 +180,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerfile().setText(dockerfile.getParentFile().getPath());
-    assertTrue(editor.getDockerfile().isVisible());
-    assertTrue(editor.getDockerfileLabel().isVisible());
-    assertTrue(editor.getGenDockerfileButton().isVisible());
+    assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
     assertEquals("The specified Dockerfile configuration file does not exist or is not a valid file.",
@@ -220,9 +200,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerfile().setText(dockerfile.getPath());
-    assertTrue(editor.getDockerfile().isVisible());
-    assertTrue(editor.getDockerfileLabel().isVisible());
-    assertTrue(editor.getGenDockerfileButton().isVisible());
+    assertTrue(editor.getDockerfilePanel().isVisible());
     assertFalse(editor.getErrorIcon().isVisible());
     assertFalse(editor.getErrorMessage().isVisible());
     editor.apply();

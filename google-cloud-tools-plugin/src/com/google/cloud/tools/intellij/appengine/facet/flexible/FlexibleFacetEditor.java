@@ -75,6 +75,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JLabel errorMessage;
   private JRadioButton jarRadioButton;
   private JRadioButton warRadioButton;
+  private JPanel dockerfilePanel;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
@@ -253,9 +254,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     } catch (MalformedYamlFileException myf) {
       // do nothing
     }
-    dockerfileLabel.setVisible(visible);
-    dockerfile.setVisible(visible);
-    genDockerfileButton.setVisible(visible);
+    dockerfilePanel.setVisible(visible);
   }
 
   @Override
@@ -334,13 +333,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  JButton getGenDockerfileButton() {
-    return genDockerfileButton;
-  }
-
-  @VisibleForTesting
-  JLabel getDockerfileLabel() {
-    return dockerfileLabel;
+  JPanel getDockerfilePanel() {
+    return dockerfilePanel;
   }
 
   @VisibleForTesting
