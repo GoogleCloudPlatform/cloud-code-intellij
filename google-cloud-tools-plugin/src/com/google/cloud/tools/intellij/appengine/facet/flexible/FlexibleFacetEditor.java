@@ -71,7 +71,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private TextFieldWithBrowseButton dockerfile;
   private JButton genAppYamlButton;
   private JButton genDockerfileButton;
-  private JLabel noDockerfileLabel;
   private JLabel errorIcon;
   private JLabel errorMessage;
   private JRadioButton jarRadioButton;
@@ -248,16 +247,15 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   private void toggleDockerfileSection() {
-    boolean enabled = false;
+    boolean visible = false;
     try {
-      enabled = isRuntimeCustom();
-      // Shows no Dockerfile label if runtime is Java and appYaml is valid.
-      noDockerfileLabel.setVisible(!enabled && isValidConfigurationFile(appYaml.getText()));
+      visible = isRuntimeCustom();
     } catch (MalformedYamlFileException myf) {
-      noDockerfileLabel.setVisible(false);
+      // do nothing
     }
-    dockerfile.setEnabled(enabled);
-    genDockerfileButton.setEnabled(enabled);
+    dockerfileLabel.setVisible(visible);
+    dockerfile.setVisible(visible);
+    genDockerfileButton.setVisible(visible);
   }
 
   @Override
@@ -341,8 +339,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  JLabel getNoDockerfileLabel() {
-    return noDockerfileLabel;
+  JLabel getDockerfileLabel() {
+    return dockerfileLabel;
   }
 
   @VisibleForTesting
