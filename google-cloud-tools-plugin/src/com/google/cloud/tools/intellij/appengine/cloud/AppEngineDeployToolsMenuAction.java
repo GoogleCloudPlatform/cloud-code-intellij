@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
@@ -88,7 +88,7 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
             .anyMatch(module -> {
               FacetManager manager = FacetManager.getInstance(module);
               boolean hasAppEngineStandardFacet
-                  = !manager.getFacetsByType(AppEngineStandardFacet.ID).isEmpty();
+                  = !manager.getFacetsByType(AppEngineStandardFacetType.ID).isEmpty();
               boolean hasAppEngineFlexibleFacet
                   = !manager.getFacetsByType(AppEngineFlexibleFacetType.ID).isEmpty();
 

@@ -20,7 +20,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardRuntime;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineTemplateGroupDescriptorFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -120,7 +120,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   public Optional<AppEngineEnvironment> getModuleAppEngineEnvironment(Module module) {
     // The order here is important -- Standard must come before Flexible so that when both Standard
     // and Flexible are selected from the New Project/Module dialog, Standard takes precedence.
-    if (FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacet.ID) != null) {
+    if (FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacetType.ID) != null) {
       if (isFlexCompat(AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(
           module.getProject(), ImmutableList.of(module)))) {
         return Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT);

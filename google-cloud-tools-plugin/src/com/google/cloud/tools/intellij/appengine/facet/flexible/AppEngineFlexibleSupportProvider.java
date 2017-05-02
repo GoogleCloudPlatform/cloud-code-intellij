@@ -20,7 +20,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
@@ -47,7 +47,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.RemoteServersManager;
-import com.intellij.remoteServer.configuration.deployment.DeploymentConfiguration;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationType;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
@@ -93,7 +92,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   public boolean isSupportAlreadyAdded(@NotNull Module module,
       @NotNull FacetsProvider facetsProvider) {
     return !facetsProvider.getFacetsByType(module, AppEngineFlexibleFacetType.ID).isEmpty()
-        || !facetsProvider.getFacetsByType(module, AppEngineStandardFacet.ID).isEmpty();
+        || !facetsProvider.getFacetsByType(module, AppEngineStandardFacetType.ID).isEmpty();
   }
 
   /** Initializes the Flexible facet by settings the default paths for app.yaml and Dockerfile
