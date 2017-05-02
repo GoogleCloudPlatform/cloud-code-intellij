@@ -72,6 +72,21 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JLabel dockerfileLabel;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
+  public enum ConfigFile {
+    APP_YAML("app.yaml"),
+    DOCKERFILE("Dockerfile");
+
+    private String fileName;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    private ConfigFile(String fileName){
+      this.fileName = fileName;
+    }
+  }
+
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
       @NotNull Module module) {
     this.facetConfiguration = facetConfiguration;
@@ -110,18 +125,15 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     genAppYamlButton.addActionListener(
         new GenerateConfigActionListener(
-            module.getProject(),
-            "app.yaml",
-            () -> APP_ENGINE_PROJECT_SERVICE.generateAppYaml(FlexibleRuntime.JAVA, module),
+            module,
+            ConfigFile.APP_YAML,
             appYaml,
             this::showWarnings));
 
     genDockerfileButton.addActionListener(
         new GenerateConfigActionListener(
-            module.getProject(),
-            "Dockerfile",
-            () -> APP_ENGINE_PROJECT_SERVICE
-                .generateDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR, module),
+            module,
+            ConfigFile.DOCKERFILE,
             dockerfile,
             this::showWarnings
     ));
@@ -258,22 +270,23 @@ public class FlexibleFacetEditor extends FacetEditorTab {
    */
   private static class GenerateConfigActionListener implements ActionListener {
 
+    private final Module module;
     private final Project project;
     private final String fileName;
     private final TextFieldWithBrowseButton filePicker;
-    private final Runnable configFileGenerator;
+    private final ConfigFile configType;
     // Used to refresh the warnings.
     private final Runnable configurationValidator;
 
     GenerateConfigActionListener(
-        Project project,
-        String fileName,
-        Runnable configFileGenerator,
+        Module module,
+        ConfigFile configType,
         TextFieldWithBrowseButton filePicker,
         Runnable configurationValidator) {
-      this.project = project;
-      this.fileName = fileName;
-      this.configFileGenerator = configFileGenerator;
+      this.module = module;
+      project = module.getProject();
+      fileName = configType.getFileName();
+      this.configType = configType;
       this.filePicker = filePicker;
       this.configurationValidator = configurationValidator;
     }
@@ -302,7 +315,19 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           }
         }
 
-        configFileGenerator.run();
+        switch (configType) {
+          case APP_YAML:
+            APP_ENGINE_PROJECT_SERVICE.generateAppYaml(FlexibleRuntime.JAVA, module,
+                destinationFolderPath);
+            break;
+          case DOCKERFILE:
+            APP_ENGINE_PROJECT_SERVICE.generateDockerfile(
+                AppEngineFlexibleDeploymentArtifactType.WAR, module, destinationFolderPath);
+            break;
+          default:
+            // TODO: throw exception
+            break;
+        }
 
         filePicker.setText(destinationFilePath.toString());
         configurationValidator.run();

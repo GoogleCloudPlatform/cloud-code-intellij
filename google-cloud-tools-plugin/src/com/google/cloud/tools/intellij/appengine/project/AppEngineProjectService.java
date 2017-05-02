@@ -30,6 +30,7 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 /**
@@ -132,10 +133,10 @@ public abstract class AppEngineProjectService {
 
 
   /**
-   * Generates an app.yaml configuration file in the src/main/appengine directory. If an app.yaml
-   * already exists it will not overwrite the file.
+   * Generates an app.yaml configuration file in the <@code>destinationFolderPath</@code> directory.
+   * If an app.yaml already exists it will not overwrite the file.
    */
-  public abstract void generateAppYaml(FlexibleRuntime runtime, Module module);
+  public abstract void generateAppYaml(FlexibleRuntime runtime, Module module, Path destinationFolderPath);
 
 
   /**
@@ -143,7 +144,7 @@ public abstract class AppEngineProjectService {
    * will not overwrite the file.
    */
   public abstract void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type,
-      Module module);
+      Module module, Path destinationFolderPath);
 
   /**
    * Returns the default location of the app.yaml configuration file, relative to a module content

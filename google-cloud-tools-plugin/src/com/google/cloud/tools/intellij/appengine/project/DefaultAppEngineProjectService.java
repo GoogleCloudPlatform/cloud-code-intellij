@@ -321,7 +321,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public void generateAppYaml(FlexibleRuntime runtime, Module module) {
+  public void generateAppYaml(FlexibleRuntime runtime, Module module, Path destinationFolderPath) {
     Properties templateProperties =
         FileTemplateManager.getDefaultInstance().getDefaultProperties();
     templateProperties.put("RUNTIME", runtime.toString());
@@ -337,7 +337,9 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module) {
+  // TODO: utilize destinationFolderPath
+  public void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module,
+      Path destinationFolderPath) {
     if (type == AppEngineFlexibleDeploymentArtifactType.UNKNOWN) {
       throw new RuntimeException("Cannot generate Dockerfile for unknown artifact type.");
     }
