@@ -81,6 +81,10 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
     }
   }
 
+  /**
+   * Determines if the project has at least one module with an App Engine standard or flexible
+   * facet. If it does not, then a notification balloon is shown.
+   */
   @VisibleForTesting
   boolean isAppEngineProjectCheck(@NotNull Project project) {
     boolean hasAppEngineFacet =
