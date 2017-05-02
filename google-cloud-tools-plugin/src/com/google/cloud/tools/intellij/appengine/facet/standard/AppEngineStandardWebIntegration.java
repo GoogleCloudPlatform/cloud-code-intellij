@@ -26,6 +26,7 @@ import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configuration.ConfigurationFactoryEx;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ModuleRunConfiguration;
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkRole;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
@@ -111,25 +112,35 @@ public abstract class AppEngineStandardWebIntegration {
   }
 
   private void setupDeployRunConfiguration(@NotNull Module module) {
-    AppEngineCloudType serverType =
-        ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
-    RemoteServer<AppEngineServerConfiguration> server
-        = ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
-
-    DeployToServerConfigurationType configurationType
-        = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
     RunManager runManager = RunManager.getInstance(module.getProject());
-    ConfigurationFactoryEx factory = configurationType.getFactory();
-    RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
-        configurationType.getDisplayName(), factory);
-    DeployToServerRunConfiguration<?, ?> runConfiguration
-        = (DeployToServerRunConfiguration<?, ?>)settings.getConfiguration();
 
-    if (server != null) {
-      runConfiguration.setServerName(server.getName());
+    boolean hasExistingDeployConfiguration = runManager.getAllConfigurationsList()
+        .stream()
+        .filter(config -> config instanceof DeployToServerRunConfiguration)
+        .map(RunConfiguration::getType)
+        .anyMatch(type-> type instanceof AppEngineCloudType);
+
+    if (!hasExistingDeployConfiguration) {
+      AppEngineCloudType serverType =
+          ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
+      RemoteServer<AppEngineServerConfiguration> server
+          = ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
+
+      DeployToServerConfigurationType configurationType
+          = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
+
+      ConfigurationFactoryEx factory = configurationType.getFactory();
+      RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
+          configurationType.getDisplayName(), factory);
+      DeployToServerRunConfiguration<?, ?> runConfiguration
+          = (DeployToServerRunConfiguration<?, ?>) settings.getConfiguration();
+
+      if (server != null) {
+        runConfiguration.setServerName(server.getName());
+      }
+
+      runManager.addConfiguration(settings, false /*isShared*/);
     }
-
-    runManager.addConfiguration(settings, false /*isShared*/);
   }
 
   private void setupDebugRunConfiguration(@NotNull Project project) {
