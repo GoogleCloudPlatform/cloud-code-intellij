@@ -143,12 +143,19 @@ public abstract class AppEngineStandardWebIntegration {
   }
 
   private void setupDebugRunConfiguration(@NotNull Project project) {
-    CloudDebugConfigType debugConfigType = CloudDebugConfigType.getInstance();
-    ConfigurationFactory factory = debugConfigType.getConfigurationFactories()[0];
     RunManager runManager = RunManager.getInstance(project);
-    RunnerAndConfigurationSettings settings = runManager.createConfiguration(
-        new CloudDebugRunConfiguration(project, factory).clone(), factory);
 
-    runManager.addConfiguration(settings, false /*isShared*/);
+    boolean hasExistingDebugConfiguration = runManager.getAllConfigurationsList()
+        .stream()
+        .anyMatch(config -> config instanceof CloudDebugRunConfiguration);
+
+    if (!hasExistingDebugConfiguration) {
+      CloudDebugConfigType debugConfigType = CloudDebugConfigType.getInstance();
+      ConfigurationFactory factory = debugConfigType.getConfigurationFactories()[0];
+      RunnerAndConfigurationSettings settings = runManager.createConfiguration(
+          new CloudDebugRunConfiguration(project, factory).clone(), factory);
+
+      runManager.addConfiguration(settings, false /*isShared*/);
+    }
   }
 }
