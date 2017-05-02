@@ -26,7 +26,6 @@ import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configuration.ConfigurationFactoryEx;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ModuleRunConfiguration;
-import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkRole;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
@@ -117,8 +116,8 @@ public abstract class AppEngineStandardWebIntegration {
     boolean hasExistingDeployConfiguration = runManager.getAllConfigurationsList()
         .stream()
         .filter(config -> config instanceof DeployToServerRunConfiguration)
-        .map(RunConfiguration::getType)
-        .anyMatch(type-> type instanceof AppEngineCloudType);
+        .map(config -> ((DeployToServerRunConfiguration) config).getServerType())
+        .anyMatch(serverType -> serverType instanceof AppEngineCloudType);
 
     if (!hasExistingDeployConfiguration) {
       AppEngineCloudType serverType =
