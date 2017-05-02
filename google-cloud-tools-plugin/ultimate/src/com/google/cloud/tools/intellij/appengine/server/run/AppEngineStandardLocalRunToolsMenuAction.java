@@ -17,22 +17,22 @@
 package com.google.cloud.tools.intellij.appengine.server.run;
 
 import com.google.cloud.tools.intellij.CloudToolsRunConfigurationAction;
-import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 
+import com.intellij.facet.FacetManager;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
-import com.intellij.notification.NotificationListener.UrlOpeningListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.xml.XmlFile;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
+import java.util.stream.Stream;
 
 /**
  * Creates a shortcut to the App Engine standard local run configuration in the tools menu.
@@ -57,41 +57,33 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
   }
 
   /**
-   * Determines if the project has at least one module with an appengine-web.xml configuration file.
+   * Determines if the project has at least one module with the App Engine Standard facet.
    * If it does not, then a notification balloon is shown.
    */
-  private boolean isAppEngineStandardProjectCheck(@NotNull Project project) {
-    XmlFile webXml = AppEngineAssetProvider.getInstance()
-        .loadAppEngineStandardWebXml(project,
-            Arrays.asList(ModuleManager.getInstance(project).getModules()));
+  @VisibleForTesting
+  boolean isAppEngineStandardProjectCheck(@NotNull Project project) {
+    boolean hasAppEngineStandardFacet =
+        Stream.of(ModuleManager.getInstance(project).getModules())
+            .anyMatch(module ->
+                !FacetManager.getInstance(module)
+                    .getFacetsByType(AppEngineStandardFacet.ID).isEmpty()
+            );
 
-    boolean isAppEngineStandardProject = webXml != null;
-
-    if (!isAppEngineStandardProject) {
+    if (!hasAppEngineStandardFacet) {
       NotificationGroup notification =
           new NotificationGroup(
               GctBundle.message("appengine.tools.menu.run.server.error.title"),
               NotificationDisplayType.BALLOON,
               true);
 
-      String errorMessage = new StringBuilder()
-          .append(GctBundle.message("appengine.tools.menu.run.server.error.message"))
-          .append("<br />")
-          .append("<br />")
-          .append(
-              GctBundle.message("appengine.tools.menu.run.server.error.help",
-                  "<a href=\"" + APP_ENGINE_STANDARD_DOCS_LINK + "\">",
-                  "</a>"))
-          .toString();
-
       notification.createNotification(
           GctBundle.message("appengine.tools.menu.run.server.error.title"),
-          errorMessage,
+          GctBundle.message("appengine.tools.menu.run.server.error.message"),
           NotificationType.ERROR,
-          new UrlOpeningListener(false /*expire*/)).notify(project);
+          null /*listener*/).notify(project);
     }
 
-    return isAppEngineStandardProject;
+    return hasAppEngineStandardFacet;
   }
 
 }

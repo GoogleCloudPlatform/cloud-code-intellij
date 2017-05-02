@@ -16,12 +16,20 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 
+import com.intellij.facet.FacetManager;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
@@ -31,7 +39,10 @@ import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRun
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerSettingsEditor;
 import com.intellij.util.containers.ContainerUtil;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Creates a shortcut to App Engine deployment configuration in the tools menu.
@@ -50,7 +61,7 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
   public void actionPerformed(AnActionEvent event) {
     Project project = event.getProject();
 
-    if (project != null) {
+    if (project != null && isAppEngineProjectCheck(project)) {
       AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
       List<RemoteServer<AppEngineServerConfiguration>> servers =
           RemoteServersManager.getInstance().getServers(serverType);
@@ -68,5 +79,36 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
         logger.warn("Error encountered executing App Engine deployment run configuration.", npe);
       }
     }
+  }
+
+  @VisibleForTesting
+  boolean isAppEngineProjectCheck(@NotNull Project project) {
+    boolean hasAppEngineFacet =
+        Stream.of(ModuleManager.getInstance(project).getModules())
+            .anyMatch(module -> {
+              FacetManager manager = FacetManager.getInstance(module);
+              boolean hasAppEngineStandardFacet
+                  = !manager.getFacetsByType(AppEngineStandardFacet.ID).isEmpty();
+              boolean hasAppEngineFlexibleFacet
+                  = !manager.getFacetsByType(AppEngineFlexibleFacetType.ID).isEmpty();
+
+              return hasAppEngineStandardFacet || hasAppEngineFlexibleFacet;
+            });
+
+    if (!hasAppEngineFacet) {
+     NotificationGroup notification =
+          new NotificationGroup(
+              GctBundle.message("appengine.tools.menu.deploy.error.title"),
+              NotificationDisplayType.BALLOON,
+              true);
+
+      notification.createNotification(
+          GctBundle.message("appengine.tools.menu.deploy.error.title"),
+          GctBundle.message("appengine.tools.menu.deploy.error.message"),
+          NotificationType.ERROR,
+          null /*listener*/).notify(project);
+    }
+
+    return hasAppEngineFacet;
   }
 }
