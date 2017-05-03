@@ -16,6 +16,7 @@
 
 buildscript {
     repositories {
+        maven { url "https://maven-central.storage.googleapis.com"}
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
@@ -31,6 +32,7 @@ plugins {
 
 subprojects {
     repositories {
+        maven { url "https://maven-central.storage.googleapis.com"}
         mavenCentral()
         maven {
             url 'https://oss.sonatype.org/content/repositories/snapshots'
