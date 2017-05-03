@@ -79,6 +79,8 @@ artifacts {
 test {
     testLogging {
         events "skipped", "failed"
+        exceptionFormat "full"
+        showCauses true
     }
     doLast{
        println "View report at file://$buildDir/reports/tests/index.html"
