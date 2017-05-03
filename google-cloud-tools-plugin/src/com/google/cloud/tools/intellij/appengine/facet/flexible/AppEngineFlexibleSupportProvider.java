@@ -36,7 +36,6 @@ import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
@@ -47,7 +46,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.RemoteServersManager;
-import com.intellij.remoteServer.configuration.deployment.DeploymentConfiguration;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationType;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
@@ -68,9 +66,6 @@ import javax.swing.JPanel;
  * Adds Flexible support to new or existing IJ modules.
  */
 public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModuleProvider {
-
-  private static Logger logger = Logger.getInstance(AppEngineFlexibleSupportProvider.class);
-
   @NotNull
   @Override
   public FrameworkTypeEx getFrameworkType() {
@@ -115,7 +110,6 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       facet.getConfiguration().setDockerfilePath(dockerfilePath.toString());
 
       if (generateConfigFiles) {
-        // TODO: verfiy appYamlPath
         appEngineProjectService.generateAppYaml(FlexibleRuntime.JAVA, facet.getModule(), appYamlPath);
       }
     }

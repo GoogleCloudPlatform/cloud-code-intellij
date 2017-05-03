@@ -403,7 +403,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
         logger.debug("Failed to create app.yaml from template. " + e.getMessage());
       }
     } else {
-      logger.error("Failed to create app.yaml from template in directory: " + outputPsiDirectory);
+      logger.error("Failed to create app.yaml from template");
     }
 
     return null;
