@@ -58,7 +58,7 @@ subprojects {
         updateSinceUntilBuild = true
         downloadSources = true
         sandboxDirectory = "${rootProject.buildDir}/idea-sandbox"
-
+        intellijRepo = "https://storage.googleapis.com/cloud-tools-for-java-team-kokoro-build-cache/idea-distributions"
         publish {
             username System.getenv('IJ_REPO_USERNAME')
             password System.getenv('IJ_REPO_PASSWORD')
