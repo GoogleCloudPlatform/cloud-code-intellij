@@ -166,7 +166,9 @@ public class RepositorySelectorTest extends PlatformTestCase {
 
   private RepositorySelector getErrorRepositoryPanel() {
     CompletableFuture<ListReposResponse> failedListing
-        = CompletableFuture.supplyAsync(ListReposResponse::new);
+        = CompletableFuture.supplyAsync(() -> {
+      throw new CloudRepositoryServiceException();
+    });
     failedListing.completeExceptionally(new CloudRepositoryServiceException());
 
     when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
