@@ -29,6 +29,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.icons.AllIcons.Ide;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
@@ -62,6 +63,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
       AppEngineProjectService.getInstance();
 
+  private static Logger logger = Logger.getInstance(FlexibleFacetEditor.class);
+
   private JPanel mainPanel;
   private TextFieldWithBrowseButton appYaml;
   private TextFieldWithBrowseButton dockerfile;
@@ -76,7 +79,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     APP_YAML("app.yaml"),
     DOCKERFILE("Dockerfile");
 
-    private String fileName;
+    private final String fileName;
 
     public String getFileName() {
         return fileName;
@@ -325,7 +328,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
                 AppEngineFlexibleDeploymentArtifactType.WAR, module, destinationFolderPath);
             break;
           default:
-            // TODO: throw exception
+            logger.error("No support to generate " + configType.getFileName());
             break;
         }
 
