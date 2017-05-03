@@ -48,10 +48,12 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.event.DocumentEvent;
 
 /**
@@ -62,6 +64,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
       AppEngineProjectService.getInstance();
 
+  private static final boolean IS_WAR_DOCKERFILE_DEFAULT = true;
+
   private JPanel mainPanel;
   private TextFieldWithBrowseButton appYaml;
   private TextFieldWithBrowseButton dockerfile;
@@ -69,7 +73,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JButton genDockerfileButton;
   private JLabel errorIcon;
   private JLabel errorMessage;
-  private JLabel dockerfileLabel;
+  private JRadioButton jarRadioButton;
+  private JRadioButton warRadioButton;
+  private JPanel dockerfilePanel;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
@@ -121,13 +127,21 @@ public class FlexibleFacetEditor extends FacetEditorTab {
             module.getProject(),
             "Dockerfile",
             () -> APP_ENGINE_PROJECT_SERVICE
-                .generateDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR, module),
+                .generateDockerfile(warRadioButton.isSelected()
+                    ? AppEngineFlexibleDeploymentArtifactType.WAR
+                    : AppEngineFlexibleDeploymentArtifactType.JAR, module),
             dockerfile,
             this::showWarnings
     ));
 
     appYaml.setText(facetConfiguration.getAppYamlPath());
     dockerfile.setText(facetConfiguration.getDockerfilePath());
+
+    ButtonGroup dockerfileTypeGroup = new ButtonGroup();
+    dockerfileTypeGroup.add(jarRadioButton);
+    dockerfileTypeGroup.add(warRadioButton);
+    warRadioButton.setSelected(IS_WAR_DOCKERFILE_DEFAULT);
+    jarRadioButton.setSelected(!IS_WAR_DOCKERFILE_DEFAULT);
 
     errorIcon.setIcon(Ide.Error);
     errorIcon.setVisible(false);
@@ -240,9 +254,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     } catch (MalformedYamlFileException myf) {
       // do nothing
     }
-    dockerfileLabel.setVisible(visible);
-    dockerfile.setVisible(visible);
-    genDockerfileButton.setVisible(visible);
+    dockerfilePanel.setVisible(visible);
   }
 
   @Override
@@ -321,13 +333,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  JButton getGenDockerfileButton() {
-    return genDockerfileButton;
-  }
-
-  @VisibleForTesting
-  JLabel getDockerfileLabel() {
-    return dockerfileLabel;
+  JPanel getDockerfilePanel() {
+    return dockerfilePanel;
   }
 
   @VisibleForTesting
@@ -338,5 +345,15 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @VisibleForTesting
   public JLabel getErrorMessage() {
     return errorMessage;
+  }
+
+  @VisibleForTesting
+  public JRadioButton getJarRadioButton() {
+    return jarRadioButton;
+  }
+
+  @VisibleForTesting
+  public JRadioButton getWarRadioButton() {
+    return warRadioButton;
   }
 }
