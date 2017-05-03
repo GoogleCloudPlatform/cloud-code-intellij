@@ -373,11 +373,9 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
         templateName);
 
     File outputFolder = outputFolderPath.toFile();
-    if (!outputFolder.exists()) {
-      if (!outputFolder.mkdirs()) {
+    if (!outputFolder.exists() && !outputFolder.mkdirs()) {
         logger.warn("Failed to create " + outputFolder.toString());
         return null;
-      }
     }
     VirtualFile virtualOutputFolder = LocalFileSystem.getInstance().
         refreshAndFindFileByIoFile(outputFolder);

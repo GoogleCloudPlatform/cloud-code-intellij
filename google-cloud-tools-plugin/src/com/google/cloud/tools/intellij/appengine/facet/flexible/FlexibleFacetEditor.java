@@ -29,7 +29,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.icons.AllIcons.Ide;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
@@ -48,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -66,8 +66,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       AppEngineProjectService.getInstance();
   private static final boolean IS_WAR_DOCKERFILE_DEFAULT = true;
 
-  private static Logger logger = Logger.getInstance(FlexibleFacetEditor.class);
-
   private JPanel mainPanel;
   private TextFieldWithBrowseButton appYaml;
   private TextFieldWithBrowseButton dockerfile;
@@ -79,21 +77,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JRadioButton warRadioButton;
   private JPanel dockerfilePanel;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
-
-  public enum ConfigFile {
-    APP_YAML("app.yaml"),
-    DOCKERFILE("Dockerfile");
-
-    private final String fileName;
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    private ConfigFile(String fileName){
-      this.fileName = fileName;
-    }
-  }
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
       @NotNull Module module) {
@@ -133,18 +116,29 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     genAppYamlButton.addActionListener(
         new GenerateConfigActionListener(
-            module,
-            ConfigFile.APP_YAML,
+            module.getProject(),
+            "app.yaml",
+            (outputFolderPath) -> APP_ENGINE_PROJECT_SERVICE.generateAppYaml(
+                FlexibleRuntime.JAVA,
+                module,
+                outputFolderPath),
             appYaml,
-            this::showWarnings));
+            this::showWarnings
+        ));
 
     genDockerfileButton.addActionListener(
         new GenerateConfigActionListener(
-            module,
-            ConfigFile.DOCKERFILE,
+            module.getProject(),
+            "Dockerfile",
+            (outputFolderPath) -> APP_ENGINE_PROJECT_SERVICE.generateDockerfile(
+                warRadioButton.isSelected()
+                    ? AppEngineFlexibleDeploymentArtifactType.WAR
+                    : AppEngineFlexibleDeploymentArtifactType.JAR,
+                module,
+                outputFolderPath),
             dockerfile,
             this::showWarnings
-    ));
+        ));
 
     appYaml.setText(facetConfiguration.getAppYamlPath());
     dockerfile.setText(facetConfiguration.getDockerfilePath());
@@ -280,25 +274,24 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   /**
    * A somewhat generic way of generating a file for a {@link TextFieldWithBrowseButton}.
    */
-  private class GenerateConfigActionListener implements ActionListener {
+  private static class GenerateConfigActionListener implements ActionListener {
 
-    private final Module module;
     private final Project project;
     private final String fileName;
     private final TextFieldWithBrowseButton filePicker;
-    private final ConfigFile configType;
+    private final Consumer<Path> configFileGenerator;
     // Used to refresh the warnings.
     private final Runnable configurationValidator;
 
     GenerateConfigActionListener(
-        Module module,
-        ConfigFile configType,
+        Project project,
+        String fileName,
+        Consumer<Path> configFileGenerator,
         TextFieldWithBrowseButton filePicker,
         Runnable configurationValidator) {
-      this.module = module;
-      project = module.getProject();
-      fileName = configType.getFileName();
-      this.configType = configType;
+      this.project = project;
+      this.fileName = fileName;
+      this.configFileGenerator = configFileGenerator;
       this.filePicker = filePicker;
       this.configurationValidator = configurationValidator;
     }
@@ -327,26 +320,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           }
         }
 
-        switch (configType) {
-          case APP_YAML:
-            APP_ENGINE_PROJECT_SERVICE.generateAppYaml(
-                FlexibleRuntime.JAVA,
-                module,
-                destinationFolderPath);
-            break;
-          case DOCKERFILE:
-            APP_ENGINE_PROJECT_SERVICE.generateDockerfile(
-                warRadioButton.isSelected() ?
-                    AppEngineFlexibleDeploymentArtifactType.WAR :
-                    AppEngineFlexibleDeploymentArtifactType.JAR,
-                module,
-                destinationFolderPath);
-            break;
-          default:
-            logger.error("No support to generate " + configType.getFileName());
-            break;
-        }
-
+        configFileGenerator.accept(destinationFolderPath);
         filePicker.setText(destinationFilePath.toString());
         configurationValidator.run();
       }
