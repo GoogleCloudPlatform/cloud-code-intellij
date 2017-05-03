@@ -165,10 +165,13 @@ public class RepositorySelectorTest extends PlatformTestCase {
   }
 
   private RepositorySelector getErrorRepositoryPanel() {
+    CompletableFuture<ListReposResponse> failedListing
+        = CompletableFuture.supplyAsync(ListReposResponse::new);
+    failedListing.completeExceptionally(new CloudRepositoryServiceException());
+
     when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
-        .thenReturn(CompletableFuture.supplyAsync(() -> {
-          throw new CloudRepositoryServiceException();
-        }));
+        .thenReturn(failedListing);
+
 
     return getSelector(true /*openPopup*/);
   }
