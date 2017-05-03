@@ -172,7 +172,6 @@ public class RepositorySelectorTest extends PlatformTestCase {
     when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
         .thenReturn(failedListing);
 
-
     return getSelector(true /*openPopup*/);
   }
 
