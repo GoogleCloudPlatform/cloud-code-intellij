@@ -167,3 +167,5 @@ task doRelease {
                 'Hit CTRL+C to cancel.\n'
     }
 }
+
+apply from: "scripts/android-studio-build.gradle"

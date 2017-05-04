@@ -1,0 +1,140 @@
+def jarLicenseMap = [
+        "GoogleFeedback.jar" : "apache2",
+        "google-api-java-client-min-repackaged-1.20.0.jar" : "apache2",
+        "google-api-services-clouddebugger-v2-rev4-1.20.0.jar" : "apache2",
+        "google-api-services-developerprojects-v1-rev20140815212553-1.19.0.jar" : "apache2",
+        "google-api-services-source.jar" : "apache2",
+        "google-api-services-oauth2-v2-rev98-1.20.0.jar" : "apache2",
+        "GoogleFeedback.jar" : "apache2",
+        "google-http-client-jackson-1.20.0.jar" : "apache2",
+        "jackson-core-asl-1.9.11.jar" : "apache2",
+        "javax.servlet-api-3.0.1.jar" : "cddlv1",
+
+        "google.gdt.eclipse.login.common.jar" : "apache2",
+        "google-gct-login-context-ij-pg.jar" : "apache2",
+        ("google-account-plugin-${version}.jar".toString()) : "apache2",
+        ("google-cloud-tools-plugin-${version}.jar".toString()) : "apache2",
+        ("common-lib-${version}.jar".toString()) : "apache2",
+]
+
+def licenseNameMap = [
+        "apache2" : "Apache License Version 2",
+        "cddlv1" : "CDDL + GPLv2 with classpath exception"
+]
+
+def licenseFileMap = [
+        "apache2" : file("scripts/APACHE2.txt"),
+        "cddlv1" : file("scripts/CDDL1.txt")
+]
+    
+
+def pluginProjects = [":google-cloud-tools-plugin", ":google-account-plugin"]
+
+allprojects {
+    if (!(project.path in pluginProjects)) {
+        return
+    }
+
+    // create a studio release
+    task buildAndroidStudioRelease(type: Copy) {
+        def outputDir = "${buildDir}/androidStudioRelease"
+        outputs.upToDateWhen { false }
+        project.afterEvaluate { 
+            dependsOn project.tasks.buildPlugin
+            dependsOn project.tasks.jar
+            dependsOn project.tasks.jarSources
+
+            into outputDir
+
+            // include dependencies
+            project.tasks.buildPlugin.outputs.files.each {
+                from zipTree(it).matching {
+                    include "${project.intellij.pluginName}/lib/**"
+                }
+            }
+
+            // includes jars
+            project.tasks.jar.outputs.files.each { outputFile ->
+                from (outputFile) {
+                    into "${project.intellij.pluginName}/lib"
+                }
+            }
+            // include sources jar
+            project.tasks.jarSources.outputs.files.each { outputFile ->
+                from (outputFile) {
+                    into "${project.intellij.pluginName}/lib/src"
+                }
+            }
+            // include any subproject sources jar
+            project.configurations.compile.incoming.resolutionResult.root.dependencies.each {
+                if (it.selected.id instanceof ProjectComponentIdentifier) {
+                    if (!(it.selected.id.projectPath in pluginProjects)) {
+                        def subProject = it.selected.id.projectPath
+                        dependsOn rootProject.project(subProject).tasks.jarSources
+                        rootProject.project(subProject).tasks.jarSources.outputs.files.each { outputFile ->
+                            from (outputFile) {
+                                into "${project.intellij.pluginName}/lib/src"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        doFirst {
+            delete(getDestinationDir())
+        }
+        doLast {
+            def allJars = fileTree(getDestinationDir()).matching { 
+                include "**/*.jar" 
+                exclude "**/*-sources.jar"
+            }.collect { it.name }
+            def licenseFiles = new HashSet()
+            def noticeTxt = new StringBuilder()
+            noticeTxt << 'This Plugin includes the following dependencies with corresponding licenses\n'
+            allJars.each { jarName ->
+                def jarLicense = jarLicenseMap[jarName]
+                if (jarLicense == null) {
+                    throw new GradleException("Could not find license for jar : ${jarName}");
+                }
+                def jarLicenseFull = licenseNameMap[jarLicense]
+                if (jarLicenseFull == null) {
+                    throw new GradleException("Could not find full name of license : ${jarLicense}");
+                }
+                def jarLicenseFile = licenseFileMap[jarLicense]
+                if (jarLicenseFile == null || !jarLicenseFile.isFile() || !jarLicenseFile.exists()) {
+                    throw new GradleException("Could not find licenseFile : ${jarLicense}");
+                }
+                noticeTxt << "${jarName} : ${jarLicenseFull}\n"
+                licenseFiles << jarLicenseFile
+            }
+            def pluginDestinationDir = "${getDestinationDir()}/${project.intellij.pluginName}"
+
+            // write license file
+            def noticeFile = file("${pluginDestinationDir}/NOTICE")
+            noticeFile.withWriter('UTF-8') { writer ->
+                writer.write(noticeTxt.toString())
+            }
+
+            // copy in individual licenses
+            licenseFiles.each { licenseFile ->
+                copy {
+                    from licenseFile
+                    into pluginDestinationDir
+                }
+            }
+
+            // write PREBUILT for build information
+            def prebuiltFile = file("${pluginDestinationDir}/PREBUILT")
+            prebuiltFile.withWriter('UTF-8') { writer ->
+                writer.write("This plugin was built from https://github.com/GoogleCloudPlatform/gcloud-intellij\n")
+                writer.write("Using the command 'gradlew ${name}'")
+            }
+
+            // copy in notice
+            copy {
+                from project.file("LICENSE")
+                into pluginDestinationDir
+            }
+        }
+    }
+}
