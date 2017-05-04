@@ -59,8 +59,8 @@ if [ "$SOURCE_VERSION" != "$TAG_VERSION" ]
         exit 1 # terminate and indicate error
 fi
 
-echo "Installing aktau/github-release.."
-go get github.com/aktau/github-release
+echo "Installing github-release"
+go get github.com/itchio/gothub
 cd github/google-cloud-intellij
 echo "Building plugins"
 ./gradlew buildPlugin
