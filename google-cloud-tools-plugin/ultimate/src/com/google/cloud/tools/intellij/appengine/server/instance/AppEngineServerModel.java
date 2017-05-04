@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
@@ -75,6 +76,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   private Sdk devAppServerJdk;
   private ProjectSdksModel projectJdksModel;
   private AppEngineModelSettings settings = new AppEngineModelSettings();
+  private boolean useDevappserver2;
 
   public AppEngineServerModel() {
     projectJdksModel = new ProjectSdksModel();
@@ -224,6 +226,14 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     }
   }
 
+  public void setUseDevappserver2(boolean useDevappserver2) {
+    this.useDevappserver2 = useDevappserver2;
+  }
+
+  public boolean isUseDevappserver2() {
+    return useDevappserver2;
+  }
+
   @Override
   public List<File> getAppYamls() {
     List<File> appYamls = new ArrayList<>();
@@ -234,8 +244,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   @Override
   public List<File> getServices() {
-    // Needed by devappserver1. Will be implemented when devappserver1 is integrated.
-    return null;
+    return ImmutableList.of(Paths.get(artifactPointer.getArtifact().getOutputPath()).toFile());
   }
 
   @Override
