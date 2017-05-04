@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 ## [unreleased]
 
+## [17.2.5_2017]
+
+### Added
+  - Environment variables in the App Engine standard local run configuration are now passed in to the dev server. [#1364](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1364)
+  - Environment variables configured in appengine-web.xml are now honored and passed in to the dev server. [#377] (https://github.com/GoogleCloudPlatform/appengine-plugins-core/issues/377)
+  - 
+
 ## [17.2.4_2017]
 
 ### Added
