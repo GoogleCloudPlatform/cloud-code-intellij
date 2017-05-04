@@ -374,7 +374,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
     File outputFolder = outputFolderPath.toFile();
     if (!outputFolder.exists() && !outputFolder.mkdirs()) {
-        logger.warn("Failed to create " + outputFolder.toString());
+        logger.warn("Failed to create " + outputFileName + " directory: " + outputFolder.toString());
         return null;
     }
     VirtualFile virtualOutputFolder = LocalFileSystem.getInstance().
