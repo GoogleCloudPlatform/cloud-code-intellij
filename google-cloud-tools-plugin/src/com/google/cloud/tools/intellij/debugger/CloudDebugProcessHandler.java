@@ -19,9 +19,11 @@ package com.google.cloud.tools.intellij.debugger;
 import com.google.cloud.tools.intellij.debugger.ui.LogoutDebugProcessDetacher;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.diagnostic.Logger;
+import com.sun.istack.NotNull;
 
 import java.io.OutputStream;
 
@@ -38,9 +40,9 @@ public class CloudDebugProcessHandler extends ProcessHandler {
   /**
    * Initialize the cloud debug process handler.
    */
-  public CloudDebugProcessHandler(CloudDebugProcess process) {
+  public CloudDebugProcessHandler(@NotNull CloudDebugProcess process) {
     this.process = process;
-    if (process != null && process.getProcessState() != null) {
+    if (process.getProcessState() != null) {
       String userEmail = process.getProcessState().getUserEmail();
       if (userEmail != null) {
         final CredentialedUser user = Services.getLoginService().getAllUsers().get(userEmail);
@@ -55,8 +57,13 @@ public class CloudDebugProcessHandler extends ProcessHandler {
         LOG.error("userEmail is null. To launch a debug session user needs to be logged in");
       }
     } else {
-      LOG.error("process or process state is null. This should only happen in tests");
+      LOG.error("process state is null.");
     }
+  }
+
+  @VisibleForTesting
+  CloudDebugProcessHandler() {
+    this.process = null;
   }
 
   @Override
