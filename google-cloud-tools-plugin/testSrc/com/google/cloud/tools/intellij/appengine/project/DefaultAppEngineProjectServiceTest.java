@@ -188,7 +188,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
   }
 
   public void testGenerateAppYaml() {
-    Path outputDir = Paths.get(getProject().getBasePath() + "src/main/appengine");
+    Path outputDir = Paths.get(getProject().getBasePath() + "/src/main/appengine");
     appEngineProjectService.generateAppYaml(
         FlexibleRuntime.JAVA,
         getModule(),
@@ -200,7 +200,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
   }
 
   public void testGenerateDockerfile_war() {
-    Path outputDir = Paths.get(getProject().getBasePath() + "src/main/docker");
+    Path outputDir = Paths.get(getProject().getBasePath() + "/src/main/docker");
     appEngineProjectService.generateDockerfile(
         AppEngineFlexibleDeploymentArtifactType.WAR,
         getModule(),
@@ -213,7 +213,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
   public void testGenerateDockerfile_jar() {
 
-    Path outputDir = Paths.get(getProject().getBasePath() + "/src/main/dockersfxv ");
+    Path outputDir = Paths.get(getProject().getBasePath() + "/src/main/docker");
     appEngineProjectService.generateDockerfile(
         AppEngineFlexibleDeploymentArtifactType.JAR,
         getModule(),
