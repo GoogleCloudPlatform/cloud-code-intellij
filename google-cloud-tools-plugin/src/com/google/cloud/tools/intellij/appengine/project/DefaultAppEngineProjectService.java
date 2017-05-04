@@ -34,7 +34,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.psi.PsiDirectory;
@@ -47,7 +47,6 @@ import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSour
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.usageView.UsageInfo;
-import com.intellij.util.IncorrectOperationException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,6 +57,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.scanner.ScannerException;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -321,7 +321,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public void generateAppYaml(FlexibleRuntime runtime, Module module) {
+  public void generateAppYaml(FlexibleRuntime runtime, Module module, Path outputFolderPath) {
     Properties templateProperties =
         FileTemplateManager.getDefaultInstance().getDefaultProperties();
     templateProperties.put("RUNTIME", runtime.toString());
@@ -329,15 +329,16 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     ApplicationManager.getApplication().runWriteAction(() -> {
       generateFromTemplate(
           AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE,
-          "appengine",
           "app.yaml",
+          outputFolderPath,
           templateProperties,
           module);
     });
   }
 
   @Override
-  public void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module) {
+  public void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module,
+      Path outputFolderPath) {
     if (type == AppEngineFlexibleDeploymentArtifactType.UNKNOWN) {
       throw new RuntimeException("Cannot generate Dockerfile for unknown artifact type.");
     }
@@ -347,8 +348,8 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
           type == AppEngineFlexibleDeploymentArtifactType.JAR
               ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
               : AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_WAR_TEMPLATE,
-          "docker",
           "Dockerfile",
+          outputFolderPath,
           FileTemplateManager.getDefaultInstance().getDefaultProperties(),
           module);
 
@@ -366,48 +367,41 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Nullable
-  private PsiElement generateFromTemplate(String templateName, String templateDirectoryName,
-      String fileName, Properties templateProperties, Module module) {
+  private PsiElement generateFromTemplate(String templateName, String outputFileName,
+      Path outputFolderPath, Properties templateProperties, Module module) {
     FileTemplate configTemplate = FileTemplateManager.getDefaultInstance().getInternalTemplate(
         templateName);
-    VirtualFile virtualFile = ModuleRootManager.getInstance(module).getContentRoots()[0]
-        .findFileByRelativePath("src/main");
 
-    if (virtualFile != null) {
-      PsiDirectory directory = PsiManager.getInstance(module.getProject())
-          .findDirectory(virtualFile);
+    File outputFolder = outputFolderPath.toFile();
+    if (!outputFolder.exists() && !outputFolder.mkdirs()) {
+        logger.warn("Failed to create " + outputFileName + " directory: " + outputFolder.toString());
+        return null;
+    }
+    VirtualFile virtualOutputFolder = LocalFileSystem.getInstance().
+        refreshAndFindFileByIoFile(outputFolder);
+    if (virtualOutputFolder == null) {
+      logger.warn("Failed to locate " + outputFolder.toString() + "directory");
+      return null;
+    }
+    PsiDirectory outputPsiDirectory = PsiManager.getInstance(module.getProject())
+        .findDirectory(virtualOutputFolder);
 
-      if (directory != null) {
-        PsiDirectory configDirectory;
-        try {
-          directory.checkCreateSubdirectory(templateDirectoryName);
-          configDirectory = directory.createSubdirectory(templateDirectoryName);
-        } catch (IncorrectOperationException ioe) {
-          // checkCreateSubdirectory threw an exception suggesting that the directory may already
-          // exist. Skip creating the directory and attempt to write file.
-          configDirectory = directory.findSubdirectory(templateDirectoryName);
-        }
-
-        if (configDirectory != null
-            && FileTemplateUtil.canCreateFromTemplate(
-            new PsiDirectory[]{configDirectory}, configTemplate)) {
-          try {
-            return FileTemplateUtil.createFromTemplate(
-                configTemplate,
-                fileName,
-                templateProperties,
-                configDirectory);
-          } catch (Exception e) {
-            // If the file already exists, this exception will be thrown by createFromTemplate
-            // We want to silently skip the generation in this case.
-            logger.debug("Failed to create app.yaml from template. " + e.getMessage());
-          }
-        } else {
-          logger.error("Failed to create app.yaml from template in directory: " + configDirectory);
-        }
+    if (outputPsiDirectory != null
+        && FileTemplateUtil.canCreateFromTemplate(
+        new PsiDirectory[]{outputPsiDirectory}, configTemplate)) {
+      try {
+        return FileTemplateUtil.createFromTemplate(
+            configTemplate,
+            outputFileName,
+            templateProperties,
+            outputPsiDirectory);
+      } catch (Exception e) {
+        // If the file already exists, this exception will be thrown by createFromTemplate
+        // We want to silently skip the generation in this case.
+        logger.debug("Failed to create app.yaml from template. " + e.getMessage());
       }
     } else {
-      logger.warn("Failed to located source root for app.yaml creation.");
+      logger.error("Failed to create app.yaml from template");
     }
 
     return null;
