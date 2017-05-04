@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,34 +23,42 @@ import com.intellij.conversion.ConversionProcessor;
 import com.intellij.conversion.ConverterProvider;
 import com.intellij.conversion.ModuleSettings;
 import com.intellij.conversion.ProjectConverter;
+import com.intellij.conversion.RunManagerSettings;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Provides converters for an App Engine Facet Migration. This migration migrates facets that use
- * a deprecated facet ID to a new facet ID.
+ * Converter provider to migrate projects created by the legacy plugin to work with this one.
  */
-public class AppEngineStandardFacetMigrationConverterProvider extends ConverterProvider {
+public class AppEngineConverterProvider
+  extends ConverterProvider {
 
-  public AppEngineStandardFacetMigrationConverterProvider() {
-    super("google-app-engine-facet-migration");
+  public AppEngineConverterProvider() {
+    super("google-app-engine-migration");
+  }
+
+  @NotNull
+  @Override
+  public String getConversionDescription() {
+    return GctBundle.message("appengine.converter.description");
   }
 
   @NotNull
   @Override
   public ProjectConverter createConverter(@NotNull ConversionContext context) {
     return new ProjectConverter() {
+      @Nullable
       @Override
       public ConversionProcessor<ModuleSettings> createModuleFileConverter() {
         return new AppEngineStandardFacetMigrationConversionProcessor();
       }
+
+      @Nullable
+      @Override
+      public ConversionProcessor<RunManagerSettings> createRunConfigurationsConverter() {
+        return new AppEngineDeploymentRunConfigurationConverter();
+      }
     };
   }
-
-  @NotNull
-  @Override
-  public String getConversionDescription() {
-    return GctBundle.message("appengine.facet.converter.description");
-  }
-
 }
