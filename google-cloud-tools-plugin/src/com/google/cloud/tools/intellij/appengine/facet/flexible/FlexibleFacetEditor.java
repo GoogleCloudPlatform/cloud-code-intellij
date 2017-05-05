@@ -47,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -63,7 +64,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
       AppEngineProjectService.getInstance();
-
   private static final boolean IS_WAR_DOCKERFILE_DEFAULT = true;
 
   private JPanel mainPanel;
@@ -118,21 +118,27 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         new GenerateConfigActionListener(
             module.getProject(),
             "app.yaml",
-            () -> APP_ENGINE_PROJECT_SERVICE.generateAppYaml(FlexibleRuntime.JAVA, module),
+            (outputFolderPath) -> APP_ENGINE_PROJECT_SERVICE.generateAppYaml(
+                FlexibleRuntime.JAVA,
+                module,
+                outputFolderPath),
             appYaml,
-            this::showWarnings));
+            this::showWarnings
+        ));
 
     genDockerfileButton.addActionListener(
         new GenerateConfigActionListener(
             module.getProject(),
             "Dockerfile",
-            () -> APP_ENGINE_PROJECT_SERVICE
-                .generateDockerfile(warRadioButton.isSelected()
+            (outputFolderPath) -> APP_ENGINE_PROJECT_SERVICE.generateDockerfile(
+                warRadioButton.isSelected()
                     ? AppEngineFlexibleDeploymentArtifactType.WAR
-                    : AppEngineFlexibleDeploymentArtifactType.JAR, module),
+                    : AppEngineFlexibleDeploymentArtifactType.JAR,
+                module,
+                outputFolderPath),
             dockerfile,
             this::showWarnings
-    ));
+        ));
 
     appYaml.setText(facetConfiguration.getAppYamlPath());
     dockerfile.setText(facetConfiguration.getDockerfilePath());
@@ -273,14 +279,14 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     private final Project project;
     private final String fileName;
     private final TextFieldWithBrowseButton filePicker;
-    private final Runnable configFileGenerator;
+    private final Consumer<Path> configFileGenerator;
     // Used to refresh the warnings.
     private final Runnable configurationValidator;
 
     GenerateConfigActionListener(
         Project project,
         String fileName,
-        Runnable configFileGenerator,
+        Consumer<Path> configFileGenerator,
         TextFieldWithBrowseButton filePicker,
         Runnable configurationValidator) {
       this.project = project;
@@ -314,8 +320,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           }
         }
 
-        configFileGenerator.run();
-
+        configFileGenerator.accept(destinationFolderPath);
         filePicker.setText(destinationFilePath.toString());
         configurationValidator.run();
       }
