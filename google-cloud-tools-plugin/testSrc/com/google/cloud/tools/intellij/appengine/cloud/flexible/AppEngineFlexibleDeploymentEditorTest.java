@@ -85,7 +85,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       AppEngineFlexibleFacet flexCustomFacet = FacetManager.getInstance(customModule).addFacet(
           AppEngineFlexibleFacet.getFacetType(), "flex facet", null /* underlyingFacet */);
       flexCustomFacet.getConfiguration().setAppYamlPath(customYaml.getPath());
-      flexCustomFacet.getConfiguration().setDockerfilePath(dockerfile.getPath());
+      flexCustomFacet.getConfiguration().setDockerfileDirectory(dockerfile.getPath());
     });
     createModule("non flex module");
 

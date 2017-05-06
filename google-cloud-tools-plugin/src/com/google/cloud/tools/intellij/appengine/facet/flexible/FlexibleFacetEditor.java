@@ -64,12 +64,12 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private JPanel mainPanel;
   private TextFieldWithBrowseButton appYaml;
-  private TextFieldWithBrowseButton dockerfile;
+  private TextFieldWithBrowseButton dockerfileDirectory;
   private JButton genAppYamlButton;
   private JButton genDockerfileButton;
   private JLabel errorIcon;
   private JLabel errorMessage;
-  private JLabel dockerfileLabel;
+  private JLabel dockerfileDirectoryLabel;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
@@ -94,18 +94,18 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       }
     });
 
-    dockerfile.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+    dockerfileDirectory.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
         showWarnings();
       }
     });
 
-    dockerfile.addBrowseFolderListener(
+    dockerfileDirectory.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.dockerfile"),
         null /* description */,
         module.getProject(),
-        FileChooserDescriptorFactory.createSingleFileDescriptor()
+        FileChooserDescriptorFactory.createSingleFolderDescriptor()
     );
 
     genAppYamlButton.addActionListener(
@@ -122,12 +122,12 @@ public class FlexibleFacetEditor extends FacetEditorTab {
             "Dockerfile",
             () -> APP_ENGINE_PROJECT_SERVICE
                 .generateDockerfile(AppEngineFlexibleDeploymentArtifactType.WAR, module),
-            dockerfile,
+            dockerfileDirectory,
             this::showWarnings
     ));
 
     appYaml.setText(facetConfiguration.getAppYamlPath());
-    dockerfile.setText(facetConfiguration.getDockerfilePath());
+    dockerfileDirectory.setText(facetConfiguration.getDockerfileDirectory());
 
     errorIcon.setIcon(Ide.Error);
     errorIcon.setVisible(false);
@@ -146,13 +146,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @Override
   public boolean isModified() {
     return !appYaml.getText().equals(facetConfiguration.getAppYamlPath())
-        || !dockerfile.getText().equals(facetConfiguration.getDockerfilePath());
+        || !dockerfileDirectory.getText().equals(facetConfiguration.getDockerfileDirectory());
   }
 
   @Override
   public void reset() {
     appYaml.setText(facetConfiguration.getAppYamlPath());
-    dockerfile.setText(facetConfiguration.getDockerfilePath());
+    dockerfileDirectory.setText(facetConfiguration.getDockerfileDirectory());
 
     toggleDockerfileSection();
   }
@@ -166,7 +166,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     }
 
     try {
-      if (isRuntimeCustom() && !isValidConfigurationFile(dockerfile.getText())) {
+      if (isRuntimeCustom() && !isValidConfigurationFile(dockerfileDirectory.getText())) {
         throw new ConfigurationException(
             GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
       }
@@ -220,7 +220,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     }
 
     try {
-      if (isRuntimeCustom() && !isValidConfigurationFile(dockerfile.getText())) {
+      if (isRuntimeCustom() && !isValidConfigurationFile(dockerfileDirectory.getText())) {
         errorMessage.setText(GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
         showError = true;
       }
@@ -240,8 +240,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     } catch (MalformedYamlFileException myf) {
       // do nothing
     }
-    dockerfileLabel.setVisible(visible);
-    dockerfile.setVisible(visible);
+    dockerfileDirectoryLabel.setVisible(visible);
+    dockerfileDirectory.setVisible(visible);
     genDockerfileButton.setVisible(visible);
   }
 
@@ -249,7 +249,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   public void onFacetInitialized(@NotNull Facet facet) {
     if (facet instanceof AppEngineFlexibleFacet) {
       ((AppEngineFlexibleFacet) facet).getConfiguration().setAppYamlPath(appYaml.getText());
-      ((AppEngineFlexibleFacet) facet).getConfiguration().setDockerfilePath(dockerfile.getText());
+      ((AppEngineFlexibleFacet) facet).getConfiguration().setDockerfileDirectory(
+          dockerfileDirectory.getText());
     }
   }
 
@@ -260,7 +261,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     private final Project project;
     private final String fileName;
-    private final TextFieldWithBrowseButton filePicker;
+    private final TextFieldWithBrowseButton directoryPicker;
     private final Runnable configFileGenerator;
     // Used to refresh the warnings.
     private final Runnable configurationValidator;
@@ -269,19 +270,19 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         Project project,
         String fileName,
         Runnable configFileGenerator,
-        TextFieldWithBrowseButton filePicker,
+        TextFieldWithBrowseButton directoryPicker,
         Runnable configurationValidator) {
       this.project = project;
       this.fileName = fileName;
       this.configFileGenerator = configFileGenerator;
-      this.filePicker = filePicker;
+      this.directoryPicker = directoryPicker;
       this.configurationValidator = configurationValidator;
     }
 
     @Override
     public void actionPerformed(ActionEvent event) {
       SelectConfigDestinationFolderDialog destinationFolderDialog = new
-          SelectConfigDestinationFolderDialog(project, filePicker.getText());
+          SelectConfigDestinationFolderDialog(project, directoryPicker.getText());
       if (destinationFolderDialog.showAndGet()) {
         Path destinationFolderPath = destinationFolderDialog.getDestinationFolder();
         Path destinationFilePath = destinationFolderPath.resolve(fileName);
@@ -304,7 +305,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
         configFileGenerator.run();
 
-        filePicker.setText(destinationFilePath.toString());
+        directoryPicker.setText(destinationFolderPath.toString());
         configurationValidator.run();
       }
     }
@@ -316,8 +317,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  TextFieldWithBrowseButton getDockerfile() {
-    return dockerfile;
+  TextFieldWithBrowseButton getDockerfileDirectory() {
+    return dockerfileDirectory;
   }
 
   @VisibleForTesting
@@ -326,8 +327,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  JLabel getDockerfileLabel() {
-    return dockerfileLabel;
+  JLabel getDockerfileDirectoryLabel() {
+    return dockerfileDirectoryLabel;
   }
 
   @VisibleForTesting

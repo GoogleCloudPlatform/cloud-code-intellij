@@ -35,15 +35,15 @@
             </constraints>
             <properties/>
           </component>
-          <component id="611f9" class="javax.swing.JLabel" binding="dockerfileLabel">
+          <component id="611f9" class="javax.swing.JLabel" binding="dockerfileDirectoryLabel">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Dockerfile"/>
+              <text value="Dockerfile Directory"/>
             </properties>
           </component>
-          <component id="cf5ec" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="dockerfile">
+          <component id="cf5ec" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="dockerfileDirectory">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -62,7 +62,7 @@
               <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Generate..."/>
+              <text value="Generate Dockerfile..."/>
             </properties>
           </component>
           <grid id="a7ffc" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">

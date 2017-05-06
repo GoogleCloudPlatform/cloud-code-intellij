@@ -47,7 +47,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.RemoteServersManager;
-import com.intellij.remoteServer.configuration.deployment.DeploymentConfiguration;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationType;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
@@ -108,11 +107,11 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
     if (contentRoots.length > 0) {
       Path appYamlPath = Paths.get(
           appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
-      Path dockerfilePath = Paths.get(
-          appEngineProjectService.getDefaultDockerfilePath(contentRoots[0].getPath()));
+      Path dockerfileDirectory = Paths.get(
+          appEngineProjectService.getDefaultDockerfileDirectory(contentRoots[0].getPath()));
 
       facet.getConfiguration().setAppYamlPath(appYamlPath.toString());
-      facet.getConfiguration().setDockerfilePath(dockerfilePath.toString());
+      facet.getConfiguration().setDockerfileDirectory(dockerfileDirectory.toString());
 
       if (generateConfigFiles) {
         appEngineProjectService.generateAppYaml(FlexibleRuntime.JAVA, facet.getModule());
