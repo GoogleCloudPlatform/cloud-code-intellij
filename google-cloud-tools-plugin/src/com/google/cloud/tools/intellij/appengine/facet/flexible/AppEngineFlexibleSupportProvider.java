@@ -36,7 +36,6 @@ import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
@@ -67,9 +66,6 @@ import javax.swing.JPanel;
  * Adds Flexible support to new or existing IJ modules.
  */
 public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModuleProvider {
-
-  private static Logger logger = Logger.getInstance(AppEngineFlexibleSupportProvider.class);
-
   @NotNull
   @Override
   public FrameworkTypeEx getFrameworkType() {
@@ -114,7 +110,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       facet.getConfiguration().setDockerfileDirectory(dockerfileDirectory.toString());
 
       if (generateConfigFiles) {
-        appEngineProjectService.generateAppYaml(FlexibleRuntime.JAVA, facet.getModule());
+        appEngineProjectService.generateAppYaml(FlexibleRuntime.JAVA, facet.getModule(), appYamlPath.getParent());
       }
     }
 
