@@ -66,14 +66,20 @@ echo "Building plugins"
 ./gradlew buildPlugin
 
 echo "Creating Github release for tag: $GIT_TAG_NAME"
+
+## GITHUB_USER and GITHUB_REPO are used by github-release command.
+export GITHUB_USER=GoogleCloudPlatform
+export GITHUB_REPO=google-cloud-intellij
 github-release release --tag $GIT_TAG_NAME
 
 echo "Uploading Google Account Plugin artifact to release $GIT_TAG_NAME"
-github-release upload --tag $GIT_TAG_NAME --file\
- google-account-plugin/build/distributions/google-account-${VERSION}.zip
+github-release upload --tag $GIT_TAG_NAME --file \
+ google-account-plugin/build/distributions/google-account-${VERSION}.zip \
+  --name google-account-${VERSION}.zip
 echo "Uploading Google Cloud Tools Plugin artifact to release $GIT_TAG_NAME"
-github-release upload --tag $GIT_TAG_NAME --file\
- google-cloud-tools-plugin/build/distributions/google-cloud-tools-${VERSION}.zip
+github-release upload --tag $GIT_TAG_NAME --file \
+ google-cloud-tools-plugin/build/distributions/google-cloud-tools-${VERSION}.zip \
+ --name google-cloud-tools-${VERSION}.zip
 echo "Upload complete."
 
 echo "Publishing plugin to Jetbrains plugin repository"
