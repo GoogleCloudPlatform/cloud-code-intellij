@@ -1,6 +1,6 @@
 ![Google Cloud Platform Logo](https://cloud.google.com/_static/images/gcp-logo.png)
 # Google Cloud Tools for IntelliJ plugin
-[![Build Status](https://cloud-tools-for-java-testing.appspot.com/buildStatus/icon?job=google-cloud-intellij master build orb (IDEA 2016))](https://cloud-tools-for-java-testing.appspot.com/job/google-cloud-intellij%20master%20build%20orb%20(IDEA%202016)/)
+[![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-ubuntu-master-orb.png)
 
 The plugin integrates the [Google Cloud Platform](https://cloud.google.com/)
 into the IntelliJ IDEA UI. Currently this includes:
