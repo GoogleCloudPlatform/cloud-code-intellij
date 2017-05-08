@@ -142,7 +142,8 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
         configuration = null;
       }
 
-      if (artifact != null && configuration != null) {
+      if (artifact != null && configuration != null
+          && configuration.getServerModel() instanceof AppEngineServerModel) {
         ((AppEngineServerModel) configuration.getServerModel()).setArtifact(artifact);
         BuildArtifactsBeforeRunTaskProvider
             .setBuildArtifactBeforeRun(project, configuration, artifact);

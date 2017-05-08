@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.project;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardRuntime;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
@@ -35,11 +36,13 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.testFramework.PlatformTestCase;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -182,6 +185,43 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
         appEngineProjectService.getServiceNameFromAppEngineWebXml(
             loadTestWebXml(
                 "testData/descriptor/appengine-web_runtime-java8-serviceandmodule.xml")));
+  }
+
+  public void testGenerateAppYaml() {
+    Path outputDir = Paths.get(getProject().getBasePath() + "/src/main/appengine");
+    appEngineProjectService.generateAppYaml(
+        FlexibleRuntime.JAVA,
+        getModule(),
+        outputDir);
+
+    File[] listOfFiles = outputDir.toFile().listFiles();
+    Assert.assertEquals(1, listOfFiles.length);
+    Assert.assertEquals("app.yaml", listOfFiles[0].getName());
+  }
+
+  public void testGenerateDockerfile_war() {
+    Path outputDir = Paths.get(getProject().getBasePath() + "/src/main/docker");
+    appEngineProjectService.generateDockerfile(
+        AppEngineFlexibleDeploymentArtifactType.WAR,
+        getModule(),
+        outputDir);
+
+    File[] listOfFiles = outputDir.toFile().listFiles();
+    Assert.assertEquals(1, listOfFiles.length);
+    Assert.assertEquals("Dockerfile", listOfFiles[0].getName());
+  }
+
+  public void testGenerateDockerfile_jar() {
+
+    Path outputDir = Paths.get(getProject().getBasePath() + "/src/main/docker");
+    appEngineProjectService.generateDockerfile(
+        AppEngineFlexibleDeploymentArtifactType.JAR,
+        getModule(),
+        outputDir);
+
+    File[] listOfFiles = outputDir.toFile().listFiles();
+    Assert.assertEquals(1, listOfFiles.length);
+    Assert.assertEquals("Dockerfile", listOfFiles[0].getName());
   }
 
   public static File getTestDataPath() {
