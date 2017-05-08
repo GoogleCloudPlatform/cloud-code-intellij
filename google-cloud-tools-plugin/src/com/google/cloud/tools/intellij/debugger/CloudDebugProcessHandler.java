@@ -23,7 +23,8 @@ import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.diagnostic.Logger;
-import com.sun.istack.NotNull;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.OutputStream;
 
@@ -35,7 +36,7 @@ public class CloudDebugProcessHandler extends ProcessHandler {
 
   private static final Logger LOG = Logger.getInstance(CloudDebugProcessHandler.class);
 
-  private final CloudDebugProcess process;
+  private CloudDebugProcess process;
 
   /**
    * Initialize the cloud debug process handler.
@@ -63,7 +64,6 @@ public class CloudDebugProcessHandler extends ProcessHandler {
 
   @VisibleForTesting
   CloudDebugProcessHandler() {
-    this.process = null;
   }
 
   @Override
