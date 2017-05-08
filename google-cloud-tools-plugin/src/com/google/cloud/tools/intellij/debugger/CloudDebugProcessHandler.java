@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.debugger;
 import com.google.cloud.tools.intellij.debugger.ui.LogoutDebugProcessDetacher;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
-import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.diagnostic.Logger;
@@ -36,7 +35,7 @@ public class CloudDebugProcessHandler extends ProcessHandler {
 
   private static final Logger LOG = Logger.getInstance(CloudDebugProcessHandler.class);
 
-  private CloudDebugProcess process;
+  private final CloudDebugProcess process;
 
   /**
    * Initialize the cloud debug process handler.
@@ -60,10 +59,6 @@ public class CloudDebugProcessHandler extends ProcessHandler {
     } else {
       LOG.error("process state is null.");
     }
-  }
-
-  @VisibleForTesting
-  CloudDebugProcessHandler() {
   }
 
   @Override
