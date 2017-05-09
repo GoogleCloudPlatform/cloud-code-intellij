@@ -24,37 +24,53 @@ import com.intellij.conversion.RunManagerSettings;
 
 import org.jdom.Element;
 
+import java.util.Collection;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
- * Converter to migrate legacy deployment run configurations created by the old App Engine plugin
- * to work with this plugin.
+ * Converter to migrate legacy run configurations created by the old App Engine plugin to work with
+ * this plugin.
  */
-public class AppEngineDeploymentRunConfigurationConverter
+public class AppEngineRunConfigurationConverter
     extends ConversionProcessor<RunManagerSettings> {
 
-  private static ImmutableMap<String, String> legacyToNewType
+  private static ImmutableMap<String, String> legacyDeployTypeToNewType
       = ImmutableMap.<String, String>builder()
         .put("google-app-engine-deploy", "gcp-app-engine-deploy")
         .build();
 
-  private Predicate<Element> isLegacyConfiguration
-      = element -> legacyToNewType.containsKey(element.getAttributeValue("type"));
+  private Predicate<Element> isLegacyDeployConfiguration
+      = element -> legacyDeployTypeToNewType.containsKey(element.getAttributeValue("type"));
+  private Predicate<Element> isLegacyLocalRunConfiguration
+      = element -> "GoogleAppEngineDevServer".equals(element.getAttributeValue("type"));
 
   @Override
   public boolean isConversionNeeded(RunManagerSettings runManagerSettings) {
     return runManagerSettings.getRunConfigurations()
         .stream()
-        .anyMatch(isLegacyConfiguration);
+        .anyMatch(isLegacyDeployConfiguration.or(isLegacyLocalRunConfiguration));
   }
 
   @Override
   public void process(RunManagerSettings runManagerSettings) throws CannotConvertException {
-    runManagerSettings.getRunConfigurations()
-        .stream()
-        .filter(isLegacyConfiguration)
+    Collection<? extends Element> runConfigs = runManagerSettings.getRunConfigurations();
+
+    processDeployConfigurations(runConfigs.stream().filter(isLegacyDeployConfiguration));
+    processLocalRunConfigurations(runConfigs.stream().filter(isLegacyLocalRunConfiguration));
+  }
+
+  private void processDeployConfigurations(Stream<? extends Element> deployConfigurations) {
+    deployConfigurations
         .forEach(element ->
-          element.setAttribute("type", legacyToNewType.get(element.getAttributeValue("type")))
+            element.setAttribute("type", legacyDeployTypeToNewType.get(element.getAttributeValue("type")))
+        );
+  }
+
+  private void processLocalRunConfigurations(Stream<? extends Element> localRunConfigurations) {
+    localRunConfigurations
+        .forEach(element ->
+            element.setName(element.getName() + " (migrated)")
         );
   }
 }
