@@ -57,7 +57,7 @@ public class AppEngineConverterProvider
       @Nullable
       @Override
       public ConversionProcessor<RunManagerSettings> createRunConfigurationsConverter() {
-        return new AppEngineDeploymentRunConfigurationConverter();
+        return new AppEngineRunConfigurationConverter();
       }
     };
   }
