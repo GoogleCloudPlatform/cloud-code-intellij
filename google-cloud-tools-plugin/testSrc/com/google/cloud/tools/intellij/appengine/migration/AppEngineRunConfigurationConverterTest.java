@@ -69,12 +69,12 @@ public class AppEngineRunConfigurationConverterTest extends PlatformTestCase {
   public void testProcessLocalRunConfig() throws CannotConvertException {
     Element element = mock(Element.class);
     when(element.getAttributeValue("type")).thenReturn("GoogleAppEngineDevServer");
-    when(element.getName()).thenReturn("My Old Name");
+    when(element.getAttributeValue("name")).thenReturn("My Old Name");
 
     Collection legacyConfig = Collections.singletonList(element);
     when(runManagerSettings.getRunConfigurations()).thenReturn(legacyConfig);
 
     converter.process(runManagerSettings);
-    verify(element).setName("My Old Name (migrated)");
+    verify(element).setAttribute("name", "My Old Name (migrated)");
   }
 }

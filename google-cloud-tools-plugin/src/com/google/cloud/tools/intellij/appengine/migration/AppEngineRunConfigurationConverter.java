@@ -63,14 +63,15 @@ public class AppEngineRunConfigurationConverter
   private void processDeployConfigurations(Stream<? extends Element> deployConfigurations) {
     deployConfigurations
         .forEach(element ->
-            element.setAttribute("type", legacyDeployTypeToNewType.get(element.getAttributeValue("type")))
+            element.setAttribute("type",
+                legacyDeployTypeToNewType.get(element.getAttributeValue("type")))
         );
   }
 
   private void processLocalRunConfigurations(Stream<? extends Element> localRunConfigurations) {
     localRunConfigurations
         .forEach(element ->
-            element.setName(element.getName() + " (migrated)")
+            element.setAttribute("name", element.getName() + " (migrated)")
         );
   }
 }
