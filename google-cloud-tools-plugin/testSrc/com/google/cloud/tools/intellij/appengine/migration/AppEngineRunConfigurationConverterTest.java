@@ -58,23 +58,25 @@ public class AppEngineRunConfigurationConverterTest extends PlatformTestCase {
   public void testProcessDeployConfig() throws CannotConvertException {
     Element element = mock(Element.class);
     when(element.getAttributeValue("type")).thenReturn("google-app-engine-deploy");
+    when(element.getAttributeValue("name")).thenReturn("My Old Deploy Name");
 
     Collection legacyConfig = Collections.singletonList(element);
     when(runManagerSettings.getRunConfigurations()).thenReturn(legacyConfig);
 
     converter.process(runManagerSettings);
     verify(element).setAttribute("type", "gcp-app-engine-deploy");
+    verify(element).setAttribute("name", "My Old Deploy Name (migrated)");
   }
 
   public void testProcessLocalRunConfig() throws CannotConvertException {
     Element element = mock(Element.class);
     when(element.getAttributeValue("type")).thenReturn("GoogleAppEngineDevServer");
-    when(element.getAttributeValue("name")).thenReturn("My Old Name");
+    when(element.getAttributeValue("name")).thenReturn("My Old Run Name");
 
     Collection legacyConfig = Collections.singletonList(element);
     when(runManagerSettings.getRunConfigurations()).thenReturn(legacyConfig);
 
     converter.process(runManagerSettings);
-    verify(element).setAttribute("name", "My Old Name (migrated)");
+    verify(element).setAttribute("name", "My Old Run Name (migrated)");
   }
 }

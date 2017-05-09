@@ -37,8 +37,8 @@ public class AppEngineRunConfigurationConverter
 
   private static ImmutableMap<String, String> legacyDeployTypeToNewType
       = ImmutableMap.<String, String>builder()
-        .put("google-app-engine-deploy", "gcp-app-engine-deploy")
-        .build();
+      .put("google-app-engine-deploy", "gcp-app-engine-deploy")
+      .build();
 
   private Predicate<Element> isLegacyDeployConfiguration
       = element -> legacyDeployTypeToNewType.containsKey(element.getAttributeValue("type"));
@@ -62,16 +62,18 @@ public class AppEngineRunConfigurationConverter
 
   private void processDeployConfigurations(Stream<? extends Element> deployConfigurations) {
     deployConfigurations
-        .forEach(element ->
-            element.setAttribute("type",
-                legacyDeployTypeToNewType.get(element.getAttributeValue("type")))
-        );
+        .forEach(element -> {
+          element.setAttribute("type",
+              legacyDeployTypeToNewType.get(element.getAttributeValue("type")));
+          updateName(element);
+        });
   }
 
   private void processLocalRunConfigurations(Stream<? extends Element> localRunConfigurations) {
-    localRunConfigurations
-        .forEach(element ->
-            element.setAttribute("name", element.getAttributeValue("name") + " (migrated)")
-        );
+    localRunConfigurations.forEach(this::updateName);
+  }
+
+  private void updateName(Element element) {
+    element.setAttribute("name", element.getAttributeValue("name") + " (migrated)");
   }
 }
