@@ -65,6 +65,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
       AppEngineProjectService.getInstance();
   private static final boolean IS_WAR_DOCKERFILE_DEFAULT = true;
+  private static final String DOCKERFILE = "/Dockerfile";
 
   private JPanel mainPanel;
   private TextFieldWithBrowseButton appYaml;
@@ -186,9 +187,17 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     }
 
     try {
-      if (isRuntimeCustom() && !isValidConfigurationFile(dockerfileDirectory.getText())) {
-        throw new ConfigurationException(
-            GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+      if (isRuntimeCustom()) {
+        String dockerfileDir = dockerfileDirectory.getText();
+        if (dockerfileDir.isEmpty() || !Files.isDirectory(Paths.get(dockerfileDir))) {
+          throw new ConfigurationException(
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile.directory"));
+        }
+
+        if (!isValidConfigurationFile(dockerfileDir + DOCKERFILE)) {
+          throw new ConfigurationException(
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+        }
       }
     } catch (MalformedYamlFileException myf) {
       throw new ConfigurationException(
@@ -237,16 +246,25 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     if (!isValidConfigurationFile(appYaml.getText())) {
       errorMessage.setText(GctBundle.getString("appengine.deployment.error.staging.yaml"));
       showError = true;
-    }
-
-    try {
-      if (isRuntimeCustom() && !isValidConfigurationFile(dockerfileDirectory.getText())) {
-        errorMessage.setText(GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+    } else {
+      try {
+        if (isRuntimeCustom()) {
+          String dockerDir = dockerfileDirectory.getText();
+          if (dockerDir.isEmpty() || Files.isDirectory(Paths.get(dockerDir))) {
+            errorMessage
+                .setText(
+                    GctBundle.getString("appengine.deployment.error.staging.dockerfile.directory"));
+            showError = true;
+          } else if (!isValidConfigurationFile(dockerDir + DOCKERFILE)) {
+            errorMessage
+                .setText(GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+            showError = true;
+          }
+        }
+      } catch (MalformedYamlFileException myf) {
+        errorMessage.setText(GctBundle.getString("appengine.appyaml.malformed"));
         showError = true;
       }
-    } catch (MalformedYamlFileException myf) {
-      errorMessage.setText(GctBundle.getString("appengine.appyaml.malformed"));
-      showError = true;
     }
 
     errorIcon.setVisible(showError);
@@ -322,7 +340,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         }
 
         configFileGenerator.accept(destinationFolderPath);
-        directoryPicker.setText(destinationFilePath.toString());
+        directoryPicker.setText(destinationFolderPath.toString());
         configurationValidator.run();
       }
     }
