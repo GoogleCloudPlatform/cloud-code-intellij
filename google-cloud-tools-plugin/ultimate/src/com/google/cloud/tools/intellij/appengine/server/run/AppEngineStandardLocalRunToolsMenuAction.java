@@ -17,12 +17,11 @@
 package com.google.cloud.tools.intellij.appengine.server.run;
 
 import com.google.cloud.tools.intellij.CloudToolsRunConfigurationAction;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
-import com.intellij.facet.FacetManager;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
@@ -65,8 +64,7 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
     boolean hasAppEngineStandardFacet =
         Stream.of(ModuleManager.getInstance(project).getModules())
             .anyMatch(module ->
-                !FacetManager.getInstance(module)
-                    .getFacetsByType(AppEngineStandardFacetType.ID).isEmpty()
+                AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module)
             );
 
     if (!hasAppEngineStandardFacet) {

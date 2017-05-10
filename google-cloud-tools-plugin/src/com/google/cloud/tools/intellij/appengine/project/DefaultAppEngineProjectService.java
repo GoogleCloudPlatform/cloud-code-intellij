@@ -120,7 +120,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   public Optional<AppEngineEnvironment> getModuleAppEngineEnvironment(Module module) {
     // The order here is important -- Standard must come before Flexible so that when both Standard
     // and Flexible are selected from the New Project/Module dialog, Standard takes precedence.
-    if (FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacetType.ID) != null) {
+    if (hasAppEngineStandardFacet(module)) {
       if (isFlexCompat(AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(
           module.getProject(), ImmutableList.of(module)))) {
         return Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT);
@@ -129,7 +129,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
       return Optional.of(AppEngineEnvironment.APP_ENGINE_STANDARD);
     }
 
-    if (FacetManager.getInstance(module).getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
+    if (hasAppEngineFlexFacet(module)) {
       return Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX);
     }
 
@@ -146,6 +146,16 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   public boolean isAppEngineFlexArtifactType(@NotNull Artifact artifact) {
     String artifactId = artifact.getArtifactType().getId();
     return "jar".equalsIgnoreCase(artifactId) || "war".equals(artifactId);
+  }
+
+  @Override
+  public boolean hasAppEngineStandardFacet(@NotNull Module module) {
+    return FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacetType.ID) != null;
+  }
+
+  @Override
+  public boolean hasAppEngineFlexFacet(@NotNull Module module) {
+    return FacetManager.getInstance(module).getFacetByType(AppEngineFlexibleFacetType.ID) != null;
   }
 
   @Override

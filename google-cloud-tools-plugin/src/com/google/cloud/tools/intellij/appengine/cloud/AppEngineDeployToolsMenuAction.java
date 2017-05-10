@@ -16,13 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
-import com.intellij.facet.FacetManager;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
@@ -87,17 +85,11 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
    */
   @VisibleForTesting
   boolean isAppEngineProjectCheck(@NotNull Project project) {
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
     boolean hasAppEngineFacet =
         Stream.of(ModuleManager.getInstance(project).getModules())
-            .anyMatch(module -> {
-              FacetManager manager = FacetManager.getInstance(module);
-              boolean hasAppEngineStandardFacet
-                  = !manager.getFacetsByType(AppEngineStandardFacetType.ID).isEmpty();
-              boolean hasAppEngineFlexibleFacet
-                  = !manager.getFacetsByType(AppEngineFlexibleFacetType.ID).isEmpty();
-
-              return hasAppEngineStandardFacet || hasAppEngineFlexibleFacet;
-            });
+            .anyMatch(module -> projectService.hasAppEngineStandardFacet(module)
+                || projectService.hasAppEngineFlexFacet(module));
 
     if (!hasAppEngineFacet) {
      NotificationGroup notification =
