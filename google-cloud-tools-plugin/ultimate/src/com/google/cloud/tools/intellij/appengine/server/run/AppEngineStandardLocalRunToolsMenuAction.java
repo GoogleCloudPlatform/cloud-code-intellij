@@ -64,8 +64,7 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
     boolean hasAppEngineStandardFacet =
         Stream.of(ModuleManager.getInstance(project).getModules())
             .anyMatch(module ->
-                AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module)
-            );
+                AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module));
 
     if (!hasAppEngineStandardFacet) {
       NotificationGroup notification =
