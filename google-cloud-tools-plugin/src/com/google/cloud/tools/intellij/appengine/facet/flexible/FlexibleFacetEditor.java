@@ -250,7 +250,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       try {
         if (isRuntimeCustom()) {
           String dockerDir = dockerfileDirectory.getText();
-          if (dockerDir.isEmpty() || Files.isDirectory(Paths.get(dockerDir))) {
+          if (dockerDir.isEmpty() || !Files.isDirectory(Paths.get(dockerDir))) {
             errorMessage
                 .setText(
                     GctBundle.getString("appengine.deployment.error.staging.dockerfile.directory"));
