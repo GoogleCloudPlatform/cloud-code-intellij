@@ -156,5 +156,5 @@ public abstract class AppEngineProjectService {
    * Returns the default directory of the Dockerfile configuration file, relative to a module
    * content root location.
    */
-  public abstract String getDefaultDockerfileDirectory(String moduleRoot);
+  public abstract String getDefaultDockerDirectory(String moduleRoot);
 }

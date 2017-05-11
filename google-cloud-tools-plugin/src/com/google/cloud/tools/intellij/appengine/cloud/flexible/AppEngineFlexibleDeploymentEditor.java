@@ -276,7 +276,7 @@ public class AppEngineFlexibleDeploymentEditor extends
       noSupportedModulesWarning.setVisible(true);
       appYamlTextField.setVisible(true);
       dockerfileTextField.setVisible(true);
-      // These checks are important so getAppYamlPath() and getDockerfileDirectory() work correctly.
+      // These checks are important so getAppYamlPath() and getDockerDirectory() work correctly.
       appYamlOverrideCheckBox.setSelected(true);
       dockerfileOverrideCheckBox.setSelected(true);
     }
@@ -502,7 +502,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     return Optional.ofNullable(
         FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
             .getFacetByType(AppEngineFlexibleFacetType.ID))
-        .map(flexFacet -> flexFacet.getConfiguration().getDockerfileDirectory())
+        .map(flexFacet -> flexFacet.getConfiguration().getDockerDirectory())
         .orElse("");
   }
 

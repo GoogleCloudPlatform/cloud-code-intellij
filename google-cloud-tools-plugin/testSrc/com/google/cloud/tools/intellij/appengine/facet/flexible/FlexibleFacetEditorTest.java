@@ -137,7 +137,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   public void testValidateConfiguration_customRuntimeNoDockerfile() {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
-    editor.getDockerfileDirectory().setText("");
+    editor.getDockerDirectory().setText("");
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
@@ -158,7 +158,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   public void testValidateConfiguration_customRuntimeNullDockerfile() {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
-    editor.getDockerfileDirectory().setText(null);
+    editor.getDockerDirectory().setText(null);
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
@@ -179,7 +179,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   public void testValidateConfiguration_customRuntimeDockerfileIsDirectory() {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
-    editor.getDockerfileDirectory().setText(dockerfile.getParentFile().getPath());
+    editor.getDockerDirectory().setText(dockerfile.getParentFile().getPath());
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
@@ -199,7 +199,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   public void testValidateConfiguration_customRuntime() throws ConfigurationException {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
-    editor.getDockerfileDirectory().setText(dockerfile.getPath());
+    editor.getDockerDirectory().setText(dockerfile.getPath());
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertFalse(editor.getErrorIcon().isVisible());
     assertFalse(editor.getErrorMessage().isVisible());
