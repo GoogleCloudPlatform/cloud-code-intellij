@@ -317,8 +317,24 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     @Override
     public void actionPerformed(ActionEvent event) {
+      boolean genAppYaml = "app.yaml".equals(fileName);
+      String directoryPath = directoryPicker.getText();
+      if (genAppYaml) {
+        try {
+          Path directoryPickerPathParent = Paths.get(directoryPicker.getText()).getParent();
+          if (directoryPickerPathParent != null) {
+            directoryPath = directoryPickerPathParent.toString();
+          } else {
+            directoryPath = "";
+          }
+        } catch (InvalidPathException ipe) {
+          directoryPath = "";
+        }
+      }
+
       SelectConfigDestinationFolderDialog destinationFolderDialog = new
-          SelectConfigDestinationFolderDialog(project, directoryPicker.getText());
+          SelectConfigDestinationFolderDialog(project, directoryPath);
+
       if (destinationFolderDialog.showAndGet()) {
         Path destinationFolderPath = destinationFolderDialog.getDestinationFolder();
         Path destinationFilePath = destinationFolderPath.resolve(fileName);
@@ -340,7 +356,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         }
 
         configFileGenerator.accept(destinationFolderPath);
-        directoryPicker.setText(destinationFolderPath.toString());
+        directoryPicker.setText(genAppYaml ?
+            destinationFilePath.toString() :
+            destinationFolderPath.toString());
         configurationValidator.run();
       }
     }
