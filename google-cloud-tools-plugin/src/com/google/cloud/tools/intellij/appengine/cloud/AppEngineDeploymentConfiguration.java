@@ -40,7 +40,7 @@ public class AppEngineDeploymentConfiguration extends
    */
   private String environment;
 
-  private String dockerFilePath;
+  private String dockerDirectoryPath;
   private String appYamlPath;
   private boolean userSpecifiedArtifact;
   private String userSpecifiedArtifactPath;
@@ -75,9 +75,9 @@ public class AppEngineDeploymentConfiguration extends
     return userSpecifiedArtifactPath;
   }
 
-  @Attribute("dockerFilePath")
-  public String getDockerFilePath() {
-    return dockerFilePath;
+  @Attribute("dockerDirectoryPath")
+  public String getDockerDirectoryPath() {
+    return dockerDirectoryPath;
   }
 
   @Attribute("appYamlPath")
@@ -130,8 +130,8 @@ public class AppEngineDeploymentConfiguration extends
     this.userSpecifiedArtifactPath = userSpecifiedArtifactPath;
   }
 
-  public void setDockerFilePath(String dockerFilePath) {
-    this.dockerFilePath = dockerFilePath;
+  public void setDockerDirectoryPath(String dockerDirectoryPath) {
+    this.dockerDirectoryPath = dockerDirectoryPath;
   }
 
   public void setAppYamlPath(String appYamlPath) {

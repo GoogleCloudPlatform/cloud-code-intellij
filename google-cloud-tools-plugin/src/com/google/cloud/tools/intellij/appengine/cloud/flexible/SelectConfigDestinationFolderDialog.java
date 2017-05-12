@@ -68,7 +68,6 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
         destinationFolderChooser.setText(directoryPath);
       } catch (InvalidPathException ipe) {
         // Do not assume any default directory and let the user specify one.
-        System.out.print(ipe.getMessage());
       }
     }
   }

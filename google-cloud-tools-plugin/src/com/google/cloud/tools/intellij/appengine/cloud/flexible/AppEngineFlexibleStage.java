@@ -24,8 +24,10 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -72,7 +74,7 @@ public class AppEngineFlexibleStage {
             GctBundle.getString("appengine.deployment.error.staging.yaml"));
       }
       if (isCustomRuntime
-          && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+          && !Files.exists(Paths.get(deploymentConfiguration.getDockerDirectoryPath() + "/Dockerfile"))) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
       }
@@ -85,8 +87,10 @@ public class AppEngineFlexibleStage {
       Files.copy(appYamlPath, stagingDirectory.resolve(appYamlPath.getFileName()));
 
       if (isCustomRuntime) {
-        Path dockerFilePath = Paths.get(deploymentConfiguration.getDockerFilePath());
-        Files.copy(dockerFilePath, stagingDirectory.resolve(dockerFilePath.getFileName()));
+        File dockerDirectory = Paths.get(deploymentConfiguration.getDockerDirectoryPath()).toFile();
+        FileUtils.copyDirectory(
+            dockerDirectory,
+            stagingDirectory.toFile());
       }
     } catch (IOException | InvalidPathException | MalformedYamlFileException ex) {
       loggingHandler.print(ex.getMessage() + "\n");

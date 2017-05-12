@@ -298,7 +298,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     promoteVersionCheckBox.setSelected(configuration.isPromote());
     stopPreviousVersionCheckBox.setSelected(configuration.isStopPreviousVersion());
     appYamlTextField.setText(configuration.getAppYamlPath());
-    dockerDirectoryTextField.setText(configuration.getDockerFilePath());
+    dockerDirectoryTextField.setText(configuration.getDockerDirectoryPath());
     gcpProjectSelector.setText(configuration.getCloudProjectName());
     appYamlTextField.setVisible(configuration.isOverrideAppYaml()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
@@ -325,7 +325,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     configuration.setPromote(promoteVersionCheckBox.isSelected());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckBox.isSelected());
     configuration.setAppYamlPath(getAppYamlPath());
-    configuration.setDockerFilePath(getDockerDirectoryPath());
+    configuration.setDockerDirectoryPath(getDockerDirectoryPath());
     configuration.setCloudProjectName(gcpProjectSelector.getText());
     CredentialedUser user = gcpProjectSelector.getSelectedUser();
     if (user != null) {
