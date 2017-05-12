@@ -15,6 +15,9 @@
  */
 package com.google.cloud.tools.intellij.appengine.validation;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.cloud.tools.intellij.appengine.GctConstants;
 
 import com.intellij.codeInspection.LocalInspectionTool;
@@ -28,9 +31,6 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class RestSignatureInspectionTest extends EndpointTestBase {
   private PsiMethod mockPsiMethod;

@@ -18,8 +18,6 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -109,15 +107,15 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     assertFalse(helper.stageCredentials(username).isPresent());
   }
 
-  @Test
-  public void testCreateDeployRunnerInvalidDeploymentSourceType_throwsException() {
-    try {
-      helper.createDeployRunner(
-          loggingHandler, new SimpleDeploymentSource(), deploymentConfiguration, callback);
-      fail("Expected RuntimeException");
-    } catch (RuntimeException re) {
-      verify(callback, times(1)).errorOccurred("Invalid deployment source.");
-    }
+  public void testCreateDeployRunnerInvalidDeploymentSourceType_returnsNull() {
+    Optional<CancellableRunnable> runner = helper.createDeployRunner(
+        loggingHandler,
+        new SimpleDeploymentSource(),
+        deploymentConfiguration,
+        callback);
+
+    assertFalse(runner.isPresent());
+    verify(callback, times(1)).errorOccurred("Invalid deployment source.");
   }
 
   @Test

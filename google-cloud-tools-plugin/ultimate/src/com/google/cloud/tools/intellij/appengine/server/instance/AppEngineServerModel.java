@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -210,12 +209,6 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   public List<File> getServices() {
     return ImmutableList.of(Paths.get(artifactPointer.getArtifact().getOutputPath()).toFile());
-  }
-
-  @Override
-  public List<File> getServices() {
-    // Needed by devappserver1. Will be implemented when devappserver1 is integrated.
-    return null;
   }
 
   @Override
