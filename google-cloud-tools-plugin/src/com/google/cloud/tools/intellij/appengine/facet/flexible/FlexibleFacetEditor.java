@@ -109,7 +109,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     });
 
     dockerDirectory.addBrowseFolderListener(
-        GctBundle.message("appengine.flex.config.browse.dockerfile"),
+        GctBundle.message("appengine.flex.config.browse.docker.directory"),
         null /* description */,
         module.getProject(),
         FileChooserDescriptorFactory.createSingleFolderDescriptor()

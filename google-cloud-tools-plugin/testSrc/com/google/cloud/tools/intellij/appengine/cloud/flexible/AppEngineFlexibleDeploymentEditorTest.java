@@ -133,19 +133,19 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   public void testDockerfileSectionToggle() {
     assertFalse(editor.getDockerfileLabel().isVisible());
     assertFalse(editor.getDockerDirectoryTextField().isVisible());
-    assertFalse(editor.getDockerfileOverrideCheckBox().isVisible());
+    assertFalse(editor.getDockerDirectoryOverrideCheckBox().isVisible());
     editor.getAppYamlOverrideCheckBox().setSelected(true);
     editor.getAppYamlTextField().setText(customYaml.getPath());
     assertTrue(editor.getDockerfileLabel().isVisible());
     assertTrue(editor.getDockerDirectoryTextField().isVisible());
-    assertTrue(editor.getDockerfileOverrideCheckBox().isVisible());
+    assertTrue(editor.getDockerDirectoryOverrideCheckBox().isVisible());
   }
 
   public void testValidateConfiguration() throws ConfigurationException {
     // javaModule
     editor.applyEditorTo(templateConfig);
     // customModule
-    editor.getDockerfileOverrideCheckBox().setSelected(true);
+    editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
     editor.getDockerDirectoryTextField().setText(dockerfile.getPath());
     editor.applyEditorTo(templateConfig);
   }
@@ -294,7 +294,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
 
   public void testValidateConfiguration_blankDockerfile() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
-    editor.getDockerfileOverrideCheckBox().setSelected(true);
+    editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
     editor.getDockerDirectoryTextField().setText("");
     try {
       editor.applyEditorTo(templateConfig);
@@ -306,7 +306,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
 
   public void testValidateConfiguration_nullDockerfile() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
-    editor.getDockerfileOverrideCheckBox().setSelected(true);
+    editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
     editor.getDockerDirectoryTextField().setText(null);
     try {
       editor.applyEditorTo(templateConfig);
@@ -318,7 +318,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
 
   public void testValidateConfiguration_unexistingDockerfile() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
-    editor.getDockerfileOverrideCheckBox().setSelected(true);
+    editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
     editor.getDockerDirectoryTextField().setText("I don't exist");
     try {
       editor.applyEditorTo(templateConfig);
@@ -333,7 +333,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
 
   public void testValidateConfiguration_directoryDockerfile() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
-    editor.getDockerfileOverrideCheckBox().setSelected(true);
+    editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
     editor.getDockerDirectoryTextField().setText(dockerfile.getParentFile().getPath());
     try {
       editor.applyEditorTo(templateConfig);
@@ -375,16 +375,16 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   public void testDockerfileOverride() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
     String previousDockerfile = editor.getDockerDirectoryTextField().getText();
-    editor.getDockerfileOverrideCheckBox().doClick();
+    editor.getDockerDirectoryOverrideCheckBox().doClick();
     // Tests that the first override will be the previous value
     assertEquals(previousDockerfile, editor.getDockerDirectoryTextField().getText());
 
     editor.getDockerDirectoryTextField().setText("an override");
-    editor.getDockerfileOverrideCheckBox().doClick();
+    editor.getDockerDirectoryOverrideCheckBox().doClick();
     // When override is unselected, value goes back to module setting
     assertEquals(previousDockerfile, editor.getDockerDirectoryTextField().getText());
 
-    editor.getDockerfileOverrideCheckBox().doClick();
+    editor.getDockerDirectoryOverrideCheckBox().doClick();
     // Override is memorized and gets restored
     assertEquals("an override", editor.getDockerDirectoryTextField().getText());
   }
