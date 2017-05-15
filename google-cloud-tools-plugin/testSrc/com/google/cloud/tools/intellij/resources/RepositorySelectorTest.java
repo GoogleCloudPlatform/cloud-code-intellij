@@ -31,6 +31,7 @@ import com.google.cloud.tools.intellij.vcs.CloudRepositoryService.CloudRepositor
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.ui.awt.RelativePoint;
 
 import org.picocontainer.MutablePicoContainer;
@@ -208,5 +209,7 @@ public class RepositorySelectorTest extends PlatformTestCase {
   @Override
   protected void tearDown() throws Exception {
     super.tearDown();
+
+    UsefulTestCase.clearFields(repositoryService);
   }
 }
