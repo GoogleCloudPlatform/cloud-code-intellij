@@ -134,7 +134,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor.apply();
   }
 
-  public void testValidateConfiguration_customRuntimeNoDockerfile() {
+  public void testValidateConfiguration_customRuntimeNoDockerDirectory() {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerDirectory().setText("");
@@ -142,7 +142,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
     assertEquals(
-        "The specified Dockerfile configuration file does not exist or is not a valid file.",
+        "The specified docker directory does not exist or it is not a valid directory.",
         editor.getErrorMessage().getText());
 
     try {
@@ -150,12 +150,12 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
       fail("Can't have runtime custom and no dockerfile.");
     } catch (ConfigurationException ce) {
       assertEquals(
-          "The specified Dockerfile configuration file does not exist or is not a valid file.",
+          "The specified docker directory does not exist or it is not a valid directory.",
           ce.getMessage());
     }
   }
 
-  public void testValidateConfiguration_customRuntimeNullDockerfile() {
+  public void testValidateConfiguration_customRuntimeNullDockerDirectory() {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerDirectory().setText(null);
@@ -163,7 +163,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
     assertEquals(
-        "The specified Dockerfile configuration file does not exist or is not a valid file.",
+        "The specified docker directory does not exist or it is not a valid directory.",
         editor.getErrorMessage().getText());
 
     try {
@@ -171,27 +171,38 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
       fail("Can't have runtime custom and no dockerfile.");
     } catch (ConfigurationException ce) {
       assertEquals(
-          "The specified Dockerfile configuration file does not exist or is not a valid file.",
+          "The specified docker directory does not exist or it is not a valid directory.",
           ce.getMessage());
     }
   }
 
-  public void testValidateConfiguration_customRuntimeDockerfileIsDirectory() {
+  public void testValidateConfiguration_customRuntimeDockerDirectoryIsDirectory()
+      throws ConfigurationException {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
     editor.getDockerDirectory().setText(dockerfile.getParentFile().getPath());
     assertTrue(editor.getDockerfilePanel().isVisible());
+    assertFalse(editor.getErrorIcon().isVisible());
+    assertFalse(editor.getErrorMessage().isVisible());
+    editor.apply();
+  }
+
+  public void testValidateConfiguration_customRuntimeDockerDirectoryIsFile() {
+    FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
+    editor.getAppYaml().setText(customYaml.getPath());
+    editor.getDockerDirectory().setText(dockerfile.getPath());
+    assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
-    assertEquals("The specified Dockerfile configuration file does not exist or is not a valid file.",
-        editor.getErrorMessage().getText());
+    assertEquals("The specified docker directory does not exist or it is not a valid "
+            + "directory.", editor.getErrorMessage().getText());
 
     try {
       editor.apply();
-      fail("Dockerfile can't be a directory.");
+      fail("Docker directory can't be a file.");
     } catch (ConfigurationException ce) {
       assertEquals(
-          "The specified Dockerfile configuration file does not exist or is not a valid file.",
+          "The specified docker directory does not exist or it is not a valid directory.",
           ce.getMessage());
     }
   }
@@ -199,7 +210,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   public void testValidateConfiguration_customRuntime() throws ConfigurationException {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(customYaml.getPath());
-    editor.getDockerDirectory().setText(dockerfile.getPath());
+    editor.getDockerDirectory().setText(dockerfile.getParentFile().getPath());
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertFalse(editor.getErrorIcon().isVisible());
     assertFalse(editor.getErrorMessage().isVisible());
