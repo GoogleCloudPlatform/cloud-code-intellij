@@ -262,7 +262,6 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     CloudLineBreakpoint breakpoint =
         mockCloudLineBreakpoint("mock error message", mock(XLineBreakpointImpl.class));
     cloudDebugProcess.updateBreakpointPresentation(breakpoint);
-    cloudDebugProcess.updateBreakpointPresentation(breakpoint);
 
     verify(breakpoint).getSetIcon(muted);
   }
@@ -323,8 +322,8 @@ public class CloudDebugProcessTest extends PlatformTestCase {
 
   @Override
   protected void tearDown() throws Exception {
-    UsefulTestCase.clearFields(process);
     super.tearDown();
+    UsefulTestCase.clearFields(process);
   }
 
   @NotNull
