@@ -23,13 +23,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.common.collect.ImmutableSet;
 
@@ -172,6 +170,11 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
     editor.getPromoteCheckbox().setSelected(true);
     assertFalse(editor.getStopPreviousVersionCheckbox().isSelected());
     assertFalse(editor.getStopPreviousVersionCheckbox().isVisible());
+  }
+
+  public void testDeployAllConfigsDefaults() {
+    assertTrue(editor.getDeployAllConfigsCheckbox().isVisible());
+    assertFalse(editor.getDeployAllConfigsCheckbox().isSelected());
   }
 
   @Override
