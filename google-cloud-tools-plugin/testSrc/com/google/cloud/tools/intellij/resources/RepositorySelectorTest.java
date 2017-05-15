@@ -55,6 +55,7 @@ import javax.swing.tree.DefaultTreeModel;
 public class RepositorySelectorTest extends PlatformTestCase {
 
   private CloudRepositoryService repositoryService;
+  private CredentialedUser credentialedUser;
 
   @Override
   public void setUp() throws Exception {
@@ -64,6 +65,7 @@ public class RepositorySelectorTest extends PlatformTestCase {
         ApplicationManager.getApplication().getPicoContainer();
 
     repositoryService = mock(CloudRepositoryService.class);
+    credentialedUser = mock(CredentialedUser.class);
 
     applicationContainer.unregisterComponent(CloudRepositoryService.class.getName());
     applicationContainer.registerComponentInstance(
@@ -202,7 +204,7 @@ public class RepositorySelectorTest extends PlatformTestCase {
   private RepositorySelector createInitializedSelector() {
     return new RepositorySelector(
         "my-project",
-        mock(CredentialedUser.class),
+        credentialedUser,
         false /*canCreateRepository*/);
   }
 
@@ -211,5 +213,6 @@ public class RepositorySelectorTest extends PlatformTestCase {
     super.tearDown();
 
     UsefulTestCase.clearFields(repositoryService);
+    UsefulTestCase.clearFields(credentialedUser);
   }
 }
