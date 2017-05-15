@@ -23,10 +23,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 
 import org.junit.Ignore;
-import org.junit.Test;
 
 /** Unit tests for {@link ServerToIdeFileResolver}. */
 public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase {
@@ -48,6 +48,9 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
   @Override
   public void tearDown() throws Exception {
     super.tearDown();
+
+    UsefulTestCase.clearFields(class1);
+    UsefulTestCase.clearFields(class2);
   }
 
   public void testGetCloudPathFromJavaFile() {
