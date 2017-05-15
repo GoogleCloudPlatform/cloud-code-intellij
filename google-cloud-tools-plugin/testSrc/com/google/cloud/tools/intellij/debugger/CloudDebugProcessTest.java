@@ -46,6 +46,7 @@ import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.impl.ProjectImpl;
 import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.ui.content.Content;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.xdebugger.XDebugSession;
@@ -261,6 +262,7 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     CloudLineBreakpoint breakpoint =
         mockCloudLineBreakpoint("mock error message", mock(XLineBreakpointImpl.class));
     cloudDebugProcess.updateBreakpointPresentation(breakpoint);
+    cloudDebugProcess.updateBreakpointPresentation(breakpoint);
 
     verify(breakpoint).getSetIcon(muted);
   }
@@ -317,6 +319,12 @@ public class CloudDebugProcessTest extends PlatformTestCase {
             same(xLineBreakpointImpl), any(Icon.class), eq("General error"));
 
     process.getStateController().stopBackgroundListening();
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    UsefulTestCase.clearFields(process);
+    super.tearDown();
   }
 
   @NotNull
