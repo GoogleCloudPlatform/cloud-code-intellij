@@ -64,7 +64,7 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
 
   // When searching for full file system path.
   @Ignore
-  public void ignore_testGetFileFromPath_fullPath() {
+  public void ignore_testGetFileFromPath_fullPath() throws IllegalAccessException {
     // TODO(joaomartins): Find out why project.getBaseDir() is returning a different tempDir to
     // myFixture.
     file1 = this.myFixture.addFileToProject("path/to/prj/src/main/com/java/package/Class.java", "");
@@ -75,24 +75,27 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
     assertEquals(
         fileResolver.getFileFromPath(project, "path/to/prj/src/main/com/java/package/Class.java"),
         file1.getVirtualFile());
+    UsefulTestCase.clearFields(fileResolver);
   }
 
   // When searching for the package and class name.
-  public void testGetFileFromPath_packageClass() {
+  public void testGetFileFromPath_packageClass() throws IllegalAccessException {
     ServerToIdeFileResolver fileResolver = new ServerToIdeFileResolver();
 
     assertEquals(
         class1.getContainingFile().getVirtualFile(),
         fileResolver.getFileFromPath(project, "com/java/pkg/Class.java"));
+    UsefulTestCase.clearFields(fileResolver);
   }
 
   // When searching for file name only.
-  public void testGetFileFromPath_fileName() {
+  public void testGetFileFromPath_fileName() throws IllegalAccessException {
     ServerToIdeFileResolver fileResolver = new ServerToIdeFileResolver();
 
     assertEquals(
         class1.getContainingFile().getVirtualFile(),
         fileResolver.getFileFromPath(project, "Class.java"));
+    UsefulTestCase.clearFields(fileResolver);
   }
 
   public void testGetPackageFromPath() {
