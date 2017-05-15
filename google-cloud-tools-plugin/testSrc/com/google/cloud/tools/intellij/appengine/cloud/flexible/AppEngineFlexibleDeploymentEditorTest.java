@@ -131,12 +131,12 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testDockerDirectorySectionToggle() {
-    assertFalse(editor.getDockerfileLabel().isVisible());
+    assertFalse(editor.getDockerDirectoryLabel().isVisible());
     assertFalse(editor.getDockerDirectoryTextField().isVisible());
     assertFalse(editor.getDockerDirectoryOverrideCheckBox().isVisible());
     editor.getAppYamlOverrideCheckBox().setSelected(true);
     editor.getAppYamlTextField().setText(customYaml.getPath());
-    assertTrue(editor.getDockerfileLabel().isVisible());
+    assertTrue(editor.getDockerDirectoryLabel().isVisible());
     assertTrue(editor.getDockerDirectoryTextField().isVisible());
     assertTrue(editor.getDockerDirectoryOverrideCheckBox().isVisible());
   }
@@ -146,7 +146,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     editor.applyEditorTo(templateConfig);
     // customModule
     editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
-    editor.getDockerDirectoryTextField().setText(dockerfile.getPath());
+    editor.getDockerDirectoryTextField().setText(dockerfile.getParentFile().getPath());
     editor.applyEditorTo(templateConfig);
   }
 

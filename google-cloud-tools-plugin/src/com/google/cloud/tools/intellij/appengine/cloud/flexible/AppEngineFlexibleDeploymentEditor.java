@@ -99,7 +99,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   private AppEngineApplicationInfoPanel appInfoPanel;
   private JPanel archiveSelectorPanel;
   private HyperlinkLabel promoteInfoLabel;
-  private JLabel dockerfileLabel;
+  private JLabel dockerDirectoryLabel;
   private JComboBox<Module> modulesWithFlexFacetComboBox;
   private JCheckBox appYamlOverrideCheckBox;
   private JCheckBox dockerDirectoryOverrideCheckBox;
@@ -450,7 +450,7 @@ public class AppEngineFlexibleDeploymentEditor extends
         visible && modulesWithFlexFacetComboBox.getItemCount() != 0);
     dockerDirectoryTextField.setVisible(visible);
     dockerDirectoryTextField.setEnabled(dockerDirectoryOverrideCheckBox.isSelected());
-    dockerfileLabel.setVisible(visible);
+    dockerDirectoryLabel.setVisible(visible);
     if (visible) {
       dockerDirectoryTextField.setText(getDockerDirectoryPath());
     }
@@ -550,8 +550,8 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
-  JLabel getDockerfileLabel() {
-    return dockerfileLabel;
+  JLabel getDockerDirectoryLabel() {
+    return dockerDirectoryLabel;
   }
 
   @VisibleForTesting
