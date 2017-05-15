@@ -85,7 +85,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       AppEngineFlexibleFacet flexCustomFacet = FacetManager.getInstance(customModule).addFacet(
           AppEngineFlexibleFacet.getFacetType(), "flex facet", null /* underlyingFacet */);
       flexCustomFacet.getConfiguration().setAppYamlPath(customYaml.getPath());
-      flexCustomFacet.getConfiguration().setDockerDirectory(dockerfile.getPath());
+      flexCustomFacet.getConfiguration().setDockerDirectory(dockerfile.getParentFile().getPath());
     });
     createModule("non flex module");
 
@@ -130,7 +130,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertEquals("flexService", editor.getServiceLabel().getText());
   }
 
-  public void testDockerfileSectionToggle() {
+  public void testDockerDirectorySectionToggle() {
     assertFalse(editor.getDockerfileLabel().isVisible());
     assertFalse(editor.getDockerDirectoryTextField().isVisible());
     assertFalse(editor.getDockerDirectoryOverrideCheckBox().isVisible());
@@ -292,56 +292,63 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     }
   }
 
-  public void testValidateConfiguration_blankDockerfile() {
+  public void testValidateConfiguration_blankDockerDirectory() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
     editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
     editor.getDockerDirectoryTextField().setText("");
     try {
       editor.applyEditorTo(templateConfig);
-      fail("Blank dockerfile.");
+      fail("Blank docker directory.");
     } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a Dockerfile.", cfe.getMessage());
+      assertEquals("Browse to a docker directory.", cfe.getMessage());
     }
   }
 
-  public void testValidateConfiguration_nullDockerfile() {
+  public void testValidateConfiguration_nullDockerDirectory() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
     editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
     editor.getDockerDirectoryTextField().setText(null);
     try {
       editor.applyEditorTo(templateConfig);
-      fail("Null dockerfile.");
+      fail("Null docker directory.");
     } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a Dockerfile.", cfe.getMessage());
+      assertEquals("Browse to a docker directory.", cfe.getMessage());
     }
   }
 
-  public void testValidateConfiguration_unexistingDockerfile() {
+  public void testValidateConfiguration_unexistingDockerDirectory() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
     editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
     editor.getDockerDirectoryTextField().setText("I don't exist");
     try {
       editor.applyEditorTo(templateConfig);
-      fail("Unexisting dockerfile.");
+      fail("Unexisting docker directory.");
     } catch (ConfigurationException cfe) {
       assertEquals(
-          "The specified Dockerfile configuration file does not exist or is not a valid file."
-          + " Set a valid file in Module Settings or use another one.",
+          "There is no Dockerfile in specified directory or it is not a valid file."
+          + " Set a valid directory in Module Settings or use another one.",
           cfe.getMessage());
     }
+  }
+
+  public void testValidateConfiguration_directoryDockerDirectory() throws ConfigurationException {
+    editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
+    editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
+    editor.getDockerDirectoryTextField().setText(dockerfile.getParentFile().getPath());
+    editor.applyEditorTo(templateConfig);
   }
 
   public void testValidateConfiguration_directoryDockerfile() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
     editor.getDockerDirectoryOverrideCheckBox().setSelected(true);
-    editor.getDockerDirectoryTextField().setText(dockerfile.getParentFile().getPath());
+    editor.getDockerDirectoryTextField().setText(dockerfile.getPath());
     try {
       editor.applyEditorTo(templateConfig);
-      fail("Dockerfile is a directory.");
+      fail("Docker Directory is a file.");
     } catch (ConfigurationException cfe) {
       assertEquals(
-          "The specified Dockerfile configuration file does not exist or is not a valid file."
-          + " Set a valid file in Module Settings or use another one.",
+          "There is no Dockerfile in specified directory or it is not a valid file."
+              + " Set a valid directory in Module Settings or use another one.",
           cfe.getMessage());
     }
   }
@@ -372,30 +379,31 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertFalse(stopPreviousVersionCheckbox.isEnabled());
   }
 
-  public void testDockerfileOverride() {
+  public void testDockerDirectoryOverride() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
-    String previousDockerfile = editor.getDockerDirectoryTextField().getText();
+    String previousDockerDirectory = editor.getDockerDirectoryTextField().getText();
     editor.getDockerDirectoryOverrideCheckBox().doClick();
     // Tests that the first override will be the previous value
-    assertEquals(previousDockerfile, editor.getDockerDirectoryTextField().getText());
+    assertEquals(previousDockerDirectory, editor.getDockerDirectoryTextField().getText());
 
     editor.getDockerDirectoryTextField().setText("an override");
     editor.getDockerDirectoryOverrideCheckBox().doClick();
     // When override is unselected, value goes back to module setting
-    assertEquals(previousDockerfile, editor.getDockerDirectoryTextField().getText());
+    assertEquals(previousDockerDirectory, editor.getDockerDirectoryTextField().getText());
 
     editor.getDockerDirectoryOverrideCheckBox().doClick();
     // Override is memorized and gets restored
     assertEquals("an override", editor.getDockerDirectoryTextField().getText());
   }
 
-  public void testDockerfileStartsDisabledAndWithModuleSetting() {
+  public void testDockerDirectoryStartsDisabledAndWithModuleSetting() {
     ApplicationManager.getApplication().runWriteAction(
         () -> ModuleManager.getInstance(getProject()).disposeModule(javaModule));
     editor = new AppEngineFlexibleDeploymentEditor(getProject(), deploymentSource);
     assertEquals(1, editor.getModulesWithFlexFacetComboBox().getItemCount());
     assertFalse(editor.getDockerDirectoryTextField().isEnabled());
-    assertEquals(dockerfile.getPath(), editor.getDockerDirectoryTextField().getText());
+    assertEquals(dockerfile.getParentFile().getPath(),
+        editor.getDockerDirectoryTextField().getText());
   }
 
   @Override
