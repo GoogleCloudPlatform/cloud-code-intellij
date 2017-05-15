@@ -36,6 +36,7 @@ import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.testFramework.UsefulTestCase;
 
 import org.mockito.Mock;
 import org.picocontainer.MutablePicoContainer;
@@ -401,6 +402,12 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   @Override
   public void tearDown() throws Exception {
     Disposer.dispose(editor);
+
+    UsefulTestCase.clearFields(editor);
+    UsefulTestCase.clearFields(cloudSdkService);
+    UsefulTestCase.clearFields(appInfoPanel);
+    UsefulTestCase.clearFields(deploymentSource);
+
     super.tearDown();
   }
 }
