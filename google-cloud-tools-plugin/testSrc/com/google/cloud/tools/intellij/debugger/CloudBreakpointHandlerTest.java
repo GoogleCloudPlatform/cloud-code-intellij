@@ -156,6 +156,10 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   protected void tearDown() throws Exception {
     fixture.tearDown();
     fixture = null;
+
+    UsefulTestCase.clearFields(project);
+    UsefulTestCase.clearFields(process);
+
     super.tearDown();
   }
 

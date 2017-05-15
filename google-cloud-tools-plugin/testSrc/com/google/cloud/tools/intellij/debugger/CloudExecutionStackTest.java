@@ -21,13 +21,11 @@ import com.google.api.services.clouddebugger.v2.model.StackFrame;
 import com.google.api.services.clouddebugger.v2.model.Variable;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XDebuggerTreeNodeHyperlink;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -81,11 +79,6 @@ public class CloudExecutionStackTest {
     localFrame.computeChildren(node);
     Assert.assertEquals(1, node.seenChildren.size());
     Assert.assertEquals("foo", node.seenChildren.get(0));
-  }
-
-  @After
-  public void tearDown() throws IllegalAccessException {
-    UsefulTestCase.clearDeclaredFields(project, CloudExecutionStackTest.class);
   }
 
   private static class SpyNode implements XCompositeNode {
