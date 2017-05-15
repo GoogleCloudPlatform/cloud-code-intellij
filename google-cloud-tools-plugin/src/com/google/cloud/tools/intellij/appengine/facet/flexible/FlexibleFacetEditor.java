@@ -280,8 +280,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         .trackEvent(GctTracking.APP_ENGINE_ADD_FLEX_FACET)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, "setOnModule")
         .ping();
-    // TODO: remove
-    System.out.print("Flex facet add on setOnModule");
   }
 
   private class AppYamlGenerateActionListener implements HyperlinkListener {
