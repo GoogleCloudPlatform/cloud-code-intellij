@@ -22,6 +22,8 @@ import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineTemplateGroupDescriptorFactory;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
@@ -332,23 +334,41 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   @Override
   public void generateAppYaml(FlexibleRuntime runtime, Module module, Path outputFolderPath) {
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_FLEX_APP_YAML_CREATE)
+        .ping();
+
     Properties templateProperties =
         FileTemplateManager.getDefaultInstance().getDefaultProperties();
     templateProperties.put("RUNTIME", runtime.toString());
 
     ApplicationManager.getApplication().runWriteAction(() -> {
-      generateFromTemplate(
+      PsiElement element = generateFromTemplate(
           AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE,
           "app.yaml",
           outputFolderPath,
           templateProperties,
           module);
+
+      if (element == null) {
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.APP_ENGINE_FLEX_APP_YAML_CREATE_FAIL)
+            .ping();
+      } else {
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.APP_ENGINE_FLEX_APP_YAML_CREATE_SUCCESS)
+            .ping();
+      }
     });
   }
 
   @Override
   public void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module,
       Path outputFolderPath) {
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_FLEX_DOCKERFILE_CREATE)
+        .ping();
+
     if (type == AppEngineFlexibleDeploymentArtifactType.UNKNOWN) {
       throw new RuntimeException("Cannot generate Dockerfile for unknown artifact type.");
     }
@@ -372,6 +392,14 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
             "Dockerfile" /*newName*/,
             UsageInfo.EMPTY_ARRAY,
             null /*listener*/);
+
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.APP_ENGINE_FLEX_DOCKERFILE_CREATE_SUCCESS)
+            .ping();
+      } else {
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.APP_ENGINE_FLEX_DOCKERFILE_CREATE_FAIL)
+            .ping();
       }
     });
   }
