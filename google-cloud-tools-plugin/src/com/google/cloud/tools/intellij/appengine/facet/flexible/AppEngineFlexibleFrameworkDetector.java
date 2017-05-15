@@ -48,8 +48,6 @@ public class AppEngineFlexibleFrameworkDetector
         .trackEvent(GctTracking.APP_ENGINE_ADD_FLEX_FACET)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, "frameworkDetect")
         .ping();
-    // TODO: remove
-    System.out.print("Flex facet add on frameworkDetect");
   }
 
   @NotNull
