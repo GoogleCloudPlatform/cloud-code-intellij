@@ -404,7 +404,6 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     Disposer.dispose(editor);
 
     UsefulTestCase.clearFields(editor);
-    UsefulTestCase.clearFields(cloudSdkService);
     UsefulTestCase.clearFields(appInfoPanel);
     UsefulTestCase.clearFields(deploymentSource);
 
