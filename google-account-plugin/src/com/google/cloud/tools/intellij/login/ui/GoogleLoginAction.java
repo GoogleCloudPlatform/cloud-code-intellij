@@ -49,6 +49,13 @@ public class GoogleLoginAction extends AnAction
         this, presentation, presentation.getText(), ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
   }
 
+  @Override
+  public void update(AnActionEvent e) {
+    GoogleLoginActionButton actionButton = (GoogleLoginActionButton) e.getPresentation()
+        .getClientProperty(CustomComponentAction.CUSTOM_COMPONENT_PROPERTY);
+    actionButton.updateIcon();
+  }
+
   /**
    * Opens up the Google Login panel as a popup.
    */
