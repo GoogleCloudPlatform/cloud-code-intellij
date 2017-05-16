@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 ## [unreleased]
 
+## [17.2.6_2017]
+
+### Fixed
+  - Plugin now works in IntelliJ 2017.1 and 2017.2. [1453] (https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1453).
+
 ## [17.2.5_2017]
 
 ### Added
