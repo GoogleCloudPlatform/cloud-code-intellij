@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [17.2.6_2017]
 
 ### Fixed
-  - Versioning fixed so that plugin works in IDEA 2017.2. [1453] (https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1453).
+  - Versioning fixed so that plugin works in IDEA 2017.2 EAP. [1453] (https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1453).
 
 ## [17.2.5_2017]
 
