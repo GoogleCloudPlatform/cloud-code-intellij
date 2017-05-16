@@ -57,7 +57,7 @@ subprojects {
     intellij {
         type = ideaEdition
         version = ideaVersion
-        updateSinceUntilBuild = true
+        updateSinceUntilBuild = false
         downloadSources = true
         sandboxDirectory = "${rootProject.buildDir}/idea-sandbox"
         intellijRepo = "https://storage.googleapis.com/cloud-tools-for-java-team-kokoro-build-cache/idea-distributions"
