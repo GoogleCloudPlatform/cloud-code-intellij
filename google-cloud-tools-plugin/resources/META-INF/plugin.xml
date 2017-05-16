@@ -29,8 +29,9 @@
     </html>]]>
   </description>
   <vendor>Google</vendor>
-  <!-- "version" set by gradle-intellij-plugin -->
-  <!-- "idea-version since-build" set by gradle-intellij-plugin -->
+  <!-- "idea-version since-build" set to cover 2017.1 - 2017.2 -->
+  <!-- Set manually because the gradle-intellij-plugin cannot span across major release versions -->
+  <idea-version since-build="171.3780" until-build="172.*"/>
 
   <change-notes>
     <![CDATA[
