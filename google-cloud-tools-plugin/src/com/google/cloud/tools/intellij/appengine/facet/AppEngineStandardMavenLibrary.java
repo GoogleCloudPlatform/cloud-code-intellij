@@ -25,7 +25,6 @@ import com.intellij.openapi.roots.DependencyScope;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.utils.library.RepositoryLibraryProperties;
-import org.jetbrains.idea.maven.utils.library.RepositoryUtils;
 
 import java.util.Arrays;
 
@@ -39,28 +38,27 @@ public enum AppEngineStandardMavenLibrary {
       DependencyScope.PROVIDED),
   JSTL(
       GctBundle.message("appengine.library.jstl.api.name"),
-      new RepositoryLibraryProperties("javax.servlet", "jstl", RepositoryUtils.ReleaseVersionId),
-      DependencyScope.PROVIDED),
+      new RepositoryLibraryProperties("javax.servlet", "jstl",
+          AppEngineStandardMavenLibrary.RELEASE_VERSION_ID), DependencyScope.PROVIDED),
   APP_ENGINE_API(
       GctBundle.message("appengine.library.app.engine.api.name"),
       new RepositoryLibraryProperties("com.google.appengine", "appengine-api-1.0-sdk",
-          RepositoryUtils.ReleaseVersionId),
-      DependencyScope.COMPILE),
+          AppEngineStandardMavenLibrary.RELEASE_VERSION_ID), DependencyScope.COMPILE),
   ENDPOINTS(
       GctBundle.message("appengine.library.endpoints.api.name"),
       new RepositoryLibraryProperties("com.google.appengine", "appengine-endpoints",
-          RepositoryUtils.ReleaseVersionId),
-      DependencyScope.COMPILE),
+          AppEngineStandardMavenLibrary.RELEASE_VERSION_ID), DependencyScope.COMPILE),
   OBJECTIFY(
       GctBundle.message("appengine.library.objectify.api.name"),
       new RepositoryLibraryProperties("com.googlecode.objectify", "objectify",
-          RepositoryUtils.ReleaseVersionId),
-      DependencyScope.COMPILE);
+          AppEngineStandardMavenLibrary.RELEASE_VERSION_ID), DependencyScope.COMPILE);
 
   private final String displayName;
   // TODO(paflynn): RepositoryLibraryProperties is a mutable type and should not be used in an enum.
   private final RepositoryLibraryProperties libraryProperties;
   private final DependencyScope scope;
+
+  private static final String RELEASE_VERSION_ID = "RELEASE";
 
   AppEngineStandardMavenLibrary(String displayName, RepositoryLibraryProperties libraryProperties,
       DependencyScope scope) {
