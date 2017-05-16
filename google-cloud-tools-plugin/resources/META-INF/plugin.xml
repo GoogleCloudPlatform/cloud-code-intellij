@@ -47,7 +47,7 @@
       <h2>[17.2.6_2017]</h2>
       <h3>Fixed</h3>
       <ul>
-        <li>Plugin now works in IDEA 2017.1 and 2017.2. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1453">#1453</a>)</li>
+        <li>Versioning fixed so that plugin works in IDEA 2017.2. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1453">#1453</a>)</li>
       </ul>
 
       <h2>[17.2.5_2017]</h2>
