@@ -237,9 +237,9 @@ public class DefaultCloudSdkService extends CloudSdkService {
     return jars.toArray(new File[jars.size()]);
   }
 
+  // TODO(joaomartins): This method should probably be extracted to CloudSdkAppEngineHelper.
   @VisibleForTesting
   CloudSdk buildCloudSdkWithPath(@NotNull Path path) {
     return new CloudSdk.Builder().sdkPath(path).build();
-
   }
 }

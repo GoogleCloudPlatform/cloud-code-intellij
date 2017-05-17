@@ -24,6 +24,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
@@ -36,11 +37,12 @@ import com.intellij.remoteServer.runtime.log.LoggingHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Deploys an application to App Engine.
@@ -48,6 +50,14 @@ import java.util.List;
 public class AppEngineDeploy {
 
   private static final Logger logger = Logger.getInstance(AppEngineDeploy.class);
+  private static final String APPENGINE_GENERATED_DIR = "WEB-INF/appengine-generated/";
+  private static final ImmutableList<String> APPENGINE_EXTRA_CONFIG_FILE_PATHS = ImmutableList.of(
+      APPENGINE_GENERATED_DIR + "index.yaml",
+      APPENGINE_GENERATED_DIR + "cron.yaml",
+      APPENGINE_GENERATED_DIR + "dos.yaml",
+      APPENGINE_GENERATED_DIR + "dispatch.yaml",
+      APPENGINE_GENERATED_DIR + "queue.yaml"
+  );
 
   private AppEngineHelper helper;
   private LoggingHandler loggingHandler;
@@ -80,6 +90,7 @@ public class AppEngineDeploy {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
+
     String appYamlName =
         deploymentConfiguration
             .getEnvironment()
@@ -89,8 +100,15 @@ public class AppEngineDeploy {
             .equals(AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT.name())
             ? "app.yaml"
             : Paths.get(deploymentConfiguration.getAppYamlPath()).getFileName().toString();
-    configuration.setDeployables(
-        Collections.singletonList(stagingDirectory.resolve(appYamlName).toFile()));
+
+    List<File> deployables = APPENGINE_EXTRA_CONFIG_FILE_PATHS.stream()
+        .map(configFilePath -> stagingDirectory.resolve(configFilePath).toFile())
+        .filter(
+            configFile -> deploymentConfiguration.isDeployAllConfigs() && configFile.exists())
+        .collect(Collectors.toList());
+    deployables.add(stagingDirectory.resolve(appYamlName).toFile());
+    configuration.setDeployables(deployables);
+
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
     configuration.setPromote(deploymentConfiguration.isPromote());

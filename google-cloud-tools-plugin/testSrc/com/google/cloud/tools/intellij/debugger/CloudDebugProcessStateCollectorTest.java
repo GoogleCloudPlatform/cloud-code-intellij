@@ -185,8 +185,6 @@ public class CloudDebugProcessStateCollectorTest extends BasePluginTestCase {
   private Project createProject(int inProgressDebugSessions,
                                 int backgroundListeningDebugsSessions,
                                 int notListeningDebugSessions) {
-    Project project = mock(Project.class);
-
     XDebuggerManager debuggerManager = mock(XDebuggerManager.class);
     XDebugSession[] debugSessions = new XDebugSession[inProgressDebugSessions];
     List<RunnerAndConfigurationSettings> allRunnerSettings =
@@ -198,7 +196,8 @@ public class CloudDebugProcessStateCollectorTest extends BasePluginTestCase {
     }
 
     when(debuggerManager.getDebugSessions()).thenReturn(debugSessions);
-    when(project.getComponent(XDebuggerManager.class)).thenReturn(debuggerManager);
+    applicationContainer.unregisterComponent(XDebuggerManager.class.getName());
+    registerService(XDebuggerManager.class, debuggerManager);
 
     for (int i = 0; i < backgroundListeningDebugsSessions; i++) {
       createBackgroundListeningDebugSettings(allRunnerSettings);
@@ -209,8 +208,9 @@ public class CloudDebugProcessStateCollectorTest extends BasePluginTestCase {
     }
 
     RunManager runManager = mock(RunManager.class);
-    when(project.getComponent(RunManager.class)).thenReturn(runManager);
     when(runManager.getAllSettings()).thenReturn(allRunnerSettings);
+    applicationContainer.unregisterComponent(RunManager.class.getName());
+    registerService(RunManager.class, runManager);
 
     return project;
   }

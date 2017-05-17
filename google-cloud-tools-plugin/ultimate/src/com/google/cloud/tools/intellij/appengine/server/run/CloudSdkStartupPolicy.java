@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.collect.Maps;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.OSProcessHandler;
@@ -31,6 +32,8 @@ import com.intellij.javaee.run.localRun.ExecutableObject;
 import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
 import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ProjectRootManager;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -45,6 +48,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
   // The startup process handler is kept so the process can be explicitly terminated, since we're
   // not delegating that to the framework.
   private OSProcessHandler startupProcessHandler;
+  private static final String JVM_FLAGS_ENVIRONMENT_KEY = "";
 
   @Nullable
   @Override
@@ -61,11 +65,16 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
           @Override
           public OSProcessHandler createProcessHandler(
-              String workingDirectory, Map<String, String> envVariables) throws ExecutionException {
+              String workingDirectory, Map<String, String> configuredEnvironment) throws ExecutionException {
 
             if (!CloudSdkService.getInstance().isValidCloudSdk()) {
               throw new ExecutionException(
                   GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
+            }
+
+            Sdk javaSdk = ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk();
+            if (javaSdk == null || javaSdk.getHomePath() == null) {
+              throw new ExecutionException(GctBundle.message("appengine.run.server.nosdk"));
             }
 
             AppEngineServerModel runConfiguration;
@@ -77,21 +86,22 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               throw new ExecutionException(ee);
             }
 
-            // This is the place we have access to the debug jvm flags provided by IJ in the
-            // Startup/Shutdown tab. We need to add them here.
-            String jvmDebugFlag = envVariables.get("");
-            if (jvmDebugFlag != null) {
-              runConfiguration.addAllJvmFlags(Arrays.asList(jvmDebugFlag.trim().split(" ")));
-              // prevent multiple JVMs from being created to make debugging deterministic
-              runConfiguration.setMaxModuleInstances(1);
-              // If debuggee JVMs restart after HotSwap, debug connection is lost, debug server goes
-              // down and doesn't come back up. Flag is set to true by default, need to set it to
-              // false here. https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972
-              runConfiguration.setAutomaticRestart(false);
+            Map<String, String> environment = Maps.newHashMap(configuredEnvironment);
+
+            // IntelliJ appends the JVM flags to the environment variables, keyed by an empty
+            // string; so we need extract them here.
+            String jvmFlags = environment.get(JVM_FLAGS_ENVIRONMENT_KEY);
+            if (jvmFlags != null) {
+              runConfiguration.appendJvmFlags(Arrays.asList(jvmFlags.trim().split(" ")));
             }
+            // We don't want to pass the jvm flags to the dev server environment
+            environment.remove(JVM_FLAGS_ENVIRONMENT_KEY);
+
+            runConfiguration.setEnvironment(environment);
 
             AppEngineStandardRunTask runTask =
-                new AppEngineStandardRunTask(runConfiguration, programRunner.getRunnerId());
+                new AppEngineStandardRunTask(
+                    runConfiguration, javaSdk, programRunner.getRunnerId());
             AppEngineExecutor executor = new AppEngineExecutor(runTask);
             executor.run();
 
