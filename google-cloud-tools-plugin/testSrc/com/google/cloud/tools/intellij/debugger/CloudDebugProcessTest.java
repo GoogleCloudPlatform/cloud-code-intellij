@@ -58,6 +58,7 @@ import com.intellij.xdebugger.ui.XDebugTabLayouter;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
@@ -67,6 +68,7 @@ import java.util.List;
 
 import javax.swing.Icon;
 
+@Ignore
 public class CloudDebugProcessTest extends PlatformTestCase {
 
   private CloudDebugProcess process;
