@@ -29,16 +29,13 @@ import org.junit.Ignore;
 /** Unit tests for {@link ServerToIdeFileResolver}. */
 public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase {
   private PsiClass class1;
-  private PsiClass class2;
-  private PsiFile file1;
-  private PsiFile file2;
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
 
     class1 = this.myFixture.addClass("package com.java.pkg; class Class {}");
-    class2 = this.myFixture.addClass("package com.java.pkg; class ClassTest {}");
+    this.myFixture.addClass("package com.java.pkg; class ClassTest {}");
   }
 
   @Override
@@ -60,9 +57,10 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
   public void ignore_testGetFileFromPath_fullPath() {
     // TODO(joaomartins): Find out why project.getBaseDir() is returning a different tempDir to
     // myFixture.
-    file1 = this.myFixture.addFileToProject("path/to/prj/src/main/com/java/package/Class.java", "");
-    file2 =
-        this.myFixture.addFileToProject("path/to/prj/src/test/com/java/package/ClassTest.java", "");
+    PsiFile file1 = this.myFixture
+        .addFileToProject("path/to/prj/src/main/com/java/package/Class.java", "");
+    this.myFixture
+        .addFileToProject("path/to/prj/src/test/com/java/package/ClassTest.java", "");
 
     ServerToIdeFileResolver fileResolver = new ServerToIdeFileResolver();
     assertEquals(
