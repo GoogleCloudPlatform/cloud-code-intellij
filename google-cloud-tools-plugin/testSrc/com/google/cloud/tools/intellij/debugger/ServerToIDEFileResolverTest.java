@@ -29,6 +29,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /** Unit tests for {@link ServerToIdeFileResolver}. */
+@Ignore
 public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase {
   private Project project;
   private PsiClass class1;
