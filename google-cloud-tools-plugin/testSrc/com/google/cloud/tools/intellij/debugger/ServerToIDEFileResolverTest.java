@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 
 import org.junit.Ignore;
@@ -43,6 +44,9 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
 
   @Override
   public void tearDown() throws Exception {
+    UsefulTestCase.clearFields(class1);
+    UsefulTestCase.clearFields(class2);
+
     super.tearDown();
   }
 
