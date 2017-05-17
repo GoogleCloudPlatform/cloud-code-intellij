@@ -402,6 +402,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   public void tearDown() throws Exception {
     editor.getModulesWithFlexFacetComboBox().removeAllItems();
     Disposer.dispose(editor);
+    Disposer.dispose(javaModule);
+    Disposer.dispose(customModule);
     super.tearDown();
   }
 }
