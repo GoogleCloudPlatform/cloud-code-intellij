@@ -51,12 +51,13 @@ public class CredentialedUser {
    * Creates a credentialed user.
    */
   public CredentialedUser(GoogleLoginState state,
-      @Nullable final IGoogleLoginCompletedCallback callback) {
+      @Nullable final IGoogleLoginCompletedCallback loginCompletedCallback) {
     this.email = state.getEmail();
     googleLoginState = state;
     credential = googleLoginState.makeCredential();
     GoogleLoginUtils
-        .getUserInfo(credential, userInfoPlus -> initializeUserInfo(userInfoPlus, callback));
+        .getUserInfo(credential,
+            userInfoPlus -> initializeUserInfo(userInfoPlus, loginCompletedCallback));
   }
 
   /**
@@ -106,7 +107,7 @@ public class CredentialedUser {
   }
 
   private void initializeUserInfo(Userinfoplus userInfo,
-      @Nullable final IGoogleLoginCompletedCallback callback) {
+      @Nullable final IGoogleLoginCompletedCallback loginCompletedCallback) {
     if (userInfo == null) {
       name = null;
       image = null;
@@ -114,8 +115,8 @@ public class CredentialedUser {
       name = userInfo.getName();
       GoogleLoginUtils.provideUserPicture(userInfo, newImage -> {
         image = newImage;
-        if (callback != null) {
-          callback.onLoginCompleted();
+        if (loginCompletedCallback != null) {
+          loginCompletedCallback.onLoginCompleted();
         }
       });
     }

@@ -588,7 +588,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
           continue;
         }
 
-        users.addUser(new CredentialedUser(delegate, null));
+        users.addUser(new CredentialedUser(delegate, null /*loginCompletedCallback*/));
       }
 
       if (activeUserString == null) {
