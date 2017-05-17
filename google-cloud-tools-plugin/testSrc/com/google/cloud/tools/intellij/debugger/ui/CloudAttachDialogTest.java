@@ -21,19 +21,21 @@ import static org.mockito.Mockito.when;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.clouddebugger.v2.model.Debuggee;
-import com.google.cloud.tools.intellij.debugger.SyncResult;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
 import com.google.cloud.tools.intellij.debugger.ProjectRepositoryValidator;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
-import com.google.cloud.tools.intellij.testing.TestUtils;
+import com.google.cloud.tools.intellij.debugger.SyncResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.testing.TestUtils;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.ui.components.JBCheckBox;
 
 import java.util.LinkedHashMap;
@@ -63,7 +65,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     mockCredentials();
   }
 
-  public void testErrorWhenUserIsLoggedOut() {
+  public void testErrorWhenUserIsLoggedOut() throws IllegalAccessException {
     CloudAttachDialog dialog = initDialog();
     mockLoggedOutUser();
     ValidationInfo error = dialog.doValidate();
@@ -72,9 +74,10 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     assertEquals(NO_LOGIN_WARNING, error.message);
 
     dialog.close(0);
+    UsefulTestCase.clearFields(dialog);
   }
 
-  public void testNoProjectSelected() {
+  public void testNoProjectSelected() throws IllegalAccessException {
     CloudAttachDialog dialog = initDialog();
     mockLoggedInUser();
     ValidationInfo error = dialog.doValidate();
@@ -83,9 +86,10 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     assertEquals(NO_PROJECT_ID_WARNING, error.message);
 
     dialog.close(0);
+    UsefulTestCase.clearFields(dialog);
   }
 
-  public void testNoModulesFound() {
+  public void testNoModulesFound() throws IllegalAccessException {
     CloudAttachDialog dialog = initDialog();
     mockLoggedInUser();
     selectEmptyProject();
@@ -99,9 +103,10 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     assertFalse(targetSelector.isEnabled());
 
     dialog.close(0);
+    UsefulTestCase.clearFields(dialog);
   }
 
-  public void testDebuggableModuleSelected() {
+  public void testDebuggableModuleSelected() throws IllegalAccessException {
     mockLoggedInUser();
 
     binding = mock(ProjectDebuggeeBinding.class);
@@ -127,6 +132,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     assertTrue(targetSelector.isEnabled());
 
     dialog.close(0);
+    UsefulTestCase.clearFields(dialog);
   }
 
   /**
@@ -135,7 +141,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
    * want to display an error to the user until the thread completes to avoid
    * flashing error messages
    */
-  public void testUnknownProjectSelected() {
+  public void testUnknownProjectSelected() throws IllegalAccessException {
     CloudAttachDialog dialog = initDialog();
     mockLoggedInUser();
     selectInProgressProject();
@@ -149,6 +155,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     assertFalse(dialog.isOKActionEnabled());
 
     dialog.close(0);
+    UsefulTestCase.clearFields(dialog);
   }
 
   /**
@@ -157,7 +164,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
    * The visibility of this option needs to be properly reset.
    *
    */
-  public void testSyncStashReset() {
+  public void testSyncStashReset() throws IllegalAccessException {
     mockLoggedInUser();
 
     binding = mock(ProjectDebuggeeBinding.class);
@@ -190,6 +197,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
     assertFalse(syncStashCheckbox.isVisible());
 
     dialog.close(0);
+    UsefulTestCase.clearFields(dialog);
   }
 
   private CloudAttachDialog initDialog() {
