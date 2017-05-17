@@ -188,13 +188,13 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
    *     when the user is presented the login dialog from doing something other than logging in,
    *     such as accessing Google API services. It should say something like "Importing a project
    *     from Google Project Hosting requires signing in."
-   * @param callback if not null, then this callback is called when the login either succeeds or
-   *     fails.
+   * @param loginCompletedCallback if not null, then this callback is called when the login either
+   *     succeeds or fails
    *
    */
   @Override
   public void logIn(@Nullable final String message,
-      @Nullable final IGoogleLoginCompletedCallback callback) {
+      @Nullable final IGoogleLoginCompletedCallback loginCompletedCallback) {
     UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGIN_START).ping();
 
     final CredentialedUser lastActiveUser = users.getActiveUser();
@@ -242,16 +242,16 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
         // TODO: add user preference to chose to use pop-up copy and paste dialog
         if (loggedIn) {
           users.addUser(new CredentialedUser(state, () -> {
-            if (callback != null) {
-              callback.onLoginCompleted();
+            if (loginCompletedCallback != null) {
+              loginCompletedCallback.onLoginCompleted();
             }
           }));
         } else {
           // Login failed (or aborted), so restore the last active user, if any
           restoreLastActiveUser();
 
-          if (callback != null) {
-            callback.onLoginCompleted();
+          if (loginCompletedCallback != null) {
+            loginCompletedCallback.onLoginCompleted();
           }
         }
       }
