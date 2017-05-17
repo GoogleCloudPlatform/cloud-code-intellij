@@ -22,6 +22,8 @@ import com.google.gdt.eclipse.login.common.GoogleLoginState;
 
 import java.awt.Image;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Class that represents a single logged in user.
  */
@@ -49,19 +51,12 @@ public class CredentialedUser {
    * Creates a credentialed user.
    */
   public CredentialedUser(GoogleLoginState state,
-      final IGoogleLoginCompletedCallback updateUserCallback) {
+      @Nullable final IGoogleLoginCompletedCallback callback) {
     this.email = state.getEmail();
     googleLoginState = state;
     credential = googleLoginState.makeCredential();
-
-    IUserPropertyCallback callback = new IUserPropertyCallback<Userinfoplus>() {
-      @Override
-      public void setProperty(Userinfoplus userinfoplus) {
-        initializeUserInfo(userinfoplus, updateUserCallback);
-      }
-    };
-
-    GoogleLoginUtils.getUserInfo(credential, callback);
+    GoogleLoginUtils
+        .getUserInfo(credential, userInfoPlus -> initializeUserInfo(userInfoPlus, callback));
   }
 
   /**
@@ -111,20 +106,18 @@ public class CredentialedUser {
   }
 
   private void initializeUserInfo(Userinfoplus userInfo,
-      final IGoogleLoginCompletedCallback updateUserCallback) {
+      @Nullable final IGoogleLoginCompletedCallback callback) {
     if (userInfo == null) {
       name = null;
       image = null;
     } else {
       name = userInfo.getName();
-      IUserPropertyCallback pictureCallback = new IUserPropertyCallback<Image>() {
-        @Override
-        public void setProperty(Image newImage) {
-          image = newImage;
-          updateUserCallback.onLoginCompleted();
+      GoogleLoginUtils.provideUserPicture(userInfo, newImage -> {
+        image = newImage;
+        if (callback != null) {
+          callback.onLoginCompleted();
         }
-      };
-      GoogleLoginUtils.provideUserPicture(userInfo, pictureCallback);
+      });
     }
   }
 }

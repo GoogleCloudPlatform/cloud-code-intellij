@@ -21,7 +21,6 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.cloud.tools.intellij.login.ui.GoogleLoginActionButton;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginCopyAndPasteDialog;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
@@ -200,7 +199,6 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
 
     final CredentialedUser lastActiveUser = users.getActiveUser();
     users.removeActiveUser();
-    uiFacade.notifyStatusIndicator();
 
     final GoogleLoginState state = createGoogleLoginState(false);
 
@@ -243,17 +241,11 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
       private void notifyOnComplete() {
         // TODO: add user preference to chose to use pop-up copy and paste dialog
         if (loggedIn) {
-          IGoogleLoginCompletedCallback localCallback = new IGoogleLoginCompletedCallback() {
-
-            @Override
-            public void onLoginCompleted() {
-              uiFacade.notifyStatusIndicator();
-              if (callback != null) {
-                callback.onLoginCompleted();
-              }
+          users.addUser(new CredentialedUser(state, () -> {
+            if (callback != null) {
+              callback.onLoginCompleted();
             }
-          };
-          users.addUser(new CredentialedUser(state, localCallback));
+          }));
         } else {
           // Login failed (or aborted), so restore the last active user, if any
           restoreLastActiveUser();
@@ -323,12 +315,6 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
   @Override
   public void setActiveUser(String userEmail) throws IllegalArgumentException {
     users.setActiveUser(userEmail);
-    uiFacade.notifyStatusIndicator();
-  }
-
-  @Override
-  public void setLoginMenuItemContribution(GoogleLoginActionButton button) {
-    uiFacade.setLoginMenuItemContribution(button);
   }
 
   @Override
@@ -443,7 +429,6 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
      * number of characters to wrap lines after in the logout message.
      */
     public static final int WRAP_LENGTH = 60;
-    private GoogleLoginActionButton button;
     private volatile CancellableServerReceiver receiver = null;
     private GoogleLoginMessageExtender[] messageExtenders;
 
@@ -457,7 +442,6 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
         GoogleAuthorizationCodeRequestUrl authCodeRequestUrl) {
       GoogleLoginCopyAndPasteDialog dialog =
           new GoogleLoginCopyAndPasteDialog(
-              button,
               authCodeRequestUrl,
               AccountMessageBundle.message("login.service.copyandpaste.title.text"));
       dialog.show();
@@ -549,28 +533,11 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
           /* newLinestr */ null,
           /* wrapLongWords */ false);
       return (Messages.showYesNoDialog(
-        updatedMessage, title, GoogleLoginIcons.GOOGLE_FAVICON) == Messages.YES);
+          updatedMessage, title, GoogleLoginIcons.GOOGLE_FAVICON) == Messages.YES);
     }
 
     @Override
     public void notifyStatusIndicator() {
-      if (button != null) {
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            button.updateUi();
-          }
-        });
-      }
-    }
-
-    /**
-     * Sets the login menu item.
-     *
-     * @param trim the login menu item
-     */
-    public void setLoginMenuItemContribution(GoogleLoginActionButton trim) {
-      this.button = trim;
     }
   }
 
@@ -621,14 +588,7 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
           continue;
         }
 
-        IGoogleLoginCompletedCallback callback = new IGoogleLoginCompletedCallback() {
-          @Override
-          public void onLoginCompleted() {
-            uiFacade.notifyStatusIndicator();
-          }
-        };
-
-        users.addUser(new CredentialedUser(delegate, callback));
+        users.addUser(new CredentialedUser(delegate, null));
       }
 
       if (activeUserString == null) {

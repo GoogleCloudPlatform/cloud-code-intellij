@@ -42,6 +42,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -186,11 +187,9 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     boolean noUsersAvailable =
         (listModel.getSize() == 1) && (listModel.get(0) instanceof NoUsersListItem);
     JButton addAccountButton = new JButton(noUsersAvailable ? SIGN_IN : ADD_ACCOUNT);
-    addAccountButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent event) {
-        Services.getLoginService().logIn();
-      }
+    addAccountButton.addActionListener(event -> {
+      SwingUtilities.getWindowAncestor(this).dispose();
+      Services.getLoginService().logIn();
     });
     addAccountButton.setHorizontalAlignment(SwingConstants.LEFT);
 

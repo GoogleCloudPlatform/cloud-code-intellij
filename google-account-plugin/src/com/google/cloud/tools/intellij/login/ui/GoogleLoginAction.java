@@ -16,6 +16,10 @@
 
 package com.google.cloud.tools.intellij.login.ui;
 
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
+
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -28,15 +32,24 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 
+import java.awt.Image;
 import java.awt.Point;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 /**
  * Action to open the Google Login panel.
  */
-public class GoogleLoginAction extends AnAction
-    implements DumbAware, CustomComponentAction, RightAlignedToolbarAction {
+public class GoogleLoginAction extends AnAction implements DumbAware, RightAlignedToolbarAction {
+
+  private static final String SIGN_IN_MESSAGE = AccountMessageBundle.message(
+      "login.toolbar.button.sign.in.text");
+
+  /** Returns a new instance with the icon set to {@link GoogleLoginIcons#DEFAULT_USER_AVATAR}. */
+  public GoogleLoginAction() {
+    super(GoogleLoginIcons.DEFAULT_USER_AVATAR);
+  }
 
   @Override
   public void actionPerformed(AnActionEvent event) {
@@ -44,16 +57,22 @@ public class GoogleLoginAction extends AnAction
   }
 
   @Override
-  public JComponent createCustomComponent(Presentation presentation) {
-    return new GoogleLoginActionButton(
-        this, presentation, presentation.getText(), ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
-  }
-
-  @Override
   public void update(AnActionEvent e) {
-    GoogleLoginActionButton actionButton = (GoogleLoginActionButton) e.getPresentation()
-        .getClientProperty(CustomComponentAction.CUSTOM_COMPONENT_PROPERTY);
-    actionButton.updateIcon();
+    Presentation presentation = e.getPresentation();
+    CredentialedUser activeUser = Services.getLoginService().getActiveUser();
+    if (activeUser == null) {
+      presentation.setText(SIGN_IN_MESSAGE);
+      presentation.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
+    } else {
+      presentation.setText(activeUser.getEmail());
+      Image image = activeUser.getPicture();
+      if (image == null) {
+        presentation.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
+      } else {
+        Image scaledImage = image.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        presentation.setIcon(new ImageIcon(scaledImage));
+      }
+    }
   }
 
   /**
@@ -61,12 +80,10 @@ public class GoogleLoginAction extends AnAction
    */
   private static void showPopup(AnActionEvent event) {
     GoogleLoginUsersPanel usersPanel = new GoogleLoginUsersPanel();
-    JComponent source = (JComponent) event.getInputEvent().getSource();
     ComponentPopupBuilder popupBuilder =
         JBPopupFactory.getInstance().createComponentPopupBuilder(usersPanel, usersPanel.getList());
-    JBPopup popup = popupBuilder.createPopup();
-    JComponent component = popup.getContent();
-    int startingPoint = (int)(source.getWidth() - component.getPreferredSize().getWidth());
-    popup.show(new RelativePoint(source, new Point(startingPoint, source.getHeight() - 1)));
+    JBPopup popup = popupBuilder.setCancelOnWindowDeactivation(true).createPopup();
+    JComponent source = (JComponent) event.getInputEvent().getSource();
+    popup.showUnderneathOf(source);
   }
 }
