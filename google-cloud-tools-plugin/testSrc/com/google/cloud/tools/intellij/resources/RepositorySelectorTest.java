@@ -31,6 +31,7 @@ import com.google.cloud.tools.intellij.vcs.CloudRepositoryService.CloudRepositor
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.ui.awt.RelativePoint;
 
 import org.picocontainer.MutablePicoContainer;
@@ -54,6 +55,7 @@ import javax.swing.tree.DefaultTreeModel;
 public class RepositorySelectorTest extends PlatformTestCase {
 
   private CloudRepositoryService repositoryService;
+  private CredentialedUser credentialedUser;
 
   @Override
   public void setUp() throws Exception {
@@ -63,6 +65,7 @@ public class RepositorySelectorTest extends PlatformTestCase {
         ApplicationManager.getApplication().getPicoContainer();
 
     repositoryService = mock(CloudRepositoryService.class);
+    credentialedUser = mock(CredentialedUser.class);
 
     applicationContainer.unregisterComponent(CloudRepositoryService.class.getName());
     applicationContainer.registerComponentInstance(
@@ -201,12 +204,15 @@ public class RepositorySelectorTest extends PlatformTestCase {
   private RepositorySelector createInitializedSelector() {
     return new RepositorySelector(
         "my-project",
-        mock(CredentialedUser.class),
+        credentialedUser,
         false /*canCreateRepository*/);
   }
 
   @Override
   protected void tearDown() throws Exception {
     super.tearDown();
+
+    UsefulTestCase.clearFields(repositoryService);
+    UsefulTestCase.clearFields(credentialedUser);
   }
 }
