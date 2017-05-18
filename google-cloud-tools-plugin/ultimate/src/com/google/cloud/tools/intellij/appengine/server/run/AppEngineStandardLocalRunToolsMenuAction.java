@@ -38,9 +38,6 @@ import java.util.stream.Stream;
  */
 public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfigurationAction {
 
-  private static final String APP_ENGINE_STANDARD_DOCS_LINK
-      = "https://cloud.google.com/appengine/docs/java/";
-
   public AppEngineStandardLocalRunToolsMenuAction() {
     super(AppEngineServerConfigurationType.getInstance(),
         GctBundle.message("appengine.tools.menu.run.server.text"),
