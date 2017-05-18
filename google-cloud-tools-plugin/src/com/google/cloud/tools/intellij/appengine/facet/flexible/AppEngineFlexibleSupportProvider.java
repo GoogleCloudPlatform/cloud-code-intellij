@@ -183,8 +183,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
 
       StartupManagerEx startupManger = StartupManagerEx.getInstanceEx(module.getProject());
       if (!startupManger.postStartupActivityPassed()) {
-        StartupManager.getInstance(module.getProject())
-            .registerPostStartupActivity(() -> addAppEngineFlexibleSupport(rootModel, facet));
+        startupManger.registerPostStartupActivity(
+            () -> addAppEngineFlexibleSupport(rootModel, facet));
       } else {
         addAppEngineFlexibleSupport(rootModel, facet);
       }
