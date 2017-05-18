@@ -49,8 +49,6 @@ public class AppEngineFlexibleSupportConfigurableTest extends PlatformTestCase {
 
   public void testAddSupportPostStartup() {
     Module module = createModule("testModule");
-    ModifiableRootModel rootModel = mock(ModifiableRootModel.class);
-    ModifiableModelsProvider modelsProvider = mock(ModifiableModelsProvider.class);
 
     doNothing().when(supportConfigurable)
         .addAppEngineFlexibleSupport(
@@ -59,7 +57,8 @@ public class AppEngineFlexibleSupportConfigurableTest extends PlatformTestCase {
     new WriteAction() {
       @Override
       protected void run(@NotNull Result result) throws Throwable {
-        supportConfigurable.addSupport(module, rootModel, modelsProvider);
+        supportConfigurable
+            .addSupport(module, mock(ModifiableRootModel.class), mock(ModifiableModelsProvider.class));
       }
     }.execute();
 
