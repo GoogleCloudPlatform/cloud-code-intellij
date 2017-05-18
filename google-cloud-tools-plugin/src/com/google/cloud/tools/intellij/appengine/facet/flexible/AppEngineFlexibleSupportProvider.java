@@ -35,6 +35,7 @@ import com.intellij.facet.FacetType;
 import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
+import com.intellij.ide.startup.StartupManagerEx;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -180,17 +181,25 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       AppEngineFlexibleFacet facet = FacetManager.getInstance(module).addFacet(
           facetType, facetType.getPresentableName(), null /* underlyingFacet */);
 
-      StartupManager.getInstance(module.getProject())
-          .registerPostStartupActivity(
-              () ->
-                  AppEngineFlexibleSupportProvider.addSupport(
-                      facet, rootModel, generateConfigurationFilesCheckBox.isSelected()));
+      StartupManagerEx startupManger = StartupManagerEx.getInstanceEx(module.getProject());
+      if (!startupManger.postStartupActivityPassed()) {
+        StartupManager.getInstance(module.getProject())
+            .registerPostStartupActivity(() -> addAppEngineFlexibleSupport(rootModel, facet));
+      } else {
+        addAppEngineFlexibleSupport(rootModel, facet);
+      }
 
       CloudSdkService sdkService = CloudSdkService.getInstance();
       if (!sdkService.validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
         sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
       }
+    }
+
+    private void addAppEngineFlexibleSupport(@NotNull ModifiableRootModel rootModel,
+        AppEngineFlexibleFacet facet) {
+      AppEngineFlexibleSupportProvider.addSupport(
+          facet, rootModel, generateConfigurationFilesCheckBox.isSelected());
     }
 
     private void createUIComponents() {
