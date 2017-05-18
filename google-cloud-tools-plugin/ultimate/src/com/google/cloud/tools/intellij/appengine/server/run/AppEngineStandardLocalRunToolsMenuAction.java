@@ -62,7 +62,6 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
 
   /**
    * Determines if the project has at least one module with the App Engine standard facet.
-   * If it does not, then a notification balloon is shown.
    */
   @VisibleForTesting
   boolean isAppEngineStandardProject(@NotNull Project project) {
