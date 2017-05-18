@@ -50,8 +50,13 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
 
   @Override
   public void actionPerformed(AnActionEvent event) {
-    if (event.getProject() != null && isAppEngineStandardProjectCheck(event.getProject())) {
-      super.actionPerformed(event);
+    Project project = event.getProject();
+    if (project != null) {
+      if (isAppEngineStandardProjectCheck(project)) {
+        super.actionPerformed(event);
+      } else {
+        notifyNotAppEngineStandardProject(project);
+      }
     }
   }
 
@@ -61,26 +66,25 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
    */
   @VisibleForTesting
   boolean isAppEngineStandardProjectCheck(@NotNull Project project) {
-    boolean hasAppEngineStandardFacet =
-        Stream.of(ModuleManager.getInstance(project).getModules())
-            .anyMatch(module ->
-                AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module));
+    return Stream.of(ModuleManager.getInstance(project).getModules())
+        .anyMatch(module ->
+            AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module));
+  }
 
-    if (!hasAppEngineStandardFacet) {
-      NotificationGroup notification =
-          new NotificationGroup(
-              GctBundle.message("appengine.tools.menu.run.server.error.title"),
-              NotificationDisplayType.BALLOON,
-              true);
+  private void notifyNotAppEngineStandardProject(@NotNull Project project) {
+    NotificationGroup notification =
+        new NotificationGroup(
+            GctBundle.message("appengine.tools.menu.run.server.error.title"),
+            NotificationDisplayType.BALLOON,
+            true);
 
-      notification.createNotification(
-          GctBundle.message("appengine.tools.menu.run.server.error.title"),
-          GctBundle.message("appengine.tools.menu.run.server.error.message"),
-          NotificationType.ERROR,
-          null /*listener*/).notify(project);
-    }
-
-    return hasAppEngineStandardFacet;
+    notification
+        .createNotification(
+            GctBundle.message("appengine.tools.menu.run.server.error.title"),
+            GctBundle.message("appengine.tools.menu.run.server.error.message"),
+            NotificationType.ERROR,
+            null /*listener*/)
+        .notify(project);
   }
 
 }

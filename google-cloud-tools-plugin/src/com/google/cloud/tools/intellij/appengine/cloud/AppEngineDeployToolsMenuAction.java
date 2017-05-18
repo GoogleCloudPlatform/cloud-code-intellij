@@ -59,52 +59,60 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
   public void actionPerformed(AnActionEvent event) {
     Project project = event.getProject();
 
-    if (project != null && isAppEngineProjectCheck(project)) {
-      AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
-      List<RemoteServer<AppEngineServerConfiguration>> servers =
-          RemoteServersManager.getInstance().getServers(serverType);
-
-      try {
-        DeploymentConfigurationManager.getInstance(project)
-            .createAndRunConfiguration(serverType, ContainerUtil.getFirstItem(servers));
-      } catch (NullPointerException npe) {
-        /**
-         * Handles the case where the configuration is executed with a null deployment source.
-         * See {@link DeployToServerSettingsEditor#applyEditorTo(DeployToServerRunConfiguration)}
-         * The deployment configuration is set to null causing the following execution to fail:
-         * {@link DeployToServerRunConfiguration#checkConfiguration()}
-         */
-        logger.warn("Error encountered executing App Engine deployment run configuration.", npe);
+    if (project != null) {
+      if (isAppEngineProject(project)) {
+        openRunConfiguration(project);
+      } else {
+        notifyNotAppEngineProject(project);
       }
     }
   }
 
+  private void openRunConfiguration(@NotNull Project project) {
+    AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
+    List<RemoteServer<AppEngineServerConfiguration>> servers =
+        RemoteServersManager.getInstance().getServers(serverType);
+
+    try {
+      DeploymentConfigurationManager.getInstance(project)
+          .createAndRunConfiguration(serverType, ContainerUtil.getFirstItem(servers));
+    } catch (NullPointerException npe) {
+      /**
+       * Handles the case where the configuration is executed with a null deployment source. See
+       * {@link DeployToServerSettingsEditor#applyEditorTo(DeployToServerRunConfiguration)} The
+       * deployment configuration is set to null causing the following execution to fail: {@link
+       * DeployToServerRunConfiguration#checkConfiguration()}
+       */
+      logger.warn("Error encountered executing App Engine deployment run configuration.", npe);
+    }
+  }
+
+  private void notifyNotAppEngineProject(@NotNull Project project) {
+    NotificationGroup notification =
+        new NotificationGroup(
+            GctBundle.message("appengine.tools.menu.deploy.error.title"),
+            NotificationDisplayType.BALLOON,
+            true);
+
+    notification
+        .createNotification(
+            GctBundle.message("appengine.tools.menu.deploy.error.title"),
+            GctBundle.message("appengine.tools.menu.deploy.error.message"),
+            NotificationType.ERROR,
+            null /*listener*/)
+        .notify(project);
+  }
+
   /**
    * Determines if the project has at least one module with an App Engine standard or flexible
-   * facet. If it does not, then a notification balloon is shown.
+   * facet.
    */
   @VisibleForTesting
-  boolean isAppEngineProjectCheck(@NotNull Project project) {
+  boolean isAppEngineProject(@NotNull Project project) {
     AppEngineProjectService projectService = AppEngineProjectService.getInstance();
-    boolean hasAppEngineFacet =
-        Stream.of(ModuleManager.getInstance(project).getModules())
-            .anyMatch(module -> projectService.hasAppEngineStandardFacet(module)
-                || projectService.hasAppEngineFlexFacet(module));
 
-    if (!hasAppEngineFacet) {
-     NotificationGroup notification =
-          new NotificationGroup(
-              GctBundle.message("appengine.tools.menu.deploy.error.title"),
-              NotificationDisplayType.BALLOON,
-              true);
-
-      notification.createNotification(
-          GctBundle.message("appengine.tools.menu.deploy.error.title"),
-          GctBundle.message("appengine.tools.menu.deploy.error.message"),
-          NotificationType.ERROR,
-          null /*listener*/).notify(project);
-    }
-
-    return hasAppEngineFacet;
+    return Stream.of(ModuleManager.getInstance(project).getModules())
+        .anyMatch(module -> projectService.hasAppEngineStandardFacet(module)
+            || projectService.hasAppEngineFlexFacet(module));
   }
 }

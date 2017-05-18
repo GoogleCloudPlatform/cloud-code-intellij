@@ -38,7 +38,7 @@ public class AppEngineDeployToolsMenuActionTest extends PlatformTestCase {
   }
 
   public void testIsAppEngineProjectCheck_noFacet() {
-    assertFalse(action.isAppEngineProjectCheck(getProject()));
+    assertFalse(action.isAppEngineProject(getProject()));
   }
 
   public void testIsAppEngineProjectCheck_flexibleFacet() {
@@ -47,7 +47,7 @@ public class AppEngineDeployToolsMenuActionTest extends PlatformTestCase {
           "flex facet", null /* underlyingFacet */);
     });
 
-    assertTrue(action.isAppEngineProjectCheck(getProject()));
+    assertTrue(action.isAppEngineProject(getProject()));
   }
 
   public void testIsAppEngineProjectCheck_standardFacet() {
@@ -56,7 +56,7 @@ public class AppEngineDeployToolsMenuActionTest extends PlatformTestCase {
           "standard facet", null /* underlyingFacet */);
     });
 
-    assertTrue(action.isAppEngineProjectCheck(getProject()));
+    assertTrue(action.isAppEngineProject(getProject()));
   }
 
 }
