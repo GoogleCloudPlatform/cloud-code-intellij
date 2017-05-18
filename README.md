@@ -24,8 +24,8 @@ For detailed user documentation go to our documentation
 
 ## Supported Platforms
 
-* IntelliJ IDEA Community Edition 15.0.6 or later
-* IntelliJ IDEA Ultimate Edition 15.0.6 or later
+* IntelliJ IDEA Community Edition 2016.3 or later
+* IntelliJ IDEA Ultimate Edition 2016.3 or later
 
 ## Installation
 
