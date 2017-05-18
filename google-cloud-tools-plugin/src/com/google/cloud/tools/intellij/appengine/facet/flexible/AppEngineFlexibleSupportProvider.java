@@ -26,6 +26,7 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -43,7 +44,6 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
-import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
@@ -196,7 +196,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       }
     }
 
-    private void addAppEngineFlexibleSupport(@NotNull ModifiableRootModel rootModel,
+    @VisibleForTesting
+    void addAppEngineFlexibleSupport(@NotNull ModifiableRootModel rootModel,
         AppEngineFlexibleFacet facet) {
       AppEngineFlexibleSupportProvider.addSupport(
           facet, rootModel, generateConfigurationFilesCheckBox.isSelected());
