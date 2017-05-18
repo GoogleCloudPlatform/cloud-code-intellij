@@ -52,7 +52,7 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
   public void actionPerformed(AnActionEvent event) {
     Project project = event.getProject();
     if (project != null) {
-      if (isAppEngineStandardProjectCheck(project)) {
+      if (isAppEngineStandardProject(project)) {
         super.actionPerformed(event);
       } else {
         notifyNotAppEngineStandardProject(project);
@@ -65,7 +65,7 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
    * If it does not, then a notification balloon is shown.
    */
   @VisibleForTesting
-  boolean isAppEngineStandardProjectCheck(@NotNull Project project) {
+  boolean isAppEngineStandardProject(@NotNull Project project) {
     return Stream.of(ModuleManager.getInstance(project).getModules())
         .anyMatch(module ->
             AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module));

@@ -38,7 +38,7 @@ public class AppEngineStandardLocalRunToolsMenuActionTest extends PlatformTestCa
   }
 
   public void testIsAppEngineStandardProjectCheck_noFacet() {
-    assertFalse(action.isAppEngineStandardProjectCheck(getProject()));
+    assertFalse(action.isAppEngineStandardProject(getProject()));
   }
 
   public void testIsAppEngineStandardProjectCheck_flexibleFacet() {
@@ -47,7 +47,7 @@ public class AppEngineStandardLocalRunToolsMenuActionTest extends PlatformTestCa
           "flex facet", null /* underlyingFacet */);
     });
 
-    assertFalse(action.isAppEngineStandardProjectCheck(getProject()));
+    assertFalse(action.isAppEngineStandardProject(getProject()));
   }
 
   public void testIsAppEngineStandardProjectCheck_standardFacet() {
@@ -56,6 +56,6 @@ public class AppEngineStandardLocalRunToolsMenuActionTest extends PlatformTestCa
           "standard facet", null /* underlyingFacet */);
     });
 
-    assertTrue(action.isAppEngineStandardProjectCheck(getProject()));
+    assertTrue(action.isAppEngineStandardProject(getProject()));
   }
 }
