@@ -6,6 +6,7 @@
 | Ubuntu | ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-ubuntu-master-orb.png) |
 | Windows | ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-windows-master-orb.png) |
 | MacOS | ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-macos-master-orb.png) |
+| Latest EAP Snapshot| ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-ubuntu-master-eap-orb.png) |
 
 The plugin integrates the [Google Cloud Platform](https://cloud.google.com/)
 into the IntelliJ IDEA UI. Currently this includes:

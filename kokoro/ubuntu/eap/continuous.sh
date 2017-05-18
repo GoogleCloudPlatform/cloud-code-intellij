@@ -29,4 +29,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cd github/google-cloud-intellij
-./gradlew check -Dorg.gradle.project.intellijRepoUrl="https://www.jetbrains.com/intellij-repository" Dorg.gradle.project.ideaVersion="LATEST-EAP-SNAPSHOT" --stacktrace
+./gradlew check \
+    -Dorg.gradle.project.intellijRepoUrl="https://www.jetbrains.com/intellij-repository" \
+    -Dorg.gradle.project.ideaVersion="LATEST-EAP-SNAPSHOT" --stacktrace

@@ -32,15 +32,15 @@ import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.function.Consumer;
 
-/**
- * Utility methods of Google Login.
- */
-public class GoogleLoginUtils {
+import javax.imageio.ImageIO;
+
+/** Utility methods of Google Login. */
+public final class GoogleLoginUtils {
 
   public static final Logger LOG = Logger.getInstance(GoogleLoginUtils.class);
   public static final int DEFAULT_PICTURE_SIZE = 96;
@@ -53,8 +53,7 @@ public class GoogleLoginUtils {
    * @param pictureCallback the user image will be set on this callback
    */
   @SuppressWarnings("FutureReturnValueIgnored")
-  public static void provideUserPicture(Userinfoplus userInfo,
-      final IUserPropertyCallback<Image> pictureCallback) {
+  public static void provideUserPicture(Userinfoplus userInfo, Consumer<Image> pictureCallback) {
     // set the size of the image before it is served
     String urlString = userInfo.getPicture() + "?sz=" + DEFAULT_PICTURE_SIZE;
     URL url;
@@ -70,18 +69,18 @@ public class GoogleLoginUtils {
     ApplicationManager.getApplication()
         .executeOnPooledThread(
             () -> {
-              Image image = Toolkit.getDefaultToolkit().getImage(newUrl);
-              Toolkit.getDefaultToolkit().prepareImage(image, -1, -1, null);
-              pictureCallback.setProperty(image);
+              try {
+                pictureCallback.accept(ImageIO.read(newUrl));
+              } catch (IOException exception) {
+                pictureCallback.accept(null);
+              }
             });
   }
 
-  /**
-   * Sets the user info on the callback.
-   */
+  /** Sets the user info on the callback. */
   @SuppressWarnings("FutureReturnValueIgnored")
-  public static void getUserInfo(@NotNull final Credential credential,
-      final IUserPropertyCallback<Userinfoplus> callback) {
+  public static void getUserInfo(
+      @NotNull final Credential credential, final IUserPropertyCallback<Userinfoplus> callback) {
     final Oauth2 userInfoService =
         new Oauth2.Builder(new NetHttpTransport(), new JacksonFactory(), credential)
             .setApplicationName(
