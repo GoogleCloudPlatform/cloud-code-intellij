@@ -42,6 +42,7 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.FacetsProvider;
+import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
@@ -179,8 +180,11 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       AppEngineFlexibleFacet facet = FacetManager.getInstance(module).addFacet(
           facetType, facetType.getPresentableName(), null /* underlyingFacet */);
 
-      AppEngineFlexibleSupportProvider
-          .addSupport(facet, rootModel, generateConfigurationFilesCheckBox.isSelected());
+      StartupManager.getInstance(module.getProject())
+          .registerPostStartupActivity(
+              () ->
+                  AppEngineFlexibleSupportProvider.addSupport(
+                      facet, rootModel, generateConfigurationFilesCheckBox.isSelected()));
 
       CloudSdkService sdkService = CloudSdkService.getInstance();
       if (!sdkService.validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
