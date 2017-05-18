@@ -82,7 +82,7 @@ import javax.swing.event.TreeModelEvent;
 public class AppEngineFlexibleDeploymentEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
   private static final String DEFAULT_SERVICE = "default";
-  private static final String DOCKERFILE = "/Dockerfile";
+  private static final String DOCKERFILE = "Dockerfile";
   private DeploymentSource deploymentSource;
   private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
@@ -384,7 +384,7 @@ public class AppEngineFlexibleDeploymentEditor extends
           throw new ConfigurationException(
               GctBundle.message("appengine.flex.config.browse.docker.directory"));
         }
-        if (!isValidConfigurationFile(dockerDirectoryPath + DOCKERFILE)) {
+        if (!isValidConfigurationFile(Paths.get(dockerDirectoryPath, DOCKERFILE).toString())) {
           throw new ConfigurationException(
               GctBundle.getString("appengine.deployment.error.staging.dockerfile") + " "
                   + GctBundle.getString("appengine.deployment.error.staging.directory.gotosettings"));

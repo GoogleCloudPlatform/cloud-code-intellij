@@ -65,7 +65,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
       AppEngineProjectService.getInstance();
   private static final boolean IS_WAR_DOCKERFILE_DEFAULT = true;
-  private static final String DOCKERFILE = "/Dockerfile";
+  private static final String DOCKERFILE = "Dockerfile";
 
   private JPanel mainPanel;
   private TextFieldWithBrowseButton appYaml;
@@ -188,13 +188,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     try {
       if (isRuntimeCustom()) {
-        String dockerfileDir = dockerDirectory.getText();
-        if (dockerfileDir.isEmpty() || !Files.isDirectory(Paths.get(dockerfileDir))) {
+        String dockerDirectoryText = dockerDirectory.getText();
+        if (dockerDirectoryText.isEmpty() || !Files.isDirectory(Paths.get(dockerDirectoryText))) {
           throw new ConfigurationException(
               GctBundle.getString("appengine.deployment.error.staging.docker.directory"));
         }
 
-        if (!isValidConfigurationFile(dockerfileDir + DOCKERFILE)) {
+        if (!isValidConfigurationFile(Paths.get(dockerDirectoryText, DOCKERFILE).toString())) {
           throw new ConfigurationException(
               GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
         }
@@ -249,13 +249,14 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     } else {
       try {
         if (isRuntimeCustom()) {
-          String dockerDir = dockerDirectory.getText();
-          if (dockerDir.isEmpty() || !Files.isDirectory(Paths.get(dockerDir))) {
+          String dockerDirectoryTest = dockerDirectory.getText();
+          if (dockerDirectoryTest.isEmpty() || !Files.isDirectory(Paths.get(dockerDirectoryTest))) {
             errorMessage
                 .setText(
                     GctBundle.getString("appengine.deployment.error.staging.docker.directory"));
             showError = true;
-          } else if (!isValidConfigurationFile(dockerDir + DOCKERFILE)) {
+          } else if (!isValidConfigurationFile(
+              Paths.get(dockerDirectoryTest, DOCKERFILE).toString())) {
             errorMessage
                 .setText(GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
             showError = true;

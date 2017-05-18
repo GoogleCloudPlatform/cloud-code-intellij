@@ -38,7 +38,7 @@ import java.nio.file.Paths;
  * Stages an application in preparation for deployment to the App Engine flexible environment.
  */
 public class AppEngineFlexibleStage {
-  private static final String DOCKERFILE = "/Dockerfile";
+  private static final String DOCKERFILE = "Dockerfile";
 
   private LoggingHandler loggingHandler;
   private Path deploymentArtifactPath;
@@ -76,8 +76,7 @@ public class AppEngineFlexibleStage {
             GctBundle.getString("appengine.deployment.error.staging.yaml"));
       }
       if (isCustomRuntime
-          && !Files.exists(Paths.get(
-          deploymentConfiguration.getDockerDirectoryPath() + DOCKERFILE))) {
+          && (!new File(deploymentConfiguration.getDockerDirectoryPath(), DOCKERFILE).exists())) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
       }

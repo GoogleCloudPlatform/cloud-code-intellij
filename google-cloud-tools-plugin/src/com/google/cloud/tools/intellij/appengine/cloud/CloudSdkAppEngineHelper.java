@@ -57,6 +57,7 @@ import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -78,7 +79,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private static final String REFRESH_TOKEN_LABEL = "refresh_token";
   private static final String GCLOUD_USER_TYPE_LABEL = "type";
   private static final String GCLOUD_USER_TYPE = "authorized_user";
-  private static final String DOCKERFILE = "/Dockerfile";
+  private static final String DOCKERFILE = "Dockerfile";
   public static final String APP_ENGINE_BILLING_URL = "https://cloud.google.com/appengine/pricing";
 
   private final Project project;
@@ -149,7 +150,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           return Optional.empty();
         }
         if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.CUSTOM).isPresent()
-            && !Files.exists(Paths.get(deploymentConfiguration.getDockerDirectoryPath() + DOCKERFILE))) {
+            && (!new File(deploymentConfiguration.getDockerDirectoryPath(), DOCKERFILE).exists())) {
           callback.errorOccurred(
               GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
           return Optional.empty();
