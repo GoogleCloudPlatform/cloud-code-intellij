@@ -28,7 +28,6 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.ui.JBColor;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,6 +39,7 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
@@ -63,6 +63,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   private JComboBox<AppEngineLocationSelectorItem> regionComboBox;
   private JTextPane statusPane;
   private JTextPane regionDetailPane;
+  private JLabel errorIcon;
 
   private final Credential userCredential;
   private final String gcpProjectId;
@@ -81,6 +82,8 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
     setTitle(GctBundle.message("appengine.application.region.select"));
     refreshLocationsSelector();
+
+    errorIcon.setVisible(false);
 
     regionComboBox.addItemListener((event) -> {
       if (event.getStateChange() == ItemEvent.SELECTED) {
@@ -154,8 +157,8 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
   private void setStatusMessage(String message, boolean isError) {
     statusPane.setText(message);
-    statusPane.setForeground(isError ? JBColor.red : JBColor.black);
     statusPane.setVisible(true);
+    errorIcon.setVisible(isError);
   }
 
   /**
