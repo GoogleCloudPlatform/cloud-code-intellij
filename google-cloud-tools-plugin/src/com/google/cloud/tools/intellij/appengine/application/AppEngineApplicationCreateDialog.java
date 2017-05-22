@@ -64,6 +64,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   private JTextPane statusPane;
   private JTextPane regionDetailPane;
   private JLabel errorIcon;
+  private JPanel statusPanel;
 
   private final Credential userCredential;
   private final String gcpProjectId;
@@ -83,6 +84,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     setTitle(GctBundle.message("appengine.application.region.select"));
     refreshLocationsSelector();
 
+    statusPanel.setVisible(false);
     errorIcon.setVisible(false);
 
     regionComboBox.addItemListener((event) -> {
@@ -158,6 +160,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   private void setStatusMessage(String message, boolean isError) {
     statusPane.setText(message);
     statusPane.setVisible(true);
+    statusPanel.setVisible(true);
     errorIcon.setVisible(isError);
   }
 
