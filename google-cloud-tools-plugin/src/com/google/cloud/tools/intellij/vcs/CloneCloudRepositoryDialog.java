@@ -38,7 +38,6 @@ import com.intellij.ui.DocumentAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 
@@ -62,7 +61,6 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
   private JTextField directoryName;
   private JLabel parentDirectoryLabel;
   private RepositorySelector repositorySelector;
-  private JLabel directoryNameLabel;
 
   @NotNull
   private String defaultDirectoryName = "";
@@ -183,18 +181,15 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
     if (file.exists()) {
       setErrorText(GctBundle.message("clonefromgcp.destination.exists.error"));
       setOKActionEnabled(false);
-      paintDirectorySelectionError();
       return;
     }
 
     if (!file.getParentFile().exists()) {
       setErrorText(GctBundle.message("clonefromgcp.parent.missing.error"));
       setOKActionEnabled(false);
-      paintParentDirectorySelectionError();
       return;
     }
 
-    paintSelectionOk();
     setErrorText(null);
     setOKActionEnabled(true);
   }
@@ -259,31 +254,5 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
   @Override
   protected JComponent createCenterPanel() {
     return rootPanel;
-  }
-
-  /**
-   * Default dialog state.
-   */
-  private void paintSelectionOk() {
-    parentDirectoryLabel.setForeground(Color.BLACK);
-    directoryNameLabel.setForeground(Color.BLACK);
-  }
-
-  /**
-   * Activates when a user selection of parent directory is incorrect.
-   * <p></p>
-   * Paints the "Parent Directory" label and textbox background red.
-   */
-  private void paintParentDirectorySelectionError() {
-    paintSelectionOk();
-    parentDirectoryLabel.setForeground(Color.RED);
-  }
-
-  /**
-   * Paints the directory selector red when in error.
-   */
-  private void paintDirectorySelectionError() {
-    paintSelectionOk();
-    directoryNameLabel.setForeground(Color.RED);
   }
 }

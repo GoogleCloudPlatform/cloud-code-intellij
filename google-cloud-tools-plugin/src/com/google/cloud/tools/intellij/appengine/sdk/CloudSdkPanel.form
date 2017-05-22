@@ -37,6 +37,9 @@
           <contentType value="text/html"/>
           <editable value="false"/>
         </properties>
+        <clientProperties>
+          <JEditorPane.honorDisplayProperties class="java.lang.Boolean" value="true"/>
+        </clientProperties>
       </component>
       <component id="b581d" class="javax.swing.JLabel" binding="warningIcon">
         <constraints>
