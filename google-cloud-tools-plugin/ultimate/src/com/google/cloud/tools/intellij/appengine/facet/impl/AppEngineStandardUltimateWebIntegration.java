@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
@@ -193,7 +194,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   public void registerFrameworkInModel(FrameworkSupportModel model,
       AppEngineStandardFacet appEngineStandardFacet) {
     JavaeeFrameworkSupportInfoCollector.getOrCreateCollector(model)
-        .setFacet(AppEngineStandardFacet.ID, appEngineStandardFacet);
+        .setFacet(AppEngineStandardFacetType.ID, appEngineStandardFacet);
   }
 
   @Override

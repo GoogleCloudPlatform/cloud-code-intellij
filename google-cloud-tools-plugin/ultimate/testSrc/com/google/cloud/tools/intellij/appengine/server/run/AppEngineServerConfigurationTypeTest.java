@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.run;
+package com.google.cloud.tools.intellij.appengine.server.run;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
-import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
 
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.openapi.application.ApplicationManager;

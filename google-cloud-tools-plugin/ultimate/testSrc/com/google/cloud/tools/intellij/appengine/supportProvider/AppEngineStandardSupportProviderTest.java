@@ -20,7 +20,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardLibraryPanel;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardMavenLibrary;
@@ -78,7 +78,7 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
     selectVersion(WebFrameworkType.getInstance(), new WebFrameworkVersion(WebAppVersion.WebAppVersion_2_5));
     addSupport();
 
-    getFacet(AppEngineStandardFacet.ID);
+    getFacet(AppEngineStandardFacetType.ID);
     assertFileExist("web/WEB-INF/web.xml");
     assertFileExist("web/WEB-INF/appengine-web.xml");
 

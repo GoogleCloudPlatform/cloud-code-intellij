@@ -106,7 +106,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
   @Override
   public boolean isSupportAlreadyAdded(@NotNull Module module,
       @NotNull FacetsProvider facetsProvider) {
-    return !facetsProvider.getFacetsByType(module, AppEngineStandardFacet.ID).isEmpty()
+    return !facetsProvider.getFacetsByType(module, AppEngineStandardFacetType.ID).isEmpty()
         || !facetsProvider.getFacetsByType(module, AppEngineFlexibleFacetType.ID).isEmpty();
   }
 
