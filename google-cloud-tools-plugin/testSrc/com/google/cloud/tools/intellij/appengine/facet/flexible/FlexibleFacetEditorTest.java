@@ -142,7 +142,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
     assertEquals(
-        "The specified docker directory does not exist or it is not a valid directory.",
+        "The specified Docker directory does not exist or it is not a valid directory.",
         editor.getErrorMessage().getText());
 
     try {
@@ -150,7 +150,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
       fail("Can't have runtime custom and no dockerfile.");
     } catch (ConfigurationException ce) {
       assertEquals(
-          "The specified docker directory does not exist or it is not a valid directory.",
+          "The specified Docker directory does not exist or it is not a valid directory.",
           ce.getMessage());
     }
   }
@@ -163,7 +163,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
     assertEquals(
-        "The specified docker directory does not exist or it is not a valid directory.",
+        "The specified Docker directory does not exist or it is not a valid directory.",
         editor.getErrorMessage().getText());
 
     try {
@@ -171,7 +171,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
       fail("Can't have runtime custom and no dockerfile.");
     } catch (ConfigurationException ce) {
       assertEquals(
-          "The specified docker directory does not exist or it is not a valid directory.",
+          "The specified Docker directory does not exist or it is not a valid directory.",
           ce.getMessage());
     }
   }
@@ -194,7 +194,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
     assertTrue(editor.getErrorMessage().isVisible());
-    assertEquals("The specified docker directory does not exist or it is not a valid "
+    assertEquals("The specified Docker directory does not exist or it is not a valid "
             + "directory.", editor.getErrorMessage().getText());
 
     try {
@@ -202,7 +202,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
       fail("Docker directory can't be a file.");
     } catch (ConfigurationException ce) {
       assertEquals(
-          "The specified docker directory does not exist or it is not a valid directory.",
+          "The specified Docker directory does not exist or it is not a valid directory.",
           ce.getMessage());
     }
   }

@@ -298,9 +298,9 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     editor.getDockerDirectoryTextField().setText("");
     try {
       editor.applyEditorTo(templateConfig);
-      fail("Blank docker directory.");
+      fail("Blank Docker directory.");
     } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a docker directory.", cfe.getMessage());
+      assertEquals("Browse to a Docker directory.", cfe.getMessage());
     }
   }
 
@@ -310,9 +310,9 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     editor.getDockerDirectoryTextField().setText(null);
     try {
       editor.applyEditorTo(templateConfig);
-      fail("Null docker directory.");
+      fail("Null Docker directory.");
     } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a docker directory.", cfe.getMessage());
+      assertEquals("Browse to a Docker directory.", cfe.getMessage());
     }
   }
 
@@ -322,7 +322,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     editor.getDockerDirectoryTextField().setText("I don't exist");
     try {
       editor.applyEditorTo(templateConfig);
-      fail("Unexisting docker directory.");
+      fail("Unexisting Docker directory.");
     } catch (ConfigurationException cfe) {
       assertEquals(
           "There is no Dockerfile in specified directory or it is not a valid file."
@@ -344,7 +344,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     editor.getDockerDirectoryTextField().setText(dockerfile.getPath());
     try {
       editor.applyEditorTo(templateConfig);
-      fail("Docker Directory is a file.");
+      fail("Docker directory is a file.");
     } catch (ConfigurationException cfe) {
       assertEquals(
           "There is no Dockerfile in specified directory or it is not a valid file."
