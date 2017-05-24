@@ -124,6 +124,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
                 module,
                 outputFolderPath),
             appYaml,
+            false,
             this::showWarnings
         ));
 
@@ -138,6 +139,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
                 module,
                 outputFolderPath),
             dockerDirectory,
+            true,
             this::showWarnings
         ));
 
@@ -300,6 +302,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     private final String fileName;
     private final TextFieldWithBrowseButton directoryPicker;
     private final Consumer<Path> configFileGenerator;
+    private final boolean isDirectory;
     // Used to refresh the warnings.
     private final Runnable configurationValidator;
 
@@ -308,19 +311,20 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         String fileName,
         Consumer<Path> configFileGenerator,
         TextFieldWithBrowseButton directoryPicker,
+        boolean isDirectory,
         Runnable configurationValidator) {
       this.project = project;
       this.fileName = fileName;
       this.configFileGenerator = configFileGenerator;
       this.directoryPicker = directoryPicker;
+      this.isDirectory = isDirectory;
       this.configurationValidator = configurationValidator;
     }
 
     @Override
     public void actionPerformed(ActionEvent event) {
-      boolean genAppYaml = "app.yaml".equals(fileName);
       String directoryPath = directoryPicker.getText();
-      if (genAppYaml) {
+      if (!isDirectory) {
         try {
           Path directoryPickerPathParent = Paths.get(directoryPicker.getText()).getParent();
           if (directoryPickerPathParent != null) {
@@ -357,9 +361,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         }
 
         configFileGenerator.accept(destinationFolderPath);
-        directoryPicker.setText(genAppYaml ?
-            destinationFilePath.toString() :
-            destinationFolderPath.toString());
+        directoryPicker.setText(isDirectory ?
+            destinationFolderPath.toString() :
+            destinationFilePath.toString());
         configurationValidator.run();
       }
     }
