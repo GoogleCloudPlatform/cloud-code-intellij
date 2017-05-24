@@ -306,11 +306,11 @@ public class AppEngineFlexibleDeploymentEditor extends
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
     appYamlOverrideCheckBox.setSelected(configuration.isOverrideAppYaml()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
-    dockerDirectoryOverrideCheckBox.setSelected(configuration.isOverrideDockerfile()
+    dockerDirectoryOverrideCheckBox.setSelected(configuration.isOverrideDockerDirectory()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
 
     setModuleControlsEnabled(
-        !(configuration.isOverrideAppYaml() && configuration.isOverrideDockerfile()));
+        !(configuration.isOverrideAppYaml() && configuration.isOverrideDockerDirectory()));
 
     toggleDockerfileSection();
     updateServiceName();
@@ -341,7 +341,7 @@ public class AppEngineFlexibleDeploymentEditor extends
         deploymentSource instanceof UserSpecifiedPathDeploymentSource);
     configuration.setUserSpecifiedArtifactPath(archiveSelector.getText());
     configuration.setOverrideAppYaml(appYamlOverrideCheckBox.isSelected());
-    configuration.setOverrideDockerfile(dockerDirectoryOverrideCheckBox.isSelected());
+    configuration.setOverrideDockerDirectory(dockerDirectoryOverrideCheckBox.isSelected());
     updateSelectors();
     setDeploymentProjectAndVersion();
   }
