@@ -65,7 +65,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
       AppEngineProjectService.getInstance();
   private static final boolean IS_WAR_DOCKERFILE_DEFAULT = true;
-  private static final String DOCKERFILE = "Dockerfile";
+  private static final String DOCKERFILE_NAME = "Dockerfile";
 
   private JPanel mainPanel;
   private TextFieldWithBrowseButton appYaml;
@@ -196,7 +196,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
               GctBundle.getString("appengine.deployment.error.staging.docker.directory"));
         }
 
-        if (!isValidConfigurationFile(Paths.get(dockerDirectoryText, DOCKERFILE).toString())) {
+        if (!isValidConfigurationFile(Paths.get(dockerDirectoryText, DOCKERFILE_NAME).toString())) {
           throw new ConfigurationException(
               GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
         }
@@ -258,7 +258,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
                     GctBundle.getString("appengine.deployment.error.staging.docker.directory"));
             showError = true;
           } else if (!isValidConfigurationFile(
-              Paths.get(dockerDirectoryTest, DOCKERFILE).toString())) {
+              Paths.get(dockerDirectoryTest, DOCKERFILE_NAME).toString())) {
             errorMessage
                 .setText(GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
             showError = true;
