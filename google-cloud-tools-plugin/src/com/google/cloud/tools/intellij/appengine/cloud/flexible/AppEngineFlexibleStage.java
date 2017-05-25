@@ -75,8 +75,10 @@ public class AppEngineFlexibleStage {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.yaml"));
       }
+
       if (isCustomRuntime
-          && (!new File(deploymentConfiguration.getDockerDirectoryPath(), DOCKERFILE_NAME).exists())) {
+          && (!Files.isRegularFile(
+          Paths.get(deploymentConfiguration.getDockerDirectoryPath(), DOCKERFILE_NAME)))) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
       }

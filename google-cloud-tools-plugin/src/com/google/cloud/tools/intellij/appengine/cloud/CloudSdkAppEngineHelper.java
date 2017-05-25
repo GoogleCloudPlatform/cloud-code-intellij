@@ -62,6 +62,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -150,7 +151,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           return Optional.empty();
         }
         if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.CUSTOM).isPresent()
-            && (!new File(deploymentConfiguration.getDockerDirectoryPath(), DOCKERFILE_NAME).exists())) {
+            && (!Files.isRegularFile(
+                Paths.get(deploymentConfiguration.getDockerDirectoryPath(), DOCKERFILE_NAME)))) {
           callback.errorOccurred(
               GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
           return Optional.empty();
@@ -160,6 +162,10 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       } catch (MalformedYamlFileException myf) {
         callback.errorOccurred(
             GctBundle.message("appengine.appyaml.malformed") + "\n" + myf.getMessage());
+        return Optional.empty();
+      } catch (InvalidPathException ipe) {
+        callback.errorOccurred(
+            GctBundle.message("appengine.invalid.appyaml.path") + "\n" + ipe.getMessage());
         return Optional.empty();
       }
     } else {
