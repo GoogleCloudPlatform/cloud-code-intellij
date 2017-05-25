@@ -251,14 +251,14 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     } else {
       try {
         if (isRuntimeCustom()) {
-          String dockerDirectoryTest = dockerDirectory.getText();
-          if (dockerDirectoryTest.isEmpty() || !Files.isDirectory(Paths.get(dockerDirectoryTest))) {
+          String dockerDirectoryText = dockerDirectory.getText();
+          if (dockerDirectoryText.isEmpty() || !Files.isDirectory(Paths.get(dockerDirectoryText))) {
             errorMessage
                 .setText(
                     GctBundle.getString("appengine.deployment.error.staging.docker.directory"));
             showError = true;
           } else if (!isValidConfigurationFile(
-              Paths.get(dockerDirectoryTest, DOCKERFILE_NAME).toString())) {
+              Paths.get(dockerDirectoryText, DOCKERFILE_NAME).toString())) {
             errorMessage
                 .setText(GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
             showError = true;
