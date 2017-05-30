@@ -55,6 +55,16 @@ public class AppEngineRunConfigurationConverterTest extends PlatformTestCase {
     assertTrue(converter.isConversionNeeded(runManagerSettings));
   }
 
+  public void testConversionIsNotNeeded_whenNewRunConfigsPresent() {
+    Element element = mock(Element.class);
+    when(element.getAttributeValue("type")).thenReturn("gcp-app-engine-local-run");
+
+    Collection legacyConfig = Collections.singletonList(element);
+    when(runManagerSettings.getRunConfigurations()).thenReturn(legacyConfig);
+
+    assertFalse(converter.isConversionNeeded(runManagerSettings));
+  }
+
   public void testProcessDeployConfig() throws CannotConvertException {
     Element element = mock(Element.class);
     when(element.getAttributeValue("type")).thenReturn("google-app-engine-deploy");
@@ -77,6 +87,7 @@ public class AppEngineRunConfigurationConverterTest extends PlatformTestCase {
     when(runManagerSettings.getRunConfigurations()).thenReturn(legacyConfig);
 
     converter.process(runManagerSettings);
+    verify(element).setAttribute("type", "gcp-app-engine-local-run");
     verify(element).setAttribute("name", "My Old Run Name (migrated)");
   }
 }
