@@ -21,7 +21,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmationDialog;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.SelectConfigDestinationFolderDialog;
-import com.google.cloud.tools.intellij.appengine.facet.flexible.FlexibleFacetEditor.Result.Status;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.FlexibleFacetEditor.ValidationResult.Status;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
@@ -184,7 +184,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   @Override
   public void apply() throws ConfigurationException {
-    Result result = validateAndShowWarnings();
+    ValidationResult result = validateAndShowWarnings();
     if (result.status == Status.ERROR) {
       throw new ConfigurationException(result.message);
     }
@@ -226,8 +226,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
    * Validates the configuration and turns on/off any necessary warnings.
    * @return the validation result
    */
-  private Result validateAndShowWarnings() {
-    Result result = validateConfiguration();
+  private ValidationResult validateAndShowWarnings() {
+    ValidationResult result = validateConfiguration();
     if (result.status == Status.OK) {
       errorIcon.setVisible(false);
       errorMessage.setVisible(false);
@@ -239,28 +239,28 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     return result;
   }
 
-  private Result validateConfiguration() {
+  private ValidationResult validateConfiguration() {
     if (!isValidConfigurationFile(appYaml.getText())) {
-      return new Result(Status.ERROR,
+      return new ValidationResult(Status.ERROR,
           GctBundle.getString("appengine.deployment.error.staging.yaml"));
     } else {
       try {
         if (isRuntimeCustom()) {
           String dockerDirectoryText = dockerDirectory.getText();
           if (dockerDirectoryText.isEmpty() || !Files.isDirectory(Paths.get(dockerDirectoryText))) {
-            return new Result(Status.ERROR,
+            return new ValidationResult(Status.ERROR,
                 GctBundle.getString("appengine.deployment.error.staging.docker.directory"));
           } else if (!isValidConfigurationFile(
               Paths.get(dockerDirectoryText, DOCKERFILE_NAME).toString())) {
-            return new Result(Status.ERROR,
+            return new ValidationResult(Status.ERROR,
                 GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
           }
         }
       } catch (MalformedYamlFileException myf) {
-        return new Result(Status.ERROR, GctBundle.getString("appengine.appyaml.malformed"));
+        return new ValidationResult(Status.ERROR, GctBundle.getString("appengine.appyaml.malformed"));
       }
     }
-    return new Result(Status.OK, "");
+    return new ValidationResult(Status.OK, "");
   }
 
   private void toggleDockerfileSection() {
@@ -295,6 +295,19 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     // Used to refresh the warnings.
     private final Runnable configurationValidator;
 
+    /**
+     * Constructor
+     *
+     * @param project the project associated with this Flex facet editor
+     * @param fileName the name of the file to be generated
+     * @param configFileGenerator the function that generates the file
+     * @param directoryPicker the text field in the Flex facet editor that provides the initial
+     *   value of the Choose Generated Configuration Destination Folder dialog
+     * @param isDirectory true when the <@code>directoryPicker</@code> browses to a directory and
+     *   false when <@code>directoryPicker</@code> browses to a file
+     * @param configurationValidator the validation method for the updated configuration in Flex
+     *   facet settings
+     */
     GenerateConfigActionListener(
         Project project,
         String fileName,
@@ -361,13 +374,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   /**
    * An object representing the outcome of a configuration validation check.
    */
-  static class Result {
+  static class ValidationResult {
     enum Status {OK, ERROR}
 
     final Status status;
     final String message;
 
-    Result(Status status, String message) {
+    ValidationResult(Status status, String message) {
       Preconditions.checkNotNull(status);
       Preconditions.checkNotNull(message);
 

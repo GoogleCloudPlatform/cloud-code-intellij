@@ -164,8 +164,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
             GctBundle.message("appengine.appyaml.malformed") + "\n" + myf.getMessage());
         return Optional.empty();
       } catch (InvalidPathException ipe) {
-        callback.errorOccurred(
-            GctBundle.message("appengine.invalid.appyaml.path") + "\n" + ipe.getMessage());
+        callback.errorOccurred(GctBundle.message(
+            "appengine.invalid.file.path") + "\n" + ipe.getMessage());
         return Optional.empty();
       }
     } else {
