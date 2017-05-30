@@ -185,7 +185,7 @@
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Docker Directory:"/>
+              <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.docker.directory.label"/>
             </properties>
           </component>
           <grid id="4bcf7" layout-manager="GridLayoutManager" row-count="1" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -248,7 +248,7 @@
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Use a different Docker directory"/>
+                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.use.different.docker.directory"/>
                 </properties>
               </component>
             </children>
