@@ -99,14 +99,14 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       @Override
       protected void textChanged(DocumentEvent event) {
         toggleDockerfileSection();
-        showWarnings();
+        validateAndShowWarnings();
       }
     });
 
     dockerDirectory.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        showWarnings();
+        validateAndShowWarnings();
       }
     });
 
@@ -127,7 +127,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
                 outputFolderPath),
             appYaml,
             false,
-            this::showWarnings
+            this::validateAndShowWarnings
         ));
 
     genDockerfileButton.addActionListener(
@@ -142,7 +142,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
                 outputFolderPath),
             dockerDirectory,
             true,
-            this::showWarnings
+            this::validateAndShowWarnings
         ));
 
     appYaml.setText(facetConfiguration.getAppYamlPath());
@@ -158,7 +158,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     errorIcon.setVisible(false);
     errorMessage.setVisible(false);
 
-    showWarnings();
+    validateAndShowWarnings();
     toggleDockerfileSection();
   }
 
@@ -184,8 +184,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   @Override
   public void apply() throws ConfigurationException {
-    showWarnings();
-    Result result = validateConfiguration();
+    Result result = validateAndShowWarnings();
     if (result.status == Status.ERROR) {
       throw new ConfigurationException(result.message);
     }
@@ -225,8 +224,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   /**
    * Validates the configuration and turns on/off any necessary warnings.
+   * @return the validation result
    */
-  private void showWarnings() {
+  private Result validateAndShowWarnings() {
     Result result = validateConfiguration();
     if (result.status == Status.OK) {
       errorIcon.setVisible(false);
@@ -236,6 +236,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       errorIcon.setVisible(true);
       errorMessage.setVisible(true);
     }
+    return result;
   }
 
   private Result validateConfiguration() {
