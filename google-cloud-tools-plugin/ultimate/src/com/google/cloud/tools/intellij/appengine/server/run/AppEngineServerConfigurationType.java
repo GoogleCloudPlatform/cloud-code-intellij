@@ -114,6 +114,6 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
   @NotNull
   @Override
   public String getId() {
-    return "GoogleAppEngineDevServer";
+    return "gcp-app-engine-local-run";
   }
 }

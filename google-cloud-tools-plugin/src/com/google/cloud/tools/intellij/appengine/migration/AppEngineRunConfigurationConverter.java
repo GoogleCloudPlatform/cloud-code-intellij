@@ -40,10 +40,15 @@ public class AppEngineRunConfigurationConverter
       .put("google-app-engine-deploy", "gcp-app-engine-deploy")
       .build();
 
+  private static ImmutableMap<String, String> legacyLocalRunTypeToNewType
+      = ImmutableMap.<String, String>builder()
+      .put("GoogleAppEngineDevServer", "gcp-app-engine-local-run")
+      .build();
+
   private Predicate<Element> isLegacyDeployConfiguration
       = element -> legacyDeployTypeToNewType.containsKey(element.getAttributeValue("type"));
   private Predicate<Element> isLegacyLocalRunConfiguration
-      = element -> "GoogleAppEngineDevServer".equals(element.getAttributeValue("type"));
+      = element -> legacyLocalRunTypeToNewType.containsKey(element.getAttributeValue("type"));
 
   @Override
   public boolean isConversionNeeded(RunManagerSettings runManagerSettings) {
@@ -70,7 +75,12 @@ public class AppEngineRunConfigurationConverter
   }
 
   private void processLocalRunConfigurations(Stream<? extends Element> localRunConfigurations) {
-    localRunConfigurations.forEach(this::updateName);
+    localRunConfigurations
+        .forEach(element -> {
+          element.setAttribute("type",
+              legacyLocalRunTypeToNewType.get(element.getAttributeValue("type")));
+          updateName(element);
+        });
   }
 
   private void updateName(Element element) {
