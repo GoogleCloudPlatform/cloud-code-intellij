@@ -74,7 +74,7 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
       stage.stage(stagingDirectory);
       fail("No Docker directory.");
     } catch (RuntimeException re) {
-      assertEquals("There is no Dockerfile in specified directory or it is not a valid file.", re.getMessage());
+      assertEquals("There is no Dockerfile in specified directory.", re.getMessage());
     }
   }
 

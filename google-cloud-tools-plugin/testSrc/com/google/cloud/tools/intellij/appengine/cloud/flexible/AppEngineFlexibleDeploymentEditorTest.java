@@ -273,7 +273,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     } catch (ConfigurationException cfe) {
       assertEquals(
           "The specified app.yaml configuration file does not exist or is not a valid file."
-              + " Set a valid file in Module Settings or use another one.",
+              + " Set a valid file for app.yaml in Module Settings or use another one.",
           cfe.getMessage());
     }
   }
@@ -287,7 +287,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     } catch (ConfigurationException cfe) {
       assertEquals(
           "The specified app.yaml configuration file does not exist or is not a valid file."
-              + " Set a valid file in Module Settings or use another one.",
+              + " Set a valid file for app.yaml in Module Settings or use another one.",
           cfe.getMessage());
     }
   }
@@ -325,8 +325,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       fail("Unexisting Docker directory.");
     } catch (ConfigurationException cfe) {
       assertEquals(
-          "There is no Dockerfile in specified directory or it is not a valid file."
-          + " Set a valid directory in Module Settings or use another one.",
+          "There is no Dockerfile in specified directory."
+          + " Set a valid Docker directory in Module Settings or use another one.",
           cfe.getMessage());
     }
   }
@@ -347,8 +347,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
       fail("Docker directory is a file.");
     } catch (ConfigurationException cfe) {
       assertEquals(
-          "There is no Dockerfile in specified directory or it is not a valid file."
-              + " Set a valid directory in Module Settings or use another one.",
+          "There is no Dockerfile in specified directory."
+              + " Set a valid Docker directory in Module Settings or use another one.",
           cfe.getMessage());
     }
   }
