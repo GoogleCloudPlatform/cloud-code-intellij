@@ -16,12 +16,18 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
@@ -31,7 +37,10 @@ import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRun
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerSettingsEditor;
 import com.intellij.util.containers.ContainerUtil;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Creates a shortcut to App Engine deployment configuration in the tools menu.
@@ -51,22 +60,59 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
     Project project = event.getProject();
 
     if (project != null) {
-      AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
-      List<RemoteServer<AppEngineServerConfiguration>> servers =
-          RemoteServersManager.getInstance().getServers(serverType);
-
-      try {
-        DeploymentConfigurationManager.getInstance(project)
-            .createAndRunConfiguration(serverType, ContainerUtil.getFirstItem(servers));
-      } catch (NullPointerException npe) {
-        /**
-         * Handles the case where the configuration is executed with a null deployment source.
-         * See {@link DeployToServerSettingsEditor#applyEditorTo(DeployToServerRunConfiguration)}
-         * The deployment configuration is set to null causing the following execution to fail:
-         * {@link DeployToServerRunConfiguration#checkConfiguration()}
-         */
-        logger.warn("Error encountered executing App Engine deployment run configuration.", npe);
+      if (isAppEngineProject(project)) {
+        openRunConfiguration(project);
+      } else {
+        notifyNotAppEngineProject(project);
       }
     }
+  }
+
+  private void openRunConfiguration(@NotNull Project project) {
+    AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
+    List<RemoteServer<AppEngineServerConfiguration>> servers =
+        RemoteServersManager.getInstance().getServers(serverType);
+
+    try {
+      DeploymentConfigurationManager.getInstance(project)
+          .createAndRunConfiguration(serverType, ContainerUtil.getFirstItem(servers));
+    } catch (NullPointerException npe) {
+      /**
+       * Handles the case where the configuration is executed with a null deployment source. See
+       * {@link DeployToServerSettingsEditor#applyEditorTo(DeployToServerRunConfiguration)} The
+       * deployment configuration is set to null causing the following execution to fail: {@link
+       * DeployToServerRunConfiguration#checkConfiguration()}
+       */
+      logger.warn("Error encountered executing App Engine deployment run configuration.", npe);
+    }
+  }
+
+  private void notifyNotAppEngineProject(@NotNull Project project) {
+    NotificationGroup notification =
+        new NotificationGroup(
+            GctBundle.message("appengine.tools.menu.deploy.error.title"),
+            NotificationDisplayType.BALLOON,
+            true);
+
+    notification
+        .createNotification(
+            GctBundle.message("appengine.tools.menu.deploy.error.title"),
+            GctBundle.message("appengine.tools.menu.deploy.error.message"),
+            NotificationType.ERROR,
+            null /*listener*/)
+        .notify(project);
+  }
+
+  /**
+   * Determines if the project has at least one module with an App Engine standard or flexible
+   * facet.
+   */
+  @VisibleForTesting
+  boolean isAppEngineProject(@NotNull Project project) {
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
+
+    return Stream.of(ModuleManager.getInstance(project).getModules())
+        .anyMatch(module -> projectService.hasAppEngineStandardFacet(module)
+            || projectService.hasAppEngineFlexFacet(module));
   }
 }

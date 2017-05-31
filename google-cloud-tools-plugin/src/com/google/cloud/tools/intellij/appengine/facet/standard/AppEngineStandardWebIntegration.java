@@ -111,34 +111,51 @@ public abstract class AppEngineStandardWebIntegration {
   }
 
   private void setupDeployRunConfiguration(@NotNull Module module) {
-    AppEngineCloudType serverType =
-        ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
-    RemoteServer<AppEngineServerConfiguration> server
-        = ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
-
-    DeployToServerConfigurationType configurationType
-        = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
     RunManager runManager = RunManager.getInstance(module.getProject());
-    ConfigurationFactoryEx factory = configurationType.getFactory();
-    RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
-        configurationType.getDisplayName(), factory);
-    DeployToServerRunConfiguration<?, ?> runConfiguration
-        = (DeployToServerRunConfiguration<?, ?>)settings.getConfiguration();
 
-    if (server != null) {
-      runConfiguration.setServerName(server.getName());
+    boolean hasExistingDeployConfiguration = runManager.getAllConfigurationsList()
+        .stream()
+        .filter(config -> config instanceof DeployToServerRunConfiguration)
+        .map(config -> ((DeployToServerRunConfiguration) config).getServerType())
+        .anyMatch(serverType -> serverType instanceof AppEngineCloudType);
+
+    if (!hasExistingDeployConfiguration) {
+      AppEngineCloudType serverType =
+          ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
+      RemoteServer<AppEngineServerConfiguration> server
+          = ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
+
+      DeployToServerConfigurationType configurationType
+          = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
+
+      ConfigurationFactoryEx factory = configurationType.getFactory();
+      RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
+          configurationType.getDisplayName(), factory);
+      DeployToServerRunConfiguration<?, ?> runConfiguration
+          = (DeployToServerRunConfiguration<?, ?>) settings.getConfiguration();
+
+      if (server != null) {
+        runConfiguration.setServerName(server.getName());
+      }
+
+      runManager.addConfiguration(settings, false /*isShared*/);
     }
-
-    runManager.addConfiguration(settings, false /*isShared*/);
   }
 
   private void setupDebugRunConfiguration(@NotNull Project project) {
-    CloudDebugConfigType debugConfigType = CloudDebugConfigType.getInstance();
-    ConfigurationFactory factory = debugConfigType.getConfigurationFactories()[0];
     RunManager runManager = RunManager.getInstance(project);
-    RunnerAndConfigurationSettings settings = runManager.createConfiguration(
-        new CloudDebugRunConfiguration(project, factory).clone(), factory);
 
-    runManager.addConfiguration(settings, false /*isShared*/);
+    boolean hasExistingDebugConfiguration = runManager.getAllConfigurationsList()
+        .stream()
+        .anyMatch(config -> config instanceof CloudDebugRunConfiguration);
+
+    if (!hasExistingDebugConfiguration) {
+      CloudDebugConfigType debugConfigType = CloudDebugConfigType.getInstance();
+      ConfigurationFactory factory = debugConfigType.getConfigurationFactories()[0];
+      RunnerAndConfigurationSettings settings = runManager.createConfiguration(
+          new CloudDebugRunConfiguration(project, factory).clone(), factory);
+
+      runManager.addConfiguration(settings, false /*isShared*/);
+    }
   }
 }

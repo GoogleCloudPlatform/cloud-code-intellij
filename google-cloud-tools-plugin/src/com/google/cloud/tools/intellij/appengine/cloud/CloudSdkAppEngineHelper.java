@@ -47,6 +47,8 @@ import com.google.gson.Gson;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
@@ -107,7 +109,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
     if (!(source instanceof AppEngineDeployable)) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.invalid.source.error"));
-      throw new RuntimeException("Invalid deployment source selected for deployment");
+      return Optional.empty();
     }
 
     if (CloudSdkService.getInstance().validateCloudSdk().contains(
@@ -226,7 +228,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     CloudToolsPluginInfoService pluginInfoService =
         ServiceManager.getService(CloudToolsPluginInfoService.class);
 
-    return new CloudSdk.Builder()
+    CloudSdk.Builder sdkBuilder = new CloudSdk.Builder()
         .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
         .async(true)
         .addStdErrLineListener(logListener)
@@ -236,8 +238,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         .appCommandCredentialFile(credentialsPath.toFile())
         .appCommandMetricsEnvironment(pluginInfoService.getExternalPluginName())
         .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
-        .appCommandOutputFormat("json")
-        .build();
+        .appCommandOutputFormat("json");
+
+    getProjectJavaSdk(project).ifPresent(sdkBuilder::javaHome);
+
+    return sdkBuilder.build();
   }
 
   @Override
@@ -341,6 +346,16 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       throw new RuntimeException(ex);
     }
     return appYaml;
+  }
+
+  private Optional<Path> getProjectJavaSdk(Project project) {
+    Sdk projectJavaSdk = ProjectRootManager.getInstance(project).getProjectSdk();
+
+    if (projectJavaSdk == null || projectJavaSdk.getHomePath() == null) {
+      return Optional.empty();
+    }
+
+    return Optional.of(Paths.get(projectJavaSdk.getHomePath()));
   }
 
   @VisibleForTesting

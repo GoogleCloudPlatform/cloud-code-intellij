@@ -19,34 +19,30 @@ package com.google.cloud.tools.intellij.debugger;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 
 import org.junit.Ignore;
-import org.junit.Test;
 
 /** Unit tests for {@link ServerToIdeFileResolver}. */
 public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase {
-  private Project project;
   private PsiClass class1;
-  private PsiClass class2;
-  private PsiFile file1;
-  private PsiFile file2;
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    project = this.getProject();
 
     class1 = this.myFixture.addClass("package com.java.pkg; class Class {}");
-    class2 = this.myFixture.addClass("package com.java.pkg; class ClassTest {}");
+    this.myFixture.addClass("package com.java.pkg; class ClassTest {}");
   }
 
   @Override
   public void tearDown() throws Exception {
+    UsefulTestCase.clearFields(class1);
+
     super.tearDown();
   }
 
@@ -64,13 +60,14 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
   public void ignore_testGetFileFromPath_fullPath() {
     // TODO(joaomartins): Find out why project.getBaseDir() is returning a different tempDir to
     // myFixture.
-    file1 = this.myFixture.addFileToProject("path/to/prj/src/main/com/java/package/Class.java", "");
-    file2 =
-        this.myFixture.addFileToProject("path/to/prj/src/test/com/java/package/ClassTest.java", "");
+    PsiFile file1 = this.myFixture
+        .addFileToProject("path/to/prj/src/main/com/java/package/Class.java", "");
+    this.myFixture
+        .addFileToProject("path/to/prj/src/test/com/java/package/ClassTest.java", "");
 
     ServerToIdeFileResolver fileResolver = new ServerToIdeFileResolver();
     assertEquals(
-        fileResolver.getFileFromPath(project, "path/to/prj/src/main/com/java/package/Class.java"),
+        fileResolver.getFileFromPath(getProject(), "path/to/prj/src/main/com/java/package/Class.java"),
         file1.getVirtualFile());
   }
 
@@ -80,7 +77,7 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
 
     assertEquals(
         class1.getContainingFile().getVirtualFile(),
-        fileResolver.getFileFromPath(project, "com/java/pkg/Class.java"));
+        fileResolver.getFileFromPath(getProject(), "com/java/pkg/Class.java"));
   }
 
   // When searching for file name only.
@@ -89,7 +86,7 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
 
     assertEquals(
         class1.getContainingFile().getVirtualFile(),
-        fileResolver.getFileFromPath(project, "Class.java"));
+        fileResolver.getFileFromPath(getProject(), "Class.java"));
   }
 
   public void testGetPackageFromPath() {

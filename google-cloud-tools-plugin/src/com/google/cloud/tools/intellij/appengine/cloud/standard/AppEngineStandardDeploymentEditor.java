@@ -64,12 +64,14 @@ public class AppEngineStandardDeploymentEditor
   private JLabel serviceLabel;
   private JLabel environmentLabel;
   private HyperlinkLabel appEngineCostWarningLabel;
+  private JCheckBox deployAllConfigsCheckbox;
 
   private Project project;
   private AppEngineDeployable deploymentSource;
 
   private static final boolean PROMOTE_DEFAULT = false;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
+  private static final boolean DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT = false;
 
   /** Initializes the UI components. */
   public AppEngineStandardDeploymentEditor(
@@ -84,6 +86,7 @@ public class AppEngineStandardDeploymentEditor
     stopPreviousVersionCheckbox.setVisible(
         AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
     stopPreviousVersionCheckbox.setSelected(STOP_PREVIOUS_VERSION_DEFAULT);
+    deployAllConfigsCheckbox.setSelected(DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT);
 
     promoteInfoLabel.setHyperlinkText(
         GctBundle.getString("appengine.promote.info.label.beforeLink") + " ",
@@ -152,6 +155,7 @@ public class AppEngineStandardDeploymentEditor
         AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     versionIdField.setText(configuration.getVersion());
+    deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
     if (deploymentSource.getEnvironment() != null) {
       environmentLabel.setText(deploymentSource.getEnvironment().localizedLabel());
     }
@@ -178,6 +182,7 @@ public class AppEngineStandardDeploymentEditor
     }
     configuration.setVersion(versionIdField.getText());
     configuration.setPromote(promoteCheckbox.isSelected());
+    configuration.setDeployAllConfigs(deployAllConfigsCheckbox.isSelected());
 
     setDeploymentProjectAndVersion();
   }
@@ -232,6 +237,11 @@ public class AppEngineStandardDeploymentEditor
   @VisibleForTesting
   JCheckBox getStopPreviousVersionCheckbox() {
     return stopPreviousVersionCheckbox;
+  }
+
+  @VisibleForTesting
+  public JCheckBox getDeployAllConfigsCheckbox() {
+    return deployAllConfigsCheckbox;
   }
 
   @VisibleForTesting

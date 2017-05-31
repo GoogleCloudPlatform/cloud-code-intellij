@@ -15,6 +15,9 @@
  */
 package com.google.cloud.tools.intellij.appengine.validation;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.cloud.tools.intellij.appengine.GctConstants;
 
 import com.intellij.codeInspection.LocalInspectionTool;
@@ -22,16 +25,12 @@ import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class RestSignatureInspectionTest extends EndpointTestBase {
   private PsiMethod mockPsiMethod;
@@ -248,9 +247,6 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
     when(mockPsiMethod.getName()).thenReturn(methodName);
     when(mockPsiMethod.getContainingClass()).thenReturn(mockPsiClass);
 
-    PsiFile file = myFixture.addFileToProject("/temp", "someFile");
-    when(mockPsiMethod.getContainingFile()).thenReturn(file);
-
     PsiParameterList mockParameterList = mock(PsiParameterList.class);
     when(mockParameterList.getParameters()).thenReturn(new PsiParameter[0]);
     when(mockPsiMethod.getParameterList()).thenReturn(mockParameterList);
@@ -281,6 +277,5 @@ public class RestSignatureInspectionTest extends EndpointTestBase {
     mockPsiClass = mock(PsiClass.class);
     when(mockPsiClass.getModifierList()).thenReturn(mockModifierList);
   }
-
 }
 

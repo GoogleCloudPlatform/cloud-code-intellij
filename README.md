@@ -1,6 +1,12 @@
 ![Google Cloud Platform Logo](https://cloud.google.com/_static/images/gcp-logo.png)
 # Google Cloud Tools for IntelliJ plugin
-[![Build Status](https://cloud-tools-for-java-testing.appspot.com/buildStatus/icon?job=google-cloud-intellij master build orb (IDEA 2016))](https://cloud-tools-for-java-testing.appspot.com/job/google-cloud-intellij%20master%20build%20orb%20(IDEA%202016)/)
+
+|  | Build Status | 
+| :--- | :---: |
+| Ubuntu | ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-ubuntu-master-orb.png) |
+| Windows | ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-windows-master-orb.png) |
+| MacOS | ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-macos-master-orb.png) |
+| Latest EAP Snapshot| ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-ubuntu-master-eap-orb.png) |
 
 The plugin integrates the [Google Cloud Platform](https://cloud.google.com/)
 into the IntelliJ IDEA UI. Currently this includes:
@@ -18,8 +24,8 @@ For detailed user documentation go to our documentation
 
 ## Supported Platforms
 
-* IntelliJ IDEA Community Edition 15.0.6 or later
-* IntelliJ IDEA Ultimate Edition 15.0.6 or later
+* IntelliJ IDEA Community Edition 2016.3 or later
+* IntelliJ IDEA Ultimate Edition 2016.3 or later
 
 ## Installation
 

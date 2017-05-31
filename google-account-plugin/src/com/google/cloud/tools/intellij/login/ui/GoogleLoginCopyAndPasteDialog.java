@@ -63,9 +63,9 @@ public class GoogleLoginCopyAndPasteDialog extends DialogWrapper {
   /**
    * Initialize the verification code dialog.
    */
-  public GoogleLoginCopyAndPasteDialog(JComponent parent,
-      GoogleAuthorizationCodeRequestUrl requestUrl, String message) {
-    super(parent, true);
+  public GoogleLoginCopyAndPasteDialog(GoogleAuthorizationCodeRequestUrl requestUrl,
+      String message) {
+    super(true);
     urlString = requestUrl.build();
 
     if (message != null) {

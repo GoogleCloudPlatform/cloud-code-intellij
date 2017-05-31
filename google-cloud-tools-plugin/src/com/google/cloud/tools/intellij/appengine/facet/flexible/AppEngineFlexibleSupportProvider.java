@@ -20,12 +20,13 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -35,6 +36,7 @@ import com.intellij.facet.FacetType;
 import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
+import com.intellij.ide.startup.StartupManagerEx;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -88,7 +90,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   public boolean isSupportAlreadyAdded(@NotNull Module module,
       @NotNull FacetsProvider facetsProvider) {
     return !facetsProvider.getFacetsByType(module, AppEngineFlexibleFacetType.ID).isEmpty()
-        || !facetsProvider.getFacetsByType(module, AppEngineStandardFacet.ID).isEmpty();
+        || !facetsProvider.getFacetsByType(module, AppEngineStandardFacetType.ID).isEmpty();
   }
 
   /** Initializes the Flexible facet by settings the default paths for app.yaml and Dockerfile
@@ -179,14 +181,26 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       AppEngineFlexibleFacet facet = FacetManager.getInstance(module).addFacet(
           facetType, facetType.getPresentableName(), null /* underlyingFacet */);
 
-      AppEngineFlexibleSupportProvider
-          .addSupport(facet, rootModel, generateConfigurationFilesCheckBox.isSelected());
+      StartupManagerEx startupManger = StartupManagerEx.getInstanceEx(module.getProject());
+      if (!startupManger.postStartupActivityPassed()) {
+        startupManger.registerPostStartupActivity(
+            () -> addAppEngineFlexibleSupport(rootModel, facet));
+      } else {
+        addAppEngineFlexibleSupport(rootModel, facet);
+      }
 
       CloudSdkService sdkService = CloudSdkService.getInstance();
       if (!sdkService.validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
         sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
       }
+    }
+
+    @VisibleForTesting
+    void addAppEngineFlexibleSupport(@NotNull ModifiableRootModel rootModel,
+        AppEngineFlexibleFacet facet) {
+      AppEngineFlexibleSupportProvider.addSupport(
+          facet, rootModel, generateConfigurationFilesCheckBox.isSelected());
     }
 
     private void createUIComponents() {

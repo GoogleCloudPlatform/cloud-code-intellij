@@ -47,19 +47,19 @@ public enum AppEngineStandardMavenLibrary {
       GctBundle.message("appengine.library.app.engine.api.name"),
       "com.google.appengine",
       "appengine-api-1.0-sdk",
-      RepositoryUtils.ReleaseVersionId,
+      AppEngineStandardMavenLibrary.RELEASE_VERSION_ID,
       DependencyScope.COMPILE),
   ENDPOINTS(
       GctBundle.message("appengine.library.endpoints.api.name"),
       "com.google.appengine",
       "appengine-endpoints",
-      RepositoryUtils.ReleaseVersionId,
+      AppEngineStandardMavenLibrary.RELEASE_VERSION_ID,
       DependencyScope.COMPILE),
   OBJECTIFY(
       GctBundle.message("appengine.library.objectify.api.name"),
       "com.googlecode.objectify",
       "objectify",
-      RepositoryUtils.ReleaseVersionId,
+      AppEngineStandardMavenLibrary.RELEASE_VERSION_ID,
       DependencyScope.COMPILE);
 
   private final String displayName;
@@ -67,6 +67,8 @@ public enum AppEngineStandardMavenLibrary {
   private final String artifactId;
   private final String version;
   private final DependencyScope scope;
+
+  private static final String RELEASE_VERSION_ID = "RELEASE";
 
   AppEngineStandardMavenLibrary(String displayName,
       String groupId,

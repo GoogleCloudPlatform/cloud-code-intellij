@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSourc
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
@@ -53,7 +54,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.swing.JComboBox;
 import javax.swing.JList;
@@ -85,7 +85,7 @@ public class AppEngineUtil {
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
       FacetManager facetManager = FacetManager.getInstance(module);
-      if (facetManager.getFacetByType(AppEngineStandardFacet.ID) != null
+      if (facetManager.getFacetByType(AppEngineStandardFacetType.ID) != null
           || facetManager.getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
         final AppEngineEnvironment environment =
             projectService.getModuleAppEngineEnvironment(module).orElseThrow(
@@ -134,7 +134,7 @@ public class AppEngineUtil {
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
       FacetManager facetManager = FacetManager.getInstance(module);
-      if (facetManager.getFacetByType(AppEngineStandardFacet.ID) != null
+      if (facetManager.getFacetByType(AppEngineStandardFacetType.ID) != null
           || facetManager.getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
         AppEngineEnvironment environment = projectService.getModuleAppEngineEnvironment(module)
             .orElseThrow(() -> new RuntimeException("No environment."));

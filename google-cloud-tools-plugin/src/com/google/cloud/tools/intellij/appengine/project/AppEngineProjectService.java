@@ -94,10 +94,15 @@ public abstract class AppEngineProjectService {
    */
   public abstract boolean isAppEngineStandardArtifactType(@NotNull Artifact artifact);
 
+
   /**
    * {@code true} if the artifact type is a jar or war.
    */
   public abstract boolean isAppEngineFlexArtifactType(@NotNull Artifact artifact);
+
+  public abstract boolean hasAppEngineStandardFacet(@NotNull Module module);
+
+  public abstract boolean hasAppEngineFlexFacet(@NotNull Module module);
 
   /**
    * Determines if the module is backed by maven.

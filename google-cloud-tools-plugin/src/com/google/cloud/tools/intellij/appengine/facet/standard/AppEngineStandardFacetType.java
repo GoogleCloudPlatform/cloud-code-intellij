@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;
+import com.intellij.facet.FacetTypeId;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
@@ -35,10 +36,12 @@ import javax.swing.Icon;
  */
 public class AppEngineStandardFacetType
     extends FacetType<AppEngineStandardFacet, AppEngineStandardFacetConfiguration> {
+
+  public static final FacetTypeId<AppEngineStandardFacet> ID = new FacetTypeId<>("appEngine");
   public static final String STRING_ID = "app-engine-standard";
 
   public AppEngineStandardFacetType() {
-    super(AppEngineStandardFacet.ID, STRING_ID, GctBundle.message("appengine.standard.facet.name"));
+    super(ID, STRING_ID, GctBundle.message("appengine.standard.facet.name"));
   }
 
   @Override

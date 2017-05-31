@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.login;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.cloud.tools.intellij.login.ui.GoogleLoginActionButton;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -127,15 +126,6 @@ public interface GoogleLoginService {
    *     not a logged in user.
    */
   void setActiveUser(String userEmail) throws IllegalArgumentException;
-
-  /**
-   * When the login menu item is instantiated by the UI, it calls this method so that
-   * when logIn() is called by something other than the login menu item itself, the
-   * login menu item can be notified to update its UI.
-   *
-   * @param button The login menu item.
-   */
-  void setLoginMenuItemContribution(GoogleLoginActionButton button);
 
   /**
    * Initializes the service from the persisted credential store.

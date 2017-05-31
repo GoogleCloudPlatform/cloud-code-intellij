@@ -19,22 +19,22 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 import com.google.cloud.tools.intellij.appengine.descriptor.dom.AppEngineStandardWebApp;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.common.collect.ImmutableList;
+
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
-import com.intellij.facet.FacetTypeId;
 import com.intellij.facet.FacetTypeRegistry;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomManager;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** @author nik */
 public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfiguration> {
 
-  public static final FacetTypeId<AppEngineStandardFacet> ID = new FacetTypeId<>("appEngine");
 
   public AppEngineStandardFacet(
       @NotNull FacetType facetType,
@@ -46,7 +46,7 @@ public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfigur
 
   public static FacetType<AppEngineStandardFacet,
       AppEngineStandardFacetConfiguration> getFacetType() {
-    return FacetTypeRegistry.getInstance().findFacetType(ID);
+    return FacetTypeRegistry.getInstance().findFacetType(AppEngineStandardFacetType.ID);
   }
 
   @Nullable
@@ -54,7 +54,7 @@ public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfigur
     if (module == null) {
       return null;
     }
-    return FacetManager.getInstance(module).getFacetByType(ID);
+    return FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacetType.ID);
   }
 
   /**
