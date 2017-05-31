@@ -17,20 +17,18 @@
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
-import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmationDialog;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.SelectConfigDestinationFolderDialog;
-import com.google.cloud.tools.intellij.appengine.facet.flexible.FlexibleFacetEditor.ValidationResult.Status;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
+import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorTab;
-import com.intellij.icons.AllIcons.Ide;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
@@ -39,24 +37,25 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.HyperlinkLabel;
 
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.function.Consumer;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 
 /**
@@ -70,22 +69,47 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private static final String DOCKERFILE_NAME = "Dockerfile";
 
   private JPanel mainPanel;
-  private TextFieldWithBrowseButton appYaml;
-  private TextFieldWithBrowseButton dockerDirectory;
-  private JButton genAppYamlButton;
-  private JButton genDockerfileButton;
-  private JLabel errorIcon;
-  private JLabel errorMessage;
-  private JRadioButton jarRadioButton;
-  private JRadioButton warRadioButton;
+  private TextFieldWithBrowseButton appYamlField;
   private JPanel dockerfilePanel;
+  private HyperlinkLabel appYamlGenerateLink;
+  private JPanel appYamlErrorPanel;
+  private HyperlinkLabel appYamlErrorMessage;
+  private JPanel runtimePanel;
+  private JLabel runtimeLabel;
+  private TextFieldWithBrowseButton dockerDirectoryField;
+  private JPanel dockerfileErrorPanel;
+  private HyperlinkLabel dockerfileErrorMessage;
+  private HyperlinkLabel dockerfileGenerateLink;
+  private JLabel runtimeExplanationLabel;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
       @NotNull Module module) {
     this.facetConfiguration = facetConfiguration;
 
-    appYaml.addBrowseFolderListener(
+    // todo use htmltext instead?
+    // todo move all these out of here
+    appYamlGenerateLink.setHyperlinkText("or ",
+        GctBundle.message("appengine.flex.facet.config.appyaml.generate.link.text"), "");
+    appYamlGenerateLink.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+    appYamlGenerateLink.setHyperlinkTarget("http://www.google.com");
+    appYamlErrorMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+    appYamlErrorMessage.setHyperlinkTarget("http://www.google.com");
+
+    dockerfileGenerateLink.setHyperlinkText("or ",
+        GctBundle.message("appengine.flex.facet.config.dockerfile.generate.link.text"), "");
+    dockerfileGenerateLink.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+    dockerfileGenerateLink.setHyperlinkTarget("http://www.google.com");
+    dockerfileErrorMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+    dockerfileErrorMessage.setHyperlinkText("http://www.google.com");
+
+    runtimeExplanationLabel.setFont(
+        new Font(
+            runtimeExplanationLabel.getFont().getName(),
+            Font.ITALIC,
+            runtimeExplanationLabel.getFont().getSize() - 1));
+
+    appYamlField.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
         null /* description */,
         module.getProject(),
@@ -95,71 +119,66 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         )
     );
 
-    appYaml.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+    appYamlField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        toggleDockerfileSection();
-        validateAndShowWarnings();
+        validateConfiguration();
       }
     });
 
-    dockerDirectory.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+    dockerDirectoryField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
-        validateAndShowWarnings();
+        validateDockerfile();
       }
     });
 
-    dockerDirectory.addBrowseFolderListener(
+    dockerDirectoryField.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.docker.directory"),
         null /* description */,
         module.getProject(),
         FileChooserDescriptorFactory.createSingleFolderDescriptor()
     );
 
-    genAppYamlButton.addActionListener(
-        new GenerateConfigActionListener(
-            module.getProject(),
-            "app.yaml",
-            (outputFolderPath) -> APP_ENGINE_PROJECT_SERVICE.generateAppYaml(
-                FlexibleRuntime.JAVA,
-                module,
-                outputFolderPath),
-            appYaml,
-            false,
-            this::validateAndShowWarnings
-        ));
+//    genAppYamlButton.addActionListener(
+//        new GenerateConfigActionListener(
+//            module.getProject(),
+//            "app.yaml",
+//            (outputFolderPath) -> APP_ENGINE_PROJECT_SERVICE.generateAppYaml(
+//                FlexibleRuntime.JAVA,
+//                module,
+//                outputFolderPath),
+//            appYaml,
+//            false,
+//            this::validateAndShowWarnings
+//        ));
 
-    genDockerfileButton.addActionListener(
-        new GenerateConfigActionListener(
-            module.getProject(),
-            "Dockerfile",
-            (outputFolderPath) -> APP_ENGINE_PROJECT_SERVICE.generateDockerfile(
-                warRadioButton.isSelected()
-                    ? AppEngineFlexibleDeploymentArtifactType.WAR
-                    : AppEngineFlexibleDeploymentArtifactType.JAR,
-                module,
-                outputFolderPath),
-            dockerDirectory,
-            true,
-            this::validateAndShowWarnings
-        ));
+//    genDockerfileButton.addActionListener(
+//        new GenerateConfigActionListener(
+//            module.getProject(),
+//            "Dockerfile",
+//            (outputFolderPath) -> APP_ENGINE_PROJECT_SERVICE.generateDockerfile(
+//                warRadioButton.isSelected()
+//                    ? AppEngineFlexibleDeploymentArtifactType.WAR
+//                    : AppEngineFlexibleDeploymentArtifactType.JAR,
+//                module,
+//                outputFolderPath),
+//            dockerDirectory,
+//            true,
+//            this::validateDockerfile
+//        ));
 
-    appYaml.setText(facetConfiguration.getAppYamlPath());
-    dockerDirectory.setText(facetConfiguration.getDockerDirectory());
+    // todo move
+//    dockerDirectory.setText(facetConfiguration.getDockerDirectory());
 
-    ButtonGroup dockerfileTypeGroup = new ButtonGroup();
-    dockerfileTypeGroup.add(jarRadioButton);
-    dockerfileTypeGroup.add(warRadioButton);
-    warRadioButton.setSelected(IS_WAR_DOCKERFILE_DEFAULT);
-    jarRadioButton.setSelected(!IS_WAR_DOCKERFILE_DEFAULT);
+    // todo move
+//    ButtonGroup dockerfileTypeGroup = new ButtonGroup();
+//    dockerfileTypeGroup.add(jarRadioButton);
+//    dockerfileTypeGroup.add(warRadioButton);
+//    warRadioButton.setSelected(IS_WAR_DOCKERFILE_DEFAULT);
+//    jarRadioButton.setSelected(!IS_WAR_DOCKERFILE_DEFAULT);
 
-    errorIcon.setIcon(Ide.Error);
-    errorIcon.setVisible(false);
-    errorMessage.setVisible(false);
-
-    validateAndShowWarnings();
-    toggleDockerfileSection();
+    validateConfiguration();
   }
 
   @NotNull
@@ -170,24 +189,29 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   @Override
   public boolean isModified() {
-    return !appYaml.getText().equals(facetConfiguration.getAppYamlPath())
-        || !dockerDirectory.getText().equals(facetConfiguration.getDockerDirectory());
+    return !appYamlField.getText().equals(facetConfiguration.getAppYamlPath())
+        || !dockerDirectoryField.getText().equals(facetConfiguration.getDockerDirectory());
   }
 
   @Override
   public void reset() {
-    appYaml.setText(facetConfiguration.getAppYamlPath());
-    dockerDirectory.setText(facetConfiguration.getDockerDirectory());
+    // todo move this to appropriate places
+    // todo get default font for resuse rather then font of each component
+    //    appYaml.getTextField().setFont(new Font(appYaml.getFont().getName(), Font.ITALIC, appYaml.getFont().getSize()));
+    //    appYamlErrorMessage.setFont(new Font(appYamlErrorMessage.getFont().getName(), appYamlErrorMessage.getFont().getStyle(), appYamlErrorMessage.getFont().getSize()));
 
-    toggleDockerfileSection();
+    appYamlField.setText(facetConfiguration.getAppYamlPath());
+    dockerDirectoryField.setText(facetConfiguration.getDockerDirectory());
   }
 
   @Override
   public void apply() throws ConfigurationException {
-    ValidationResult result = validateAndShowWarnings();
-    if (result.status == Status.ERROR) {
-      throw new ConfigurationException(result.message);
-    }
+//    ValidationResult result =
+    // TODO: not blocking on errors, so can prob get rid of Status.Error
+//    validateAndShowWarnings();
+//    if (result.status == Status.ERROR) {
+//      throw new ConfigurationException(result.message);
+//    }
   }
 
   @Override
@@ -202,9 +226,17 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   private boolean isRuntimeCustom() throws MalformedYamlFileException {
-    return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(appYaml.getText())
-        .filter(runtime -> runtime == FlexibleRuntime.CUSTOM)
-        .isPresent();
+    return getRuntime().filter(runtime -> runtime == FlexibleRuntime.CUSTOM).isPresent();
+  }
+
+  private String getRuntimeText() throws MalformedYamlFileException {
+    return getRuntime()
+        .map(FlexibleRuntime::toString)
+        .orElse("");
+  }
+
+  private Optional<FlexibleRuntime> getRuntime() throws MalformedYamlFileException {
+    return APP_ENGINE_PROJECT_SERVICE.getFlexibleRuntimeFromAppYaml(appYamlField.getText());
   }
 
   /**
@@ -223,62 +255,97 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   /**
-   * Validates the configuration and turns on/off any necessary warnings.
-   * @return the validation result
+   * Validates the configuration and toggles on/off any necessary warnings and components.
    */
-  private ValidationResult validateAndShowWarnings() {
-    ValidationResult result = validateConfiguration();
-    if (result.status == Status.OK) {
-      errorIcon.setVisible(false);
-      errorMessage.setVisible(false);
-    } else if (result.status == Status.ERROR) {
-      errorMessage.setText(result.message);
-      errorIcon.setVisible(true);
-      errorMessage.setVisible(true);
-    }
-    return result;
-  }
+  private void validateConfiguration() {
+    boolean isValidAppYaml = validateAppYaml();
 
-  private ValidationResult validateConfiguration() {
-    if (!isValidConfigurationFile(appYaml.getText())) {
-      return new ValidationResult(Status.ERROR,
-          GctBundle.getString("appengine.deployment.error.staging.yaml"));
-    } else {
+    if (isValidAppYaml) {
       try {
         if (isRuntimeCustom()) {
-          String dockerDirectoryText = dockerDirectory.getText();
-          if (dockerDirectoryText.isEmpty() || !Files.isDirectory(Paths.get(dockerDirectoryText))) {
-            return new ValidationResult(Status.ERROR,
-                GctBundle.getString("appengine.deployment.error.staging.docker.directory"));
-          } else if (!isValidConfigurationFile(
-              Paths.get(dockerDirectoryText, DOCKERFILE_NAME).toString())) {
-            return new ValidationResult(Status.ERROR,
-                GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
-          }
+          validateDockerfile();
         }
       } catch (MalformedYamlFileException myf) {
-        return new ValidationResult(Status.ERROR, GctBundle.getString("appengine.appyaml.malformed"));
+        // TODO can this be refactored?
+        // We already know that runtime is parsable from {@link #validateAppYaml}
       }
     }
-    return new ValidationResult(Status.OK, "");
   }
 
-  private void toggleDockerfileSection() {
-    boolean visible = false;
-    try {
-      visible = isRuntimeCustom();
-    } catch (MalformedYamlFileException myf) {
-      // do nothing
+  private boolean validateAppYaml() {
+    if (!isValidConfigurationFile(appYamlField.getText())) {
+      toggleInvalidAppYamlState(
+          GctBundle.getString("appengine.flex.facet.config.appyaml.error.before.text"));
+      return false;
+    } else {
+      try {
+        toggleValidAppYamlState(getRuntimeText());
+      } catch (MalformedYamlFileException myf) {
+        toggleInvalidAppYamlState(GctBundle.getString("appengine.appyaml.malformed"));
+        return false;
+      }
     }
-    dockerfilePanel.setVisible(visible);
+
+    return true;
+  }
+
+  private void validateDockerfile() {
+    String dockerDirectoryText = dockerDirectoryField.getText();
+    if (dockerDirectoryText.isEmpty()
+        || !Files.isDirectory(Paths.get(dockerDirectoryText))
+        || !isValidConfigurationFile(Paths.get(dockerDirectoryText, DOCKERFILE_NAME).toString())) {
+      toggleInvalidDockerfileState(
+          GctBundle.getString(
+              "appengine.flex.facet.config.dockerfile.directory.error.before.text"));
+    } else {
+      toggleValidDockerfileState();
+    }
+  }
+
+  private void toggleInvalidAppYamlState(String message) {
+    appYamlErrorPanel.setVisible(true);
+    // todo no need to set the text/hyperlinkstuff here: do it once on init
+    appYamlErrorMessage.setHyperlinkText(
+        message, GctBundle.message("appengine.flex.facet.config.appyaml.generate.link.text"), "");
+    appYamlGenerateLink.setVisible(false);
+    runtimePanel.setVisible(false);
+    dockerfilePanel.setVisible(false);
+    runtimeExplanationLabel.setVisible(false);
+  }
+
+  private void toggleValidAppYamlState(String runtimeText) {
+    appYamlErrorPanel.setVisible(false);
+    appYamlGenerateLink.setVisible(true);
+    runtimePanel.setVisible(true);
+    runtimeLabel.setText(runtimeText);
+    if (runtimeText.equalsIgnoreCase(FlexibleRuntime.CUSTOM.toString())) {
+      dockerfilePanel.setVisible(true);
+      runtimeExplanationLabel.setVisible(false);
+    } else {
+      dockerfilePanel.setVisible(false);
+      runtimeExplanationLabel.setVisible(true);
+    }
+  }
+
+  private void toggleInvalidDockerfileState(String message) {
+    dockerfileErrorPanel.setVisible(true);
+    // todo no need to set this here; can do it on init
+    dockerfileErrorMessage.setHyperlinkText(message,
+        GctBundle.message("appengine.flex.facet.config.dockerfile.generate.link.text"),"");
+    dockerfileGenerateLink.setVisible(false);
+  }
+
+  private void toggleValidDockerfileState() {
+    dockerfileErrorPanel.setVisible(false);
+    dockerfileGenerateLink.setVisible(true);
   }
 
   @Override
   public void onFacetInitialized(@NotNull Facet facet) {
     if (facet instanceof AppEngineFlexibleFacet) {
-      ((AppEngineFlexibleFacet) facet).getConfiguration().setAppYamlPath(appYaml.getText());
+      ((AppEngineFlexibleFacet) facet).getConfiguration().setAppYamlPath(appYamlField.getText());
       ((AppEngineFlexibleFacet) facet).getConfiguration().setDockerDirectory(
-          dockerDirectory.getText());
+          dockerDirectoryField.getText());
     }
   }
 
@@ -388,13 +455,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  TextFieldWithBrowseButton getAppYaml() {
-    return appYaml;
+  TextFieldWithBrowseButton getAppYamlField() {
+    return appYamlField;
   }
 
   @VisibleForTesting
   TextFieldWithBrowseButton getDockerDirectory() {
-    return dockerDirectory;
+    return dockerDirectoryField;
   }
 
   @VisibleForTesting
@@ -402,23 +469,10 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     return dockerfilePanel;
   }
 
-  @VisibleForTesting
-  public JLabel getErrorIcon() {
-    return errorIcon;
-  }
+  // todo expose panel for testing
 
   @VisibleForTesting
-  public JLabel getErrorMessage() {
-    return errorMessage;
-  }
-
-  @VisibleForTesting
-  public JRadioButton getJarRadioButton() {
-    return jarRadioButton;
-  }
-
-  @VisibleForTesting
-  public JRadioButton getWarRadioButton() {
-    return warRadioButton;
+  public HyperlinkLabel getAppYamlErrorMessage() {
+    return appYamlErrorMessage;
   }
 }

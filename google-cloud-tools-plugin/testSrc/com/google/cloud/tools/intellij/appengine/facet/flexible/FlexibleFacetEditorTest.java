@@ -58,9 +58,9 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     facetConfiguration.setAppYamlPath("");
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getErrorMessage().isVisible());
+    assertTrue(editor.getAppYamlErrorMessage().isVisible());
     assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
-        editor.getErrorMessage().getText());
+        editor.getAppYamlErrorMessage().getText());
     assertFalse(editor.getDockerfilePanel().isVisible());
 
     try {
@@ -77,9 +77,9 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     facetConfiguration.setAppYamlPath(null);
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getErrorMessage().isVisible());
+    assertTrue(editor.getAppYamlErrorMessage().isVisible());
     assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
-        editor.getErrorMessage().getText());
+        editor.getAppYamlErrorMessage().getText());
     assertFalse(editor.getDockerfilePanel().isVisible());
 
     try {
@@ -111,9 +111,9 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
     editor.getAppYaml().setText(javaYaml.getParentFile().getPath());
     assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getErrorMessage().isVisible());
+    assertTrue(editor.getAppYamlErrorMessage().isVisible());
     assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
-        editor.getErrorMessage().getText());
+        editor.getAppYamlErrorMessage().getText());
 
     try {
       editor.apply();
@@ -130,7 +130,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor.getAppYaml().setText(javaYaml.getPath());
     assertFalse(editor.getDockerfilePanel().isVisible());
     assertFalse(editor.getErrorIcon().isVisible());
-    assertFalse(editor.getErrorMessage().isVisible());
+    assertFalse(editor.getAppYamlErrorMessage().isVisible());
     editor.apply();
   }
 
@@ -140,10 +140,10 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor.getDockerDirectory().setText("");
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getErrorMessage().isVisible());
+    assertTrue(editor.getAppYamlErrorMessage().isVisible());
     assertEquals(
         "The specified Docker directory does not exist or it is not a valid directory.",
-        editor.getErrorMessage().getText());
+        editor.getAppYamlErrorMessage().getText());
 
     try {
       editor.apply();
@@ -161,10 +161,10 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor.getDockerDirectory().setText(null);
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getErrorMessage().isVisible());
+    assertTrue(editor.getAppYamlErrorMessage().isVisible());
     assertEquals(
         "The specified Docker directory does not exist or it is not a valid directory.",
-        editor.getErrorMessage().getText());
+        editor.getAppYamlErrorMessage().getText());
 
     try {
       editor.apply();
@@ -183,7 +183,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor.getDockerDirectory().setText(dockerfile.getParentFile().getPath());
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertFalse(editor.getErrorIcon().isVisible());
-    assertFalse(editor.getErrorMessage().isVisible());
+    assertFalse(editor.getAppYamlErrorMessage().isVisible());
     editor.apply();
   }
 
@@ -193,9 +193,9 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor.getDockerDirectory().setText(dockerfile.getPath());
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getErrorMessage().isVisible());
+    assertTrue(editor.getAppYamlErrorMessage().isVisible());
     assertEquals("The specified Docker directory does not exist or it is not a valid "
-            + "directory.", editor.getErrorMessage().getText());
+            + "directory.", editor.getAppYamlErrorMessage().getText());
 
     try {
       editor.apply();
@@ -213,7 +213,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor.getDockerDirectory().setText(dockerfile.getParentFile().getPath());
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertFalse(editor.getErrorIcon().isVisible());
-    assertFalse(editor.getErrorMessage().isVisible());
+    assertFalse(editor.getAppYamlErrorMessage().isVisible());
     editor.apply();
   }
 
