@@ -423,7 +423,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public String getDefaultDockerfilePath(String moduleRoot) {
-    return moduleRoot + "/src/main/docker/Dockerfile";
+  public String getDefaultDockerDirectory(String moduleRoot) {
+    return moduleRoot + "/src/main/docker";
   }
 }

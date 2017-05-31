@@ -82,6 +82,7 @@ import javax.swing.event.TreeModelEvent;
 public class AppEngineFlexibleDeploymentEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
   private static final String DEFAULT_SERVICE = "default";
+  private static final String DOCKERFILE_NAME = "Dockerfile";
   private DeploymentSource deploymentSource;
   private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
@@ -93,16 +94,16 @@ public class AppEngineFlexibleDeploymentEditor extends
   private ProjectSelector gcpProjectSelector;
   private JLabel serviceLabel;
   private TextFieldWithBrowseButton appYamlTextField;
-  private TextFieldWithBrowseButton dockerfileTextField;
+  private TextFieldWithBrowseButton dockerDirectoryTextField;
   private TextFieldWithBrowseButton archiveSelector;
   private HyperlinkLabel appEngineCostWarningLabel;
   private AppEngineApplicationInfoPanel appInfoPanel;
   private JPanel archiveSelectorPanel;
   private HyperlinkLabel promoteInfoLabel;
-  private JLabel dockerfileLabel;
+  private JLabel dockerDirectoryLabel;
   private JComboBox<Module> modulesWithFlexFacetComboBox;
   private JCheckBox appYamlOverrideCheckBox;
-  private JCheckBox dockerfileOverrideCheckBox;
+  private JCheckBox dockerDirectoryOverrideCheckBox;
   private String dockerfileOverride = "";
   private JButton moduleSettingsButton;
   private JCheckBox hiddenValidationTrigger;
@@ -123,11 +124,11 @@ public class AppEngineFlexibleDeploymentEditor extends
                 || Comparing.equal(virtualFile.getExtension(), "yml"))
     );
 
-    dockerfileTextField.addBrowseFolderListener(
-        GctBundle.message("appengine.flex.config.browse.dockerfile"),
+    dockerDirectoryTextField.addBrowseFolderListener(
+        GctBundle.message("appengine.flex.config.browse.docker.directory"),
         null /* description */,
         project,
-        FileChooserDescriptorFactory.createSingleFileDescriptor()
+        FileChooserDescriptorFactory.createSingleFolderDescriptor()
     );
 
     archiveSelector.addBrowseFolderListener(
@@ -160,23 +161,23 @@ public class AppEngineFlexibleDeploymentEditor extends
       appYamlTextField.setVisible(isAppYamlOverrideSelected);
 
       setModuleControlsEnabled(
-          !(isAppYamlOverrideSelected && dockerfileOverrideCheckBox.isSelected()));
+          !(isAppYamlOverrideSelected && dockerDirectoryOverrideCheckBox.isSelected()));
       updateServiceName();
       toggleDockerfileSection();
     });
 
-    dockerfileOverrideCheckBox.addActionListener(
+    dockerDirectoryOverrideCheckBox.addActionListener(
         event -> {
           boolean isDockerfileOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
-          dockerfileTextField.setEnabled(isDockerfileOverrideSelected);
+          dockerDirectoryTextField.setEnabled(isDockerfileOverrideSelected);
           if (isDockerfileOverrideSelected) {
             if (dockerfileOverride.isEmpty()) {
-              dockerfileOverride = dockerfileTextField.getText();
+              dockerfileOverride = dockerDirectoryTextField.getText();
             }
-            dockerfileTextField.setText(dockerfileOverride);
+            dockerDirectoryTextField.setText(dockerfileOverride);
           } else {
-            dockerfileOverride = dockerfileTextField.getText();
-            dockerfileTextField.setText(getDockerfilePath());
+            dockerfileOverride = dockerDirectoryTextField.getText();
+            dockerDirectoryTextField.setText(getDockerDirectoryPath());
           }
 
           setModuleControlsEnabled(
@@ -272,13 +273,13 @@ public class AppEngineFlexibleDeploymentEditor extends
       modulesWithFlexFacetComboBox.setVisible(false);
       moduleSettingsButton.setVisible(false);
       appYamlOverrideCheckBox.setVisible(false);
-      dockerfileOverrideCheckBox.setVisible(false);
+      dockerDirectoryOverrideCheckBox.setVisible(false);
       noSupportedModulesWarning.setVisible(true);
       appYamlTextField.setVisible(true);
-      dockerfileTextField.setVisible(true);
-      // These checks are important so getAppYamlPath() and getDockerfilePath() work correctly.
+      dockerDirectoryTextField.setVisible(true);
+      // These checks are important so getAppYamlPath() and getDockerDirectory() work correctly.
       appYamlOverrideCheckBox.setSelected(true);
-      dockerfileOverrideCheckBox.setSelected(true);
+      dockerDirectoryOverrideCheckBox.setSelected(true);
     }
   }
 
@@ -298,18 +299,18 @@ public class AppEngineFlexibleDeploymentEditor extends
     promoteVersionCheckBox.setSelected(configuration.isPromote());
     stopPreviousVersionCheckBox.setSelected(configuration.isStopPreviousVersion());
     appYamlTextField.setText(configuration.getAppYamlPath());
-    dockerfileTextField.setText(configuration.getDockerFilePath());
+    dockerDirectoryTextField.setText(configuration.getDockerDirectoryPath());
     gcpProjectSelector.setText(configuration.getCloudProjectName());
     appYamlTextField.setVisible(configuration.isOverrideAppYaml()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
     appYamlOverrideCheckBox.setSelected(configuration.isOverrideAppYaml()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
-    dockerfileOverrideCheckBox.setSelected(configuration.isOverrideDockerfile()
+    dockerDirectoryOverrideCheckBox.setSelected(configuration.isOverrideDockerDirectory()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
 
     setModuleControlsEnabled(
-        !(configuration.isOverrideAppYaml() && configuration.isOverrideDockerfile()));
+        !(configuration.isOverrideAppYaml() && configuration.isOverrideDockerDirectory()));
 
     toggleDockerfileSection();
     updateServiceName();
@@ -325,7 +326,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     configuration.setPromote(promoteVersionCheckBox.isSelected());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckBox.isSelected());
     configuration.setAppYamlPath(getAppYamlPath());
-    configuration.setDockerFilePath(getDockerfilePath());
+    configuration.setDockerDirectoryPath(getDockerDirectoryPath());
     configuration.setCloudProjectName(gcpProjectSelector.getText());
     CredentialedUser user = gcpProjectSelector.getSelectedUser();
     if (user != null) {
@@ -340,7 +341,7 @@ public class AppEngineFlexibleDeploymentEditor extends
         deploymentSource instanceof UserSpecifiedPathDeploymentSource);
     configuration.setUserSpecifiedArtifactPath(archiveSelector.getText());
     configuration.setOverrideAppYaml(appYamlOverrideCheckBox.isSelected());
-    configuration.setOverrideDockerfile(dockerfileOverrideCheckBox.isSelected());
+    configuration.setOverrideDockerDirectory(dockerDirectoryOverrideCheckBox.isSelected());
     updateSelectors();
     setDeploymentProjectAndVersion();
   }
@@ -374,18 +375,19 @@ public class AppEngineFlexibleDeploymentEditor extends
     if (!isValidConfigurationFile(getAppYamlPath())) {
       throw new ConfigurationException(
           GctBundle.getString("appengine.deployment.error.staging.yaml") + " "
-              + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
+              + GctBundle.getString("appengine.deployment.error.staging.file.gotosettings"));
     }
     try {
       if (isCustomRuntime()) {
-        if (StringUtils.isBlank(getDockerfilePath())) {
+        String dockerDirectoryPath = getDockerDirectoryPath();
+        if (StringUtils.isBlank(dockerDirectoryPath)) {
           throw new ConfigurationException(
-              GctBundle.message("appengine.flex.config.browse.dockerfile"));
+              GctBundle.message("appengine.flex.config.browse.docker.directory"));
         }
-        if (!isValidConfigurationFile(getDockerfilePath())) {
+        if (!isValidConfigurationFile(Paths.get(dockerDirectoryPath, DOCKERFILE_NAME).toString())) {
           throw new ConfigurationException(
               GctBundle.getString("appengine.deployment.error.staging.dockerfile") + " "
-                  + GctBundle.getString("appengine.deployment.error.staging.gotosettings"));
+                  + GctBundle.getString("appengine.deployment.error.staging.directory.gotosettings"));
         }
       }
     } catch (MalformedYamlFileException myf) {
@@ -445,13 +447,13 @@ public class AppEngineFlexibleDeploymentEditor extends
     } catch (MalformedYamlFileException myf) {
       // Do nothing, don't blow up, let visible stay false.
     }
-    dockerfileOverrideCheckBox.setVisible(
+    dockerDirectoryOverrideCheckBox.setVisible(
         visible && modulesWithFlexFacetComboBox.getItemCount() != 0);
-    dockerfileTextField.setVisible(visible);
-    dockerfileTextField.setEnabled(dockerfileOverrideCheckBox.isSelected());
-    dockerfileLabel.setVisible(visible);
+    dockerDirectoryTextField.setVisible(visible);
+    dockerDirectoryTextField.setEnabled(dockerDirectoryOverrideCheckBox.isSelected());
+    dockerDirectoryLabel.setVisible(visible);
     if (visible) {
-      dockerfileTextField.setText(getDockerfilePath());
+      dockerDirectoryTextField.setText(getDockerDirectoryPath());
     }
   }
 
@@ -463,7 +465,7 @@ public class AppEngineFlexibleDeploymentEditor extends
       if (!Files.exists(Paths.get(path)) || !Files.isRegularFile(Paths.get(path))) {
         return false;
       }
-    } catch (InvalidPathException ipe) {
+    } catch (SecurityException ex) {
       return false;
     }
 
@@ -490,9 +492,9 @@ public class AppEngineFlexibleDeploymentEditor extends
         .orElse("");
   }
 
-  private String getDockerfilePath() {
-    if (dockerfileOverrideCheckBox.isSelected()) {
-      return dockerfileTextField.getText();
+  private String getDockerDirectoryPath() {
+    if (dockerDirectoryOverrideCheckBox.isSelected()) {
+      return dockerDirectoryTextField.getText();
     }
 
     if (modulesWithFlexFacetComboBox.getSelectedItem() == null) {
@@ -502,7 +504,7 @@ public class AppEngineFlexibleDeploymentEditor extends
     return Optional.ofNullable(
         FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
             .getFacetByType(AppEngineFlexibleFacetType.ID))
-        .map(flexFacet -> flexFacet.getConfiguration().getDockerfilePath())
+        .map(flexFacet -> flexFacet.getConfiguration().getDockerDirectory())
         .orElse("");
   }
 
@@ -544,18 +546,18 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
-  TextFieldWithBrowseButton getDockerfileTextField() {
-    return dockerfileTextField;
+  TextFieldWithBrowseButton getDockerDirectoryTextField() {
+    return dockerDirectoryTextField;
   }
 
   @VisibleForTesting
-  JLabel getDockerfileLabel() {
-    return dockerfileLabel;
+  JLabel getDockerDirectoryLabel() {
+    return dockerDirectoryLabel;
   }
 
   @VisibleForTesting
-  JCheckBox getDockerfileOverrideCheckBox() {
-    return dockerfileOverrideCheckBox;
+  JCheckBox getDockerDirectoryOverrideCheckBox() {
+    return dockerDirectoryOverrideCheckBox;
   }
 
   @VisibleForTesting

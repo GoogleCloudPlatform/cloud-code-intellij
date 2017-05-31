@@ -24,8 +24,10 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -36,6 +38,8 @@ import java.nio.file.Paths;
  * Stages an application in preparation for deployment to the App Engine flexible environment.
  */
 public class AppEngineFlexibleStage {
+  private static final String DOCKERFILE_NAME = "Dockerfile";
+
   private LoggingHandler loggingHandler;
   private Path deploymentArtifactPath;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
@@ -71,8 +75,10 @@ public class AppEngineFlexibleStage {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.yaml"));
       }
+
       if (isCustomRuntime
-          && !Files.exists(Paths.get(deploymentConfiguration.getDockerFilePath()))) {
+          && (!Files.isRegularFile(
+          Paths.get(deploymentConfiguration.getDockerDirectoryPath(), DOCKERFILE_NAME)))) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
       }
@@ -85,8 +91,10 @@ public class AppEngineFlexibleStage {
       Files.copy(appYamlPath, stagingDirectory.resolve(appYamlPath.getFileName()));
 
       if (isCustomRuntime) {
-        Path dockerFilePath = Paths.get(deploymentConfiguration.getDockerFilePath());
-        Files.copy(dockerFilePath, stagingDirectory.resolve(dockerFilePath.getFileName()));
+        File dockerDirectory = Paths.get(deploymentConfiguration.getDockerDirectoryPath()).toFile();
+        FileUtils.copyDirectory(
+            dockerDirectory,
+            stagingDirectory.toFile());
       }
     } catch (IOException | InvalidPathException | MalformedYamlFileException ex) {
       loggingHandler.print(ex.getMessage() + "\n");

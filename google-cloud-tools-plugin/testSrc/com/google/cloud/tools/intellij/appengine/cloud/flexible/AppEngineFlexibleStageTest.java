@@ -50,7 +50,7 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
     artifact = createTempFile("artifact.war", "").toPath();
     deploymentConfiguration = new AppEngineDeploymentConfiguration();
     deploymentConfiguration.setAppYamlPath(createTempFile("custom.yaml", "runtime: custom").getPath());
-    deploymentConfiguration.setDockerFilePath(createTempFile("Dockerfile", "").getPath());
+    deploymentConfiguration.setDockerDirectoryPath(createTempFile("Dockerfile", "").getParentFile().getPath());
     stagingDirectory = createTempDirectory().toPath();
   }
 
@@ -66,20 +66,20 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
     }
   }
 
-  public void testStage_noDockerfile() {
-    deploymentConfiguration.setDockerFilePath("I don't exist.");
+  public void testStage_noDockerDirectory() {
+    deploymentConfiguration.setDockerDirectoryPath("I don't exist.");
     AppEngineFlexibleStage stage =
         new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration);
     try {
       stage.stage(stagingDirectory);
-      fail("No Dockerfile.");
+      fail("No Docker directory.");
     } catch (RuntimeException re) {
-      assertEquals("The specified Dockerfile configuration file does not exist or is not a valid file.", re.getMessage());
+      assertEquals("There is no Dockerfile in specified directory.", re.getMessage());
     }
   }
 
   public void testStage_javaRuntime() throws IOException {
-    deploymentConfiguration.setDockerFilePath("I don't exist.");
+    deploymentConfiguration.setDockerDirectoryPath("I don't exist.");
     deploymentConfiguration.setAppYamlPath(createTempFile("java.yaml", "runtime: java").getPath());
     AppEngineFlexibleStage stage =
         new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration);

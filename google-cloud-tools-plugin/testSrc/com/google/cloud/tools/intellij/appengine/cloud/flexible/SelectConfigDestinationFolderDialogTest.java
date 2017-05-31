@@ -34,15 +34,15 @@ public class SelectConfigDestinationFolderDialogTest extends PlatformTestCase {
 
   public void testSuggestion() {
     SelectConfigDestinationFolderDialog dialog =
-        new SelectConfigDestinationFolderDialog(null, file.getPath());
+        new SelectConfigDestinationFolderDialog(null, file.getParentFile().getPath());
     assertEquals(file.toPath().getParent(), dialog.getDestinationFolder());
     Disposer.dispose(dialog.getDisposable());
   }
 
-  public void testSuggestion_noParent() {
+  public void testSuggestion_nonExistingParent() {
     SelectConfigDestinationFolderDialog dialog =
         new SelectConfigDestinationFolderDialog(null,"I don't exist.");
-    assertEquals("", dialog.getDestinationFolder().toString());
+    assertEquals("I don't exist.", dialog.getDestinationFolder().toString());
     Disposer.dispose(dialog.getDisposable());
   }
 

@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="8" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="0" y="0" width="1154" height="557"/>
+      <xy x="0" y="0" width="1168" height="557"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -180,12 +180,12 @@
               <visible value="false"/>
             </properties>
           </component>
-          <component id="9e96a" class="javax.swing.JLabel" binding="dockerfileLabel">
+          <component id="9e96a" class="javax.swing.JLabel" binding="dockerDirectoryLabel">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Dockerfile:"/>
+              <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.docker.directory.label"/>
             </properties>
           </component>
           <grid id="4bcf7" layout-manager="GridLayoutManager" row-count="1" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -237,18 +237,18 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="a7f92" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="dockerfileTextField">
+              <component id="a7f92" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="dockerDirectoryTextField">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="7" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
               </component>
-              <component id="1b50b" class="javax.swing.JCheckBox" binding="dockerfileOverrideCheckBox">
+              <component id="1b50b" class="javax.swing.JCheckBox" binding="dockerDirectoryOverrideCheckBox">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Use a different Dockerfile"/>
+                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.use.different.docker.directory"/>
                 </properties>
               </component>
             </children>

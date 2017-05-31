@@ -158,8 +158,8 @@ public abstract class AppEngineProjectService {
   public abstract String getDefaultAppYamlPath(String moduleRoot);
 
   /**
-   * Returns the default location of the Dockerfile configuration file, relative to a module content
-   * root location.
+   * Returns the default directory of the Dockerfile configuration file, relative to a module
+   * content root location.
    */
-  public abstract String getDefaultDockerfilePath(String moduleRoot);
+  public abstract String getDefaultDockerDirectory(String moduleRoot);
 }

@@ -40,7 +40,7 @@ public class AppEngineDeploymentConfiguration extends
    */
   private String environment;
 
-  private String dockerFilePath;
+  private String dockerDirectoryPath;
   private String appYamlPath;
   private boolean userSpecifiedArtifact;
   private String userSpecifiedArtifactPath;
@@ -49,7 +49,7 @@ public class AppEngineDeploymentConfiguration extends
   private String version;
   private boolean deployAllConfigs;
   private boolean overrideAppYaml;
-  private boolean overrideDockerfile;
+  private boolean overrideDockerDirectory;
 
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
@@ -76,9 +76,9 @@ public class AppEngineDeploymentConfiguration extends
     return userSpecifiedArtifactPath;
   }
 
-  @Attribute("dockerFilePath")
-  public String getDockerFilePath() {
-    return dockerFilePath;
+  @Attribute("dockerDirectoryPath")
+  public String getDockerDirectoryPath() {
+    return dockerDirectoryPath;
   }
 
   @Attribute("appYamlPath")
@@ -111,9 +111,9 @@ public class AppEngineDeploymentConfiguration extends
     return overrideAppYaml;
   }
 
-  @Attribute("overrideDockerfile")
-  public boolean isOverrideDockerfile() {
-    return overrideDockerfile;
+  @Attribute("overrideDockerDirectory")
+  public boolean isOverrideDockerDirectory() {
+    return overrideDockerDirectory;
   }
 
   public void setDeployAllConfigs(boolean deployAllConfigs) {
@@ -140,8 +140,8 @@ public class AppEngineDeploymentConfiguration extends
     this.userSpecifiedArtifactPath = userSpecifiedArtifactPath;
   }
 
-  public void setDockerFilePath(String dockerFilePath) {
-    this.dockerFilePath = dockerFilePath;
+  public void setDockerDirectoryPath(String dockerDirectoryPath) {
+    this.dockerDirectoryPath = dockerDirectoryPath;
   }
 
   public void setAppYamlPath(String appYamlPath) {
@@ -164,7 +164,7 @@ public class AppEngineDeploymentConfiguration extends
     this.overrideAppYaml = overrideAppYaml;
   }
 
-  public void setOverrideDockerfile(boolean overrideDockerfile) {
-    this.overrideDockerfile = overrideDockerfile;
+  public void setOverrideDockerDirectory(boolean overrideDockerDirectory) {
+    this.overrideDockerDirectory = overrideDockerDirectory;
   }
 }

@@ -36,7 +36,7 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     PersistentStateComponent<AppEngineFlexibleFacetConfiguration> {
 
   private String appYamlPath;
-  private String dockerfilePath;
+  private String dockerDirectory;
 
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
@@ -65,22 +65,22 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
   @Override
   public void loadState(AppEngineFlexibleFacetConfiguration state) {
     appYamlPath = state.getAppYamlPath();
-    dockerfilePath = state.getDockerfilePath();
+    dockerDirectory = state.getDockerDirectory();
   }
 
   public String getAppYamlPath() {
     return appYamlPath;
   }
 
-  public String getDockerfilePath() {
-    return dockerfilePath;
+  public String getDockerDirectory() {
+    return dockerDirectory;
   }
 
   public void setAppYamlPath(String appYamlPath) {
     this.appYamlPath = appYamlPath;
   }
 
-  public void setDockerfilePath(String dockerfilePath) {
-    this.dockerfilePath = dockerfilePath;
+  public void setDockerDirectory(String dockerDirectory) {
+    this.dockerDirectory = dockerDirectory;
   }
 }

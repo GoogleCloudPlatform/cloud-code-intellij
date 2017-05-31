@@ -28,6 +28,8 @@ import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,7 +50,7 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
   /**
    * Initialize the widget and set the default paths.
    */
-  public SelectConfigDestinationFolderDialog(@Nullable Project project, String filePath) {
+  public SelectConfigDestinationFolderDialog(@Nullable Project project, String directoryPath) {
     super(project);
     setTitle(GctBundle.message("appengine.flex.config.destination.chooser.title"));
 
@@ -60,13 +62,10 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
         FileChooserDescriptorFactory.createSingleFolderDescriptor()
     );
 
-    // Suggests the parent of the specified file as directory.
-    if (filePath != null) {
+    if (directoryPath != null) {
       try {
-        Path file = Paths.get(filePath);
-        if (file.getParent() != null) {
-          destinationFolderChooser.setText(file.getParent().toString());
-        }
+        Paths.get(directoryPath);
+        destinationFolderChooser.setText(directoryPath);
       } catch (InvalidPathException ipe) {
         // Do not assume any default directory and let the user specify one.
       }
