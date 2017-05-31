@@ -55,7 +55,6 @@ import java.util.function.Consumer;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 
 /**
@@ -71,7 +70,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JPanel mainPanel;
   private TextFieldWithBrowseButton appYamlField;
   private JPanel dockerfilePanel;
-  private HyperlinkLabel appYamlGenerateLink;
   private JPanel appYamlErrorPanel;
   private HyperlinkLabel appYamlErrorMessage;
   private JPanel runtimePanel;
@@ -79,7 +77,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private TextFieldWithBrowseButton dockerDirectoryField;
   private JPanel dockerfileErrorPanel;
   private HyperlinkLabel dockerfileErrorMessage;
-  private HyperlinkLabel dockerfileGenerateLink;
   private JLabel runtimeExplanationLabel;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
@@ -89,17 +86,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     // todo use htmltext instead?
     // todo move all these out of here
-    appYamlGenerateLink.setHyperlinkText("or ",
-        GctBundle.message("appengine.flex.facet.config.appyaml.generate.link.text"), "");
-    appYamlGenerateLink.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    appYamlGenerateLink.setHyperlinkTarget("http://www.google.com");
     appYamlErrorMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appYamlErrorMessage.setHyperlinkTarget("http://www.google.com");
 
-    dockerfileGenerateLink.setHyperlinkText("or ",
-        GctBundle.message("appengine.flex.facet.config.dockerfile.generate.link.text"), "");
-    dockerfileGenerateLink.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    dockerfileGenerateLink.setHyperlinkTarget("http://www.google.com");
     dockerfileErrorMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     dockerfileErrorMessage.setHyperlinkText("http://www.google.com");
 
@@ -307,7 +296,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     // todo no need to set the text/hyperlinkstuff here: do it once on init
     appYamlErrorMessage.setHyperlinkText(
         message, GctBundle.message("appengine.flex.facet.config.appyaml.generate.link.text"), "");
-    appYamlGenerateLink.setVisible(false);
     runtimePanel.setVisible(false);
     dockerfilePanel.setVisible(false);
     runtimeExplanationLabel.setVisible(false);
@@ -315,7 +303,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private void toggleValidAppYamlState(String runtimeText) {
     appYamlErrorPanel.setVisible(false);
-    appYamlGenerateLink.setVisible(true);
     runtimePanel.setVisible(true);
     runtimeLabel.setText(runtimeText);
     if (runtimeText.equalsIgnoreCase(FlexibleRuntime.CUSTOM.toString())) {
@@ -332,12 +319,10 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     // todo no need to set this here; can do it on init
     dockerfileErrorMessage.setHyperlinkText(message,
         GctBundle.message("appengine.flex.facet.config.dockerfile.generate.link.text"),"");
-    dockerfileGenerateLink.setVisible(false);
   }
 
   private void toggleValidDockerfileState() {
     dockerfileErrorPanel.setVisible(false);
-    dockerfileGenerateLink.setVisible(true);
   }
 
   @Override
