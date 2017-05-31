@@ -296,11 +296,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     private final Runnable configurationValidator;
 
     /**
-     * Constructor
+     * Generates a configuration file and updates the directory picker text after generation.
      *
-     * @param project the project associated with this Flex facet editor
-     * @param fileName the name of the file to be generated
-     * @param configFileGenerator the function that generates the file
+     * @param configFileGenerator the callback that generates the file
      * @param directoryPicker the text field in the Flex facet editor that provides the initial
      *   value of the Choose Generated Configuration Destination Folder dialog
      * @param isDirectory true when the <@code>directoryPicker</@code> browses to a directory and
