@@ -292,7 +292,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         Path destinationFolderPath = dialog.getDestinationFolder();
         Path destinationFilePath = destinationFolderPath.resolve(APP_YAML_FILE_NAME);
 
-        if (fileGenerateValidateAndWarn(destinationFolderPath, destinationFilePath)) {
+        if (validateAndWarnFileGeneration(destinationFolderPath, destinationFilePath)) {
           APP_ENGINE_PROJECT_SERVICE
               .generateAppYaml(FlexibleRuntime.JAVA, module, destinationFolderPath);
           appYamlField.setText(destinationFilePath.toString());
@@ -334,7 +334,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         Path destinationFolderPath = dialog.getDestinationFolder();
         Path destinationFilePath = destinationFolderPath.resolve(DOCKERFILE_NAME);
 
-        if (fileGenerateValidateAndWarn(destinationFolderPath, destinationFilePath)) {
+        if (validateAndWarnFileGeneration(destinationFolderPath, destinationFilePath)) {
           APP_ENGINE_PROJECT_SERVICE.generateDockerfile(
               dialog.getArtifactType(), module, destinationFolderPath);
           dockerDirectoryField.setText(destinationFolderPath.toString());
@@ -362,7 +362,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
    * Performs validation on the config file destination directory and file paths, and warns
    * if generation cannot be performed.
    */
-  private boolean fileGenerateValidateAndWarn(
+  private boolean validateAndWarnFileGeneration(
       Path destinationFolderPath, Path destinationFilePath) {
     if (Files.exists(destinationFilePath)) {
       Messages.showErrorDialog(
