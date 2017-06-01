@@ -60,7 +60,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 /**
- * Panel used to configure the Flexible settings.
+ * App Engine flexible facet editor configuration panel.
  */
 public class FlexibleFacetEditor extends FacetEditorTab {
 
