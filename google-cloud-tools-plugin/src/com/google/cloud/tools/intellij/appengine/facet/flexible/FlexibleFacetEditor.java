@@ -16,14 +16,14 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.api.client.repackaged.com.google.common.base.Preconditions;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.DockerfileArtifactTypePanel;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmationDialog;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.FileConfirmationDialog.DialogType;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.SelectConfigDestinationFolderDialog;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
-import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -31,7 +31,6 @@ import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -39,23 +38,24 @@ import com.intellij.openapi.util.Comparing;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkLabel;
 
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 /**
  * Panel used to configure the Flexible settings.
@@ -64,9 +64,10 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
       AppEngineProjectService.getInstance();
-  private static final boolean IS_WAR_DOCKERFILE_DEFAULT = true;
   private static final String DOCKERFILE_NAME = "Dockerfile";
+  private static final String APP_YAML_FILE_NAME = "app.yaml";
 
+  private Module module;
   private JPanel mainPanel;
   private TextFieldWithBrowseButton appYamlField;
   private JPanel dockerfilePanel;
@@ -82,15 +83,11 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
       @NotNull Module module) {
+    this.module = module;
     this.facetConfiguration = facetConfiguration;
 
-    // todo use htmltext instead?
-    // todo move all these out of here
-    appYamlErrorMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    appYamlErrorMessage.setHyperlinkTarget("http://www.google.com");
-
-    dockerfileErrorMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    dockerfileErrorMessage.setHyperlinkText("http://www.google.com");
+    appYamlErrorMessage.addHyperlinkListener(new AppYamlGenerateActionListener());
+    dockerfileErrorMessage.addHyperlinkListener(new DockerfileGenerateActionListener());
 
     runtimeExplanationLabel.setFont(
         new Font(
@@ -129,44 +126,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         FileChooserDescriptorFactory.createSingleFolderDescriptor()
     );
 
-//    genAppYamlButton.addActionListener(
-//        new GenerateConfigActionListener(
-//            module.getProject(),
-//            "app.yaml",
-//            (outputFolderPath) -> APP_ENGINE_PROJECT_SERVICE.generateAppYaml(
-//                FlexibleRuntime.JAVA,
-//                module,
-//                outputFolderPath),
-//            appYaml,
-//            false,
-//            this::validateAndShowWarnings
-//        ));
-
-//    genDockerfileButton.addActionListener(
-//        new GenerateConfigActionListener(
-//            module.getProject(),
-//            "Dockerfile",
-//            (outputFolderPath) -> APP_ENGINE_PROJECT_SERVICE.generateDockerfile(
-//                warRadioButton.isSelected()
-//                    ? AppEngineFlexibleDeploymentArtifactType.WAR
-//                    : AppEngineFlexibleDeploymentArtifactType.JAR,
-//                module,
-//                outputFolderPath),
-//            dockerDirectory,
-//            true,
-//            this::validateDockerfile
-//        ));
-
-    // todo move
-//    dockerDirectory.setText(facetConfiguration.getDockerDirectory());
-
-    // todo move
-//    ButtonGroup dockerfileTypeGroup = new ButtonGroup();
-//    dockerfileTypeGroup.add(jarRadioButton);
-//    dockerfileTypeGroup.add(warRadioButton);
-//    warRadioButton.setSelected(IS_WAR_DOCKERFILE_DEFAULT);
-//    jarRadioButton.setSelected(!IS_WAR_DOCKERFILE_DEFAULT);
-
     validateConfiguration();
   }
 
@@ -184,28 +143,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   @Override
   public void reset() {
-    // todo move this to appropriate places
-    // todo get default font for resuse rather then font of each component
-    //    appYaml.getTextField().setFont(new Font(appYaml.getFont().getName(), Font.ITALIC, appYaml.getFont().getSize()));
-    //    appYamlErrorMessage.setFont(new Font(appYamlErrorMessage.getFont().getName(), appYamlErrorMessage.getFont().getStyle(), appYamlErrorMessage.getFont().getSize()));
-
     appYamlField.setText(facetConfiguration.getAppYamlPath());
     dockerDirectoryField.setText(facetConfiguration.getDockerDirectory());
-  }
-
-  @Override
-  public void apply() throws ConfigurationException {
-//    ValidationResult result =
-    // TODO: not blocking on errors, so can prob get rid of Status.Error
-//    validateAndShowWarnings();
-//    if (result.status == Status.ERROR) {
-//      throw new ConfigurationException(result.message);
-//    }
-  }
-
-  @Override
-  public void disposeUIResources() {
-    // Do nothing.
   }
 
   @Nls
@@ -293,7 +232,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private void toggleInvalidAppYamlState(String message) {
     appYamlErrorPanel.setVisible(true);
-    // todo no need to set the text/hyperlinkstuff here: do it once on init
     appYamlErrorMessage.setHyperlinkText(
         message, GctBundle.message("appengine.flex.facet.config.appyaml.generate.link.text"), "");
     runtimePanel.setVisible(false);
@@ -316,7 +254,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private void toggleInvalidDockerfileState(String message) {
     dockerfileErrorPanel.setVisible(true);
-    // todo no need to set this here; can do it on init
     dockerfileErrorMessage.setHyperlinkText(message,
         GctBundle.message("appengine.flex.facet.config.dockerfile.generate.link.text"),"");
   }
@@ -334,108 +271,133 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     }
   }
 
-  /**
-   * A somewhat generic way of generating a file for a {@link TextFieldWithBrowseButton}.
-   */
-  private static class GenerateConfigActionListener implements ActionListener {
+  private class AppYamlGenerateActionListener implements HyperlinkListener {
 
-    private final Project project;
-    private final String fileName;
-    private final TextFieldWithBrowseButton directoryPicker;
-    private final Consumer<Path> configFileGenerator;
-    private final boolean isDirectory;
-    // Used to refresh the warnings.
-    private final Runnable configurationValidator;
-
-    /**
-     * Generates a configuration file and updates the directory picker text after generation.
-     *
-     * @param configFileGenerator the callback that generates the file
-     * @param directoryPicker the text field in the Flex facet editor that provides the initial
-     *   value of the Choose Generated Configuration Destination Folder dialog
-     * @param isDirectory true when the <@code>directoryPicker</@code> browses to a directory and
-     *   false when <@code>directoryPicker</@code> browses to a file
-     * @param configurationValidator the validation method for the updated configuration in Flex
-     *   facet settings
-     */
-    GenerateConfigActionListener(
-        Project project,
-        String fileName,
-        Consumer<Path> configFileGenerator,
-        TextFieldWithBrowseButton directoryPicker,
-        boolean isDirectory,
-        Runnable configurationValidator) {
-      this.project = project;
-      this.fileName = fileName;
-      this.configFileGenerator = configFileGenerator;
-      this.directoryPicker = directoryPicker;
-      this.isDirectory = isDirectory;
-      this.configurationValidator = configurationValidator;
-    }
+    // todo restore canonical path
+    private static final String DEFAULT_APP_YAML_DIRECTORY = "";
 
     @Override
-    public void actionPerformed(ActionEvent event) {
-      String directoryPath = directoryPicker.getText();
-      if (!isDirectory) {
-        try {
-          Path directoryPickerPathParent = Paths.get(directoryPicker.getText()).getParent();
-          if (directoryPickerPathParent != null) {
-            directoryPath = directoryPickerPathParent.toString();
-          } else {
-            directoryPath = "";
-          }
-        } catch (InvalidPathException ipe) {
-          directoryPath = "";
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+      String appYamlFilePath = appYamlField.getText();
+      String appYamlDirectoryPath = StringUtils.isEmpty(appYamlFilePath)
+          ? DEFAULT_APP_YAML_DIRECTORY
+          : getParentDirectory(appYamlFilePath);
+
+      SelectConfigDestinationFolderDialog dialog =
+          new SelectConfigDestinationFolderDialog(
+              module.getProject(),
+              appYamlDirectoryPath,
+              GctBundle.message("appengine.flex.config.appyaml.destination.chooser.title"));
+
+      if (dialog.showAndGet()) {
+        Path destinationFolderPath = dialog.getDestinationFolder();
+        Path destinationFilePath = destinationFolderPath.resolve(APP_YAML_FILE_NAME);
+
+        if (fileGenerateValidateAndWarn(destinationFolderPath, destinationFilePath)) {
+          APP_ENGINE_PROJECT_SERVICE
+              .generateAppYaml(FlexibleRuntime.JAVA, module, destinationFolderPath);
+          appYamlField.setText(destinationFilePath.toString());
+          validateConfiguration();
         }
       }
+    }
 
-      SelectConfigDestinationFolderDialog destinationFolderDialog = new
-          SelectConfigDestinationFolderDialog(project, directoryPath);
+    /**
+     * Returns the parent directory path string of the file, or empty string if it can't be
+     * resolved.
+     */
+    private String getParentDirectory(String filePath) {
+      try {
+        Path parentDirecotry = Paths.get(filePath).getParent();
+        return parentDirecotry != null ? parentDirecotry.toString() : "";
+      } catch (InvalidPathException ipe) {
+        return "";
+      }
+    }
+  }
 
-      if (destinationFolderDialog.showAndGet()) {
-        Path destinationFolderPath = destinationFolderDialog.getDestinationFolder();
-        Path destinationFilePath = destinationFolderPath.resolve(fileName);
+  private class DockerfileGenerateActionListener implements HyperlinkListener {
+    // todo
+    private static final String DEFAULT_DOCKERFILE_DIRECTORY = "";
 
-        if (Files.exists(destinationFilePath)) {
-          Messages.showErrorDialog(project,
-              GctBundle.message("appengine.flex.config.generation.file.exists.error",
-                  destinationFilePath.getFileName().toString()), "Error");
-          return;
-        } else if (Files.isRegularFile(destinationFolderPath)) {
-          new FileConfirmationDialog(
-              project, DialogType.NOT_DIRECTORY_ERROR, destinationFolderPath).show();
-          return;
-        } else if (!Files.exists(destinationFolderPath)) {
-          if (!new FileConfirmationDialog(
-              project, DialogType.CONFIRM_CREATE_DIR, destinationFolderPath).showAndGet()) {
-            return;
-          }
+    @Override
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+      String dockerfileDirectoryPath = StringUtils.isEmpty(dockerDirectoryField.getText())
+          ? DEFAULT_DOCKERFILE_DIRECTORY
+          : dockerDirectoryField.getText();
+
+      SelectDockerfileDestinationFolderDialog dialog =
+          new SelectDockerfileDestinationFolderDialog(
+              module.getProject(),
+              dockerfileDirectoryPath,
+              GctBundle.message("appengine.flex.config.dockerfile.destination.chooser.title"));
+
+      if (dialog.showAndGet()) {
+        Path destinationFolderPath = dialog.getDestinationFolder();
+        Path destinationFilePath = destinationFolderPath.resolve(DOCKERFILE_NAME);
+
+        if (fileGenerateValidateAndWarn(destinationFolderPath, destinationFilePath)) {
+          APP_ENGINE_PROJECT_SERVICE.generateDockerfile(
+              dialog.getArtifactType(), module, destinationFolderPath);
+          dockerDirectoryField.setText(destinationFolderPath.toString());
+          validateConfiguration();
         }
-
-        configFileGenerator.accept(destinationFolderPath);
-        directoryPicker.setText(isDirectory ?
-            destinationFolderPath.toString() :
-            destinationFilePath.toString());
-        configurationValidator.run();
       }
     }
   }
 
   /**
-   * An object representing the outcome of a configuration validation check.
+   * Performs validation on the config file destination directory and file paths, and warns
+   * if generation cannot be performed.
    */
-  static class ValidationResult {
-    enum Status {OK, ERROR}
+  private boolean fileGenerateValidateAndWarn(
+      Path destinationFolderPath, Path destinationFilePath) {
+    if (Files.exists(destinationFilePath)) {
+      Messages.showErrorDialog(
+          module.getProject(),
+          GctBundle.message(
+              "appengine.flex.config.generation.file.exists.error",
+              destinationFilePath.getFileName().toString()),
+          GctBundle.message("appengine.flex.config.generation.error.title"));
+      return false;
+    } else if (Files.isRegularFile(destinationFolderPath)) {
+      new FileConfirmationDialog(
+              module.getProject(), DialogType.NOT_DIRECTORY_ERROR, destinationFolderPath)
+          .show();
+      return false;
+    } else if (!Files.exists(destinationFolderPath)) {
+      if (!new FileConfirmationDialog(
+              module.getProject(), DialogType.CONFIRM_CREATE_DIR, destinationFolderPath)
+          .showAndGet()) {
+        return false;
+      }
+    }
+    return true;
+  }
 
-    final Status status;
-    final String message;
+  private static class SelectDockerfileDestinationFolderDialog
+      extends SelectConfigDestinationFolderDialog {
 
-    ValidationResult(Status status, String message) {
-      Preconditions.checkNotNull(status);
-      Preconditions.checkNotNull(message);
+    private DockerfileArtifactTypePanel panel;
 
-      this.status = status;
-      this.message = message;
+    SelectDockerfileDestinationFolderDialog(
+        @Nullable Project project,
+        String directoryPath, String title) {
+      super(project, directoryPath, title);
+    }
+
+    @Override
+    public void createUIComponents() {
+      panel = new DockerfileArtifactTypePanel();
+      setAdditionalConfigurationPanel(panel.getPanel());
+    }
+
+    AppEngineFlexibleDeploymentArtifactType getArtifactType() {
+      if (panel == null) {
+        return AppEngineFlexibleDeploymentArtifactType.UNKNOWN;
+      }
+
+      return panel.getArtifactType();
     }
   }
 
