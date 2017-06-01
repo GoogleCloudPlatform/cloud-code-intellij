@@ -32,9 +32,11 @@ import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Comparing;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkLabel;
 
@@ -272,15 +274,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   private class AppYamlGenerateActionListener implements HyperlinkListener {
-
-    // todo restore canonical path
-    private static final String DEFAULT_APP_YAML_DIRECTORY = "";
+    private static final String DEFAULT_APP_YAML_DIRECTORY_NAME = "appengine";
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
       String appYamlFilePath = appYamlField.getText();
       String appYamlDirectoryPath = StringUtils.isEmpty(appYamlFilePath)
-          ? DEFAULT_APP_YAML_DIRECTORY
+          ? getDefaultConfigPath(DEFAULT_APP_YAML_DIRECTORY_NAME)
           : getParentDirectory(appYamlFilePath);
 
       SelectConfigDestinationFolderDialog dialog =
@@ -317,13 +317,12 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   private class DockerfileGenerateActionListener implements HyperlinkListener {
-    // todo
-    private static final String DEFAULT_DOCKERFILE_DIRECTORY = "";
+    private static final String DEFAULT_DOCKERFILE_DIRECTORY_NAME = "docker";
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
       String dockerfileDirectoryPath = StringUtils.isEmpty(dockerDirectoryField.getText())
-          ? DEFAULT_DOCKERFILE_DIRECTORY
+          ? getDefaultConfigPath(DEFAULT_DOCKERFILE_DIRECTORY_NAME)
           : dockerDirectoryField.getText();
 
       SelectDockerfileDestinationFolderDialog dialog =
@@ -344,6 +343,20 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         }
       }
     }
+  }
+
+  /**
+   * Returns the canonical directory path for config file under src/main/{directoryName}.
+   */
+  private String getDefaultConfigPath(String directoryName) {
+    VirtualFile virtualFile = ModuleRootManager.getInstance(module).getContentRoots()[0]
+        .findFileByRelativePath("src/main");
+
+    if (virtualFile == null) {
+      return "";
+    }
+
+    return Paths.get(virtualFile.getPath(), directoryName).toString();
   }
 
   /**
