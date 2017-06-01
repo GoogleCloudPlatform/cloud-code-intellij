@@ -429,7 +429,22 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  public HyperlinkLabel getAppYamlErrorMessage() {
-    return appYamlErrorMessage;
+  JPanel getAppYamlErrorPanel() {
+    return appYamlErrorPanel;
+  }
+
+  @VisibleForTesting
+  public JPanel getRuntimePanel() {
+    return runtimePanel;
+  }
+
+  @VisibleForTesting
+  JLabel getRuntimeLabel() {
+    return runtimeLabel;
+  }
+
+  @VisibleForTesting
+  public JPanel getDockerfileErrorPanel() {
+    return dockerfileErrorPanel;
   }
 }

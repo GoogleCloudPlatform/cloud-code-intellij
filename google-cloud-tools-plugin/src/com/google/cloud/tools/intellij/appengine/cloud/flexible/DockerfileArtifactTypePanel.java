@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -47,5 +49,15 @@ public class DockerfileArtifactTypePanel {
 
   public JPanel getPanel() {
     return panel;
+  }
+
+  @VisibleForTesting
+  JRadioButton getJarRadioButton() {
+    return jarRadioButton;
+  }
+
+  @VisibleForTesting
+  JRadioButton getWarRadioButton() {
+    return warRadioButton;
   }
 }

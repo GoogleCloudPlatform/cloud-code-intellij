@@ -47,179 +47,98 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     // no yaml
     assertFalse(editor.getDockerfilePanel().isVisible());
     // java yaml
-    editor.getAppYaml().setText(javaYaml.getPath());
+    editor.getAppYamlField().setText(javaYaml.getPath());
     assertFalse(editor.getDockerfilePanel().isVisible());
+    assertTrue(editor.getRuntimePanel().isVisible());
+    assertEquals("java", editor.getRuntimeLabel().getText());
     // custom yaml
-    editor.getAppYaml().setText(customYaml.getPath());
+    editor.getAppYamlField().setText(customYaml.getPath());
     assertTrue(editor.getDockerfilePanel().isVisible());
+    assertTrue(editor.getRuntimePanel().isVisible());
+    assertEquals("custom", editor.getRuntimeLabel().getText());
   }
 
   public void testValidateConfiguration_noYAML() {
     facetConfiguration.setAppYamlPath("");
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getAppYamlErrorMessage().isVisible());
-    assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
-        editor.getAppYamlErrorMessage().getText());
+    assertTrue(editor.getAppYamlErrorPanel().isVisible());
     assertFalse(editor.getDockerfilePanel().isVisible());
-
-    try {
-      editor.apply();
-      fail("app.yaml can't be empty");
-    } catch (ConfigurationException ce) {
-      assertEquals(
-          "The specified app.yaml configuration file does not exist or is not a valid file.",
-          ce.getMessage());
-    }
+    assertFalse(editor.getRuntimePanel().isVisible());
   }
 
   public void testValidateConfiguration_nullYAML() {
     facetConfiguration.setAppYamlPath(null);
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getAppYamlErrorMessage().isVisible());
-    assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
-        editor.getAppYamlErrorMessage().getText());
+    assertTrue(editor.getAppYamlErrorPanel().isVisible());
     assertFalse(editor.getDockerfilePanel().isVisible());
-
-    try {
-      editor.apply();
-      fail("app.yaml can't be empty");
-    } catch (ConfigurationException ce) {
-      assertEquals(
-          "The specified app.yaml configuration file does not exist or is not a valid file.",
-          ce.getMessage());
-    }
+    assertFalse(editor.getRuntimePanel().isVisible());
   }
 
   public void testValidateConfiguration_malformedYAML() {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    editor.getAppYaml().setText(invalidYaml.getPath());
-
-    try {
-      editor.apply();
-      fail("YAML is malformed.");
-    } catch (ConfigurationException ce) {
-      assertEquals("The selected app.yaml file is malformed.",
-          ce.getMessage());
-    }
-
+    editor.getAppYamlField().setText(invalidYaml.getPath());
+    assertTrue(editor.getAppYamlErrorPanel().isVisible());
+    assertFalse(editor.getRuntimePanel().isVisible());
     assertFalse(editor.getDockerfilePanel().isVisible());
   }
 
   public void testValidateConfiguration_YAMLIsDirectory() {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    editor.getAppYaml().setText(javaYaml.getParentFile().getPath());
-    assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getAppYamlErrorMessage().isVisible());
-    assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.",
-        editor.getAppYamlErrorMessage().getText());
-
-    try {
-      editor.apply();
-      fail("app.yaml can't be empty");
-    } catch (ConfigurationException ce) {
-      assertEquals(
-          "The specified app.yaml configuration file does not exist or is not a valid file.",
-          ce.getMessage());
-    }
+    editor.getAppYamlField().setText(javaYaml.getParentFile().getPath());
+    assertTrue(editor.getAppYamlErrorPanel().isVisible());
+    assertFalse(editor.getRuntimePanel().isVisible());
   }
 
   public void testValidateConfiguration_javaRuntime() throws ConfigurationException {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    editor.getAppYaml().setText(javaYaml.getPath());
+    editor.getAppYamlField().setText(javaYaml.getPath());
     assertFalse(editor.getDockerfilePanel().isVisible());
-    assertFalse(editor.getErrorIcon().isVisible());
-    assertFalse(editor.getAppYamlErrorMessage().isVisible());
+    assertFalse(editor.getAppYamlErrorPanel().isVisible());
+    assertTrue(editor.getRuntimePanel().isVisible());
+    assertEquals("java", editor.getRuntimeLabel().getText());
     editor.apply();
   }
 
   public void testValidateConfiguration_customRuntimeNoDockerDirectory() {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    editor.getAppYaml().setText(customYaml.getPath());
+    editor.getAppYamlField().setText(customYaml.getPath());
     editor.getDockerDirectory().setText("");
+    assertFalse(editor.getAppYamlErrorPanel().isVisible());
     assertTrue(editor.getDockerfilePanel().isVisible());
-    assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getAppYamlErrorMessage().isVisible());
-    assertEquals(
-        "The specified Docker directory does not exist or it is not a valid directory.",
-        editor.getAppYamlErrorMessage().getText());
-
-    try {
-      editor.apply();
-      fail("Can't have runtime custom and no dockerfile.");
-    } catch (ConfigurationException ce) {
-      assertEquals(
-          "The specified Docker directory does not exist or it is not a valid directory.",
-          ce.getMessage());
-    }
+    assertTrue(editor.getDockerfileErrorPanel().isVisible());
+    assertTrue(editor.getRuntimePanel().isVisible());
+    assertEquals("custom", editor.getRuntimeLabel().getText());
   }
 
   public void testValidateConfiguration_customRuntimeNullDockerDirectory() {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    editor.getAppYaml().setText(customYaml.getPath());
+    editor.getAppYamlField().setText(customYaml.getPath());
     editor.getDockerDirectory().setText(null);
+    assertFalse(editor.getAppYamlErrorPanel().isVisible());
     assertTrue(editor.getDockerfilePanel().isVisible());
-    assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getAppYamlErrorMessage().isVisible());
-    assertEquals(
-        "The specified Docker directory does not exist or it is not a valid directory.",
-        editor.getAppYamlErrorMessage().getText());
-
-    try {
-      editor.apply();
-      fail("Can't have runtime custom and no dockerfile.");
-    } catch (ConfigurationException ce) {
-      assertEquals(
-          "The specified Docker directory does not exist or it is not a valid directory.",
-          ce.getMessage());
-    }
-  }
-
-  public void testValidateConfiguration_customRuntimeDockerDirectoryIsDirectory()
-      throws ConfigurationException {
-    FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    editor.getAppYaml().setText(customYaml.getPath());
-    editor.getDockerDirectory().setText(dockerfile.getParentFile().getPath());
-    assertTrue(editor.getDockerfilePanel().isVisible());
-    assertFalse(editor.getErrorIcon().isVisible());
-    assertFalse(editor.getAppYamlErrorMessage().isVisible());
-    editor.apply();
+    assertTrue(editor.getDockerfileErrorPanel().isVisible());
+    assertTrue(editor.getRuntimePanel().isVisible());
+    assertEquals("custom", editor.getRuntimeLabel().getText());
   }
 
   public void testValidateConfiguration_customRuntimeDockerDirectoryIsFile() {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    editor.getAppYaml().setText(customYaml.getPath());
+    editor.getAppYamlField().setText(customYaml.getPath());
     editor.getDockerDirectory().setText(dockerfile.getPath());
+    assertFalse(editor.getAppYamlErrorPanel().isVisible());
     assertTrue(editor.getDockerfilePanel().isVisible());
-    assertTrue(editor.getErrorIcon().isVisible());
-    assertTrue(editor.getAppYamlErrorMessage().isVisible());
-    assertEquals("The specified Docker directory does not exist or it is not a valid "
-            + "directory.", editor.getAppYamlErrorMessage().getText());
-
-    try {
-      editor.apply();
-      fail("Docker directory can't be a file.");
-    } catch (ConfigurationException ce) {
-      assertEquals(
-          "The specified Docker directory does not exist or it is not a valid directory.",
-          ce.getMessage());
-    }
+    assertTrue(editor.getDockerfileErrorPanel().isVisible());
+    assertTrue(editor.getRuntimePanel().isVisible());
+    assertEquals("custom", editor.getRuntimeLabel().getText());
   }
 
   public void testValidateConfiguration_customRuntime() throws ConfigurationException {
     FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    editor.getAppYaml().setText(customYaml.getPath());
+    editor.getAppYamlField().setText(customYaml.getPath());
     editor.getDockerDirectory().setText(dockerfile.getParentFile().getPath());
     assertTrue(editor.getDockerfilePanel().isVisible());
-    assertFalse(editor.getErrorIcon().isVisible());
-    assertFalse(editor.getAppYamlErrorMessage().isVisible());
+    assertFalse(editor.getAppYamlErrorPanel().isVisible());
+    assertFalse(editor.getDockerfileErrorPanel().isVisible());
     editor.apply();
-  }
-
-  public void testDefaultDockerfileType() {
-    FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
-    assertTrue(editor.getWarRadioButton().isSelected());
-    assertFalse(editor.getJarRadioButton().isSelected());
   }
 }
