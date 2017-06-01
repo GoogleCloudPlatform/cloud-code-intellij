@@ -196,8 +196,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           validateDockerfile();
         }
       } catch (MalformedYamlFileException myf) {
-        // TODO can this be refactored?
-        // We already know that runtime is parsable from {@link #validateAppYaml}
+        // We already know that runtime is parsable from {@link validateAppYaml}
       }
     }
   }
