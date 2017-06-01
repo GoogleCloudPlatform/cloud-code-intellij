@@ -416,8 +416,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     return dockerfilePanel;
   }
 
-  // todo expose panel for testing
-
   @VisibleForTesting
   public HyperlinkLabel getAppYamlErrorMessage() {
     return appYamlErrorMessage;
