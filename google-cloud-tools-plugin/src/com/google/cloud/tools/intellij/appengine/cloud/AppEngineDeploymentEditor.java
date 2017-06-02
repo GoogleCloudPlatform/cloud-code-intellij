@@ -27,5 +27,5 @@ public class AppEngineDeploymentEditor {
 
   private ProjectSelector projectSelector;
   private JLabel environmentLabel;
-  private JLabel applicationInfoPanel;
+  private AppEngineApplicationInfoPanel applicationInfoPanel;
 }

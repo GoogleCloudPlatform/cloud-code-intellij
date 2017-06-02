@@ -51,12 +51,13 @@
           <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.config.region.label"/>
         </properties>
       </component>
-      <component id="542e2" class="javax.swing.JLabel" binding="applicationInfoPanel">
+      <component id="28655" class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel" binding="applicationInfoPanel">
         <constraints>
-          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value=""/>
+          <alignmentX value="1.0"/>
+          <opaque value="false"/>
         </properties>
       </component>
     </children>
