@@ -19,13 +19,27 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * Common App Engine deployment configuration UI shared by flexible and standard.
  */
 public class AppEngineDeploymentEditor {
 
+  private JPanel commonConfigPanel;
   private ProjectSelector projectSelector;
   private JLabel environmentLabel;
   private AppEngineApplicationInfoPanel applicationInfoPanel;
+
+  public ProjectSelector getProjectSelector() {
+    return projectSelector;
+  }
+
+  public JLabel getEnvironmentLabel() {
+    return environmentLabel;
+  }
+
+  public AppEngineApplicationInfoPanel getApplicationInfoPanel() {
+    return applicationInfoPanel;
+  }
 }
