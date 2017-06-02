@@ -28,12 +28,9 @@ import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -46,13 +43,15 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
 
   private JPanel rootPanel;
   private TextFieldWithBrowseButton destinationFolderChooser;
+  private JPanel additionalConfigurationPanel;
 
   /**
    * Initialize the widget and set the default paths.
    */
-  public SelectConfigDestinationFolderDialog(@Nullable Project project, String directoryPath) {
+  public SelectConfigDestinationFolderDialog(@Nullable Project project, String directoryPath,
+      String title) {
     super(project);
-    setTitle(GctBundle.message("appengine.flex.config.destination.chooser.title"));
+    setTitle(title);
 
     init();
     destinationFolderChooser.addBrowseFolderListener(
@@ -97,5 +96,13 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
           "appengine.flex.config.destination.chooser.directory.missing"), destinationFolderChooser);
     }
     return null;
+  }
+
+  public void setAdditionalConfigurationPanel(JPanel additionalConfigurationPanel) {
+    this.additionalConfigurationPanel = additionalConfigurationPanel;
+  }
+
+  public void createUIComponents() {
+    additionalConfigurationPanel = new JPanel();
   }
 }
