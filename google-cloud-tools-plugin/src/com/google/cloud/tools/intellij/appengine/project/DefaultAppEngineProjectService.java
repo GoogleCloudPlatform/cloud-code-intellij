@@ -22,8 +22,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineTemplateGroupDescriptorFactory;
-import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
@@ -333,48 +331,34 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public void generateAppYaml(FlexibleRuntime runtime, Module module, Path outputFolderPath) {
-    UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_FLEX_APP_YAML_CREATE)
-        .ping();
-
+  public boolean generateAppYaml(FlexibleRuntime runtime, Module module, Path outputFolderPath) {
     Properties templateProperties =
         FileTemplateManager.getDefaultInstance().getDefaultProperties();
     templateProperties.put("RUNTIME", runtime.toString());
 
+    final PsiElement[] element = new PsiElement[1];
     ApplicationManager.getApplication().runWriteAction(() -> {
-      PsiElement element = generateFromTemplate(
+      element[0] = generateFromTemplate(
           AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE,
           "app.yaml",
           outputFolderPath,
           templateProperties,
           module);
-
-      if (element == null) {
-        UsageTrackerProvider.getInstance()
-            .trackEvent(GctTracking.APP_ENGINE_FLEX_APP_YAML_CREATE_FAIL)
-            .ping();
-      } else {
-        UsageTrackerProvider.getInstance()
-            .trackEvent(GctTracking.APP_ENGINE_FLEX_APP_YAML_CREATE_SUCCESS)
-            .ping();
-      }
     });
+
+    return (element[0] != null);
   }
 
   @Override
-  public void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module,
+  public boolean generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module,
       Path outputFolderPath) {
-    UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_FLEX_DOCKERFILE_CREATE)
-        .ping();
-
     if (type == AppEngineFlexibleDeploymentArtifactType.UNKNOWN) {
       throw new RuntimeException("Cannot generate Dockerfile for unknown artifact type.");
     }
 
+    final PsiElement[] element = new PsiElement[1];
     ApplicationManager.getApplication().runWriteAction(() -> {
-      PsiElement element = generateFromTemplate(
+      element[0] = generateFromTemplate(
           type == AppEngineFlexibleDeploymentArtifactType.JAR
               ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
               : AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_WAR_TEMPLATE,
@@ -383,25 +367,19 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
           FileTemplateManager.getDefaultInstance().getDefaultProperties(),
           module);
 
-      if (element != null) {
+      if (element[0] != null) {
         // Remove the .docker extension to satisfy the Docker convention. This extension was added
         // since the templating mechanism requires an extension or else a default template type of
         // "java" will be assumed.
         RenamePsiElementProcessor.DEFAULT.renameElement(
-            element,
+            element[0],
             "Dockerfile" /*newName*/,
             UsageInfo.EMPTY_ARRAY,
             null /*listener*/);
-
-        UsageTrackerProvider.getInstance()
-            .trackEvent(GctTracking.APP_ENGINE_FLEX_DOCKERFILE_CREATE_SUCCESS)
-            .ping();
-      } else {
-        UsageTrackerProvider.getInstance()
-            .trackEvent(GctTracking.APP_ENGINE_FLEX_DOCKERFILE_CREATE_FAIL)
-            .ping();
       }
     });
+
+    return (element[0] != null);
   }
 
   @Nullable

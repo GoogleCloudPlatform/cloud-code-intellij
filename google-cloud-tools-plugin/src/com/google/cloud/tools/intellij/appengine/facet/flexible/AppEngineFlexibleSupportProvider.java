@@ -26,6 +26,8 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.RunManager;
@@ -112,7 +114,20 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       facet.getConfiguration().setDockerDirectory(dockerDirectory.toString());
 
       if (generateConfigFiles) {
-        appEngineProjectService.generateAppYaml(FlexibleRuntime.JAVA, facet.getModule(), appYamlPath.getParent());
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.APP_ENGINE_FLEX_APP_YAML_CREATE)
+            .addMetadata(GctTracking.METADATA_LABEL_KEY, "addedByFramework")
+            .ping();
+
+        boolean result = appEngineProjectService.generateAppYaml(
+            FlexibleRuntime.JAVA, facet.getModule(), appYamlPath.getParent());
+
+        UsageTrackerProvider.getInstance()
+            .trackEvent(result ?
+                GctTracking.APP_ENGINE_FLEX_APP_YAML_CREATE_SUCCESS :
+                GctTracking.APP_ENGINE_FLEX_APP_YAML_CREATE_FAIL)
+            .addMetadata(GctTracking.METADATA_LABEL_KEY, "addedByFramework")
+            .ping();
       }
     }
 
