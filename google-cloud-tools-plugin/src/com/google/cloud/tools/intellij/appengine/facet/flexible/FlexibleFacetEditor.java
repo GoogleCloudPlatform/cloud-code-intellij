@@ -210,7 +210,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       try {
         toggleValidAppYamlState(getRuntimeText());
       } catch (MalformedYamlFileException myf) {
-        toggleInvalidAppYamlState(GctBundle.getString("appengine.appyaml.malformed"));
+        toggleInvalidAppYamlState(
+            GctBundle.getString("appengine.flex.facet.config.appyaml.malformed.error"));
         return false;
       }
     }
