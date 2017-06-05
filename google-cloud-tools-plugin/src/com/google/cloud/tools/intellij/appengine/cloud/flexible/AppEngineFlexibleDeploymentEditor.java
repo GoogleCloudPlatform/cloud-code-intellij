@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineSharedDeploymentConfigPanel;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfigurationPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRuntimeInstance;
 import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
@@ -89,7 +89,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
 
-  private AppEngineSharedDeploymentConfigPanel appEngineConfig;
+  private AppEngineDeploymentConfigurationPanel appEngineConfig;
   private JPanel mainPanel;
   private JBTextField version;
   private JCheckBox promoteVersionCheckBox;
