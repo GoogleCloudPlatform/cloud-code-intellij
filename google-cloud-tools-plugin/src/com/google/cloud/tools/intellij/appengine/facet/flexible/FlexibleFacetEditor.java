@@ -278,7 +278,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     // Framework discovered "Configure" popup.
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
-        .addMetadata("source", "FlexFacet")
+        .addMetadata("source", "setOnModule")
         .addMetadata("env", "flex")
         .ping();
   }
@@ -290,7 +290,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     public void hyperlinkUpdate(HyperlinkEvent e) {
       UsageTrackerProvider.getInstance()
           .trackEvent(GctTracking.APP_ENGINE_GENERATE_FILE_APPYAML)
-          .addMetadata("source", "FlexFacet")
+          .addMetadata("source", "setOnModule")
           .addMetadata("env", "flex")
           .ping();
 
@@ -339,7 +339,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     public void hyperlinkUpdate(HyperlinkEvent e) {
       UsageTrackerProvider.getInstance()
           .trackEvent(GctTracking.APP_ENGINE_GENERATE_FILE_DOCKERFILE)
-          .addMetadata("source", "FlexFacet")
+          .addMetadata("source", "setOnModule")
           .addMetadata("env", "flex")
           .ping();
       String dockerfileDirectoryPath = StringUtils.isEmpty(dockerDirectoryField.getText())
