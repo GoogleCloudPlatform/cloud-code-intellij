@@ -103,7 +103,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       boolean generateConfigFiles) {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_ADD_SUPPORT)
-        .addMetadata("environment", "flex");
+        .addMetadata("env", "flex");
     // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
     VirtualFile[] contentRoots = rootModel.getContentRoots();
     AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
@@ -117,11 +117,12 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       facet.getConfiguration().setDockerDirectory(dockerDirectory.toString());
 
       if (generateConfigFiles) {
-        boolean result = appEngineProjectService.generateAppYaml(
+        appEngineProjectService.generateAppYaml(
             FlexibleRuntime.JAVA, facet.getModule(), appYamlPath.getParent());
         UsageTrackerProvider.getInstance()
             .trackEvent(GctTracking.APP_ENGINE_GENERATE_FILE_APPYAML)
             .addMetadata("source", "addedByFramework")
+            .addMetadata("env", "flex")
             .ping();
       }
     }
