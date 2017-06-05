@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.standard;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfigurationPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRuntimeInstance;
 import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
@@ -54,6 +55,7 @@ import javax.swing.event.TreeModelEvent;
 /** Editor for an App Engine Deployment runtime configuration. */
 public class AppEngineStandardDeploymentEditor
     extends SettingsEditor<AppEngineDeploymentConfiguration> {
+  private AppEngineDeploymentConfigurationPanel appEngineConfig;
   private JPanel editorPanel;
   private JBTextField versionIdField;
   private ProjectSelector projectSelector;
@@ -78,6 +80,10 @@ public class AppEngineStandardDeploymentEditor
       Project project, final AppEngineDeployable deploymentSource) {
     this.project = project;
     this.deploymentSource = deploymentSource;
+
+    projectSelector = appEngineConfig.getProjectSelector();
+    applicationInfoPanel = appEngineConfig.getApplicationInfoPanel();
+    environmentLabel = appEngineConfig.getEnvironmentLabel();
 
     versionIdField
         .getEmptyText()
