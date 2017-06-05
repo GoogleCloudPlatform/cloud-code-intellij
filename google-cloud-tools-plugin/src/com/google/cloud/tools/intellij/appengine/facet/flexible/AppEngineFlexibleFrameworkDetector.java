@@ -47,6 +47,7 @@ public class AppEngineFlexibleFrameworkDetector
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
         .addMetadata("source", "frameworkDetect")
+        .addMetadata("env", "flex")
         .ping();
   }
 
