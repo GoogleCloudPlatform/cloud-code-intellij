@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 /**
  * Common App Engine deployment configuration UI shared by flexible and standard.
  */
-public class AppEngineDeploymentPanel {
+public class AppEngineSharedDeploymentConfigPanel {
 
   private JPanel commonConfigPanel;
   private ProjectSelector projectSelector;
