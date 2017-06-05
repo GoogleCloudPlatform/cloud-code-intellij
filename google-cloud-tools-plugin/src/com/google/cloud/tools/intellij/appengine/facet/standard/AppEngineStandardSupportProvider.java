@@ -303,6 +303,8 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
       // or upon adding App Engine 'Framework Support' to an existing module.
       UsageTrackerProvider.getInstance()
           .trackEvent(GctTracking.APP_ENGINE_ADD_SUPPORT)
+          .addMetadata("source", "addedByFramework")
+          .addMetadata("env", "standard")
           .ping();
     }
 
