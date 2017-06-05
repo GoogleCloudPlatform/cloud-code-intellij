@@ -234,7 +234,7 @@
           <visible value="false"/>
         </properties>
       </component>
-      <nested-form id="ebeae" form-file="com/google/cloud/tools/intellij/appengine/cloud/AppEngineDeploymentEditor.form" binding="appEngineConfig">
+      <nested-form id="ebeae" form-file="com/google/cloud/tools/intellij/appengine/cloud/AppEngineDeploymentPanel.form" binding="appEngineConfig">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
