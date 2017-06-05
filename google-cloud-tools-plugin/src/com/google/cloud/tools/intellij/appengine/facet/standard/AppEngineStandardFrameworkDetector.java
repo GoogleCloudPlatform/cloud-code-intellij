@@ -50,8 +50,9 @@ public class AppEngineStandardFrameworkDetector extends
         null /*existingConfiguration*/);
 
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_ADD_STANDARD_FACET)
-        .addMetadata(GctTracking.METADATA_LABEL_KEY, "frameworkDetect")
+        .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
+        .addMetadata("source", "frameworkDetect")
+        .addMetadata("env", "standard")
         .ping();
   }
 

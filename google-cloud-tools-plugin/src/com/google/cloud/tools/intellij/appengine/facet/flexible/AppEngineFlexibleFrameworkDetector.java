@@ -45,8 +45,8 @@ public class AppEngineFlexibleFrameworkDetector
     AppEngineFlexibleSupportProvider.addSupport(facet, model, false /* generateConfigFiles */);
 
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_ADD_FLEX_FACET)
-        .addMetadata(GctTracking.METADATA_LABEL_KEY, "frameworkDetect")
+        .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
+        .addMetadata("source", "frameworkDetect")
         .ping();
   }
 

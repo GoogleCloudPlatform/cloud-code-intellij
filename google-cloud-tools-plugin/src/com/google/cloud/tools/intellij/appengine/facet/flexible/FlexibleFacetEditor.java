@@ -277,8 +277,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
     // Framework discovered "Configure" popup.
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_ADD_FLEX_FACET)
-        .addMetadata(GctTracking.METADATA_LABEL_KEY, "setOnModule")
+        .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
+        .addMetadata("source", "FlexFacet")
+        .addMetadata("env", "flex")
         .ping();
   }
 
@@ -287,6 +288,12 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.APP_ENGINE_GENERATE_FILE_APPYAML)
+          .addMetadata("source", "FlexFacet")
+          .addMetadata("env", "flex")
+          .ping();
+
       String appYamlFilePath = appYamlField.getText();
       String appYamlDirectoryPath = StringUtils.isEmpty(appYamlFilePath)
           ? getDefaultConfigPath(DEFAULT_APP_YAML_DIRECTORY_NAME)
@@ -330,6 +337,11 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.APP_ENGINE_GENERATE_FILE_DOCKERFILE)
+          .addMetadata("source", "FlexFacet")
+          .addMetadata("env", "flex")
+          .ping();
       String dockerfileDirectoryPath = StringUtils.isEmpty(dockerDirectoryField.getText())
           ? getDefaultConfigPath(DEFAULT_DOCKERFILE_DIRECTORY_NAME)
           : dockerDirectoryField.getText();
