@@ -331,55 +331,52 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public boolean generateAppYaml(FlexibleRuntime runtime, Module module, Path outputFolderPath) {
-    Properties templateProperties =
-        FileTemplateManager.getDefaultInstance().getDefaultProperties();
+  public void generateAppYaml(FlexibleRuntime runtime, Module module, Path outputFolderPath) {
+    Properties templateProperties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
     templateProperties.put("RUNTIME", runtime.toString());
 
-    final PsiElement[] element = new PsiElement[1];
-    ApplicationManager.getApplication().runWriteAction(() -> {
-      element[0] = generateFromTemplate(
-          AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE,
-          "app.yaml",
-          outputFolderPath,
-          templateProperties,
-          module);
-    });
-
-    return (element[0] != null);
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              PsiElement element =
+                  generateFromTemplate(
+                      AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE,
+                      "app.yaml",
+                      outputFolderPath,
+                      templateProperties,
+                      module);
+            });
   }
 
   @Override
-  public boolean generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module,
-      Path outputFolderPath) {
+  public void generateDockerfile(
+      AppEngineFlexibleDeploymentArtifactType type, Module module, Path outputFolderPath) {
+
     if (type == AppEngineFlexibleDeploymentArtifactType.UNKNOWN) {
       throw new RuntimeException("Cannot generate Dockerfile for unknown artifact type.");
     }
 
-    final PsiElement[] element = new PsiElement[1];
-    ApplicationManager.getApplication().runWriteAction(() -> {
-      element[0] = generateFromTemplate(
-          type == AppEngineFlexibleDeploymentArtifactType.JAR
-              ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
-              : AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_WAR_TEMPLATE,
-          "Dockerfile",
-          outputFolderPath,
-          FileTemplateManager.getDefaultInstance().getDefaultProperties(),
-          module);
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              PsiElement element =
+                  generateFromTemplate(
+                      type == AppEngineFlexibleDeploymentArtifactType.JAR
+                          ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
+                          : AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_WAR_TEMPLATE,
+                      "Dockerfile",
+                      outputFolderPath,
+                      FileTemplateManager.getDefaultInstance().getDefaultProperties(),
+                      module);
 
-      if (element[0] != null) {
-        // Remove the .docker extension to satisfy the Docker convention. This extension was added
-        // since the templating mechanism requires an extension or else a default template type of
-        // "java" will be assumed.
-        RenamePsiElementProcessor.DEFAULT.renameElement(
-            element[0],
-            "Dockerfile" /*newName*/,
-            UsageInfo.EMPTY_ARRAY,
-            null /*listener*/);
-      }
-    });
-
-    return (element[0] != null);
+              if (element != null) {
+                // Remove the .docker extension to satisfy the Docker convention. This extension was added
+                // since the templating mechanism requires an extension or else a default template type of
+                // "java" will be assumed.
+                RenamePsiElementProcessor.DEFAULT.renameElement(
+                    element, "Dockerfile" /*newName*/, UsageInfo.EMPTY_ARRAY, null /*listener*/);
+              }
+            });
   }
 
   @Nullable

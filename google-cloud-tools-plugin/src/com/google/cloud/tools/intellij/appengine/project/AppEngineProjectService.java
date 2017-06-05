@@ -140,19 +140,16 @@ public abstract class AppEngineProjectService {
   /**
    * Generates an app.yaml configuration file in the <@code>outputFolderPath</@code>. If an app.yaml
    * already exists it will not overwrite the file.
-   *
-   *  @return true if an app.yaml was successfully generated, false otherwise
    */
-  public abstract boolean generateAppYaml(FlexibleRuntime runtime, Module module, Path outputFolderPath);
+  public abstract void generateAppYaml(FlexibleRuntime runtime, Module module,
+      Path outputFolderPath);
 
 
   /**
    * Generates a Dockerfile in the <@code>outputFolderPath</@code>. If a Dockerfile already exists
    * it will not overwrite the file.
-   *
-   * @return true if a Dockerfile was successfully generated, false otherwise
    */
-  public abstract boolean generateDockerfile(AppEngineFlexibleDeploymentArtifactType type,
+  public abstract void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type,
       Module module, Path outputFolderPath);
 
   /**
