@@ -109,7 +109,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
 
     editor = new AppEngineFlexibleDeploymentEditor(getProject(), deploymentSource);
     editor.setAppInfoPanel(appInfoPanel);
-    editor.getGcpProjectSelector().setText("test project");
+    editor.getProjectSelector().setText("test project");
 
     userSpecifiedPathDeploymentSource = new UserSpecifiedPathDeploymentSource(
         ModulePointerManager.getInstance(getProject()).create(
@@ -212,7 +212,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testValidateConfiguration_blankProjectSelector() {
-    editor.getGcpProjectSelector().setText("");
+    editor.getProjectSelector().setText("");
     try {
       editor.applyEditorTo(templateConfig);
       fail("Project selector is blank.");
@@ -222,7 +222,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testValidateConfiguration_nullProjectSelector() {
-    editor.getGcpProjectSelector().setText(null);
+    editor.getProjectSelector().setText(null);
     try {
       editor.applyEditorTo(templateConfig);
       fail("Project selector is null");
@@ -365,7 +365,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testPromote_StopPreviousVersion_Flexible() {
-    JCheckBox promoteCheckbox = editor.getPromoteVersionCheckBox();
+    JCheckBox promoteCheckbox = editor.getCommonConfig().getPromoteCheckbox();
     JCheckBox stopPreviousVersionCheckbox = editor.getStopPreviousVersionCheckBox();
 
     assertFalse(promoteCheckbox.isSelected());
@@ -404,6 +404,11 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertFalse(editor.getDockerDirectoryTextField().isEnabled());
     assertEquals(dockerfile.getParentFile().getPath(),
         editor.getDockerDirectoryTextField().getText());
+  }
+
+  public void testDeployAllConfigsDefaults() {
+    assertFalse(editor.getDeployAllConfigsCheckbox().isVisible());
+    assertFalse(editor.getDeployAllConfigsCheckbox().isSelected());
   }
 
   @Override

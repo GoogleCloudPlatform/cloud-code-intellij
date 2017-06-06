@@ -161,13 +161,13 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testPromoteAndStopDefaults() {
-    assertFalse(editor.getPromoteCheckbox().isSelected());
+    assertFalse(editor.getCommonConfig().getPromoteCheckbox().isSelected());
     assertFalse(editor.getStopPreviousVersionCheckbox().isSelected());
     assertFalse(editor.getStopPreviousVersionCheckbox().isVisible());
   }
 
   public void testSelectPromote_doesntSelectStop() {
-    editor.getPromoteCheckbox().setSelected(true);
+    editor.getCommonConfig().getPromoteCheckbox().setSelected(true);
     assertFalse(editor.getStopPreviousVersionCheckbox().isSelected());
     assertFalse(editor.getStopPreviousVersionCheckbox().isVisible());
   }

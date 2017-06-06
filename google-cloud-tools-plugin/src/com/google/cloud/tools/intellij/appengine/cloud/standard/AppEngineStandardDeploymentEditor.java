@@ -21,25 +21,18 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfigurationPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRuntimeInstance;
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
-import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.HyperlinkLabel;
-import com.intellij.ui.components.JBTextField;
-import com.intellij.util.ui.tree.TreeModelAdapter;
 
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -48,31 +41,17 @@ import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.TreeModelEvent;
 
 /** Editor for an App Engine Deployment runtime configuration. */
 public class AppEngineStandardDeploymentEditor
     extends SettingsEditor<AppEngineDeploymentConfiguration> {
-  private AppEngineDeploymentConfigurationPanel appEngineConfig;
+  private AppEngineDeploymentConfigurationPanel commonConfig;
   private JPanel editorPanel;
-  private JBTextField versionIdField;
-  private ProjectSelector projectSelector;
-  private JCheckBox promoteCheckbox;
-  private JCheckBox stopPreviousVersionCheckbox;
-  private HyperlinkLabel promoteInfoLabel;
-  private AppEngineApplicationInfoPanel applicationInfoPanel;
-  private JLabel serviceLabel;
-  private JLabel environmentLabel;
-  private HyperlinkLabel appEngineCostWarningLabel;
-  private JCheckBox deployAllConfigsCheckbox;
 
   private Project project;
   private AppEngineDeployable deploymentSource;
 
-  private static final boolean PROMOTE_DEFAULT = false;
-  private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
   private static final boolean DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT = false;
 
   /** Initializes the UI components. */
@@ -81,89 +60,44 @@ public class AppEngineStandardDeploymentEditor
     this.project = project;
     this.deploymentSource = deploymentSource;
 
-    projectSelector = appEngineConfig.getProjectSelector();
-    applicationInfoPanel = appEngineConfig.getApplicationInfoPanel();
-    environmentLabel = appEngineConfig.getEnvironmentLabel();
-
-    versionIdField
-        .getEmptyText()
-        .setText(GctBundle.message("appengine.flex.version.placeholder.text"));
-    promoteCheckbox.setSelected(PROMOTE_DEFAULT);
-    stopPreviousVersionCheckbox.setVisible(
+    commonConfig.getStopPreviousVersionCheckbox().setVisible(
         AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
-    stopPreviousVersionCheckbox.setSelected(STOP_PREVIOUS_VERSION_DEFAULT);
-    deployAllConfigsCheckbox.setSelected(DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT);
+    commonConfig.getDeployAllConfigsCheckbox().setSelected(DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT);
 
-    promoteInfoLabel.setHyperlinkText(
-        GctBundle.getString("appengine.promote.info.label.beforeLink") + " ",
-        GctBundle.getString("appengine.promote.info.label.link"),
-        "");
-    promoteInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    promoteInfoLabel.setHyperlinkTarget(GctBundle.getString("appengine.promoteinfo.url"));
-
-    promoteCheckbox.addItemListener(
+    commonConfig.getPromoteCheckbox().addItemListener(
         event -> {
           boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
 
-          stopPreviousVersionCheckbox.setEnabled(isPromoteSelected);
-
+          commonConfig.getStopPreviousVersionCheckbox().setEnabled(isPromoteSelected);
           if (!isPromoteSelected) {
-            stopPreviousVersionCheckbox.setSelected(false);
+            commonConfig.getStopPreviousVersionCheckbox().setSelected(false);
           }
         });
 
-    projectSelector.addProjectSelectionListener(applicationInfoPanel::refresh);
-
-    projectSelector.addModelListener(
-        new TreeModelAdapter() {
-          @Override
-          public void treeStructureChanged(TreeModelEvent event) {
-            // projects have finished loading
-            refreshApplicationInfoPanel();
-          }
-        });
-
-    serviceLabel.setText(
-        AppEngineProjectService.getInstance()
-            .getServiceNameFromAppEngineWebXml(project, deploymentSource));
+    commonConfig
+        .getServiceLabel()
+        .setText(
+            AppEngineProjectService.getInstance()
+                .getServiceNameFromAppEngineWebXml(project, deploymentSource));
 
     if (deploymentSource.getEnvironment() != null) {
-      environmentLabel.setText(deploymentSource.getEnvironment().localizedLabel());
-      if (deploymentSource.getEnvironment().isFlexCompat()) {
-        appEngineCostWarningLabel.setHyperlinkText(
-            GctBundle.getString("appengine.flex.deployment.cost.warning.beforeLink"),
-            GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
-            " " + GctBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
-        appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-        appEngineCostWarningLabel.setHyperlinkTarget(
-            CloudSdkAppEngineHelper.APP_ENGINE_BILLING_URL);
-      }
-    } else {
-      appEngineCostWarningLabel.setVisible(false);
-    }
-  }
+      commonConfig.getEnvironmentLabel().setText(deploymentSource.getEnvironment().localizedLabel());
 
-  private void refreshApplicationInfoPanel() {
-    if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
-      applicationInfoPanel.refresh(
-          projectSelector.getProject().getProjectId(),
-          projectSelector.getSelectedUser().getCredential());
+      if (!deploymentSource.getEnvironment().isFlexCompat()) {
+        commonConfig.getAppEngineCostWarningLabel().setVisible(false);
+      }
     }
   }
 
   @Override
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
-    projectSelector.setText(configuration.getCloudProjectName());
-    refreshApplicationInfoPanel();
+    commonConfig.resetEditorFrom(configuration);
 
-    promoteCheckbox.setSelected(configuration.isPromote());
-    stopPreviousVersionCheckbox.setVisible(
+    commonConfig.getStopPreviousVersionCheckbox().setVisible(
         AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
-    stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
-    versionIdField.setText(configuration.getVersion());
-    deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
+    commonConfig.getDeployAllConfigsCheckbox().setSelected(configuration.isDeployAllConfigs());
     if (deploymentSource.getEnvironment() != null) {
-      environmentLabel.setText(deploymentSource.getEnvironment().localizedLabel());
+      commonConfig.getEnvironmentLabel().setText(deploymentSource.getEnvironment().localizedLabel());
     }
   }
 
@@ -172,8 +106,9 @@ public class AppEngineStandardDeploymentEditor
       throws ConfigurationException {
     validateConfiguration();
 
-    configuration.setCloudProjectName(projectSelector.getText());
-    CredentialedUser selectedUser = projectSelector.getSelectedUser();
+    commonConfig.applyEditorTo(configuration);
+
+    CredentialedUser selectedUser = commonConfig.getProjectSelector().getSelectedUser();
     if (selectedUser != null) {
       configuration.setGoogleUsername(selectedUser.getEmail());
     }
@@ -184,23 +119,12 @@ public class AppEngineStandardDeploymentEditor
             ? AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT.name()
             : AppEngineEnvironment.APP_ENGINE_STANDARD.name());
     if (isFlexCompat) {
-      configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
+      configuration.setStopPreviousVersion(commonConfig.getStopPreviousVersionCheckbox().isSelected());
     }
-    configuration.setVersion(versionIdField.getText());
-    configuration.setPromote(promoteCheckbox.isSelected());
-    configuration.setDeployAllConfigs(deployAllConfigsCheckbox.isSelected());
 
-    setDeploymentProjectAndVersion();
-  }
+    configuration.setDeployAllConfigs(commonConfig.getDeployAllConfigsCheckbox().isSelected());
 
-  /**
-   * Sets the project / version to allow the deployment line items to be decorated with additional
-   * identifying data. See {@link AppEngineRuntimeInstance#getDeploymentName}.
-   */
-  private void setDeploymentProjectAndVersion() {
-    deploymentSource.setProjectName(projectSelector.getText());
-    deploymentSource.setVersion(
-        Strings.isNullOrEmpty(versionIdField.getText()) ? "auto" : versionIdField.getText());
+    commonConfig.setDeploymentProjectAndVersion(deploymentSource);
   }
 
   private void validateConfiguration() throws ConfigurationException {
@@ -209,11 +133,11 @@ public class AppEngineStandardDeploymentEditor
       throw new ConfigurationException(
           GctBundle.message("appengine.config.deployment.source.error"));
     }
-    if (StringUtils.isBlank(projectSelector.getText())) {
+    if (StringUtils.isBlank(commonConfig.getProjectSelector().getText())) {
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.project.missing.message"));
     }
-    if (!applicationInfoPanel.isApplicationValid()) {
+    if (!commonConfig.getApplicationInfoPanel().isApplicationValid()) {
       throw new ConfigurationException(
           GctBundle.message("appengine.application.required.deployment"));
     }
@@ -236,27 +160,27 @@ public class AppEngineStandardDeploymentEditor
   }
 
   @VisibleForTesting
-  JCheckBox getPromoteCheckbox() {
-    return promoteCheckbox;
-  }
-
-  @VisibleForTesting
   JCheckBox getStopPreviousVersionCheckbox() {
-    return stopPreviousVersionCheckbox;
+    return commonConfig.getStopPreviousVersionCheckbox();
   }
 
   @VisibleForTesting
   public JCheckBox getDeployAllConfigsCheckbox() {
-    return deployAllConfigsCheckbox;
+    return commonConfig.getDeployAllConfigsCheckbox();
+  }
+
+  @VisibleForTesting
+  public AppEngineDeploymentConfigurationPanel getCommonConfig() {
+    return commonConfig;
   }
 
   @VisibleForTesting
   void setProjectSelector(ProjectSelector projectSelector) {
-    this.projectSelector = projectSelector;
+    commonConfig.setProjectSelector(projectSelector);
   }
 
   @VisibleForTesting
   void setApplicationInfoPanel(AppEngineApplicationInfoPanel applicationInfoPanel) {
-    this.applicationInfoPanel = applicationInfoPanel;
+    commonConfig.setApplicationInfoPanel(applicationInfoPanel);
   }
 }
