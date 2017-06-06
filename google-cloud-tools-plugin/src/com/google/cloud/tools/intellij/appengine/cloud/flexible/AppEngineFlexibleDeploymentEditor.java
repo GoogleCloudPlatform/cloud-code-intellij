@@ -19,6 +19,8 @@ package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfigurationPanel;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRuntimeInstance;
 import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
@@ -87,6 +89,7 @@ public class AppEngineFlexibleDeploymentEditor extends
   private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
 
+  private AppEngineDeploymentConfigurationPanel appEngineConfig;
   private JPanel mainPanel;
   private JBTextField version;
   private JCheckBox promoteVersionCheckBox;
@@ -108,12 +111,20 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JButton moduleSettingsButton;
   private JCheckBox hiddenValidationTrigger;
   private JLabel noSupportedModulesWarning;
+  private JLabel environmentLabel;
 
   private static final boolean PROMOTE_DEFAULT = false;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
 
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
     this.deploymentSource = deploymentSource;
+
+    gcpProjectSelector = appEngineConfig.getProjectSelector();
+    appInfoPanel = appEngineConfig.getApplicationInfoPanel();
+    environmentLabel = appEngineConfig.getEnvironmentLabel();
+
+    environmentLabel.setText(AppEngineEnvironment.APP_ENGINE_FLEX.localizedLabel());
+
     version.getEmptyText().setText(GctBundle.getString("appengine.flex.version.placeholder.text"));
     appYamlTextField.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
