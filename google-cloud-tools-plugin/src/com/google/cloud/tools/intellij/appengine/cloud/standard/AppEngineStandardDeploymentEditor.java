@@ -148,12 +148,12 @@ public class AppEngineStandardDeploymentEditor
   }
 
   @VisibleForTesting
-  public JCheckBox getDeployAllConfigsCheckbox() {
+  JCheckBox getDeployAllConfigsCheckbox() {
     return commonConfig.getDeployAllConfigsCheckbox();
   }
 
   @VisibleForTesting
-  public AppEngineDeploymentConfigurationPanel getCommonConfig() {
+  AppEngineDeploymentConfigurationPanel getCommonConfig() {
     return commonConfig;
   }
 

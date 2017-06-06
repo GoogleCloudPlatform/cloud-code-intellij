@@ -98,6 +98,11 @@ public class AppEngineDeploymentConfigurationPanel {
         });
   }
 
+  /**
+   * Shared implementation for
+   * {@link com.intellij.openapi.options.SettingsEditor#resetEditorFrom(Object)}. To be invoked
+   * by users of this panel.
+   */
   public void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     promoteCheckbox.setSelected(configuration.isPromote());
     versionIdField.setText(configuration.getVersion());
@@ -107,6 +112,11 @@ public class AppEngineDeploymentConfigurationPanel {
     refreshApplicationInfoPanel();
   }
 
+  /**
+   * Shared implementation for
+   * {@link com.intellij.openapi.options.SettingsEditor#applyEditorTo(Object)}. To be invoked
+   * by users of this panel.
+   */
   public void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     configuration.setVersion(versionIdField.getText());
     configuration.setPromote(promoteCheckbox.isSelected());
@@ -175,8 +185,7 @@ public class AppEngineDeploymentConfigurationPanel {
   }
 
   @VisibleForTesting
-  public void setApplicationInfoPanel(
-      AppEngineApplicationInfoPanel applicationInfoPanel) {
+  public void setApplicationInfoPanel(AppEngineApplicationInfoPanel applicationInfoPanel) {
     this.applicationInfoPanel = applicationInfoPanel;
   }
 }

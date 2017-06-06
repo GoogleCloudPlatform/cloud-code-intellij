@@ -241,8 +241,6 @@ public class AppEngineFlexibleDeploymentEditor extends
     }
   }
 
-
-
   @Override
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
