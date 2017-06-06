@@ -141,7 +141,8 @@ public abstract class AppEngineProjectService {
    * Generates an app.yaml configuration file in the <@code>outputFolderPath</@code>. If an app.yaml
    * already exists it will not overwrite the file.
    */
-  public abstract void generateAppYaml(FlexibleRuntime runtime, Module module, Path outputFolderPath);
+  public abstract void generateAppYaml(FlexibleRuntime runtime, Module module,
+      Path outputFolderPath);
 
 
   /**

@@ -30,7 +30,6 @@ import com.intellij.openapi.roots.DependencyScope;
 import com.intellij.openapi.roots.ExportableOrderEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable.Listener;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
@@ -145,8 +144,9 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
     // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
     // Framework discovered "Configure" popup.
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_ADD_STANDARD_FACET)
-        .addMetadata(GctTracking.METADATA_LABEL_KEY, "setOnModule")
+        .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
+        .addMetadata("source", "setOnModule")
+        .addMetadata("env", "standard")
         .ping();
   }
 

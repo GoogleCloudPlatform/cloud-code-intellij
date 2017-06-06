@@ -26,6 +26,8 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.intellij.execution.RunManager;
@@ -99,6 +101,9 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   public static void addSupport(@NotNull AppEngineFlexibleFacet facet,
       @NotNull ModifiableRootModel rootModel,
       boolean generateConfigFiles) {
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.APP_ENGINE_ADD_SUPPORT)
+        .addMetadata("env", "flex");
     // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
     VirtualFile[] contentRoots = rootModel.getContentRoots();
     AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
@@ -112,7 +117,13 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       facet.getConfiguration().setDockerDirectory(dockerDirectory.toString());
 
       if (generateConfigFiles) {
-        appEngineProjectService.generateAppYaml(FlexibleRuntime.JAVA, facet.getModule(), appYamlPath.getParent());
+        appEngineProjectService.generateAppYaml(
+            FlexibleRuntime.JAVA, facet.getModule(), appYamlPath.getParent());
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.APP_ENGINE_GENERATE_FILE_APPYAML)
+            .addMetadata("source", "addedByFramework")
+            .addMetadata("env", "flex")
+            .ping();
       }
     }
 
