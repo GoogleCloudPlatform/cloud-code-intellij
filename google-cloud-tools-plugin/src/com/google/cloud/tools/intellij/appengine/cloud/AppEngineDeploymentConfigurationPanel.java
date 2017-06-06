@@ -99,9 +99,9 @@ public class AppEngineDeploymentConfigurationPanel {
   }
 
   /**
-   * Shared implementation for
+   * Shared implementation of
    * {@link com.intellij.openapi.options.SettingsEditor#resetEditorFrom(Object)}. To be invoked
-   * by users of this panel.
+   * by users of this panel in the overriden method.
    */
   public void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     promoteCheckbox.setSelected(configuration.isPromote());
@@ -113,9 +113,9 @@ public class AppEngineDeploymentConfigurationPanel {
   }
 
   /**
-   * Shared implementation for
+   * Shared implementation of
    * {@link com.intellij.openapi.options.SettingsEditor#applyEditorTo(Object)}. To be invoked
-   * by users of this panel.
+   * by users of this panel in the overriden method.
    */
   public void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     configuration.setVersion(versionIdField.getText());
