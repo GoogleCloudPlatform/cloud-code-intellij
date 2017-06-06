@@ -21,8 +21,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfigurationPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineRuntimeInstance;
-import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
@@ -32,10 +30,8 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
-import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -51,10 +47,7 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.ListCellRendererWrapper;
-import com.intellij.ui.components.JBTextField;
-import com.intellij.util.ui.tree.TreeModelAdapter;
 
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -76,12 +69,11 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.TreeModelEvent;
 
 /**
  * Flexible deployment run configuration user interface.
  */
-public class AppEngineFlexibleDeploymentEditor extends
+public final class AppEngineFlexibleDeploymentEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
   private static final String DEFAULT_SERVICE = "default";
   private static final String DOCKERFILE_NAME = "Dockerfile";
@@ -89,20 +81,12 @@ public class AppEngineFlexibleDeploymentEditor extends
   private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
 
-  private AppEngineDeploymentConfigurationPanel appEngineConfig;
+  private AppEngineDeploymentConfigurationPanel commonConfig;
   private JPanel mainPanel;
-  private JBTextField version;
-  private JCheckBox promoteVersionCheckBox;
-  private JCheckBox stopPreviousVersionCheckBox;
-  private ProjectSelector gcpProjectSelector;
-  private JLabel serviceLabel;
   private TextFieldWithBrowseButton appYamlTextField;
   private TextFieldWithBrowseButton dockerDirectoryTextField;
   private TextFieldWithBrowseButton archiveSelector;
-  private HyperlinkLabel appEngineCostWarningLabel;
-  private AppEngineApplicationInfoPanel appInfoPanel;
   private JPanel archiveSelectorPanel;
-  private HyperlinkLabel promoteInfoLabel;
   private JLabel dockerDirectoryLabel;
   private JComboBox<Module> modulesWithFlexFacetComboBox;
   private JCheckBox appYamlOverrideCheckBox;
@@ -111,21 +95,17 @@ public class AppEngineFlexibleDeploymentEditor extends
   private JButton moduleSettingsButton;
   private JCheckBox hiddenValidationTrigger;
   private JLabel noSupportedModulesWarning;
-  private JLabel environmentLabel;
-
-  private static final boolean PROMOTE_DEFAULT = false;
-  private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
 
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
     this.deploymentSource = deploymentSource;
 
-    gcpProjectSelector = appEngineConfig.getProjectSelector();
-    appInfoPanel = appEngineConfig.getApplicationInfoPanel();
-    environmentLabel = appEngineConfig.getEnvironmentLabel();
+    commonConfig
+        .getEnvironmentLabel()
+        .setText(AppEngineEnvironment.APP_ENGINE_FLEX.localizedLabel());
 
-    environmentLabel.setText(AppEngineEnvironment.APP_ENGINE_FLEX.localizedLabel());
+    commonConfig.getDeployAllConfigsCheckbox().setSelected(false);
+    commonConfig.getDeployAllConfigsCheckbox().setVisible(false);
 
-    version.getEmptyText().setText(GctBundle.getString("appengine.flex.version.placeholder.text"));
     appYamlTextField.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
         null /* description */,
@@ -204,39 +184,6 @@ public class AppEngineFlexibleDeploymentEditor extends
       }
     });
 
-    appEngineCostWarningLabel.setHyperlinkText(
-        GctBundle.getString("appengine.flex.deployment.cost.warning.beforeLink"),
-        GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
-        " " + GctBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
-    appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    appEngineCostWarningLabel.setHyperlinkTarget(CloudSdkAppEngineHelper.APP_ENGINE_BILLING_URL);
-
-    gcpProjectSelector.addProjectSelectionListener(appInfoPanel::refresh);
-    gcpProjectSelector.addModelListener(new TreeModelAdapter() {
-      @Override
-      public void treeStructureChanged(TreeModelEvent event) {
-        // projects have finished loading
-        refreshApplicationInfoPanel();
-      }
-    });
-
-    promoteInfoLabel.setHyperlinkText(
-        GctBundle.getString("appengine.promote.info.label.beforeLink") + " ",
-        GctBundle.getString("appengine.promote.info.label.link"),
-        "");
-    promoteInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    promoteInfoLabel.setHyperlinkTarget(GctBundle.getString("appengine.promoteinfo.url"));
-
-    promoteVersionCheckBox.addItemListener(event -> {
-      boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
-
-      stopPreviousVersionCheckBox.setEnabled(isPromoteSelected);
-      stopPreviousVersionCheckBox.setSelected(isPromoteSelected);
-    });
-    promoteVersionCheckBox.setSelected(PROMOTE_DEFAULT);
-    stopPreviousVersionCheckBox.setEnabled(STOP_PREVIOUS_VERSION_DEFAULT);
-
-
     resetModuleConfigSelection(project);
     modulesWithFlexFacetComboBox.addItemListener(event -> toggleDockerfileSection());
     modulesWithFlexFacetComboBox.setRenderer(new ListCellRendererWrapper<Module>() {
@@ -294,24 +241,12 @@ public class AppEngineFlexibleDeploymentEditor extends
     }
   }
 
-  private void refreshApplicationInfoPanel() {
-    if (gcpProjectSelector.getProject() != null && gcpProjectSelector.getSelectedUser() != null) {
-      appInfoPanel.refresh(gcpProjectSelector.getProject().getProjectId(),
-          gcpProjectSelector.getSelectedUser().getCredential());
-    } else {
-      appInfoPanel.setMessage(GctBundle.getString("appengine.infopanel.noproject"),
-          true /* isError*/);
-    }
-  }
-
   @Override
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
-    version.setText(configuration.getVersion());
-    promoteVersionCheckBox.setSelected(configuration.isPromote());
-    stopPreviousVersionCheckBox.setSelected(configuration.isStopPreviousVersion());
+    commonConfig.resetEditorFrom(configuration);
+
     appYamlTextField.setText(configuration.getAppYamlPath());
     dockerDirectoryTextField.setText(configuration.getDockerDirectoryPath());
-    gcpProjectSelector.setText(configuration.getCloudProjectName());
     appYamlTextField.setVisible(configuration.isOverrideAppYaml()
         || modulesWithFlexFacetComboBox.getItemCount() == 0);
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
@@ -325,7 +260,6 @@ public class AppEngineFlexibleDeploymentEditor extends
 
     toggleDockerfileSection();
     updateServiceName();
-    refreshApplicationInfoPanel();
   }
 
   @Override
@@ -333,13 +267,11 @@ public class AppEngineFlexibleDeploymentEditor extends
       throws ConfigurationException {
     validateConfiguration();
 
-    configuration.setVersion(version.getText());
-    configuration.setPromote(promoteVersionCheckBox.isSelected());
-    configuration.setStopPreviousVersion(stopPreviousVersionCheckBox.isSelected());
+    commonConfig.applyEditorTo(configuration);
+
     configuration.setAppYamlPath(getAppYamlPath());
     configuration.setDockerDirectoryPath(getDockerDirectoryPath());
-    configuration.setCloudProjectName(gcpProjectSelector.getText());
-    CredentialedUser user = gcpProjectSelector.getSelectedUser();
+    CredentialedUser user = commonConfig.getProjectSelector().getSelectedUser();
     if (user != null) {
       configuration.setGoogleUsername(user.getEmail());
     }
@@ -354,7 +286,8 @@ public class AppEngineFlexibleDeploymentEditor extends
     configuration.setOverrideAppYaml(appYamlOverrideCheckBox.isSelected());
     configuration.setOverrideDockerDirectory(dockerDirectoryOverrideCheckBox.isSelected());
     updateSelectors();
-    setDeploymentProjectAndVersion();
+
+    commonConfig.setDeploymentProjectAndVersion(deploymentSource);
   }
 
   private void validateConfiguration() throws ConfigurationException {
@@ -369,7 +302,7 @@ public class AppEngineFlexibleDeploymentEditor extends
       throw new ConfigurationException(
           GctBundle.message("appengine.config.deployment.source.error"));
     }
-    if (StringUtils.isBlank(gcpProjectSelector.getText())) {
+    if (StringUtils.isBlank(commonConfig.getProjectSelector().getText())) {
       throw new ConfigurationException(
           GctBundle.message("appengine.flex.config.project.missing.message"));
     }
@@ -405,7 +338,7 @@ public class AppEngineFlexibleDeploymentEditor extends
       throw new ConfigurationException(
           GctBundle.message("appengine.appyaml.malformed"));
     }
-    if (!appInfoPanel.isApplicationValid()) {
+    if (!commonConfig.getApplicationInfoPanel().isApplicationValid()) {
       throw new ConfigurationException(
           GctBundle.message("appengine.application.required.deployment"));
     }
@@ -421,9 +354,9 @@ public class AppEngineFlexibleDeploymentEditor extends
     try {
       Optional<String> service =
           appEngineProjectService.getServiceNameFromAppYaml(getAppYamlPath());
-      serviceLabel.setText(service.orElse(DEFAULT_SERVICE));
+      commonConfig.getServiceLabel().setText(service.orElse(DEFAULT_SERVICE));
     } catch (MalformedYamlFileException myf) {
-      serviceLabel.setText("");
+      commonConfig.getServiceLabel().setText("");
     }
   }
 
@@ -520,18 +453,6 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   /**
-   * Sets the project / version to allow the deployment line items to be decorated with additional
-   * identifying data. See {@link AppEngineRuntimeInstance#getDeploymentName}.
-   */
-  private void setDeploymentProjectAndVersion() {
-    if (deploymentSource instanceof AppEngineDeployable) {
-      ((AppEngineDeployable) deploymentSource).setProjectName(gcpProjectSelector.getText());
-      ((AppEngineDeployable) deploymentSource).setVersion(
-          Strings.isNullOrEmpty(version.getText()) ? "auto" : version.getText());
-    }
-  }
-
-  /**
    * Enables or disables the modules combo box and module settings button. Ideally, they get
    * disabled if both app.yaml and Dockerfile override check boxes are checked and enabled
    * otherwise.
@@ -542,13 +463,8 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
-  JCheckBox getPromoteVersionCheckBox() {
-    return promoteVersionCheckBox;
-  }
-
-  @VisibleForTesting
   JCheckBox getStopPreviousVersionCheckBox() {
-    return stopPreviousVersionCheckBox;
+    return commonConfig.getStopPreviousVersionCheckbox();
   }
 
   @VisibleForTesting
@@ -578,7 +494,7 @@ public class AppEngineFlexibleDeploymentEditor extends
 
   @VisibleForTesting
   JLabel getServiceLabel() {
-    return serviceLabel;
+    return commonConfig.getServiceLabel();
   }
 
   @VisibleForTesting
@@ -592,13 +508,23 @@ public class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
-  ProjectSelector getGcpProjectSelector() {
-    return gcpProjectSelector;
+  JCheckBox getDeployAllConfigsCheckbox() {
+    return commonConfig.getDeployAllConfigsCheckbox();
+  }
+
+  @VisibleForTesting
+  ProjectSelector getProjectSelector() {
+    return commonConfig.getProjectSelector();
+  }
+
+  @VisibleForTesting
+  AppEngineDeploymentConfigurationPanel getCommonConfig() {
+    return commonConfig;
   }
 
   @VisibleForTesting
   void setAppInfoPanel(AppEngineApplicationInfoPanel appInfoPanel) {
-    this.appInfoPanel = appInfoPanel;
+    commonConfig.setApplicationInfoPanel(appInfoPanel);
   }
 
   @VisibleForTesting
