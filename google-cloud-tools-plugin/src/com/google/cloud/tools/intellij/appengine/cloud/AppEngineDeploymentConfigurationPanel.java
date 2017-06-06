@@ -37,7 +37,7 @@ import javax.swing.event.TreeModelEvent;
 /**
  * Common App Engine deployment configuration UI shared by flexible and standard deployments.
  */
-public class AppEngineDeploymentConfigurationPanel {
+public final class AppEngineDeploymentConfigurationPanel {
 
   private JPanel commonConfigPanel;
   private ProjectSelector projectSelector;

@@ -73,7 +73,7 @@ import javax.swing.event.DocumentEvent;
 /**
  * Flexible deployment run configuration user interface.
  */
-public class AppEngineFlexibleDeploymentEditor extends
+public final class AppEngineFlexibleDeploymentEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
   private static final String DEFAULT_SERVICE = "default";
   private static final String DOCKERFILE_NAME = "Dockerfile";

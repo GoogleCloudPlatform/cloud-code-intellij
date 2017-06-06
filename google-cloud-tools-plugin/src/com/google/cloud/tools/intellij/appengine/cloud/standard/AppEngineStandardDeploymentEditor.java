@@ -44,7 +44,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /** Editor for an App Engine Deployment runtime configuration. */
-public class AppEngineStandardDeploymentEditor
+public final class AppEngineStandardDeploymentEditor
     extends SettingsEditor<AppEngineDeploymentConfiguration> {
   private AppEngineDeploymentConfigurationPanel commonConfig;
   private JPanel editorPanel;
