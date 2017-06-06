@@ -106,14 +106,6 @@ public class AppEngineFlexibleDeploymentEditor extends
     commonConfig.getDeployAllConfigsCheckbox().setSelected(false);
     commonConfig.getDeployAllConfigsCheckbox().setVisible(false);
 
-    commonConfig.getPromoteCheckbox().addItemListener(
-        event -> {
-          boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
-
-          commonConfig.getStopPreviousVersionCheckbox().setEnabled(isPromoteSelected);
-          commonConfig.getStopPreviousVersionCheckbox().setSelected(isPromoteSelected);
-        });
-
     appYamlTextField.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
         null /* description */,
@@ -279,8 +271,6 @@ public class AppEngineFlexibleDeploymentEditor extends
 
     commonConfig.applyEditorTo(configuration);
 
-    configuration.setStopPreviousVersion(
-        commonConfig.getStopPreviousVersionCheckbox().isSelected());
     configuration.setAppYamlPath(getAppYamlPath());
     configuration.setDockerDirectoryPath(getDockerDirectoryPath());
     CredentialedUser user = commonConfig.getProjectSelector().getSelectedUser();

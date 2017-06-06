@@ -379,6 +379,13 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertFalse(stopPreviousVersionCheckbox.isEnabled());
   }
 
+  public void testSelectPromote_enablesStop() {
+    editor.getCommonConfig().getPromoteCheckbox().setSelected(true);
+    assertTrue(editor.getStopPreviousVersionCheckBox().isSelected());
+    assertTrue(editor.getStopPreviousVersionCheckBox().isVisible());
+    assertTrue(editor.getStopPreviousVersionCheckBox().isEnabled());
+  }
+
   public void testDockerDirectoryOverride() {
     editor.getModulesWithFlexFacetComboBox().setSelectedItem(customModule);
     String previousDockerDirectory = editor.getDockerDirectoryTextField().getText();

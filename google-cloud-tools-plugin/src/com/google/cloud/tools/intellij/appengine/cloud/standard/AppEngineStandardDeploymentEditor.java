@@ -60,19 +60,7 @@ public class AppEngineStandardDeploymentEditor
     this.project = project;
     this.deploymentSource = deploymentSource;
 
-    commonConfig.getStopPreviousVersionCheckbox().setVisible(
-        AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
     commonConfig.getDeployAllConfigsCheckbox().setSelected(DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT);
-
-    commonConfig.getPromoteCheckbox().addItemListener(
-        event -> {
-          boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
-
-          commonConfig.getStopPreviousVersionCheckbox().setEnabled(isPromoteSelected);
-          if (!isPromoteSelected) {
-            commonConfig.getStopPreviousVersionCheckbox().setSelected(false);
-          }
-        });
 
     commonConfig
         .getServiceLabel()
@@ -93,8 +81,6 @@ public class AppEngineStandardDeploymentEditor
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
 
-    commonConfig.getStopPreviousVersionCheckbox().setVisible(
-        AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource));
     commonConfig.getDeployAllConfigsCheckbox().setSelected(configuration.isDeployAllConfigs());
     if (deploymentSource.getEnvironment() != null) {
       commonConfig.getEnvironmentLabel().setText(deploymentSource.getEnvironment().localizedLabel());
@@ -118,9 +104,6 @@ public class AppEngineStandardDeploymentEditor
         isFlexCompat
             ? AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT.name()
             : AppEngineEnvironment.APP_ENGINE_STANDARD.name());
-    if (isFlexCompat) {
-      configuration.setStopPreviousVersion(commonConfig.getStopPreviousVersionCheckbox().isSelected());
-    }
 
     configuration.setDeployAllConfigs(commonConfig.getDeployAllConfigsCheckbox().isSelected());
 

@@ -71,6 +71,14 @@ public class AppEngineDeploymentConfigurationPanel {
     promoteInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     promoteInfoLabel.setHyperlinkTarget(GctBundle.getString("appengine.promoteinfo.url"));
 
+    promoteCheckbox.addItemListener(
+        event -> {
+          boolean isPromoteSelected = ((JCheckBox) event.getItem()).isSelected();
+
+          stopPreviousVersionCheckbox.setEnabled(isPromoteSelected);
+          stopPreviousVersionCheckbox.setSelected(isPromoteSelected);
+        });
+
     appEngineCostWarningLabel.setHyperlinkText(
         GctBundle.getString("appengine.flex.deployment.cost.warning.beforeLink"),
         GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
@@ -103,6 +111,7 @@ public class AppEngineDeploymentConfigurationPanel {
     configuration.setVersion(versionIdField.getText());
     configuration.setPromote(promoteCheckbox.isSelected());
     configuration.setCloudProjectName(projectSelector.getText());
+    configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
   }
 
   /**
