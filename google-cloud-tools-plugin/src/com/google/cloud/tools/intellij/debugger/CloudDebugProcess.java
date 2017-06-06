@@ -261,9 +261,12 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     // Start breakpoints refresh job on first use.
     getStateController().addListener(this);
     getStateController().startBackgroundListening();
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
+    SwingUtilities.invokeLater(() -> {
+      // If a breakpoint handler has not been created before, getBreakpointHandler() will attempt to
+      // create one. But if the project is disposed of, this creation will fail because it will try
+      // to access the project's components when creating the PsiManager. This guards against a
+      // failure in this scenario.
+      if (breakpointHandlers != null || !getXDebugSession().getProject().isDisposed()) {
         getBreakpointHandler().createIdeRepresentationsIfNecessary(getCurrentBreakpointList());
       }
     });
