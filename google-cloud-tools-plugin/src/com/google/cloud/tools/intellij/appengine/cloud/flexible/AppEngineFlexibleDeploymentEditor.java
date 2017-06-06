@@ -518,7 +518,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
-  public AppEngineDeploymentConfigurationPanel getCommonConfig() {
+  AppEngineDeploymentConfigurationPanel getCommonConfig() {
     return commonConfig;
   }
 
