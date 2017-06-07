@@ -17,11 +17,13 @@
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.intellij.facet.Facet;
+import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeRegistry;
 import com.intellij.openapi.module.Module;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The App Engine Flexible facet.
@@ -38,5 +40,17 @@ public class AppEngineFlexibleFacet extends Facet<AppEngineFlexibleFacetConfigur
   public static FacetType<AppEngineFlexibleFacet,
       AppEngineFlexibleFacetConfiguration> getFacetType() {
     return FacetTypeRegistry.getInstance().findFacetType(AppEngineFlexibleFacetType.ID);
+  }
+
+  /**
+   * Returns the {@link AppEngineFlexibleFacet} present in the supplied module, or null if there
+   * isn't one.
+   */
+  @Nullable
+  public static AppEngineFlexibleFacet getAppEngineFacetByModule(@Nullable Module module) {
+    if (module == null) {
+      return null;
+    }
+    return FacetManager.getInstance(module).getFacetByType(AppEngineFlexibleFacetType.ID);
   }
 }

@@ -47,7 +47,6 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Font;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -55,7 +54,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.HyperlinkEvent;
@@ -77,12 +75,10 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private JPanel dockerfilePanel;
   private JPanel appYamlErrorPanel;
   private HyperlinkLabel appYamlErrorMessage;
-  private JPanel runtimePanel;
-  private JLabel runtimeLabel;
+  private AppEngineFlexibleRuntimePanel runtimePanel;
   private TextFieldWithBrowseButton dockerDirectoryField;
   private JPanel dockerfileErrorPanel;
   private HyperlinkLabel dockerfileErrorMessage;
-  private JLabel runtimeExplanationLabel;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
@@ -92,12 +88,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     appYamlErrorMessage.addHyperlinkListener(new AppYamlGenerateActionListener());
     dockerfileErrorMessage.addHyperlinkListener(new DockerfileGenerateActionListener());
-
-    runtimeExplanationLabel.setFont(
-        new Font(
-            runtimeExplanationLabel.getFont().getName(),
-            Font.ITALIC,
-            runtimeExplanationLabel.getFont().getSize() - 1));
 
     appYamlField.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
@@ -240,19 +230,18 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         message, GctBundle.message("appengine.flex.facet.config.appyaml.generate.link.text"), "");
     runtimePanel.setVisible(false);
     dockerfilePanel.setVisible(false);
-    runtimeExplanationLabel.setVisible(false);
   }
 
   private void toggleValidAppYamlState(String runtimeText) {
     appYamlErrorPanel.setVisible(false);
     runtimePanel.setVisible(true);
-    runtimeLabel.setText(runtimeText);
+    runtimePanel.setLabelText(runtimeText);
     if (runtimeText.equalsIgnoreCase(FlexibleRuntime.CUSTOM.toString())) {
       dockerfilePanel.setVisible(true);
-      runtimeExplanationLabel.setVisible(false);
+      runtimePanel.setExplanationLabelVisibility(false);
     } else {
       dockerfilePanel.setVisible(false);
-      runtimeExplanationLabel.setVisible(true);
+      runtimePanel.setExplanationLabelVisibility(true);
     }
   }
 
@@ -456,17 +445,12 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   @VisibleForTesting
-  public JPanel getRuntimePanel() {
+  AppEngineFlexibleRuntimePanel getRuntimePanel() {
     return runtimePanel;
   }
 
   @VisibleForTesting
-  JLabel getRuntimeLabel() {
-    return runtimeLabel;
-  }
-
-  @VisibleForTesting
-  public JPanel getDockerfileErrorPanel() {
+  JPanel getDockerfileErrorPanel() {
     return dockerfileErrorPanel;
   }
 }

@@ -50,6 +50,13 @@ public abstract class AppEngineProjectService {
     public String toString() {
       return name().toLowerCase();
     }
+
+    /**
+     * Tests if the runtime is {@link FlexibleRuntime#CUSTOM}.
+     */
+    public boolean isCustom() {
+      return this == FlexibleRuntime.CUSTOM;
+    }
   }
 
   public static AppEngineProjectService getInstance() {

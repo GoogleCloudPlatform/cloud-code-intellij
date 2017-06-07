@@ -81,45 +81,6 @@
               </grid>
             </constraints>
           </vspacer>
-          <grid id="da350" binding="runtimePanel" layout-manager="GridLayoutManager" row-count="2" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-            <margin top="0" left="0" bottom="0" right="0"/>
-            <constraints>
-              <grid row="3" column="1" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties/>
-            <border type="none"/>
-            <children>
-              <component id="4a164" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.facet.config.runtime.label"/>
-                </properties>
-              </component>
-              <hspacer id="2674b">
-                <constraints>
-                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-              </hspacer>
-              <component id="de148" class="javax.swing.JLabel" binding="runtimeLabel">
-                <constraints>
-                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value=""/>
-                </properties>
-              </component>
-              <component id="56833" class="javax.swing.JLabel" binding="runtimeExplanationLabel">
-                <constraints>
-                  <grid row="1" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.facet.config.runtime.explanation.label"/>
-                </properties>
-              </component>
-            </children>
-          </grid>
           <grid id="434e6" binding="dockerfilePanel" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
@@ -174,6 +135,11 @@
               </grid>
             </children>
           </grid>
+          <nested-form id="21e53" form-file="com/google/cloud/tools/intellij/appengine/facet/flexible/AppEngineFlexibleRuntimePanel.form" binding="runtimePanel">
+            <constraints>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </nested-form>
         </children>
       </grid>
       <grid id="aaf07" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">

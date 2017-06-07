@@ -48,8 +48,6 @@ public class AppEngineDeploymentConfiguration extends
   private boolean stopPreviousVersion;
   private String version;
   private boolean deployAllConfigs;
-  private boolean overrideAppYaml;
-  private boolean overrideDockerDirectory;
 
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
@@ -106,16 +104,6 @@ public class AppEngineDeploymentConfiguration extends
     return deployAllConfigs;
   }
 
-  @Attribute("overrideAppYaml")
-  public boolean isOverrideAppYaml() {
-    return overrideAppYaml;
-  }
-
-  @Attribute("overrideDockerDirectory")
-  public boolean isOverrideDockerDirectory() {
-    return overrideDockerDirectory;
-  }
-
   public void setDeployAllConfigs(boolean deployAllConfigs) {
     this.deployAllConfigs = deployAllConfigs;
   }
@@ -158,13 +146,5 @@ public class AppEngineDeploymentConfiguration extends
 
   public void setVersion(String version) {
     this.version = version;
-  }
-
-  public void setOverrideAppYaml(boolean overrideAppYaml) {
-    this.overrideAppYaml = overrideAppYaml;
-  }
-
-  public void setOverrideDockerDirectory(boolean overrideDockerDirectory) {
-    this.overrideDockerDirectory = overrideDockerDirectory;
   }
 }
