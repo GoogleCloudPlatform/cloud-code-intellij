@@ -49,6 +49,7 @@ public final class AppEngineDeploymentConfigurationPanel {
   private JCheckBox stopPreviousVersionCheckbox;
   private JCheckBox deployAllConfigsCheckbox;
   private HyperlinkLabel promoteInfoLabel;
+  private JPanel appEngineCostWarningPanel;
   private HyperlinkLabel appEngineCostWarningLabel;
   private JLabel serviceLabel;
 
@@ -167,8 +168,8 @@ public final class AppEngineDeploymentConfigurationPanel {
     return deployAllConfigsCheckbox;
   }
 
-  public HyperlinkLabel getAppEngineCostWarningLabel() {
-    return appEngineCostWarningLabel;
+  public JPanel getAppEngineCostWarningPanel() {
+    return appEngineCostWarningPanel;
   }
 
   public JLabel getServiceLabel() {
