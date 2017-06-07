@@ -85,13 +85,13 @@ public final class AppEngineFlexibleDeploymentEditor extends
   private JPanel mainPanel;
   private TextFieldWithBrowseButton archiveSelector;
   private JPanel archiveSelectorPanel;
-  private JLabel dockerDirectoryLabel;
   private JComboBox<AppEngineFlexibleFacet> appYamlCombobox;
   private JButton editAppYamlButton;
   private JCheckBox hiddenValidationTrigger;
   private HyperlinkLabel dockerfileDirectoryPathLink;
   private JPanel noAppYamlsWarningPanel;
   private AppEngineFlexibleRuntimePanel runtimePanel;
+  private JPanel dockerDirectoryPanel;
 
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
     this.deploymentSource = deploymentSource;
@@ -200,7 +200,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
       appYamlCombobox.setVisible(false);
       editAppYamlButton.setVisible(false);
       noAppYamlsWarningPanel.setVisible(true);
-      dockerfileDirectoryPathLink.setVisible(true);
+      dockerDirectoryPanel.setVisible(true);
     }
   }
 
@@ -345,8 +345,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
     } catch (MalformedYamlFileException myf) {
       // Do nothing, don't blow up, let visible stay false.
     }
-    dockerfileDirectoryPathLink.setVisible(visible);
-    dockerDirectoryLabel.setVisible(visible);
+    dockerDirectoryPanel.setVisible(visible);
     if (visible) {
       dockerfileDirectoryPathLink.setHyperlinkText(
           tryTruncateConfigPathForDisplay(getDockerDirectoryPath()));
