@@ -149,22 +149,22 @@ public final class AppEngineFlexibleDeploymentEditor extends
 
     updateSelectors();
     toggleDockerfileSection();
-    resetRuntimeDisplay();
   }
 
   private void openModuleSettings() {
     AppEngineFlexibleFacet flexFacet = ((AppEngineFlexibleFacet) appYamlCombobox.getSelectedItem());
     ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
+
+    // The user may have updated the configuration, so we need to refresh it here too.
+    resetAppYamlConfigSelection(project);
+    toggleDockerfileSection();
+
     // When we get out of the dialog window, we want to re-eval the configuration.
     // validateConfiguration() can't be used here because the ConfigurationException
     // isn't caught anywhere, and fireEditorStateChanged() doesn't trigger any listeners
     // called from here. Emulating a user action triggers apply(), so that's what we're
     // doing here.
     hiddenValidationTrigger.doClick();
-    toggleDockerfileSection();
-
-    resetRuntimeDisplay();
-    resetAppYamlConfigSelection(project);
   }
 
   private void resetRuntimeDisplay() {
@@ -202,6 +202,9 @@ public final class AppEngineFlexibleDeploymentEditor extends
       noAppYamlsWarningPanel.setVisible(true);
       dockerDirectoryPanel.setVisible(true);
     }
+
+    // Since we updated the app.yaml selection, we need to update the runtime
+    resetRuntimeDisplay();
   }
 
   @Override
