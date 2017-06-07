@@ -48,6 +48,7 @@ import com.intellij.openapi.project.impl.ProjectImpl;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.ui.content.Content;
 import com.intellij.util.containers.ContainerUtil;
+import com.intellij.util.ui.UIUtil;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.breakpoints.XBreakpointManager;
@@ -114,6 +115,7 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     verify(ui, Mockito.atLeast(1)).removeContent(console, false);
 
     process.getStateController().stopBackgroundListening();
+    UIUtil.dispatchAllInvocationEvents();
   }
 
   public void testRegisterAdditionalActions_close() {
