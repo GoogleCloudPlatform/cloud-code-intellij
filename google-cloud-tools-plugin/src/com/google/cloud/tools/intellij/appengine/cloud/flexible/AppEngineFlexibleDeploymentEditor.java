@@ -346,7 +346,6 @@ public final class AppEngineFlexibleDeploymentEditor extends
       // Do nothing, don't blow up, let visible stay false.
     }
     dockerfileDirectoryPathLink.setVisible(visible);
-    dockerfileDirectoryPathLink.setEnabled(false);
     dockerDirectoryLabel.setVisible(visible);
     if (visible) {
       dockerfileDirectoryPathLink.setHyperlinkText(
