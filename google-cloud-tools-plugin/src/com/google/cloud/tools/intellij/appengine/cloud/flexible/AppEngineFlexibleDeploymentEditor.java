@@ -134,15 +134,20 @@ public final class AppEngineFlexibleDeploymentEditor extends
       toggleDockerfileSection();
       resetRuntimeDisplay();
     });
-    appYamlCombobox.setRenderer(new ListCellRendererWrapper<AppEngineFlexibleFacet>() {
-      @Override
-      public void customize(JList list, AppEngineFlexibleFacet facet, int index, boolean selected,
-          boolean hasFocus) {
-        if (facet != null) {
-          setText(tryTruncateConfigPathForDisplay(facet.getConfiguration().getAppYamlPath()));
-        }
-      }
-    });
+    appYamlCombobox.setRenderer(
+        new ListCellRendererWrapper<AppEngineFlexibleFacet>() {
+          @Override
+          public void customize(
+              JList list,
+              AppEngineFlexibleFacet facet,
+              int index,
+              boolean selected,
+              boolean hasFocus) {
+            if (facet != null) {
+              setText(tryTruncateConfigPathForDisplay(facet.getConfiguration().getAppYamlPath()));
+            }
+          }
+        });
 
     editAppYamlButton.addActionListener(event -> openModuleSettings());
     dockerfileDirectoryPathLink.addHyperlinkListener(event -> openModuleSettings());

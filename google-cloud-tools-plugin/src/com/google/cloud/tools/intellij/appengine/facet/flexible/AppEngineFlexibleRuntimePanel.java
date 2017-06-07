@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 /**
  * UI panel containing App Engine flexible runtime information.
  */
-public class AppEngineFlexibleRuntimePanel {
+public final class AppEngineFlexibleRuntimePanel {
 
   private JPanel runtimePanel;
   private JLabel runtimeLabel;
