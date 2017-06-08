@@ -64,7 +64,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
@@ -129,7 +128,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
         }
     );
 
-    resetAppYamlConfigSelection(project);
+    reloadAppYamls(project);
     appYamlCombobox.addItemListener(event -> {
       toggleDockerfileSection();
       resetRuntimeDisplay();
@@ -161,7 +160,8 @@ public final class AppEngineFlexibleDeploymentEditor extends
 
     if (ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */)) {
       // The user may have updated the configuration, so we need to refresh it here too.
-      resetAppYamlConfigSelection(project);
+      reloadAppYamls(project);
+      appYamlCombobox.setSelectedItem(flexFacet);
       toggleDockerfileSection();
 
       // When we get out of the dialog window, we want to re-eval the configuration.
@@ -191,7 +191,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
     }
   }
 
-  private void resetAppYamlConfigSelection(Project project) {
+  private void reloadAppYamls(Project project) {
     appYamlCombobox.setModel(new DefaultComboBoxModel<>(
         Arrays.stream(ModuleManager.getInstance(project).getModules())
             .filter(module ->
