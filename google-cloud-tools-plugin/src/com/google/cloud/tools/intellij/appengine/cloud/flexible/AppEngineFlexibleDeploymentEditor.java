@@ -437,6 +437,16 @@ public final class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
+  JPanel getDockerDirectoryPanel() {
+    return dockerDirectoryPanel;
+  }
+
+  @VisibleForTesting
+  AppEngineFlexibleRuntimePanel getRuntimePanel() {
+    return runtimePanel;
+  }
+
+  @VisibleForTesting
   AppEngineDeploymentConfigurationPanel getCommonConfig() {
     return commonConfig;
   }

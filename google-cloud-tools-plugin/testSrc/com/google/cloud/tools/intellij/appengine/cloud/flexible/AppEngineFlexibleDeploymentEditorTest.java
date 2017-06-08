@@ -252,6 +252,26 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertFalse(editor.getDeployAllConfigsCheckbox().isSelected());
   }
 
+  public void testFlexibleConfig_javaAppYaml() {
+    AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getAppEngineFacetByModule(javaModule);
+    editor.getAppYamlCombobox().setSelectedItem(facet);
+
+    assertFalse(editor.getDockerDirectoryPanel().isVisible());
+    assertTrue(editor.getRuntimePanel().isVisible());
+    assertTrue(editor.getRuntimePanel().getExplanationLabel().isVisible());
+    assertEquals("java", editor.getRuntimePanel().getLabelText());
+  }
+
+  public void testFlexibleConfig_customAppYaml() {
+    AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getAppEngineFacetByModule(customModule);
+    editor.getAppYamlCombobox().setSelectedItem(facet);
+
+    assertTrue(editor.getDockerDirectoryPanel().isVisible());
+    assertTrue(editor.getRuntimePanel().isVisible());
+    assertFalse(editor.getRuntimePanel().getExplanationLabel().isVisible());
+    assertEquals("custom", editor.getRuntimePanel().getLabelText());
+  }
+
   @Override
   public void tearDown() throws Exception {
     editor.getAppYamlCombobox().removeAllItems();

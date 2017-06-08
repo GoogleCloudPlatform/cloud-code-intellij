@@ -63,12 +63,17 @@ public final class AppEngineFlexibleRuntimePanel {
   }
 
   @VisibleForTesting
-  boolean isVisible() {
+  public boolean isVisible() {
     return runtimePanel.isVisible();
   }
 
   @VisibleForTesting
-  String getLabelText() {
+  public String getLabelText() {
     return runtimeLabel.getText();
+  }
+
+  @VisibleForTesting
+  public JLabel getExplanationLabel() {
+    return runtimeExplanationLabel;
   }
 }
