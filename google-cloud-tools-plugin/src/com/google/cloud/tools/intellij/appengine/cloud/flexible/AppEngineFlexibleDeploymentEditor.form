@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="0" y="0" width="1168" height="579"/>
+      <xy x="0" y="0" width="1168" height="667"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -37,103 +37,110 @@
           </component>
         </children>
       </grid>
-      <grid id="2e783" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-        <margin top="0" left="4" bottom="0" right="0"/>
+      <grid id="2e783" layout-manager="GridLayoutManager" row-count="4" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="10" left="10" bottom="10" right="10"/>
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="true"/>
         </constraints>
         <properties/>
-        <border type="none" title="Configuration files"/>
+        <border type="etched" title-resource-bundle="messages/CloudToolsBundle" title-key="appengine.deployment.flex.config.panel.title"/>
         <children>
-          <component id="b3acc" class="javax.swing.JLabel">
+          <component id="80761" class="javax.swing.JLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="app.yaml from module:"/>
+              <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.flex.appyaml.label"/>
             </properties>
           </component>
-          <component id="aa677" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="appYamlTextField">
+          <component id="a4e42" class="javax.swing.JButton" binding="editAppYamlButton">
             <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="7" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <actionCommand value=""/>
+              <focusPainted value="false"/>
+              <label value="edit"/>
+              <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.appyaml.edit.button.text"/>
+            </properties>
+          </component>
+          <hspacer id="35c9">
+            <constraints>
+              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </hspacer>
+          <grid id="ca2bd" binding="noAppYamlsWarningPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <visible value="false"/>
             </properties>
-          </component>
-          <component id="9e96a" class="javax.swing.JLabel" binding="dockerDirectoryLabel">
-            <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.docker.directory.label"/>
-            </properties>
-          </component>
-          <grid id="4bcf7" layout-manager="GridLayoutManager" row-count="1" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-            <margin top="0" left="0" bottom="0" right="0"/>
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="true"/>
-            </constraints>
-            <properties/>
             <border type="none"/>
             <children>
-              <component id="28b70" class="javax.swing.JCheckBox" binding="appYamlOverrideCheckBox">
-                <constraints>
-                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Use a different app.yaml file"/>
-                </properties>
-              </component>
-              <component id="ddeb1" class="javax.swing.JComboBox" binding="modulesWithFlexFacetComboBox">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="5ca93" class="javax.swing.JButton" binding="moduleSettingsButton">
-                <constraints>
-                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Module Settings..."/>
-                </properties>
-              </component>
-              <component id="1d6a8" class="javax.swing.JLabel" binding="noSupportedModulesWarning">
-                <constraints>
-                  <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.flexible.nogaesupport"/>
-                  <visible value="false"/>
-                </properties>
-              </component>
-            </children>
-          </grid>
-          <grid id="3b494" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-            <margin top="0" left="0" bottom="0" right="0"/>
-            <constraints>
-              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="true"/>
-            </constraints>
-            <properties/>
-            <border type="none"/>
-            <children>
-              <component id="a7f92" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="dockerDirectoryTextField">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="7" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="1b50b" class="javax.swing.JCheckBox" binding="dockerDirectoryOverrideCheckBox">
+              <component id="62a53" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.use.different.docker.directory"/>
+                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.flexible.nogaesupport"/>
+                  <visible value="true"/>
+                </properties>
+              </component>
+              <component id="87bc1" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <icon value="ide/error.png"/>
+                  <text value=""/>
                 </properties>
               </component>
             </children>
           </grid>
+          <nested-form id="3413a" form-file="com/google/cloud/tools/intellij/appengine/facet/flexible/AppEngineFlexibleRuntimePanel.form" binding="runtimePanel">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="6" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </nested-form>
+          <component id="35a0f" class="javax.swing.JComboBox" binding="appYamlCombobox">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+          </component>
+          <grid id="3714c" binding="dockerDirectoryPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="6" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="9e96a" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.docker.directory.label"/>
+                </properties>
+              </component>
+              <component id="f69e6" class="com.intellij.ui.HyperlinkLabel" binding="dockerfileDirectoryPathLink">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+              </component>
+            </children>
+          </grid>
+          <vspacer id="c46d7">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="6" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+                <preferred-size width="-1" height="10"/>
+              </grid>
+            </constraints>
+          </vspacer>
         </children>
       </grid>
       <component id="d3412" class="javax.swing.JCheckBox" binding="hiddenValidationTrigger">

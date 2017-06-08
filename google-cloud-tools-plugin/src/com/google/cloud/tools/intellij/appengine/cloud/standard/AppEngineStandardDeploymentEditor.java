@@ -72,7 +72,7 @@ public final class AppEngineStandardDeploymentEditor
       commonConfig.getEnvironmentLabel().setText(deploymentSource.getEnvironment().localizedLabel());
 
       if (!deploymentSource.getEnvironment().isFlexCompat()) {
-        commonConfig.getAppEngineCostWarningLabel().setVisible(false);
+        commonConfig.getAppEngineCostWarningPanel().setVisible(false);
       }
     }
   }

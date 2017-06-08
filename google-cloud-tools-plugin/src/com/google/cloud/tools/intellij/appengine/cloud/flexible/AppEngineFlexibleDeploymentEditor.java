@@ -22,7 +22,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfig
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfigurationPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
-import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleRuntimePanel;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
@@ -33,9 +33,7 @@ import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 
-import com.intellij.facet.FacetManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -47,6 +45,7 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.ListCellRendererWrapper;
 
 import org.apache.commons.lang.StringUtils;
@@ -65,7 +64,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
@@ -81,23 +79,22 @@ public final class AppEngineFlexibleDeploymentEditor extends
   private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
 
+  private Project project;
   private AppEngineDeploymentConfigurationPanel commonConfig;
   private JPanel mainPanel;
-  private TextFieldWithBrowseButton appYamlTextField;
-  private TextFieldWithBrowseButton dockerDirectoryTextField;
   private TextFieldWithBrowseButton archiveSelector;
   private JPanel archiveSelectorPanel;
-  private JLabel dockerDirectoryLabel;
-  private JComboBox<Module> modulesWithFlexFacetComboBox;
-  private JCheckBox appYamlOverrideCheckBox;
-  private JCheckBox dockerDirectoryOverrideCheckBox;
-  private String dockerfileOverride = "";
-  private JButton moduleSettingsButton;
+  private JComboBox<AppEngineFlexibleFacet> appYamlCombobox;
+  private JButton editAppYamlButton;
   private JCheckBox hiddenValidationTrigger;
-  private JLabel noSupportedModulesWarning;
+  private HyperlinkLabel dockerfileDirectoryPathLink;
+  private JPanel noAppYamlsWarningPanel;
+  private AppEngineFlexibleRuntimePanel runtimePanel;
+  private JPanel dockerDirectoryPanel;
 
   public AppEngineFlexibleDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
     this.deploymentSource = deploymentSource;
+    this.project = project;
 
     commonConfig
         .getEnvironmentLabel()
@@ -105,22 +102,6 @@ public final class AppEngineFlexibleDeploymentEditor extends
 
     commonConfig.getDeployAllConfigsCheckbox().setSelected(false);
     commonConfig.getDeployAllConfigsCheckbox().setVisible(false);
-
-    appYamlTextField.addBrowseFolderListener(
-        GctBundle.message("appengine.flex.config.browse.app.yaml"),
-        null /* description */,
-        project,
-        FileChooserDescriptorFactory.createSingleFileDescriptor().withFileFilter(
-            virtualFile -> Comparing.equal(virtualFile.getExtension(), "yaml")
-                || Comparing.equal(virtualFile.getExtension(), "yml"))
-    );
-
-    dockerDirectoryTextField.addBrowseFolderListener(
-        GctBundle.message("appengine.flex.config.browse.docker.directory"),
-        null /* description */,
-        project,
-        FileChooserDescriptorFactory.createSingleFolderDescriptor()
-    );
 
     archiveSelector.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.user.specified.artifact.title"),
@@ -147,116 +128,96 @@ public final class AppEngineFlexibleDeploymentEditor extends
         }
     );
 
-    appYamlOverrideCheckBox.addActionListener(event -> {
-      boolean isAppYamlOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
-      appYamlTextField.setVisible(isAppYamlOverrideSelected);
-
-      setModuleControlsEnabled(
-          !(isAppYamlOverrideSelected && dockerDirectoryOverrideCheckBox.isSelected()));
-      updateServiceName();
+    reloadAppYamls(project);
+    appYamlCombobox.addItemListener(event -> {
       toggleDockerfileSection();
+      resetRuntimeDisplay();
     });
-
-    dockerDirectoryOverrideCheckBox.addActionListener(
-        event -> {
-          boolean isDockerfileOverrideSelected = ((JCheckBox) event.getSource()).isSelected();
-          dockerDirectoryTextField.setEnabled(isDockerfileOverrideSelected);
-          if (isDockerfileOverrideSelected) {
-            if (dockerfileOverride.isEmpty()) {
-              dockerfileOverride = dockerDirectoryTextField.getText();
+    appYamlCombobox.setRenderer(
+        new ListCellRendererWrapper<AppEngineFlexibleFacet>() {
+          @Override
+          public void customize(
+              JList list,
+              AppEngineFlexibleFacet facet,
+              int index,
+              boolean selected,
+              boolean hasFocus) {
+            if (facet != null) {
+              setText(tryTruncateConfigPathForDisplay(facet.getConfiguration().getAppYamlPath()));
             }
-            dockerDirectoryTextField.setText(dockerfileOverride);
-          } else {
-            dockerfileOverride = dockerDirectoryTextField.getText();
-            dockerDirectoryTextField.setText(getDockerDirectoryPath());
           }
+        });
 
-          setModuleControlsEnabled(
-              !(isDockerfileOverrideSelected && appYamlOverrideCheckBox.isSelected()));
-        }
-    );
-
-    appYamlTextField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        updateServiceName();
-        toggleDockerfileSection();
-      }
-    });
-
-    resetModuleConfigSelection(project);
-    modulesWithFlexFacetComboBox.addItemListener(event -> toggleDockerfileSection());
-    modulesWithFlexFacetComboBox.setRenderer(new ListCellRendererWrapper<Module>() {
-      @Override
-      public void customize(JList list, Module value, int index, boolean selected,
-          boolean hasFocus) {
-        if (value != null) {
-          setText(value.getName());
-        }
-      }
-    });
-
-    appYamlTextField.setText(getAppYamlPath());
-
-    moduleSettingsButton.addActionListener(event -> {
-      AppEngineFlexibleFacet flexFacet =
-          FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
-              .getFacetByType(AppEngineFlexibleFacetType.ID);
-      ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */);
-      // When we get out of the dialog window, we want to re-eval the configuration.
-      // validateConfiguration() can't be used here because the ConfigurationException isn't caught
-      // anywhere, and fireEditorStateChanged() doesn't trigger any listeners called from here.
-      // Emulating a user action triggers apply(), so that's what we're doing here.
-      hiddenValidationTrigger.doClick();
-      toggleDockerfileSection();
-      resetModuleConfigSelection(project);
-    });
+    editAppYamlButton.addActionListener(event -> openModuleSettings());
+    dockerfileDirectoryPathLink.addHyperlinkListener(event -> openModuleSettings());
 
     updateSelectors();
     toggleDockerfileSection();
   }
 
-  private void resetModuleConfigSelection(Project project) {
-    modulesWithFlexFacetComboBox.setModel(new DefaultComboBoxModel<>(
+  private void openModuleSettings() {
+    AppEngineFlexibleFacet flexFacet = ((AppEngineFlexibleFacet) appYamlCombobox.getSelectedItem());
+
+    if (ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */)) {
+      // The user may have updated the configuration, so we need to refresh it here too.
+      reloadAppYamls(project);
+      appYamlCombobox.setSelectedItem(flexFacet);
+      toggleDockerfileSection();
+
+      // When we get out of the dialog window, we want to re-eval the configuration.
+      // validateConfiguration() can't be used here because the ConfigurationException
+      // isn't caught anywhere, and fireEditorStateChanged() doesn't trigger any listeners
+      // called from here. Emulating a user action triggers apply(), so that's what we're
+      // doing here.
+      hiddenValidationTrigger.doClick();
+    }
+  }
+
+  private void resetRuntimeDisplay() {
+    if (isValidConfigurationFile(getAppYamlPath())) {
+      try {
+        Optional<FlexibleRuntime> flexibleRuntime =
+            appEngineProjectService.getFlexibleRuntimeFromAppYaml(getAppYamlPath());
+
+        runtimePanel.setLabelText(flexibleRuntime.map(FlexibleRuntime::toString).orElse(""));
+        runtimePanel.setVisible(true);
+      } catch (MalformedYamlFileException ex) {
+        runtimePanel.setVisible(false);
+      }
+    } else {
+      runtimePanel.setVisible(false);
+    }
+  }
+
+  private void reloadAppYamls(Project project) {
+    appYamlCombobox.setModel(new DefaultComboBoxModel<>(
         Arrays.stream(ModuleManager.getInstance(project).getModules())
             .filter(module ->
-                FacetManager.getInstance(module)
-                    .getFacetByType(AppEngineFlexibleFacetType.ID) != null)
-            .toArray(Module[]::new)
+                AppEngineFlexibleFacet.getAppEngineFacetByModule(module) != null)
+            .map(AppEngineFlexibleFacet::getAppEngineFacetByModule)
+            .toArray(AppEngineFlexibleFacet[]::new)
     ));
 
     // For the case Flex isn't enabled for any modules, the user can still deploy filesystem
     // jars/wars.
-    if (modulesWithFlexFacetComboBox.getItemCount() == 0) {
-      modulesWithFlexFacetComboBox.setVisible(false);
-      moduleSettingsButton.setVisible(false);
-      appYamlOverrideCheckBox.setVisible(false);
-      dockerDirectoryOverrideCheckBox.setVisible(false);
-      noSupportedModulesWarning.setVisible(true);
-      appYamlTextField.setVisible(true);
-      dockerDirectoryTextField.setVisible(true);
-      // These checks are important so getAppYamlPath() and getDockerDirectory() work correctly.
-      appYamlOverrideCheckBox.setSelected(true);
-      dockerDirectoryOverrideCheckBox.setSelected(true);
+    if (appYamlCombobox.getItemCount() == 0) {
+      appYamlCombobox.setVisible(false);
+      editAppYamlButton.setVisible(false);
+      noAppYamlsWarningPanel.setVisible(true);
+      dockerDirectoryPanel.setVisible(true);
     }
+
+    // Since we updated the app.yaml selection, we need to update the runtime
+    resetRuntimeDisplay();
   }
 
   @Override
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
 
-    appYamlTextField.setText(configuration.getAppYamlPath());
-    dockerDirectoryTextField.setText(configuration.getDockerDirectoryPath());
-    appYamlTextField.setVisible(configuration.isOverrideAppYaml()
-        || modulesWithFlexFacetComboBox.getItemCount() == 0);
+    dockerfileDirectoryPathLink.setHyperlinkText(
+        tryTruncateConfigPathForDisplay(configuration.getDockerDirectoryPath()));
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
-    appYamlOverrideCheckBox.setSelected(configuration.isOverrideAppYaml()
-        || modulesWithFlexFacetComboBox.getItemCount() == 0);
-    dockerDirectoryOverrideCheckBox.setSelected(configuration.isOverrideDockerDirectory()
-        || modulesWithFlexFacetComboBox.getItemCount() == 0);
-
-    setModuleControlsEnabled(
-        !(configuration.isOverrideAppYaml() && configuration.isOverrideDockerDirectory()));
 
     toggleDockerfileSection();
     updateServiceName();
@@ -283,8 +244,6 @@ public final class AppEngineFlexibleDeploymentEditor extends
     configuration.setUserSpecifiedArtifact(
         deploymentSource instanceof UserSpecifiedPathDeploymentSource);
     configuration.setUserSpecifiedArtifactPath(archiveSelector.getText());
-    configuration.setOverrideAppYaml(appYamlOverrideCheckBox.isSelected());
-    configuration.setOverrideDockerDirectory(dockerDirectoryOverrideCheckBox.isSelected());
     updateSelectors();
 
     commonConfig.setDeploymentProjectAndVersion(deploymentSource);
@@ -318,8 +277,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
     }
     if (!isValidConfigurationFile(getAppYamlPath())) {
       throw new ConfigurationException(
-          GctBundle.getString("appengine.deployment.error.staging.yaml") + " "
-              + GctBundle.getString("appengine.deployment.error.staging.file.gotosettings"));
+          GctBundle.getString("appengine.deployment.error.staging.yaml"));
     }
     try {
       if (isCustomRuntime()) {
@@ -330,8 +288,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
         }
         if (!isValidConfigurationFile(Paths.get(dockerDirectoryPath, DOCKERFILE_NAME).toString())) {
           throw new ConfigurationException(
-              GctBundle.getString("appengine.deployment.error.staging.dockerfile") + " "
-                  + GctBundle.getString("appengine.deployment.error.staging.directory.gotosettings"));
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
         }
       }
     } catch (MalformedYamlFileException myf) {
@@ -376,8 +333,8 @@ public final class AppEngineFlexibleDeploymentEditor extends
 
   private boolean isCustomRuntime() throws MalformedYamlFileException {
     return appEngineProjectService.getFlexibleRuntimeFromAppYaml(getAppYamlPath())
-        .filter(runtime -> runtime == FlexibleRuntime.CUSTOM)
-        .isPresent();
+        .map(FlexibleRuntime::isCustom)
+        .orElse(false);
   }
 
   /**
@@ -391,13 +348,10 @@ public final class AppEngineFlexibleDeploymentEditor extends
     } catch (MalformedYamlFileException myf) {
       // Do nothing, don't blow up, let visible stay false.
     }
-    dockerDirectoryOverrideCheckBox.setVisible(
-        visible && modulesWithFlexFacetComboBox.getItemCount() != 0);
-    dockerDirectoryTextField.setVisible(visible);
-    dockerDirectoryTextField.setEnabled(dockerDirectoryOverrideCheckBox.isSelected());
-    dockerDirectoryLabel.setVisible(visible);
+    dockerDirectoryPanel.setVisible(visible);
     if (visible) {
-      dockerDirectoryTextField.setText(getDockerDirectoryPath());
+      dockerfileDirectoryPathLink.setHyperlinkText(
+          tryTruncateConfigPathForDisplay(getDockerDirectoryPath()));
     }
   }
 
@@ -417,49 +371,42 @@ public final class AppEngineFlexibleDeploymentEditor extends
   }
 
   /**
-   * Returns the final app.yaml file path from the combobox or text field, depending on if it's
-   * overridden.
+   * Returns the final app.yaml file path from the combobox.
    */
   private String getAppYamlPath() {
-    if (appYamlOverrideCheckBox.isSelected()) {
-      return appYamlTextField.getText();
-    }
-
-    if (modulesWithFlexFacetComboBox.getSelectedItem() == null) {
+    if (appYamlCombobox.getSelectedItem() == null) {
       return "";
     }
 
     return Optional.ofNullable(
-        FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
-        .getFacetByType(AppEngineFlexibleFacetType.ID))
+        ((AppEngineFlexibleFacet) appYamlCombobox.getSelectedItem()))
         .map(flexFacet -> flexFacet.getConfiguration().getAppYamlPath())
         .orElse("");
   }
 
   private String getDockerDirectoryPath() {
-    if (dockerDirectoryOverrideCheckBox.isSelected()) {
-      return dockerDirectoryTextField.getText();
-    }
-
-    if (modulesWithFlexFacetComboBox.getSelectedItem() == null) {
+    if (appYamlCombobox.getSelectedItem() == null) {
       return "";
     }
 
     return Optional.ofNullable(
-        FacetManager.getInstance(((Module) modulesWithFlexFacetComboBox.getSelectedItem()))
-            .getFacetByType(AppEngineFlexibleFacetType.ID))
+        ((AppEngineFlexibleFacet) appYamlCombobox.getSelectedItem()))
         .map(flexFacet -> flexFacet.getConfiguration().getDockerDirectory())
         .orElse("");
   }
 
   /**
-   * Enables or disables the modules combo box and module settings button. Ideally, they get
-   * disabled if both app.yaml and Dockerfile override check boxes are checked and enabled
-   * otherwise.
+   * Returns the project relative path of the supplied path for display. If the project path isn't
+   * strictly a prefix of the supplied path, return the original path.
    */
-  private void setModuleControlsEnabled(boolean enabled) {
-    modulesWithFlexFacetComboBox.setEnabled(enabled);
-    moduleSettingsButton.setEnabled(enabled);
+  private String tryTruncateConfigPathForDisplay(String path) {
+    String projectPath = project.getBasePath();
+
+    if (projectPath != null && path.startsWith(projectPath)) {
+      return path.replaceFirst("^" + projectPath, "");
+    }
+
+    return path;
   }
 
   @VisibleForTesting
@@ -468,38 +415,8 @@ public final class AppEngineFlexibleDeploymentEditor extends
   }
 
   @VisibleForTesting
-  TextFieldWithBrowseButton getAppYamlTextField() {
-    return appYamlTextField;
-  }
-
-  @VisibleForTesting
-  TextFieldWithBrowseButton getDockerDirectoryTextField() {
-    return dockerDirectoryTextField;
-  }
-
-  @VisibleForTesting
-  JLabel getDockerDirectoryLabel() {
-    return dockerDirectoryLabel;
-  }
-
-  @VisibleForTesting
-  JCheckBox getDockerDirectoryOverrideCheckBox() {
-    return dockerDirectoryOverrideCheckBox;
-  }
-
-  @VisibleForTesting
-  JCheckBox getAppYamlOverrideCheckBox() {
-    return appYamlOverrideCheckBox;
-  }
-
-  @VisibleForTesting
-  JLabel getServiceLabel() {
-    return commonConfig.getServiceLabel();
-  }
-
-  @VisibleForTesting
-  JComboBox getModulesWithFlexFacetComboBox() {
-    return modulesWithFlexFacetComboBox;
+  JComboBox getAppYamlCombobox() {
+    return appYamlCombobox;
   }
 
   @VisibleForTesting
@@ -515,6 +432,16 @@ public final class AppEngineFlexibleDeploymentEditor extends
   @VisibleForTesting
   ProjectSelector getProjectSelector() {
     return commonConfig.getProjectSelector();
+  }
+
+  @VisibleForTesting
+  JPanel getDockerDirectoryPanel() {
+    return dockerDirectoryPanel;
+  }
+
+  @VisibleForTesting
+  AppEngineFlexibleRuntimePanel getRuntimePanel() {
+    return runtimePanel;
   }
 
   @VisibleForTesting

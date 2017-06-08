@@ -50,12 +50,12 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     editor.getAppYamlField().setText(javaYaml.getPath());
     assertFalse(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getRuntimePanel().isVisible());
-    assertEquals("java", editor.getRuntimeLabel().getText());
+    assertEquals("java", editor.getRuntimePanel().getLabelText());
     // custom yaml
     editor.getAppYamlField().setText(customYaml.getPath());
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getRuntimePanel().isVisible());
-    assertEquals("custom", editor.getRuntimeLabel().getText());
+    assertEquals("custom", editor.getRuntimePanel().getLabelText());
   }
 
   public void testValidateConfiguration_noYAML() {
@@ -95,7 +95,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertFalse(editor.getDockerfilePanel().isVisible());
     assertFalse(editor.getAppYamlErrorPanel().isVisible());
     assertTrue(editor.getRuntimePanel().isVisible());
-    assertEquals("java", editor.getRuntimeLabel().getText());
+    assertEquals("java", editor.getRuntimePanel().getLabelText());
     editor.apply();
   }
 
@@ -107,7 +107,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getDockerfileErrorPanel().isVisible());
     assertTrue(editor.getRuntimePanel().isVisible());
-    assertEquals("custom", editor.getRuntimeLabel().getText());
+    assertEquals("custom", editor.getRuntimePanel().getLabelText());
   }
 
   public void testValidateConfiguration_customRuntimeNullDockerDirectory() {
@@ -118,7 +118,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getDockerfileErrorPanel().isVisible());
     assertTrue(editor.getRuntimePanel().isVisible());
-    assertEquals("custom", editor.getRuntimeLabel().getText());
+    assertEquals("custom", editor.getRuntimePanel().getLabelText());
   }
 
   public void testValidateConfiguration_customRuntimeDockerDirectoryIsFile() {
@@ -129,7 +129,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertTrue(editor.getDockerfilePanel().isVisible());
     assertTrue(editor.getDockerfileErrorPanel().isVisible());
     assertTrue(editor.getRuntimePanel().isVisible());
-    assertEquals("custom", editor.getRuntimeLabel().getText());
+    assertEquals("custom", editor.getRuntimePanel().getLabelText());
   }
 
   public void testValidateConfiguration_customRuntime() throws ConfigurationException {
