@@ -43,8 +43,8 @@ public class AppEngineFlexibleFacet extends Facet<AppEngineFlexibleFacetConfigur
   }
 
   /**
-   * Returns the {@link AppEngineFlexibleFacet} present in the supplied module, or null if there
-   * isn't one.
+   * Returns the {@link AppEngineFlexibleFacet} present in the supplied module, or {@code null} if
+   * there isn't one.
    */
   @Nullable
   public static AppEngineFlexibleFacet getAppEngineFacetByModule(@NotNull Module module) {
