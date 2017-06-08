@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import java.awt.Font;
 
 import javax.swing.JLabel;
@@ -58,5 +60,15 @@ public final class AppEngineFlexibleRuntimePanel {
    */
   public void setExplanationLabelVisibility(boolean visible) {
     runtimeExplanationLabel.setVisible(visible);
+  }
+
+  @VisibleForTesting
+  boolean isVisible() {
+    return runtimePanel.isVisible();
+  }
+
+  @VisibleForTesting
+  String getLabelText() {
+    return runtimeLabel.getText();
   }
 }
