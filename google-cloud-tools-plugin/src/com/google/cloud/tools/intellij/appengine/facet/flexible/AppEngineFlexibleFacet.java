@@ -47,10 +47,7 @@ public class AppEngineFlexibleFacet extends Facet<AppEngineFlexibleFacetConfigur
    * isn't one.
    */
   @Nullable
-  public static AppEngineFlexibleFacet getAppEngineFacetByModule(@Nullable Module module) {
-    if (module == null) {
-      return null;
-    }
+  public static AppEngineFlexibleFacet getAppEngineFacetByModule(@NotNull Module module) {
     return FacetManager.getInstance(module).getFacetByType(AppEngineFlexibleFacetType.ID);
   }
 }
