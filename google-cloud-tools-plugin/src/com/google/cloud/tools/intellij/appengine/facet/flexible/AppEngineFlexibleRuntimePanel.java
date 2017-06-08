@@ -18,8 +18,6 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import java.awt.Font;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -30,15 +28,6 @@ public final class AppEngineFlexibleRuntimePanel {
 
   private JPanel runtimePanel;
   private JLabel runtimeLabel;
-  private JLabel runtimeExplanationLabel;
-
-  public AppEngineFlexibleRuntimePanel() {
-    runtimeExplanationLabel.setFont(
-        new Font(
-            runtimeExplanationLabel.getFont().getName(),
-            Font.ITALIC,
-            runtimeExplanationLabel.getFont().getSize() - 1));
-  }
 
   /**
    * Sets the visibility of the entire panel.
@@ -54,14 +43,6 @@ public final class AppEngineFlexibleRuntimePanel {
     runtimeLabel.setText(text);
   }
 
-  /**
-   * Sets the visibility of the explanation label. This label explains why the Dockerfile
-   * configuration is missing when the runtime != 'custom'.
-   */
-  public void setExplanationLabelVisibility(boolean visible) {
-    runtimeExplanationLabel.setVisible(visible);
-  }
-
   @VisibleForTesting
   public boolean isVisible() {
     return runtimePanel.isVisible();
@@ -70,10 +51,5 @@ public final class AppEngineFlexibleRuntimePanel {
   @VisibleForTesting
   public String getLabelText() {
     return runtimeLabel.getText();
-  }
-
-  @VisibleForTesting
-  public JLabel getExplanationLabel() {
-    return runtimeExplanationLabel;
   }
 }

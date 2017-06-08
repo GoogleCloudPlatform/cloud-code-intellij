@@ -238,10 +238,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     runtimePanel.setLabelText(runtimeText);
     if (runtimeText.equalsIgnoreCase(FlexibleRuntime.CUSTOM.toString())) {
       dockerfilePanel.setVisible(true);
-      runtimePanel.setExplanationLabelVisibility(false);
     } else {
       dockerfilePanel.setVisible(false);
-      runtimePanel.setExplanationLabelVisibility(true);
     }
   }
 

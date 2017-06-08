@@ -181,8 +181,6 @@ public final class AppEngineFlexibleDeploymentEditor extends
 
         runtimePanel.setLabelText(flexibleRuntime.map(FlexibleRuntime::toString).orElse(""));
         runtimePanel.setVisible(true);
-        runtimePanel.setExplanationLabelVisibility(
-            !flexibleRuntime.map(FlexibleRuntime::isCustom).orElse(false));
       } catch (MalformedYamlFileException ex) {
         runtimePanel.setVisible(false);
       }

@@ -258,7 +258,6 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
 
     assertFalse(editor.getDockerDirectoryPanel().isVisible());
     assertTrue(editor.getRuntimePanel().isVisible());
-    assertTrue(editor.getRuntimePanel().getExplanationLabel().isVisible());
     assertEquals("java", editor.getRuntimePanel().getLabelText());
   }
 
@@ -268,7 +267,6 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
 
     assertTrue(editor.getDockerDirectoryPanel().isVisible());
     assertTrue(editor.getRuntimePanel().isVisible());
-    assertFalse(editor.getRuntimePanel().getExplanationLabel().isVisible());
     assertEquals("custom", editor.getRuntimePanel().getLabelText());
   }
 
