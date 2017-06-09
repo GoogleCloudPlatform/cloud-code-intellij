@@ -280,7 +280,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertEquals(javaModuleFacet, editor.getAppYamlCombobox().getSelectedItem());
 
     // set the stored app.yaml to the custom yaml
-    templateConfig.setModuleName(javaModule.getName());
+    templateConfig.setModuleName(customModule.getName());
     editor.resetEditorFrom(templateConfig);
 
     AppEngineFlexibleFacet customModuleFacet =
