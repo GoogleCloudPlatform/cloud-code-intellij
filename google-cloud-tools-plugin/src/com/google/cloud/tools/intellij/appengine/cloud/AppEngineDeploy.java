@@ -104,7 +104,8 @@ public class AppEngineDeploy {
         appYamlName =
             Paths.get(flexFacet.getConfiguration().getAppYamlPath()).getFileName().toString();
       } else {
-        callback.errorOccurred("todo: Failed to resolve app.yaml file...");
+        // This should not happen since staging already verified the file
+        callback.errorOccurred(GctBundle.message("appengine.deployment.error.appyaml.notfound"));
         return;
       }
     }
