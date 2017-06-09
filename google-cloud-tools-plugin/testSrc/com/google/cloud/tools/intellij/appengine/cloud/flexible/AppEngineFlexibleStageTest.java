@@ -72,20 +72,6 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
     stagingDirectory = createTempDirectory().toPath();
   }
 
-  private void setupTestFacet(Module module, String yamlPath) {
-    ApplicationManager.getApplication()
-        .runWriteAction(
-            () -> {
-              AppEngineFlexibleFacet flexFacet =
-                  FacetManager.getInstance(module)
-                      .addFacet(
-                          AppEngineFlexibleFacet.getFacetType(),
-                          "flex facet",
-                          null /* underlyingFacet */);
-              flexFacet.getConfiguration().setAppYamlPath(yamlPath);
-            });
-  }
-
   public void testStage_noYaml() {
     deploymentConfiguration.setModuleName(noYamlModuleName);
     AppEngineFlexibleStage stage =
@@ -132,5 +118,19 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
     assertTrue(Files.exists(stagingDirectory.resolve("custom.yaml")));
     assertTrue(Files.exists(stagingDirectory.resolve("Dockerfile")));
     assertTrue(Files.exists(stagingDirectory.resolve("target.war")));
+  }
+
+  private void setupTestFacet(Module module, String yamlPath) {
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              AppEngineFlexibleFacet flexFacet =
+                  FacetManager.getInstance(module)
+                      .addFacet(
+                          AppEngineFlexibleFacet.getFacetType(),
+                          "flex facet",
+                          null /* underlyingFacet */);
+              flexFacet.getConfiguration().setAppYamlPath(yamlPath);
+            });
   }
 }
