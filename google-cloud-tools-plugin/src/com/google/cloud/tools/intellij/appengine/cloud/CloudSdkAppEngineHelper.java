@@ -27,6 +27,8 @@ import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardDeployTask;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetConfiguration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
@@ -59,7 +61,6 @@ import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -143,18 +144,26 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           deploy, isFlexCompat));
     } else if (targetEnvironment.isFlexible()) {
       try {
-        // Checks if the Yaml or Dockerfile exist.
-        Optional<FlexibleRuntime> runtimeOptional =
-            AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
-                deploymentConfiguration.getAppYamlPath());
+        AppEngineFlexibleFacet flexFacet =
+            AppEngineFlexibleFacet.getFacetByModuleName(
+                deploymentConfiguration.getModuleName(), project);
 
-        if (!Files.exists(Paths.get(deploymentConfiguration.getAppYamlPath()))) {
+        if (flexFacet == null
+            || !Files.exists(Paths.get(flexFacet.getConfiguration().getAppYamlPath()))) {
           callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
           return Optional.empty();
         }
+
+        AppEngineFlexibleFacetConfiguration facetConfiguration = flexFacet.getConfiguration();
+
+        // Checks if the Yaml or Dockerfile exist.
+        Optional<FlexibleRuntime> runtimeOptional =
+            AppEngineProjectService.getInstance()
+                .getFlexibleRuntimeFromAppYaml(facetConfiguration.getAppYamlPath());
+
         if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.CUSTOM).isPresent()
             && (!Files.isRegularFile(
-                Paths.get(deploymentConfiguration.getDockerDirectoryPath(), DOCKERFILE_NAME)))) {
+                Paths.get(facetConfiguration.getDockerDirectory(), DOCKERFILE_NAME)))) {
           callback.errorOccurred(
               GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
           return Optional.empty();
@@ -196,7 +205,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       AppEngineDeploy deploy) {
     return new AppEngineExecutor(
         new AppEngineFlexibleDeployTask(deploy,
-            new AppEngineFlexibleStage(loggingHandler, artifactToDeploy, config)));
+            new AppEngineFlexibleStage(loggingHandler, artifactToDeploy, config, project)));
   }
 
   @Override

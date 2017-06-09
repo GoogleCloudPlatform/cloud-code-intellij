@@ -193,8 +193,8 @@ public final class AppEngineFlexibleDeploymentEditor extends
     appYamlCombobox.setModel(new DefaultComboBoxModel<>(
         Arrays.stream(ModuleManager.getInstance(project).getModules())
             .filter(module ->
-                AppEngineFlexibleFacet.getAppEngineFacetByModule(module) != null)
-            .map(AppEngineFlexibleFacet::getAppEngineFacetByModule)
+                AppEngineFlexibleFacet.getFacetByModule(module) != null)
+            .map(AppEngineFlexibleFacet::getFacetByModule)
             .toArray(AppEngineFlexibleFacet[]::new)
     ));
 
@@ -215,8 +215,12 @@ public final class AppEngineFlexibleDeploymentEditor extends
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
 
-    dockerfileDirectoryPathLink.setHyperlinkText(
-        tryTruncateConfigPathForDisplay(configuration.getDockerDirectoryPath()));
+    appYamlCombobox.setSelectedItem(
+        AppEngineFlexibleFacet.getFacetByModuleName(configuration.getModuleName(), project));
+    // todo confirm that the below is not needed
+//    dockerfileDirectoryPathLink.setHyperlinkText(
+//        tryTruncateConfigPathForDisplay(
+//            configuration.getFlexibleFacet().getConfiguration().getDockerDirectory()));
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
 
     toggleDockerfileSection();
@@ -230,8 +234,8 @@ public final class AppEngineFlexibleDeploymentEditor extends
 
     commonConfig.applyEditorTo(configuration);
 
-    configuration.setAppYamlPath(getAppYamlPath());
-    configuration.setDockerDirectoryPath(getDockerDirectoryPath());
+    configuration.setModuleName(
+        ((AppEngineFlexibleFacet) appYamlCombobox.getSelectedItem()).getModule().getName());
     CredentialedUser user = commonConfig.getProjectSelector().getSelectedUser();
     if (user != null) {
       configuration.setGoogleUsername(user.getEmail());

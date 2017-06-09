@@ -21,6 +21,8 @@ import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeRegistry;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.Project;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +49,14 @@ public class AppEngineFlexibleFacet extends Facet<AppEngineFlexibleFacetConfigur
    * there isn't one.
    */
   @Nullable
-  public static AppEngineFlexibleFacet getAppEngineFacetByModule(@NotNull Module module) {
+  public static AppEngineFlexibleFacet getFacetByModule(@NotNull Module module) {
     return FacetManager.getInstance(module).getFacetByType(AppEngineFlexibleFacetType.ID);
+  }
+
+  @Nullable
+  public static AppEngineFlexibleFacet getFacetByModuleName(
+      @NotNull String moduleName, @NotNull Project project) {
+    Module module = ModuleManager.getInstance(project).findModuleByName(moduleName);
+    return module != null ? getFacetByModule(module) : null;
   }
 }
