@@ -217,10 +217,6 @@ public final class AppEngineFlexibleDeploymentEditor extends
 
     appYamlCombobox.setSelectedItem(
         AppEngineFlexibleFacet.getFacetByModuleName(configuration.getModuleName(), project));
-    // todo confirm that the below is not needed
-//    dockerfileDirectoryPathLink.setHyperlinkText(
-//        tryTruncateConfigPathForDisplay(
-//            configuration.getFlexibleFacet().getConfiguration().getDockerDirectory()));
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
 
     toggleDockerfileSection();
