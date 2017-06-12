@@ -179,26 +179,18 @@ public class FlexibleFacetEditor extends FacetEditorTab {
    */
   private boolean isValidConfigurationFile(String path) {
     try {
-      if (StringUtils.isEmpty(path) || !Files.isRegularFile(Paths.get(path))) {
-        return false;
-      }
+      return !StringUtils.isEmpty(path) && Files.isRegularFile(Paths.get(path));
     } catch (InvalidPathException ipe) {
       return false;
     }
-
-    return true;
   }
 
   private boolean isValidConfigurationDirectory(String path) {
     try {
-      if (StringUtils.isEmpty(path) || !Files.isDirectory(Paths.get(path))) {
-        return false;
-      }
+      return !StringUtils.isEmpty(path) && Files.isDirectory(Paths.get(path));
     } catch (InvalidPathException ipe) {
       return false;
     }
-
-    return true;
   }
 
   /**
