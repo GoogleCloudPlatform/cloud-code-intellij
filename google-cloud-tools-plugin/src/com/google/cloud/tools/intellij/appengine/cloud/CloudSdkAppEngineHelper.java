@@ -150,7 +150,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
         if (flexFacet == null
             || !Files.exists(Paths.get(flexFacet.getConfiguration().getAppYamlPath()))) {
-          callback.errorOccurred(GctBundle.getString("appengine.deployment.error.staging.yaml"));
+          callback.errorOccurred(
+              GctBundle.getString("appengine.deployment.error.appyaml.notfound"));
           return Optional.empty();
         }
 
@@ -165,7 +166,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
             && (!Files.isRegularFile(
                 Paths.get(facetConfiguration.getDockerDirectory(), DOCKERFILE_NAME)))) {
           callback.errorOccurred(
-              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+              GctBundle.getString("appengine.deployment.error.Dockerfile.notfound"));
           return Optional.empty();
         }
         return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),

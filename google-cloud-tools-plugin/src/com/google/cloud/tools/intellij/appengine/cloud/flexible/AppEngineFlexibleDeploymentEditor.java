@@ -277,7 +277,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
     }
     if (!isValidConfigurationFile(getAppYamlPath())) {
       throw new ConfigurationException(
-          GctBundle.getString("appengine.deployment.error.staging.yaml"));
+          GctBundle.getString("appengine.deployment.config.appyaml.error"));
     }
     try {
       if (isCustomRuntime()) {
@@ -288,7 +288,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
         }
         if (!isValidConfigurationFile(Paths.get(dockerDirectoryPath, DOCKERFILE_NAME).toString())) {
           throw new ConfigurationException(
-              GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+              GctBundle.getString("appengine.deployment.config.dockerfile.error"));
         }
       }
     } catch (MalformedYamlFileException myf) {
