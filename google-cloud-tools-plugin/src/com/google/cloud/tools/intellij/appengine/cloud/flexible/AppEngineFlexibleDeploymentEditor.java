@@ -215,8 +215,12 @@ public final class AppEngineFlexibleDeploymentEditor extends
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
 
-    appYamlCombobox.setSelectedItem(
-        AppEngineFlexibleFacet.getFacetByModuleName(configuration.getModuleName(), project));
+    if (!StringUtils.isEmpty(configuration.getModuleName())) {
+      appYamlCombobox.setSelectedItem(
+          AppEngineFlexibleFacet.getFacetByModuleName(configuration.getModuleName(), project));
+    } else {
+      appYamlCombobox.setSelectedIndex(-1);
+    }
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
 
     toggleDockerfileSection();
