@@ -288,6 +288,11 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertEquals(customModuleFacet, editor.getAppYamlCombobox().getSelectedItem());
   }
 
+  public void testFlexibleConfig_unselectedWhenNullPersistedConfig() {
+    editor.resetEditorFrom(templateConfig);
+    assertNull(editor.getAppYamlCombobox().getSelectedItem());
+  }
+
   @Override
   public void tearDown() throws Exception {
     editor.getAppYamlCombobox().removeAllItems();
