@@ -22,6 +22,8 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDeployment;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.FlexibleFacetEditor;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.ImmutableList;
@@ -91,15 +93,22 @@ public class AppEngineDeploy {
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
 
-    String appYamlName =
-        deploymentConfiguration
-            .getEnvironment()
-            .equals(AppEngineEnvironment.APP_ENGINE_STANDARD.name())
-            || deploymentConfiguration
-            .getEnvironment()
-            .equals(AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT.name())
-            ? "app.yaml"
-            : Paths.get(deploymentConfiguration.getAppYamlPath()).getFileName().toString();
+    String appYamlName;
+    if (environment.isStandard() || environment.isFlexCompat()) {
+      appYamlName = FlexibleFacetEditor.APP_YAML_FILE_NAME;
+    } else {
+      AppEngineFlexibleFacet flexFacet =
+          AppEngineFlexibleFacet.getFacetByModuleName(
+              deploymentConfiguration.getModuleName(), helper.getProject());
+      if (flexFacet != null) {
+        appYamlName =
+            Paths.get(flexFacet.getConfiguration().getAppYamlPath()).getFileName().toString();
+      } else {
+        // This should not happen since staging already verified the file
+        callback.errorOccurred(GctBundle.message("appengine.deployment.error.appyaml.notfound"));
+        return;
+      }
+    }
 
     List<File> deployables = APPENGINE_EXTRA_CONFIG_FILE_PATHS.stream()
         .map(configFilePath -> stagingDirectory.resolve(configFilePath).toFile())

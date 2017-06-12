@@ -21,7 +21,11 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
 
+import com.intellij.facet.FacetManager;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.Module;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 import com.intellij.testFramework.PlatformTestCase;
 
@@ -39,6 +43,10 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
   private Path artifact;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
   private Path stagingDirectory;
+  private Module customModule;
+  private String javaModuleName = "java-module";
+  private String customModuleName = "custom-module";
+  private String noYamlModuleName = "no-yaml";
 
   @Override
   public void setUp() throws Exception {
@@ -47,54 +55,82 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
     loggingHandler = mock(LoggingHandler.class);
     doNothing().when(loggingHandler).print(anyString());
 
+    Module javaModule = createModule(javaModuleName);
+    String javaYamlPath = createTempFile("java.yaml", "runtime: java").getPath();
+    setupTestFacet(javaModule, javaYamlPath);
+
+    customModule = createModule(customModuleName);
+    String customYamlPath = createTempFile("custom.yaml", "runtime: custom").getPath();
+    setupTestFacet(customModule, customYamlPath);
+
+    Module noYamlModule = createModule(noYamlModuleName);
+    setupTestFacet(noYamlModule, "/i/dont/exist");
+
     artifact = createTempFile("artifact.war", "").toPath();
     deploymentConfiguration = new AppEngineDeploymentConfiguration();
-    deploymentConfiguration.setAppYamlPath(createTempFile("custom.yaml", "runtime: custom").getPath());
-    deploymentConfiguration.setDockerDirectoryPath(createTempFile("Dockerfile", "").getParentFile().getPath());
+    deploymentConfiguration.setModuleName(javaModuleName);
     stagingDirectory = createTempDirectory().toPath();
   }
 
   public void testStage_noYaml() {
-    deploymentConfiguration.setAppYamlPath("I don't exist.");
+    deploymentConfiguration.setModuleName(noYamlModuleName);
     AppEngineFlexibleStage stage =
-        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration);
+        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration, getProject());
     try {
       stage.stage(stagingDirectory);
       fail("No yaml file.");
     } catch (RuntimeException re) {
-      assertEquals("The specified app.yaml configuration file does not exist or is not a valid file.", re.getMessage());
+      assertEquals("Error occurred during App Engine flexible staging: the specified app.yaml configuration file does not exist or is not a valid file.", re.getMessage());
     }
   }
 
   public void testStage_noDockerDirectory() {
-    deploymentConfiguration.setDockerDirectoryPath("I don't exist.");
+    deploymentConfiguration.setModuleName(customModuleName);
     AppEngineFlexibleStage stage =
-        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration);
+        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration, getProject());
     try {
       stage.stage(stagingDirectory);
       fail("No Docker directory.");
     } catch (RuntimeException re) {
-      assertEquals("There is no Dockerfile in specified directory.", re.getMessage());
+      assertEquals("Error occured during App Engine flexible staging: there is no Dockerfile in specified directory.", re.getMessage());
     }
   }
 
   public void testStage_javaRuntime() throws IOException {
-    deploymentConfiguration.setDockerDirectoryPath("I don't exist.");
-    deploymentConfiguration.setAppYamlPath(createTempFile("java.yaml", "runtime: java").getPath());
+    deploymentConfiguration.setModuleName(javaModuleName);
     AppEngineFlexibleStage stage =
-        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration);
+        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration, getProject());
     stage.stage(stagingDirectory);
     assertTrue(Files.exists(stagingDirectory.resolve("java.yaml")));
     assertTrue(Files.exists(stagingDirectory.resolve("target.war")));
   }
 
-  public void testStage_customRuntime() {
+  public void testStage_customRuntime() throws IOException {
+    String dockerDirectory = createTempFile("Dockerfile", "").getParentFile().getPath();
+    AppEngineFlexibleFacet.getFacetByModule(customModule)
+        .getConfiguration()
+        .setDockerDirectory(dockerDirectory);
+    deploymentConfiguration.setModuleName(customModuleName);
     AppEngineFlexibleStage stage =
-        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration);
+        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration, getProject());
     stage.stage(stagingDirectory);
 
     assertTrue(Files.exists(stagingDirectory.resolve("custom.yaml")));
     assertTrue(Files.exists(stagingDirectory.resolve("Dockerfile")));
     assertTrue(Files.exists(stagingDirectory.resolve("target.war")));
+  }
+
+  private void setupTestFacet(Module module, String yamlPath) {
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              AppEngineFlexibleFacet flexFacet =
+                  FacetManager.getInstance(module)
+                      .addFacet(
+                          AppEngineFlexibleFacet.getFacetType(),
+                          "flex facet",
+                          null /* underlyingFacet */);
+              flexFacet.getConfiguration().setAppYamlPath(yamlPath);
+            });
   }
 }

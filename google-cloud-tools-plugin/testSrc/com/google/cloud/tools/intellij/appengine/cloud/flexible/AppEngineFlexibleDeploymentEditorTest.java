@@ -253,7 +253,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testFlexibleConfig_javaAppYaml() {
-    AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getAppEngineFacetByModule(javaModule);
+    AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getFacetByModule(javaModule);
     editor.getAppYamlCombobox().setSelectedItem(facet);
 
     assertFalse(editor.getDockerDirectoryPanel().isVisible());
@@ -262,12 +262,30 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testFlexibleConfig_customAppYaml() {
-    AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getAppEngineFacetByModule(customModule);
+    AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getFacetByModule(customModule);
     editor.getAppYamlCombobox().setSelectedItem(facet);
 
     assertTrue(editor.getDockerDirectoryPanel().isVisible());
     assertTrue(editor.getRuntimePanel().isVisible());
     assertEquals("custom", editor.getRuntimePanel().getLabelText());
+  }
+
+  public void testFlexibleConfig_restoredFromPersistedConfiguration() {
+    // set the stored app.yaml to the java yaml
+    templateConfig.setModuleName(javaModule.getName());
+    editor.resetEditorFrom(templateConfig);
+
+    AppEngineFlexibleFacet javaModuleFacet =
+        AppEngineFlexibleFacet.getFacetByModule(javaModule);
+    assertEquals(javaModuleFacet, editor.getAppYamlCombobox().getSelectedItem());
+
+    // set the stored app.yaml to the custom yaml
+    templateConfig.setModuleName(customModule.getName());
+    editor.resetEditorFrom(templateConfig);
+
+    AppEngineFlexibleFacet customModuleFacet =
+        AppEngineFlexibleFacet.getFacetByModule(customModule);
+    assertEquals(customModuleFacet, editor.getAppYamlCombobox().getSelectedItem());
   }
 
   @Override

@@ -40,14 +40,14 @@ public class AppEngineDeploymentConfiguration extends
    */
   private String environment;
 
-  private String dockerDirectoryPath;
-  private String appYamlPath;
   private boolean userSpecifiedArtifact;
   private String userSpecifiedArtifactPath;
   private boolean promote;
   private boolean stopPreviousVersion;
   private String version;
   private boolean deployAllConfigs;
+  // Used to resolve the facet configuration for flexible deployments
+  private String moduleName;
 
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
@@ -74,16 +74,6 @@ public class AppEngineDeploymentConfiguration extends
     return userSpecifiedArtifactPath;
   }
 
-  @Attribute("dockerDirectoryPath")
-  public String getDockerDirectoryPath() {
-    return dockerDirectoryPath;
-  }
-
-  @Attribute("appYamlPath")
-  public String getAppYamlPath() {
-    return appYamlPath;
-  }
-
   @Attribute("promote")
   public boolean isPromote() {
     return promote;
@@ -102,6 +92,11 @@ public class AppEngineDeploymentConfiguration extends
   @Attribute("deployAllConfigs")
   public boolean isDeployAllConfigs() {
     return deployAllConfigs;
+  }
+
+  @Attribute("moduleName")
+  public String getModuleName() {
+    return moduleName;
   }
 
   public void setDeployAllConfigs(boolean deployAllConfigs) {
@@ -128,14 +123,6 @@ public class AppEngineDeploymentConfiguration extends
     this.userSpecifiedArtifactPath = userSpecifiedArtifactPath;
   }
 
-  public void setDockerDirectoryPath(String dockerDirectoryPath) {
-    this.dockerDirectoryPath = dockerDirectoryPath;
-  }
-
-  public void setAppYamlPath(String appYamlPath) {
-    this.appYamlPath = appYamlPath;
-  }
-
   public void setPromote(boolean promote) {
     this.promote = promote;
   }
@@ -146,5 +133,9 @@ public class AppEngineDeploymentConfiguration extends
 
   public void setVersion(String version) {
     this.version = version;
+  }
+
+  public void setModuleName(String moduleName) {
+    this.moduleName = moduleName;
   }
 }
