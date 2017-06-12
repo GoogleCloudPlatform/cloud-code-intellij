@@ -289,6 +289,7 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testFlexibleConfig_unselectedWhenNullPersistedConfig() {
+    templateConfig.setModuleName(null);
     editor.resetEditorFrom(templateConfig);
     assertNull(editor.getAppYamlCombobox().getSelectedItem());
   }
