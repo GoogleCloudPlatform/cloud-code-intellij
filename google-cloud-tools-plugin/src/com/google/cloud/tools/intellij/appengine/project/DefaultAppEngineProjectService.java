@@ -418,12 +418,17 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public String getDefaultAppYamlPath(String moduleRoot) {
-    return moduleRoot + "/src/main/appengine/app.yaml";
+  public Path getDefaultAppYamlPath(Path moduleRoot) {
+    return moduleRoot.resolve(Paths.get("src", "main", "appengine", "app.yaml"));
   }
 
   @Override
-  public String getDefaultDockerDirectory(String moduleRoot) {
-    return moduleRoot + "/src/main/docker";
+  public Path getDefaultDockerDirectory(Path moduleRoot) {
+    return moduleRoot.resolve(Paths.get("src", "main", "docker"));
+  }
+
+  @Override
+  public Path getDefaultAppEngineConfigurationDirectory(Path moduleRoot) {
+    return moduleRoot.resolve(Paths.get("src", "main", "appengine"));
   }
 }

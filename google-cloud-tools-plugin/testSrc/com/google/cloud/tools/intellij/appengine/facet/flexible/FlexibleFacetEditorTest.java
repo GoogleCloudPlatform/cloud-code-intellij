@@ -27,6 +27,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
   private File customYaml;
   private File invalidYaml;
   private File dockerfile;
+  private File additionalConfigDirectory;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
   @Override
@@ -37,6 +38,7 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     customYaml = createTempFile("custom.yaml", "runtime: custom");
     invalidYaml = createTempFile("invalid.yaml", "runtime: custom\nenv_variables:\n  'ASD");
     dockerfile = createTempFile("Dockerfile", "");
+    additionalConfigDirectory = createTempDir("additionalconfigdir");
 
     facetConfiguration = new AppEngineFlexibleFacetConfiguration();
   }
@@ -140,5 +142,21 @@ public class FlexibleFacetEditorTest extends PlatformTestCase {
     assertFalse(editor.getAppYamlErrorPanel().isVisible());
     assertFalse(editor.getDockerfileErrorPanel().isVisible());
     editor.apply();
+  }
+
+  public void testAdditionalConfiguration_validState() {
+    FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
+    editor.getAdditionalConfigurationField().setText(additionalConfigDirectory.getPath());
+
+    assertTrue(editor.getAdditionalConfigurationPanel().isVisible());
+    assertFalse(editor.getAdditionalConfigurationErrorPanel().isVisible());
+  }
+
+  public void testAdditionalConfiguration_errorState() {
+    FlexibleFacetEditor editor = new FlexibleFacetEditor(facetConfiguration, getModule());
+    editor.getAdditionalConfigurationField().setText("/invalid/path");
+
+    assertTrue(editor.getAdditionalConfigurationPanel().isVisible());
+    assertTrue(editor.getAdditionalConfigurationErrorPanel().isVisible());
   }
 }
