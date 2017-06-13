@@ -133,6 +133,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
       toggleDockerfileSection();
       resetRuntimeDisplay();
       toggleYamlEditButton();
+      updateServiceName();
     });
     appYamlCombobox.setRenderer(
         new ListCellRendererWrapper<AppEngineFlexibleFacet>() {
@@ -154,6 +155,8 @@ public final class AppEngineFlexibleDeploymentEditor extends
 
     updateSelectors();
     toggleDockerfileSection();
+    toggleYamlEditButton();
+    updateServiceName();
   }
 
   private void openModuleSettings() {
@@ -224,9 +227,6 @@ public final class AppEngineFlexibleDeploymentEditor extends
       appYamlCombobox.setSelectedIndex(-1);
     }
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
-
-    toggleDockerfileSection();
-    updateServiceName();
   }
 
   @Override

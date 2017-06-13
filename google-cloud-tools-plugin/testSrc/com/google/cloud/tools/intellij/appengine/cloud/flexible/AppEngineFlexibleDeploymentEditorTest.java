@@ -67,8 +67,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   public void setUp() throws Exception {
     super.setUp();
 
-    customYaml = createTempFile("custom.yaml", "runtime: custom\nservice: flexService");
-    javaYaml = createTempFile("java.yaml", "runtime: java");
+    customYaml = createTempFile("custom.yaml", "runtime: custom\nservice: customService");
+    javaYaml = createTempFile("java.yaml", "runtime: java\nservice: javaService");
     dockerfile = createTempFile("Dockerfile", "FROM gcr.io/google_appengine/jetty\n"
         + "ADD target.war $JETTY_BASE/webapps/root.war");
 
@@ -306,6 +306,19 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     editor.resetEditorFrom(templateConfig);
 
     assertFalse(editor.getEditAppYamlButton().isVisible());
+  }
+
+  public void testServiceNameIsUpdated_whenAppYamlSelectionChanges() {
+    templateConfig.setModuleName(javaModule.getName());
+    editor.resetEditorFrom(templateConfig);
+
+    assertEquals("javaService", editor.getCommonConfig().getServiceLabel().getText());
+
+    // Now update to custom service
+    AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getFacetByModule(customModule);
+    editor.getAppYamlCombobox().setSelectedItem(facet);
+
+    assertEquals("customService", editor.getCommonConfig().getServiceLabel().getText());
   }
 
   @Override
