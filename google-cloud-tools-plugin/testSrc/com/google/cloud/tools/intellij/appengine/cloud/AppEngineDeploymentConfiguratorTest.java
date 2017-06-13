@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +68,7 @@ public class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
         .thenReturn("service");
     when(projectService.getFlexibleRuntimeFromAppYaml(isA(String.class))).thenReturn(
         Optional.of(FlexibleRuntime.JAVA));
+    when(projectService.getServiceNameFromAppYaml(anyString())).thenReturn(Optional.empty());
     when(project.getComponent(ModuleManager.class)).thenReturn(moduleManager);
     when(moduleManager.getModules()).thenReturn(new Module[]{module});
     when(module.getComponent(FacetManager.class)).thenReturn(facetManager);
