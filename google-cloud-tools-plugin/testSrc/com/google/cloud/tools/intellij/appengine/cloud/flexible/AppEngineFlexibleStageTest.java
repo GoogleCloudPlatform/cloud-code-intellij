@@ -96,6 +96,18 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
     }
   }
 
+  public void testStage_noModule() {
+    deploymentConfiguration.setModuleName(null);
+    AppEngineFlexibleStage stage =
+        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration, getProject());
+    try {
+      stage.stage(stagingDirectory);
+      fail("expected failure due to missing module name in deployment config");
+    } catch (RuntimeException re) {
+      assertEquals("Error occurred during App Engine flexible staging: no app.yaml configuration file was specified.", re.getMessage());
+    }
+  }
+
   public void testStage_javaRuntime() throws IOException {
     deploymentConfiguration.setModuleName(javaModuleName);
     AppEngineFlexibleStage stage =

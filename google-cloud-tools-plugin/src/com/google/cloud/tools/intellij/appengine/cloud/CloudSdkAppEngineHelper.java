@@ -59,6 +59,7 @@ import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -144,10 +145,15 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
           deploy, isFlexCompat));
     } else if (targetEnvironment.isFlexible()) {
       try {
-        AppEngineFlexibleFacet flexFacet =
-            AppEngineFlexibleFacet.getFacetByModuleName(
-                deploymentConfiguration.getModuleName(), project);
+        String moduleName = deploymentConfiguration.getModuleName();
+        if (StringUtils.isEmpty(moduleName)) {
+          callback.errorOccurred(
+              GctBundle.getString("appengine.deployment.error.appyaml.notspecified"));
+          return Optional.empty();
+        }
 
+        AppEngineFlexibleFacet flexFacet =
+              AppEngineFlexibleFacet.getFacetByModuleName(moduleName, project);
         if (flexFacet == null
             || !Files.exists(Paths.get(flexFacet.getConfiguration().getAppYamlPath()))) {
           callback.errorOccurred(

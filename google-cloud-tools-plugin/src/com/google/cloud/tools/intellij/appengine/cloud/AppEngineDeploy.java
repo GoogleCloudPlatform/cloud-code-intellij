@@ -36,6 +36,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,16 +98,22 @@ public class AppEngineDeploy {
     if (environment.isStandard() || environment.isFlexCompat()) {
       appYamlName = FlexibleFacetEditor.APP_YAML_FILE_NAME;
     } else {
+      String moduleName = deploymentConfiguration.getModuleName();
+      if (StringUtils.isEmpty(moduleName)) {
+        callback.errorOccurred(
+            GctBundle.message("appengine.deployment.error.appyaml.notspecified"));
+        return;
+      }
+
       AppEngineFlexibleFacet flexFacet =
-          AppEngineFlexibleFacet.getFacetByModuleName(
-              deploymentConfiguration.getModuleName(), helper.getProject());
-      if (flexFacet != null) {
-        appYamlName =
-            Paths.get(flexFacet.getConfiguration().getAppYamlPath()).getFileName().toString();
-      } else {
+          AppEngineFlexibleFacet.getFacetByModuleName(moduleName, helper.getProject());
+      if (flexFacet == null) {
         // This should not happen since staging already verified the file
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.appyaml.notfound"));
         return;
+      } else {
+        appYamlName =
+            Paths.get(flexFacet.getConfiguration().getAppYamlPath()).getFileName().toString();
       }
     }
 
