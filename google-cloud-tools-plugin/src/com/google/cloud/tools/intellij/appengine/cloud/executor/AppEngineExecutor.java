@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
-
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
 /**
@@ -34,31 +32,15 @@ public class AppEngineExecutor implements CancellableRunnable {
 
   @Override
   public void run() {
-    task.execute(new ProcessStartListener() {
-      @Override
-      public void onStart(Process process) {
-        setProcess(process);
-      }
-    });
+    task.execute(this::setProcess);
   }
 
   @Override
   public void cancel() {
     // Only destroy the process and signal cancellation if the process hasn't exited
-    if (process != null && isAlive(process)) {
+    if (process != null && process.isAlive()) {
       process.destroy();
       task.onCancel();
-    }
-  }
-
-  // TODO(eshaul) replace this with Process#isAlive when switching to Java 8
-  private boolean isAlive(Process process) {
-    try {
-      // Throws IllegalThreadStateException when the process has not yet terminated
-      process.exitValue();
-      return false;
-    } catch (IllegalThreadStateException itse) {
-      return true;
     }
   }
 
