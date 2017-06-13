@@ -294,6 +294,20 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
     assertNull(editor.getAppYamlCombobox().getSelectedItem());
   }
 
+  public void testAppYamlEditButton_visibleWhenAppYamlSelected() {
+    templateConfig.setModuleName(javaModule.getName());
+    editor.resetEditorFrom(templateConfig);
+
+    assertTrue(editor.getEditAppYamlButton().isVisible());
+  }
+
+  public void testAppYamlEditButton_hiddenWhenNoAppYamlSelected() {
+    templateConfig.setModuleName(null);
+    editor.resetEditorFrom(templateConfig);
+
+    assertFalse(editor.getEditAppYamlButton().isVisible());
+  }
+
   @Override
   public void tearDown() throws Exception {
     editor.getAppYamlCombobox().removeAllItems();

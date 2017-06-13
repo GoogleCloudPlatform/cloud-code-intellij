@@ -132,6 +132,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
     appYamlCombobox.addItemListener(event -> {
       toggleDockerfileSection();
       resetRuntimeDisplay();
+      toggleYamlEditButton();
     });
     appYamlCombobox.setRenderer(
         new ListCellRendererWrapper<AppEngineFlexibleFacet>() {
@@ -158,7 +159,8 @@ public final class AppEngineFlexibleDeploymentEditor extends
   private void openModuleSettings() {
     AppEngineFlexibleFacet flexFacet = ((AppEngineFlexibleFacet) appYamlCombobox.getSelectedItem());
 
-    if (ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */)) {
+    if (flexFacet != null
+        && ModulesConfigurator.showFacetSettingsDialog(flexFacet, null /* tabNameToSelect */)) {
       // The user may have updated the configuration, so we need to refresh it here too.
       reloadAppYamls(project);
       appYamlCombobox.setSelectedItem(flexFacet);
@@ -360,6 +362,14 @@ public final class AppEngineFlexibleDeploymentEditor extends
   }
 
   /**
+   * If there is no app.yaml selected (the dropdown selection is empty) then we want to hide the
+   * edit button since there is no associated facet to link to.
+   */
+  private void toggleYamlEditButton() {
+    editAppYamlButton.setVisible(appYamlCombobox.getSelectedItem() != null);
+  }
+
+  /**
    * Checks if a configuration file is valid by checking if it exists and is a regular file.
    */
   private boolean isValidConfigurationFile(String path) {
@@ -441,6 +451,11 @@ public final class AppEngineFlexibleDeploymentEditor extends
   @VisibleForTesting
   JPanel getDockerDirectoryPanel() {
     return dockerDirectoryPanel;
+  }
+
+  @VisibleForTesting
+  JButton getEditAppYamlButton() {
+    return editAppYamlButton;
   }
 
   @VisibleForTesting
