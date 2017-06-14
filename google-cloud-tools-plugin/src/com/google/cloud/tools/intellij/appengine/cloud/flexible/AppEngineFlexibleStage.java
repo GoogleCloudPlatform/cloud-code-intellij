@@ -28,6 +28,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -68,14 +69,18 @@ public class AppEngineFlexibleStage {
    */
   public void stage(@NotNull Path stagingDirectory) {
     try {
-      AppEngineFlexibleFacet flexibleFacet =
-          AppEngineFlexibleFacet.getFacetByModuleName(
-              deploymentConfiguration.getModuleName(), project);
+      String moduleName = deploymentConfiguration.getModuleName();
+      if (StringUtils.isEmpty(moduleName)) {
+        throw new RuntimeException(
+            GctBundle.getString("appengine.deployment.error.staging.yaml.notspecified"));
+      }
 
+      AppEngineFlexibleFacet flexibleFacet =
+          AppEngineFlexibleFacet.getFacetByModuleName(moduleName, project);
       if (flexibleFacet == null
           || !Files.exists(Paths.get(flexibleFacet.getConfiguration().getAppYamlPath()))) {
         throw new RuntimeException(
-            GctBundle.getString("appengine.deployment.error.staging.yaml"));
+            GctBundle.getString("appengine.deployment.error.staging.yaml.notfound"));
       }
 
       // Checks if the Yaml or Dockerfile exist before staging.

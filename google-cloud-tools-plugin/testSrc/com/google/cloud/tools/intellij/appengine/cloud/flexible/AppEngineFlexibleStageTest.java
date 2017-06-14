@@ -80,7 +80,10 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
       stage.stage(stagingDirectory);
       fail("No yaml file.");
     } catch (RuntimeException re) {
-      assertEquals("Error occurred during App Engine flexible staging: the specified app.yaml configuration file does not exist or is not a valid file.", re.getMessage());
+      assertEquals(
+          "Error occurred during App Engine flexible staging: the specified app.yaml "
+              + "configuration file does not exist or is not a valid file.",
+          re.getMessage());
     }
   }
 
@@ -92,7 +95,25 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
       stage.stage(stagingDirectory);
       fail("No Docker directory.");
     } catch (RuntimeException re) {
-      assertEquals("Error occured during App Engine flexible staging: there is no Dockerfile in specified directory.", re.getMessage());
+      assertEquals(
+          "Error occured during App Engine flexible staging: there is no Dockerfile in "
+              + "specified directory.",
+          re.getMessage());
+    }
+  }
+
+  public void testStage_noModule() {
+    deploymentConfiguration.setModuleName(null);
+    AppEngineFlexibleStage stage =
+        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration, getProject());
+    try {
+      stage.stage(stagingDirectory);
+      fail("expected failure due to missing module name in deployment config");
+    } catch (RuntimeException re) {
+      assertEquals(
+          "Error occurred during App Engine flexible staging: no app.yaml configuration "
+              + "file was specified.",
+          re.getMessage());
     }
   }
 
