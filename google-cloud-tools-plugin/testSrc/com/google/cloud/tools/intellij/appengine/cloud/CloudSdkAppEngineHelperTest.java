@@ -62,6 +62,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   @Mock private LoggingHandler loggingHandler;
   @Mock private DeploymentOperationCallback callback;
   @Mock private CloudSdkService sdkService;
+  @Mock private DeploymentSource undeployableDeploymentSource;
 
   @Before
   public void initialize() {
@@ -107,7 +108,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   public void testCreateDeployRunnerInvalidDeploymentSourceType_returnsNull() {
     Optional<CancellableRunnable> runner = helper.createDeployRunner(
         loggingHandler,
-        createMockUndeployableDeploymentSource(),
+        undeployableDeploymentSource,
         deploymentConfiguration,
         callback);
 
@@ -168,11 +169,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     verify(callback, times(1)).errorOccurred("No app.yaml specified for flexible deployment.");
   }
 
-  private DeploymentSource createMockDeployableDeploymentSource() {
+  private static DeploymentSource createMockDeployableDeploymentSource() {
     return mock(DeploymentSource.class, withSettings().extraInterfaces(AppEngineDeployable.class));
-  }
-
-  private DeploymentSource createMockUndeployableDeploymentSource() {
-    return mock(DeploymentSource.class);
   }
 }
