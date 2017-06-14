@@ -68,7 +68,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
       AppEngineProjectService.getInstance();
   private static final String DOCKERFILE_NAME = "Dockerfile";
-  public static final String APP_YAML_FILE_NAME = "app.yaml";
+  private static final String APP_YAML_FILE_NAME = "app.yaml";
 
   private Module module;
   private JPanel mainPanel;
