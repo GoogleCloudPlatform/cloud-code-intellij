@@ -23,10 +23,10 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDeployment;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
-import com.google.cloud.tools.intellij.appengine.facet.flexible.FlexibleFacetEditor;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
@@ -42,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -53,14 +54,10 @@ import java.util.stream.Collectors;
 public class AppEngineDeploy {
 
   private static final Logger logger = Logger.getInstance(AppEngineDeploy.class);
-  private static final String APPENGINE_GENERATED_DIR = "WEB-INF/appengine-generated/";
-  private static final ImmutableList<String> APPENGINE_EXTRA_CONFIG_FILE_PATHS = ImmutableList.of(
-      APPENGINE_GENERATED_DIR + "index.yaml",
-      APPENGINE_GENERATED_DIR + "cron.yaml",
-      APPENGINE_GENERATED_DIR + "dos.yaml",
-      APPENGINE_GENERATED_DIR + "dispatch.yaml",
-      APPENGINE_GENERATED_DIR + "queue.yaml"
-  );
+  private static final String APPENGINE_STANDARD_GENERATED_DIR = "WEB-INF/appengine-generated/";
+  private static final String APP_YAML_FILE_NAME = "app.yaml";
+  private static final ImmutableList<String> APPENGINE_EXTRA_CONFIG_FILE_PATHS =
+      ImmutableList.of("index.yaml", "cron.yaml", "dos.yaml", "dispatch.yaml", "queue.yaml");
 
   private AppEngineHelper helper;
   private LoggingHandler loggingHandler;
@@ -87,47 +84,19 @@ public class AppEngineDeploy {
   /**
    * Given a staging directory, deploy the application to Google App Engine.
    */
-  // TODO(eshaul) break this down into smaller parts
   public void deploy(
       @NotNull Path stagingDirectory,
       @NotNull ProcessStartListener deployStartListener) {
-    final StringBuilder rawDeployOutput = new StringBuilder();
-
-    DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
-
-    String appYamlName;
-    if (environment.isStandard() || environment.isFlexCompat()) {
-      appYamlName = FlexibleFacetEditor.APP_YAML_FILE_NAME;
-    } else {
-      String moduleName = deploymentConfiguration.getModuleName();
-      if (StringUtils.isEmpty(moduleName)) {
-        callback.errorOccurred(
-            GctBundle.message("appengine.deployment.error.appyaml.notspecified"));
-        return;
-      }
-
-      AppEngineFlexibleFacet flexFacet =
-          AppEngineFlexibleFacet.getFacetByModuleName(moduleName, helper.getProject());
-      if (flexFacet == null) {
+    Path appYamlPath = stagingDirectory.resolve(APP_YAML_FILE_NAME);
+    if (appYamlPath == null || !Files.isRegularFile(appYamlPath)) {
         // This should not happen since staging already verified the file
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.appyaml.notfound"));
         return;
-      } else {
-        appYamlName =
-            Paths.get(flexFacet.getConfiguration().getAppYamlPath()).getFileName().toString();
-      }
     }
 
-    List<File> deployables = APPENGINE_EXTRA_CONFIG_FILE_PATHS.stream()
-        .map(configFilePath -> stagingDirectory.resolve(configFilePath).toFile())
-        .filter(
-            configFile -> deploymentConfiguration.isDeployAllConfigs() && configFile.exists())
-        .collect(Collectors.toList());
-    deployables.add(stagingDirectory.resolve(appYamlName).toFile());
-    configuration.setDeployables(deployables);
-
+    DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
+    configuration.setDeployables(collectDeployables(stagingDirectory, appYamlPath));
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
-
     configuration.setPromote(deploymentConfiguration.isPromote());
 
     // Only send stopPreviousVersion if the environment is AE flexible (since standard does not
@@ -142,6 +111,7 @@ public class AppEngineDeploy {
       configuration.setVersion(deploymentConfiguration.getVersion());
     }
 
+    final StringBuilder rawDeployOutput = new StringBuilder();
     ProcessExitListener deployExitListener = new DeployExitListener(rawDeployOutput);
 
     CloudSdk sdk = helper.createSdk(
@@ -172,6 +142,55 @@ public class AppEngineDeploy {
 
   public DeploymentOperationCallback getCallback() {
     return callback;
+  }
+
+  private List<File> collectDeployables(Path stagingDirectory, Path appYamlPath) {
+    List<File> deployables = Lists.newArrayList();
+
+    if (deploymentConfiguration.isDeployAllConfigs()) {
+      Path additionalConfigsDirectory = getAdditionalConfigsDirectory(stagingDirectory,
+          environment);
+
+      if (additionalConfigsDirectory != null) {
+        deployables.addAll(collectAdditionalConfigs(additionalConfigsDirectory));
+      } else {
+        logger.warn(
+            "Error collecting additional configs for deployment: config directory could not be "
+                + "found.");
+      }
+    }
+
+    deployables.add(appYamlPath.toFile());
+
+    return deployables;
+  }
+
+  private List<File> collectAdditionalConfigs(Path additionalConfigsDirectory) {
+    return APPENGINE_EXTRA_CONFIG_FILE_PATHS
+        .stream()
+        .map(configFileName -> additionalConfigsDirectory.resolve(configFileName).toFile())
+        .filter(File::exists)
+        .collect(Collectors.toList());
+  }
+
+  @Nullable
+  private Path getAdditionalConfigsDirectory(
+      Path stagingDirectory, AppEngineEnvironment environment) {
+    if (environment == AppEngineEnvironment.APP_ENGINE_FLEX) {
+      String moduleName = deploymentConfiguration.getModuleName();
+      if (!StringUtil.isEmpty(moduleName)) {
+        AppEngineFlexibleFacet flexFacet =
+            AppEngineFlexibleFacet.getFacetByModuleName(moduleName, helper.getProject());
+        if (flexFacet != null) {
+          String configDirectory = flexFacet.getConfiguration().getConfigurationDirectory();
+          return !StringUtils.isEmpty(configDirectory) ? Paths.get(configDirectory) : null;
+        }
+      }
+
+      return null;
+    } else {
+      return stagingDirectory.resolve(APPENGINE_STANDARD_GENERATED_DIR);
+    }
   }
 
   private class DeployExitListener implements ProcessExitListener {

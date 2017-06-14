@@ -55,6 +55,7 @@ public final class AppEngineDeploymentConfigurationPanel {
 
   private static final boolean PROMOTE_DEFAULT = false;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
+  private static final boolean DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT = false;
 
   public AppEngineDeploymentConfigurationPanel() {
     versionIdField
@@ -64,6 +65,8 @@ public final class AppEngineDeploymentConfigurationPanel {
     promoteCheckbox.setSelected(PROMOTE_DEFAULT);
     stopPreviousVersionCheckbox.setSelected(STOP_PREVIOUS_VERSION_DEFAULT);
     stopPreviousVersionCheckbox.setEnabled(STOP_PREVIOUS_VERSION_DEFAULT);
+
+    deployAllConfigsCheckbox.setSelected(DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT);
 
     promoteInfoLabel.setHyperlinkText(
         GctBundle.getString("appengine.promote.info.label.beforeLink") + " ",
@@ -106,6 +109,7 @@ public final class AppEngineDeploymentConfigurationPanel {
    */
   public void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     promoteCheckbox.setSelected(configuration.isPromote());
+    deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
     versionIdField.setText(configuration.getVersion());
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     projectSelector.setText(configuration.getCloudProjectName());
@@ -121,6 +125,7 @@ public final class AppEngineDeploymentConfigurationPanel {
   public void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     configuration.setVersion(versionIdField.getText());
     configuration.setPromote(promoteCheckbox.isSelected());
+    configuration.setDeployAllConfigs(deployAllConfigsCheckbox.isSelected());
     configuration.setCloudProjectName(projectSelector.getText());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
   }
