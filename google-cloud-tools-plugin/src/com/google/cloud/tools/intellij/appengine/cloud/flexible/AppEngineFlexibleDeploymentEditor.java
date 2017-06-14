@@ -100,9 +100,6 @@ public final class AppEngineFlexibleDeploymentEditor extends
         .getEnvironmentLabel()
         .setText(AppEngineEnvironment.APP_ENGINE_FLEX.localizedLabel());
 
-    commonConfig.getDeployAllConfigsCheckbox().setSelected(false);
-    commonConfig.getDeployAllConfigsCheckbox().setVisible(false);
-
     archiveSelector.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.user.specified.artifact.title"),
         null /* description */,
@@ -436,11 +433,6 @@ public final class AppEngineFlexibleDeploymentEditor extends
   @VisibleForTesting
   TextFieldWithBrowseButton getArchiveSelector() {
     return archiveSelector;
-  }
-
-  @VisibleForTesting
-  JCheckBox getDeployAllConfigsCheckbox() {
-    return commonConfig.getDeployAllConfigsCheckbox();
   }
 
   @VisibleForTesting

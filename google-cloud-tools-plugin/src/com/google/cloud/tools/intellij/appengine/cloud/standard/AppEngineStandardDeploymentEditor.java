@@ -52,15 +52,11 @@ public final class AppEngineStandardDeploymentEditor
   private Project project;
   private AppEngineDeployable deploymentSource;
 
-  private static final boolean DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT = false;
-
   /** Initializes the UI components. */
   public AppEngineStandardDeploymentEditor(
       Project project, final AppEngineDeployable deploymentSource) {
     this.project = project;
     this.deploymentSource = deploymentSource;
-
-    commonConfig.getDeployAllConfigsCheckbox().setSelected(DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT);
 
     commonConfig
         .getServiceLabel()
@@ -81,7 +77,6 @@ public final class AppEngineStandardDeploymentEditor
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
 
-    commonConfig.getDeployAllConfigsCheckbox().setSelected(configuration.isDeployAllConfigs());
     if (deploymentSource.getEnvironment() != null) {
       commonConfig.getEnvironmentLabel().setText(deploymentSource.getEnvironment().localizedLabel());
     }
@@ -104,8 +99,6 @@ public final class AppEngineStandardDeploymentEditor
         isFlexCompat
             ? AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT.name()
             : AppEngineEnvironment.APP_ENGINE_STANDARD.name());
-
-    configuration.setDeployAllConfigs(commonConfig.getDeployAllConfigsCheckbox().isSelected());
 
     commonConfig.setDeploymentProjectAndVersion(deploymentSource);
   }
@@ -145,11 +138,6 @@ public final class AppEngineStandardDeploymentEditor
   @VisibleForTesting
   JCheckBox getStopPreviousVersionCheckbox() {
     return commonConfig.getStopPreviousVersionCheckbox();
-  }
-
-  @VisibleForTesting
-  JCheckBox getDeployAllConfigsCheckbox() {
-    return commonConfig.getDeployAllConfigsCheckbox();
   }
 
   @VisibleForTesting

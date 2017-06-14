@@ -180,8 +180,8 @@ public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testDeployAllConfigsDefaults() {
-    assertTrue(editor.getDeployAllConfigsCheckbox().isVisible());
-    assertFalse(editor.getDeployAllConfigsCheckbox().isSelected());
+    assertTrue(editor.getCommonConfig().getDeployAllConfigsCheckbox().isVisible());
+    assertFalse(editor.getCommonConfig().getDeployAllConfigsCheckbox().isSelected());
   }
 
   @Override

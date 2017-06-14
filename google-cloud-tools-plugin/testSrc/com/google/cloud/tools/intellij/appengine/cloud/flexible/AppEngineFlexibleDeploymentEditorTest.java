@@ -248,8 +248,8 @@ public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
   }
 
   public void testDeployAllConfigsDefaults() {
-    assertFalse(editor.getDeployAllConfigsCheckbox().isVisible());
-    assertFalse(editor.getDeployAllConfigsCheckbox().isSelected());
+    assertTrue(editor.getCommonConfig().getDeployAllConfigsCheckbox().isVisible());
+    assertFalse(editor.getCommonConfig().getDeployAllConfigsCheckbox().isSelected());
   }
 
   public void testFlexibleConfig_javaAppYaml() {
