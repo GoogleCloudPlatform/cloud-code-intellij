@@ -108,17 +108,13 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
     VirtualFile[] contentRoots = rootModel.getContentRoots();
     AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
     if (contentRoots.length > 0) {
-      Path moduleRoot = Paths.get(contentRoots[0].getPath());
-      Path appYamlPath = appEngineProjectService.getDefaultAppYamlPath(moduleRoot);
-      Path dockerDirectory = appEngineProjectService.getDefaultDockerDirectory(moduleRoot);
-      Path appEngineConfigurationDirectory =
-          appEngineProjectService.getDefaultAppEngineConfigurationDirectory(moduleRoot);
+      Path appYamlPath = Paths.get(
+          appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
+      Path dockerDirectory = Paths.get(
+          appEngineProjectService.getDefaultDockerDirectory(contentRoots[0].getPath()));
 
       facet.getConfiguration().setAppYamlPath(appYamlPath.toString());
       facet.getConfiguration().setDockerDirectory(dockerDirectory.toString());
-      facet
-          .getConfiguration()
-          .setConfigurationDirectory(appEngineConfigurationDirectory.toString());
 
       if (generateConfigFiles) {
         appEngineProjectService.generateAppYaml(

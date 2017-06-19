@@ -37,7 +37,6 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
 
   private String appYamlPath;
   private String dockerDirectory;
-  private String configurationDirectory;
 
   @Override
   public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
@@ -77,19 +76,11 @@ public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
     return dockerDirectory;
   }
 
-  public String getConfigurationDirectory() {
-    return configurationDirectory;
-  }
-
   public void setAppYamlPath(String appYamlPath) {
     this.appYamlPath = appYamlPath;
   }
 
   public void setDockerDirectory(String dockerDirectory) {
     this.dockerDirectory = dockerDirectory;
-  }
-
-  public void setConfigurationDirectory(String configurationDirectory) {
-    this.configurationDirectory = configurationDirectory;
   }
 }

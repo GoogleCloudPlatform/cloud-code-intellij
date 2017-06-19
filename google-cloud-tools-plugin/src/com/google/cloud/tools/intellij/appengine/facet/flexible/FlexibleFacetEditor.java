@@ -41,7 +41,6 @@ import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkLabel;
-import com.intellij.ui.IdeBorderFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nls;
@@ -80,20 +79,12 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private TextFieldWithBrowseButton dockerDirectoryField;
   private JPanel dockerfileErrorPanel;
   private HyperlinkLabel dockerfileErrorMessage;
-  private JPanel additionalConfigurationPanel;
-  private JPanel additionalConfigurationErrorPanel;
-  private TextFieldWithBrowseButton additionalConfigurationField;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
   FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
       @NotNull Module module) {
     this.module = module;
     this.facetConfiguration = facetConfiguration;
-
-    additionalConfigurationPanel.setBorder(
-        IdeBorderFactory.createTitledBorder(
-            GctBundle.message("appengine.flex.facet.config.additional.config.title"),
-            false /*hasIndent*/));
 
     appYamlErrorMessage.addHyperlinkListener(new AppYamlGenerateActionListener());
     dockerfileErrorMessage.addHyperlinkListener(new DockerfileGenerateActionListener());
@@ -108,22 +99,22 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         )
     );
 
-    appYamlField.getTextField().getDocument().addDocumentListener(new ValidationListener());
-    dockerDirectoryField.getTextField().getDocument().addDocumentListener(new ValidationListener());
-    additionalConfigurationField
-        .getTextField()
-        .getDocument()
-        .addDocumentListener(new ValidationListener());
+    appYamlField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+      @Override
+      protected void textChanged(DocumentEvent event) {
+        validateConfiguration();
+      }
+    });
+
+    dockerDirectoryField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+      @Override
+      protected void textChanged(DocumentEvent event) {
+        validateDockerfile();
+      }
+    });
 
     dockerDirectoryField.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.docker.directory"),
-        null /* description */,
-        module.getProject(),
-        FileChooserDescriptorFactory.createSingleFolderDescriptor()
-    );
-
-    additionalConfigurationField.addBrowseFolderListener(
-        GctBundle.message("appengine.flex.config.browse.additional.config.directory"),
         null /* description */,
         module.getProject(),
         FileChooserDescriptorFactory.createSingleFolderDescriptor()
@@ -141,17 +132,13 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @Override
   public boolean isModified() {
     return !appYamlField.getText().equals(facetConfiguration.getAppYamlPath())
-        || !dockerDirectoryField.getText().equals(facetConfiguration.getDockerDirectory())
-        || !additionalConfigurationField
-            .getText()
-            .equals(facetConfiguration.getConfigurationDirectory());
+        || !dockerDirectoryField.getText().equals(facetConfiguration.getDockerDirectory());
   }
 
   @Override
   public void reset() {
     appYamlField.setText(facetConfiguration.getAppYamlPath());
     dockerDirectoryField.setText(facetConfiguration.getDockerDirectory());
-    additionalConfigurationField.setText(facetConfiguration.getConfigurationDirectory());
   }
 
   @Nls
@@ -179,18 +166,14 @@ public class FlexibleFacetEditor extends FacetEditorTab {
    */
   private boolean isValidConfigurationFile(String path) {
     try {
-      return !StringUtils.isEmpty(path) && Files.isRegularFile(Paths.get(path));
+      if (!Files.isRegularFile(Paths.get(path))) {
+        return false;
+      }
     } catch (InvalidPathException ipe) {
       return false;
     }
-  }
 
-  private boolean isValidConfigurationDirectory(String path) {
-    try {
-      return !StringUtils.isEmpty(path) && Files.isDirectory(Paths.get(path));
-    } catch (InvalidPathException ipe) {
-      return false;
-    }
+    return true;
   }
 
   /**
@@ -208,8 +191,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         // We already know that runtime is parsable from {@link validateAppYaml}
       }
     }
-
-    validateAdditionalConfiguration();
   }
 
   private boolean validateAppYaml() {
@@ -232,7 +213,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private void validateDockerfile() {
     String dockerDirectoryText = dockerDirectoryField.getText();
-    if (!isValidConfigurationDirectory(dockerDirectoryText)
+    if (dockerDirectoryText.isEmpty()
+        || !Files.isDirectory(Paths.get(dockerDirectoryText))
         || !isValidConfigurationFile(Paths.get(dockerDirectoryText, DOCKERFILE_NAME).toString())) {
       toggleInvalidDockerfileState(
           GctBundle.getString(
@@ -240,11 +222,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     } else {
       toggleValidDockerfileState();
     }
-  }
-
-  private void validateAdditionalConfiguration() {
-    additionalConfigurationErrorPanel.setVisible(
-        !isValidConfigurationDirectory(additionalConfigurationField.getText()));
   }
 
   private void toggleInvalidAppYamlState(String message) {
@@ -282,9 +259,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
       ((AppEngineFlexibleFacet) facet).getConfiguration().setAppYamlPath(appYamlField.getText());
       ((AppEngineFlexibleFacet) facet).getConfiguration().setDockerDirectory(
           dockerDirectoryField.getText());
-      ((AppEngineFlexibleFacet) facet)
-          .getConfiguration()
-          .setConfigurationDirectory(additionalConfigurationField.getText());
     }
 
     // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
@@ -448,13 +422,6 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     }
   }
 
-  private final class ValidationListener extends DocumentAdapter {
-    @Override
-    protected void textChanged(DocumentEvent e) {
-      validateConfiguration();
-    }
-  }
-
   @VisibleForTesting
   TextFieldWithBrowseButton getAppYamlField() {
     return appYamlField;
@@ -483,20 +450,5 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @VisibleForTesting
   JPanel getDockerfileErrorPanel() {
     return dockerfileErrorPanel;
-  }
-
-  @VisibleForTesting
-  JPanel getAdditionalConfigurationPanel() {
-    return additionalConfigurationPanel;
-  }
-
-  @VisibleForTesting
-  JPanel getAdditionalConfigurationErrorPanel() {
-    return additionalConfigurationErrorPanel;
-  }
-
-  @VisibleForTesting
-  public TextFieldWithBrowseButton getAdditionalConfigurationField() {
-    return additionalConfigurationField;
   }
 }
