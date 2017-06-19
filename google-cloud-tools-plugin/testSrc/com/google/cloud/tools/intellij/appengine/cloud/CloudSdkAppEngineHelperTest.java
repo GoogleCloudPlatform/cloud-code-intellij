@@ -18,9 +18,11 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
@@ -33,12 +35,9 @@ import com.google.gson.Gson;
 
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
-import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -52,8 +51,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.swing.Icon;
-
 /** Unit tests for {@link CloudSdkAppEngineHelper} */
 public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
@@ -65,6 +62,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   @Mock private LoggingHandler loggingHandler;
   @Mock private DeploymentOperationCallback callback;
   @Mock private CloudSdkService sdkService;
+  @Mock private DeploymentSource undeployableDeploymentSource;
 
   @Before
   public void initialize() {
@@ -110,7 +108,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   public void testCreateDeployRunnerInvalidDeploymentSourceType_returnsNull() {
     Optional<CancellableRunnable> runner = helper.createDeployRunner(
         loggingHandler,
-        new SimpleDeploymentSource(),
+        undeployableDeploymentSource,
         deploymentConfiguration,
         callback);
 
@@ -124,7 +122,10 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
     Optional<CancellableRunnable> runner =
         helper.createDeployRunner(
-            loggingHandler, new DeployableDeploymentSource(), deploymentConfiguration, callback);
+            loggingHandler,
+            createMockDeployableDeploymentSource(),
+            deploymentConfiguration,
+            callback);
 
     assertFalse(runner.isPresent());
     verify(callback, times(1)).errorOccurred("Deployment source not found: null.");
@@ -139,117 +140,36 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
     Optional<CancellableRunnable> runner =
         helper.createDeployRunner(
-            loggingHandler, new DeployableDeploymentSource(), deploymentConfiguration, callback);
+            loggingHandler,
+            createMockDeployableDeploymentSource(),
+            deploymentConfiguration,
+            callback);
 
     assertFalse(runner.isPresent());
     verify(callback, times(1))
         .errorOccurred("No Cloud SDK was found in the specified directory. " + path.toString());
   }
 
-  private static class SimpleDeploymentSource implements DeploymentSource {
+  @Test
+  public void testCreateFlexDeployRunner_noPersistedModule() {
+    when(deploymentConfiguration.getModuleName()).thenReturn(null);
 
-    @Nullable
-    @Override
-    public File getFile() {
-      return null;
-    }
+    DeploymentSource flexSource = createMockDeployableDeploymentSource();
+    when(((AppEngineDeployable) flexSource).getEnvironment())
+        .thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
+    File mockSourceFile = mock(File.class);
+    when(mockSourceFile.exists()).thenReturn(true);
+    when(flexSource.getFile()).thenReturn(mockSourceFile);
 
-    @Nullable
-    @Override
-    public String getFilePath() {
-      return null;
-    }
+    Optional<CancellableRunnable> runner =
+        helper.createDeployRunner(
+            loggingHandler, flexSource, deploymentConfiguration, callback);
 
-    @NotNull
-    @Override
-    public String getPresentableName() {
-      return null;
-    }
-
-    @Nullable
-    @Override
-    public Icon getIcon() {
-      return null;
-    }
-
-    @Override
-    public boolean isValid() {
-      return false;
-    }
-
-    @Override
-    public boolean isArchive() {
-      return false;
-    }
-
-    @NotNull
-    @Override
-    public DeploymentSourceType<?> getType() {
-      return null;
-    }
+    assertFalse(runner.isPresent());
+    verify(callback, times(1)).errorOccurred("No app.yaml specified for flexible deployment.");
   }
 
-  private static class DeployableDeploymentSource implements DeploymentSource, AppEngineDeployable {
-
-    @Override
-    public AppEngineEnvironment getEnvironment() {
-      return null;
-    }
-
-    @Override
-    public String getProjectName() {
-      return null;
-    }
-
-    @Override
-    public void setProjectName(String projectName) {}
-
-    @Override
-    public String getVersion() {
-      return null;
-    }
-
-    @Override
-    public void setVersion(String version) {}
-
-    @Nullable
-    @Override
-    public File getFile() {
-      return null;
-    }
-
-    @Nullable
-    @Override
-    public String getFilePath() {
-      return null;
-    }
-
-    @NotNull
-    @Override
-    public String getPresentableName() {
-      return null;
-    }
-
-    @Nullable
-    @Override
-    public Icon getIcon() {
-      return null;
-    }
-
-    @Override
-    public boolean isValid() {
-      return false;
-    }
-
-    @Override
-    public boolean isArchive() {
-      return false;
-    }
-
-    @NotNull
-    @Override
-    public DeploymentSourceType<?> getType() {
-      return null;
-    }
+  private static DeploymentSource createMockDeployableDeploymentSource() {
+    return mock(DeploymentSource.class, withSettings().extraInterfaces(AppEngineDeployable.class));
   }
 }
