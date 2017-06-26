@@ -44,6 +44,24 @@
       </p>
       <br/>
 
+      <h2>[17.6.1]</h2>
+      <h3>Added</h3>
+      <ul>
+        <li>App Engine flexible facet with app.yaml and Dockerfile configuration. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1514">#1514</a>)</li>
+        <li>App Engine flexible framework support detection. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1277">#1277</a>)</li>
+      </ul>
+
+      <h3>Changed</h3>
+      <ul>
+        <li>Allow user to specify a Docker directory instead of just a Dockerfile for flexible deployments. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1304">#1304</a>)</li>
+        <li>Refresh the user experience of the deployment dialog (both standard and flexible). (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1477">#1477</a>)</li>
+      </ul>
+
+      <h3>Fixed</h3>
+      <ul>
+        <li>Fixed Google avatar size for HiDPI displays. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1391">#1391</a>)</li>
+      </ul>
+
       <h2>[17.2.5_2017]</h2>
       <h3>Added</h3>
       <ul>
