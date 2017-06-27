@@ -41,6 +41,8 @@
 [ -z "$IJ_REPO_PASSWORD" ] && \
     echo "ERROR: Releasing requires the IJ_REPO_PASSWORD environment variable" && exit 1;
 
+cd github/google-cloud-intellij
+
 export SOURCE_VERSION=$(sed -n 's/version[ tab]*=[ tab]*\(.*\)/\1/p' gradle.properties)
 [ -z "$SOURCE_VERSION" ] && \
     echo "ERROR: gradle.properties could not be parsed. Perhaps we're not in the project root?"\
@@ -61,7 +63,6 @@ fi
 
 echo "Installing aktau/github-release.."
 go get github.com/itchio/gothub
-cd github/google-cloud-intellij
 echo "Building plugins"
 ./gradlew buildPlugin
 
