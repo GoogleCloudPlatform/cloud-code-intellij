@@ -420,7 +420,7 @@ public final class AppEngineFlexibleDeploymentEditor extends
       try {
         return Paths.get(projectPath).relativize(Paths.get(path)).toString();
       } catch (IllegalArgumentException iae) {
-        // if the supplied path fails to be relativized to the project path then just fail silently
+        // if the supplied path fails to be relativized to the project path then fail silently
         // and just return the original path for display
       }
     }
