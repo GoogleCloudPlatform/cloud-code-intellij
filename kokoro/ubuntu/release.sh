@@ -68,17 +68,17 @@ echo "Building plugins"
 
 echo "Creating Github release for tag: $GIT_TAG_NAME"
 
-## GITHUB_USER and GITHUB_REPO are used by githob command.
+## GITHUB_USER and GITHUB_REPO are used by gothub command.
 export GITHUB_USER=GoogleCloudPlatform
 export GITHUB_REPO=google-cloud-intellij
-gothib release --tag $GIT_TAG_NAME
+gothub release --tag $GIT_TAG_NAME
 
 echo "Uploading Google Account Plugin artifact to release $GIT_TAG_NAME"
-gothib upload --tag $GIT_TAG_NAME --file \
+gothub upload --tag $GIT_TAG_NAME --file \
  google-account-plugin/build/distributions/google-account-${VERSION}.zip \
   --name google-account-${VERSION}.zip
 echo "Uploading Google Cloud Tools Plugin artifact to release $GIT_TAG_NAME"
-gothib upload --tag $GIT_TAG_NAME --file \
+gothub upload --tag $GIT_TAG_NAME --file \
  google-cloud-tools-plugin/build/distributions/google-cloud-tools-${VERSION}.zip \
  --name google-cloud-tools-${VERSION}.zip
 echo "Upload complete."
