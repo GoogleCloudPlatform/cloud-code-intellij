@@ -416,8 +416,13 @@ public final class AppEngineFlexibleDeploymentEditor extends
   private String tryTruncateConfigPathForDisplay(String path) {
     String projectPath = project.getBasePath();
 
-    if (projectPath != null && path.startsWith(projectPath)) {
-      return path.replaceFirst("^" + projectPath, "");
+    if (projectPath != null) {
+      try {
+        return Paths.get(projectPath).relativize(Paths.get(path)).toString();
+      } catch (IllegalArgumentException iae) {
+        // if the supplied path fails to be relativized to the project path then fail silently
+        // and just return the original path for display
+      }
     }
 
     return path;
