@@ -74,12 +74,12 @@ public class AppEngineUtilTest extends PlatformTestCase {
     ArchivePackagingElement archivePackagingElement =
         new ArchivePackagingElement(module.getName() + ".jar");
 
-    final PackagingElement<?> moduleOutput =
+    PackagingElement<?> moduleOutput =
         PackagingElementFactory.getInstance().createModuleOutput(module);
     archivePackagingElement.addFirstChild(moduleOutput);
-    final ModifiableArtifact artifact =
+    ModifiableArtifact artifact =
         modifiableArtifactModel.addArtifact(
-            "Project Artifacts", JarArtifactType.getInstance(), archivePackagingElement);
+            "test-artifact", JarArtifactType.getInstance(), archivePackagingElement);
     artifact.setBuildOnMake(true);
     return artifact;
   }
