@@ -180,8 +180,7 @@ public class AppEngineUtil {
       @NotNull Project project, @NotNull Artifact artifact) {
     // TODO(joaomartins): Find out why the GAE facet isn't being added to Gradle projects.
     // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/835
-    return ArtifactUtil
-        .getModulesIncludedInArtifacts(Collections.singletonList(artifact), project)
+    return ArtifactUtil.getModulesIncludedInArtifacts(Collections.singletonList(artifact), project)
         .stream()
         .map(AppEngineStandardFacet::getAppEngineFacetByModule)
         .map(Optional::ofNullable)
