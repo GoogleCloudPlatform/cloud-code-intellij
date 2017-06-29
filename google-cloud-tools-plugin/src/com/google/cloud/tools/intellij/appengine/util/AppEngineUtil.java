@@ -54,6 +54,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.swing.JComboBox;
 import javax.swing.JList;
@@ -182,7 +183,9 @@ public class AppEngineUtil {
     return ArtifactUtil.getModulesIncludedInArtifacts(Collections.singletonList(artifact), project)
         .stream()
         .map(AppEngineStandardFacet::getAppEngineFacetByModule)
-        .findFirst();
+        .map(Optional::ofNullable)
+        .findFirst()
+        .flatMap(Function.identity());
   }
 
   /**
