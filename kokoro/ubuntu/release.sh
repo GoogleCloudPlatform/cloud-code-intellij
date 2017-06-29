@@ -62,7 +62,7 @@ if [ "$SOURCE_VERSION" != "$TAG_VERSION" ]
 fi
 
 echo "Installing itchio/gothub.."
-sudo go get github.com/itchio/gothub || { echo "Failed to install gothub"; exit 1; }
+go get github.com/itchio/gothub || { echo "Failed to install gothub"; exit 1; }
 echo "Building plugins"
 ./gradlew buildPlugin
 
