@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 ## [unreleased]
 
+## [17.6.2]
+
+### Fixed
+  - Fixed NPE occurring when there is a local dev server configuration but no standard facet. [1525](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1525)
+
 ## [17.6.1]
 
 ### Added
