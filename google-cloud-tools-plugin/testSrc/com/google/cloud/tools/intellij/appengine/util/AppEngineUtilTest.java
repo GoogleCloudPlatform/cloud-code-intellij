@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.appengine.util;
 
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 
+import com.intellij.facet.FacetManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactManager;
@@ -35,9 +37,13 @@ import java.util.Optional;
 /** Tests for {@link AppEngineUtil}. */
 public class AppEngineUtilTest extends PlatformTestCase {
 
+  private Module module;
+
   @Override
   protected void setUp() throws Exception {
     super.setUp();
+
+    module = createModule("testModule");
   }
 
   public void testMissingAppEngineStandardFacet() {
@@ -46,8 +52,23 @@ public class AppEngineUtilTest extends PlatformTestCase {
     assertFalse(facet.isPresent());
   }
 
+  public void testPresentAppEngineStandardFacet() {
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              FacetManager.getInstance(module)
+                  .addFacet(
+                      AppEngineStandardFacet.getFacetType(),
+                      "standard facet",
+                      null /* underlyingFacet */);
+            });
+
+    Optional<AppEngineStandardFacet> facet =
+        AppEngineUtil.findAppEngineStandardFacet(getProject(), createArtifactWithModule());
+    assertTrue(facet.isPresent());
+  }
+
   private Artifact createArtifactWithModule() {
-    Module module = createModule("test");
     ArtifactManager artifactManager = ArtifactManagerImpl.getInstance(getProject());
     ModifiableArtifactModel modifiableArtifactModel = artifactManager.createModifiableModel();
     ArchivePackagingElement archivePackagingElement =
