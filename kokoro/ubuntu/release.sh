@@ -29,8 +29,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## Release script that publishes our plugins to Github and Jetbrains plugin repository
+
 ## Assert required environment variables
-set -o nounset
 
 [ -z "$ANALYTICS_ID" ] && \
     echo "ERROR: Releasing requires the ANALYTICS_ID environment variable" && exit 1;
@@ -62,7 +62,7 @@ if [ "$SOURCE_VERSION" != "$TAG_VERSION" ]
 fi
 
 echo "Installing itchio/gothub.."
-go get github.com/itchio/gothub || { echo "Failed to install gothub"; exit 1; }
+go get github.com/itchio/gothub
 echo "Building plugins"
 ./gradlew buildPlugin
 
@@ -71,18 +71,16 @@ echo "Creating Github release for tag: $GIT_TAG_NAME"
 ## GITHUB_USER and GITHUB_REPO are used by gothub command.
 export GITHUB_USER=GoogleCloudPlatform
 export GITHUB_REPO=google-cloud-intellij
-gothub release --tag $GIT_TAG_NAME || { echo "Failed to create Github release"; exit 1; }
+gothub release --tag $GIT_TAG_NAME
 
 echo "Uploading Google Account Plugin artifact to release $GIT_TAG_NAME"
 gothub upload --tag $GIT_TAG_NAME --file \
  google-account-plugin/build/distributions/google-account-${VERSION}.zip \
-  --name google-account-${VERSION}.zip || \
-   { echo "Failed to upload account plugin artifact to Github"; exit 1; }
+  --name google-account-${VERSION}.zip
 echo "Uploading Google Cloud Tools Plugin artifact to release $GIT_TAG_NAME"
 gothub upload --tag $GIT_TAG_NAME --file \
  google-cloud-tools-plugin/build/distributions/google-cloud-tools-${VERSION}.zip \
- --name google-cloud-tools-${VERSION}.zip || \
-  { echo "Failed to upload Cloud Tools plugin artifact to Github"; exit 1; }
+ --name google-cloud-tools-${VERSION}.zip
 echo "Upload complete."
 
 echo "Publishing plugin to Jetbrains plugin repository"
