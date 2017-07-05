@@ -26,6 +26,6 @@ public class DockerFileTemplateLanguage extends Language {
   static final DockerFileTemplateLanguage INSTANCE = new DockerFileTemplateLanguage();
 
   private DockerFileTemplateLanguage() {
-    super("Docker");
+    super("App Engine Dockerfile Template");
   }
 }
