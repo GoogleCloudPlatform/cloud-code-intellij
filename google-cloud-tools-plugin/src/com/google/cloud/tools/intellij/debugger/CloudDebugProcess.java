@@ -335,8 +335,14 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   private void navigateToBreakpoint(@NotNull Breakpoint target) {
     Date snapshotTime;
     try {
-      snapshotTime = ISODateTimeFormat.dateTime().parseDateTime(target.getFinalTime()).toDate();
+      if (target.getFinalTime() == null) {
+        LOG.warn("Could not resolve final time from breakpoint.");
+        snapshotTime = new Date();
+      } else {
+        snapshotTime = ISODateTimeFormat.dateTime().parseDateTime(target.getFinalTime()).toDate();
+      }
     } catch (IllegalArgumentException iae) {
+      LOG.warn("Could not parse breakpoint timestamp using ISO8601.");
       snapshotTime = new Date();
     }
 
