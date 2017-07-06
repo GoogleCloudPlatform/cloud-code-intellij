@@ -28,5 +28,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+## Continuous integration script that also publishes the plugin to the Jetbrains nightly repository channel
+
 cd github/google-cloud-intellij
+
+[ -z "$ANALYTICS_ID" ] && \
+    echo "ERROR: Releasing requires the ANALYTICS_ID environment variable" && exit 1;
+[ -z "$IJ_REPO_USERNAME" ] && \
+    echo "ERROR: Releasing requires the IJ_REPO_USERNAME environment variable" && exit 1;
+[ -z "$IJ_REPO_PASSWORD" ] && \
+    echo "ERROR: Releasing requires the IJ_REPO_PASSWORD environment variable" && exit 1;
+
+echo "Publishing plugin to Jetbrains nightly plugin repository channel"
 ./gradlew check --stacktrace
+./gradlew publishPlugin -PijPluginRepoChannel=nightly
