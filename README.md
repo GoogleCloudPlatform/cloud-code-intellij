@@ -45,6 +45,9 @@ channel. To install them please perform the following steps:
     1. Use the same steps as step 1 but use the following URL `https://plugins.jetbrains.com/plugins/alpha/8079`
     1. When installing look for the 'Google Cloud Tools' plugin.
 
+You can also grab the latest nightly build of the plugin by following the same steps as above but 
+replacing 'alpha' with 'nightly' in the URLs.
+
 If you wish to build this plugin from source, please see the
 [contributor instructions](https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/master/CONTRIBUTING.md).
 
