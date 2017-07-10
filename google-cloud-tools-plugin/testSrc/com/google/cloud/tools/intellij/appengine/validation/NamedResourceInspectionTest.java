@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.google.cloud.tools.intellij.appengine.GctConstants;
+import com.google.cloud.tools.intellij.appengine.validation.NamedResourceInspection.NamedResourceError;
 
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemHighlightType;
@@ -58,7 +59,7 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
 
   /**
    * Tests that the NamedResourceInspection's quick fix flagged with
-   * {@link NamedResourceInspection.Error.DUPLICATE_PARAMETER} for an @Named annotation updates
+   * {@link NamedResourceError.DUPLICATE_PARAMETER} for an @Named annotation updates
    * the query name by adding "_1" as a suffix.
    */
   public void testQuickFix_duplicateParameter() {
@@ -76,7 +77,7 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
 
   /**
    * Tests that the NamedResourceInspection's quick fix flagged with
-   * {@link NamedResourceInspection.Error.MISSING_NAME} for an @Named annotation
+   * {@link NamedResourceError.MISSING_NAME} for an @Named annotation
    * with no parent updates the query name to "myName".
    */
   public void testQuickFix_noQueryNameSpecifiedWithoutParameter() {
@@ -94,7 +95,7 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
 
   /**
    * Tests that the NamedResourceInspection's quick fix flagged with
-   * {@link NamedResourceInspection.Error.MISSING_NAME} for an @Named annotation
+   * {@link NamedResourceError.MISSING_NAME} for an @Named annotation
    * with a {@link PsiParameter} parent updates the query name to to the name of the
    * {@link PsiParameter}.
    */

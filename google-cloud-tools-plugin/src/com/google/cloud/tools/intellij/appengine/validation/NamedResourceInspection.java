@@ -48,11 +48,9 @@ import java.util.Map;
  */
 public class NamedResourceInspection extends EndpointInspectionBase {
 
-  public enum Error {
+  public enum NamedResourceError {
     MISSING_NAME, DUPLICATE_PARAMETER
   }
-
-  ;
 
   @Override
   @Nullable
