@@ -58,9 +58,9 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
   }
 
   /**
-   * Tests that the NamedResourceInspection's quick fix flagged with
-   * {@link NamedResourceError#DUPLICATE_PARAMETER} for an @Named annotation updates
-   * the query name by adding "_1" as a suffix.
+   * Tests that the NamedResourceInspection's quick fix flagged with {@link
+   * NamedResourceError#DUPLICATE_PARAMETER} for an @Named annotation updates the query name by
+   * adding "_1" as a suffix.
    */
   public void testQuickFix_duplicateParameter() {
     Project myProject = myFixture.getProject();
@@ -76,9 +76,9 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
   }
 
   /**
-   * Tests that the NamedResourceInspection's quick fix flagged with
-   * {@link NamedResourceError#MISSING_NAME} for an @Named annotation
-   * with no parent updates the query name to "myName".
+   * Tests that the NamedResourceInspection's quick fix flagged with {@link
+   * NamedResourceError#MISSING_NAME} for an @Named annotation with no parent updates the query name
+   * to "myName".
    */
   public void testQuickFix_noQueryNameSpecifiedWithoutParameter() {
     Project myProject = myFixture.getProject();
@@ -94,10 +94,9 @@ public class NamedResourceInspectionTest extends EndpointTestBase {
   }
 
   /**
-   * Tests that the NamedResourceInspection's quick fix flagged with
-   * {@link NamedResourceError#MISSING_NAME} for an @Named annotation
-   * with a {@link PsiParameter} parent updates the query name to to the name of the
-   * {@link PsiParameter}.
+   * Tests that the NamedResourceInspection's quick fix flagged with {@link
+   * NamedResourceError#MISSING_NAME} for an @Named annotation with a {@link PsiParameter} parent
+   * updates the query name to to the name of the {@link PsiParameter}.
    */
   public void testQuickFix_noQueryNameSpecifiedWithParameter() {
     Project myProject = myFixture.getProject();
