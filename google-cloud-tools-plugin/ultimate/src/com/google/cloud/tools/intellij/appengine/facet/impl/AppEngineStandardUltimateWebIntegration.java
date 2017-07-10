@@ -33,7 +33,6 @@ import com.intellij.ide.util.frameworkSupport.FrameworkRole;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.javaee.JavaeePersistenceDescriptorsConstants;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
-import com.intellij.javaee.artifact.JavaeeArtifactUtil;
 import com.intellij.javaee.facet.JavaeeFrameworkSupportInfoCollector;
 import com.intellij.javaee.framework.JavaeeProjectCategory;
 import com.intellij.javaee.oss.server.JavaeePersistentData;
@@ -74,12 +73,6 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   @Override
   public ArtifactType getAppEngineWebArtifactType() {
     return WebArtifactUtil.getInstance().getExplodedWarArtifactType();
-  }
-
-  @Nullable
-  @Override
-  public ArtifactType getAppEngineApplicationArtifactType() {
-    return JavaeeArtifactUtil.getInstance().getExplodedEarArtifactType();
   }
 
   @Override

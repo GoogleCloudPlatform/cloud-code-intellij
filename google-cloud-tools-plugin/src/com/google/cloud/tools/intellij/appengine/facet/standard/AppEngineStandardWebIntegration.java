@@ -66,14 +66,11 @@ public abstract class AppEngineStandardWebIntegration {
   @NotNull
   public List<ArtifactType> getAppEngineTargetArtifactTypes() {
     return ContainerUtil
-        .packNullables(getAppEngineWebArtifactType(), getAppEngineApplicationArtifactType());
+        .packNullables(getAppEngineWebArtifactType());
   }
 
   @NotNull
   public abstract ArtifactType getAppEngineWebArtifactType();
-
-  @Nullable
-  public abstract ArtifactType getAppEngineApplicationArtifactType();
 
   @NotNull
   public abstract List<FrameworkSupportInModuleProvider.FrameworkDependency>
