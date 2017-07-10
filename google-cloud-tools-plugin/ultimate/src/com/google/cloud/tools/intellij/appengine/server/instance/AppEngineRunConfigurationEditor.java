@@ -142,7 +142,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   @NotNull
   @Override
   protected JComponent createEditor() {
-    AppEngineUtil.setupAppEngineArtifactCombobox(myProject, myArtifactComboBox, false);
+    AppEngineUtil.setupAppEngineStandardArtifactCombobox(myProject, myArtifactComboBox);
     return myMainPanel;
   }
 
