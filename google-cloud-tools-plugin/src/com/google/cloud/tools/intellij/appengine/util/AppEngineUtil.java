@@ -159,7 +159,7 @@ public class AppEngineUtil {
     return moduleDeploymentSources;
   }
 
-  public static void setupAppEngineArtifactCombobox(@NotNull Project project,
+  public static void setupAppEngineStandardArtifactCombobox(@NotNull Project project,
       final @NotNull JComboBox comboBox) {
     comboBox.setRenderer(new ListCellRendererWrapper<Artifact>() {
       @Override
@@ -173,7 +173,7 @@ public class AppEngineUtil {
     });
 
     comboBox.removeAllItems();
-    collectAppEngineArtifacts(project).forEach(comboBox::addItem);
+    collectAppEngineStandardArtifacts(project).forEach(comboBox::addItem);
   }
 
   public static Optional<AppEngineStandardFacet> findAppEngineStandardFacet(
@@ -233,7 +233,7 @@ public class AppEngineUtil {
     return new UserSpecifiedPathDeploymentSource(modulePointer);
   }
 
-  private static List<Artifact> collectAppEngineArtifacts(@NotNull Project project) {
+  private static List<Artifact> collectAppEngineStandardArtifacts(@NotNull Project project) {
     final List<Artifact> artifacts = new ArrayList<>();
     if (project.isDefault()) {
       return artifacts;
