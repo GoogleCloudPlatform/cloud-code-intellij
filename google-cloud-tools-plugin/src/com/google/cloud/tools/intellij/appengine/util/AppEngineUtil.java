@@ -159,21 +159,22 @@ public class AppEngineUtil {
     return moduleDeploymentSources;
   }
 
-  public static void setupAppEngineArtifactCombobox(@NotNull Project project,
-      final @NotNull JComboBox comboBox, final boolean withAppEngineFacetOnly) {
-    comboBox.setRenderer(new ListCellRendererWrapper<Artifact>() {
-      @Override
-      public void customize(JList list, Artifact value, int index, boolean selected,
-          boolean hasFocus) {
-        if (value != null) {
-          setIcon(value.getArtifactType().getIcon());
-          setText(value.getName());
-        }
-      }
-    });
+  public static void setupAppEngineStandardArtifactCombobox(
+      @NotNull Project project, final @NotNull JComboBox comboBox) {
+    comboBox.setRenderer(
+        new ListCellRendererWrapper<Artifact>() {
+          @Override
+          public void customize(
+              JList list, Artifact value, int index, boolean selected, boolean hasFocus) {
+            if (value != null) {
+              setIcon(value.getArtifactType().getIcon());
+              setText(value.getName());
+            }
+          }
+        });
 
     comboBox.removeAllItems();
-    collectAppEngineArtifacts(project, withAppEngineFacetOnly).forEach(comboBox::addItem);
+    collectAppEngineStandardArtifacts(project).forEach(comboBox::addItem);
   }
 
   public static Optional<AppEngineStandardFacet> findAppEngineStandardFacet(
@@ -233,8 +234,7 @@ public class AppEngineUtil {
     return new UserSpecifiedPathDeploymentSource(modulePointer);
   }
 
-  private static List<Artifact> collectAppEngineArtifacts(@NotNull Project project,
-      final boolean withAppEngineFacetOnly) {
+  private static List<Artifact> collectAppEngineStandardArtifacts(@NotNull Project project) {
     final List<Artifact> artifacts = new ArrayList<>();
     if (project.isDefault()) {
       return artifacts;
@@ -243,11 +243,9 @@ public class AppEngineUtil {
     List<ArtifactType> artifactTypes =
         AppEngineStandardWebIntegration.getInstance().getAppEngineTargetArtifactTypes();
 
-    // TODO(joaomartins): Is a flexible facet check required here as well?
     return Arrays.stream(ArtifactManager.getInstance(project).getArtifacts())
         .filter(artifact -> artifactTypes.contains(artifact.getArtifactType()))
-        .filter(artifact ->
-            !withAppEngineFacetOnly || findAppEngineStandardFacet(project, artifact).isPresent())
+        .filter(artifact -> findAppEngineStandardFacet(project, artifact).isPresent())
         .sorted(ArtifactManager.ARTIFACT_COMPARATOR)
         .collect(toList());
   }
