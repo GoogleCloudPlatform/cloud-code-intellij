@@ -74,12 +74,6 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
 
   @Nullable
   @Override
-  public ArtifactType getAppEngineApplicationArtifactType() {
-    return null;
-  }
-
-  @Nullable
-  @Override
   public String getUnderlyingFrameworkTypeId() {
     return null;
   }
