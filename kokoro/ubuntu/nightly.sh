@@ -42,4 +42,4 @@
 cd github/google-cloud-intellij
 
 echo "Publishing plugin to Jetbrains plugin repository nightly channel"
-./gradlew publishPlugin -PijPluginRepoChannel=nightly
+./gradlew publishPlugin -PijPluginRepoChannel=nightly --info
