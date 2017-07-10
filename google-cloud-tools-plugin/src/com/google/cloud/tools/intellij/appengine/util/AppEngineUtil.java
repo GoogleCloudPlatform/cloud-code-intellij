@@ -159,18 +159,19 @@ public class AppEngineUtil {
     return moduleDeploymentSources;
   }
 
-  public static void setupAppEngineStandardArtifactCombobox(@NotNull Project project,
-      final @NotNull JComboBox comboBox) {
-    comboBox.setRenderer(new ListCellRendererWrapper<Artifact>() {
-      @Override
-      public void customize(JList list, Artifact value, int index, boolean selected,
-          boolean hasFocus) {
-        if (value != null) {
-          setIcon(value.getArtifactType().getIcon());
-          setText(value.getName());
-        }
-      }
-    });
+  public static void setupAppEngineStandardArtifactCombobox(
+      @NotNull Project project, final @NotNull JComboBox comboBox) {
+    comboBox.setRenderer(
+        new ListCellRendererWrapper<Artifact>() {
+          @Override
+          public void customize(
+              JList list, Artifact value, int index, boolean selected, boolean hasFocus) {
+            if (value != null) {
+              setIcon(value.getArtifactType().getIcon());
+              setText(value.getName());
+            }
+          }
+        });
 
     comboBox.removeAllItems();
     collectAppEngineStandardArtifacts(project).forEach(comboBox::addItem);
