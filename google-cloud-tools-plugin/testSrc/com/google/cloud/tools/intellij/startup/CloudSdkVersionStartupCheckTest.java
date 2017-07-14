@@ -42,7 +42,7 @@ import java.nio.file.Path;
 public class CloudSdkVersionStartupCheckTest extends BasePluginTestCase {
 
   @Mock
-  Project project;
+  Project myProject;
 
   @Mock
   CloudSdkVersionNotifier cloudSdkVersionNotifier;
@@ -63,7 +63,7 @@ public class CloudSdkVersionStartupCheckTest extends BasePluginTestCase {
     Path mockPath = mock(Path.class);
 
     when(cloudSdkService.getSdkHomePath()).thenReturn(mockPath);
-    cloudSdkVersionStartupCheck.runActivity(project);
+    cloudSdkVersionStartupCheck.runActivity(myProject);
 
     verify(cloudSdkVersionNotifier, times(1)).notifyIfUnsupportedVersion();
   }

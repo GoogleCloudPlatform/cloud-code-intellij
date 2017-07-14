@@ -46,7 +46,7 @@ import java.util.Optional;
 @RunWith(MockitoJUnitRunner.class)
 public class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
   @Mock
-  Project project;
+  Project myProject;
   @Mock
   AppEngineDeployable deployable;
   @Mock
@@ -64,12 +64,12 @@ public class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
   public void setUp() throws MalformedYamlFileException {
     registerService(AppEngineProjectService.class, projectService);
 
-    when(projectService.getServiceNameFromAppEngineWebXml(project, deployable))
+    when(projectService.getServiceNameFromAppEngineWebXml(myProject, deployable))
         .thenReturn("service");
     when(projectService.getFlexibleRuntimeFromAppYaml(isA(String.class))).thenReturn(
         Optional.of(FlexibleRuntime.JAVA));
     when(projectService.getServiceNameFromAppYaml(anyString())).thenReturn(Optional.empty());
-    when(project.getComponent(ModuleManager.class)).thenReturn(moduleManager);
+    when(myProject.getComponent(ModuleManager.class)).thenReturn(moduleManager);
     when(moduleManager.getModules()).thenReturn(new Module[]{module});
     when(module.getComponent(FacetManager.class)).thenReturn(facetManager);
     when(facetManager.getFacetByType(AppEngineFlexibleFacetType.ID)).thenReturn(null);
@@ -78,7 +78,7 @@ public class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
   @Test
   public void testCreateEditor_flexible() {
     when(deployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
-    AppEngineDeploymentConfigurator configurator = new AppEngineDeploymentConfigurator(project);
+    AppEngineDeploymentConfigurator configurator = new AppEngineDeploymentConfigurator(myProject);
 
     assertTrue(configurator.createEditor(deployable, server) instanceof AppEngineFlexibleDeploymentEditor);
   }
@@ -86,7 +86,7 @@ public class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
   @Test
   public void testCreateEditor_standard() {
     when(deployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
-    AppEngineDeploymentConfigurator configurator = new AppEngineDeploymentConfigurator(project);
+    AppEngineDeploymentConfigurator configurator = new AppEngineDeploymentConfigurator(myProject);
 
     assertTrue(configurator.createEditor(deployable, server) instanceof AppEngineStandardDeploymentEditor);
   }

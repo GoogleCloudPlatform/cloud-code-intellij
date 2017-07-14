@@ -54,7 +54,7 @@ import javax.swing.UIManager;
  * A custom cell render for {@link GoogleLoginUsersPanel#list} that manages how each user item in
  * the Google Login panel would be displayed.
  */
-public class UsersListCellRenderer extends JComponent implements ListCellRenderer {
+public class UsersListCellRenderer extends JComponent implements ListCellRenderer<UsersListItem> {
 
   private static final String CLOUD_LABEL_TEXT = AccountMessageBundle
       .message("login.panel.play.console.link.text");
@@ -122,16 +122,16 @@ public class UsersListCellRenderer extends JComponent implements ListCellRendere
 
   @Nullable
   @Override
-  public Component getListCellRendererComponent(JList list, Object value, int index,
-      boolean isSelected, boolean cellHasFocus) {
-    if (value instanceof NoUsersListItem) {
+  public Component getListCellRendererComponent(
+      JList<? extends UsersListItem> list,
+      UsersListItem usersListItem,
+      int index,
+      boolean isSelected,
+      boolean cellHasFocus) {
+    if (usersListItem instanceof NoUsersListItem) {
       return createNoUserDisplay();
     }
-    if (!(value instanceof UsersListItem)) {
-      return null;
-    }
 
-    final UsersListItem usersListItem = (UsersListItem) value;
     final CredentialedUser activeUser = Services.getLoginService().getActiveUser();
     final boolean isActiveUserSelected =
         activeUser != null && usersListItem.getUserEmail().equals(activeUser.getEmail());
