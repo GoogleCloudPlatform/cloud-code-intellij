@@ -17,17 +17,16 @@
 buildscript {
     repositories {
         maven { url "https://maven-central.storage.googleapis.com"}
-        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.1.10'
         classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.8"
-        classpath "gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.6"
     }
 }
 
 plugins {
     id 'net.researchgate.release' version '2.3.4'
+    id 'com.github.sherter.google-java-format' version '0.6' apply false
+    id 'org.jetbrains.intellij' version '0.1.10' apply false
 }
 
 subprojects {
