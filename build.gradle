@@ -15,11 +15,10 @@
  */
 
 buildscript {
+    // does this actually still help builds run faster (dl transitive dependencies?)
+    // even if buildscript dependencies are defined in plugins block?
     repositories {
-        maven { url "https://maven-central.storage.googleapis.com"}
-    }
-    dependencies {
-        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.8"
+        maven { url "https://maven-central.storage.googleapis.com" }
     }
 }
 
@@ -27,6 +26,7 @@ plugins {
     id 'net.researchgate.release' version '2.3.4'
     id 'com.github.sherter.google-java-format' version '0.6' apply false
     id 'org.jetbrains.intellij' version '0.1.10' apply false
+    id 'net.ltgt.errorprone' version '0.0.8' apply false
 }
 
 subprojects {
