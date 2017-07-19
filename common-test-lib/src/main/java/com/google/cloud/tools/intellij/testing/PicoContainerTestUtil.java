@@ -17,12 +17,9 @@
 package com.google.cloud.tools.intellij.testing;
 
 import com.google.auto.value.AutoValue;
-
 import com.intellij.openapi.application.ApplicationManager;
-
-import org.picocontainer.MutablePicoContainer;
-
 import java.util.ArrayList;
+import org.picocontainer.MutablePicoContainer;
 
 /**
  * Handles modifications to the {@link MutablePicoContainer} stored in the {@link
