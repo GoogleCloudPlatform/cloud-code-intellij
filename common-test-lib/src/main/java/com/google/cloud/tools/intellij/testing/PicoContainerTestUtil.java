@@ -48,9 +48,8 @@ public final class PicoContainerTestUtil {
    *
    * @param clazz the class of the registered component
    * @param mockedInstance the mocked instance to register
-   * @param <T> the type of the registered component
    */
-  public <T> void replaceComponentWithMock(Class<T> clazz, T mockedInstance) {
+  public void replaceComponentWithMock(Class<?> clazz, Object mockedInstance) {
     Object originalInstance = setComponent(clazz, mockedInstance);
     components.add(Component.create(clazz, originalInstance));
   }
