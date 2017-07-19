@@ -64,8 +64,8 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
       AccountMessageBundle.message("login.panel.sign.out.button.text");
   private static final int MAX_VISIBLE_ROW_COUNT = 3;
 
-  private JBList list;
-  private DefaultListModel listModel;
+  private JBList<UsersListItem> list;
+  private DefaultListModel<UsersListItem> listModel;
   private JButton signOutButton;
   private boolean valueChanged;
   private boolean ignoreSelection;
@@ -73,14 +73,14 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
   /**
    * Initializes the user login panel.
    */
-  public GoogleLoginUsersPanel() {
+  GoogleLoginUsersPanel() {
     super(new BorderLayout());
 
     int indexToSelect = initializeUsers();
     final UsersListCellRenderer usersListCellRenderer = new UsersListCellRenderer();
 
     //Create the list that displays the users and put it in a scroll pane.
-    list = new JBList(listModel) {
+    list = new JBList<UsersListItem>(listModel) {
       @Override
       public Dimension getPreferredScrollableViewportSize() {
         int numUsers = listModel.size();
@@ -242,7 +242,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
         signOutButton.setEnabled(true);
 
         // Make newly selected value the active value
-        UsersListItem selectedUser = (UsersListItem) listModel.get(list.getSelectedIndex());
+        UsersListItem selectedUser = listModel.get(list.getSelectedIndex());
         if (!selectedUser.isActiveUser()) {
           Services.getLoginService().setActiveUser(selectedUser.getUserEmail());
         }
@@ -269,7 +269,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
 
   private int initializeUsers() {
     Map<String, CredentialedUser> allUsers = Services.getLoginService().getAllUsers();
-    listModel = new DefaultListModel();
+    listModel = new DefaultListModel<>();
 
     int activeUserIndex = allUsers.size();
     for (CredentialedUser user : allUsers.values()) {
@@ -285,7 +285,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     } else if ((activeUserIndex != 0) && (activeUserIndex < listModel.getSize())) {
       // Change order of elements in the list so that the
       // active user becomes the first element in the list
-      UsersListItem activeUser = (UsersListItem) listModel.remove(activeUserIndex);
+      UsersListItem activeUser = listModel.remove(activeUserIndex);
       listModel.add(0, activeUser);
       activeUserIndex = 0;
     }
@@ -314,7 +314,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
         : MAX_VISIBLE_ROW_COUNT;
 
     for (int i = 0; i < max; i++) {
-      if (((UsersListItem) listModel.get(i)).isActiveUser()) {
+      if (listModel.get(i).isActiveUser()) {
         return true;
       }
     }

@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.server.run;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,13 +25,12 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.testFramework.PlatformTestCase;
 
 import org.picocontainer.MutablePicoContainer;
-
-import java.util.Collection;
 
 /**
  * Tests for {@link AppEngineServerConfigurationType}.
@@ -54,7 +54,8 @@ public class AppEngineServerConfigurationTypeTest extends PlatformTestCase {
   }
 
   public void testIsApplicable_notAppEngineStandardApp() {
-    when(assetProvider.loadAppEngineStandardWebXml(any(Project.class), any(Collection.class)))
+    when(assetProvider.loadAppEngineStandardWebXml(
+            any(Project.class), anyCollectionOf(Module.class)))
         .thenReturn(null);
     AppEngineServerConfigurationType configurationType
         = AppEngineServerConfigurationType.getInstance();
@@ -64,7 +65,8 @@ public class AppEngineServerConfigurationTypeTest extends PlatformTestCase {
   }
 
   public void testIsApplicable_appEngineStandardApp() {
-    when(assetProvider.loadAppEngineStandardWebXml(any(Project.class), any(Collection.class)))
+    when(assetProvider.loadAppEngineStandardWebXml(
+            any(Project.class), anyCollectionOf(Module.class)))
         .thenReturn(mock(XmlFile.class));
 
     AppEngineServerConfigurationType configurationType
