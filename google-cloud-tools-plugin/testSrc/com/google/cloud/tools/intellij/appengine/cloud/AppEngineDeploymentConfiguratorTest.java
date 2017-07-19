@@ -44,33 +44,27 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
-  @Mock
-  Project project;
-  @Mock
-  AppEngineDeployable deployable;
-  @Mock
-  RemoteServer<AppEngineServerConfiguration> server;
-  @Mock
-  AppEngineProjectService projectService;
-  @Mock
-  ModuleManager moduleManager;
-  @Mock
-  Module module;
-  @Mock
-  FacetManager facetManager;
+public final class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
+
+  @Mock private Project mockProject;
+  @Mock private AppEngineDeployable deployable;
+  @Mock private RemoteServer<AppEngineServerConfiguration> server;
+  @Mock private AppEngineProjectService projectService;
+  @Mock private ModuleManager moduleManager;
+  @Mock private Module module;
+  @Mock private FacetManager facetManager;
 
   @Before
   public void setUp() throws MalformedYamlFileException {
     registerService(AppEngineProjectService.class, projectService);
 
-    when(projectService.getServiceNameFromAppEngineWebXml(project, deployable))
+    when(projectService.getServiceNameFromAppEngineWebXml(mockProject, deployable))
         .thenReturn("service");
-    when(projectService.getFlexibleRuntimeFromAppYaml(isA(String.class))).thenReturn(
-        Optional.of(FlexibleRuntime.JAVA));
+    when(projectService.getFlexibleRuntimeFromAppYaml(isA(String.class)))
+        .thenReturn(Optional.of(FlexibleRuntime.JAVA));
     when(projectService.getServiceNameFromAppYaml(anyString())).thenReturn(Optional.empty());
-    when(project.getComponent(ModuleManager.class)).thenReturn(moduleManager);
-    when(moduleManager.getModules()).thenReturn(new Module[]{module});
+    when(mockProject.getComponent(ModuleManager.class)).thenReturn(moduleManager);
+    when(moduleManager.getModules()).thenReturn(new Module[] {module});
     when(module.getComponent(FacetManager.class)).thenReturn(facetManager);
     when(facetManager.getFacetByType(AppEngineFlexibleFacetType.ID)).thenReturn(null);
   }
@@ -78,16 +72,18 @@ public class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
   @Test
   public void testCreateEditor_flexible() {
     when(deployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
-    AppEngineDeploymentConfigurator configurator = new AppEngineDeploymentConfigurator(project);
+    AppEngineDeploymentConfigurator configurator = new AppEngineDeploymentConfigurator(mockProject);
 
-    assertTrue(configurator.createEditor(deployable, server) instanceof AppEngineFlexibleDeploymentEditor);
+    assertTrue(
+        configurator.createEditor(deployable, server) instanceof AppEngineFlexibleDeploymentEditor);
   }
 
   @Test
   public void testCreateEditor_standard() {
     when(deployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
-    AppEngineDeploymentConfigurator configurator = new AppEngineDeploymentConfigurator(project);
+    AppEngineDeploymentConfigurator configurator = new AppEngineDeploymentConfigurator(mockProject);
 
-    assertTrue(configurator.createEditor(deployable, server) instanceof AppEngineStandardDeploymentEditor);
+    assertTrue(
+        configurator.createEditor(deployable, server) instanceof AppEngineStandardDeploymentEditor);
   }
 }

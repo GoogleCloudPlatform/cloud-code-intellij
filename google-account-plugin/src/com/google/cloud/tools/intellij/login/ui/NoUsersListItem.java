@@ -16,13 +16,36 @@
 
 package com.google.cloud.tools.intellij.login.ui;
 
+import java.awt.Image;
+
 /**
  * A place holder for when no user exist. This allows us to create a customized panel
  * when no users exist.
  */
-public class NoUsersListItem {
+public class NoUsersListItem extends UsersListItem {
   public static final NoUsersListItem INSTANCE = new NoUsersListItem();
 
   private NoUsersListItem() {
+    super(null);
+  }
+
+  @Override
+  public String getUserEmail() {
+    return null;
+  }
+
+  @Override
+  public boolean isActiveUser() {
+    return false;
+  }
+
+  @Override
+  public String getUserName() {
+    return null;
+  }
+
+  @Override
+  public Image getUserPicture() {
+    return null;
   }
 }

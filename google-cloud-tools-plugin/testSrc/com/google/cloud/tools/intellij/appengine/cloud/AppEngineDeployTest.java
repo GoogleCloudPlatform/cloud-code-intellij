@@ -50,8 +50,8 @@ public class AppEngineDeployTest {
 
     AppEngineDeploy.DeployOutput deployOutput =
         AppEngineDeploy.parseDeployOutput(jsonOutput);
-    assertEquals(deployOutput.getVersion(), "20160429t112518");
-    assertEquals(deployOutput.getService(), "default");
+    assertEquals("20160429t112518", deployOutput.getVersion());
+    assertEquals("default", deployOutput.getService());
   }
 
   @Test

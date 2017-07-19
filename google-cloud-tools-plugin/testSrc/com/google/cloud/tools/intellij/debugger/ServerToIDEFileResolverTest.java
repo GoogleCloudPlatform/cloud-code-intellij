@@ -51,8 +51,8 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
     when(psiJavaFile.getPackageName()).thenReturn("com.java.package");
     when(psiJavaFile.getName()).thenReturn("Class.java");
     assertEquals(
-        ServerToIdeFileResolver.getCloudPathFromJavaFile(psiJavaFile),
-        "com/java/package/Class.java");
+        "com/java/package/Class.java",
+        ServerToIdeFileResolver.getCloudPathFromJavaFile(psiJavaFile));
   }
 
   // When searching for full file system path.

@@ -35,21 +35,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.nio.file.Path;
 
-/**
- * Unit tests for {@link CloudSdkVersionStartupCheck}
- */
+/** Unit tests for {@link CloudSdkVersionStartupCheck} */
 @RunWith(MockitoJUnitRunner.class)
-public class CloudSdkVersionStartupCheckTest extends BasePluginTestCase {
+public final class CloudSdkVersionStartupCheckTest extends BasePluginTestCase {
 
-  @Mock
-  Project project;
+  @Mock private Project mockProject;
+  @Mock private CloudSdkVersionNotifier cloudSdkVersionNotifier;
+  @Mock private CloudSdkService cloudSdkService;
 
-  @Mock
-  CloudSdkVersionNotifier cloudSdkVersionNotifier;
-  @Mock
-  CloudSdkService cloudSdkService;
-
-  CloudSdkVersionStartupCheck cloudSdkVersionStartupCheck;
+  private CloudSdkVersionStartupCheck cloudSdkVersionStartupCheck;
 
   @Before
   public void setUp() {
@@ -63,7 +57,7 @@ public class CloudSdkVersionStartupCheckTest extends BasePluginTestCase {
     Path mockPath = mock(Path.class);
 
     when(cloudSdkService.getSdkHomePath()).thenReturn(mockPath);
-    cloudSdkVersionStartupCheck.runActivity(project);
+    cloudSdkVersionStartupCheck.runActivity(mockProject);
 
     verify(cloudSdkVersionNotifier, times(1)).notifyIfUnsupportedVersion();
   }
