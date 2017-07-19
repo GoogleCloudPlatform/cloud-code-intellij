@@ -17,4 +17,7 @@
 dependencies {
     compile 'junit:junit:4.+'
     compile 'org.mockito:mockito-all:1.9.5'
+
+    compileOnly 'com.google.auto.value:auto-value:1.4.1'
+    apt         'com.google.auto.value:auto-value:1.4.1'
 }
