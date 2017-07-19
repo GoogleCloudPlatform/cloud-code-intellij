@@ -88,9 +88,6 @@ subprojects {
     }
 
     dependencies {
-        testCompileOnly 'com.google.auto.value:auto-value:1.4.1'
-        testApt         'com.google.auto.value:auto-value:1.4.1'
-
         testCompile 'junit:junit:4.+'
         testCompile ('org.mockito:mockito-core:1.9.5') {
             exclude group: 'org.hamcrest', module: 'hamcrest-core'

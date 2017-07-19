@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.intellij.appengine;
+package com.google.cloud.tools.intellij.testing;
 
 import com.google.auto.value.AutoValue;
 
