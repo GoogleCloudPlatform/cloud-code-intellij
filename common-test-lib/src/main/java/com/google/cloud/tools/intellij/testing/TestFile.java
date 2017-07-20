@@ -22,25 +22,29 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated field is a mocked value that should replace the registered component
- * in the application's {@link org.picocontainer.PicoContainer PicoContainer}.
+ * Marks a temporary {@link java.io.File File} used for testing purposes.
  *
- * <p>{@link CloudToolsRule} handles the set-up and tear-down involved for these mocks. For example,
- * this is all that is required for a mocked {@code CloudSdkService} to substitute the real
- * component in the {@link org.picocontainer.PicoContainer PicoContainer}:
+ * <p>{@link CloudToolsRule} manages the creation, injection, and destruction of this file. For
+ * example:
  *
  * <pre>
  *   &#64;Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
  *
- *   &#64;Mock &#64;MockComponent private CloudSdkService mockCloudSdkService;
- * </pre>
- *
- * <p>Now this mock can be used like any other Mockito variable:
- *
- * <pre>
- *   when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
+ *   &#64;TestFile(name = "my.file", contents = "Some contents")
+ *   private File myFile;
  * </pre>
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MockComponent {}
+public @interface TestFile {
+
+  /** The name of the file. */
+  String name();
+
+  /**
+   * The contents of the file.
+   *
+   * <p>Defaults to an empty string.
+   */
+  String contents() default "";
+}

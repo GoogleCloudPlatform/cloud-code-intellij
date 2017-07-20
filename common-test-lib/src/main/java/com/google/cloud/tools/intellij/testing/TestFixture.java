@@ -22,25 +22,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated field is a mocked value that should replace the registered component
- * in the application's {@link org.picocontainer.PicoContainer PicoContainer}.
+ * Marks a field where the {@link com.intellij.testFramework.fixtures.IdeaProjectTestFixture
+ * IdeaProjectTestFixture}, created by {@link CloudToolsRule}, should be injected.
  *
- * <p>{@link CloudToolsRule} handles the set-up and tear-down involved for these mocks. For example,
- * this is all that is required for a mocked {@code CloudSdkService} to substitute the real
- * component in the {@link org.picocontainer.PicoContainer PicoContainer}:
+ * <p>This is useful to gain access to the {@link com.intellij.openapi.project.Project Project}
+ * inside of a unit test. For example:
  *
  * <pre>
  *   &#64;Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
  *
- *   &#64;Mock &#64;MockComponent private CloudSdkService mockCloudSdkService;
- * </pre>
+ *   &#64;TestFixture private IdeaProjectTestFixture testFixture;
  *
- * <p>Now this mock can be used like any other Mockito variable:
- *
- * <pre>
- *   when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
+ *   &#64;Test
+ *   public void myTest() {
+ *     Project project = testFixture.getProject();
+ *     // Do something with the project...
+ *   }
  * </pre>
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MockComponent {}
+public @interface TestFixture {}

@@ -22,25 +22,28 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated field is a mocked value that should replace the registered component
- * in the application's {@link org.picocontainer.PicoContainer PicoContainer}.
+ * Marks a {@link com.intellij.openapi.module.Module Module} that should be created and added to the
+ * test fixture's {@link com.intellij.openapi.project.Project Project}.
  *
- * <p>{@link CloudToolsRule} handles the set-up and tear-down involved for these mocks. For example,
- * this is all that is required for a mocked {@code CloudSdkService} to substitute the real
- * component in the {@link org.picocontainer.PicoContainer PicoContainer}:
+ * <p>{@link CloudToolsRule} manages the creation and injection of this module. You can also specify
+ * a value for {@link #facetTypeId()} to have the facet associated with the given ID added to the
+ * module. For example:
  *
  * <pre>
  *   &#64;Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
  *
- *   &#64;Mock &#64;MockComponent private CloudSdkService mockCloudSdkService;
- * </pre>
- *
- * <p>Now this mock can be used like any other Mockito variable:
- *
- * <pre>
- *   when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
+ *   &#64;TestModule(facetTypeId = MyFacetType.ID)
+ *   private Module myModule;
  * </pre>
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MockComponent {}
+public @interface TestModule {
+
+  /**
+   * The ID of the {@link com.intellij.facet.FacetType FacetType} to add to the module.
+   *
+   * <p>Defaults to an empty string.
+   */
+  String facetTypeId() default "";
+}

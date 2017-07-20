@@ -17,12 +17,27 @@
 package com.google.cloud.tools.intellij.testing;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.intellij.testFramework.fixtures.BareTestFixture;
+import com.google.common.base.Strings;
+import com.intellij.facet.FacetManager;
+import com.intellij.facet.FacetTypeRegistry;
+import com.intellij.ide.highlighter.ModuleFileType;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleType;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
+import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import org.junit.function.ThrowingRunnable;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -35,8 +50,8 @@ import org.mockito.MockitoAnnotations;
  *
  * <ul>
  *   <li>Initializes mocks annotated with {@link org.mockito.Mock Mock}
- *   <li>Creates a {@link com.intellij.testFramework.fixtures.BareTestFixture BareTestFixture} and
- *       handles setting it up and tearing it down
+ *   <li>Creates an {@link IdeaProjectTestFixture} and injects the value into any fields annotated
+ *       with {@link TestFixture}
  *   <li>Uses the {@link PicoContainerTestUtil} to replace all fields annotated with {@link
  *       MockComponent} in the {@link org.picocontainer.PicoContainer PicoContainer} with the mocked
  *       field value. After the test finishes, it replaces the mocked value with the real registered
@@ -46,12 +61,13 @@ import org.mockito.MockitoAnnotations;
 public final class CloudToolsRule implements TestRule {
 
   private final Object testInstance;
-  private final BareTestFixture bareTestFixture;
+  private final List<File> filesToDelete = new ArrayList<>();
+  private final AtomicInteger moduleCounter = new AtomicInteger();
+  private IdeaProjectTestFixture testFixture;
 
   /** Returns a new instance for the given {@code testInstance}. */
   public CloudToolsRule(Object testInstance) {
     this.testInstance = Preconditions.checkNotNull(testInstance);
-    bareTestFixture = IdeaTestFixtureFactory.getFixtureFactory().createBareFixture();
   }
 
   @Override
@@ -59,18 +75,60 @@ public final class CloudToolsRule implements TestRule {
     return new Statement() {
       @Override
       public void evaluate() throws Throwable {
-        setUp();
-        base.evaluate();
-        tearDown();
+        setUp(description);
+        try {
+          base.evaluate();
+        } finally {
+          tearDown();
+        }
       }
     };
   }
 
   /** Sets up utilities before the test runs. */
-  private void setUp() throws Exception {
+  private void setUp(Description description) throws Exception {
     MockitoAnnotations.initMocks(testInstance);
-    bareTestFixture.setUp();
+    testFixture =
+        IdeaTestFixtureFactory.getFixtureFactory()
+            .createFixtureBuilder(description.getMethodName())
+            .getFixture();
+    testFixture.setUp();
 
+    populateTestFixture();
+    replaceComponentsWithMocks();
+    createTestModules();
+    createTestFiles(description.getMethodName());
+  }
+
+  /** Tears down utilities after the test has finished. */
+  private void tearDown() throws Exception {
+    PicoContainerTestUtil.getInstance().tearDown();
+    filesToDelete.forEach(File::delete);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              try {
+                testFixture.tearDown();
+              } catch (Exception e) {
+                throw new RuntimeException(e);
+              }
+            });
+  }
+
+  /** Populates all fields annotated with {@link TestFixture} with the created test fixture. */
+  private void populateTestFixture() throws IllegalAccessException {
+    for (Field field : getFieldsWithAnnotation(testInstance.getClass(), TestFixture.class)) {
+      field.setAccessible(true);
+      field.set(testInstance, testFixture);
+    }
+  }
+
+  /**
+   * Replaces all components annotated with {@link MockComponent} using the {@link
+   * PicoContainerTestUtil}.
+   */
+  private void replaceComponentsWithMocks() throws IllegalAccessException {
     for (Field field : getFieldsWithAnnotation(testInstance.getClass(), MockComponent.class)) {
       field.setAccessible(true);
       Object mockInstance = field.get(testInstance);
@@ -78,27 +136,98 @@ public final class CloudToolsRule implements TestRule {
     }
   }
 
-  /** Tears down utilities after the test has finished. */
-  private void tearDown() throws Exception {
-    bareTestFixture.tearDown();
-    PicoContainerTestUtil.getInstance().tearDown();
+  /** Creates all {@link Module modules} annotated with {@link TestModule}. */
+  private void createTestModules() throws IllegalAccessException {
+    for (Field field : getFieldsWithAnnotation(testInstance.getClass(), TestModule.class)) {
+      field.setAccessible(true);
+      if (!field.getType().equals(Module.class)) {
+        throw new IllegalArgumentException(
+            "@TestModule can only annotate fields of type com.intellij.openapi.module.Module");
+      }
+
+      writeOnMainThread(
+          () -> {
+            Module module =
+                ModuleManager.getInstance(testFixture.getProject())
+                    .newModule(
+                        testFixture.getProject().getBasePath()
+                            + "/"
+                            + moduleCounter.incrementAndGet()
+                            + ModuleFileType.DOT_DEFAULT_EXTENSION,
+                        ModuleType.EMPTY.getId());
+            field.set(testInstance, module);
+
+            String facetTypeId = field.getAnnotation(TestModule.class).facetTypeId();
+            if (!Strings.isNullOrEmpty(facetTypeId)) {
+              FacetManager.getInstance(module)
+                  .addFacet(
+                      FacetTypeRegistry.getInstance().findFacetType(facetTypeId),
+                      facetTypeId,
+                      /* underlying= */ null);
+            }
+          });
+    }
   }
 
   /**
-   * Returns the list of {@link Field fields} in the given {@code clazz} and its superclasses that
-   * are annotated with the given {@code annotationClass}.
+   * Creates all {@link File files} annotated with {@link TestFile} in the given directory name.
+   *
+   * @param directoryName the name of the directory to create the test files in
+   */
+  private void createTestFiles(String directoryName) throws IllegalAccessException, IOException {
+    for (Field field : getFieldsWithAnnotation(testInstance.getClass(), TestFile.class)) {
+      field.setAccessible(true);
+      if (!field.getType().equals(File.class)) {
+        throw new IllegalArgumentException(
+            "@TestFile can only annotate fields of type java.io.File");
+      }
+
+      TestFile annotation = field.getAnnotation(TestFile.class);
+      File directory = FileUtil.createTempDirectory(directoryName, null);
+      File file = new File(directory, annotation.name());
+      if (!file.createNewFile()) {
+        throw new IOException("Can't create file: " + file);
+      }
+      if (!annotation.contents().isEmpty()) {
+        FileUtil.writeToFile(file, annotation.contents());
+      }
+
+      filesToDelete.add(file);
+      field.set(testInstance, file);
+    }
+  }
+
+  /**
+   * Returns the list of {@link Field fields} in the given {@code clazz} that are annotated with the
+   * given {@code annotationClass}.
    *
    * @param clazz the {@link Class} to search for annotated fields
    * @param annotationClass the {@link Class} of the {@link Annotation} to search for
    */
-  private static ImmutableList<Field> getFieldsWithAnnotation(
+  private static List<Field> getFieldsWithAnnotation(
       Class<?> clazz, Class<? extends Annotation> annotationClass) {
-    ImmutableList.Builder<Field> builder = ImmutableList.builder();
-    for (Class<?> testClass = clazz; testClass != null; testClass = testClass.getSuperclass()) {
-      Arrays.stream(testClass.getDeclaredFields())
-          .filter(field -> field.isAnnotationPresent(annotationClass))
-          .forEach(builder::add);
-    }
-    return builder.build();
+    return Arrays.stream(clazz.getDeclaredFields())
+        .filter(field -> field.isAnnotationPresent(annotationClass))
+        .collect(Collectors.toList());
+  }
+
+  /** Runs the given {@link ThrowingRunnable} as a write action on the main thread. */
+  private static void writeOnMainThread(ThrowingRunnable runnable) {
+    ApplicationManager.getApplication()
+        .invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(wrap(runnable)));
+  }
+
+  /**
+   * Wraps the given {@link ThrowingRunnable} in a {@link Runnable} that transforms all {@link
+   * Throwable throwables} to a {@link RuntimeException}.
+   */
+  private static Runnable wrap(ThrowingRunnable runnable) {
+    return () -> {
+      try {
+        runnable.run();
+      } catch (Throwable throwable) {
+        throw new RuntimeException(throwable);
+      }
+    };
   }
 }
