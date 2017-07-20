@@ -25,7 +25,7 @@ import org.picocontainer.MutablePicoContainer;
  * Handles modifications to the {@link MutablePicoContainer} stored in the {@link
  * ApplicationManager} for tests that wish to mock registered components.
  */
-public final class PicoContainerTestUtil {
+final class PicoContainerTestUtil {
 
   private static final PicoContainerTestUtil INSTANCE = new PicoContainerTestUtil();
 
