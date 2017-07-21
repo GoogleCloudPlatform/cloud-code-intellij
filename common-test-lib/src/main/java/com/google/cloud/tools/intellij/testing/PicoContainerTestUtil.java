@@ -23,52 +23,50 @@ import org.picocontainer.MutablePicoContainer;
 
 /**
  * Handles modifications to the {@link MutablePicoContainer} stored in the {@link
- * ApplicationManager} for tests that wish to mock registered components.
+ * ApplicationManager} for tests that wish to replace registered services for testing purposes.
  */
-public final class PicoContainerTestUtil {
+final class PicoContainerTestUtil {
 
   private static final PicoContainerTestUtil INSTANCE = new PicoContainerTestUtil();
 
-  private final ArrayList<Component> components = new ArrayList<>();
+  private final ArrayList<Service> services = new ArrayList<>();
 
   /** Prevents instantiation. */
   private PicoContainerTestUtil() {}
 
   /** Returns the static instance of this class. */
-  public static PicoContainerTestUtil getInstance() {
+  static PicoContainerTestUtil getInstance() {
     return INSTANCE;
   }
 
   /**
-   * Replaces the registered component in the {@link MutablePicoContainer} with the given mocked
-   * instance.
+   * Replaces the registered service in the {@link MutablePicoContainer} with the given instance.
    *
    * <p>You should always call {@link #tearDown()} in the test's tear-down process if you make a
    * call to this method.
    *
-   * @param clazz the class of the registered component
-   * @param mockedInstance the mocked instance to register
-   * @param <T> the type of the registered component
+   * @param clazz the class of the registered service
+   * @param instance the new instance to register
    */
-  public <T> void replaceComponentWithMock(Class<T> clazz, T mockedInstance) {
-    Object originalInstance = setComponent(clazz, mockedInstance);
-    components.add(Component.create(clazz, originalInstance));
+  void replaceServiceWithInstance(Class<?> clazz, Object instance) {
+    Object originalInstance = setService(clazz, instance);
+    services.add(Service.create(clazz, originalInstance));
   }
 
-  /** Tears down this utility's state by re-registering all of the original component instances. */
-  public void tearDown() {
-    components.forEach(component -> setComponent(component.clazz(), component.originalInstance()));
-    components.clear();
+  /** Tears down this utility's state by re-registering all of the original service instances. */
+  void tearDown() {
+    services.forEach(service -> setService(service.clazz(), service.originalInstance()));
+    services.clear();
   }
 
   /**
-   * Replaces the component binding in the {@link MutablePicoContainer} with the given instance and
-   * returns the original component instance.
+   * Replaces the service binding in the {@link MutablePicoContainer} with the given instance and
+   * returns the original service instance.
    *
-   * @param clazz the class of the registered component
+   * @param clazz the class of the registered service
    * @param newInstance the new instance to register
    */
-  private static Object setComponent(Class<?> clazz, Object newInstance) {
+  private static Object setService(Class<?> clazz, Object newInstance) {
     MutablePicoContainer applicationContainer =
         (MutablePicoContainer) ApplicationManager.getApplication().getPicoContainer();
     Object originalInstance = applicationContainer.getComponentInstanceOfType(clazz);
@@ -77,19 +75,19 @@ public final class PicoContainerTestUtil {
     return originalInstance;
   }
 
-  /** Represents a bound component in the {@link MutablePicoContainer}. */
+  /** Represents a bound service in the {@link MutablePicoContainer}. */
   @AutoValue
-  abstract static class Component {
+  abstract static class Service {
 
-    /** Returns a new instance for the given class and original component instance. */
-    static Component create(Class<?> clazz, Object originalInstance) {
-      return new AutoValue_PicoContainerTestUtil_Component(clazz, originalInstance);
+    /** Returns a new instance for the given class and original service instance. */
+    static Service create(Class<?> clazz, Object originalInstance) {
+      return new AutoValue_PicoContainerTestUtil_Service(clazz, originalInstance);
     }
 
-    /** The class of the bound component. */
+    /** The class of the bound service. */
     abstract Class<?> clazz();
 
-    /** The original instance of the bound component. */
+    /** The original instance of the bound service. */
     abstract Object originalInstance();
   }
 }
