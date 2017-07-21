@@ -26,9 +26,6 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
@@ -42,7 +39,6 @@ import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.SystemInfo;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkLabel;
@@ -52,12 +48,9 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -74,7 +67,6 @@ import javax.swing.event.DocumentEvent;
 public final class AppEngineFlexibleDeploymentEditor extends
     SettingsEditor<AppEngineDeploymentConfiguration> {
   private static final String DEFAULT_SERVICE = "default";
-  private static final String DOCKERFILE_NAME = "Dockerfile";
   private DeploymentSource deploymentSource;
   private final AppEngineProjectService appEngineProjectService =
       AppEngineProjectService.getInstance();
@@ -232,79 +224,19 @@ public final class AppEngineFlexibleDeploymentEditor extends
   @Override
   protected void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration)
       throws ConfigurationException {
-    validateConfiguration();
-
     commonConfig.applyEditorTo(configuration);
-
-    configuration.setModuleName(
-        ((AppEngineFlexibleFacet) appYamlCombobox.getSelectedItem()).getModule().getName());
-    CredentialedUser user = commonConfig.getProjectSelector().getSelectedUser();
-    if (user != null) {
-      configuration.setGoogleUsername(user.getEmail());
-    }
-    String environment = "";
-    if (deploymentSource instanceof AppEngineDeployable) {
-      environment = ((AppEngineDeployable) deploymentSource).getEnvironment().name();
-    }
-    configuration.setEnvironment(environment);
-    configuration.setUserSpecifiedArtifact(
-        deploymentSource instanceof UserSpecifiedPathDeploymentSource);
-    configuration.setUserSpecifiedArtifactPath(archiveSelector.getText());
-    updateSelectors();
-
     commonConfig.setDeploymentProjectAndVersion(deploymentSource);
-  }
 
-  private void validateConfiguration() throws ConfigurationException {
-    if (deploymentSource instanceof UserSpecifiedPathDeploymentSource
-        && (StringUtil.isEmpty(archiveSelector.getText())
-        || !isJarOrWar(archiveSelector.getText()))) {
-      throw new ConfigurationException(
-          GctBundle.message("appengine.flex.config.user.specified.artifact.error"));
+    if (appYamlCombobox.getSelectedItem() != null) {
+      configuration.setModuleName(
+          ((AppEngineFlexibleFacet) appYamlCombobox.getSelectedItem()).getModule().getName());
     }
-    if (!(deploymentSource instanceof UserSpecifiedPathDeploymentSource)
-        && !deploymentSource.isValid()) {
-      throw new ConfigurationException(
-          GctBundle.message("appengine.config.deployment.source.error"));
-    }
-    if (StringUtils.isBlank(commonConfig.getProjectSelector().getText())) {
-      throw new ConfigurationException(
-          GctBundle.message("appengine.flex.config.project.missing.message"));
-    }
-    Set<CloudSdkValidationResult> validationResults =
-        CloudSdkService.getInstance().validateCloudSdk();
-    if (validationResults.contains(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
-      throw new ConfigurationException(GctBundle.message(
-          "appengine.cloudsdk.deploymentconfiguration.location.invalid.message"));
-    }
-    if (StringUtils.isBlank(getAppYamlPath())) {
-      throw new ConfigurationException(
-          GctBundle.message("appengine.flex.config.browse.app.yaml"));
-    }
-    if (!isValidConfigurationFile(getAppYamlPath())) {
-      throw new ConfigurationException(
-          GctBundle.getString("appengine.deployment.config.appyaml.error"));
-    }
-    try {
-      if (isCustomRuntime()) {
-        String dockerDirectoryPath = getDockerDirectoryPath();
-        if (StringUtils.isBlank(dockerDirectoryPath)) {
-          throw new ConfigurationException(
-              GctBundle.message("appengine.flex.config.browse.docker.directory"));
-        }
-        if (!isValidConfigurationFile(Paths.get(dockerDirectoryPath, DOCKERFILE_NAME).toString())) {
-          throw new ConfigurationException(
-              GctBundle.getString("appengine.deployment.config.dockerfile.error"));
-        }
-      }
-    } catch (MalformedYamlFileException myf) {
-      throw new ConfigurationException(
-          GctBundle.message("appengine.appyaml.malformed"));
-    }
-    if (!commonConfig.getApplicationInfoPanel().isApplicationValid()) {
-      throw new ConfigurationException(
-          GctBundle.message("appengine.application.required.deployment"));
-    }
+
+    configuration.setEnvironment(AppEngineEnvironment.APP_ENGINE_FLEX);
+    configuration.setUserSpecifiedArtifactPath(archiveSelector.getText());
+    configuration.setAppYamlPath(getAppYamlPath());
+    configuration.setDockerDirectoryPath(getDockerDirectoryPath());
+    updateSelectors();
   }
 
   @NotNull
@@ -325,16 +257,6 @@ public final class AppEngineFlexibleDeploymentEditor extends
 
   private void updateSelectors() {
     archiveSelectorPanel.setVisible(deploymentSource instanceof UserSpecifiedPathDeploymentSource);
-  }
-
-  private boolean isJarOrWar(String stringPath) {
-    try {
-      Path path = Paths.get(stringPath);
-      return !Files.isDirectory(path) && (StringUtil.endsWithIgnoreCase(stringPath, ".jar")
-          || StringUtil.endsWithIgnoreCase(stringPath, ".war"));
-    } catch (InvalidPathException ipe) {
-      return false;
-    }
   }
 
   private boolean isCustomRuntime() throws MalformedYamlFileException {

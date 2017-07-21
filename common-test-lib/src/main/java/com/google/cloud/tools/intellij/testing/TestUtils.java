@@ -20,7 +20,6 @@ import static org.junit.Assert.fail;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-
 import com.intellij.mock.MockApplicationEx;
 import com.intellij.mock.MockProject;
 import com.intellij.openapi.Disposable;
@@ -34,13 +33,6 @@ import com.intellij.openapi.util.Getter;
 import com.intellij.openapi.vfs.encoding.EncodingManager;
 import com.intellij.openapi.vfs.encoding.EncodingManagerImpl;
 import com.intellij.util.pico.DefaultPicoContainer;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.mockito.Mockito;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.PicoContainer;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -48,6 +40,12 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.junit.function.ThrowingRunnable;
+import org.mockito.Mockito;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.PicoContainer;
 
 /**
  * Test utilities.
@@ -171,5 +169,55 @@ public class TestUtils {
         }
       }
     }
+  }
+
+
+  /**
+   * Asserts that the given {@link ThrowingRunnable} throws an exception of type {@code
+   * expectedThrowable} when executed.
+   *
+   * @param expectedThrowable the class of the exception that should be thrown
+   * @param runnable the {@link ThrowingRunnable} that should throw
+   * @param <T> the type of exception that should be thrown
+   * @return the thrown exception of type {@code expectedThrowable}
+   * @throws AssertionError if the given {@link ThrowingRunnable} throws a different type of
+   *     exception or does not throw at all
+   */
+  public static <T extends Throwable> T expectThrows(
+      Class<T> expectedThrowable, ThrowingRunnable runnable) {
+    try {
+      runnable.run();
+    } catch (Throwable thrown) {
+      if (isInstanceOfType(thrown, expectedThrowable)) {
+        @SuppressWarnings("unchecked")
+        T retVal = (T) thrown;
+        return retVal;
+      }
+      String message =
+          String.format(
+              "Unexpected exception type thrown; expected '%s' but was '%s'.",
+              expectedThrowable.getSimpleName(), thrown.getClass().getSimpleName());
+      throw new AssertionError(message, thrown);
+    }
+
+    String message =
+        String.format(
+            "Expected '%s' to be thrown, but nothing was thrown.",
+            expectedThrowable.getSimpleName());
+    throw new AssertionError(message);
+  }
+
+  /**
+   * Returns true if the given {@code instance} can be assigned to the given {@code clazz},
+   * otherwise returns false.
+   */
+  private static boolean isInstanceOfType(Object instance, Class<?> clazz) {
+    String className = clazz.getName();
+    for (Class<?> type = instance.getClass(); type != null; type = type.getSuperclass()) {
+      if (type.getName().equals(className)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

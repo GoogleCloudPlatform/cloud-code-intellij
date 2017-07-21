@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
-import static org.mockito.Mockito.mock;
+import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
@@ -24,307 +24,274 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeployme
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-import com.google.common.collect.ImmutableSet;
-
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetConfiguration;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestFile;
+import com.google.cloud.tools.intellij.testing.TestFixture;
+import com.google.cloud.tools.intellij.testing.TestModule;
 import com.intellij.facet.FacetManager;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModulePointerManager;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.testFramework.PlatformTestCase;
-
-import org.mockito.Mock;
-import org.picocontainer.MutablePicoContainer;
-
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
 
-import javax.swing.JCheckBox;
+/** Unit tests for {@link AppEngineFlexibleDeploymentEditor}. */
+public final class AppEngineFlexibleDeploymentEditorTest {
 
-public class AppEngineFlexibleDeploymentEditorTest extends PlatformTestCase {
+  private static final String EMAIL = "example@example.com";
 
-  @Mock
-  private CloudSdkService cloudSdkService;
-  @Mock
-  private AppEngineApplicationInfoPanel appInfoPanel;
-  @Mock
-  private AppEngineArtifactDeploymentSource deploymentSource;
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
+  @Mock private AppEngineArtifactDeploymentSource deploymentSource;
+  @Mock private CredentialedUser credentialedUser;
+  @Mock private ProjectSelector projectSelector;
+  @Mock private AppEngineApplicationInfoPanel appInfoPanel;
+
+  @TestFixture private IdeaProjectTestFixture testFixture;
+
+  @TestModule(facetTypeId = AppEngineFlexibleFacetType.STRING_ID)
+  private Module javaModule;
+
+  @TestModule(facetTypeId = AppEngineFlexibleFacetType.STRING_ID)
+  private Module customModule;
+
+  @TestModule private Module nonFlexModule;
+
+  @TestFile(name = "java.yaml", contents = "runtime: java\nservice: javaService")
+  private File javaYaml;
+
+  @TestFile(name = "custom.yaml", contents = "runtime: custom\nservice: customService")
+  private File customYaml;
+
+  @TestFile(
+    name = "Dockerfile",
+    contents = "FROM gcr.io/google_appengine/jetty\nADD target.war $JETTY_BASE/webapps/root.war"
+  )
+  private File dockerfile;
+
+  @TestFile(name = "target")
+  private File notAWar;
 
   private UserSpecifiedPathDeploymentSource userSpecifiedPathDeploymentSource;
+  private AppEngineDeploymentConfiguration configuration;
   private AppEngineFlexibleDeploymentEditor editor;
-  private Module javaModule;
-  private Module customModule;
-  private File customYaml;
-  private File javaYaml;
-  private File dockerfile;
-  private AppEngineDeploymentConfiguration templateConfig;
 
-  @Override
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
+    FacetManager.getInstance(javaModule)
+        .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId())
+        .getConfiguration()
+        .setAppYamlPath(javaYaml.getPath());
+    AppEngineFlexibleFacetConfiguration customConfig =
+        FacetManager.getInstance(customModule)
+            .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId())
+            .getConfiguration();
+    customConfig.setAppYamlPath(customYaml.getPath());
+    customConfig.setDockerDirectory(dockerfile.getParentFile().getPath());
 
-    customYaml = createTempFile("custom.yaml", "runtime: custom\nservice: customService");
-    javaYaml = createTempFile("java.yaml", "runtime: java\nservice: javaService");
-    dockerfile = createTempFile("Dockerfile", "FROM gcr.io/google_appengine/jetty\n"
-        + "ADD target.war $JETTY_BASE/webapps/root.war");
+    userSpecifiedPathDeploymentSource =
+        new UserSpecifiedPathDeploymentSource(
+            ModulePointerManager.getInstance(testFixture.getProject())
+                .create(UserSpecifiedPathDeploymentSource.moduleName));
 
-    javaModule = createModule("flex module");
-    ApplicationManager.getApplication().runWriteAction(
-        () -> {
-          AppEngineFlexibleFacet flexJavaFacet = FacetManager.getInstance(javaModule).addFacet(
-              AppEngineFlexibleFacet.getFacetType(), "flex facet", null /* underlyingFacet */);
-          flexJavaFacet.getConfiguration().setAppYamlPath(javaYaml.getPath());
-        });
-    customModule = createModule("flex module 2");
-    ApplicationManager.getApplication().runWriteAction(() -> {
-      AppEngineFlexibleFacet flexCustomFacet = FacetManager.getInstance(customModule).addFacet(
-          AppEngineFlexibleFacet.getFacetType(), "flex facet", null /* underlyingFacet */);
-      flexCustomFacet.getConfiguration().setAppYamlPath(customYaml.getPath());
-      flexCustomFacet.getConfiguration().setDockerDirectory(dockerfile.getParentFile().getPath());
-    });
-    createModule("non flex module");
-
-    deploymentSource = mock(AppEngineArtifactDeploymentSource.class);
-    when(deploymentSource.isValid()).thenReturn(true);
-    when(deploymentSource.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
-
-    cloudSdkService = mock(CloudSdkService.class);
-    when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<>());
-
-    appInfoPanel = mock(AppEngineApplicationInfoPanel.class);
-    when(appInfoPanel.isApplicationValid()).thenReturn(true);
-
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
-
-    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
-
-    applicationContainer.registerComponentInstance(
-        CloudSdkService.class.getName(), cloudSdkService);
-
-    editor = new AppEngineFlexibleDeploymentEditor(getProject(), deploymentSource);
+    configuration = new AppEngineDeploymentConfiguration();
+    editor = new AppEngineFlexibleDeploymentEditor(testFixture.getProject(), deploymentSource);
     editor.setAppInfoPanel(appInfoPanel);
-    editor.getProjectSelector().setText("test project");
-
-    userSpecifiedPathDeploymentSource = new UserSpecifiedPathDeploymentSource(
-        ModulePointerManager.getInstance(getProject()).create(
-            UserSpecifiedPathDeploymentSource.moduleName));
-
-    templateConfig = new AppEngineDeploymentConfiguration();
-    templateConfig.setCloudProjectName("test project");
+    editor.getCommonConfig().setProjectSelector(projectSelector);
   }
 
-  public void testModuleSelector() {
-    assertEquals(2, editor.getAppYamlCombobox().getItemCount());
+  @After
+  public void tearDown() throws Exception {
+    editor.getAppYamlCombobox().removeAllItems();
+    Disposer.dispose(editor);
   }
 
-  public void testValidateConfiguration_emptyUserSpecified() {
-    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
-    editor.getArchiveSelector().setText("");
-    try {
-      editor.applyEditorTo(templateConfig);
-      fail("Should fail with empty deployable");
-    } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a JAR or WAR file.", cfe.getMessage());
-    }
+  @Test
+  public void moduleSelector() {
+    assertThat(editor.getAppYamlCombobox().getItemCount()).isEqualTo(2);
   }
 
-  public void testValidateConfiguration_nullUserSpecified() {
-    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
-    editor.getArchiveSelector().setText(null);
-    try {
-      editor.applyEditorTo(templateConfig);
-      fail("Should fail with null deployable");
-    } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a JAR or WAR file.", cfe.getMessage());
-    }
+  @Test
+  public void applyEditorTo_withDefaultConfiguration_doesSetDefaults() throws Exception {
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getCloudProjectName()).isNull();
+    assertThat(configuration.getGoogleUsername()).isNull();
+    assertThat(configuration.getEnvironment()).isEqualTo(AppEngineEnvironment.APP_ENGINE_FLEX);
+    assertThat(configuration.getUserSpecifiedArtifactPath()).isEmpty();
+    assertThat(configuration.isPromote()).isFalse();
+    assertThat(configuration.isStopPreviousVersion()).isFalse();
+    assertThat(configuration.getVersion()).isEmpty();
+    assertThat(configuration.isDeployAllConfigs()).isFalse();
+    assertThat(configuration.getModuleName()).isEqualTo(javaModule.getName());
+    assertThat(configuration.getAppYamlPath()).isEqualTo(javaYaml.getPath());
+    assertThat(configuration.getDockerDirectoryPath()).isEmpty();
   }
 
-  public void testValidateConfiguration_notJarOrWarUserSpecified() throws IOException {
-    File invalidWar = createTempFile("target", "");
-    userSpecifiedPathDeploymentSource.setFilePath(invalidWar.getPath());
-    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
-    editor.getArchiveSelector().setText(invalidWar.getPath());
-    try {
-      editor.applyEditorTo(templateConfig);
-      fail("Not a war or jar artifact");
-    } catch (ConfigurationException cfe) {
-      assertEquals("Browse to a JAR or WAR file.", cfe.getMessage());
-    }
+  @Test
+  public void applyEditorTo_doesSetVersion() throws Exception {
+    String version = "some-version";
+    editor.getCommonConfig().getVersionIdField().setText(version);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getVersion()).isEqualTo(version);
   }
 
-  public void testValidateConfiguration_validWar() throws IOException, ConfigurationException {
-    File war = createTempFile("target.war", "");
-    userSpecifiedPathDeploymentSource.setFilePath(war.getPath());
-    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
-    editor.getArchiveSelector().setText(war.getPath());
-    editor.applyEditorTo(templateConfig);
-  }
-
-  public void testValidateConfiguration_validJar() throws IOException, ConfigurationException {
-    File jar = createTempFile("target.jar", "");
-    userSpecifiedPathDeploymentSource.setFilePath(jar.getPath());
-    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
-    editor.getArchiveSelector().setText(jar.getPath());
-    editor.applyEditorTo(templateConfig);
-  }
-
-  public void testValidateConfiguration_invalidArtifact() {
-    when(deploymentSource.isValid()).thenReturn(false);
-    try {
-      editor.applyEditorTo(templateConfig);
-      fail("Should be invalid artifact.");
-    } catch (ConfigurationException cfe) {
-      assertEquals("Select a valid deployment source.", cfe.getMessage());
-    }
-  }
-
-  public void testValidateConfiguration_blankProjectSelector() {
-    editor.getProjectSelector().setText("");
-    try {
-      editor.applyEditorTo(templateConfig);
-      fail("Project selector is blank.");
-    } catch (ConfigurationException cfe) {
-      assertEquals("Please select a project.", cfe.getMessage());
-    }
-  }
-
-  public void testValidateConfiguration_nullProjectSelector() {
-    editor.getProjectSelector().setText(null);
-    try {
-      editor.applyEditorTo(templateConfig);
-      fail("Project selector is null");
-    } catch (ConfigurationException cfe) {
-      assertEquals("Please select a project.", cfe.getMessage());
-    }
-  }
-
-  public void testValidateConfiguration_invalidCloudSdk() {
-    when(cloudSdkService.validateCloudSdk())
-        .thenReturn(ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
-    try {
-      editor.applyEditorTo(templateConfig);
-      fail("Project selector is null");
-    } catch (ConfigurationException cfe) {
-      assertEquals("The Cloud SDK is misconfigured. To fix, reconfigure the Server.", cfe.getMessage());
-    }
-  }
-
-  public void testValidateConfiguration_invalidApplication() {
-    when(appInfoPanel.isApplicationValid()).thenReturn(false);
-    try {
-      editor.applyEditorTo(templateConfig);
-      fail("Invalid application.");
-    } catch (ConfigurationException cfe) {
-      assertEquals("An App Engine application must be created before you can deploy to App Engine.",
-          cfe.getMessage());
-    }
-  }
-
-  public void testPromote_StopPreviousVersion_Flexible() {
-    JCheckBox promoteCheckbox = editor.getCommonConfig().getPromoteCheckbox();
-    JCheckBox stopPreviousVersionCheckbox = editor.getStopPreviousVersionCheckBox();
-
-    assertFalse(promoteCheckbox.isSelected());
-    assertFalse(stopPreviousVersionCheckbox.isSelected());
-    assertFalse(stopPreviousVersionCheckbox.isEnabled());
-
-    // Disable the promote checkbox and test that stopPreviousVersion behaves correctly
-    promoteCheckbox.setSelected(false);
-
-    assertFalse(stopPreviousVersionCheckbox.isSelected());
-    assertFalse(stopPreviousVersionCheckbox.isEnabled());
-  }
-
-  public void testSelectPromote_enablesStop() {
+  @Test
+  public void applyEditorTo_doesSetPromote() throws Exception {
     editor.getCommonConfig().getPromoteCheckbox().setSelected(true);
-    assertTrue(editor.getStopPreviousVersionCheckBox().isSelected());
-    assertTrue(editor.getStopPreviousVersionCheckBox().isVisible());
-    assertTrue(editor.getStopPreviousVersionCheckBox().isEnabled());
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.isPromote()).isTrue();
   }
 
-  public void testDeployAllConfigsDefaults() {
-    assertFalse(editor.getDeployAllConfigsCheckbox().isVisible());
-    assertFalse(editor.getDeployAllConfigsCheckbox().isSelected());
+  @Test
+  public void applyEditorTo_doesSetCloudProjectName() throws Exception {
+    String project = "some-project";
+    when(projectSelector.getText()).thenReturn(project);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getCloudProjectName()).isEqualTo(project);
   }
 
-  public void testFlexibleConfig_javaAppYaml() {
+  @Test
+  public void applyEditorTo_doesSetStopPreviousVersion() throws Exception {
+    editor.getCommonConfig().getStopPreviousVersionCheckbox().setSelected(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.isStopPreviousVersion()).isTrue();
+  }
+
+  @Test
+  public void applyEditorTo_withUser_doesSetGoogleUsername() throws Exception {
+    when(credentialedUser.getEmail()).thenReturn(EMAIL);
+    when(projectSelector.getSelectedUser()).thenReturn(credentialedUser);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getGoogleUsername()).isEqualTo(EMAIL);
+  }
+
+  @Test
+  public void applyEditorTo_notJarOrWarUserSpecified() throws Exception {
+    userSpecifiedPathDeploymentSource.setFilePath(notAWar.getPath());
+    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
+    editor.getArchiveSelector().setText(notAWar.getPath());
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getUserSpecifiedArtifactPath()).isEqualTo(notAWar.getPath());
+  }
+
+  @Test
+  public void applyEditorTo_validWar() throws Exception {
+    String war = "some-war.war";
+    userSpecifiedPathDeploymentSource.setFilePath(war);
+    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
+    editor.getArchiveSelector().setText(war);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getUserSpecifiedArtifactPath()).isEqualTo(war);
+  }
+
+  @Test
+  public void applyEditorTo_validJar() throws Exception {
+    String jar = "some-jar.jar";
+    userSpecifiedPathDeploymentSource.setFilePath(jar);
+    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
+    editor.getArchiveSelector().setText(jar);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getUserSpecifiedArtifactPath()).isEqualTo(jar);
+  }
+
+  @Test
+  public void flexibleConfig_javaAppYaml() {
     AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getFacetByModule(javaModule);
     editor.getAppYamlCombobox().setSelectedItem(facet);
 
-    assertFalse(editor.getDockerDirectoryPanel().isVisible());
-    assertTrue(editor.getRuntimePanel().isVisible());
-    assertEquals("java", editor.getRuntimePanel().getLabelText());
+    assertThat(editor.getDockerDirectoryPanel().isVisible()).isFalse();
+    assertThat(editor.getRuntimePanel().isVisible()).isTrue();
+    assertThat(editor.getRuntimePanel().getLabelText()).isEqualTo("java");
   }
 
-  public void testFlexibleConfig_customAppYaml() {
+  @Test
+  public void flexibleConfig_customAppYaml() {
     AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getFacetByModule(customModule);
     editor.getAppYamlCombobox().setSelectedItem(facet);
 
-    assertTrue(editor.getDockerDirectoryPanel().isVisible());
-    assertTrue(editor.getRuntimePanel().isVisible());
-    assertEquals("custom", editor.getRuntimePanel().getLabelText());
+    assertThat(editor.getDockerDirectoryPanel().isVisible()).isTrue();
+    assertThat(editor.getRuntimePanel().isVisible()).isTrue();
+    assertThat(editor.getRuntimePanel().getLabelText()).isEqualTo("custom");
   }
 
-  public void testFlexibleConfig_restoredFromPersistedConfiguration() {
+  @Test
+  public void flexibleConfig_restoredFromPersistedConfiguration() {
     // set the stored app.yaml to the java yaml
-    templateConfig.setModuleName(javaModule.getName());
-    editor.resetEditorFrom(templateConfig);
+    configuration.setModuleName(javaModule.getName());
+    editor.resetEditorFrom(configuration);
 
-    AppEngineFlexibleFacet javaModuleFacet =
-        AppEngineFlexibleFacet.getFacetByModule(javaModule);
-    assertEquals(javaModuleFacet, editor.getAppYamlCombobox().getSelectedItem());
+    AppEngineFlexibleFacet javaModuleFacet = AppEngineFlexibleFacet.getFacetByModule(javaModule);
+    assertThat(editor.getAppYamlCombobox().getSelectedItem()).isEqualTo(javaModuleFacet);
 
     // set the stored app.yaml to the custom yaml
-    templateConfig.setModuleName(customModule.getName());
-    editor.resetEditorFrom(templateConfig);
+    configuration.setModuleName(customModule.getName());
+    editor.resetEditorFrom(configuration);
 
     AppEngineFlexibleFacet customModuleFacet =
         AppEngineFlexibleFacet.getFacetByModule(customModule);
-    assertEquals(customModuleFacet, editor.getAppYamlCombobox().getSelectedItem());
+    assertThat(editor.getAppYamlCombobox().getSelectedItem()).isEqualTo(customModuleFacet);
   }
 
-  public void testFlexibleConfig_unselectedWhenNullPersistedConfig() {
-    templateConfig.setModuleName(null);
-    editor.resetEditorFrom(templateConfig);
-    assertNull(editor.getAppYamlCombobox().getSelectedItem());
+  @Test
+  public void flexibleConfig_unselectedWhenNullPersistedConfig() {
+    configuration.setModuleName(null);
+    editor.resetEditorFrom(configuration);
+    assertThat(editor.getAppYamlCombobox().getSelectedItem()).isNull();
   }
 
-  public void testAppYamlEditButton_visibleWhenAppYamlSelected() {
-    templateConfig.setModuleName(javaModule.getName());
-    editor.resetEditorFrom(templateConfig);
+  @Test
+  public void appYamlEditButton_visibleWhenAppYamlSelected() {
+    configuration.setModuleName(javaModule.getName());
+    editor.resetEditorFrom(configuration);
 
-    assertTrue(editor.getEditAppYamlButton().isVisible());
+    assertThat(editor.getEditAppYamlButton().isVisible()).isTrue();
   }
 
-  public void testAppYamlEditButton_hiddenWhenNoAppYamlSelected() {
-    templateConfig.setModuleName(null);
-    editor.resetEditorFrom(templateConfig);
+  @Test
+  public void appYamlEditButton_hiddenWhenNoAppYamlSelected() {
+    configuration.setModuleName(null);
+    editor.resetEditorFrom(configuration);
 
-    assertFalse(editor.getEditAppYamlButton().isVisible());
+    assertThat(editor.getEditAppYamlButton().isVisible()).isFalse();
   }
 
-  public void testServiceNameIsUpdated_whenAppYamlSelectionChanges() {
-    templateConfig.setModuleName(javaModule.getName());
-    editor.resetEditorFrom(templateConfig);
+  @Test
+  public void serviceNameIsUpdated_whenAppYamlSelectionChanges() {
+    configuration.setModuleName(javaModule.getName());
+    editor.resetEditorFrom(configuration);
 
-    assertEquals("javaService", editor.getCommonConfig().getServiceLabel().getText());
+    assertThat(editor.getCommonConfig().getServiceLabel().getText()).isEqualTo("javaService");
 
     // Now update to custom service
     AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getFacetByModule(customModule);
     editor.getAppYamlCombobox().setSelectedItem(facet);
 
-    assertEquals("customService", editor.getCommonConfig().getServiceLabel().getText());
-  }
-
-  @Override
-  public void tearDown() throws Exception {
-    editor.getAppYamlCombobox().removeAllItems();
-    Disposer.dispose(editor);
-    super.tearDown();
+    assertThat(editor.getCommonConfig().getServiceLabel().getText()).isEqualTo("customService");
   }
 }

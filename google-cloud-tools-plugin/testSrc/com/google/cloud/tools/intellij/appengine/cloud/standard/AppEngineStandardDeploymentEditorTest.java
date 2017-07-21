@@ -16,177 +16,274 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.standard;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
+import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
-import com.google.common.collect.ImmutableSet;
-
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.options.ConfigurationException;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestService;
+import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.testFramework.PlatformTestCase;
-
-import org.apache.commons.lang.StringUtils;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.Mock;
-import org.picocontainer.MutablePicoContainer;
 
-import java.util.HashSet;
+/** Unit tests for {@link AppEngineStandardDeploymentEditor}. */
+@RunWith(JUnit4.class)
+public final class AppEngineStandardDeploymentEditorTest {
 
-public class AppEngineStandardDeploymentEditorTest extends PlatformTestCase {
+  private static final String EMAIL = "example@example.com";
 
-  private static final String PROJECT_NAME = "test-proj";
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
+  @Mock private AppEngineArtifactDeploymentSource deploymentSource;
+  @Mock private CredentialedUser credentialedUser;
+  @Mock private ProjectSelector projectSelector;
+  @Mock @TestService private AppEngineProjectService mockAppEngineProjectService;
+
+  @TestFixture private IdeaProjectTestFixture testFixture;
+
+  private AppEngineDeploymentConfiguration configuration;
   private AppEngineStandardDeploymentEditor editor;
-  private AppEngineArtifactDeploymentSource deploymentSource;
-  private ProjectSelector projectSelector;
-  private CloudSdkService cloudSdkService;
-  @Mock
-  private AppEngineApplicationInfoPanel infoPanel;
 
-  @Override
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
-
-    deploymentSource = mock(AppEngineArtifactDeploymentSource.class);
-    when(deploymentSource.isValid()).thenReturn(true);
-
-    projectSelector = mock(ProjectSelector.class);
-    when(projectSelector.getText()).thenReturn(PROJECT_NAME);
-
-    cloudSdkService = mock(CloudSdkService.class);
-    when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<>());
-
-    infoPanel = mock(AppEngineApplicationInfoPanel.class);
-    when(infoPanel.isApplicationValid()).thenReturn(true);
-    doNothing().when(infoPanel).refresh(anyString(), isA(Credential.class));
-
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
-
-    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
-
-    applicationContainer.registerComponentInstance(
-        CloudSdkService.class.getName(), cloudSdkService);
-
-    editor = new AppEngineStandardDeploymentEditor(getProject(), deploymentSource);
-    editor.setProjectSelector(projectSelector);
-    editor.setApplicationInfoPanel(infoPanel);
+    configuration = new AppEngineDeploymentConfiguration();
+    editor = new AppEngineStandardDeploymentEditor(testFixture.getProject(), deploymentSource);
+    editor.getCommonConfig().setProjectSelector(projectSelector);
   }
 
-  public void testValidateConfiguration() throws ConfigurationException {
-    AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
-    config.setCloudProjectName("test-cloud-proj");
-    when(cloudSdkService.validateCloudSdk()).thenReturn(new HashSet<>());
-
-    editor.applyEditorTo(config);
-  }
-
-  public void testValidateConfiguration_invalidDeploymentSource() {
-    when(deploymentSource.isValid()).thenReturn(false);
-    AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
-
-    try {
-      editor.applyEditorTo(config);
-      fail("Invalid deployment source.");
-    } catch (ConfigurationException e) {
-      assertTrue(e.getMessage().equals("Select a valid deployment source."));
-      assertNull(config.getVersion());
-    }
-  }
-
-  public void testValidateConfiguration_blankProjectSelector() {
-    AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
-    when(projectSelector.getText()).thenReturn("");
-
-    try {
-      editor.applyEditorTo(config);
-      fail("No project selected.");
-    } catch (ConfigurationException e) {
-      assertTrue(e.getMessage().equals("Please select a project."));
-      assertNull(config.getVersion());
-    }
-  }
-
-  public void testValidateConfiguration_invalidApplication() {
-    AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
-    when(infoPanel.isApplicationValid()).thenReturn(false);
-
-    try {
-      editor.applyEditorTo(config);
-      fail("Invalid application.");
-    } catch (ConfigurationException e) {
-      assertTrue(e.getMessage().equals(
-          "An App Engine application must be created before you can deploy to App Engine."));
-      assertNull(config.getVersion());
-    }
-  }
-
-  public void testValidateConfiguration_invalidCloudSdk() {
-    when(cloudSdkService.validateCloudSdk()).thenReturn(
-        ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
-    AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
-    config.setCloudProjectName("test-cloud-proj");
-
-    try {
-      editor.applyEditorTo(config);
-      fail("Cloud SDK not found validation error expected");
-    } catch (ConfigurationException ce) {
-      assertTrue(!StringUtils.isEmpty(ce.getMessage()));
-      assertNull(config.getVersion());
-    }
-  }
-
-  public void testValidateConfiguration_missingJavaComponent() {
-    when(cloudSdkService.validateCloudSdk()).thenReturn(
-        ImmutableSet.of(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
-    AppEngineDeploymentConfiguration config = new AppEngineDeploymentConfiguration();
-    config.setCloudProjectName("test-cloud-proj");
-
-    try {
-      editor.applyEditorTo(config);
-      fail("Missing Java component validation error expected");
-    } catch (ConfigurationException ce) {
-      assertTrue(!StringUtils.isEmpty(ce.getMessage()));
-      assertNull(config.getVersion());
-    }
-  }
-
-  public void testPromoteAndStopDefaults() {
-    assertFalse(editor.getCommonConfig().getPromoteCheckbox().isSelected());
-    assertFalse(editor.getStopPreviousVersionCheckbox().isSelected());
-    assertTrue(editor.getStopPreviousVersionCheckbox().isVisible());
-  }
-
-  public void testUnselectPromote_disablesStop() {
-    editor.getCommonConfig().getPromoteCheckbox().setSelected(false);
-    assertFalse(editor.getStopPreviousVersionCheckbox().isSelected());
-    assertFalse(editor.getStopPreviousVersionCheckbox().isEnabled());
-  }
-
-  public void testSelectPromote_enablesStop() {
-    editor.getCommonConfig().getPromoteCheckbox().setSelected(true);
-    assertTrue(editor.getStopPreviousVersionCheckbox().isSelected());
-    assertTrue(editor.getStopPreviousVersionCheckbox().isVisible());
-    assertTrue(editor.getStopPreviousVersionCheckbox().isEnabled());
-  }
-
-  public void testDeployAllConfigsDefaults() {
-    assertTrue(editor.getDeployAllConfigsCheckbox().isVisible());
-    assertFalse(editor.getDeployAllConfigsCheckbox().isSelected());
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     Disposer.dispose(editor);
-    super.tearDown();
+  }
+
+  @Test
+  public void newInstance_doesSetServiceLabel() {
+    String serviceName = "some-service-name";
+    when(mockAppEngineProjectService.getServiceNameFromAppEngineWebXml(
+            testFixture.getProject(), deploymentSource))
+        .thenReturn(serviceName);
+
+    Disposer.dispose(editor);
+    editor = new AppEngineStandardDeploymentEditor(testFixture.getProject(), deploymentSource);
+
+    assertThat(editor.getCommonConfig().getServiceLabel().getText()).isEqualTo(serviceName);
+  }
+
+  @Test
+  public void newInstance_doesSetEnvironmentLabel() {
+    when(deploymentSource.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
+
+    Disposer.dispose(editor);
+    editor = new AppEngineStandardDeploymentEditor(testFixture.getProject(), deploymentSource);
+
+    assertThat(editor.getCommonConfig().getEnvironmentLabel().getText())
+        .isEqualTo(AppEngineEnvironment.APP_ENGINE_STANDARD.localizedLabel());
+  }
+
+  @Test
+  public void newInstance_withStandardEnvironment_doesHideCostWarningPanel() {
+    when(deploymentSource.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
+
+    Disposer.dispose(editor);
+    editor = new AppEngineStandardDeploymentEditor(testFixture.getProject(), deploymentSource);
+
+    assertThat(editor.getCommonConfig().getAppEngineCostWarningPanel().isVisible()).isFalse();
+  }
+
+  @Test
+  public void newInstance_withFlexEnvironment_doesHideCostWarningPanel() {
+    when(deploymentSource.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
+
+    Disposer.dispose(editor);
+    editor = new AppEngineStandardDeploymentEditor(testFixture.getProject(), deploymentSource);
+
+    assertThat(editor.getCommonConfig().getAppEngineCostWarningPanel().isVisible()).isFalse();
+  }
+
+  @Test
+  public void newInstance_withFlexCompatEnvironment_doesNotHideCostWarningPanel() {
+    when(deploymentSource.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT);
+
+    Disposer.dispose(editor);
+    editor = new AppEngineStandardDeploymentEditor(testFixture.getProject(), deploymentSource);
+
+    assertThat(editor.getCommonConfig().getAppEngineCostWarningPanel().isVisible()).isTrue();
+  }
+
+  @Test
+  public void applyEditorTo_withDefaultConfiguration_doesSetDefaults() throws Exception {
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getCloudProjectName()).isNull();
+    assertThat(configuration.getGoogleUsername()).isNull();
+    assertThat(configuration.getEnvironment()).isEqualTo(AppEngineEnvironment.APP_ENGINE_STANDARD);
+    assertThat(configuration.getUserSpecifiedArtifactPath()).isNull();
+    assertThat(configuration.isPromote()).isFalse();
+    assertThat(configuration.isStopPreviousVersion()).isFalse();
+    assertThat(configuration.getVersion()).isEmpty();
+    assertThat(configuration.isDeployAllConfigs()).isFalse();
+    assertThat(configuration.getModuleName()).isNull();
+    assertThat(configuration.getAppYamlPath()).isNull();
+    assertThat(configuration.getDockerDirectoryPath()).isNull();
+  }
+
+  @Test
+  public void applyEditorTo_doesSetVersion() throws Exception {
+    String version = "some-version";
+    editor.getCommonConfig().getVersionIdField().setText(version);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getVersion()).isEqualTo(version);
+  }
+
+  @Test
+  public void applyEditorTo_doesSetPromote() throws Exception {
+    editor.getCommonConfig().getPromoteCheckbox().setSelected(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.isPromote()).isTrue();
+  }
+
+  @Test
+  public void applyEditorTo_doesSetCloudProjectName() throws Exception {
+    String project = "some-project";
+    when(projectSelector.getText()).thenReturn(project);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getCloudProjectName()).isEqualTo(project);
+  }
+
+  @Test
+  public void applyEditorTo_doesSetStopPreviousVersion() throws Exception {
+    editor.getCommonConfig().getStopPreviousVersionCheckbox().setSelected(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.isStopPreviousVersion()).isTrue();
+  }
+
+
+  @Test
+  public void applyEditorTo_doesSetDeployAllConfigs() throws Exception {
+    editor.getCommonConfig().getDeployAllConfigsCheckbox().setSelected(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.isDeployAllConfigs()).isTrue();
+  }
+
+  @Test
+  public void applyEditorTo_withUser_doesSetGoogleUsername() throws Exception {
+    when(credentialedUser.getEmail()).thenReturn(EMAIL);
+    when(projectSelector.getSelectedUser()).thenReturn(credentialedUser);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getGoogleUsername()).isEqualTo(EMAIL);
+  }
+
+  @Test
+  public void applyEditorTo_withFlexCompatSource_doesSetEnvironment() throws Exception {
+    when(mockAppEngineProjectService.isFlexCompat(testFixture.getProject(), deploymentSource))
+        .thenReturn(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getEnvironment())
+        .isEqualTo(AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT);
+  }
+
+  @Test
+  public void resetEditorFrom_withDefaultConfiguration_doesSetDefaults() {
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getVersionIdField().getText()).isEmpty();
+    assertThat(editor.getCommonConfig().getPromoteCheckbox().isSelected()).isFalse();
+    assertThat(editor.getCommonConfig().getProjectSelector().getText()).isNull();
+    assertThat(editor.getCommonConfig().getStopPreviousVersionCheckbox().isSelected()).isFalse();
+    assertThat(editor.getCommonConfig().getDeployAllConfigsCheckbox().isSelected()).isFalse();
+    assertThat(editor.getCommonConfig().getEnvironmentLabel().getText()).isEmpty();
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetVersion() {
+    String version = "some-version;";
+    configuration.setVersion(version);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getVersionIdField().getText()).isEqualTo(version);
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetPromote() {
+    configuration.setPromote(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getPromoteCheckbox().isSelected()).isTrue();
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetStopPreviousVersion() {
+    configuration.setStopPreviousVersion(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getStopPreviousVersionCheckbox().isSelected()).isTrue();
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetDeployAllConfigs() {
+    configuration.setDeployAllConfigs(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getDeployAllConfigsCheckbox().isSelected()).isTrue();
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetEnvironment() {
+    AppEngineEnvironment environment = AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT;
+    configuration.setEnvironment(environment);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getEnvironmentLabel().getText())
+        .isEqualTo(environment.localizedLabel());
+  }
+
+  @Test
+  public void resetEditorFrom_doesNotSetCloudProjectName() {
+    configuration.setCloudProjectName("some-project");
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getProjectSelector().getText()).isNull();
+  }
+
+
+  @Test
+  public void resetEditorFrom_doesNotSetGoogleUsername() {
+    configuration.setGoogleUsername("some@user.name");
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getProjectSelector().getSelectedUser()).isNull();
   }
 }
