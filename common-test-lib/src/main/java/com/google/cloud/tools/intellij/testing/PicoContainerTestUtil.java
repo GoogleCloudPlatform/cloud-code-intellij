@@ -23,7 +23,7 @@ import org.picocontainer.MutablePicoContainer;
 
 /**
  * Handles modifications to the {@link MutablePicoContainer} stored in the {@link
- * ApplicationManager} for tests that wish to mock registered services.
+ * ApplicationManager} for tests that wish to replace registered services for testing purposes.
  */
 final class PicoContainerTestUtil {
 
@@ -40,17 +40,16 @@ final class PicoContainerTestUtil {
   }
 
   /**
-   * Replaces the registered service in the {@link MutablePicoContainer} with the given mocked
-   * instance.
+   * Replaces the registered service in the {@link MutablePicoContainer} with the given instance.
    *
    * <p>You should always call {@link #tearDown()} in the test's tear-down process if you make a
    * call to this method.
    *
    * @param clazz the class of the registered service
-   * @param mockedInstance the mocked instance to register
+   * @param instance the new instance to register
    */
-  void replaceServiceWithMock(Class<?> clazz, Object mockedInstance) {
-    Object originalInstance = setService(clazz, mockedInstance);
+  void replaceServiceWithInstance(Class<?> clazz, Object instance) {
+    Object originalInstance = setService(clazz, instance);
     services.add(Service.create(clazz, originalInstance));
   }
 

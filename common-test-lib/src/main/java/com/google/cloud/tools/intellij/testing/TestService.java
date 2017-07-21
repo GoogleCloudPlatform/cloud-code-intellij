@@ -22,17 +22,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated field is a mocked value that should replace the registered service
- * in the application's {@link org.picocontainer.PicoContainer PicoContainer}.
+ * Indicates that the annotated field should replace the registered service in the application's
+ * {@link org.picocontainer.PicoContainer PicoContainer}.
  *
- * <p>{@link CloudToolsRule} handles the set-up and tear-down involved for these mocks. For example,
- * this is all that is required for a mocked {@code CloudSdkService} to substitute the real service
- * in the {@link org.picocontainer.PicoContainer PicoContainer}:
+ * <p>This is often used in conjunction with the {@link org.mockito.Mock Mock} annotation to replace
+ * the real service with a mock. {@link CloudToolsRule} handles the set-up and tear-down involved
+ * for these services. For example, this is all that is required for a mocked {@code
+ * CloudSdkService} to substitute the real service in the {@link org.picocontainer.PicoContainer
+ * PicoContainer}:
  *
  * <pre>
  *   &#64;Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
  *
- *   &#64;Mock &#64;MockService private CloudSdkService mockCloudSdkService;
+ *   &#64;Mock &#64;TestService private CloudSdkService mockCloudSdkService;
  * </pre>
  *
  * <p>Now this mock can be used like any other Mockito variable:
@@ -43,4 +45,4 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MockService {}
+public @interface TestService {}

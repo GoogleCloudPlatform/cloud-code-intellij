@@ -53,9 +53,8 @@ import org.mockito.MockitoAnnotations;
  *   <li>Creates an {@link IdeaProjectTestFixture} and injects the value into any fields annotated
  *       with {@link TestFixture}
  *   <li>Uses the {@link PicoContainerTestUtil} to replace all fields annotated with {@link
- *       MockService} in the {@link org.picocontainer.PicoContainer PicoContainer} with the mocked
- *       field value. After the test finishes, it replaces the mocked value with the real registered
- *       service.
+ *       TestService} in the {@link org.picocontainer.PicoContainer PicoContainer} with the field
+ *       values. After the test finishes, it re-registers the original services.
  *   <li>Creates {@link Module Modules} for any fields annotated with {@link TestModule} and adds
  *       them to the project
  *   <li>Creates {@link File Files} for any fields annotated with {@link TestFile} and manages the
@@ -99,7 +98,7 @@ public final class CloudToolsRule implements TestRule {
     testFixture.setUp();
 
     populateTestFixture();
-    replaceServicesWithMocks();
+    replaceServices();
     createTestModules();
     createTestFiles(description.getMethodName());
   }
@@ -129,14 +128,14 @@ public final class CloudToolsRule implements TestRule {
   }
 
   /**
-   * Replaces all services annotated with {@link MockService} using the {@link
+   * Replaces all services annotated with {@link TestService} using the {@link
    * PicoContainerTestUtil}.
    */
-  private void replaceServicesWithMocks() throws IllegalAccessException {
-    for (Field field : getFieldsWithAnnotation(testInstance.getClass(), MockService.class)) {
+  private void replaceServices() throws IllegalAccessException {
+    for (Field field : getFieldsWithAnnotation(testInstance.getClass(), TestService.class)) {
       field.setAccessible(true);
-      Object mockInstance = field.get(testInstance);
-      PicoContainerTestUtil.getInstance().replaceServiceWithMock(field.getType(), mockInstance);
+      Object service = field.get(testInstance);
+      PicoContainerTestUtil.getInstance().replaceServiceWithInstance(field.getType(), service);
     }
   }
 

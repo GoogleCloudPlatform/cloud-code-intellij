@@ -126,14 +126,14 @@ A summary of its features can be found below.
 
 **Additional Annotations:**
 
-`@MockService`:
-- Annotates fields of any type, but should also have the `@Mock` annotation
+`@TestService`:
+- Annotates fields of any type, but usually accompanies a `@Mock` annotation
 - Before the test runs, it swaps the actual implementation of the service that is registered in the
-  application's `PicoContainer`
+  application's `PicoContainer` with the field's value
 - After the test runs, it swaps the real implementation back
 - Sample:
     ```
-    @Mock @MockService private CloudSdkService mockCloudSdkService;
+    @Mock @TestService private CloudSdkService mockCloudSdkService;
 
     @Test
     public void myTest() {
