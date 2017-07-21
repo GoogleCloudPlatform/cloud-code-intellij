@@ -56,6 +56,10 @@ import org.mockito.MockitoAnnotations;
  *       MockService} in the {@link org.picocontainer.PicoContainer PicoContainer} with the mocked
  *       field value. After the test finishes, it replaces the mocked value with the real registered
  *       service.
+ *   <li>Creates {@link Module Modules} for any fields annotated with {@link TestModule} and adds
+ *       them to the project
+ *   <li>Creates {@link File Files} for any fields annotated with {@link TestFile} and manages the
+ *       creation and deletion of them
  * </ul>
  */
 public final class CloudToolsRule implements TestRule {
