@@ -109,7 +109,6 @@ public final class AppEngineDeploymentConfigurationPanel {
     promoteCheckbox.setSelected(configuration.isPromote());
     versionIdField.setText(configuration.getVersion());
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
-    projectSelector.setText(configuration.getCloudProjectName());
     deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
 
     if (configuration.getEnvironment() != null) {
