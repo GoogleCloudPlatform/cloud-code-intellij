@@ -53,9 +53,9 @@ import org.mockito.MockitoAnnotations;
  *   <li>Creates an {@link IdeaProjectTestFixture} and injects the value into any fields annotated
  *       with {@link TestFixture}
  *   <li>Uses the {@link PicoContainerTestUtil} to replace all fields annotated with {@link
- *       MockComponent} in the {@link org.picocontainer.PicoContainer PicoContainer} with the mocked
+ *       MockService} in the {@link org.picocontainer.PicoContainer PicoContainer} with the mocked
  *       field value. After the test finishes, it replaces the mocked value with the real registered
- *       component.
+ *       service.
  * </ul>
  */
 public final class CloudToolsRule implements TestRule {
@@ -95,7 +95,7 @@ public final class CloudToolsRule implements TestRule {
     testFixture.setUp();
 
     populateTestFixture();
-    replaceComponentsWithMocks();
+    replaceServicesWithMocks();
     createTestModules();
     createTestFiles(description.getMethodName());
   }
@@ -125,14 +125,14 @@ public final class CloudToolsRule implements TestRule {
   }
 
   /**
-   * Replaces all components annotated with {@link MockComponent} using the {@link
+   * Replaces all services annotated with {@link MockService} using the {@link
    * PicoContainerTestUtil}.
    */
-  private void replaceComponentsWithMocks() throws IllegalAccessException {
-    for (Field field : getFieldsWithAnnotation(testInstance.getClass(), MockComponent.class)) {
+  private void replaceServicesWithMocks() throws IllegalAccessException {
+    for (Field field : getFieldsWithAnnotation(testInstance.getClass(), MockService.class)) {
       field.setAccessible(true);
       Object mockInstance = field.get(testInstance);
-      PicoContainerTestUtil.getInstance().replaceComponentWithMock(field.getType(), mockInstance);
+      PicoContainerTestUtil.getInstance().replaceServiceWithMock(field.getType(), mockInstance);
     }
   }
 
