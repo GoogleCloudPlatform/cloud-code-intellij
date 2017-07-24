@@ -67,11 +67,14 @@ public class AppEngineFlexibleStage {
   public void stage(@NotNull Path stagingDirectory) {
     try {
       String moduleName = deploymentConfiguration.getModuleName();
+      if (StringUtils.isEmpty(moduleName)) {
+        throw new RuntimeException(
+            GctBundle.getString("appengine.deployment.error.staging.yaml.notspecified"));
+      }
+
       AppEngineFlexibleFacet flexibleFacet =
           AppEngineFlexibleFacet.getFacetByModuleName(moduleName, project);
-
-      if (StringUtils.isEmpty(moduleName)
-          || flexibleFacet == null
+      if (flexibleFacet == null
           || Strings.isNullOrEmpty(flexibleFacet.getConfiguration().getAppYamlPath())) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.yaml.notspecified"));
