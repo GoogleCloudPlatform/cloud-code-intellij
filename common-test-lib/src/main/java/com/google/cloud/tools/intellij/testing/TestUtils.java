@@ -188,8 +188,8 @@ public class TestUtils {
     try {
       runnable.run();
     } catch (Throwable thrown) {
-      if (expectedThrowable.isInstance(expectedThrowable)) {
-        return expectedThrowable.cast(expectedThrowable);
+      if (expectedThrowable.isInstance(thrown)) {
+        return expectedThrowable.cast(thrown);
       }
       String message =
           String.format(
