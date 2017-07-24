@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
-import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -236,20 +235,4 @@ public class AppEngineDeploymentConfiguration
       return false;
     }
   }
-
-  /**
-   * Returns true if the runtime specified in the {@link #getAppYamlPath() appYamlPath} is custom,
-   * otherwise returns false.
-   *
-   * @throws MalformedYamlFileException if the {@link #getAppYamlPath() appYamlPath} is malformed
-   */
-//  private boolean isCustomRuntime() throws MalformedYamlFileException {
-//    if (appYamlPath == null) {
-//      return false;
-//    }
-//    return AppEngineProjectService.getInstance()
-//        .getFlexibleRuntimeFromAppYaml(appYamlPath)
-//        .map(FlexibleRuntime::isCustom)
-//        .orElse(false);
-//  }
 }
