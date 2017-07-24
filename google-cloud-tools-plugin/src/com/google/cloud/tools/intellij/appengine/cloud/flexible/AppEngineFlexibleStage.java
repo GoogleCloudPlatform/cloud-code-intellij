@@ -96,10 +96,16 @@ public class AppEngineFlexibleStage {
               .isPresent();
 
       // Checks if the Dockerfile exists before staging.
-      Path dockerDirectoryPath = Paths.get(facetConfiguration.getDockerDirectory());
-      if (isCustomRuntime && !Files.isRegularFile(dockerDirectoryPath.resolve(DOCKERFILE_NAME))) {
-        throw new RuntimeException(
-            GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
+      String dockerDirectory = facetConfiguration.getDockerDirectory();
+      if (isCustomRuntime) {
+        if (Strings.isNullOrEmpty(dockerDirectory)) {
+          throw new RuntimeException(
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile.notspecified"));
+        }
+        if (!Files.isRegularFile(Paths.get(dockerDirectory, DOCKERFILE_NAME))) {
+          throw new RuntimeException(
+              GctBundle.getString("appengine.deployment.error.staging.dockerfile.notfound"));
+        }
       }
 
       Path stagedArtifactPath =
@@ -112,7 +118,7 @@ public class AppEngineFlexibleStage {
       Files.copy(appYamlPath, stagingDirectory.resolve(appYamlPath.getFileName()));
 
       if (isCustomRuntime) {
-        FileUtils.copyDirectory(dockerDirectoryPath.toFile(), stagingDirectory.toFile());
+        FileUtils.copyDirectory(Paths.get(dockerDirectory).toFile(), stagingDirectory.toFile());
       }
     } catch (IOException | InvalidPathException | MalformedYamlFileException ex) {
       loggingHandler.print(ex.getMessage() + "\n");
