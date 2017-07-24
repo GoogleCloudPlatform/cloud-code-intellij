@@ -29,13 +29,11 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
-import com.google.cloud.tools.intellij.testing.TestFile;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
-import java.io.File;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
@@ -56,9 +54,6 @@ public final class AppEngineDeploymentConfigurationTest {
   @Mock private DeploymentSource mockOtherDeploymentSource;
   @Mock @TestService private CloudSdkService mockCloudSdkService;
   @Mock @TestService private AppEngineProjectService mockAppEngineProjectService;
-
-  @TestFile(name = "Dockerfile")
-  private File dockerfile;
 
   private AppEngineDeploymentConfiguration configuration;
 
@@ -193,48 +188,15 @@ public final class AppEngineDeploymentConfigurationTest {
   }
 
   @Test
-  public void checkConfiguration_withCustomRuntime_andNoDockerDirectory_throwsException()
-      throws Exception {
+  public void checkConfiguration_withBlankModuleName_throwsException() throws Exception {
     setUpValidCustomFlexConfiguration();
-    configuration.setDockerDirectoryPath("");
+    configuration.setModuleName("");
 
     RuntimeConfigurationError error =
         expectThrows(
             RuntimeConfigurationError.class,
             () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
-    assertThat(error).hasMessage("Browse to a Docker directory.");
-  }
-
-  @Test
-  public void checkConfiguration_withCustomRuntime_andNoDockerfile_throwsException()
-      throws Exception {
-    setUpValidCustomFlexConfiguration();
-
-    // There is no Dockerfile in the testData/ directory.
-    configuration.setDockerDirectoryPath("testData");
-
-    RuntimeConfigurationError error =
-        expectThrows(
-            RuntimeConfigurationError.class,
-            () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
-    assertThat(error).hasMessage("There is no Dockerfile in specified directory.");
-  }
-
-  @Test
-  public void checkConfiguration_withCustomRuntime_andMalformedYaml_throwsException()
-      throws Exception {
-    setUpValidCustomFlexConfiguration();
-
-    String appYamlPath = "some-app.yaml";
-    configuration.setAppYamlPath(appYamlPath);
-    when(mockAppEngineProjectService.getFlexibleRuntimeFromAppYaml(appYamlPath))
-        .thenThrow(new MalformedYamlFileException(new Throwable()));
-
-    RuntimeConfigurationError error =
-        expectThrows(
-            RuntimeConfigurationError.class,
-            () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
-    assertThat(error).hasMessage("The selected app.yaml file is malformed.");
+    assertThat(error).hasMessage("Browse to an app.yaml file.");
   }
 
   /** Sets up the {@code configuration} to be valid for a deployment to a flex environment. */
@@ -256,8 +218,6 @@ public final class AppEngineDeploymentConfigurationTest {
     when(mockAppEngineDeployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
 
     String appYamlPath = "some-app.yaml";
-    configuration.setAppYamlPath(appYamlPath);
-    configuration.setDockerDirectoryPath(dockerfile.getParent());
     configuration.setCloudProjectName("some-project-name");
     configuration.setUserSpecifiedArtifactPath("something.war");
     configuration.setModuleName("some-module-name");

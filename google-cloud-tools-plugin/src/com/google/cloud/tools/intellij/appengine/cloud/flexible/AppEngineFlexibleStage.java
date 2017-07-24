@@ -23,20 +23,17 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
+import com.google.common.base.Strings;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Stages an application in preparation for deployment to the App Engine flexible environment.
@@ -70,48 +67,49 @@ public class AppEngineFlexibleStage {
   public void stage(@NotNull Path stagingDirectory) {
     try {
       String moduleName = deploymentConfiguration.getModuleName();
-      if (StringUtils.isEmpty(moduleName)) {
+      AppEngineFlexibleFacet flexibleFacet =
+          AppEngineFlexibleFacet.getFacetByModuleName(moduleName, project);
+
+      if (StringUtils.isEmpty(moduleName)
+          || flexibleFacet == null
+          || Strings.isNullOrEmpty(flexibleFacet.getConfiguration().getAppYamlPath())) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.yaml.notspecified"));
       }
 
-      AppEngineFlexibleFacet flexibleFacet =
-          AppEngineFlexibleFacet.getFacetByModuleName(moduleName, project);
-      if (flexibleFacet == null
-          || !Files.exists(Paths.get(flexibleFacet.getConfiguration().getAppYamlPath()))) {
+      AppEngineFlexibleFacetConfiguration facetConfiguration = flexibleFacet.getConfiguration();
+      String appYaml = facetConfiguration.getAppYamlPath();
+
+      // Checks if the app.yaml exists before staging.
+      if (!Files.exists(Paths.get(appYaml))) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.yaml.notfound"));
       }
 
-      // Checks if the Yaml or Dockerfile exist before staging.
-      // This should only happen in special circumstances, since the deployment UI prevents the
-      // run config from being ran is the specified configuration files don't exist.
-      AppEngineFlexibleFacetConfiguration facetConfiguration = flexibleFacet.getConfiguration();
       boolean isCustomRuntime =
-          AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(
-              facetConfiguration.getAppYamlPath())
-          .filter(runtime -> runtime == FlexibleRuntime.CUSTOM)
-          .isPresent();
+          AppEngineProjectService.getInstance()
+              .getFlexibleRuntimeFromAppYaml(appYaml)
+              .filter(runtime -> runtime == FlexibleRuntime.CUSTOM)
+              .isPresent();
 
-      if (isCustomRuntime
-          && (!Files.isRegularFile(
-          Paths.get(facetConfiguration.getDockerDirectory(), DOCKERFILE_NAME)))) {
+      // Checks if the Dockerfile exists before staging.
+      Path dockerDirectoryPath = Paths.get(facetConfiguration.getDockerDirectory());
+      if (isCustomRuntime && !Files.isRegularFile(dockerDirectoryPath.resolve(DOCKERFILE_NAME))) {
         throw new RuntimeException(
             GctBundle.getString("appengine.deployment.error.staging.dockerfile"));
       }
 
-      Path stagedArtifactPath = stagingDirectory.resolve(
-          "target" + AppEngineFlexibleDeploymentArtifactType.typeForPath(deploymentArtifactPath));
+      Path stagedArtifactPath =
+          stagingDirectory.resolve(
+              "target"
+                  + AppEngineFlexibleDeploymentArtifactType.typeForPath(deploymentArtifactPath));
       Files.copy(deploymentArtifactPath, stagedArtifactPath);
 
-      Path appYamlPath = Paths.get(facetConfiguration.getAppYamlPath());
+      Path appYamlPath = Paths.get(appYaml);
       Files.copy(appYamlPath, stagingDirectory.resolve(appYamlPath.getFileName()));
 
       if (isCustomRuntime) {
-        File dockerDirectory = Paths.get(facetConfiguration.getDockerDirectory()).toFile();
-        FileUtils.copyDirectory(
-            dockerDirectory,
-            stagingDirectory.toFile());
+        FileUtils.copyDirectory(dockerDirectoryPath.toFile(), stagingDirectory.toFile());
       }
     } catch (IOException | InvalidPathException | MalformedYamlFileException ex) {
       loggingHandler.print(ex.getMessage() + "\n");

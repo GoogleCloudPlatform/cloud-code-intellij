@@ -234,8 +234,6 @@ public final class AppEngineFlexibleDeploymentEditor extends
 
     configuration.setEnvironment(AppEngineEnvironment.APP_ENGINE_FLEX);
     configuration.setUserSpecifiedArtifactPath(archiveSelector.getText());
-    configuration.setAppYamlPath(getAppYamlPath());
-    configuration.setDockerDirectoryPath(getDockerDirectoryPath());
     updateSelectors();
   }
 

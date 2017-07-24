@@ -133,8 +133,6 @@ public final class AppEngineFlexibleDeploymentEditorTest {
     assertThat(configuration.getVersion()).isEmpty();
     assertThat(configuration.isDeployAllConfigs()).isFalse();
     assertThat(configuration.getModuleName()).isEqualTo(javaModule.getName());
-    assertThat(configuration.getAppYamlPath()).isEqualTo(javaYaml.getPath());
-    assertThat(configuration.getDockerDirectoryPath()).isEmpty();
   }
 
   @Test

@@ -17,14 +17,11 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
-import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Iterables;
-
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.openapi.util.text.StringUtil;
@@ -32,14 +29,12 @@ import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.util.CloudDeploymentNameConfiguration;
 import com.intellij.util.xmlb.annotations.Attribute;
-
-import org.apache.commons.lang.StringUtils;
-
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * The model for an App Engine based deployment configuration. This state is specific to the
@@ -70,8 +65,6 @@ public class AppEngineDeploymentConfiguration
   private boolean deployAllConfigs;
   // Used to resolve the facet configuration for flexible deployments
   private String moduleName;
-  private String appYamlPath;
-  private String dockerDirectoryPath;
 
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
@@ -118,16 +111,6 @@ public class AppEngineDeploymentConfiguration
     return moduleName;
   }
 
-  @Attribute("appYamlPath")
-  public String getAppYamlPath() {
-    return appYamlPath;
-  }
-
-  @Attribute("dockerDirectoryPath")
-  public String getDockerDirectoryPath() {
-    return dockerDirectoryPath;
-  }
-
   public void setDeployAllConfigs(boolean deployAllConfigs) {
     this.deployAllConfigs = deployAllConfigs;
   }
@@ -162,14 +145,6 @@ public class AppEngineDeploymentConfiguration
 
   public void setModuleName(String moduleName) {
     this.moduleName = moduleName;
-  }
-
-  public void setAppYamlPath(String appYamlPath) {
-    this.appYamlPath = appYamlPath;
-  }
-
-  public void setDockerDirectoryPath(String dockerDirectoryPath) {
-    this.dockerDirectoryPath = dockerDirectoryPath;
   }
 
   @Override
@@ -216,19 +191,6 @@ public class AppEngineDeploymentConfiguration
                 && isJarOrWar(userSpecifiedArtifactPath)),
         "appengine.flex.config.user.specified.artifact.error");
     check(!StringUtils.isBlank(moduleName), "appengine.flex.config.browse.app.yaml");
-
-    try {
-      if (isCustomRuntime()) {
-        check(
-            !StringUtils.isBlank(dockerDirectoryPath),
-            "appengine.flex.config.browse.docker.directory");
-        check(
-            isRegularFile(Paths.get(dockerDirectoryPath, DOCKERFILE_NAME)),
-            "appengine.deployment.config.dockerfile.error");
-      }
-    } catch (MalformedYamlFileException myf) {
-      throw new RuntimeConfigurationError(GctBundle.message("appengine.appyaml.malformed"));
-    }
   }
 
   /**
@@ -281,13 +243,13 @@ public class AppEngineDeploymentConfiguration
    *
    * @throws MalformedYamlFileException if the {@link #getAppYamlPath() appYamlPath} is malformed
    */
-  private boolean isCustomRuntime() throws MalformedYamlFileException {
-    if (appYamlPath == null) {
-      return false;
-    }
-    return AppEngineProjectService.getInstance()
-        .getFlexibleRuntimeFromAppYaml(appYamlPath)
-        .map(FlexibleRuntime::isCustom)
-        .orElse(false);
-  }
+//  private boolean isCustomRuntime() throws MalformedYamlFileException {
+//    if (appYamlPath == null) {
+//      return false;
+//    }
+//    return AppEngineProjectService.getInstance()
+//        .getFlexibleRuntimeFromAppYaml(appYamlPath)
+//        .map(FlexibleRuntime::isCustom)
+//        .orElse(false);
+//  }
 }

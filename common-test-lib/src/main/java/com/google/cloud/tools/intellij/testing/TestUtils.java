@@ -188,10 +188,8 @@ public class TestUtils {
     try {
       runnable.run();
     } catch (Throwable thrown) {
-      if (isInstanceOfType(thrown, expectedThrowable)) {
-        @SuppressWarnings("unchecked")
-        T retVal = (T) thrown;
-        return retVal;
+      if (expectedThrowable.isInstance(expectedThrowable)) {
+        return expectedThrowable.cast(expectedThrowable);
       }
       String message =
           String.format(
@@ -205,19 +203,5 @@ public class TestUtils {
             "Expected '%s' to be thrown, but nothing was thrown.",
             expectedThrowable.getSimpleName());
     throw new AssertionError(message);
-  }
-
-  /**
-   * Returns true if the given {@code instance} can be assigned to the given {@code clazz},
-   * otherwise returns false.
-   */
-  private static boolean isInstanceOfType(Object instance, Class<?> clazz) {
-    String className = clazz.getName();
-    for (Class<?> type = instance.getClass(); type != null; type = type.getSuperclass()) {
-      if (type.getName().equals(className)) {
-        return true;
-      }
-    }
-    return false;
   }
 }

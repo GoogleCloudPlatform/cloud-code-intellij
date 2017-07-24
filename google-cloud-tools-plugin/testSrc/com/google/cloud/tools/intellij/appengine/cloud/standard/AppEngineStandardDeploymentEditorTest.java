@@ -135,8 +135,6 @@ public final class AppEngineStandardDeploymentEditorTest {
     assertThat(configuration.getVersion()).isEmpty();
     assertThat(configuration.isDeployAllConfigs()).isFalse();
     assertThat(configuration.getModuleName()).isNull();
-    assertThat(configuration.getAppYamlPath()).isNull();
-    assertThat(configuration.getDockerDirectoryPath()).isNull();
   }
 
   @Test
