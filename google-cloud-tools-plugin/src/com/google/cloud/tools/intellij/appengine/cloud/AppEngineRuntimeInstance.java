@@ -137,20 +137,16 @@ public class AppEngineRuntimeInstance extends
 
   @Override
   public void disconnect() {
-    // kill any executing deployment actions
     synchronized (createdDeployments) {
-      for (CancellableRunnable runnable : createdDeployments.values()) {
-        runnable.cancel();
-      }
+      // Kills any executing deployment actions.
+      createdDeployments.values().forEach(CancellableRunnable::cancel);
+      createdDeployments
+          .keys()
+          .forEach(
+              project ->
+                  ProjectManager.getInstance()
+                      .removeProjectManagerListener(project, projectClosingListener));
       createdDeployments.clear();
     }
-
-    createdDeployments
-        .keys()
-        .forEach(
-            project ->
-                ProjectManager.getInstance()
-                    .removeProjectManagerListener(project, projectClosingListener));
   }
-
 }
