@@ -24,13 +24,13 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.UrlEscapers;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import java.text.MessageFormat;
 
 /** Adds a Cloud Tools menu shortcut link to the GitHub issue creation page. */
-public class CloudToolsFeedbackAction extends AnAction {
+public class CloudToolsFeedbackAction extends DumbAwareAction {
 
   private static final String NEW_ISSUE_URL =
       new PropertiesFileFlagReader().getFlagString("plugin.github.new.issue.url");
