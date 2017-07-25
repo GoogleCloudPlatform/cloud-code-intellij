@@ -52,9 +52,6 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   private final JLabel errorIcon;
   private final HyperlinkLabel messageText;
 
-  // Start in a friendly state before we know whether the application is truly valid.
-  private boolean isApplicationValid = true;
-
   private CreateApplicationLinkListener currentLinkListener;
 
   public AppEngineApplicationInfoPanel() {
@@ -101,24 +98,13 @@ public class AppEngineApplicationInfoPanel extends JPanel {
 
         if (application != null) {
           setMessage(application.getLocationId(), false);
-          isApplicationValid = true;
         } else {
           setCreateApplicationMessage(projectId, credential);
-          isApplicationValid = false;
         }
       } catch (IOException | GoogleApiException e) {
         setMessage(GctBundle.message("appengine.application.region.fetch.error"), true);
-        isApplicationValid = false;
       }
     });
-  }
-
-  /**
-   * Returns {@code true} if the currently displayed Application is valid, {@code false} if
-   * otherwise.
-   */
-  public boolean isApplicationValid() {
-    return isApplicationValid;
   }
 
   private void setMessage(Runnable messagePrinter, boolean isError) {
