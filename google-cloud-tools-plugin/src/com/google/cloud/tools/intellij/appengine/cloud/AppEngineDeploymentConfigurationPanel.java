@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -108,7 +109,11 @@ public final class AppEngineDeploymentConfigurationPanel {
     promoteCheckbox.setSelected(configuration.isPromote());
     versionIdField.setText(configuration.getVersion());
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
-    projectSelector.setText(configuration.getCloudProjectName());
+    deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
+
+    if (configuration.getEnvironment() != null) {
+      environmentLabel.setText(configuration.getEnvironment().localizedLabel());
+    }
 
     refreshApplicationInfoPanel();
   }
@@ -123,6 +128,12 @@ public final class AppEngineDeploymentConfigurationPanel {
     configuration.setPromote(promoteCheckbox.isSelected());
     configuration.setCloudProjectName(projectSelector.getText());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
+    configuration.setDeployAllConfigs(deployAllConfigsCheckbox.isSelected());
+
+    CredentialedUser user = getProjectSelector().getSelectedUser();
+    if (user != null) {
+      configuration.setGoogleUsername(user.getEmail());
+    }
   }
 
   /**
@@ -188,5 +199,10 @@ public final class AppEngineDeploymentConfigurationPanel {
   @VisibleForTesting
   public void setApplicationInfoPanel(AppEngineApplicationInfoPanel applicationInfoPanel) {
     this.applicationInfoPanel = applicationInfoPanel;
+  }
+
+  @VisibleForTesting
+  public JBTextField getVersionIdField() {
+    return versionIdField;
   }
 }

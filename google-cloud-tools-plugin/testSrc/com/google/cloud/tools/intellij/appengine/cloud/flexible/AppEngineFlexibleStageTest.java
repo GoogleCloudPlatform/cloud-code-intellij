@@ -22,18 +22,15 @@ import static org.mockito.Mockito.mock;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
-
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 import com.intellij.testFramework.PlatformTestCase;
-
-import org.mockito.Mock;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.mockito.Mock;
 
 public class AppEngineFlexibleStageTest extends PlatformTestCase {
 
@@ -96,8 +93,28 @@ public class AppEngineFlexibleStageTest extends PlatformTestCase {
       fail("No Docker directory.");
     } catch (RuntimeException re) {
       assertEquals(
-          "Error occured during App Engine flexible staging: there is no Dockerfile in "
-              + "specified directory.",
+          "Error occurred during App Engine flexible staging: "
+              + "no Dockerfile directory was specified.",
+          re.getMessage());
+    }
+  }
+
+
+  public void testStage_noDockerfile() throws IOException {
+    String directory = createTempDir("noDockerfile").getPath();
+    AppEngineFlexibleFacet.getFacetByModule(customModule)
+        .getConfiguration()
+        .setDockerDirectory(directory);
+    deploymentConfiguration.setModuleName(customModuleName);
+    AppEngineFlexibleStage stage =
+        new AppEngineFlexibleStage(loggingHandler, artifact, deploymentConfiguration, getProject());
+    try {
+      stage.stage(stagingDirectory);
+      fail("No Docker directory.");
+    } catch (RuntimeException re) {
+      assertEquals(
+          "Error occurred during App Engine flexible staging: "
+              + "there is no Dockerfile in specified directory.",
           re.getMessage());
     }
   }

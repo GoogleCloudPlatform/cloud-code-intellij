@@ -88,6 +88,7 @@ subprojects {
     }
 
     dependencies {
+        testCompile 'com.google.truth:truth:0.30'
         testCompile 'junit:junit:4.+'
         testCompile ('org.mockito:mockito-core:1.9.5') {
             exclude group: 'org.hamcrest', module: 'hamcrest-core'
