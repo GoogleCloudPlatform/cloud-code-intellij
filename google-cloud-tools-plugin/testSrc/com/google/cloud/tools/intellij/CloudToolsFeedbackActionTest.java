@@ -28,7 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
-/** Created by eshaul on 7/25/17. */
+/** Tests for {@link CloudToolsFeedbackAction}. */
 public class CloudToolsFeedbackActionTest {
 
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
