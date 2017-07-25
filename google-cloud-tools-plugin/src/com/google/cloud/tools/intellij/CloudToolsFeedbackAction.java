@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.net.UrlEscapers;
@@ -77,7 +78,8 @@ public class CloudToolsFeedbackAction extends AnAction {
 
   private static String getCloudSdkVersion() {
     try {
-      CloudSdk sdk = new CloudSdk.Builder().build();
+      CloudSdk sdk =
+          new CloudSdk.Builder().sdkPath(CloudSdkService.getInstance().getSdkHomePath()).build();
       return sdk.getVersion().toString();
     } catch (AppEngineException aee) {
       return "";
