@@ -29,11 +29,13 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestFile;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import java.io.File;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,6 +57,15 @@ public final class AppEngineDeploymentConfigurationTest {
   @Mock @TestService private CloudSdkService mockCloudSdkService;
   @Mock @TestService private AppEngineProjectService mockAppEngineProjectService;
 
+  @TestFile(name = "some.war")
+  private File someWar;
+
+  @TestFile(name = "some.jar")
+  private File someJar;
+
+  @TestFile(name = "some-other-file.txt")
+  private File someOtherFile;
+
   private AppEngineDeploymentConfiguration configuration;
 
   @Before
@@ -67,6 +78,21 @@ public final class AppEngineDeploymentConfigurationTest {
   public void checkConfiguration_withValidFlexConfig_doesNotThrow() throws Exception {
     setUpValidFlexConfiguration();
     configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable);
+  }
+
+  @Test
+  public void checkConfiguration_withValidFlexConfig_andUserSpecifiedWar_doesNotThrow()
+      throws Exception {
+    setUpValidFlexConfigurationWithUserSpecifiedSource();
+    configuration.checkConfiguration(mockRemoteServer, mockUserSpecifiedPathDeploymentSource);
+  }
+
+  @Test
+  public void checkConfiguration_withValidFlexConfig_andUserSpecifiedJar_doesNotThrow()
+      throws Exception {
+    setUpValidFlexConfigurationWithUserSpecifiedSource();
+    configuration.setUserSpecifiedArtifactPath(someJar.getPath());
+    configuration.checkConfiguration(mockRemoteServer, mockUserSpecifiedPathDeploymentSource);
   }
 
   @Test
@@ -172,11 +198,22 @@ public final class AppEngineDeploymentConfigurationTest {
 
   @Test
   public void checkConfiguration_withUserSpecifiedSource_andNotAJarOrWar_throwsException() {
-    setUpValidFlexConfiguration();
-    when(mockUserSpecifiedPathDeploymentSource.isValid()).thenReturn(true);
-    when(mockUserSpecifiedPathDeploymentSource.getEnvironment())
-        .thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
-    configuration.setUserSpecifiedArtifactPath("some-file.txt");
+    setUpValidFlexConfigurationWithUserSpecifiedSource();
+    configuration.setUserSpecifiedArtifactPath(someOtherFile.getPath());
+
+    RuntimeConfigurationError error =
+        expectThrows(
+            RuntimeConfigurationError.class,
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockUserSpecifiedPathDeploymentSource));
+    assertThat(error).hasMessage("Browse to a JAR or WAR file.");
+  }
+
+  @Test
+  public void checkConfiguration_withUserSpecifiedSource_andDirectory_throwsException() {
+    setUpValidFlexConfigurationWithUserSpecifiedSource();
+    configuration.setUserSpecifiedArtifactPath(someWar.getParent());
 
     RuntimeConfigurationError error =
         expectThrows(
@@ -204,8 +241,23 @@ public final class AppEngineDeploymentConfigurationTest {
     when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
     when(mockAppEngineDeployable.isValid()).thenReturn(true);
     when(mockAppEngineDeployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
+
     configuration.setCloudProjectName("some-project-name");
-    configuration.setUserSpecifiedArtifactPath("something.war");
+    configuration.setModuleName("some-module-name");
+  }
+
+  /**
+   * Sets up the {@code configuration} to be valid for a deployment to a flex environment with a
+   * {@link UserSpecifiedPathDeploymentSource}.
+   */
+  private void setUpValidFlexConfigurationWithUserSpecifiedSource() {
+    when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
+    when(mockUserSpecifiedPathDeploymentSource.isValid()).thenReturn(true);
+    when(mockUserSpecifiedPathDeploymentSource.getEnvironment())
+        .thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
+
+    configuration.setCloudProjectName("some-project-name");
+    configuration.setUserSpecifiedArtifactPath(someWar.getPath());
     configuration.setModuleName("some-module-name");
   }
 
@@ -219,7 +271,6 @@ public final class AppEngineDeploymentConfigurationTest {
 
     String appYamlPath = "some-app.yaml";
     configuration.setCloudProjectName("some-project-name");
-    configuration.setUserSpecifiedArtifactPath("something.war");
     configuration.setModuleName("some-module-name");
 
     try {

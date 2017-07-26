@@ -29,8 +29,6 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.util.CloudDeploymentNameConfiguration;
 import com.intellij.util.xmlb.annotations.Attribute;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
@@ -213,26 +211,8 @@ public class AppEngineDeploymentConfiguration
    * @param stringPath the path to check
    */
   private static boolean isJarOrWar(String stringPath) {
-    try {
-      Path path = Paths.get(stringPath);
-      return !Files.isDirectory(path)
-          && (StringUtil.endsWithIgnoreCase(stringPath, ".jar")
-              || StringUtil.endsWithIgnoreCase(stringPath, ".war"));
-    } catch (InvalidPathException ipe) {
-      return false;
-    }
-  }
-
-  /**
-   * Returns true if the given path points to a valid, regular file, otherwise returns false.
-   *
-   * @param path the path to check
-   */
-  private static boolean isRegularFile(Path path) {
-    try {
-      return Files.exists(path) && Files.isRegularFile(path);
-    } catch (SecurityException ex) {
-      return false;
-    }
+    String lowercasePath = stringPath.toLowerCase();
+    return Files.isRegularFile(Paths.get(stringPath))
+        && (lowercasePath.endsWith(".jar") || lowercasePath.endsWith(".war"));
   }
 }
