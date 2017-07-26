@@ -19,24 +19,23 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.base.Strings;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.deployment.DeploymentLogManager;
 import com.intellij.remoteServer.runtime.deployment.DeploymentTask;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance;
-
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A {@link ServerRuntimeInstance} for the {@link AppEngineCloudType}.
@@ -44,10 +43,17 @@ import java.util.Set;
 public class AppEngineRuntimeInstance extends
     ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
-  private final Set<CancellableRunnable> createdDeployments;
+  private final Multimap<Project, CancellableRunnable> createdDeployments;
+  private final ProjectManagerListener projectClosingListener;
 
   AppEngineRuntimeInstance() {
-    this.createdDeployments = new HashSet<>();
+    createdDeployments = ArrayListMultimap.create();
+    projectClosingListener = new ProjectManagerListener() {
+      @Override
+      public void projectClosing(Project project) {
+        disconnect();
+      }
+    };
   }
 
   @Override
@@ -64,8 +70,9 @@ public class AppEngineRuntimeInstance extends
     }
 
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();
-
     AppEngineHelper appEngineHelper = new CloudSdkAppEngineHelper(task.getProject());
+    ProjectManager.getInstance()
+        .addProjectManagerListener(task.getProject(), projectClosingListener);
 
     appEngineHelper
         .createDeployRunner(
@@ -74,7 +81,7 @@ public class AppEngineRuntimeInstance extends
             deployRunner -> {
               // keep track of any active deployments
               synchronized (createdDeployments) {
-                createdDeployments.add(deployRunner);
+                createdDeployments.put(task.getProject(), deployRunner);
               }
 
               ProgressManager.getInstance()
@@ -130,13 +137,16 @@ public class AppEngineRuntimeInstance extends
 
   @Override
   public void disconnect() {
-    // kill any executing deployment actions
     synchronized (createdDeployments) {
-      for (CancellableRunnable runnable : createdDeployments) {
-        runnable.cancel();
-      }
+      // Kills any executing deployment actions.
+      createdDeployments.values().forEach(CancellableRunnable::cancel);
+      createdDeployments
+          .keys()
+          .forEach(
+              project ->
+                  ProjectManager.getInstance()
+                      .removeProjectManagerListener(project, projectClosingListener));
       createdDeployments.clear();
     }
   }
-
 }

@@ -21,24 +21,17 @@ import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.project.ProjectManagerAdapter;
 import com.intellij.remoteServer.RemoteServerConfigurable;
 import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfigurator;
-import com.intellij.remoteServer.runtime.ServerConnection;
-import com.intellij.remoteServer.runtime.ServerConnectionManager;
 import com.intellij.remoteServer.runtime.ServerConnector;
 import com.intellij.remoteServer.runtime.ServerTaskExecutor;
-
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -53,24 +46,6 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
    */
   public AppEngineCloudType() {
     super("gcp-app-engine"); // "google-app-engine" is used by the native IJ app engine support.
-
-    // listen for project closing event and close all active server connections
-    ProjectManager projectManager = ProjectManager.getInstance();
-    if (projectManager != null) {
-      projectManager.addProjectManagerListener(new ProjectManagerAdapter() {
-        @Override
-        public void projectClosing(Project project) {
-          super.projectClosing(project);
-          for (ServerConnection connection : ServerConnectionManager.getInstance()
-              .getConnections()) {
-            if (connection.getServer().getType() instanceof AppEngineCloudType) {
-              connection.disconnect();
-            }
-          }
-        }
-      });
-    }
-
   }
 
   @NotNull
