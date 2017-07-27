@@ -11,3 +11,5 @@
 **What did you see instead?**
 
 (screenshots are helpful)
+
+_If you are submitting a feature request you can deviate from this template_
