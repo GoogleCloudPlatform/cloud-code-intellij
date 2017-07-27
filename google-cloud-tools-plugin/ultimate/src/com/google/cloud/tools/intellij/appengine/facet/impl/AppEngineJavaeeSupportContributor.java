@@ -68,7 +68,7 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
     StartupManager.getInstance(module.getProject()).runWhenProjectIsInitialized(() -> {
       for (WebFacet webFacet : WebFacet.getInstances(module)) {
         final WebApp webApp = webFacet.getRoot();
-        if (webApp == null) {
+        if (webApp == null || !webApp.getXmlTag().isWritable()) {
           continue;
         }
 
