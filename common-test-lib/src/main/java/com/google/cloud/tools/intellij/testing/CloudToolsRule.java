@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.testing;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.intellij.facet.FacetManager;
+import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeRegistry;
 import com.intellij.ide.highlighter.ModuleFileType;
 import com.intellij.openapi.application.ApplicationManager;
@@ -162,11 +163,10 @@ public final class CloudToolsRule implements TestRule {
 
             String facetTypeId = field.getAnnotation(TestModule.class).facetTypeId();
             if (!Strings.isNullOrEmpty(facetTypeId)) {
+              FacetType<?, ?> facetType =
+                  FacetTypeRegistry.getInstance().findFacetType(facetTypeId);
               FacetManager.getInstance(module)
-                  .addFacet(
-                      FacetTypeRegistry.getInstance().findFacetType(facetTypeId),
-                      facetTypeId,
-                      /* underlying= */ null);
+                  .addFacet(facetType, facetTypeId, /* underlying= */ null);
             }
           });
     }

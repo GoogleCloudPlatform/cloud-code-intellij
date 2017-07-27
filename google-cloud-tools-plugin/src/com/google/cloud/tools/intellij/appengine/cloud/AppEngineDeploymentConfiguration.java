@@ -16,18 +16,33 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.collect.Iterables;
+import com.intellij.execution.configurations.RuntimeConfigurationError;
+import com.intellij.execution.configurations.RuntimeConfigurationException;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.remoteServer.configuration.RemoteServer;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.util.CloudDeploymentNameConfiguration;
 import com.intellij.util.xmlb.annotations.Attribute;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 
 /**
- * The model for a App Engine based deployment configuration.  This state is specific to the
+ * The model for an App Engine based deployment configuration. This state is specific to the
  * artifact that's being deployed, as such there can be multiple per project.
  */
-public class AppEngineDeploymentConfiguration extends
-    CloudDeploymentNameConfiguration<AppEngineDeploymentConfiguration> {
+public class AppEngineDeploymentConfiguration
+    extends CloudDeploymentNameConfiguration<AppEngineDeploymentConfiguration> {
 
   public static final String USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE = "userSpecifiedArtifactPath";
   static final String ENVIRONMENT_ATTRIBUTE = "environment";
+  private static final String DOCKERFILE_NAME = "Dockerfile";
 
   private String cloudProjectName;
   private String googleUsername;
@@ -38,9 +53,8 @@ public class AppEngineDeploymentConfiguration extends
    * of inspecting the Project's modules and artifacts because this happens before the modules have
    * been loaded.
    */
-  private String environment;
+  private AppEngineEnvironment environment;
 
-  private boolean userSpecifiedArtifact;
   private String userSpecifiedArtifactPath;
   private boolean promote;
   private boolean stopPreviousVersion;
@@ -60,13 +74,8 @@ public class AppEngineDeploymentConfiguration extends
   }
 
   @Attribute(ENVIRONMENT_ATTRIBUTE)
-  public String getEnvironment() {
+  public AppEngineEnvironment getEnvironment() {
     return environment;
-  }
-
-  @Attribute("userSpecifiedArtifact")
-  public boolean isUserSpecifiedArtifact() {
-    return userSpecifiedArtifact;
   }
 
   @Attribute(USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE)
@@ -111,12 +120,8 @@ public class AppEngineDeploymentConfiguration extends
     this.googleUsername = googleUsername;
   }
 
-  public void setEnvironment(String environment) {
+  public void setEnvironment(AppEngineEnvironment environment) {
     this.environment = environment;
-  }
-
-  public void setUserSpecifiedArtifact(boolean userSpecifiedArtifact) {
-    this.userSpecifiedArtifact = userSpecifiedArtifact;
   }
 
   public void setUserSpecifiedArtifactPath(String userSpecifiedArtifactPath) {
@@ -137,5 +142,77 @@ public class AppEngineDeploymentConfiguration extends
 
   public void setModuleName(String moduleName) {
     this.moduleName = moduleName;
+  }
+
+  @Override
+  public void checkConfiguration(RemoteServer<?> server, DeploymentSource deploymentSource)
+      throws RuntimeConfigurationException {
+    if (!(deploymentSource instanceof AppEngineDeployable)) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.deployment.invalid.source.error"));
+    }
+
+    AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
+    checkCommonConfig(deployable);
+    if (deployable.getEnvironment().isFlexible()) {
+      checkFlexConfig(deployable);
+    }
+  }
+
+  private void checkCommonConfig(AppEngineDeployable deployable) throws RuntimeConfigurationError {
+    Set<CloudSdkValidationResult> sdkValidationResult =
+        CloudSdkService.getInstance().validateCloudSdk();
+    if (!sdkValidationResult.isEmpty()) {
+      CloudSdkValidationResult result = Iterables.getFirst(sdkValidationResult, null);
+      throw new RuntimeConfigurationError(result.getMessage());
+    }
+
+    check(
+        deployable instanceof UserSpecifiedPathDeploymentSource || deployable.isValid(),
+        "appengine.config.deployment.source.error");
+    check(!StringUtils.isBlank(cloudProjectName), "appengine.flex.config.project.missing.message");
+  }
+
+  /**
+   * Checks that this configuration is valid for a flex deployment, otherwise throws a {@link
+   * RuntimeConfigurationError}.
+   *
+   * @param deployable the {@link AppEngineDeployable deployment source} that was selected by the
+   *     user to deploy
+   * @throws RuntimeConfigurationError if this configuration is not valid for a flex deployment
+   */
+  private void checkFlexConfig(AppEngineDeployable deployable) throws RuntimeConfigurationError {
+    check(
+        !(deployable instanceof UserSpecifiedPathDeploymentSource)
+            || (!StringUtil.isEmpty(userSpecifiedArtifactPath)
+                && isJarOrWar(userSpecifiedArtifactPath)),
+        "appengine.flex.config.user.specified.artifact.error");
+    check(!StringUtils.isBlank(moduleName), "appengine.flex.config.browse.app.yaml");
+  }
+
+  /**
+   * Ensures the truth of the given boolean expression, otherwise throws a {@link
+   * RuntimeConfigurationError} with the given message.
+   *
+   * @param expression the expression to test
+   * @param message the key of the message (as described by {@link GctBundle#message}) to show in
+   *     the error
+   * @throws RuntimeConfigurationError if the given expression is false
+   */
+  private static void check(boolean expression, String message) throws RuntimeConfigurationError {
+    if (!expression) {
+      throw new RuntimeConfigurationError(GctBundle.message(message));
+    }
+  }
+
+  /**
+   * Returns true if the given path points to a valid JAR or WAR file, otherwise returns false.
+   *
+   * @param stringPath the path to check
+   */
+  private static boolean isJarOrWar(String stringPath) {
+    String lowercasePath = stringPath.toLowerCase();
+    return Files.isRegularFile(Paths.get(stringPath))
+        && (lowercasePath.endsWith(".jar") || lowercasePath.endsWith(".war"));
   }
 }
