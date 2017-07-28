@@ -43,7 +43,7 @@ public class CloudToolsFeedbackActionTest {
   @Mock @TestService private BrowserLauncher browserLauncher;
 
   @TestFile(name = "testCloudSdk")
-  private File testCloudSdk;
+  private File missingCloudSdk;
 
   private CloudToolsFeedbackAction feedbackAction;
 
@@ -56,7 +56,7 @@ public class CloudToolsFeedbackActionTest {
 
   @Test
   public void testDisplayableSdkVersion_isEmpty_whenSdkIsInvalid() {
-    when(sdkService.getSdkHomePath()).thenReturn(testCloudSdk.toPath());
+    when(sdkService.getSdkHomePath()).thenReturn(missingCloudSdk.toPath());
 
     feedbackAction.actionPerformed(null /*event*/);
     verify(browserLauncher).browse(urlArg.capture(), eq(null));
