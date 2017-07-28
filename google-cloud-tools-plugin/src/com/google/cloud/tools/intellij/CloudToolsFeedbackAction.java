@@ -21,7 +21,6 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.UrlEscapers;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -78,8 +77,7 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
     return NEW_ISSUE_URL + "?body=" + UrlEscapers.urlFormParameterEscaper().escape(issueBody);
   }
 
-  @VisibleForTesting
-  static String getCloudSdkVersion() {
+  private static String getCloudSdkVersion() {
     try {
       CloudSdk sdk =
           new CloudSdk.Builder().sdkPath(CloudSdkService.getInstance().getSdkHomePath()).build();
