@@ -12,4 +12,4 @@
 
 (screenshots are helpful)
 
-_If you are submitting a feature request you can deviate from this template._
+_Feel free to deviate from this template as needed, especially if you are submitting a feature request._

@@ -37,7 +37,7 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
 
   // should be kept up to date with .github/ISSUE_TEMPLATE.md
   private static final String BODY_TEMPLATE =
-      "(please ensure you are running the latest version of Cloud Tools for IntelliJ with _Help > Check for Updates_)\n"
+      "(Please ensure you are running the latest version of Cloud Tools for IntelliJ with _Help > Check for Updates_)\n"
           + "- Cloud Tools for IntelliJ version: {0}\n"
           + "- Google Cloud SDK version: {1}\n"
           + "- OS: {2} {3}\n"
@@ -48,7 +48,8 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
           + "\n"
           + "**What did you see instead?**\n"
           + "\n"
-          + "(screenshots are helpful)";
+          + "(screenshots are helpful)\n"
+          + "_Feel free to deviate from this template as needed, especially if you are submitting a feature request._";
 
   public CloudToolsFeedbackAction() {
     super(
