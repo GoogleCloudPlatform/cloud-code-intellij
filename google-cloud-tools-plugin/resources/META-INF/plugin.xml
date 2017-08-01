@@ -405,6 +405,8 @@
       <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.debugger.CloudDebuggerToolsMenuAction"/>
       <separator/>
       <reference ref="GoogleCloudTools.UploadSourceToGCP"/>
+      <separator/>
+      <action id="GoogleCloudTools.Feedback" class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction"/>
 
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </group>
