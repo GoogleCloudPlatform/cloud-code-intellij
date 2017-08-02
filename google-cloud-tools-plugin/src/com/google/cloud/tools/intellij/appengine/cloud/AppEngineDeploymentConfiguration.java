@@ -154,7 +154,7 @@ public class AppEngineDeploymentConfiguration
 
     AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
     checkCommonConfig(deployable);
-    if (deployable.getEnvironment().isFlexible()) {
+    if (deployable.getEnvironment() != null && deployable.getEnvironment().isFlexible()) {
       checkFlexConfig(deployable);
     }
   }
