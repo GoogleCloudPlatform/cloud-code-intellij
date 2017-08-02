@@ -238,7 +238,9 @@ public final class AppEngineDeploymentConfigurationTest {
 
   @Test
   public void checkConfiguration_withNullEnvironment_doesNotThrow() throws Exception {
-    setUpConfigurationWithNullEnvironment();
+    setUpValidFlexConfiguration();
+    when(mockAppEngineDeployable.getEnvironment()).thenReturn(null);
+
     configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable);
   }
 
@@ -247,15 +249,6 @@ public final class AppEngineDeploymentConfigurationTest {
     when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
     when(mockAppEngineDeployable.isValid()).thenReturn(true);
     when(mockAppEngineDeployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
-
-    configuration.setCloudProjectName("some-project-name");
-    configuration.setModuleName("some-module-name");
-  }
-
-  private void setUpConfigurationWithNullEnvironment() {
-    when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
-    when(mockAppEngineDeployable.isValid()).thenReturn(true);
-    when(mockAppEngineDeployable.getEnvironment()).thenReturn(null);
 
     configuration.setCloudProjectName("some-project-name");
     configuration.setModuleName("some-module-name");
