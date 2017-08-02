@@ -17,28 +17,27 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
-
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
-
 import icons.MavenIcons;
-
+import java.io.File;
+import java.util.Optional;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
-
-import java.io.File;
-
-import javax.swing.Icon;
 
 /**
  * A deployment source backed by the Maven build system.
  */
 public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
     implements AppEngineDeployable {
+
+  private static final Logger logger = Logger.getInstance(MavenBuildDeploymentSource.class);
 
   private final Project project;
   private AppEngineEnvironment environment;
@@ -120,24 +119,31 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
       return null;
     }
 
-    String targetBuild =
-        new File(mavenProject.getBuildDirectory()).getPath() + File.separator
-            + mavenProject.getFinalName();
+    final StringBuilder targetBuild =
+        new StringBuilder(
+            new File(mavenProject.getBuildDirectory()).getPath()
+                + File.separator
+                + mavenProject.getFinalName());
 
     AppEngineProjectService projectService = AppEngineProjectService.getInstance();
 
     // The environment will be null for newly deserialized deployment sources to ensure freshness.
-    // In this case, we need to reload the environment.
+    // In this case, we need to try and reload the environment.
     if (environment == null) {
-      environment = projectService.getModuleAppEngineEnvironment(getModule()).orElseThrow(
-          () -> new RuntimeException("No environment."));
+      Optional<AppEngineEnvironment> appEngineEnvironment =
+          projectService.getModuleAppEngineEnvironment(getModule());
+
+      appEngineEnvironment.ifPresent(
+          env -> {
+            environment = env;
+            if (env.isFlexible()) {
+              targetBuild.append(".");
+              targetBuild.append(mavenProject.getPackaging());
+            }
+          });
     }
 
-    if (environment.isFlexible()) {
-      targetBuild += "." + mavenProject.getPackaging();
-    }
-
-    return new File(targetBuild);
+    return new File(targetBuild.toString());
   }
 
   @Override
