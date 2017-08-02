@@ -28,49 +28,47 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
-
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.mockito.Mock;
 
-/**
- * Unit tests for {@link AppEngineFlexibleDeployTask}
- */
-@RunWith(MockitoJUnitRunner.class)
+/** Unit tests for {@link AppEngineFlexibleDeployTask} */
+@RunWith(JUnit4.class)
 public class AppEngineFlexibleDeployTaskTest {
 
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
+  @Mock private AppEngineDeploy deploy;
+  @Mock private DeploymentOperationCallback callback;
+  @Mock private AppEngineDeploymentConfiguration deploymentConfiguration;
+  @Mock private AppEngineFlexibleStage stage;
+  @Mock private AppEngineHelper helper;
+  @Mock private ProcessStartListener startListener;
+
   private AppEngineFlexibleDeployTask task;
-  @Mock
-  AppEngineDeploy deploy;
-  @Mock DeploymentOperationCallback callback;
-  @Mock
-  AppEngineDeploymentConfiguration deploymentConfiguration;
-  @Mock
-  AppEngineFlexibleStage stage;
-  @Mock
-  AppEngineHelper helper;
-  @Mock ProcessStartListener startListener;
 
   @Before
   public void setUp() throws IOException {
     when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
         .thenReturn(Paths.get("myFile.jar"));
+    when(stage.stage(Paths.get("myFile.jar"))).thenReturn(true);
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
-    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(Optional.of(Paths.get("/some/file")));
+    when(deploy.getHelper().stageCredentials(anyString()))
+        .thenReturn(Optional.of(Paths.get("/some/file")));
 
     task = new AppEngineFlexibleDeployTask(deploy, stage);
   }
@@ -81,7 +79,8 @@ public class AppEngineFlexibleDeployTaskTest {
     task.execute(startListener);
 
     verify(callback, times(1))
-        .errorOccurred("Failed to prepare credentials. Please make sure you are logged in with the correct account.");
+        .errorOccurred(
+            "Failed to prepare credentials. Please make sure you are logged in with the correct account.");
   }
 
   @Test
@@ -96,7 +95,7 @@ public class AppEngineFlexibleDeployTaskTest {
 
   @Test
   public void stage_exception() {
-    doThrow(new RuntimeException("myError")).when(stage).stage(Paths.get("myFile.jar"));
+    when(stage.stage(Paths.get("myFile.jar"))).thenReturn(false);
     try {
       task.execute(startListener);
     } catch (AssertionError ae) {
@@ -125,10 +124,11 @@ public class AppEngineFlexibleDeployTaskTest {
       task.execute(startListener);
     } catch (AssertionError ae) {
       verify(callback, times(1))
-          .errorOccurred("Deployment failed with an exception.\n"
-          + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
-          + "Run ''gcloud components update'' to update the SDK. "
-          + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)");
+          .errorOccurred(
+              "Deployment failed with an exception.\n"
+                  + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
+                  + "Run ''gcloud components update'' to update the SDK. "
+                  + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)");
       return;
     }
 
