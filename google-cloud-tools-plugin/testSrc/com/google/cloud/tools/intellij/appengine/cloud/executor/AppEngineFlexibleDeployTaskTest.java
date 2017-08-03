@@ -96,15 +96,11 @@ public class AppEngineFlexibleDeployTaskTest {
   @Test
   public void stage_exception() {
     when(stage.stage(Paths.get("myFile.jar"))).thenReturn(false);
-    try {
-      task.execute(startListener);
-    } catch (AssertionError ae) {
-      verify(callback, times(1))
-          .errorOccurred("Deployment failed due to an exception while staging the project.");
-      return;
-    }
 
-    failureExpected();
+    task.execute(startListener);
+
+    verify(callback, times(1))
+        .errorOccurred("Deployment failed due to an exception while staging the project.");
   }
 
   @Test
