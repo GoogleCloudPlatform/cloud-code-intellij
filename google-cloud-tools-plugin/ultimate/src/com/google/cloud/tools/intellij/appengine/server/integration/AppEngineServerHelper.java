@@ -19,20 +19,15 @@ package com.google.cloud.tools.intellij.appengine.server.integration;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.javaee.appServerIntegrations.ApplicationServerHelper;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerInfo;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
 import com.intellij.javaee.appServerIntegrations.CantFindApplicationServerJarsException;
 import com.intellij.javaee.oss.server.JavaeePersistentData;
-import com.intellij.openapi.options.ConfigurationException;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
-
 import javax.swing.JComponent;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author nik
@@ -64,13 +59,9 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
 
       @Override
       protected void applyEditorTo(ApplicationServerPersistentData data) {
-        if (CloudSdkService.getInstance().isValidCloudSdk(
-            cloudSdkPanel.getCloudSdkDirectoryText())) {
-          try {
-            cloudSdkPanel.apply();
-          } catch (ConfigurationException ce) {
-            // do nothing
-          }
+        if (CloudSdkService.getInstance()
+            .isValidCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())) {
+          cloudSdkPanel.apply();
         }
       }
 

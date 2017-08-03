@@ -16,83 +16,65 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import static com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND;
+import static com.google.cloud.tools.intellij.testing.TestUtils.expectThrows;
+import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.api.client.repackaged.javax.annotation.concurrent.Immutable;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.ImmutableSet;
-
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.testFramework.PlatformTestCase;
-
-import org.picocontainer.MutablePicoContainer;
-
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.mockito.Mock;
 
-public class AppEngineCloudConfigurableTest extends PlatformTestCase {
-  private AppEngineCloudConfigurable appEngineCloudConfigurable;
-  private CloudSdkService cloudSdkService;
-  private TextFieldWithBrowseButton cloudSdkDirectoryField;
+/** Unit tests for {@link AppEngineCloudConfigurable}. */
+@RunWith(JUnit4.class)
+public final class AppEngineCloudConfigurableTest {
 
-  private static final Path CLOUD_SDK_DIR_PATH = Paths.get("a", "b", "c", "gcloud-sdk");
-  private static final String INVALID_SDK_DIR_WARNING =
-      "No Cloud SDK was found in the specified directory.";
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  @Mock @TestService private CloudSdkService mockCloudSdkService;
 
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
+  private final AppEngineCloudConfigurable appEngineCloudConfigurable =
+      new AppEngineCloudConfigurable();
 
-    cloudSdkService = mock(CloudSdkService.class);
+  @Test
+  public void reset_withSdkPath_doesSetFieldText() {
+    String sdkPath = "/some/sdk/path";
+    when(mockCloudSdkService.getSdkHomePath()).thenReturn(Paths.get(sdkPath));
 
-    applicationContainer.unregisterComponent(CloudSdkService.class.getName());
-
-    applicationContainer.registerComponentInstance(
-        CloudSdkService.class.getName(), cloudSdkService);
-  }
-
-  public void testSetupWithGoogleSettingSdkConfigured() throws Exception {
-    when(cloudSdkService.getSdkHomePath()).thenReturn(CLOUD_SDK_DIR_PATH);
-    initCloudConfigurable();
     appEngineCloudConfigurable.reset();
 
-    assertEquals(CLOUD_SDK_DIR_PATH, Paths.get(cloudSdkDirectoryField.getText()));
+    assertThat(appEngineCloudConfigurable.getCloudSdkPanel().getCloudSdkDirectoryText())
+        .isEqualTo(sdkPath);
   }
 
-  public void testApply_invalidSdk() throws ConfigurationException {
-    when(cloudSdkService.validateCloudSdk(anyString()))
-        .thenReturn(ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
-    initCloudConfigurable();
-    cloudSdkDirectoryField.setText("/some/invalid/path");
+  @Test
+  public void apply_withValidSdkPath_doesSetSdkPath() throws ConfigurationException {
+    String sdkPath = "/some/sdk/path";
+    appEngineCloudConfigurable.getCloudSdkPanel().getCloudSdkDirectoryField().setText(sdkPath);
 
-    try {
-      appEngineCloudConfigurable.apply();
-      fail("Applying settings without a valid SDK should throw exception.");
-    } catch (ConfigurationException ce) {
-      assertEquals(INVALID_SDK_DIR_WARNING, ce.getMessage());
-    }
+    appEngineCloudConfigurable.apply();
+
+    verify(mockCloudSdkService).setSdkHomePath(sdkPath);
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-  }
+  @Test
+  public void apply_withInvalidSdkPath_throwsException() {
+    when(mockCloudSdkService.validateCloudSdk(anyString()))
+        .thenReturn(ImmutableSet.of(CLOUD_SDK_NOT_FOUND));
 
-  private void initCloudConfigurable() {
-    appEngineCloudConfigurable =
-        new AppEngineCloudConfigurable();
+    ConfigurationException e =
+        expectThrows(ConfigurationException.class, appEngineCloudConfigurable::apply);
 
-    CloudSdkPanel panel = appEngineCloudConfigurable.getCloudSdkPanel();
-
-    cloudSdkDirectoryField = panel.getCloudSdkDirectoryField();
+    assertThat(e).hasMessage(CLOUD_SDK_NOT_FOUND.getMessage());
   }
 }
