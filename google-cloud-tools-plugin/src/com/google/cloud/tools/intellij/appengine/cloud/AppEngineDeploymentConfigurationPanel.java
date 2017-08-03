@@ -35,9 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.TreeModelEvent;
 
-/**
- * Common App Engine deployment configuration UI shared by flexible and standard deployments.
- */
+/** Common App Engine deployment configuration UI shared by flexible and standard deployments. */
 public final class AppEngineDeploymentConfigurationPanel {
 
   private JPanel commonConfigPanel;
@@ -101,13 +99,14 @@ public final class AppEngineDeploymentConfigurationPanel {
   }
 
   /**
-   * Shared implementation of
-   * {@link com.intellij.openapi.options.SettingsEditor#resetEditorFrom(Object)}. To be invoked
-   * by users of this panel in the overriden method.
+   * Shared implementation of {@link
+   * com.intellij.openapi.options.SettingsEditor#resetEditorFrom(Object)}. To be invoked by users of
+   * this panel in the overriden method.
    */
   public void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     promoteCheckbox.setSelected(configuration.isPromote());
     versionIdField.setText(configuration.getVersion());
+    projectSelector.setText(configuration.getCloudProjectName());
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
 
@@ -119,9 +118,9 @@ public final class AppEngineDeploymentConfigurationPanel {
   }
 
   /**
-   * Shared implementation of
-   * {@link com.intellij.openapi.options.SettingsEditor#applyEditorTo(Object)}. To be invoked
-   * by users of this panel in the overriden method.
+   * Shared implementation of {@link
+   * com.intellij.openapi.options.SettingsEditor#applyEditorTo(Object)}. To be invoked by users of
+   * this panel in the overriden method.
    */
   public void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     configuration.setVersion(versionIdField.getText());
@@ -143,8 +142,9 @@ public final class AppEngineDeploymentConfigurationPanel {
   public void setDeploymentProjectAndVersion(DeploymentSource deploymentSource) {
     if (deploymentSource instanceof AppEngineDeployable) {
       ((AppEngineDeployable) deploymentSource).setProjectName(projectSelector.getText());
-      ((AppEngineDeployable) deploymentSource).setVersion(
-          Strings.isNullOrEmpty(versionIdField.getText()) ? "auto" : versionIdField.getText());
+      ((AppEngineDeployable) deploymentSource)
+          .setVersion(
+              Strings.isNullOrEmpty(versionIdField.getText()) ? "auto" : versionIdField.getText());
     }
   }
 
