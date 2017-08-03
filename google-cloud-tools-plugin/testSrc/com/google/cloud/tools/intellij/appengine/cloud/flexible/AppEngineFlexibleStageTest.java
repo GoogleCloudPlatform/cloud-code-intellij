@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.verify;
+import static com.google.cloud.tools.intellij.testing.TestUtils.expectThrows;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
@@ -105,7 +106,7 @@ public final class AppEngineFlexibleStageTest {
   }
 
   @Test
-  public void stage_noYaml() {
+  public void stage_noYaml() throws IOException {
     deploymentConfiguration.setModuleName(noYamlModule.getName());
 
     boolean result = stage.stage(stagingDirectory.toPath());
@@ -118,7 +119,7 @@ public final class AppEngineFlexibleStageTest {
   }
 
   @Test
-  public void stage_noDockerDirectory() {
+  public void stage_noDockerDirectory() throws IOException {
     deploymentConfiguration.setModuleName(customModule.getName());
 
     boolean result = stage.stage(stagingDirectory.toPath());
@@ -148,7 +149,7 @@ public final class AppEngineFlexibleStageTest {
   }
 
   @Test
-  public void stage_noModule() {
+  public void stage_noModule() throws IOException {
     deploymentConfiguration.setModuleName(null);
 
     boolean result = stage.stage(stagingDirectory.toPath());
@@ -158,6 +159,16 @@ public final class AppEngineFlexibleStageTest {
         .print(
             "Error occurred during App Engine flexible staging: no app.yaml configuration file was "
                 + "specified.\n");
+  }
+
+  @Test
+  public void stage_withIOException_doesPropagateException() {
+    deploymentConfiguration.setModuleName(javaModule.getName());
+
+    // Throws an IOException because the staging directory given is actually a file.
+    IOException e = expectThrows(IOException.class, () -> stage.stage(dockerfile.toPath()));
+
+    assertThat(e.getMessage()).contains("Not a directory");
   }
 
   @Test

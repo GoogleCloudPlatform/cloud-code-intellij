@@ -65,10 +65,18 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
       return;
     }
 
-    if (!flexibleStage.stage(stagingDirectory)) {
-      String message = GctBundle.message("appengine.deployment.exception.during.staging");
-      deploy.getCallback().errorOccurred(message);
-      logger.warn(message);
+    try {
+      if (!flexibleStage.stage(stagingDirectory)) {
+        String message = GctBundle.message("appengine.deployment.exception.during.staging");
+        deploy.getCallback().errorOccurred(message);
+        logger.warn(message);
+        return;
+      }
+    } catch (IOException e) {
+      deploy
+          .getCallback()
+          .errorOccurred(GctBundle.message("appengine.deployment.exception.during.staging"));
+      logger.error(e);
       return;
     }
 

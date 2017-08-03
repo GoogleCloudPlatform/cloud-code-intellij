@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
+import static com.google.cloud.tools.intellij.testing.TestUtils.expectThrows;
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -80,7 +82,8 @@ public class AppEngineFlexibleDeployTaskTest {
 
     verify(callback, times(1))
         .errorOccurred(
-            "Failed to prepare credentials. Please make sure you are logged in with the correct account.");
+            "Failed to prepare credentials. Please make sure you are logged in with the correct "
+                + "account.");
   }
 
   @Test
@@ -94,12 +97,24 @@ public class AppEngineFlexibleDeployTaskTest {
   }
 
   @Test
-  public void stage_exception() {
+  public void stage_exception() throws IOException {
     when(stage.stage(Paths.get("myFile.jar"))).thenReturn(false);
 
     task.execute(startListener);
 
     verify(callback, times(1))
+        .errorOccurred("Deployment failed due to an exception while staging the project.");
+  }
+
+  @Test
+  public void stage_withIOException_throwsAssertionError() throws IOException {
+    String exceptionMessage = "some exception";
+    when(stage.stage(Paths.get("myFile.jar"))).thenThrow(new IOException(exceptionMessage));
+
+    AssertionError e = expectThrows(AssertionError.class, () -> task.execute(startListener));
+
+    assertThat(e).hasMessage(exceptionMessage);
+    verify(callback)
         .errorOccurred("Deployment failed due to an exception while staging the project.");
   }
 
@@ -122,8 +137,8 @@ public class AppEngineFlexibleDeployTaskTest {
       verify(callback, times(1))
           .errorOccurred(
               "Deployment failed with an exception.\n"
-                  + "Please make sure that you are using the latest version of the Google Cloud SDK.\n"
-                  + "Run ''gcloud components update'' to update the SDK. "
+                  + "Please make sure that you are using the latest version of the Google Cloud "
+                  + "SDK.\nRun ''gcloud components update'' to update the SDK. "
                   + "(See: https://cloud.google.com/sdk/gcloud/reference/components/update.)");
       return;
     }

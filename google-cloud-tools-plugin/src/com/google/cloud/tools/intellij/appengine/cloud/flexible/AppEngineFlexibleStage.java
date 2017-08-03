@@ -63,8 +63,9 @@ public class AppEngineFlexibleStage {
    *
    * @param stagingDirectory the directory to stage the application to
    * @return {@code true} if the application was staged successfully, {@code false} otherwise
+   * @throws IOException if there was a filesystem error during copying
    */
-  public boolean stage(@NotNull Path stagingDirectory) {
+  public boolean stage(@NotNull Path stagingDirectory) throws IOException {
     try {
       String moduleName = deploymentConfiguration.getModuleName();
       if (StringUtils.isEmpty(moduleName)) {
@@ -122,7 +123,7 @@ public class AppEngineFlexibleStage {
       if (isCustomRuntime) {
         FileUtils.copyDirectory(Paths.get(dockerDirectory).toFile(), stagingDirectory.toFile());
       }
-    } catch (IOException | InvalidPathException | MalformedYamlFileException e) {
+    } catch (InvalidPathException | MalformedYamlFileException e) {
       loggingHandler.print(e.getMessage() + "\n");
     }
     return true;
