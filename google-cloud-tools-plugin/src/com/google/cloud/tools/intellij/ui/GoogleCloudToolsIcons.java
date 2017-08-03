@@ -47,6 +47,7 @@ public final class GoogleCloudToolsIcons {
       "/icons/debugreactivatebreakpoint.png");
   public static final Icon CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS = load("/icons/debugdeleteall.png");
   public static final Icon STACKDRIVER_DEBUGGER = load("/icons/stackdriverdebugger.png");
+  public static final Icon FEEDBACK = load("/icons/cloudtoolsfeedback.png");
 
   private static Icon load(String path) {
     return IconLoader.getIcon(path, GoogleCloudToolsIcons.class);
