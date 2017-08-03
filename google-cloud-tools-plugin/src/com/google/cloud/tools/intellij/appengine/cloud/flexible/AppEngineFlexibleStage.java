@@ -35,20 +35,17 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Stages an application in preparation for deployment to the App Engine flexible environment.
- */
+/** Stages an application in preparation for deployment to the App Engine flexible environment. */
 public class AppEngineFlexibleStage {
+
   private static final String DOCKERFILE_NAME = "Dockerfile";
 
-  private LoggingHandler loggingHandler;
-  private Path deploymentArtifactPath;
-  private AppEngineDeploymentConfiguration deploymentConfiguration;
-  private Project project;
+  private final LoggingHandler loggingHandler;
+  private final Path deploymentArtifactPath;
+  private final AppEngineDeploymentConfiguration deploymentConfiguration;
+  private final Project project;
 
-  /**
-   * Initialize the staging dependencies.
-   */
+  /** Initialize the staging dependencies. */
   public AppEngineFlexibleStage(
       @NotNull LoggingHandler loggingHandler,
       @NotNull Path deploymentArtifactPath,
@@ -61,23 +58,27 @@ public class AppEngineFlexibleStage {
   }
 
   /**
-   * Given a local staging directory, stage the application in preparation for deployment to the
-   * App Engine flexible environment.
+   * Stages the application in the given staging directory, in preparation for deployment to the App
+   * Engine flexible environment.
+   *
+   * @param stagingDirectory the directory to stage the application to
+   * @return {@code true} if the application was staged successfully, {@code false} otherwise
+   * @throws IOException if there was a filesystem error during copying
    */
-  public void stage(@NotNull Path stagingDirectory) {
+  public boolean stage(@NotNull Path stagingDirectory) throws IOException {
     try {
       String moduleName = deploymentConfiguration.getModuleName();
       if (StringUtils.isEmpty(moduleName)) {
-        throw new RuntimeException(
-            GctBundle.getString("appengine.deployment.error.staging.yaml.notspecified"));
+        loggingHandler.print(getMessage("appengine.deployment.error.staging.yaml.notspecified"));
+        return false;
       }
 
       AppEngineFlexibleFacet flexibleFacet =
           AppEngineFlexibleFacet.getFacetByModuleName(moduleName, project);
       if (flexibleFacet == null
-          || Strings.isNullOrEmpty(flexibleFacet.getConfiguration().getAppYamlPath())) {
-        throw new RuntimeException(
-            GctBundle.getString("appengine.deployment.error.staging.yaml.notspecified"));
+          || StringUtils.isEmpty(flexibleFacet.getConfiguration().getAppYamlPath())) {
+        loggingHandler.print(getMessage("appengine.deployment.error.staging.yaml.notspecified"));
+        return false;
       }
 
       AppEngineFlexibleFacetConfiguration facetConfiguration = flexibleFacet.getConfiguration();
@@ -85,26 +86,28 @@ public class AppEngineFlexibleStage {
 
       // Checks if the app.yaml exists before staging.
       if (!Files.exists(Paths.get(appYaml))) {
-        throw new RuntimeException(
-            GctBundle.getString("appengine.deployment.error.staging.yaml.notfound"));
+        loggingHandler.print(getMessage("appengine.deployment.error.staging.yaml.notfound"));
+        return false;
       }
 
       boolean isCustomRuntime =
           AppEngineProjectService.getInstance()
               .getFlexibleRuntimeFromAppYaml(appYaml)
-              .filter(runtime -> runtime == FlexibleRuntime.CUSTOM)
+              .filter(FlexibleRuntime::isCustom)
               .isPresent();
 
       // Checks if the Dockerfile exists before staging.
       String dockerDirectory = facetConfiguration.getDockerDirectory();
       if (isCustomRuntime) {
         if (Strings.isNullOrEmpty(dockerDirectory)) {
-          throw new RuntimeException(
-              GctBundle.getString("appengine.deployment.error.staging.dockerfile.notspecified"));
+          loggingHandler.print(
+              getMessage("appengine.deployment.error.staging.dockerfile.notspecified"));
+          return false;
         }
         if (!Files.isRegularFile(Paths.get(dockerDirectory, DOCKERFILE_NAME))) {
-          throw new RuntimeException(
-              GctBundle.getString("appengine.deployment.error.staging.dockerfile.notfound"));
+          loggingHandler.print(
+              getMessage("appengine.deployment.error.staging.dockerfile.notfound"));
+          return false;
         }
       }
 
@@ -120,9 +123,20 @@ public class AppEngineFlexibleStage {
       if (isCustomRuntime) {
         FileUtils.copyDirectory(Paths.get(dockerDirectory).toFile(), stagingDirectory.toFile());
       }
-    } catch (IOException | InvalidPathException | MalformedYamlFileException ex) {
-      loggingHandler.print(ex.getMessage() + "\n");
-      throw new RuntimeException(ex);
+    } catch (InvalidPathException | MalformedYamlFileException e) {
+      loggingHandler.print(e.getMessage() + "\n");
     }
+    return true;
+  }
+
+  /**
+   * Returns the message associated with the given key, as described by {@link GctBundle}, appended
+   * by a newline.
+   *
+   * @param messageKey the key of the message (as described by {@link GctBundle#message}) to show in
+   *     the error
+   */
+  private static String getMessage(String messageKey) {
+    return GctBundle.message(messageKey) + "\n";
   }
 }

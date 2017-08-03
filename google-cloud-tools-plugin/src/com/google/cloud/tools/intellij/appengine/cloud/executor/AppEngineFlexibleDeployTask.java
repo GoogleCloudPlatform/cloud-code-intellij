@@ -18,14 +18,12 @@ package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
-import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
+import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
-
 import com.intellij.openapi.diagnostic.Logger;
-
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -68,11 +66,17 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
     }
 
     try {
-      flexibleStage.stage(stagingDirectory);
-    } catch (RuntimeException re) {
-      deploy.getCallback()
+      if (!flexibleStage.stage(stagingDirectory)) {
+        String message = GctBundle.message("appengine.deployment.exception.during.staging");
+        deploy.getCallback().errorOccurred(message);
+        logger.warn(message);
+        return;
+      }
+    } catch (IOException e) {
+      deploy
+          .getCallback()
           .errorOccurred(GctBundle.message("appengine.deployment.exception.during.staging"));
-      logger.error(re);
+      logger.error(e);
       return;
     }
 
