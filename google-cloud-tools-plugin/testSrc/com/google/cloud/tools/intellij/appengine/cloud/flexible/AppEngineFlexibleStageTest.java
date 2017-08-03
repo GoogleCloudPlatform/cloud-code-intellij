@@ -165,10 +165,9 @@ public final class AppEngineFlexibleStageTest {
   public void stage_withIOException_doesPropagateException() {
     deploymentConfiguration.setModuleName(javaModule.getName());
 
-    // Throws an IOException because the staging directory given is actually a file.
-    IOException e = expectThrows(IOException.class, () -> stage.stage(dockerfile.toPath()));
-
-    assertThat(e.getMessage()).contains("Not a directory");
+    // Throws an IOException because the staging directory given is actually a file. No validation
+    // occurs on the exception message because it is OS dependent and can vary.
+    expectThrows(IOException.class, () -> stage.stage(dockerfile.toPath()));
   }
 
   @Test
