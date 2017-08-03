@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
@@ -291,5 +292,15 @@ public final class AppEngineFlexibleDeploymentEditorTest {
     editor.getAppYamlCombobox().setSelectedItem(facet);
 
     assertThat(editor.getCommonConfig().getServiceLabel().getText()).isEqualTo("customService");
+  }
+
+  @Test
+  public void resetEditorFrom_withCloudProjectName_doesSetCloudProjectName() {
+    String projectName = "some-project";
+    configuration.setCloudProjectName(projectName);
+
+    editor.resetEditorFrom(configuration);
+
+    verify(projectSelector).setText(projectName);
   }
 }

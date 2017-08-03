@@ -236,6 +236,14 @@ public final class AppEngineDeploymentConfigurationTest {
     assertThat(error).hasMessage("Browse to an app.yaml file.");
   }
 
+  @Test
+  public void checkConfiguration_withNullEnvironment_doesNotThrow() throws Exception {
+    setUpValidFlexConfiguration();
+    when(mockAppEngineDeployable.getEnvironment()).thenReturn(null);
+
+    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable);
+  }
+
   /** Sets up the {@code configuration} to be valid for a deployment to a flex environment. */
   private void setUpValidFlexConfiguration() {
     when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());

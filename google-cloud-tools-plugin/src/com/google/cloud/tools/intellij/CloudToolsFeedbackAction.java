@@ -20,6 +20,7 @@ import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
+import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.net.UrlEscapers;
 import com.intellij.ide.BrowserUtil;
@@ -54,7 +55,7 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
     super(
         GctBundle.message("plugin.tools.menu.item.feedback.title"),
         GctBundle.message("plugin.tools.menu.item.feedback.description"),
-        null /*icon*/);
+        GoogleCloudToolsIcons.FEEDBACK);
   }
 
   @Override

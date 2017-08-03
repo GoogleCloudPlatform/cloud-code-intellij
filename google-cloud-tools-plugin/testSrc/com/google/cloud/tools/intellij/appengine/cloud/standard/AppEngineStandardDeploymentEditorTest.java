@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.standard;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
@@ -175,7 +176,6 @@ public final class AppEngineStandardDeploymentEditorTest {
     assertThat(configuration.isStopPreviousVersion()).isTrue();
   }
 
-
   @Test
   public void applyEditorTo_doesSetDeployAllConfigs() throws Exception {
     editor.getCommonConfig().getDeployAllConfigsCheckbox().setSelected(true);
@@ -267,14 +267,14 @@ public final class AppEngineStandardDeploymentEditorTest {
   }
 
   @Test
-  public void resetEditorFrom_doesNotSetCloudProjectName() {
-    configuration.setCloudProjectName("some-project");
+  public void resetEditorFrom_doesSetCloudProjectName() {
+    String projectName = "some-project";
+    configuration.setCloudProjectName(projectName);
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getProjectSelector().getText()).isNull();
+    verify(projectSelector).setText(projectName);
   }
-
 
   @Test
   public void resetEditorFrom_doesNotSetGoogleUsername() {
