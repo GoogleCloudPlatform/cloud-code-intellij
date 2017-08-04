@@ -102,6 +102,7 @@ public final class CloudToolsRule implements TestRule {
     replaceServices();
     createTestModules();
     createTestFiles(description.getMethodName());
+    createTestDirectories();
   }
 
   /** Tears down utilities after the test has finished. */
@@ -197,6 +198,25 @@ public final class CloudToolsRule implements TestRule {
 
       filesToDelete.add(file);
       field.set(testInstance, file);
+    }
+  }
+
+  /**
+   * Creates all directories, represented as {@link File Files}, annotated with {@link
+   * TestDirectory}.
+   */
+  private void createTestDirectories() throws IllegalAccessException, IOException {
+    for (Field field : getFieldsWithAnnotation(testInstance.getClass(), TestDirectory.class)) {
+      field.setAccessible(true);
+      if (!field.getType().equals(File.class)) {
+        throw new IllegalArgumentException(
+            "@TestDirectory can only annotate fields of type java.io.File");
+      }
+
+      TestDirectory annotation = field.getAnnotation(TestDirectory.class);
+      File directory = FileUtil.createTempDirectory(annotation.name(), null);
+      filesToDelete.add(directory);
+      field.set(testInstance, directory);
     }
   }
 
