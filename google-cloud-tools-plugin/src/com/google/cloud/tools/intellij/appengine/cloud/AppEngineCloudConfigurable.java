@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.remoteServer.RemoteServerConfigurable;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -79,10 +80,8 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   }
 
   @Override
-  public void apply() {
-    if (cloudSdkPanel != null) {
-      cloudSdkPanel.apply();
-    }
+  public void apply() throws ConfigurationException {
+    cloudSdkPanel.apply();
   }
 
   @Override

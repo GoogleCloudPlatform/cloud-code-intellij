@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import static com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND;
-import static com.google.cloud.tools.intellij.testing.TestUtils.expectThrows;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -29,6 +28,7 @@ import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.options.ConfigurationException;
 import java.nio.file.Paths;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +43,12 @@ public final class AppEngineCloudConfigurableTest {
 
   @Mock @TestService private CloudSdkService mockCloudSdkService;
 
-  private final AppEngineCloudConfigurable appEngineCloudConfigurable =
-      new AppEngineCloudConfigurable();
+  private AppEngineCloudConfigurable appEngineCloudConfigurable;
+
+  @Before
+  public void setUp() {
+    appEngineCloudConfigurable = new AppEngineCloudConfigurable();
+  }
 
   @Test
   public void reset_withSdkPath_doesSetFieldText() {
@@ -60,7 +64,7 @@ public final class AppEngineCloudConfigurableTest {
   @Test
   public void apply_withValidSdkPath_doesSetSdkPath() throws ConfigurationException {
     String sdkPath = "/some/sdk/path";
-    appEngineCloudConfigurable.getCloudSdkPanel().getCloudSdkDirectoryField().setText(sdkPath);
+    appEngineCloudConfigurable.getCloudSdkPanel().setCloudSdkDirectoryText(sdkPath);
 
     appEngineCloudConfigurable.apply();
 
@@ -68,13 +72,14 @@ public final class AppEngineCloudConfigurableTest {
   }
 
   @Test
-  public void apply_withInvalidSdkPath_throwsException() {
+  public void apply_withInvalidSdkPath_doesSetSdkPath() throws ConfigurationException {
+    String sdkPath = "/some/sdk/path";
+    appEngineCloudConfigurable.getCloudSdkPanel().setCloudSdkDirectoryText(sdkPath);
     when(mockCloudSdkService.validateCloudSdk(anyString()))
         .thenReturn(ImmutableSet.of(CLOUD_SDK_NOT_FOUND));
 
-    ConfigurationException e =
-        expectThrows(ConfigurationException.class, appEngineCloudConfigurable::apply);
+    appEngineCloudConfigurable.apply();
 
-    assertThat(e).hasMessage(CLOUD_SDK_NOT_FOUND.getMessage());
+    verify(mockCloudSdkService).setSdkHomePath(sdkPath);
   }
 }

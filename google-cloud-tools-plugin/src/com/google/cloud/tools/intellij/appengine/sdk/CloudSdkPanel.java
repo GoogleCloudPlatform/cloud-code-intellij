@@ -19,21 +19,27 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
+
 import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Reusable panel for configuring the path to the Cloud SDK from various contexts.
@@ -72,64 +78,14 @@ public class CloudSdkPanel {
         });
   }
 
-  public boolean isModified() {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-
-    String cloudSdkDirectoryFieldValue =
-        getCloudSdkDirectoryText() != null ? getCloudSdkDirectoryText() : "";
-    String currentCloudSdkDirectory = sdkService.getSdkHomePath() != null
-        ? sdkService.getSdkHomePath().toString() : "";
-    return !cloudSdkDirectoryFieldValue.equals(currentCloudSdkDirectory);
-  }
-
-  public void apply() {
-    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
-  }
-
-  public void reset() {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-
-    // TODO(joaomartins): Suggest Cloud SDK location (by resorting to PathResolver) if the path is
-    // empty? Or create a suggest button?
-    setCloudSdkDirectoryText(sdkService.getSdkHomePath() != null
-        ? sdkService.getSdkHomePath().toString() : "");
-  }
-
-  public String getCloudSdkDirectoryText() {
-    return cloudSdkDirectoryField.getText();
-  }
-
-  /** Sets the Cloud SDK directory text. */
-  public void setCloudSdkDirectoryText(String path) {
-    cloudSdkDirectoryField.setText(path);
-  }
-
-  @NotNull
-  public JPanel getComponent() {
-    return cloudSdkPanel;
-  }
-
-  @VisibleForTesting
-  public TextFieldWithBrowseButton getCloudSdkDirectoryField() {
-    return cloudSdkDirectoryField;
-  }
-
-  @VisibleForTesting
-  JTextPane getWarningMessage() {
-    return warningMessage;
-  }
-
-  @VisibleForTesting
-  JLabel getWarningIcon() {
-    return warningIcon;
-  }
-
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void checkSdkInBackground() {
     final String path = cloudSdkDirectoryField.getText();
-    ApplicationManager.getApplication().executeOnPooledThread(() -> checkSdk(path));
+    ApplicationManager.getApplication().executeOnPooledThread(new CloudSdkCheckerRunnable(path));
   }
 
-  private void checkSdk(String path) {
+  @VisibleForTesting
+  protected void checkSdk(String path) {
     String message = buildSdkMessage(path, true /*htmlEnabled*/);
 
     if (!StringUtil.isEmpty(message)) {
@@ -139,7 +95,7 @@ public class CloudSdkPanel {
     }
   }
 
-  private String buildSdkMessage(String path, boolean htmlEnabled) {
+  public String buildSdkMessage(String path, boolean htmlEnabled) {
     if (StringUtil.isEmpty(path)) {
       String missingMessage = GctBundle.message("appengine.cloudsdk.location.missing.message");
 
@@ -185,27 +141,93 @@ public class CloudSdkPanel {
     return null;
   }
 
-  private void showWarning(String message) {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              warningMessage.setText(message);
-              warningMessage.setVisible(true);
-              warningIcon.setVisible(true);
-              cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
-            },
-            ModalityState.any());
+  @VisibleForTesting
+  protected void showWarning(final String message) {
+    invokePanelValidationUpdate(new Runnable() {
+      @Override
+      public void run() {
+        warningMessage.setText(message);
+        warningMessage.setVisible(true);
+        warningIcon.setVisible(true);
+        cloudSdkDirectoryField.getTextField().setForeground(JBColor.red);
+      }
+    });
   }
 
-  private void hideWarning() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
-              warningIcon.setVisible(false);
-              warningMessage.setVisible(false);
-            },
-            ModalityState.any());
+  @VisibleForTesting
+  protected void hideWarning() {
+    invokePanelValidationUpdate(new Runnable() {
+      @Override
+      public void run() {
+        cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
+        warningIcon.setVisible(false);
+        warningMessage.setVisible(false);
+      }
+    });
+  }
+
+  private void invokePanelValidationUpdate(Runnable runnable) {
+    ApplicationManager.getApplication().invokeLater(runnable, ModalityState.any());
+  }
+
+  @VisibleForTesting
+  public TextFieldWithBrowseButton getCloudSdkDirectoryField() {
+    return cloudSdkDirectoryField;
+  }
+
+  @VisibleForTesting
+  JTextPane getWarningMessage() {
+    return warningMessage;
+  }
+
+  public boolean isModified() {
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+
+    String cloudSdkDirectoryFieldValue =
+        getCloudSdkDirectoryText() != null ? getCloudSdkDirectoryText() : "";
+    String currentCloudSdkDirectory = sdkService.getSdkHomePath() != null
+        ? sdkService.getSdkHomePath().toString() : "";
+    return !cloudSdkDirectoryFieldValue.equals(currentCloudSdkDirectory);
+  }
+
+  public void apply() throws ConfigurationException {
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+
+    if (sdkService.validateCloudSdk(getCloudSdkDirectoryText())
+        .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
+      throw new ConfigurationException(
+          GctBundle.message("appengine.cloudsdk.location.badchars.message"));
+    }
+
+    sdkService.setSdkHomePath(getCloudSdkDirectoryText());
+  }
+
+  public void reset() {
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+
+    // TODO(joaomartins): Suggest Cloud SDK location (by resorting to PathResolver) if the path is
+    // empty? Or create a suggest button?
+    setCloudSdkDirectoryText(sdkService.getSdkHomePath() != null
+        ? sdkService.getSdkHomePath().toString() : "");
+  }
+
+  public String getCloudSdkDirectoryText() {
+    return cloudSdkDirectoryField.getText();
+  }
+
+  /**
+   * Sets the Cloud SDK directory text. Performs no action if the current value of the Cloud SDK
+   * directory field is already equal to the path.
+   */
+  public void setCloudSdkDirectoryText(String path) {
+    if (!Objects.equals(cloudSdkDirectoryField.getText(), path)) {
+      cloudSdkDirectoryField.setText(path);
+    }
+  }
+
+  @NotNull
+  public JPanel getComponent() {
+    return cloudSdkPanel;
   }
 
   private String getCloudSdkDownloadMessage() {
@@ -214,4 +236,19 @@ public class CloudSdkPanel {
         + "'>";
     return GctBundle.message("appengine.cloudsdk.download.message", openTag, "</a>");
   }
+
+  private class CloudSdkCheckerRunnable implements Runnable {
+
+    private final String sdkPath;
+
+    public CloudSdkCheckerRunnable(String sdkPath) {
+      this.sdkPath = sdkPath;
+    }
+
+    @Override
+    public void run() {
+      checkSdk(sdkPath);
+    }
+  }
+
 }
