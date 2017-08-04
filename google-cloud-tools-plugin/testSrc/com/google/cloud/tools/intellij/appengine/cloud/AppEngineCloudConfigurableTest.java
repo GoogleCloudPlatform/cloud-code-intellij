@@ -27,6 +27,7 @@ import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.options.ConfigurationException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,13 +53,16 @@ public final class AppEngineCloudConfigurableTest {
 
   @Test
   public void reset_withSdkPath_doesSetFieldText() {
-    String sdkPath = "/some/sdk/path";
-    when(mockCloudSdkService.getSdkHomePath()).thenReturn(Paths.get(sdkPath));
+    Path sdkPath = Paths.get("/some/sdk/path");
+    when(mockCloudSdkService.getSdkHomePath()).thenReturn(sdkPath);
 
     appEngineCloudConfigurable.reset();
+    Path actualPath =
+        Paths.get(appEngineCloudConfigurable.getCloudSdkPanel().getCloudSdkDirectoryText());
 
-    assertThat(appEngineCloudConfigurable.getCloudSdkPanel().getCloudSdkDirectoryText())
-        .isEqualTo(sdkPath);
+    // Cast to Object is needed to clarify the method since Path implements Iterable and there is
+    // also an assertThat(Iterable).
+    assertThat((Object) actualPath).isEqualTo(sdkPath);
   }
 
   @Test
