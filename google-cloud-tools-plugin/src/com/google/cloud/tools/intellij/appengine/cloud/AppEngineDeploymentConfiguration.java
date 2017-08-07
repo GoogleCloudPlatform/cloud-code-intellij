@@ -187,6 +187,7 @@ public class AppEngineDeploymentConfiguration
    *
    * @param deployable the {@link AppEngineDeployable deployment source} that was selected by the
    *     user to deploy
+   * @param project the {@link Project} that this configuration belongs to
    * @throws RuntimeConfigurationError if this configuration is not valid for a flex deployment
    */
   private void checkFlexConfig(AppEngineDeployable deployable, Project project)
