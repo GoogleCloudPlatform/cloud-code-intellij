@@ -58,8 +58,10 @@
       <h3>Fixed</h3>
       <ul>
         <li>Fixed registered Docker language conflict causing issues running plugin alongside .ignore plugin. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1535">#1535</a>)</li>
+        <li>Fixed NPE parsing Stackdriver Debugger breakpoint timestamps. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1537">#1537</a>)</li>
         <li>Removed EAR as acceptable App Engine artifact type for local dev server runs. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1190">#1190</a>)</li>
         <li>Deployments are now displayed across multiple IDE windows. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1432">#1432</a>)</li>
+        <li>Fixed crash caused by attempting to modify a read-only collection. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1571">#1571</a>)</li>
       </ul>
 
       <h2>[17.6.2]</h2>
