@@ -230,6 +230,8 @@ public final class AppEngineFlexibleDeploymentEditor extends
     if (appYamlCombobox.getSelectedItem() != null) {
       configuration.setModuleName(
           ((AppEngineFlexibleFacet) appYamlCombobox.getSelectedItem()).getModule().getName());
+    } else {
+      configuration.setModuleName(null);
     }
 
     configuration.setEnvironment(AppEngineEnvironment.APP_ENGINE_FLEX);

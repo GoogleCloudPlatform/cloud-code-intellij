@@ -17,12 +17,17 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
+import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Iterables;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
@@ -30,6 +35,7 @@ import com.intellij.remoteServer.util.CloudDeploymentNameConfiguration;
 import com.intellij.util.xmlb.annotations.Attribute;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
@@ -145,7 +151,8 @@ public class AppEngineDeploymentConfiguration
   }
 
   @Override
-  public void checkConfiguration(RemoteServer<?> server, DeploymentSource deploymentSource)
+  public void checkConfiguration(
+      RemoteServer<?> server, DeploymentSource deploymentSource, Project project)
       throws RuntimeConfigurationException {
     if (!(deploymentSource instanceof AppEngineDeployable)) {
       throw new RuntimeConfigurationError(
@@ -155,7 +162,7 @@ public class AppEngineDeploymentConfiguration
     AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
     checkCommonConfig(deployable);
     if (deployable.getEnvironment() != null && deployable.getEnvironment().isFlexible()) {
-      checkFlexConfig(deployable);
+      checkFlexConfig(deployable, project);
     }
   }
 
@@ -182,13 +189,36 @@ public class AppEngineDeploymentConfiguration
    *     user to deploy
    * @throws RuntimeConfigurationError if this configuration is not valid for a flex deployment
    */
-  private void checkFlexConfig(AppEngineDeployable deployable) throws RuntimeConfigurationError {
+  private void checkFlexConfig(AppEngineDeployable deployable, Project project)
+      throws RuntimeConfigurationError {
     check(
         !(deployable instanceof UserSpecifiedPathDeploymentSource)
             || (!StringUtil.isEmpty(userSpecifiedArtifactPath)
                 && isJarOrWar(userSpecifiedArtifactPath)),
         "appengine.flex.config.user.specified.artifact.error");
-    check(!StringUtils.isBlank(moduleName), "appengine.flex.config.browse.app.yaml");
+    check(!StringUtils.isBlank(moduleName), "appengine.flex.config.select.module");
+
+    AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getFacetByModuleName(moduleName, project);
+    check(facet != null, "appengine.flex.config.select.module");
+
+    String appYamlPath = facet.getConfiguration().getAppYamlPath();
+    check(!StringUtils.isBlank(appYamlPath), "appengine.flex.config.browse.app.yaml");
+    check(Files.exists(Paths.get(appYamlPath)), "appengine.deployment.config.appyaml.error");
+
+    try {
+      Optional<FlexibleRuntime> runtime =
+          AppEngineProjectService.getInstance().getFlexibleRuntimeFromAppYaml(appYamlPath);
+      if (runtime.isPresent() && runtime.get().isCustom()) {
+        String dockerDirectory = facet.getConfiguration().getDockerDirectory();
+        check(
+            !StringUtils.isBlank(dockerDirectory), "appengine.flex.config.browse.docker.directory");
+        check(
+            Files.exists(Paths.get(dockerDirectory, DOCKERFILE_NAME)),
+            "appengine.deployment.config.dockerfile.error");
+      }
+    } catch (MalformedYamlFileException e) {
+      throw new RuntimeConfigurationError(GctBundle.message("appengine.appyaml.malformed"));
+    }
   }
 
   /**
