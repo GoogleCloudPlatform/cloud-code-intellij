@@ -138,7 +138,8 @@ public final class AppEngineDeploymentConfigurationTest {
         expectThrows(
             RuntimeConfigurationError.class,
             () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
-    assertThat(error).hasMessage("Server is misconfigured: The Cloud SDK is out of date.");
+    assertThat(error.getMessage())
+        .contains("Server is misconfigured: The Cloud SDK is out of date.");
   }
 
   @Test
@@ -151,8 +152,8 @@ public final class AppEngineDeploymentConfigurationTest {
         expectThrows(
             RuntimeConfigurationError.class,
             () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
-    assertThat(error)
-        .hasMessage(
+    assertThat(error.getMessage())
+        .contains(
             "Server is misconfigured: The Cloud SDK does not contain the app-engine-java component.");
   }
 
