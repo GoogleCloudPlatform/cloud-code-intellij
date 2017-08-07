@@ -125,7 +125,7 @@ public final class AppEngineDeploymentConfigurationTest {
         expectThrows(
             RuntimeConfigurationError.class,
             () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
-    assertThat(error).hasMessage("No Cloud SDK was found in the specified directory.");
+    assertThat(error).hasMessage("Server is misconfigured: No Cloud SDK was found in the specified directory.");
   }
 
   @Test
@@ -138,7 +138,7 @@ public final class AppEngineDeploymentConfigurationTest {
         expectThrows(
             RuntimeConfigurationError.class,
             () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
-    assertThat(error.getMessage()).contains("The Cloud SDK is out of date.");
+    assertThat(error).hasMessage("Server is misconfigured: The Cloud SDK is out of date.");
   }
 
   @Test
@@ -151,8 +151,9 @@ public final class AppEngineDeploymentConfigurationTest {
         expectThrows(
             RuntimeConfigurationError.class,
             () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
-    assertThat(error.getMessage())
-        .contains("The Cloud SDK does not contain the app-engine-java component.");
+    assertThat(error)
+        .hasMessage(
+            "Server is misconfigured: The Cloud SDK does not contain the app-engine-java component.");
   }
 
   @Test

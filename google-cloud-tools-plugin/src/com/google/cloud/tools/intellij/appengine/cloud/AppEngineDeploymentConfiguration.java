@@ -164,7 +164,8 @@ public class AppEngineDeploymentConfiguration
         CloudSdkService.getInstance().validateCloudSdk();
     if (!sdkValidationResult.isEmpty()) {
       CloudSdkValidationResult result = Iterables.getFirst(sdkValidationResult, null);
-      throw new RuntimeConfigurationError(result.getMessage());
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.flex.config.server.error", result.getMessage()));
     }
 
     check(
