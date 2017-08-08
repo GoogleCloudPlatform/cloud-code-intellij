@@ -220,6 +220,15 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
+  public void applyEditorTo_withNoAppYamlSelected_doesSetModuleNameToNull() throws Exception {
+    editor.getAppYamlCombobox().setSelectedIndex(-1);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getModuleName()).isNull();
+  }
+
+  @Test
   public void flexibleConfig_javaAppYaml() {
     AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getFacetByModule(javaModule);
     editor.getAppYamlCombobox().setSelectedItem(facet);

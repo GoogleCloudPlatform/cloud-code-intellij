@@ -24,17 +24,27 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetConfiguration;
+import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestDirectory;
 import com.google.cloud.tools.intellij.testing.TestFile;
+import com.google.cloud.tools.intellij.testing.TestFixture;
+import com.google.cloud.tools.intellij.testing.TestModule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
+import com.intellij.facet.FacetManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.io.File;
 import java.util.Optional;
 import org.junit.Before;
@@ -57,6 +67,23 @@ public final class AppEngineDeploymentConfigurationTest {
   @Mock @TestService private CloudSdkService mockCloudSdkService;
   @Mock @TestService private AppEngineProjectService mockAppEngineProjectService;
 
+  @TestFixture private IdeaProjectTestFixture testFixture;
+
+  @TestModule(facetTypeId = AppEngineFlexibleFacetType.STRING_ID)
+  private Module module;
+
+  @TestFile(name = "java.yaml", contents = "runtime: java\nservice: javaService")
+  private File javaYaml;
+
+  @TestFile(name = "custom.yaml", contents = "runtime: custom\nservice: customService")
+  private File customYaml;
+
+  @TestFile(
+    name = "Dockerfile",
+    contents = "FROM gcr.io/google_appengine/jetty\nADD target.war $JETTY_BASE/webapps/root.war"
+  )
+  private File dockerfile;
+
   @TestFile(name = "some.war")
   private File someWar;
 
@@ -66,25 +93,36 @@ public final class AppEngineDeploymentConfigurationTest {
   @TestFile(name = "some-other-file.txt")
   private File someOtherFile;
 
+  @TestDirectory(name = "emptyDirectory")
+  private File emptyDirectory;
+
   private AppEngineDeploymentConfiguration configuration;
+  private Project project;
 
   @Before
   public void setUp() throws Exception {
+    FacetManager.getInstance(module)
+        .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId())
+        .getConfiguration()
+        .setAppYamlPath(javaYaml.getPath());
+
     when(mockAppEngineDeployable.isValid()).thenReturn(true);
     configuration = new AppEngineDeploymentConfiguration();
+    project = testFixture.getProject();
   }
 
   @Test
   public void checkConfiguration_withValidFlexConfig_doesNotThrow() throws Exception {
     setUpValidFlexConfiguration();
-    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable);
+    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable, project);
   }
 
   @Test
   public void checkConfiguration_withValidFlexConfig_andUserSpecifiedWar_doesNotThrow()
       throws Exception {
     setUpValidFlexConfigurationWithUserSpecifiedSource();
-    configuration.checkConfiguration(mockRemoteServer, mockUserSpecifiedPathDeploymentSource);
+    configuration.checkConfiguration(
+        mockRemoteServer, mockUserSpecifiedPathDeploymentSource, project);
   }
 
   @Test
@@ -92,19 +130,29 @@ public final class AppEngineDeploymentConfigurationTest {
       throws Exception {
     setUpValidFlexConfigurationWithUserSpecifiedSource();
     configuration.setUserSpecifiedArtifactPath(someJar.getPath());
-    configuration.checkConfiguration(mockRemoteServer, mockUserSpecifiedPathDeploymentSource);
+    configuration.checkConfiguration(
+        mockRemoteServer, mockUserSpecifiedPathDeploymentSource, project);
+  }
+
+  @Test
+  public void checkConfiguration_withValidFlexConfig_andNoRuntimeFromAppYaml_doesNotThrow()
+      throws Exception {
+    setUpValidFlexConfiguration();
+    when(mockAppEngineProjectService.getFlexibleRuntimeFromAppYaml(customYaml.getPath()))
+        .thenReturn(Optional.empty());
+    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable, project);
   }
 
   @Test
   public void checkConfiguration_withValidCustomFlexConfig_doesNotThrow() throws Exception {
     setUpValidCustomFlexConfiguration();
-    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable);
+    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable, project);
   }
 
   @Test
   public void checkConfiguration_withValidStandardConfig_doesNotThrow() throws Exception {
     setUpValidStandardConfiguration();
-    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable);
+    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable, project);
   }
 
   @Test
@@ -112,7 +160,9 @@ public final class AppEngineDeploymentConfigurationTest {
     RuntimeConfigurationError error =
         expectThrows(
             RuntimeConfigurationError.class,
-            () -> configuration.checkConfiguration(mockRemoteServer, mockOtherDeploymentSource));
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockOtherDeploymentSource, project));
     assertThat(error).hasMessage("Invalid deployment source.");
   }
 
@@ -124,8 +174,11 @@ public final class AppEngineDeploymentConfigurationTest {
     RuntimeConfigurationError error =
         expectThrows(
             RuntimeConfigurationError.class,
-            () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
-    assertThat(error).hasMessage("Server is misconfigured: No Cloud SDK was found in the specified directory.");
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
+    assertThat(error)
+        .hasMessage("Server is misconfigured: No Cloud SDK was found in the specified directory.");
   }
 
   @Test
@@ -137,7 +190,9 @@ public final class AppEngineDeploymentConfigurationTest {
     RuntimeConfigurationError error =
         expectThrows(
             RuntimeConfigurationError.class,
-            () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
     assertThat(error.getMessage())
         .contains("Server is misconfigured: The Cloud SDK is out of date.");
   }
@@ -151,10 +206,13 @@ public final class AppEngineDeploymentConfigurationTest {
     RuntimeConfigurationError error =
         expectThrows(
             RuntimeConfigurationError.class,
-            () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
     assertThat(error.getMessage())
         .contains(
-            "Server is misconfigured: The Cloud SDK does not contain the app-engine-java component.");
+            "Server is misconfigured: The Cloud SDK does not contain the app-engine-java "
+                + "component.");
   }
 
   @Test
@@ -165,7 +223,9 @@ public final class AppEngineDeploymentConfigurationTest {
     RuntimeConfigurationError error =
         expectThrows(
             RuntimeConfigurationError.class,
-            () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
     assertThat(error).hasMessage("Select a valid deployment source.");
   }
 
@@ -177,7 +237,9 @@ public final class AppEngineDeploymentConfigurationTest {
     RuntimeConfigurationError error =
         expectThrows(
             RuntimeConfigurationError.class,
-            () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
     assertThat(error).hasMessage("Please select a project.");
   }
 
@@ -194,7 +256,7 @@ public final class AppEngineDeploymentConfigurationTest {
             RuntimeConfigurationError.class,
             () ->
                 configuration.checkConfiguration(
-                    mockRemoteServer, mockUserSpecifiedPathDeploymentSource));
+                    mockRemoteServer, mockUserSpecifiedPathDeploymentSource, project));
     assertThat(error).hasMessage("Browse to a JAR or WAR file.");
   }
 
@@ -208,7 +270,7 @@ public final class AppEngineDeploymentConfigurationTest {
             RuntimeConfigurationError.class,
             () ->
                 configuration.checkConfiguration(
-                    mockRemoteServer, mockUserSpecifiedPathDeploymentSource));
+                    mockRemoteServer, mockUserSpecifiedPathDeploymentSource, project));
     assertThat(error).hasMessage("Browse to a JAR or WAR file.");
   }
 
@@ -222,20 +284,126 @@ public final class AppEngineDeploymentConfigurationTest {
             RuntimeConfigurationError.class,
             () ->
                 configuration.checkConfiguration(
-                    mockRemoteServer, mockUserSpecifiedPathDeploymentSource));
+                    mockRemoteServer, mockUserSpecifiedPathDeploymentSource, project));
     assertThat(error).hasMessage("Browse to a JAR or WAR file.");
   }
 
   @Test
   public void checkConfiguration_withBlankModuleName_throwsException() throws Exception {
-    setUpValidCustomFlexConfiguration();
+    setUpValidFlexConfiguration();
     configuration.setModuleName("");
 
     RuntimeConfigurationError error =
         expectThrows(
             RuntimeConfigurationError.class,
-            () -> configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable));
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
+    assertThat(error).hasMessage("Select a module with the App Engine flexible facet.");
+  }
+
+  @Test
+  public void checkConfiguration_withInvalidModuleName_throwsException() throws Exception {
+    setUpValidFlexConfiguration();
+    configuration.setModuleName("some invalid module");
+
+    RuntimeConfigurationError error =
+        expectThrows(
+            RuntimeConfigurationError.class,
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
+    assertThat(error).hasMessage("Select a module with the App Engine flexible facet.");
+  }
+
+  @Test
+  public void checkConfiguration_withNoAppYaml_throwsException() throws Exception {
+    setUpValidFlexConfiguration();
+
+    FacetManager.getInstance(module)
+        .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId())
+        .getConfiguration()
+        .setAppYamlPath(null);
+
+    RuntimeConfigurationError error =
+        expectThrows(
+            RuntimeConfigurationError.class,
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
     assertThat(error).hasMessage("Browse to an app.yaml file.");
+  }
+
+  @Test
+  public void checkConfiguration_withInvalidAppYaml_throwsException() throws Exception {
+    setUpValidFlexConfiguration();
+
+    FacetManager.getInstance(module)
+        .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId())
+        .getConfiguration()
+        .setAppYamlPath("/some/invalid/file");
+
+    RuntimeConfigurationError error =
+        expectThrows(
+            RuntimeConfigurationError.class,
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
+    assertThat(error)
+        .hasMessage(
+            "The specified app.yaml configuration file does not exist or is not a valid file.");
+  }
+
+  @Test
+  public void checkConfiguration_withMalformedAppYaml_throwsException() throws Exception {
+    setUpValidFlexConfiguration();
+
+    when(mockAppEngineProjectService.getFlexibleRuntimeFromAppYaml(javaYaml.getPath()))
+        .thenThrow(new MalformedYamlFileException(null));
+
+    RuntimeConfigurationError error =
+        expectThrows(
+            RuntimeConfigurationError.class,
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
+    assertThat(error).hasMessage("The selected app.yaml file is malformed.");
+  }
+
+  @Test
+  public void checkConfiguration_withNoDockerDirectory_throwsException() throws Exception {
+    setUpValidCustomFlexConfiguration();
+
+    FacetManager.getInstance(module)
+        .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId())
+        .getConfiguration()
+        .setDockerDirectory(null);
+
+    RuntimeConfigurationError error =
+        expectThrows(
+            RuntimeConfigurationError.class,
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
+    assertThat(error).hasMessage("Browse to a Docker directory.");
+  }
+
+  @Test
+  public void checkConfiguration_withNoDockerfile_throwsException() throws Exception {
+    setUpValidCustomFlexConfiguration();
+
+    FacetManager.getInstance(module)
+        .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId())
+        .getConfiguration()
+        .setDockerDirectory(emptyDirectory.getPath());
+
+    RuntimeConfigurationError error =
+        expectThrows(
+            RuntimeConfigurationError.class,
+            () ->
+                configuration.checkConfiguration(
+                    mockRemoteServer, mockAppEngineDeployable, project));
+    assertThat(error).hasMessage("There is no Dockerfile in specified directory.");
   }
 
   @Test
@@ -243,7 +411,7 @@ public final class AppEngineDeploymentConfigurationTest {
     setUpValidFlexConfiguration();
     when(mockAppEngineDeployable.getEnvironment()).thenReturn(null);
 
-    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable);
+    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable, project);
   }
 
   /** Sets up the {@code configuration} to be valid for a deployment to a flex environment. */
@@ -253,7 +421,14 @@ public final class AppEngineDeploymentConfigurationTest {
     when(mockAppEngineDeployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
 
     configuration.setCloudProjectName("some-project-name");
-    configuration.setModuleName("some-module-name");
+    configuration.setModuleName(module.getName());
+
+    try {
+      when(mockAppEngineProjectService.getFlexibleRuntimeFromAppYaml(javaYaml.getPath()))
+          .thenReturn(Optional.of(FlexibleRuntime.JAVA));
+    } catch (MalformedYamlFileException e) {
+      throw new AssertionError("This should not happen; Mockito must be broken.", e);
+    }
   }
 
   /**
@@ -268,23 +443,34 @@ public final class AppEngineDeploymentConfigurationTest {
 
     configuration.setCloudProjectName("some-project-name");
     configuration.setUserSpecifiedArtifactPath(someWar.getPath());
-    configuration.setModuleName("some-module-name");
+    configuration.setModuleName(module.getName());
+
+    try {
+      when(mockAppEngineProjectService.getFlexibleRuntimeFromAppYaml(javaYaml.getPath()))
+          .thenReturn(Optional.of(FlexibleRuntime.JAVA));
+    } catch (MalformedYamlFileException e) {
+      throw new AssertionError("This should not happen; Mockito must be broken.", e);
+    }
   }
 
   /** Sets up the {@code configuration} to be a valid custom deployment to a flex environment. */
   private void setUpValidCustomFlexConfiguration() {
-    configuration = new AppEngineDeploymentConfiguration();
-
     when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
     when(mockAppEngineDeployable.isValid()).thenReturn(true);
     when(mockAppEngineDeployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
 
-    String appYamlPath = "some-app.yaml";
+    AppEngineFlexibleFacetConfiguration facetConfig =
+        FacetManager.getInstance(module)
+            .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId())
+            .getConfiguration();
+    facetConfig.setAppYamlPath(customYaml.getPath());
+    facetConfig.setDockerDirectory(dockerfile.getParent());
+
     configuration.setCloudProjectName("some-project-name");
-    configuration.setModuleName("some-module-name");
+    configuration.setModuleName(module.getName());
 
     try {
-      when(mockAppEngineProjectService.getFlexibleRuntimeFromAppYaml(appYamlPath))
+      when(mockAppEngineProjectService.getFlexibleRuntimeFromAppYaml(customYaml.getPath()))
           .thenReturn(Optional.of(FlexibleRuntime.CUSTOM));
     } catch (MalformedYamlFileException e) {
       throw new AssertionError("This should not happen; Mockito must be broken.", e);
