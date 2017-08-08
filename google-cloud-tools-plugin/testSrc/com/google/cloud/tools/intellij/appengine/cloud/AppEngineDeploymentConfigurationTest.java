@@ -299,7 +299,7 @@ public final class AppEngineDeploymentConfigurationTest {
             () ->
                 configuration.checkConfiguration(
                     mockRemoteServer, mockAppEngineDeployable, project));
-    assertThat(error).hasMessage("Select a module with the App Engine Flexible facet.");
+    assertThat(error).hasMessage("Select a module with the App Engine flexible facet.");
   }
 
   @Test
@@ -313,7 +313,7 @@ public final class AppEngineDeploymentConfigurationTest {
             () ->
                 configuration.checkConfiguration(
                     mockRemoteServer, mockAppEngineDeployable, project));
-    assertThat(error).hasMessage("Select a module with the App Engine Flexible facet.");
+    assertThat(error).hasMessage("Select a module with the App Engine flexible facet.");
   }
 
   @Test
