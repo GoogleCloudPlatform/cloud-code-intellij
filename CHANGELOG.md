@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 ## [unreleased]
 
 
+## [17.8.2]
+
+### Fixed
+  - Fixed "Error: invalid_scope" issue when logging in with your Google Account. [1598](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1598)
+
 ## [17.8.1]
 
 ### Added
