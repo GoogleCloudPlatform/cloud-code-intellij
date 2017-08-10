@@ -31,9 +31,9 @@ class OAuthScopeRegistry {
   static {
     SortedSet<String> scopes = new TreeSet<String>();
     scopes.add("https://www.googleapis.com/auth/userinfo#email");
+    // TODO: I think only the cloud-platform scope is required. Remove admin and cloud_debugger.
     scopes.add("https://www.googleapis.com/auth/appengine.admin");
     scopes.add("https://www.googleapis.com/auth/cloud-platform");
-    scopes.add("https://www.googleapis.com/auth/projecthosting");
     scopes.add("https://www.googleapis.com/auth/cloud_debugger");
     SCOPES = Collections.unmodifiableSortedSet(scopes);
   }
