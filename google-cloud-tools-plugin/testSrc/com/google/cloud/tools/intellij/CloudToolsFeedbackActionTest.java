@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij;
 
-import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,7 +31,6 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
 /** Tests for {@link CloudToolsFeedbackAction}. */
@@ -47,8 +46,6 @@ public class CloudToolsFeedbackActionTest {
 
   private CloudToolsFeedbackAction feedbackAction;
 
-  private static ArgumentCaptor<String> urlArg = ArgumentCaptor.forClass(String.class);
-
   @Before
   public void setUp() {
     feedbackAction = new CloudToolsFeedbackAction();
@@ -59,23 +56,22 @@ public class CloudToolsFeedbackActionTest {
     when(sdkService.getSdkHomePath()).thenReturn(missingCloudSdk.toPath());
 
     feedbackAction.actionPerformed(null /*event*/);
-    verify(browserLauncher).browse(urlArg.capture(), eq(null));
 
-    String expectedEmptySdkVersionMessage = "- Google Cloud SDK version: \n";
-    assertTrue(urlContainsMessage(expectedEmptySdkVersionMessage));
+    String expected = "- Google Cloud SDK version: \n";
+    verify(browserLauncher).browse(urlContains(expected), eq(null), eq(null));
   }
 
   @Test
   public void testDisplayableOs() {
     feedbackAction.actionPerformed(null /*event*/);
-    verify(browserLauncher).browse(urlArg.capture(), eq(null));
 
-    String expectedOsMessage =
-        "OS: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "\n";
-    assertTrue(urlContainsMessage(expectedOsMessage));
+    String expected =
+        String.format(
+            "OS: %s %s\n", System.getProperty("os.name"), System.getProperty("os.version"));
+    verify(browserLauncher).browse(urlContains(expected), eq(null), eq(null));
   }
 
-  private static boolean urlContainsMessage(String message) {
-    return urlArg.getValue().contains(UrlEscapers.urlFormParameterEscaper().escape(message));
+  private static String urlContains(String unescapedMessage) {
+    return contains(UrlEscapers.urlFormParameterEscaper().escape(unescapedMessage));
   }
 }
