@@ -22,6 +22,7 @@ import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInsta
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
+import com.google.cloud.tools.appengine.cloudsdk.InvalidJavaSdkException;
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
@@ -117,6 +118,8 @@ public class DefaultCloudSdkService extends CloudSdkService {
       return validationResults;
     } catch (CloudSdkOutOfDateException exception) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
+    } catch (InvalidJavaSdkException exception) {
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     }
 
     try {
