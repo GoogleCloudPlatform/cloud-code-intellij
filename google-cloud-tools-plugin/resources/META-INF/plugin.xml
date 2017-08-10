@@ -44,6 +44,12 @@
       </p>
       <br/>
 
+      <h2>[17.8.2]</h2>
+      <h3>Fixed</h3>
+      <ul>
+        <li>Fixed "Error: invalid_scope" issue when logging in with your Google Account. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1598">#1598</a>)</li>
+      </ul>
+
       <h2>[17.8.1]</h2>
       <h3>Added</h3>
       <ul>
