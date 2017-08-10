@@ -33,7 +33,6 @@ class OAuthScopeRegistry {
     scopes.add("https://www.googleapis.com/auth/userinfo#email");
     scopes.add("https://www.googleapis.com/auth/appengine.admin");
     scopes.add("https://www.googleapis.com/auth/cloud-platform");
-    scopes.add("https://www.googleapis.com/auth/projecthosting");
     scopes.add("https://www.googleapis.com/auth/cloud_debugger");
     SCOPES = Collections.unmodifiableSortedSet(scopes);
   }
