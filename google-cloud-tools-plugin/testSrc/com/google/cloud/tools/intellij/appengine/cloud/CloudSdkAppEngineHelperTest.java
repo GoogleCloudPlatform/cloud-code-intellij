@@ -78,7 +78,6 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     String clientId = "clientId";
     String clientSecret = "clientSecret";
     String refreshToken = "refreshToken";
-    when(deploymentConfiguration.getGoogleUsername()).thenReturn(username);
     when(googleLoginService.ensureLoggedIn(username)).thenReturn(true);
     when(googleLoginService.getLoggedInUser(username)).thenReturn(Optional.of(credentialedUser));
     when(credentialedUser.getGoogleLoginState()).thenReturn(loginState);
@@ -100,7 +99,6 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   @Test
   public void testStageCredentials_withoutValidCreds() throws Exception {
     String username = "jones@gmail.com";
-    when(deploymentConfiguration.getGoogleUsername()).thenReturn(username);
     when(googleLoginService.ensureLoggedIn(username)).thenReturn(false);
     assertFalse(helper.stageCredentials(username).isPresent());
   }

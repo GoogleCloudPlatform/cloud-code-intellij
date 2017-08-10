@@ -19,8 +19,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.executor;
 import static com.google.cloud.tools.intellij.testing.TestUtils.expectThrows;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -34,7 +33,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleStage;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
-import com.intellij.remoteServer.runtime.log.LoggingHandler;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,13 +61,13 @@ public class AppEngineFlexibleDeployTaskTest {
 
   @Before
   public void setUp() throws IOException {
-    when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
+    when(helper.createStagingDirectory(any(), any()))
         .thenReturn(Paths.get("myFile.jar"));
     when(stage.stage(Paths.get("myFile.jar"))).thenReturn(true);
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
-    when(deploy.getHelper().stageCredentials(anyString()))
+    when(deploy.getHelper().stageCredentials(any()))
         .thenReturn(Optional.of(Paths.get("/some/file")));
 
     task = new AppEngineFlexibleDeployTask(deploy, stage);
@@ -77,7 +75,7 @@ public class AppEngineFlexibleDeployTaskTest {
 
   @Test
   public void testStageCredentials_error() {
-    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(null);
+    when(deploy.getHelper().stageCredentials(any())).thenReturn(null);
     task.execute(startListener);
 
     verify(callback, times(1))
@@ -88,7 +86,7 @@ public class AppEngineFlexibleDeployTaskTest {
 
   @Test
   public void testCreateStagingDirectory_error() throws IOException {
-    when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
+    when(helper.createStagingDirectory(any(), any()))
         .thenThrow(new IOException());
 
     task.execute(startListener);
@@ -122,7 +120,7 @@ public class AppEngineFlexibleDeployTaskTest {
   public void deploy_success() {
     task.execute(startListener);
 
-    verify(callback, never()).errorOccurred(anyString());
+    verify(callback, never()).errorOccurred(any());
   }
 
   @Test
@@ -143,10 +141,6 @@ public class AppEngineFlexibleDeployTaskTest {
       return;
     }
 
-    failureExpected();
-  }
-
-  private void failureExpected() {
     fail("Expected exception due to log error level");
   }
 }
