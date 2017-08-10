@@ -119,7 +119,7 @@ public class DefaultCloudSdkService extends CloudSdkService {
     } catch (CloudSdkOutOfDateException exception) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
     } catch (InvalidJavaSdkException exception) {
-      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+      validationResults.add(CloudSdkValidationResult.INVALID_JAVA_SDK);
     }
 
     try {
