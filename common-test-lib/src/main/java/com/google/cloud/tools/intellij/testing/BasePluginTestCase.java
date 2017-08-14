@@ -36,7 +36,7 @@ import org.picocontainer.MutablePicoContainer;
 /**
  * Test base class that provides a mock Intellij application and project.
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(MockitoJUnitRunner.class)
 public class BasePluginTestCase {
 
   protected Project project;

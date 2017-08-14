@@ -79,7 +79,6 @@ public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_nullSdkPath() {
-    when(cloudSdkServiceMock.getSdkHomePath()).thenReturn(null);
     checker.notifyIfUnsupportedVersion();
     verify(checker, times(0)).showNotification();
   }
