@@ -16,16 +16,14 @@
 
 package com.google.cloud.tools.intellij.debugger;
 
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
@@ -34,15 +32,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 
 public class CloudDebugProcessStateCollectorTest extends BasePluginTestCase {
 
@@ -61,7 +57,7 @@ public class CloudDebugProcessStateCollectorTest extends BasePluginTestCase {
         new CloudDebugProcessStateCollector().getBackgroundListeningStates();
 
     assertNotNull(backgroundListeningStates);
-    assertThat(backgroundListeningStates, hasSize(2 * listeningSessions));
+    assertThat(backgroundListeningStates).hasSize(2 * listeningSessions);
     for (CloudDebugProcessState state : backgroundListeningStates) {
       assertTrue(state.isListenInBackground());
     }
@@ -74,7 +70,7 @@ public class CloudDebugProcessStateCollectorTest extends BasePluginTestCase {
     List<CloudDebugProcessState> backgroundListeningStates =
         new CloudDebugProcessStateCollector().getBackgroundListeningStates();
     assertNotNull(backgroundListeningStates);
-    assertThat(backgroundListeningStates, hasSize(0));
+    assertThat(backgroundListeningStates).hasSize(0);
   }
 
   @Test
@@ -86,7 +82,7 @@ public class CloudDebugProcessStateCollectorTest extends BasePluginTestCase {
         new CloudDebugProcessStateCollector().getProfilesWithActiveDebugSession(project);
 
     assertNotNull(profiles);
-    assertThat(profiles, hasSize(0));
+    assertThat(profiles).hasSize(0);
   }
 
   @Test
@@ -106,7 +102,7 @@ public class CloudDebugProcessStateCollectorTest extends BasePluginTestCase {
         new CloudDebugProcessStateCollector().getProfilesWithActiveDebugSession(project);
 
     assertNotNull(profiles);
-    assertThat(profiles, hasSize(1));
+    assertThat(profiles).hasSize(1);
   }
 
   @Test

@@ -16,24 +16,18 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-
 import com.intellij.openapi.project.Project;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.nio.file.Path;
 
 /** Unit tests for {@link CloudSdkVersionStartupCheck} */
 @RunWith(MockitoJUnitRunner.class)
@@ -54,9 +48,6 @@ public final class CloudSdkVersionStartupCheckTest extends BasePluginTestCase {
 
   @Test
   public void testRunActivity() {
-    Path mockPath = mock(Path.class);
-
-    when(cloudSdkService.getSdkHomePath()).thenReturn(mockPath);
     cloudSdkVersionStartupCheck.runActivity(mockProject);
 
     verify(cloudSdkVersionNotifier, times(1)).notifyIfUnsupportedVersion();

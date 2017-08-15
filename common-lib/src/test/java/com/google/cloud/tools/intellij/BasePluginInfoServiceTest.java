@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /** Tests for {@link BasePluginInfoService}. */
 @RunWith(MockitoJUnitRunner.class)
@@ -129,7 +129,6 @@ public class BasePluginInfoServiceTest {
     Feature systemFlagEnabledFeature = mock(Feature.class);
     String flagString = "TEST_FLAG";
     try {
-      when(flagReader.getFlagString(flagString)).thenReturn("false");
       when(systemFlagEnabledFeature.getSystemFlagName()).thenReturn(flagString);
       System.setProperty(flagString, "true");
       assertTrue(underTest.shouldEnable(systemFlagEnabledFeature));
@@ -140,10 +139,6 @@ public class BasePluginInfoServiceTest {
 
   @Test
   public void testIsEnabled_SystemPropertyIsMissing() throws Exception {
-    Feature systemFlagEnabledFeature = mock(Feature.class);
-    String flagString = "TEST_FLAG";
-    when(flagReader.getFlagString(flagString)).thenReturn("false");
-    when(systemFlagEnabledFeature.getSystemFlagName()).thenReturn(flagString);
-    assertFalse(underTest.shouldEnable(systemFlagEnabledFeature));
+    assertFalse(underTest.shouldEnable(mock(Feature.class)));
   }
 }
