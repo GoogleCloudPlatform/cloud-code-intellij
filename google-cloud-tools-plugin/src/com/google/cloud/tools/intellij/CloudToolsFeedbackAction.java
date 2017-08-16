@@ -23,7 +23,7 @@ import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.net.UrlEscapers;
-import com.intellij.ide.BrowserUtil;
+import com.intellij.ide.browsers.BrowserLauncher;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -60,7 +60,7 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
 
   @Override
   public void actionPerformed(AnActionEvent event) {
-    BrowserUtil.browse(formatUrl());
+    BrowserLauncher.getInstance().browse(formatUrl(), /* browser= */ null, /* project= */ null);
   }
 
   private static String formatUrl() {
