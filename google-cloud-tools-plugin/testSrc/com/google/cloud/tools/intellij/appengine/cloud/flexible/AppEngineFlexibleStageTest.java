@@ -71,7 +71,10 @@ public final class AppEngineFlexibleStageTest {
   private File dockerfile;
 
   @TestFile(name = "artifact.war")
-  private File artifact;
+  private File warArtifact;
+
+  @TestFile(name = "artifact.jar")
+  private File jarArtifact;
 
   @TestDirectory(name = "stagingDirectory")
   private File stagingDirectory;
@@ -100,7 +103,7 @@ public final class AppEngineFlexibleStageTest {
     stage =
         new AppEngineFlexibleStage(
             mockLoggingHandler,
-            artifact.toPath(),
+            warArtifact.toPath(),
             deploymentConfiguration,
             testFixture.getProject());
   }
@@ -172,8 +175,6 @@ public final class AppEngineFlexibleStageTest {
 
   @Test
   public void stage_javaRuntime() throws IOException {
-    deploymentConfiguration.setModuleName(javaModule.getName());
-
     boolean result = stage.stage(stagingDirectory.toPath());
 
     assertThat(result).isTrue();
@@ -194,5 +195,42 @@ public final class AppEngineFlexibleStageTest {
     assertThat(Files.exists(stagingDirectory.toPath().resolve("custom.yaml"))).isTrue();
     assertThat(Files.exists(stagingDirectory.toPath().resolve("Dockerfile"))).isTrue();
     assertThat(Files.exists(stagingDirectory.toPath().resolve("target.war"))).isTrue();
+  }
+
+  @Test
+  public void stage_withJarArtifact_doesStageTargetJar() throws IOException {
+    stage =
+        new AppEngineFlexibleStage(
+            mockLoggingHandler,
+            jarArtifact.toPath(),
+            deploymentConfiguration,
+            testFixture.getProject());
+
+    boolean result = stage.stage(stagingDirectory.toPath());
+
+    assertThat(result).isTrue();
+    assertThat(Files.exists(stagingDirectory.toPath().resolve("target.jar"))).isTrue();
+  }
+
+  @Test
+  public void stage_withStagedArtifactName_doesStageChosenArtifactName() throws IOException {
+    String stagedArtifactName = "some-artifact.war";
+    deploymentConfiguration.setStagedArtifactName(stagedArtifactName);
+
+    boolean result = stage.stage(stagingDirectory.toPath());
+
+    assertThat(result).isTrue();
+    assertThat(Files.exists(stagingDirectory.toPath().resolve(stagedArtifactName))).isTrue();
+  }
+
+  @Test
+  public void stage_withDirectoriesInStagedArtifactName_doesCreateDirectories() throws IOException {
+    String stagedArtifactName = "some/directory/artifact.war";
+    deploymentConfiguration.setStagedArtifactName(stagedArtifactName);
+
+    boolean result = stage.stage(stagingDirectory.toPath());
+
+    assertThat(result).isTrue();
+    assertThat(Files.exists(stagingDirectory.toPath().resolve(stagedArtifactName))).isTrue();
   }
 }

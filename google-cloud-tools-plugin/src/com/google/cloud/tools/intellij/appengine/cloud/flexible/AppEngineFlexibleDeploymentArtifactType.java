@@ -16,38 +16,45 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
+import java.nio.file.Path;
+import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.nio.file.Path;
-import java.util.Locale;
 
 /**
  * Represents the supported Java artifact types that we can deploy to App Engine flexible
  * environment.
  */
 public enum AppEngineFlexibleDeploymentArtifactType {
-  UNKNOWN, JAR, WAR;
+  JAR(".jar"),
+  WAR(".war"),
+  // Must be last since it will match every path.
+  UNKNOWN("");
+
+  @NotNull private final String extension;
+
+  AppEngineFlexibleDeploymentArtifactType(@NotNull String extension) {
+    this.extension = extension;
+  }
 
   /**
-   * Returns the right {@code AppEngineFlexibleDeploymentArtifactType} for the given
-   * {@code deployPackage}.
+   * Returns the right {@code AppEngineFlexibleDeploymentArtifactType} for the given {@code
+   * deployPackage}.
    */
   @NotNull
   public static AppEngineFlexibleDeploymentArtifactType typeForPath(@Nullable Path deployPackage) {
-    if (deployPackage != null) {
-      if (deployPackage.toString().endsWith(".jar")) {
-        return JAR;
-      } else if (deployPackage.toString().endsWith(".war")) {
-        return WAR;
-      }
+    if (deployPackage == null) {
+      return UNKNOWN;
     }
-    return UNKNOWN;
+    return Arrays.stream(AppEngineFlexibleDeploymentArtifactType.values())
+        .filter(type -> deployPackage.toString().endsWith(type.extension))
+        .findFirst()
+        // Just in case, but UNKNOWN should always match the filter.
+        .orElse(UNKNOWN);
   }
 
-
-  @Override
-  public String toString() {
-    return "." + name().toLowerCase(Locale.US);
+  @NotNull
+  public String getDefaultArtifactName() {
+    return extension.isEmpty() ? "" : "target" + extension;
   }
 }

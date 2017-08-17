@@ -79,8 +79,14 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   )
   private File dockerfile;
 
+  @TestFile(name = "artifact.war")
+  private File warArtifact;
+
+  @TestFile(name = "artifact.jar")
+  private File jarArtifact;
+
   @TestFile(name = "target")
-  private File notAWar;
+  private File unknownArtifact;
 
   private UserSpecifiedPathDeploymentSource userSpecifiedPathDeploymentSource;
   private AppEngineDeploymentConfiguration configuration;
@@ -185,38 +191,46 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
-  public void applyEditorTo_notJarOrWarUserSpecified() throws Exception {
-    userSpecifiedPathDeploymentSource.setFilePath(notAWar.getPath());
-    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
-    editor.getArchiveSelector().setText(notAWar.getPath());
+  public void applyEditorTo_withStagedArtifactName_doesSetStagedArtifactName() throws Exception {
+    String stagedArtifactName = "some-artifact.war";
+    editor.getStagedArtifactNameTextField().setText(stagedArtifactName);
 
     editor.applyEditorTo(configuration);
 
-    assertThat(configuration.getUserSpecifiedArtifactPath()).isEqualTo(notAWar.getPath());
+    assertThat(configuration.getStagedArtifactName()).isEqualTo(stagedArtifactName);
   }
 
   @Test
-  public void applyEditorTo_validWar() throws Exception {
-    String war = "some-war.war";
-    userSpecifiedPathDeploymentSource.setFilePath(war);
+  public void applyEditorTo_withUnknown_doesSetUserSpecifiedArtifactPath() throws Exception {
+    userSpecifiedPathDeploymentSource.setFilePath(unknownArtifact.getPath());
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
-    editor.getArchiveSelector().setText(war);
+    editor.getArchiveSelector().setText(unknownArtifact.getPath());
 
     editor.applyEditorTo(configuration);
 
-    assertThat(configuration.getUserSpecifiedArtifactPath()).isEqualTo(war);
+    assertThat(configuration.getUserSpecifiedArtifactPath()).isEqualTo(unknownArtifact.getPath());
   }
 
   @Test
-  public void applyEditorTo_validJar() throws Exception {
-    String jar = "some-jar.jar";
-    userSpecifiedPathDeploymentSource.setFilePath(jar);
+  public void applyEditorTo_withWar_doesSetUserSpecifiedArtifactPath() throws Exception {
+    userSpecifiedPathDeploymentSource.setFilePath(warArtifact.getPath());
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
-    editor.getArchiveSelector().setText(jar);
+    editor.getArchiveSelector().setText(warArtifact.getPath());
 
     editor.applyEditorTo(configuration);
 
-    assertThat(configuration.getUserSpecifiedArtifactPath()).isEqualTo(jar);
+    assertThat(configuration.getUserSpecifiedArtifactPath()).isEqualTo(warArtifact.getPath());
+  }
+
+  @Test
+  public void applyEditorTo_withJar_doesSetUserSpecifiedArtifactPath() throws Exception {
+    userSpecifiedPathDeploymentSource.setFilePath(jarArtifact.getPath());
+    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
+    editor.getArchiveSelector().setText(jarArtifact.getPath());
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getUserSpecifiedArtifactPath()).isEqualTo(jarArtifact.getPath());
   }
 
   @Test
@@ -234,6 +248,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
     editor.getAppYamlCombobox().setSelectedItem(facet);
 
     assertThat(editor.getDockerDirectoryPanel().isVisible()).isFalse();
+    assertThat(editor.getStagedArtifactNamePanel().isVisible()).isFalse();
     assertThat(editor.getRuntimePanel().isVisible()).isTrue();
     assertThat(editor.getRuntimePanel().getLabelText()).isEqualTo("java");
   }
@@ -244,6 +259,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
     editor.getAppYamlCombobox().setSelectedItem(facet);
 
     assertThat(editor.getDockerDirectoryPanel().isVisible()).isTrue();
+    assertThat(editor.getStagedArtifactNamePanel().isVisible()).isTrue();
     assertThat(editor.getRuntimePanel().isVisible()).isTrue();
     assertThat(editor.getRuntimePanel().getLabelText()).isEqualTo("custom");
   }
@@ -311,5 +327,41 @@ public final class AppEngineFlexibleDeploymentEditorTest {
     editor.resetEditorFrom(configuration);
 
     verify(projectSelector).setText(projectName);
+  }
+
+  @Test
+  public void resetEditorFrom_withStagedArtifactName_doesSetStagedArtifactName() {
+    String stagedArtifactName = "some-artifact.war";
+    configuration.setStagedArtifactName(stagedArtifactName);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getStagedArtifactNameTextField().getText()).isEqualTo(stagedArtifactName);
+  }
+
+  @Test
+  public void updateArtifactField_toWar_doesSetStagedArtifactNameEmptyText() {
+    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
+    editor.getArchiveSelector().setText(warArtifact.toString());
+
+    assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText())
+        .isEqualTo("target.war");
+  }
+
+  @Test
+  public void updateArtifactField_toJar_doesSetStagedArtifactNameEmptyText() {
+    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
+    editor.getArchiveSelector().setText(jarArtifact.toString());
+
+    assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText())
+        .isEqualTo("target.jar");
+  }
+
+  @Test
+  public void updateArtifactField_toUnknown_doesClearStagedArtifactNameEmptyText() {
+    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
+    editor.getArchiveSelector().setText(unknownArtifact.toString());
+
+    assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText()).isEmpty();
   }
 }

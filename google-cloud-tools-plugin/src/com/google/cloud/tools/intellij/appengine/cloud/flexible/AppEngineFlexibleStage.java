@@ -111,10 +111,16 @@ public class AppEngineFlexibleStage {
         }
       }
 
-      Path stagedArtifactPath =
-          stagingDirectory.resolve(
-              "target"
-                  + AppEngineFlexibleDeploymentArtifactType.typeForPath(deploymentArtifactPath));
+      String stagedArtifactName = deploymentConfiguration.getStagedArtifactName();
+      if (Strings.isNullOrEmpty(stagedArtifactName)) {
+        stagedArtifactName =
+            AppEngineFlexibleDeploymentArtifactType.typeForPath(deploymentArtifactPath)
+                .getDefaultArtifactName();
+      }
+      Path stagedArtifactPath = stagingDirectory.resolve(stagedArtifactName);
+
+      // Creates parent directories first, if necessary.
+      Files.createDirectories(stagedArtifactPath.getParent());
       Files.copy(deploymentArtifactPath, stagedArtifactPath);
 
       Path appYamlPath = Paths.get(appYaml);
