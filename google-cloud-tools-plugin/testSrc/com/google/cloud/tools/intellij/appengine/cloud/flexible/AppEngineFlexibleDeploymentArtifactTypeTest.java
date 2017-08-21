@@ -50,11 +50,6 @@ public final class AppEngineFlexibleDeploymentArtifactTypeTest {
   }
 
   @Test
-  public void typeForPath_withNull_doesReturnUnknown() {
-    assertThat(AppEngineFlexibleDeploymentArtifactType.typeForPath(null)).isEqualTo(UNKNOWN);
-  }
-
-  @Test
   public void getDefaultArtifactName_withJar_doesReturnTargetJar() {
     assertThat(JAR.getDefaultArtifactName()).isEqualTo("target.jar");
   }
