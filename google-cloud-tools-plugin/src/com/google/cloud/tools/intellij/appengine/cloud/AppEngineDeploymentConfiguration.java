@@ -47,6 +47,8 @@ public class AppEngineDeploymentConfiguration
     extends CloudDeploymentNameConfiguration<AppEngineDeploymentConfiguration> {
 
   public static final String USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE = "userSpecifiedArtifactPath";
+  public static final String STAGED_ARTIFACT_NAME = "stagedArtifactName";
+
   static final String ENVIRONMENT_ATTRIBUTE = "environment";
   private static final String DOCKERFILE_NAME = "Dockerfile";
 
@@ -115,7 +117,7 @@ public class AppEngineDeploymentConfiguration
     return moduleName;
   }
 
-  @Attribute("stagedArtifactName")
+  @Attribute(STAGED_ARTIFACT_NAME)
   public String getStagedArtifactName() {
     return stagedArtifactName;
   }
