@@ -417,6 +417,11 @@
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.util.SystemEnvironmentProvider" />
   </extensions>
 
+  <extensions defaultExtensionNs="com.intellij">
+    <!--<toolWindow id="Google Cloud Storage" anchor="right"-->
+                <!--factoryClass="com.google.cloud.tools.intellij.gcs.GcsToolWindowFactory"/>-->
+  </extensions>
+
   <actions>
     <action id="AddSnapshotLocation" class="com.google.cloud.tools.intellij.debugger.actions.ToggleSnapshotLocationAction"/>
 
