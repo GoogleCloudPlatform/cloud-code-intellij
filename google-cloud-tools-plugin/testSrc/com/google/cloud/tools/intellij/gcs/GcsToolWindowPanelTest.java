@@ -16,19 +16,26 @@
 
 package com.google.cloud.tools.intellij.gcs;
 
-import com.intellij.testFramework.PlatformTestCase;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.intellij.openapi.application.ApplicationManager;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 /** Tests for {@link GcsToolWindowPanel}. */
-public class GcsToolWindowPanelTest extends PlatformTestCase {
+public class GcsToolWindowPanelTest {
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   private GcsToolWindowPanel gcsPanel;
 
-  @Override
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
-    gcsPanel = new GcsToolWindowPanel();
+    ApplicationManager.getApplication().invokeAndWait(() -> gcsPanel = new GcsToolWindowPanel());
   }
 
+  @Test
   public void testPanelInitialization() {
     assertTrue(gcsPanel.isVisible());
     assertTrue(gcsPanel.isToolbarVisible());
