@@ -35,7 +35,10 @@ public class DefaultGoogleApiFactory extends GoogleApiFactory {
             new GoogleCredentials(
                 new AccessToken(
                     credential.getAccessToken(),
-                    Date.from(Instant.ofEpochMilli(credential.getExpirationTimeMilliseconds())))))
+                    credential.getExpirationTimeMilliseconds() != null
+                        ? Date.from(
+                            Instant.ofEpochMilli(credential.getExpirationTimeMilliseconds()))
+                        : null)))
         .build()
         .getService();
   }
