@@ -130,9 +130,9 @@ If your unit test is testing platform UI components such as toolbars/panels/dial
 
 For example:
 
-    ```
-    ApplicationManager.getApplication().invokeAndWait(() -> // initialize your component);
-    ```
+```
+ApplicationManager.getApplication().invokeAndWait(() -> // initialize your component);
+```
 
 **Additional Annotations:**
 
