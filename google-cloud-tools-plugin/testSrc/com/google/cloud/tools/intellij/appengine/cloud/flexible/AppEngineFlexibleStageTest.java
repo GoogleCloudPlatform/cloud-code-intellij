@@ -178,8 +178,8 @@ public final class AppEngineFlexibleStageTest {
     boolean result = stage.stage(stagingDirectory.toPath());
 
     assertThat(result).isTrue();
-    assertThat(Files.exists(stagingDirectory.toPath().resolve("java.yaml"))).isTrue();
-    assertThat(Files.exists(stagingDirectory.toPath().resolve("target.war"))).isTrue();
+    assertFileIsStaged(javaYaml);
+    assertFileIsStaged(warArtifact);
   }
 
   @Test
@@ -192,9 +192,9 @@ public final class AppEngineFlexibleStageTest {
     boolean result = stage.stage(stagingDirectory.toPath());
 
     assertThat(result).isTrue();
-    assertThat(Files.exists(stagingDirectory.toPath().resolve("custom.yaml"))).isTrue();
-    assertThat(Files.exists(stagingDirectory.toPath().resolve("Dockerfile"))).isTrue();
-    assertThat(Files.exists(stagingDirectory.toPath().resolve("target.war"))).isTrue();
+    assertFileIsStaged(customYaml);
+    assertFileIsStaged(dockerfile);
+    assertFileIsStaged(warArtifact);
   }
 
   @Test
@@ -209,7 +209,7 @@ public final class AppEngineFlexibleStageTest {
     boolean result = stage.stage(stagingDirectory.toPath());
 
     assertThat(result).isTrue();
-    assertThat(Files.exists(stagingDirectory.toPath().resolve("target.jar"))).isTrue();
+    assertFileIsStaged(jarArtifact);
   }
 
   @Test
@@ -232,5 +232,10 @@ public final class AppEngineFlexibleStageTest {
 
     assertThat(result).isTrue();
     assertThat(Files.exists(stagingDirectory.toPath().resolve(stagedArtifactName))).isTrue();
+  }
+
+  /** Asserts the given {@link File} was staged in the staging directory. */
+  private void assertFileIsStaged(File file) {
+    assertThat(Files.exists(stagingDirectory.toPath().resolve(file.getName()))).isTrue();
   }
 }

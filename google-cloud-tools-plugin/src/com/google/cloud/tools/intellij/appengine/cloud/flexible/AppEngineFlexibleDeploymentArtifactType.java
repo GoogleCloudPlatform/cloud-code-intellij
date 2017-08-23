@@ -42,12 +42,4 @@ public enum AppEngineFlexibleDeploymentArtifactType {
       return UNKNOWN;
     }
   }
-
-  @NotNull
-  public String getDefaultArtifactName() {
-    if (this.equals(UNKNOWN)) {
-      return "";
-    }
-    return "target." + this.name().toLowerCase();
-  }
 }

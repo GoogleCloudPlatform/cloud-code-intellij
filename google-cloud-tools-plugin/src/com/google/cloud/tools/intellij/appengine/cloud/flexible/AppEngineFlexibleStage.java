@@ -113,9 +113,8 @@ public class AppEngineFlexibleStage {
 
       String stagedArtifactName = deploymentConfiguration.getStagedArtifactName();
       if (Strings.isNullOrEmpty(stagedArtifactName)) {
-        stagedArtifactName =
-            AppEngineFlexibleDeploymentArtifactType.typeForPath(deploymentArtifactPath)
-                .getDefaultArtifactName();
+        // Defaults to the name of the artifact.
+        stagedArtifactName = deploymentArtifactPath.getFileName().toString();
       }
       Path stagedArtifactPath = stagingDirectory.resolve(stagedArtifactName);
 

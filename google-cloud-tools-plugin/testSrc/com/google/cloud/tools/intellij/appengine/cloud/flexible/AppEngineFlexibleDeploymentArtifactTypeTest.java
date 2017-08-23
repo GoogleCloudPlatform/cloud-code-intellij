@@ -48,19 +48,4 @@ public final class AppEngineFlexibleDeploymentArtifactTypeTest {
     Path txtPath = Paths.get("some", "path", "to", "a.txt");
     assertThat(AppEngineFlexibleDeploymentArtifactType.typeForPath(txtPath)).isEqualTo(UNKNOWN);
   }
-
-  @Test
-  public void getDefaultArtifactName_withJar_doesReturnTargetJar() {
-    assertThat(JAR.getDefaultArtifactName()).isEqualTo("target.jar");
-  }
-
-  @Test
-  public void getDefaultArtifactName_withWar_doesReturnTargetWar() {
-    assertThat(WAR.getDefaultArtifactName()).isEqualTo("target.war");
-  }
-
-  @Test
-  public void getDefaultArtifactName_withUnknown_doesReturnEmptyString() {
-    assertThat(UNKNOWN.getDefaultArtifactName()).isEmpty();
-  }
 }

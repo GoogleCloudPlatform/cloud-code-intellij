@@ -85,7 +85,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   @TestFile(name = "artifact.jar")
   private File jarArtifact;
 
-  @TestFile(name = "target")
+  @TestFile(name = "unknown.txt")
   private File unknownArtifact;
 
   private UserSpecifiedPathDeploymentSource userSpecifiedPathDeploymentSource;
@@ -345,7 +345,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
     editor.getArchiveSelector().setText(warArtifact.toString());
 
     assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText())
-        .isEqualTo("target.war");
+        .isEqualTo(warArtifact.getName());
   }
 
   @Test
@@ -354,13 +354,27 @@ public final class AppEngineFlexibleDeploymentEditorTest {
     editor.getArchiveSelector().setText(jarArtifact.toString());
 
     assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText())
-        .isEqualTo("target.jar");
+        .isEqualTo(jarArtifact.getName());
   }
 
   @Test
   public void updateArtifactField_toUnknown_doesClearStagedArtifactNameEmptyText() {
+    // Starts the field with non-empty text so we can verify it was cleared.
+    editor.getStagedArtifactNameTextField().getEmptyText().setText("some text");
+
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
     editor.getArchiveSelector().setText(unknownArtifact.toString());
+
+    assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText()).isEmpty();
+  }
+
+  @Test
+  public void updateArtifactField_withEmptyArtifact_doesClearStagedArtifactNameEmptyText() {
+    // Sets up the artifact field with some text so a change is triggered when clearing it below.
+    editor.getArchiveSelector().setText("some/artifact.war");
+
+    editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
+    editor.getArchiveSelector().setText(null);
 
     assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText()).isEmpty();
   }

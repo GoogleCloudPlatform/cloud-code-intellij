@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
+import static com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType.UNKNOWN;
+
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
@@ -29,7 +31,6 @@ import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileExcept
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.ConfigurationException;
@@ -44,8 +45,8 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.components.JBTextField;
+import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
@@ -195,12 +196,19 @@ public final class AppEngineFlexibleDeploymentEditor
   }
 
   private void updateStagedArtifactNameEmptyText() {
-    Path artifactPath = Paths.get(Strings.nullToEmpty(deploymentSource.getFilePath()));
-    AppEngineFlexibleDeploymentArtifactType deploymentArtifactType =
-        AppEngineFlexibleDeploymentArtifactType.typeForPath(artifactPath);
-    stagedArtifactNameTextField
-        .getEmptyText()
-        .setText(deploymentArtifactType.getDefaultArtifactName());
+    File artifact = deploymentSource.getFile();
+    if (artifact == null) {
+      stagedArtifactNameTextField.getEmptyText().clear();
+      return;
+    }
+
+    AppEngineFlexibleDeploymentArtifactType artifactType =
+        AppEngineFlexibleDeploymentArtifactType.typeForPath(artifact.toPath());
+    if (artifactType.equals(UNKNOWN)) {
+      stagedArtifactNameTextField.getEmptyText().clear();
+    } else {
+      stagedArtifactNameTextField.getEmptyText().setText(artifact.getName());
+    }
   }
 
   private void reloadAppYamls(Project project) {
