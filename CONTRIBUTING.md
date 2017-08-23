@@ -127,7 +127,9 @@ A summary of its features can be found below.
 **Testing UI components:**
 
 If your unit test is testing platform UI components such as toolbars/panels/dialogs, then you should instantiate these components on the Swing event-dispatch thread.
+
 For example:
+
     ```
     ApplicationManager.getApplication().invokeAndWait(() -> // initialize your component);
     ```
