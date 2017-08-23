@@ -27,7 +27,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.util.ui.JBUI;
 import javax.swing.JPanel;
 
-/** Creates a Google Cloud Storage side tool panel. */
+/** Creates a Google Cloud Storage tool panel. */
 final class GcsToolWindowPanel extends SimpleToolWindowPanel {
 
   private static final String GCS_PANEL_TOOLBAR_ACTION = "GcsPanelToolbar";
