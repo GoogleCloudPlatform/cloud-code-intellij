@@ -49,6 +49,12 @@ public final class StagedArtifactNameConverterProviderTest {
   @TestFile(name = "some.war")
   private File someWar;
 
+  @TestFile(name = "some.jar")
+  private File someJar;
+
+  @TestFile(name = "some.txt")
+  private File someTxt;
+
   private final Element configurationElement = new Element("configuration");
   private final Element deploymentElement = new Element("deployment");
   private final Element settingsElement = new Element("settings");
@@ -107,6 +113,13 @@ public final class StagedArtifactNameConverterProviderTest {
   }
 
   @Test
+  public void isConversionNeeded_withNullArtifactPath_doesReturnFalse() {
+    settingsElement.removeAttribute(USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE);
+
+    assertThat(getConversionProcessor().isConversionNeeded(mockRunManagerSettings)).isFalse();
+  }
+
+  @Test
   public void isConversionNeeded_withNoSettingsElement_doesReturnFalse() {
     deploymentElement.removeContent(settingsElement);
 
@@ -150,6 +163,24 @@ public final class StagedArtifactNameConverterProviderTest {
   }
 
   @Test
+  public void process_withJarArtifact_doesSetNameToTargetJar() throws CannotConvertException {
+    settingsElement.setAttribute(USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE, someJar.toString());
+
+    getConversionProcessor().process(mockRunManagerSettings);
+
+    assertThat(settingsElement.getAttributeValue(STAGED_ARTIFACT_NAME)).isEqualTo("target.jar");
+  }
+
+  @Test
+  public void process_withUnknownArtifact_doesNotChangeName() throws CannotConvertException {
+    settingsElement.setAttribute(USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE, someTxt.toString());
+
+    getConversionProcessor().process(mockRunManagerSettings);
+
+    assertThat(settingsElement.getAttributeValue(STAGED_ARTIFACT_NAME)).isNull();
+  }
+
+  @Test
   public void process_withStagedArtifactName_doesNotChangeName() throws CannotConvertException {
     String stagedArtifactName = "some-name.war";
     settingsElement.setAttribute(STAGED_ARTIFACT_NAME, stagedArtifactName);
@@ -168,6 +199,15 @@ public final class StagedArtifactNameConverterProviderTest {
     getConversionProcessor().process(mockRunManagerSettings);
 
     assertThat(settingsElement.getAttributeValue(STAGED_ARTIFACT_NAME)).isEmpty();
+  }
+
+  @Test
+  public void process_withNullArtifactPath_doesNotChangeName() throws CannotConvertException {
+    settingsElement.removeAttribute(USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE);
+
+    getConversionProcessor().process(mockRunManagerSettings);
+
+    assertThat(settingsElement.getAttributeValue(STAGED_ARTIFACT_NAME)).isNull();
   }
 
   @Test

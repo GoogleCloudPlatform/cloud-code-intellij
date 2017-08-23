@@ -36,7 +36,6 @@ import java.util.stream.Stream;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A {@link ConverterProvider} for converting the staged artifact name in App Engine run
@@ -64,7 +63,6 @@ public final class StagedArtifactNameConverterProvider extends ConverterProvider
   @Override
   public ProjectConverter createConverter(@NotNull ConversionContext context) {
     return new ProjectConverter() {
-      @Nullable
       @Override
       public ConversionProcessor<RunManagerSettings> createRunConfigurationsConverter() {
         return new StagedArtifactNameConversionProcessor();
