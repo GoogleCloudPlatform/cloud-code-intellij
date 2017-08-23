@@ -25,6 +25,7 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Iterators;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.DocumentAdapter;
@@ -119,6 +120,13 @@ final class GcsBucketPanel {
 
                 try {
                   Iterable<Bucket> buckets = storage.list().iterateAll();
+
+                  if (Iterators.size(buckets.iterator()) == 0) {
+                    notificationLabel.setText(
+                        GctBundle.message("gcs.panel.bucket.listing.no.buckets.found"));
+                    return;
+                  }
+
                   for (Bucket bucket : buckets) {
                     bucketListModel.addElement(bucket);
                   }
@@ -135,7 +143,5 @@ final class GcsBucketPanel {
       notificationPanel.setVisible(show);
       bucketListPanel.setVisible(!show);
     }
-
-
   }
 }
