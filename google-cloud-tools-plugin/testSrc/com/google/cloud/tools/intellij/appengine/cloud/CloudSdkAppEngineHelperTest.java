@@ -103,6 +103,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     assertFalse(helper.stageCredentials(username).isPresent());
   }
 
+  @Test
   public void testCreateDeployRunnerInvalidDeploymentSourceType_returnsNull() {
     Optional<CancellableRunnable> runner = helper.createDeployRunner(
         loggingHandler,
