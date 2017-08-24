@@ -60,24 +60,23 @@ public class DefaultGoogleApiClientFactory extends GoogleApiClientFactory {
         .build();
   }
 
-  private String getApplicationName() {
-    return ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent();
-  }
-
   @Override
   public Storage getCloudStorageApiClient(
       @NotNull String projectId, @NotNull Credential credential) {
+    Date expiration =
+        credential.getExpirationTimeMilliseconds() != null
+            ? Date.from(Instant.ofEpochMilli(credential.getExpirationTimeMilliseconds()))
+            : null;
+
     return StorageOptions.newBuilder()
         .setProjectId(projectId)
         .setCredentials(
-            new GoogleCredentials(
-                new AccessToken(
-                    credential.getAccessToken(),
-                    credential.getExpirationTimeMilliseconds() != null
-                        ? Date.from(
-                            Instant.ofEpochMilli(credential.getExpirationTimeMilliseconds()))
-                        : null)))
+            new GoogleCredentials(new AccessToken(credential.getAccessToken(), expiration)))
         .build()
         .getService();
+  }
+
+  private String getApplicationName() {
+    return ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent();
   }
 }
