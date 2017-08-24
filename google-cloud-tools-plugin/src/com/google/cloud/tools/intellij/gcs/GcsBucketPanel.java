@@ -72,7 +72,7 @@ final class GcsBucketPanel {
   }
 
   void refresh() {
-    showNotificationPanel(true);
+    showNotificationPanel();
 
     if (StringUtils.isEmpty(projectSelector.getText())) {
       notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
@@ -143,7 +143,7 @@ final class GcsBucketPanel {
                       bucketListModel.addElement(bucket);
                     }
 
-                    showNotificationPanel(false);
+                    showBucketListPanel();
                   } catch (StorageException se) {
                     notificationLabel.setText(
                         GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
@@ -151,8 +151,13 @@ final class GcsBucketPanel {
                 });
   }
 
-  private void showNotificationPanel(boolean show) {
-    notificationPanel.setVisible(show);
-    bucketListPanel.setVisible(!show);
+  private void showNotificationPanel() {
+    notificationPanel.setVisible(true);
+    bucketListPanel.setVisible(false);
+  }
+
+  private void showBucketListPanel() {
+    bucketListPanel.setVisible(true);
+    notificationPanel.setVisible(false);
   }
 }
