@@ -29,8 +29,6 @@ import com.google.common.collect.Iterators;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.DocumentAdapter;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.concurrent.Future;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
@@ -71,15 +69,6 @@ final class GcsBucketPanel {
                 refresh();
               }
             });
-
-    bucketList.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent event) {
-        if (event.getClickCount() == 2) {
-          loadBucketContents();
-        }
-      }
-    });
   }
 
   void refresh() {
@@ -159,10 +148,6 @@ final class GcsBucketPanel {
                         GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
                   }
                 });
-  }
-
-  private void loadBucketContents() {
-
   }
 
   private void showNotificationPanel(boolean show) {
