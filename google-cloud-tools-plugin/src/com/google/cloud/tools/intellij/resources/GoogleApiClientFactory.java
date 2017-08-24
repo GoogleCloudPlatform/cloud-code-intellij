@@ -50,6 +50,12 @@ public abstract class GoogleApiClientFactory {
   public abstract Appengine getAppEngineApiClient(@Nullable HttpRequestInitializer
       httpRequestInitializer);
 
+  /**
+   * Creates a new instance of {@link Storage} client.
+   *
+   * @param projectId id of the cloud project
+   * @param credential credential object to use for authentication
+   */
   public abstract Storage getCloudStorageApiClient(
       @NotNull String projectId, @NotNull Credential credential);
 }
