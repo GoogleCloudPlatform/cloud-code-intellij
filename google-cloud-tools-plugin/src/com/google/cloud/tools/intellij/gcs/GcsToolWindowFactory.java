@@ -30,7 +30,7 @@ public final class GcsToolWindowFactory implements ToolWindowFactory, DumbAware 
 
   @Override
   public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-    GcsToolWindowPanel gcsToolWindowPanel = new GcsToolWindowPanel();
+    GcsToolWindowPanel gcsToolWindowPanel = new GcsToolWindowPanel(project);
     ContentManager contentManager = toolWindow.getContentManager();
     Content content =
         contentManager

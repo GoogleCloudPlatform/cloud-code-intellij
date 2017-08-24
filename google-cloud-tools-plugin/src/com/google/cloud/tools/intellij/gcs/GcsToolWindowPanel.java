@@ -23,19 +23,25 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.util.ui.JBUI;
 import javax.swing.JPanel;
+import org.jetbrains.annotations.NotNull;
 
 /** Defines a Google Cloud Storage tool panel. */
 final class GcsToolWindowPanel extends SimpleToolWindowPanel {
 
   private static final String GCS_PANEL_TOOLBAR_ACTION = "GcsPanelToolbar";
+  private final GcsBucketPanel bucketPanel;
 
-  GcsToolWindowPanel() {
+  GcsToolWindowPanel(@NotNull Project project) {
     super(true /*vertical*/, true /*borderless*/);
 
+    bucketPanel = new GcsBucketPanel(project);
+
     setToolbar(createToolbar());
+    setContent(bucketPanel.getComponent());
   }
 
   private JPanel createToolbar() {
@@ -49,7 +55,7 @@ final class GcsToolWindowPanel extends SimpleToolWindowPanel {
     return JBUI.Panels.simplePanel(actionToolBar.getComponent());
   }
 
-  private static final class RefreshAction extends DumbAwareAction {
+  private final class RefreshAction extends DumbAwareAction {
     RefreshAction() {
       super(
           GctBundle.message("gcs.panel.toolbar.refresh.hover.text"),
@@ -59,7 +65,7 @@ final class GcsToolWindowPanel extends SimpleToolWindowPanel {
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-      // TODO refresh bucket list
+      bucketPanel.refresh();
     }
   }
 }

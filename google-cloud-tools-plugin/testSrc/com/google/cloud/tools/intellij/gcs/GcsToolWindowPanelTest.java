@@ -19,7 +19,9 @@ package com.google.cloud.tools.intellij.gcs;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,16 +29,18 @@ import org.junit.Test;
 /** Tests for {@link GcsToolWindowPanel}. */
 public class GcsToolWindowPanelTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+  @TestFixture private IdeaProjectTestFixture testFixture;
 
   private GcsToolWindowPanel gcsPanel;
 
   @Before
   public void setUp() throws Exception {
-    ApplicationManager.getApplication().invokeAndWait(() -> gcsPanel = new GcsToolWindowPanel());
+    ApplicationManager.getApplication()
+        .invokeAndWait(() -> gcsPanel = new GcsToolWindowPanel(testFixture.getProject()));
   }
 
   @Test
-  public void testPanelInitialization() {
+  public void testPanelInitializationState() {
     assertTrue(gcsPanel.isVisible());
     assertTrue(gcsPanel.isToolbarVisible());
   }

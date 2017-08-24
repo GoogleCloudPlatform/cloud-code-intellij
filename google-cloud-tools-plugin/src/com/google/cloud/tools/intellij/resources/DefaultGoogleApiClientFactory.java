@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.resources;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -23,10 +24,17 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.services.appengine.v1.Appengine;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 
 import com.intellij.openapi.components.ServiceManager;
 
+import java.time.Instant;
+import java.util.Date;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class DefaultGoogleApiClientFactory extends GoogleApiClientFactory {
@@ -50,6 +58,22 @@ public class DefaultGoogleApiClientFactory extends GoogleApiClientFactory {
         httpTransport, jsonFactory, httpRequestInitializer)
         .setApplicationName(getApplicationName())
         .build();
+  }
+
+  @Override
+  public Storage getCloudStorageApiClient(
+      @NotNull String projectId, @NotNull Credential credential) {
+    Date expiration =
+        credential.getExpirationTimeMilliseconds() != null
+            ? Date.from(Instant.ofEpochMilli(credential.getExpirationTimeMilliseconds()))
+            : null;
+
+    return StorageOptions.newBuilder()
+        .setProjectId(projectId)
+        .setCredentials(
+            new GoogleCredentials(new AccessToken(credential.getAccessToken(), expiration)))
+        .build()
+        .getService();
   }
 
   private String getApplicationName() {
