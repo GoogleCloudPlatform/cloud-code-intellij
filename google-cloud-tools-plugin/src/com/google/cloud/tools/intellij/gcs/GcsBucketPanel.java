@@ -20,8 +20,8 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
-import com.google.cloud.tools.intellij.googleapis.GoogleApiFactory;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
@@ -127,7 +127,8 @@ final class GcsBucketPanel {
             .executeOnPooledThread(
                 () -> {
                   Storage storage =
-                      GoogleApiFactory.getInstance().newStorageApi(projectId, credential);
+                      GoogleApiClientFactory.getInstance()
+                          .getCloudStorageApiClient(projectId, credential);
 
                   try {
                     Iterable<Bucket> buckets = storage.list().iterateAll();

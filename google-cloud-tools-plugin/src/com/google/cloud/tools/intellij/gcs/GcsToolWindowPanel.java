@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 final class GcsToolWindowPanel extends SimpleToolWindowPanel {
 
   private static final String GCS_PANEL_TOOLBAR_ACTION = "GcsPanelToolbar";
-  private GcsBucketPanel bucketPanel;
+  private final GcsBucketPanel bucketPanel;
 
   GcsToolWindowPanel(@NotNull Project project) {
     super(true /*vertical*/, true /*borderless*/);
