@@ -29,6 +29,7 @@ import com.google.common.collect.Iterators;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.DocumentAdapter;
+import java.util.concurrent.Future;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -50,6 +51,7 @@ final class GcsBucketPanel {
   private JLabel notificationLabel;
   private JList<Bucket> bucketList;
   private DefaultListModel<Bucket> bucketListModel;
+  private Future<?> bucketLoadExecution;
 
   GcsBucketPanel(@NotNull Project project) {
     bucketListModel = new DefaultListModel<>();
@@ -69,7 +71,7 @@ final class GcsBucketPanel {
             });
   }
 
-  private void refresh() {
+  void refresh() {
     showNotificationPanel(true);
 
     if (StringUtils.isEmpty(projectSelector.getText())) {
@@ -116,30 +118,36 @@ final class GcsBucketPanel {
     bucketListModel.clear();
     notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.loading.text"));
 
-    ApplicationManager.getApplication()
-        .executeOnPooledThread(
-            () -> {
-              Storage storage = GoogleApiFactory.getInstance().newStorageApi(projectId, credential);
+    if (bucketLoadExecution != null && bucketLoadExecution.isDone()) {
+      return;
+    }
 
-              try {
-                Iterable<Bucket> buckets = storage.list().iterateAll();
+    bucketLoadExecution =
+        ApplicationManager.getApplication()
+            .executeOnPooledThread(
+                () -> {
+                  Storage storage =
+                      GoogleApiFactory.getInstance().newStorageApi(projectId, credential);
 
-                if (Iterators.size(buckets.iterator()) == 0) {
-                  notificationLabel.setText(
-                      GctBundle.message("gcs.panel.bucket.listing.no.buckets.found"));
-                  return;
-                }
+                  try {
+                    Iterable<Bucket> buckets = storage.list().iterateAll();
 
-                for (Bucket bucket : buckets) {
-                  bucketListModel.addElement(bucket);
-                }
+                    if (Iterators.size(buckets.iterator()) == 0) {
+                      notificationLabel.setText(
+                          GctBundle.message("gcs.panel.bucket.listing.no.buckets.found"));
+                      return;
+                    }
 
-                showNotificationPanel(false);
-              } catch (StorageException se) {
-                notificationLabel.setText(
-                    GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
-              }
-            });
+                    for (Bucket bucket : buckets) {
+                      bucketListModel.addElement(bucket);
+                    }
+
+                    showNotificationPanel(false);
+                  } catch (StorageException se) {
+                    notificationLabel.setText(
+                        GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+                  }
+                });
   }
 
   private void showNotificationPanel(boolean show) {
