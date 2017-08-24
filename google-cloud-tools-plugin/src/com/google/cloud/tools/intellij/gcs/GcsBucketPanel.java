@@ -64,13 +64,27 @@ final class GcsBucketPanel {
             new DocumentAdapter() {
               @Override
               protected void textChanged(DocumentEvent event) {
-                updatePanels();
+                refresh();
               }
             });
   }
 
-  void refresh() {
-    updatePanels();
+  private void refresh() {
+    showNotificationPanel(true);
+
+    if (StringUtils.isEmpty(projectSelector.getText())) {
+      notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
+    } else {
+      String projectId = projectSelector.getText();
+      CredentialedUser user = projectSelector.getSelectedUser();
+
+      if (user != null) {
+        loadAndDisplayBuckets(projectId, user.getCredential());
+      } else {
+        notificationLabel.setText(
+            GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+      }
+    }
   }
 
   @NotNull
@@ -96,24 +110,6 @@ final class GcsBucketPanel {
   @VisibleForTesting
   JLabel getNotificationLabel() {
     return notificationLabel;
-  }
-
-  private void updatePanels() {
-    showNotificationPanel(true);
-
-    if (StringUtils.isEmpty(projectSelector.getText())) {
-      notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
-    } else {
-      String projectId = projectSelector.getText();
-      CredentialedUser user = projectSelector.getSelectedUser();
-
-      if (user != null) {
-        loadAndDisplayBuckets(projectId, user.getCredential());
-      } else {
-        notificationLabel.setText(
-            GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
-      }
-    }
   }
 
   private void loadAndDisplayBuckets(String projectId, Credential credential) {
