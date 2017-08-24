@@ -58,7 +58,19 @@ final class GcsBucketPanel {
     bucketList.setFixedCellHeight(25);
     bucketList.setBackground(bucketListPanel.getBackground());
 
-    projectSelector.getDocument().addDocumentListener(new GcsProjectChangeListener());
+    projectSelector
+        .getDocument()
+        .addDocumentListener(
+            new DocumentAdapter() {
+              @Override
+              protected void textChanged(DocumentEvent event) {
+                updatePanels();
+              }
+            });
+  }
+
+  void refresh() {
+    updatePanels();
   }
 
   @NotNull
@@ -86,62 +98,56 @@ final class GcsBucketPanel {
     return notificationLabel;
   }
 
-  private class GcsProjectChangeListener extends DocumentAdapter {
+  private void updatePanels() {
+    showNotificationPanel(true);
 
-    @Override
-    protected void textChanged(DocumentEvent event) {
-      showNotificationPanel(true);
+    if (StringUtils.isEmpty(projectSelector.getText())) {
+      notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
+    } else {
+      String projectId = projectSelector.getText();
+      CredentialedUser user = projectSelector.getSelectedUser();
 
-      if (StringUtils.isEmpty(projectSelector.getText())) {
-        notificationLabel.setText(
-            GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
+      if (user != null) {
+        loadAndDisplayBuckets(projectId, user.getCredential());
       } else {
-        String projectId = projectSelector.getText();
-        CredentialedUser user = projectSelector.getSelectedUser();
-
-        if (user != null) {
-          loadAndDisplayBuckets(projectId, user.getCredential());
-        } else {
-          notificationLabel.setText(
-              GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
-        }
+        notificationLabel.setText(
+            GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
       }
     }
+  }
 
-    private void loadAndDisplayBuckets(String projectId, Credential credential) {
-      bucketListModel.clear();
-      notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.loading.text"));
+  private void loadAndDisplayBuckets(String projectId, Credential credential) {
+    bucketListModel.clear();
+    notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.loading.text"));
 
-      ApplicationManager.getApplication()
-          .executeOnPooledThread(
-              () -> {
-                Storage storage =
-                    GoogleApiFactory.getInstance().newStorageApi(projectId, credential);
+    ApplicationManager.getApplication()
+        .executeOnPooledThread(
+            () -> {
+              Storage storage = GoogleApiFactory.getInstance().newStorageApi(projectId, credential);
 
-                try {
-                  Iterable<Bucket> buckets = storage.list().iterateAll();
+              try {
+                Iterable<Bucket> buckets = storage.list().iterateAll();
 
-                  if (Iterators.size(buckets.iterator()) == 0) {
-                    notificationLabel.setText(
-                        GctBundle.message("gcs.panel.bucket.listing.no.buckets.found"));
-                    return;
-                  }
-
-                  for (Bucket bucket : buckets) {
-                    bucketListModel.addElement(bucket);
-                  }
-
-                  showNotificationPanel(false);
-                } catch (StorageException se) {
+                if (Iterators.size(buckets.iterator()) == 0) {
                   notificationLabel.setText(
-                      GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+                      GctBundle.message("gcs.panel.bucket.listing.no.buckets.found"));
+                  return;
                 }
-              });
-    }
 
-    private void showNotificationPanel(boolean show) {
-      notificationPanel.setVisible(show);
-      bucketListPanel.setVisible(!show);
-    }
+                for (Bucket bucket : buckets) {
+                  bucketListModel.addElement(bucket);
+                }
+
+                showNotificationPanel(false);
+              } catch (StorageException se) {
+                notificationLabel.setText(
+                    GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+              }
+            });
+  }
+
+  private void showNotificationPanel(boolean show) {
+    notificationPanel.setVisible(show);
+    bucketListPanel.setVisible(!show);
   }
 }

@@ -55,7 +55,7 @@ final class GcsToolWindowPanel extends SimpleToolWindowPanel {
     return JBUI.Panels.simplePanel(actionToolBar.getComponent());
   }
 
-  private static final class RefreshAction extends DumbAwareAction {
+  private final class RefreshAction extends DumbAwareAction {
     RefreshAction() {
       super(
           GctBundle.message("gcs.panel.toolbar.refresh.hover.text"),
@@ -65,7 +65,7 @@ final class GcsToolWindowPanel extends SimpleToolWindowPanel {
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-      // TODO refresh bucket list
+      bucketPanel.refresh();
     }
   }
 }
