@@ -25,8 +25,6 @@ import com.intellij.psi.PsiJavaFile;
 import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 
-import org.junit.Ignore;
-
 /** Unit tests for {@link ServerToIdeFileResolver}. */
 public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase {
   private PsiClass class1;
@@ -56,7 +54,6 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
   }
 
   // When searching for full file system path.
-  @Ignore
   public void ignore_testGetFileFromPath_fullPath() {
     // TODO(joaomartins): Find out why project.getBaseDir() is returning a different tempDir to
     // myFixture.
