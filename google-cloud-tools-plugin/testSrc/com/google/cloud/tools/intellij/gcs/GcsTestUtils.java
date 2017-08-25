@@ -25,7 +25,7 @@ import com.google.cloud.storage.Bucket;
 import java.util.Iterator;
 
 /** Utilities for GCS related tests. */
-class GcsTestUtils {
+final class GcsTestUtils {
 
   static GcsBucketVirtualFile createVirtualFileWithBucketMocks() {
     GcsBucketVirtualFile gcsBucketVirtualFile = mock(GcsBucketVirtualFile.class);
