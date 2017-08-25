@@ -51,7 +51,7 @@ import org.jetbrains.annotations.NotNull;
  */
 final class GcsBucketPanel {
 
-  private Project project;
+  final private Project project;
 
   private JPanel gcsBucketPanel;
   private ProjectSelector projectSelector;

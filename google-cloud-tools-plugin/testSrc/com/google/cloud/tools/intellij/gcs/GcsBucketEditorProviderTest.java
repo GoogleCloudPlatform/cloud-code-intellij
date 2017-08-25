@@ -16,13 +16,15 @@
 
 package com.google.cloud.tools.intellij.gcs;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.google.cloud.storage.Bucket;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
-import com.intellij.openapi.vfs.newvfs.impl.StubVirtualFile;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,17 +37,27 @@ public class GcsBucketEditorProviderTest {
   @TestFixture private IdeaProjectTestFixture testFixture;
 
   private GcsBucketEditorProvider bucketEditorProvider;
-  @Mock private Bucket bucket;
+  @Mock private VirtualFile virtualFile;
+  private GcsBucketVirtualFile gcsBucketVirtualFile;
 
   @Before
   public void setUp() {
     bucketEditorProvider = new GcsBucketEditorProvider();
+    gcsBucketVirtualFile = GcsTestUtils.createVirtualFileWithBucketMocks();
   }
 
   @Test
   public void testAcceptsCorrectFileType() {
-    assertFalse(bucketEditorProvider.accept(testFixture.getProject(), new StubVirtualFile()));
-    assertTrue(
-        bucketEditorProvider.accept(testFixture.getProject(), new GcsBucketVirtualFile(bucket)));
+    assertFalse(bucketEditorProvider.accept(testFixture.getProject(), virtualFile));
+    assertTrue(bucketEditorProvider.accept(testFixture.getProject(), gcsBucketVirtualFile));
+  }
+
+  @Test
+  public void testCreateEditor() {
+    FileEditor editor =
+        bucketEditorProvider.createEditor(testFixture.getProject(), gcsBucketVirtualFile);
+
+    assertNotNull(editor);
+    assertThat(editor).isInstanceOf(GcsBucketContentEditor.class);
   }
 }

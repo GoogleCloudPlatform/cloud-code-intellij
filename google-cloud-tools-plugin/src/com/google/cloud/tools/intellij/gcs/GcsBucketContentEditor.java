@@ -49,7 +49,7 @@ final class GcsBucketContentEditor implements FileEditor {
   @Nullable
   @Override
   public JComponent getPreferredFocusedComponent() {
-    return bucketContentPanel.getComponent();
+    return getComponent();
   }
 
   @NotNull

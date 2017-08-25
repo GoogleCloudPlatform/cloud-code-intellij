@@ -21,11 +21,12 @@ import static org.mockito.Mockito.when;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Bucket;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 import javax.swing.JTable;
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,19 +38,12 @@ public class GcsBucketContentEditorPanelTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   private GcsBucketContentEditorPanel editorPanel;
-  @Mock private GcsBucketVirtualFile bucketVirtualFile;
-  @Mock private Bucket bucket;
-  @Mock private Page<Blob> blobPage;
-  @Mock private Iterable<Blob> blobIterable;
-  @Mock private Iterator<Blob> blobIterator;
+  private GcsBucketVirtualFile bucketVirtualFile;
   @Mock private Blob blob;
 
   @Before
   public void setUp() {
-    when(bucketVirtualFile.getBucket()).thenReturn(bucket);
-    when(bucket.list()).thenReturn(blobPage);
-    when(blobPage.iterateAll()).thenReturn(blobIterable);
-    when(blobIterable.iterator()).thenReturn(blobIterator);
+    bucketVirtualFile = GcsTestUtils.createVirtualFileWithBucketMocks();
   }
 
   @Test
@@ -64,6 +58,7 @@ public class GcsBucketContentEditorPanelTest {
   @Test
   public void testBucketContentTableInitialization() {
     List<Blob> blobs = Lists.newArrayList(blob);
+    Page<Blob> blobPage = bucketVirtualFile.getBucket().list();
     when(blobPage.iterateAll()).thenReturn(blobs);
     when(blob.getName()).thenReturn("blobName");
 
@@ -72,5 +67,10 @@ public class GcsBucketContentEditorPanelTest {
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getColumnCount()).isEqualTo(4);
     assertThat(bucketTable.getRowCount()).isEqualTo(1);
+
+    Map<Integer, String> indexToColName =
+        ImmutableMap.of(0, "Name", 1, "Size", 2, "Type", 3, "Last Modified");
+    IntStream.range(0, bucketTable.getColumnCount())
+        .forEach(i -> assertThat(indexToColName.get(i)).isEqualTo(bucketTable.getColumnName(i)));
   }
 }
