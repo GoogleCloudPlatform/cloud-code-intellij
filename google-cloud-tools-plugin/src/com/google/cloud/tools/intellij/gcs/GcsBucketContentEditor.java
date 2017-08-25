@@ -32,6 +32,8 @@ import org.jetbrains.annotations.Nullable;
  */
 final class GcsBucketContentEditor implements FileEditor {
 
+  private static final String GCS_FILE_EDITOR_NAME = "gcs-bucket-content";
+
   private final GcsBucketContentEditorPanel bucketContentPanel;
   private final GcsBucketVirtualFile bucketVirtualFile;
 
@@ -55,7 +57,7 @@ final class GcsBucketContentEditor implements FileEditor {
   @NotNull
   @Override
   public String getName() {
-    return "gcs-bucket-content";
+    return GCS_FILE_EDITOR_NAME;
   }
 
   @Override
