@@ -41,7 +41,7 @@ final class GcsBucketContentEditorPanel {
   private static final List<String> TABLE_COL_HEADER =
       Arrays.asList("Name", "Size", "Type", "Last Modified");
 
-  GcsBucketContentEditorPanel(@NotNull GcsBucketVirtualFile bucketVirtualFile) {
+  void setTableModel(@NotNull GcsBucketVirtualFile bucketVirtualFile) {
     Iterable<Blob> blobs = bucketVirtualFile.getBucket().list().iterateAll();
 
     if (Iterators.size(blobs.iterator()) != 0) {
