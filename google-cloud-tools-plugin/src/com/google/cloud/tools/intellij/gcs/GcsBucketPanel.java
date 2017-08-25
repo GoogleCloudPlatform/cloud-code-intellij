@@ -27,8 +27,15 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterators;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.Future;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
@@ -44,6 +51,8 @@ import org.jetbrains.annotations.NotNull;
  */
 final class GcsBucketPanel {
 
+  private Project project;
+
   private JPanel gcsBucketPanel;
   private ProjectSelector projectSelector;
   private JPanel notificationPanel;
@@ -54,6 +63,7 @@ final class GcsBucketPanel {
   private Future<?> bucketLoadExecution;
 
   GcsBucketPanel(@NotNull Project project) {
+    this.project = project;
     bucketListModel = new DefaultListModel<>();
     bucketList.setModel(bucketListModel);
     bucketList.setCellRenderer(new GcsBucketCellRenderer());
@@ -69,6 +79,21 @@ final class GcsBucketPanel {
                 refresh();
               }
             });
+
+    bucketList.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent event) {
+            if (event.getClickCount() == 2) {
+              int index = bucketList.locationToIndex(event.getPoint());
+              Bucket clickedBucket = bucketListModel.getElementAt(index);
+
+              if (clickedBucket != null) {
+                loadBucketContents(clickedBucket);
+              }
+            }
+          }
+        });
   }
 
   void refresh() {
@@ -114,6 +139,11 @@ final class GcsBucketPanel {
     return notificationLabel;
   }
 
+  @VisibleForTesting
+  void setProjectSelector(ProjectSelector projectSelector) {
+    this.projectSelector = projectSelector;
+  }
+
   private void loadAndDisplayBuckets(String projectId, Credential credential) {
     if (bucketLoadExecution != null && !bucketLoadExecution.isDone()) {
       return;
@@ -149,6 +179,31 @@ final class GcsBucketPanel {
                         GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
                   }
                 });
+  }
+
+  private void loadBucketContents(@NotNull Bucket bucket) {
+    FileEditorManager editorManager = FileEditorManager.getInstance(project);
+
+    editorManager.openEditor(
+        new OpenFileDescriptor(
+            project,
+            findOpenGcsVirtualFile(bucket).orElseGet(() -> new GcsBucketVirtualFile(bucket)),
+            1 /*offset*/),
+        true /*focusEditor*/);
+  }
+
+  /**
+   * Searches for an open editor who's {@link VirtualFile} matches the bucket that was opened. This
+   * prevents the same editor window being opened multiple times for the same bucket.
+   */
+  private Optional<GcsBucketVirtualFile> findOpenGcsVirtualFile(@NotNull Bucket bucket) {
+    FileEditorManager editorManager = FileEditorManager.getInstance(project);
+
+    return Arrays.stream(editorManager.getOpenFiles())
+        .filter(openFile -> openFile instanceof GcsBucketVirtualFile)
+        .map(openGcsFile -> (GcsBucketVirtualFile) openGcsFile)
+        .filter(openGcsFile -> openGcsFile.getBucket().equals(bucket))
+        .findFirst();
   }
 
   private void showNotificationPanel() {

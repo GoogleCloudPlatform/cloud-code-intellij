@@ -19,24 +19,33 @@ package com.google.cloud.tools.intellij.gcs;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
+import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
 
 /** Tests for {@link GcsBucketPanel}. */
 public class GcsBucketPanelTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
 
+  @Mock @TestService private GoogleApiClientFactory apiFactory;
+  @Mock private ProjectSelector projectSelector;
+
   private GcsBucketPanel bucketPanel;
 
   @Before
   public void setUp() {
     bucketPanel = new GcsBucketPanel(testFixture.getProject());
+    bucketPanel.setProjectSelector(projectSelector);
   }
 
   @Test
@@ -51,8 +60,9 @@ public class GcsBucketPanelTest {
 
   @Test
   public void testNotificationLabel_emptyProjectSelection() {
-    bucketPanel.getProjectSelector().setText("some-project");
-    bucketPanel.getProjectSelector().setText("");
+    when(projectSelector.getText()).thenReturn("");
+
+    bucketPanel.refresh();
 
     assertTrue(bucketPanel.getNotificationPanel().isVisible());
     assertFalse(bucketPanel.getBucketListPanel().isVisible());
@@ -63,7 +73,10 @@ public class GcsBucketPanelTest {
 
   @Test
   public void testNotificationLabel_nonExistentProject() {
-    bucketPanel.getProjectSelector().setText("some-project");
+    when(projectSelector.getText()).thenReturn("non-existent-project");
+    when(projectSelector.getSelectedUser()).thenReturn(null);
+
+    bucketPanel.refresh();
 
     assertTrue(bucketPanel.getNotificationPanel().isVisible());
     assertFalse(bucketPanel.getBucketListPanel().isVisible());
