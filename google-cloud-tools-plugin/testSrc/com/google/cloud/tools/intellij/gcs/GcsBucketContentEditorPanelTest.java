@@ -71,6 +71,14 @@ public class GcsBucketContentEditorPanelTest {
     Map<Integer, String> indexToColName =
         ImmutableMap.of(0, "Name", 1, "Size", 2, "Type", 3, "Last Modified");
     IntStream.range(0, bucketTable.getColumnCount())
-        .forEach(i -> assertThat(indexToColName.get(i)).isEqualTo(bucketTable.getColumnName(i)));
+        .forEach(
+            colIdx ->
+                assertThat(indexToColName.get(colIdx))
+                    .isEqualTo(bucketTable.getColumnName(colIdx)));
+
+    assertThat(bucketTable.getValueAt(0, 0)).isEqualTo("blobName");
+    // TODO update this once the rest of the columns are populated appropriately
+    IntStream.range(1, bucketTable.getColumnCount())
+        .forEach(colIdx -> assertThat(bucketTable.getValueAt(0, colIdx)).isEqualTo("--"));
   }
 }
