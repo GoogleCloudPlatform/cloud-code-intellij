@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class GcsBucketEditorProvider implements FileEditorProvider {
 
+  private static final String GCS_EDITOR_TYPE_ID = "gcs-bucket-content-editor";
+
   @Override
   public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
     return file instanceof GcsBucketVirtualFile;
@@ -42,7 +44,7 @@ public final class GcsBucketEditorProvider implements FileEditorProvider {
   @NotNull
   @Override
   public String getEditorTypeId() {
-    return "gcs-bucket-content-editor";
+    return GCS_EDITOR_TYPE_ID;
   }
 
   @NotNull
