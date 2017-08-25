@@ -49,7 +49,7 @@ public class GcsBucketContentEditorPanelTest {
   @Test
   public void testEmptyBucket_noBucketContentTable() {
     editorPanel = new GcsBucketContentEditorPanel();
-    editorPanel.setTableModel(bucketVirtualFile);
+    editorPanel.setTableModel(bucketVirtualFile.getBucket().list().iterateAll());
 
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getColumnCount()).isEqualTo(0);
@@ -64,7 +64,7 @@ public class GcsBucketContentEditorPanelTest {
     when(blob.getName()).thenReturn("blobName");
 
     editorPanel = new GcsBucketContentEditorPanel();
-    editorPanel.setTableModel(bucketVirtualFile);
+    editorPanel.setTableModel(blobs);
 
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getColumnCount()).isEqualTo(4);

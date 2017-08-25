@@ -40,7 +40,7 @@ final class GcsBucketContentEditor implements FileEditor {
   GcsBucketContentEditor(@NotNull GcsBucketVirtualFile bucketVirtualFile) {
     this.bucketVirtualFile = bucketVirtualFile;
     bucketContentPanel = new GcsBucketContentEditorPanel();
-    bucketContentPanel.setTableModel(bucketVirtualFile);
+    bucketContentPanel.setTableModel(bucketVirtualFile.getBucket().list().iterateAll());
   }
 
   @NotNull
