@@ -16,35 +16,36 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType.JAR;
+import static com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType.UNKNOWN;
+import static com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType.WAR;
+import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.Test;
-
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-/**
- * Test cases for {@link AppEngineFlexibleDeploymentArtifactType}.
- */
-public class AppEngineFlexibleDeploymentArtifactTypeTest {
+/** Test cases for {@link AppEngineFlexibleDeploymentArtifactType}. */
+@RunWith(JUnit4.class)
+public final class AppEngineFlexibleDeploymentArtifactTypeTest {
 
   @Test
-  public void testTypeForPath_jar() throws Exception {
-    assertEquals(AppEngineFlexibleDeploymentArtifactType.JAR,
-        AppEngineFlexibleDeploymentArtifactType.typeForPath(
-            Paths.get("some", "path", "to", "a.jar")));
+  public void typeForPath_withJarPath_doesReturnJar() {
+    Path jarPath = Paths.get("some", "path", "to", "a.jar");
+    assertThat(AppEngineFlexibleDeploymentArtifactType.typeForPath(jarPath)).isEqualTo(JAR);
   }
 
   @Test
-  public void testTypeForPath_war() throws Exception {
-    assertEquals(AppEngineFlexibleDeploymentArtifactType.WAR,
-        AppEngineFlexibleDeploymentArtifactType.typeForPath(
-            Paths.get("some", "path", "to", "a.war")));
+  public void typeForPath_withWarPath_doesReturnWar() {
+    Path warPath = Paths.get("some", "path", "to", "a.war");
+    assertThat(AppEngineFlexibleDeploymentArtifactType.typeForPath(warPath)).isEqualTo(WAR);
   }
 
   @Test
-  public void testTypeForPath_anythingElse() throws Exception {
-    assertEquals(AppEngineFlexibleDeploymentArtifactType.UNKNOWN,
-        AppEngineFlexibleDeploymentArtifactType.typeForPath(
-            Paths.get("some", "path", "to", "a.txt")));
+  public void typeForPath_withOtherExtension_doesReturnUnknown() {
+    Path txtPath = Paths.get("some", "path", "to", "a.txt");
+    assertThat(AppEngineFlexibleDeploymentArtifactType.typeForPath(txtPath)).isEqualTo(UNKNOWN);
   }
 }

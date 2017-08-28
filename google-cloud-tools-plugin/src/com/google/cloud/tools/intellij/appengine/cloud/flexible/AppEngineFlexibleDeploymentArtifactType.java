@@ -16,38 +16,30 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
+import com.google.common.io.Files;
 import java.nio.file.Path;
-import java.util.Locale;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents the supported Java artifact types that we can deploy to App Engine flexible
  * environment.
  */
 public enum AppEngineFlexibleDeploymentArtifactType {
-  UNKNOWN, JAR, WAR;
+  JAR,
+  WAR,
+  UNKNOWN;
 
   /**
-   * Returns the right {@code AppEngineFlexibleDeploymentArtifactType} for the given
-   * {@code deployPackage}.
+   * Returns the right {@code AppEngineFlexibleDeploymentArtifactType} for the given {@code
+   * deployPackage}.
    */
   @NotNull
-  public static AppEngineFlexibleDeploymentArtifactType typeForPath(@Nullable Path deployPackage) {
-    if (deployPackage != null) {
-      if (deployPackage.toString().endsWith(".jar")) {
-        return JAR;
-      } else if (deployPackage.toString().endsWith(".war")) {
-        return WAR;
-      }
+  public static AppEngineFlexibleDeploymentArtifactType typeForPath(@NotNull Path deployPackage) {
+    String extension = Files.getFileExtension(deployPackage.toString());
+    try {
+      return valueOf(extension.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      return UNKNOWN;
     }
-    return UNKNOWN;
-  }
-
-
-  @Override
-  public String toString() {
-    return "." + name().toLowerCase(Locale.US);
   }
 }

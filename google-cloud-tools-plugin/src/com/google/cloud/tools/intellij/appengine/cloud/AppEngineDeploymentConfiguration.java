@@ -47,6 +47,8 @@ public class AppEngineDeploymentConfiguration
     extends CloudDeploymentNameConfiguration<AppEngineDeploymentConfiguration> {
 
   public static final String USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE = "userSpecifiedArtifactPath";
+  public static final String STAGED_ARTIFACT_NAME = "stagedArtifactName";
+
   static final String ENVIRONMENT_ATTRIBUTE = "environment";
   private static final String DOCKERFILE_NAME = "Dockerfile";
 
@@ -68,6 +70,7 @@ public class AppEngineDeploymentConfiguration
   private boolean deployAllConfigs;
   // Used to resolve the facet configuration for flexible deployments
   private String moduleName;
+  private String stagedArtifactName;
 
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
@@ -114,6 +117,11 @@ public class AppEngineDeploymentConfiguration
     return moduleName;
   }
 
+  @Attribute(STAGED_ARTIFACT_NAME)
+  public String getStagedArtifactName() {
+    return stagedArtifactName;
+  }
+
   public void setDeployAllConfigs(boolean deployAllConfigs) {
     this.deployAllConfigs = deployAllConfigs;
   }
@@ -150,6 +158,10 @@ public class AppEngineDeploymentConfiguration
     this.moduleName = moduleName;
   }
 
+  public void setStagedArtifactName(String stagedArtifactName) {
+    this.stagedArtifactName = stagedArtifactName;
+  }
+
   @Override
   public void checkConfiguration(
       RemoteServer<?> server, DeploymentSource deploymentSource, Project project)
@@ -178,7 +190,8 @@ public class AppEngineDeploymentConfiguration
     check(
         deployable instanceof UserSpecifiedPathDeploymentSource || deployable.isValid(),
         "appengine.config.deployment.source.error");
-    check(!StringUtils.isBlank(cloudProjectName), "appengine.flex.config.project.missing.message");
+    check(
+        StringUtils.isNotBlank(cloudProjectName), "appengine.flex.config.project.missing.message");
   }
 
   /**
@@ -197,13 +210,13 @@ public class AppEngineDeploymentConfiguration
             || (!StringUtil.isEmpty(userSpecifiedArtifactPath)
                 && isJarOrWar(userSpecifiedArtifactPath)),
         "appengine.flex.config.user.specified.artifact.error");
-    check(!StringUtils.isBlank(moduleName), "appengine.flex.config.select.module");
+    check(StringUtils.isNotBlank(moduleName), "appengine.flex.config.select.module");
 
     AppEngineFlexibleFacet facet = AppEngineFlexibleFacet.getFacetByModuleName(moduleName, project);
     check(facet != null, "appengine.flex.config.select.module");
 
     String appYamlPath = facet.getConfiguration().getAppYamlPath();
-    check(!StringUtils.isBlank(appYamlPath), "appengine.flex.config.browse.app.yaml");
+    check(StringUtils.isNotBlank(appYamlPath), "appengine.flex.config.browse.app.yaml");
     check(Files.exists(Paths.get(appYamlPath)), "appengine.deployment.config.appyaml.error");
 
     try {
@@ -212,7 +225,8 @@ public class AppEngineDeploymentConfiguration
       if (runtime.isPresent() && runtime.get().isCustom()) {
         String dockerDirectory = facet.getConfiguration().getDockerDirectory();
         check(
-            !StringUtils.isBlank(dockerDirectory), "appengine.flex.config.browse.docker.directory");
+            StringUtils.isNotBlank(dockerDirectory),
+            "appengine.flex.config.browse.docker.directory");
         check(
             Files.exists(Paths.get(dockerDirectory, DOCKERFILE_NAME)),
             "appengine.deployment.config.dockerfile.error");

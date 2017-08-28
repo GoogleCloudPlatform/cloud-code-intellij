@@ -407,6 +407,15 @@ public final class AppEngineDeploymentConfigurationTest {
   }
 
   @Test
+  public void checkConfiguration_withNoStagedArtifactName_doesNotThrow() throws Exception {
+    setUpValidCustomFlexConfiguration();
+
+    configuration.setStagedArtifactName(null);
+
+    configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable, project);
+  }
+
+  @Test
   public void checkConfiguration_withNullEnvironment_doesNotThrow() throws Exception {
     setUpValidFlexConfiguration();
     when(mockAppEngineDeployable.getEnvironment()).thenReturn(null);
@@ -468,6 +477,7 @@ public final class AppEngineDeploymentConfigurationTest {
 
     configuration.setCloudProjectName("some-project-name");
     configuration.setModuleName(module.getName());
+    configuration.setStagedArtifactName("target.war");
 
     try {
       when(mockAppEngineProjectService.getFlexibleRuntimeFromAppYaml(customYaml.getPath()))
