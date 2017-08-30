@@ -128,6 +128,18 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
+  public void fireStateChange_doesSetStagedArtifactNameEmptyText() {
+    when(deploymentSource.getFile()).thenReturn(warArtifact);
+
+    String beforeText = editor.getStagedArtifactNameTextField().getEmptyText().getText();
+    editor.fireStateChange();
+    String afterText = editor.getStagedArtifactNameTextField().getEmptyText().getText();
+
+    assertThat(beforeText).isEmpty();
+    assertThat(afterText).isEqualTo(warArtifact.getName());
+  }
+
+  @Test
   public void applyEditorTo_withDefaultConfiguration_doesSetDefaults() throws Exception {
     editor.applyEditorTo(configuration);
 
