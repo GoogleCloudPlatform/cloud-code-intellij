@@ -126,7 +126,6 @@ public final class AppEngineFlexibleDeploymentEditor
                           AppEngineFlexibleDeploymentEditor.this.deploymentSource)
                       .setFilePath(archiveSelector.getText());
                 }
-                updateStagedArtifactNameEmptyText();
               }
             });
 
