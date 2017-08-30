@@ -97,6 +97,8 @@ public final class AppEngineFlexibleDeploymentEditor
     commonConfig.getDeployAllConfigsCheckbox().setSelected(false);
     commonConfig.getDeployAllConfigsCheckbox().setVisible(false);
 
+    addSettingsEditorListener(editor -> updateStagedArtifactNameEmptyText());
+
     archiveSelector.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.user.specified.artifact.title"),
         null /* description */,
@@ -124,7 +126,6 @@ public final class AppEngineFlexibleDeploymentEditor
                           AppEngineFlexibleDeploymentEditor.this.deploymentSource)
                       .setFilePath(archiveSelector.getText());
                 }
-                updateStagedArtifactNameEmptyText();
               }
             });
 
@@ -439,5 +440,10 @@ public final class AppEngineFlexibleDeploymentEditor
   @VisibleForTesting
   void setDeploymentSource(DeploymentSource deploymentSource) {
     this.deploymentSource = deploymentSource;
+  }
+
+  @VisibleForTesting
+  void fireStateChange() {
+    fireEditorStateChanged();
   }
 }

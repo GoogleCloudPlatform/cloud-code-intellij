@@ -128,6 +128,18 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
+  public void fireStateChange_doesSetStagedArtifactNameEmptyText() {
+    when(deploymentSource.getFile()).thenReturn(warArtifact);
+
+    String beforeText = editor.getStagedArtifactNameTextField().getEmptyText().getText();
+    editor.fireStateChange();
+    String afterText = editor.getStagedArtifactNameTextField().getEmptyText().getText();
+
+    assertThat(beforeText).isEmpty();
+    assertThat(afterText).isEqualTo(warArtifact.getName());
+  }
+
+  @Test
   public void applyEditorTo_withDefaultConfiguration_doesSetDefaults() throws Exception {
     editor.applyEditorTo(configuration);
 
@@ -343,6 +355,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   public void updateArtifactField_toWar_doesSetStagedArtifactNameEmptyText() {
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
     editor.getArchiveSelector().setText(warArtifact.toString());
+    editor.fireStateChange();
 
     assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText())
         .isEqualTo(warArtifact.getName());
@@ -352,6 +365,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   public void updateArtifactField_toJar_doesSetStagedArtifactNameEmptyText() {
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
     editor.getArchiveSelector().setText(jarArtifact.toString());
+    editor.fireStateChange();
 
     assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText())
         .isEqualTo(jarArtifact.getName());
@@ -364,6 +378,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
 
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
     editor.getArchiveSelector().setText(unknownArtifact.toString());
+    editor.fireStateChange();
 
     assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText()).isEmpty();
   }
@@ -375,6 +390,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
 
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
     editor.getArchiveSelector().setText(null);
+    editor.fireStateChange();
 
     assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText()).isEmpty();
   }
