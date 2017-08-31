@@ -62,6 +62,8 @@ dependencies {
         exclude group: 'org.yaml', module: 'snakeyaml'
     }
     compile files('lib/google-api-services-source.jar')
+
+    compile 'com.google.guava:guava:20.0'
     compile 'org.yaml:snakeyaml:1.18'
 
     testCompile(project(':common-test-lib'))
