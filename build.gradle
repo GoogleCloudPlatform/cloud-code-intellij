@@ -118,7 +118,6 @@ subprojects {
     ]
     dependencies {
         checkstyleConfig ("com.puppycrawl.tools:checkstyle:${versions.checkstyle}") {
-//            exclude group: 'com.google.guava', module: 'guava'
             transitive = false
         }
         checkstyle "com.puppycrawl.tools:checkstyle:${versions.checkstyle}"
