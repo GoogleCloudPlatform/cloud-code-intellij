@@ -29,7 +29,7 @@ import javax.swing.JTable;
 import org.jetbrains.annotations.NotNull;
 
 /** Defines the Google Cloud Storage bucket content browsing UI panel. */
-// TODO(eshaul) work in progress
+// TODO(eshaul) implement toolbar panel and breadcrumb browser
 final class GcsBucketContentEditorPanel {
 
   private Bucket bucket;
