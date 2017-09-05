@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableModel;
  * Table model representation of a Google Cloud Storage blob row. Handles display of blob name and
  * metadata in the GCS content browser.
  */
-public class GcsBlobTableModel extends DefaultTableModel {
+final class GcsBlobTableModel extends DefaultTableModel {
 
   private List<Blob> blobs;
 
