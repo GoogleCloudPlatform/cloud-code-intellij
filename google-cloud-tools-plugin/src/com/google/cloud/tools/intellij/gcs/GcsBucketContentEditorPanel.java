@@ -17,34 +17,67 @@
 package com.google.cloud.tools.intellij.gcs;
 
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterators;
-import java.util.Arrays;
+import com.google.common.collect.Lists;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
-import java.util.Vector;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 import org.jetbrains.annotations.NotNull;
 
 /** Defines the Google Cloud Storage bucket content browsing UI panel. */
 // TODO(eshaul) work in progress
 final class GcsBucketContentEditorPanel {
 
+  private Bucket bucket;
+
   private JPanel bucketContentEditorPanel;
   private JPanel bucketContentToolbarPanel;
   private JPanel breadCrumbsPanel;
   private JTable bucketContentTable;
+  private GcsBlobTableModel tableModel;
 
-  private static final List<String> TABLE_COL_HEADER =
-      Arrays.asList("Name", "Size", "Type", "Last Modified");
+  GcsBucketContentEditorPanel(@NotNull Bucket bucket) {
+    this.bucket = bucket;
 
-  void setTableModel(@NotNull Iterable<Blob> blobs) {
-    if (Iterators.size(blobs.iterator()) != 0) {
-      bucketContentTable.setModel(new GcsBucketTableModel(blobs));
+    bucketContentTable.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent event) {
+            if (event.getClickCount() == 2 && tableModel != null) {
+              Blob selectedBlob =
+                  tableModel.getBlobAt(bucketContentTable.rowAtPoint(event.getPoint()));
+
+              if (selectedBlob.isDirectory()) {
+                updateTableModel(selectedBlob.getName());
+              }
+            }
+          }
+        });
+  }
+
+  void initTableModel() {
+    List<Blob> blobs = getBlobsAtLevel("");
+    if (!blobs.isEmpty()) {
+      tableModel = new GcsBlobTableModel();
+      tableModel.setDataVector(blobs, "");
+      bucketContentTable.setModel(tableModel);
     }
+  }
+
+  private void updateTableModel(String prefix) {
+    tableModel.setRowCount(0);
+    tableModel.setDataVector(getBlobsAtLevel(prefix), prefix);
+    tableModel.fireTableDataChanged();
+  }
+
+  // todo should be done asynchronously and show loader in the UI
+  private List<Blob> getBlobsAtLevel(String prefix) {
+    return Lists.newArrayList(
+        bucket.list(BlobListOption.currentDirectory(), BlobListOption.prefix(prefix)).iterateAll());
   }
 
   JPanel getComponent() {
@@ -54,33 +87,5 @@ final class GcsBucketContentEditorPanel {
   @VisibleForTesting
   JTable getBucketContentTable() {
     return bucketContentTable;
-  }
-
-  private final class GcsBucketTableModel extends DefaultTableModel {
-
-    GcsBucketTableModel(Iterable<Blob> blobs) {
-      super();
-      setDataVector(buildDataVector(blobs), new Vector<>(TABLE_COL_HEADER));
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int column) {
-      return false;
-    }
-
-    // TODO(eshaul) this is a placeholder implementation; need to complete.
-    private Vector<Vector<String>> buildDataVector(Iterable<Blob> blobs) {
-      return StreamSupport.stream(blobs.spliterator(), false)
-          .map(
-              blob -> {
-                Vector<String> rowData = new Vector<>();
-                rowData.add(blob.getName());
-                rowData.add("--");
-                rowData.add("--");
-                rowData.add("--");
-                return rowData;
-              })
-          .collect(Collectors.toCollection(Vector::new));
-    }
   }
 }
