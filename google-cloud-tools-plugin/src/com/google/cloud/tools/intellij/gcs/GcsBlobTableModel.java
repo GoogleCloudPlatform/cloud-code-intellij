@@ -25,7 +25,10 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 import javax.swing.table.DefaultTableModel;
 
-/** Created by eshaul on 9/1/17. */
+/**
+ * Table model representation of a Google Cloud Storage blob row. Handles display of blob name and
+ * metadata in the GCS content browser.
+ */
 public class GcsBlobTableModel extends DefaultTableModel {
 
   private List<Blob> blobs;
