@@ -56,7 +56,7 @@ final class GcsBucketContentEditorPanel {
     return bucketContentTable;
   }
 
-  private final class GcsBucketTableModel extends DefaultTableModel {
+  private static final class GcsBucketTableModel extends DefaultTableModel {
 
     GcsBucketTableModel(Iterable<Blob> blobs) {
       super();
