@@ -17,15 +17,10 @@
 package com.google.cloud.tools.intellij.appengine.facet.standard;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.openapi.roots.DependencyScope;
-
-import org.apache.commons.lang.WordUtils;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.idea.maven.utils.library.RepositoryUtils;
-
 import java.util.Arrays;
 import java.util.Optional;
+import org.apache.commons.lang.WordUtils;
 
 /**
  * Defines the available App Engine standard maven-sourced libraries.
@@ -51,8 +46,8 @@ public enum AppEngineStandardMavenLibrary {
       DependencyScope.COMPILE),
   ENDPOINTS(
       GctBundle.message("appengine.library.endpoints.api.name"),
-      "com.google.appengine",
-      "appengine-endpoints",
+      "com.google.endpoints",
+      "endpoints-framework",
       AppEngineStandardMavenLibrary.RELEASE_VERSION_ID,
       DependencyScope.COMPILE),
   OBJECTIFY(
