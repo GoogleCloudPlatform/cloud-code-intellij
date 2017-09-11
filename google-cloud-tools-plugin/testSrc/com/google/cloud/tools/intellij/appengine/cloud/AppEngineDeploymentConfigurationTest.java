@@ -44,6 +44,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.remoteServer.util.CloudDeploymentNameConfiguration;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.io.File;
 import java.util.Optional;
@@ -423,6 +424,62 @@ public final class AppEngineDeploymentConfigurationTest {
     configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable, project);
   }
 
+  @Test
+  public void equals_withEqualConfigs_doesReturnTrue() {
+    AppEngineDeploymentConfiguration configA = createPopulatedConfig();
+    AppEngineDeploymentConfiguration configB = createPopulatedConfig();
+
+    assertThat(configA.equals(configB)).isTrue();
+  }
+
+  @Test
+  public void equals_withNewConfigs_doesReturnTrue() {
+    AppEngineDeploymentConfiguration configA = new AppEngineDeploymentConfiguration();
+    AppEngineDeploymentConfiguration configB = new AppEngineDeploymentConfiguration();
+
+    assertThat(configA.equals(configB)).isTrue();
+  }
+
+  @Test
+  public void equals_withSameConfig_doesReturnTrue() {
+    AppEngineDeploymentConfiguration configA = createPopulatedConfig();
+    AppEngineDeploymentConfiguration configB = configA;
+
+    assertThat(configA.equals(configB)).isTrue();
+  }
+
+  @Test
+  public void equals_withOtherObject_doesReturnFalse() {
+    AppEngineDeploymentConfiguration configA = new AppEngineDeploymentConfiguration();
+    CloudDeploymentNameConfiguration configB = new CloudDeploymentNameConfiguration();
+
+    assertThat(configA.equals(configB)).isFalse();
+  }
+
+  @Test
+  public void equals_withDifferentConfigs_doesReturnFalse() {
+    AppEngineDeploymentConfiguration configA = createPopulatedConfig();
+    AppEngineDeploymentConfiguration configB = new AppEngineDeploymentConfiguration();
+
+    assertThat(configA.equals(configB)).isFalse();
+  }
+
+  @Test
+  public void hashCode_withEqualConfigs_doesReturnSameHashCode() {
+    int hashCodeA = createPopulatedConfig().hashCode();
+    int hashCodeB = createPopulatedConfig().hashCode();
+
+    assertThat(hashCodeA).isEqualTo(hashCodeB);
+  }
+
+  @Test
+  public void hashCode_withDifferentConfigs_doesReturnDifferentHashCodes() {
+    int hashCodeA = createPopulatedConfig().hashCode();
+    int hashCodeB = new AppEngineDeploymentConfiguration().hashCode();
+
+    assertThat(hashCodeA).isNotEqualTo(hashCodeB);
+  }
+
   /** Sets up the {@code configuration} to be valid for a deployment to a flex environment. */
   private void setUpValidFlexConfiguration() {
     when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
@@ -494,5 +551,26 @@ public final class AppEngineDeploymentConfigurationTest {
     when(mockAppEngineDeployable.getEnvironment())
         .thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
     configuration.setCloudProjectName("some-project-name");
+  }
+
+  /**
+   * Returns a fully populated {@link AppEngineDeploymentConfiguration} with non-default values for
+   * every field.
+   */
+  private static AppEngineDeploymentConfiguration createPopulatedConfig() {
+    AppEngineDeploymentConfiguration configuration = new AppEngineDeploymentConfiguration();
+    configuration.setCloudProjectName("cloud-project-name");
+    configuration.setGoogleUsername("google-username");
+    configuration.setEnvironment(AppEngineEnvironment.APP_ENGINE_FLEX);
+    configuration.setUserSpecifiedArtifactPath("user-specified-artifact-path");
+    configuration.setPromote(true);
+    configuration.setStopPreviousVersion(true);
+    configuration.setVersion("version");
+    configuration.setDeployAllConfigs(true);
+    configuration.setModuleName("module-name");
+    configuration.setStagedArtifactName("staged-artifact-name");
+    configuration.setDefaultDeploymentName(true);
+    configuration.setDeploymentName("deployment-name");
+    return configuration;
   }
 }
