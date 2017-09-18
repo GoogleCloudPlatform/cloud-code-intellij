@@ -34,6 +34,7 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -48,6 +49,7 @@ import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.ClassUtil;
 
+import java.util.Optional;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,7 +68,13 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
     Module module = ModuleUtilCore.findModuleForPsiElement(file);
     final AppEngineStandardFacet appEngineStandardFacet
         = AppEngineStandardFacet.getAppEngineFacetByModule(module);
-    if (appEngineStandardFacet == null || appEngineStandardFacet.isJava8Runtime()) {
+    if (appEngineStandardFacet == null) {
+      return null;
+    }
+
+    Optional<LanguageLevel> runtimeLanguageLevel = appEngineStandardFacet.getRuntimeLanguageLevel();
+    if (!runtimeLanguageLevel.isPresent()
+        || runtimeLanguageLevel.get().isAtLeast(LanguageLevel.JDK_1_8)) {
       return null;
     }
 

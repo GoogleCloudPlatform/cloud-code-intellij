@@ -35,6 +35,7 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.pom.java.LanguageLevel;
 
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -83,7 +84,10 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
                   // this is a standard app
                   if (!appEngineFacet.isNonStandardCompatEnvironment()) {
                     // this is targeting the standard environment
-                    if (!appEngineFacet.isJava8Runtime()) {
+                    Optional<LanguageLevel> runtimeLanguageLevel =
+                        appEngineFacet.getRuntimeLanguageLevel();
+                    if (runtimeLanguageLevel.isPresent()
+                        && runtimeLanguageLevel.get().isLessThan(LanguageLevel.JDK_1_8)) {
                       // The runtime only supports Java 7 or below.
                       if (usesJava8OrGreater(module)) {
                         invalidModules.add(module);
@@ -98,7 +102,7 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
 
   private boolean usesJava8OrGreater(Module module) {
     LanguageLevel languageLevel = EffectiveLanguageLevelUtil.getEffectiveLanguageLevel(module);
-    return languageLevel.compareTo(LanguageLevel.JDK_1_8) >= 0;
+    return languageLevel.isAtLeast(LanguageLevel.JDK_1_8);
   }
 
   private void warnUser(Project project, List<Module> invalidModules) {

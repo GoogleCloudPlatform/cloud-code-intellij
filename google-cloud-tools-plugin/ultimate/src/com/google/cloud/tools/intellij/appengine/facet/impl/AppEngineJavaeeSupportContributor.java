@@ -28,8 +28,10 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.startup.StartupManager;
 import com.intellij.packaging.artifacts.Artifact;
+import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
+import java.util.Optional;
 
 /**
  * @author nik
@@ -48,7 +50,9 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
       return;
     }
 
-    if (!appEngineStandardFacet.isJava8Runtime()) {
+    Optional<LanguageLevel> runtimeLanguageLevel = appEngineStandardFacet.getRuntimeLanguageLevel();
+    if (runtimeLanguageLevel.isPresent()
+        && runtimeLanguageLevel.get().equals(LanguageLevel.JDK_1_7)) {
       setWebXmlServletVersion(model.getModule());
     }
 

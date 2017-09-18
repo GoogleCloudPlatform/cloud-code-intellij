@@ -19,22 +19,31 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 import com.google.cloud.tools.intellij.appengine.descriptor.dom.AppEngineStandardWebApp;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.common.collect.ImmutableList;
-
+import com.google.common.collect.ImmutableMap;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeRegistry;
 import com.intellij.openapi.module.Module;
+import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomManager;
-
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** @author nik */
 public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfiguration> {
 
+  private static final ImmutableMap<String, LanguageLevel> RUNTIMES_MAP =
+      ImmutableMap.of(
+          "java",
+          LanguageLevel.JDK_1_7,
+          "java7",
+          LanguageLevel.JDK_1_7,
+          "java8",
+          LanguageLevel.JDK_1_8);
 
   public AppEngineStandardFacet(
       @NotNull FacetType facetType,
@@ -44,8 +53,8 @@ public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfigur
     super(facetType, module, name, configuration, null);
   }
 
-  public static FacetType<AppEngineStandardFacet,
-      AppEngineStandardFacetConfiguration> getFacetType() {
+  public static FacetType<AppEngineStandardFacet, AppEngineStandardFacetConfiguration>
+      getFacetType() {
     return FacetTypeRegistry.getInstance().findFacetType(AppEngineStandardFacetType.ID);
   }
 
@@ -85,10 +94,22 @@ public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfigur
     return isFlexCompatEnvironment() || isManagedVmCompatEnvironment();
   }
 
-  public boolean isJava8Runtime() {
+  /**
+   * Returns the {@link LanguageLevel} of the Java runtime, as defined in the {@code
+   * appengine-web.xml}.
+   *
+   * @return an {@link Optional} of the runtime {@link LanguageLevel}. Returns {@link
+   *     Optional#empty()} if the {@code appengine-web.xml} does not exist or if the value of the
+   *     runtime is not recognized.
+   */
+  public Optional<LanguageLevel> getRuntimeLanguageLevel() {
     AppEngineStandardWebApp appEngineStandardWebApp = getAppEngineStandardWebXml();
-    return appEngineStandardWebApp != null
-        && "java8".equalsIgnoreCase(appEngineStandardWebApp.getRuntime().getStringValue());
+    if (appEngineStandardWebApp == null) {
+      return Optional.empty();
+    }
+
+    String runtime = appEngineStandardWebApp.getRuntime().getStringValue();
+    return Optional.ofNullable(RUNTIMES_MAP.get(runtime));
   }
 
   @Nullable
