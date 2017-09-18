@@ -35,6 +35,7 @@ import com.intellij.remoteServer.util.CloudDeploymentNameConfiguration;
 import com.intellij.util.xmlb.annotations.Attribute;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
@@ -176,6 +177,48 @@ public class AppEngineDeploymentConfiguration
     if (deployable.getEnvironment() != null && deployable.getEnvironment().isFlexible()) {
       checkFlexConfig(deployable, project);
     }
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other == this) {
+      return true;
+    }
+
+    if (!(other instanceof AppEngineDeploymentConfiguration)) {
+      return false;
+    }
+
+    AppEngineDeploymentConfiguration otherConfig = (AppEngineDeploymentConfiguration) other;
+    return Objects.equals(cloudProjectName, otherConfig.cloudProjectName)
+        && Objects.equals(googleUsername, otherConfig.googleUsername)
+        && Objects.equals(environment, otherConfig.environment)
+        && Objects.equals(userSpecifiedArtifactPath, otherConfig.userSpecifiedArtifactPath)
+        && Objects.equals(promote, otherConfig.promote)
+        && Objects.equals(stopPreviousVersion, otherConfig.stopPreviousVersion)
+        && Objects.equals(version, otherConfig.version)
+        && Objects.equals(deployAllConfigs, otherConfig.deployAllConfigs)
+        && Objects.equals(moduleName, otherConfig.moduleName)
+        && Objects.equals(stagedArtifactName, otherConfig.stagedArtifactName)
+        && Objects.equals(isDefaultDeploymentName(), otherConfig.isDefaultDeploymentName())
+        && Objects.equals(getDeploymentName(), otherConfig.getDeploymentName());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        cloudProjectName,
+        googleUsername,
+        environment,
+        userSpecifiedArtifactPath,
+        promote,
+        stopPreviousVersion,
+        version,
+        deployAllConfigs,
+        moduleName,
+        stagedArtifactName,
+        isDefaultDeploymentName(),
+        getDeploymentName());
   }
 
   private void checkCommonConfig(AppEngineDeployable deployable) throws RuntimeConfigurationError {

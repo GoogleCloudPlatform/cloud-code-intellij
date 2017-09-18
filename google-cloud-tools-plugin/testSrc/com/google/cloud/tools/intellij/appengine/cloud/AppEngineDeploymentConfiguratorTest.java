@@ -16,74 +16,91 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
+import static com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment.APP_ENGINE_FLEX;
+import static com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment.APP_ENGINE_STANDARD;
+import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentEditor;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardDeploymentEditor;
-import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
-import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
-import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
-import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-
-import com.intellij.facet.FacetManager;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.project.Project;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestFixture;
+import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.remoteServer.configuration.RemoteServer;
-
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Optional;
+@RunWith(JUnit4.class)
+public final class AppEngineDeploymentConfiguratorTest {
 
-@RunWith(MockitoJUnitRunner.class)
-public final class AppEngineDeploymentConfiguratorTest extends BasePluginTestCase {
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
-  @Mock private Project mockProject;
-  @Mock private AppEngineDeployable deployable;
-  @Mock private RemoteServer<AppEngineServerConfiguration> server;
-  @Mock private AppEngineProjectService projectService;
-  @Mock private ModuleManager moduleManager;
-  @Mock private Module module;
-  @Mock private FacetManager facetManager;
+  @TestFixture private IdeaProjectTestFixture testFixture;
+
+  @Mock private AppEngineDeployable mockAppEngineDeployable;
+  @Mock private DeploymentSource mockDeploymentSource;
+  @Mock private RemoteServer<AppEngineServerConfiguration> mockRemoteServer;
+
+  private AppEngineDeploymentConfigurator configurator;
 
   @Before
-  public void setUp() throws MalformedYamlFileException {
-    registerService(AppEngineProjectService.class, projectService);
-
-    when(projectService.getServiceNameFromAppEngineWebXml(mockProject, deployable))
-        .thenReturn("service");
-    when(projectService.getFlexibleRuntimeFromAppYaml(isA(String.class)))
-        .thenReturn(Optional.of(FlexibleRuntime.JAVA));
-    when(projectService.getServiceNameFromAppYaml(anyString())).thenReturn(Optional.empty());
-    when(mockProject.getComponent(ModuleManager.class)).thenReturn(moduleManager);
-    when(moduleManager.getModules()).thenReturn(new Module[] {module});
-    when(module.getComponent(FacetManager.class)).thenReturn(facetManager);
-    when(facetManager.getFacetByType(AppEngineFlexibleFacetType.ID)).thenReturn(null);
+  public void setUpConfigurator() {
+    configurator = new AppEngineDeploymentConfigurator(testFixture.getProject());
   }
 
   @Test
-  public void testCreateEditor_flexible() {
-    when(deployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
-    AppEngineDeploymentConfigurator configurator = new AppEngineDeploymentConfigurator(mockProject);
+  public void createDefaultConfiguration_withFlexibleEnvironment_doesReturnDefaultConfig() {
+    when(mockAppEngineDeployable.getEnvironment()).thenReturn(APP_ENGINE_FLEX);
 
-    assertTrue(
-        configurator.createEditor(deployable, server) instanceof AppEngineFlexibleDeploymentEditor);
+    AppEngineDeploymentConfiguration configuration =
+        configurator.createDefaultConfiguration(mockAppEngineDeployable);
+
+    assertThat(configuration).isEqualTo(new AppEngineDeploymentConfiguration());
   }
 
   @Test
-  public void testCreateEditor_standard() {
-    when(deployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);
-    AppEngineDeploymentConfigurator configurator = new AppEngineDeploymentConfigurator(mockProject);
+  public void createDefaultConfiguration_withStandardEnvironment_doesSetDeployAllConfigs() {
+    when(mockAppEngineDeployable.getEnvironment()).thenReturn(APP_ENGINE_STANDARD);
 
-    assertTrue(
-        configurator.createEditor(deployable, server) instanceof AppEngineStandardDeploymentEditor);
+    AppEngineDeploymentConfiguration configuration =
+        configurator.createDefaultConfiguration(mockAppEngineDeployable);
+
+    AppEngineDeploymentConfiguration expectedConfig = new AppEngineDeploymentConfiguration();
+    expectedConfig.setDeployAllConfigs(true);
+    assertThat(configuration).isEqualTo(expectedConfig);
+  }
+
+  @Test
+  public void createDefaultConfiguration_withDifferentDeploymentSource_doesReturnDefaultConfig() {
+    AppEngineDeploymentConfiguration configuration =
+        configurator.createDefaultConfiguration(mockDeploymentSource);
+
+    assertThat(configuration).isEqualTo(new AppEngineDeploymentConfiguration());
+  }
+
+  @Test
+  public void createEditor_withFlexibleEnvironment_doesReturnFlexibleEditor() {
+    when(mockAppEngineDeployable.getEnvironment()).thenReturn(APP_ENGINE_FLEX);
+
+    SettingsEditor<AppEngineDeploymentConfiguration> editor =
+        configurator.createEditor(mockAppEngineDeployable, mockRemoteServer);
+
+    assertThat(editor).isInstanceOf(AppEngineFlexibleDeploymentEditor.class);
+  }
+
+  @Test
+  public void createEditor_withStandardEnvironment_doesReturnStandardEditor() {
+    when(mockAppEngineDeployable.getEnvironment()).thenReturn(APP_ENGINE_STANDARD);
+
+    SettingsEditor<AppEngineDeploymentConfiguration> editor =
+        configurator.createEditor(mockAppEngineDeployable, mockRemoteServer);
+
+    assertThat(editor).isInstanceOf(AppEngineStandardDeploymentEditor.class);
   }
 }
