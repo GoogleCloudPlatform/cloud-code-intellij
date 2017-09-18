@@ -65,7 +65,7 @@ public class GoogleLoginAction extends AnAction implements DumbAware, RightAlign
       if (image == null) {
         presentation.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
       } else {
-        int size = (int) JBUI.pixScale(ICON_SIZE);
+        int size = JBUI.scale(ICON_SIZE);
         Image scaledImage = image.getScaledInstance(size, size, Image.SCALE_SMOOTH);
         presentation.setIcon(new ImageIcon(scaledImage));
       }

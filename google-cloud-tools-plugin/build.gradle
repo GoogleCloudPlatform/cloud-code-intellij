@@ -50,7 +50,7 @@ dependencies {
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
     compile 'com.google.apis:google-api-services-cloudresourcemanager:v1beta1-rev12-1.21.0'
     compile 'com.google.apis:google-api-services-appengine:v1-rev8-1.22.0'
-    compile ('com.google.cloud:google-cloud-storage:1.2.1') {
+    compile ('com.google.cloud:google-cloud-storage:1.2.0') {
         exclude group: 'com.google.http-client', module: 'google-http-client'
         exclude group: 'com.google.http-client', module: 'google-http-client-jackson'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'

@@ -73,6 +73,9 @@ subprojects {
 
     configurations.runtime {
         resolutionStrategy {
+            // GCS brings in conflicting versions of this library so force the latest
+            force 'com.google.api:api-common:1.1.0'
+
             failOnVersionConflict()
 
             def provided = [["org.apache.httpcomponents", "httpclient"],
@@ -90,7 +93,9 @@ subprojects {
     dependencies {
         compile 'joda-time:joda-time:2.9.2'
 
-        testCompile 'com.google.truth:truth:0.30'
+        testCompile ('com.google.truth:truth:0.30') {
+            exclude group: 'com.google.guava', module: 'guava'
+        }
         testCompile 'junit:junit:4.+'
         testCompile 'org.mockito:mockito-core:2.+'
     }

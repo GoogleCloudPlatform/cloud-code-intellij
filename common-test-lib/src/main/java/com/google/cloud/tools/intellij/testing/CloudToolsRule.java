@@ -16,8 +16,10 @@
 
 package com.google.cloud.tools.intellij.testing;
 
+import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeRegistry;
@@ -60,6 +62,9 @@ import org.mockito.MockitoAnnotations;
  *       them to the project
  *   <li>Creates {@link File Files} for any fields annotated with {@link TestFile} and manages the
  *       creation and deletion of them
+ *   <li>Binds the {@link java.util.concurrent.ExecutorService} in {@link ThreadUtil} to a direct
+ *       executor service, which executes every submitted task immediately and on the same thread
+ *       that submitted the task
  * </ul>
  */
 public final class CloudToolsRule implements TestRule {
@@ -103,6 +108,7 @@ public final class CloudToolsRule implements TestRule {
     createTestModules();
     createTestFiles(description.getMethodName());
     createTestDirectories();
+    bindDirectExecutorService();
   }
 
   /** Tears down utilities after the test has finished. */
@@ -218,6 +224,11 @@ public final class CloudToolsRule implements TestRule {
       filesToDelete.add(directory);
       field.set(testInstance, directory);
     }
+  }
+
+  /** Binds the executor service in {@link ThreadUtil} to a direct executor service. */
+  private void bindDirectExecutorService() {
+    ThreadUtil.getInstance().setBackgroundExecutorService(MoreExecutors.newDirectExecutorService());
   }
 
   /**

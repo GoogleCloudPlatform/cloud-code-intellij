@@ -18,9 +18,9 @@
   <id>com.google.gct.login</id>
   <name>Google Account</name>
   <vendor>Google</vendor>
-  <!-- "idea-version since-build" set to cover 2017.1 - 2017.2 -->
+  <!-- "idea-version since-build" set to cover 2017.1 - 2017.3 -->
   <!-- Set manually because the gradle-intellij-plugin cannot span across major release versions -->
-  <idea-version since-build="171.3780" until-build="172.*"/>
+  <idea-version since-build="171.3780" until-build="173.*"/>
 
   <description>
     Provides Google account setting and authentication for IntelliJ plugins that need it.

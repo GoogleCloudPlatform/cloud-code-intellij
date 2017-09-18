@@ -33,11 +33,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Sets up the configuration elements for an AppEngine Cloud deployment.
- */
-public class AppEngineDeploymentConfigurator extends
-    DeploymentConfigurator<AppEngineDeploymentConfiguration, AppEngineServerConfiguration> {
+/** Sets up the configuration elements for an AppEngine Cloud deployment. */
+public class AppEngineDeploymentConfigurator
+    extends DeploymentConfigurator<AppEngineDeploymentConfiguration, AppEngineServerConfiguration> {
 
   private static final Logger logger = Logger.getInstance(AppEngineDeploymentConfigurator.class);
 
@@ -62,7 +60,15 @@ public class AppEngineDeploymentConfigurator extends
   @Override
   public AppEngineDeploymentConfiguration createDefaultConfiguration(
       @NotNull DeploymentSource source) {
-    return new AppEngineDeploymentConfiguration();
+    AppEngineDeploymentConfiguration configuration = new AppEngineDeploymentConfiguration();
+    if (source instanceof AppEngineDeployable) {
+      AppEngineEnvironment environment = ((AppEngineDeployable) source).getEnvironment();
+      if (environment != null && environment.isStandard()) {
+        configuration.setDeployAllConfigs(true);
+      }
+    }
+
+    return configuration;
   }
 
   @Nullable
@@ -72,7 +78,8 @@ public class AppEngineDeploymentConfigurator extends
       @NotNull RemoteServer<AppEngineServerConfiguration> server) {
     if (!(source instanceof AppEngineDeployable)) {
       logger.error(
-          String.format("Deployment source with name %s is not deployable to App Engine.",
+          String.format(
+              "Deployment source with name %s is not deployable to App Engine.",
               source.getPresentableName()));
       return null;
     }
