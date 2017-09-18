@@ -44,11 +44,13 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
   @Override
   public void setupFrameworkSupport(JavaeeFrameworkSupportContributionModel model) {
     AppEngineStandardFacet appEngineStandardFacet = model.getFacet(AppEngineStandardFacetType.ID);
-    if (appEngineStandardFacet == null || appEngineStandardFacet.isJava8Runtime()) {
+    if (appEngineStandardFacet == null) {
       return;
     }
 
-    setWebXmlServletVersion(model.getModule());
+    if (!appEngineStandardFacet.isJava8Runtime()) {
+      setWebXmlServletVersion(model.getModule());
+    }
 
     Artifact artifactToDeploy = model.getExplodedEarArtifact();
     if (artifactToDeploy == null) {
