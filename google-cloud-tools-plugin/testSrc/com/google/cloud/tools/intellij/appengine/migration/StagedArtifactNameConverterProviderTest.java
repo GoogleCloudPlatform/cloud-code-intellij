@@ -69,8 +69,9 @@ public final class StagedArtifactNameConverterProviderTest {
   @Test
   public void getConversionDescription_doesReturnDescription() {
     String expected =
-        "Converts run configurations to set a legacy bit for preserving the old staged artifact "
-            + "name.";
+        "Existing App Engine flexible deployment run configurations will have their staged "
+            + "artifact name explicitly set to target.jar/war for interoperability with existing "
+            + "Dockerfiles.";
     assertThat(converterProvider.getConversionDescription()).isEqualTo(expected);
   }
 

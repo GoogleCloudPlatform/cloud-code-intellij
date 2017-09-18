@@ -90,7 +90,7 @@ public final class StagedArtifactNameConverterProvider extends ConverterProvider
     static final Predicate<Element> IS_GCP_APP_ENGINE_DEPLOY =
         element -> "gcp-app-engine-deploy".equals(element.getAttributeValue("type"));
 
-    static final Predicate<Element> IS_LEGACY_BIT_NOT_SET =
+    static final Predicate<Element> IS_LEGACY_BIT_NONEXISTENT =
         element -> element.getAttribute(STAGED_ARTIFACT_NAME_LEGACY) == null;
 
     final ConversionContext conversionContext;
@@ -106,7 +106,7 @@ public final class StagedArtifactNameConverterProvider extends ConverterProvider
           .stream()
           .filter(IS_GCP_APP_ENGINE_DEPLOY)
           .flatMap(TO_DEPLOYMENT_SETTINGS)
-          .anyMatch(IS_LEGACY_BIT_NOT_SET);
+          .anyMatch(IS_LEGACY_BIT_NONEXISTENT);
     }
 
     @Override
@@ -116,11 +116,9 @@ public final class StagedArtifactNameConverterProvider extends ConverterProvider
           .stream()
           .filter(IS_GCP_APP_ENGINE_DEPLOY)
           .flatMap(TO_DEPLOYMENT_SETTINGS)
-          .filter(IS_LEGACY_BIT_NOT_SET)
+          .filter(IS_LEGACY_BIT_NONEXISTENT)
           .forEach(
-              element ->
-                  element.setAttribute(STAGED_ARTIFACT_NAME_LEGACY, Boolean.toString(true)));
-      //conversionContext.getRunManagerSettings().
+              element -> element.setAttribute(STAGED_ARTIFACT_NAME_LEGACY, Boolean.toString(true)));
     }
   }
 }
