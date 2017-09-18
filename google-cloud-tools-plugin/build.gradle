@@ -62,7 +62,6 @@ dependencies {
         exclude group: 'org.yaml', module: 'snakeyaml'
     }
     compile files('lib/google-api-services-source.jar')
-
     compile 'org.yaml:snakeyaml:1.18'
 
     testCompile(project(':common-test-lib'))
