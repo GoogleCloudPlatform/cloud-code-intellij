@@ -44,7 +44,7 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
   @Override
   public void setupFrameworkSupport(JavaeeFrameworkSupportContributionModel model) {
     AppEngineStandardFacet appEngineStandardFacet = model.getFacet(AppEngineStandardFacetType.ID);
-    if (appEngineStandardFacet == null) {
+    if (appEngineStandardFacet == null || appEngineStandardFacet.isJava8Runtime()) {
       return;
     }
 
