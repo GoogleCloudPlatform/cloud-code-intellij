@@ -73,9 +73,13 @@ subprojects {
 
     configurations.runtime {
         resolutionStrategy {
+            // GCS brings in conflicting versions of this library so force the latest
+            force 'com.google.api:api-common:1.1.0'
+
             failOnVersionConflict()
 
             def provided = [["org.apache.httpcomponents", "httpclient"],
+                            ["com.google.guava", "guava"],
                             ["com.google.api-client", "google-api-client"]]
             eachDependency { DependencyResolveDetails dependency ->
                 if (provided.contains([dependency.requested.group, dependency.requested.name])) {
