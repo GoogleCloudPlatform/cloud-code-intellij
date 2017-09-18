@@ -49,6 +49,7 @@ public class AppEngineDeploymentConfiguration
 
   public static final String USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE = "userSpecifiedArtifactPath";
   public static final String STAGED_ARTIFACT_NAME = "stagedArtifactName";
+  public static final String STAGED_ARTIFACT_NAME_LEGACY = "stagedArtifactNameLegacy";
 
   static final String ENVIRONMENT_ATTRIBUTE = "environment";
   private static final String DOCKERFILE_NAME = "Dockerfile";
@@ -72,6 +73,7 @@ public class AppEngineDeploymentConfiguration
   // Used to resolve the facet configuration for flexible deployments
   private String moduleName;
   private String stagedArtifactName;
+  private boolean stagedArtifactNameLegacy;
 
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
@@ -123,6 +125,11 @@ public class AppEngineDeploymentConfiguration
     return stagedArtifactName;
   }
 
+  @Attribute(STAGED_ARTIFACT_NAME_LEGACY)
+  public boolean isStagedArtifactNameLegacy() {
+    return stagedArtifactNameLegacy;
+  }
+
   public void setDeployAllConfigs(boolean deployAllConfigs) {
     this.deployAllConfigs = deployAllConfigs;
   }
@@ -163,6 +170,10 @@ public class AppEngineDeploymentConfiguration
     this.stagedArtifactName = stagedArtifactName;
   }
 
+  public void setStagedArtifactNameLegacy(boolean stagedArtifactNameLegacy) {
+    this.stagedArtifactNameLegacy = stagedArtifactNameLegacy;
+  }
+
   @Override
   public void checkConfiguration(
       RemoteServer<?> server, DeploymentSource deploymentSource, Project project)
@@ -200,6 +211,7 @@ public class AppEngineDeploymentConfiguration
         && Objects.equals(deployAllConfigs, otherConfig.deployAllConfigs)
         && Objects.equals(moduleName, otherConfig.moduleName)
         && Objects.equals(stagedArtifactName, otherConfig.stagedArtifactName)
+        && Objects.equals(stagedArtifactNameLegacy, otherConfig.stagedArtifactNameLegacy)
         && Objects.equals(isDefaultDeploymentName(), otherConfig.isDefaultDeploymentName())
         && Objects.equals(getDeploymentName(), otherConfig.getDeploymentName());
   }
@@ -217,6 +229,7 @@ public class AppEngineDeploymentConfiguration
         deployAllConfigs,
         moduleName,
         stagedArtifactName,
+        stagedArtifactNameLegacy,
         isDefaultDeploymentName(),
         getDeploymentName());
   }

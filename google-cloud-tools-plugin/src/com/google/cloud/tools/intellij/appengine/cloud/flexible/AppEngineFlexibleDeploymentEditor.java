@@ -246,6 +246,16 @@ public final class AppEngineFlexibleDeploymentEditor
     }
     archiveSelector.setText(configuration.getUserSpecifiedArtifactPath());
 
+    if (configuration.isStagedArtifactNameLegacy()) {
+      File artifact = deploymentSource.getFile();
+      if (artifact != null) {
+        AppEngineFlexibleDeploymentArtifactType type =
+            AppEngineFlexibleDeploymentArtifactType.typeForPath(artifact.toPath());
+        configuration.setStagedArtifactName(StagedArtifactNameLegacySupport.getTargetName(type));
+        configuration.setStagedArtifactNameLegacy(false);
+      }
+    }
+
     if (StringUtils.isNotBlank(configuration.getStagedArtifactName())) {
       stagedArtifactNameTextField.setText(configuration.getStagedArtifactName());
     }

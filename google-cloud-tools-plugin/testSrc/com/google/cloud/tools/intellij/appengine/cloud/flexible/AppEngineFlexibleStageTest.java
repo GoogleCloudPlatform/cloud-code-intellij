@@ -76,6 +76,9 @@ public final class AppEngineFlexibleStageTest {
   @TestFile(name = "artifact.jar")
   private File jarArtifact;
 
+  @TestFile(name = "unknown")
+  private File unknownArtifact;
+
   @TestDirectory(name = "stagingDirectory")
   private File stagingDirectory;
 
@@ -232,6 +235,48 @@ public final class AppEngineFlexibleStageTest {
 
     assertThat(result).isTrue();
     assertThat(Files.exists(stagingDirectory.toPath().resolve(stagedArtifactName))).isTrue();
+  }
+
+  @Test
+  public void stage_withLegacyStagedNameBit_doesStageTargetWar() throws IOException {
+    deploymentConfiguration.setStagedArtifactNameLegacy(true);
+
+    boolean result = stage.stage(stagingDirectory.toPath());
+
+    assertThat(result).isTrue();
+    assertThat(Files.exists(stagingDirectory.toPath().resolve("target.war"))).isTrue();
+  }
+
+  @Test
+  public void stage_withJarArtifact_andLegacyStagedNameBit_doesStageTargetJar() throws IOException {
+    deploymentConfiguration.setStagedArtifactNameLegacy(true);
+    stage =
+        new AppEngineFlexibleStage(
+            mockLoggingHandler,
+            jarArtifact.toPath(),
+            deploymentConfiguration,
+            testFixture.getProject());
+
+    boolean result = stage.stage(stagingDirectory.toPath());
+
+    assertThat(result).isTrue();
+    assertThat(Files.exists(stagingDirectory.toPath().resolve("target.jar"))).isTrue();
+  }
+
+  @Test
+  public void stage_withUnknownArtifact_andLegacyStagedNameBit_doesStageTarget() throws IOException {
+    deploymentConfiguration.setStagedArtifactNameLegacy(true);
+    stage =
+        new AppEngineFlexibleStage(
+            mockLoggingHandler,
+            unknownArtifact.toPath(),
+            deploymentConfiguration,
+            testFixture.getProject());
+
+    boolean result = stage.stage(stagingDirectory.toPath());
+
+    assertThat(result).isTrue();
+    assertThat(Files.exists(stagingDirectory.toPath().resolve("target"))).isTrue();
   }
 
   /** Asserts the given {@link File} was staged in the staging directory. */
