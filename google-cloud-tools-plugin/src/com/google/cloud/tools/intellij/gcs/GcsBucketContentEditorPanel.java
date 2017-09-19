@@ -75,7 +75,9 @@ final class GcsBucketContentEditorPanel {
   }
 
   /**
-   * In the GCS backend there are no directories, just blobs with names. Implicit in the name,
+   * Returns the list of {@link Blob blobs} that start with the given prefix.
+   *
+   * <p>In the GCS backend there are no directories, just blobs with names. Implicit in the name,
    * however, is a directory structure (e.g. "dir1/dir2/blob.zip"). Therefore, in order to create a
    * directory browsing experience, we need to "unflatten" the blobs into a directory structure.
    *

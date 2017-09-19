@@ -42,22 +42,22 @@ public class GcsBucketContentEditorPanelTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @Rule public final TimeZoneRule timeZoneRule = new TimeZoneRule(TimeZone.getTimeZone("GMT"));
 
-  private GcsBucketContentEditorPanel editorPanel;
-  private GcsBucketVirtualFile bucketVirtualFile;
-
-  @Mock private Blob directoryBlob;
-  @Mock private Blob binaryBlob;
-  @Mock private Blob nestedBlob;
-
   private static final String DIR_NAME = "my_directory";
   private static final String BLOB_NAME = "my_blob.zip";
   private static final String BLOB_CONTENT_TYPE = "application/zip";
   private static final String NESTED_BLOB_FULL_NAME = "dir1/dir2/nested_blob.zip";
   private static final String NESTED_BLOB_NAME = "nested_blob.zip";
 
-  private static final BiMap<Integer, String> indexToColName =
+  private static final BiMap<Integer, String> INDEX_TO_COL_NAME =
       HashBiMap.create(ImmutableMap.of(0, "Name", 1, "Size", 2, "Type", 3, "Last Modified"));
-  private static final Map<String, Integer> colNameToIndex = indexToColName.inverse();
+  private static final Map<String, Integer> COL_NAME_TO_INDEX = INDEX_TO_COL_NAME.inverse();
+
+  private GcsBucketContentEditorPanel editorPanel;
+  private GcsBucketVirtualFile bucketVirtualFile;
+
+  @Mock private Blob directoryBlob;
+  @Mock private Blob binaryBlob;
+  @Mock private Blob nestedBlob;
 
   @Before
   public void setUp() {
@@ -95,7 +95,7 @@ public class GcsBucketContentEditorPanelTest {
     IntStream.range(0, bucketTable.getColumnCount())
         .forEach(
             colIdx ->
-                assertThat(indexToColName.get(colIdx))
+                assertThat(INDEX_TO_COL_NAME.get(colIdx))
                     .isEqualTo(bucketTable.getColumnName(colIdx)));
   }
 
@@ -106,10 +106,10 @@ public class GcsBucketContentEditorPanelTest {
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getRowCount()).isEqualTo(1);
 
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Name"))).isEqualTo(DIR_NAME);
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("-");
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Type"))).isEqualTo("Folder");
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Last Modified"))).isEqualTo("-");
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Name"))).isEqualTo(DIR_NAME);
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("-");
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Type"))).isEqualTo("Folder");
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Last Modified"))).isEqualTo("-");
   }
 
   @Test
@@ -119,10 +119,11 @@ public class GcsBucketContentEditorPanelTest {
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getRowCount()).isEqualTo(1);
 
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Name"))).isEqualTo(BLOB_NAME);
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("1.0 KB");
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Type"))).isEqualTo(BLOB_CONTENT_TYPE);
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Last Modified")))
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Name"))).isEqualTo(BLOB_NAME);
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("1.0 KB");
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Type")))
+        .isEqualTo(BLOB_CONTENT_TYPE);
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Last Modified")))
         .isEqualTo("1/1/70 12:00 AM");
   }
 
@@ -140,7 +141,8 @@ public class GcsBucketContentEditorPanelTest {
     editorPanel.updateTableModel("dir1/dir2/");
 
     JTable bucketTable = editorPanel.getBucketContentTable();
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Name"))).isEqualTo(NESTED_BLOB_NAME);
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Name")))
+        .isEqualTo(NESTED_BLOB_NAME);
   }
 
   @Test
@@ -149,7 +151,7 @@ public class GcsBucketContentEditorPanelTest {
     initBlobEditor(binaryBlob);
     JTable bucketTable = editorPanel.getBucketContentTable();
 
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("100 B");
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("100 B");
   }
 
   @Test
@@ -158,7 +160,7 @@ public class GcsBucketContentEditorPanelTest {
     initBlobEditor(binaryBlob);
     JTable bucketTable = editorPanel.getBucketContentTable();
 
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("100.0 KB");
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("100.0 KB");
   }
 
   @Test
@@ -167,7 +169,7 @@ public class GcsBucketContentEditorPanelTest {
     initBlobEditor(binaryBlob);
     JTable bucketTable = editorPanel.getBucketContentTable();
 
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("100.0 MB");
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("100.0 MB");
   }
 
   @Test
@@ -176,7 +178,7 @@ public class GcsBucketContentEditorPanelTest {
     initBlobEditor(binaryBlob);
     JTable bucketTable = editorPanel.getBucketContentTable();
 
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("100.0 GB");
+    assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("100.0 GB");
   }
 
   private void initBlobEditor(Blob... blobs) {
