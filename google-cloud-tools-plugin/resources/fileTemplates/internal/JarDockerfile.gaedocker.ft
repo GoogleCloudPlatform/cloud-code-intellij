@@ -1,4 +1,5 @@
 FROM gcr.io/google_appengine/openjdk
-ADD target.jar /app/
+# Replace occurrences of ${project.build.finalName} with the name of the deployed jar
+ADD ${project.build.finalName}.jar /app/
 ENTRYPOINT ["/docker-entrypoint.bash"]
-CMD ["java","-jar","/app/target.jar"]
+CMD ["java","-jar","/app/${project.build.finalName}.jar"]

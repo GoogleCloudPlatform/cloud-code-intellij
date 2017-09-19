@@ -1,2 +1,3 @@
 FROM gcr.io/google_appengine/jetty
-ADD target.war $JETTY_BASE/webapps/root.war
+# Replace ${project.build.finalName} with the name of the deployed war
+ADD ${project.build.finalName}.war $JETTY_BASE/webapps/root.war
