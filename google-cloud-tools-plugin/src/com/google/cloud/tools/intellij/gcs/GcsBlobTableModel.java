@@ -95,7 +95,7 @@ final class GcsBlobTableModel extends DefaultTableModel {
   }
 
   private static String getBlobSize(Blob blob) {
-    return blob.isDirectory() ? "-" : humanReadableByteSize(blob.getSize());
+    return blob.isDirectory() ? "-" : toHumanReadableByteSize(blob.getSize());
   }
 
   private static String getLastModifiedTimestamp(Blob blob) {
@@ -106,7 +106,7 @@ final class GcsBlobTableModel extends DefaultTableModel {
     return dateFormat.format(new Date(blob.getUpdateTime()));
   }
 
-  private static String humanReadableByteSize(long bytes) {
+  private static String toHumanReadableByteSize(long bytes) {
     int unit = 1024;
     if (bytes < unit) {
       return bytes + " B";
