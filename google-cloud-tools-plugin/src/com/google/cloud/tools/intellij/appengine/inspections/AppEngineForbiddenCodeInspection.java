@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.inspections;
 
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-
 import com.intellij.codeHighlighting.HighlightDisplayLevel;
 import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.InspectionManager;
@@ -34,7 +33,6 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -48,13 +46,12 @@ import com.intellij.psi.PsiNewExpression;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.ClassUtil;
-
-import java.util.Optional;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import org.apache.commons.lang3.JavaVersion;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author nik
@@ -72,9 +69,9 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
       return null;
     }
 
-    Optional<LanguageLevel> runtimeLanguageLevel = appEngineStandardFacet.getRuntimeLanguageLevel();
+    Optional<JavaVersion> runtimeLanguageLevel = appEngineStandardFacet.getRuntimeJavaVersion();
     if (!runtimeLanguageLevel.isPresent()
-        || runtimeLanguageLevel.get().isAtLeast(LanguageLevel.JDK_1_8)) {
+        || runtimeLanguageLevel.get().atLeast(JavaVersion.JAVA_1_8)) {
       return null;
     }
 

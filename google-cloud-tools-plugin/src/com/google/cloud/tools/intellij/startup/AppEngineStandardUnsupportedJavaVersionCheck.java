@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.event.HyperlinkEvent;
+import org.apache.commons.lang3.JavaVersion;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -81,8 +82,8 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
                             AppEngineStandardFacet.getAppEngineFacetByModule(module);
                         return !(facet == null || facet.isNonStandardCompatEnvironment())
                             && facet
-                                .getRuntimeLanguageLevel()
-                                .filter(level -> level.isLessThan(LanguageLevel.JDK_1_8))
+                                .getRuntimeJavaVersion()
+                                .filter(level -> level.compareTo(JavaVersion.JAVA_1_8) < 0)
                                 .isPresent();
                       })
                   .forEach(invalidModules::add);

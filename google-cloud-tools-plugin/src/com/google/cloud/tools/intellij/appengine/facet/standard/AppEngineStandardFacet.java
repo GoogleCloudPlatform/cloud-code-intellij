@@ -25,25 +25,25 @@ import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeRegistry;
 import com.intellij.openapi.module.Module;
-import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomManager;
 import java.util.Optional;
+import org.apache.commons.lang3.JavaVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** @author nik */
 public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfiguration> {
 
-  private static final ImmutableMap<String, LanguageLevel> RUNTIMES_MAP =
+  private static final ImmutableMap<String, JavaVersion> RUNTIMES_MAP =
       ImmutableMap.of(
           "java",
-          LanguageLevel.JDK_1_7,
+          JavaVersion.JAVA_1_7,
           "java7",
-          LanguageLevel.JDK_1_7,
+          JavaVersion.JAVA_1_7,
           "java8",
-          LanguageLevel.JDK_1_8);
+          JavaVersion.JAVA_1_8);
 
   public AppEngineStandardFacet(
       @NotNull FacetType facetType,
@@ -95,14 +95,14 @@ public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfigur
   }
 
   /**
-   * Returns the {@link LanguageLevel} of the Java runtime, as defined in the {@code
+   * Returns the {@link JavaVersion} of the Java runtime, as defined in the {@code
    * appengine-web.xml}.
    *
-   * @return an {@link Optional} of the runtime {@link LanguageLevel}. Returns {@link
+   * @return an {@link Optional} of the runtime {@link JavaVersion}. Returns {@link
    *     Optional#empty()} if the {@code appengine-web.xml} does not exist or if the value of the
    *     runtime is not recognized.
    */
-  public Optional<LanguageLevel> getRuntimeLanguageLevel() {
+  public Optional<JavaVersion> getRuntimeJavaVersion() {
     AppEngineStandardWebApp appEngineStandardWebApp = getAppEngineStandardWebXml();
     if (appEngineStandardWebApp == null) {
       return Optional.empty();

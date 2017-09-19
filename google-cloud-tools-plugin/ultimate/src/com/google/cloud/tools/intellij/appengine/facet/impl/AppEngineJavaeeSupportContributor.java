@@ -27,9 +27,9 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.startup.StartupManager;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
+import org.apache.commons.lang3.JavaVersion;
 
 /**
  * @author nik
@@ -49,8 +49,8 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
     }
 
     appEngineStandardFacet
-        .getRuntimeLanguageLevel()
-        .filter(level -> level.equals(LanguageLevel.JDK_1_7))
+        .getRuntimeJavaVersion()
+        .filter(level -> level.equals(JavaVersion.JAVA_1_7))
         .ifPresent(level -> setWebXmlServletVersion(model.getModule()));
 
     Artifact artifactToDeploy = model.getExplodedEarArtifact();
