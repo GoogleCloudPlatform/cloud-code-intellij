@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 import javax.swing.table.DefaultTableModel;
+import sun.plugin.dom.exception.InvalidStateException;
 
 /**
  * Table model representation of a Google Cloud Storage blob row. Handles display of blob name and
@@ -42,6 +43,9 @@ final class GcsBlobTableModel extends DefaultTableModel {
   }
 
   Blob getBlobAt(int index) {
+    if (blobs == null) {
+      throw new InvalidStateException("Data vector with blob values not initialized.");
+    }
     return blobs.get(index);
   }
 
