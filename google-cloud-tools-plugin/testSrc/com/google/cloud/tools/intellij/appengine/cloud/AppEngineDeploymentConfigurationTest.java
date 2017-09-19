@@ -569,6 +569,7 @@ public final class AppEngineDeploymentConfigurationTest {
     configuration.setDeployAllConfigs(true);
     configuration.setModuleName("module-name");
     configuration.setStagedArtifactName("staged-artifact-name");
+    configuration.setStagedArtifactNameLegacy(true);
     configuration.setDefaultDeploymentName(true);
     configuration.setDeploymentName("deployment-name");
     return configuration;

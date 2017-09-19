@@ -352,6 +352,53 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
+  public void resetEditorFrom_withStagedArtifactNameLegacyBit_andWarArtifact_doesSetName() {
+    when(deploymentSource.getFile()).thenReturn(warArtifact);
+    configuration.setStagedArtifactNameLegacy(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getStagedArtifactNameTextField().getText()).isEqualTo("target.war");
+    assertThat(configuration.getStagedArtifactName()).isEqualTo("target.war");
+    assertThat(configuration.isStagedArtifactNameLegacy()).isFalse();
+  }
+
+  @Test
+  public void resetEditorFrom_withStagedArtifactNameLegacyBit_andJarArtifact_doesSetName() {
+    when(deploymentSource.getFile()).thenReturn(jarArtifact);
+    configuration.setStagedArtifactNameLegacy(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getStagedArtifactNameTextField().getText()).isEqualTo("target.jar");
+    assertThat(configuration.getStagedArtifactName()).isEqualTo("target.jar");
+    assertThat(configuration.isStagedArtifactNameLegacy()).isFalse();
+  }
+
+  @Test
+  public void resetEditorFrom_withStagedArtifactNameLegacyBit_andUnknownArtifact_doesSetName() {
+    when(deploymentSource.getFile()).thenReturn(unknownArtifact);
+    configuration.setStagedArtifactNameLegacy(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getStagedArtifactNameTextField().getText()).isEqualTo("target");
+    assertThat(configuration.getStagedArtifactName()).isEqualTo("target");
+    assertThat(configuration.isStagedArtifactNameLegacy()).isFalse();
+  }
+
+  @Test
+  public void resetEditorFrom_withStagedArtifactNameLegacyBit_andNoArtifact_doesNothing() {
+    configuration.setStagedArtifactNameLegacy(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getStagedArtifactNameTextField().getText()).isEmpty();
+    assertThat(configuration.getStagedArtifactName()).isNull();
+    assertThat(configuration.isStagedArtifactNameLegacy()).isTrue();
+  }
+
+  @Test
   public void updateArtifactField_toWar_doesSetStagedArtifactNameEmptyText() {
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
     editor.getArchiveSelector().setText(warArtifact.toString());
