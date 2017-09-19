@@ -16,12 +16,14 @@
 
 package com.google.cloud.tools.intellij.gcs;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage.BlobListOption;
 import java.util.Iterator;
 
 /** Utilities for GCS related tests. */
@@ -36,6 +38,7 @@ final class GcsTestUtils {
 
     when(gcsBucketVirtualFile.getBucket()).thenReturn(bucket);
     when(bucket.list()).thenReturn(page);
+    when(bucket.list(any(BlobListOption.class), any(BlobListOption.class))).thenReturn(page);
     when(page.iterateAll()).thenReturn(blobIterable);
     when(blobIterable.iterator()).thenReturn(blobIterator);
 
