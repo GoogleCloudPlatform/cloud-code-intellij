@@ -47,23 +47,32 @@ public class GcsBucketContentEditorPanelTest {
 
   @Mock private Blob directoryBlob;
   @Mock private Blob binaryBlob;
+  @Mock private Blob nestedBlob;
 
-  private BiMap<Integer, String> indexToColName =
+  private static final String DIR_NAME = "my_directory";
+  private static final String BLOB_NAME = "my_blob.zip";
+  private static final String BLOB_CONTENT_TYPE = "application/zip";
+  private static final String NESTED_BLOB_FULL_NAME = "dir1/dir2/nested_blob.zip";
+  private static final String NESTED_BLOB_NAME = "nested_blob.zip";
+
+  private static final BiMap<Integer, String> indexToColName =
       HashBiMap.create(ImmutableMap.of(0, "Name", 1, "Size", 2, "Type", 3, "Last Modified"));
-  private Map<String, Integer> colNameToIndex = indexToColName.inverse();
+  private static final Map<String, Integer> colNameToIndex = indexToColName.inverse();
 
   @Before
   public void setUp() {
     bucketVirtualFile = GcsTestUtils.createVirtualFileWithBucketMocks();
 
     when(directoryBlob.isDirectory()).thenReturn(true);
-    when(directoryBlob.getName()).thenReturn("my_directory");
+    when(directoryBlob.getName()).thenReturn(DIR_NAME);
 
     when(binaryBlob.isDirectory()).thenReturn(false);
-    when(binaryBlob.getName()).thenReturn("my_blob.zip");
+    when(binaryBlob.getName()).thenReturn(BLOB_NAME);
     when(binaryBlob.getSize()).thenReturn(1024L);
-    when(binaryBlob.getContentType()).thenReturn("application/zip");
+    when(binaryBlob.getContentType()).thenReturn(BLOB_CONTENT_TYPE);
     when(binaryBlob.getUpdateTime()).thenReturn(0L);
+
+    when(nestedBlob.getName()).thenReturn(NESTED_BLOB_FULL_NAME);
   }
 
   @Test
@@ -97,7 +106,7 @@ public class GcsBucketContentEditorPanelTest {
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getRowCount()).isEqualTo(1);
 
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Name"))).isEqualTo("my_directory");
+    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Name"))).isEqualTo(DIR_NAME);
     assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("-");
     assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Type"))).isEqualTo("Folder");
     assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Last Modified"))).isEqualTo("-");
@@ -110,9 +119,9 @@ public class GcsBucketContentEditorPanelTest {
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getRowCount()).isEqualTo(1);
 
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Name"))).isEqualTo("my_blob.zip");
+    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Name"))).isEqualTo(BLOB_NAME);
     assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("1.0 KB");
-    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Type"))).isEqualTo("application/zip");
+    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Type"))).isEqualTo(BLOB_CONTENT_TYPE);
     assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Last Modified")))
         .isEqualTo("1/1/70 12:00 AM");
   }
@@ -123,6 +132,51 @@ public class GcsBucketContentEditorPanelTest {
 
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getRowCount()).isEqualTo(2);
+  }
+
+  @Test
+  public void testBucketName_directoryPrefixIsTrimmed() {
+    initBlobEditor(nestedBlob);
+    editorPanel.updateTableModel("dir1/dir2/");
+
+    JTable bucketTable = editorPanel.getBucketContentTable();
+    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Name"))).isEqualTo(NESTED_BLOB_NAME);
+  }
+
+  @Test
+  public void testBlobSizeDisplay_Bytes() {
+    when(binaryBlob.getSize()).thenReturn(100L);
+    initBlobEditor(binaryBlob);
+    JTable bucketTable = editorPanel.getBucketContentTable();
+
+    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("100 B");
+  }
+
+  @Test
+  public void testBlobSizeDisplay_KB() {
+    when(binaryBlob.getSize()).thenReturn(102400L);
+    initBlobEditor(binaryBlob);
+    JTable bucketTable = editorPanel.getBucketContentTable();
+
+    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("100.0 KB");
+  }
+
+  @Test
+  public void testBlobSizeDisplay_MB() {
+    when(binaryBlob.getSize()).thenReturn(104857600L);
+    initBlobEditor(binaryBlob);
+    JTable bucketTable = editorPanel.getBucketContentTable();
+
+    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("100.0 MB");
+  }
+
+  @Test
+  public void testBlobSizeDisplay_GB() {
+    when(binaryBlob.getSize()).thenReturn(107374182400L);
+    initBlobEditor(binaryBlob);
+    JTable bucketTable = editorPanel.getBucketContentTable();
+
+    assertThat(bucketTable.getValueAt(0, colNameToIndex.get("Size"))).isEqualTo("100.0 GB");
   }
 
   private void initBlobEditor(Blob... blobs) {

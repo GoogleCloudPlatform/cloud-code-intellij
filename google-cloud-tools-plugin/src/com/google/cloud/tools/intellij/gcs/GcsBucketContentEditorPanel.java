@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 // TODO(eshaul) implement toolbar panel and breadcrumb browser
 final class GcsBucketContentEditorPanel {
 
-  private Bucket bucket;
+  private final Bucket bucket;
 
   private JPanel bucketContentEditorPanel;
   private JPanel bucketContentToolbarPanel;
@@ -60,7 +60,7 @@ final class GcsBucketContentEditorPanel {
   }
 
   void initTableModel() {
-    List<Blob> blobs = getBlobsAtLevel("");
+    List<Blob> blobs = getBlobsStartingWith("");
     if (!blobs.isEmpty()) {
       tableModel = new GcsBlobTableModel();
       tableModel.setDataVector(blobs, "");
@@ -68,14 +68,24 @@ final class GcsBucketContentEditorPanel {
     }
   }
 
-  private void updateTableModel(String prefix) {
+  void updateTableModel(String prefix) {
     tableModel.setRowCount(0);
-    tableModel.setDataVector(getBlobsAtLevel(prefix), prefix);
+    tableModel.setDataVector(getBlobsStartingWith(prefix), prefix);
     tableModel.fireTableDataChanged();
   }
 
+  /**
+   * In the GCS backend there are no directories, just blobs with names. Implicit in the name,
+   * however, is a directory structure (e.g. "dir1/dir2/blob.zip"). Therefore, in order to create a
+   * directory browsing experience, we need to "unflatten" the blobs into a directory structure.
+   *
+   * <p>{@link Bucket#list(BlobListOption...)} provides options to help simulate directories by
+   * supplying the {@link BlobListOption#currentDirectory()} and {@link
+   * BlobListOption#prefix(String)} options. The prefix acts as the current directory for the blobs
+   * we wish to fetch.
+   */
   // TODO(eshaul) should be done asynchronously and show loader in the UI
-  private List<Blob> getBlobsAtLevel(String prefix) {
+  private List<Blob> getBlobsStartingWith(String prefix) {
     return Lists.newArrayList(
         bucket.list(BlobListOption.currentDirectory(), BlobListOption.prefix(prefix)).iterateAll());
   }

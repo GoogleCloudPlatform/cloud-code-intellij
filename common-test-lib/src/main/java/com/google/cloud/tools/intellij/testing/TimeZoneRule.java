@@ -22,7 +22,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /** A custom {@link TestRule} for setting a time zone in unit tests. */
-public class TimeZoneRule implements TestRule {
+public final class TimeZoneRule implements TestRule {
   private final TimeZone timeZone;
 
   public TimeZoneRule(TimeZone timeZone) {
