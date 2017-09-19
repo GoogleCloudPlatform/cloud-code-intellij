@@ -5,11 +5,11 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 
 ### Added
   - Added the ability to change the name of the staged artifact for App Engine flexible deployments.
-    [1151](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1151)
+    [1610](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1610)
 
 ### Changed
   - App Engine flexible deployment configurations now default to deploy the artifact as-is, without
-    renaming to `target.jar` or `target.war`. [1611](https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/1611)
+    renaming to `target.jar` or `target.war`. [1151](https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/1151)
   - App Engine standard deployment configurations now default to update dos, dispatch, cron, queues,
     and datastore indexes. [1613](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1613)
   - Native projects that add support for Cloud Endpoints Frameworks for App Engine will now use
