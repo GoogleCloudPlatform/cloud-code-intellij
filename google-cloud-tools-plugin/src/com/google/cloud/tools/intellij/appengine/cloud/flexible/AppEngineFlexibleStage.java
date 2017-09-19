@@ -113,9 +113,18 @@ public class AppEngineFlexibleStage {
 
       String stagedArtifactName = deploymentConfiguration.getStagedArtifactName();
       if (Strings.isNullOrEmpty(stagedArtifactName)) {
-        // Defaults to the name of the artifact.
-        stagedArtifactName = deploymentArtifactPath.getFileName().toString();
+        if (deploymentConfiguration.isStagedArtifactNameLegacy()) {
+          // Uses "target.jar" or "target.war" for legacy configs.
+          AppEngineFlexibleDeploymentArtifactType artifactType =
+              AppEngineFlexibleDeploymentArtifactType.typeForPath(deploymentArtifactPath);
+          stagedArtifactName = StagedArtifactNameLegacySupport.getTargetName(artifactType);
+        } else {
+          // Defaults to the name of the artifact.
+          stagedArtifactName = deploymentArtifactPath.getFileName().toString();
+        }
       }
+      loggingHandler.print(
+          getMessage("appengine.deployment.staging.artifact.as", stagedArtifactName));
       Path stagedArtifactPath = stagingDirectory.resolve(stagedArtifactName);
 
       // Creates parent directories first, if necessary.
@@ -140,8 +149,9 @@ public class AppEngineFlexibleStage {
    *
    * @param messageKey the key of the message (as described by {@link GctBundle#message}) to show in
    *     the error
+   * @param params the optional parameters to add to the message
    */
-  private static String getMessage(String messageKey) {
-    return GctBundle.message(messageKey) + "\n";
+  private static String getMessage(String messageKey, @NotNull Object... params) {
+    return GctBundle.message(messageKey, params) + "\n";
   }
 }
