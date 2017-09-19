@@ -48,7 +48,6 @@ import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.ClassUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.apache.commons.lang3.JavaVersion;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -69,9 +68,7 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
       return null;
     }
 
-    Optional<JavaVersion> runtimeLanguageLevel = appEngineStandardFacet.getRuntimeJavaVersion();
-    if (!runtimeLanguageLevel.isPresent()
-        || runtimeLanguageLevel.get().atLeast(JavaVersion.JAVA_1_8)) {
+    if (appEngineStandardFacet.getRuntimeJavaVersion().atLeast(JavaVersion.JAVA_1_8)) {
       return null;
     }
 

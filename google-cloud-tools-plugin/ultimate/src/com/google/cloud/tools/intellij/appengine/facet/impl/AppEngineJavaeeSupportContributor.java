@@ -48,10 +48,9 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
       return;
     }
 
-    appEngineStandardFacet
-        .getRuntimeJavaVersion()
-        .filter(level -> level.equals(JavaVersion.JAVA_1_7))
-        .ifPresent(level -> setWebXmlServletVersion(model.getModule()));
+    if (appEngineStandardFacet.getRuntimeJavaVersion().equals(JavaVersion.JAVA_1_7)) {
+      setWebXmlServletVersion(model.getModule());
+    }
 
     Artifact artifactToDeploy = model.getExplodedEarArtifact();
     if (artifactToDeploy == null) {

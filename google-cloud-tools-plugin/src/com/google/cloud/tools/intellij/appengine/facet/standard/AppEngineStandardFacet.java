@@ -28,7 +28,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomManager;
-import java.util.Optional;
 import org.apache.commons.lang3.JavaVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -98,18 +97,21 @@ public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfigur
    * Returns the {@link JavaVersion} of the Java runtime, as defined in the {@code
    * appengine-web.xml}.
    *
-   * @return an {@link Optional} of the runtime {@link JavaVersion}. Returns {@link
-   *     Optional#empty()} if the {@code appengine-web.xml} does not exist or if the value of the
-   *     runtime is not recognized.
+   * <p>If no runtime is specified in the {@code appengine-web.xml} or if the specified runtime is
+   * not valid, {@link JavaVersion#JAVA_1_7} is returned.
    */
-  public Optional<JavaVersion> getRuntimeJavaVersion() {
+  public JavaVersion getRuntimeJavaVersion() {
     AppEngineStandardWebApp appEngineStandardWebApp = getAppEngineStandardWebXml();
-    if (appEngineStandardWebApp == null) {
-      return Optional.empty();
+    if (appEngineStandardWebApp != null) {
+      String runtimeString = appEngineStandardWebApp.getRuntime().getStringValue();
+      JavaVersion runtimeVersion = RUNTIMES_MAP.get(runtimeString);
+      if (runtimeVersion != null) {
+        return runtimeVersion;
+      }
     }
 
-    String runtime = appEngineStandardWebApp.getRuntime().getStringValue();
-    return Optional.ofNullable(RUNTIMES_MAP.get(runtime));
+    // The default runtime is Java 7.
+    return JavaVersion.JAVA_1_7;
   }
 
   @Nullable

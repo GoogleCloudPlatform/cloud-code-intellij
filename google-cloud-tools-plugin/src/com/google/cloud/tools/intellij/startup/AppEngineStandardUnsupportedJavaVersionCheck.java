@@ -81,10 +81,7 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
                         AppEngineStandardFacet facet =
                             AppEngineStandardFacet.getAppEngineFacetByModule(module);
                         return !(facet == null || facet.isNonStandardCompatEnvironment())
-                            && facet
-                                .getRuntimeJavaVersion()
-                                .filter(level -> level.compareTo(JavaVersion.JAVA_1_8) < 0)
-                                .isPresent();
+                            && facet.getRuntimeJavaVersion().compareTo(JavaVersion.JAVA_1_8) < 0;
                       })
                   .forEach(invalidModules::add);
             });
