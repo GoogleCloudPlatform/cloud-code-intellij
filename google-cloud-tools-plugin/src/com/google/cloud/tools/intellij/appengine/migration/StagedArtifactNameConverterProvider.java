@@ -16,9 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.migration;
 
+import static com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE;
 import static com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.STAGED_ARTIFACT_NAME_LEGACY;
 
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.base.Strings;
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionContext;
 import com.intellij.conversion.ConversionProcessor;
@@ -67,11 +70,6 @@ public final class StagedArtifactNameConverterProvider extends ConverterProvider
     };
   }
 
-  @Override
-  public boolean canDetermineIfConversionAlreadyPerformedByProjectFiles() {
-    return false;
-  }
-
   private static final class StagedArtifactNameConversionProcessor
       extends ConversionProcessor<RunManagerSettings> {
 
@@ -93,6 +91,20 @@ public final class StagedArtifactNameConverterProvider extends ConverterProvider
     static final Predicate<Element> IS_LEGACY_BIT_NONEXISTENT =
         element -> element.getAttribute(STAGED_ARTIFACT_NAME_LEGACY) == null;
 
+    static final Predicate<Element> IS_FLEX_ENVIRONMENT = element -> {
+      String environmentString = element.getAttributeValue(ENVIRONMENT_ATTRIBUTE);
+      if (Strings.isNullOrEmpty(environmentString)) {
+        return false;
+      }
+
+      try {
+        AppEngineEnvironment environment = AppEngineEnvironment.valueOf(environmentString);
+        return environment.equals(AppEngineEnvironment.APP_ENGINE_FLEX);
+      } catch (IllegalArgumentException e) {
+        return false;
+      }
+    };
+
     final ConversionContext conversionContext;
 
     StagedArtifactNameConversionProcessor(ConversionContext conversionContext) {
@@ -106,7 +118,7 @@ public final class StagedArtifactNameConverterProvider extends ConverterProvider
           .stream()
           .filter(IS_GCP_APP_ENGINE_DEPLOY)
           .flatMap(TO_DEPLOYMENT_SETTINGS)
-          .anyMatch(IS_LEGACY_BIT_NONEXISTENT);
+          .anyMatch(IS_LEGACY_BIT_NONEXISTENT.and(IS_FLEX_ENVIRONMENT));
     }
 
     @Override
@@ -116,7 +128,7 @@ public final class StagedArtifactNameConverterProvider extends ConverterProvider
           .stream()
           .filter(IS_GCP_APP_ENGINE_DEPLOY)
           .flatMap(TO_DEPLOYMENT_SETTINGS)
-          .filter(IS_LEGACY_BIT_NONEXISTENT)
+          .filter(IS_LEGACY_BIT_NONEXISTENT.and(IS_FLEX_ENVIRONMENT))
           .forEach(
               element -> element.setAttribute(STAGED_ARTIFACT_NAME_LEGACY, Boolean.toString(true)));
     }

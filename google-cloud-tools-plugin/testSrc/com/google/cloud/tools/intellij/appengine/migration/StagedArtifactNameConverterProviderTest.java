@@ -16,7 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.migration;
 
+import static com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE;
 import static com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration.STAGED_ARTIFACT_NAME_LEGACY;
+import static com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment.APP_ENGINE_FLEX;
+import static com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT;
+import static com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment.APP_ENGINE_STANDARD;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -55,6 +59,7 @@ public final class StagedArtifactNameConverterProviderTest {
   @Before
   public void setUpElements() {
     configurationElement.setAttribute(TYPE, GCP_APP_ENGINE_DEPLOY);
+    settingsElement.setAttribute(ENVIRONMENT_ATTRIBUTE, APP_ENGINE_FLEX.name());
     configurationElement.addContent(deploymentElement);
     deploymentElement.addContent(settingsElement);
   }
@@ -127,6 +132,20 @@ public final class StagedArtifactNameConverterProviderTest {
   @Test
   public void isConversionNeeded_withEmptyElementsList_doesReturnFalse() {
     when(mockRunManagerSettings.getRunConfigurations()).thenReturn(ImmutableList.of());
+
+    assertThat(getConversionProcessor().isConversionNeeded(mockRunManagerSettings)).isFalse();
+  }
+
+  @Test
+  public void isConversionNeeded_withStandardEnvironment_doesReturnFalse() {
+    settingsElement.setAttribute(ENVIRONMENT_ATTRIBUTE, APP_ENGINE_STANDARD.name());
+
+    assertThat(getConversionProcessor().isConversionNeeded(mockRunManagerSettings)).isFalse();
+  }
+
+  @Test
+  public void isConversionNeeded_withFlexCompatEnvironment_doesReturnFalse() {
+    settingsElement.setAttribute(ENVIRONMENT_ATTRIBUTE, APP_ENGINE_FLEX_COMPAT.name());
 
     assertThat(getConversionProcessor().isConversionNeeded(mockRunManagerSettings)).isFalse();
   }
@@ -207,6 +226,26 @@ public final class StagedArtifactNameConverterProviderTest {
   @Test
   public void process_withEmptyElementsList_doesNothing() throws CannotConvertException {
     when(mockRunManagerSettings.getRunConfigurations()).thenReturn(ImmutableList.of());
+
+    getConversionProcessor().process(mockRunManagerSettings);
+
+    assertThat(settingsElement.getAttribute(STAGED_ARTIFACT_NAME_LEGACY)).isNull();
+  }
+
+  @Test
+  public void process_withStandardEnvironment_doesNothing() throws CannotConvertException {
+    settingsElement.setAttribute(ENVIRONMENT_ATTRIBUTE, APP_ENGINE_STANDARD.name());
+
+    getConversionProcessor().process(mockRunManagerSettings);
+
+    assertThat(settingsElement.getAttribute(STAGED_ARTIFACT_NAME_LEGACY)).isNull();
+  }
+
+  @Test
+  public void process_withFlexCompatEnvironment_doesNothing() throws CannotConvertException {
+    settingsElement.setAttribute(ENVIRONMENT_ATTRIBUTE, APP_ENGINE_FLEX_COMPAT.name());
+
+    getConversionProcessor().process(mockRunManagerSettings);
 
     assertThat(settingsElement.getAttribute(STAGED_ARTIFACT_NAME_LEGACY)).isNull();
   }

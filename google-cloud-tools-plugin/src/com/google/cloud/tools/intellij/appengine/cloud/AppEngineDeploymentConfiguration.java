@@ -50,8 +50,8 @@ public class AppEngineDeploymentConfiguration
   public static final String USER_SPECIFIED_ARTIFACT_PATH_ATTRIBUTE = "userSpecifiedArtifactPath";
   public static final String STAGED_ARTIFACT_NAME = "stagedArtifactName";
   public static final String STAGED_ARTIFACT_NAME_LEGACY = "stagedArtifactNameLegacy";
+  public static final String ENVIRONMENT_ATTRIBUTE = "environment";
 
-  static final String ENVIRONMENT_ATTRIBUTE = "environment";
   private static final String DOCKERFILE_NAME = "Dockerfile";
 
   private String cloudProjectName;
