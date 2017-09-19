@@ -71,6 +71,14 @@ final class GcsBlobTableModel extends DefaultTableModel {
         .collect(Collectors.toCollection(Vector::new));
   }
 
+  /**
+   * Given an full blob name such as "dir1/dir2/blob.zip" and a directory prefix indicating which
+   * directory we are examining such as "dir1/dir2/", this method will trim off the prefix and
+   * return the blob name: "blob.zip".
+   *
+   * @param fullName the full path to the blob.
+   * @param directoryPrefix the path indicating which virtual directory the blob is in.
+   */
   private static String getDirectoryTrimmedBlobName(String fullName, String directoryPrefix) {
     String prefix = fullName.substring(0, directoryPrefix.length());
     if (!prefix.isEmpty() && prefix.equals(directoryPrefix)) {
