@@ -37,6 +37,7 @@ final class GcsTestUtils {
     Iterator<Blob> blobIterator = mock(Iterator.class);
 
     when(gcsBucketVirtualFile.getBucket()).thenReturn(bucket);
+    when(bucket.list()).thenReturn(page);
     when(bucket.list(any(BlobListOption.class), any(BlobListOption.class))).thenReturn(page);
     when(page.iterateAll()).thenReturn(blobIterable);
     when(blobIterable.iterator()).thenReturn(blobIterator);
