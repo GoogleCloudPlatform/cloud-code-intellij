@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.facet.impl;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
-
 import com.intellij.javaee.model.xml.web.WebApp;
 import com.intellij.javaee.supportProvider.JavaeeFrameworkSupportContributionModel;
 import com.intellij.javaee.supportProvider.JavaeeFrameworkSupportContributor;
@@ -31,7 +30,6 @@ import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
-import java.util.Optional;
 
 /**
  * @author nik
@@ -50,11 +48,10 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
       return;
     }
 
-    Optional<LanguageLevel> runtimeLanguageLevel = appEngineStandardFacet.getRuntimeLanguageLevel();
-    if (runtimeLanguageLevel.isPresent()
-        && runtimeLanguageLevel.get().equals(LanguageLevel.JDK_1_7)) {
-      setWebXmlServletVersion(model.getModule());
-    }
+    appEngineStandardFacet
+        .getRuntimeLanguageLevel()
+        .filter(level -> level.equals(LanguageLevel.JDK_1_7))
+        .ifPresent(level -> setWebXmlServletVersion(model.getModule()));
 
     Artifact artifactToDeploy = model.getExplodedEarArtifact();
     if (artifactToDeploy == null) {
