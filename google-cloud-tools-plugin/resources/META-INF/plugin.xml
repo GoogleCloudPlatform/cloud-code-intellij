@@ -47,12 +47,12 @@
       <h2>[17.9.1]</h2>
       <h3>Added</h3>
       <ul>
-        <li>Added the ability to change the name of the staged artifact for App Engine flexible deployments. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1151">#1151</a>)</li>
+        <li>Added the ability to change the name of the staged artifact for App Engine flexible deployments. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1610">#1610</a>)</li>
       </ul>
 
       <h3>Changed</h3>
       <ul>
-        <li>App Engine flexible deployment configurations now default to deploy the artifact as-is, without renaming to "target.jar" or "target.war". (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/1611">#1611</a>)</li>
+        <li>App Engine flexible deployment configurations now default to deploy the artifact as-is, without renaming to "target.jar" or "target.war". (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1151">#1151</a>)</li>
         <li>App Engine standard deployment configurations now default to update dos, dispatch, cron, queues, and datastore indexes. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1613">#1613</a>)</li>
         <li>Native projects that add support for Cloud Endpoints Frameworks for App Engine will now use Endpoints V2. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1612">#1612</a>)</li>
       </ul>
