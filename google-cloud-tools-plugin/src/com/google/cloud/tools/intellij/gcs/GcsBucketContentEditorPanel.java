@@ -74,7 +74,7 @@ final class GcsBucketContentEditorPanel {
     tableModel.fireTableDataChanged();
   }
 
-  // todo should be done asynchronously and show loader in the UI
+  // TODO(eshaul) should be done asynchronously and show loader in the UI
   private List<Blob> getBlobsAtLevel(String prefix) {
     return Lists.newArrayList(
         bucket.list(BlobListOption.currentDirectory(), BlobListOption.prefix(prefix)).iterateAll());
