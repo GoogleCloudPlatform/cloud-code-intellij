@@ -19,19 +19,16 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentEditor;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardDeploymentEditor;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
-
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfigurator;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** Sets up the configuration elements for an AppEngine Cloud deployment. */
 public class AppEngineDeploymentConfigurator
@@ -60,15 +57,7 @@ public class AppEngineDeploymentConfigurator
   @Override
   public AppEngineDeploymentConfiguration createDefaultConfiguration(
       @NotNull DeploymentSource source) {
-    AppEngineDeploymentConfiguration configuration = new AppEngineDeploymentConfiguration();
-    if (source instanceof AppEngineDeployable) {
-      AppEngineEnvironment environment = ((AppEngineDeployable) source).getEnvironment();
-      if (environment != null && environment.isStandard()) {
-        configuration.setDeployAllConfigs(true);
-      }
-    }
-
-    return configuration;
+    return new AppEngineDeploymentConfiguration();
   }
 
   @Nullable
