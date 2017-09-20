@@ -41,7 +41,7 @@ public final class AppEngineStandardDeploymentEditor
   private Project project;
   private AppEngineDeployable deploymentSource;
 
-  private static final boolean DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT = false;
+  private static final boolean DEPLOY_ALL_APPENGINE_CONFIGS_DEFAULT = true;
 
   /** Initializes the UI components. */
   public AppEngineStandardDeploymentEditor(Project project, AppEngineDeployable deploymentSource) {
