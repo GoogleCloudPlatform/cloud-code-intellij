@@ -38,7 +38,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="b5290" class="javax.swing.JTable" binding="bucketContentTable">
+          <component id="b5290" class="javax.swing.JTable" binding="bucketContentTable" custom-create="true">
             <constraints/>
             <properties/>
           </component>
