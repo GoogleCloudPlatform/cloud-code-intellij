@@ -47,7 +47,7 @@ final class GcsBucketContentEditorPanel {
 
   private static final Color MEDIUM_GRAY = new Color(96, 96, 96);
 
-      GcsBucketContentEditorPanel(@NotNull Bucket bucket) {
+  GcsBucketContentEditorPanel(@NotNull Bucket bucket) {
     this.bucket = bucket;
 
     bucketContentTable.addMouseListener(
