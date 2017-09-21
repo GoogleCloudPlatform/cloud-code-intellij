@@ -35,6 +35,14 @@ public class GcsBreadcrumbsTextPane extends JTextPane {
   private String currentDirectoryPath;
 
   /**
+   * See {@link #render(String, String)}. Renders the root directory of the breadcrumb navigation
+   * display.
+   */
+  void render(String bucketName) {
+    render(bucketName, "");
+  }
+
+  /**
    * Renders the breadcrumb navigation display.
    *
    * <p>The display consists of the bucket name (linking to the root directory of the bucket)

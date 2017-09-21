@@ -97,7 +97,7 @@ final class GcsBucketContentEditorPanel {
       tableModel.setDataVector(blobs, "");
       bucketContentTable.setModel(tableModel);
     }
-    breadcrumbs.render(bucket.getName(), "");
+    breadcrumbs.render(bucket.getName());
   }
 
   void updateTableModel(String prefix) {
