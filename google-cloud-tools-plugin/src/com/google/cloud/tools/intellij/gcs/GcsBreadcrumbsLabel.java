@@ -46,10 +46,10 @@ public class GcsBreadcrumbsLabel extends JTextPane {
     currentDirectoryPath = directoryPath;
 
     String labelText =
-        "<html><p>"
+        "<html><font face='sans' size='-1'>"
             + getBucketNameForDisplay(bucketName, directoryPath)
             + getDirectoryPathForDisplay(directoryPath)
-            + "</p></html>";
+            + "</font></html>";
     setText(labelText);
   }
 
