@@ -27,10 +27,6 @@ import javax.swing.table.TableCellRenderer;
 /** Custom {@link TableCellRenderer} for rendering blob name cells. */
 final class GcsBlobNameCellRenderer extends DefaultTableCellRenderer {
 
-  GcsBlobNameCellRenderer() {
-    setOpaque(true);
-  }
-
   @Override
   public Component getTableCellRendererComponent(
       JTable table, Object blobName, boolean isSelected, boolean hasFocus, int row, int column) {
