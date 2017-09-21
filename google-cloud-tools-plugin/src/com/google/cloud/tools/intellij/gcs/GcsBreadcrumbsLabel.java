@@ -31,13 +31,21 @@ public class GcsBreadcrumbsLabel extends JTextPane {
   private static final String BREADCRUMB_SEPARATOR = " / ";
   private static final String DIRECTORY_SEPARATOR = "/";
 
+  private String currentDirectoryPath;
+
   void render(String bucketName, String directoryPath) {
+    currentDirectoryPath = directoryPath;
+
     String labelText =
         "<html><p>"
             + getBucketNameForDisplay(bucketName, directoryPath)
             + getDirectoryPathForDisplay(directoryPath)
             + "</p></html>";
     setText(labelText);
+  }
+
+  public String getCurrentDirectoryPath() {
+    return currentDirectoryPath;
   }
 
   private static String getBucketNameForDisplay(String bucketName, String directoryPath) {

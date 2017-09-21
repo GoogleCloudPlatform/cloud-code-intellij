@@ -67,9 +67,7 @@ final class GcsBucketContentEditorPanel {
         });
 
     refreshButton.addActionListener(
-        event -> {
-          // TODO need to get current location in browser, so implement breadcrumbs first
-        });
+        event -> updateTableModel(breadcrumbs.getCurrentDirectoryPath()));
 
     breadcrumbs.addHyperlinkListener(
         event -> {
@@ -99,6 +97,7 @@ final class GcsBucketContentEditorPanel {
       tableModel.setDataVector(blobs, "");
       bucketContentTable.setModel(tableModel);
     }
+    breadcrumbs.render(bucket.getName(), "");
   }
 
   void updateTableModel(String prefix) {
