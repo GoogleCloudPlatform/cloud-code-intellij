@@ -24,8 +24,9 @@ import javax.swing.JTextPane;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * GUI element for breadcrumb navigation in bucket folder hierarchy. Renders the directory elements
- * together with the links to individual directories.
+ * Custom {@link JTextPane} implementation for breadcrumb navigation representing the bucket folder
+ * hierarchy leading up to the current directory. Renders the directory elements and navigable links
+ * to individual directories.
  */
 public class GcsBreadcrumbsLabel extends JTextPane {
   private static final String BREADCRUMB_SEPARATOR = " / ";
@@ -33,6 +34,14 @@ public class GcsBreadcrumbsLabel extends JTextPane {
 
   private String currentDirectoryPath;
 
+  /**
+   * Renders the breadcrumb navigation display.
+   *
+   * <p>The display consists of the bucket name (linking to the root directory of the bucket)
+   * followed by each directory leading up to the current directory. For example:
+   *
+   * <p>"bucket_name / dir1 / dir2"
+   */
   void render(String bucketName, String directoryPath) {
     currentDirectoryPath = directoryPath;
 
@@ -44,7 +53,7 @@ public class GcsBreadcrumbsLabel extends JTextPane {
     setText(labelText);
   }
 
-  public String getCurrentDirectoryPath() {
+  String getCurrentDirectoryPath() {
     return currentDirectoryPath;
   }
 
