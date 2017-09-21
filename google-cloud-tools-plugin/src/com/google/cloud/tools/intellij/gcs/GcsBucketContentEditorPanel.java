@@ -43,7 +43,7 @@ final class GcsBucketContentEditorPanel {
   private JPanel bucketContentEditorPanel;
   private JTable bucketContentTable;
   private JButton refreshButton;
-  private GcsBreadcrumbsLabel breadcrumbs;
+  private GcsBreadcrumbsTextPane breadcrumbs;
   private GcsBlobTableModel tableModel;
 
   private static final Color MEDIUM_GRAY = new Color(96, 96, 96);

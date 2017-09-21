@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
  * hierarchy leading up to the current directory. Renders the directory elements and navigable links
  * to individual directories.
  */
-public class GcsBreadcrumbsLabel extends JTextPane {
+public class GcsBreadcrumbsTextPane extends JTextPane {
   private static final String BREADCRUMB_SEPARATOR = " / ";
   private static final String DIRECTORY_SEPARATOR = "/";
 
