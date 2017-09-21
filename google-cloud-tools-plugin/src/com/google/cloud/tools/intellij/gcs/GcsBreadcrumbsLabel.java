@@ -40,7 +40,7 @@ public class GcsBreadcrumbsLabel extends JTextPane {
    * <p>The display consists of the bucket name (linking to the root directory of the bucket)
    * followed by each directory leading up to the current directory. For example:
    *
-   * <p>"bucket_name / dir1 / dir2"
+   * <p>"bucket_name / parent_dir_1 / parent_dir_2 / current_dir"
    */
   void render(String bucketName, String directoryPath) {
     currentDirectoryPath = directoryPath;
