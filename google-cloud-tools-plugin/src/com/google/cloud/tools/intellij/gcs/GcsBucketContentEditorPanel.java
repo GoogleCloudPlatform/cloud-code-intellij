@@ -21,11 +21,16 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import org.jetbrains.annotations.NotNull;
 
 /** Defines the Google Cloud Storage bucket content browsing UI panel. */
@@ -39,6 +44,8 @@ final class GcsBucketContentEditorPanel {
   private JPanel breadCrumbsPanel;
   private JTable bucketContentTable;
   private GcsBlobTableModel tableModel;
+
+  private static final Color MEDIUM_GRAY = new Color(96, 96, 96);
 
   GcsBucketContentEditorPanel(@NotNull Bucket bucket) {
     this.bucket = bucket;
@@ -57,6 +64,15 @@ final class GcsBucketContentEditorPanel {
             }
           }
         });
+    bucketContentTable.setRowHeight(23);
+    bucketContentTable.setForeground(MEDIUM_GRAY);
+
+    JTableHeader tableHeader = bucketContentTable.getTableHeader();
+    Font tableHeaderFont = tableHeader.getFont();
+    tableHeader.setFont(
+        new Font(tableHeaderFont.getFontName(), Font.BOLD, tableHeaderFont.getSize()));
+    tableHeader.setForeground(MEDIUM_GRAY);
+    tableHeader.setAlignmentX(JLabel.LEFT);
   }
 
   void initTableModel() {
@@ -99,5 +115,18 @@ final class GcsBucketContentEditorPanel {
   @VisibleForTesting
   JTable getBucketContentTable() {
     return bucketContentTable;
+  }
+
+  private void createUIComponents() {
+    bucketContentTable =
+        new JTable() {
+          @Override
+          public TableCellRenderer getCellRenderer(int row, int column) {
+            if (column == 0) {
+              return new GcsBlobNameCellRenderer();
+            }
+            return super.getCellRenderer(row, column);
+          }
+        };
   }
 }
