@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.gcs;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage.BlobListOption;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import java.awt.Color;
@@ -97,7 +98,7 @@ final class GcsBucketContentEditorPanel {
   void initTableModel() {
     List<Blob> blobs = getBlobsStartingWith("");
     if (blobs.isEmpty()) {
-      showEmptyBlobs("No files found in this bucket");
+      showEmptyBlobs(GctBundle.message("gcs.content.explorer.no.files.in.bucket"));
     } else {
       showBlobTable();
       tableModel = new GcsBlobTableModel();
@@ -118,7 +119,9 @@ final class GcsBucketContentEditorPanel {
 
     if (isEmptyDirectory(prefix, blobs)) {
       String message =
-          prefix.isEmpty() ? "No files found in this bucket" : "No files found in this directory";
+          prefix.isEmpty()
+              ? GctBundle.message("gcs.content.explorer.no.files.in.bucket")
+              : GctBundle.message("gcs.content.explorer.no.files.in.directory");
       showEmptyBlobs(message);
     } else {
       showBlobTable();
