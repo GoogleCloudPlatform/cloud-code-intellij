@@ -162,7 +162,7 @@ public class GcsBucketContentEditorPanelTest {
 
     assertFalse(bucketScrollPane.isVisible());
     assertTrue(noBlobsPanel.isVisible());
-    assertThat(noBlobsLabel.getText()).isEqualTo("No files found in this bucket");
+    assertThat(noBlobsLabel.getText()).isEqualTo("No files or directories found in this bucket");
 
     // add blobs and update bucket
     setBlobs(binaryBlob);
@@ -190,7 +190,7 @@ public class GcsBucketContentEditorPanelTest {
 
     assertFalse(bucketScrollPane.isVisible());
     assertTrue(noBlobsPanel.isVisible());
-    assertThat(noBlobsLabel.getText()).isEqualTo("No files found in this bucket");
+    assertThat(noBlobsLabel.getText()).isEqualTo("No files or directories found in this bucket");
   }
 
   @Test

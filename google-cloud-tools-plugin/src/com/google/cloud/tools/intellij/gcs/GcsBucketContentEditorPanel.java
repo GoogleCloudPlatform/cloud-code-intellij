@@ -98,7 +98,7 @@ final class GcsBucketContentEditorPanel {
   void initTableModel() {
     List<Blob> blobs = getBlobsStartingWith("");
     if (blobs.isEmpty()) {
-      showEmptyBlobs(GctBundle.message("gcs.content.explorer.no.files.in.bucket"));
+      showEmptyBlobs(GctBundle.message("gcs.content.explorer.empty.bucket.text"));
     } else {
       showBlobTable();
       tableModel = new GcsBlobTableModel();
@@ -120,8 +120,8 @@ final class GcsBucketContentEditorPanel {
     if (isEmptyDirectory(prefix, blobs)) {
       String message =
           prefix.isEmpty()
-              ? GctBundle.message("gcs.content.explorer.no.files.in.bucket")
-              : GctBundle.message("gcs.content.explorer.no.files.in.directory");
+              ? GctBundle.message("gcs.content.explorer.empty.bucket.text")
+              : GctBundle.message("gcs.content.explorer.empty.directory.text");
       showEmptyBlobs(message);
     } else {
       showBlobTable();
