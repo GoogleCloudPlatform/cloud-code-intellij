@@ -26,23 +26,24 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import org.jetbrains.annotations.NotNull;
 
 /** Defines the Google Cloud Storage bucket content browsing UI panel. */
-// TODO(eshaul) implement toolbar panel and breadcrumb browser
 final class GcsBucketContentEditorPanel {
 
   private final Bucket bucket;
 
   private JPanel bucketContentEditorPanel;
-  private JPanel bucketContentToolbarPanel;
-  private JPanel breadCrumbsPanel;
   private JTable bucketContentTable;
+  private JButton refreshButton;
+  private GcsBreadcrumbsTextPane breadcrumbs;
   private GcsBlobTableModel tableModel;
 
   private static final Color MEDIUM_GRAY = new Color(96, 96, 96);
@@ -64,6 +65,20 @@ final class GcsBucketContentEditorPanel {
             }
           }
         });
+
+    refreshButton.addActionListener(
+        event -> updateTableModel(breadcrumbs.getCurrentDirectoryPath()));
+
+    breadcrumbs.addHyperlinkListener(
+        event -> {
+          if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            String prefix = event.getDescription();
+            updateTableModel(prefix);
+          }
+        });
+
+    breadcrumbs.setBackground(bucketContentEditorPanel.getBackground());
+
     bucketContentTable.setRowHeight(23);
     bucketContentTable.setForeground(MEDIUM_GRAY);
 
@@ -82,12 +97,14 @@ final class GcsBucketContentEditorPanel {
       tableModel.setDataVector(blobs, "");
       bucketContentTable.setModel(tableModel);
     }
+    breadcrumbs.render(bucket.getName());
   }
 
   void updateTableModel(String prefix) {
     tableModel.setRowCount(0);
     tableModel.setDataVector(getBlobsStartingWith(prefix), prefix);
     tableModel.fireTableDataChanged();
+    breadcrumbs.render(bucket.getName(), prefix);
   }
 
   /**

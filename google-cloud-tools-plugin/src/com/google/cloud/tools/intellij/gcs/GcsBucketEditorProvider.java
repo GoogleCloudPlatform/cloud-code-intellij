@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.gcs;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
 import com.intellij.openapi.fileEditor.FileEditorProvider;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Provider of {@link GcsBucketContentEditor}'s for browsing Google Cloud Storage bucket contents.
  */
-public final class GcsBucketEditorProvider implements FileEditorProvider {
+public final class GcsBucketEditorProvider implements FileEditorProvider, DumbAware {
 
   private static final String GCS_EDITOR_TYPE_ID = "gcs-bucket-content-editor";
 
