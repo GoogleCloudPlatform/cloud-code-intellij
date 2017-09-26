@@ -65,18 +65,6 @@ public final class AppEngineDeploymentConfiguratorTest {
   }
 
   @Test
-  public void createDefaultConfiguration_withStandardEnvironment_doesSetDeployAllConfigs() {
-    when(mockAppEngineDeployable.getEnvironment()).thenReturn(APP_ENGINE_STANDARD);
-
-    AppEngineDeploymentConfiguration configuration =
-        configurator.createDefaultConfiguration(mockAppEngineDeployable);
-
-    AppEngineDeploymentConfiguration expectedConfig = new AppEngineDeploymentConfiguration();
-    expectedConfig.setDeployAllConfigs(true);
-    assertThat(configuration).isEqualTo(expectedConfig);
-  }
-
-  @Test
   public void createDefaultConfiguration_withDifferentDeploymentSource_doesReturnDefaultConfig() {
     AppEngineDeploymentConfiguration configuration =
         configurator.createDefaultConfiguration(mockDeploymentSource);

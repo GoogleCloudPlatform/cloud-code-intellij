@@ -134,7 +134,7 @@ public final class AppEngineStandardDeploymentEditorTest {
     assertThat(configuration.isPromote()).isFalse();
     assertThat(configuration.isStopPreviousVersion()).isFalse();
     assertThat(configuration.getVersion()).isEmpty();
-    assertThat(configuration.isDeployAllConfigs()).isFalse();
+    assertThat(configuration.isDeployAllConfigs()).isTrue();
     assertThat(configuration.getModuleName()).isNull();
   }
 

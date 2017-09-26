@@ -17,34 +17,112 @@
 package com.google.cloud.tools.intellij.gcs;
 
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterators;
-import java.util.Arrays;
+import com.google.common.collect.Lists;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
-import java.util.Vector;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import org.jetbrains.annotations.NotNull;
 
 /** Defines the Google Cloud Storage bucket content browsing UI panel. */
-// TODO(eshaul) work in progress
 final class GcsBucketContentEditorPanel {
 
+  private final Bucket bucket;
+
   private JPanel bucketContentEditorPanel;
-  private JPanel bucketContentToolbarPanel;
-  private JPanel breadCrumbsPanel;
   private JTable bucketContentTable;
+  private JButton refreshButton;
+  private GcsBreadcrumbsTextPane breadcrumbs;
+  private GcsBlobTableModel tableModel;
 
-  private static final List<String> TABLE_COL_HEADER =
-      Arrays.asList("Name", "Size", "Type", "Last Modified");
+  private static final Color MEDIUM_GRAY = new Color(96, 96, 96);
 
-  void setTableModel(@NotNull Iterable<Blob> blobs) {
-    if (Iterators.size(blobs.iterator()) != 0) {
-      bucketContentTable.setModel(new GcsBucketTableModel(blobs));
+  GcsBucketContentEditorPanel(@NotNull Bucket bucket) {
+    this.bucket = bucket;
+
+    bucketContentTable.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent event) {
+            if (event.getClickCount() == 2 && tableModel != null) {
+              Blob selectedBlob =
+                  tableModel.getBlobAt(bucketContentTable.rowAtPoint(event.getPoint()));
+
+              if (selectedBlob.isDirectory()) {
+                updateTableModel(selectedBlob.getName());
+              }
+            }
+          }
+        });
+
+    refreshButton.addActionListener(
+        event -> updateTableModel(breadcrumbs.getCurrentDirectoryPath()));
+
+    breadcrumbs.addHyperlinkListener(
+        event -> {
+          if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            String prefix = event.getDescription();
+            updateTableModel(prefix);
+          }
+        });
+
+    breadcrumbs.setBackground(bucketContentEditorPanel.getBackground());
+
+    bucketContentTable.setRowHeight(23);
+    bucketContentTable.setForeground(MEDIUM_GRAY);
+
+    JTableHeader tableHeader = bucketContentTable.getTableHeader();
+    Font tableHeaderFont = tableHeader.getFont();
+    tableHeader.setFont(
+        new Font(tableHeaderFont.getFontName(), Font.BOLD, tableHeaderFont.getSize()));
+    tableHeader.setForeground(MEDIUM_GRAY);
+    tableHeader.setAlignmentX(JLabel.LEFT);
+  }
+
+  void initTableModel() {
+    List<Blob> blobs = getBlobsStartingWith("");
+    if (!blobs.isEmpty()) {
+      tableModel = new GcsBlobTableModel();
+      tableModel.setDataVector(blobs, "");
+      bucketContentTable.setModel(tableModel);
     }
+    breadcrumbs.render(bucket.getName());
+  }
+
+  void updateTableModel(String prefix) {
+    tableModel.setRowCount(0);
+    tableModel.setDataVector(getBlobsStartingWith(prefix), prefix);
+    tableModel.fireTableDataChanged();
+    breadcrumbs.render(bucket.getName(), prefix);
+  }
+
+  /**
+   * Returns the list of {@link Blob blobs} that start with the given prefix.
+   *
+   * <p>In the GCS backend there are no directories, just blobs with names. Implicit in the name,
+   * however, is a directory structure (e.g. "dir1/dir2/blob.zip"). Therefore, in order to create a
+   * directory browsing experience, we need to "unflatten" the blobs into a directory structure.
+   *
+   * <p>{@link Bucket#list(BlobListOption...)} provides options to help simulate directories by
+   * supplying the {@link BlobListOption#currentDirectory()} and {@link
+   * BlobListOption#prefix(String)} options. The prefix acts as the current directory for the blobs
+   * we wish to fetch.
+   */
+  // TODO(eshaul) should be done asynchronously and show loader in the UI
+  private List<Blob> getBlobsStartingWith(String prefix) {
+    return Lists.newArrayList(
+        bucket.list(BlobListOption.currentDirectory(), BlobListOption.prefix(prefix)).iterateAll());
   }
 
   JPanel getComponent() {
@@ -56,31 +134,16 @@ final class GcsBucketContentEditorPanel {
     return bucketContentTable;
   }
 
-  private static final class GcsBucketTableModel extends DefaultTableModel {
-
-    GcsBucketTableModel(Iterable<Blob> blobs) {
-      super();
-      setDataVector(buildDataVector(blobs), new Vector<>(TABLE_COL_HEADER));
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int column) {
-      return false;
-    }
-
-    // TODO(eshaul) this is a placeholder implementation; need to complete.
-    private Vector<Vector<String>> buildDataVector(Iterable<Blob> blobs) {
-      return StreamSupport.stream(blobs.spliterator(), false)
-          .map(
-              blob -> {
-                Vector<String> rowData = new Vector<>();
-                rowData.add(blob.getName());
-                rowData.add("--");
-                rowData.add("--");
-                rowData.add("--");
-                return rowData;
-              })
-          .collect(Collectors.toCollection(Vector::new));
-    }
+  private void createUIComponents() {
+    bucketContentTable =
+        new JTable() {
+          @Override
+          public TableCellRenderer getCellRenderer(int row, int column) {
+            if (column == 0) {
+              return new GcsBlobNameCellRenderer();
+            }
+            return super.getCellRenderer(row, column);
+          }
+        };
   }
 }

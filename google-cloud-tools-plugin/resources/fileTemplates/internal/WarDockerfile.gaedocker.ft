@@ -1,2 +1,3 @@
 FROM gcr.io/google_appengine/jetty
-ADD target.war $JETTY_BASE/webapps/root.war
+# Replace YOUR_ARTIFACT_NAME_HERE with the name of the deployed war
+ADD YOUR_ARTIFACT_NAME_HERE.war $JETTY_BASE/webapps/root.war

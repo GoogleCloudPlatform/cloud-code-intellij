@@ -1,6 +1,30 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 17.9.1
+
+### Added
+  - Added the ability to change the name of the staged artifact for App Engine flexible deployments.
+    [1610](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1610)
+
+### Changed
+  - App Engine flexible deployment configurations now default to deploy the artifact as-is, without
+    renaming to `target.jar` or `target.war`. [1151](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1151)
+  - Updated the name of the placeholder artifact name in the generated Dockerfile templates to make 
+    it clearer that it needs to be updated by the user. [1648](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1648) 
+  - App Engine standard deployment configurations now default to update dos, dispatch, cron, queues,
+    and datastore indexes. [1613](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1613)
+  - Native projects that add support for Cloud Endpoints Frameworks for App Engine will now use
+    Endpoints V2. [1612](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1612)
+
+### Fixed
+  - Fixed the `Deployment source not found` error when deploying Maven artifacts.
+    [1220](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1220)
+  - Fixed the scale of the user icon on HiDPI displays.
+    [1633](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1633)
+  - Fixed an issue where the plugin was downgraded on the IDEA 2017.3 EAP.
+    [1631](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1631)
+
 ## 17.8.2 
 
 ### Fixed
