@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 import com.google.cloud.tools.intellij.appengine.descriptor.dom.AppEngineStandardWebApp;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider;
 import com.google.common.collect.ImmutableList;
-
+import com.google.common.collect.ImmutableMap;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
@@ -28,13 +28,21 @@ import com.intellij.openapi.module.Module;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomManager;
-
+import org.apache.commons.lang3.JavaVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** @author nik */
 public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfiguration> {
 
+  private static final ImmutableMap<String, JavaVersion> RUNTIMES_MAP =
+      ImmutableMap.of(
+          "java",
+          JavaVersion.JAVA_1_7,
+          "java7",
+          JavaVersion.JAVA_1_7,
+          "java8",
+          JavaVersion.JAVA_1_8);
 
   public AppEngineStandardFacet(
       @NotNull FacetType facetType,
@@ -44,8 +52,8 @@ public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfigur
     super(facetType, module, name, configuration, null);
   }
 
-  public static FacetType<AppEngineStandardFacet,
-      AppEngineStandardFacetConfiguration> getFacetType() {
+  public static FacetType<AppEngineStandardFacet, AppEngineStandardFacetConfiguration>
+      getFacetType() {
     return FacetTypeRegistry.getInstance().findFacetType(AppEngineStandardFacetType.ID);
   }
 
@@ -85,10 +93,25 @@ public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfigur
     return isFlexCompatEnvironment() || isManagedVmCompatEnvironment();
   }
 
-  public boolean isJava8Runtime() {
+  /**
+   * Returns the {@link JavaVersion} of the Java runtime, as defined in the {@code
+   * appengine-web.xml}.
+   *
+   * <p>If no runtime is specified in the {@code appengine-web.xml} or if the specified runtime is
+   * not valid, {@link JavaVersion#JAVA_1_7} is returned.
+   */
+  public JavaVersion getRuntimeJavaVersion() {
     AppEngineStandardWebApp appEngineStandardWebApp = getAppEngineStandardWebXml();
-    return appEngineStandardWebApp != null
-        && "java8".equalsIgnoreCase(appEngineStandardWebApp.getRuntime().getStringValue());
+    if (appEngineStandardWebApp != null) {
+      String runtimeString = appEngineStandardWebApp.getRuntime().getStringValue();
+      JavaVersion runtimeVersion = RUNTIMES_MAP.get(runtimeString);
+      if (runtimeVersion != null) {
+        return runtimeVersion;
+      }
+    }
+
+    // The default runtime is Java 7.
+    return JavaVersion.JAVA_1_7;
   }
 
   @Nullable

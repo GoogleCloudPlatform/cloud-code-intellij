@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.inspections;
 
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-
 import com.intellij.codeHighlighting.HighlightDisplayLevel;
 import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.InspectionManager;
@@ -47,12 +46,11 @@ import com.intellij.psi.PsiNewExpression;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.ClassUtil;
-
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.JavaVersion;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author nik
@@ -66,7 +64,11 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
     Module module = ModuleUtilCore.findModuleForPsiElement(file);
     final AppEngineStandardFacet appEngineStandardFacet
         = AppEngineStandardFacet.getAppEngineFacetByModule(module);
-    if (appEngineStandardFacet == null || appEngineStandardFacet.isJava8Runtime()) {
+    if (appEngineStandardFacet == null) {
+      return null;
+    }
+
+    if (appEngineStandardFacet.getRuntimeJavaVersion().atLeast(JavaVersion.JAVA_1_8)) {
       return null;
     }
 

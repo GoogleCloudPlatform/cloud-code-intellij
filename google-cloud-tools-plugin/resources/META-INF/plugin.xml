@@ -44,6 +44,15 @@
       </p>
       <br/>
 
+      <h2>[17.9.2]</h2>
+
+      <p>Java 8 on App Engine standard environment is now <a href="https://cloudplatform.googleblog.com/2017/09/Java-8-on-App-Engine-Standard-environment-is-now-generally-available.html">generally available</a>.</p>
+
+      <h3>Changed</h3>
+      <ul>
+        <li>Updated the new App Engine standard project wizard to generate Java 8 applications by default. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1641">#1641</a>)</li>
+      </ul>
+
       <h2>[17.9.1]</h2>
       <h3>Added</h3>
       <ul>
