@@ -3,7 +3,7 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 
 ## 17.9.2
 
-Java 8 on App Engine standard environment is now generally available.
+Java 8 on App Engine standard environment is now [generally available](https://cloudplatform.googleblog.com/2017/09/Java-8-on-App-Engine-Standard-environment-is-now-generally-available.html).
 
 ### Changed
   - Updated the new App Engine standard project wizard to generate Java 8 applications by default.
