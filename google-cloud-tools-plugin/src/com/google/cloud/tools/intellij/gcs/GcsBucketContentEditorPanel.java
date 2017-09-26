@@ -165,7 +165,7 @@ final class GcsBucketContentEditorPanel {
    * Tests if a given directory prefix is empty. A directory is empty if there are no blobs or if
    * the only blob matches the current directory prefix.
    */
-  private boolean isEmptyDirectory(String prefix, List<Blob> blobs) {
+  private static boolean isEmptyDirectory(String prefix, List<Blob> blobs) {
     return blobs.isEmpty() || (blobs.size() == 1 && blobs.get(0).getName().equals(prefix));
   }
 
