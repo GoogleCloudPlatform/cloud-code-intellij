@@ -88,6 +88,7 @@ public class GcsBucketContentEditorPanelTest {
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getColumnCount()).isEqualTo(0);
     assertThat(bucketTable.getRowCount()).isEqualTo(0);
+    assertFalse(editorPanel.getLoadingPanel().isVisible());
   }
 
   @Test

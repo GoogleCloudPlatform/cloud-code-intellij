@@ -109,6 +109,7 @@ public final class CloudToolsRule implements TestRule {
     createTestFiles(description.getMethodName());
     createTestDirectories();
     bindDirectExecutorService();
+    bindSynchronousEDTInvocator();
   }
 
   /** Tears down utilities after the test has finished. */
@@ -229,6 +230,11 @@ public final class CloudToolsRule implements TestRule {
   /** Binds the executor service in {@link ThreadUtil} to a direct executor service. */
   private void bindDirectExecutorService() {
     ThreadUtil.getInstance().setBackgroundExecutorService(MoreExecutors.newDirectExecutorService());
+  }
+
+  /** Binds the EDT invocator to a synchronous one. */
+  private void bindSynchronousEDTInvocator() {
+    ThreadUtil.getInstance().setSynchronousEDTInvocator();
   }
 
   /**
