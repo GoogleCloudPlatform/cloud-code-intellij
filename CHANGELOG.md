@@ -1,6 +1,14 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 17.9.2
+
+Java 8 on App Engine standard environment is now [generally available](https://cloudplatform.googleblog.com/2017/09/Java-8-on-App-Engine-Standard-environment-is-now-generally-available.html).
+
+### Changed
+  - Updated the new App Engine standard project wizard to generate Java 8 applications by default.
+    [1641](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1641)
+
 ## 17.9.1
 
 ### Added
