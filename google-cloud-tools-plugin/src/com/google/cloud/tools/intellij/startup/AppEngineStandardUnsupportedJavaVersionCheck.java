@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.startup;
 
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -34,13 +33,12 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.pom.java.LanguageLevel;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
 import javax.swing.event.HyperlinkEvent;
+import org.apache.commons.lang3.JavaVersion;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A StartupActivity that warns the user if they are using a Java language level that corresponds to
@@ -76,29 +74,23 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
     ApplicationManager.getApplication()
         .runReadAction(
             () -> {
-              for (Module module : projectModules) {
-                AppEngineStandardFacet appEngineFacet =
-                    AppEngineStandardFacet.getAppEngineFacetByModule(module);
-                if (appEngineFacet != null) {
-                  // this is a standard app
-                  if (!appEngineFacet.isNonStandardCompatEnvironment()) {
-                    // this is targeting the standard environment
-                    if (!appEngineFacet.isJava8Runtime()) {
-                      // The runtime only supports Java 7 or below.
-                      if (usesJava8OrGreater(module)) {
-                        invalidModules.add(module);
-                      }
-                    }
-                  }
-                }
-              }
+              Arrays.stream(projectModules)
+                  .filter(this::usesJava8OrGreater)
+                  .filter(
+                      module -> {
+                        AppEngineStandardFacet facet =
+                            AppEngineStandardFacet.getAppEngineFacetByModule(module);
+                        return !(facet == null || facet.isNonStandardCompatEnvironment())
+                            && facet.getRuntimeJavaVersion().compareTo(JavaVersion.JAVA_1_8) < 0;
+                      })
+                  .forEach(invalidModules::add);
             });
     return invalidModules;
   }
 
   private boolean usesJava8OrGreater(Module module) {
     LanguageLevel languageLevel = EffectiveLanguageLevelUtil.getEffectiveLanguageLevel(module);
-    return languageLevel.compareTo(LanguageLevel.JDK_1_8) >= 0;
+    return languageLevel.isAtLeast(LanguageLevel.JDK_1_8);
   }
 
   private void warnUser(Project project, List<Module> invalidModules) {
