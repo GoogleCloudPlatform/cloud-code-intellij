@@ -51,7 +51,7 @@ public final class ThreadUtil {
   }
 
   /**
-   * Executes the given {@link Runnable} on even dispatching thread.
+   * Executes the given {@link Runnable} on the event dispatching thread.
    *
    * <p>If {@link #invokeLaterOnEDT} is {@code true} the runnable will be invoked asynchronously,
    * otherwise it will be invoked synchronously.
@@ -87,7 +87,7 @@ public final class ThreadUtil {
   }
 
   /**
-   * Indicates that runnables to be invoked on the EDT should be invoked later in the background.
+   * Indicates that runnables to be invoked on the EDT should be invoked asynchronously.
    */
   @VisibleForTesting
   public void setBackgroundEDTInvocator() {
