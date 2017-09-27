@@ -392,11 +392,14 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   @Override
   public void showPopup(RelativePoint showTarget) {
     if (popup == null || popup.isDisposed()) {
-      popupPanel = new PopupPanel();
+      if (popupPanel == null) {
+        popupPanel = new PopupPanel();
+        popupPanel.initializeContent(getText());
+      }
 
-      popupPanel.initializeContent(getText());
-      ComponentPopupBuilder popup = JBPopupFactory.getInstance()
-          .createComponentPopupBuilder(popupPanel, popupPanel.getInitialFocus());
+      ComponentPopupBuilder popup =
+          JBPopupFactory.getInstance()
+              .createComponentPopupBuilder(popupPanel, popupPanel.getInitialFocus());
       this.popup = popup.createPopup();
     }
     if (!popup.isVisible()) {
@@ -434,7 +437,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
           GoogleUserModelItem userModelItem = (GoogleUserModelItem) path.getLastPathComponent();
           userModelItem.setFilter(filter);
           DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-          model.reload(userModelItem);
+          model.nodeStructureChanged(userModelItem);
         }
       }
     }
