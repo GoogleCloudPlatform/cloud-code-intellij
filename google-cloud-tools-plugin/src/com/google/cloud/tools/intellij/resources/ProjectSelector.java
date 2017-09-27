@@ -433,14 +433,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         if (path.getLastPathComponent() instanceof GoogleUserModelItem) {
           GoogleUserModelItem userModelItem = (GoogleUserModelItem) path.getLastPathComponent();
           userModelItem.setFilter(filter);
-
-          boolean isExpanded = tree.isExpanded(path);
           DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
           model.reload(userModelItem);
-
-          if (isExpanded) {
-            tree.expandPath(path);
-          }
         }
       }
     }
