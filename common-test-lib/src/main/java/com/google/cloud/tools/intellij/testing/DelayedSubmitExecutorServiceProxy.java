@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
  * ExecutorService#submit(Runnable)}. This proxy instead stores the supplied {@link Runnable} and
  * then executes it only after {@link #doSubmit()} is invoked.
  */
-public class DelayedSubmitExecutorServiceProxy extends AbstractExecutorService {
+public final class DelayedSubmitExecutorServiceProxy extends AbstractExecutorService {
 
   private final ExecutorService executor;
   private Runnable task;
@@ -81,7 +81,7 @@ public class DelayedSubmitExecutorServiceProxy extends AbstractExecutorService {
   /** Submits the stored task. */
   public Future<?> doSubmit() {
     if (task == null) {
-      throw new IllegalStateException("There is no task to submit.");
+      throw new AssertionError("There is no task to submit.");
     }
     return executor.submit(task);
   }
