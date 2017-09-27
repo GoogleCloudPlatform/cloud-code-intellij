@@ -23,6 +23,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import com.intellij.openapi.application.ApplicationManager;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
@@ -177,7 +178,7 @@ final class GcsBucketContentEditorPanel {
                           .list(BlobListOption.currentDirectory(), BlobListOption.prefix(prefix))
                           .iterateAll());
               hideLoader();
-              ThreadUtil.getInstance().invokeLaterOnEDT(() -> afterLoad.accept(blobs));
+              ApplicationManager.getApplication().invokeAndWait(() -> afterLoad.accept(blobs));
             });
   }
 

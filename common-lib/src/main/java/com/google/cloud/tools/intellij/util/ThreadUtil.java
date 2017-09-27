@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.util;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.intellij.openapi.application.ApplicationManager;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -28,7 +27,6 @@ public final class ThreadUtil {
   private static final ThreadUtil INSTANCE = new ThreadUtil();
 
   private ExecutorService backgroundExecutorService;
-  private boolean invokeLaterOnEDT = true;
 
   /** Visibility is restricted internally; use {@link #getInstance()} instead. */
   private ThreadUtil() {
@@ -51,22 +49,6 @@ public final class ThreadUtil {
   }
 
   /**
-   * Executes the given {@link Runnable} on the event dispatching thread.
-   *
-   * <p>If {@link #invokeLaterOnEDT} is {@code true} the runnable will be invoked asynchronously,
-   * otherwise it will be invoked synchronously.
-   *
-   * @param runnable the {@link Runnable} to run on the EDT.
-   */
-  public void invokeLaterOnEDT(Runnable runnable) {
-    if (invokeLaterOnEDT) {
-      ApplicationManager.getApplication().invokeLater(runnable);
-    } else {
-      ApplicationManager.getApplication().invokeAndWait(runnable);
-    }
-  }
-
-  /**
    * Sets the {@link ExecutorService} used for executing background tasks.
    *
    * <p>This should only be used by unit tests to replace the default {@link ExecutorService} with
@@ -84,25 +66,5 @@ public final class ThreadUtil {
   @VisibleForTesting
   public void setBackgroundExecutorService(ExecutorService backgroundExecutorService) {
     this.backgroundExecutorService = backgroundExecutorService;
-  }
-
-  /**
-   * Indicates that runnables to be invoked on the EDT should be invoked asynchronously.
-   */
-  @VisibleForTesting
-  public void setBackgroundEDTInvocator() {
-    this.invokeLaterOnEDT = true;
-  }
-
-  /**
-   * Indicates that runnables to be invoked on the EDT should be invoked synchronously.
-   *
-   * <p>This should only be used by unit tests to replace behavior of {@link
-   * #executeInBackground(Runnable)} from running Swing EDT tasks in the background to having them
-   * block.
-   */
-  @VisibleForTesting
-  public void setSynchronousEDTInvocator() {
-    this.invokeLaterOnEDT = false;
   }
 }
