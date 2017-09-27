@@ -24,11 +24,14 @@ import static org.mockito.Mockito.when;
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.DelayedSubmitExecutorServiceProxy;
 import com.google.cloud.tools.intellij.testing.TimeZoneRule;
+import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -88,6 +91,21 @@ public class GcsBucketContentEditorPanelTest {
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getColumnCount()).isEqualTo(0);
     assertThat(bucketTable.getRowCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void testLoadingMessageShown_whenLoadingBuckets() {
+    DelayedSubmitExecutorServiceProxy delayedExecutor =
+        new DelayedSubmitExecutorServiceProxy(MoreExecutors.newDirectExecutorService());
+    ThreadUtil.getInstance().setBackgroundExecutorService(delayedExecutor);
+
+    editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
+    editorPanel.initTableModel();
+
+    assertTrue(editorPanel.getLoadingPanel().isVisible());
+
+    delayedExecutor.doSubmit();
+
     assertFalse(editorPanel.getLoadingPanel().isVisible());
   }
 
