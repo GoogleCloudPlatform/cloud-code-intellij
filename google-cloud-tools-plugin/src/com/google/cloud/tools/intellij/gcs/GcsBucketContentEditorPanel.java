@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.gcs;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage.BlobListOption;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import java.awt.Color;
@@ -29,6 +30,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.JTableHeader;
@@ -44,6 +46,9 @@ final class GcsBucketContentEditorPanel {
   private JTable bucketContentTable;
   private JButton refreshButton;
   private GcsBreadcrumbsTextPane breadcrumbs;
+  private JLabel noBlobsLabel;
+  private JPanel noBlobsPanel;
+  private JScrollPane bucketContentScrollPane;
   private GcsBlobTableModel tableModel;
 
   private static final Color MEDIUM_GRAY = new Color(96, 96, 96);
@@ -92,7 +97,10 @@ final class GcsBucketContentEditorPanel {
 
   void initTableModel() {
     List<Blob> blobs = getBlobsStartingWith("");
-    if (!blobs.isEmpty()) {
+    if (blobs.isEmpty()) {
+      showEmptyBlobs(GctBundle.message("gcs.content.explorer.empty.bucket.text"));
+    } else {
+      showBlobTable();
       tableModel = new GcsBlobTableModel();
       tableModel.setDataVector(blobs, "");
       bucketContentTable.setModel(tableModel);
@@ -101,10 +109,38 @@ final class GcsBucketContentEditorPanel {
   }
 
   void updateTableModel(String prefix) {
+    if (tableModel == null) {
+      initTableModel();
+      return;
+    }
+
     tableModel.setRowCount(0);
-    tableModel.setDataVector(getBlobsStartingWith(prefix), prefix);
-    tableModel.fireTableDataChanged();
+    List<Blob> blobs = getBlobsStartingWith(prefix);
+
+    if (isEmptyDirectory(prefix, blobs)) {
+      String message =
+          prefix.isEmpty()
+              ? GctBundle.message("gcs.content.explorer.empty.bucket.text")
+              : GctBundle.message("gcs.content.explorer.empty.directory.text");
+      showEmptyBlobs(message);
+    } else {
+      showBlobTable();
+
+      tableModel.setDataVector(blobs, prefix);
+      tableModel.fireTableDataChanged();
+    }
     breadcrumbs.render(bucket.getName(), prefix);
+  }
+
+  private void showEmptyBlobs(String message) {
+    bucketContentScrollPane.setVisible(false);
+    noBlobsPanel.setVisible(true);
+    noBlobsLabel.setText(message);
+  }
+
+  private void showBlobTable() {
+    noBlobsPanel.setVisible(false);
+    bucketContentScrollPane.setVisible(true);
   }
 
   /**
@@ -125,6 +161,14 @@ final class GcsBucketContentEditorPanel {
         bucket.list(BlobListOption.currentDirectory(), BlobListOption.prefix(prefix)).iterateAll());
   }
 
+  /**
+   * Tests if a given directory prefix is empty. A directory is empty if there are no blobs or if
+   * the only blob matches the current directory prefix.
+   */
+  private static boolean isEmptyDirectory(String prefix, List<Blob> blobs) {
+    return blobs.isEmpty() || (blobs.size() == 1 && blobs.get(0).getName().equals(prefix));
+  }
+
   JPanel getComponent() {
     return bucketContentEditorPanel;
   }
@@ -132,6 +176,21 @@ final class GcsBucketContentEditorPanel {
   @VisibleForTesting
   JTable getBucketContentTable() {
     return bucketContentTable;
+  }
+
+  @VisibleForTesting
+  JScrollPane getBucketContentScrollPane() {
+    return bucketContentScrollPane;
+  }
+
+  @VisibleForTesting
+  JLabel getNoBlobsLabel() {
+    return noBlobsLabel;
+  }
+
+  @VisibleForTesting
+  JPanel getNoBlobsPanel() {
+    return noBlobsPanel;
   }
 
   private void createUIComponents() {
