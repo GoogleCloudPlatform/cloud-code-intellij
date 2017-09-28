@@ -310,7 +310,8 @@ public class GcsBucketContentEditorPanelTest {
 
   @Test
   public void testErrorMessageIsCleared_afterSuccessfulBucketList() {
-    when(bucketVirtualFile.getBucket().list()).thenThrow(StorageException.class);
+    when(bucketVirtualFile.getBucket().list(any(BlobListOption.class), any(BlobListOption.class)))
+        .thenThrow(StorageException.class);
 
     editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
     editorPanel.initTableModel();
