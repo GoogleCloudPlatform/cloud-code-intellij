@@ -75,6 +75,9 @@ public final class DelayedSubmitExecutorServiceProxy extends AbstractExecutorSer
   /** Stores the submitted {@code task} to be submitted later on {@link #doSubmit()}. */
   @Override
   public Future<?> submit(Runnable task) {
+    if (this.task != null) {
+      throw new AssertionError("A task has already been submitted to this executor.");
+    }
     this.task = task;
     return new FutureTask<>(task, null);
   }
