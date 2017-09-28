@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.testing;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.ExecutorService;
@@ -34,9 +35,9 @@ public final class DelayedSubmitExecutorServiceProxy extends AbstractExecutorSer
   private final ExecutorService executor;
   private Runnable task;
 
-  /** Creates a new instance that is a proxy for the given {@code executor}. */
-  public DelayedSubmitExecutorServiceProxy(ExecutorService executor) {
-    this.executor = executor;
+  /** Creates a new instance that is a proxy for a direct executor. */
+  public DelayedSubmitExecutorServiceProxy() {
+    this.executor = MoreExecutors.newDirectExecutorService();
   }
 
   @Override

@@ -34,7 +34,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -98,8 +97,7 @@ public class GcsBucketContentEditorPanelTest {
 
   @Test
   public void testLoadingMessageShown_whenLoadingBuckets() {
-    DelayedSubmitExecutorServiceProxy delayedExecutor =
-        new DelayedSubmitExecutorServiceProxy(MoreExecutors.newDirectExecutorService());
+    DelayedSubmitExecutorServiceProxy delayedExecutor = new DelayedSubmitExecutorServiceProxy();
     ThreadUtil.getInstance().setBackgroundExecutorService(delayedExecutor);
 
     editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
