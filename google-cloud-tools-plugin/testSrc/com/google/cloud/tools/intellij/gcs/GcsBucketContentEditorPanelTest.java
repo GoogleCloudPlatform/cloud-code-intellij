@@ -20,6 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import com.google.api.gax.paging.Page;
@@ -96,6 +97,7 @@ public class GcsBucketContentEditorPanelTest {
   }
 
   @Test
+  @SuppressWarnings("FutureReturnValueIgnored")
   public void testLoadingMessageShown_whenLoadingBuckets() {
     DelayedSubmitExecutorServiceProxy delayedExecutor = new DelayedSubmitExecutorServiceProxy();
     ThreadUtil.getInstance().setBackgroundExecutorService(delayedExecutor);
@@ -318,8 +320,9 @@ public class GcsBucketContentEditorPanelTest {
 
     assertTrue(editorPanel.getErrorPanel().isVisible());
 
-    // Re-initialize mocks so the exception is not thrown
-    GcsTestUtils.setupVirtualFileWithBucketMocks(bucketVirtualFile);
+    // Re-initialize mocks so the exception is not thrown and update the UI
+    reset(bucketVirtualFile.getBucket());
+    editorPanel.updateTableModel("");
 
     assertFalse(editorPanel.getErrorPanel().isVisible());
   }

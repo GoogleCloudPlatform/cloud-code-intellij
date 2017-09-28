@@ -169,6 +169,7 @@ final class GcsBucketContentEditorPanel {
    * BlobListOption#prefix(String)} options. The prefix acts as the current directory for the blobs
    * we wish to fetch.
    */
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void loadBlobsStartingWith(String prefix, Consumer<List<Blob>> afterLoad) {
     showLoader();
     hideError();
