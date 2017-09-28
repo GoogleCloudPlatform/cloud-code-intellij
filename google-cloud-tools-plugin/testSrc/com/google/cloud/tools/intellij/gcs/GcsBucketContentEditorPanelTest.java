@@ -19,10 +19,13 @@ package com.google.cloud.tools.intellij.gcs;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage.BlobListOption;
+import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.DelayedSubmitExecutorServiceProxy;
 import com.google.cloud.tools.intellij.testing.TimeZoneRule;
@@ -61,15 +64,15 @@ public class GcsBucketContentEditorPanelTest {
   private static final Map<String, Integer> COL_NAME_TO_INDEX = INDEX_TO_COL_NAME.inverse();
 
   private GcsBucketContentEditorPanel editorPanel;
-  private GcsBucketVirtualFile bucketVirtualFile;
 
   @Mock private Blob binaryBlob;
   @Mock private Blob directoryBlob;
   @Mock private Blob binaryBlobInDirectory;
+  @Mock private GcsBucketVirtualFile bucketVirtualFile;
 
   @Before
   public void setUp() {
-    bucketVirtualFile = GcsTestUtils.createVirtualFileWithBucketMocks();
+    GcsTestUtils.setupVirtualFileWithBucketMocks(bucketVirtualFile);
 
     when(directoryBlob.isDirectory()).thenReturn(true);
     when(directoryBlob.getName()).thenReturn(DIR_NAME);
@@ -289,6 +292,35 @@ public class GcsBucketContentEditorPanelTest {
     JTable bucketTable = editorPanel.getBucketContentTable();
 
     assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("100.0 GB");
+  }
+
+  @Test
+  public void testBucketListException_showsErrorMessage() {
+    when(bucketVirtualFile.getBucket().list(any(BlobListOption.class), any(BlobListOption.class)))
+        .thenThrow(StorageException.class);
+
+    editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
+    editorPanel.initTableModel();
+
+    JTable bucketTable = editorPanel.getBucketContentTable();
+    assertThat(bucketTable.getColumnCount()).isEqualTo(0);
+    assertThat(bucketTable.getRowCount()).isEqualTo(0);
+    assertFalse(editorPanel.getNoBlobsPanel().isVisible());
+    assertFalse(editorPanel.getLoadingPanel().isVisible());
+    assertTrue(editorPanel.getErrorPanel().isVisible());
+  }
+
+  @Test
+  public void testErrorMessageIsCleared_afterSuccessfulBucketList() {
+    when(bucketVirtualFile.getBucket().list()).thenThrow(StorageException.class);
+
+    editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
+    editorPanel.initTableModel();
+
+    // Re-initialize mocks so the exception is not thrown
+    GcsTestUtils.setupVirtualFileWithBucketMocks(bucketVirtualFile);
+
+    assertFalse(editorPanel.getErrorPanel().isVisible());
   }
 
   private void initEditorWithBlobs(Blob... blobs) {

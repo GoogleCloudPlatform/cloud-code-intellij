@@ -29,8 +29,8 @@ import java.util.Iterator;
 /** Utilities for GCS related tests. */
 final class GcsTestUtils {
 
-  static GcsBucketVirtualFile createVirtualFileWithBucketMocks() {
-    GcsBucketVirtualFile gcsBucketVirtualFile = mock(GcsBucketVirtualFile.class);
+  static GcsBucketVirtualFile setupVirtualFileWithBucketMocks(
+      GcsBucketVirtualFile gcsBucketVirtualFile) {
     Bucket bucket = mock(Bucket.class);
     Page<Blob> page = mock(Page.class);
     Iterable<Blob> blobIterable = mock(Iterable.class);

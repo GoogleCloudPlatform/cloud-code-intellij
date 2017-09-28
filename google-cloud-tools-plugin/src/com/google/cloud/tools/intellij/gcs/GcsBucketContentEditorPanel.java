@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.gcs;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage.BlobListOption;
+import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.annotations.VisibleForTesting;
@@ -53,6 +54,7 @@ final class GcsBucketContentEditorPanel {
   private JPanel noBlobsPanel;
   private JScrollPane bucketContentScrollPane;
   private JPanel loadingPanel;
+  private JPanel errorPanel;
   private GcsBlobTableModel tableModel;
 
   private static final Color MEDIUM_GRAY = new Color(96, 96, 96);
@@ -169,18 +171,34 @@ final class GcsBucketContentEditorPanel {
    */
   private void loadBlobsStartingWith(String prefix, Consumer<List<Blob>> afterLoad) {
     showLoader();
+    hideError();
     ThreadUtil.getInstance()
         .executeInBackground(
             () -> {
-              List<Blob> blobs =
-                  Lists.newArrayList(
-                      bucket
-                          .list(BlobListOption.currentDirectory(), BlobListOption.prefix(prefix))
-                          .iterateAll());
-              ApplicationManager.getApplication().invokeAndWait(() -> {
-                hideLoader();
-                afterLoad.accept(blobs);
-              });
+              List<Blob> blobs;
+              try {
+                blobs =
+                    Lists.newArrayList(
+                        bucket
+                            .list(BlobListOption.currentDirectory(), BlobListOption.prefix(prefix))
+                            .iterateAll());
+              } catch (StorageException se) {
+                ApplicationManager.getApplication()
+                    .invokeAndWait(
+                        () -> {
+                          hideLoader();
+                          showError();
+                        });
+                return;
+              }
+
+              final List<Blob> loadedBlobs = blobs;
+              ApplicationManager.getApplication()
+                  .invokeAndWait(
+                      () -> {
+                        hideLoader();
+                        afterLoad.accept(loadedBlobs);
+                      });
             });
   }
 
@@ -200,6 +218,14 @@ final class GcsBucketContentEditorPanel {
 
   private void hideLoader() {
     loadingPanel.setVisible(false);
+  }
+
+  private void showError() {
+    errorPanel.setVisible(true);
+  }
+
+  private void hideError() {
+    errorPanel.setVisible(false);
   }
 
   JPanel getComponent() {
@@ -229,6 +255,11 @@ final class GcsBucketContentEditorPanel {
   @VisibleForTesting
   JPanel getNoBlobsPanel() {
     return noBlobsPanel;
+  }
+
+  @VisibleForTesting
+  JPanel getErrorPanel() {
+    return errorPanel;
   }
 
   private void createUIComponents() {
