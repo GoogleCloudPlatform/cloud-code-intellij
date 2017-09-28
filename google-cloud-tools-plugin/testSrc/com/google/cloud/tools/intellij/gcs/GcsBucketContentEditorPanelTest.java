@@ -315,6 +315,8 @@ public class GcsBucketContentEditorPanelTest {
     editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
     editorPanel.initTableModel();
 
+    assertTrue(editorPanel.getErrorPanel().isVisible());
+
     // Re-initialize mocks so the exception is not thrown
     GcsTestUtils.setupVirtualFileWithBucketMocks(bucketVirtualFile);
 
