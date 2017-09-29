@@ -38,12 +38,12 @@ public class GcsBucketEditorProviderTest {
 
   private GcsBucketEditorProvider bucketEditorProvider;
   @Mock private VirtualFile virtualFile;
-  private GcsBucketVirtualFile gcsBucketVirtualFile;
+  @Mock private GcsBucketVirtualFile gcsBucketVirtualFile;
 
   @Before
   public void setUp() {
     bucketEditorProvider = new GcsBucketEditorProvider();
-    gcsBucketVirtualFile = GcsTestUtils.createVirtualFileWithBucketMocks();
+    GcsTestUtils.setupVirtualFileWithBucketMocks(gcsBucketVirtualFile);
   }
 
   @Test
