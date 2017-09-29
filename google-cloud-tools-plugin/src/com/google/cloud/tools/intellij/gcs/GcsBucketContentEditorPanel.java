@@ -19,14 +19,18 @@ package com.google.cloud.tools.intellij.gcs;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage.BlobListOption;
+import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import com.intellij.openapi.application.ApplicationManager;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.function.Consumer;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,6 +53,8 @@ final class GcsBucketContentEditorPanel {
   private JLabel noBlobsLabel;
   private JPanel noBlobsPanel;
   private JScrollPane bucketContentScrollPane;
+  private JPanel loadingPanel;
+  private JPanel errorPanel;
   private GcsBlobTableModel tableModel;
 
   private static final Color MEDIUM_GRAY = new Color(96, 96, 96);
@@ -96,16 +102,20 @@ final class GcsBucketContentEditorPanel {
   }
 
   void initTableModel() {
-    List<Blob> blobs = getBlobsStartingWith("");
-    if (blobs.isEmpty()) {
-      showEmptyBlobs(GctBundle.message("gcs.content.explorer.empty.bucket.text"));
-    } else {
-      showBlobTable();
-      tableModel = new GcsBlobTableModel();
-      tableModel.setDataVector(blobs, "");
-      bucketContentTable.setModel(tableModel);
-    }
-    breadcrumbs.render(bucket.getName());
+    Consumer<List<Blob>> afterLoad =
+        blobs -> {
+          if (blobs.isEmpty()) {
+            showEmptyBlobs(GctBundle.message("gcs.content.explorer.empty.bucket.text"));
+          } else {
+            showBlobTable();
+            tableModel = new GcsBlobTableModel();
+            tableModel.setDataVector(blobs, "");
+            bucketContentTable.setModel(tableModel);
+          }
+          breadcrumbs.render(bucket.getName());
+        };
+
+    loadBlobsStartingWith("", afterLoad);
   }
 
   void updateTableModel(String prefix) {
@@ -115,21 +125,25 @@ final class GcsBucketContentEditorPanel {
     }
 
     tableModel.setRowCount(0);
-    List<Blob> blobs = getBlobsStartingWith(prefix);
 
-    if (isEmptyDirectory(prefix, blobs)) {
-      String message =
-          prefix.isEmpty()
-              ? GctBundle.message("gcs.content.explorer.empty.bucket.text")
-              : GctBundle.message("gcs.content.explorer.empty.directory.text");
-      showEmptyBlobs(message);
-    } else {
-      showBlobTable();
+    Consumer<List<Blob>> afterLoad =
+        blobs -> {
+          if (isEmptyDirectory(prefix, blobs)) {
+            String message =
+                prefix.isEmpty()
+                    ? GctBundle.message("gcs.content.explorer.empty.bucket.text")
+                    : GctBundle.message("gcs.content.explorer.empty.directory.text");
+            showEmptyBlobs(message);
+          } else {
+            showBlobTable();
 
-      tableModel.setDataVector(blobs, prefix);
-      tableModel.fireTableDataChanged();
-    }
-    breadcrumbs.render(bucket.getName(), prefix);
+            tableModel.setDataVector(blobs, prefix);
+            tableModel.fireTableDataChanged();
+          }
+          breadcrumbs.render(bucket.getName(), prefix);
+        };
+
+    loadBlobsStartingWith(prefix, afterLoad);
   }
 
   private void showEmptyBlobs(String message) {
@@ -155,10 +169,38 @@ final class GcsBucketContentEditorPanel {
    * BlobListOption#prefix(String)} options. The prefix acts as the current directory for the blobs
    * we wish to fetch.
    */
-  // TODO(eshaul) should be done asynchronously and show loader in the UI
-  private List<Blob> getBlobsStartingWith(String prefix) {
-    return Lists.newArrayList(
-        bucket.list(BlobListOption.currentDirectory(), BlobListOption.prefix(prefix)).iterateAll());
+  @SuppressWarnings("FutureReturnValueIgnored")
+  private void loadBlobsStartingWith(String prefix, Consumer<List<Blob>> afterLoad) {
+    showLoader();
+    hideError();
+    ThreadUtil.getInstance()
+        .executeInBackground(
+            () -> {
+              List<Blob> blobs;
+              try {
+                blobs =
+                    Lists.newArrayList(
+                        bucket
+                            .list(BlobListOption.currentDirectory(), BlobListOption.prefix(prefix))
+                            .iterateAll());
+              } catch (StorageException se) {
+                ApplicationManager.getApplication()
+                    .invokeAndWait(
+                        () -> {
+                          hideLoader();
+                          showError();
+                        });
+                return;
+              }
+
+              final List<Blob> loadedBlobs = blobs;
+              ApplicationManager.getApplication()
+                  .invokeAndWait(
+                      () -> {
+                        hideLoader();
+                        afterLoad.accept(loadedBlobs);
+                      });
+            });
   }
 
   /**
@@ -167,6 +209,24 @@ final class GcsBucketContentEditorPanel {
    */
   private static boolean isEmptyDirectory(String prefix, List<Blob> blobs) {
     return blobs.isEmpty() || (blobs.size() == 1 && blobs.get(0).getName().equals(prefix));
+  }
+
+  private void showLoader() {
+    loadingPanel.setVisible(true);
+    bucketContentScrollPane.setVisible(false);
+    noBlobsPanel.setVisible(false);
+  }
+
+  private void hideLoader() {
+    loadingPanel.setVisible(false);
+  }
+
+  private void showError() {
+    errorPanel.setVisible(true);
+  }
+
+  private void hideError() {
+    errorPanel.setVisible(false);
   }
 
   JPanel getComponent() {
@@ -189,8 +249,18 @@ final class GcsBucketContentEditorPanel {
   }
 
   @VisibleForTesting
+  JPanel getLoadingPanel() {
+    return loadingPanel;
+  }
+
+  @VisibleForTesting
   JPanel getNoBlobsPanel() {
     return noBlobsPanel;
+  }
+
+  @VisibleForTesting
+  JPanel getErrorPanel() {
+    return errorPanel;
   }
 
   private void createUIComponents() {
