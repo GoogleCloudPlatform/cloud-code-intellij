@@ -158,7 +158,7 @@ class GcsBucketVirtualFile extends VirtualFile {
     @Nullable
     @Override
     public Icon getIcon() {
-      return GoogleCloudToolsIcons.CLOUD;
+      return GoogleCloudToolsIcons.CLOUD_STORAGE_BUCKET;
     }
 
     @Override

@@ -41,6 +41,6 @@ public final class GcsToolWindowFactory implements ToolWindowFactory, DumbAware 
 
   @Override
   public void init(ToolWindow window) {
-    window.setIcon(GoogleCloudToolsIcons.CLOUD);
+    window.setIcon(GoogleCloudToolsIcons.CLOUD_STORAGE);
   }
 }
