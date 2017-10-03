@@ -37,7 +37,7 @@ final class GcsBucketCellRenderer extends JLabel implements ListCellRenderer<Buc
       int index,
       boolean isSelected,
       boolean cellHasFocus) {
-    setIcon(GoogleCloudToolsIcons.CLOUD);
+    setIcon(GoogleCloudToolsIcons.CLOUD_STORAGE_BUCKET);
     setText(bucket.getName());
 
     if (isSelected) {

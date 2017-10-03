@@ -17,12 +17,20 @@
 package com.google.cloud.tools.intellij.gcs;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage.BlobListOption;
+import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.DelayedSubmitExecutorServiceProxy;
 import com.google.cloud.tools.intellij.testing.TimeZoneRule;
+import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
@@ -31,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.IntStream;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import org.junit.Before;
 import org.junit.Rule;
@@ -42,7 +53,7 @@ public class GcsBucketContentEditorPanelTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @Rule public final TimeZoneRule timeZoneRule = new TimeZoneRule(TimeZone.getTimeZone("GMT"));
 
-  private static final String DIR_NAME = "my_directory";
+  private static final String DIR_NAME = "dir1/dir2/";
   private static final String BLOB_NAME = "my_blob.zip";
   private static final String BLOB_CONTENT_TYPE = "application/zip";
   private static final String NESTED_BLOB_FULL_NAME = "dir1/dir2/nested_blob.zip";
@@ -53,15 +64,15 @@ public class GcsBucketContentEditorPanelTest {
   private static final Map<String, Integer> COL_NAME_TO_INDEX = INDEX_TO_COL_NAME.inverse();
 
   private GcsBucketContentEditorPanel editorPanel;
-  private GcsBucketVirtualFile bucketVirtualFile;
 
-  @Mock private Blob directoryBlob;
   @Mock private Blob binaryBlob;
-  @Mock private Blob nestedBlob;
+  @Mock private Blob directoryBlob;
+  @Mock private Blob binaryBlobInDirectory;
+  @Mock private GcsBucketVirtualFile bucketVirtualFile;
 
   @Before
   public void setUp() {
-    bucketVirtualFile = GcsTestUtils.createVirtualFileWithBucketMocks();
+    GcsTestUtils.setupVirtualFileWithBucketMocks(bucketVirtualFile);
 
     when(directoryBlob.isDirectory()).thenReturn(true);
     when(directoryBlob.getName()).thenReturn(DIR_NAME);
@@ -72,7 +83,7 @@ public class GcsBucketContentEditorPanelTest {
     when(binaryBlob.getContentType()).thenReturn(BLOB_CONTENT_TYPE);
     when(binaryBlob.getUpdateTime()).thenReturn(0L);
 
-    when(nestedBlob.getName()).thenReturn(NESTED_BLOB_FULL_NAME);
+    when(binaryBlobInDirectory.getName()).thenReturn(NESTED_BLOB_FULL_NAME);
   }
 
   @Test
@@ -86,8 +97,24 @@ public class GcsBucketContentEditorPanelTest {
   }
 
   @Test
+  @SuppressWarnings("FutureReturnValueIgnored")
+  public void testLoadingMessageShown_whenLoadingBuckets() {
+    DelayedSubmitExecutorServiceProxy delayedExecutor = new DelayedSubmitExecutorServiceProxy();
+    ThreadUtil.getInstance().setBackgroundExecutorService(delayedExecutor);
+
+    editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
+    editorPanel.initTableModel();
+
+    assertTrue(editorPanel.getLoadingPanel().isVisible());
+
+    delayedExecutor.doSubmit();
+
+    assertFalse(editorPanel.getLoadingPanel().isVisible());
+  }
+
+  @Test
   public void testBucketEditorColumnHeaders() {
-    initBlobEditor(directoryBlob);
+    initEditorWithBlobs(directoryBlob);
 
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getColumnCount()).isEqualTo(4);
@@ -101,7 +128,7 @@ public class GcsBucketContentEditorPanelTest {
 
   @Test
   public void testBucketContent_singleDirectoryBlob() {
-    initBlobEditor(directoryBlob);
+    initEditorWithBlobs(directoryBlob);
 
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getRowCount()).isEqualTo(1);
@@ -114,7 +141,7 @@ public class GcsBucketContentEditorPanelTest {
 
   @Test
   public void testBucketContent_singleBinaryBlob() {
-    initBlobEditor(binaryBlob);
+    initEditorWithBlobs(binaryBlob);
 
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getRowCount()).isEqualTo(1);
@@ -129,7 +156,7 @@ public class GcsBucketContentEditorPanelTest {
 
   @Test
   public void testBuckets_mixedBinaryAndDirectoryBlobs() {
-    initBlobEditor(binaryBlob, directoryBlob);
+    initEditorWithBlobs(binaryBlob, directoryBlob);
 
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getRowCount()).isEqualTo(2);
@@ -137,7 +164,7 @@ public class GcsBucketContentEditorPanelTest {
 
   @Test
   public void testBucketName_directoryPrefixIsTrimmed() {
-    initBlobEditor(nestedBlob);
+    initEditorWithBlobs(binaryBlobInDirectory);
     editorPanel.updateTableModel("dir1/dir2/");
 
     JTable bucketTable = editorPanel.getBucketContentTable();
@@ -146,9 +173,95 @@ public class GcsBucketContentEditorPanelTest {
   }
 
   @Test
+  public void testUpdateEmptyBucket_toNonEmptyBucket() {
+    // setup empty bucket
+    editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
+    editorPanel.initTableModel();
+
+    JScrollPane bucketScrollPane = editorPanel.getBucketContentScrollPane();
+    JPanel noBlobsPanel = editorPanel.getNoBlobsPanel();
+    JLabel noBlobsLabel = editorPanel.getNoBlobsLabel();
+
+    assertFalse(bucketScrollPane.isVisible());
+    assertTrue(noBlobsPanel.isVisible());
+    assertThat(noBlobsLabel.getText()).isEqualTo("No files or directories found in this bucket");
+
+    // add blobs and update bucket
+    setBlobs(binaryBlob);
+    editorPanel.updateTableModel("");
+
+    assertTrue(bucketScrollPane.isVisible());
+    assertFalse(noBlobsPanel.isVisible());
+  }
+
+  @Test
+  public void testUpdateNonEmptyBucket_toEmptyBucket() {
+    // setup bucket with blobs
+    initEditorWithBlobs(binaryBlob);
+
+    JScrollPane bucketScrollPane = editorPanel.getBucketContentScrollPane();
+    JPanel noBlobsPanel = editorPanel.getNoBlobsPanel();
+    JLabel noBlobsLabel = editorPanel.getNoBlobsLabel();
+
+    assertTrue(bucketScrollPane.isVisible());
+    assertFalse(noBlobsPanel.isVisible());
+
+    // remove blobs and update
+    setBlobs();
+    editorPanel.updateTableModel("");
+
+    assertFalse(bucketScrollPane.isVisible());
+    assertTrue(noBlobsPanel.isVisible());
+    assertThat(noBlobsLabel.getText()).isEqualTo("No files or directories found in this bucket");
+  }
+
+  @Test
+  public void testUpdateEmptyDirectory_toNonEmptyDirectory() {
+    // Create an empty directory and move to it
+    initEditorWithBlobs(directoryBlob);
+    editorPanel.updateTableModel(DIR_NAME);
+
+    JScrollPane bucketScrollPane = editorPanel.getBucketContentScrollPane();
+    JPanel noBlobsPanel = editorPanel.getNoBlobsPanel();
+    JLabel noBlobsLabel = editorPanel.getNoBlobsLabel();
+
+    assertFalse(bucketScrollPane.isVisible());
+    assertTrue(noBlobsPanel.isVisible());
+    assertThat(noBlobsLabel.getText()).isEqualTo("No files found in this directory");
+
+    // Add a blob to the directory and update
+    setBlobs(binaryBlobInDirectory);
+    editorPanel.updateTableModel(DIR_NAME);
+
+    assertTrue(bucketScrollPane.isVisible());
+    assertFalse(noBlobsPanel.isVisible());
+  }
+
+  @Test
+  public void testUpdateNonEmptyDirectory_toEmptyDirectory() {
+    // setup bucket directory with blobs
+    initEditorWithBlobs(directoryBlob, binaryBlobInDirectory);
+
+    JScrollPane bucketScrollPane = editorPanel.getBucketContentScrollPane();
+    JPanel noBlobsPanel = editorPanel.getNoBlobsPanel();
+    JLabel noBlobsLabel = editorPanel.getNoBlobsLabel();
+
+    assertTrue(bucketScrollPane.isVisible());
+    assertFalse(noBlobsPanel.isVisible());
+
+    // remove blobs from the directory and update
+    setBlobs(directoryBlob);
+    editorPanel.updateTableModel(DIR_NAME);
+
+    assertFalse(bucketScrollPane.isVisible());
+    assertTrue(noBlobsPanel.isVisible());
+    assertThat(noBlobsLabel.getText()).isEqualTo("No files found in this directory");
+  }
+
+  @Test
   public void testBlobSizeDisplay_Bytes() {
     when(binaryBlob.getSize()).thenReturn(100L);
-    initBlobEditor(binaryBlob);
+    initEditorWithBlobs(binaryBlob);
     JTable bucketTable = editorPanel.getBucketContentTable();
 
     assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("100 B");
@@ -157,7 +270,7 @@ public class GcsBucketContentEditorPanelTest {
   @Test
   public void testBlobSizeDisplay_KB() {
     when(binaryBlob.getSize()).thenReturn(102400L);
-    initBlobEditor(binaryBlob);
+    initEditorWithBlobs(binaryBlob);
     JTable bucketTable = editorPanel.getBucketContentTable();
 
     assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("100.0 KB");
@@ -166,7 +279,7 @@ public class GcsBucketContentEditorPanelTest {
   @Test
   public void testBlobSizeDisplay_MB() {
     when(binaryBlob.getSize()).thenReturn(104857600L);
-    initBlobEditor(binaryBlob);
+    initEditorWithBlobs(binaryBlob);
     JTable bucketTable = editorPanel.getBucketContentTable();
 
     assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("100.0 MB");
@@ -175,18 +288,54 @@ public class GcsBucketContentEditorPanelTest {
   @Test
   public void testBlobSizeDisplay_GB() {
     when(binaryBlob.getSize()).thenReturn(107374182400L);
-    initBlobEditor(binaryBlob);
+    initEditorWithBlobs(binaryBlob);
     JTable bucketTable = editorPanel.getBucketContentTable();
 
     assertThat(bucketTable.getValueAt(0, COL_NAME_TO_INDEX.get("Size"))).isEqualTo("100.0 GB");
   }
 
-  private void initBlobEditor(Blob... blobs) {
-    List<Blob> blobList = Lists.newArrayList(blobs);
-    Page<Blob> blobPage = bucketVirtualFile.getBucket().list();
-    when(blobPage.iterateAll()).thenReturn(blobList);
+  @Test
+  public void testBucketListException_showsErrorMessage() {
+    when(bucketVirtualFile.getBucket().list(any(BlobListOption.class), any(BlobListOption.class)))
+        .thenThrow(StorageException.class);
 
     editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
     editorPanel.initTableModel();
+
+    JTable bucketTable = editorPanel.getBucketContentTable();
+    assertThat(bucketTable.getColumnCount()).isEqualTo(0);
+    assertThat(bucketTable.getRowCount()).isEqualTo(0);
+    assertFalse(editorPanel.getNoBlobsPanel().isVisible());
+    assertFalse(editorPanel.getLoadingPanel().isVisible());
+    assertTrue(editorPanel.getErrorPanel().isVisible());
+  }
+
+  @Test
+  public void testErrorMessageIsCleared_afterSuccessfulBucketList() {
+    when(bucketVirtualFile.getBucket().list(any(BlobListOption.class), any(BlobListOption.class)))
+        .thenThrow(StorageException.class);
+
+    editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
+    editorPanel.initTableModel();
+
+    assertTrue(editorPanel.getErrorPanel().isVisible());
+
+    // Re-initialize mocks so the exception is not thrown and update the UI
+    reset(bucketVirtualFile.getBucket());
+    editorPanel.updateTableModel("");
+
+    assertFalse(editorPanel.getErrorPanel().isVisible());
+  }
+
+  private void initEditorWithBlobs(Blob... blobs) {
+    setBlobs(blobs);
+    editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
+    editorPanel.initTableModel();
+  }
+
+  private void setBlobs(Blob... blobs) {
+    List<Blob> blobList = Lists.newArrayList(blobs);
+    Page<Blob> blobPage = bucketVirtualFile.getBucket().list();
+    when(blobPage.iterateAll()).thenReturn(blobList);
   }
 }
