@@ -67,6 +67,12 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   }
 
   @SuppressWarnings("FutureReturnValueIgnored")
+  /**
+   * Updates the panel as follows:
+   *   if the project textbox specifies a valid project, it displays the project's information,
+   *   if the project textbox specifies an invalid project, it displays an error message,
+   *   if the project textbox is empty, no message is displayed.
+   */
   public void refresh(final ProjectSelectionChangedEvent event) {
     if (event == null) {
       ApplicationManager.getApplication().executeOnPooledThread(

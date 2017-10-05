@@ -148,8 +148,16 @@ public final class AppEngineDeploymentConfigurationPanel {
     }
   }
 
+  /**
+   * Updates the text of the panel as follows:
+   *   if the project text box is empty, no message is displayed,
+   *   if the project text represents a valid project, the project details are displayed,
+   *   if the project text represents an invalid project, an error message is displayed.
+   */
   private void refreshApplicationInfoPanel() {
-    if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
+    if (projectSelector.getText().isEmpty()) {
+      applicationInfoPanel.setMessage("", false /* isError*/);
+    } else if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
       applicationInfoPanel.refresh(
           projectSelector.getProject().getProjectId(),
           projectSelector.getSelectedUser().getCredential());

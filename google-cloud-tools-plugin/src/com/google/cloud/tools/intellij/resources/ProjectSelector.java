@@ -599,7 +599,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   }
 
   /**
-   * Event for when the selection changes to a valid project.
+   * Event for when the selection changes to a valid or invalid project.
    */
   public static class ProjectSelectionChangedEvent {
     private final Project selectedProject;
