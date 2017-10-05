@@ -23,12 +23,8 @@ import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
-import com.intellij.openapi.application.ApplicationManager;
+import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.intellij.openapi.diagnostic.Logger;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.Image;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -37,10 +33,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
+import java.util.stream.Stream;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This model item represents a {@link IntellijGoogleLoginService} credentialed user in the treeview
@@ -64,8 +62,8 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     this.treeModel = treeModel;
     setNeedsSynchronizing();
 
-    cloudResourceManagerClient
-        = GoogleApiClientFactory.getInstance().getCloudResourceManagerClient(user.getCredential());
+    cloudResourceManagerClient =
+        GoogleApiClientFactory.getInstance().getCloudResourceManagerClient(user.getCredential());
   }
 
   public CredentialedUser getCredentialedUser() {
@@ -106,18 +104,30 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
     }
     isSynchronizing = true;
 
-    ApplicationManager.getApplication().executeOnPooledThread(() -> {
-      try {
-        loadUserProjects();
-        needsSynchronizing = false;
-      } finally {
-        isSynchronizing = false;
-      }
-    });
+    ThreadUtil.getInstance()
+        .executeInBackground(
+            () -> {
+              try {
+                loadUserProjects();
+                needsSynchronizing = false;
+              } finally {
+                isSynchronizing = false;
+              }
+            });
   }
 
   public boolean isSynchronizing() {
     return isSynchronizing;
+  }
+
+  @SuppressWarnings("unchecked")
+  void setFilter(String filter) {
+    children.forEach(
+        child -> {
+          if (child instanceof ResourceProjectModelItem) {
+            ((ResourceProjectModelItem) child).setFilter(filter);
+          }
+        });
   }
 
   // If an error occurs during the resource manager call, we load a model that shows the error.
@@ -135,25 +145,34 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
 
     try {
 
-      ListProjectsResponse response = cloudResourceManagerClient.projects().list()
-          .setPageSize(PROJECTS_MAX_PAGE_SIZE).execute();
+      ListProjectsResponse response =
+          cloudResourceManagerClient
+              .projects()
+              .list()
+              .setPageSize(PROJECTS_MAX_PAGE_SIZE)
+              .execute();
 
       if (response != null && response.getProjects() != null) {
         // Create a sorted set to sort the projects list by project ID.
-        Set<Project> allProjects = new TreeSet<>(
-            Comparator.comparing(project -> project.getName().toLowerCase()));
+        Set<Project> allProjects =
+            new TreeSet<>(Comparator.comparing(project -> project.getName().toLowerCase()));
 
-        response.getProjects().stream()
+        response
+            .getProjects()
+            .stream()
             // Filter out any projects that are scheduled for deletion.
             .filter((project) -> !PROJECT_DELETE_REQUESTED.equals(project.getLifecycleState()))
             // Add remaining projects to the set.
             .forEach(allProjects::add);
 
         while (!Strings.isNullOrEmpty(response.getNextPageToken())) {
-          response = cloudResourceManagerClient.projects().list()
-              .setPageToken(response.getNextPageToken())
-              .setPageSize(PROJECTS_MAX_PAGE_SIZE)
-              .execute();
+          response =
+              cloudResourceManagerClient
+                  .projects()
+                  .list()
+                  .setPageToken(response.getNextPageToken())
+                  .setPageSize(PROJECTS_MAX_PAGE_SIZE)
+                  .execute();
           allProjects.addAll(response.getProjects());
         }
         for (Project pantheonProject : allProjects) {
@@ -194,5 +213,37 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
       LOG.error("InvocationTargetException loading projects for " + user.getName(), ex);
       loadErrorState(ex.getMessage());
     }
+  }
+
+  @Override
+  public TreeNode getChildAt(int index) {
+    return (TreeNode) getFilteredChildren().toArray()[index];
+  }
+
+  @Override
+  public int getChildCount() {
+    return Math.toIntExact(getFilteredChildren().count());
+  }
+
+  /**
+   * Returns a {@link Stream} of {@link TreeNode TreeNodes} that represent the visible children of
+   * this user model item.
+   *
+   * <p>If any child {@link ResourceProjectModelItem} does not match the given filter (settable via
+   * {@link #setFilter(String)}), it is not included in the resulting stream.
+   */
+  @SuppressWarnings("unchecked")
+  private Stream<TreeNode> getFilteredChildren() {
+    if (children == null) {
+      return Stream.empty();
+    }
+
+    return children
+        .stream()
+        .map(TreeNode.class::cast)
+        .filter(
+            child ->
+                !(child instanceof ResourceProjectModelItem)
+                    || ((ResourceProjectModelItem) child).isVisible());
   }
 }
