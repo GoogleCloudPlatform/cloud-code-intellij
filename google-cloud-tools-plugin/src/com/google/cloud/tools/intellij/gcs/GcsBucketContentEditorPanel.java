@@ -25,7 +25,6 @@ import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -56,8 +55,6 @@ final class GcsBucketContentEditorPanel {
   private JPanel loadingPanel;
   private JPanel errorPanel;
   private GcsBlobTableModel tableModel;
-
-  private static final Color MEDIUM_GRAY = new Color(96, 96, 96);
 
   GcsBucketContentEditorPanel(@NotNull Bucket bucket) {
     this.bucket = bucket;
@@ -91,13 +88,11 @@ final class GcsBucketContentEditorPanel {
     breadcrumbs.setBackground(bucketContentEditorPanel.getBackground());
 
     bucketContentTable.setRowHeight(23);
-    bucketContentTable.setForeground(MEDIUM_GRAY);
 
     JTableHeader tableHeader = bucketContentTable.getTableHeader();
     Font tableHeaderFont = tableHeader.getFont();
     tableHeader.setFont(
         new Font(tableHeaderFont.getFontName(), Font.BOLD, tableHeaderFont.getSize()));
-    tableHeader.setForeground(MEDIUM_GRAY);
     tableHeader.setAlignmentX(JLabel.LEFT);
   }
 
@@ -112,9 +107,9 @@ final class GcsBucketContentEditorPanel {
             tableModel.setDataVector(blobs, "");
             bucketContentTable.setModel(tableModel);
           }
-          breadcrumbs.render(bucket.getName());
         };
 
+    breadcrumbs.render(bucket.getName());
     loadBlobsStartingWith("", afterLoad);
   }
 
@@ -140,9 +135,9 @@ final class GcsBucketContentEditorPanel {
             tableModel.setDataVector(blobs, prefix);
             tableModel.fireTableDataChanged();
           }
-          breadcrumbs.render(bucket.getName(), prefix);
         };
 
+    breadcrumbs.render(bucket.getName(), prefix);
     loadBlobsStartingWith(prefix, afterLoad);
   }
 
@@ -261,6 +256,11 @@ final class GcsBucketContentEditorPanel {
   @VisibleForTesting
   JPanel getErrorPanel() {
     return errorPanel;
+  }
+
+  @VisibleForTesting
+  public GcsBreadcrumbsTextPane getBreadcrumbs() {
+    return breadcrumbs;
   }
 
   private void createUIComponents() {
