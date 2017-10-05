@@ -70,7 +70,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   public void refresh(final ProjectSelectionChangedEvent event) {
     if (event == null) {
       ApplicationManager.getApplication().executeOnPooledThread(
-          () -> setMessage(GctBundle.getString("appengine.infopanel.noproject"),
+          () -> setMessage(GctBundle.getString("appengine.infopanel.no.region"),
               true /* isError*/));
       return;
     }
@@ -88,7 +88,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   public void refresh(final String projectId, final Credential credential) {
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
       if (projectId == null || credential == null) {
-        setMessage(GctBundle.getString("appengine.infopanel.noproject"),
+        setMessage(GctBundle.getString("appengine.infopanel.no.region"),
             true /* isError*/);
       }
 

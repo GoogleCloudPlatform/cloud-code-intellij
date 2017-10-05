@@ -155,7 +155,7 @@ public final class AppEngineDeploymentConfigurationPanel {
           projectSelector.getSelectedUser().getCredential());
     } else {
       applicationInfoPanel.setMessage(
-          GctBundle.getString("appengine.infopanel.noproject"), true /* isError*/);
+          GctBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
     }
   }
 
