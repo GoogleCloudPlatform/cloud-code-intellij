@@ -107,9 +107,9 @@ final class GcsBucketContentEditorPanel {
             tableModel.setDataVector(blobs, "");
             bucketContentTable.setModel(tableModel);
           }
-          breadcrumbs.render(bucket.getName());
         };
 
+    breadcrumbs.render(bucket.getName());
     loadBlobsStartingWith("", afterLoad);
   }
 
@@ -135,9 +135,9 @@ final class GcsBucketContentEditorPanel {
             tableModel.setDataVector(blobs, prefix);
             tableModel.fireTableDataChanged();
           }
-          breadcrumbs.render(bucket.getName(), prefix);
         };
 
+    breadcrumbs.render(bucket.getName(), prefix);
     loadBlobsStartingWith(prefix, afterLoad);
   }
 
@@ -256,6 +256,11 @@ final class GcsBucketContentEditorPanel {
   @VisibleForTesting
   JPanel getErrorPanel() {
     return errorPanel;
+  }
+
+  @VisibleForTesting
+  public GcsBreadcrumbsTextPane getBreadcrumbs() {
+    return breadcrumbs;
   }
 
   private void createUIComponents() {
