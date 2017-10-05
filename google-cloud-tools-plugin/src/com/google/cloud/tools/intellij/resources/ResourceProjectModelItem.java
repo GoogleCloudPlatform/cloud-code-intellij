@@ -26,7 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 /**
  * This model item represents a single GCP project.
  */
-class ResourceProjectModelItem extends DefaultMutableTreeNode {
+class ResourceProjectModelItem extends ModelItem {
 
   private Project project;
 

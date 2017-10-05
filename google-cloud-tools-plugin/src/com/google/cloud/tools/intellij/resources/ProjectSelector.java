@@ -176,7 +176,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       @Override
       public void focusLost(FocusEvent event) {
         if (!event.isTemporary()) {
-          ResourceProjectModelItem node = getCurrentModelItem();
+          ModelItem node = getCurrentModelItem();
           onSelectionChanged(node);
         }
       }
@@ -229,8 +229,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public String getProjectDescription() {
-    ResourceProjectModelItem modelItem = getCurrentModelItem();
-    return modelItem != null ? modelItem.getDescription() : null;
+    ModelItem modelItem = getCurrentModelItem();
+    return modelItem instanceof ResourceProjectModelItem ?
+        ((ResourceProjectModelItem)modelItem).getDescription() : null;
   }
 
   /**
@@ -241,8 +242,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public Long getProjectNumber() {
-    ResourceProjectModelItem modelItem = getCurrentModelItem();
-    return modelItem != null ? modelItem.getNumber() : null;
+    ModelItem modelItem = getCurrentModelItem();
+    return modelItem instanceof ResourceProjectModelItem ?
+        ((ResourceProjectModelItem)modelItem).getNumber() : null;
   }
 
   /**
@@ -253,12 +255,13 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public Project getProject() {
-    ResourceProjectModelItem modelItem = getCurrentModelItem();
-    return modelItem != null ? modelItem.getProject() : null;
+   ModelItem modelItem = getCurrentModelItem();
+   return modelItem instanceof ResourceProjectModelItem ?
+       ((ResourceProjectModelItem)modelItem).getProject() : null;
   }
 
   @Nullable
-  private ResourceProjectModelItem getCurrentModelItem() {
+  private ModelItem getCurrentModelItem() {
     if (Strings.isNullOrEmpty(getText())) {
       return null;
     }
@@ -277,7 +280,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       }
     }
 
-    return null;
+    return new InvalidProjectModelItem();
   }
 
   @Override
@@ -519,14 +522,20 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     }
   }
 
-  private void onSelectionChanged(ResourceProjectModelItem newSelection) {
+  private void onSelectionChanged(ModelItem newSelection) {
     CredentialedUser user = null;
     ProjectSelectionChangedEvent event = null;
     if (newSelection != null) {
       if (newSelection.getParent() instanceof GoogleUserModelItem) {
         user = ((GoogleUserModelItem) newSelection.getParent()).getCredentialedUser();
       }
-      event = new ProjectSelectionChangedEvent(newSelection.getProject(), user);
+
+      if (newSelection instanceof InvalidProjectModelItem) {
+        event = new ProjectSelectionChangedEvent(null, user);
+      } else if (newSelection instanceof ResourceProjectModelItem) {
+        event = new ProjectSelectionChangedEvent((
+            (ResourceProjectModelItem)newSelection).getProject(), user);
+      }
     }
     for (ProjectSelectionListener listener : projectSelectionListeners) {
       listener.selectionChanged(event);
