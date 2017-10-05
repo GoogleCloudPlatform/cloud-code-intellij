@@ -91,13 +91,11 @@ final class GcsBucketContentEditorPanel {
     breadcrumbs.setBackground(bucketContentEditorPanel.getBackground());
 
     bucketContentTable.setRowHeight(23);
-    bucketContentTable.setForeground(MEDIUM_GRAY);
 
     JTableHeader tableHeader = bucketContentTable.getTableHeader();
     Font tableHeaderFont = tableHeader.getFont();
     tableHeader.setFont(
         new Font(tableHeaderFont.getFontName(), Font.BOLD, tableHeaderFont.getSize()));
-    tableHeader.setForeground(MEDIUM_GRAY);
     tableHeader.setAlignmentX(JLabel.LEFT);
   }
 
