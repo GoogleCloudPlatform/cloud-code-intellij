@@ -26,6 +26,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterators;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
@@ -49,8 +50,9 @@ import org.jetbrains.annotations.NotNull;
  * Storage API to load project buckets.
  */
 final class GcsBucketPanel {
+  private static final Logger log = Logger.getInstance(GcsBucketPanel.class);
 
-  final private Project project;
+  private final Project project;
 
   private JPanel gcsBucketPanel;
   private ProjectSelector projectSelector;
@@ -109,6 +111,7 @@ final class GcsBucketPanel {
       } else {
         notificationLabel.setText(
             GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+        log.warn("Cloud not load credentialed user for GCS operation. User may be logged.");
       }
     }
   }
@@ -176,6 +179,9 @@ final class GcsBucketPanel {
                   } catch (StorageException se) {
                     notificationLabel.setText(
                         GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+                    log.warn(
+                        "StorageException when performing GCS bucket list operation, with message: "
+                            + se.getMessage());
                   }
                 });
   }

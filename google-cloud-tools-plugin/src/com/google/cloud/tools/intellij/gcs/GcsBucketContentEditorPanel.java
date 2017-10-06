@@ -25,6 +25,7 @@ import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 
 /** Defines the Google Cloud Storage bucket content browsing UI panel. */
 final class GcsBucketContentEditorPanel {
+  private static final Logger log = Logger.getInstance(GcsBucketContentEditorPanel.class);
 
   private final Bucket bucket;
 
@@ -184,6 +186,9 @@ final class GcsBucketContentEditorPanel {
                         () -> {
                           hideLoader();
                           showError();
+                          log.warn(
+                              "StorageException when performing GCS blob list operation, with message: "
+                                  + se.getMessage());
                         });
                 return;
               }
