@@ -91,7 +91,10 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   }
 
   /**
-   * Updates the panel to display application info for the given project.
+   *  Updates the panel as follows:
+   *   if {@code projectId} is valid, it displays the given project's information,
+   *   if {@code projectId} is invalid, it displays an error message,
+   *   if {@code projectId} is empty, no message is displayed.
    *
    * @param projectId the ID of the project whose application info to display
    * @param credential the Credential to use to make any required API calls
@@ -99,9 +102,15 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   @SuppressWarnings("FutureReturnValueIgnored")
   public void refresh(final String projectId, final Credential credential) {
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
+      if (projectId.isEmpty()) {
+        setMessage("", false /* isError*/);
+        return;
+      }
+
       if (projectId == null || credential == null) {
         setMessage(GctBundle.getString("appengine.infopanel.no.region"),
             true /* isError*/);
+        return;
       }
 
       try {
