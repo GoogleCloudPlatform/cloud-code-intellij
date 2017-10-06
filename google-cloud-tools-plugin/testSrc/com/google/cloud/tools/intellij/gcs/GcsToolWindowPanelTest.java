@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.gcs;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
