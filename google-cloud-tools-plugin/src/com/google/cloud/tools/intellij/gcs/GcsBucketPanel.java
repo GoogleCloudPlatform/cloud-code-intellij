@@ -111,7 +111,7 @@ final class GcsBucketPanel {
       } else {
         notificationLabel.setText(
             GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
-        log.warn("Cloud not load credentialed user for GCS operation. User may be logged.");
+        log.warn("Cloud not load credentialed user for GCS operation. User may not be logged.");
       }
     }
   }
