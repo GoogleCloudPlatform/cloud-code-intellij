@@ -99,8 +99,7 @@ public class GcsBucketContentEditorPanelTest {
   @Test
   @SuppressWarnings("FutureReturnValueIgnored")
   public void testLoadingMessageShown_whenLoadingBuckets() {
-    DelayedSubmitExecutorServiceProxy delayedExecutor = new DelayedSubmitExecutorServiceProxy();
-    ThreadUtil.getInstance().setBackgroundExecutorService(delayedExecutor);
+    DelayedSubmitExecutorServiceProxy delayedExecutor = setDelayedExecutorService();
 
     editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
     editorPanel.initTableModel();
@@ -124,6 +123,16 @@ public class GcsBucketContentEditorPanelTest {
             colIdx ->
                 assertThat(INDEX_TO_COL_NAME.get(colIdx))
                     .isEqualTo(bucketTable.getColumnName(colIdx)));
+  }
+
+  @Test
+  public void testBucketBreadCrumbsInit() {
+    setDelayedExecutorService();
+
+    initEditorWithBlobs(directoryBlob);
+
+    assertTrue(editorPanel.getBreadcrumbs().isVisible());
+    assertFalse(editorPanel.getBreadcrumbs().getText().isEmpty());
   }
 
   @Test
@@ -337,5 +346,11 @@ public class GcsBucketContentEditorPanelTest {
     List<Blob> blobList = Lists.newArrayList(blobs);
     Page<Blob> blobPage = bucketVirtualFile.getBucket().list();
     when(blobPage.iterateAll()).thenReturn(blobList);
+  }
+
+  private DelayedSubmitExecutorServiceProxy setDelayedExecutorService() {
+    DelayedSubmitExecutorServiceProxy delayedExecutor = new DelayedSubmitExecutorServiceProxy();
+    ThreadUtil.getInstance().setBackgroundExecutorService(delayedExecutor);
+    return delayedExecutor;
   }
 }
