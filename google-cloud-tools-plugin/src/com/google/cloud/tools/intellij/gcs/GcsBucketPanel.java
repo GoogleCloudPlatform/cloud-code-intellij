@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.gcs;
 
-import com.google.api.client.auth.oauth2.Credential;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
