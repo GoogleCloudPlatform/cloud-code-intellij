@@ -16,14 +16,12 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.services.appengine.v1.Appengine;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
-
 import com.google.cloud.storage.Storage;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.intellij.openapi.components.ServiceManager;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,8 +52,8 @@ public abstract class GoogleApiClientFactory {
    * Creates a new instance of {@link Storage} client.
    *
    * @param projectId id of the cloud project
-   * @param credential credential object to use for authentication
+   * @param credentialedUser credential object to use for authentication
    */
   public abstract Storage getCloudStorageApiClient(
-      @NotNull String projectId, @NotNull Credential credential);
+      @NotNull String projectId, @NotNull CredentialedUser credentialedUser);
 }

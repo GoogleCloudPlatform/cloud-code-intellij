@@ -106,7 +106,7 @@ final class GcsBucketPanel {
       CredentialedUser user = projectSelector.getSelectedUser();
 
       if (user != null) {
-        loadAndDisplayBuckets(projectId, user.getCredential());
+        loadAndDisplayBuckets(projectId, user);
       } else {
         notificationLabel.setText(
             GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
@@ -144,7 +144,7 @@ final class GcsBucketPanel {
     this.projectSelector = projectSelector;
   }
 
-  private void loadAndDisplayBuckets(String projectId, Credential credential) {
+  private void loadAndDisplayBuckets(String projectId, CredentialedUser credentialedUser) {
     if (bucketLoadExecution != null && !bucketLoadExecution.isDone()) {
       return;
     }
@@ -158,7 +158,7 @@ final class GcsBucketPanel {
                 () -> {
                   Storage storage =
                       GoogleApiClientFactory.getInstance()
-                          .getCloudStorageApiClient(projectId, credential);
+                          .getCloudStorageApiClient(projectId, credentialedUser);
 
                   try {
                     Iterable<Bucket> buckets = storage.list().iterateAll();
