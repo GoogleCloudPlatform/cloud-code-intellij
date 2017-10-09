@@ -156,7 +156,7 @@ public final class AppEngineDeploymentConfigurationPanel {
    */
   private void refreshApplicationInfoPanel() {
     if (Strings.isNullOrEmpty(projectSelector.getText())) {
-      applicationInfoPanel.setMessage("", false /* isError*/);
+      applicationInfoPanel.clearMessage();
     } else if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
       applicationInfoPanel.refresh(
           projectSelector.getProject().getProjectId(),

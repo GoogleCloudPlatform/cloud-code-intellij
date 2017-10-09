@@ -75,8 +75,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
    */
   public void refresh(final ProjectSelectionChangedEvent event) {
     if (event == null) {
-      ApplicationManager.getApplication().executeOnPooledThread(
-          () -> setMessage("", false /* isError*/));
+      ApplicationManager.getApplication().executeOnPooledThread(() -> clearMessage());
       return;
     }
 
@@ -103,7 +102,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   public void refresh(final String projectId, final Credential credential) {
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
       if (projectId.isEmpty()) {
-        setMessage("", false /* isError*/);
+        clearMessage();
         return;
       }
 
@@ -128,13 +127,6 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     });
   }
 
-  private void setMessage(Runnable messagePrinter, boolean isError) {
-    ApplicationManager.getApplication().invokeAndWait(() -> {
-      errorIcon.setVisible(isError);
-      messagePrinter.run();
-    }, ModalityState.stateForComponent(this));
-  }
-
   /**
    * Prints a message that doesn't contain a hyperlink.
    */
@@ -145,6 +137,17 @@ public class AppEngineApplicationInfoPanel extends JPanel {
       // actually show up. setHyperlinkText() calls revalidate() internally.
       messageText.revalidate();
     }, isError);
+  }
+
+  public void clearMessage() {
+    setMessage("", false /* isError*/);
+  }
+
+  private void setMessage(Runnable messagePrinter, boolean isError) {
+    ApplicationManager.getApplication().invokeAndWait(() -> {
+      errorIcon.setVisible(isError);
+      messagePrinter.run();
+    }, ModalityState.stateForComponent(this));
   }
 
   /**
