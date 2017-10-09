@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.gcs;
 
-import com.google.api.client.auth.oauth2.Credential;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
@@ -27,6 +26,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterators;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
@@ -50,8 +50,9 @@ import org.jetbrains.annotations.NotNull;
  * Storage API to load project buckets.
  */
 final class GcsBucketPanel {
+  private static final Logger log = Logger.getInstance(GcsBucketPanel.class);
 
-  final private Project project;
+  private final Project project;
 
   private JPanel gcsBucketPanel;
   private ProjectSelector projectSelector;
@@ -106,10 +107,11 @@ final class GcsBucketPanel {
       CredentialedUser user = projectSelector.getSelectedUser();
 
       if (user != null) {
-        loadAndDisplayBuckets(projectId, user.getCredential());
+        loadAndDisplayBuckets(projectId, user);
       } else {
         notificationLabel.setText(
             GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+        log.warn("Cloud not load credentialed user for GCS operation. User may not be logged.");
       }
     }
   }
@@ -144,7 +146,7 @@ final class GcsBucketPanel {
     this.projectSelector = projectSelector;
   }
 
-  private void loadAndDisplayBuckets(String projectId, Credential credential) {
+  private void loadAndDisplayBuckets(String projectId, CredentialedUser credentialedUser) {
     if (bucketLoadExecution != null && !bucketLoadExecution.isDone()) {
       return;
     }
@@ -158,7 +160,7 @@ final class GcsBucketPanel {
                 () -> {
                   Storage storage =
                       GoogleApiClientFactory.getInstance()
-                          .getCloudStorageApiClient(projectId, credential);
+                          .getCloudStorageApiClient(projectId, credentialedUser);
 
                   try {
                     Iterable<Bucket> buckets = storage.list().iterateAll();
@@ -177,6 +179,9 @@ final class GcsBucketPanel {
                   } catch (StorageException se) {
                     notificationLabel.setText(
                         GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+                    log.warn(
+                        "StorageException when performing GCS bucket list operation, with message: "
+                            + se.getMessage());
                   }
                 });
   }
