@@ -155,7 +155,8 @@ public final class AppEngineDeploymentConfigurationPanel {
    *   if the project text represents an invalid project, an error message is displayed.
    */
   private void refreshApplicationInfoPanel() {
-    if (projectSelector.getText().isEmpty()) {
+    String projectSelectorText = projectSelector.getText();
+    if (projectSelectorText == null || projectSelectorText.isEmpty()) {
       applicationInfoPanel.setMessage("", false /* isError*/);
     } else if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
       applicationInfoPanel.refresh(
