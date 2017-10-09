@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * This model item represents a single GCP project.
  */
-final class ResourceProjectModelItem extends ModelItem {
+final class ResourceProjectModelItem extends GcpModelItem {
 
   @NotNull private final Project project;
   private String filter;

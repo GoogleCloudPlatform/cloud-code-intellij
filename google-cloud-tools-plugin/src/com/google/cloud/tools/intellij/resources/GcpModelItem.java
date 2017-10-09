@@ -16,10 +16,11 @@
 
 package com.google.cloud.tools.intellij.resources;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 /**
- * A non-existing project specified in the Project field of the App Engine Deployment configuration
- * dialog.
+ * Represents an existing or non-existing GCP project
  */
-public class InvalidProjectModelItem extends ModelItem {
+public class GcpModelItem extends DefaultMutableTreeNode {
 
 }

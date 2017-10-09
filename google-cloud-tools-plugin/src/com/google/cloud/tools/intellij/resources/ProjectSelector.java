@@ -189,7 +189,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       @Override
       public void focusLost(FocusEvent event) {
         if (!event.isTemporary()) {
-          ModelItem node = getCurrentModelItem();
+          GcpModelItem node = getCurrentModelItem();
           onSelectionChanged(node);
         }
       }
@@ -243,9 +243,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public String getProjectDescription() {
-    ModelItem modelItem = getCurrentModelItem();
-    return modelItem instanceof ResourceProjectModelItem ?
-        ((ResourceProjectModelItem)modelItem).getProject().getName() : null;
+    GcpModelItem gcpModelItem = getCurrentModelItem();
+    return gcpModelItem instanceof ResourceProjectModelItem ?
+        ((ResourceProjectModelItem) gcpModelItem).getProject().getName() : null;
   }
 
   /**
@@ -256,9 +256,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public Long getProjectNumber() {
-    ModelItem modelItem = getCurrentModelItem();
-    return modelItem instanceof ResourceProjectModelItem ?
-        ((ResourceProjectModelItem)modelItem).getProject().getProjectNumber() : null;
+    GcpModelItem gcpModelItem = getCurrentModelItem();
+    return gcpModelItem instanceof ResourceProjectModelItem ?
+        ((ResourceProjectModelItem) gcpModelItem).getProject().getProjectNumber() : null;
   }
 
   /**
@@ -269,13 +269,13 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public Project getProject() {
-   ModelItem modelItem = getCurrentModelItem();
-   return modelItem instanceof ResourceProjectModelItem ?
-       ((ResourceProjectModelItem)modelItem).getProject() : null;
+   GcpModelItem gcpModelItem = getCurrentModelItem();
+   return gcpModelItem instanceof ResourceProjectModelItem ?
+       ((ResourceProjectModelItem) gcpModelItem).getProject() : null;
   }
 
   @Nullable
-  private ModelItem getCurrentModelItem() {
+  private GcpModelItem getCurrentModelItem() {
     if (Strings.isNullOrEmpty(getText())) {
       return null;
     }
@@ -295,7 +295,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       }
     }
 
-    return new InvalidProjectModelItem();
+    return new InvalidResourceProjectModelItem();
   }
 
   @Override
@@ -553,7 +553,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     }
   }
 
-  private void onSelectionChanged(ModelItem newSelection) {
+  private void onSelectionChanged(GcpModelItem newSelection) {
     CredentialedUser user = null;
     ProjectSelectionChangedEvent event = null;
     if (newSelection != null) {
@@ -561,7 +561,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         user = ((GoogleUserModelItem) newSelection.getParent()).getCredentialedUser();
       }
 
-      if (newSelection instanceof InvalidProjectModelItem) {
+      if (newSelection instanceof InvalidResourceProjectModelItem) {
         event = new ProjectSelectionChangedEvent(null, user);
       } else if (newSelection instanceof ResourceProjectModelItem) {
         event = new ProjectSelectionChangedEvent((
