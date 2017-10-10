@@ -565,7 +565,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         event = new ProjectSelectionChangedEvent(null, user);
       } else if (newSelection instanceof ResourceProjectModelItem) {
         event = new ProjectSelectionChangedEvent((
-            (ResourceProjectModelItem)newSelection).getProject(), user);
+            (ResourceProjectModelItem) newSelection).getProject(), user);
       }
     }
     for (ProjectSelectionListener listener : projectSelectionListeners) {
