@@ -189,7 +189,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       @Override
       public void focusLost(FocusEvent event) {
         if (!event.isTemporary()) {
-          GcpModelItem node = getCurrentModelItem();
+          ProjectModelItem node = getCurrentModelItem();
           onSelectionChanged(node);
         }
       }
@@ -243,9 +243,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public String getProjectDescription() {
-    GcpModelItem gcpModelItem = getCurrentModelItem();
-    return gcpModelItem instanceof ResourceProjectModelItem ?
-        ((ResourceProjectModelItem) gcpModelItem).getProject().getName() : null;
+    ProjectModelItem projectModelItem = getCurrentModelItem();
+    return projectModelItem instanceof ResourceProjectModelItem ?
+        ((ResourceProjectModelItem) projectModelItem).getProject().getName() : null;
   }
 
   /**
@@ -256,9 +256,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public Long getProjectNumber() {
-    GcpModelItem gcpModelItem = getCurrentModelItem();
-    return gcpModelItem instanceof ResourceProjectModelItem ?
-        ((ResourceProjectModelItem) gcpModelItem).getProject().getProjectNumber() : null;
+    ProjectModelItem projectModelItem = getCurrentModelItem();
+    return projectModelItem instanceof ResourceProjectModelItem ?
+        ((ResourceProjectModelItem) projectModelItem).getProject().getProjectNumber() : null;
   }
 
   /**
@@ -269,13 +269,13 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public Project getProject() {
-   GcpModelItem gcpModelItem = getCurrentModelItem();
-   return gcpModelItem instanceof ResourceProjectModelItem ?
-       ((ResourceProjectModelItem) gcpModelItem).getProject() : null;
+   ProjectModelItem projectModelItem = getCurrentModelItem();
+   return projectModelItem instanceof ResourceProjectModelItem ?
+       ((ResourceProjectModelItem) projectModelItem).getProject() : null;
   }
 
   @Nullable
-  private GcpModelItem getCurrentModelItem() {
+  private ProjectModelItem getCurrentModelItem() {
     if (Strings.isNullOrEmpty(getText())) {
       return null;
     }
@@ -553,7 +553,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     }
   }
 
-  private void onSelectionChanged(GcpModelItem newSelection) {
+  private void onSelectionChanged(ProjectModelItem newSelection) {
     CredentialedUser user = null;
     ProjectSelectionChangedEvent event = null;
     if (newSelection != null) {

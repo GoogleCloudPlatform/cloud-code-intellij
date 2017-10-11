@@ -139,7 +139,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     }, isError);
   }
 
-  public void clearMessage() {
+  void clearMessage() {
     setMessage("", false /* isError*/);
   }
 
