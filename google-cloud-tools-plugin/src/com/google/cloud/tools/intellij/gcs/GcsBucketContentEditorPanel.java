@@ -101,7 +101,7 @@ final class GcsBucketContentEditorPanel {
 
   void initTableModel() {
     if (!Services.getLoginService().isLoggedIn()) {
-      showMessage(GctBundle.message("gcs.content.explorer.loading.error.text"));
+      showMessage(GctBundle.message("gcs.content.explorer.not.logged.in.text"));
       return;
     }
 
@@ -123,7 +123,7 @@ final class GcsBucketContentEditorPanel {
 
   void updateTableModel(String prefix) {
     if (!Services.getLoginService().isLoggedIn()) {
-      showMessage(GctBundle.message("gcs.content.explorer.loading.error.text"));
+      showMessage(GctBundle.message("gcs.content.explorer.not.logged.in.text"));
       return;
     }
 
