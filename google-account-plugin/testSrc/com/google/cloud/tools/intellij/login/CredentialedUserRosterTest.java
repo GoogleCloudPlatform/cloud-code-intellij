@@ -42,10 +42,6 @@ public class CredentialedUserRosterTest {
     user3 = new CredentialedUser("user3");
   }
 
-  /**
-   * Tests that {@link CredentialedUserRoster#addUser(CredentialedUser)} stores the proper users and
-   * currently manages the active user.
-   */
   @Test
   public void testAddUser() {
     Assert.assertEquals(0, users.numberOfUsers());
@@ -64,11 +60,6 @@ public class CredentialedUserRosterTest {
     Assert.assertNotNull(allUsers.get(user2.getEmail()));
   }
 
-  /**
-   * Tests that {@link CredentialedUserRoster#getActiveUser()} properly manages the active user so
-   * that the active user is either the last added user or the user that has explicitly requested to
-   * be active.
-   */
   @Test
   public void testGetActiveUser() {
     Assert.assertNull(users.getActiveUser());
@@ -102,7 +93,6 @@ public class CredentialedUserRosterTest {
     Assert.assertTrue(user1.isActive());
   }
 
-  /** Tests that {@link CredentialedUserRoster#getAllUsers()}. */
   @Test
   public void testGetAllUsers() {
     Assert.assertEquals(0, users.getAllUsers().size());
@@ -120,7 +110,6 @@ public class CredentialedUserRosterTest {
     Assert.assertEquals(2, users.getAllUsers().size());
   }
 
-  /** Tests {@link CredentialedUserRoster#isActiveUserAvailable()}. */
   @Test
   public void testIsActiveUserAvailable() {
     Assert.assertFalse(users.isActiveUserAvailable());
@@ -142,7 +131,6 @@ public class CredentialedUserRosterTest {
     Assert.assertTrue(user1.isActive());
   }
 
-  /** Tests {@link CredentialedUserRoster#numberOfUsers()} */
   @Test
   public void testNumberOfUsers() {
     Assert.assertEquals(0, users.numberOfUsers());
@@ -158,9 +146,6 @@ public class CredentialedUserRosterTest {
     Assert.assertEquals(2, users.numberOfUsers());
   }
 
-  /**
-   * Tests {@link CredentialedUserRoster#removeActiveUser()}
-   */
   @Test
   public void testRemoveActiveUser() {
     Assert.assertNull(users.getActiveUser());
@@ -179,7 +164,6 @@ public class CredentialedUserRosterTest {
     Assert.assertFalse(user3.isActive());
   }
 
-  /** Tests {@link CredentialedUserRoster#removeUser(String)} */
   @Test
   public void testRemoveUser() {
     Assert.assertFalse(users.removeUser(user1.getEmail()));
@@ -193,9 +177,6 @@ public class CredentialedUserRosterTest {
     Assert.assertNull(users.getActiveUser());
   }
 
-  /**
-   * Tests {@link CredentialedUserRoster#setActiveUser(String)}
-   */
   @Test
   public void testSetActiveUser() {
     users.addUser(user1);
@@ -216,9 +197,6 @@ public class CredentialedUserRosterTest {
     Assert.assertTrue(user1.isActive());
   }
 
-  /**
-   * Tests {@link CredentialedUserRoster#setAllUsers(java.util.Map)}
-   */
   @Test
   public void testSetAllUsers() {
     users.addUser(user1);
@@ -235,9 +213,6 @@ public class CredentialedUserRosterTest {
     Assert.assertTrue(setUsers.containsKey(user3.getEmail()));
   }
 
-  /**
-   * Tests {@link CredentialedUserRoster#removeAllUsers()}
-   */
   @Test
   public void testRemoveAllUsers() {
     Assert.assertEquals(0, users.numberOfUsers());
