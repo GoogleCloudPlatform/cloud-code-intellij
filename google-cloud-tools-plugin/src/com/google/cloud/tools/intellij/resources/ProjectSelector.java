@@ -26,7 +26,7 @@ import com.google.cloud.tools.intellij.login.ui.GoogleLoginEmptyPanel;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -50,6 +50,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -197,13 +198,14 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       }
     });
 
-    ApplicationManager.getApplication().getMessageBus().connect().subscribe(
-        GoogleLoginListener.GOOGLE_LOGIN_NOTIFIER_TOPIC, new GoogleLoginListener() {
-          @Override
-          public void statusChanged() {
-            synchronize(true);
-          }
-        });
+    Stream.of(ProjectManager.getInstance().getOpenProjects())
+        .forEach(
+            project ->
+                project
+                    .getMessageBus()
+                    .connect()
+                    .subscribe(
+                        GoogleLoginListener.GOOGLE_LOGIN_NOTIFIER_TOPIC, () -> synchronize(true)));
   }
 
   public void addModelListener(TreeModelListener listener) {
