@@ -96,6 +96,8 @@ final class GcsBucketPanel {
             }
           }
         });
+
+    refresh();
   }
 
   void refresh() {
