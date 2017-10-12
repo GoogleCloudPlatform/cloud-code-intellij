@@ -185,7 +185,7 @@ public class CredentialedUserRoster {
     GoogleLoginListener publisher =
         ApplicationManager.getApplication()
             .getMessageBus()
-            .syncPublisher(GoogleLoginListener.GOOGLE_LOGIN_NOTIFIER_TOPIC);
+            .syncPublisher(GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC);
     publisher.statusChanged();
   }
 }

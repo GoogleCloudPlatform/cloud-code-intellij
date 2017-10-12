@@ -205,7 +205,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
                     .getMessageBus()
                     .connect()
                     .subscribe(
-                        GoogleLoginListener.GOOGLE_LOGIN_NOTIFIER_TOPIC, () -> synchronize(true)));
+                        GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, () -> synchronize(true)));
   }
 
   public void addModelListener(TreeModelListener listener) {
