@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.resources;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.GoogleLoginNotifier;
+import com.google.cloud.tools.intellij.login.GoogleLoginListener;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginEmptyPanel;
@@ -198,7 +198,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     });
 
     ApplicationManager.getApplication().getMessageBus().connect().subscribe(
-        GoogleLoginNotifier.GOOGLE_LOGIN_NOTIFIER_TOPIC, new GoogleLoginNotifier() {
+        GoogleLoginListener.GOOGLE_LOGIN_NOTIFIER_TOPIC, new GoogleLoginListener() {
           @Override
           public void statusChanged() {
             synchronize(true);

@@ -19,10 +19,11 @@ package com.google.cloud.tools.intellij.login;
 import com.intellij.util.messages.Topic;
 
 /** Listener for changes in the login status. */
-public interface GoogleLoginNotifier {
+public interface GoogleLoginListener {
 
-  Topic<GoogleLoginNotifier> GOOGLE_LOGIN_NOTIFIER_TOPIC =
-      Topic.create("google-login", GoogleLoginNotifier.class);
+  Topic<GoogleLoginListener> GOOGLE_LOGIN_NOTIFIER_TOPIC =
+      Topic.create("google-login", GoogleLoginListener.class);
 
+  /** Called when the login or active status of the user changes. */
   void statusChanged();
 }
