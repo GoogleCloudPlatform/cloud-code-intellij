@@ -19,12 +19,14 @@ package com.google.cloud.tools.intellij.resources;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.GoogleLoginNotifier;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginEmptyPanel;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -194,6 +196,14 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         }
       }
     });
+
+    ApplicationManager.getApplication().getMessageBus().connect().subscribe(
+        GoogleLoginNotifier.GOOGLE_LOGIN_NOTIFIER_TOPIC, new GoogleLoginNotifier() {
+          @Override
+          public void statusChanged() {
+            synchronize(true);
+          }
+        });
   }
 
   public void addModelListener(TreeModelListener listener) {
