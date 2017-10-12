@@ -102,7 +102,7 @@ final class GcsBucketPanel {
     showNotificationPanel();
 
     if (!Services.getLoginService().isLoggedIn()) {
-      notificationLabel.setText("You are not logged in!");
+      notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.not.logged.in"));
     } else if (StringUtils.isEmpty(projectSelector.getText())) {
       notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
     } else {
