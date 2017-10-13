@@ -343,7 +343,7 @@ final class GcsBucketContentEditorPanel {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent event) {
       Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
       clipboard.setContents(new StringSelection(text), null /*owner*/);
     }
