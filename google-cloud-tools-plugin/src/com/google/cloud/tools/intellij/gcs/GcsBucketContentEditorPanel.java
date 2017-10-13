@@ -78,7 +78,7 @@ final class GcsBucketContentEditorPanel {
               Blob selectedBlob =
                   tableModel.getBlobAt(bucketContentTable.rowAtPoint(event.getPoint()));
 
-              if (selectedBlob.isDirectory()) {
+              if (selectedBlob != null && selectedBlob.isDirectory()) {
                 updateTableModel(selectedBlob.getName());
               }
             }
@@ -191,11 +191,14 @@ final class GcsBucketContentEditorPanel {
 
     Blob selectedBlob = tableModel.getBlobAt(bucketContentTable.rowAtPoint(event.getPoint()));
 
-    copyBlobNameMenuItem.addActionListener(new CopyToClipboardMouseAdapter(selectedBlob.getName()));
-    copyBucketNameMenuItem.addActionListener(
-        new CopyToClipboardMouseAdapter(selectedBlob.getBucket()));
+    if (selectedBlob != null) {
+      copyBlobNameMenuItem.addActionListener(
+          new CopyToClipboardMouseAdapter(selectedBlob.getName()));
+      copyBucketNameMenuItem.addActionListener(
+          new CopyToClipboardMouseAdapter(selectedBlob.getBucket()));
 
-    rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
+      rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
+    }
   }
 
   private void showMessage(String message) {
