@@ -15,24 +15,20 @@
  */
 package com.google.cloud.tools.intellij.login;
 
-import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.CredentialedUserRoster;
-
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.intellij.util.containers.HashMap;
-
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
-import java.util.Map;
 
 /**
  * Tests for {@link CredentialedUserRoster}.
  */
-@RunWith(JUnit4.class)
 public class CredentialedUserRosterTest {
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
   private CredentialedUserRoster users;
   private CredentialedUser user1;
   private CredentialedUser user2;
@@ -46,10 +42,6 @@ public class CredentialedUserRosterTest {
     user3 = new CredentialedUser("user3");
   }
 
-  /**
-   * Tests that {@link com.google.intellij.login.Users#addUser(CredentialedUser)}
-   * stores the proper users and currently manages the active user.
-   */
   @Test
   public void testAddUser() {
     Assert.assertEquals(0, users.numberOfUsers());
@@ -68,11 +60,6 @@ public class CredentialedUserRosterTest {
     Assert.assertNotNull(allUsers.get(user2.getEmail()));
   }
 
-  /**
-   * Tests that {@link com.google.intellij.login.Users#getActiveUser()}
-   * properly manages the active user so that the active user is either the last
-   * added user or the user that has explicitly requested to be active.
-   */
   @Test
   public void testGetActiveUser() {
     Assert.assertNull(users.getActiveUser());
@@ -106,9 +93,6 @@ public class CredentialedUserRosterTest {
     Assert.assertTrue(user1.isActive());
   }
 
-  /**
-   * Tests that {@link com.google.intellij.login.Users#getAllUsers()}.
-   */
   @Test
   public void testGetAllUsers() {
     Assert.assertEquals(0, users.getAllUsers().size());
@@ -126,9 +110,6 @@ public class CredentialedUserRosterTest {
     Assert.assertEquals(2, users.getAllUsers().size());
   }
 
-  /**
-   * Tests {@link com.google.intellij.login.Users#isActiveUserAvailable()}.
-   */
   @Test
   public void testIsActiveUserAvailable() {
     Assert.assertFalse(users.isActiveUserAvailable());
@@ -150,9 +131,6 @@ public class CredentialedUserRosterTest {
     Assert.assertTrue(user1.isActive());
   }
 
-  /**
-   * Tests {@link com.google.intellij.login.Users#numberOfUsers()}
-   */
   @Test
   public void testNumberOfUsers() {
     Assert.assertEquals(0, users.numberOfUsers());
@@ -168,9 +146,6 @@ public class CredentialedUserRosterTest {
     Assert.assertEquals(2, users.numberOfUsers());
   }
 
-  /**
-   * Tests {@link CredentialedUserRoster#removeActiveUser()}
-   */
   @Test
   public void testRemoveActiveUser() {
     Assert.assertNull(users.getActiveUser());
@@ -189,9 +164,6 @@ public class CredentialedUserRosterTest {
     Assert.assertFalse(user3.isActive());
   }
 
-  /**
-   * Tests {@link com.google.intellij.login.Users#removeUser()}
-   */
   @Test
   public void testRemoveUser() {
     Assert.assertFalse(users.removeUser(user1.getEmail()));
@@ -205,9 +177,6 @@ public class CredentialedUserRosterTest {
     Assert.assertNull(users.getActiveUser());
   }
 
-  /**
-   * Tests {@link com.google.intellij.login.Users#setActiveUser()}
-   */
   @Test
   public void testSetActiveUser() {
     users.addUser(user1);
@@ -228,9 +197,6 @@ public class CredentialedUserRosterTest {
     Assert.assertTrue(user1.isActive());
   }
 
-  /**
-   * Tests {@link CredentialedUserRoster#setAllUsers(java.util.Map)}
-   */
   @Test
   public void testSetAllUsers() {
     users.addUser(user1);
@@ -247,9 +213,6 @@ public class CredentialedUserRosterTest {
     Assert.assertTrue(setUsers.containsKey(user3.getEmail()));
   }
 
-  /**
-   * Tests {@link CredentialedUserRoster#removeAllUsers()}
-   */
   @Test
   public void testRemoveAllUsers() {
     Assert.assertEquals(0, users.numberOfUsers());
