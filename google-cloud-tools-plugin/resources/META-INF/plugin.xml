@@ -463,7 +463,7 @@
     </action>
 
     <group id="GoogleCloudTools" text="Google Cloud Tools" class="com.google.cloud.tools.intellij.CloudToolsMenuGroupAction" popup="true">
-      <group id="AddAppEngineFacet" text="Add App Engine framework support" class="com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFacetMenuGroupAction" popup="true">
+      <group id="AddAppEngineFacet" text="Add App Engine support" class="com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFacetMenuGroupAction" popup="true">
         <action id="AppAppEngineFacet.Standard" class="com.google.cloud.tools.intellij.appengine.facet.standard.AddAppEngineStandardFacetToolsMenuAction"/>
         <action id="AppAppEngineFacet.Flexible" class="com.google.cloud.tools.intellij.appengine.facet.flexible.AddAppEngineFlexibleFacetToolsMenuAction"/>
       </group>

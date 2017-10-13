@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.standard;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -29,7 +28,7 @@ public class AddAppEngineStandardFacetToolsMenuAction extends AnAction
   public AddAppEngineStandardFacetToolsMenuAction() {
     super(GctBundle.message("appengine.standard.facet.name"),
         GctBundle.message("appengine.add.standard.facet.tools.menu.description"),
-        GoogleCloudToolsIcons.APP_ENGINE);
+        null /* icon */);
   }
 
   @Override

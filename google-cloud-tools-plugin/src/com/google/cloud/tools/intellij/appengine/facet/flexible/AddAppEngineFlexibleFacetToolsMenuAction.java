@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -28,7 +27,7 @@ public class AddAppEngineFlexibleFacetToolsMenuAction extends AnAction {
   public AddAppEngineFlexibleFacetToolsMenuAction() {
     super(GctBundle.message("appengine.flexible.facet.name"),
         GctBundle.message("appengine.add.flexible.facet.tools.menu.description"),
-        GoogleCloudToolsIcons.APP_ENGINE);
+        null /* icon */);
   }
 
   @Override
