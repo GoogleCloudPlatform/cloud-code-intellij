@@ -449,9 +449,9 @@
   </extensions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <!--<toolWindow id="Google Cloud Storage" anchor="right"-->
-                <!--factoryClass="com.google.cloud.tools.intellij.gcs.GcsToolWindowFactory"/>-->
-    <!--<fileEditorProvider implementation="com.google.cloud.tools.intellij.gcs.GcsBucketEditorProvider"/>-->
+    <toolWindow id="Google Cloud Storage" anchor="right"
+                factoryClass="com.google.cloud.tools.intellij.gcs.GcsToolWindowFactory"/>
+    <fileEditorProvider implementation="com.google.cloud.tools.intellij.gcs.GcsBucketEditorProvider"/>
   </extensions>
 
   <actions>
@@ -468,8 +468,8 @@
       <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.debugger.CloudDebuggerToolsMenuAction"/>
       <separator/>
       <reference ref="GoogleCloudTools.UploadSourceToGCP"/>
-      <!--<separator/>-->
-      <!--<action id="GoogleCloudTools.CloudStorage" class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>-->
+      <separator/>
+      <action id="GoogleCloudTools.CloudStorage" class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>
       <separator/>
       <action id="GoogleCloudTools.Feedback" class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction"/>
 

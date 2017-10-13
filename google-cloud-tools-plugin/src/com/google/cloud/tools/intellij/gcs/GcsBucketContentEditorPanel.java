@@ -28,15 +28,23 @@ import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -73,6 +81,24 @@ final class GcsBucketContentEditorPanel {
               if (selectedBlob.isDirectory()) {
                 updateTableModel(selectedBlob.getName());
               }
+            }
+          }
+        });
+
+    bucketContentTable.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mousePressed(MouseEvent event) {
+            if (SwingUtilities.isRightMouseButton(event)) {
+              JTable source = (JTable) event.getSource();
+              int row = source.rowAtPoint(event.getPoint());
+              int col = source.columnAtPoint(event.getPoint());
+
+              if (!source.isRowSelected(row)) {
+                source.changeSelection(row, col, false, false);
+              }
+
+              showRightClickMenu(event);
             }
           }
         });
@@ -152,6 +178,22 @@ final class GcsBucketContentEditorPanel {
 
     breadcrumbs.render(bucket.getName(), prefix);
     loadBlobsStartingWith(prefix, afterLoad);
+  }
+
+  private void showRightClickMenu(MouseEvent event) {
+    JPopupMenu rightClickMenu = new JPopupMenu();
+    JMenuItem copyBlobNameMenuItem = new JMenuItem("Copy blob name");
+    JMenuItem copyBucketNameMenuItem = new JMenuItem("Copy bucket name");
+    rightClickMenu.add(copyBlobNameMenuItem);
+    rightClickMenu.add(copyBucketNameMenuItem);
+
+    Blob selectedBlob = tableModel.getBlobAt(bucketContentTable.rowAtPoint(event.getPoint()));
+
+    copyBlobNameMenuItem.addActionListener(new CopyToClipboardMouseAdapter(selectedBlob.getName()));
+    copyBucketNameMenuItem.addActionListener(
+        new CopyToClipboardMouseAdapter(selectedBlob.getBucket()));
+
+    rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
   }
 
   private void showMessage(String message) {
@@ -290,5 +332,20 @@ final class GcsBucketContentEditorPanel {
             return super.getCellRenderer(row, column);
           }
         };
+  }
+
+  private static class CopyToClipboardMouseAdapter implements ActionListener {
+
+    private final String text;
+
+    CopyToClipboardMouseAdapter(String text) {
+      this.text = text;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      clipboard.setContents(new StringSelection(text), null /*owner*/);
+    }
   }
 }
