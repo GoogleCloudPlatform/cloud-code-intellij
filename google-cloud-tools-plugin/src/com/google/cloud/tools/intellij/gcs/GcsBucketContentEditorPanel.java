@@ -182,8 +182,10 @@ final class GcsBucketContentEditorPanel {
 
   private void showRightClickMenu(MouseEvent event) {
     JPopupMenu rightClickMenu = new JPopupMenu();
-    JMenuItem copyBlobNameMenuItem = new JMenuItem("Copy blob name");
-    JMenuItem copyBucketNameMenuItem = new JMenuItem("Copy bucket name");
+    JMenuItem copyBlobNameMenuItem =
+        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.blob.text"));
+    JMenuItem copyBucketNameMenuItem =
+        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.bucket.text"));
     rightClickMenu.add(copyBlobNameMenuItem);
     rightClickMenu.add(copyBucketNameMenuItem);
 
