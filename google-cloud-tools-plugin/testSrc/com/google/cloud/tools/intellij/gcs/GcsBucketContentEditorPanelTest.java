@@ -27,8 +27,10 @@ import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.cloud.storage.StorageException;
+import com.google.cloud.tools.intellij.login.GoogleLoginService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.DelayedSubmitExecutorServiceProxy;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.testing.TimeZoneRule;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.collect.BiMap;
@@ -65,6 +67,7 @@ public class GcsBucketContentEditorPanelTest {
 
   private GcsBucketContentEditorPanel editorPanel;
 
+  @TestService @Mock private GoogleLoginService loginService;
   @Mock private Blob binaryBlob;
   @Mock private Blob directoryBlob;
   @Mock private Blob binaryBlobInDirectory;
@@ -73,6 +76,8 @@ public class GcsBucketContentEditorPanelTest {
   @Before
   public void setUp() {
     GcsTestUtils.setupVirtualFileWithBucketMocks(bucketVirtualFile);
+
+    when(loginService.isLoggedIn()).thenReturn(true);
 
     when(directoryBlob.isDirectory()).thenReturn(true);
     when(directoryBlob.getName()).thenReturn(DIR_NAME);
@@ -94,6 +99,17 @@ public class GcsBucketContentEditorPanelTest {
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getColumnCount()).isEqualTo(0);
     assertThat(bucketTable.getRowCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void testLoginMessageShown_whenLoggedOut() {
+    when(loginService.isLoggedIn()).thenReturn(false);
+    editorPanel = new GcsBucketContentEditorPanel(bucketVirtualFile.getBucket());
+    editorPanel.initTableModel();
+
+    assertTrue(editorPanel.getMessagePanel().isVisible());
+    assertThat(editorPanel.getMessageLabel().getText())
+        .isEqualTo("To view bucket contents log in to your Google Cloud Platform account");
   }
 
   @Test
@@ -188,8 +204,8 @@ public class GcsBucketContentEditorPanelTest {
     editorPanel.initTableModel();
 
     JScrollPane bucketScrollPane = editorPanel.getBucketContentScrollPane();
-    JPanel noBlobsPanel = editorPanel.getNoBlobsPanel();
-    JLabel noBlobsLabel = editorPanel.getNoBlobsLabel();
+    JPanel noBlobsPanel = editorPanel.getMessagePanel();
+    JLabel noBlobsLabel = editorPanel.getMessageLabel();
 
     assertFalse(bucketScrollPane.isVisible());
     assertTrue(noBlobsPanel.isVisible());
@@ -209,8 +225,8 @@ public class GcsBucketContentEditorPanelTest {
     initEditorWithBlobs(binaryBlob);
 
     JScrollPane bucketScrollPane = editorPanel.getBucketContentScrollPane();
-    JPanel noBlobsPanel = editorPanel.getNoBlobsPanel();
-    JLabel noBlobsLabel = editorPanel.getNoBlobsLabel();
+    JPanel noBlobsPanel = editorPanel.getMessagePanel();
+    JLabel noBlobsLabel = editorPanel.getMessageLabel();
 
     assertTrue(bucketScrollPane.isVisible());
     assertFalse(noBlobsPanel.isVisible());
@@ -231,8 +247,8 @@ public class GcsBucketContentEditorPanelTest {
     editorPanel.updateTableModel(DIR_NAME);
 
     JScrollPane bucketScrollPane = editorPanel.getBucketContentScrollPane();
-    JPanel noBlobsPanel = editorPanel.getNoBlobsPanel();
-    JLabel noBlobsLabel = editorPanel.getNoBlobsLabel();
+    JPanel noBlobsPanel = editorPanel.getMessagePanel();
+    JLabel noBlobsLabel = editorPanel.getMessageLabel();
 
     assertFalse(bucketScrollPane.isVisible());
     assertTrue(noBlobsPanel.isVisible());
@@ -252,8 +268,8 @@ public class GcsBucketContentEditorPanelTest {
     initEditorWithBlobs(directoryBlob, binaryBlobInDirectory);
 
     JScrollPane bucketScrollPane = editorPanel.getBucketContentScrollPane();
-    JPanel noBlobsPanel = editorPanel.getNoBlobsPanel();
-    JLabel noBlobsLabel = editorPanel.getNoBlobsLabel();
+    JPanel noBlobsPanel = editorPanel.getMessagePanel();
+    JLabel noBlobsLabel = editorPanel.getMessageLabel();
 
     assertTrue(bucketScrollPane.isVisible());
     assertFalse(noBlobsPanel.isVisible());
@@ -314,7 +330,7 @@ public class GcsBucketContentEditorPanelTest {
     JTable bucketTable = editorPanel.getBucketContentTable();
     assertThat(bucketTable.getColumnCount()).isEqualTo(0);
     assertThat(bucketTable.getRowCount()).isEqualTo(0);
-    assertFalse(editorPanel.getNoBlobsPanel().isVisible());
+    assertFalse(editorPanel.getMessagePanel().isVisible());
     assertFalse(editorPanel.getLoadingPanel().isVisible());
     assertTrue(editorPanel.getErrorPanel().isVisible());
   }
