@@ -20,6 +20,7 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -95,12 +96,16 @@ final class GcsBucketPanel {
             }
           }
         });
+
+    refresh();
   }
 
   void refresh() {
     showNotificationPanel();
 
-    if (StringUtils.isEmpty(projectSelector.getText())) {
+    if (!Services.getLoginService().isLoggedIn()) {
+      notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.not.logged.in"));
+    } else if (StringUtils.isEmpty(projectSelector.getText())) {
       notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
     } else {
       String projectId = projectSelector.getText();

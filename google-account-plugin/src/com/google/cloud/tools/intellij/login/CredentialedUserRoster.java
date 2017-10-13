@@ -16,14 +16,11 @@
 
 package com.google.cloud.tools.intellij.login;
 
-import com.google.common.collect.Lists;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
+import com.intellij.openapi.application.ApplicationManager;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Tracks which users are logged in, and which of these (if any) is currently designated as the
@@ -34,7 +31,6 @@ public class CredentialedUserRoster {
 
   private final Map<String, CredentialedUser> allUsers =
       new LinkedHashMap<String, CredentialedUser>();
-  private final Collection<GoogleLoginListener> listeners = Lists.newLinkedList();
   private CredentialedUser activeUser;
 
   /**
@@ -185,23 +181,11 @@ public class CredentialedUserRoster {
     }
   }
 
-  /**
-   * Register a specified {@link GoogleLoginListener} to be notified of changes to the logged-in
-   * state.
-   *
-   * @param listener the specified {@code GoogleLoginListener}
-   */
-  void addLoginListener(GoogleLoginListener listener) {
-    synchronized (listeners) {
-      listeners.add(listener);
-    }
-  }
-
   private void notifyLoginStatusChange() {
-    synchronized (listeners) {
-      for (GoogleLoginListener listener : listeners) {
-        listener.statusChanged();
-      }
-    }
+    GoogleLoginListener publisher =
+        ApplicationManager.getApplication()
+            .getMessageBus()
+            .syncPublisher(GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC);
+    publisher.statusChanged();
   }
 }
