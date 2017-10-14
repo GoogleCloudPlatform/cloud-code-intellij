@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
 /**
@@ -25,6 +26,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 public class AddAppEngineFacetMenuGroupAction extends DefaultActionGroup {
 
   public AddAppEngineFacetMenuGroupAction() {
+    getTemplatePresentation().setText(GctBundle.message("appengine.add.facet.group.menu.text"));
     getTemplatePresentation().setIcon(GoogleCloudToolsIcons.APP_ENGINE);
   }
 
