@@ -23,8 +23,10 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterators;
 import com.intellij.openapi.application.ApplicationManager;
@@ -173,6 +175,8 @@ final class GcsBucketPanel {
       return;
     }
 
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BUCKET_LIST).ping();
+
     bucketListModel.clear();
     notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.loading.text"));
 
@@ -201,6 +205,10 @@ final class GcsBucketPanel {
                   } catch (StorageException se) {
                     notificationLabel.setText(
                         GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+
+                    UsageTrackerProvider.getInstance()
+                        .trackEvent(GctTracking.GCS_BUCKET_LIST_EXCEPTION)
+                        .ping();
                     log.warn(
                         "StorageException when performing GCS bucket list operation, with message: "
                             + se.getMessage());
@@ -253,6 +261,11 @@ final class GcsBucketPanel {
     Bucket bucket = bucketListModel.getElementAt(index);
 
     if (bucket != null) {
+      copyBucketNameMenuItem.addActionListener(
+          e ->
+              UsageTrackerProvider.getInstance()
+                  .trackEvent(GctTracking.GCS_BUCKET_LIST_COPY_BUCKET_NAME)
+                  .ping());
       copyBucketNameMenuItem.addActionListener(new CopyToClipboardActionListener(bucket.getName()));
       rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
     }

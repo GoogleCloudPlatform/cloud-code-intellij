@@ -64,6 +64,17 @@ public class GctTracking {
 
   public static final String CLOUD_SDK_MALFORMED_PATH = "cloudsdk.malformedpath";
 
+  public static final String GCS_BUCKET_LIST = "cloud.storage.bucket.list";
+  public static final String GCS_BUCKET_LIST_EXCEPTION = "cloud.storage.bucket.list.exception";
+  public static final String GCS_BUCKET_LIST_COPY_BUCKET_NAME =
+      "cloud.storage.bucket.list.copy.blob.name";
+  public static final String GCS_BLOB_BROWSE = "cloud.storage.blob.browse";
+  public static final String GCS_BLOB_BROWSE_COPY_BUCKET_NAME =
+      "cloud.storage.blob.browse.copy.bucket.name";
+  public static final String GCS_BLOB_BROWSE_COPY_BLOB_NAME =
+      "cloud.storage.blob.browse.copy.blob.name";
+  public static final String GCS_BLOB_BROWSE_EXCEPTION = "cloud.storage.blow.browse.exception";
+
   public static final String METADATA_LABEL_KEY = "label";
   public static final String METADATA_MESSAGE_KEY = "message";
 }
