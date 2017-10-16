@@ -21,6 +21,7 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.annotations.VisibleForTesting;
@@ -28,11 +29,6 @@ import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -193,9 +189,9 @@ final class GcsBucketContentEditorPanel {
 
     if (selectedBlob != null) {
       copyBlobNameMenuItem.addActionListener(
-          new CopyToClipboardMouseAdapter(selectedBlob.getName()));
+          new CopyToClipboardActionListener(selectedBlob.getName()));
       copyBucketNameMenuItem.addActionListener(
-          new CopyToClipboardMouseAdapter(selectedBlob.getBucket()));
+          new CopyToClipboardActionListener(selectedBlob.getBucket()));
 
       rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
     }
@@ -337,20 +333,5 @@ final class GcsBucketContentEditorPanel {
             return super.getCellRenderer(row, column);
           }
         };
-  }
-
-  private static class CopyToClipboardMouseAdapter implements ActionListener {
-
-    private final String text;
-
-    CopyToClipboardMouseAdapter(String text) {
-      this.text = text;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent event) {
-      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-      clipboard.setContents(new StringSelection(text), null /*owner*/);
-    }
   }
 }
