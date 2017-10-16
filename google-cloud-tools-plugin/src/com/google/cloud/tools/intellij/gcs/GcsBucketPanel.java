@@ -245,15 +245,15 @@ final class GcsBucketPanel {
 
   private void showRightClickMenu(MouseEvent event) {
     JPopupMenu rightClickMenu = new JPopupMenu();
-    JMenuItem copyBlobNameMenuItem =
-        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.blob.text"));
-    rightClickMenu.add(copyBlobNameMenuItem);
+    JMenuItem copyBucketNameMenuItem =
+        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.bucket.text"));
+    rightClickMenu.add(copyBucketNameMenuItem);
 
     int index = bucketList.locationToIndex(event.getPoint());
     Bucket bucket = bucketListModel.getElementAt(index);
 
     if (bucket != null) {
-      copyBlobNameMenuItem.addActionListener(new CopyToClipboardActionListener(bucket.getName()));
+      copyBucketNameMenuItem.addActionListener(new CopyToClipboardActionListener(bucket.getName()));
       rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
     }
   }
