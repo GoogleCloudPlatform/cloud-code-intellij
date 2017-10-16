@@ -18,15 +18,10 @@ package com.google.cloud.tools.intellij.testing;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.extensions.DefaultPluginDescriptor;
-import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.extensions.Extensions;
-import com.intellij.openapi.extensions.PluginId;
-import com.intellij.openapi.extensions.impl.ExtensionPointImpl;
 import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.TestRunnerUtil;
-import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -65,19 +60,6 @@ public class BasePluginTestCase {
    */
   protected <T> void registerService(Class<T> clazz, T instance) {
     applicationContainer.registerComponentInstance(clazz.getName(), instance);
-  }
-
-  /**
-   * Register your extension points for test here.
-   */
-  protected <N, T extends N> ExtensionPointImpl<T> registerExtensionPoint(
-      @NotNull ExtensionPointName<N> name,
-      @NotNull Class<T> type) {
-    extensionsArea.registerExtensionPoint(
-        name.getName(),
-        type.getName(),
-        new DefaultPluginDescriptor(PluginId.getId(type.getName()), type.getClassLoader()));
-    return extensionsArea.getExtensionPoint(name.getName());
   }
 
   @After
