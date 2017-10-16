@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /** {@link ActionListener} that copies text to the clipboard on action performed. */
-public class CopyToClipboardActionListener implements ActionListener {
+public final class CopyToClipboardActionListener implements ActionListener {
   private final String text;
 
   public CopyToClipboardActionListener(String text) {
