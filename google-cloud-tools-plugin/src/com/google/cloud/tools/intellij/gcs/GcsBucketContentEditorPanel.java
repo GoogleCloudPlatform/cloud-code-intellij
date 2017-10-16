@@ -129,7 +129,7 @@ final class GcsBucketContentEditorPanel {
       return;
     }
 
-    pingMetrics(GctTracking.GCS_BLOB_BROWSE);
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BLOB_BROWSE).ping();
 
     Consumer<List<Blob>> afterLoad =
         blobs -> {
@@ -158,7 +158,7 @@ final class GcsBucketContentEditorPanel {
       return;
     }
 
-    pingMetrics(GctTracking.GCS_BLOB_BROWSE);
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BLOB_BROWSE).ping();
 
     tableModel.setRowCount(0);
 
@@ -194,19 +194,19 @@ final class GcsBucketContentEditorPanel {
     Blob selectedBlob = tableModel.getBlobAt(bucketContentTable.rowAtPoint(event.getPoint()));
 
     if (selectedBlob != null) {
-      copyBucketNameMenuItem.addActionListener(
+      copyBlobNameMenuItem.addActionListener(
           e ->
               UsageTrackerProvider.getInstance()
-                  .trackEvent(GctTracking.GCS_BUCKET_LIST_ACTION_COPY_BUCKET_NAME)
+                  .trackEvent(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BLOB_NAME)
                   .ping());
-
-      copyBlobNameMenuItem.addActionListener(
-          e -> pingMetrics(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BLOB_NAME));
       copyBlobNameMenuItem.addActionListener(
           new CopyToClipboardActionListener(selectedBlob.getName()));
 
       copyBucketNameMenuItem.addActionListener(
-          e -> pingMetrics(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BUCKET_NAME));
+          e ->
+              UsageTrackerProvider.getInstance()
+                  .trackEvent(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BUCKET_NAME)
+                  .ping());
       copyBucketNameMenuItem.addActionListener(
           new CopyToClipboardActionListener(selectedBlob.getBucket()));
 
@@ -302,10 +302,6 @@ final class GcsBucketContentEditorPanel {
 
   private void hideError() {
     errorPanel.setVisible(false);
-  }
-
-  private void pingMetrics(String metricsEvent) {
-    UsageTrackerProvider.getInstance().trackEvent(metricsEvent).ping();
   }
 
   JPanel getComponent() {
