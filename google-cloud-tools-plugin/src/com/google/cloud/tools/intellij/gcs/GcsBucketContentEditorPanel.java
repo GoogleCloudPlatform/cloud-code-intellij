@@ -197,16 +197,16 @@ final class GcsBucketContentEditorPanel {
       copyBucketNameMenuItem.addActionListener(
           e ->
               UsageTrackerProvider.getInstance()
-                  .trackEvent(GctTracking.GCS_BUCKET_LIST_COPY_BUCKET_NAME)
+                  .trackEvent(GctTracking.GCS_BUCKET_LIST_ACTION_COPY_BUCKET_NAME)
                   .ping());
 
       copyBlobNameMenuItem.addActionListener(
-          e -> pingMetrics(GctTracking.GCS_BLOB_BROWSE_COPY_BLOB_NAME));
+          e -> pingMetrics(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BLOB_NAME));
       copyBlobNameMenuItem.addActionListener(
           new CopyToClipboardActionListener(selectedBlob.getName()));
 
       copyBucketNameMenuItem.addActionListener(
-          e -> pingMetrics(GctTracking.GCS_BLOB_BROWSE_COPY_BUCKET_NAME));
+          e -> pingMetrics(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BUCKET_NAME));
       copyBucketNameMenuItem.addActionListener(
           new CopyToClipboardActionListener(selectedBlob.getBucket()));
 

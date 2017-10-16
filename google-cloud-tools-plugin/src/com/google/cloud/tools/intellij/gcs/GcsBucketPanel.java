@@ -264,7 +264,7 @@ final class GcsBucketPanel {
       copyBucketNameMenuItem.addActionListener(
           e ->
               UsageTrackerProvider.getInstance()
-                  .trackEvent(GctTracking.GCS_BUCKET_LIST_COPY_BUCKET_NAME)
+                  .trackEvent(GctTracking.GCS_BUCKET_LIST_ACTION_COPY_BUCKET_NAME)
                   .ping());
       copyBucketNameMenuItem.addActionListener(new CopyToClipboardActionListener(bucket.getName()));
       rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
