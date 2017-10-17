@@ -21,8 +21,10 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
@@ -127,6 +129,8 @@ final class GcsBucketContentEditorPanel {
       return;
     }
 
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BLOB_BROWSE).ping();
+
     Consumer<List<Blob>> afterLoad =
         blobs -> {
           if (blobs.isEmpty()) {
@@ -153,6 +157,8 @@ final class GcsBucketContentEditorPanel {
       initTableModel();
       return;
     }
+
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BLOB_BROWSE).ping();
 
     tableModel.setRowCount(0);
 
@@ -189,7 +195,18 @@ final class GcsBucketContentEditorPanel {
 
     if (selectedBlob != null) {
       copyBlobNameMenuItem.addActionListener(
+          e ->
+              UsageTrackerProvider.getInstance()
+                  .trackEvent(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BLOB_NAME)
+                  .ping());
+      copyBlobNameMenuItem.addActionListener(
           new CopyToClipboardActionListener(selectedBlob.getName()));
+
+      copyBucketNameMenuItem.addActionListener(
+          e ->
+              UsageTrackerProvider.getInstance()
+                  .trackEvent(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BUCKET_NAME)
+                  .ping());
       copyBucketNameMenuItem.addActionListener(
           new CopyToClipboardActionListener(selectedBlob.getBucket()));
 
@@ -240,6 +257,10 @@ final class GcsBucketContentEditorPanel {
                         () -> {
                           hideLoader();
                           showError();
+
+                          UsageTrackerProvider.getInstance()
+                              .trackEvent(GctTracking.GCS_BLOB_BROWSE_EXCEPTION)
+                              .ping();
                           log.warn(
                               "StorageException when performing GCS blob list operation, with message: "
                                   + se.getMessage());
