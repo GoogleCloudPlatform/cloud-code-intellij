@@ -18,12 +18,13 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
 
-import com.google.cloud.tools.intellij.appengine.facet.standard.AddAppEngineStandardFacetToolsMenuAction;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -35,6 +36,12 @@ import org.junit.runners.JUnit4;
 public class AddAppEngineFlexibleFacetToolsMenuActionTest {
 
   @Test
+  public void isActionNotRegistered() {
+    assertNull(ActionManager.getInstance().getAction("AppAppEngineFacet.Flexible"));
+  }
+
+  @Ignore
+  // Temporarily disabled until implementation is complete
   public void isActionRegistered() {
     AnAction action = ActionManager.getInstance().getAction("AppAppEngineFacet.Flexible");
     assertNotNull(action);
