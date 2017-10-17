@@ -20,6 +20,8 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.cloud.storage.StorageException;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.annotations.VisibleForTesting;
@@ -33,9 +35,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -51,8 +56,8 @@ final class GcsBucketContentEditorPanel {
   private JTable bucketContentTable;
   private JButton refreshButton;
   private GcsBreadcrumbsTextPane breadcrumbs;
-  private JLabel noBlobsLabel;
-  private JPanel noBlobsPanel;
+  private JLabel messageLabel;
+  private JPanel messagePanel;
   private JScrollPane bucketContentScrollPane;
   private JPanel loadingPanel;
   private JPanel errorPanel;
@@ -69,9 +74,27 @@ final class GcsBucketContentEditorPanel {
               Blob selectedBlob =
                   tableModel.getBlobAt(bucketContentTable.rowAtPoint(event.getPoint()));
 
-              if (selectedBlob.isDirectory()) {
+              if (selectedBlob != null && selectedBlob.isDirectory()) {
                 updateTableModel(selectedBlob.getName());
               }
+            }
+          }
+        });
+
+    bucketContentTable.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mousePressed(MouseEvent event) {
+            if (SwingUtilities.isRightMouseButton(event)) {
+              JTable source = (JTable) event.getSource();
+              int row = source.rowAtPoint(event.getPoint());
+              int col = source.columnAtPoint(event.getPoint());
+
+              if (!source.isRowSelected(row)) {
+                source.changeSelection(row, col, false, false);
+              }
+
+              showRightClickMenu(event);
             }
           }
         });
@@ -99,10 +122,15 @@ final class GcsBucketContentEditorPanel {
   }
 
   void initTableModel() {
+    if (!Services.getLoginService().isLoggedIn()) {
+      showMessage(GctBundle.message("gcs.content.explorer.not.logged.in.text"));
+      return;
+    }
+
     Consumer<List<Blob>> afterLoad =
         blobs -> {
           if (blobs.isEmpty()) {
-            showEmptyBlobs(GctBundle.message("gcs.content.explorer.empty.bucket.text"));
+            showMessage(GctBundle.message("gcs.content.explorer.empty.bucket.text"));
           } else {
             showBlobTable();
             tableModel = new GcsBlobTableModel();
@@ -116,6 +144,11 @@ final class GcsBucketContentEditorPanel {
   }
 
   void updateTableModel(String prefix) {
+    if (!Services.getLoginService().isLoggedIn()) {
+      showMessage(GctBundle.message("gcs.content.explorer.not.logged.in.text"));
+      return;
+    }
+
     if (tableModel == null) {
       initTableModel();
       return;
@@ -130,7 +163,7 @@ final class GcsBucketContentEditorPanel {
                 prefix.isEmpty()
                     ? GctBundle.message("gcs.content.explorer.empty.bucket.text")
                     : GctBundle.message("gcs.content.explorer.empty.directory.text");
-            showEmptyBlobs(message);
+            showMessage(message);
           } else {
             showBlobTable();
 
@@ -143,14 +176,35 @@ final class GcsBucketContentEditorPanel {
     loadBlobsStartingWith(prefix, afterLoad);
   }
 
-  private void showEmptyBlobs(String message) {
+  private void showRightClickMenu(MouseEvent event) {
+    JPopupMenu rightClickMenu = new JPopupMenu();
+    JMenuItem copyBlobNameMenuItem =
+        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.blob.text"));
+    JMenuItem copyBucketNameMenuItem =
+        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.bucket.text"));
+    rightClickMenu.add(copyBlobNameMenuItem);
+    rightClickMenu.add(copyBucketNameMenuItem);
+
+    Blob selectedBlob = tableModel.getBlobAt(bucketContentTable.rowAtPoint(event.getPoint()));
+
+    if (selectedBlob != null) {
+      copyBlobNameMenuItem.addActionListener(
+          new CopyToClipboardActionListener(selectedBlob.getName()));
+      copyBucketNameMenuItem.addActionListener(
+          new CopyToClipboardActionListener(selectedBlob.getBucket()));
+
+      rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
+    }
+  }
+
+  private void showMessage(String message) {
     bucketContentScrollPane.setVisible(false);
-    noBlobsPanel.setVisible(true);
-    noBlobsLabel.setText(message);
+    messagePanel.setVisible(true);
+    messageLabel.setText(message);
   }
 
   private void showBlobTable() {
-    noBlobsPanel.setVisible(false);
+    messagePanel.setVisible(false);
     bucketContentScrollPane.setVisible(true);
   }
 
@@ -214,7 +268,7 @@ final class GcsBucketContentEditorPanel {
   private void showLoader() {
     loadingPanel.setVisible(true);
     bucketContentScrollPane.setVisible(false);
-    noBlobsPanel.setVisible(false);
+    messagePanel.setVisible(false);
   }
 
   private void hideLoader() {
@@ -244,8 +298,8 @@ final class GcsBucketContentEditorPanel {
   }
 
   @VisibleForTesting
-  JLabel getNoBlobsLabel() {
-    return noBlobsLabel;
+  JLabel getMessageLabel() {
+    return messageLabel;
   }
 
   @VisibleForTesting
@@ -254,8 +308,8 @@ final class GcsBucketContentEditorPanel {
   }
 
   @VisibleForTesting
-  JPanel getNoBlobsPanel() {
-    return noBlobsPanel;
+  JPanel getMessagePanel() {
+    return messagePanel;
   }
 
   @VisibleForTesting

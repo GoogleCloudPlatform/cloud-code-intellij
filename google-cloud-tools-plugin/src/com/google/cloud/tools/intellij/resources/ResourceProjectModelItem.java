@@ -18,12 +18,13 @@ package com.google.cloud.tools.intellij.resources;
 
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.common.base.Strings;
-import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** This model item represents a single GCP project. */
-final class ResourceProjectModelItem extends DefaultMutableTreeNode {
+/**
+ * This model item represents a single GCP project.
+ */
+final class ResourceProjectModelItem extends ProjectModelItem {
 
   @NotNull private final Project project;
   private String filter;

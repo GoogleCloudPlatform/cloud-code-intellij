@@ -20,8 +20,10 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterators;
@@ -40,7 +42,10 @@ import java.util.concurrent.Future;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -95,12 +100,29 @@ final class GcsBucketPanel {
             }
           }
         });
+
+    bucketList.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mousePressed(MouseEvent event) {
+            if (SwingUtilities.isRightMouseButton(event)) {
+              JList source = (JList) event.getSource();
+              source.setSelectedIndex(source.locationToIndex(event.getPoint()));
+
+              showRightClickMenu(event);
+            }
+          }
+        });
+
+    refresh();
   }
 
   void refresh() {
     showNotificationPanel();
 
-    if (StringUtils.isEmpty(projectSelector.getText())) {
+    if (!Services.getLoginService().isLoggedIn()) {
+      notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.not.logged.in"));
+    } else if (StringUtils.isEmpty(projectSelector.getText())) {
       notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
     } else {
       String projectId = projectSelector.getText();
@@ -219,5 +241,20 @@ final class GcsBucketPanel {
   private void showBucketListPanel() {
     bucketListPanel.setVisible(true);
     notificationPanel.setVisible(false);
+  }
+
+  private void showRightClickMenu(MouseEvent event) {
+    JPopupMenu rightClickMenu = new JPopupMenu();
+    JMenuItem copyBucketNameMenuItem =
+        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.bucket.text"));
+    rightClickMenu.add(copyBucketNameMenuItem);
+
+    int index = bucketList.locationToIndex(event.getPoint());
+    Bucket bucket = bucketListModel.getElementAt(index);
+
+    if (bucket != null) {
+      copyBucketNameMenuItem.addActionListener(new CopyToClipboardActionListener(bucket.getName()));
+      rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
+    }
   }
 }

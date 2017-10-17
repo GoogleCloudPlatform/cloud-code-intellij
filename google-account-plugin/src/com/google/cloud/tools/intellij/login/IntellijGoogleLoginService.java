@@ -34,7 +34,6 @@ import com.google.gdt.eclipse.login.common.OAuthData;
 import com.google.gdt.eclipse.login.common.OAuthDataStore;
 import com.google.gdt.eclipse.login.common.UiFacade;
 import com.google.gdt.eclipse.login.common.VerificationCodeHolder;
-
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -49,18 +48,15 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ex.ProgressIndicatorEx;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
-
-import net.jcip.annotations.Immutable;
-
-import org.apache.commons.lang.WordUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.Window;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import net.jcip.annotations.Immutable;
+import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -79,7 +75,6 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
     this.uiFacade = new AndroidUiFacade();
     this.users = new CredentialedUserRoster();
     this.dataStore =  new AndroidPreferencesOAuthDataStore();
-    addLoginListenersFromExtensionPoints();
   }
 
   @Nullable
@@ -350,17 +345,6 @@ public class IntellijGoogleLoginService implements GoogleLoginService {
       user.getGoogleLoginState().logOut(false /* showPrompt */);
     }
     users.removeAllUsers();
-  }
-
-  /**
-   * Gets all the implementations of {@link GoogleLoginListener} and registers them to
-   * <code>state</code>.
-   */
-  private void addLoginListenersFromExtensionPoints() {
-    GoogleLoginListener[] loginListeners = Extensions.getExtensions(GoogleLoginListener.EP_NAME);
-    for (GoogleLoginListener listener : loginListeners) {
-      users.addLoginListener(listener);
-    }
   }
 
   /**

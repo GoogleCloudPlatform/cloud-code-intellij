@@ -19,12 +19,14 @@ package com.google.cloud.tools.intellij.resources;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.GoogleLoginListener;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginEmptyPanel;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -48,6 +50,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -189,11 +192,20 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       @Override
       public void focusLost(FocusEvent event) {
         if (!event.isTemporary()) {
-          ResourceProjectModelItem node = getCurrentModelItem();
+          ProjectModelItem node = getCurrentModelItem();
           onSelectionChanged(node);
         }
       }
     });
+
+    Stream.of(ProjectManager.getInstance().getOpenProjects())
+        .forEach(
+            project ->
+                project
+                    .getMessageBus()
+                    .connect()
+                    .subscribe(
+                        GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, () -> synchronize(true)));
   }
 
   public void addModelListener(TreeModelListener listener) {
@@ -243,8 +255,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public String getProjectDescription() {
-    ResourceProjectModelItem modelItem = getCurrentModelItem();
-    return modelItem != null ? modelItem.getProject().getName() : null;
+    ProjectModelItem projectModelItem = getCurrentModelItem();
+    return projectModelItem instanceof ResourceProjectModelItem ?
+        ((ResourceProjectModelItem) projectModelItem).getProject().getName() : null;
   }
 
   /**
@@ -255,8 +268,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public Long getProjectNumber() {
-    ResourceProjectModelItem modelItem = getCurrentModelItem();
-    return modelItem != null ? modelItem.getProject().getProjectNumber() : null;
+    ProjectModelItem projectModelItem = getCurrentModelItem();
+    return projectModelItem instanceof ResourceProjectModelItem ?
+        ((ResourceProjectModelItem) projectModelItem).getProject().getProjectNumber() : null;
   }
 
   /**
@@ -267,12 +281,13 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    */
   @Nullable
   public Project getProject() {
-    ResourceProjectModelItem modelItem = getCurrentModelItem();
-    return modelItem != null ? modelItem.getProject() : null;
+   ProjectModelItem projectModelItem = getCurrentModelItem();
+   return projectModelItem instanceof ResourceProjectModelItem ?
+       ((ResourceProjectModelItem) projectModelItem).getProject() : null;
   }
 
   @Nullable
-  private ResourceProjectModelItem getCurrentModelItem() {
+  private ProjectModelItem getCurrentModelItem() {
     if (Strings.isNullOrEmpty(getText())) {
       return null;
     }
@@ -292,7 +307,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       }
     }
 
-    return null;
+    return new InvalidResourceProjectModelItem();
   }
 
   @Override
@@ -550,14 +565,20 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     }
   }
 
-  private void onSelectionChanged(ResourceProjectModelItem newSelection) {
+  private void onSelectionChanged(ProjectModelItem newSelection) {
     CredentialedUser user = null;
     ProjectSelectionChangedEvent event = null;
     if (newSelection != null) {
       if (newSelection.getParent() instanceof GoogleUserModelItem) {
         user = ((GoogleUserModelItem) newSelection.getParent()).getCredentialedUser();
       }
-      event = new ProjectSelectionChangedEvent(newSelection.getProject(), user);
+
+      if (newSelection instanceof InvalidResourceProjectModelItem) {
+        event = new ProjectSelectionChangedEvent(null, user);
+      } else if (newSelection instanceof ResourceProjectModelItem) {
+        event = new ProjectSelectionChangedEvent((
+            (ResourceProjectModelItem) newSelection).getProject(), user);
+      }
     }
     for (ProjectSelectionListener listener : projectSelectionListeners) {
       listener.selectionChanged(event);
@@ -621,7 +642,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   }
 
   /**
-   * Event for when the selection changes to a valid project.
+   * Event for when the selection changes to a valid or invalid project.
    */
   public static class ProjectSelectionChangedEvent {
     private final Project selectedProject;

@@ -20,16 +20,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.GoogleLoginListener;
 import com.google.cloud.tools.intellij.login.GoogleLoginService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
-
+import java.util.LinkedHashMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.LinkedHashMap;
 
 public class CloudDebugProcessHandlerTest extends BasePluginTestCase {
 
@@ -38,7 +35,6 @@ public class CloudDebugProcessHandlerTest extends BasePluginTestCase {
 
     @Before
     public void setUp() throws Exception {
-        registerExtensionPoint(GoogleLoginListener.EP_NAME, GoogleLoginListener.class);
         registerService(GoogleLoginService.class, mockLoginService);
 
         setupMocks();

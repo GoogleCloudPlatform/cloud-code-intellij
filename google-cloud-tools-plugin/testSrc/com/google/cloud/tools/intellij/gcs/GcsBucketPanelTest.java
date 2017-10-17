@@ -21,6 +21,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.login.GoogleLoginService;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
@@ -37,6 +38,7 @@ public class GcsBucketPanelTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
 
+  @Mock @TestService private GoogleLoginService loginService;
   @Mock @TestService private GoogleApiClientFactory apiFactory;
   @Mock private ProjectSelector projectSelector;
 
@@ -44,6 +46,7 @@ public class GcsBucketPanelTest {
 
   @Before
   public void setUp() {
+    when(loginService.isLoggedIn()).thenReturn(true);
     bucketPanel = new GcsBucketPanel(testFixture.getProject());
     bucketPanel.setProjectSelector(projectSelector);
   }
@@ -69,6 +72,19 @@ public class GcsBucketPanelTest {
 
     assertThat(bucketPanel.getNotificationLabel().getText())
         .isEqualTo("To view your buckets select a Cloud Project.");
+  }
+
+  @Test
+  public void testNotificationLabel_userLoggedOut() {
+    when(loginService.isLoggedIn()).thenReturn(false);
+
+    bucketPanel.refresh();
+
+    assertTrue(bucketPanel.getNotificationPanel().isVisible());
+    assertFalse(bucketPanel.getBucketListPanel().isVisible());
+
+    assertThat(bucketPanel.getNotificationLabel().getText())
+        .isEqualTo("To view your buckets log in to your Google Cloud Platform account.");
   }
 
   @Test

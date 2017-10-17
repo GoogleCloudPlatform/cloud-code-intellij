@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.login;
+package com.google.cloud.tools.intellij.resources;
 
-import com.intellij.util.messages.Topic;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-/** Listener for changes in the login status. */
-public interface GoogleLoginListener {
+/**
+ * Represents an existing or non-existing GCP project
+ */
+public class ProjectModelItem extends DefaultMutableTreeNode {
 
-  Topic<GoogleLoginListener> GOOGLE_LOGIN_LISTENER_TOPIC =
-      Topic.create("google-login", GoogleLoginListener.class);
-
-  /** Called when the login or active status of the user changes. */
-  void statusChanged();
 }
