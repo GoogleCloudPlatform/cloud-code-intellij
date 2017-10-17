@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij;
+package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
 /**
- * Creates the tools menu top-level menu group for Cloud Tools. All relevant shortcuts are sub-menu
- * items of this.
+ * Creates the menu group for Add App Engine framework support.
  */
-public class CloudToolsMenuGroupAction extends DefaultActionGroup {
+public class AddAppEngineFacetMenuGroupAction extends DefaultActionGroup {
 
-  public CloudToolsMenuGroupAction() {
-    getTemplatePresentation().setText(GctBundle.message("cloud.tools.group.menu.text"));
-    getTemplatePresentation().setIcon(GoogleCloudToolsIcons.CLOUD);
+  public AddAppEngineFacetMenuGroupAction() {
+    getTemplatePresentation().setText(GctBundle.message("appengine.add.facet.group.menu.text"));
+    getTemplatePresentation().setIcon(GoogleCloudToolsIcons.APP_ENGINE);
   }
 
 }
