@@ -21,7 +21,10 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
@@ -34,9 +37,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -70,9 +76,27 @@ final class GcsBucketContentEditorPanel {
               Blob selectedBlob =
                   tableModel.getBlobAt(bucketContentTable.rowAtPoint(event.getPoint()));
 
-              if (selectedBlob.isDirectory()) {
+              if (selectedBlob != null && selectedBlob.isDirectory()) {
                 updateTableModel(selectedBlob.getName());
               }
+            }
+          }
+        });
+
+    bucketContentTable.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mousePressed(MouseEvent event) {
+            if (SwingUtilities.isRightMouseButton(event)) {
+              JTable source = (JTable) event.getSource();
+              int row = source.rowAtPoint(event.getPoint());
+              int col = source.columnAtPoint(event.getPoint());
+
+              if (!source.isRowSelected(row)) {
+                source.changeSelection(row, col, false, false);
+              }
+
+              showRightClickMenu(event);
             }
           }
         });
@@ -105,6 +129,8 @@ final class GcsBucketContentEditorPanel {
       return;
     }
 
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BLOB_BROWSE).ping();
+
     Consumer<List<Blob>> afterLoad =
         blobs -> {
           if (blobs.isEmpty()) {
@@ -132,6 +158,8 @@ final class GcsBucketContentEditorPanel {
       return;
     }
 
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BLOB_BROWSE).ping();
+
     tableModel.setRowCount(0);
 
     Consumer<List<Blob>> afterLoad =
@@ -152,6 +180,38 @@ final class GcsBucketContentEditorPanel {
 
     breadcrumbs.render(bucket.getName(), prefix);
     loadBlobsStartingWith(prefix, afterLoad);
+  }
+
+  private void showRightClickMenu(MouseEvent event) {
+    JPopupMenu rightClickMenu = new JPopupMenu();
+    JMenuItem copyBlobNameMenuItem =
+        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.blob.text"));
+    JMenuItem copyBucketNameMenuItem =
+        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.bucket.text"));
+    rightClickMenu.add(copyBlobNameMenuItem);
+    rightClickMenu.add(copyBucketNameMenuItem);
+
+    Blob selectedBlob = tableModel.getBlobAt(bucketContentTable.rowAtPoint(event.getPoint()));
+
+    if (selectedBlob != null) {
+      copyBlobNameMenuItem.addActionListener(
+          e ->
+              UsageTrackerProvider.getInstance()
+                  .trackEvent(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BLOB_NAME)
+                  .ping());
+      copyBlobNameMenuItem.addActionListener(
+          new CopyToClipboardActionListener(selectedBlob.getName()));
+
+      copyBucketNameMenuItem.addActionListener(
+          e ->
+              UsageTrackerProvider.getInstance()
+                  .trackEvent(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BUCKET_NAME)
+                  .ping());
+      copyBucketNameMenuItem.addActionListener(
+          new CopyToClipboardActionListener(selectedBlob.getBucket()));
+
+      rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
+    }
   }
 
   private void showMessage(String message) {
@@ -197,6 +257,10 @@ final class GcsBucketContentEditorPanel {
                         () -> {
                           hideLoader();
                           showError();
+
+                          UsageTrackerProvider.getInstance()
+                              .trackEvent(GctTracking.GCS_BLOB_BROWSE_EXCEPTION)
+                              .ping();
                           log.warn(
                               "StorageException when performing GCS blob list operation, with message: "
                                   + se.getMessage());
