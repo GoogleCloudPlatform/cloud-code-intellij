@@ -16,23 +16,22 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.standard;
 
+import com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFrameworkSupportAction;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardSupportProvider.AppEngineSupportConfigurable;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 
 /**
  * Creates a shortcut in the tools menu to add the App Engine Standard facet to a module.
  */
-public class AddAppEngineStandardFacetToolsMenuAction extends AnAction
-{
+public class AddAppEngineStandardFacetToolsMenuAction extends AddAppEngineFrameworkSupportAction {
   public AddAppEngineStandardFacetToolsMenuAction() {
     super(GctBundle.message("appengine.standard.facet.name"),
-        GctBundle.message("appengine.add.standard.facet.tools.menu.description"),
-        null /* icon */);
+        GctBundle.message("appengine.add.standard.facet.tools.menu.description"));
   }
 
   @Override
-  public void actionPerformed(AnActionEvent e) {
-
+  public FrameworkSupportInModuleConfigurable getModuleConfigurable() {
+    return new AppEngineSupportConfigurable(null); // TODO: fix
   }
 }
