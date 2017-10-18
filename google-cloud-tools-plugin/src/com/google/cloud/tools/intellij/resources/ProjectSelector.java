@@ -409,8 +409,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     if (popup == null || popup.isDisposed()) {
       if (popupPanel == null) {
         popupPanel = new PopupPanel();
-        popupPanel.initializeContent(getText());
       }
+      popupPanel.initializeContent(getText());
 
       ComponentPopupBuilder popup =
           JBPopupFactory.getInstance()
@@ -556,6 +556,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         treeModel.setModelNeedsRefresh(false);
         synchronize(true);
       }
+
+      setFilter(selectedProjectId);
     }
 
     @Override
