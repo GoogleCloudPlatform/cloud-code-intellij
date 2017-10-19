@@ -23,29 +23,33 @@ import com.intellij.ide.util.frameworkSupport.FrameworkSupportModelImpl;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainer;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainerFactory;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Creates a shortcut in the tools menu to add the App Engine Standard facet to a module.
+ * Creates a shortcut in the tools menu to add the App Engine Standard framework support to a
+ * module.
  */
 public class AddAppEngineStandardFacetToolsMenuAction extends AddAppEngineFrameworkSupportAction {
   public AddAppEngineStandardFacetToolsMenuAction() {
     super(GctBundle.message("appengine.standard.facet.name"),
-        GctBundle.message("appengine.add.standard.facet.tools.menu.description"));
+        GctBundle.message("appengine.add.standard.framework.support.tools.menu.description"));
   }
 
+  @NotNull
   @Override
-  // TODO: rename to frameworkConfiguratble?
   public FrameworkSupportInModuleConfigurable getModuleConfigurable(Module module) {
     Project project = module.getProject();
-    LibrariesContainer container = LibrariesContainerFactory.createContainer(project);
+    String contentRootPath = "";
     VirtualFile[] roots = ModuleRootManager.getInstance(module).getContentRoots();
-    if (roots.length == 0) return null;
-    String contentRootPath = roots[0].getPath();
+    if (roots.length > 0) {
+      contentRootPath = roots[0].getPath();
+    }
 
-    FrameworkSupportModelImpl model = new FrameworkSupportModelImpl(project, contentRootPath, container);
+    FrameworkSupportModelImpl model = new FrameworkSupportModelImpl(project, contentRootPath,
+        LibrariesContainerFactory.createContainer(project));
     return new AppEngineStandardSupportProvider().createConfigurable(model);
   }
+
 }

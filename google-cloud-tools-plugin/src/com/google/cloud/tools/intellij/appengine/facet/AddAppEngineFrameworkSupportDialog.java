@@ -30,39 +30,36 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by nbashirbello on 10/18/17.
+ * Wraps the App Engine Standard or Flexible framework support configuration panel in a dialog.
  */
 public class AddAppEngineFrameworkSupportDialog extends DialogWrapper {
-  // TODO: Why is AppEngineFlexibleSupportConfigurable static?
-  private FrameworkSupportInModuleConfigurable configurable;
+  private FrameworkSupportInModuleConfigurable moduleConfigurable;
   private Module module;
 
-  public AddAppEngineFrameworkSupportDialog (@Nullable Project project, Module module,
-      @NotNull FrameworkSupportInModuleConfigurable frameworkSupportInModuleConfigurable) {
+  public AddAppEngineFrameworkSupportDialog (@NotNull String title, @Nullable Project project, Module module,
+      @NotNull FrameworkSupportInModuleConfigurable configurable) {
     super(project);
-    setTitle("Some title");
+    setTitle(title);
     this.module = module;
-    //configurable = new AppEngineFlexibleSupportConfigurable();
-    configurable = frameworkSupportInModuleConfigurable;
+    moduleConfigurable = configurable;
     init();
   }
 
   @Nullable
   @Override
   protected JComponent createCenterPanel() {
-    return configurable.createComponent();
+    return moduleConfigurable.createComponent();
   }
 
 
   @Override
   protected void doOKAction() {
     if (getOKAction().isEnabled()) {
-      // TODO: action?
       new WriteAction() {
         protected void run(@NotNull final Result result) {
           ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
-          final IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
-          configurable.addSupport(module, model, modifiableModelsProvider);
+          IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
+          moduleConfigurable.addSupport(module, model, modifiableModelsProvider);
           model.commit();
         }
       }.execute();

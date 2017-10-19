@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -27,10 +28,12 @@ import com.intellij.openapi.ui.Messages;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by nbashirbello on 10/18/17.
+ * Action to add either App Engine Flexible or Standard framework support to a module which
+ * includes creating appropriate facet and run configurations.
  */
 public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
 
@@ -38,43 +41,50 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
     super(text, description, null /* icon */);
   }
 
+  @NotNull
   public abstract FrameworkSupportInModuleConfigurable getModuleConfigurable(Module module);
 
+  /**
+   * Opens Choose Module dialog for user to select a module, then opens the appropriate App Engine
+   * Framework Support dialog to add App Engine support.
+   */
   @Override
   public void actionPerformed(AnActionEvent event) {
     Project project = event.getProject();
     if (project == null) {
-      Messages.showErrorDialog("No project available", "Cannot add App Engine Flexible support");
       return;
     }
 
     // TODO: add parser for suitable modules - modules that don't have the flex facet or the standard facet
     // or all modules?
+    String frameworkName = getTemplatePresentation().getText();
     List<Module> suitableModules = new ArrayList<>(
         Arrays.asList(ModuleManager.getInstance(project).getModules()));
     if (suitableModules.isEmpty()) {
-      Messages.showErrorDialog(project, "No suitable modules for App Engine Flexible facet found.",
-          "Cannot add App Engine Flexible support");
+      Messages.showErrorDialog(project,
+          GctBundle.message("appengine.add.framework.support.no.modules.message", frameworkName),
+          GctBundle.message("appengine.add.framework.support.no.modules.title", frameworkName));
       return;
     }
 
     ChooseModulesDialog chooseModulesDialog = new ChooseModulesDialog(project, suitableModules,
-        "Choose Module", "");
+        GctBundle.message("appengine.add.framework.support.choose.module.dialog.title"),
+        GctBundle.message("appengine.add.framework.support.choose.module.dialog.description",
+            frameworkName));
     chooseModulesDialog.setSingleSelectionMode();
     chooseModulesDialog.show();
     final List<Module> elements = chooseModulesDialog.getChosenElements();
-    if (!chooseModulesDialog.isOK()) {
-      return;
-    }
-
-    if (elements.size() == 0) {
-      Messages.showErrorDialog(project, "No module selected ", "Error");
+    if (!chooseModulesDialog.isOK() || elements.size() != 1) {
       return;
     }
 
     Module module = elements.get(0);
     AddAppEngineFrameworkSupportDialog frameworkSupportDialog =
-        new AddAppEngineFrameworkSupportDialog(project, module, getModuleConfigurable(module));
+        new AddAppEngineFrameworkSupportDialog(
+            GctBundle.message("appengine.add.framework.support.dialog.title", frameworkName),
+            project,
+            module,
+            getModuleConfigurable(module));
     frameworkSupportDialog.show();
   }
 

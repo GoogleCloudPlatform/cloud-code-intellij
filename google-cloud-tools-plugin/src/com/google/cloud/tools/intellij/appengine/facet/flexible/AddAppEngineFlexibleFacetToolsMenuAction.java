@@ -21,19 +21,22 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.openapi.module.Module;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Creates a shortcut in the tools menu to add the App Engine Flexible facet to a module.
+ * Creates a shortcut in the tools menu to add the App Engine Flexible framework support to a
+ * module.
  */
-// TODO: add tracking and tests
 public class AddAppEngineFlexibleFacetToolsMenuAction extends AddAppEngineFrameworkSupportAction {
   public AddAppEngineFlexibleFacetToolsMenuAction() {
     super(GctBundle.message("appengine.flexible.facet.name"),
-        GctBundle.message("appengine.add.flexible.facet.tools.menu.description"));
+        GctBundle.message("appengine.add.flexible.framework.support.tools.menu.description"));
   }
-  
+
+  @NotNull
   @Override
   public FrameworkSupportInModuleConfigurable getModuleConfigurable(Module module) {
     return new AppEngineFlexibleSupportConfigurable();
   }
+
 }
