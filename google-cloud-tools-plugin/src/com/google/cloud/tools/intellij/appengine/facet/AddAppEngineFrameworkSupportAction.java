@@ -38,7 +38,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
     super(text, description, null /* icon */);
   }
 
-  public abstract FrameworkSupportInModuleConfigurable getModuleConfigurable();
+  public abstract FrameworkSupportInModuleConfigurable getModuleConfigurable(Module module);
 
   @Override
   public void actionPerformed(AnActionEvent event) {
@@ -74,7 +74,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
 
     Module module = elements.get(0);
     AddAppEngineFrameworkSupportDialog frameworkSupportDialog =
-        new AddAppEngineFrameworkSupportDialog(project, module, getModuleConfigurable());
+        new AddAppEngineFrameworkSupportDialog(project, module, getModuleConfigurable(module));
     frameworkSupportDialog.show();
   }
 

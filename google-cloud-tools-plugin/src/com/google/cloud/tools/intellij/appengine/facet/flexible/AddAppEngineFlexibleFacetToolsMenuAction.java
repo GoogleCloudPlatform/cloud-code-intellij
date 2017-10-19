@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFrameworkSupp
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleSupportProvider.AppEngineFlexibleSupportConfigurable;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
+import com.intellij.openapi.module.Module;
 
 /**
  * Creates a shortcut in the tools menu to add the App Engine Flexible facet to a module.
@@ -30,10 +31,9 @@ public class AddAppEngineFlexibleFacetToolsMenuAction extends AddAppEngineFramew
     super(GctBundle.message("appengine.flexible.facet.name"),
         GctBundle.message("appengine.add.flexible.facet.tools.menu.description"));
   }
-
-  // TODO: new instance always or member value
+  
   @Override
-  public FrameworkSupportInModuleConfigurable getModuleConfigurable() {
+  public FrameworkSupportInModuleConfigurable getModuleConfigurable(Module module) {
     return new AppEngineFlexibleSupportConfigurable();
   }
 }

@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AddAppEngineFrameworkSupportDialog extends DialogWrapper {
   // TODO: Why is AppEngineFlexibleSupportConfigurable static?
-  private FrameworkSupportInModuleConfigurable supportConfigurable;
+  private FrameworkSupportInModuleConfigurable configurable;
   private Module module;
 
   public AddAppEngineFrameworkSupportDialog (@Nullable Project project, Module module,
@@ -42,26 +42,27 @@ public class AddAppEngineFrameworkSupportDialog extends DialogWrapper {
     super(project);
     setTitle("Some title");
     this.module = module;
-    //supportConfigurable = new AppEngineFlexibleSupportConfigurable();
-    supportConfigurable = frameworkSupportInModuleConfigurable;
+    //configurable = new AppEngineFlexibleSupportConfigurable();
+    configurable = frameworkSupportInModuleConfigurable;
     init();
   }
 
   @Nullable
   @Override
   protected JComponent createCenterPanel() {
-    return supportConfigurable.createComponent();
+    return configurable.createComponent();
   }
 
 
   @Override
   protected void doOKAction() {
     if (getOKAction().isEnabled()) {
+      // TODO: action?
       new WriteAction() {
         protected void run(@NotNull final Result result) {
           ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
           final IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
-          supportConfigurable.addSupport(module, model, modifiableModelsProvider);
+          configurable.addSupport(module, model, modifiableModelsProvider);
           model.commit();
         }
       }.execute();

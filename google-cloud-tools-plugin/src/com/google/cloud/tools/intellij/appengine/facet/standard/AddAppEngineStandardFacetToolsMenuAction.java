@@ -17,9 +17,15 @@
 package com.google.cloud.tools.intellij.appengine.facet.standard;
 
 import com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFrameworkSupportAction;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardSupportProvider.AppEngineSupportConfigurable;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
+import com.intellij.ide.util.frameworkSupport.FrameworkSupportModelImpl;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainer;
+import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainerFactory;
+import com.intellij.openapi.vfs.VirtualFile;
 
 /**
  * Creates a shortcut in the tools menu to add the App Engine Standard facet to a module.
@@ -31,7 +37,15 @@ public class AddAppEngineStandardFacetToolsMenuAction extends AddAppEngineFramew
   }
 
   @Override
-  public FrameworkSupportInModuleConfigurable getModuleConfigurable() {
-    return new AppEngineSupportConfigurable(null); // TODO: fix
+  // TODO: rename to frameworkConfiguratble?
+  public FrameworkSupportInModuleConfigurable getModuleConfigurable(Module module) {
+    Project project = module.getProject();
+    LibrariesContainer container = LibrariesContainerFactory.createContainer(project);
+    VirtualFile[] roots = ModuleRootManager.getInstance(module).getContentRoots();
+    if (roots.length == 0) return null;
+    String contentRootPath = roots[0].getPath();
+
+    FrameworkSupportModelImpl model = new FrameworkSupportModelImpl(project, contentRootPath, container);
+    return new AppEngineStandardSupportProvider().createConfigurable(model);
   }
 }

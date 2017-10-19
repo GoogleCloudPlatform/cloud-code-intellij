@@ -131,7 +131,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
     }
   }
 
-  public void addSupport(final Module module,
+  private void addSupport(final Module module,
       final ModifiableRootModel rootModel,
       FrameworkSupportModel frameworkSupportModel,
       Set<AppEngineStandardMavenLibrary> librariesToAdd) {
@@ -248,8 +248,8 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
     ((AppEngineSupportConfigurable) configurable).cloudSdkPanel.setCloudSdkDirectoryText(path);
   }
 
-  //@VisibleForTesting
-  public static class AppEngineSupportConfigurable extends FrameworkSupportInModuleConfigurable implements
+  @VisibleForTesting
+  public class AppEngineSupportConfigurable extends FrameworkSupportInModuleConfigurable implements
       FrameworkSupportModelListener {
 
     private final FrameworkSupportModel frameworkSupportModel;
@@ -257,7 +257,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
     private CloudSdkPanel cloudSdkPanel;
     private AppEngineStandardLibraryPanel appEngineStandardLibraryPanel;
 
-    AppEngineSupportConfigurable(FrameworkSupportModel model) {
+    private AppEngineSupportConfigurable(FrameworkSupportModel model) {
       frameworkSupportModel = model;
       model.addFrameworkListener(this);
     }
@@ -290,7 +290,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
         sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
       }
 
-      AppEngineStandardSupportProvider.
+      AppEngineStandardSupportProvider.this
           .addSupport(module, rootModel, frameworkSupportModel,
               appEngineStandardLibraryPanel.getSelectedLibraries());
 
