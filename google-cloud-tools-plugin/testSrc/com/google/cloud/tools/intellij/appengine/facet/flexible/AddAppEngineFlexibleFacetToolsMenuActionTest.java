@@ -23,6 +23,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -32,6 +33,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class AddAppEngineFlexibleFacetToolsMenuActionTest {
 
+  @Test
   public void isActionRegistered() {
     AnAction action = ActionManager.getInstance().getAction("AppAppEngineFacet.Flexible");
     assertNotNull(action);
