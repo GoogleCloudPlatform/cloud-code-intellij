@@ -18,14 +18,11 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -35,19 +32,13 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class AddAppEngineStandardFacetToolsMenuActionTest {
 
-  @Test
-  public void isActionNotRegistered() {
-    assertNull(ActionManager.getInstance().getAction("AppAppEngineFacet.Standard"));
-  }
-
-  @Ignore
-  // Temporarily disabled until implementation is complete
   public void isActionRegistered() {
     AnAction action = ActionManager.getInstance().getAction("AppAppEngineFacet.Standard");
     assertNotNull(action);
     Presentation presentation = action.getTemplatePresentation();
     assertEquals(GctBundle.message("appengine.standard.facet.name"), presentation.getText());
-    assertEquals(GctBundle.message("appengine.add.standard.facet.tools.menu.description"),
+    assertEquals(GctBundle.message(
+        "appengine.add.standard.framework.support.tools.menu.description"),
         presentation.getDescription());
   }
 
