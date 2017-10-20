@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFrameworkSupp
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleSupportProvider.AppEngineFlexibleSupportConfigurable;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
+import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +38,12 @@ public class AddAppEngineFlexibleFacetToolsMenuAction extends AddAppEngineFramew
   @Override
   public FrameworkSupportInModuleConfigurable getModuleConfigurable(Module module) {
     return new AppEngineFlexibleSupportConfigurable();
+  }
+
+  @NotNull
+  @Override
+  public FrameworkSupportInModuleProvider getModuleProvider() {
+    return new AppEngineFlexibleSupportProvider();
   }
 
 }

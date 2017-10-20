@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 import com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFrameworkSupportAction;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
+import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModelImpl;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -32,9 +33,11 @@ import org.jetbrains.annotations.NotNull;
  * module.
  */
 public class AddAppEngineStandardFacetToolsMenuAction extends AddAppEngineFrameworkSupportAction {
+  private AppEngineStandardSupportProvider provider;
   public AddAppEngineStandardFacetToolsMenuAction() {
     super(GctBundle.message("appengine.standard.facet.name"),
         GctBundle.message("appengine.add.standard.framework.support.tools.menu.description"));
+    provider = new AppEngineStandardSupportProvider();
   }
 
   @NotNull
@@ -49,7 +52,13 @@ public class AddAppEngineStandardFacetToolsMenuAction extends AddAppEngineFramew
 
     FrameworkSupportModelImpl model = new FrameworkSupportModelImpl(project, contentRootPath,
         LibrariesContainerFactory.createContainer(project));
-    return new AppEngineStandardSupportProvider().createConfigurable(model);
+    return provider.createConfigurable(model);
+  }
+
+  @NotNull
+  @Override
+  public FrameworkSupportInModuleProvider getModuleProvider() {
+    return provider;
   }
 
 }

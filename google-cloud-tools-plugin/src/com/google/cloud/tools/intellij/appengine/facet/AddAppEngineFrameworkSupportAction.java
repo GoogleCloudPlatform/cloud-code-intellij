@@ -17,11 +17,14 @@
 package com.google.cloud.tools.intellij.appengine.facet;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.intellij.facet.impl.DefaultFacetsProvider;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
+import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ChooseModulesDialog;
 import com.intellij.openapi.ui.Messages;
@@ -44,6 +47,9 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
   @NotNull
   public abstract FrameworkSupportInModuleConfigurable getModuleConfigurable(Module module);
 
+  @NotNull
+  public abstract FrameworkSupportInModuleProvider getModuleProvider();
+
   /**
    * Opens Choose Module dialog for user to select a module, then opens the appropriate App Engine
    * Framework Support dialog to add App Engine support.
@@ -55,11 +61,14 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
       return;
     }
 
-    // TODO: add parser for suitable modules - modules that don't have the flex facet or the standard facet
-    // or all modules?
-    String frameworkName = getTemplatePresentation().getText();
     List<Module> suitableModules = new ArrayList<>(
         Arrays.asList(ModuleManager.getInstance(project).getModules()));
+    DefaultFacetsProvider facetsProvider = new DefaultFacetsProvider();
+    FrameworkSupportInModuleProvider provider = getModuleProvider();
+    suitableModules.removeIf(module -> !provider.isEnabledForModuleType(ModuleType.get(module)) ||
+        provider.isSupportAlreadyAdded(module, facetsProvider));
+
+    String frameworkName = getTemplatePresentation().getText();
     if (suitableModules.isEmpty()) {
       Messages.showErrorDialog(project,
           GctBundle.message("appengine.add.framework.support.no.modules.message", frameworkName),
