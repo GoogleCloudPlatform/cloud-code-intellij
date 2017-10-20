@@ -48,9 +48,14 @@ public class AddAppEngineFrameworkSupportDialog extends DialogWrapper {
   @Nullable
   @Override
   protected JComponent createCenterPanel() {
-    return moduleConfigurable.createComponent();
+    return null;
   }
 
+  @Nullable
+  @Override
+  protected JComponent createNorthPanel() {
+    return moduleConfigurable.createComponent();
+  }
 
   @Override
   protected void doOKAction() {
