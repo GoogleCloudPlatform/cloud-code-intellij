@@ -28,10 +28,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 /**
- * Tests for {@link AddAppEngineStandardFacetToolsMenuAction}
+ * Tests for {@link AddAppEngineStandardFrameworkSupportToolsMenuAction}
  */
 @RunWith(JUnit4.class)
-public class AddAppEngineStandardFacetToolsMenuActionTest {
+public class AddAppEngineStandardFrameworkSupportToolsMenuActionTest {
 
   @Test
   public void isActionRegistered() {
