@@ -36,8 +36,8 @@ public class AddAppEngineFrameworkSupportDialog extends DialogWrapper {
   private FrameworkSupportInModuleConfigurable moduleConfigurable;
   private Module module;
 
-  public AddAppEngineFrameworkSupportDialog (@NotNull String title, @Nullable Project project, Module module,
-      @NotNull FrameworkSupportInModuleConfigurable configurable) {
+  public AddAppEngineFrameworkSupportDialog (@NotNull String title, @NotNull Project project,
+      @NotNull Module module, @NotNull FrameworkSupportInModuleConfigurable configurable) {
     super(project);
     setTitle(title);
     this.module = module;
@@ -58,8 +58,8 @@ public class AddAppEngineFrameworkSupportDialog extends DialogWrapper {
       new WriteAction() {
         protected void run(@NotNull final Result result) {
           ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
-          IdeaModifiableModelsProvider modifiableModelsProvider = new IdeaModifiableModelsProvider();
-          moduleConfigurable.addSupport(module, model, modifiableModelsProvider);
+          IdeaModifiableModelsProvider modelsProvider = new IdeaModifiableModelsProvider();
+          moduleConfigurable.addSupport(module, model, modelsProvider);
           model.commit();
         }
       }.execute();
