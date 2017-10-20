@@ -463,9 +463,9 @@
     </action>
 
     <group id="GoogleCloudTools" class="com.google.cloud.tools.intellij.CloudToolsMenuGroupAction" popup="true">
-      <group id="AddAppEngineFacet" class="com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFacetMenuGroupAction" popup="true">
-        <action id="AppAppEngineFacet.Standard" class="com.google.cloud.tools.intellij.appengine.facet.standard.AddAppEngineStandardFrameworkSupportToolsMenuAction"/>
-        <action id="AppAppEngineFacet.Flexible" class="com.google.cloud.tools.intellij.appengine.facet.flexible.AddAppEngineFlexibleFrameworkSupportToolsMenuAction"/>
+      <group id="AddAppEngineFrameworkSupport" class="com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFacetMenuGroupAction" popup="true">
+        <action id="AddAppEngineFrameworkSupport.Standard" class="com.google.cloud.tools.intellij.appengine.facet.standard.AddAppEngineStandardFrameworkSupportToolsMenuAction"/>
+        <action id="AddAppEngineFrameworkSupport.Flexible" class="com.google.cloud.tools.intellij.appengine.facet.flexible.AddAppEngineFlexibleFrameworkSupportToolsMenuAction"/>
       </group>
       <action id="GoogleCloudTools.AppEngineDeploy" class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployToolsMenuAction"/>
       <separator/>

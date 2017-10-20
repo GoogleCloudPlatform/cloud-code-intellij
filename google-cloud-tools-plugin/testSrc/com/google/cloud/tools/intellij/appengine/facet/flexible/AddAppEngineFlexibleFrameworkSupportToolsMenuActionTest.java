@@ -35,7 +35,7 @@ public class AddAppEngineFlexibleFrameworkSupportToolsMenuActionTest {
 
   @Test
   public void isActionRegistered() {
-    AnAction action = ActionManager.getInstance().getAction("AppAppEngineFacet.Flexible");
+    AnAction action = ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Flexible");
     assertNotNull(action);
     Presentation presentation = action.getTemplatePresentation();
     assertEquals(GctBundle.message("appengine.flexible.facet.name"), presentation.getText());

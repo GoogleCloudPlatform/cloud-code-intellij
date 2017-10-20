@@ -35,7 +35,7 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuActionTest {
 
   @Test
   public void isActionRegistered() {
-    AnAction action = ActionManager.getInstance().getAction("AppAppEngineFacet.Standard");
+    AnAction action = ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Standard");
     assertNotNull(action);
     Presentation presentation = action.getTemplatePresentation();
     assertEquals(GctBundle.message("appengine.standard.facet.name"), presentation.getText());
