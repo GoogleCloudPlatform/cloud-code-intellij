@@ -36,7 +36,7 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuAction extends AddAppE
   private AppEngineStandardSupportProvider provider;
   public AddAppEngineStandardFrameworkSupportToolsMenuAction() {
     super(GctBundle.message("appengine.standard.facet.name"),
-        GctBundle.message("appengine.add.standard.framework.support.tools.menu.description"));
+        GctBundle.message("appengine.standard.name.in.message"));
     provider = new AppEngineStandardSupportProvider();
   }
 

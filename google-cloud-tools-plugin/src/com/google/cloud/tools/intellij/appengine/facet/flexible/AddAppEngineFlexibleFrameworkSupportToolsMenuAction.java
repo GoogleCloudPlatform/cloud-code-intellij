@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 public class AddAppEngineFlexibleFrameworkSupportToolsMenuAction extends AddAppEngineFrameworkSupportAction {
   public AddAppEngineFlexibleFrameworkSupportToolsMenuAction() {
     super(GctBundle.message("appengine.flexible.facet.name"),
-        GctBundle.message("appengine.add.flexible.framework.support.tools.menu.description"));
+        GctBundle.message("appengine.flexible.name.in.message"));
   }
 
   @NotNull

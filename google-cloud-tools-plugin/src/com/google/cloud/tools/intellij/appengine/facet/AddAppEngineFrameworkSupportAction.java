@@ -32,16 +32,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Action to add either App Engine Flexible or Standard framework support to a module which
  * includes creating appropriate facet and run configurations.
  */
 public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
+  private final String FRAMEWORK_NAME_IN_MESSAGE;
 
-  public AddAppEngineFrameworkSupportAction(@Nullable String text, @Nullable String description) {
-    super(text, description, null /* icon */);
+  public AddAppEngineFrameworkSupportAction(@NotNull String nameInTitle,
+      @NotNull String nameInMessage) {
+    super(nameInTitle, GctBundle.message(
+        "appengine.add.framework.support.tools.menu.description", nameInMessage),
+        null /* icon */);
+    FRAMEWORK_NAME_IN_MESSAGE = nameInMessage;
   }
 
   @NotNull
@@ -68,18 +72,19 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
     suitableModules.removeIf(module -> !provider.isEnabledForModuleType(ModuleType.get(module)) ||
         provider.isSupportAlreadyAdded(module, facetsProvider));
 
-    String frameworkName = getTemplatePresentation().getText();
+    String frameworkNameInTitle = getTemplatePresentation().getText();
     if (suitableModules.isEmpty()) {
       Messages.showErrorDialog(project,
-          GctBundle.message("appengine.add.framework.support.no.modules.message", frameworkName),
-          GctBundle.message("appengine.add.framework.support.no.modules.title", frameworkName));
+          GctBundle.message("appengine.add.framework.support.no.modules.message",
+              FRAMEWORK_NAME_IN_MESSAGE),
+          GctBundle.message("appengine.add.framework.support.no.modules.title", frameworkNameInTitle));
       return;
     }
 
     ChooseModulesDialog chooseModulesDialog = new ChooseModulesDialog(project, suitableModules,
         GctBundle.message("appengine.add.framework.support.choose.module.dialog.title"),
         GctBundle.message("appengine.add.framework.support.choose.module.dialog.description",
-            frameworkName));
+            FRAMEWORK_NAME_IN_MESSAGE));
     chooseModulesDialog.setSingleSelectionMode();
     chooseModulesDialog.show();
     final List<Module> elements = chooseModulesDialog.getChosenElements();
@@ -90,7 +95,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
     Module module = elements.get(0);
     AddAppEngineFrameworkSupportDialog frameworkSupportDialog =
         new AddAppEngineFrameworkSupportDialog(
-            GctBundle.message("appengine.add.framework.support.dialog.title", frameworkName),
+            GctBundle.message("appengine.add.framework.support.dialog.title", frameworkNameInTitle),
             project,
             module,
             getModuleConfigurable(module));
