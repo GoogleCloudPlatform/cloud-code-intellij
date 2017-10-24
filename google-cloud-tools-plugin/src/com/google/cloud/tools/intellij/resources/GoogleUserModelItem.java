@@ -206,8 +206,10 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
               GoogleUserModelItem.this.add(item);
             }
 
-            // Re-applies the filter to the new child nodes.
-            setFilter(filter);
+            if (!Strings.isNullOrEmpty(filter)) {
+              // Re-applies the filter to the new child nodes.
+              setFilter(filter);
+            }
             treeModel.reload(GoogleUserModelItem.this);
           });
     } catch (InterruptedException ex) {
