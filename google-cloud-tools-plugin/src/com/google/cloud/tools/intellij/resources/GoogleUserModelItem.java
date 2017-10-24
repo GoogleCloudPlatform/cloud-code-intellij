@@ -231,17 +231,31 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
   }
 
   @Override
+  public void remove(int childIndex) {
+    if (children == null) {
+      // Preserved functionality from default getChildAt() implementation.
+      throw new ArrayIndexOutOfBoundsException("node has no children");
+    }
+
+    // This is different from the default implementation because it uses the raw children vector
+    // instead of relying on the getChildAt() method, which has been modified to only return
+    // filtered children.
+    MutableTreeNode child = (MutableTreeNode) children.elementAt(childIndex);
+    children.removeElementAt(childIndex);
+    child.setParent(null);
+  }
+
+  @Override
   public void removeAllChildren() {
     if (children == null) {
       return;
     }
 
+    // This is different from the default implementation because it uses the raw children vector
+    // instead of relying on the getChildCount() method, which has been modified to only return
+    // the number of filtered children.
     for (int i = children.size() - 1; i >= 0; i--) {
-      // We do this manually because the overridden getChildCount() method will only return the
-      // count of filtered results and not all child nodes.
-      MutableTreeNode child = (MutableTreeNode) children.elementAt(i);
-      children.removeElementAt(i);
-      child.setParent(null);
+      remove(i);
     }
   }
 
