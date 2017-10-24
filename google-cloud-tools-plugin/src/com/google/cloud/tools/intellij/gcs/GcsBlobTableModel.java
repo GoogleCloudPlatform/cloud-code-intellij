@@ -54,6 +54,7 @@ final class GcsBlobTableModel extends DefaultTableModel {
     }
   }
 
+  @SuppressWarnings("JdkObsolete")
   void setDataVector(List<Blob> blobs, String directoryPrefix) {
     this.blobs =
         blobs
@@ -65,6 +66,7 @@ final class GcsBlobTableModel extends DefaultTableModel {
         buildDataVector(this.blobs, directoryPrefix), new Vector<>(TABLE_COL_HEADER));
   }
 
+  @SuppressWarnings("JdkObsolete")
   private static Vector<Vector<String>> buildDataVector(List<Blob> blobs, String directoryPrefix) {
     return blobs
         .stream()
