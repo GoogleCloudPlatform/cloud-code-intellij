@@ -42,7 +42,7 @@ public class AppEngineFlexibleFacetType extends
   public static final String STRING_ID = "app-engine-flexible";
 
   public AppEngineFlexibleFacetType() {
-    super(ID, STRING_ID, GctBundle.getString("appengine.flexible.facet.name"));
+    super(ID, STRING_ID, GctBundle.getString("appengine.flexible.facet.name.title"));
   }
 
   @Override

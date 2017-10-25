@@ -38,8 +38,8 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuAction
 
   public AddAppEngineStandardFrameworkSupportToolsMenuAction() {
     super(
-        GctBundle.message("appengine.standard.facet.name"),
-        GctBundle.message("appengine.standard.name.in.message"));
+        GctBundle.message("appengine.standard.facet.name.title"),
+        GctBundle.message("appengine.standard.facet.name"));
     provider = new AppEngineStandardSupportProvider();
   }
 

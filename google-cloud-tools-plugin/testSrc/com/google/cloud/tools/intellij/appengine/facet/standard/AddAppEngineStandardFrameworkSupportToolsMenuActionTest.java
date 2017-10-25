@@ -47,9 +47,9 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuActionTest extends
     AnAction action = ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Standard");
     assertNotNull(action);
     Presentation presentation = action.getTemplatePresentation();
-    assertEquals(GctBundle.message("appengine.standard.facet.name"), presentation.getText());
+    assertEquals(GctBundle.message("appengine.standard.facet.name.title"), presentation.getText());
     assertEquals(GctBundle.message("appengine.add.framework.support.tools.menu.description",
-        GctBundle.message("appengine.standard.name.in.message")),
+        GctBundle.message("appengine.standard.facet.name")),
         presentation.getDescription());
   }
 

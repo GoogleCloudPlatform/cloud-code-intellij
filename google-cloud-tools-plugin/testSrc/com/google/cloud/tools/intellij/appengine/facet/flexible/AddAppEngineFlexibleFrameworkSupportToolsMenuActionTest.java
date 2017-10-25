@@ -47,9 +47,9 @@ public class AddAppEngineFlexibleFrameworkSupportToolsMenuActionTest extends
     AnAction action = ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Flexible");
     assertNotNull(action);
     Presentation presentation = action.getTemplatePresentation();
-    assertEquals(GctBundle.message("appengine.flexible.facet.name"), presentation.getText());
+    assertEquals(GctBundle.message("appengine.flexible.facet.name.title"), presentation.getText());
     assertEquals(GctBundle.message("appengine.add.framework.support.tools.menu.description",
-        GctBundle.message("appengine.flexible.name.in.message")),
+        GctBundle.message("appengine.flexible.facet.name")),
         presentation.getDescription());
   }
 

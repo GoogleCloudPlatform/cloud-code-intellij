@@ -39,15 +39,14 @@ import org.jetbrains.annotations.NotNull;
  * creating appropriate facet and run configurations.
  */
 public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
-  private final String FRAMEWORK_NAME_IN_MESSAGE;
+  private final String FRAMEWORK_NAME;
 
-  public AddAppEngineFrameworkSupportAction(
-      @NotNull String nameInTitle, @NotNull String nameInMessage) {
+  public AddAppEngineFrameworkSupportAction(@NotNull String nameInTitle, @NotNull String name) {
     super(
         nameInTitle,
-        GctBundle.message("appengine.add.framework.support.tools.menu.description", nameInMessage),
+        GctBundle.message("appengine.add.framework.support.tools.menu.description", name),
         null /* icon */);
-    FRAMEWORK_NAME_IN_MESSAGE = nameInMessage;
+    FRAMEWORK_NAME = name;
   }
 
   @NotNull
@@ -73,8 +72,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
     if (suitableModules.isEmpty()) {
       Messages.showErrorDialog(
           project,
-          GctBundle.message(
-              "appengine.add.framework.support.no.modules.message", FRAMEWORK_NAME_IN_MESSAGE),
+          GctBundle.message("appengine.add.framework.support.no.modules.message", FRAMEWORK_NAME),
           GctBundle.message(
               "appengine.add.framework.support.no.modules.title", frameworkNameInTitle));
       return;
@@ -87,7 +85,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
             GctBundle.message("appengine.add.framework.support.choose.module.dialog.title"),
             GctBundle.message(
                 "appengine.add.framework.support.choose.module.dialog.description",
-                FRAMEWORK_NAME_IN_MESSAGE));
+                FRAMEWORK_NAME));
     chooseModulesDialog.setSingleSelectionMode();
     chooseModulesDialog.show();
     final List<Module> elements = chooseModulesDialog.getChosenElements();
