@@ -21,9 +21,9 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
 /** Creates the menu group for Add App Engine framework support. */
-public class AddAppEngineFacetMenuGroupAction extends DefaultActionGroup {
+public class AddAppEngineFrameworkSupportMenuGroupAction extends DefaultActionGroup {
 
-  public AddAppEngineFacetMenuGroupAction() {
+  public AddAppEngineFrameworkSupportMenuGroupAction() {
     getTemplatePresentation().setText(GctBundle.message("appengine.add.facet.group.menu.text"));
     getTemplatePresentation().setIcon(GoogleCloudToolsIcons.APP_ENGINE);
   }
