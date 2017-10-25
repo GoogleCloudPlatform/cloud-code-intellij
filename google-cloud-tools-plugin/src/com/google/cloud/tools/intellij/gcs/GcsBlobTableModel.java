@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 import javax.swing.table.DefaultTableModel;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Table model representation of a Google Cloud Storage blob row. Handles display of blob name and
@@ -41,13 +42,19 @@ final class GcsBlobTableModel extends DefaultTableModel {
     return false;
   }
 
+  @Nullable
   Blob getBlobAt(int index) {
     if (blobs == null) {
       throw new IllegalStateException("Data vector with blob values not initialized.");
     }
-    return blobs.get(index);
+    try {
+      return blobs.get(index);
+    } catch (IndexOutOfBoundsException ex) {
+      return null;
+    }
   }
 
+  @SuppressWarnings("JdkObsolete")
   void setDataVector(List<Blob> blobs, String directoryPrefix) {
     this.blobs =
         blobs
@@ -59,6 +66,7 @@ final class GcsBlobTableModel extends DefaultTableModel {
         buildDataVector(this.blobs, directoryPrefix), new Vector<>(TABLE_COL_HEADER));
   }
 
+  @SuppressWarnings("JdkObsolete")
   private static Vector<Vector<String>> buildDataVector(List<Blob> blobs, String directoryPrefix) {
     return blobs
         .stream()

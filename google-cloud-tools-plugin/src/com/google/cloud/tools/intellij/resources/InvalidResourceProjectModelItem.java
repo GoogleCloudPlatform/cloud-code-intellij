@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.login;
+package com.google.cloud.tools.intellij.resources;
 
-import com.intellij.util.messages.Topic;
+/**
+ * A non-existing project specified in the Project field of the App Engine Deployment configuration
+ * dialog.
+ */
+final class InvalidResourceProjectModelItem extends ProjectModelItem {
 
-/** Listener for changes in the login status. */
-public interface GoogleLoginListener {
-
-  Topic<GoogleLoginListener> GOOGLE_LOGIN_LISTENER_TOPIC =
-      Topic.create("google-login", GoogleLoginListener.class);
-
-  /** Called when the login or active status of the user changes. */
-  void statusChanged();
 }

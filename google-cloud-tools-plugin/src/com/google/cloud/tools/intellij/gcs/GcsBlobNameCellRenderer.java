@@ -35,7 +35,6 @@ final class GcsBlobNameCellRenderer extends DefaultTableCellRenderer {
 
     String name = (String) blobName;
     setText(name);
-    setForeground(Color.BLACK);
 
     if (name.endsWith("/")) {
       setIcon(Nodes.Folder);

@@ -67,10 +67,21 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   }
 
   @SuppressWarnings("FutureReturnValueIgnored")
+  /**
+   * Updates the panel as follows:
+   *   if the project textbox specifies a valid project, it displays the project's information,
+   *   if the project textbox specifies an invalid project, it displays an error message,
+   *   if the project textbox is empty, no message is displayed.
+   */
   public void refresh(final ProjectSelectionChangedEvent event) {
     if (event == null) {
+      ApplicationManager.getApplication().executeOnPooledThread(() -> clearMessage());
+      return;
+    }
+
+    if (event.getSelectedProject() == null) {
       ApplicationManager.getApplication().executeOnPooledThread(
-          () -> setMessage(GctBundle.getString("appengine.infopanel.noproject"),
+          () -> setMessage(GctBundle.getString("appengine.infopanel.no.region"),
               true /* isError*/));
       return;
     }
@@ -79,7 +90,10 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   }
 
   /**
-   * Updates the panel to display application info for the given project.
+   *  Updates the panel as follows:
+   *   if {@code projectId} is valid, it displays the given project's information,
+   *   if {@code projectId} is invalid, it displays an error message,
+   *   if {@code projectId} is empty, no message is displayed.
    *
    * @param projectId the ID of the project whose application info to display
    * @param credential the Credential to use to make any required API calls
@@ -87,9 +101,15 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   @SuppressWarnings("FutureReturnValueIgnored")
   public void refresh(final String projectId, final Credential credential) {
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
+      if (projectId.isEmpty()) {
+        clearMessage();
+        return;
+      }
+
       if (projectId == null || credential == null) {
-        setMessage(GctBundle.getString("appengine.infopanel.noproject"),
+        setMessage(GctBundle.getString("appengine.infopanel.no.region"),
             true /* isError*/);
+        return;
       }
 
       try {
@@ -107,13 +127,6 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     });
   }
 
-  private void setMessage(Runnable messagePrinter, boolean isError) {
-    ApplicationManager.getApplication().invokeAndWait(() -> {
-      errorIcon.setVisible(isError);
-      messagePrinter.run();
-    }, ModalityState.stateForComponent(this));
-  }
-
   /**
    * Prints a message that doesn't contain a hyperlink.
    */
@@ -124,6 +137,17 @@ public class AppEngineApplicationInfoPanel extends JPanel {
       // actually show up. setHyperlinkText() calls revalidate() internally.
       messageText.revalidate();
     }, isError);
+  }
+
+  void clearMessage() {
+    setMessage("", false /* isError*/);
+  }
+
+  private void setMessage(Runnable messagePrinter, boolean isError) {
+    ApplicationManager.getApplication().invokeAndWait(() -> {
+      errorIcon.setVisible(isError);
+      messagePrinter.run();
+    }, ModalityState.stateForComponent(this));
   }
 
   /**

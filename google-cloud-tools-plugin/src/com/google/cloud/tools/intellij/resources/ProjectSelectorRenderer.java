@@ -18,10 +18,6 @@ package com.google.cloud.tools.intellij.resources;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ConcurrencyUtil;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -32,13 +28,14 @@ import java.awt.event.MouseMotionListener;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The renderer for the project selector, it acts as a gateway for rendering all nodes and for
@@ -58,7 +55,6 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
   private DefaultTreeCellRenderer defaultRenderer = new DefaultTreeCellRenderer();
   private ProjectSelectorGoogleLogin projectSelectorGoogleLogin = new ProjectSelectorGoogleLogin();
   private ProjectSelectorNewProjectItem projectSelectorNewProjectItem;
-  private ProjectSelectorItem projectSelectorItem;
   private ProjectSelectorCredentialedUser projectSelectorCredentialedUser =
       new ProjectSelectorCredentialedUser();
   private ResourceSelectorLoadingItem resourceSelectorLoadingItem;
@@ -69,8 +65,6 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
     this.tree = tree;
     Color backgroundNonSelectionColor = defaultRenderer.getBackgroundNonSelectionColor();
     Color textNonSelectionColor = defaultRenderer.getTextNonSelectionColor();
-    projectSelectorItem = new ProjectSelectorItem(backgroundNonSelectionColor,
-        defaultRenderer.getTextSelectionColor(), textNonSelectionColor);
     resourceSelectorLoadingItem = new ResourceSelectorLoadingItem(backgroundNonSelectionColor,
         textNonSelectionColor);
     projectSelectorNewProjectItem = new ProjectSelectorNewProjectItem(tree);
@@ -143,11 +137,10 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
       selectorErrorItem.setText(((ResourceErrorModelItem) userObject).getErrorMessage());
       return selectorErrorItem;
     } else if (userObject instanceof ResourceProjectModelItem) {
-      projectSelectorItem
-          .initialize(((ResourceProjectModelItem) userObject).getDescription(),
-              ((ResourceProjectModelItem) userObject).getProjectId(), selected,
-              lastHoveredNode == userObject);
-
+      ResourceProjectModelItem modelItem = (ResourceProjectModelItem) userObject;
+      ProjectSelectorItem projectSelectorItem =
+          new ProjectSelectorItem(selected, lastHoveredNode == userObject);
+      projectSelectorItem.setText(modelItem.getLabelHtml());
       return projectSelectorItem;
     } else if (userObject instanceof GoogleUserModelItem) {
       GoogleUserModelItem userModelItem = (GoogleUserModelItem) userObject;

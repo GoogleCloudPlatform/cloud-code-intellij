@@ -16,17 +16,21 @@
 
 package com.google.cloud.tools.intellij.gcs;
 
-import com.google.api.client.auth.oauth2.Credential;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterators;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
@@ -40,7 +44,10 @@ import java.util.concurrent.Future;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -50,8 +57,9 @@ import org.jetbrains.annotations.NotNull;
  * Storage API to load project buckets.
  */
 final class GcsBucketPanel {
+  private static final Logger log = Logger.getInstance(GcsBucketPanel.class);
 
-  final private Project project;
+  private final Project project;
 
   private JPanel gcsBucketPanel;
   private ProjectSelector projectSelector;
@@ -94,22 +102,40 @@ final class GcsBucketPanel {
             }
           }
         });
+
+    bucketList.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mousePressed(MouseEvent event) {
+            if (SwingUtilities.isRightMouseButton(event)) {
+              JList source = (JList) event.getSource();
+              source.setSelectedIndex(source.locationToIndex(event.getPoint()));
+
+              showRightClickMenu(event);
+            }
+          }
+        });
+
+    refresh();
   }
 
   void refresh() {
     showNotificationPanel();
 
-    if (StringUtils.isEmpty(projectSelector.getText())) {
+    if (!Services.getLoginService().isLoggedIn()) {
+      notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.not.logged.in"));
+    } else if (StringUtils.isEmpty(projectSelector.getText())) {
       notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
     } else {
       String projectId = projectSelector.getText();
       CredentialedUser user = projectSelector.getSelectedUser();
 
       if (user != null) {
-        loadAndDisplayBuckets(projectId, user.getCredential());
+        loadAndDisplayBuckets(projectId, user);
       } else {
         notificationLabel.setText(
             GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+        log.warn("Cloud not load credentialed user for GCS operation. User may not be logged.");
       }
     }
   }
@@ -144,10 +170,12 @@ final class GcsBucketPanel {
     this.projectSelector = projectSelector;
   }
 
-  private void loadAndDisplayBuckets(String projectId, Credential credential) {
+  private void loadAndDisplayBuckets(String projectId, CredentialedUser credentialedUser) {
     if (bucketLoadExecution != null && !bucketLoadExecution.isDone()) {
       return;
     }
+
+    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BUCKET_LIST).ping();
 
     bucketListModel.clear();
     notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.loading.text"));
@@ -158,7 +186,7 @@ final class GcsBucketPanel {
                 () -> {
                   Storage storage =
                       GoogleApiClientFactory.getInstance()
-                          .getCloudStorageApiClient(projectId, credential);
+                          .getCloudStorageApiClient(projectId, credentialedUser);
 
                   try {
                     Iterable<Bucket> buckets = storage.list().iterateAll();
@@ -177,6 +205,13 @@ final class GcsBucketPanel {
                   } catch (StorageException se) {
                     notificationLabel.setText(
                         GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+
+                    UsageTrackerProvider.getInstance()
+                        .trackEvent(GctTracking.GCS_BUCKET_LIST_EXCEPTION)
+                        .ping();
+                    log.warn(
+                        "StorageException when performing GCS bucket list operation, with message: "
+                            + se.getMessage());
                   }
                 });
   }
@@ -214,5 +249,25 @@ final class GcsBucketPanel {
   private void showBucketListPanel() {
     bucketListPanel.setVisible(true);
     notificationPanel.setVisible(false);
+  }
+
+  private void showRightClickMenu(MouseEvent event) {
+    JPopupMenu rightClickMenu = new JPopupMenu();
+    JMenuItem copyBucketNameMenuItem =
+        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.bucket.text"));
+    rightClickMenu.add(copyBucketNameMenuItem);
+
+    int index = bucketList.locationToIndex(event.getPoint());
+    Bucket bucket = bucketListModel.getElementAt(index);
+
+    if (bucket != null) {
+      copyBucketNameMenuItem.addActionListener(
+          e ->
+              UsageTrackerProvider.getInstance()
+                  .trackEvent(GctTracking.GCS_BUCKET_LIST_ACTION_COPY_BUCKET_NAME)
+                  .ping());
+      copyBucketNameMenuItem.addActionListener(new CopyToClipboardActionListener(bucket.getName()));
+      rightClickMenu.show(event.getComponent(), event.getX(), event.getY());
+    }
   }
 }
