@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,6 +57,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
   private volatile boolean isSynchronizing;
   private volatile boolean needsSynchronizing;
   private CloudResourceManager cloudResourceManagerClient;
+  private String filter;
 
   GoogleUserModelItem(@NotNull CredentialedUser user, @NotNull DefaultTreeModel treeModel) {
     this.user = user;
@@ -122,6 +124,7 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
 
   @SuppressWarnings("unchecked")
   void setFilter(String filter) {
+    this.filter = filter;
     children.forEach(
         child -> {
           if (child instanceof ResourceProjectModelItem) {
@@ -203,6 +206,10 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
               GoogleUserModelItem.this.add(item);
             }
 
+            if (!Strings.isNullOrEmpty(filter)) {
+              // Re-applies the filter to the new child nodes.
+              setFilter(filter);
+            }
             treeModel.reload(GoogleUserModelItem.this);
           });
     } catch (InterruptedException ex) {
@@ -223,6 +230,35 @@ class GoogleUserModelItem extends DefaultMutableTreeNode {
   @Override
   public int getChildCount() {
     return Math.toIntExact(getFilteredChildren().count());
+  }
+
+  @Override
+  public void remove(int childIndex) {
+    if (children == null) {
+      // Preserved functionality from default getChildAt() implementation.
+      throw new ArrayIndexOutOfBoundsException("node has no children");
+    }
+
+    // This is different from the default implementation because it uses the raw children vector
+    // instead of relying on the getChildAt() method, which has been modified to only return
+    // filtered children.
+    MutableTreeNode child = (MutableTreeNode) children.elementAt(childIndex);
+    children.removeElementAt(childIndex);
+    child.setParent(null);
+  }
+
+  @Override
+  public void removeAllChildren() {
+    if (children == null) {
+      return;
+    }
+
+    // This is different from the default implementation because it uses the raw children vector
+    // instead of relying on the getChildCount() method, which has been modified to only return
+    // the number of filtered children.
+    for (int i = children.size() - 1; i >= 0; i--) {
+      remove(i);
+    }
   }
 
   /**
