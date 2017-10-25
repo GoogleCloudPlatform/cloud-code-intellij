@@ -69,7 +69,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   @Override
   public String getDisplayName() {
-    return GctBundle.message("appengine.standard.facet.name");
+    return GctBundle.message("appengine.standard.facet.name.title");
   }
 
   @NotNull

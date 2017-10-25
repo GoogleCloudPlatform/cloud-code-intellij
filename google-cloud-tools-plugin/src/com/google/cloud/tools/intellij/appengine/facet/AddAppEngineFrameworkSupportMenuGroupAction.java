@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.facet.standard;
+package com.google.cloud.tools.intellij.appengine.facet;
 
+import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
-/**
- * Creates a shortcut in the tools menu to add the App Engine Standard facet to a module.
- */
-public class AddAppEngineStandardFacetToolsMenuAction extends AnAction
-{
-  public AddAppEngineStandardFacetToolsMenuAction() {
-    super(GctBundle.message("appengine.standard.facet.name"),
-        GctBundle.message("appengine.add.standard.facet.tools.menu.description"),
-        null /* icon */);
+/** Creates the menu group for Add App Engine framework support. */
+public class AddAppEngineFrameworkSupportMenuGroupAction extends DefaultActionGroup {
+
+  public AddAppEngineFrameworkSupportMenuGroupAction() {
+    getTemplatePresentation().setText(GctBundle.message("appengine.add.facet.group.menu.text"));
+    getTemplatePresentation().setIcon(GoogleCloudToolsIcons.APP_ENGINE);
   }
 
-  @Override
-  public void actionPerformed(AnActionEvent e) {
-
-  }
 }
