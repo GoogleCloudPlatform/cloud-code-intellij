@@ -16,32 +16,51 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-
+import com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFrameworkSupportAction;
+import com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFrameworkSupportActionTest;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Tests for {@link AddAppEngineFlexibleFrameworkSupportToolsMenuAction}
  */
-@RunWith(JUnit4.class)
-public class AddAppEngineFlexibleFrameworkSupportToolsMenuActionTest {
+public class AddAppEngineFlexibleFrameworkSupportToolsMenuActionTest extends
+    AddAppEngineFrameworkSupportActionTest {
+  private AddAppEngineFlexibleFrameworkSupportToolsMenuAction action;
 
-  @Test
-  public void isActionRegistered() {
+  @NotNull
+  @Override
+  public AddAppEngineFrameworkSupportAction getAction() {
+    return action;
+  }
+
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    action = new AddAppEngineFlexibleFrameworkSupportToolsMenuAction();
+  }
+
+  public void testIsActionRegistered() {
     AnAction action = ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Flexible");
     assertNotNull(action);
     Presentation presentation = action.getTemplatePresentation();
     assertEquals(GctBundle.message("appengine.flexible.facet.name"), presentation.getText());
-    assertEquals(GctBundle.message(
-        "appengine.add.flexible.framework.support.tools.menu.description"),
+    assertEquals(GctBundle.message("appengine.add.framework.support.tools.menu.description",
+        GctBundle.message("appengine.flexible.name.in.message")),
         presentation.getDescription());
+  }
+
+  @Override
+  public void testGetSuitableModules_returnsAllModules_whenModulesHaveNoAppEngineFacet() {
+    super.testGetSuitableModules_returnsAllModules_whenModulesHaveNoAppEngineFacet();
+  }
+
+  @Override
+  public void testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
+    super.testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet();
   }
 
 }
