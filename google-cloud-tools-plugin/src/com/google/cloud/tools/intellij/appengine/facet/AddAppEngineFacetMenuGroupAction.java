@@ -20,9 +20,7 @@ import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
-/**
- * Creates the menu group for Add App Engine framework support.
- */
+/** Creates the menu group for Add App Engine framework support. */
 public class AddAppEngineFacetMenuGroupAction extends DefaultActionGroup {
 
   public AddAppEngineFacetMenuGroupAction() {

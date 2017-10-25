@@ -32,10 +32,13 @@ import org.jetbrains.annotations.NotNull;
  * Creates a shortcut in the tools menu to add the App Engine Standard framework support to a
  * module.
  */
-public class AddAppEngineStandardFrameworkSupportToolsMenuAction extends AddAppEngineFrameworkSupportAction {
+public class AddAppEngineStandardFrameworkSupportToolsMenuAction
+    extends AddAppEngineFrameworkSupportAction {
   private AppEngineStandardSupportProvider provider;
+
   public AddAppEngineStandardFrameworkSupportToolsMenuAction() {
-    super(GctBundle.message("appengine.standard.facet.name"),
+    super(
+        GctBundle.message("appengine.standard.facet.name"),
         GctBundle.message("appengine.standard.name.in.message"));
     provider = new AppEngineStandardSupportProvider();
   }
@@ -50,8 +53,9 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuAction extends AddAppE
       contentRootPath = roots[0].getPath();
     }
 
-    FrameworkSupportModelImpl model = new FrameworkSupportModelImpl(project, contentRootPath,
-        LibrariesContainerFactory.createContainer(project));
+    FrameworkSupportModelImpl model =
+        new FrameworkSupportModelImpl(
+            project, contentRootPath, LibrariesContainerFactory.createContainer(project));
     return provider.createConfigurable(model);
   }
 
@@ -60,5 +64,4 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuAction extends AddAppE
   public FrameworkSupportInModuleProvider getModuleProvider() {
     return provider;
   }
-
 }

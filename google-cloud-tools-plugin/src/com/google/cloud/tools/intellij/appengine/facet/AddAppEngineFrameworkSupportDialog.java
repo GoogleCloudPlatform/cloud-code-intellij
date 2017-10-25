@@ -29,15 +29,16 @@ import javax.swing.JComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Wraps the App Engine Standard or Flexible framework support configuration panel in a dialog.
- */
+/** Wraps the App Engine Standard or Flexible framework support configuration panel in a dialog. */
 public class AddAppEngineFrameworkSupportDialog extends DialogWrapper {
   private FrameworkSupportInModuleConfigurable moduleConfigurable;
   private Module module;
 
-  public AddAppEngineFrameworkSupportDialog (@NotNull String title, @NotNull Project project,
-      @NotNull Module module, @NotNull FrameworkSupportInModuleConfigurable configurable) {
+  public AddAppEngineFrameworkSupportDialog(
+      @NotNull String title,
+      @NotNull Project project,
+      @NotNull Module module,
+      @NotNull FrameworkSupportInModuleConfigurable configurable) {
     super(project);
     setTitle(title);
     this.module = module;
