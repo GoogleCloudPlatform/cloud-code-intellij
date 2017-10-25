@@ -74,7 +74,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
     Font font = parent.getFont();
     HTML_OPEN_TAG =
-        "<html><font face='" + font.getName() + "' size=\\\"" + font.getSize() + "\\\">";
+        "<html><font face=\"" + font.getName() + "\" size=\\\"" + font.getSize() + "\\\">";
 
     init();
   }
