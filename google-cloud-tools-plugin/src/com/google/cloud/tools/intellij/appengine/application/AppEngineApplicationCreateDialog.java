@@ -79,26 +79,6 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     init();
   }
 
-  public JTextPane getInstructionsTextPane() {
-    return instructionsTextPane;
-  }
-
-  public JComboBox<AppEngineLocationSelectorItem> getRegionComboBox() {
-    return regionComboBox;
-  }
-
-  public JTextPane getStatusPane() {
-    return statusPane;
-  }
-
-  public JTextPane getRegionDetailPane() {
-    return regionDetailPane;
-  }
-
-  public JLabel getErrorIcon() {
-    return errorIcon;
-  }
-
   @Override
   protected void init() {
     super.init();
