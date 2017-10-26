@@ -50,7 +50,7 @@
       <ul>
         <li>Google Cloud Storage (GCS) integration in IntelliJ. You can now browse your GCS buckets and view their contents without leaving the IDE. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1696">#1696</a>)</li>
         <li>Searching and filtering capabilities in the cloud project selector. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1660">#1660</a>)</li>
-        <li>New 'Add App Engine framework support' tools menu shortcut to provide another way to add App Engine support to a project. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1685">#1685</a>)</li>
+        <li>New 'add App Engine framework support' tools menu shortcut to provide another way to add App Engine support to a project. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1685">#1685</a>)</li>
       </ul>
 
       <h3>Fixed</h3>

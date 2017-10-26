@@ -7,7 +7,7 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
   - Google Cloud Storage (GCS) integration in IntelliJ. You can now browse your GCS buckets 
     and view their contents without leaving the IDE. [1696](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1696)
   - Searching and filtering capabilities in the cloud project selector. [1660](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1660)
-  - New 'Add App Engine framework support' tools menu shortcut to provide another way to add App 
+  - New 'add App Engine framework support' tools menu shortcut to provide another way to add App 
     Engine support to a project. [1685](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1685)
   
 ### Fixed
