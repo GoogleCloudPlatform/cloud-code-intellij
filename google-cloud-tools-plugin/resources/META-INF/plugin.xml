@@ -44,6 +44,20 @@
       </p>
       <br/>
 
+      <h2>[17.10.1]</h2>
+
+      <h3>Added</h3>
+      <ul>
+        <li>Google Cloud Storage (GCS) integration in IntelliJ. You can now browse your GCS buckets and view their contents without leaving the IDE. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1696">#1696</a>)</li>
+        <li>Searching and filtering capabilities in the cloud project selector. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1660">#1660</a>)</li>
+        <li>New 'add App Engine framework support' tools menu shortcut to provide another way to add App Engine support to a project. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1685">#1685</a>)</li>
+      </ul>
+
+      <h3>Fixed</h3>
+      <ul>
+        <li>Fixed App Engine region indicator status message when no cloud project has been selected. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1607">#1607</a>)</li>
+      </ul>
+
       <h2>[17.9.2]</h2>
 
       <p>Java 8 on App Engine standard environment is now <a href="https://cloudplatform.googleblog.com/2017/09/Java-8-on-App-Engine-Standard-environment-is-now-generally-available.html">generally available</a>.</p>

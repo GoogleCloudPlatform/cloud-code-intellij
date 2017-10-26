@@ -1,6 +1,18 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 17.10.1
+
+### Added
+  - Google Cloud Storage (GCS) integration in IntelliJ. You can now browse your GCS buckets 
+    and view their contents without leaving the IDE. [1696](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1696)
+  - Searching and filtering capabilities in the cloud project selector. [1660](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1660)
+  - New 'add App Engine framework support' tools menu shortcut to provide another way to add App 
+    Engine support to a project. [1685](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1685)
+  
+### Fixed
+  - Fixed App Engine region indicator status message when no cloud project has been selected. [1607](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1607)
+
 ## 17.9.2
 
 Java 8 on App Engine standard environment is now [generally available](https://cloudplatform.googleblog.com/2017/09/Java-8-on-App-Engine-Standard-environment-is-now-generally-available.html).
