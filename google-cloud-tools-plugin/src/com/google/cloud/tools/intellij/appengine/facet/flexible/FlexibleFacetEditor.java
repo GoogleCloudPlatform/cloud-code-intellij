@@ -144,7 +144,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   @Nls
   @Override
   public String getDisplayName() {
-    return GctBundle.getString("appengine.flexible.facet.name");
+    return GctBundle.getString("appengine.flexible.facet.name.title");
   }
 
   private boolean isRuntimeCustom() throws MalformedYamlFileException {

@@ -41,7 +41,7 @@ public class AppEngineStandardFacetType
   public static final String STRING_ID = "app-engine-standard";
 
   public AppEngineStandardFacetType() {
-    super(ID, STRING_ID, GctBundle.message("appengine.standard.facet.name"));
+    super(ID, STRING_ID, GctBundle.message("appengine.standard.facet.name.title"));
   }
 
   @Override
