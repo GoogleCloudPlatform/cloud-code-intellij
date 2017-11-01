@@ -1,7 +1,7 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 17.10.1
+## 17.11.1
 
 ### Added
   - Google Cloud Storage (GCS) integration in IntelliJ. You can now browse your GCS buckets 
