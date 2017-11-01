@@ -27,7 +27,6 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Strings;
-
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -35,19 +34,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.containers.HashMap;
 import com.intellij.util.ui.tree.TreeModelAdapter;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.util.Map;
-
 import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This binding between the project and debuggee is refactored out to make it reusable in the
@@ -76,7 +71,7 @@ class ProjectDebuggeeBinding {
     this.targetSelector = targetSelector;
     this.okAction = okAction;
 
-    this.projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
+    this.projectSelector.addTextChangedListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
         refreshDebugTargetList();

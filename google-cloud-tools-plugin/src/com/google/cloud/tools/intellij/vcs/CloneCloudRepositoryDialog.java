@@ -211,7 +211,7 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
   private void createUIComponents() {
     projectSelector = new ProjectSelector();
     projectSelector.setMinimumSize(new Dimension(300, 0));
-    projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
+    projectSelector.addTextChangedListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
         if (defaultDirectoryName.equals(directoryName.getText())

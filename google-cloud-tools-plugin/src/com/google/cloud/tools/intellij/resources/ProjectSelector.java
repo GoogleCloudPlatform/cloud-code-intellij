@@ -74,6 +74,7 @@ import org.jetbrains.annotations.Nullable;
  * IntellijGoogleLoginService} to get the set of credentialed users and then into
  * resource manager to get the set of projects. The result is displayed in a tree view organized by
  * google login. */
+// TODO(nkibler): Re-do this mess so we can remove the plethora of hacky solutions for listeners.
 public class ProjectSelector extends CustomizableComboBox implements CustomizableComboBoxPopup {
 
   // An empty marker is used because the template engine validates even
@@ -92,6 +93,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   private JBPopup popup;
   private PopupPanel popupPanel;
   private List<ProjectSelectionListener> projectSelectionListeners;
+  private final List<DocumentAdapter> textChangedListeners = new ArrayList<>();
 
   public ProjectSelector() {
     this(false);
@@ -180,6 +182,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
                 if (popupPanel != null) {
                   popupPanel.setFilter(getText());
                 }
+                textChangedListeners.forEach(listener -> listener.changedUpdate(e));
               }
             });
 
@@ -206,6 +209,10 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
                     .connect()
                     .subscribe(
                         GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, () -> synchronize(true)));
+  }
+
+  public void addTextChangedListener(DocumentAdapter listener) {
+    textChangedListeners.add(listener);
   }
 
   public void addModelListener(TreeModelListener listener) {

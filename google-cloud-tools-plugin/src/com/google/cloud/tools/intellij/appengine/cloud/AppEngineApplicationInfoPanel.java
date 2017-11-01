@@ -21,25 +21,20 @@ import com.google.api.services.appengine.v1.model.Application;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineApplicationCreateDialog;
 import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
-import com.google.cloud.tools.intellij.resources.ProjectSelector.ProjectSelectionChangedEvent;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.HyperlinkLabel;
-
+import git4idea.DialogManager;
 import java.awt.BorderLayout;
 import java.io.IOException;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
-
-import git4idea.DialogManager;
 
 /**
  * A {@link JPanel} that displays contextual information about an App Engine Application.
@@ -50,9 +45,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   private static final int COMPONENTS_VERTICAL_PADDING = 0;
 
   private final JLabel errorIcon;
-  private final HyperlinkLabel messageText;
-
-  private CreateApplicationLinkListener currentLinkListener;
+  private HyperlinkLabel messageText;
 
   public AppEngineApplicationInfoPanel() {
     super(new BorderLayout(COMPONENTS_HORIZONTAL_PADDING, COMPONENTS_VERTICAL_PADDING));
@@ -64,29 +57,6 @@ public class AppEngineApplicationInfoPanel extends JPanel {
 
     add(errorIcon, BorderLayout.WEST);
     add(messageText);
-  }
-
-  @SuppressWarnings("FutureReturnValueIgnored")
-  /**
-   * Updates the panel as follows:
-   *   if the project textbox specifies a valid project, it displays the project's information,
-   *   if the project textbox specifies an invalid project, it displays an error message,
-   *   if the project textbox is empty, no message is displayed.
-   */
-  public void refresh(final ProjectSelectionChangedEvent event) {
-    if (event == null) {
-      ApplicationManager.getApplication().executeOnPooledThread(() -> clearMessage());
-      return;
-    }
-
-    if (event.getSelectedProject() == null) {
-      ApplicationManager.getApplication().executeOnPooledThread(
-          () -> setMessage(GctBundle.getString("appengine.infopanel.no.region"),
-              true /* isError*/));
-      return;
-    }
-
-    refresh(event.getSelectedProject().getProjectId(), event.getUser().getCredential());
   }
 
   /**
@@ -144,31 +114,30 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   }
 
   private void setMessage(Runnable messagePrinter, boolean isError) {
-    ApplicationManager.getApplication().invokeAndWait(() -> {
-      errorIcon.setVisible(isError);
-      messagePrinter.run();
-    }, ModalityState.stateForComponent(this));
-  }
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              errorIcon.setVisible(isError);
 
-  /**
-   * Prints a message with a hyperlink.
-   */
-  private void setMessage(String beforeLinkText, String linkText, String afterLinkText) {
-    setMessage(() -> messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText), true);
+              // TODO(nkibler): Figure out what's causing the HyperlinkLabel to not refresh its view
+              // if we re-use the label here.
+              remove(messageText);
+              messageText = new HyperlinkLabel();
+              messageText.setOpaque(false);
+              add(messageText);
+
+              messagePrinter.run();
+            },
+            ModalityState.stateForComponent(this));
   }
 
   private void setCreateApplicationMessage(String projectId, Credential credential) {
-    // dispose the old link listener and replace with a new instance that has the current args
-    if (currentLinkListener != null) {
-      // if the listener is not found, this is a no-op
-      messageText.removeHyperlinkListener(currentLinkListener);
-    }
-    currentLinkListener = new CreateApplicationLinkListener(projectId, credential);
-    messageText.addHyperlinkListener(currentLinkListener);
+    messageText.addHyperlinkListener(new CreateApplicationLinkListener(projectId, credential));
 
-    setMessage(GctBundle.getString("appengine.application.not.exist") + " ",
-        GctBundle.getString("appengine.application.create.linkText"),
-        " " + GctBundle.getString("appengine.application.create.afterLinkText"));
+    String beforeLinkText = GctBundle.getString("appengine.application.not.exist") + " ";
+    String linkText = GctBundle.getString("appengine.application.create.linkText");
+    String afterLinkText = " " + GctBundle.getString("appengine.application.create.afterLinkText");
+    setMessage(() -> messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText), true);
   }
 
   /**

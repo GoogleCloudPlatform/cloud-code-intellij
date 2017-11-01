@@ -22,18 +22,17 @@ import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.tree.TreeModelAdapter;
-
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.TreeModelEvent;
+import org.jetbrains.annotations.NotNull;
 
 /** Common App Engine deployment configuration UI shared by flexible and standard deployments. */
 public final class AppEngineDeploymentConfigurationPanel {
@@ -86,13 +85,18 @@ public final class AppEngineDeploymentConfigurationPanel {
     appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appEngineCostWarningLabel.setHyperlinkTarget(CloudSdkAppEngineHelper.APP_ENGINE_BILLING_URL);
 
-    projectSelector.addProjectSelectionListener(applicationInfoPanel::refresh);
-
     projectSelector.addModelListener(
         new TreeModelAdapter() {
           @Override
           public void treeStructureChanged(TreeModelEvent event) {
             // projects have finished loading
+            refreshApplicationInfoPanel();
+          }
+        });
+    projectSelector.addTextChangedListener(
+        new DocumentAdapter() {
+          @Override
+          protected void textChanged(DocumentEvent e) {
             refreshApplicationInfoPanel();
           }
         });

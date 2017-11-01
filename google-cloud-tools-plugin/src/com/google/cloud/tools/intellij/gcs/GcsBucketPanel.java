@@ -57,6 +57,7 @@ import org.jetbrains.annotations.NotNull;
  * Storage API to load project buckets.
  */
 final class GcsBucketPanel {
+
   private static final Logger log = Logger.getInstance(GcsBucketPanel.class);
 
   private final Project project;
@@ -79,8 +80,7 @@ final class GcsBucketPanel {
     bucketList.setBackground(bucketListPanel.getBackground());
 
     projectSelector
-        .getDocument()
-        .addDocumentListener(
+        .addTextChangedListener(
             new DocumentAdapter() {
               @Override
               protected void textChanged(DocumentEvent event) {
