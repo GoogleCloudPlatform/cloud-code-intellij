@@ -114,31 +114,30 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   }
 
   private void setMessage(Runnable messagePrinter, boolean isError) {
-    ApplicationManager.getApplication().invokeAndWait(() -> {
-      errorIcon.setVisible(isError);
-      messagePrinter.run();
-    }, ModalityState.stateForComponent(this));
-  }
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              errorIcon.setVisible(isError);
 
-  /**
-   * Prints a message with a hyperlink.
-   */
-  private void setMessage(String beforeLinkText, String linkText, String afterLinkText) {
-    setMessage(() -> messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText), true);
+              // TODO(nkibler): Figure out what's causing the HyperlinkLabel to not refresh its view
+              // if we re-use the label here.
+              remove(messageText);
+              messageText = new HyperlinkLabel();
+              messageText.setOpaque(false);
+              add(messageText);
+
+              messagePrinter.run();
+            },
+            ModalityState.stateForComponent(this));
   }
 
   private void setCreateApplicationMessage(String projectId, Credential credential) {
-    // TODO(nkibler): Figure out what's causing the HyperlinkLabel to not refresh its view if we
-    // re-use the label here.
-    remove(messageText);
-    messageText = new HyperlinkLabel();
-    messageText.setOpaque(false);
-    add(messageText);
-
     messageText.addHyperlinkListener(new CreateApplicationLinkListener(projectId, credential));
-    setMessage(GctBundle.getString("appengine.application.not.exist") + " ",
-        GctBundle.getString("appengine.application.create.linkText"),
-        " " + GctBundle.getString("appengine.application.create.afterLinkText"));
+
+    String beforeLinkText = GctBundle.getString("appengine.application.not.exist") + " ";
+    String linkText = GctBundle.getString("appengine.application.create.linkText");
+    String afterLinkText = " " + GctBundle.getString("appengine.application.create.afterLinkText");
+    setMessage(() -> messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText), true);
   }
 
   /**
