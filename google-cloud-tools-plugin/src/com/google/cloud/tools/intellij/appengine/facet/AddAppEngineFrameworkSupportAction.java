@@ -68,7 +68,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
       return;
     }
 
-    List<Module> suitableModules = getSuitableModules(project);
+    List<Module> suitableModules = getModulesWithoutAppEngineSupport(project);
 
     String frameworkNameInTitle = getTemplatePresentation().getText();
     if (suitableModules.isEmpty()) {
@@ -119,7 +119,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
   }
 
   @VisibleForTesting
-  List<Module> getSuitableModules(Project project) {
+  List<Module> getModulesWithoutAppEngineSupport(Project project) {
     List<Module> suitableModules =
         new ArrayList<>(Arrays.asList(ModuleManager.getInstance(project).getModules()));
     DefaultFacetsProvider facetsProvider = new DefaultFacetsProvider();

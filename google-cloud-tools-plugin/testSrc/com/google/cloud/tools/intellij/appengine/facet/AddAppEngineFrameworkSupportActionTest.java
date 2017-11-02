@@ -50,7 +50,7 @@ public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTes
     createModuleAt("module2", project, moduleType, path);
     createModuleAt("module3", project, moduleType, path);
 
-    List<Module> suitableModules = getAction().getSuitableModules(project);
+    List<Module> suitableModules = getAction().getModulesWithoutAppEngineSupport(project);
     assertEquals(3, suitableModules.size());
   }
 
@@ -75,7 +75,7 @@ public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTes
       }
     }.execute();
 
-    List<Module> suitableModules = getAction().getSuitableModules(project);
+    List<Module> suitableModules = getAction().getModulesWithoutAppEngineSupport(project);
     assertEquals(1, suitableModules.size());
     assertEquals("module1", suitableModules.get(0).getName());
   }
