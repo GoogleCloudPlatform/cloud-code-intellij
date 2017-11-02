@@ -32,6 +32,8 @@ import com.intellij.openapi.ui.Messages;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -66,7 +68,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
       return;
     }
 
-    List<Module> suitableModules = getSuitableModules(project);
+    List<Module> suitableModules = getModulesWithoutAppEngineSupport(project);
 
     String frameworkNameInTitle = getTemplatePresentation().getText();
     if (suitableModules.isEmpty()) {
@@ -87,7 +89,20 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
                 "appengine.add.framework.support.choose.module.dialog.description",
                 FRAMEWORK_NAME));
     chooseModulesDialog.setSingleSelectionMode();
+    chooseModulesDialog.setOKActionEnabled(false);
+
+    if (chooseModulesDialog.getPreferredFocusedComponent() instanceof JTable) {
+      JTable chooseModuleTable = (JTable) chooseModulesDialog.getPreferredFocusedComponent();
+
+      ListSelectionModel selectionModel = chooseModuleTable.getSelectionModel();
+      if (selectionModel != null) {
+        selectionModel.addListSelectionListener(
+            e -> chooseModulesDialog.setOKActionEnabled(chooseModuleTable.getSelectedRow() != -1));
+      }
+    }
+
     chooseModulesDialog.show();
+
     final List<Module> elements = chooseModulesDialog.getChosenElements();
     if (!chooseModulesDialog.isOK() || elements.size() != 1) {
       return;
@@ -104,7 +119,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
   }
 
   @VisibleForTesting
-  public List<Module> getSuitableModules(Project project) {
+  List<Module> getModulesWithoutAppEngineSupport(Project project) {
     List<Module> suitableModules =
         new ArrayList<>(Arrays.asList(ModuleManager.getInstance(project).getModules()));
     DefaultFacetsProvider facetsProvider = new DefaultFacetsProvider();
