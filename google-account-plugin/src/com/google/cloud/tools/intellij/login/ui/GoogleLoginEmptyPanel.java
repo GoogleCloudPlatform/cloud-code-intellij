@@ -17,16 +17,13 @@
 package com.google.cloud.tools.intellij.login.ui;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.GoogleLoginListener;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
-
+import com.google.cloud.tools.intellij.util.ProjectUtil;
 import com.intellij.ui.components.JBScrollPane;
-
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Map;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -53,13 +50,13 @@ public class GoogleLoginEmptyPanel extends JPanel {
 
     contentScrollPane = new JBScrollPane();
     JButton addAccountButton = new JButton(needsToSignIn() ? SIGN_IN : ADD_ACCOUNT);
-    addAccountButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent event) {
-        doLogin();
-      }
-    });
+    addAccountButton.addActionListener(event -> doLogin());
     addAccountButton.setHorizontalAlignment(SwingConstants.LEFT);
+
+    ProjectUtil.getInstance()
+        .subscribeAll(
+            GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC,
+            () -> addAccountButton.setText(needsToSignIn() ? SIGN_IN : ADD_ACCOUNT));
 
     //Create a panel to hold the buttons
     JPanel buttonPane = new JPanel();
