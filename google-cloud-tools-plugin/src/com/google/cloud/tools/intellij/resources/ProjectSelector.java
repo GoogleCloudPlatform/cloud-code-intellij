@@ -26,7 +26,7 @@ import com.google.cloud.tools.intellij.login.ui.GoogleLoginEmptyPanel;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.intellij.openapi.project.ProjectManager;
+import com.google.cloud.tools.intellij.util.ProjectUtil;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -50,7 +50,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -92,6 +91,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   private final boolean queryOnExpand;
   private JBPopup popup;
   private PopupPanel popupPanel;
+  private JButton synchronizeButton;
   private List<ProjectSelectionListener> projectSelectionListeners;
   private final List<DocumentAdapter> textChangedListeners = new ArrayList<>();
 
@@ -201,14 +201,13 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       }
     });
 
-    Stream.of(ProjectManager.getInstance().getOpenProjects())
-        .forEach(
-            project ->
-                project
-                    .getMessageBus()
-                    .connect()
-                    .subscribe(
-                        GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, () -> synchronize(true)));
+    ProjectUtil.getInstance()
+        .subscribeAll(GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, () -> synchronize(true));
+
+    ProjectUtil.getInstance()
+        .subscribeAll(
+            GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC,
+            () -> synchronizeButton.setVisible(!needsToSignIn()));
   }
 
   public void addTextChangedListener(DocumentAdapter listener) {
@@ -547,17 +546,11 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
       getBottomPane().setLayout(new BorderLayout());
 
-      if (!needsToSignIn()) {
-        JButton synchronizeButton = new JButton();
-        synchronizeButton.setIcon(GoogleCloudToolsIcons.REFRESH);
-        synchronizeButton.addActionListener(event -> {
-          if (!needsToSignIn()) {
-            synchronize(true);
-          }
-        });
-
-        getBottomPane().add(synchronizeButton, BorderLayout.EAST);
-      }
+      synchronizeButton = new JButton();
+      synchronizeButton.setIcon(GoogleCloudToolsIcons.REFRESH);
+      synchronizeButton.addActionListener(event -> synchronize(!needsToSignIn()));
+      getBottomPane().add(synchronizeButton, BorderLayout.EAST);
+      synchronizeButton.setVisible(!needsToSignIn());
 
       if (treeModel.isModelNeedsRefresh()) {
         treeModel.setModelNeedsRefresh(false);
