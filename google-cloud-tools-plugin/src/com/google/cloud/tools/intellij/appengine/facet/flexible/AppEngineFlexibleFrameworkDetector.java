@@ -18,16 +18,17 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
-
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
 import com.intellij.framework.detection.FileContentPattern;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.patterns.ElementPattern;
-import com.intellij.patterns.StandardPatterns;
+import com.intellij.patterns.ObjectPattern;
+import com.intellij.patterns.PatternCondition;
+import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileContent;
-
+import java.util.Scanner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLFileType;
 
@@ -66,8 +67,38 @@ public class AppEngineFlexibleFrameworkDetector
   @NotNull
   @Override
   public ElementPattern<FileContent> createSuitableFilePattern() {
-    return StandardPatterns.or(
-        FileContentPattern.fileContent().withName("app.yaml"),
-        FileContentPattern.fileContent().withName("app.yml"));
+    return new AppEngineFlexFileCondition().withAppEngineFlexYAMLContent();
   }
+
+  /**
+   * IDEA API pattern class that checks for App Engine Flex project file presence and checks it has
+   * required configuration lines to avoid spurious detection.
+   */
+  private static class AppEngineFlexFileCondition extends ObjectPattern<FileContent, FileContentPattern> {
+
+    private AppEngineFlexFileCondition() {
+      super(FileContent.class);
+    }
+
+    FileContentPattern withAppEngineFlexYAMLContent() {
+      return with(new PatternCondition<FileContent>("with-appengine-java-flexible") {
+        @Override
+        public boolean accepts(@NotNull FileContent fileContent, ProcessingContext context) {
+          // checks for flex engine file names and then checks for required configuration line inside.
+          boolean nameMatch = fileContent.getFileName().equals("app.yaml") || fileContent.getFileName().equals("app.yml");
+          if (nameMatch) {
+            Scanner scanner = new Scanner(fileContent.getContentAsText().toString());
+            while (scanner.hasNextLine()) {
+              if (scanner.nextLine().startsWith("runtime:"))
+                return true;
+            }
+          }
+
+          return false;
+        }
+      });
+    }
+
+  }
+
 }
