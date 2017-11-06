@@ -73,6 +73,9 @@ public class GoogleLoginEmptyPanel extends JPanel {
 
     bottomPane = new JPanel();
     buttonPane.add(bottomPane);
+
+    // BorderLayout only allows a single component to be added per region so it is safe to call
+    // this multiple times
     add(buttonPane, BorderLayout.PAGE_END);
   }
 
