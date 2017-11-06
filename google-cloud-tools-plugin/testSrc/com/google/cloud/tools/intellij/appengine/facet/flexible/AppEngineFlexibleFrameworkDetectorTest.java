@@ -16,9 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.intellij.testFramework.PlatformTestCase;
+import junit.framework.TestCase;
+import org.jetbrains.yaml.YAMLFileType;
 
-public class AppEngineFlexibleFrameworkDetectorTest extends PlatformTestCase {
+public class AppEngineFlexibleFrameworkDetectorTest extends TestCase {
+
   public void testIncompleteAppYamlDetection() {
+    AppEngineFlexibleFrameworkDetector detector = new AppEngineFlexibleFrameworkDetector();
+    assertEquals(YAMLFileType.YML, detector.getFileType());
+    detector.createSuitableFilePattern();
   }
+
 }

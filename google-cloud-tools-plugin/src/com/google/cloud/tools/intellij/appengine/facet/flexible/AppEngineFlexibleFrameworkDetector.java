@@ -71,8 +71,8 @@ public class AppEngineFlexibleFrameworkDetector
   }
 
   /**
-   * IntelliJ API pattern class that checks for App Engine Flex project file presence and checks it has
-   * required configuration lines to avoid spurious detection.
+   * IntelliJ API pattern class that checks for App Engine Flex project file presence and checks it
+   * has required configuration lines to avoid spurious detection.
    */
   private static class AppEngineFlexFileCondition extends ObjectPattern<FileContent, FileContentPattern> {
 
@@ -85,7 +85,8 @@ public class AppEngineFlexibleFrameworkDetector
         @Override
         public boolean accepts(@NotNull FileContent fileContent, ProcessingContext context) {
           // checks for flex engine file names and then checks for required configuration line inside.
-          boolean nameMatch = fileContent.getFileName().equals("app.yaml") || fileContent.getFileName().equals("app.yml");
+          boolean nameMatch = fileContent.getFileName().equals("app.yaml") ||
+              fileContent.getFileName().equals("app.yml");
           if (nameMatch) {
             Scanner scanner = new Scanner(fileContent.getContentAsText().toString());
             while (scanner.hasNextLine()) {
@@ -93,7 +94,6 @@ public class AppEngineFlexibleFrameworkDetector
                 return true;
             }
           }
-
           return false;
         }
       });
