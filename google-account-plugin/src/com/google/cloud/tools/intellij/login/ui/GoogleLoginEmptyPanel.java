@@ -19,14 +19,11 @@ package com.google.cloud.tools.intellij.login.ui;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
-
 import com.intellij.ui.components.JBScrollPane;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -52,6 +49,12 @@ public class GoogleLoginEmptyPanel extends JPanel {
     super(new BorderLayout());
 
     contentScrollPane = new JBScrollPane();
+
+    add(contentScrollPane, BorderLayout.CENTER);
+    initializeBottomPane();
+  }
+
+  protected void initializeBottomPane() {
     JButton addAccountButton = new JButton(needsToSignIn() ? SIGN_IN : ADD_ACCOUNT);
     addAccountButton.addActionListener(new ActionListener() {
       @Override
@@ -71,7 +74,8 @@ public class GoogleLoginEmptyPanel extends JPanel {
     bottomPane = new JPanel();
     buttonPane.add(bottomPane);
 
-    add(contentScrollPane, BorderLayout.CENTER);
+    // BorderLayout only allows a single component to be added per region so it is safe to call
+    // this multiple times
     add(buttonPane, BorderLayout.PAGE_END);
   }
 

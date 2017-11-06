@@ -545,6 +545,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       this.setPreferredSize(new Dimension(Math.max(BaseGoogleLoginUi.MIN_WIDTH, preferredWidth),
           getPreferredPopupHeight()));
 
+      initializeBottomPane();
       getBottomPane().setLayout(new BorderLayout());
 
       if (!needsToSignIn()) {
