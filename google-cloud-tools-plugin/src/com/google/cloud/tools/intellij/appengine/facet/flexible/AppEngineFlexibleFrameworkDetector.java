@@ -71,7 +71,7 @@ public class AppEngineFlexibleFrameworkDetector
   }
 
   /**
-   * IDEA API pattern class that checks for App Engine Flex project file presence and checks it has
+   * IntelliJ API pattern class that checks for App Engine Flex project file presence and checks it has
    * required configuration lines to avoid spurious detection.
    */
   private static class AppEngineFlexFileCondition extends ObjectPattern<FileContent, FileContentPattern> {
