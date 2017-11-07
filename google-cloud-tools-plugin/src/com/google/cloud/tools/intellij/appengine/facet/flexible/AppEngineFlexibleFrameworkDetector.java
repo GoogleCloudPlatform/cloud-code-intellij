@@ -42,7 +42,7 @@ public class AppEngineFlexibleFrameworkDetector
 
   // app engine flex file names.
   static final Collection<String> APP_ENGINE_FLEX_PROJECT_FILES =
-          Collections.unmodifiableList(Arrays.asList("app.yaml",  "app.yml"));
+      Collections.unmodifiableList(Arrays.asList("app.yaml", "app.yml"));
   // required string in app engine flex YAML project file.
   static final String APP_ENGINE_REQUIRED_YAML = "runtime:";
 
@@ -83,30 +83,30 @@ public class AppEngineFlexibleFrameworkDetector
    * IntelliJ API pattern class that checks for App Engine Flex project file presence and checks it
    * has required configuration lines to avoid spurious detection.
    */
-  private static class AppEngineFlexPattern extends ObjectPattern<FileContent, AppEngineFlexPattern> {
+  private static class AppEngineFlexPattern
+      extends ObjectPattern<FileContent, AppEngineFlexPattern> {
 
     private AppEngineFlexPattern() {
       super(FileContent.class);
     }
 
     private AppEngineFlexPattern withAppEngineFlexYAMLContent() {
-      return with(new PatternCondition<FileContent>("with-appengine-java-flexible") {
-        @Override
-        public boolean accepts(@NotNull FileContent fileContent, ProcessingContext context) {
-          // checks for flex engine file names and then checks for required configuration line inside.
-          boolean nameMatch = APP_ENGINE_FLEX_PROJECT_FILES.contains(fileContent.getFileName());
-          if (nameMatch) {
-            Scanner scanner = new Scanner(fileContent.getContentAsText().toString());
-            while (scanner.hasNextLine()) {
-              if (scanner.nextLine().startsWith(APP_ENGINE_REQUIRED_YAML))
-                return true;
+      return with(
+          new PatternCondition<FileContent>("with-appengine-java-flexible") {
+            @Override
+            public boolean accepts(@NotNull FileContent fileContent, ProcessingContext context) {
+              // checks for flex engine file names and then checks for required configuration line
+              // inside.
+              boolean nameMatch = APP_ENGINE_FLEX_PROJECT_FILES.contains(fileContent.getFileName());
+              if (nameMatch) {
+                Scanner scanner = new Scanner(fileContent.getContentAsText().toString());
+                while (scanner.hasNextLine()) {
+                  if (scanner.nextLine().startsWith(APP_ENGINE_REQUIRED_YAML)) return true;
+                }
+              }
+              return false;
             }
-          }
-          return false;
-        }
-      });
+          });
     }
-
   }
-
 }
