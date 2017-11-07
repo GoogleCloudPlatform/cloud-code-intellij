@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.collect.Lists;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
 import com.intellij.framework.detection.FileContentPattern;
@@ -28,7 +29,9 @@ import com.intellij.patterns.ObjectPattern;
 import com.intellij.patterns.PatternCondition;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileContent;
-import java.util.Scanner;
+
+import java.util.*;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLFileType;
 
@@ -36,6 +39,11 @@ import org.jetbrains.yaml.YAMLFileType;
 public class AppEngineFlexibleFrameworkDetector
     extends FacetBasedFrameworkDetector<
         AppEngineFlexibleFacet, AppEngineFlexibleFacetConfiguration> {
+
+  // app engine flex file names.
+  static final List<String> APP_ENGINE_FLEX_PROJECT_FILES = Collections.unmodifiableList(Arrays.asList("app.yaml",  "app.yml"));
+  // required string in app engine flex YAML project file.
+  static final String APP_ENGINE_REQUIRED_YAML = "runtime:";
 
   public AppEngineFlexibleFrameworkDetector() {
     super("appengine-java-flexible");
@@ -67,30 +75,29 @@ public class AppEngineFlexibleFrameworkDetector
   @NotNull
   @Override
   public ElementPattern<FileContent> createSuitableFilePattern() {
-    return new AppEngineFlexFileCondition().withAppEngineFlexYAMLContent();
+    return new AppEngineFlexPattern().withAppEngineFlexYAMLContent();
   }
 
   /**
    * IntelliJ API pattern class that checks for App Engine Flex project file presence and checks it
    * has required configuration lines to avoid spurious detection.
    */
-  private static class AppEngineFlexFileCondition extends ObjectPattern<FileContent, FileContentPattern> {
+  private static class AppEngineFlexPattern extends ObjectPattern<FileContent, AppEngineFlexPattern> {
 
-    private AppEngineFlexFileCondition() {
+    private AppEngineFlexPattern() {
       super(FileContent.class);
     }
 
-    FileContentPattern withAppEngineFlexYAMLContent() {
+    AppEngineFlexPattern withAppEngineFlexYAMLContent() {
       return with(new PatternCondition<FileContent>("with-appengine-java-flexible") {
         @Override
         public boolean accepts(@NotNull FileContent fileContent, ProcessingContext context) {
           // checks for flex engine file names and then checks for required configuration line inside.
-          boolean nameMatch = fileContent.getFileName().equals("app.yaml") ||
-              fileContent.getFileName().equals("app.yml");
+          boolean nameMatch = APP_ENGINE_FLEX_PROJECT_FILES.contains(fileContent.getFileName());
           if (nameMatch) {
             Scanner scanner = new Scanner(fileContent.getContentAsText().toString());
             while (scanner.hasNextLine()) {
-              if (scanner.nextLine().startsWith("runtime:"))
+              if (scanner.nextLine().startsWith(APP_ENGINE_REQUIRED_YAML))
                 return true;
             }
           }
