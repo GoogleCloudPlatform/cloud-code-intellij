@@ -18,10 +18,8 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
-import com.google.common.collect.Lists;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
-import com.intellij.framework.detection.FileContentPattern;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.patterns.ElementPattern;
@@ -29,11 +27,13 @@ import com.intellij.patterns.ObjectPattern;
 import com.intellij.patterns.PatternCondition;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileContent;
-
-import java.util.*;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLFileType;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Collection;
+import java.util.Scanner;
 
 /** Detects App Engine Flexible framework in a project. */
 public class AppEngineFlexibleFrameworkDetector
@@ -41,7 +41,7 @@ public class AppEngineFlexibleFrameworkDetector
         AppEngineFlexibleFacet, AppEngineFlexibleFacetConfiguration> {
 
   // app engine flex file names.
-  static final List<String> APP_ENGINE_FLEX_PROJECT_FILES =
+  static final Collection<String> APP_ENGINE_FLEX_PROJECT_FILES =
           Collections.unmodifiableList(Arrays.asList("app.yaml",  "app.yml"));
   // required string in app engine flex YAML project file.
   static final String APP_ENGINE_REQUIRED_YAML = "runtime:";
