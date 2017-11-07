@@ -31,6 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/** Tests {@link AppEngineFlexibleFrameworkDetector} for valid/invalid App Engine Flex detection. */
 public class AppEngineFlexibleFrameworkDetectorTest {
 
   private final String validAppEngineFlexYamlString =
@@ -54,7 +55,7 @@ public class AppEngineFlexibleFrameworkDetectorTest {
     FileContent wrongFile = new FileContentImpl(invalidNameFile, validAppEngineFlexYamlString, System.currentTimeMillis());
     Assert.assertFalse(pattern.accepts(wrongFile));
 
-    // valid name, does not have required framework contents.
+    // valid name, does not have required YAML contents.
     String notAppEngineFlexYamlString = "spring:\n  application:\n  name: jhipsterSampleApplication";
     for (String validFileName: AppEngineFlexibleFrameworkDetector.APP_ENGINE_FLEX_PROJECT_FILES) {
       MockVirtualFile invalidYamlFile = new MockVirtualFile(validFileName);
