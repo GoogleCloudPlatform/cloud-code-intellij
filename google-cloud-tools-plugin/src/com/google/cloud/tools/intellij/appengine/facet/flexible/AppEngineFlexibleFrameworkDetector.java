@@ -41,7 +41,8 @@ public class AppEngineFlexibleFrameworkDetector
         AppEngineFlexibleFacet, AppEngineFlexibleFacetConfiguration> {
 
   // app engine flex file names.
-  static final List<String> APP_ENGINE_FLEX_PROJECT_FILES = Collections.unmodifiableList(Arrays.asList("app.yaml",  "app.yml"));
+  static final List<String> APP_ENGINE_FLEX_PROJECT_FILES =
+          Collections.unmodifiableList(Arrays.asList("app.yaml",  "app.yml"));
   // required string in app engine flex YAML project file.
   static final String APP_ENGINE_REQUIRED_YAML = "runtime:";
 

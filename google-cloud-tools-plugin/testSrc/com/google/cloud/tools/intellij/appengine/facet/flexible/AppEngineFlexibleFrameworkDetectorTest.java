@@ -33,7 +33,8 @@ import static org.mockito.Mockito.when;
 
 public class AppEngineFlexibleFrameworkDetectorTest {
 
-  private final String validAppEngineFlexYamlString = AppEngineFlexibleFrameworkDetector.APP_ENGINE_REQUIRED_YAML + " java";
+  private final String validAppEngineFlexYamlString =
+          AppEngineFlexibleFrameworkDetector.APP_ENGINE_REQUIRED_YAML + " java";
 
   @Before
   public void setUp() {
@@ -55,8 +56,10 @@ public class AppEngineFlexibleFrameworkDetectorTest {
 
     // valid name, does not have required framework contents.
     String notAppEngineFlexYamlString = "spring:\n  application:\n  name: jhipsterSampleApplication";
-    MockVirtualFile invalidYamlFile = new MockVirtualFile(AppEngineFlexibleFrameworkDetector.APP_ENGINE_FLEX_PROJECT_FILES.get(0), notAppEngineFlexYamlString);
-    FileContent invalidYamlFileContent = new FileContentImpl(invalidYamlFile, notAppEngineFlexYamlString, System.currentTimeMillis());
+    String anyValidFileName = AppEngineFlexibleFrameworkDetector.APP_ENGINE_FLEX_PROJECT_FILES.get(0);
+    MockVirtualFile invalidYamlFile = new MockVirtualFile(anyValidFileName, notAppEngineFlexYamlString);
+    FileContent invalidYamlFileContent =
+            new FileContentImpl(invalidYamlFile, notAppEngineFlexYamlString, System.currentTimeMillis());
     Assert.assertFalse(pattern.accepts(invalidYamlFileContent));
   }
 
@@ -67,8 +70,10 @@ public class AppEngineFlexibleFrameworkDetectorTest {
     ElementPattern<FileContent> pattern = detector.createSuitableFilePattern();
 
     // valid name, valid app engine line.
-    MockVirtualFile validAppEngineFlexFile = new MockVirtualFile(AppEngineFlexibleFrameworkDetector.APP_ENGINE_FLEX_PROJECT_FILES.get(0), validAppEngineFlexYamlString);
-    FileContent validAppEngineFlexFileContent = new FileContentImpl(validAppEngineFlexFile, validAppEngineFlexYamlString, System.currentTimeMillis());
+    String anyValidFileName = AppEngineFlexibleFrameworkDetector.APP_ENGINE_FLEX_PROJECT_FILES.get(0);
+    MockVirtualFile validAppEngineFlexFile = new MockVirtualFile(anyValidFileName, validAppEngineFlexYamlString);
+    FileContent validAppEngineFlexFileContent =
+            new FileContentImpl(validAppEngineFlexFile, validAppEngineFlexYamlString, System.currentTimeMillis());
     Assert.assertTrue(pattern.accepts(validAppEngineFlexFileContent));
   }
 
