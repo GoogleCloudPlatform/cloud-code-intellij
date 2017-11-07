@@ -89,7 +89,7 @@ public class AppEngineFlexibleFrameworkDetector
       super(FileContent.class);
     }
 
-    AppEngineFlexPattern withAppEngineFlexYAMLContent() {
+    private AppEngineFlexPattern withAppEngineFlexYAMLContent() {
       return with(new PatternCondition<FileContent>("with-appengine-java-flexible") {
         @Override
         public boolean accepts(@NotNull FileContent fileContent, ProcessingContext context) {
