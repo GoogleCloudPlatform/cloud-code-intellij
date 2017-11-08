@@ -18,11 +18,13 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.intellij.mock.MockVirtualFile;
 import com.intellij.openapi.fileTypes.FileTypeRegistry;
+import com.intellij.openapi.util.Getter;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
 import com.intellij.util.indexing.FileContentImpl;
 import org.jetbrains.yaml.YAMLFileType;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,14 +38,22 @@ public class AppEngineFlexibleFrameworkDetectorTest {
 
   private final String validAppEngineFlexYamlString =
       AppEngineFlexibleFrameworkDetector.APP_ENGINE_REQUIRED_YAML + " java";
+  // keeps original getter for file type registry to reset after tests are done.
+  private Getter<FileTypeRegistry> fileTypeRegistryGetterOriginal;
 
   @Before
   public void setUp() {
     FileTypeRegistry mockFileTypeRegistry = mock(FileTypeRegistry.class);
     // mock file type check routine. getInstance() is static, has to replace it with IJ Getter mock.
+    fileTypeRegistryGetterOriginal = FileTypeRegistry.ourInstanceGetter;
     FileTypeRegistry.ourInstanceGetter = () -> mockFileTypeRegistry;
     when(mockFileTypeRegistry.getFileTypeByFile(any(VirtualFile.class)))
         .thenReturn(YAMLFileType.YML);
+  }
+
+  @After
+  public void tearDown() {
+    FileTypeRegistry.ourInstanceGetter = fileTypeRegistryGetterOriginal;
   }
 
   @Test
