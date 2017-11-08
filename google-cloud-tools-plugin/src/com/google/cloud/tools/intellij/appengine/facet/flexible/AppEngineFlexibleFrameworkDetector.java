@@ -86,7 +86,6 @@ public class AppEngineFlexibleFrameworkDetector
     private AppEngineFlexPattern withAppEngineFlexYamlContent() {
       return with(
           new PatternCondition<FileContent>("with-appengine-java-flexible") {
-            // app engine flex file names.
             private final Collection<String> APP_ENGINE_FLEX_CONFIG_FILES =
                 ImmutableList.of("app.yaml", "app.yml");
 
