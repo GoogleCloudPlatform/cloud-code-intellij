@@ -16,85 +16,89 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
+import static com.google.common.truth.Truth.assertThat;
+
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.intellij.mock.MockVirtualFile;
-import com.intellij.openapi.fileTypes.FileTypeRegistry;
-import com.intellij.openapi.util.Getter;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
 import com.intellij.util.indexing.FileContentImpl;
 import org.jetbrains.yaml.YAMLFileType;
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-/** Tests {@link AppEngineFlexibleFrameworkDetector} for valid/invalid App Engine Flex detection. */
+/** Tests {@link AppEngineFlexibleFrameworkDetector}. */
 public class AppEngineFlexibleFrameworkDetectorTest {
 
-  private final String validAppEngineFlexYamlString =
-      AppEngineFlexibleFrameworkDetector.APP_ENGINE_REQUIRED_YAML + " java";
-  // keeps original getter for file type registry to reset after tests are done.
-  private Getter<FileTypeRegistry> fileTypeRegistryGetterOriginal;
+  private static final String VALID_APP_ENGINE_FLEX_YAML_CONTENT = "runtime: java";
+  private static final String NOT_APP_ENGINE_FLEX_YAML_CONTENT =
+      "spring:\n  application:\n  name: jhipsterSampleApplication";
+
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
+  private AppEngineFlexibleFrameworkDetector detector;
+  private ElementPattern<FileContent> pattern;
 
   @Before
   public void setUp() {
-    FileTypeRegistry mockFileTypeRegistry = mock(FileTypeRegistry.class);
-    // mock file type check routine. getInstance() is static, has to replace it with IJ Getter mock.
-    fileTypeRegistryGetterOriginal = FileTypeRegistry.ourInstanceGetter;
-    FileTypeRegistry.ourInstanceGetter = () -> mockFileTypeRegistry;
-    when(mockFileTypeRegistry.getFileTypeByFile(any(VirtualFile.class)))
-        .thenReturn(YAMLFileType.YML);
-  }
-
-  @After
-  public void tearDown() {
-    FileTypeRegistry.ourInstanceGetter = fileTypeRegistryGetterOriginal;
+    detector = new AppEngineFlexibleFrameworkDetector();
+    pattern = detector.createSuitableFilePattern();
   }
 
   @Test
-  public void testIncompleteAppYamlDetection() {
-    AppEngineFlexibleFrameworkDetector detector = new AppEngineFlexibleFrameworkDetector();
-    ElementPattern<FileContent> pattern = detector.createSuitableFilePattern();
+  public void detectorFileType_Yaml() {
+    assertThat(detector.getFileType()).isEqualTo(YAMLFileType.YML);
+  }
 
+  @Test
+  public void createSuitableFilePattern_withInvalidFilename_doesNotMatch() {
     // unaccepted file name pattern, although correct content.
-    MockVirtualFile invalidNameFile =
-        new MockVirtualFile("myApp.yaml", validAppEngineFlexYamlString);
+    MockVirtualFile invalidNameFile = new MockVirtualFile("myApp.yaml");
     FileContent wrongFile =
         new FileContentImpl(
-            invalidNameFile, validAppEngineFlexYamlString, System.currentTimeMillis());
-    Assert.assertFalse(pattern.accepts(wrongFile));
+            invalidNameFile, VALID_APP_ENGINE_FLEX_YAML_CONTENT, System.currentTimeMillis());
 
-    // valid name, does not have required YAML contents.
-    String notAppEngineFlexYamlString =
-        "spring:\n  application:\n  name: jhipsterSampleApplication";
-    for (String validFileName : AppEngineFlexibleFrameworkDetector.APP_ENGINE_FLEX_PROJECT_FILES) {
-      MockVirtualFile invalidYamlFile = new MockVirtualFile(validFileName);
-      FileContent invalidYamlFileContent =
-          new FileContentImpl(
-              invalidYamlFile, notAppEngineFlexYamlString, System.currentTimeMillis());
-      Assert.assertFalse(pattern.accepts(invalidYamlFileContent));
-    }
+    assertThat(pattern.accepts(wrongFile)).isFalse();
   }
 
   @Test
-  public void testValidAppYamlDetection() {
-    // test we require YAML files for detection.
-    AppEngineFlexibleFrameworkDetector detector = new AppEngineFlexibleFrameworkDetector();
-    Assert.assertEquals(YAMLFileType.YML, detector.getFileType());
-    ElementPattern<FileContent> pattern = detector.createSuitableFilePattern();
+  public void createSuitableFilePattern_appYml_withInvalidContent_doesNotMatch() {
+    MockVirtualFile invalidYamlFile = new MockVirtualFile("app.yml");
+    FileContent invalidYamlFileContent =
+        new FileContentImpl(
+            invalidYamlFile, NOT_APP_ENGINE_FLEX_YAML_CONTENT, System.currentTimeMillis());
 
-    // check all valid names, with valid app engine line.
-    for (String validFileName : AppEngineFlexibleFrameworkDetector.APP_ENGINE_FLEX_PROJECT_FILES) {
-      MockVirtualFile validAppEngineFlexFile = new MockVirtualFile(validFileName);
-      FileContent validAppEngineFlexFileContent =
-          new FileContentImpl(
-              validAppEngineFlexFile, validAppEngineFlexYamlString, System.currentTimeMillis());
-      Assert.assertTrue(pattern.accepts(validAppEngineFlexFileContent));
-    }
+    assertThat(pattern.accepts(invalidYamlFileContent)).isFalse();
+  }
+
+  @Test
+  public void createSuitableFilePattern_appYaml_withInvalidContent_doesNotMatch() {
+    MockVirtualFile invalidYamlFile = new MockVirtualFile("app.yaml");
+    FileContent invalidYamlFileContent =
+        new FileContentImpl(
+            invalidYamlFile, NOT_APP_ENGINE_FLEX_YAML_CONTENT, System.currentTimeMillis());
+
+    assertThat(pattern.accepts(invalidYamlFileContent)).isFalse();
+  }
+
+  @Test
+  public void createSuitableFilePattern_appYml_withValidContent_matches() {
+    MockVirtualFile validAppEngineFlexFile = new MockVirtualFile("app.yml");
+    FileContent validAppEngineFlexFileContent =
+        new FileContentImpl(
+            validAppEngineFlexFile, VALID_APP_ENGINE_FLEX_YAML_CONTENT, System.currentTimeMillis());
+
+    assertThat(pattern.accepts(validAppEngineFlexFileContent)).isTrue();
+  }
+
+  @Test
+  public void createSuitableFilePattern_appYaml_withValidContent_matches() {
+    MockVirtualFile validAppEngineFlexFile = new MockVirtualFile("app.yaml");
+    FileContent validAppEngineFlexFileContent =
+        new FileContentImpl(
+            validAppEngineFlexFile, VALID_APP_ENGINE_FLEX_YAML_CONTENT, System.currentTimeMillis());
+
+    assertThat(pattern.accepts(validAppEngineFlexFileContent)).isTrue();
   }
 }
