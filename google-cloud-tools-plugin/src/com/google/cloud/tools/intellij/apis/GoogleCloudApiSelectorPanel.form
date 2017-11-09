@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.google.cloud.tools.intellij.apis.GoogleCloudApiSelectorPanel">
+  <grid id="27dc6" binding="panel" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="ae9b6" class="com.intellij.ui.JBSplitter" binding="splitter" custom-create="true">
+        <constraints border-constraint="Center"/>
+        <properties>
+          <firstComponent value="3cccd"/>
+          <proportion value="0.3"/>
+          <secondComponent value="349d1"/>
+        </properties>
+      </component>
+      <scrollpane id="3cccd" class="com.intellij.ui.components.JBScrollPane" binding="leftScrollPane">
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="5e7fa" binding="checkboxPanel" custom-create="true" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints/>
+            <properties/>
+            <border type="none"/>
+            <children/>
+          </grid>
+        </children>
+      </scrollpane>
+      <scrollpane id="349d1" class="com.intellij.ui.components.JBScrollPane" binding="rightScrollPane">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <nested-form id="a0864" form-file="com/google/cloud/tools/intellij/apis/GoogleCloudApiDetailsPanel.form" binding="detailsForm">
+            <constraints/>
+          </nested-form>
+        </children>
+      </scrollpane>
+    </children>
+  </grid>
+</form>
