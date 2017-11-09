@@ -78,6 +78,10 @@ public class AppEngineFlexibleFrameworkDetector
    */
   private static final class AppEngineFlexPattern
       extends ObjectPattern<FileContent, AppEngineFlexPattern> {
+    private static final Collection<String> APP_ENGINE_FLEX_CONFIG_FILES =
+        ImmutableList.of("app.yaml", "app.yml");
+
+    private static final String APP_ENGINE_FLEX_REQUIRED_YAML_CONTENT = "runtime:";
 
     private AppEngineFlexPattern() {
       super(FileContent.class);
@@ -86,11 +90,6 @@ public class AppEngineFlexibleFrameworkDetector
     private AppEngineFlexPattern withAppEngineFlexYamlContent() {
       return with(
           new PatternCondition<FileContent>("with-appengine-java-flexible") {
-            private final Collection<String> APP_ENGINE_FLEX_CONFIG_FILES =
-                ImmutableList.of("app.yaml", "app.yml");
-
-            private static final String APP_ENGINE_FLEX_REQUIRED_YAML_CONTENT = "runtime:";
-
             @Override
             public boolean accepts(@NotNull FileContent fileContent, ProcessingContext context) {
               // checks for flex engine file names and then checks for required configuration line
