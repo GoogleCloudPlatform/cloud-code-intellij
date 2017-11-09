@@ -11,7 +11,7 @@
         <constraints border-constraint="Center"/>
         <properties>
           <firstComponent value="3cccd"/>
-          <proportion value="0.3"/>
+          <proportion value="0.35"/>
           <secondComponent value="349d1"/>
         </properties>
       </component>
@@ -33,7 +33,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <nested-form id="a0864" form-file="com/google/cloud/tools/intellij/apis/GoogleCloudApiDetailsPanel.form" binding="detailsForm">
+          <nested-form id="a0864" form-file="com/google/cloud/tools/intellij/apis/GoogleCloudApiDetailsPanel.form" binding="detailsForm" custom-create="true">
             <constraints/>
           </nested-form>
         </children>
