@@ -18,18 +18,21 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
-
+import com.google.common.collect.ImmutableList;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
-import com.intellij.framework.detection.FileContentPattern;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.patterns.ElementPattern;
-import com.intellij.patterns.StandardPatterns;
+import com.intellij.patterns.ObjectPattern;
+import com.intellij.patterns.PatternCondition;
+import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileContent;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLFileType;
+
+import java.util.Collection;
+import java.util.Scanner;
 
 /** Detects App Engine Flexible framework in a project. */
 public class AppEngineFlexibleFrameworkDetector
@@ -66,8 +69,43 @@ public class AppEngineFlexibleFrameworkDetector
   @NotNull
   @Override
   public ElementPattern<FileContent> createSuitableFilePattern() {
-    return StandardPatterns.or(
-        FileContentPattern.fileContent().withName("app.yaml"),
-        FileContentPattern.fileContent().withName("app.yml"));
+    return new AppEngineFlexPattern().withAppEngineFlexYamlContent();
+  }
+
+  /**
+   * IntelliJ API pattern class that checks for App Engine Flex project file presence and checks it
+   * has required configuration lines to avoid spurious detection.
+   */
+  private static final class AppEngineFlexPattern
+      extends ObjectPattern<FileContent, AppEngineFlexPattern> {
+    private static final ImmutableList<String> APP_ENGINE_FLEX_CONFIG_FILES =
+        ImmutableList.of("app.yaml", "app.yml");
+
+    private static final String APP_ENGINE_FLEX_REQUIRED_YAML_CONTENT = "runtime:";
+
+    private AppEngineFlexPattern() {
+      super(FileContent.class);
+    }
+
+    private AppEngineFlexPattern withAppEngineFlexYamlContent() {
+      return with(
+          new PatternCondition<FileContent>("with-appengine-java-flexible") {
+            @Override
+            public boolean accepts(@NotNull FileContent fileContent, ProcessingContext context) {
+              // checks for flex engine file names and then checks for required configuration line
+              // inside.
+              boolean nameMatch = APP_ENGINE_FLEX_CONFIG_FILES.contains(fileContent.getFileName());
+              if (nameMatch) {
+                Scanner scanner = new Scanner(fileContent.getContentAsText().toString());
+                while (scanner.hasNextLine()) {
+                  if (scanner.nextLine().startsWith(APP_ENGINE_FLEX_REQUIRED_YAML_CONTENT)) {
+                    return true;
+                  }
+                }
+              }
+              return false;
+            }
+          });
+    }
   }
 }
