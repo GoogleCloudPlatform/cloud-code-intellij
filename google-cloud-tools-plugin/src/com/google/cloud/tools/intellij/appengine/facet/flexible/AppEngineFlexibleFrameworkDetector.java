@@ -78,7 +78,7 @@ public class AppEngineFlexibleFrameworkDetector
    */
   private static final class AppEngineFlexPattern
       extends ObjectPattern<FileContent, AppEngineFlexPattern> {
-    private static final Collection<String> APP_ENGINE_FLEX_CONFIG_FILES =
+    private static final ImmutableList<String> APP_ENGINE_FLEX_CONFIG_FILES =
         ImmutableList.of("app.yaml", "app.yml");
 
     private static final String APP_ENGINE_FLEX_REQUIRED_YAML_CONTENT = "runtime:";
