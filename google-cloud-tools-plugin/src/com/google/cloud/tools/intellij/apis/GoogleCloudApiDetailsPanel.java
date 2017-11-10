@@ -74,26 +74,9 @@ public final class GoogleCloudApiDetailsPanel {
     if (cloudLibrariesEqual(currentCloudLibrary, library)) {
       return;
     }
+
     currentCloudLibrary = library;
-
-    if (library.getIcon() == null) {
-      icon.setIcon(null);
-    } else {
-      icon.setIcon(GoogleCloudToolsIcons.LOADING);
-      loadImageAsync(library.getIcon(), icon::setIcon);
-    }
-
-    nameLabel.setText(library.getName());
-    descriptionTextPane.setText(library.getDescription());
-
-    if (library.getClients() != null) {
-      library
-          .getClients()
-          .stream()
-          .filter(client -> JAVA_CLIENT_LANGUAGE.equals(client.getLanguage()))
-          .findFirst()
-          .ifPresent(client -> updateUI());
-    }
+    updateUI();
   }
 
   /**
@@ -239,7 +222,7 @@ public final class GoogleCloudApiDetailsPanel {
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.joining(LINKS_SEPARATOR));
-    return String.format("<html>%s</html>", joinedLinks);
+    return String.format("<html><body><p>%s</p></body></html>", joinedLinks);
   }
 
   /**

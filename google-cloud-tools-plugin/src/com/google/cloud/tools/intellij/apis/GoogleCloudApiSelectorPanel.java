@@ -16,9 +16,7 @@
 
 package com.google.cloud.tools.intellij.apis;
 
-import com.google.cloud.tools.libraries.CloudLibraries;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBScrollPane;
@@ -28,8 +26,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -41,14 +39,18 @@ import javax.swing.border.Border;
 /** The form-bound class for the Cloud API selector panel. */
 final class GoogleCloudApiSelectorPanel {
 
-  private static final Logger logger = Logger.getInstance(GoogleCloudApiSelectorPanel.class);
-
   private JPanel panel;
   private JBScrollPane leftScrollPane;
   private JBScrollPane rightScrollPane;
   private JPanel checkboxPanel;
   private JBSplitter splitter;
   private GoogleCloudApiDetailsPanel detailsForm;
+
+  private final List<CloudLibrary> libraries;
+
+  GoogleCloudApiSelectorPanel(List<CloudLibrary> libraries) {
+    this.libraries = libraries;
+  }
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
   public JPanel getPanel() {
@@ -69,14 +71,11 @@ final class GoogleCloudApiSelectorPanel {
 
     checkboxPanel = new JPanel();
     checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.PAGE_AXIS));
-    try {
-      CloudLibraries.getCloudLibraries()
-          .stream()
-          .sorted(Comparator.comparing(CloudLibrary::getName))
-          .forEach(this::addLibraryCheckbox);
-    } catch (IOException e) {
-      logger.error(e);
-    }
+
+    libraries
+        .stream()
+        .sorted(Comparator.comparing(CloudLibrary::getName))
+        .forEach(this::addLibraryCheckbox);
   }
 
   /**
@@ -146,6 +145,21 @@ final class GoogleCloudApiSelectorPanel {
       checkbox.addActionListener(e -> checkbox.getParent().requestFocusInWindow());
       add(checkbox);
       add(new JLabel(library.getName()));
+    }
+
+    /**
+     * This is overridden for debug purposes; this message will be printed in tests when there is a
+     * mismatch in expectations.
+     */
+    @Override
+    public String toString() {
+      JBCheckBox checkbox = (JBCheckBox) getComponents()[0];
+      return String.format(
+          "%s{libraryName=%s, isChecked=%s, hasBorder=%s}",
+          getClass().getSimpleName(),
+          library.getName(),
+          checkbox.isSelected(),
+          getBorder().isBorderOpaque());
     }
   }
 }

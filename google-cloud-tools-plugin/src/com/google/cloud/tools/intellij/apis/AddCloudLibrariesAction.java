@@ -18,17 +18,25 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.libraries.CloudLibraries;
+import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import git4idea.DialogManager;
 import java.awt.Dimension;
+import java.io.IOException;
+import java.util.List;
 import javax.swing.JComponent;
 import org.jetbrains.annotations.Nullable;
 
 /** The action in the Google Cloud Tools menu group that opens the dialog to add Cloud libraries. */
 public final class AddCloudLibrariesAction extends DumbAwareAction {
+
+  private static final Logger logger = Logger.getInstance(AddCloudLibrariesAction.class);
 
   public AddCloudLibrariesAction() {
     super(
@@ -57,7 +65,15 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-      GoogleCloudApiSelectorPanel panel = new GoogleCloudApiSelectorPanel();
+      List<CloudLibrary> libraries;
+      try {
+        libraries = CloudLibraries.getCloudLibraries();
+      } catch (IOException e) {
+        logger.error(e);
+        libraries = ImmutableList.of();
+      }
+
+      GoogleCloudApiSelectorPanel panel = new GoogleCloudApiSelectorPanel(libraries);
       panel.getPanel().setPreferredSize(new Dimension(800, 600));
       return panel.getPanel();
     }
