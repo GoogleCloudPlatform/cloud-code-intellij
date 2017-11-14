@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.apis;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.auto.value.AutoValue;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClient;
@@ -26,22 +25,17 @@ import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLi
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.truth.Correspondence;
 import com.intellij.ui.JBSplitter;
-import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBScrollPane;
 import java.awt.Component;
-import java.awt.event.FocusEvent;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.JTextPane;
+import javax.swing.table.TableModel;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,14 +80,14 @@ public final class GoogleCloudApiSelectorPanelTest {
     CloudLibrary library = LIBRARY_1.toCloudLibrary();
 
     GoogleCloudApiSelectorPanel panel = new GoogleCloudApiSelectorPanel(ImmutableList.of(library));
+    JTable table = panel.getCloudLibrariesTable();
 
-    List<JPanel> checkboxPanels = getCheckboxPanels(panel);
-    ExpectedCheckboxAttributes expected =
-        ExpectedCheckboxAttributes.create(
-            LIBRARY_1.name(), /* isChecked= */ false, /* hasBorder= */ false);
-    assertThat(checkboxPanels)
-        .comparingElementsUsing(new CheckboxPanelCorrespondence())
-        .containsExactlyElementsIn(ImmutableList.of(expected));
+    assertThat(table.getSelectionModel().isSelectionEmpty()).isTrue();
+
+    TableModel model = table.getModel();
+    assertThat(model.getRowCount()).isEqualTo(1);
+    assertThat(model.getValueAt(0, 0)).isEqualTo(library);
+    assertThat((Boolean) model.getValueAt(0, 1)).isFalse();
 
     JPanel detailsPanel = getDetailsPanel(panel);
     assertDetailsEmpty(detailsPanel);
@@ -104,18 +98,15 @@ public final class GoogleCloudApiSelectorPanelTest {
     CloudLibrary library = LIBRARY_1.toCloudLibrary();
 
     GoogleCloudApiSelectorPanel panel = new GoogleCloudApiSelectorPanel(ImmutableList.of(library));
+    JTable table = panel.getCloudLibrariesTable();
+    checkCheckbox(table, 0);
 
-    List<JPanel> checkboxPanels = getCheckboxPanels(panel);
-    Optional<JBCheckBox> checkbox = findCheckbox(checkboxPanels, library);
+    assertThat(table.getSelectionModel().isSelectedIndex(0)).isTrue();
 
-    clickCheckbox(checkbox.get(), checkboxPanels);
-
-    ExpectedCheckboxAttributes expected =
-        ExpectedCheckboxAttributes.create(
-            LIBRARY_1.name(), /* isChecked= */ true, /* hasBorder= */ true);
-    assertThat(checkboxPanels)
-        .comparingElementsUsing(new CheckboxPanelCorrespondence())
-        .containsExactlyElementsIn(ImmutableList.of(expected));
+    TableModel model = table.getModel();
+    assertThat(model.getRowCount()).isEqualTo(1);
+    assertThat(model.getValueAt(0, 0)).isEqualTo(library);
+    assertThat((Boolean) model.getValueAt(0, 1)).isTrue();
 
     JPanel detailsPanel = getDetailsPanel(panel);
     assertDetailsShownForLibrary(detailsPanel, LIBRARY_1, JAVA_CLIENT_1);
@@ -126,18 +117,15 @@ public final class GoogleCloudApiSelectorPanelTest {
     CloudLibrary library = LIBRARY_1.toCloudLibrary();
 
     GoogleCloudApiSelectorPanel panel = new GoogleCloudApiSelectorPanel(ImmutableList.of(library));
+    JTable table = panel.getCloudLibrariesTable();
+    table.setRowSelectionInterval(0, 0);
 
-    List<JPanel> checkboxPanels = getCheckboxPanels(panel);
-    Optional<JBCheckBox> checkbox = findCheckbox(checkboxPanels, library);
+    assertThat(table.getSelectionModel().isSelectedIndex(0)).isTrue();
 
-    forceFocus(checkbox.get(), checkboxPanels);
-
-    ExpectedCheckboxAttributes expected =
-        ExpectedCheckboxAttributes.create(
-            LIBRARY_1.name(), /* isChecked= */ false, /* hasBorder= */ true);
-    assertThat(checkboxPanels)
-        .comparingElementsUsing(new CheckboxPanelCorrespondence())
-        .containsExactlyElementsIn(ImmutableList.of(expected));
+    TableModel model = table.getModel();
+    assertThat(model.getRowCount()).isEqualTo(1);
+    assertThat(model.getValueAt(0, 0)).isEqualTo(library);
+    assertThat((Boolean) model.getValueAt(0, 1)).isFalse();
 
     JPanel detailsPanel = getDetailsPanel(panel);
     assertDetailsShownForLibrary(detailsPanel, LIBRARY_1, JAVA_CLIENT_1);
@@ -148,19 +136,19 @@ public final class GoogleCloudApiSelectorPanelTest {
     CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
     CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
 
+    // The given list should be reordered by the name's natural order, placing library1 first.
     GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(library1, library2));
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library2, library1));
+    JTable table = panel.getCloudLibrariesTable();
 
-    List<JPanel> checkboxPanels = getCheckboxPanels(panel);
-    ExpectedCheckboxAttributes expected1 =
-        ExpectedCheckboxAttributes.create(
-            LIBRARY_1.name(), /* isChecked= */ false, /* hasBorder= */ false);
-    ExpectedCheckboxAttributes expected2 =
-        ExpectedCheckboxAttributes.create(
-            LIBRARY_2.name(), /* isChecked= */ false, /* hasBorder= */ false);
-    assertThat(checkboxPanels)
-        .comparingElementsUsing(new CheckboxPanelCorrespondence())
-        .containsExactlyElementsIn(ImmutableList.of(expected1, expected2));
+    assertThat(table.getSelectionModel().isSelectionEmpty()).isTrue();
+
+    TableModel model = table.getModel();
+    assertThat(model.getRowCount()).isEqualTo(2);
+    assertThat(model.getValueAt(0, 0)).isEqualTo(library1);
+    assertThat(model.getValueAt(1, 0)).isEqualTo(library2);
+    assertThat((Boolean) model.getValueAt(0, 1)).isFalse();
+    assertThat((Boolean) model.getValueAt(1, 1)).isFalse();
 
     JPanel detailsPanel = getDetailsPanel(panel);
     assertDetailsEmpty(detailsPanel);
@@ -171,23 +159,23 @@ public final class GoogleCloudApiSelectorPanelTest {
     CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
     CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
 
+    // The given list should be reordered by the name's natural order, placing library1 first.
     GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(library1, library2));
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library2, library1));
+    JTable table = panel.getCloudLibrariesTable();
 
-    List<JPanel> checkboxPanels = getCheckboxPanels(panel);
-    Optional<JBCheckBox> checkbox = findCheckbox(checkboxPanels, library2);
+    // Checks the second row's checkbox, which should be library2.
+    checkCheckbox(table, 1);
 
-    clickCheckbox(checkbox.get(), checkboxPanels);
+    assertThat(table.getSelectionModel().isSelectedIndex(0)).isFalse();
+    assertThat(table.getSelectionModel().isSelectedIndex(1)).isTrue();
 
-    ExpectedCheckboxAttributes expected1 =
-        ExpectedCheckboxAttributes.create(
-            LIBRARY_1.name(), /* isChecked= */ false, /* hasBorder= */ false);
-    ExpectedCheckboxAttributes expected2 =
-        ExpectedCheckboxAttributes.create(
-            LIBRARY_2.name(), /* isChecked= */ true, /* hasBorder= */ true);
-    assertThat(checkboxPanels)
-        .comparingElementsUsing(new CheckboxPanelCorrespondence())
-        .containsExactlyElementsIn(ImmutableList.of(expected1, expected2));
+    TableModel model = table.getModel();
+    assertThat(model.getRowCount()).isEqualTo(2);
+    assertThat(model.getValueAt(0, 0)).isEqualTo(library1);
+    assertThat(model.getValueAt(1, 0)).isEqualTo(library2);
+    assertThat((Boolean) model.getValueAt(0, 1)).isFalse();
+    assertThat((Boolean) model.getValueAt(1, 1)).isTrue();
 
     JPanel detailsPanel = getDetailsPanel(panel);
     assertDetailsShownForLibrary(detailsPanel, LIBRARY_2, JAVA_CLIENT_2);
@@ -198,83 +186,37 @@ public final class GoogleCloudApiSelectorPanelTest {
     CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
     CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
 
+    // The given list should be reordered by the name's natural order, placing library1 first.
     GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(library1, library2));
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library2, library1));
+    JTable table = panel.getCloudLibrariesTable();
 
-    List<JPanel> checkboxPanels = getCheckboxPanels(panel);
-    Optional<JBCheckBox> checkbox1 = findCheckbox(checkboxPanels, library1);
-    Optional<JBCheckBox> checkbox2 = findCheckbox(checkboxPanels, library2);
+    checkCheckbox(table, 1);
+    checkCheckbox(table, 0);
 
-    clickCheckbox(checkbox2.get(), checkboxPanels);
-    clickCheckbox(checkbox1.get(), checkboxPanels);
+    assertThat(table.getSelectionModel().isSelectedIndex(0)).isTrue();
+    assertThat(table.getSelectionModel().isSelectedIndex(1)).isFalse();
 
-    ExpectedCheckboxAttributes expected1 =
-        ExpectedCheckboxAttributes.create(
-            LIBRARY_1.name(), /* isChecked= */ true, /* hasBorder= */ true);
-    ExpectedCheckboxAttributes expected2 =
-        ExpectedCheckboxAttributes.create(
-            LIBRARY_2.name(), /* isChecked= */ true, /* hasBorder= */ false);
-    assertThat(checkboxPanels)
-        .comparingElementsUsing(new CheckboxPanelCorrespondence())
-        .containsExactlyElementsIn(ImmutableList.of(expected1, expected2));
+    TableModel model = table.getModel();
+    assertThat(model.getRowCount()).isEqualTo(2);
+    assertThat(model.getValueAt(0, 0)).isEqualTo(library1);
+    assertThat(model.getValueAt(1, 0)).isEqualTo(library2);
+    assertThat((Boolean) model.getValueAt(0, 1)).isTrue();
+    assertThat((Boolean) model.getValueAt(1, 1)).isTrue();
 
     JPanel detailsPanel = getDetailsPanel(panel);
     assertDetailsShownForLibrary(detailsPanel, LIBRARY_1, JAVA_CLIENT_1);
   }
 
   /**
-   * Clicks the given {@link JBCheckBox} and forces a {@link FocusEvent} to be triggered.
+   * Forcibly checks the checkbox in the given {@link JTable} at the given row number.
    *
-   * @param checkbox the {@link JBCheckBox} to click
-   * @param otherPanels the list of other checkbox {@link JPanel JPanels}. These are required to
-   *     force a {@link FocusEvent#FOCUS_LOST} event to properly simulate how focus works.
+   * @param table the {@link JTable} to check the checkbox in
+   * @param row the index of the row to check the checkbox in
    */
-  private static void clickCheckbox(JBCheckBox checkbox, List<JPanel> otherPanels) {
-    checkbox.doClick();
-
-    // Force the focus events since they won't be triggered outside the context of a window.
-    forceFocus(checkbox, otherPanels);
-  }
-
-  /**
-   * Forces a {@link FocusEvent} for the given {@link JBCheckBox}'s parent component.
-   *
-   * @param checkbox the {@link JBCheckBox} to force a focus event for
-   * @param otherPanels the list of other checkbox {@link JPanel JPanels}. These are required to
-   *     force a {@link FocusEvent#FOCUS_LOST} event to properly simulate how focus works.
-   */
-  private static void forceFocus(JBCheckBox checkbox, List<JPanel> otherPanels) {
-    otherPanels.forEach(
-        panel -> {
-          FocusEvent lostEvent = new FocusEvent(panel, FocusEvent.FOCUS_LOST);
-          Arrays.stream(panel.getFocusListeners())
-              .forEach(listener -> listener.focusLost(lostEvent));
-        });
-
-    Component parent = checkbox.getParent();
-    FocusEvent gainedEvent = new FocusEvent(parent, FocusEvent.FOCUS_GAINED);
-    Arrays.stream(parent.getFocusListeners())
-        .forEach(listener -> listener.focusGained(gainedEvent));
-  }
-
-  /**
-   * Optionally returns the {@link JBCheckBox} in the given list of {@link JPanel JPanels} whose
-   * label matches the given {@link CloudLibrary}'s name.
-   *
-   * @param panels the list of {@link JPanel JPanels} to search
-   * @param library the {@link CloudLibrary} to find the matching {@link JBCheckBox} for
-   */
-  private static Optional<JBCheckBox> findCheckbox(List<JPanel> panels, CloudLibrary library) {
-    return panels
-        .stream()
-        .filter(
-            panel -> {
-              Component[] components = panel.getComponents();
-              JLabel label = (JLabel) components[1];
-              return Objects.equals(label.getText(), library.getName());
-            })
-        .findFirst()
-        .map(panel -> (JBCheckBox) panel.getComponents()[0]);
+  private static void checkCheckbox(JTable table, int row) {
+    table.setRowSelectionInterval(row, row);
+    table.setValueAt(true, row, 1);
   }
 
   /**
@@ -372,24 +314,6 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   /**
-   * Returns the list of {@link JPanel JPanels} that represent the API library checkboxes in the
-   * given {@link GoogleCloudApiSelectorPanel}.
-   *
-   * @param panel the {@link GoogleCloudApiSelectorPanel} to return the checkbox panels for
-   */
-  private static List<JPanel> getCheckboxPanels(GoogleCloudApiSelectorPanel panel) {
-    Component[] panelChildren = panel.getPanel().getComponents();
-    assertThat(panelChildren).hasLength(1);
-
-    JBSplitter splitter = (JBSplitter) panelChildren[0];
-    JBScrollPane leftScrollPane = (JBScrollPane) splitter.getFirstComponent();
-    JPanel checkboxPanel = (JPanel) leftScrollPane.getViewport().getView();
-    return Arrays.stream(checkboxPanel.getComponents())
-        .map(component -> (JPanel) component)
-        .collect(ImmutableList.toImmutableList());
-  }
-
-  /**
    * Returns the {@link JPanel} that represents the API library details pane in the given {@link
    * GoogleCloudApiSelectorPanel}.
    *
@@ -402,73 +326,5 @@ public final class GoogleCloudApiSelectorPanelTest {
     JBSplitter splitter = (JBSplitter) panelChildren[0];
     JBScrollPane rightScrollPane = (JBScrollPane) splitter.getSecondComponent();
     return (JPanel) rightScrollPane.getViewport().getView();
-  }
-
-  /**
-   * The set of expected attributes for an API library checkbox.
-   *
-   * <p>This is designed to make comparison methods (using the {@link com.google.common.truth.Truth
-   * Truth} library) easy-to-write, by leveraging the usage of the {@link
-   * CheckboxPanelCorrespondence} class. All expected parameters of the checkbox panels should be
-   * added to this holder class; the comparison logic should be added to the {@link
-   * CheckboxPanelCorrespondence#compare(JPanel, ExpectedCheckboxAttributes)} method.
-   */
-  @AutoValue
-  abstract static class ExpectedCheckboxAttributes {
-
-    /** Returns a newly created instance for the given parameters. */
-    static ExpectedCheckboxAttributes create(
-        String libraryName, boolean isChecked, boolean hasBorder) {
-      return new AutoValue_GoogleCloudApiSelectorPanelTest_ExpectedCheckboxAttributes(
-          libraryName, isChecked, hasBorder);
-    }
-
-    /** The name of the expected library. */
-    abstract String libraryName();
-
-    /** {@code true} if the checkbox is expected to be checked, {@code false} otherwise. */
-    abstract boolean isChecked();
-
-    /**
-     * {@code true} if the checkbox panel is expected to have a highlighted border visible, {@code
-     * false} otherwise.
-     */
-    abstract boolean hasBorder();
-  }
-
-  /**
-   * A custom {@link Correspondence} for checkbox {@link JPanel JPanels} and {@link
-   * ExpectedCheckboxAttributes}.
-   */
-  private static final class CheckboxPanelCorrespondence
-      extends Correspondence<JPanel, ExpectedCheckboxAttributes> {
-
-    @Override
-    public boolean compare(JPanel actual, ExpectedCheckboxAttributes expected) {
-      try {
-        Component[] components = actual.getComponents();
-        JBCheckBox checkbox = (JBCheckBox) components[0];
-        JLabel label = (JLabel) components[1];
-
-        if (!Objects.equals(label.getText(), expected.libraryName())) {
-          return false;
-        }
-        if (checkbox.isSelected() != expected.isChecked()) {
-          return false;
-        }
-        if (expected.hasBorder()
-            && (actual.getBorder() == null || !actual.getBorder().isBorderOpaque())) {
-          return false;
-        }
-      } catch (Throwable throwable) {
-        return false;
-      }
-      return true;
-    }
-
-    @Override
-    public String toString() {
-      return "has UI elements that match the parameters in";
-    }
   }
 }

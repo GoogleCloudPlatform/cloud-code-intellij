@@ -7,7 +7,7 @@
     <properties/>
     <border type="none"/>
     <children>
-      <component id="ae9b6" class="com.intellij.ui.JBSplitter" binding="splitter" custom-create="true">
+      <component id="ae9b6" class="com.intellij.ui.JBSplitter" binding="splitter">
         <constraints border-constraint="Center"/>
         <properties>
           <firstComponent value="3cccd"/>
@@ -20,12 +20,15 @@
         <properties/>
         <border type="none"/>
         <children>
-          <grid id="5e7fa" binding="checkboxPanel" custom-create="true" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+          <component id="af308" class="javax.swing.JTable" binding="cloudLibrariesTable" custom-create="true">
             <constraints/>
-            <properties/>
-            <border type="none"/>
-            <children/>
-          </grid>
+            <properties>
+              <autoResizeMode value="1"/>
+              <intercellSpacing width="0" height="0"/>
+              <showHorizontalLines value="false"/>
+              <showVerticalLines value="false"/>
+            </properties>
+          </component>
         </children>
       </scrollpane>
       <scrollpane id="349d1" class="com.intellij.ui.components.JBScrollPane" binding="rightScrollPane">
@@ -33,7 +36,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <nested-form id="a0864" form-file="com/google/cloud/tools/intellij/apis/GoogleCloudApiDetailsPanel.form" binding="detailsForm" custom-create="true">
+          <nested-form id="a0864" form-file="com/google/cloud/tools/intellij/apis/GoogleCloudApiDetailsPanel.form" binding="detailsForm">
             <constraints/>
           </nested-form>
         </children>
