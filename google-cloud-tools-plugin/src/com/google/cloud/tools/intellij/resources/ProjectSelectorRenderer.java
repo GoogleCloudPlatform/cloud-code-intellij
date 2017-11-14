@@ -59,6 +59,8 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
       new ProjectSelectorCredentialedUser();
   private ResourceSelectorLoadingItem resourceSelectorLoadingItem;
   private ResourceSelectorErrorItem selectorErrorItem;
+  // flyweight label for rendering project item. One instance is used for all rendering.
+  private ProjectSelectorItem projectSelectorItem = new ProjectSelectorItem();
   private DefaultMutableTreeNode lastHoveredNode;
 
   public ProjectSelectorRenderer(@NotNull JTree tree) {
@@ -138,8 +140,7 @@ class ProjectSelectorRenderer implements TreeCellRenderer, MouseListener, MouseM
       return selectorErrorItem;
     } else if (userObject instanceof ResourceProjectModelItem) {
       ResourceProjectModelItem modelItem = (ResourceProjectModelItem) userObject;
-      ProjectSelectorItem projectSelectorItem =
-          new ProjectSelectorItem(selected, lastHoveredNode == userObject);
+      projectSelectorItem.setRenderStyle(selected, lastHoveredNode == userObject);
       projectSelectorItem.setText(modelItem.getLabelHtml());
       return projectSelectorItem;
     } else if (userObject instanceof GoogleUserModelItem) {
