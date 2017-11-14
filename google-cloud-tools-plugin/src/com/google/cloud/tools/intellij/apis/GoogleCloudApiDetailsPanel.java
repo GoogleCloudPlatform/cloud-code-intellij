@@ -86,6 +86,7 @@ public final class GoogleCloudApiDetailsPanel {
    */
   private void createUIComponents() {
     descriptionTextPane = new JTextPane();
+    descriptionTextPane.setOpaque(false);
     descriptionTextPane
         .getDocument()
         .addDocumentListener(
@@ -104,6 +105,7 @@ public final class GoogleCloudApiDetailsPanel {
             });
 
     linksTextPane = new JTextPane();
+    linksTextPane.setOpaque(false);
     linksTextPane.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
   }
 

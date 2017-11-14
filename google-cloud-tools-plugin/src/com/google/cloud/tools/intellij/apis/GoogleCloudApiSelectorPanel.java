@@ -78,6 +78,7 @@ final class GoogleCloudApiSelectorPanel {
    */
   private void createUIComponents() {
     cloudLibrariesTable = new CloudLibraryTable(libraries);
+    cloudLibrariesTable.setTableHeader(null);
     cloudLibrariesTable
         .getSelectionModel()
         .addListSelectionListener(
