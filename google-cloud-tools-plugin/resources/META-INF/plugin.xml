@@ -295,8 +295,7 @@
   <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
   <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
   <depends optional="true" config-file="google-app-engine-maven-support.xml">org.jetbrains.idea.maven</depends>
-    <depends optional="true" config-file="google-account.xml">com.intellij.modules.platform
-    </depends>
+  <depends optional="true" config-file="google-account.xml">com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
   <depends>com.intellij.modules.vcs</depends>
   <depends>com.intellij.modules.xml</depends>
@@ -440,7 +439,6 @@
                      key="unique.rest.signature.name" groupKey="inspections.group.name" enabledByDefault="true"
                      level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.RestSignatureInspection"/>
 
-    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.PluginCompatibilityCheck"/>
     <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.AppEngineStandardUnsupportedJavaVersionCheck"/>
     <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.CloudSdkVersionStartupCheck"/>
   </extensions>
