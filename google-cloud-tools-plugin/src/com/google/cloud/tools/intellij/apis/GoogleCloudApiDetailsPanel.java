@@ -224,7 +224,8 @@ public final class GoogleCloudApiDetailsPanel {
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.joining(LINKS_SEPARATOR));
-    return String.format("<html><body><p>%s</p></body></html>", joinedLinks);
+    return String.format(
+        "<html><body><p style=\"margin-top: 0\">%s</p></body></html>", joinedLinks);
   }
 
   /**
