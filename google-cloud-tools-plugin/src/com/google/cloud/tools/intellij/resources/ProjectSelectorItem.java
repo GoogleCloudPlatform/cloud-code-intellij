@@ -36,14 +36,13 @@ final class ProjectSelectorItem extends JBLabel {
     setHorizontalAlignment(SwingConstants.LEFT);
     setVerticalAlignment(SwingConstants.CENTER);
     setBackground(BACKGROUND_NON_SELECTION_COLOR);
-    // default is non-selected, non-hover state.
     setForeground(TEXT_NON_SELECTION_COLOR);
   }
 
   /**
    * Renders the project item hovered (takes precedence), selected or plain.
    */
-  public void setRenderStyle(boolean selected, boolean hovered) {
+  void setRenderStyle(boolean selected, boolean hovered) {
     if (selected) {
       setForeground(TEXT_SELECTION_COLOR);
     } else if (hovered) {
