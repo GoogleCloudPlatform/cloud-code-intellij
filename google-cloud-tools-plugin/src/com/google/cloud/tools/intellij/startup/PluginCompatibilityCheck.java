@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ package com.google.cloud.tools.intellij.startup;
 
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.plugins.PluginManagerConfigurable;
+import com.intellij.ide.plugins.PluginManagerUISettings;
+import com.intellij.ide.plugins.UninstallPluginAction;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -32,10 +33,8 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.updateSettings.impl.UpdateChecker;
-
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.event.HyperlinkEvent;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A plugin post startup activity which checks to ensure that the Google Cloud Tools and Account
@@ -50,58 +49,22 @@ public class PluginCompatibilityCheck implements StartupActivity {
   }
 
   private void checkPluginCompatibility(@NotNull Project project) {
-    IdeaPluginDescriptor cloudToolsPlugin =
-        PluginManager.getPlugin(PluginId.findId("com.google.gct.core"));
     IdeaPluginDescriptor accountPlugin =
         PluginManager.getPlugin(PluginId.findId("com.google.gct.login"));
-
-    if (cloudToolsPlugin == null || accountPlugin == null) {
-      return;
-    }
-
-    String cloudToolsPluginVersion = cloudToolsPlugin.getVersion();
-    String accountPluginVersion = accountPlugin.getVersion();
-
-    if (!accountPluginVersion.equals(cloudToolsPluginVersion)) {
-      StringBuilder errorMessage = new StringBuilder();
-
-      errorMessage.append("<p>");
-      errorMessage.append(GctBundle.message("plugin.compatibility.error.message"));
-      errorMessage.append("<p/>");
-
-      errorMessage.append("<ul>");
-      errorMessage.append("<li>");
-      errorMessage.append(
-          GctBundle.message(
-              "plugin.compatibility.error.name.and.version",
-              cloudToolsPlugin.getName(),
-              cloudToolsPluginVersion));
-      errorMessage.append("</li>");
-      errorMessage.append("<li>");
-      errorMessage.append(
-          GctBundle.message(
-              "plugin.compatibility.error.name.and.version",
-              accountPlugin.getName(),
-              accountPluginVersion));
-      errorMessage.append("</li>");
-      errorMessage.append("</ul>");
-
-      errorMessage.append("<br />");
-
-      errorMessage.append("<p>");
-      errorMessage.append(
-          GctBundle.message(
-              "plugin.compatibility.error.update.link", "<a href=\"#update\">", "</a>"));
-      errorMessage.append("</p>");
+    if (accountPlugin != null) {
 
       NotificationGroup notification = new NotificationGroup(
-          GctBundle.message("plugin.compatibility.error.title"),
+          GctBundle.message("account.plugin.removal.error.title"),
           NotificationDisplayType.BALLOON, true);
 
       notification.createNotification(
-          GctBundle.message("plugin.compatibility.error.title"),
-          errorMessage.toString(),
-          NotificationType.ERROR, new PluginCompatibilityLinkListener(project)).notify(project);
+          GctBundle.message(
+              "account.plugin.removal.error.message"),
+          NotificationType.ERROR).notify(project);
+      accountPlugin.setEnabled(false);
+      PluginManagerConfigurable managerConfigurable = new PluginManagerConfigurable(
+          PluginManagerUISettings.getInstance());
+      UninstallPluginAction.uninstall(managerConfigurable.getOrCreatePanel(), true, accountPlugin);
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,23 +21,20 @@ import static org.mockito.Mockito.when;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.clouddebugger.v2.model.Debuggee;
-import com.google.cloud.tools.intellij.debugger.SyncResult;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
 import com.google.cloud.tools.intellij.debugger.ProjectRepositoryValidator;
+import com.google.cloud.tools.intellij.debugger.SyncResult;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
+import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.TestUtils;
-import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.GoogleLoginService;
-import com.google.cloud.tools.intellij.login.Services;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
-
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.ui.components.JBCheckBox;
-
 import java.util.LinkedHashMap;
-
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
@@ -228,7 +225,8 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   }
 
   private void mockCredentials() throws Exception {
-    GoogleLoginService mockLoginService = TestUtils.installMockService(GoogleLoginService.class);
+    IntegratedGoogleLoginService mockLoginService = TestUtils
+        .installMockService(IntegratedGoogleLoginService.class);
 
     GoogleLoginState googleLoginState = mock(GoogleLoginState.class);
     Credential credential = mock(Credential.class);
