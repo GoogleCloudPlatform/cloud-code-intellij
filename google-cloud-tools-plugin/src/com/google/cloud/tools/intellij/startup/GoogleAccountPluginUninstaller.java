@@ -30,16 +30,19 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.ui.MessageDialogBuilder;
 
 /**
- * A plugin post startup activity which checks to ensure that the Google Cloud Tools and Account
- * plugins are running the same version. If there is a version mismatch, then a warning dialog is
- * displayed with a link to check for updates.
+ * Google Login used to be implemented as its own plugin that was distributed separately, but
+ * dependend on by the Cloud Tools plugin.  We have now incorporated login directly into the
+ * Cloud Tools plugin and this class checks whether the legacy Google Account plugin is still
+ * installed and removes it, prompting the user to restart.
+ *
+ * Keeping the old Google Account plugin installed causes problems such as duplicating the login
+ * widget in the toolbar.
  */
 public class GoogleAccountPluginUninstaller {
 
   private static final Logger LOGGER = Logger.getInstance(GoogleAccountPluginUninstaller.class);
 
   public void uninstallIfPresent() {
-
     IdeaPluginDescriptor accountPlugin =
         PluginManager.getPlugin(PluginId.findId("com.google.gct.login"));
     if (accountPlugin != null) {
