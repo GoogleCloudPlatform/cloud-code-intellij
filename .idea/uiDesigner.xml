@@ -131,6 +131,15 @@
       <item class="com.intellij.ui.RawCommandLineEditor" icon="/com/intellij/uiDesigner/icons/panel.png" removable="true" auto-create-binding="false" can-attach-label="false">
         <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="0" />
       </item>
+      <item class="com.intellij.ui.JBSplitter" icon="/com/intellij/uiDesigner/icons/panel.png" removable="true" auto-create-binding="false" can-attach-label="true" is-container="true">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="0" />
+      </item>
+      <item class="com.intellij.ui.components.JBScrollPane" icon="/com/intellij/uiDesigner/icons/scrollPane.png" removable="true" auto-create-binding="false" can-attach-label="true">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="0" />
+      </item>
+      <item class="com.google.cloud.tools.intellij.apis.GoogleCloudApiDetailsPanel" icon="" removable="true" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="0" />
+      </item>
     </group>
   </component>
 </project>
