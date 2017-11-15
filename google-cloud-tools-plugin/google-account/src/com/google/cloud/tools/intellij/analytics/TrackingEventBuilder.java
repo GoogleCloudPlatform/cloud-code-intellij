@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stats;
+package com.google.cloud.tools.intellij.analytics;
 
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.api.client.util.Maps;
-import com.google.cloud.tools.intellij.stats.UsageTracker.FluentTrackingEventWithMetadata;
+import com.google.cloud.tools.intellij.analytics.UsageTracker.FluentTrackingEventWithMetadata;
 import java.util.Map;
 
 /**

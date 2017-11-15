@@ -16,17 +16,18 @@
 
 package com.google.cloud.tools.intellij.startup;
 
+import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.plugins.PluginManagerConfigurable;
 import com.intellij.ide.plugins.PluginManagerUISettings;
 import com.intellij.ide.plugins.UninstallPluginAction;
-import com.intellij.notification.NotificationDisplayType;
-import com.intellij.notification.NotificationGroup;
-import com.intellij.notification.NotificationType;
+import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
+import com.intellij.openapi.ui.MessageDialogBuilder;
 
 /**
  * A plugin post startup activity which checks to ensure that the Google Cloud Tools and Account
@@ -42,24 +43,35 @@ public class GoogleAccountPluginUninstaller {
     IdeaPluginDescriptor accountPlugin =
         PluginManager.getPlugin(PluginId.findId("com.google.gct.login"));
     if (accountPlugin != null) {
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.ACCOUNT_PLUGIN_DETECTED)
+          .ping();
       LOGGER.info("legacy google account plugin found.");
-      NotificationGroup notification =
-          new NotificationGroup(
-              GctBundle.message("account.plugin.removal.error.title"),
-              NotificationDisplayType.STICKY_BALLOON,
-              true);
-
-      notification
-          .createNotification(
-              GctBundle.message("account.plugin.removal.error.message"),
-              NotificationType.INFORMATION)
-          .notify(null);
       accountPlugin.setEnabled(false);
       PluginManagerConfigurable managerConfigurable =
           new PluginManagerConfigurable(PluginManagerUISettings.getInstance());
       UninstallPluginAction.uninstall(managerConfigurable.getOrCreatePanel(), true, accountPlugin);
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.ACCOUNT_PLUGIN_UNINSTALLED)
+          .ping();
       LOGGER.info(
-          "legacy google account plugin has been disabled and uninstalled. This will take effect on the next IDE restart.");
+          "legacy google account plugin has been disabled and uninstalled. This will take effect on"
+              + " the next IDE restart.");
+      if (MessageDialogBuilder
+          .yesNo(GctBundle.message("account.plugin.removal.requires.restart.title"),
+              GctBundle.message("account.plugin.removal.requires.restart.text"))
+          .yesText(GctBundle.message("OK"))
+          .noText(GctBundle.message("Cancel"))
+          .isYes()) {
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.ACCOUNT_PLUGIN_RESTART_DIALOG_YES_ACTION)
+            .ping();
+        ApplicationManagerEx.getApplicationEx().restart(true);
+        return; // presumably we never get here, but just to make sure we never ping no and yes.
+      }
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.ACCOUNT_PLUGIN_RESTART_DIALOG_NO_ACTION)
+          .ping();
     }
   }
 }

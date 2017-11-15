@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stats;
+package com.google.cloud.tools.intellij.analytics;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

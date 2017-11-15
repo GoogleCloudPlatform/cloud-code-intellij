@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stats;
+package com.google.cloud.tools.intellij.analytics;
 
 import com.google.cloud.tools.intellij.service.AccountPluginInfoService;
 import com.google.common.base.Joiner;

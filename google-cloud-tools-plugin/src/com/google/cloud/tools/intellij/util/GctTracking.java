@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,4 +77,9 @@ public class GctTracking {
 
   public static final String METADATA_LABEL_KEY = "label";
   public static final String METADATA_MESSAGE_KEY = "message";
+
+  public static final String ACCOUNT_PLUGIN_DETECTED = "account.plugin.detected";
+  public static final String ACCOUNT_PLUGIN_UNINSTALLED = "account.plugin.uninstalled";
+  public static final String ACCOUNT_PLUGIN_RESTART_DIALOG_YES_ACTION = "account.plugin.restart.dialog.yes.action";
+  public static final String ACCOUNT_PLUGIN_RESTART_DIALOG_NO_ACTION = "account.plugin.restart.dialog.no.action";
 }

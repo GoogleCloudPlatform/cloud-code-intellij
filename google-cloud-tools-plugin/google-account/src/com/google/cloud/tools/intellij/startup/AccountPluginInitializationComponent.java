@@ -16,10 +16,10 @@
 
 package com.google.cloud.tools.intellij.startup;
 
+import com.google.cloud.tools.intellij.analytics.UsageTrackerManager;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerNotification;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
-import com.google.cloud.tools.intellij.stats.UsageTrackerManager;
-import com.google.cloud.tools.intellij.stats.UsageTrackerNotification;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationsConfiguration;
