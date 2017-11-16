@@ -21,24 +21,29 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.CloudLibraries;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
+import com.intellij.ide.wizard.AbstractWizard;
+import com.intellij.ide.wizard.Step;
+import com.intellij.ide.wizard.StepAdapter;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import git4idea.DialogManager;
-import java.awt.Dimension;
 import java.io.IOException;
 import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import org.jetbrains.annotations.Nullable;
 
-/** The action in the Google Cloud Tools menu group that opens the dialog to add Cloud libraries. */
-public final class AddCloudLibrariesAction extends DumbAwareAction {
+/**
+ * The action in the Google Cloud Tools menu group that opens the wizard to add client libraries to
+ * the user's project and manage cloud APIs.
+ */
+public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
 
-  private static final Logger logger = Logger.getInstance(AddCloudLibrariesAction.class);
+  private static final Logger logger = Logger.getInstance(AddCloudLibrariesWizardAction.class);
 
-  public AddCloudLibrariesAction() {
+  public AddCloudLibrariesWizardAction() {
     super(
         GctBundle.message("cloud.libraries.menu.action.text"),
         GctBundle.message("cloud.libraries.menu.action.description"),
@@ -48,23 +53,34 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
   @Override
   public void actionPerformed(AnActionEvent e) {
     if (e.getProject() != null) {
-      AddCloudLibrariesDialog dialog = new AddCloudLibrariesDialog(e.getProject());
+      AddCloudLibrariesWizard dialog = new AddCloudLibrariesWizard(e.getProject());
       DialogManager.show(dialog);
     }
   }
 
-  /** The dialog for the "Add Cloud Libraries" menu action. */
-  private static final class AddCloudLibrariesDialog extends DialogWrapper {
+  /** The wizard for the "Add Cloud Libraries" menu action. */
+  private static final class AddCloudLibrariesWizard extends AbstractWizard<Step> {
 
-    AddCloudLibrariesDialog(Project project) {
-      super(project);
+    AddCloudLibrariesWizard(Project project) {
+      super(GctBundle.message("cloud.libraries.dialog.title"), project);
+      addStep(new SelectClientLibrariesStep());
+      addStep(new ManageCloudApisStep());
       init();
-      setTitle(GctBundle.message("cloud.libraries.dialog.title"));
     }
 
     @Nullable
     @Override
-    protected JComponent createCenterPanel() {
+    protected String getHelpID() {
+      return null;
+    }
+  }
+
+  /** The wizard step encapsulating the client library selection panel. */
+  private static final class SelectClientLibrariesStep extends StepAdapter {
+
+    private final GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
+
+    SelectClientLibrariesStep() {
       List<CloudLibrary> libraries;
       try {
         libraries = CloudLibraries.getCloudLibraries();
@@ -73,9 +89,23 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
         libraries = ImmutableList.of();
       }
 
-      GoogleCloudApiSelectorPanel panel = new GoogleCloudApiSelectorPanel(libraries);
-      panel.getPanel().setPreferredSize(new Dimension(800, 600));
-      return panel.getPanel();
+      this.cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries);
+    }
+
+    @Override
+    public JComponent getComponent() {
+      return cloudApiSelectorPanel.getPanel();
+    }
+  }
+
+  /** The wizard step encapsulating the cloud API management panel. */
+  private static final class ManageCloudApisStep extends StepAdapter {
+
+    @Override
+    // TODO(eshaul): Implement the cloud API management panel; this panel can be opened as part of
+    // this wizard, or as a standalone dialog.
+    public JComponent getComponent() {
+      return new JPanel();
     }
   }
 }

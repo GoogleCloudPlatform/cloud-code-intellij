@@ -27,6 +27,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -58,6 +59,7 @@ final class GoogleCloudApiSelectorPanel {
 
   GoogleCloudApiSelectorPanel(List<CloudLibrary> libraries) {
     this.libraries = libraries;
+    panel.setPreferredSize(new Dimension(800, 600));
   }
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
