@@ -17,13 +17,11 @@
 package com.google.cloud.tools.intellij.ui;
 
 import com.google.common.collect.ImmutableList;
-
 import com.intellij.openapi.util.IconLoader;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 /**
  * Note: This file should be auto generated once build/scripts/icons.gant is part of CE.
@@ -48,11 +46,16 @@ public final class GoogleCloudToolsIcons {
   public static final Icon CLOUD_DEBUG_REACTIVATE_BREAKPOINT = load(
       "/icons/debugreactivatebreakpoint.png");
   public static final Icon CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS = load("/icons/debugdeleteall.png");
+  public static final Icon LOADING = loadGif("/icons/loading.gif");
   public static final Icon STACKDRIVER_DEBUGGER = load("/icons/stackdriverdebugger.png");
   public static final Icon FEEDBACK = load("/icons/cloudtoolsfeedback.png");
 
   private static Icon load(String path) {
     return IconLoader.getIcon(path, GoogleCloudToolsIcons.class);
+  }
+
+  private static Icon loadGif(String path) {
+    return new ImageIcon(GoogleCloudToolsIcons.class.getResource(path));
   }
 
   private static ImmutableList<Icon> findStepIcons(String prefix) {
