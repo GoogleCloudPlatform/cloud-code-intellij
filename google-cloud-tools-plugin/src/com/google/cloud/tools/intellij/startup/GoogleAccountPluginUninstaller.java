@@ -31,7 +31,7 @@ import com.intellij.openapi.ui.MessageDialogBuilder;
 
 /**
  * Google Login used to be implemented as its own plugin that was distributed separately, but
- * dependend on by the Cloud Tools plugin.  We have now incorporated login directly into the
+ * depended on by the Cloud Tools plugin.  We have now incorporated login directly into the
  * Cloud Tools plugin and this class checks whether the legacy Google Account plugin is still
  * installed and removes it, prompting the user to restart.
  *
