@@ -304,7 +304,6 @@
   <depends>org.jetbrains.plugins.yaml</depends>
   <depends>Git4Idea</depends>
   <depends>org.jetbrains.idea.maven</depends>
-    <!--<xi:include href="/META-INF/google-account.xml" xpointer="xpointer(/idea-plugin/*)"/>-->
 
   <application-components>
     <component>
