@@ -21,16 +21,16 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 
 /** Selected project and account. */
 public class ProjectSelection {
-  private final Project selectedProject;
+  private final Project project;
   private final CredentialedUser user;
 
-  public ProjectSelection(Project selectedProject, CredentialedUser user) {
-    this.selectedProject = selectedProject;
+  public ProjectSelection(Project project, CredentialedUser user) {
+    this.project = project;
     this.user = user;
   }
 
-  public Project getSelectedProject() {
-    return selectedProject;
+  public Project getProject() {
+    return project;
   }
 
   public CredentialedUser getUser() {

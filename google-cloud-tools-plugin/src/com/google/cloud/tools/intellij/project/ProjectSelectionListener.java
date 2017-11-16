@@ -20,5 +20,5 @@ package com.google.cloud.tools.intellij.project;
 public interface ProjectSelectionListener {
 
   /** @param projectSelection new project selection or null if nothing was selected. */
-  void selectionChanged(ProjectSelection projectSelection);
+  void projectSelected(ProjectSelection projectSelection);
 }

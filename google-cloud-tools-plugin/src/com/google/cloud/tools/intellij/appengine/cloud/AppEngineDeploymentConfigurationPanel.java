@@ -38,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
 public final class AppEngineDeploymentConfigurationPanel {
 
   private JPanel commonConfigPanel;
-  private ProjectSelector projectSelector;
+  private ProjectSelector projectSelector = new ProjectSelector();
   private JLabel environmentLabel;
   private AppEngineApplicationInfoPanel applicationInfoPanel;
 
