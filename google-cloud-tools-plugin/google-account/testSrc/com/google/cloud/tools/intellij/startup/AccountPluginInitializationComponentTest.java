@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij;
+package com.google.cloud.tools.intellij.startup;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.service.AccountPluginConfigurationService;
 import com.google.cloud.tools.intellij.service.AccountPluginInfoService;
-import com.google.cloud.tools.intellij.startup.AccountPluginInitializationComponent;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.Application;
