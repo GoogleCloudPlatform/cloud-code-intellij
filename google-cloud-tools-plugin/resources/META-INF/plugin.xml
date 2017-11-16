@@ -490,7 +490,7 @@
       <action id="GoogleCloudTools.CloudStorage" class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>
       <!--
       <separator/>
-      <action id="GoogleCloudTools.AddCloudLibraries" class="com.google.cloud.tools.intellij.apis.AddCloudLibrariesAction"/>
+      <action id="GoogleCloudTools.AddCloudLibrariesWizard" class="com.google.cloud.tools.intellij.apis.AddCloudLibrariesWizardAction"/>
       -->
       <separator/>
       <action id="GoogleCloudTools.Feedback" class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction"/>
