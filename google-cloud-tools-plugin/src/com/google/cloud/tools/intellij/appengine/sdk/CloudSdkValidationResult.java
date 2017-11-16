@@ -31,7 +31,8 @@ public enum CloudSdkValidationResult {
   MALFORMED_PATH(GctBundle.message("appengine.cloudsdk.location.badchars.message"), true),
   NO_APP_ENGINE_COMPONENT(
       GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
-          + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"), false);
+          + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"), false),
+  INVALID_JAVA_SDK(GctBundle.message("appengine.cloudsdk.java.sdk.invalid.message"), true);
 
   private final String message;
   private final boolean isError;
