@@ -108,8 +108,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   public GoogleUsageTracker() {
     analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
 
-    AccountPluginInfoService pluginInfo = ServiceManager
-        .getService(AccountPluginInfoService.class);
+    AccountPluginInfoService pluginInfo = ServiceManager.getService(AccountPluginInfoService.class);
     externalPluginName = pluginInfo.getExternalPluginName();
     userAgent = pluginInfo.getUserAgent();
     String intellijPlatformName = PlatformUtils.getPlatformPrefix();

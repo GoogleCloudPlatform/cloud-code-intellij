@@ -446,7 +446,7 @@
     <GitHttpAuthDataProvider implementation="com.google.cloud.tools.intellij.vcs.GcpHttpAuthDataProvider" />
   </extensions>
 
-    <extensions defaultExtensionNs="com.google.gct.core">
+  <extensions defaultExtensionNs="com.google.gct.core">
     <googleLoginMessageExtender
             implementation="com.google.cloud.tools.intellij.login.IntelliJGoogleLoginMessageExtender"/>
   </extensions>

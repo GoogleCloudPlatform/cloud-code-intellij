@@ -35,6 +35,7 @@ import com.intellij.openapi.ui.MessageDialogBuilder;
  * Cloud Tools plugin and this class checks whether the legacy Google Account plugin is still
  * installed and removes it, prompting the user to restart.
  *
+ * <p/>
  * Keeping the old Google Account plugin installed causes problems such as duplicating the login
  * widget in the toolbar.
  */

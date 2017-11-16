@@ -27,11 +27,11 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class PluginXmlTest {
 
-    @Test
-    public void testWellFormed() throws SAXException, IOException {
-        XMLReader reader = XMLReaderFactory.createXMLReader();
-        // Shouldn't this be reading from the build output classpath?
-      reader.parse("resources/META-INF/google-account.xml");
-        // throws exception if file is malformed
-    }
+  @Test
+  public void testWellFormed() throws SAXException, IOException {
+    XMLReader reader = XMLReaderFactory.createXMLReader();
+    // Shouldn't this be reading from the build output classpath?
+    reader.parse("resources/META-INF/google-account.xml");
+    // throws exception if file is malformed
+  }
 }
