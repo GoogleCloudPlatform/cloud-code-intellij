@@ -75,7 +75,7 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
     }
   }
 
-  /** The wizard step encapsulating the client library selection panel */
+  /** The wizard step encapsulating the client library selection panel. */
   private static final class SelectClientLibrariesStep extends StepAdapter {
 
     private final GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
