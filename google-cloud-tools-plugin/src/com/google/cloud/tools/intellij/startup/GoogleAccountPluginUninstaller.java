@@ -71,11 +71,11 @@ public class GoogleAccountPluginUninstaller {
             .trackEvent(GctTracking.ACCOUNT_PLUGIN_RESTART_DIALOG_YES_ACTION)
             .ping();
         ApplicationManagerEx.getApplicationEx().restart(true);
-        return; // presumably we never get here, but just to make sure we never ping no and yes.
+      } else {
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.ACCOUNT_PLUGIN_RESTART_DIALOG_NO_ACTION)
+            .ping();
       }
-      UsageTrackerProvider.getInstance()
-          .trackEvent(GctTracking.ACCOUNT_PLUGIN_RESTART_DIALOG_NO_ACTION)
-          .ping();
     }
   }
 }
