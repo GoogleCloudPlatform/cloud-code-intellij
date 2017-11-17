@@ -15,6 +15,7 @@
  */
 package com.google.cloud.tools.intellij.login;
 
+import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.intellij.util.containers.HashMap;
 import java.util.Map;
@@ -26,8 +27,7 @@ import org.junit.Test;
 /**
  * Tests for {@link CredentialedUserRoster}.
  */
-public class CredentialedUserRosterTest {
-  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+public class CredentialedUserRosterTest extends BasePluginTestCase {
 
   private CredentialedUserRoster users;
   private CredentialedUser user1;
