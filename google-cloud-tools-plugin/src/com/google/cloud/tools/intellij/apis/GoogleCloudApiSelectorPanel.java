@@ -18,7 +18,11 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.intellij.application.options.ModulesComboBox;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.BooleanTableCellEditor;
 import com.intellij.ui.BooleanTableCellRenderer;
 import com.intellij.ui.JBSplitter;
@@ -29,11 +33,15 @@ import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -52,13 +60,17 @@ final class GoogleCloudApiSelectorPanel {
   private JBScrollPane leftScrollPane;
   private JBScrollPane rightScrollPane;
   private JBSplitter splitter;
-  private GoogleCloudApiDetailsPanel detailsForm;
+  private GoogleCloudApiDetailsPanel detailsPanel;
   private JTable cloudLibrariesTable;
+  private JLabel modulesLabel;
+  private ModulesComboBox modulesComboBox;
 
   private final List<CloudLibrary> libraries;
+  private final Project project;
 
-  GoogleCloudApiSelectorPanel(List<CloudLibrary> libraries) {
+  GoogleCloudApiSelectorPanel(List<CloudLibrary> libraries, Project project) {
     this.libraries = libraries;
+    this.project = project;
     panel.setPreferredSize(new Dimension(800, 600));
   }
 
@@ -67,10 +79,40 @@ final class GoogleCloudApiSelectorPanel {
     return panel;
   }
 
-  /** Returns the {@link JTable} */
+  /** Adds the given {@link ActionListener} to the {@link ModulesComboBox}. */
+  void addModuleSelectionListener(ActionListener listener) {
+    modulesComboBox.addActionListener(listener);
+  }
+
+  /** Returns the selected {@link Module}. */
+  Module getSelectedModule() {
+    return modulesComboBox.getSelectedModule();
+  }
+
+  /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
+  Set<CloudLibrary> getSelectedLibraries() {
+    return ((CloudLibraryTableModel) cloudLibrariesTable.getModel()).getSelectedLibraries();
+  }
+
+  /** Returns the {@link ModulesComboBox} in this panel. */
+  @VisibleForTesting
+  ModulesComboBox getModulesComboBox() {
+    return modulesComboBox;
+  }
+
+  /**
+   * Returns the {@link JTable} that holds the list of available {@link CloudLibrary
+   * CloudLibraries}.
+   */
   @VisibleForTesting
   JTable getCloudLibrariesTable() {
     return cloudLibrariesTable;
+  }
+
+  /** Returns the {@link GoogleCloudApiDetailsPanel} that shows the selected library details. */
+  @VisibleForTesting
+  GoogleCloudApiDetailsPanel getDetailsPanel() {
+    return detailsPanel;
   }
 
   /**
@@ -79,6 +121,9 @@ final class GoogleCloudApiSelectorPanel {
    * <p>This is automatically called by the IDEA SDK and should not be directly invoked.
    */
   private void createUIComponents() {
+    modulesComboBox = new ModulesComboBox();
+    modulesComboBox.fillModules(project);
+
     cloudLibrariesTable = new CloudLibraryTable(libraries);
     cloudLibrariesTable.setTableHeader(null);
     cloudLibrariesTable
@@ -90,7 +135,7 @@ final class GoogleCloudApiSelectorPanel {
                 int selectedIndex = model.getMinSelectionIndex();
                 CloudLibrary library =
                     (CloudLibrary) cloudLibrariesTable.getModel().getValueAt(selectedIndex, 0);
-                detailsForm.setCloudLibrary(library);
+                detailsPanel.setCloudLibrary(library);
               }
             });
   }
@@ -153,6 +198,16 @@ final class GoogleCloudApiSelectorPanel {
 
     CloudLibraryTableModel(List<CloudLibrary> libraries) {
       librariesMap.putAll(Maps.toMap(libraries, lib -> false));
+    }
+
+    /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
+    Set<CloudLibrary> getSelectedLibraries() {
+      return librariesMap
+          .entrySet()
+          .stream()
+          .filter(Entry::getValue)
+          .map(Entry::getKey)
+          .collect(ImmutableSet.toImmutableSet());
     }
 
     @Override

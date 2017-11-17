@@ -26,11 +26,14 @@ import com.intellij.ide.wizard.Step;
 import com.intellij.ide.wizard.StepAdapter;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import git4idea.DialogManager;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.jetbrains.annotations.Nullable;
@@ -61,11 +64,29 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
   /** The wizard for the "Add Cloud Libraries" menu action. */
   private static final class AddCloudLibrariesWizard extends AbstractWizard<Step> {
 
+    private final SelectClientLibrariesStep selectClientLibrariesStep;
+    private final ManageCloudApisStep manageCloudApisStep;
+
     AddCloudLibrariesWizard(Project project) {
       super(GctBundle.message("cloud.libraries.dialog.title"), project);
-      addStep(new SelectClientLibrariesStep());
-      addStep(new ManageCloudApisStep());
+
+      selectClientLibrariesStep = new SelectClientLibrariesStep(project);
+      selectClientLibrariesStep.addModuleSelectionListener(event -> updateButtons());
+      manageCloudApisStep = new ManageCloudApisStep();
+
+      addStep(selectClientLibrariesStep);
+      addStep(manageCloudApisStep);
       init();
+    }
+
+    /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
+    Set<CloudLibrary> getSelectedLibraries() {
+      return selectClientLibrariesStep.getSelectedLibraries();
+    }
+
+    @Override
+    protected boolean canGoNext() {
+      return selectClientLibrariesStep.getSelectedModule() != null;
     }
 
     @Nullable
@@ -80,7 +101,7 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
 
     private final GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
 
-    SelectClientLibrariesStep() {
+    SelectClientLibrariesStep(Project project) {
       List<CloudLibrary> libraries;
       try {
         libraries = CloudLibraries.getCloudLibraries();
@@ -89,7 +110,22 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
         libraries = ImmutableList.of();
       }
 
-      this.cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries);
+      this.cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries, project);
+    }
+
+    /** Adds the given {@link ActionListener} to the panel's module combobox. */
+    void addModuleSelectionListener(ActionListener listener) {
+      cloudApiSelectorPanel.addModuleSelectionListener(listener);
+    }
+
+    /** Returns the selected {@link Module}. */
+    Module getSelectedModule() {
+      return cloudApiSelectorPanel.getSelectedModule();
+    }
+
+    /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
+    Set<CloudLibrary> getSelectedLibraries() {
+      return cloudApiSelectorPanel.getSelectedLibraries();
     }
 
     @Override
