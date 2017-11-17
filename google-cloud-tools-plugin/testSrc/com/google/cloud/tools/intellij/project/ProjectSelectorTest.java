@@ -16,9 +16,26 @@
 
 package com.google.cloud.tools.intellij.project;
 
-/** Interface that must be implemented in order to be informed of project selection changes. */
-public interface ProjectSelectionListener {
+import static com.google.common.truth.Truth.assertThat;
 
-  /** @param cloudProject new project selection or null if nothing was selected. */
-  void projectSelected(CloudProject cloudProject);
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+/** Tests {@link ProjectSelector}. */
+public class ProjectSelectorTest {
+  @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
+  private ProjectSelector projectSelector;
+
+  @Before
+  public void setUp() {
+    projectSelector = new ProjectSelector();
+  }
+
+  @Test
+  public void projectSelector_startsEmpty() {
+    assertThat(projectSelector.getSelectedProject()).isNull();
+  }
 }

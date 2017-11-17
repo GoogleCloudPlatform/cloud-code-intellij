@@ -58,18 +58,10 @@ public class GoogleLoginAction extends AnAction implements DumbAware, RightAlign
     CredentialedUser activeUser = Services.getLoginService().getActiveUser();
     if (activeUser == null) {
       presentation.setText(SIGN_IN_MESSAGE);
-      presentation.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
     } else {
       presentation.setText(activeUser.getEmail());
-      Image image = activeUser.getPicture();
-      if (image == null) {
-        presentation.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
-      } else {
-        int size = JBUI.scale(ICON_SIZE);
-        Image scaledImage = image.getScaledInstance(size, size, Image.SCALE_SMOOTH);
-        presentation.setIcon(new ImageIcon(scaledImage));
-      }
     }
+    presentation.setIcon(CredentialedUserScaledIcon.getScaledUserIcon(ICON_SIZE, activeUser));
   }
 
   /** Opens up the Google Login panel as a popup. */

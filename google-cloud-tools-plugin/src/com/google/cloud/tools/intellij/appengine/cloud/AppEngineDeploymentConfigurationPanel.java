@@ -18,9 +18,8 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
-import com.google.cloud.tools.intellij.project.ProjectSelection;
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -120,7 +119,7 @@ public final class AppEngineDeploymentConfigurationPanel {
     project.setName(configuration.getCloudProjectName());
     project.setProjectId("ID");
     CredentialedUser user = Services.getLoginService().getActiveUser();
-    projectSelectorNew.setSelectedProject(new ProjectSelection(project, user));
+    projectSelectorNew.setSelectedProject(new CloudProject(project, user));
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
 

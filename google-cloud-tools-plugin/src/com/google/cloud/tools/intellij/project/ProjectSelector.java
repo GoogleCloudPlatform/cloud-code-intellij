@@ -17,19 +17,17 @@
 package com.google.cloud.tools.intellij.project;
 
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
-import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
+import com.google.cloud.tools.intellij.login.ui.CredentialedUserScaledIcon;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.util.ui.JBUI;
 import java.awt.BorderLayout;
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
@@ -39,14 +37,14 @@ import javax.swing.UIManager;
  * to get the set of projects.
  */
 public class ProjectSelector extends JPanel {
-  private static final int ACCOUNT_ICON_SIZE = 16;
+  static final int ACCOUNT_ICON_SIZE = 16;
 
   private final List<ProjectSelectionListener> projectSelectionListeners = new ArrayList<>();
 
   private JBLabel projectNameLabel;
-  private JBLabel accoountInfoLabel;
+  private JBLabel accountInfoLabel;
 
-  private ProjectSelection projectSelection;
+  private CloudProject cloudProject;
   private JBLabel projectAccountSeparatorLabel;
 
   public ProjectSelector() {
@@ -54,18 +52,18 @@ public class ProjectSelector extends JPanel {
   }
 
   /** @return project selection or null if no project is selected. */
-  public ProjectSelection getSelectedProject() {
-    return projectSelection;
+  public CloudProject getSelectedProject() {
+    return cloudProject;
   }
 
   /**
    * Updates component UI and state with the new project and user account information.
    *
-   * @param projectSelection New project/account information, null to clear selected project.
+   * @param cloudProject New project/account information, null to clear selected project.
    */
-  public void setSelectedProject(ProjectSelection projectSelection) {
-    this.projectSelection = projectSelection;
-    updateProjectAndUserInformation(projectSelection);
+  public void setSelectedProject(CloudProject cloudProject) {
+    this.cloudProject = cloudProject;
+    updateProjectAndUserInformation(cloudProject);
   }
 
   /**
@@ -106,9 +104,9 @@ public class ProjectSelector extends JPanel {
     staticInfoPanel.add(projectAccountSeparatorLabel);
     staticInfoPanel.add(Box.createHorizontalStrut(5));
 
-    accoountInfoLabel = new JBLabel();
-    accoountInfoLabel.setIcon(GoogleCloudToolsIcons.CLOUD_BREAKPOINT);
-    staticInfoPanel.add(accoountInfoLabel);
+    accountInfoLabel = new JBLabel();
+    accountInfoLabel.setIcon(GoogleCloudToolsIcons.CLOUD_BREAKPOINT);
+    staticInfoPanel.add(accountInfoLabel);
     staticInfoPanel.add(Box.createHorizontalGlue());
 
     ComponentWithBrowseButton<JPanel> componentWithBrowseButton =
@@ -119,38 +117,34 @@ public class ProjectSelector extends JPanel {
   }
 
   private void handleOpenProjectSelectionDialog() {
-    projectSelection = ProjectSelectionDialog.showDialog(this, projectSelection);
-    System.out.println("Selected: " + projectSelection);
-    updateProjectAndUserInformation(projectSelection);
-    notifyProjectSelectionListeners();
+    CloudProject newSelection = ProjectSelectionDialog.showDialog(this, cloudProject);
+
+    // if null, it means no change or user cancelled selection dialog - no update required.
+    if (newSelection != null) {
+      setSelectedProject(newSelection);
+      notifyProjectSelectionListeners();
+    }
   }
 
-  private void updateProjectAndUserInformation(ProjectSelection selection) {
+  private void updateProjectAndUserInformation(CloudProject selection) {
     if (selection == null) {
-      projectNameLabel.setText("No project selected.");
-      accoountInfoLabel.setText("");
-      accoountInfoLabel.setIcon(null);
+      projectNameLabel.setText(GctBundle.getString("project.selector.no.selected.project"));
+      accountInfoLabel.setText("");
+      accountInfoLabel.setIcon(null);
       projectAccountSeparatorLabel.setVisible(false);
 
     } else {
       projectNameLabel.setText(selection.getProject().getName());
       projectAccountSeparatorLabel.setVisible(true);
-      accoountInfoLabel.setText(
+      accountInfoLabel.setText(
           selection.getUser().getName() + " (" + selection.getUser().getEmail() + ")");
 
-      Image userImage = selection.getUser().getPicture();
-      if (userImage == null) {
-        accoountInfoLabel.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
-      } else {
-        int targetIconSize = JBUI.scale(ACCOUNT_ICON_SIZE);
-        Image scaledUserImage =
-            userImage.getScaledInstance(targetIconSize, targetIconSize, Image.SCALE_SMOOTH);
-        accoountInfoLabel.setIcon(new ImageIcon(scaledUserImage));
-      }
+      accountInfoLabel.setIcon(
+          CredentialedUserScaledIcon.getScaledUserIcon(ACCOUNT_ICON_SIZE, selection.getUser()));
     }
   }
 
   private void notifyProjectSelectionListeners() {
-    projectSelectionListeners.forEach(listener -> listener.projectSelected(projectSelection));
+    projectSelectionListeners.forEach(listener -> listener.projectSelected(cloudProject));
   }
 }

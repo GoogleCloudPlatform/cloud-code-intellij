@@ -19,12 +19,12 @@ package com.google.cloud.tools.intellij.project;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 
-/** Selected project and account. */
-public class ProjectSelection {
+/** GCP project and account. */
+public class CloudProject {
   private final Project project;
   private final CredentialedUser user;
 
-  public ProjectSelection(Project project, CredentialedUser user) {
+  public CloudProject(Project project, CredentialedUser user) {
     this.project = project;
     this.user = user;
   }

@@ -16,9 +16,13 @@
 
 package com.google.cloud.tools.intellij.project;
 
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.ui.CredentialedUserScaledIcon;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.table.JBTable;
 import git4idea.DialogManager;
 import java.awt.Component;
@@ -28,6 +32,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -35,15 +40,19 @@ import javax.swing.table.AbstractTableModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Modal project and account selection dialog. Contains account drop-down with user list, table with
+ * project list and simple filter. Called from {@link ProjectSelector}.
+ */
 public class ProjectSelectionDialog extends DialogWrapper {
 
-  private JComboBox accountComboBox;
+  private JComboBox<CredentialedUser> accountComboBox;
   private JButton addAccountButton;
   private JTextField filterTextField;
   private JTable projectListTable;
   private JPanel centerPanel;
 
-  private ProjectSelection projectSelection;
+  private CloudProject cloudProject;
   private ProjectListTableModel projectListTableModel;
 
   private ProjectSelectionDialog(Component parent) {
@@ -51,24 +60,30 @@ public class ProjectSelectionDialog extends DialogWrapper {
     init();
   }
 
-  static ProjectSelection showDialog(Component parent, ProjectSelection projectSelection) {
+  /**
+   * Creates and shows modal dialog to select project/account. Blocks EDT until choice is made.
+   *
+   * @param parent Parent component for the dialog.
+   * @param cloudProject Current project selection to populate dialog UI state.
+   * @return New project selection or null if user cancels.
+   */
+  @Nullable
+  static CloudProject showDialog(
+      Component parent, @Nullable CloudProject cloudProject) {
     ProjectSelectionDialog selectionDialog = new ProjectSelectionDialog(parent);
-    selectionDialog.setProjectSelection(projectSelection);
+    selectionDialog.setCloudProject(cloudProject);
     DialogManager.show(selectionDialog);
-    return selectionDialog.projectSelection;
-  }
-
-  void setProjectSelection(ProjectSelection projectSelection) {
-    this.projectSelection = projectSelection;
-    updateProjectAccountInformation();
+    int result = selectionDialog.getExitCode();
+    return result == OK_EXIT_CODE ? selectionDialog.getCloudProject() : null;
   }
 
   @Override
   protected void init() {
     super.init();
-    setTitle("Select Google Cloud Project");
+    setTitle(GctBundle.getString("project.selector.dialog.title"));
   }
 
+  // IntelliJ API - creates actions (converted to buttons) for "left side" of the dialog.
   @NotNull
   @Override
   protected Action[] createLeftSideActions() {
@@ -77,17 +92,31 @@ public class ProjectSelectionDialog extends DialogWrapper {
 
   private void createUIComponents() {
     // prepare account combobox model and rendering.
+    accountComboBox = new ComboBox<>();
+    accountComboBox.setRenderer(new AccountComboBoxRenderer());
 
     // prepare table model and rendering.
     projectListTable = new JBTable();
     projectListTableModel = new ProjectListTableModel();
     projectListTable.setModel(projectListTableModel);
+
+    // disabled unless project is selected in the list.
+    getOKAction().setEnabled(false);
+  }
+
+  private void setCloudProject(CloudProject cloudProject) {
+    this.cloudProject = cloudProject;
+    updateProjectAccountInformation();
+  }
+
+  private CloudProject getCloudProject() {
+    return cloudProject;
   }
 
   private void updateProjectAccountInformation() {
-    if (projectSelection != null) {
-      accountComboBox.addItem(projectSelection.getUser().getName());
-      filterTextField.setText(projectSelection.getProject().getName());
+    if (cloudProject != null) {
+      accountComboBox.addItem(cloudProject.getUser());
+      filterTextField.setText(cloudProject.getProject().getName());
       projectListTableModel.fireTableDataChanged();
     }
   }
@@ -128,12 +157,24 @@ public class ProjectSelectionDialog extends DialogWrapper {
     public String getColumnName(int column) {
       switch (column) {
         case 0:
-          return "Project Name";
+          return GctBundle.getString("project.selector.project.list.project.name.column");
         case 1:
-          return "Project ID";
+          return GctBundle.getString("project.selector.project.list.project.id.column");
       }
 
       return "";
+    }
+  }
+
+  private static final class AccountComboBoxRenderer
+      extends ListCellRendererWrapper<CredentialedUser> {
+
+    @Override
+    public void customize(
+        JList list, CredentialedUser user, int index, boolean selected, boolean hasFocus) {
+      setText(user.getName() + " (" + user.getEmail() + ")");
+      setIcon(
+          CredentialedUserScaledIcon.getScaledUserIcon(ProjectSelector.ACCOUNT_ICON_SIZE, user));
     }
   }
 }
