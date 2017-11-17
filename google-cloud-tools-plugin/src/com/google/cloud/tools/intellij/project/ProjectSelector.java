@@ -17,13 +17,16 @@
 package com.google.cloud.tools.intellij.project;
 
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
+import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.util.ui.JBUI;
 import java.awt.BorderLayout;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -36,13 +39,33 @@ import javax.swing.UIManager;
  * to get the set of projects.
  */
 public class ProjectSelector extends JPanel {
+  private static final int ACCOUNT_ICON_SIZE = 16;
+
   private final List<ProjectSelectionListener> projectSelectionListeners = new ArrayList<>();
 
   private JBLabel projectNameLabel;
   private JBLabel accoountInfoLabel;
 
+  private ProjectSelection projectSelection;
+  private JBLabel projectAccountSeparatorLabel;
+
   public ProjectSelector() {
     createUIComponents();
+  }
+
+  /** @return project selection or null if no project is selected. */
+  public ProjectSelection getSelectedProject() {
+    return projectSelection;
+  }
+
+  /**
+   * Updates component UI and state with the new project and user account information.
+   *
+   * @param projectSelection New project/account information, null to clear selected project.
+   */
+  public void setSelectedProject(ProjectSelection projectSelection) {
+    this.projectSelection = projectSelection;
+    updateProjectAndUserInformation(projectSelection);
   }
 
   /**
@@ -65,19 +88,25 @@ public class ProjectSelector extends JPanel {
   }
 
   private void createUIComponents() {
+    // layout - in the center of panel, horizontal line of project/account labels in a panel
+    // ends with a fixed size browse button.
     setLayout(new BorderLayout());
 
     JPanel staticInfoPanel = new JPanel();
     staticInfoPanel.setLayout(new BoxLayout(staticInfoPanel, BoxLayout.X_AXIS));
-    staticInfoPanel.setBorder(UIManager.getBorder("TextField.border"));
+    staticInfoPanel.setBorder(
+        BorderFactory.createCompoundBorder(
+            UIManager.getBorder("TextField.border"), BorderFactory.createEmptyBorder(2, 2, 2, 2)));
 
-    projectNameLabel = new JBLabel("test-project");
+    projectNameLabel = new JBLabel();
     staticInfoPanel.add(projectNameLabel);
     staticInfoPanel.add(Box.createHorizontalStrut(5));
-    staticInfoPanel.add(new JBLabel("/"));
+    projectAccountSeparatorLabel = new JBLabel("/");
+    projectAccountSeparatorLabel.setVisible(false /* only visible when project is selected. */);
+    staticInfoPanel.add(projectAccountSeparatorLabel);
     staticInfoPanel.add(Box.createHorizontalStrut(5));
 
-    accoountInfoLabel = new JBLabel("John Doe (jd@google.com)");
+    accoountInfoLabel = new JBLabel();
     accoountInfoLabel.setIcon(GoogleCloudToolsIcons.CLOUD_BREAKPOINT);
     staticInfoPanel.add(accoountInfoLabel);
     staticInfoPanel.add(Box.createHorizontalGlue());
@@ -90,15 +119,38 @@ public class ProjectSelector extends JPanel {
   }
 
   private void handleOpenProjectSelectionDialog() {
-    int result = ProjectSelectionDialog.showDialog(this);
-    if (result == DialogWrapper.OK_EXIT_CODE) {
-      System.out.println("OK!");
-    }
+    projectSelection = ProjectSelectionDialog.showDialog(this, projectSelection);
+    System.out.println("Selected: " + projectSelection);
+    updateProjectAndUserInformation(projectSelection);
+    notifyProjectSelectionListeners();
   }
 
   private void updateProjectAndUserInformation(ProjectSelection selection) {
-    projectNameLabel.setText(selection.getProject().getName());
-    accoountInfoLabel.setText(selection.getUser().getName());
-    accoountInfoLabel.setIcon(new ImageIcon(selection.getUser().getPicture()));
+    if (selection == null) {
+      projectNameLabel.setText("No project selected.");
+      accoountInfoLabel.setText("");
+      accoountInfoLabel.setIcon(null);
+      projectAccountSeparatorLabel.setVisible(false);
+
+    } else {
+      projectNameLabel.setText(selection.getProject().getName());
+      projectAccountSeparatorLabel.setVisible(true);
+      accoountInfoLabel.setText(
+          selection.getUser().getName() + " (" + selection.getUser().getEmail() + ")");
+
+      Image userImage = selection.getUser().getPicture();
+      if (userImage == null) {
+        accoountInfoLabel.setIcon(GoogleLoginIcons.DEFAULT_USER_AVATAR);
+      } else {
+        int targetIconSize = JBUI.scale(ACCOUNT_ICON_SIZE);
+        Image scaledUserImage =
+            userImage.getScaledInstance(targetIconSize, targetIconSize, Image.SCALE_SMOOTH);
+        accoountInfoLabel.setIcon(new ImageIcon(scaledUserImage));
+      }
+    }
+  }
+
+  private void notifyProjectSelectionListeners() {
+    projectSelectionListeners.forEach(listener -> listener.projectSelected(projectSelection));
   }
 }

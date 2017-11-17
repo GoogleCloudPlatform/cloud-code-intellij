@@ -16,7 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.project.ProjectSelection;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -50,6 +54,7 @@ public final class AppEngineDeploymentConfigurationPanel {
   private JPanel appEngineCostWarningPanel;
   private HyperlinkLabel appEngineCostWarningLabel;
   private JLabel serviceLabel;
+  private com.google.cloud.tools.intellij.project.ProjectSelector projectSelectorNew;
 
   private static final boolean PROMOTE_DEFAULT = false;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
@@ -111,6 +116,11 @@ public final class AppEngineDeploymentConfigurationPanel {
     promoteCheckbox.setSelected(configuration.isPromote());
     versionIdField.setText(configuration.getVersion());
     projectSelector.setText(configuration.getCloudProjectName());
+    Project project = new Project();
+    project.setName(configuration.getCloudProjectName());
+    project.setProjectId("ID");
+    CredentialedUser user = Services.getLoginService().getActiveUser();
+    projectSelectorNew.setSelectedProject(new ProjectSelection(project, user));
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
 

@@ -43,15 +43,24 @@ public class ProjectSelectionDialog extends DialogWrapper {
   private JTable projectListTable;
   private JPanel centerPanel;
 
+  private ProjectSelection projectSelection;
+  private ProjectListTableModel projectListTableModel;
+
   private ProjectSelectionDialog(Component parent) {
     super(parent, false);
     init();
   }
 
-  static int showDialog(Component parent) {
+  static ProjectSelection showDialog(Component parent, ProjectSelection projectSelection) {
     ProjectSelectionDialog selectionDialog = new ProjectSelectionDialog(parent);
+    selectionDialog.setProjectSelection(projectSelection);
     DialogManager.show(selectionDialog);
-    return selectionDialog.getExitCode();
+    return selectionDialog.projectSelection;
+  }
+
+  void setProjectSelection(ProjectSelection projectSelection) {
+    this.projectSelection = projectSelection;
+    updateProjectAccountInformation();
   }
 
   @Override
@@ -71,7 +80,16 @@ public class ProjectSelectionDialog extends DialogWrapper {
 
     // prepare table model and rendering.
     projectListTable = new JBTable();
-    projectListTable.setModel(new ProjectListTableModel());
+    projectListTableModel = new ProjectListTableModel();
+    projectListTable.setModel(projectListTableModel);
+  }
+
+  private void updateProjectAccountInformation() {
+    if (projectSelection != null) {
+      accountComboBox.addItem(projectSelection.getUser().getName());
+      filterTextField.setText(projectSelection.getProject().getName());
+      projectListTableModel.fireTableDataChanged();
+    }
   }
 
   @Nullable
