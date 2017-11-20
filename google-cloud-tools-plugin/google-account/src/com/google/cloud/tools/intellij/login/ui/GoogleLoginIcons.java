@@ -57,7 +57,11 @@ public final class GoogleLoginIcons {
     // This utility class should not be instantiated.
   }
 
-  /** Provides scaled icon for {@link com.google.cloud.tools.intellij.login.CredentialedUser}. */
+  /**
+   * Provides scaled icon for {@link com.google.cloud.tools.intellij.login.CredentialedUser}.
+   *
+   * @param user User to get picture for, null to return generic user placeholder icon.
+   */
   public static Icon getScaledUserIcon(int size, CredentialedUser user) {
     Icon icon = DEFAULT_USER_AVATAR;
     if (user != null) {

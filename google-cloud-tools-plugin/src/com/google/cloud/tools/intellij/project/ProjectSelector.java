@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
@@ -38,8 +37,8 @@ import javax.swing.UIManager;
 /**
  * ProjectSelector allows the user to select a GCP project id. It shows selected project name and
  * user account information. To change selection it uses {@link ProjectSelectionDialog} to call into
- * {@link com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService} to get the set
- * of credentialed users and then into resource manager to get the set of projects.
+ * {@link com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService} to get the set of
+ * credentialed users and then into resource manager to get the set of projects.
  */
 public class ProjectSelector extends JPanel {
   static final int ACCOUNT_ICON_SIZE = 16;
@@ -54,6 +53,7 @@ public class ProjectSelector extends JPanel {
 
   public ProjectSelector() {
     createUIComponents();
+    setSelectedProject(null);
   }
 
   /** @return project selection or null if no project is selected. */
@@ -110,7 +110,6 @@ public class ProjectSelector extends JPanel {
     staticInfoPanel.add(Box.createHorizontalStrut(5));
 
     accountInfoLabel = new JBLabel();
-    accountInfoLabel.setIcon(GoogleCloudToolsIcons.CLOUD_BREAKPOINT);
     staticInfoPanel.add(accountInfoLabel);
     staticInfoPanel.add(Box.createHorizontalGlue());
 
@@ -143,18 +142,16 @@ public class ProjectSelector extends JPanel {
     } else {
       projectNameLabel.setText(selection.getProjectName());
       projectAccountSeparatorLabel.setVisible(true);
-      // first just show account email, then expand with name/picture if this account is signed in
-      // to.
+      // first just show account email, then expand with name/picture if this account is signed in.
       accountInfoLabel.setText(selection.getGoogleUsername());
       Optional<CredentialedUser> loggedInUser =
           Services.getLoginService().getLoggedInUser(selection.getGoogleUsername());
       if (loggedInUser.isPresent()) {
         accountInfoLabel.setText(
             loggedInUser.get().getName() + " (" + loggedInUser.get().getEmail() + ")");
-
-        accountInfoLabel.setIcon(
-            GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, loggedInUser.get()));
       }
+      accountInfoLabel.setIcon(
+          GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, loggedInUser.orElse(null)));
     }
   }
 

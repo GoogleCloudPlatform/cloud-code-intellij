@@ -55,17 +55,14 @@ public class ProjectSelectorTest {
   @Test
   public void projectSelector_startsEmpty() {
     assertThat(projectSelector.getSelectedProject()).isNull();
+    verifyUiStateForProject(null);
   }
 
   @Test
   public void setProject_updatesUi() {
     projectSelector.setSelectedProject(TEST_PROJECT);
 
-    assertThat(projectSelector.getProjectNameLabel().getText())
-        .isEqualTo(TEST_PROJECT.getProjectName());
-    assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isTrue();
-    assertThat(projectSelector.getAccountInfoLabel().getText())
-        .isEqualTo(TEST_PROJECT.getGoogleUsername());
+    verifyUiStateForProject(TEST_PROJECT);
   }
 
   @Test
@@ -86,11 +83,7 @@ public class ProjectSelectorTest {
 
     projectSelector.handleOpenProjectSelectionDialog();
 
-    assertThat(projectSelector.getProjectNameLabel().getText())
-        .isEqualTo(TEST_PROJECT.getProjectName());
-    assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isTrue();
-    assertThat(projectSelector.getAccountInfoLabel().getText())
-        .isEqualTo(TEST_PROJECT.getGoogleUsername());
+    verifyUiStateForProject(TEST_PROJECT);
   }
 
   @Test
@@ -132,9 +125,24 @@ public class ProjectSelectorTest {
     projectSelector.setSelectedProject(TEST_PROJECT);
     projectSelector.setSelectedProject(null);
 
-    assertThat(projectSelector.getProjectNameLabel().getText())
-        .isEqualTo(GctBundle.getString("project.selector.no.selected.project"));
-    // no account information UI is visible/populated.
-    assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isFalse();
+    verifyUiStateForProject(null);
+  }
+
+  private void verifyUiStateForProject(CloudProject project) {
+    if (project == null) {
+      assertThat(projectSelector.getProjectNameLabel().getText())
+          .isEqualTo(GctBundle.getString("project.selector.no.selected.project"));
+      // no account information UI is visible/populated.
+      assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isFalse();
+      assertThat(projectSelector.getAccountInfoLabel().getText()).isEmpty();
+      assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
+    } else {
+      assertThat(projectSelector.getProjectNameLabel().getText())
+          .isEqualTo(project.getProjectName());
+      assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isTrue();
+      assertThat(projectSelector.getAccountInfoLabel().getText())
+          .isEqualTo(project.getGoogleUsername());
+      assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNotNull();
+    }
   }
 }
