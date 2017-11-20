@@ -47,9 +47,9 @@ public class ProjectSelector extends JPanel {
 
   private JBLabel projectNameLabel;
   private JBLabel accountInfoLabel;
+  private JBLabel projectAccountSeparatorLabel;
 
   private CloudProject cloudProject;
-  private JBLabel projectAccountSeparatorLabel;
 
   public ProjectSelector() {
     createUIComponents();
