@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<idea-plugin version="2">
+<idea-plugin>
   <id>com.google.gct.core</id>
   <name>Google Cloud Tools</name>
   <description>
@@ -295,15 +295,13 @@
   <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
   <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
   <depends optional="true" config-file="google-app-engine-maven-support.xml">org.jetbrains.idea.maven</depends>
-
-  <depends>com.intellij.modules.platform</depends>
+  <depends optional="true" config-file="google-account.xml">com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
   <depends>com.intellij.modules.vcs</depends>
   <depends>com.intellij.modules.xml</depends>
   <depends>com.intellij.modules.xdebugger</depends>
   <depends>org.jetbrains.plugins.gradle</depends>
   <depends>org.jetbrains.plugins.yaml</depends>
-  <depends>com.google.gct.login</depends>
   <depends>Git4Idea</depends>
   <depends>org.jetbrains.idea.maven</depends>
 
@@ -440,7 +438,6 @@
                      key="unique.rest.signature.name" groupKey="inspections.group.name" enabledByDefault="true"
                      level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.RestSignatureInspection"/>
 
-    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.PluginCompatibilityCheck"/>
     <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.AppEngineStandardUnsupportedJavaVersionCheck"/>
     <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.CloudSdkVersionStartupCheck"/>
   </extensions>
@@ -449,7 +446,7 @@
     <GitHttpAuthDataProvider implementation="com.google.cloud.tools.intellij.vcs.GcpHttpAuthDataProvider" />
   </extensions>
 
-  <extensions defaultExtensionNs="com.google.gct.login">
+  <extensions defaultExtensionNs="com.google.gct.core">
     <googleLoginMessageExtender
             implementation="com.google.cloud.tools.intellij.login.IntelliJGoogleLoginMessageExtender"/>
   </extensions>

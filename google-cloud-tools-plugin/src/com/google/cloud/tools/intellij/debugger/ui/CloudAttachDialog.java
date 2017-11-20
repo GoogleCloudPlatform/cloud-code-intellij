@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,17 @@
 
 package com.google.cloud.tools.intellij.debugger.ui;
 
+import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
 import com.google.cloud.tools.intellij.debugger.ProjectRepositoryState;
 import com.google.cloud.tools.intellij.debugger.ProjectRepositoryValidator;
 import com.google.cloud.tools.intellij.debugger.SyncResult;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
-import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.components.ServiceManager;
@@ -40,7 +39,6 @@ import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
-
 import git4idea.actions.BasicAction;
 import git4idea.branch.GitBrancher;
 import git4idea.commands.GitCommand;
@@ -48,10 +46,6 @@ import git4idea.commands.GitHandlerUtil;
 import git4idea.commands.GitLineHandler;
 import git4idea.i18n.GitBundle;
 import git4idea.repo.GitRepository;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Window;
@@ -60,13 +54,14 @@ import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
-
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * CloudAttachDialog shows a dialog allowing the user to select a target (module & version) and

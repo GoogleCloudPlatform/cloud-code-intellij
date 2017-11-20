@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginListener;
-import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
+import com.google.cloud.tools.intellij.login.IntegratedIntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginEmptyPanel;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
@@ -71,7 +71,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * ProjectSelector allows the user to select a GCP project id. It calls into {@link
- * IntellijGoogleLoginService} to get the set of credentialed users and then into
+ * IntegratedIntellijGoogleLoginService} to get the set of credentialed users and then into
  * resource manager to get the set of projects. The result is displayed in a tree view organized by
  * google login. */
 // TODO(nkibler): Re-do this mess so we can remove the plethora of hacky solutions for listeners.
@@ -228,7 +228,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
    * <p/>
    * Note: if the ProjectSelector is created with queryOnExpand, this value could be {@code null}
    * even if {@link #getText()} represents a valid project because the user has not expanded the
-   * owning {@link IntellijGoogleLoginService}.
+   * owning {@link IntegratedIntellijGoogleLoginService}.
    */
   @Nullable
   public CredentialedUser getSelectedUser() {

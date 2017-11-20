@@ -21,7 +21,7 @@ import com.google.api.services.cloudresourcemanager.CloudResourceManager;
 import com.google.api.services.cloudresourcemanager.model.ListProjectsResponse;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
+import com.google.cloud.tools.intellij.login.IntegratedIntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.intellij.openapi.diagnostic.Logger;
@@ -42,7 +42,7 @@ import javax.swing.tree.TreeNode;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * This model item represents a {@link IntellijGoogleLoginService} credentialed user in the treeview
+ * This model item represents a {@link IntegratedIntellijGoogleLoginService} credentialed user in the treeview
  * of the project selector.
  */
 @SuppressWarnings("FutureReturnValueIgnored")

@@ -62,6 +62,7 @@ public class AddAppEngineFrameworkSupportDialog extends DialogWrapper {
   protected void doOKAction() {
     if (getOKAction().isEnabled()) {
       new WriteAction() {
+
         @Override
         protected void run(@NotNull final Result result) {
           ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();

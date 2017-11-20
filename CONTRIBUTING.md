@@ -28,7 +28,6 @@ Cloning into 'gcloud-intellij'...
 
 There are four modules:
 
-* google-account-plugin: Google account management and preferences
 * google-clout-tools: Cloud debugger and code inspections
 * common-lib: Code shared between the above two
 * common-test-lib: test infrastructure code
@@ -43,7 +42,7 @@ Gradle is self-installing. This one command
 $ ./gradlew buildPlugin
 
 compiles everything, runs the tests, and builds the plugins. The output appears in
-google-account-plugin/build/distributions and google-cloud-tools-plugin/build/distributions.
+google-cloud-tools-plugin/build/distributions.
 
 Other useful targets while developing include:
 
