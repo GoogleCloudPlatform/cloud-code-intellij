@@ -74,7 +74,8 @@ public final class GoogleCloudApiSelectorPanelTest {
 
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
-  @TestModule private Module module;
+  @TestModule private Module module1;
+  @TestModule private Module module2;
 
   @TestFixture private IdeaProjectTestFixture testFixture;
 
@@ -212,21 +213,24 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
-  public void getSelectedModule_withNoneSelected_returnsNull() {
+  public void getSelectedModule_withNoneSelected_returnsDefaultModule() {
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
 
-    assertThat(panel.getSelectedModule()).isNull();
+    // The order is determined by the call to Project.getSortedModules(), which returns module2
+    // before module1. It is deterministic, though, so there is no issue testing for direct equality
+    // here.
+    assertThat(panel.getSelectedModule()).isEqualTo(module2);
   }
 
   @Test
-  public void getSelectedModule_withModuleSelected_returnsModule() {
+  public void getSelectedModule_withModuleSelected_returnsSelectedModule() {
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
 
-    panel.getModulesComboBox().setSelectedModule(module);
+    panel.getModulesComboBox().setSelectedModule(module1);
 
-    assertThat(panel.getSelectedModule()).isEqualTo(module);
+    assertThat(panel.getSelectedModule()).isEqualTo(module1);
   }
 
   @Test

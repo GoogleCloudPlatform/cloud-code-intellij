@@ -21,7 +21,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.intellij.application.options.ModulesComboBox;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.BooleanTableCellEditor;
 import com.intellij.ui.BooleanTableCellRenderer;
@@ -33,7 +35,6 @@ import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -79,11 +80,6 @@ final class GoogleCloudApiSelectorPanel {
     return panel;
   }
 
-  /** Adds the given {@link ActionListener} to the {@link ModulesComboBox}. */
-  void addModuleSelectionListener(ActionListener listener) {
-    modulesComboBox.addActionListener(listener);
-  }
-
   /** Returns the selected {@link Module}. */
   Module getSelectedModule() {
     return modulesComboBox.getSelectedModule();
@@ -123,6 +119,16 @@ final class GoogleCloudApiSelectorPanel {
   private void createUIComponents() {
     modulesComboBox = new ModulesComboBox();
     modulesComboBox.fillModules(project);
+
+    ApplicationManager.getApplication()
+        .runReadAction(
+            () -> {
+              Module[] modules = ModuleManager.getInstance(project).getSortedModules();
+              if (modules.length > 0) {
+                // Defaults to the first, top-level module in this project.
+                modulesComboBox.setSelectedModule(modules[0]);
+              }
+            });
 
     cloudLibrariesTable = new CloudLibraryTable(libraries);
     cloudLibrariesTable.setTableHeader(null);

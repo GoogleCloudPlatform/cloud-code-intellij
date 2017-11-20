@@ -30,7 +30,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import git4idea.DialogManager;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -71,7 +70,6 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
       super(GctBundle.message("cloud.libraries.dialog.title"), project);
 
       selectClientLibrariesStep = new SelectClientLibrariesStep(project);
-      selectClientLibrariesStep.addModuleSelectionListener(event -> updateButtons());
       manageCloudApisStep = new ManageCloudApisStep();
 
       addStep(selectClientLibrariesStep);
@@ -82,11 +80,6 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
     /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
     Set<CloudLibrary> getSelectedLibraries() {
       return selectClientLibrariesStep.getSelectedLibraries();
-    }
-
-    @Override
-    protected boolean canGoNext() {
-      return selectClientLibrariesStep.getSelectedModule() != null;
     }
 
     @Nullable
@@ -111,11 +104,6 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
       }
 
       this.cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries, project);
-    }
-
-    /** Adds the given {@link ActionListener} to the panel's module combobox. */
-    void addModuleSelectionListener(ActionListener listener) {
-      cloudApiSelectorPanel.addModuleSelectionListener(listener);
     }
 
     /** Returns the selected {@link Module}. */
