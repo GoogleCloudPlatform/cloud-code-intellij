@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,22 @@
 
 package com.google.cloud.tools.intellij.integration;
 
+import java.io.IOException;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
-
-import java.io.IOException;
 
 /**
  * Test that the plugin.xml file is at least marginally sensible.
  */
 public class PluginXmlTest {
 
-    @Test
-    public void testWellFormed() throws SAXException, IOException {
-        XMLReader reader = XMLReaderFactory.createXMLReader();
-        reader.parse("resources/META-INF/plugin.xml");
-        // throws exception if file is malformed
-    }
+  @Test
+  public void testWellFormed() throws SAXException, IOException {
+    XMLReader reader = XMLReaderFactory.createXMLReader();
+    reader.parse("resources/META-INF/plugin.xml");
+    // throws exception if file is malformed
+  }
 
 }

@@ -30,17 +30,12 @@ For detailed user documentation go to our documentation
 ## Installation
 
 You can find our plugin in the Jetbrains plugin repository by going to IntelliJ -> Settings -> Browse Repositories, and search for 'Google Cloud Tools'. 
-You will see a prompt to install the 'Google Account' plugin which provides common Google settings to the plugin.
 
 ### Pre-releases 
 
 The pre-release binaries are being deployed to the Jetbrains plugin repository on an alpha
 channel. To install them please perform the following steps:
 
-1. Install the Google Account plugin
-    1. Copy this URL `https://plugins.jetbrains.com/plugins/alpha/8078`
-    1. Use the copied URL as the Custom Plugin URL when following [these instrucions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
-    1. Search for the 'Google Account' plugin in the plugin manager and install it.
 1. Install the Google Cloud Tools plugin
     1. Use the same steps as step 1 but use the following URL `https://plugins.jetbrains.com/plugins/alpha/8079`
     1. When installing look for the 'Google Cloud Tools' plugin.

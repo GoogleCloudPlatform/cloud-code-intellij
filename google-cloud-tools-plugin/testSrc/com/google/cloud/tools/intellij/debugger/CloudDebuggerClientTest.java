@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,13 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
-import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.GoogleLoginService;
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
+import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
-
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,9 +37,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.IOException;
-import java.util.LinkedHashMap;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CloudDebuggerClientTest extends BasePluginTestCase {
@@ -48,8 +46,8 @@ public class CloudDebuggerClientTest extends BasePluginTestCase {
 
   @Before
   public void setUp() {
-    GoogleLoginService mockLogin = Mockito.mock(GoogleLoginService.class);
-    registerService(GoogleLoginService.class, mockLogin);
+    IntegratedGoogleLoginService mockLogin = Mockito.mock(IntegratedGoogleLoginService.class);
+    registerService(IntegratedGoogleLoginService.class, mockLogin);
     registerService(CloudToolsPluginInfoService.class, mockInfoService);
     LinkedHashMap<String, CredentialedUser> allUsers = new LinkedHashMap<String, CredentialedUser>();
     CredentialedUser user = Mockito.mock(CredentialedUser.class);

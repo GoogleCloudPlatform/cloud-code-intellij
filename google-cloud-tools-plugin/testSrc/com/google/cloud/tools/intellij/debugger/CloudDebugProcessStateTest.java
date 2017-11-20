@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,10 @@ import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.api.services.clouddebugger.v2.model.StatusMessage;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
-import com.google.cloud.tools.intellij.testing.TestUtils;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.GoogleLoginService;
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
+import com.google.cloud.tools.intellij.testing.TestUtils;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
-
 import com.intellij.mock.MockProjectEx;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.psi.PsiManager;
@@ -39,20 +38,17 @@ import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.util.xmlb.XmlSerializer;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.List;
 import org.jdom.Element;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 /** Tests for {@link CloudDebugProcessState} */
 public class CloudDebugProcessStateTest extends UsefulTestCase {
@@ -126,7 +122,8 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     PsiManager psiManager = Mockito.mock(PsiManager.class);
     project.registerService(PsiManager.class, psiManager);
 
-    GoogleLoginService mockLoginService = TestUtils.installMockService(GoogleLoginService.class);
+    IntegratedGoogleLoginService mockLoginService = TestUtils
+        .installMockService(IntegratedGoogleLoginService.class);
 
     GoogleLoginState googleLoginState = Mockito.mock(GoogleLoginState.class);
     CredentialedUser user = Mockito.mock(CredentialedUser.class);

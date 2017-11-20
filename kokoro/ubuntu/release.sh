@@ -63,7 +63,7 @@ fi
 
 echo "Installing itchio/gothub.."
 sudo /usr/local/go/bin/go get github.com/itchio/gothub
-echo "Building plugins"
+echo "Building plugin"
 ./gradlew buildPlugin
 
 echo "Creating Github release for tag: $GIT_TAG_NAME"
@@ -80,10 +80,6 @@ if [[ $GIT_TAG_NAME =~ RC[0-9]+$ ]]
         gothub release --tag $GIT_TAG_NAME
 fi
 
-echo "Uploading Google Account Plugin artifact to release $GIT_TAG_NAME"
-gothub upload --tag $GIT_TAG_NAME --file \
- google-account-plugin/build/distributions/google-account-${VERSION}.zip \
-  --name google-account-${VERSION}.zip
 echo "Uploading Google Cloud Tools Plugin artifact to release $GIT_TAG_NAME"
 gothub upload --tag $GIT_TAG_NAME --file \
  google-cloud-tools-plugin/build/distributions/google-cloud-tools-${VERSION}.zip \
@@ -91,4 +87,4 @@ gothub upload --tag $GIT_TAG_NAME --file \
 echo "Upload complete."
 
 echo "Publishing plugin to Jetbrains plugin repository"
-./gradlew publishPlugin
+./gradlew :google-cloud-tools-plugin:publishPlugin

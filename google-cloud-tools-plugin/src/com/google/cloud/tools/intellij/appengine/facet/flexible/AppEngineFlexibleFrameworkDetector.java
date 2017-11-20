@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
-import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.collect.ImmutableList;
 import com.intellij.facet.FacetType;
@@ -28,11 +28,9 @@ import com.intellij.patterns.ObjectPattern;
 import com.intellij.patterns.PatternCondition;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileContent;
+import java.util.Scanner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLFileType;
-
-import java.util.Collection;
-import java.util.Scanner;
 
 /** Detects App Engine Flexible framework in a project. */
 public class AppEngineFlexibleFrameworkDetector

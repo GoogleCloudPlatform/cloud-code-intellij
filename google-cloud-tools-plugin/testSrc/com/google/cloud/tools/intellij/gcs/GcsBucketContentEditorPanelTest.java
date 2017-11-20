@@ -27,7 +27,7 @@ import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.cloud.storage.StorageException;
-import com.google.cloud.tools.intellij.login.GoogleLoginService;
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.DelayedSubmitExecutorServiceProxy;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -67,7 +67,9 @@ public class GcsBucketContentEditorPanelTest {
 
   private GcsBucketContentEditorPanel editorPanel;
 
-  @TestService @Mock private GoogleLoginService loginService;
+  @TestService
+  @Mock
+  private IntegratedGoogleLoginService loginService;
   @Mock private Blob binaryBlob;
   @Mock private Blob directoryBlob;
   @Mock private Blob binaryBlobInDirectory;
