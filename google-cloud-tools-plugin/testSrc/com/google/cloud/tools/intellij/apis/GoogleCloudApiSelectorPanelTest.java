@@ -27,7 +27,9 @@ import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLi
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -231,6 +233,23 @@ public final class GoogleCloudApiSelectorPanelTest {
     panel.getModulesComboBox().setSelectedModule(module1);
 
     assertThat(panel.getSelectedModule()).isEqualTo(module1);
+  }
+
+  @Test
+  public void getSelectedModule_withNoModulesInProject_returnsNull() {
+    // Disposes the modules created by the CloudToolsRule.
+    ModuleManager moduleManager = ModuleManager.getInstance(testFixture.getProject());
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              moduleManager.disposeModule(module1);
+              moduleManager.disposeModule(module2);
+            });
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+
+    assertThat(panel.getSelectedModule()).isNull();
   }
 
   @Test

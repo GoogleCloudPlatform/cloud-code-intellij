@@ -35,6 +35,7 @@ import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -78,6 +79,11 @@ final class GoogleCloudApiSelectorPanel {
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
   public JPanel getPanel() {
     return panel;
+  }
+
+  /** Adds the given {@link ActionListener} to the {@link ModulesComboBox}. */
+  void addModuleSelectionListener(ActionListener listener) {
+    modulesComboBox.addActionListener(listener);
   }
 
   /** Returns the selected {@link Module}. */
