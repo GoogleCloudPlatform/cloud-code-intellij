@@ -19,22 +19,23 @@ package com.google.cloud.tools.intellij.apis;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestFixture;
+import com.google.cloud.tools.intellij.testing.TestModule;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClient;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClientMavenCoordinates;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.intellij.ui.JBSplitter;
-import com.intellij.ui.components.JBScrollPane;
-import java.awt.Component;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
 import javax.swing.table.TableModel;
 import org.junit.Rule;
 import org.junit.Test;
@@ -75,11 +76,17 @@ public final class GoogleCloudApiSelectorPanelTest {
 
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
+  @TestModule private Module module1;
+  @TestModule private Module module2;
+
+  @TestFixture private IdeaProjectTestFixture testFixture;
+
   @Test
   public void getPanel_withOneLibrary_noSelection_hasCheckboxAndEmptyDetails() {
     CloudLibrary library = LIBRARY_1.toCloudLibrary();
 
-    GoogleCloudApiSelectorPanel panel = new GoogleCloudApiSelectorPanel(ImmutableList.of(library));
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
 
     assertThat(table.getSelectionModel().isSelectionEmpty()).isTrue();
@@ -89,15 +96,15 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat(model.getValueAt(0, 0)).isEqualTo(library);
     assertThat((Boolean) model.getValueAt(0, 1)).isFalse();
 
-    JPanel detailsPanel = getDetailsPanel(panel);
-    assertDetailsEmpty(detailsPanel);
+    assertDetailsEmpty(panel.getDetailsPanel());
   }
 
   @Test
   public void getPanel_withOneLibrary_selectedLibrary_hasCheckboxAndPopulatedDetails() {
     CloudLibrary library = LIBRARY_1.toCloudLibrary();
 
-    GoogleCloudApiSelectorPanel panel = new GoogleCloudApiSelectorPanel(ImmutableList.of(library));
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
     checkCheckbox(table, 0);
 
@@ -108,15 +115,15 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat(model.getValueAt(0, 0)).isEqualTo(library);
     assertThat((Boolean) model.getValueAt(0, 1)).isTrue();
 
-    JPanel detailsPanel = getDetailsPanel(panel);
-    assertDetailsShownForLibrary(detailsPanel, LIBRARY_1, JAVA_CLIENT_1);
+    assertDetailsShownForLibrary(panel.getDetailsPanel(), LIBRARY_1, JAVA_CLIENT_1);
   }
 
   @Test
   public void getPanel_withOneLibrary_focusedLibrary_hasUncheckedCheckboxAndPopulatedDetails() {
     CloudLibrary library = LIBRARY_1.toCloudLibrary();
 
-    GoogleCloudApiSelectorPanel panel = new GoogleCloudApiSelectorPanel(ImmutableList.of(library));
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
     table.setRowSelectionInterval(0, 0);
 
@@ -127,8 +134,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat(model.getValueAt(0, 0)).isEqualTo(library);
     assertThat((Boolean) model.getValueAt(0, 1)).isFalse();
 
-    JPanel detailsPanel = getDetailsPanel(panel);
-    assertDetailsShownForLibrary(detailsPanel, LIBRARY_1, JAVA_CLIENT_1);
+    assertDetailsShownForLibrary(panel.getDetailsPanel(), LIBRARY_1, JAVA_CLIENT_1);
   }
 
   @Test
@@ -138,7 +144,8 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     // The given list should be reordered by the name's natural order, placing library1 first.
     GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(library2, library1));
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library2, library1), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
 
     assertThat(table.getSelectionModel().isSelectionEmpty()).isTrue();
@@ -150,8 +157,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat((Boolean) model.getValueAt(0, 1)).isFalse();
     assertThat((Boolean) model.getValueAt(1, 1)).isFalse();
 
-    JPanel detailsPanel = getDetailsPanel(panel);
-    assertDetailsEmpty(detailsPanel);
+    assertDetailsEmpty(panel.getDetailsPanel());
   }
 
   @Test
@@ -161,7 +167,8 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     // The given list should be reordered by the name's natural order, placing library1 first.
     GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(library2, library1));
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library2, library1), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
 
     // Checks the second row's checkbox, which should be library2.
@@ -177,8 +184,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat((Boolean) model.getValueAt(0, 1)).isFalse();
     assertThat((Boolean) model.getValueAt(1, 1)).isTrue();
 
-    JPanel detailsPanel = getDetailsPanel(panel);
-    assertDetailsShownForLibrary(detailsPanel, LIBRARY_2, JAVA_CLIENT_2);
+    assertDetailsShownForLibrary(panel.getDetailsPanel(), LIBRARY_2, JAVA_CLIENT_2);
   }
 
   @Test
@@ -188,7 +194,8 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     // The given list should be reordered by the name's natural order, placing library1 first.
     GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(library2, library1));
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library2, library1), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
 
     checkCheckbox(table, 1);
@@ -204,8 +211,103 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat((Boolean) model.getValueAt(0, 1)).isTrue();
     assertThat((Boolean) model.getValueAt(1, 1)).isTrue();
 
-    JPanel detailsPanel = getDetailsPanel(panel);
-    assertDetailsShownForLibrary(detailsPanel, LIBRARY_1, JAVA_CLIENT_1);
+    assertDetailsShownForLibrary(panel.getDetailsPanel(), LIBRARY_1, JAVA_CLIENT_1);
+  }
+
+  @Test
+  public void getSelectedModule_withNoneSelected_returnsDefaultModule() {
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+
+    // The order is determined by the call to Project.getSortedModules(), which returns module2
+    // before module1. It is deterministic, though, so there is no issue testing for direct equality
+    // here.
+    assertThat(panel.getSelectedModule()).isEqualTo(module2);
+  }
+
+  @Test
+  public void getSelectedModule_withModuleSelected_returnsSelectedModule() {
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+
+    panel.getModulesComboBox().setSelectedModule(module1);
+
+    assertThat(panel.getSelectedModule()).isEqualTo(module1);
+  }
+
+  @Test
+  public void getSelectedModule_withNoModulesInProject_returnsNull() {
+    // Disposes the modules created by the CloudToolsRule.
+    ModuleManager moduleManager = ModuleManager.getInstance(testFixture.getProject());
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              moduleManager.disposeModule(module1);
+              moduleManager.disposeModule(module2);
+            });
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+
+    assertThat(panel.getSelectedModule()).isNull();
+  }
+
+  @Test
+  public void getSelectedLibraries_withNoneSelected_returnsEmptySet() {
+    CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
+    CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library1, library2), testFixture.getProject());
+
+    assertThat(panel.getSelectedLibraries()).isEmpty();
+  }
+
+  @Test
+  public void getSelectedLibraries_withOneFocused_returnsEmptySet() {
+    CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
+    CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library1, library2), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+
+    table.setRowSelectionInterval(0, 0);
+
+    assertThat(panel.getSelectedLibraries()).isEmpty();
+  }
+
+  @Test
+  public void getSelectedLibraries_withOneSelected_returnsLibrary() {
+    CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
+    CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library1, library2), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+
+    checkCheckbox(table, 0);
+
+    assertThat(panel.getSelectedLibraries()).containsExactly(library1);
+  }
+
+  @Test
+  public void getSelectedLibraries_withSomeSelected_returnsLibraries() {
+    CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
+    CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library1, library2), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+
+    checkCheckbox(table, 0);
+    checkCheckbox(table, 1);
+
+    assertThat(panel.getSelectedLibraries()).containsExactly(library1, library2);
   }
 
   /**
@@ -224,16 +326,16 @@ public final class GoogleCloudApiSelectorPanelTest {
    *
    * @param panel the {@link JPanel} for the details view to assert on
    */
-  private static void assertDetailsEmpty(JPanel panel) {
+  private static void assertDetailsEmpty(GoogleCloudApiDetailsPanel panel) {
     TestCloudLibrary emptyLibrary = TestCloudLibrary.createEmpty();
     assertDetailsShownForLibrary(panel, emptyLibrary, emptyLibrary.clients().get(0));
   }
 
   /**
-   * Asserts the given {@link JPanel} shows the proper details for the given {@link
-   * TestCloudLibrary} and {@link TestCloudLibraryClient}.
+   * Asserts the given {@link GoogleCloudApiDetailsPanel} shows the proper details for the given
+   * {@link TestCloudLibrary} and {@link TestCloudLibraryClient}.
    *
-   * @param panel the {@link JPanel} for the details view to assert on
+   * @param panel the {@link GoogleCloudApiDetailsPanel} for the details view to assert on
    * @param library the {@link TestCloudLibrary} whose details should be shown. If using {@link
    *     TestCloudLibrary#createEmpty()}, this method will assert the corresponding fields are
    *     empty.
@@ -242,34 +344,26 @@ public final class GoogleCloudApiSelectorPanelTest {
    *     empty.
    */
   private static void assertDetailsShownForLibrary(
-      JPanel panel, TestCloudLibrary library, TestCloudLibraryClient client) {
-    Component[] components = panel.getComponents();
-    JLabel icon = (JLabel) components[0];
-    JLabel nameLabel = (JLabel) components[1];
-    JLabel versionLabel = (JLabel) components[2];
-    JLabel statusLabel = (JLabel) components[3];
-    JTextPane descriptionTextPane = (JTextPane) ((JPanel) components[4]).getComponents()[0];
-    JTextPane linksTextPane = (JTextPane) ((JPanel) components[5]).getComponents()[0];
-
-    assertThat(nameLabel.getText()).isEqualTo(library.name());
-    assertThat(descriptionTextPane.getText()).isEqualTo(library.description());
+      GoogleCloudApiDetailsPanel panel, TestCloudLibrary library, TestCloudLibraryClient client) {
+    assertThat(panel.getNameLabel().getText()).isEqualTo(library.name());
+    assertThat(panel.getDescriptionTextPane().getText()).isEqualTo(library.description());
 
     String expectedVersion =
         client.mavenCoordinates().version().isEmpty()
             ? ""
             : "Version: " + client.mavenCoordinates().version();
-    assertThat(versionLabel.getText()).isEqualTo(expectedVersion);
+    assertThat(panel.getVersionLabel().getText()).isEqualTo(expectedVersion);
 
     String expectedStatus = client.launchStage().isEmpty() ? "" : "Status: " + client.launchStage();
-    assertThat(statusLabel.getText()).isEqualTo(expectedStatus);
+    assertThat(panel.getStatusLabel().getText()).isEqualTo(expectedStatus);
 
-    Map<String, String> actualUrlMap = buildActualUrlMap(linksTextPane.getText());
+    Map<String, String> actualUrlMap = buildActualUrlMap(panel.getLinksTextPane().getText());
     Map<String, String> expectedUrlMap = buildExpectedUrlMap(library, client);
     assertThat(actualUrlMap).containsExactlyEntriesIn(expectedUrlMap);
 
     // TODO(nkibler): Consider refactoring the details panel to allow unit tests to inject fake
     // icons. Until then, this will always be null.
-    assertThat(icon.getIcon()).isNull();
+    assertThat(panel.getIcon().getIcon()).isNull();
   }
 
   /**
@@ -311,20 +405,5 @@ public final class GoogleCloudApiSelectorPanelTest {
       mapBuilder.put(matcher.group(2), matcher.group(1));
     }
     return mapBuilder.build();
-  }
-
-  /**
-   * Returns the {@link JPanel} that represents the API library details pane in the given {@link
-   * GoogleCloudApiSelectorPanel}.
-   *
-   * @param panel the {@link GoogleCloudApiSelectorPanel} to return the details panel for
-   */
-  private static JPanel getDetailsPanel(GoogleCloudApiSelectorPanel panel) {
-    Component[] panelChildren = panel.getPanel().getComponents();
-    assertThat(panelChildren).hasLength(1);
-
-    JBSplitter splitter = (JBSplitter) panelChildren[0];
-    JBScrollPane rightScrollPane = (JBScrollPane) splitter.getSecondComponent();
-    return (JPanel) rightScrollPane.getViewport().getView();
   }
 }
