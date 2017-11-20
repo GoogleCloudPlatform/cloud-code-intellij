@@ -28,11 +28,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.util.ui.JBUI;
 
-import java.awt.Image;
-
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 /** Action to open the Google Login panel. */
@@ -61,7 +57,7 @@ public class GoogleLoginAction extends AnAction implements DumbAware, RightAlign
     } else {
       presentation.setText(activeUser.getEmail());
     }
-    presentation.setIcon(CredentialedUserScaledIcon.getScaledUserIcon(ICON_SIZE, activeUser));
+    presentation.setIcon(GoogleLoginIcons.getScaledUserIcon(ICON_SIZE, activeUser));
   }
 
   /** Opens up the Google Login panel as a popup. */

@@ -16,9 +16,13 @@
 
 package com.google.cloud.tools.intellij.login.ui;
 
+import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.intellij.openapi.util.IconLoader;
 
+import com.intellij.util.ui.JBUI;
+import java.awt.Image;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 /**
  * A utility class that loads the icons that are used by the Google Login plugin.
@@ -52,5 +56,20 @@ public final class GoogleLoginIcons {
 
   private GoogleLoginIcons() {
     // This utility class should not be instantiated.
+  }
+
+  /** Provides scaled icon for {@link com.google.cloud.tools.intellij.login.CredentialedUser}. */
+  public static Icon getScaledUserIcon(int size, CredentialedUser user) {
+    Icon icon = DEFAULT_USER_AVATAR;
+    if (user != null) {
+      Image userImage = user.getPicture();
+      if (userImage != null) {
+        int targetIconSize = JBUI.scale(size);
+        Image scaledUserImage = userImage.getScaledInstance(targetIconSize, targetIconSize, Image.SCALE_SMOOTH);
+        icon = new ImageIcon(scaledUserImage);
+      }
+    }
+
+    return icon;
   }
 }

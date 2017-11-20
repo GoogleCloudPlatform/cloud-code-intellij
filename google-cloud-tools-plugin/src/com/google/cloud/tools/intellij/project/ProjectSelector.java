@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.project;
 
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
-import com.google.cloud.tools.intellij.login.ui.CredentialedUserScaledIcon;
+import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
@@ -140,7 +140,7 @@ public class ProjectSelector extends JPanel {
           selection.getUser().getName() + " (" + selection.getUser().getEmail() + ")");
 
       accountInfoLabel.setIcon(
-          CredentialedUserScaledIcon.getScaledUserIcon(ACCOUNT_ICON_SIZE, selection.getUser()));
+          GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, selection.getUser()));
     }
   }
 

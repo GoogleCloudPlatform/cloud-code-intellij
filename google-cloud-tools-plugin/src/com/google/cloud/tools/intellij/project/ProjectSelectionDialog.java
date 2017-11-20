@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.project;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.ui.CredentialedUserScaledIcon;
+import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.ui.ComboBox;
@@ -83,7 +83,7 @@ public class ProjectSelectionDialog extends DialogWrapper {
     setTitle(GctBundle.getString("project.selector.dialog.title"));
   }
 
-  // IntelliJ API - creates actions (converted to buttons) for "left side" of the dialog.
+  // IntelliJ API - creates actions (buttons) for "left side" of the dialog bottom panel.
   @NotNull
   @Override
   protected Action[] createLeftSideActions() {
@@ -174,7 +174,7 @@ public class ProjectSelectionDialog extends DialogWrapper {
         JList list, CredentialedUser user, int index, boolean selected, boolean hasFocus) {
       setText(user.getName() + " (" + user.getEmail() + ")");
       setIcon(
-          CredentialedUserScaledIcon.getScaledUserIcon(ProjectSelector.ACCOUNT_ICON_SIZE, user));
+          GoogleLoginIcons.getScaledUserIcon(ProjectSelector.ACCOUNT_ICON_SIZE, user));
     }
   }
 }
