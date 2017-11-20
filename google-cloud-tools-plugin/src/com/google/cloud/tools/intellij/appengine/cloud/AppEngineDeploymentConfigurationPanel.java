@@ -115,11 +115,10 @@ public final class AppEngineDeploymentConfigurationPanel {
     promoteCheckbox.setSelected(configuration.isPromote());
     versionIdField.setText(configuration.getVersion());
     projectSelector.setText(configuration.getCloudProjectName());
-    Project project = new Project();
-    project.setName(configuration.getCloudProjectName());
-    project.setProjectId("ID");
-    CredentialedUser user = Services.getLoginService().getActiveUser();
-    projectSelectorNew.setSelectedProject(new CloudProject(project, user));
+
+    // TODO remove before review.
+    projectSelectorNew.setSelectedProject(new CloudProject(configuration.getCloudProjectName(), configuration.getGoogleUsername()));
+
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
 

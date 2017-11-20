@@ -19,6 +19,6 @@ package com.google.cloud.tools.intellij.project;
 /** Interface that must be implemented in order to be informed of project selection changes. */
 public interface ProjectSelectionListener {
 
-  /** @param cloudProject new project selection or null if nothing was selected. */
+  /** @param cloudProject new project selection. Not called if project was not selected. */
   void projectSelected(CloudProject cloudProject);
 }

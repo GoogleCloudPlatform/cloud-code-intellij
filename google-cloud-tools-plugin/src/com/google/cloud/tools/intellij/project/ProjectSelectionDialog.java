@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.project;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -27,6 +28,7 @@ import com.intellij.ui.table.JBTable;
 import git4idea.DialogManager;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -55,7 +57,7 @@ public class ProjectSelectionDialog extends DialogWrapper {
   private CloudProject cloudProject;
   private ProjectListTableModel projectListTableModel;
 
-  private ProjectSelectionDialog(Component parent) {
+   ProjectSelectionDialog(Component parent) {
     super(parent, false);
     init();
   }
@@ -63,18 +65,16 @@ public class ProjectSelectionDialog extends DialogWrapper {
   /**
    * Creates and shows modal dialog to select project/account. Blocks EDT until choice is made.
    *
-   * @param parent Parent component for the dialog.
    * @param cloudProject Current project selection to populate dialog UI state.
    * @return New project selection or null if user cancels.
    */
   @Nullable
-  static CloudProject showDialog(
-      Component parent, @Nullable CloudProject cloudProject) {
-    ProjectSelectionDialog selectionDialog = new ProjectSelectionDialog(parent);
-    selectionDialog.setCloudProject(cloudProject);
-    DialogManager.show(selectionDialog);
-    int result = selectionDialog.getExitCode();
-    return result == OK_EXIT_CODE ? selectionDialog.getCloudProject() : null;
+  CloudProject showDialog(@Nullable CloudProject cloudProject) {
+    loadUsersAndProjects();
+    setCloudProject(cloudProject);
+    DialogManager.show(this);
+    int result = getExitCode();
+    return result == OK_EXIT_CODE ? getCloudProject() : null;
   }
 
   @Override
@@ -113,10 +113,16 @@ public class ProjectSelectionDialog extends DialogWrapper {
     return cloudProject;
   }
 
+  private void loadUsersAndProjects() {
+
+  }
+
   private void updateProjectAccountInformation() {
     if (cloudProject != null) {
-      accountComboBox.addItem(cloudProject.getUser());
-      filterTextField.setText(cloudProject.getProject().getName());
+      Optional<CredentialedUser> loggedInUser =
+          Services.getLoginService().getLoggedInUser(cloudProject.getGoogleUsername());
+      loggedInUser.ifPresent(credentialedUser -> accountComboBox.addItem(credentialedUser));
+      filterTextField.setText(cloudProject.getProjectName());
       projectListTableModel.fireTableDataChanged();
     }
   }

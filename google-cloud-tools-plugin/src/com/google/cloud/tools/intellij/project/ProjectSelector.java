@@ -16,15 +16,20 @@
 
 package com.google.cloud.tools.intellij.project;
 
+import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
+import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.ui.components.JBLabel;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -32,9 +37,10 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 /**
- * ProjectSelector allows the user to select a GCP project id. It calls into {@link
- * IntellijGoogleLoginService} to get the set of credentialed users and then into resource manager
- * to get the set of projects.
+ * ProjectSelector allows the user to select a GCP project id. It shows selected project name and
+ * user account information. To change selection it uses {@link ProjectSelectionDialog} to call into
+ * {@link IntellijGoogleLoginService} to get the set of credentialed users and then into resource
+ * manager to get the set of projects.
  */
 public class ProjectSelector extends JPanel {
   static final int ACCOUNT_ICON_SIZE = 16;
@@ -116,8 +122,10 @@ public class ProjectSelector extends JPanel {
     add(componentWithBrowseButton);
   }
 
-  private void handleOpenProjectSelectionDialog() {
-    CloudProject newSelection = ProjectSelectionDialog.showDialog(this, cloudProject);
+  @VisibleForTesting
+  void handleOpenProjectSelectionDialog() {
+    ProjectSelectionDialog projectSelectionDialog = createProjectSelectionDialog(this);
+    CloudProject newSelection = projectSelectionDialog.showDialog(cloudProject);
 
     // if null, it means no change or user cancelled selection dialog - no update required.
     if (newSelection != null) {
@@ -134,17 +142,44 @@ public class ProjectSelector extends JPanel {
       projectAccountSeparatorLabel.setVisible(false);
 
     } else {
-      projectNameLabel.setText(selection.getProject().getName());
+      projectNameLabel.setText(selection.getProjectName());
       projectAccountSeparatorLabel.setVisible(true);
-      accountInfoLabel.setText(
-          selection.getUser().getName() + " (" + selection.getUser().getEmail() + ")");
+      // first just show account email, then expand with name/picture if this account is signed in
+      // to.
+      accountInfoLabel.setText(selection.getGoogleUsername());
+      Optional<CredentialedUser> loggedInUser =
+          Services.getLoginService().getLoggedInUser(selection.getGoogleUsername());
+      if (loggedInUser.isPresent()) {
+        accountInfoLabel.setText(
+            loggedInUser.get().getName() + " (" + loggedInUser.get().getEmail() + ")");
 
-      accountInfoLabel.setIcon(
-          GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, selection.getUser()));
+        accountInfoLabel.setIcon(
+            GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, loggedInUser.get()));
+      }
     }
   }
 
   private void notifyProjectSelectionListeners() {
     projectSelectionListeners.forEach(listener -> listener.projectSelected(cloudProject));
+  }
+
+  @VisibleForTesting
+  ProjectSelectionDialog createProjectSelectionDialog(Component parent) {
+    return new ProjectSelectionDialog(this);
+  }
+
+  @VisibleForTesting
+  JBLabel getProjectNameLabel() {
+    return projectNameLabel;
+  }
+
+  @VisibleForTesting
+  JBLabel getAccountInfoLabel() {
+    return accountInfoLabel;
+  }
+
+  @VisibleForTesting
+  JBLabel getProjectAccountSeparatorLabel() {
+    return projectAccountSeparatorLabel;
   }
 }

@@ -16,24 +16,21 @@
 
 package com.google.cloud.tools.intellij.project;
 
-import com.google.api.services.cloudresourcemanager.model.Project;
-import com.google.cloud.tools.intellij.login.CredentialedUser;
-
 /** GCP project and account. */
 public class CloudProject {
-  private final Project project;
-  private final CredentialedUser user;
+  private final String projectName;
+  private final String googleUsername;
 
-  public CloudProject(Project project, CredentialedUser user) {
-    this.project = project;
-    this.user = user;
+  public CloudProject(String projectName, String googleUsername) {
+    this.projectName = projectName;
+    this.googleUsername = googleUsername;
   }
 
-  public Project getProject() {
-    return project;
+  public String getProjectName() {
+    return projectName;
   }
 
-  public CredentialedUser getUser() {
-    return user;
+  public String getGoogleUsername() {
+    return googleUsername;
   }
 }
