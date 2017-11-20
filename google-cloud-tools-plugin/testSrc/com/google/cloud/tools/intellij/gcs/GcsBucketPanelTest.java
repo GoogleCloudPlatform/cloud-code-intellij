@@ -21,7 +21,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.login.GoogleLoginService;
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
@@ -38,7 +38,9 @@ public class GcsBucketPanelTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
 
-  @Mock @TestService private GoogleLoginService loginService;
+  @Mock
+  @TestService
+  private IntegratedGoogleLoginService loginService;
   @Mock @TestService private GoogleApiClientFactory apiFactory;
   @Mock private ProjectSelector projectSelector;
 

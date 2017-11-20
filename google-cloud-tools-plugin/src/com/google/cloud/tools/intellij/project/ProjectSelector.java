@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.project;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -39,8 +38,8 @@ import javax.swing.UIManager;
 /**
  * ProjectSelector allows the user to select a GCP project id. It shows selected project name and
  * user account information. To change selection it uses {@link ProjectSelectionDialog} to call into
- * {@link IntellijGoogleLoginService} to get the set of credentialed users and then into resource
- * manager to get the set of projects.
+ * {@link com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService} to get the set
+ * of credentialed users and then into resource manager to get the set of projects.
  */
 public class ProjectSelector extends JPanel {
   static final int ACCOUNT_ICON_SIZE = 16;

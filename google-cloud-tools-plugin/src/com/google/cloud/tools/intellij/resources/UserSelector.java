@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,17 @@ package com.google.cloud.tools.intellij.resources;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IGoogleLoginCompletedCallback;
-import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
+import com.google.cloud.tools.intellij.login.IntegratedIntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginEmptyPanel;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBList;
-
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -41,7 +37,6 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -51,6 +46,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A custom combobox that allows the user to select a GoogleLogin and also signin/add-account all
@@ -73,7 +69,7 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
    * Returns the selected credentialed user for the project id represented by getText(). Note that
    * if the ProjectSelector is created with queryOnExpand, this value could be {@code null} even if
    * {@link #getText()} represents a valid project because the user has not expanded the owning
-   * {@link IntellijGoogleLoginService}.
+   * {@link IntegratedIntellijGoogleLoginService}.
    */
   @Nullable
   public CredentialedUser getSelectedUser() {

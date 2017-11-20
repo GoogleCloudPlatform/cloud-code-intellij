@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.GoogleLoginService;
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import java.util.LinkedHashMap;
@@ -31,11 +31,11 @@ import org.junit.Test;
 public class CloudDebugProcessHandlerTest extends BasePluginTestCase {
 
     private CloudDebugProcessHandler handler;
-    private GoogleLoginService mockLoginService = mock(GoogleLoginService.class);
+  private IntegratedGoogleLoginService mockLoginService = mock(IntegratedGoogleLoginService.class);
 
     @Before
     public void setUp() throws Exception {
-        registerService(GoogleLoginService.class, mockLoginService);
+      registerService(IntegratedGoogleLoginService.class, mockLoginService);
 
         setupMocks();
     }
