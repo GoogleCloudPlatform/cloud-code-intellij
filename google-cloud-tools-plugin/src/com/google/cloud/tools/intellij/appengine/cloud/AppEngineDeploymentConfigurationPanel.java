@@ -16,27 +16,25 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.tree.TreeModelAdapter;
-
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.TreeModelEvent;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * Common App Engine deployment configuration UI shared by flexible and standard deployments.
- */
+/** Common App Engine deployment configuration UI shared by flexible and standard deployments. */
 public final class AppEngineDeploymentConfigurationPanel {
 
   private JPanel commonConfigPanel;
@@ -87,8 +85,6 @@ public final class AppEngineDeploymentConfigurationPanel {
     appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appEngineCostWarningLabel.setHyperlinkTarget(CloudSdkAppEngineHelper.APP_ENGINE_BILLING_URL);
 
-    projectSelector.addProjectSelectionListener(applicationInfoPanel::refresh);
-
     projectSelector.addModelListener(
         new TreeModelAdapter() {
           @Override
@@ -97,32 +93,50 @@ public final class AppEngineDeploymentConfigurationPanel {
             refreshApplicationInfoPanel();
           }
         });
+    projectSelector.addTextChangedListener(
+        new DocumentAdapter() {
+          @Override
+          protected void textChanged(DocumentEvent e) {
+            refreshApplicationInfoPanel();
+          }
+        });
   }
 
   /**
-   * Shared implementation of
-   * {@link com.intellij.openapi.options.SettingsEditor#resetEditorFrom(Object)}. To be invoked
-   * by users of this panel in the overriden method.
+   * Shared implementation of {@link
+   * com.intellij.openapi.options.SettingsEditor#resetEditorFrom(Object)}. To be invoked by users of
+   * this panel in the overriden method.
    */
   public void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     promoteCheckbox.setSelected(configuration.isPromote());
     versionIdField.setText(configuration.getVersion());
-    stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     projectSelector.setText(configuration.getCloudProjectName());
+    stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
+    deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
+
+    if (configuration.getEnvironment() != null) {
+      environmentLabel.setText(configuration.getEnvironment().localizedLabel());
+    }
 
     refreshApplicationInfoPanel();
   }
 
   /**
-   * Shared implementation of
-   * {@link com.intellij.openapi.options.SettingsEditor#applyEditorTo(Object)}. To be invoked
-   * by users of this panel in the overriden method.
+   * Shared implementation of {@link
+   * com.intellij.openapi.options.SettingsEditor#applyEditorTo(Object)}. To be invoked by users of
+   * this panel in the overriden method.
    */
   public void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     configuration.setVersion(versionIdField.getText());
     configuration.setPromote(promoteCheckbox.isSelected());
     configuration.setCloudProjectName(projectSelector.getText());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
+    configuration.setDeployAllConfigs(deployAllConfigsCheckbox.isSelected());
+
+    CredentialedUser user = getProjectSelector().getSelectedUser();
+    if (user != null) {
+      configuration.setGoogleUsername(user.getEmail());
+    }
   }
 
   /**
@@ -132,19 +146,28 @@ public final class AppEngineDeploymentConfigurationPanel {
   public void setDeploymentProjectAndVersion(DeploymentSource deploymentSource) {
     if (deploymentSource instanceof AppEngineDeployable) {
       ((AppEngineDeployable) deploymentSource).setProjectName(projectSelector.getText());
-      ((AppEngineDeployable) deploymentSource).setVersion(
-          Strings.isNullOrEmpty(versionIdField.getText()) ? "auto" : versionIdField.getText());
+      ((AppEngineDeployable) deploymentSource)
+          .setVersion(
+              Strings.isNullOrEmpty(versionIdField.getText()) ? "auto" : versionIdField.getText());
     }
   }
 
+  /**
+   * Updates the text of the panel as follows:
+   *   if the project text box is empty, no message is displayed,
+   *   if the project text represents a valid project, the project details are displayed,
+   *   if the project text represents an invalid project, an error message is displayed.
+   */
   private void refreshApplicationInfoPanel() {
-    if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
+    if (Strings.isNullOrEmpty(projectSelector.getText())) {
+      applicationInfoPanel.clearMessage();
+    } else if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
       applicationInfoPanel.refresh(
           projectSelector.getProject().getProjectId(),
           projectSelector.getSelectedUser().getCredential());
     } else {
       applicationInfoPanel.setMessage(
-          GctBundle.getString("appengine.infopanel.noproject"), true /* isError*/);
+          GctBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
     }
   }
 
@@ -188,5 +211,10 @@ public final class AppEngineDeploymentConfigurationPanel {
   @VisibleForTesting
   public void setApplicationInfoPanel(AppEngineApplicationInfoPanel applicationInfoPanel) {
     this.applicationInfoPanel = applicationInfoPanel;
+  }
+
+  @VisibleForTesting
+  public JBTextField getVersionIdField() {
+    return versionIdField;
   }
 }

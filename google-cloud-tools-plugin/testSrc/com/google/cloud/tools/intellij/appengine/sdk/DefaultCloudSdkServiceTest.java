@@ -20,7 +20,6 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
@@ -28,18 +27,16 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Set;
 
 /**
  * Unit tests for {@link DefaultCloudSdkService}
@@ -67,7 +64,6 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
   @Test
   public void testValidateCloudSdk_cloudSdkNotFound() throws  IOException {
-    when(mockSdk.getVersion()).thenReturn(supportedVersion);
     doThrow(CloudSdkNotFoundException.class).when(mockSdk).validateCloudSdk();
     Set<CloudSdkValidationResult> results = service.validateCloudSdk();
     assertEquals(1, results.size());

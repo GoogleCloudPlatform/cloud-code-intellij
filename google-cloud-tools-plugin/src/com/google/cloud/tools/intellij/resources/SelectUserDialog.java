@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,23 @@
 package com.google.cloud.tools.intellij.resources;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.cloud.tools.intellij.login.IntellijGoogleLoginService;
+import com.google.cloud.tools.intellij.login.IntegratedIntellijGoogleLoginService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
-
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.DocumentAdapter;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.Dimension;
 import java.awt.Window;
-
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * A dialog that prompts the user to select a {@link IntellijGoogleLoginService} or click "Login
- * Manually" to continue without {@link IntellijGoogleLoginService} credentials.
+ * A dialog that prompts the user to select a {@link IntegratedIntellijGoogleLoginService} or click "Login
+ * Manually" to continue without {@link IntegratedIntellijGoogleLoginService} credentials.
  */
 public class SelectUserDialog extends DialogWrapper {
 

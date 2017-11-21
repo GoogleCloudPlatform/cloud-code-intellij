@@ -19,10 +19,10 @@ package com.google.cloud.tools.intellij.appengine.application;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -46,19 +46,16 @@ import com.google.api.services.appengine.v1.model.Status;
 import com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService.AppEngineApplicationNotFoundException;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 
 /**
@@ -90,8 +87,8 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
 
     String projectId = "my-project";
     assertEquals(result, service.getApplicationForProjectId(projectId, mock(Credential.class)));
-    verify(appengineClientMock.apps(), times(1)).get(eq(projectId));
-    verify(appengineClientMock.getAppsGetQuery(), times(1)).execute();
+    verify(appengineClientMock.apps()).get(eq(projectId));
+    verify(appengineClientMock.getAppsGetQuery()).execute();
 
     // make the call again, and assert that the cached result is returned without calling the API
     service.getApplicationForProjectId(projectId, mock(Credential.class));
@@ -159,14 +156,9 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
     verify(appengineClientMock.apps(), times(1))
         .create(
             argThat(
-                new ArgumentMatcher<Application>() {
-                  @Override
-                  public boolean matches(Object argument) {
-                    Application application = (Application) argument;
-                    return application.getId().equals(projectId)
-                        && application.getLocationId().equals(locationId);
-                  }
-                }));
+                application ->
+                    application.getId().equals(projectId)
+                        && application.getLocationId().equals(locationId)));
 
     // ensure the 'createApplication' API call was only made once
     verify(appengineClientMock.getAppsCreateQuery(), times(1)).execute();
@@ -233,7 +225,7 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
     response2.setLocations(locationsPage2);
     response2.setNextPageToken(null);
 
-    when(appengineClientMock.getAppsLocationsListQuery().setPageToken(anyString()))
+    when(appengineClientMock.getAppsLocationsListQuery().setPageToken(any()))
         .thenReturn(appengineClientMock.getAppsLocationsListQuery());
     when(appengineClientMock.getAppsLocationsListQuery().execute()).thenReturn(response1);
 

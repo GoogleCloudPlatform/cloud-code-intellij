@@ -19,6 +19,8 @@
       <module name="common-test-lib_test" target="1.8" />
       <module name="google-account-plugin_main" target="1.8" />
       <module name="google-account-plugin_test" target="1.8" />
+      <module name="google-account_main" target="1.8" />
+      <module name="google-account_test" target="1.8" />
       <module name="google-cloud-tools-plugin_main" target="1.8" />
       <module name="google-cloud-tools-plugin_test" target="1.8" />
       <module name="ultimate_main" target="1.8" />

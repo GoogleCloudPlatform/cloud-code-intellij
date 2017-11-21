@@ -346,6 +346,11 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return settings.getEnvironment();
   }
 
+  @Override
+  public List<String> getAdditionalArguments() {
+    return ImmutableList.of();
+  }
+
   public void setEnvironment(Map<String, String> environment) {
     settings.setEnvironment(environment);
   }

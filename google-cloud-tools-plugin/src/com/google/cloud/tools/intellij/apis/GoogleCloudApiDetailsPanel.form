@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.google.cloud.tools.intellij.apis.GoogleCloudApiDetailsPanel">
+  <grid id="27dc6" binding="panel" layout-manager="FormLayout">
+    <rowspec value="center:p:noGrow"/>
+    <rowspec value="center:p:noGrow"/>
+    <rowspec value="center:p:noGrow"/>
+    <rowspec value="center:p:noGrow"/>
+    <rowspec value="center:p:noGrow"/>
+    <rowspec value="center:p:noGrow"/>
+    <rowspec value="center:p:noGrow"/>
+    <colspec value="fill:d:grow"/>
+    <constraints>
+      <xy x="26" y="20" width="494" height="417"/>
+    </constraints>
+    <properties/>
+    <border type="empty">
+      <size top="25" left="25" bottom="25" right="25"/>
+    </border>
+    <children>
+      <component id="38de" class="javax.swing.JLabel" binding="icon">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="afe6c" class="javax.swing.JLabel" binding="nameLabel">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="2" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <forms top="15" left="0" bottom="0" right="0"/>
+        </constraints>
+        <properties>
+          <font size="20"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="9b3aa" class="javax.swing.JLabel" binding="versionLabel">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <forms top="15" left="0" bottom="0" right="0"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="83d58" class="javax.swing.JLabel" binding="statusLabel">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <forms top="15" left="0" bottom="0" right="0"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
+      <grid id="c0909" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="15" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="3f488" class="javax.swing.JTextPane" binding="descriptionTextPane" custom-create="true">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="0" height="0"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+              <font swing-font="Label.font"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <text value=""/>
+            </properties>
+            <clientProperties>
+              <JEditorPane.honorDisplayProperties class="java.lang.Boolean" value="true"/>
+            </clientProperties>
+          </component>
+        </children>
+      </grid>
+      <grid id="d7866" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="15" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="e91e7" class="javax.swing.JTextPane" binding="linksTextPane" custom-create="true">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="50"/>
+              </grid>
+            </constraints>
+            <properties>
+              <contentType value="text/html"/>
+              <editable value="false"/>
+              <font swing-font="Label.font"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+            </properties>
+            <clientProperties>
+              <JEditorPane.honorDisplayProperties class="java.lang.Boolean" value="true"/>
+            </clientProperties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
+import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
-import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
@@ -26,10 +26,8 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-import com.google.cloud.tools.intellij.stats.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
-
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
@@ -54,17 +52,14 @@ import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerCon
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
 import com.intellij.util.containers.ContainerUtil;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Adds Flexible support to new or existing IJ modules.
@@ -164,12 +159,9 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
         .filter(runConfig -> runConfig instanceof DeployToServerRunConfiguration)
         .map(runConfig -> ((DeployToServerRunConfiguration) runConfig).getDeploymentConfiguration())
         .filter(deployConfig -> deployConfig instanceof AppEngineDeploymentConfiguration)
-        .anyMatch(deployConfig -> {
-          String environment
-              = ((AppEngineDeploymentConfiguration) deployConfig).getEnvironment();
-
-          return AppEngineEnvironment.APP_ENGINE_FLEX.name().equals(environment);
-        });
+        .anyMatch(
+            deployConfig ->
+                ((AppEngineDeploymentConfiguration) deployConfig).getEnvironment().isFlexible());
   }
 
   static class AppEngineFlexibleSupportConfigurable extends FrameworkSupportInModuleConfigurable {

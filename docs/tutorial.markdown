@@ -55,8 +55,6 @@ From inside IDEA:
 
 5. Click the Green Install button.
 
-6. You'll be prompted to also install the "Google Account Plugin."
-
 7. Click Close.
 
 8. Click OK in the Settings dialog.

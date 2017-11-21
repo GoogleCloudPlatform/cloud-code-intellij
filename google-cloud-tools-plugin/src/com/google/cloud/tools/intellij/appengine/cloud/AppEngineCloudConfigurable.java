@@ -17,23 +17,17 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
-
-import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.RemoteServerConfigurable;
-
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.Nullable;
-
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * GCP App Engine Cloud configuration UI.
@@ -82,27 +76,12 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   @Override
   public boolean isModified() {
-    // Forces a modify check so the user is unable to save an invalid Cloud SDK configuration from
-    // Other Settings, on the Clouds menu.
-    return cloudSdkPanel.isModified()
-        || !CloudSdkService.getInstance().isValidCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText());
+    return cloudSdkPanel.isModified();
   }
 
-  /**
-   * Users shouldn't be able to save a cloud configuration without a valid Cloud SDK configured.
-   */
   @Override
   public void apply() throws ConfigurationException {
-    String message = cloudSdkPanel.buildSdkMessage(cloudSdkPanel.getCloudSdkDirectoryText(),
-        false /*htmlEnabled*/);
-
-    if (!StringUtil.isEmpty(message)) {
-      throw new RuntimeConfigurationError(message);
-    }
-    
-    if (cloudSdkPanel != null) {
-      cloudSdkPanel.apply();
-    }
+    cloudSdkPanel.apply();
   }
 
   @Override

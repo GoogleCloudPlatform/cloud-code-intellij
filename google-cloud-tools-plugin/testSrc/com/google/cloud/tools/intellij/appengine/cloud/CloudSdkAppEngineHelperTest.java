@@ -27,21 +27,15 @@ import static org.mockito.Mockito.withSettings;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.GoogleLoginService;
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.common.collect.ImmutableSet;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
-
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-
 import java.io.File;
 import java.io.Reader;
 import java.nio.charset.Charset;
@@ -50,13 +44,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
 
 /** Unit tests for {@link CloudSdkAppEngineHelper} */
 public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
   CloudSdkAppEngineHelper helper;
   @Mock private AppEngineDeploymentConfiguration deploymentConfiguration;
-  @Mock private GoogleLoginService googleLoginService;
+  @Mock
+  private IntegratedGoogleLoginService googleLoginService;
   @Mock private CredentialedUser credentialedUser;
   @Mock private GoogleLoginState loginState;
   @Mock private LoggingHandler loggingHandler;
@@ -68,7 +66,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   public void initialize() {
     helper = new CloudSdkAppEngineHelper(getProject());
 
-    registerService(GoogleLoginService.class, googleLoginService);
+    registerService(IntegratedGoogleLoginService.class, googleLoginService);
     registerService(CloudSdkService.class, sdkService);
   }
 
@@ -78,7 +76,6 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     String clientId = "clientId";
     String clientSecret = "clientSecret";
     String refreshToken = "refreshToken";
-    when(deploymentConfiguration.getGoogleUsername()).thenReturn(username);
     when(googleLoginService.ensureLoggedIn(username)).thenReturn(true);
     when(googleLoginService.getLoggedInUser(username)).thenReturn(Optional.of(credentialedUser));
     when(credentialedUser.getGoogleLoginState()).thenReturn(loginState);
@@ -100,11 +97,11 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
   @Test
   public void testStageCredentials_withoutValidCreds() throws Exception {
     String username = "jones@gmail.com";
-    when(deploymentConfiguration.getGoogleUsername()).thenReturn(username);
     when(googleLoginService.ensureLoggedIn(username)).thenReturn(false);
     assertFalse(helper.stageCredentials(username).isPresent());
   }
 
+  @Test
   public void testCreateDeployRunnerInvalidDeploymentSourceType_returnsNull() {
     Optional<CancellableRunnable> runner = helper.createDeployRunner(
         loggingHandler,

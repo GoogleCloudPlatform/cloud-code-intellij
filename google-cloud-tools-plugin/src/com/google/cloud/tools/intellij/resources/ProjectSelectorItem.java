@@ -18,44 +18,37 @@ package com.google.cloud.tools.intellij.resources;
 
 import com.intellij.ui.UI;
 import com.intellij.ui.components.JBLabel;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.Color;
-
 import javax.swing.BorderFactory;
 import javax.swing.SwingConstants;
 
-/**
- * Represents a single GCP project ui.
- */
-class ProjectSelectorItem extends JBLabel {
+/** Represents a single GCP project ui. */
+final class ProjectSelectorItem extends JBLabel {
 
-  private Color textSelectionColor;
-  private Color textNonSelectionColor;
-  private Color hoverColor;
+  private static final Color BACKGROUND_NON_SELECTION_COLOR = UI.getColor("Tree.textBackground");
+  private static final Color TEXT_SELECTION_COLOR = UI.getColor("");
+  private static final Color TEXT_NON_SELECTION_COLOR = UI.getColor("");
+  private static final Color HOVER_COLOR = UI.getColor("link.foreground");
 
-  public ProjectSelectorItem(@NotNull Color backgroundNonSelectionColor,
-      @NotNull Color textSelectionColor, @NotNull Color textNonSelectionColor) {
+  ProjectSelectorItem() {
     setBorder(BorderFactory.createEmptyBorder(2, 15, 2, 0));
     setOpaque(false);
     setHorizontalAlignment(SwingConstants.LEFT);
     setVerticalAlignment(SwingConstants.CENTER);
-    this.textSelectionColor = textSelectionColor;
-    this.textNonSelectionColor = textNonSelectionColor;
-
-    hoverColor = UI.getColor("link.foreground");
-    setBackground(backgroundNonSelectionColor);
+    setBackground(BACKGROUND_NON_SELECTION_COLOR);
+    setForeground(TEXT_NON_SELECTION_COLOR);
   }
 
-  public void initialize(String projectName, String projectId, boolean selected, boolean hovered) {
-    setText(projectName + " (" + projectId + ")");
+  /**
+   * Renders the project item hovered (takes precedence), selected or plain.
+   */
+  void setRenderStyle(boolean selected, boolean hovered) {
     if (selected) {
-      setForeground(textSelectionColor);
+      setForeground(TEXT_SELECTION_COLOR);
     } else if (hovered) {
-      setForeground(hoverColor);
+      setForeground(HOVER_COLOR);
     } else {
-      setForeground(textNonSelectionColor);
+      setForeground(TEXT_NON_SELECTION_COLOR);
     }
   }
 }

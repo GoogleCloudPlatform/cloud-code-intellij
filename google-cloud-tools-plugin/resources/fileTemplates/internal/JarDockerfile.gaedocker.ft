@@ -1,4 +1,5 @@
 FROM gcr.io/google_appengine/openjdk
-ADD target.jar /app/
+# Replace occurrences of YOUR_ARTIFACT_NAME_HERE with the name of the deployed jar
+ADD YOUR_ARTIFACT_NAME_HERE.jar /app/
 ENTRYPOINT ["/docker-entrypoint.bash"]
-CMD ["java","-jar","/app/target.jar"]
+CMD ["java","-jar","/app/YOUR_ARTIFACT_NAME_HERE.jar"]

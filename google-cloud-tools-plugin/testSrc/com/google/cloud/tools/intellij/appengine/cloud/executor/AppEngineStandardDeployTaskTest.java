@@ -17,8 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -26,45 +25,27 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
-import com.intellij.remoteServer.runtime.log.LoggingHandler;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.mockito.Mock;
 
-/**
- * Unit tests for {@link AppEngineStandardDeployTask}
- */
-@RunWith(MockitoJUnitRunner.class)
-public class AppEngineStandardDeployTaskTest {
-
-  private AppEngineStandardDeployTask task;
-  @Mock
-  AppEngineDeploy deploy;
-  @Mock
-  AppEngineStandardStage stage;
-  @Mock DeploymentOperationCallback callback;
-  @Mock
-  AppEngineDeploymentConfiguration deploymentConfiguration;
-  @Mock
-  AppEngineHelper helper;
-  @Mock ProcessStartListener startListener;
+/** Unit tests for {@link AppEngineStandardDeployTask} */
+@RunWith(JUnit4.class)
+public final class AppEngineStandardDeployTaskTest {
 
   private static final String DEPLOY_EXCEPTION_MSG =
       "Deployment failed with an exception.\n"
@@ -81,14 +62,24 @@ public class AppEngineStandardDeployTaskTest {
   private static final String JAVA_COMPONENTS_MISSING_FAIL_MSG =
       CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT.getMessage();
 
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
+  @Mock private AppEngineDeploy deploy;
+  @Mock private AppEngineStandardStage stage;
+  @Mock private DeploymentOperationCallback callback;
+  @Mock private AppEngineDeploymentConfiguration deploymentConfiguration;
+  @Mock private AppEngineHelper helper;
+  @Mock private ProcessStartListener startListener;
+
+  private AppEngineStandardDeployTask task;
+
   @Before
   public void setUp() throws IOException {
-    when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
-        .thenReturn(Paths.get("myFile"));
+    when(helper.createStagingDirectory(any(), any())).thenReturn(Paths.get("myFile"));
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
     when(deploy.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
-    when(deploy.getHelper().stageCredentials(anyString()))
+    when(deploy.getHelper().stageCredentials(any()))
         .thenReturn(Optional.of(Paths.get("/some/file")));
 
     task = new AppEngineStandardDeployTask(deploy, stage, false);
@@ -96,16 +87,17 @@ public class AppEngineStandardDeployTaskTest {
 
   @Test
   public void testStageCredentials_error() {
-    when(deploy.getHelper().stageCredentials(anyString())).thenReturn(null);
+    when(deploy.getHelper().stageCredentials(any())).thenReturn(null);
     task.execute(startListener);
 
-    verify(callback, times(1)).errorOccurred("Failed to prepare credentials. Please make sure you are logged in with the correct account.");
+    verify(callback, times(1))
+        .errorOccurred(
+            "Failed to prepare credentials. Please make sure you are logged in with the correct account.");
   }
 
   @Test
   public void createStagingDirectory_exception() throws IOException {
-    when(helper.createStagingDirectory(any(LoggingHandler.class), anyString()))
-        .thenThrow(new IOException());
+    when(helper.createStagingDirectory(any(), any())).thenThrow(new IOException());
 
     try {
       task.execute(startListener);
@@ -120,9 +112,7 @@ public class AppEngineStandardDeployTaskTest {
 
   @Test
   public void stage_runtime_exception() {
-    doThrow(new RuntimeException())
-        .when(stage)
-        .stage(any(Path.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
+    doThrow(new RuntimeException()).when(stage).stage(any(), any(), any());
     try {
       task.execute(startListener);
     } catch (AssertionError ae) {
@@ -137,7 +127,7 @@ public class AppEngineStandardDeployTaskTest {
   public void stage_missingJavaComponents_error() {
     doThrow(new AppEngineJavaComponentsNotInstalledException(""))
         .when(stage)
-        .stage(any(Path.class), any(ProcessStartListener.class), any(ProcessExitListener.class));
+        .stage(any(), any(), any());
 
     task.execute(startListener);
     verify(callback, times(1)).errorOccurred(JAVA_COMPONENTS_MISSING_FAIL_MSG);
@@ -147,13 +137,12 @@ public class AppEngineStandardDeployTaskTest {
   public void deploy_success() {
     task.deploy(Paths.get("myFile.jar"), startListener).onExit(0);
 
-    verify(callback, never()).errorOccurred(anyString());
+    verify(callback, never()).errorOccurred(any());
   }
 
   @Test
   public void deploy_exception() {
-    doThrow(new RuntimeException())
-        .when(deploy).deploy(any(Path.class), any(ProcessStartListener.class));
+    doThrow(new RuntimeException()).when(deploy).deploy(any(), any());
     try {
       task.deploy(Paths.get("myFile.jar"), startListener).onExit(0);
     } catch (AssertionError ae) {

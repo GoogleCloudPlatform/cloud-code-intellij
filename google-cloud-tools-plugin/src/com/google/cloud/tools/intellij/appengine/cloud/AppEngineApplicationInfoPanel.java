@@ -21,25 +21,20 @@ import com.google.api.services.appengine.v1.model.Application;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService;
 import com.google.cloud.tools.intellij.appengine.application.AppEngineApplicationCreateDialog;
 import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
-import com.google.cloud.tools.intellij.resources.ProjectSelector.ProjectSelectionChangedEvent;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.HyperlinkLabel;
-
+import git4idea.DialogManager;
 import java.awt.BorderLayout;
 import java.io.IOException;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
-
-import git4idea.DialogManager;
 
 /**
  * A {@link JPanel} that displays contextual information about an App Engine Application.
@@ -50,12 +45,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   private static final int COMPONENTS_VERTICAL_PADDING = 0;
 
   private final JLabel errorIcon;
-  private final HyperlinkLabel messageText;
-
-  // Start in a friendly state before we know whether the application is truly valid.
-  private boolean isApplicationValid = true;
-
-  private CreateApplicationLinkListener currentLinkListener;
+  private HyperlinkLabel messageText;
 
   public AppEngineApplicationInfoPanel() {
     super(new BorderLayout(COMPONENTS_HORIZONTAL_PADDING, COMPONENTS_VERTICAL_PADDING));
@@ -69,20 +59,11 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     add(messageText);
   }
 
-  @SuppressWarnings("FutureReturnValueIgnored")
-  public void refresh(final ProjectSelectionChangedEvent event) {
-    if (event == null) {
-      ApplicationManager.getApplication().executeOnPooledThread(
-          () -> setMessage(GctBundle.getString("appengine.infopanel.noproject"),
-              true /* isError*/));
-      return;
-    }
-
-    refresh(event.getSelectedProject().getProjectId(), event.getUser().getCredential());
-  }
-
   /**
-   * Updates the panel to display application info for the given project.
+   * Updates the panel as follows:
+   * if {@code projectId} is valid, it displays the given project's information,
+   * if {@code projectId} is invalid, it displays an error message,
+   * if {@code projectId} is empty, no message is displayed.
    *
    * @param projectId the ID of the project whose application info to display
    * @param credential the Credential to use to make any required API calls
@@ -90,9 +71,15 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   @SuppressWarnings("FutureReturnValueIgnored")
   public void refresh(final String projectId, final Credential credential) {
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
+      if (projectId.isEmpty()) {
+        clearMessage();
+        return;
+      }
+
       if (projectId == null || credential == null) {
-        setMessage(GctBundle.getString("appengine.infopanel.noproject"),
+        setMessage(GctBundle.getString("appengine.infopanel.no.region"),
             true /* isError*/);
+        return;
       }
 
       try {
@@ -101,31 +88,13 @@ public class AppEngineApplicationInfoPanel extends JPanel {
 
         if (application != null) {
           setMessage(application.getLocationId(), false);
-          isApplicationValid = true;
         } else {
           setCreateApplicationMessage(projectId, credential);
-          isApplicationValid = false;
         }
       } catch (IOException | GoogleApiException e) {
         setMessage(GctBundle.message("appengine.application.region.fetch.error"), true);
-        isApplicationValid = false;
       }
     });
-  }
-
-  /**
-   * Returns {@code true} if the currently displayed Application is valid, {@code false} if
-   * otherwise.
-   */
-  public boolean isApplicationValid() {
-    return isApplicationValid;
-  }
-
-  private void setMessage(Runnable messagePrinter, boolean isError) {
-    ApplicationManager.getApplication().invokeAndWait(() -> {
-      errorIcon.setVisible(isError);
-      messagePrinter.run();
-    }, ModalityState.stateForComponent(this));
   }
 
   /**
@@ -140,25 +109,36 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     }, isError);
   }
 
-  /**
-   * Prints a message with a hyperlink.
-   */
-  private void setMessage(String beforeLinkText, String linkText, String afterLinkText) {
-    setMessage(() -> messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText), true);
+  void clearMessage() {
+    setMessage("", false /* isError*/);
+  }
+
+  private void setMessage(Runnable messagePrinter, boolean isError) {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              errorIcon.setVisible(isError);
+
+              // TODO(nkibler): Figure out what's causing the HyperlinkLabel to not refresh its view
+              // if we re-use the label here.
+              remove(messageText);
+              messageText = new HyperlinkLabel();
+              messageText.setOpaque(false);
+              add(messageText);
+
+              messagePrinter.run();
+            },
+            ModalityState.stateForComponent(this));
   }
 
   private void setCreateApplicationMessage(String projectId, Credential credential) {
-    // dispose the old link listener and replace with a new instance that has the current args
-    if (currentLinkListener != null) {
-      // if the listener is not found, this is a no-op
-      messageText.removeHyperlinkListener(currentLinkListener);
-    }
-    currentLinkListener = new CreateApplicationLinkListener(projectId, credential);
-    messageText.addHyperlinkListener(currentLinkListener);
-
-    setMessage(GctBundle.getString("appengine.application.not.exist") + " ",
-        GctBundle.getString("appengine.application.create.linkText"),
-        " " + GctBundle.getString("appengine.application.create.afterLinkText"));
+    String beforeLinkText = GctBundle.getString("appengine.application.not.exist") + " ";
+    String linkText = GctBundle.getString("appengine.application.create.linkText");
+    String afterLinkText = " " + GctBundle.getString("appengine.application.create.afterLinkText");
+    setMessage(() -> {
+      messageText.addHyperlinkListener(new CreateApplicationLinkListener(projectId, credential));
+      messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText);
+    }, true);
   }
 
   /**

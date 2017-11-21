@@ -23,10 +23,14 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.services.appengine.v1.Appengine;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
+import com.google.auth.oauth2.UserCredentials;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
-
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.intellij.openapi.components.ServiceManager;
-
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class DefaultGoogleApiClientFactory extends GoogleApiClientFactory {
@@ -50,6 +54,21 @@ public class DefaultGoogleApiClientFactory extends GoogleApiClientFactory {
         httpTransport, jsonFactory, httpRequestInitializer)
         .setApplicationName(getApplicationName())
         .build();
+  }
+
+  @Override
+  public Storage getCloudStorageApiClient(
+      @NotNull String projectId, @NotNull CredentialedUser credentialedUser) {
+    GoogleLoginState loginState = credentialedUser.getGoogleLoginState();
+    String clientId = loginState.fetchOAuth2ClientId();
+    String clientSecret = loginState.fetchOAuth2ClientSecret();
+    String refreshToken = loginState.fetchOAuth2RefreshToken();
+
+    return StorageOptions.newBuilder()
+        .setProjectId(projectId)
+        .setCredentials(new UserCredentials(clientId, clientSecret, refreshToken))
+        .build()
+        .getService();
   }
 
   private String getApplicationName() {

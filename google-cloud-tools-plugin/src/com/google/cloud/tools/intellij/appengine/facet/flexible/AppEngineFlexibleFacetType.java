@@ -39,10 +39,10 @@ public class AppEngineFlexibleFacetType extends
 
   public static final FacetTypeId<AppEngineFlexibleFacet> ID =
       new FacetTypeId<>("appEngineFlexible");
-  private static final String STRING_ID = "app-engine-flexible";
+  public static final String STRING_ID = "app-engine-flexible";
 
   public AppEngineFlexibleFacetType() {
-    super(ID, STRING_ID, GctBundle.getString("appengine.flexible.facet.name"));
+    super(ID, STRING_ID, GctBundle.getString("appengine.flexible.facet.name.title"));
   }
 
   @Override

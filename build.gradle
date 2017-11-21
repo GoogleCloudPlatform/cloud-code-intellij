@@ -42,6 +42,8 @@ subprojects {
     }
     assemble.dependsOn jarSources
 
+    apply plugin: "idea"
+    apply plugin: "net.ltgt.apt"
     apply plugin: "net.ltgt.errorprone"
 
     apply plugin: 'org.jetbrains.intellij'
@@ -50,17 +52,14 @@ subprojects {
         version = ideaVersion
         updateSinceUntilBuild = false
         downloadSources = true
-        sandboxDirectory = "${rootProject.buildDir}/idea-sandbox"
         intellijRepo = intellijRepoUrl
-        publish {
-            username System.getenv('IJ_REPO_USERNAME')
-            password System.getenv('IJ_REPO_PASSWORD')
-            channel ijPluginRepoChannel
-        }
     }
 
     configurations.runtime {
         resolutionStrategy {
+            // GCS brings in conflicting versions of this library so force the latest
+            force 'com.google.api:api-common:1.1.0'
+
             failOnVersionConflict()
 
             def provided = [["org.apache.httpcomponents", "httpclient"],
@@ -76,12 +75,13 @@ subprojects {
     }
 
     dependencies {
-        testCompile 'junit:junit:4.+'
-        testCompile ('org.mockito:mockito-core:1.9.5') {
-            exclude group: 'org.hamcrest', module: 'hamcrest-core'
-        }
-        testCompile 'org.hamcrest:hamcrest-all:1.3'
         compile 'joda-time:joda-time:2.9.2'
+
+        testCompile ('com.google.truth:truth:0.30') {
+            exclude group: 'com.google.guava', module: 'guava'
+        }
+        testCompile 'junit:junit:4.+'
+        testCompile 'org.mockito:mockito-core:2.+'
     }
 
     apply plugin: 'jacoco'

@@ -67,13 +67,14 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     });
 
     setAnchor(myWebArtifactToDeployLabel);
-    appEngineSettingsPanel.setBorder(PlainSmallWithoutIndent.createTitledBorder(
-        null /* border - ignored */,
-        GctBundle.message("appengine.run.settings.title.label"),
-        0 /* titleJustification - ignored */,
-        0 /* titlePosition - ignored */,
-        null /* titleFont - ignored */,
-        null /* titleColor - ignored */));
+    appEngineSettingsPanel.setBorder(
+        PlainSmallWithoutIndent.createTitledBorder(
+            null /* border */,
+            GctBundle.message("appengine.run.settings.title.label"),
+            0 /* titleJustification */,
+            0 /* titlePosition */,
+            null /* titleFont */,
+            null /* titleColor */));
   }
 
   private void onArtifactChanged() {

@@ -106,7 +106,7 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
 
     remoteNameSelector = new RepositoryRemotePanel(gitRepository);
 
-    projectSelector.getDocument().addDocumentListener(new DocumentAdapter() {
+    projectSelector.addTextChangedListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent event) {
         repositorySelector.setCloudProject(projectSelector.getText());

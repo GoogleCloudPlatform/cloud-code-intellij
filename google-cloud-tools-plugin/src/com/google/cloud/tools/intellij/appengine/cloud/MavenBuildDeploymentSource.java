@@ -17,26 +17,19 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
-
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
-
 import icons.MavenIcons;
-
+import java.io.File;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
-import java.io.File;
-
-import javax.swing.Icon;
-
-/**
- * A deployment source backed by the Maven build system.
- */
+/** A deployment source backed by the Maven build system. */
 public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
     implements AppEngineDeployable {
 
@@ -46,16 +39,15 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
   private String projectName;
   private String version;
 
-  /**
-   * Default constructor used instantiating plain Maven Build Deployment sources.
-   */
+  /** Default constructor used instantiating plain Maven Build Deployment sources. */
   public MavenBuildDeploymentSource(@NotNull ModulePointer pointer, @NotNull Project project) {
     super(pointer);
     this.project = project;
     this.name = getDefaultName();
   }
 
-  public MavenBuildDeploymentSource(@NotNull ModulePointer pointer,
+  public MavenBuildDeploymentSource(
+      @NotNull ModulePointer pointer,
       @NotNull Project project,
       @NotNull AppEngineEnvironment environment) {
     super(pointer);
@@ -113,31 +105,32 @@ public class MavenBuildDeploymentSource extends ModuleDeploymentSourceImpl
       return null;
     }
 
-    MavenProject mavenProject =
-        MavenProjectsManager.getInstance(project).findProject(getModule());
+    MavenProject mavenProject = MavenProjectsManager.getInstance(project).findProject(getModule());
 
     if (mavenProject == null) {
       return null;
     }
 
-    String targetBuild =
-        new File(mavenProject.getBuildDirectory()).getPath() + File.separator
-            + mavenProject.getFinalName();
+    final StringBuilder targetBuild =
+        new StringBuilder(
+            new File(mavenProject.getBuildDirectory()).getPath()
+                + File.separator
+                + mavenProject.getFinalName());
 
     AppEngineProjectService projectService = AppEngineProjectService.getInstance();
 
     // The environment will be null for newly deserialized deployment sources to ensure freshness.
-    // In this case, we need to reload the environment.
+    // In this case, we need to try and reload the environment.
     if (environment == null) {
-      environment = projectService.getModuleAppEngineEnvironment(getModule()).orElseThrow(
-          () -> new RuntimeException("No environment."));
+      projectService.getModuleAppEngineEnvironment(getModule()).ifPresent(env -> environment = env);
     }
 
-    if (environment.isFlexible()) {
-      targetBuild += "." + mavenProject.getPackaging();
+    if (environment != null && environment.isFlexible()) {
+      targetBuild.append(".");
+      targetBuild.append(mavenProject.getPackaging());
     }
 
-    return new File(targetBuild);
+    return new File(targetBuild.toString());
   }
 
   @Override

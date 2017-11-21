@@ -28,7 +28,6 @@ Cloning into 'gcloud-intellij'...
 
 There are four modules:
 
-* google-account-plugin: Google account management and preferences
 * google-clout-tools: Cloud debugger and code inspections
 * common-lib: Code shared between the above two
 * common-test-lib: test infrastructure code
@@ -43,7 +42,7 @@ Gradle is self-installing. This one command
 $ ./gradlew buildPlugin
 
 compiles everything, runs the tests, and builds the plugins. The output appears in
-google-account-plugin/build/distributions and google-cloud-tools-plugin/build/distributions.
+google-cloud-tools-plugin/build/distributions.
 
 Other useful targets while developing include:
 
@@ -101,9 +100,97 @@ the Apache license found in the LICENSE file.
 A number of issues in the 
 [issue tracker](https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/new)
 have been tagged as "[Help Wanted](https://github.com/GoogleCloudPlatform/gcloud-intellij/labels/help%20wanted)." 
-These are relatively small, self-contained changes that are good places to start. 
+These are relatively small, self-contained changes that are good places to start.
+
+## Project Utilities
+
+### `CloudToolsRule`
+We have a custom JUnit `TestRule` that reduces the amount of boilerplate code we have in our unit
+tests. Notably, this rule handles a lot of the set-up and tear-down required for a proper IntelliJ
+project context.
+
+For example:
+
+```
+@Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+```
+
+A summary of its features can be found below.
+
+**Always:**
+1. Initializes the fields annotated with `@Mock` by calling
+   `MockitoAnnotations.initMocks(testInstance)`
+2. Creates an `IdeaProjectTestFixture`, which sets up static application state for the IntelliJ SDK
+   and creates a `Project`
+
+**Testing UI components:**
+
+If your unit test is testing platform UI components such as toolbars/panels/dialogs, then you should instantiate these components on the Swing event-dispatch thread.
+
+For example:
+
+```
+ApplicationManager.getApplication().invokeAndWait(() -> // initialize your component);
+```
+
+**Additional Annotations:**
+
+`@TestService`:
+- Annotates fields of any type, but usually accompanies a `@Mock` annotation
+- Before the test runs, it swaps the actual implementation of the service that is registered in the
+  application's `PicoContainer` with the field's value
+- After the test runs, it swaps the real implementation back
+- Sample:
+    ```
+    @Mock @TestService private CloudSdkService mockCloudSdkService;
+
+    @Test
+    public void myTest() {
+      when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
+      // Do something that depends on this mocked call...
+    }
+    ```
+
+`@TestFixture`:
+- Annotates fields of type `com.intellij.testFramework.fixtures.IdeaProjectTestFixture`
+- Injects the created `IdeaProjectTestFixture` into the annotated field, giving access to the
+  underlying `Project`
+- Sample:
+    ```
+    @TestFixture private IdeaProjectTestFixture testFixture;
+
+    @Test
+    public void myTest() {
+      Project project = testFixture.getProject();
+      // Do something with the project...
+    }
+    ```
+
+`@TestModule`:
+- Annotates fields of type `com.intellij.openapi.module.Module`
+- Creates a new `Module` and adds it to the test fixture's `Project`, then injects the value of the
+  created `Module` into the annotated field
+- Optionally allows for the addition of a `Facet` to the `Module` by specifying the ID of the
+  associated `com.intellij.facet.FacetType`
+- Samples:
+    ```
+    @TestModule private Module myModule;
+    @TestModule(facetTypeId = MyFacetType.ID) private Module myModuleWithFacet;
+    ```
+
+`@TestFile`:
+- Annotates fields of type `java.io.File`
+- Creates a new `File` with the given name and optionally the given contents
+- Manages the deletion of the file after the test is torn down
+- Samples:
+    ```
+    @TestFile(name = "my.file")
+    private File myFile;
+
+    @TestFile(name = "my-file-with.contents", contents = "Some contents")
+    private File myFileWithContents;
+    ```
 
 ## FAQ
 
 Nothing here yet.
-

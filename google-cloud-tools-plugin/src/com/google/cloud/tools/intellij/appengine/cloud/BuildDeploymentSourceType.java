@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.common.collect.ImmutableList;
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.configurations.RunConfiguration;
@@ -27,14 +28,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.List;
-
 import javax.swing.JComponent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base class for build-system (e.g. maven or gradle) deployment source types. Deployment sources
@@ -78,8 +76,9 @@ public abstract class BuildDeploymentSourceType
       BeforeRunTask buildTask = createBuildTask(module);
       if (buildTask != null) {
         List<BeforeRunTask> tasks = runManager.getBeforeRunTasks(configuration);
-        tasks.add(buildTask);
-        runManager.setBeforeRunTasks(configuration, tasks, true);
+        ImmutableList<BeforeRunTask> newTaskList =
+            ImmutableList.<BeforeRunTask>builder().addAll(tasks).add(buildTask).build();
+        runManager.setBeforeRunTasks(configuration, newTaskList, true);
       }
     }
   }

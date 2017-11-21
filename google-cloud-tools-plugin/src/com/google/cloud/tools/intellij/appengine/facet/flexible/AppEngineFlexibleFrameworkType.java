@@ -50,7 +50,7 @@ public class AppEngineFlexibleFrameworkType extends FrameworkTypeEx {
   @NotNull
   @Override
   public String getPresentableName() {
-    return GctBundle.getString("appengine.flexible.facet.name");
+    return GctBundle.getString("appengine.flexible.facet.name.title");
   }
 
   @NotNull

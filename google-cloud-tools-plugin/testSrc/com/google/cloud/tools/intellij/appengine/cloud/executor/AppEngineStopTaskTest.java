@@ -17,8 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -29,65 +28,61 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineStop;
-
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import java.nio.file.Paths;
 import java.util.Optional;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.mockito.Mock;
 
-/**
- * Unit tests for {@link AppEngineStopTask}
- */
-@RunWith(MockitoJUnitRunner.class)
-public class AppEngineStopTaskTest {
+/** Unit tests for {@link AppEngineStopTask} */
+@RunWith(JUnit4.class)
+public final class AppEngineStopTaskTest {
+
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
+  @Mock private AppEngineStop stop;
+  @Mock private AppEngineDeploymentConfiguration configuration;
+  @Mock private AppEngineHelper helper;
+  @Mock private UndeploymentTaskCallback callback;
+  @Mock private ProcessStartListener startListener;
 
   private AppEngineStopTask task;
-  @Mock
-  AppEngineStop stop;
-  @Mock
-  AppEngineDeploymentConfiguration configuration;
-  @Mock
-  AppEngineHelper helper;
-  @Mock UndeploymentTaskCallback callback;
-  @Mock ProcessStartListener startListener;
 
   @Before
   public void setUp() {
     when(stop.getCallback()).thenReturn(callback);
     when(stop.getHelper()).thenReturn(helper);
     when(stop.getDeploymentConfiguration()).thenReturn(configuration);
-    when(stop.getHelper().stageCredentials(anyString())).thenReturn(Optional.of(Paths.get("/some/file")));
+    when(stop.getHelper().stageCredentials(any())).thenReturn(Optional.of(Paths.get("/some/file")));
 
     task = new AppEngineStopTask(stop, "myModule", "myVersion");
   }
 
   @Test
   public void testStageCredentials_error() {
-    when(stop.getHelper().stageCredentials(anyString())).thenReturn(null);
+    when(stop.getHelper().stageCredentials(any())).thenReturn(null);
     task.execute(startListener);
 
     verify(callback, times(1))
-        .errorOccurred("Failed to prepare credentials. Please make sure you are logged in with the correct account.");
+        .errorOccurred(
+            "Failed to prepare credentials. Please make sure you are logged in with the correct account.");
   }
 
   @Test
   public void testStop_success() {
     task.execute(startListener);
 
-    verify(callback, never()).errorOccurred(anyString());
+    verify(callback, never()).errorOccurred(any());
   }
 
   @Test
   public void testStop_error() {
-    doThrow(new RuntimeException("myError"))
-        .when(stop)
-        .stop(anyString(), anyString(), any(ProcessStartListener.class));
+    doThrow(new RuntimeException("myError")).when(stop).stop(any(), any(), any());
     try {
       task.execute(startListener);
     } catch (AssertionError ae) {
@@ -98,5 +93,4 @@ public class AppEngineStopTaskTest {
 
     fail("Expected exception due to logging error level.");
   }
-
 }
