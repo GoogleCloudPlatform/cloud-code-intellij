@@ -28,6 +28,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.util.List;
@@ -51,8 +52,8 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
       = "https://cloud.google.com/appengine/docs/flexible";
   private final static String STANDARD_DOCUMENTATION_URL
       = "https://cloud.google.com/appengine/docs/about-the-standard-environment";
-  private static final String HTML_OPEN_TAG = "<html><font face='sans' size='-1'>";
-  private static final String HTML_CLOSE_TAG = "</font></html>";
+  private final String HTML_CLOSE_TAG = "</font></html>";
+  private final String HTML_OPEN_TAG;
 
   private JPanel panel;
   private JTextPane instructionsTextPane;
@@ -70,6 +71,11 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     super(parent, false);
     this.gcpProjectId = gcpProjectId;
     this.userCredential = userCredential;
+
+    Font font = parent.getFont();
+    HTML_OPEN_TAG =
+        "<html><font face=\"" + font.getName() + "\" size=\\\"" + font.getSize() + "\\\">";
+
     init();
   }
 
