@@ -101,7 +101,8 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     setMessage(
         () -> {
           messageText.setText(text);
-          // HyperlinkLabels require that revalidate() be called after setText(), in order for text to
+          // HyperlinkLabels require that revalidate() be called after setText(), in order for text
+          // to
           // actually show up. setHyperlinkText() calls revalidate() internally.
           messageText.revalidate();
         },

@@ -74,7 +74,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     int indexToSelect = initializeUsers();
     final UsersListCellRenderer usersListCellRenderer = new UsersListCellRenderer();
 
-    //Create the list that displays the users and put it in a scroll pane.
+    // Create the list that displays the users and put it in a scroll pane.
     list =
         new JBList<UsersListItem>(listModel) {
           @Override
@@ -145,7 +145,8 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
         new MouseMotionListener() {
           @Override
           public void mouseMoved(MouseEvent mouseEvent) {
-            // Determine if the user under the cursor is an active user, a non-active user or a non-user
+            // Determine if the user under the cursor is an active user, a non-active user or a
+            // non-user
             int index = list.locationToIndex(mouseEvent.getPoint());
             if (index >= 0) {
               // If current object is the non-user list item, use default cursor
@@ -214,7 +215,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
       }
     }
 
-    //Create a panel to hold the buttons
+    // Create a panel to hold the buttons
     JPanel buttonPane = new JPanel();
     buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
     buttonPane.add(addAccountButton);
@@ -228,7 +229,7 @@ public class GoogleLoginUsersPanel extends JPanel implements ListSelectionListen
     add(buttonPane, BorderLayout.PAGE_END);
   }
 
-  //This method is required by ListSelectionListener.
+  // This method is required by ListSelectionListener.
   @Override
   public void valueChanged(ListSelectionEvent event) {
     if (ignoreSelection) {

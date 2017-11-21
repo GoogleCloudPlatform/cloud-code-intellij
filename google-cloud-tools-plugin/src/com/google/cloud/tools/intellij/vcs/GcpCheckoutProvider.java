@@ -166,12 +166,12 @@ public class GcpCheckoutProvider implements CheckoutProvider {
 
               @Override
               public void projectClosed(Project project) {
-                //no-op
+                // no-op
               }
 
               @Override
               public void projectClosing(Project project) {
-                //no-op
+                // no-op
               }
             };
 

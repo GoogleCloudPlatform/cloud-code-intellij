@@ -430,7 +430,7 @@ public class CloudAttachDialog extends DialogWrapper {
     }
 
     if (!Strings.isNullOrEmpty(syncResult.getTargetSyncSha())) {
-      //try to check out that revision.
+      // try to check out that revision.
       final GitBrancher brancher = ServiceManager.getService(project, GitBrancher.class);
       if (sourceRepository == null) {
         LOG.error("unexpected null source repo with a target SHA.");

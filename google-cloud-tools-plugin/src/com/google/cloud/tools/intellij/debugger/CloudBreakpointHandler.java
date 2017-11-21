@@ -388,7 +388,9 @@ public class CloudBreakpointHandler
                       public void run() {
                         if (!Strings.isNullOrEmpty(id)) {
                           if (!cloudIdeLineBreakpoint.isEnabled()) {
-                            process.getStateController().deleteBreakpointAsync(id); //race condition
+                            process
+                                .getStateController()
+                                .deleteBreakpointAsync(id); // race condition
                           } else { // Success.
                             // Mark as added so we don't add it again.
                             ideBreakpoint.getProperties().setAddedOnServer(true);
@@ -396,7 +398,8 @@ public class CloudBreakpointHandler
                             process.updateBreakpointPresentation(cloudIdeLineBreakpoint);
                           }
                         } else {
-                          // TODO(joaomartins): Why couldn't the breakpoint be set? Improve this message.
+                          // TODO(joaomartins): Why couldn't the breakpoint be set? Improve this
+                          // message.
                           cloudIdeLineBreakpoint.setErrorMessage(
                               GctBundle.getString("clouddebug.errorset"));
                           process.updateBreakpointPresentation(cloudIdeLineBreakpoint);

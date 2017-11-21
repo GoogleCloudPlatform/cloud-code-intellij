@@ -180,7 +180,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     List<Breakpoint> currentList = state.getCurrentServerBreakpointList();
     assertNotEmpty(currentList);
 
-    //verifies the sort order...
+    // verifies the sort order...
     assertTrue(verifyList(currentList, "bp5", "bp6", "bp7", "bp4", "bp8", "bp3", "bp2", "bp1"));
   }
 

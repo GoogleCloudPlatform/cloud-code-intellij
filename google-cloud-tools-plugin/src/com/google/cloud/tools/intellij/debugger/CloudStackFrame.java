@@ -137,7 +137,7 @@ public class CloudStackFrame extends XStackFrame {
     private final List<Variable> variableTable;
 
     public MyValue(@NotNull Variable variable, @NotNull List<Variable> variableTable) {
-      //Note that we have to examine the variable table for some cases depending on how the
+      // Note that we have to examine the variable table for some cases depending on how the
       // server compressed results.
       this.variableTable = variableTable;
       this.variable =

@@ -90,10 +90,10 @@ public final class GoogleLoginUtils {
               try {
                 userInfo = userInfoService.userinfo().get().execute();
               } catch (IOException ex) {
-                //The core IDE functionality still works, so this does
-                //not affect anything right now. The user will receive
-                //error messages when they attempt to do something that
-                //requires a logged in state.
+                // The core IDE functionality still works, so this does
+                // not affect anything right now. The user will receive
+                // error messages when they attempt to do something that
+                // requires a logged in state.
                 LOG.warn("Error retrieving user information.", ex);
               }
 

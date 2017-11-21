@@ -51,7 +51,7 @@ public class AppEngineGwtServer extends GwtDevModeServer {
     final CloudSdkService sdkService = CloudSdkService.getInstance();
     sdkService.patchJavaParametersForDevServer(parameters.getVMParametersList());
 
-    //actually these jars are added by AppEngine dev server automatically. But they need to be
+    // actually these jars are added by AppEngine dev server automatically. But they need to be
     // added to classpath before gwt-dev.jar, because otherwise wrong jsp compiler version will be
     // used (see IDEA-63068)
     if (sdkService.getLibraries() != null) {

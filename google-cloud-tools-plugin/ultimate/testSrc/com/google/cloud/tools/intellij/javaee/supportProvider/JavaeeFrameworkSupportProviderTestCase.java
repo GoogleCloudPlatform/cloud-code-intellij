@@ -23,7 +23,8 @@ import com.intellij.javaee.serverInstances.ApplicationServersManager;
 import com.intellij.openapi.application.ApplicationManager;
 import java.util.List;
 
-//todo: this class is copied from javaee_tests module. We need to create a separate artifact from that module and use it instead.
+// todo: this class is copied from javaee_tests module. We need to create a separate artifact from
+// that module and use it instead.
 public abstract class JavaeeFrameworkSupportProviderTestCase
     extends FrameworkSupportProviderTestCase {
   public static void deleteApplicationServers() {

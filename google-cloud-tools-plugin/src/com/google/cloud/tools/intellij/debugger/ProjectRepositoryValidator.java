@@ -200,7 +200,7 @@ public class ProjectRepositoryValidator {
     String syncSha = null;
 
     if (targetLocalRepo != null) {
-      //check for local changes.
+      // check for local changes.
       try {
         if (GitUtil.hasLocalChanges(true, processState.getProject(), targetLocalRepo.getRoot())
             || GitUtil.hasLocalChanges(
@@ -264,7 +264,7 @@ public class ProjectRepositoryValidator {
       assert repoState.getSourceRepository() != null;
       final VirtualFile root = repoState.getSourceRepository().getRoot();
 
-      //check for an unstash requirement.
+      // check for an unstash requirement.
       final Ref<StashInfo> targetStash = new Ref<StashInfo>();
       if (!Strings.isNullOrEmpty(repoState.getStashMessage())) {
         GitStashUtils.loadStashStack(

@@ -186,7 +186,7 @@ public class CloudDebugProcessStateSerializer
 
   public static class ProjectState {
 
-    //For serialization purposes, this cannot be final.
+    // For serialization purposes, this cannot be final.
     public List<RunConfigState> configStates = new ArrayList<RunConfigState>();
 
     public ProjectState() {}

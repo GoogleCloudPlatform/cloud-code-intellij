@@ -61,7 +61,7 @@ public class AppEngineServerInstance extends DefaultServerInstance {
     super.shutdown();
     ProcessHandler processHandler = getProcessHandler();
     if (processHandler instanceof OSProcessHandler) {
-      //todo[nik] remove later. This fix is necessary only for IDEA 8.x
+      // todo[nik] remove later. This fix is necessary only for IDEA 8.x
       ((OSProcessHandler) processHandler).getProcess().destroy();
     }
   }

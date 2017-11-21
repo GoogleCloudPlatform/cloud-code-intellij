@@ -183,8 +183,10 @@ public class CloudDebugProcessStateController {
     ApplicationManager.getApplication()
         .executeOnPooledThread(
             () -> {
-              //At this point, the user has selected a final state breakpoint which is not yet hydrated.
-              //So we query the server to get this final on a worker thread and then run the runnable
+              // At this point, the user has selected a final state breakpoint which is not yet
+              // hydrated.
+              // So we query the server to get this final on a worker thread and then run the
+              // runnable
               // back on ui
               GetBreakpointResponse response;
               try {
@@ -244,7 +246,7 @@ public class CloudDebugProcessStateController {
                       && serverBp.getLocation().getLine().equals(location.getLine())
                       && !Strings.isNullOrEmpty(serverBp.getLocation().getPath())
                       && serverBp.getLocation().getPath().equals(location.getPath())) {
-                    deleteBreakpoint(serverBp.getId()); //should not be async here.
+                    deleteBreakpoint(serverBp.getId()); // should not be async here.
                   }
                 }
 
@@ -292,7 +294,7 @@ public class CloudDebugProcessStateController {
                   // We run after a short period to act as a throttle.
                   timer.schedule(new RunnableTimerTask(this), PERIOD_MS);
                 } catch (IllegalStateException ex) {
-                  //This can happen in rare race conditions and isn't an error.  We just ignore it.
+                  // This can happen in rare race conditions and isn't an error.  We just ignore it.
                 }
               }
             }
@@ -355,7 +357,7 @@ public class CloudDebugProcessStateController {
       return;
     }
 
-    //tokenToSend can be null on first initialization -- where we shouldn't fire events or need
+    // tokenToSend can be null on first initialization -- where we shouldn't fire events or need
     // to do pruning.
     if (!Strings.isNullOrEmpty(tokenToSend)) {
       pruneBreakpointCache(currentList);
@@ -388,10 +390,10 @@ public class CloudDebugProcessStateController {
                       .getClientVersionForCloudDebugger())
               .execute();
 
-      //We are running on a background thread and the cancel can happen any time triggered
-      //on the ui thread from the user.  We want to short circuit immediately and not change
-      //any state.  If we processed this result, it could incorrectly update the state and mess
-      //up the background watcher.
+      // We are running on a background thread and the cancel can happen any time triggered
+      // on the ui thread from the user.  We want to short circuit immediately and not change
+      // any state.  If we processed this result, it could incorrectly update the state and mess
+      // up the background watcher.
       if (tokenToSend != null && !isBackgroundListening()) {
         return null;
       }
@@ -404,7 +406,7 @@ public class CloudDebugProcessStateController {
 
       if (!CloudDebugConfigType.useWaitToken() && tokenToSend.equals(responseWaitToken)) {
         try {
-          //our fallback polling mode has a 1 second loop.
+          // our fallback polling mode has a 1 second loop.
           Thread.currentThread().sleep(1000);
         } catch (InterruptedException ex) {
           return null;
@@ -426,7 +428,7 @@ public class CloudDebugProcessStateController {
   }
 
   private void pruneBreakpointCache(List<Breakpoint> currentList) {
-    //Clear out the obsolete breakpoint cache for old items.
+    // Clear out the obsolete breakpoint cache for old items.
     HashSet<String> toRemoveSet = new HashSet<>();
     toRemoveSet.addAll(fullFinalBreakpoints.keySet());
     if (!toRemoveSet.isEmpty() && currentList != null) {

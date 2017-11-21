@@ -49,7 +49,7 @@ public class AppEngineServerIntegration extends AppServerIntegration {
 
   @Override
   public ApplicationServerPersistentDataEditor createNewServerEditor() {
-    //Google App Engine server should not be shown in 'Application Server' combobox in the new
+    // Google App Engine server should not be shown in 'Application Server' combobox in the new
     // project wizard because there is a special 'Google App Engine' option
     return null;
   }

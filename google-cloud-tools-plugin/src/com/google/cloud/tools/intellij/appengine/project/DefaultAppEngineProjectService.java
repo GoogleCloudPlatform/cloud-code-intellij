@@ -358,8 +358,10 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
                       module);
 
               if (element != null) {
-                // Remove the .docker extension to satisfy the Docker convention. This extension was added
-                // since the templating mechanism requires an extension or else a default template type of
+                // Remove the .docker extension to satisfy the Docker convention. This extension was
+                // added
+                // since the templating mechanism requires an extension or else a default template
+                // type of
                 // "java" will be assumed.
                 RenamePsiElementProcessor.DEFAULT.renameElement(
                     element, "Dockerfile" /*newName*/, UsageInfo.EMPTY_ARRAY, null /*listener*/);

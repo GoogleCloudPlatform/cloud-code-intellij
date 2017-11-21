@@ -222,7 +222,7 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
             return;
           }
 
-          //git push origin master
+          // git push origin master
           LOG.info("Pushing to Google master");
           indicator.setText(GctBundle.message("uploadtogcp.pushingtotgcp"));
           if (!pushCurrentBranch(project, repository, remoteName, remoteUrl)) {
@@ -232,7 +232,7 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
           succeeded = true;
         } finally {
           if (!succeeded) {
-            //remove the remote if possible on a failure, so the user can try again.
+            // remove the remote if possible on a failure, so the user can try again.
             removeGitRemote(project, repository, remoteName);
           }
         }

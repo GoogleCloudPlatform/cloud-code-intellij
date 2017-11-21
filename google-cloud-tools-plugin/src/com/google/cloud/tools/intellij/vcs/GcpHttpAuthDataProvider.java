@@ -56,7 +56,8 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
   public AuthData getAuthData(@NotNull String url) {
     final Project currentProject = getCurrentProject();
     if ((currentProject != null || Context.currentContext != null) && isGcpUrl(url)) {
-      Context currentContext = Context.currentContext; //always prefer context over project setting.
+      Context currentContext =
+          Context.currentContext; // always prefer context over project setting.
       String userEmail = currentContext != null ? currentContext.userName : null;
 
       if (Strings.isNullOrEmpty(userEmail) && currentProject != null) {
@@ -65,7 +66,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
       CredentialedUser targetUser = getUserFromEmail(userEmail);
 
       if (targetUser == null) {
-        //show a dialog allowing the user to select a login.  (new project recognized)
+        // show a dialog allowing the user to select a login.  (new project recognized)
         ApplicationManager.getApplication()
             .invokeAndWait(
                 new Runnable() {

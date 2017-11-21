@@ -61,7 +61,7 @@ class DoUpdateIdeWithBreakpoint implements Runnable {
     newXIdeBreakpoint.putUserData(CloudBreakpointHandler.CLOUD_ID, serverBreakpoint.getId());
     ideBreakpoints.put(serverBreakpoint.getId(), newXIdeBreakpoint);
 
-    //condition, watches
+    // condition, watches
     if (!Strings.isNullOrEmpty(serverBreakpoint.getCondition())) {
       newXIdeBreakpoint.setCondition(serverBreakpoint.getCondition());
     }

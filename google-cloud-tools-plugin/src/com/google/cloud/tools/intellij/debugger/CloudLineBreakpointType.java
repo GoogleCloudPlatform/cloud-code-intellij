@@ -217,14 +217,14 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     return new JavaDebuggerEditorsProvider();
   }
 
-  //TODO Use the new method provided by Jetbrains to customize the breakpoint ui and hide the
+  // TODO Use the new method provided by Jetbrains to customize the breakpoint ui and hide the
   // default panels.
-  //@Override
-  //@Nullable
-  //public XBreakpointCustomPropertiesPanel<XLineBreakpoint<CloudLineBreakpointProperties>>
+  // @Override
+  // @Nullable
+  // public XBreakpointCustomPropertiesPanel<XLineBreakpoint<CloudLineBreakpointProperties>>
   // createMainPanel(@NotNull Project project) {
   //  return new BreakpointConfigurationPanel(this);
-  //}
+  // }
 
   @NotNull
   @Override

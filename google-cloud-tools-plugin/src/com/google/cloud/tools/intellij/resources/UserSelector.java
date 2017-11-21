@@ -218,7 +218,8 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
                   SwingUtilities.invokeLater(
                       new Runnable() {
                         @SuppressWarnings("ConstantConditions")
-                        // This suppresses a nullref warning for GoogleLogin.getInstance().getActiveUser().
+                        // This suppresses a nullref warning for
+                        // GoogleLogin.getInstance().getActiveUser().
                         @Override
                         public void run() {
                           if (Services.getLoginService().getActiveUser() != null) {

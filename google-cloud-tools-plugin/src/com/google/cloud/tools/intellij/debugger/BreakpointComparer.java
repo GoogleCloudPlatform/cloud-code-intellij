@@ -45,7 +45,7 @@ public class BreakpointComparer implements Comparator<Breakpoint> {
       return -1;
     }
     if (o2.getFinalTime() == null && o1.getFinalTime() == null) {
-      //compare file and line
+      // compare file and line
       SourceLocation s1 = o1.getLocation();
       SourceLocation s2 = o2.getLocation();
       boolean s1Valid = isSourceLocationValid(s1);

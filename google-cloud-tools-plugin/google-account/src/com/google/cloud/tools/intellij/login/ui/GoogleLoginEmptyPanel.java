@@ -61,7 +61,7 @@ public class GoogleLoginEmptyPanel extends JPanel {
         });
     addAccountButton.setHorizontalAlignment(SwingConstants.LEFT);
 
-    //Create a panel to hold the buttons
+    // Create a panel to hold the buttons
     JPanel buttonPane = new JPanel();
     buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
     buttonPane.add(addAccountButton);

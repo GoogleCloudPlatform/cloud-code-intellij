@@ -281,7 +281,8 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
           public void run() {
             if (!getXDebugSession().isStopped()) {
               // Since there is no equivalent metaphor in traditional debug sessions, this simulates
-              // the desired behavior of clearing the current context by setting the current position
+              // the desired behavior of clearing the current context by setting the current
+              // position
               // to an empty context
               getXDebugSession().positionReached(new XSuspendContext() {});
             }
@@ -309,7 +310,8 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
                     new Runnable() {
                       @Override
                       public void run() {
-                        // We will only do the selection if the id for this async task matches the latest
+                        // We will only do the selection if the id for this async task matches the
+                        // latest
                         // user clicked item.  This prevents multiple (and possibly out of order)
                         // selections getting queued up.
                         if (id.equals(navigatedSnapshotId)) {
