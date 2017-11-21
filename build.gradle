@@ -120,6 +120,7 @@ subprojects {
         }
         checkstyle "com.puppycrawl.tools:checkstyle:${versions.checkstyle}"
     }
+
     checkstyle {
         configFile = rootProject.file('google_checks.xml')
         showViolations true
