@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.project.ProjectLoader.ProjectLoaderResultCallback;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
@@ -34,7 +35,6 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.table.JBTable;
 import git4idea.DialogManager;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.Collections;
@@ -81,8 +81,9 @@ public class ProjectSelectionDialog extends DialogWrapper {
 
   private ProjectLoader projectLoader;
 
-  ProjectSelectionDialog(Component parent) {
-    super(parent, false);
+  ProjectSelectionDialog() {
+    super(false);
+    setTitle(GctBundle.getString("project.selector.dialog.title"));
     init();
 
     projectLoader = new ProjectLoader();
@@ -113,12 +114,10 @@ public class ProjectSelectionDialog extends DialogWrapper {
     return result == OK_EXIT_CODE ? getCloudProject() : null;
   }
 
+  @VisibleForTesting
   @Override
   protected void init() {
     super.init();
-    setTitle(GctBundle.getString("project.selector.dialog.title"));
-
-    projectLoader = new ProjectLoader();
   }
 
   // IntelliJ API - creates actions (buttons) for "left side" of the dialog bottom panel.
@@ -128,7 +127,8 @@ public class ProjectSelectionDialog extends DialogWrapper {
     return new Action[] {refreshAction};
   }
 
-  private void createUIComponents() {
+  @VisibleForTesting
+  void createUIComponents() {
     // prepare account combobox model and rendering.
     accountComboBox = new ComboBox<>();
     accountComboBox.setRenderer(new AccountComboBoxRenderer());
@@ -182,7 +182,8 @@ public class ProjectSelectionDialog extends DialogWrapper {
     centerPanelWrapper = new JPanel(new BorderLayout());
   }
 
-  private void setCloudProject(CloudProject cloudProject) {
+  @VisibleForTesting
+  void setCloudProject(CloudProject cloudProject) {
     this.cloudProject = cloudProject;
     updateProjectAccountInformation();
   }
@@ -324,5 +325,18 @@ public class ProjectSelectionDialog extends DialogWrapper {
         setIcon(GoogleLoginIcons.getScaledUserIcon(ProjectSelector.ACCOUNT_ICON_SIZE, user));
       }
     }
+  }
+
+  @VisibleForTesting
+  JComboBox<CredentialedUser> getAccountComboBox() {
+    return accountComboBox;
+  }
+  @VisibleForTesting
+  JTable getProjectListTable() {
+    return projectListTable;
+  }
+  @VisibleForTesting
+  public ProjectListTableModel getProjectListTableModel() {
+    return projectListTableModel;
   }
 }

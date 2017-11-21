@@ -161,7 +161,7 @@ public class ProjectSelector extends JPanel {
 
   @VisibleForTesting
   ProjectSelectionDialog createProjectSelectionDialog(Component parent) {
-    return new ProjectSelectionDialog(this);
+    return new ProjectSelectionDialog();
   }
 
   @VisibleForTesting

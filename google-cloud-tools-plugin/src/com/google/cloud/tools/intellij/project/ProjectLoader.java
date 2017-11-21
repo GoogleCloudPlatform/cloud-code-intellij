@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /** Loads list of {@link Project} for a {@link CredentialedUser}. */
-public class ProjectLoader {
+class ProjectLoader {
   private static final Logger LOG = Logger.getInstance(ProjectLoader.class);
 
   private static final int PROJECTS_MAX_PAGE_SIZE = 300;
@@ -54,7 +54,8 @@ public class ProjectLoader {
             () -> loadUserProjects(user, resultCallback));
   }
 
-  private void loadUserProjects(CredentialedUser user, ProjectLoaderResultCallback resultCallback) {
+  @VisibleForTesting
+  void loadUserProjects(CredentialedUser user, ProjectLoaderResultCallback resultCallback) {
     CloudResourceManager cloudResourceManagerClient = createCloudResourceManager(user);
     try {
       final List<Project> result = new ArrayList<>();
