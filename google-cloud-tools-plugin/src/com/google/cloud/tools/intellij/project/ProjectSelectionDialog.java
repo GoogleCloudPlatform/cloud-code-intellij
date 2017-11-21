@@ -25,13 +25,15 @@ import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.ListCellRendererWrapper;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.table.JBTable;
 import git4idea.DialogManager;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.AbstractAction;
@@ -45,13 +47,16 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import org.jdesktop.swingx.sort.RowFilters.GeneralFilter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Modal project and account selection dialog. Contains account drop-down with user list, table with
- * project list and simple filter. Called from {@link ProjectSelector}.
+ * project list and simple filter. {@link ProjectSelector} calls {@link #showDialog(CloudProject)}.
  */
 public class ProjectSelectionDialog extends DialogWrapper {
 
@@ -66,7 +71,7 @@ public class ProjectSelectionDialog extends DialogWrapper {
 
   private ProjectLoader projectLoader;
 
-   ProjectSelectionDialog(Component parent) {
+  ProjectSelectionDialog(Component parent) {
     super(parent, false);
     init();
   }
@@ -112,8 +117,37 @@ public class ProjectSelectionDialog extends DialogWrapper {
     projectListTableModel = new ProjectListTableModel();
     projectListTable.setModel(projectListTableModel);
     projectListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    projectListTable.getSelectionModel().addListSelectionListener(
-        e -> validateProjectSelection());
+    projectListTable.getSelectionModel().addListSelectionListener(e -> validateProjectSelection());
+    FilteredTextTableCellRenderer filterRenderer = new FilteredTextTableCellRenderer();
+    projectListTable.setDefaultRenderer(Object.class, filterRenderer);
+
+    // filter rows based on text field content.
+    filterTextField = new JBTextField();
+    TableRowSorter<TableModel> sorter = new TableRowSorter<>(projectListTableModel);
+    projectListTable.setRowSorter(sorter);
+
+    GeneralFilter filter =
+        new GeneralFilter() {
+          @Override
+          protected boolean include(Entry value, int index) {
+            return value
+                .getStringValue(index)
+                .toLowerCase()
+                .contains(filterTextField.getText().toLowerCase());
+          }
+        };
+    sorter.setRowFilter(filter);
+    // on filter types, update row filter and renderer.
+    filterTextField
+        .getDocument()
+        .addDocumentListener(
+            new DocumentAdapter() {
+              @Override
+              protected void textChanged(DocumentEvent e) {
+                sorter.allRowsChanged();
+                filterRenderer.setFilterText(filterTextField.getText());
+              }
+            });
 
     // disabled unless project is selected in the list.
     getOKAction().setEnabled(false);
@@ -126,12 +160,12 @@ public class ProjectSelectionDialog extends DialogWrapper {
 
   private CloudProject getCloudProject() {
     CredentialedUser user = accountComboBox.getItemAt(accountComboBox.getSelectedIndex());
-    CloudProject project = new CloudProject(getSelectedProjectName(), user.getEmail());
-    return project;
+    return new CloudProject(getSelectedProjectName(), user.getEmail());
   }
 
   private void loadUsersAndProjects() {
-    Collection<CredentialedUser> credentialedUsers = Services.getLoginService().getAllUsers().values();
+    Collection<CredentialedUser> credentialedUsers =
+        Services.getLoginService().getAllUsers().values();
     if (credentialedUsers.isEmpty()) {
       showSignInRequest();
     } else {
@@ -146,25 +180,24 @@ public class ProjectSelectionDialog extends DialogWrapper {
   private void updateProjectList() {
     CredentialedUser user = (CredentialedUser) accountComboBox.getSelectedItem();
     if (user != null) {
+      projectListTableModel.setProjectList(Collections.emptyList());
+      ((JBTable) projectListTable).setPaintBusy(true);
       projectLoader.loadUserProjectsInBackground(
           user,
           new ProjectLoaderResultCallback() {
             @Override
             public void projectListReady(List<Project> result) {
               SwingUtilities.invokeLater(
-                      () -> {
-                        System.out.println(
-                            "Received project list for "
-                                + user.getEmail()
-                                + ", size: "
-                                + result.size());
-                        projectListTableModel.setProjectList(result);
-                      });
+                  () -> {
+                    projectListTableModel.setProjectList(result);
+                    ((JBTable) projectListTable).setPaintBusy(false);
+                    showProjectInList(cloudProject.getProjectName());
+                  });
             }
 
             @Override
             public void onError(String errorDetails) {
-              System.out.println("ERR!: " + errorDetails);
+              ((JBTable) projectListTable).setPaintBusy(false);
             }
           });
     }
@@ -180,14 +213,11 @@ public class ProjectSelectionDialog extends DialogWrapper {
         // specified user is not in logged in user list, clear the account selection.
         accountComboBox.setSelectedItem(null);
       }
-
-      updateProjectList();
+      // no need to update project list - account combo box will generate event to reload.
     }
   }
 
-  private void showSignInRequest() {
-
-  }
+  private void showSignInRequest() {}
 
   private void validateProjectSelection() {
     if (projectListTable.getSelectedRow() >= 0) {
@@ -197,8 +227,23 @@ public class ProjectSelectionDialog extends DialogWrapper {
     }
   }
 
+  // finds if project list contains the project with given name, selects and scrolls to it.
+  private void showProjectInList(String projectName) {
+    for (int i = 0; i < projectListTableModel.getRowCount(); i++) {
+      String projectNameAtRow = projectListTableModel.getProjectNameAtRow(i);
+      if (projectNameAtRow.equals(projectName)) {
+        projectListTable.getSelectionModel().setSelectionInterval(i, i);
+        projectListTable.scrollRectToVisible(projectListTable.getCellRect(i, 0, true));
+        break;
+      }
+    }
+  }
+
   private String getSelectedProjectName() {
-    return projectListTableModel.getValueAt(projectListTable.getSelectedRow(), ProjectListTableModel.PROJECT_NAME_COLUMN).toString();
+    // row number change based on filtering state.
+    int actualSelectedRow =
+        projectListTable.getRowSorter().convertRowIndexToModel(projectListTable.getSelectedRow());
+    return projectListTableModel.getProjectNameAtRow(actualSelectedRow);
   }
 
   @Nullable
@@ -207,60 +252,15 @@ public class ProjectSelectionDialog extends DialogWrapper {
     return centerPanel;
   }
 
-  private static final class RefreshAction extends AbstractAction {
+  // re-queries all signed in users and projects.
+  private final class RefreshAction extends AbstractAction {
     private RefreshAction() {
       putValue(Action.SMALL_ICON, GoogleCloudToolsIcons.REFRESH);
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {}
-  }
-
-  private static final class ProjectListTableModel extends AbstractTableModel {
-    private static final int PROJECT_NAME_COLUMN = 0;
-    private static final int PROJECT_ID_COLUMN = 1;
-
-    private List<Project> projectList = new ArrayList<>();
-
-    @Override
-    public int getRowCount() {
-      return projectList.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-      return 2;
-    }
-
-    @Override
-    public Object getValueAt(int row, int column) {
-      switch (column) {
-        case PROJECT_NAME_COLUMN:
-          return projectList.get(row).getName();
-        case PROJECT_ID_COLUMN:
-          return projectList.get(row).getProjectId();
-      }
-
-      return "";
-    }
-
-    @Override
-    public String getColumnName(int column) {
-      switch (column) {
-        case PROJECT_NAME_COLUMN:
-          return GctBundle.getString("project.selector.project.list.project.name.column");
-        case PROJECT_ID_COLUMN:
-          return GctBundle.getString("project.selector.project.list.project.id.column");
-      }
-
-      return "";
-    }
-
-    private void setProjectList(
-        List<Project> updatedList) {
-      projectList.clear();
-      projectList.addAll(updatedList);
-      fireTableDataChanged();
+    public void actionPerformed(ActionEvent e) {
+      loadUsersAndProjects();
     }
   }
 
@@ -272,8 +272,7 @@ public class ProjectSelectionDialog extends DialogWrapper {
         JList list, CredentialedUser user, int index, boolean selected, boolean hasFocus) {
       if (user != null) {
         setText(user.getName() + " (" + user.getEmail() + ")");
-        setIcon(
-            GoogleLoginIcons.getScaledUserIcon(ProjectSelector.ACCOUNT_ICON_SIZE, user));
+        setIcon(GoogleLoginIcons.getScaledUserIcon(ProjectSelector.ACCOUNT_ICON_SIZE, user));
       }
     }
   }
