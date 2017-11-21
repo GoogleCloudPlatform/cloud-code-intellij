@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+buildscript {
+    repositories {
+        maven { url "https://maven-central.storage.googleapis.com"}
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+}
+
 plugins {
     id 'net.researchgate.release' version '2.3.4'
     id 'com.github.sherter.google-java-format' version '0.6' apply false
@@ -110,6 +117,7 @@ subprojects {
         }
         checkstyle "com.puppycrawl.tools:checkstyle:${versions.checkstyle}"
     }
+
     checkstyle {
         configFile = rootProject.file('google_checks.xml')
         showViolations true
