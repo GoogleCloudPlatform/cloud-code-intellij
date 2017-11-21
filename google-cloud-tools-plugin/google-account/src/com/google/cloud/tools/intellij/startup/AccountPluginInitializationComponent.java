@@ -28,9 +28,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Performs runtime initialization for the Google Login plugin.
- */
+/** Performs runtime initialization for the Google Login plugin. */
 public class AccountPluginInitializationComponent implements ApplicationComponent {
 
   @NotNull
@@ -52,13 +50,11 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
     // no-op
   }
 
-
   /**
-   * For Google Usage Tracker
-   * Ensure that the notification manager (also an application component) is registered first;
-   * otherwise this component's initComponent() call will fire a notification event bus
-   * to show the opt-in dialog, but the notification component may not yet have been initialized
-   * and is therefore not subscribed and listening.
+   * For Google Usage Tracker Ensure that the notification manager (also an application component)
+   * is registered first; otherwise this component's initComponent() call will fire a notification
+   * event bus to show the opt-in dialog, but the notification component may not yet have been
+   * initialized and is therefore not subscribed and listening.
    */
   @VisibleForTesting
   void configureUsageTracking() {
@@ -66,9 +62,10 @@ public class AccountPluginInitializationComponent implements ApplicationComponen
     if (usageTrackerManager.isUsageTrackingAvailable()
         && !usageTrackerManager.hasUserRecordedTrackingPreference()) {
       NotificationsManager.getNotificationsManager();
-      NotificationsConfiguration.getNotificationsConfiguration().register(
-          TrackerMessageBundle.message("notification.group.display.id"),
-          NotificationDisplayType.STICKY_BALLOON);
+      NotificationsConfiguration.getNotificationsConfiguration()
+          .register(
+              TrackerMessageBundle.message("notification.group.display.id"),
+              NotificationDisplayType.STICKY_BALLOON);
       UsageTrackerNotification.getInstance().showNotification();
     }
   }

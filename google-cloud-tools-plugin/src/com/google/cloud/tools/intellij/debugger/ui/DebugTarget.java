@@ -20,16 +20,11 @@ import com.google.api.services.clouddebugger.v2.model.Debuggee;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-
 import com.intellij.openapi.diagnostic.Logger;
-
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-
-/**
- * The class models out the details for a target debuggable module.
- */
+/** The class models out the details for a target debuggable module. */
 class DebugTarget implements DebugTargetSelectorItem {
 
   private static final Logger LOG = Logger.getInstance(DebugTarget.class);
@@ -73,8 +68,7 @@ class DebugTarget implements DebugTargetSelectorItem {
 
       //Build a description from the strings.
       if (!Strings.isNullOrEmpty(version)) {
-        description = GctBundle.getString("clouddebug.version.with.module.format",
-            module, version);
+        description = GctBundle.getString("clouddebug.version.with.module.format", module, version);
       }
 
       //Record the minor version.  We only show the latest minor version.

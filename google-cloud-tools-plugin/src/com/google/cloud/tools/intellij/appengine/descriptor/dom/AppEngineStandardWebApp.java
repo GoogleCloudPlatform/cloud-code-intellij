@@ -19,14 +19,10 @@ package com.google.cloud.tools.intellij.appengine.descriptor.dom;
 import com.intellij.util.xml.DomElement;
 import com.intellij.util.xml.GenericDomValue;
 
-/**
- * This is the Dom for the App Engine config file.
- */
+/** This is the Dom for the App Engine config file. */
 public interface AppEngineStandardWebApp extends DomElement {
 
-  /**
-   * Returns the App Engine service name of this application
-   */
+  /** Returns the App Engine service name of this application */
   GenericDomValue<String> getService();
 
   /**
@@ -37,15 +33,14 @@ public interface AppEngineStandardWebApp extends DomElement {
 
   /**
    * Returns the App Engine environment type this application will run in. Currently this is empty
-   * for Standard Environment or 'flex' for Flexible Environment.  appengine-web.xmls support for
+   * for Standard Environment or 'flex' for Flexible Environment. appengine-web.xmls support for
    * 'flex' will be going away in 2018.
    */
   GenericDomValue<String> getEnv();
 
   /**
-   * This field has been deprecated in the appengine-web.xml but we still need to be able to
-   * read it for older projects.
+   * This field has been deprecated in the appengine-web.xml but we still need to be able to read it
+   * for older projects.
    */
   GenericDomValue<String> getVm();
 }
-

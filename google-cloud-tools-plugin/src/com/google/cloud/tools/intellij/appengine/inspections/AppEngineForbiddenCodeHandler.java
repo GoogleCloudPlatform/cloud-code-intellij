@@ -20,12 +20,10 @@ import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author nik
- */
+/** @author nik */
 public abstract class AppEngineForbiddenCodeHandler {
-  public static final ExtensionPointName<AppEngineForbiddenCodeHandler> EP_NAME
-      = ExtensionPointName.create("com.google.gct.core.forbiddenCodeHandler");
+  public static final ExtensionPointName<AppEngineForbiddenCodeHandler> EP_NAME =
+      ExtensionPointName.create("com.google.gct.core.forbiddenCodeHandler");
 
   public abstract boolean isNativeMethodAllowed(@NotNull PsiMethod method);
 }

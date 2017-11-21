@@ -50,7 +50,6 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Default implementation of {@link CloudSdkService} backed by {@link PropertiesComponent} for
  * serialization.
- *
  */
 // TODO (eshaul) Offload path logic for retrieving AE libs to the common library once implemented
 public class DefaultCloudSdkService extends CloudSdkService {
@@ -59,12 +58,12 @@ public class DefaultCloudSdkService extends CloudSdkService {
 
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
-  private static final Path JAVA_TOOLS_RELATIVE_PATH
-      = Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
+  private static final Path JAVA_TOOLS_RELATIVE_PATH =
+      Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
 
   // Kept around for AppEngineGwtServer
-  public static final Path LIB_APPENGINE_TOOLS_API_JAR
-      = Paths.get("lib", "appengine-tools-api.jar");
+  public static final Path LIB_APPENGINE_TOOLS_API_JAR =
+      Paths.get("lib", "appengine-tools-api.jar");
 
   private Map<String, Set<String>> myMethodsBlackList;
 
@@ -187,13 +186,15 @@ public class DefaultCloudSdkService extends CloudSdkService {
   @Override
   public void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters) {
     if (getJavaToolsBasePath() != null) {
-      File agentPath = getJavaToolsBasePath().resolve(
-          Paths.get("lib", "agent", "appengine-agent.jar")).toFile();
+      File agentPath =
+          getJavaToolsBasePath().resolve(Paths.get("lib", "agent", "appengine-agent.jar")).toFile();
       if (agentPath.exists()) {
         vmParameters.add("-javaagent:" + agentPath.getAbsolutePath());
       }
-      File patchPath = getJavaToolsBasePath().resolve(
-          Paths.get("lib", "override", "appengine-dev-jdk-overrides.jar")).toFile();
+      File patchPath =
+          getJavaToolsBasePath()
+              .resolve(Paths.get("lib", "override", "appengine-dev-jdk-overrides.jar"))
+              .toFile();
       if (patchPath.exists()) {
         vmParameters.add("-Xbootclasspath/p:" + patchPath.getAbsolutePath());
       }
@@ -204,8 +205,8 @@ public class DefaultCloudSdkService extends CloudSdkService {
     final InputStream stream = getClass().getResourceAsStream("/data/methodsBlacklist.txt");
     logger.assertTrue(stream != null, "/data/methodsBlacklist.txt not found");
     final THashMap<String, Set<String>> map = new THashMap<>();
-    BufferedReader reader
-        = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+    BufferedReader reader =
+        new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     try {
       String line;
       while ((line = reader.readLine()) != null) {

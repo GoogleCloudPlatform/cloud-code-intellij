@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.login;
 
 import com.google.api.client.repackaged.javax.annotation.Nullable;
 
-/**
- * Login Plugin configuration flags.
- */
+/** Login Plugin configuration flags. */
 public interface PluginFlags {
 
   @Nullable

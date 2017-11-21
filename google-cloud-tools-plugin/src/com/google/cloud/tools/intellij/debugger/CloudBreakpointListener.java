@@ -16,9 +16,7 @@
 
 package com.google.cloud.tools.intellij.debugger;
 
-/**
- * Implement this interface to listen on update events to the cloud state.
- */
+/** Implement this interface to listen on update events to the cloud state. */
 public interface CloudBreakpointListener {
 
   void onBreakpointListChanged(CloudDebugProcessState state);

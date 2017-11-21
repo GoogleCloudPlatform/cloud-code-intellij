@@ -64,26 +64,29 @@ class ProjectDebuggeeBinding {
   //   has projectSelector.getProjectNumber() set to null.
   private boolean isCdbQueried = false;
 
-  public ProjectDebuggeeBinding(@NotNull ProjectSelector projectSelector,
+  public ProjectDebuggeeBinding(
+      @NotNull ProjectSelector projectSelector,
       @NotNull JComboBox targetSelector,
       @NotNull Action okAction) {
     this.projectSelector = projectSelector;
     this.targetSelector = targetSelector;
     this.okAction = okAction;
 
-    this.projectSelector.addTextChangedListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        refreshDebugTargetList();
-      }
-    });
+    this.projectSelector.addTextChangedListener(
+        new DocumentAdapter() {
+          @Override
+          protected void textChanged(DocumentEvent event) {
+            refreshDebugTargetList();
+          }
+        });
 
-    this.projectSelector.addModelListener(new TreeModelAdapter() {
-      @Override
-      public void treeStructureChanged(TreeModelEvent event) {
-        refreshDebugTargetList();
-      }
-    });
+    this.projectSelector.addModelListener(
+        new TreeModelAdapter() {
+          @Override
+          public void treeStructureChanged(TreeModelEvent event) {
+            refreshDebugTargetList();
+          }
+        });
   }
 
   @NotNull
@@ -94,7 +97,8 @@ class ProjectDebuggeeBinding {
     String savedDebuggeeId = selectedItem != null ? selectedItem.getId() : null;
     String savedProjectDescription = projectSelector.getText();
 
-    return new CloudDebugProcessState(credentialedUser != null ? credentialedUser.getEmail() : null,
+    return new CloudDebugProcessState(
+        credentialedUser != null ? credentialedUser.getEmail() : null,
         savedDebuggeeId,
         savedProjectDescription,
         projectNumberString,
@@ -110,8 +114,9 @@ class ProjectDebuggeeBinding {
 
     this.credentialedUser = credentialedUser;
     cloudDebuggerClient =
-        this.credentialedUser != null ? CloudDebuggerClient.getLongTimeoutClient(
-            this.credentialedUser.getEmail()) : null;
+        this.credentialedUser != null
+            ? CloudDebuggerClient.getLongTimeoutClient(this.credentialedUser.getEmail())
+            : null;
 
     return cloudDebuggerClient;
   }
@@ -128,9 +133,7 @@ class ProjectDebuggeeBinding {
     }
   }
 
-  /**
-   * Refreshes the list of attachable debug targets based on the project selection.
-   */
+  /** Refreshes the list of attachable debug targets based on the project selection. */
   @SuppressWarnings("FutureReturnValueIgnored")
   private void refreshDebugTargetList() {
     targetSelector.removeAllItems();
@@ -234,8 +237,8 @@ class ProjectDebuggeeBinding {
       case 403:
         return GctBundle.message("clouddebug.debug.targets.accessdenied");
       default:
-        return GctBundle
-            .getString("clouddebug.debug.targets.error", reason.getDetails().getMessage());
+        return GctBundle.getString(
+            "clouddebug.debug.targets.error", reason.getDetails().getMessage());
     }
   }
 

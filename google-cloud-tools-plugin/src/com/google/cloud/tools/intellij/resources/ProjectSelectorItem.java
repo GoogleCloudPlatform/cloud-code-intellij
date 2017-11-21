@@ -39,9 +39,7 @@ final class ProjectSelectorItem extends JBLabel {
     setForeground(TEXT_NON_SELECTION_COLOR);
   }
 
-  /**
-   * Renders the project item hovered (takes precedence), selected or plain.
-   */
+  /** Renders the project item hovered (takes precedence), selected or plain. */
   void setRenderStyle(boolean selected, boolean hovered) {
     if (selected) {
       setForeground(TEXT_SELECTION_COLOR);

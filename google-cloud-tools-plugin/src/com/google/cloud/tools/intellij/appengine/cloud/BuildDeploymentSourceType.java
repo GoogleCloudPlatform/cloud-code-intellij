@@ -49,16 +49,15 @@ public abstract class BuildDeploymentSourceType
   /**
    * Creates a pre-deploy task ({@link BeforeRunTask}) for the given build-system and attaches it to
    * this module deployment source type. Invoked when a new deployment configuration is created.
-   * <p/>
-   * Provides the common functionality for creating the build-system packaging task, delegating
+   *
+   * <p>Provides the common functionality for creating the build-system packaging task, delegating
    * build-system specific functions to the concrete sub-types.
-   * <p/>
-   * Only creates a new task if one is not already configured.
+   *
+   * <p>Only creates a new task if one is not already configured.
    */
   @Override
   public void setBuildBeforeRunTask(
-      @NotNull RunConfiguration configuration,
-      @NotNull ModuleDeploymentSource source) {
+      @NotNull RunConfiguration configuration, @NotNull ModuleDeploymentSource source) {
 
     Module module = source.getModule();
 
@@ -69,8 +68,7 @@ public abstract class BuildDeploymentSourceType
     setConfiguration(configuration);
 
     RunManagerEx runManager = RunManagerEx.getInstanceEx(configuration.getProject());
-    final Collection<? extends BeforeRunTask> buildTasks =
-        getBuildTasks(runManager, configuration);
+    final Collection<? extends BeforeRunTask> buildTasks = getBuildTasks(runManager, configuration);
 
     if (!hasBuildTaskForModule(buildTasks, module)) {
       BeforeRunTask buildTask = createBuildTask(module);
@@ -86,12 +84,12 @@ public abstract class BuildDeploymentSourceType
   /**
    * Updates the pre-deploy build tasks ({@link BeforeRunTask}) when the deployment source is
    * updated.
-   * <p/>
-   * Similar to {@link BuildDeploymentSourceType#setBuildBeforeRunTask(RunConfiguration,
+   *
+   * <p>Similar to {@link BuildDeploymentSourceType#setBuildBeforeRunTask(RunConfiguration,
    * ModuleDeploymentSource)}, but it is invoked when switching between deployment sources in the
    * UI.
-   * <p/>
-   * Only creates a new task if one is not already configured. In following the IntelliJ pattern
+   *
+   * <p>Only creates a new task if one is not already configured. In following the IntelliJ pattern
    * used for bundled deployment sources, this does NOT remove any existing tasks.
    */
   @Override
@@ -124,30 +122,28 @@ public abstract class BuildDeploymentSourceType
 
   /**
    * Returns the collection of already configured {@link BeforeRunTask} subtypes for the given
-   *     build-system.
+   * build-system.
    */
   @NotNull
   protected abstract Collection<? extends BeforeRunTask> getBuildTasks(
-      RunManagerEx runManager,
-      RunConfiguration configuration);
+      RunManagerEx runManager, RunConfiguration configuration);
 
   /**
    * Creates a new instance of a {@link BeforeRunTask} for the corresponding build-system.
-   * <p/>
-   * This build task should encapsulate packaging of the build artifact for the supplied module.
+   *
+   * <p>This build task should encapsulate packaging of the build artifact for the supplied module.
    *
    * @param module for which this task is scoped
    * @return a new build task
    */
-
   @Nullable
   protected abstract BeforeRunTask createBuildTask(Module module);
 
   /**
    * Determines if there is already a configured build task in the supplied collection.
-   * <p/>
-   * Implementors should consider only those tasks corresponding to their build-systems, those that
-   * produce the build artifact, and those scoped to the supplied module.
+   *
+   * <p>Implementors should consider only those tasks corresponding to their build-systems, those
+   * that produce the build artifact, and those scoped to the supplied module.
    *
    * @return boolean indicating if a build task exists.
    */
@@ -167,5 +163,4 @@ public abstract class BuildDeploymentSourceType
       deployRunConfiguration.setDeploymentConfiguration(new AppEngineDeploymentConfiguration());
     }
   }
-
 }

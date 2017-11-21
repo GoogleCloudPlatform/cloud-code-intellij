@@ -22,9 +22,7 @@ import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Performs runtime initialization for the GCT plugin.
- */
+/** Performs runtime initialization for the GCT plugin. */
 public class CloudToolsPluginInitializationComponent implements ApplicationComponent {
 
   @Override
@@ -40,10 +38,10 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
 
   @Override
   public void initComponent() {
-    CloudToolsPluginConfigurationService pluginConfigurationService = ServiceManager
-        .getService(CloudToolsPluginConfigurationService.class);
-    CloudToolsPluginInfoService pluginInfoService = ServiceManager
-        .getService(CloudToolsPluginInfoService.class);
+    CloudToolsPluginConfigurationService pluginConfigurationService =
+        ServiceManager.getService(CloudToolsPluginConfigurationService.class);
+    CloudToolsPluginInfoService pluginInfoService =
+        ServiceManager.getService(CloudToolsPluginInfoService.class);
 
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
       initErrorReporting(pluginConfigurationService, pluginInfoService);
@@ -53,9 +51,9 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
     new GoogleAccountPluginUninstaller().uninstallIfPresent();
   }
 
-  private void initErrorReporting(CloudToolsPluginConfigurationService pluginConfigurationService,
+  private void initErrorReporting(
+      CloudToolsPluginConfigurationService pluginConfigurationService,
       CloudToolsPluginInfoService pluginInfoService) {
-    pluginConfigurationService
-        .enabledGoogleFeedbackErrorReporting(pluginInfoService.getPluginId());
+    pluginConfigurationService.enabledGoogleFeedbackErrorReporting(pluginInfoService.getPluginId());
   }
 }

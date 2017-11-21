@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.SelectUserDialog;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.ide.DataManager;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -32,19 +31,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 import com.intellij.util.AuthData;
-
+import git4idea.DialogManager;
+import git4idea.remote.GitHttpAuthDataProvider;
+import java.awt.Window;
+import java.io.IOException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Window;
-import java.io.IOException;
-
-import git4idea.DialogManager;
-import git4idea.remote.GitHttpAuthDataProvider;
-
-/**
- * Provides credential information for URLs pointing to Google's cloud source.
- */
+/** Provides credential information for URLs pointing to Google's cloud source. */
 public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
 
   private static final Logger LOG = Logger.getInstance(GcpHttpAuthDataProvider.class);
@@ -72,16 +66,20 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
 
       if (targetUser == null) {
         //show a dialog allowing the user to select a login.  (new project recognized)
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
-          @Override
-          public void run() {
-            SelectUserDialog dialog = new SelectUserDialog(currentProject,
-                GctBundle.getString("httpauthprovider.chooselogin"));
-            DialogManager.show(dialog);
-            chooseManualLogin = !dialog.isOK();
-            selectedUser = dialog.getSelectedUser();
-          }
-        }, ModalityState.defaultModalityState());
+        ApplicationManager.getApplication()
+            .invokeAndWait(
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    SelectUserDialog dialog =
+                        new SelectUserDialog(
+                            currentProject, GctBundle.getString("httpauthprovider.chooselogin"));
+                    DialogManager.show(dialog);
+                    chooseManualLogin = !dialog.isOK();
+                    selectedUser = dialog.getSelectedUser();
+                  }
+                },
+                ModalityState.defaultModalityState());
 
         if (chooseManualLogin) {
           return null;
@@ -95,24 +93,21 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
 
       if (targetUser != null) {
         try {
-          return new AuthData(targetUser.getEmail(),
-              targetUser.getGoogleLoginState().fetchAccessToken());
+          return new AuthData(
+              targetUser.getEmail(), targetUser.getGoogleLoginState().fetchAccessToken());
         } catch (IOException ex) {
           LOG.error("IOException creating authdata:" + ex.toString());
         }
       }
-
     }
     return null;
   }
 
-  /**
-   * Check if url is a Google Cloud Platform URL.
-   */
+  /** Check if url is a Google Cloud Platform URL. */
   public static boolean isGcpUrl(@Nullable String url) {
     return (url != null
-        && (StringUtil.startsWithIgnoreCase(url, GOOGLE_URL) || StringUtil
-            .startsWithIgnoreCase(url, GOOGLE_URL_ALT)));
+        && (StringUtil.startsWithIgnoreCase(url, GOOGLE_URL)
+            || StringUtil.startsWithIgnoreCase(url, GOOGLE_URL_ALT)));
   }
 
   public static String getGcpUrl(String projectId, String repositoryId) {
@@ -153,15 +148,15 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
     Project result = null;
     Window activeWindow = WindowManagerEx.getInstanceEx().getMostRecentFocusedWindow();
     if (activeWindow != null) {
-      result = CommonDataKeys.PROJECT
-          .getData(DataManager.getInstance().getDataContext(activeWindow));
+      result =
+          CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(activeWindow));
     }
     return result != null ? result : currentProject;
   }
 
   /**
    * This class allows IJ to perform Git operations without a project, but with context that will
-   * give the authdataprovider enough information to log in.  This is used in the checkout from GCP
+   * give the authdataprovider enough information to log in. This is used in the checkout from GCP
    * scenario, where the user has explicitly chosen a GCP project (with username), but there isn't a
    * project yet to choose from.
    */
@@ -175,9 +170,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
       this.userName = userName;
     }
 
-    /**
-     * Creates a new context.
-     */
+    /** Creates a new context. */
     public static Context create(@Nullable String userName) {
       Context newContext = new Context(userName);
       assert currentContext == null;
@@ -185,9 +178,7 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
       return newContext;
     }
 
-    /**
-     * Close the current context.
-     */
+    /** Close the current context. */
     public void close() {
       if (currentContext == this) {
         currentContext = null;

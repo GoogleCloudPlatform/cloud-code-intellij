@@ -71,9 +71,10 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * ProjectSelector allows the user to select a GCP project id. It calls into {@link
- * IntegratedIntellijGoogleLoginService} to get the set of credentialed users and then into
- * resource manager to get the set of projects. The result is displayed in a tree view organized by
- * google login. */
+ * IntegratedIntellijGoogleLoginService} to get the set of credentialed users and then into resource
+ * manager to get the set of projects. The result is displayed in a tree view organized by google
+ * login.
+ */
 // TODO(nkibler): Re-do this mess so we can remove the plethora of hacky solutions for listeners.
 public class ProjectSelector extends CustomizableComboBox implements CustomizableComboBoxPopup {
 
@@ -99,9 +100,7 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     this(false);
   }
 
-  /**
-   * Initialize the project selector.
-   */
+  /** Initialize the project selector. */
   public ProjectSelector(final boolean queryOnExpand) {
     this.queryOnExpand = queryOnExpand;
     modelRoot = new DefaultMutableTreeNode("root");
@@ -136,22 +135,23 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
         });
 
     // When the project selector becomes visible, we synchronize and call elysium.
-    addComponentListener(new ComponentAdapter() {
-      @Override
-      public void componentShown(ComponentEvent event) {
-        synchronize(false);
-        if (EMPTY_MARKER.equals(getText())) {
-          setText(EMPTY_VALUE);
-        }
-      }
+    addComponentListener(
+        new ComponentAdapter() {
+          @Override
+          public void componentShown(ComponentEvent event) {
+            synchronize(false);
+            if (EMPTY_MARKER.equals(getText())) {
+              setText(EMPTY_VALUE);
+            }
+          }
 
-      @Override
-      public void componentHidden(ComponentEvent event) {
-        if (EMPTY_VALUE.equals(getText())) {
-          setText(EMPTY_MARKER);
-        }
-      }
-    });
+          @Override
+          public void componentHidden(ComponentEvent event) {
+            if (EMPTY_VALUE.equals(getText())) {
+              setText(EMPTY_MARKER);
+            }
+          }
+        });
 
     getTextField().setCursor(Cursor.getDefaultCursor());
     getTextField().getEmptyText().setText("Enter a cloud project ID...");
@@ -165,11 +165,12 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     addHierarchyListener(
         event -> {
           if ((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-            SwingUtilities.invokeLater(() -> {
-              if (ProjectSelector.this.isVisible()) {
-                synchronize(false);
-              }
-            });
+            SwingUtilities.invokeLater(
+                () -> {
+                  if (ProjectSelector.this.isVisible()) {
+                    synchronize(false);
+                  }
+                });
           }
         });
 
@@ -186,20 +187,22 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
               }
             });
 
-    getTextField().addFocusListener(new FocusListener() {
-      @Override
-      public void focusGained(FocusEvent e) {
-        // do nothing
-      }
+    getTextField()
+        .addFocusListener(
+            new FocusListener() {
+              @Override
+              public void focusGained(FocusEvent e) {
+                // do nothing
+              }
 
-      @Override
-      public void focusLost(FocusEvent event) {
-        if (!event.isTemporary()) {
-          ProjectModelItem node = getCurrentModelItem();
-          onSelectionChanged(node);
-        }
-      }
-    });
+              @Override
+              public void focusLost(FocusEvent event) {
+                if (!event.isTemporary()) {
+                  ProjectModelItem node = getCurrentModelItem();
+                  onSelectionChanged(node);
+                }
+              }
+            });
 
     Stream.of(ProjectManager.getInstance().getOpenProjects())
         .forEach(
@@ -225,8 +228,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
   /**
    * Returns the selected credentialed user for the project id represented by {@link #getText()}.
-   * <p/>
-   * Note: if the ProjectSelector is created with queryOnExpand, this value could be {@code null}
+   *
+   * <p>Note: if the ProjectSelector is created with queryOnExpand, this value could be {@code null}
    * even if {@link #getText()} represents a valid project because the user has not expanded the
    * owning {@link IntegratedIntellijGoogleLoginService}.
    */
@@ -256,41 +259,44 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
   /**
    * Returns the selected project's description.
-   * <p/>
-   * This has the same limitations as {@link #getSelectedUser()}  in that it may be null even if
+   *
+   * <p>This has the same limitations as {@link #getSelectedUser()} in that it may be null even if
    * getText represents a valid ID if queryOnExpand is true.
    */
   @Nullable
   public String getProjectDescription() {
     ProjectModelItem projectModelItem = getCurrentModelItem();
-    return projectModelItem instanceof ResourceProjectModelItem ?
-        ((ResourceProjectModelItem) projectModelItem).getProject().getName() : null;
+    return projectModelItem instanceof ResourceProjectModelItem
+        ? ((ResourceProjectModelItem) projectModelItem).getProject().getName()
+        : null;
   }
 
   /**
    * Returns the selected project's numeric code.
-   * <p/>
-   * This has the same limitations as {@link #getSelectedUser()}  in that it may be null even if
+   *
+   * <p>This has the same limitations as {@link #getSelectedUser()} in that it may be null even if
    * getText represents a valid ID if queryOnExpand is true.
    */
   @Nullable
   public Long getProjectNumber() {
     ProjectModelItem projectModelItem = getCurrentModelItem();
-    return projectModelItem instanceof ResourceProjectModelItem ?
-        ((ResourceProjectModelItem) projectModelItem).getProject().getProjectNumber() : null;
+    return projectModelItem instanceof ResourceProjectModelItem
+        ? ((ResourceProjectModelItem) projectModelItem).getProject().getProjectNumber()
+        : null;
   }
 
   /**
    * Returns the selected project.
-   * <p/>
-   * This has the same limitations as {@link #getSelectedUser()}  in that it may be null even if
+   *
+   * <p>This has the same limitations as {@link #getSelectedUser()} in that it may be null even if
    * getText represents a valid ID if queryOnExpand is true.
    */
   @Nullable
   public Project getProject() {
-   ProjectModelItem projectModelItem = getCurrentModelItem();
-   return projectModelItem instanceof ResourceProjectModelItem ?
-       ((ResourceProjectModelItem) projectModelItem).getProject() : null;
+    ProjectModelItem projectModelItem = getCurrentModelItem();
+    return projectModelItem instanceof ResourceProjectModelItem
+        ? ((ResourceProjectModelItem) projectModelItem).getProject()
+        : null;
   }
 
   @Nullable
@@ -319,7 +325,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
   @Override
   protected int getPreferredPopupHeight() {
-    return !needsToSignIn() ? PREFERRED_HEIGHT
+    return !needsToSignIn()
+        ? PREFERRED_HEIGHT
         : BaseGoogleLoginUi.PREFERRED_HEIGHT + POPUP_HEIGHTFRAMESIZE;
   }
 
@@ -399,8 +406,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
             if (forceUpdate) {
               node.setNeedsSynchronizing();
             }
-            if (!queryOnExpand ||
-                (popupPanel != null && popupPanel.tree.isExpanded(new TreePath(node.getPath())))) {
+            if (!queryOnExpand
+                || (popupPanel != null
+                    && popupPanel.tree.isExpanded(new TreePath(node.getPath())))) {
               node.synchronize();
             }
           }
@@ -435,8 +443,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
     @Nullable
     private TreePath find(DefaultMutableTreeNode root, String str) {
-      @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> nodes = root
-          .depthFirstEnumeration();
+      @SuppressWarnings("unchecked")
+      Enumeration<DefaultMutableTreeNode> nodes = root.depthFirstEnumeration();
       while (nodes.hasMoreElements()) {
         DefaultMutableTreeNode node = nodes.nextElement();
         if (node instanceof ResourceProjectModelItem
@@ -484,40 +492,41 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       this.getContentPane()
           .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       this.getContentPane().setViewportView(tree);
-      tree.addTreeSelectionListener(event -> {
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
-              .getLastSelectedPathComponent();
-          if (node != null) {
-            if (node instanceof ResourceProjectModelItem) {
-              ResourceProjectModelItem projectNode = (ResourceProjectModelItem) node;
-              String oldSelection = ProjectSelector.this.getText();
-              String newSelection = projectNode.getProject().getProjectId();
-              if (Strings.isNullOrEmpty(oldSelection) || !oldSelection.equals(newSelection)) {
-                ProjectSelector.this.setText(newSelection);
-                onSelectionChanged(projectNode);
-                SwingUtilities.invokeLater(ProjectSelector.this::hidePopup);
+      tree.addTreeSelectionListener(
+          event -> {
+            DefaultMutableTreeNode node =
+                (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            if (node != null) {
+              if (node instanceof ResourceProjectModelItem) {
+                ResourceProjectModelItem projectNode = (ResourceProjectModelItem) node;
+                String oldSelection = ProjectSelector.this.getText();
+                String newSelection = projectNode.getProject().getProjectId();
+                if (Strings.isNullOrEmpty(oldSelection) || !oldSelection.equals(newSelection)) {
+                  ProjectSelector.this.setText(newSelection);
+                  onSelectionChanged(projectNode);
+                  SwingUtilities.invokeLater(ProjectSelector.this::hidePopup);
+                }
+              } else {
+                tree.clearSelection();
               }
-            } else {
-              tree.clearSelection();
             }
-          }
-      });
+          });
 
       if (queryOnExpand) {
-        tree.addTreeExpansionListener(new TreeExpansionListener() {
-          @Override
-          public void treeExpanded(TreeExpansionEvent event) {
-            TreePath expandedPath = event.getPath();
-            if (expandedPath != null && expandedPath
-                .getLastPathComponent() instanceof GoogleUserModelItem) {
-              ((GoogleUserModelItem) expandedPath.getLastPathComponent()).synchronize();
-            }
-          }
+        tree.addTreeExpansionListener(
+            new TreeExpansionListener() {
+              @Override
+              public void treeExpanded(TreeExpansionEvent event) {
+                TreePath expandedPath = event.getPath();
+                if (expandedPath != null
+                    && expandedPath.getLastPathComponent() instanceof GoogleUserModelItem) {
+                  ((GoogleUserModelItem) expandedPath.getLastPathComponent()).synchronize();
+                }
+              }
 
-          @Override
-          public void treeCollapsed(TreeExpansionEvent event) {
-          }
-        });
+              @Override
+              public void treeCollapsed(TreeExpansionEvent event) {}
+            });
       }
 
       for (int i = 0; i < tree.getRowCount(); i++) {
@@ -533,17 +542,19 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       Insets contentInset = this.getContentPane().getInsets();
       Insets treeInset = tree.getInsets();
 
-      int preferredWidth = renderer.getMaximumWidth()
-          + UIUtil.getTreeLeftChildIndent() * 2
-          + UIUtil.getTreeExpandedIcon().getIconWidth() * 2
-          + UIUtil.getScrollBarWidth()
-          + (thisInsets != null ? (thisInsets.left + thisInsets.right) : 0)
-          + (contentInset != null ? (contentInset.left + contentInset.right) : 0)
-          + (treeInset != null ? (treeInset.left + treeInset.right) : 0);
+      int preferredWidth =
+          renderer.getMaximumWidth()
+              + UIUtil.getTreeLeftChildIndent() * 2
+              + UIUtil.getTreeExpandedIcon().getIconWidth() * 2
+              + UIUtil.getScrollBarWidth()
+              + (thisInsets != null ? (thisInsets.left + thisInsets.right) : 0)
+              + (contentInset != null ? (contentInset.left + contentInset.right) : 0)
+              + (treeInset != null ? (treeInset.left + treeInset.right) : 0);
 
       preferredWidth = Math.max(preferredWidth, ProjectSelector.this.getWidth());
-      this.setPreferredSize(new Dimension(Math.max(BaseGoogleLoginUi.MIN_WIDTH, preferredWidth),
-          getPreferredPopupHeight()));
+      this.setPreferredSize(
+          new Dimension(
+              Math.max(BaseGoogleLoginUi.MIN_WIDTH, preferredWidth), getPreferredPopupHeight()));
 
       initializeBottomPane();
       getBottomPane().setLayout(new BorderLayout());
@@ -551,11 +562,12 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       if (!needsToSignIn()) {
         JButton synchronizeButton = new JButton();
         synchronizeButton.setIcon(GoogleCloudToolsIcons.REFRESH);
-        synchronizeButton.addActionListener(event -> {
-          if (!needsToSignIn()) {
-            synchronize(true);
-          }
-        });
+        synchronizeButton.addActionListener(
+            event -> {
+              if (!needsToSignIn()) {
+                synchronize(true);
+              }
+            });
 
         getBottomPane().add(synchronizeButton, BorderLayout.EAST);
       }
@@ -570,8 +582,8 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
 
     @Override
     protected void doLogin() {
-      Services.getLoginService().logIn(
-          null /* message */, () -> synchronize(true) /* onLoginCompleted */);
+      Services.getLoginService()
+          .logIn(null /* message */, () -> synchronize(true) /* onLoginCompleted */);
     }
   }
 
@@ -586,8 +598,9 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
       if (newSelection instanceof InvalidResourceProjectModelItem) {
         event = new ProjectSelectionChangedEvent(null, user);
       } else if (newSelection instanceof ResourceProjectModelItem) {
-        event = new ProjectSelectionChangedEvent((
-            (ResourceProjectModelItem) newSelection).getProject(), user);
+        event =
+            new ProjectSelectionChangedEvent(
+                ((ResourceProjectModelItem) newSelection).getProject(), user);
       }
     }
     for (ProjectSelectionListener listener : projectSelectionListeners) {
@@ -644,22 +657,19 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
   }
 
   /**
-   * Interface that must be implemented in order to be informed of
-   * {@link ProjectSelectionChangedEvent} events.
+   * Interface that must be implemented in order to be informed of {@link
+   * ProjectSelectionChangedEvent} events.
    */
   public interface ProjectSelectionListener {
     void selectionChanged(ProjectSelectionChangedEvent event);
   }
 
-  /**
-   * Event for when the selection changes to a valid or invalid project.
-   */
+  /** Event for when the selection changes to a valid or invalid project. */
   public static class ProjectSelectionChangedEvent {
     private final Project selectedProject;
     private final CredentialedUser user;
 
-    public ProjectSelectionChangedEvent(
-        Project selectedProject, CredentialedUser user) {
+    public ProjectSelectionChangedEvent(Project selectedProject, CredentialedUser user) {
       this.selectedProject = selectedProject;
       this.user = user;
     }
@@ -671,7 +681,5 @@ public class ProjectSelector extends CustomizableComboBox implements Customizabl
     public CredentialedUser getUser() {
       return user;
     }
-
   }
-
 }

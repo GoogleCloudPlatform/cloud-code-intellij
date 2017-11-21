@@ -21,26 +21,21 @@ import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.resources.RepositoryRemotePanel;
 import com.google.cloud.tools.intellij.resources.RepositorySelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
+import git4idea.repo.GitRepository;
 import java.awt.Dimension;
-
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
-
-import git4idea.repo.GitRepository;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Shows the upload to Google Cloud Source Repositories dialog for initializing a project on
- * a GCP repository.
+ * Shows the upload to Google Cloud Source Repositories dialog for initializing a project on a GCP
+ * repository.
  */
 public class SetupCloudRepositoryDialog extends DialogWrapper {
 
@@ -54,8 +49,11 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
   private CredentialedUser credentialedUser;
   private GitRepository gitRepository;
 
-  public SetupCloudRepositoryDialog(@NotNull Project project, @Nullable GitRepository gitRepository,
-      @NotNull String title, @NotNull String okText) {
+  public SetupCloudRepositoryDialog(
+      @NotNull Project project,
+      @Nullable GitRepository gitRepository,
+      @NotNull String title,
+      @NotNull String okText) {
     super(project, true);
 
     this.gitRepository = gitRepository;
@@ -66,9 +64,7 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
     setOKActionEnabled(false);
   }
 
-  /**
-   * Return the project ID selected by the user.
-   */
+  /** Return the project ID selected by the user. */
   @NotNull
   public String getProjectId() {
     return projectId;
@@ -84,9 +80,7 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
     return remoteName;
   }
 
-  /**
-   * Return the credentialed user that owns the ID returned from {@link #getProjectId()}.
-   */
+  /** Return the credentialed user that owns the ID returned from {@link #getProjectId()}. */
   @Nullable
   public CredentialedUser getCredentialedUser() {
     return credentialedUser;
@@ -101,37 +95,47 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
     projectSelector = new ProjectSelector();
     projectSelector.setMinimumSize(new Dimension(300, 0));
 
-    repositorySelector = new RepositorySelector(projectSelector.getText(),
-        projectSelector.getSelectedUser(), true /*canCreateRepository*/);
+    repositorySelector =
+        new RepositorySelector(
+            projectSelector.getText(),
+            projectSelector.getSelectedUser(),
+            true /*canCreateRepository*/);
 
     remoteNameSelector = new RepositoryRemotePanel(gitRepository);
 
-    projectSelector.addTextChangedListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        repositorySelector.setCloudProject(projectSelector.getText());
-        repositorySelector.setUser(projectSelector.getSelectedUser());
-        repositorySelector.setText("");
-        repositorySelector.loadRepositories();
-        updateButtons();
-      }
-    });
-
-    repositorySelector.getDocument().addDocumentListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        remoteNameSelector.update(repositorySelector.getSelectedRepository());
-        updateButtons();
-      }
-    });
-
-    remoteNameSelector.getRemoteNameField().getDocument().addDocumentListener(
+    projectSelector.addTextChangedListener(
         new DocumentAdapter() {
           @Override
           protected void textChanged(DocumentEvent event) {
+            repositorySelector.setCloudProject(projectSelector.getText());
+            repositorySelector.setUser(projectSelector.getSelectedUser());
+            repositorySelector.setText("");
+            repositorySelector.loadRepositories();
             updateButtons();
           }
         });
+
+    repositorySelector
+        .getDocument()
+        .addDocumentListener(
+            new DocumentAdapter() {
+              @Override
+              protected void textChanged(DocumentEvent event) {
+                remoteNameSelector.update(repositorySelector.getSelectedRepository());
+                updateButtons();
+              }
+            });
+
+    remoteNameSelector
+        .getRemoteNameField()
+        .getDocument()
+        .addDocumentListener(
+            new DocumentAdapter() {
+              @Override
+              protected void textChanged(DocumentEvent event) {
+                updateButtons();
+              }
+            });
   }
 
   private void updateButtons() {
@@ -149,14 +153,14 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
       return;
     }
 
-    if(projectSelector.getSelectedUser() == null
+    if (projectSelector.getSelectedUser() == null
         || StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
       setErrorText(null);
       setOKActionEnabled(false);
       return;
     }
 
-    if(StringUtil.isEmpty(remoteNameSelector.getText())) {
+    if (StringUtil.isEmpty(remoteNameSelector.getText())) {
       setErrorText(GctBundle.message("uploadtogcp.dialog.missing.remote"));
       setOKActionEnabled(false);
       return;

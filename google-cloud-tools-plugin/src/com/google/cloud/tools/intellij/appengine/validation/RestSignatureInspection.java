@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
 import com.google.cloud.tools.intellij.appengine.util.PsiUtils;
 import com.google.common.collect.Maps;
-
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -38,26 +37,22 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
-
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Inspection to check that REST signatures in an Endpoint class are unique.
- */
+/** Inspection to check that REST signatures in an Endpoint class are unique. */
 public class RestSignatureInspection extends EndpointInspectionBase {
 
   public enum RestMethod {
     LIST("list", "GET") {
       /**
-       * If the return type of {@code method} is a parameterized collection,
-       * this function constructs the resource name from the parameterized parameters
-       * of the return type else it returns {@code null}.
+       * If the return type of {@code method} is a parameterized collection, this function
+       * constructs the resource name from the parameterized parameters of the return type else it
+       * returns {@code null}.
        *
        * @param method the method in which the resource name will be generated from
        * @return the guessed resource name
@@ -90,11 +85,12 @@ public class RestSignatureInspection extends EndpointInspectionBase {
           PsiClassType collectionType =
               JavaPsiFacade.getElementFactory(project)
                   .createTypeByFQClassName("java.util.Collection");
-          PsiClassType collectionResponseType = JavaPsiFacade.getElementFactory(project)
-              .createTypeByFQClassName("com.google.api.server.spi.response.CollectionResponse");
+          PsiClassType collectionResponseType =
+              JavaPsiFacade.getElementFactory(project)
+                  .createTypeByFQClassName("com.google.api.server.spi.response.CollectionResponse");
 
-          return collectionType.isAssignableFrom(type) || collectionResponseType
-              .isAssignableFrom(type);
+          return collectionType.isAssignableFrom(type)
+              || collectionResponseType.isAssignableFrom(type);
         }
         return false;
       }
@@ -104,30 +100,30 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     UPDATE("update", "PUT"),
     DELETE("delete", "DELETE") {
       /**
-       * Returns {@code null} if the length of the name of {@code method} is
-       * shorter or equal to the current RestMethod's prefix. Otherwise returns the substring
-       * of the name of {@code method} beginning at the length of the current RestMethod's
-       * prefix.
+       * Returns {@code null} if the length of the name of {@code method} is shorter or equal to the
+       * current RestMethod's prefix. Otherwise returns the substring of the name of {@code method}
+       * beginning at the length of the current RestMethod's prefix.
        */
       @Override
       public String guessResourceName(PsiMethod method) {
         String methodName = method.getName();
-        return methodNamePrefix.length() >= methodName.length() ? null :
-            methodName.substring(methodNamePrefix.length()).toLowerCase();
+        return methodNamePrefix.length() >= methodName.length()
+            ? null
+            : methodName.substring(methodNamePrefix.length()).toLowerCase();
       }
     },
     REMOVE("remove", "DELETE") {
       /**
-       * Returns {@code null} if the length of the name of {@code method} is
-       * shorter or equal to the current RestMethod's prefix. Otherwise returns the substring
-       * of the name of {@code method} beginning at the length of the current RestMethod's
-       * prefix.
+       * Returns {@code null} if the length of the name of {@code method} is shorter or equal to the
+       * current RestMethod's prefix. Otherwise returns the substring of the name of {@code method}
+       * beginning at the length of the current RestMethod's prefix.
        */
       @Override
       public String guessResourceName(PsiMethod method) {
         String methodName = method.getName();
-        return methodNamePrefix.length() >= methodName.length() ? null :
-            methodName.substring(methodNamePrefix.length()).toLowerCase();
+        return methodNamePrefix.length() >= methodName.length()
+            ? null
+            : methodName.substring(methodNamePrefix.length()).toLowerCase();
       }
     },
     DEFAULT("", "POST") {
@@ -142,8 +138,7 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     private final String httpMethod;
 
     /**
-     * Specifies a default REST method prefix, as well as what HTTP method it should use by
-     * default.
+     * Specifies a default REST method prefix, as well as what HTTP method it should use by default.
      *
      * @param methodNamePrefix a method name prefix
      * @param httpMethod the default HTTP method for this prefix
@@ -229,14 +224,12 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     return EndpointBundle.message("unique.rest.signature.description");
   }
 
-
   @Nls
   @NotNull
   @Override
   public String getDisplayName() {
     return EndpointBundle.message("unique.rest.signature.name");
   }
-
 
   @NotNull
   @Override
@@ -266,8 +259,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         }
       }
 
-      private void validateRestSignatureUnique(PsiMethod psiMethod,
-          Map<String, PsiMethod> restfulSignatures) {
+      private void validateRestSignatureUnique(
+          PsiMethod psiMethod, Map<String, PsiMethod> restfulSignatures) {
         // Check if method public or non-static
         if (!EndpointUtilities.isApiMethod(psiMethod)) {
           return;
@@ -282,7 +275,8 @@ public class RestSignatureInspection extends EndpointInspectionBase {
         if (seenMethod == null) {
           restfulSignatures.put(restSignature, psiMethod);
         } else {
-          holder.registerProblem(psiMethod,
+          holder.registerProblem(
+              psiMethod,
               getErrorMessage(restSignature, psiMethod.getName(), seenMethod.getName()),
               LocalQuickFix.EMPTY_ARRAY);
         }
@@ -298,8 +292,9 @@ public class RestSignatureInspection extends EndpointInspectionBase {
    * @return the Rest Signature of psiMethod
    */
   public String getRestfulSignature(PsiMethod psiMethod) {
-    return getHttpMethod(psiMethod) + " " + getPath(psiMethod)
-        .replaceAll("\\{([^\\}]*)\\}", "\\{\\}");
+    return getHttpMethod(psiMethod)
+        + " "
+        + getPath(psiMethod).replaceAll("\\{([^\\}]*)\\}", "\\{\\}");
   }
 
   /**
@@ -317,8 +312,9 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     // Check if the httpMethod was specified by uses in @ApiMethod's httpMethod attribute
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
-        httpMethod = getAttributeFromAnnotation(annotation,
-            GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "httpMethod");
+        httpMethod =
+            getAttributeFromAnnotation(
+                annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "httpMethod");
       } catch (InvalidAnnotationException ex) {
         // do nothing
       } catch (MissingAttributeException ex) {
@@ -348,8 +344,9 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     // Check if the httpMethod was specified by user in @ApiMethod's httpMethod attribute
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
-        path = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD,
-            "path");
+        path =
+            getAttributeFromAnnotation(
+                annotation, GctConstants.APP_ENGINE_ANNOTATION_API_METHOD, "path");
       } catch (InvalidAnnotationException ex) {
         // do nothing
       } catch (MissingAttributeException ex) {
@@ -429,8 +426,9 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     // Get @ApiClass's resource attribute if it exists
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
-        resource = getAttributeFromAnnotation(annotation,
-            GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, "resource");
+        resource =
+            getAttributeFromAnnotation(
+                annotation, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, "resource");
       } catch (InvalidAnnotationException ex) {
         // do nothing
       } catch (MissingAttributeException ex) {
@@ -446,8 +444,9 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     // Get @Api's resource attribute if it exists
     for (PsiAnnotation annotation : modifierList.getAnnotations()) {
       try {
-        resource = getAttributeFromAnnotation(annotation, GctConstants.APP_ENGINE_ANNOTATION_API,
-            "resource");
+        resource =
+            getAttributeFromAnnotation(
+                annotation, GctConstants.APP_ENGINE_ANNOTATION_API, "resource");
       } catch (InvalidAnnotationException ex) {
         // do nothing
       } catch (MissingAttributeException ex) {
@@ -467,8 +466,9 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     return null;
   }
 
-  private String getAttributeFromAnnotation(PsiAnnotation annotation, String annotationType,
-      final String attribute) throws InvalidAnnotationException, MissingAttributeException {
+  private String getAttributeFromAnnotation(
+      PsiAnnotation annotation, String annotationType, final String attribute)
+      throws InvalidAnnotationException, MissingAttributeException {
 
     String annotationQualifiedName = annotation.getQualifiedName();
     if (annotationQualifiedName == null) {
@@ -489,13 +489,12 @@ public class RestSignatureInspection extends EndpointInspectionBase {
   }
 
   private String getErrorMessage(String restSignature, String method1, String method2) {
-    return String.format("Multiple methods with same rest path \"%s\": \"%s\" and \"%s\"",
+    return String.format(
+        "Multiple methods with same rest path \"%s\": \"%s\" and \"%s\"",
         restSignature, method1, method2);
   }
 
-  /**
-   * Guesses a resource name based off the method name or return type.
-   */
+  /** Guesses a resource name based off the method name or return type. */
   @Nullable
   private String guessResourceName(PsiMethod method) {
     // Check if return type is void
@@ -518,7 +517,9 @@ public class RestSignatureInspection extends EndpointInspectionBase {
     StringBuilder path = new StringBuilder();
     EndpointPsiElementVisitor elementVisitor = new EndpointPsiElementVisitor();
     List<String> annotions =
-        Arrays.asList(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE, "javax.annotation.Nullable",
+        Arrays.asList(
+            GctConstants.APP_ENGINE_ANNOTATION_NULLABLE,
+            "javax.annotation.Nullable",
             GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
 
     for (PsiParameter param : method.getParameterList().getParameters()) {

@@ -29,9 +29,7 @@ public class PropertiesFilePluginFlags implements PluginFlags {
   private static final String USAGE_TRACKER_PROPERTY = "usage.tracker.property";
   private FlagReader flagReader;
 
-  /**
-   * Initialize the property flag reader.
-   */
+  /** Initialize the property flag reader. */
   public PropertiesFilePluginFlags() {
     try {
       flagReader = new PropertiesFileFlagReader();

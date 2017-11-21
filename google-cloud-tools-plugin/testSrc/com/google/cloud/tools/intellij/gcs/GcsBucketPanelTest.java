@@ -38,9 +38,7 @@ public class GcsBucketPanelTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
 
-  @Mock
-  @TestService
-  private IntegratedGoogleLoginService loginService;
+  @Mock @TestService private IntegratedGoogleLoginService loginService;
   @Mock @TestService private GoogleApiClientFactory apiFactory;
   @Mock private ProjectSelector projectSelector;
 

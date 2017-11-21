@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.intellij.psi.PsiAnnotation;
 
-/**
- * Exception for values that do not match annotation.
- */
+/** Exception for values that do not match annotation. */
 public class InvalidAnnotationException extends Exception {
 
   public InvalidAnnotationException(PsiAnnotation annotation, String annotationType) {

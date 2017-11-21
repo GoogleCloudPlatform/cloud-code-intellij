@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.debugger;
 
 import java.util.TimerTask;
 
-/**
- * Polls for changes form the Cloud Debugger backend.
- */
+/** Polls for changes form the Cloud Debugger backend. */
 class CloudDebugGlobalPollerTimerTask extends TimerTask {
 
   private final CloudDebugProcessStateCollector stateCollector;

@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.appengine.GctConstants;
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
 import com.google.common.annotations.VisibleForTesting;
-
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.codeInspection.LocalQuickFix;
@@ -36,16 +35,12 @@ import com.intellij.psi.PsiAnnotationParameterList;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiUtilBase;
-
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.regex.Pattern;
-
-/**
- * Inspection class for validating endpoint API name.
- */
+/** Inspection class for validating endpoint API name. */
 public class ApiNameInspection extends EndpointInspectionBase {
 
   private static final String API_NAME_ATTRIBUTE = "name";
@@ -93,8 +88,8 @@ public class ApiNameInspection extends EndpointInspectionBase {
           return;
         }
 
-        PsiAnnotationMemberValue annotationMemberValue = annotation
-            .findAttributeValue(API_NAME_ATTRIBUTE);
+        PsiAnnotationMemberValue annotationMemberValue =
+            annotation.findAttributeValue(API_NAME_ATTRIBUTE);
         if (annotationMemberValue == null) {
           return;
         }
@@ -108,12 +103,12 @@ public class ApiNameInspection extends EndpointInspectionBase {
         }
 
         if (!API_NAME_PATTERN.matcher(nameValue).matches()) {
-          holder.registerProblem(annotationMemberValue,
+          holder.registerProblem(
+              annotationMemberValue,
               "Invalid api name: it must start with a lower case letter and consists only of "
                   + "letter and digits",
               new MyQuickFix());
         }
-
       }
     };
   }
@@ -122,9 +117,7 @@ public class ApiNameInspection extends EndpointInspectionBase {
 
     private static final String DEFAULT_API_NAME = "myApi";
 
-    public MyQuickFix() {
-
-    }
+    public MyQuickFix() {}
 
     @NotNull
     @Override
@@ -165,9 +158,7 @@ public class ApiNameInspection extends EndpointInspectionBase {
       lookupManager.showLookup(editor, LookupElementBuilder.create(variant));
     }
 
-    /**
-     * Get an api naming suggestion.
-     */
+    /** Get an api naming suggestion. */
     @VisibleForTesting
     public String getNameSuggestions(String baseString) {
       if (baseString.isEmpty()) {
@@ -216,4 +207,3 @@ public class ApiNameInspection extends EndpointInspectionBase {
     }
   }
 }
-

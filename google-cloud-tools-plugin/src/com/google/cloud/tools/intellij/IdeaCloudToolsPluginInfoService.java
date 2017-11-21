@@ -16,12 +16,11 @@
 
 package com.google.cloud.tools.intellij;
 
-
 /**
  * The singleton instance of this class provides plugin metadata for the Google Cloud Tools plugin.
  */
-public class IdeaCloudToolsPluginInfoService extends BasePluginInfoService implements
-    CloudToolsPluginInfoService {
+public class IdeaCloudToolsPluginInfoService extends BasePluginInfoService
+    implements CloudToolsPluginInfoService {
 
   private static final String CLIENT_VERSION_PREFIX = "google.com/intellij/v";
 

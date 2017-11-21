@@ -62,8 +62,8 @@ public final class AppEngineDeploymentConfigurationPanelTest {
     when(projectSelector.getText()).thenReturn("projectId");
     deploymentConfiguration.setCloudProjectName("projectName");
     configurationPanel.resetEditorFrom(deploymentConfiguration);
-    verify(infoPanel).setMessage(
-        GctBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
+    verify(infoPanel)
+        .setMessage(GctBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
   }
 
   @Test

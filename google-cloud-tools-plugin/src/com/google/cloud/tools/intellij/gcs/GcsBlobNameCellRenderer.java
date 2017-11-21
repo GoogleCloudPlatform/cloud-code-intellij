@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.gcs;
 
 import com.intellij.icons.AllIcons.FileTypes;
 import com.intellij.icons.AllIcons.Nodes;
-import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;

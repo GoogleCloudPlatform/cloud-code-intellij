@@ -18,22 +18,19 @@ package com.google.cloud.tools.intellij.resources;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.hash.HashMap;
-
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.util.Map;
-
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * UI that represents a single Google Login It displays an image of the user with his or her email.
@@ -107,10 +104,12 @@ class ProjectSelectorCredentialedUser extends JPanel {
     emailLabel.setText(email);
 
     this.setPreferredSize(
-        new Dimension(userIcon.getPreferredSize().width + name.getPreferredSize().width + emailLabel
-            .getPreferredSize().width,
-            Math.max(scaledIcon != null ? scaledIcon.getIconHeight() + 2 : 0,
-                emailLabel.getPreferredSize().height
-                    + name.getPreferredSize().height + 4)));
+        new Dimension(
+            userIcon.getPreferredSize().width
+                + name.getPreferredSize().width
+                + emailLabel.getPreferredSize().width,
+            Math.max(
+                scaledIcon != null ? scaledIcon.getIconHeight() + 2 : 0,
+                emailLabel.getPreferredSize().height + name.getPreferredSize().height + 4)));
   }
 }

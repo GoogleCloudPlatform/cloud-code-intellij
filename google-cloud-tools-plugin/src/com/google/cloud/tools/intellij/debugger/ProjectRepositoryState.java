@@ -18,29 +18,21 @@ package com.google.cloud.tools.intellij.debugger;
 
 import com.intellij.openapi.util.Key;
 import com.intellij.util.xmlb.annotations.Transient;
-
 import git4idea.repo.GitRepository;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Holds state and performs operations related to source control contexts.
- */
+/** Holds state and performs operations related to source control contexts. */
 public class ProjectRepositoryState {
 
-  private static final Key<ProjectRepositoryState> REPO_KEY =
-      Key.create("ProjectRepositoryState");
+  private static final Key<ProjectRepositoryState> REPO_KEY = Key.create("ProjectRepositoryState");
   private String originalBranchName;
   private GitRepository sourceRepository;
   private String stashMessage;
 
-  private ProjectRepositoryState() {
-  }
+  private ProjectRepositoryState() {}
 
-  /**
-   * Given a {@link CloudDebugProcessState}.
-   */
+  /** Given a {@link CloudDebugProcessState}. */
   @NotNull
   public static ProjectRepositoryState fromProcessState(
       @NotNull CloudDebugProcessState processState) {
@@ -73,8 +65,7 @@ public class ProjectRepositoryState {
 
   /**
    * The source repository is used during stash/unstash and sync to perform Git operations. Right
-   * now we only support Git.  If we added citc or other clients, this would need to be factored
-   * out.
+   * now we only support Git. If we added citc or other clients, this would need to be factored out.
    */
   @Transient
   @Nullable
@@ -103,11 +94,8 @@ public class ProjectRepositoryState {
     this.stashMessage = stashMessage;
   }
 
-  /**
-   * @return True if we have a valid git repo.
-   */
+  /** @return True if we have a valid git repo. */
   protected boolean hasSourceRepository() {
     return getSourceRepository() != null;
   }
-
 }

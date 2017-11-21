@@ -17,44 +17,41 @@
 package com.google.cloud.tools.intellij.appengine.migration;
 
 import com.google.common.collect.ImmutableMap;
-
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionProcessor;
 import com.intellij.conversion.RunManagerSettings;
-
+import java.util.function.Predicate;
 import org.jdom.Element;
 
-import java.util.function.Predicate;
-
 /**
- * Converter to migrate legacy deployment run configurations created by the old App Engine plugin
- * to work with this plugin.
+ * Converter to migrate legacy deployment run configurations created by the old App Engine plugin to
+ * work with this plugin.
  */
 public class AppEngineDeploymentRunConfigurationConverter
     extends ConversionProcessor<RunManagerSettings> {
 
-  private static ImmutableMap<String, String> legacyToNewType
-      = ImmutableMap.<String, String>builder()
-        .put("google-app-engine-deploy", "gcp-app-engine-deploy")
-        .build();
+  private static ImmutableMap<String, String> legacyToNewType =
+      ImmutableMap.<String, String>builder()
+          .put("google-app-engine-deploy", "gcp-app-engine-deploy")
+          .build();
 
-  private Predicate<Element> isLegacyConfiguration
-      = element -> legacyToNewType.containsKey(element.getAttributeValue("type"));
+  private Predicate<Element> isLegacyConfiguration =
+      element -> legacyToNewType.containsKey(element.getAttributeValue("type"));
 
   @Override
   public boolean isConversionNeeded(RunManagerSettings runManagerSettings) {
-    return runManagerSettings.getRunConfigurations()
-        .stream()
-        .anyMatch(isLegacyConfiguration);
+    return runManagerSettings.getRunConfigurations().stream().anyMatch(isLegacyConfiguration);
   }
 
   @Override
   public void process(RunManagerSettings runManagerSettings) throws CannotConvertException {
-    runManagerSettings.getRunConfigurations()
+    runManagerSettings
+        .getRunConfigurations()
         .stream()
         .filter(isLegacyConfiguration)
-        .forEach(element ->
-          element.setAttribute("type", legacyToNewType.get(element.getAttributeValue("type")))
-        );
+        .forEach(
+            element ->
+                element.setAttribute(
+                    "type", legacyToNewType.get(element.getAttributeValue("type"))));
   }
 }

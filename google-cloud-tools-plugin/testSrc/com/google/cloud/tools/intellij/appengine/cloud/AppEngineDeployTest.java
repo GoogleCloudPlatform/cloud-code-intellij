@@ -20,36 +20,32 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import com.google.gson.JsonParseException;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * Unit tests for {@link AppEngineDeploy}
- */
+/** Unit tests for {@link AppEngineDeploy} */
 @RunWith(MockitoJUnitRunner.class)
 public class AppEngineDeployTest {
 
   @Test
   public void testDeployOutputJsonParsingOneVersion() {
     String jsonOutput =
-        "{\n" +
-            "  \"configs\": [],\n" +
-            "  \"versions\": [\n" +
-            "    {\n" +
-            "      \"id\": \"20160429t112518\",\n" +
-            "      \"last_deployed_time\": null,\n" +
-            "      \"project\": \"some-project\",\n" +
-            "      \"service\": \"default\",\n" +
-            "      \"traffic_split\": null,\n" +
-            "      \"version\": null\n" +
-            "    }\n" +
-            "  ]\n" +
-            "}\n";
+        "{\n"
+            + "  \"configs\": [],\n"
+            + "  \"versions\": [\n"
+            + "    {\n"
+            + "      \"id\": \"20160429t112518\",\n"
+            + "      \"last_deployed_time\": null,\n"
+            + "      \"project\": \"some-project\",\n"
+            + "      \"service\": \"default\",\n"
+            + "      \"traffic_split\": null,\n"
+            + "      \"version\": null\n"
+            + "    }\n"
+            + "  ]\n"
+            + "}\n";
 
-    AppEngineDeploy.DeployOutput deployOutput =
-        AppEngineDeploy.parseDeployOutput(jsonOutput);
+    AppEngineDeploy.DeployOutput deployOutput = AppEngineDeploy.parseDeployOutput(jsonOutput);
     assertEquals("20160429t112518", deployOutput.getVersion());
     assertEquals("default", deployOutput.getService());
   }
@@ -57,27 +53,27 @@ public class AppEngineDeployTest {
   @Test
   public void testDeployOutputJsonParsingTwoVersions() {
     String jsonOutput =
-        "{\n" +
-            "  \"configs\": [],\n" +
-            "  \"versions\": [\n" +
-            "    {\n" +
-            "      \"id\": \"20160429t112518\",\n" +
-            "      \"last_deployed_time\": null,\n" +
-            "      \"project\": \"some-project\",\n" +
-            "      \"service\": \"default\",\n" +
-            "      \"traffic_split\": null,\n" +
-            "      \"version\": null\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"id\": \"20160429t112518\",\n" +
-            "      \"last_deployed_time\": null,\n" +
-            "      \"project\": \"some-project\",\n" +
-            "      \"service\": \"default\",\n" +
-            "      \"traffic_split\": null,\n" +
-            "      \"version\": null\n" +
-            "    }\n" +
-            "  ]\n" +
-            "}\n";
+        "{\n"
+            + "  \"configs\": [],\n"
+            + "  \"versions\": [\n"
+            + "    {\n"
+            + "      \"id\": \"20160429t112518\",\n"
+            + "      \"last_deployed_time\": null,\n"
+            + "      \"project\": \"some-project\",\n"
+            + "      \"service\": \"default\",\n"
+            + "      \"traffic_split\": null,\n"
+            + "      \"version\": null\n"
+            + "    },\n"
+            + "    {\n"
+            + "      \"id\": \"20160429t112518\",\n"
+            + "      \"last_deployed_time\": null,\n"
+            + "      \"project\": \"some-project\",\n"
+            + "      \"service\": \"default\",\n"
+            + "      \"traffic_split\": null,\n"
+            + "      \"version\": null\n"
+            + "    }\n"
+            + "  ]\n"
+            + "}\n";
 
     try {
       AppEngineDeploy.parseDeployOutput(jsonOutput);
@@ -90,9 +86,7 @@ public class AppEngineDeployTest {
   @Test
   public void testDeployOutputJsonParsingOldFormat() {
     String jsonOutput =
-        "{\n" +
-            "  \"default\": \"https://springboot-maven-project.appspot.com\"\n" +
-            "}\n";
+        "{\n" + "  \"default\": \"https://springboot-maven-project.appspot.com\"\n" + "}\n";
 
     try {
       AppEngineDeploy.parseDeployOutput(jsonOutput);

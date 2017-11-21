@@ -19,14 +19,11 @@ package com.google.cloud.tools.intellij.appengine.application;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.appengine.v1.model.Application;
 import com.google.api.services.appengine.v1.model.Location;
-
 import com.intellij.openapi.components.ServiceManager;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A service that handles App Engine Administration. This class provides some general caching logic,
@@ -48,8 +45,9 @@ public abstract class AppEngineAdminService {
    * @throws IOException if there was a transient error connecting to the API
    */
   @Nullable
-  public abstract Application getApplicationForProjectId(@NotNull String projectId,
-      @NotNull Credential credential) throws IOException, GoogleApiException;
+  public abstract Application getApplicationForProjectId(
+      @NotNull String projectId, @NotNull Credential credential)
+      throws IOException, GoogleApiException;
 
   /**
    * Returns a list of all available App Engine Locations
@@ -59,8 +57,8 @@ public abstract class AppEngineAdminService {
    * @throws GoogleApiException if the desired operation could not be completed
    */
   @NotNull
-  public abstract List<Location> getAllAppEngineLocations(Credential credential) throws IOException,
-      GoogleApiException;
+  public abstract List<Location> getAllAppEngineLocations(Credential credential)
+      throws IOException, GoogleApiException;
 
   /**
    * Creates an Application for the given project in the given location. This is a long-running
@@ -73,8 +71,9 @@ public abstract class AppEngineAdminService {
    * @throws GoogleApiException if the desired operation could not be completed
    */
   @NotNull
-  public abstract Application createApplication(@NotNull String locationId,
-      @NotNull final String projectId, @NotNull final Credential credential)
+  public abstract Application createApplication(
+      @NotNull String locationId,
+      @NotNull final String projectId,
+      @NotNull final Credential credential)
       throws IOException, GoogleApiException;
-
 }

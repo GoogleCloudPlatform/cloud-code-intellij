@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.cloud.tools.intellij.debugger.actions.ToggleSnapshotLocationAction;
-
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -32,24 +31,23 @@ import com.intellij.openapi.editor.event.EditorFactoryListener;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.containers.HashMap;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Stores process state to workspace.xml. This allows us to continue watching the process after a
  * restart.
  */
 @State(
-    name = "CloudDebugProcessStateSerializer",
-    storages = {@Storage(file = StoragePathMacros.WORKSPACE_FILE)})
+  name = "CloudDebugProcessStateSerializer",
+  storages = {@Storage(file = StoragePathMacros.WORKSPACE_FILE)}
+)
 public class CloudDebugProcessStateSerializer
     implements PersistentStateComponent<CloudDebugProcessStateSerializer.ProjectState> {
 
@@ -63,32 +61,36 @@ public class CloudDebugProcessStateSerializer
     if (CloudDebugConfigType.isFeatureEnabled()) {
       // We listen on mouse events to calculate the line where we should add a cloud breakpoint
       // in our right click menu action.
-      EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryListener() {
-        private final Map<Editor, TargetLineMouseAdapter> mouseAdapterMap =
-            new HashMap<Editor, TargetLineMouseAdapter>();
+      EditorFactory.getInstance()
+          .addEditorFactoryListener(
+              new EditorFactoryListener() {
+                private final Map<Editor, TargetLineMouseAdapter> mouseAdapterMap =
+                    new HashMap<Editor, TargetLineMouseAdapter>();
 
-        @Override
-        public void editorCreated(@NotNull EditorFactoryEvent event) {
-          if (event.getEditor().getProject() == CloudDebugProcessStateSerializer.this.project
-              && event.getEditor().getGutter() instanceof Component) {
-            Component gutterComponent = (Component) event.getEditor().getGutter();
-            TargetLineMouseAdapter adapter = new TargetLineMouseAdapter(event.getEditor());
-            assert !mouseAdapterMap.containsKey(event.getEditor());
-            mouseAdapterMap.put(event.getEditor(), adapter);
-            gutterComponent.addMouseListener(adapter);
-          }
-        }
+                @Override
+                public void editorCreated(@NotNull EditorFactoryEvent event) {
+                  if (event.getEditor().getProject()
+                          == CloudDebugProcessStateSerializer.this.project
+                      && event.getEditor().getGutter() instanceof Component) {
+                    Component gutterComponent = (Component) event.getEditor().getGutter();
+                    TargetLineMouseAdapter adapter = new TargetLineMouseAdapter(event.getEditor());
+                    assert !mouseAdapterMap.containsKey(event.getEditor());
+                    mouseAdapterMap.put(event.getEditor(), adapter);
+                    gutterComponent.addMouseListener(adapter);
+                  }
+                }
 
-        @Override
-        public void editorReleased(@NotNull EditorFactoryEvent event) {
-          TargetLineMouseAdapter adapter = mouseAdapterMap.get(event.getEditor());
-          if (adapter != null && event.getEditor().getGutter() instanceof Component) {
-            Component gutterComponent = (Component) event.getEditor().getGutter();
-            gutterComponent.removeMouseListener(adapter);
-            mouseAdapterMap.remove(event.getEditor());
-          }
-        }
-      }, project);
+                @Override
+                public void editorReleased(@NotNull EditorFactoryEvent event) {
+                  TargetLineMouseAdapter adapter = mouseAdapterMap.get(event.getEditor());
+                  if (adapter != null && event.getEditor().getGutter() instanceof Component) {
+                    Component gutterComponent = (Component) event.getEditor().getGutter();
+                    gutterComponent.removeMouseListener(adapter);
+                    mouseAdapterMap.remove(event.getEditor());
+                  }
+                }
+              },
+              project);
     }
   }
 
@@ -114,8 +116,8 @@ public class CloudDebugProcessStateSerializer
         }
 
         if (config.getConfiguration() instanceof CloudDebugRunConfiguration) {
-          final CloudDebugRunConfiguration cloudConfig = (CloudDebugRunConfiguration) config
-              .getConfiguration();
+          final CloudDebugRunConfiguration cloudConfig =
+              (CloudDebugRunConfiguration) config.getConfiguration();
           final CloudDebugProcessState state = cloudConfig.getProcessState();
           if (state != null) {
             projectState.configStates.add(new RunConfigState(cloudConfig.getName(), state));
@@ -173,7 +175,8 @@ public class CloudDebugProcessStateSerializer
       if (event.isPopupTrigger()) {
         // We should see if we can get JB to make this information public from the Gutter so we
         // don't have to calculate it.
-        editor.putUserData(ToggleSnapshotLocationAction.POPUP_LINE,
+        editor.putUserData(
+            ToggleSnapshotLocationAction.POPUP_LINE,
             Integer.valueOf(EditorUtil.yPositionToLogicalLine(editor, event.getPoint())));
       } else {
         editor.putUserData(ToggleSnapshotLocationAction.POPUP_LINE, null);
@@ -186,8 +189,7 @@ public class CloudDebugProcessStateSerializer
     //For serialization purposes, this cannot be final.
     public List<RunConfigState> configStates = new ArrayList<RunConfigState>();
 
-    public ProjectState() {
-    }
+    public ProjectState() {}
   }
 
   public static class RunConfigState {
@@ -195,11 +197,8 @@ public class CloudDebugProcessStateSerializer
     public String configName;
     public CloudDebugProcessState processState;
 
-    /**
-     * This is used during deserialization.
-     */
-    public RunConfigState() {
-    }
+    /** This is used during deserialization. */
+    public RunConfigState() {}
 
     public RunConfigState(String configName, CloudDebugProcessState processState) {
       this.configName = configName;

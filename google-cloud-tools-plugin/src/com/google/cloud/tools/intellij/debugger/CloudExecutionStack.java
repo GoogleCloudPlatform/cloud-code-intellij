@@ -18,29 +18,24 @@ package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.services.clouddebugger.v2.model.StackFrame;
 import com.google.api.services.clouddebugger.v2.model.Variable;
-
 import com.intellij.openapi.project.Project;
 import com.intellij.xdebugger.frame.XExecutionStack;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * CloudExecutionStack represents an entire stack for a
- * {@link com.google.api.services.clouddebugger.v2.model.Breakpoint}. It stores the individual
- * frames, and also the variables and custom watch expressions.
+ * CloudExecutionStack represents an entire stack for a {@link
+ * com.google.api.services.clouddebugger.v2.model.Breakpoint}. It stores the individual frames, and
+ * also the variables and custom watch expressions.
  */
 public class CloudExecutionStack extends XExecutionStack {
 
   private final List<CloudStackFrame> frames = new ArrayList<CloudStackFrame>();
 
-  /**
-   * Initialize the execution stack.
-   */
+  /** Initialize the execution stack. */
   public CloudExecutionStack(
       @NotNull Project project,
       @NotNull String name,
@@ -54,8 +49,12 @@ public class CloudExecutionStack extends XExecutionStack {
         variableTable = Collections.emptyList();
       }
       for (StackFrame nativeFrame : frames) {
-        this.frames
-            .add(new CloudStackFrame(project, nativeFrame, variableTable, evaluatedExpressions,
+        this.frames.add(
+            new CloudStackFrame(
+                project,
+                nativeFrame,
+                variableTable,
+                evaluatedExpressions,
                 new ServerToIdeFileResolver()));
         // We only show custom watches on the top frame.
         evaluatedExpressions = null;

@@ -18,13 +18,11 @@ package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
-
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import com.intellij.xdebugger.breakpoints.XBreakpointManager;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
-
 import java.util.Map;
 
 class DoUpdateIdeWithBreakpoint implements Runnable {
@@ -37,7 +35,8 @@ class DoUpdateIdeWithBreakpoint implements Runnable {
   private Map<String, XBreakpoint> ideBreakpoints;
   private CloudDebugProcess debugProcess;
 
-  public DoUpdateIdeWithBreakpoint(XBreakpointManager manager,
+  public DoUpdateIdeWithBreakpoint(
+      XBreakpointManager manager,
       VirtualFile file,
       int line,
       CloudLineBreakpointProperties properties,
@@ -67,11 +66,13 @@ class DoUpdateIdeWithBreakpoint implements Runnable {
       newXIdeBreakpoint.setCondition(serverBreakpoint.getCondition());
     }
 
-    if (serverBreakpoint.getExpressions() != null
-        && serverBreakpoint.getExpressions().size() > 0) {
-      newXIdeBreakpoint.getProperties().setWatchExpressions(
-          serverBreakpoint.getExpressions().toArray(
-              new String[serverBreakpoint.getExpressions().size()]));
+    if (serverBreakpoint.getExpressions() != null && serverBreakpoint.getExpressions().size() > 0) {
+      newXIdeBreakpoint
+          .getProperties()
+          .setWatchExpressions(
+              serverBreakpoint
+                  .getExpressions()
+                  .toArray(new String[serverBreakpoint.getExpressions().size()]));
     }
 
     // after this, changes in the UI will cause a re-register on the server.

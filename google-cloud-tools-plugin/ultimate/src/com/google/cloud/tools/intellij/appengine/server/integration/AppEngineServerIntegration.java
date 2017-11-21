@@ -17,17 +17,13 @@
 package com.google.cloud.tools.intellij.appengine.server.integration;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-
 import com.intellij.javaee.appServerIntegrations.AppServerIntegration;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerHelper;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
 import com.intellij.javaee.openapi.ex.AppServerIntegrationsManager;
-
 import javax.swing.Icon;
 
-/**
- * @author nik
- */
+/** @author nik */
 public class AppEngineServerIntegration extends AppServerIntegration {
 
   private final AppEngineServerHelper serverHelper;

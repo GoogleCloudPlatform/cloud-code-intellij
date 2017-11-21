@@ -63,9 +63,8 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
 
 /**
- * CloudLineBreakpointType defines our custom line breakpoint.  It adds properties for custom
- * watches and controls when its valid to add a cloud breakpoint instead of the normal java
- * breakpoint.
+ * CloudLineBreakpointType defines our custom line breakpoint. It adds properties for custom watches
+ * and controls when its valid to add a cloud breakpoint instead of the normal java breakpoint.
  */
 public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakpointProperties>
     implements JavaBreakpointType, Disposable {
@@ -83,12 +82,12 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
    * breakpoint. 2) The selected run config is a {@link CloudDebugRunConfiguration}.
    */
   @Override
-  public final boolean canPutAt(@NotNull final VirtualFile file, final int line,
-      @NotNull Project project) {
+  public final boolean canPutAt(
+      @NotNull final VirtualFile file, final int line, @NotNull Project project) {
     RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
     if (runManager.getSelectedConfiguration() == null
-        || !(runManager.getSelectedConfiguration()
-        .getConfiguration() instanceof CloudDebugRunConfiguration)) {
+        || !(runManager.getSelectedConfiguration().getConfiguration()
+            instanceof CloudDebugRunConfiguration)) {
       return false;
     }
 
@@ -98,57 +97,62 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
       return false;
     }
 
-    if (!StdFileTypes.CLASS.equals(psiFile.getFileType()) && !DebuggerUtils
-        .isBreakpointAware(psiFile)) {
+    if (!StdFileTypes.CLASS.equals(psiFile.getFileType())
+        && !DebuggerUtils.isBreakpointAware(psiFile)) {
       return false;
     }
 
     final Document document = FileDocumentManager.getInstance().getDocument(file);
     final Ref<Class<? extends CloudLineBreakpointType>> result = Ref.create();
     assert document != null;
-    XDebuggerUtil.getInstance().iterateLine(project, document, line, new Processor<PsiElement>() {
-      @Override
-      public boolean process(PsiElement element) {
-        // avoid comments
-        if ((element instanceof PsiWhiteSpace)
-            || (PsiTreeUtil.getParentOfType(element, PsiComment.class, false) != null)) {
-          return true;
-        }
-        PsiElement parent = element;
-        while (element != null) {
-          // skip modifiers
-          if (element instanceof PsiModifierList) {
-            element = element.getParent();
-            continue;
-          }
+    XDebuggerUtil.getInstance()
+        .iterateLine(
+            project,
+            document,
+            line,
+            new Processor<PsiElement>() {
+              @Override
+              public boolean process(PsiElement element) {
+                // avoid comments
+                if ((element instanceof PsiWhiteSpace)
+                    || (PsiTreeUtil.getParentOfType(element, PsiComment.class, false) != null)) {
+                  return true;
+                }
+                PsiElement parent = element;
+                while (element != null) {
+                  // skip modifiers
+                  if (element instanceof PsiModifierList) {
+                    element = element.getParent();
+                    continue;
+                  }
 
-          final int offset = element.getTextOffset();
-          if (offset >= 0) {
-            if (document.getLineNumber(offset) != line) {
-              break;
-            }
-          }
-          parent = element;
-          element = element.getParent();
-        }
+                  final int offset = element.getTextOffset();
+                  if (offset >= 0) {
+                    if (document.getLineNumber(offset) != line) {
+                      break;
+                    }
+                  }
+                  parent = element;
+                  element = element.getParent();
+                }
 
-        if (parent instanceof PsiMethod) {
-          if (parent.getTextRange().getEndOffset() >= document.getLineEndOffset(line)) {
-            PsiCodeBlock body = ((PsiMethod) parent).getBody();
-            if (body != null) {
-              PsiStatement[] statements = body.getStatements();
-              if (statements.length > 0
-                  && document.getLineNumber(statements[0].getTextOffset()) == line) {
-                result.set(CloudLineBreakpointType.class);
+                if (parent instanceof PsiMethod) {
+                  if (parent.getTextRange().getEndOffset() >= document.getLineEndOffset(line)) {
+                    PsiCodeBlock body = ((PsiMethod) parent).getBody();
+                    if (body != null) {
+                      PsiStatement[] statements = body.getStatements();
+                      if (statements.length > 0
+                          && document.getLineNumber(statements[0].getTextOffset()) == line) {
+                        result.set(CloudLineBreakpointType.class);
+                      }
+                    }
+                  }
+                } else {
+                  result.set(CloudLineBreakpointType.class);
+                }
+                return true;
               }
-            }
-          }
-        } else {
-          result.set(CloudLineBreakpointType.class);
-        }
-        return true;
-      }
-    });
+            });
 
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.CLOUD_DEBUGGER_CREATE_BREAKPOINT)
@@ -163,8 +167,8 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
 
   @Nullable
   @Override
-  public CloudLineBreakpointProperties createBreakpointProperties(@NotNull VirtualFile file,
-      int line) {
+  public CloudLineBreakpointProperties createBreakpointProperties(
+      @NotNull VirtualFile file, int line) {
     return new CloudLineBreakpointProperties();
   }
 
@@ -182,7 +186,6 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     return new BreakpointErrorStatusPanel();
   }
 
-
   @NotNull
   @Override
   public Breakpoint createJavaBreakpoint(Project project, XBreakpoint breakpoint) {
@@ -198,8 +201,7 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
   }
 
   @Override
-  public void dispose() {
-  }
+  public void dispose() {}
 
   @NotNull
   @Override
@@ -210,8 +212,7 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
   @Nullable
   @Override
   public final XDebuggerEditorsProvider getEditorsProvider(
-      @NotNull XLineBreakpoint<CloudLineBreakpointProperties>
-          breakpoint,
+      @NotNull XLineBreakpoint<CloudLineBreakpointProperties> breakpoint,
       @NotNull Project project) {
     return new JavaDebuggerEditorsProvider();
   }
@@ -285,13 +286,11 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
       return GoogleCloudToolsIcons.CLOUD_BREAKPOINT;
     }
 
-    /**
-     * Get the watch expressions from the breakpoint.
-     */
+    /** Get the watch expressions from the breakpoint. */
     @Nullable
     public List<String> getWatchExpressions() {
-      CloudLineBreakpointProperties properties = (CloudLineBreakpointProperties) getXBreakpoint()
-          .getProperties();
+      CloudLineBreakpointProperties properties =
+          (CloudLineBreakpointProperties) getXBreakpoint().getProperties();
       if (properties.getWatchExpressions() != null && properties.getWatchExpressions().length > 0) {
         return Arrays.asList(properties.getWatchExpressions());
       }

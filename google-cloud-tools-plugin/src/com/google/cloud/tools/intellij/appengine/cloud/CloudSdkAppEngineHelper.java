@@ -69,9 +69,7 @@ import java.util.Optional;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * A Cloud SDK (gcloud) based implementation of the {@link AppEngineHelper} interface.
- */
+/** A Cloud SDK (gcloud) based implementation of the {@link AppEngineHelper} interface. */
 public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   private static final Logger logger = Logger.getInstance(CloudSdkAppEngineHelper.class);
@@ -87,9 +85,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   private final Project project;
   private Path credentialsPath;
 
-  /**
-   * Initialize the helper.
-   */
+  /** Initialize the helper. */
   public CloudSdkAppEngineHelper(@NotNull Project project) {
     this.project = project;
   }
@@ -112,35 +108,40 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       return Optional.empty();
     }
 
-    if (CloudSdkService.getInstance().validateCloudSdk().contains(
-        CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
-      callback.errorOccurred(GctBundle.message("appengine.cloudsdk.location.invalid.message") + " "
-          + CloudSdkService.getInstance().getSdkHomePath());
+    if (CloudSdkService.getInstance()
+        .validateCloudSdk()
+        .contains(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
+      callback.errorOccurred(
+          GctBundle.message("appengine.cloudsdk.location.invalid.message")
+              + " "
+              + CloudSdkService.getInstance().getSdkHomePath());
       return Optional.empty();
     }
 
     if (source.getFile() == null || !source.getFile().exists()) {
-      callback.errorOccurred(GctBundle.message("appengine.deployment.source.not.found.error",
-          source.getFilePath()));
+      callback.errorOccurred(
+          GctBundle.message("appengine.deployment.source.not.found.error", source.getFilePath()));
       return Optional.empty();
     }
 
     AppEngineEnvironment targetEnvironment = ((AppEngineDeployable) source).getEnvironment();
 
-    AppEngineDeploy deploy = new AppEngineDeploy(
-        this,
-        loggingHandler,
-        deploymentConfiguration,
-        targetEnvironment,
-        wrapCallbackForUsageTracking(callback, targetEnvironment));
+    AppEngineDeploy deploy =
+        new AppEngineDeploy(
+            this,
+            loggingHandler,
+            deploymentConfiguration,
+            targetEnvironment,
+            wrapCallbackForUsageTracking(callback, targetEnvironment));
 
     if (targetEnvironment.isStandard() || targetEnvironment.isFlexCompat()) {
       // We need this fresh check in case appengine-web.xml gets modified to turn compat<->standard,
       // or vice-versa, and that change gets picked up.
       boolean isFlexCompat = AppEngineProjectService.getInstance().isFlexCompat(project, source);
 
-      return Optional.of(createStandardRunner(loggingHandler, Paths.get(source.getFilePath()),
-          deploy, isFlexCompat));
+      return Optional.of(
+          createStandardRunner(
+              loggingHandler, Paths.get(source.getFilePath()), deploy, isFlexCompat));
     } else if (targetEnvironment.isFlexible()) {
       try {
         String moduleName = deploymentConfiguration.getModuleName();
@@ -151,7 +152,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
         }
 
         AppEngineFlexibleFacet flexFacet =
-              AppEngineFlexibleFacet.getFacetByModuleName(moduleName, project);
+            AppEngineFlexibleFacet.getFacetByModuleName(moduleName, project);
         if (flexFacet == null
             || !Files.exists(Paths.get(flexFacet.getConfiguration().getAppYamlPath()))) {
           callback.errorOccurred(
@@ -173,15 +174,16 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
               GctBundle.getString("appengine.deployment.error.Dockerfile.notfound"));
           return Optional.empty();
         }
-        return Optional.of(createFlexRunner(loggingHandler, Paths.get(source.getFilePath()),
-            deploymentConfiguration, deploy));
+        return Optional.of(
+            createFlexRunner(
+                loggingHandler, Paths.get(source.getFilePath()), deploymentConfiguration, deploy));
       } catch (MalformedYamlFileException myf) {
         callback.errorOccurred(
             GctBundle.message("appengine.appyaml.malformed") + "\n" + myf.getMessage());
         return Optional.empty();
       } catch (InvalidPathException ipe) {
-        callback.errorOccurred(GctBundle.message(
-            "appengine.invalid.file.path") + "\n" + ipe.getMessage());
+        callback.errorOccurred(
+            GctBundle.message("appengine.invalid.file.path") + "\n" + ipe.getMessage());
         return Optional.empty();
       }
     } else {
@@ -194,10 +196,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       Path artifactToDeploy,
       AppEngineDeploy deploy,
       boolean isFlexCompat) {
-    AppEngineStandardStage standardStage = new AppEngineStandardStage(
-          this,
-          loggingHandler,
-          artifactToDeploy);
+    AppEngineStandardStage standardStage =
+        new AppEngineStandardStage(this, loggingHandler, artifactToDeploy);
 
     return new AppEngineExecutor(
         new AppEngineStandardDeployTask(deploy, standardStage, isFlexCompat));
@@ -209,18 +209,19 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       AppEngineDeploymentConfiguration config,
       AppEngineDeploy deploy) {
     return new AppEngineExecutor(
-        new AppEngineFlexibleDeployTask(deploy,
-            new AppEngineFlexibleStage(loggingHandler, artifactToDeploy, config, project)));
+        new AppEngineFlexibleDeployTask(
+            deploy, new AppEngineFlexibleStage(loggingHandler, artifactToDeploy, config, project)));
   }
 
   @Override
-  public Path createStagingDirectory(
-      LoggingHandler loggingHandler,
-      String cloudProjectName) throws IOException {
-    Path stagingDirectory = FileUtil.createTempDirectory(
-        "gae-staging-" + cloudProjectName /* prefix */,
-        null /* suffix */,
-        true /* deleteOnExit */).toPath();
+  public Path createStagingDirectory(LoggingHandler loggingHandler, String cloudProjectName)
+      throws IOException {
+    Path stagingDirectory =
+        FileUtil.createTempDirectory(
+                "gae-staging-" + cloudProjectName /* prefix */,
+                null /* suffix */,
+                true /* deleteOnExit */)
+            .toPath();
     loggingHandler.print(
         "Created temporary staging directory: " + stagingDirectory.toString() + "\n");
 
@@ -242,17 +243,18 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     CloudToolsPluginInfoService pluginInfoService =
         ServiceManager.getService(CloudToolsPluginInfoService.class);
 
-    CloudSdk.Builder sdkBuilder = new CloudSdk.Builder()
-        .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
-        .async(true)
-        .addStdErrLineListener(logListener)
-        .addStdOutLineListener(outputListener)
-        .exitListener(exitListener)
-        .startListener(startListener)
-        .appCommandCredentialFile(credentialsPath.toFile())
-        .appCommandMetricsEnvironment(pluginInfoService.getExternalPluginName())
-        .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
-        .appCommandOutputFormat("json");
+    CloudSdk.Builder sdkBuilder =
+        new CloudSdk.Builder()
+            .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
+            .async(true)
+            .addStdErrLineListener(logListener)
+            .addStdOutLineListener(outputListener)
+            .exitListener(exitListener)
+            .startListener(startListener)
+            .appCommandCredentialFile(credentialsPath.toFile())
+            .appCommandMetricsEnvironment(pluginInfoService.getExternalPluginName())
+            .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
+            .appCommandOutputFormat("json");
 
     getProjectJavaSdk(project).ifPresent(sdkBuilder::javaHome);
 
@@ -315,8 +317,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
   @NotNull
   private DeploymentOperationCallback wrapCallbackForUsageTracking(
-      final DeploymentOperationCallback deploymentCallback,
-      AppEngineEnvironment environment) {
+      final DeploymentOperationCallback deploymentCallback, AppEngineEnvironment environment) {
 
     StringBuilder labelBuilder = new StringBuilder();
     if (environment == AppEngineEnvironment.APP_ENGINE_STANDARD) {
@@ -353,8 +354,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     Path appYaml;
     try {
       URL resource = this.getClass().getClassLoader().getResource(resourcePath);
-      Preconditions
-          .checkArgument(resource != null, resourcePath + " is not a valid resource path.");
+      Preconditions.checkArgument(
+          resource != null, resourcePath + " is not a valid resource path.");
       appYaml = Paths.get(resource.toURI());
     } catch (URISyntaxException ex) {
       throw new RuntimeException(ex);

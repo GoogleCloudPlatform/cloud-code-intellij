@@ -16,9 +16,7 @@
 
 package com.google.cloud.tools.intellij.login;
 
-/**
- * A common callback interface for getting user data.
- */
+/** A common callback interface for getting user data. */
 public interface IUserPropertyCallback<T> {
 
   void setProperty(T property);

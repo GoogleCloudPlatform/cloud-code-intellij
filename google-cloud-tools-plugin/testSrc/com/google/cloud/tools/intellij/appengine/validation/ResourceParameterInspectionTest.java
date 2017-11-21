@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.appengine.validation;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 
-/**
- * Tests for {@link ResourceParameterInspection}.
- */
+/** Tests for {@link ResourceParameterInspection}. */
 public class ResourceParameterInspectionTest extends EndpointTestBase {
 
   @Override
@@ -32,55 +30,55 @@ public class ResourceParameterInspectionTest extends EndpointTestBase {
   }
 
   /**
-   * Tests that ResourceParameterInspection error is not generated for a method parameter
-   * of parameter type.
+   * Tests that ResourceParameterInspection error is not generated for a method parameter of
+   * parameter type.
    */
   public void testNonResourceParameter() {
     doTest();
   }
 
   /**
-   * Tests that a ResourceParameterInspection error is generated for a resource parameter
-   * with the @Named.
+   * Tests that a ResourceParameterInspection error is generated for a resource parameter with
+   * the @Named.
    */
   public void testResourceParameterWithNamedAnnotation() {
     doTest();
   }
 
   /**
-   * Tests that a ResourceParameterInspection error is generated for a resource parameter
-   * of array type.
+   * Tests that a ResourceParameterInspection error is generated for a resource parameter of array
+   * type.
    */
   public void testResourceParameterOfArrayType() {
     doTest();
   }
 
   /**
-   * Tests that a ResourceParameterInspection error is generated for a resource parameter
-   * of List type.
+   * Tests that a ResourceParameterInspection error is generated for a resource parameter of List
+   * type.
    */
   public void testResourceParameterOfListType() {
     doTest();
   }
 
   /**
-   * Tests that a ResourceParameterInspection error is not generated for a resource parameter
-   * that is not of array or collection type and does not have @Named.
+   * Tests that a ResourceParameterInspection error is not generated for a resource parameter that
+   * is not of array or collection type and does not have @Named.
    */
   public void testValidResourceParameterConfiguration() {
     doTest();
   }
 
   /**
-   * Tests that a ResourceParameterInspection error is generated for a method that has
-   * multiple resource parameters.
+   * Tests that a ResourceParameterInspection error is generated for a method that has multiple
+   * resource parameters.
    */
   public void testMultipleResourceParameters() {
     doTest();
   }
   /**
-   * Tests that a ResourceParameterInspection error is not generated for constructor
-   * with a resource parameter.
+   * Tests that a ResourceParameterInspection error is not generated for constructor with a resource
+   * parameter.
    */
   public void testConstructor() {
     doTest();

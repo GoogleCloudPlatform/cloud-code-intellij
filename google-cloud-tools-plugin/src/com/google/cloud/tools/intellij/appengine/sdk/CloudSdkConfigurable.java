@@ -17,18 +17,13 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-
+import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.JComponent;
-
-/**
- * Creates a Cloud SDK menu item for configuring the path to the Cloud SDK.
- */
+/** Creates a Cloud SDK menu item for configuring the path to the Cloud SDK. */
 public class CloudSdkConfigurable implements Configurable {
 
   private CloudSdkPanel cloudSdkPanel;

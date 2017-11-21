@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointProperties;
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
-
 import com.intellij.debugger.ui.breakpoints.Breakpoint;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -27,11 +26,9 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.breakpoints.ui.XBreakpointCustomPropertiesPanel;
 import com.intellij.xdebugger.impl.breakpoints.XBreakpointBase;
-
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The breakpoint config panel is shown for both the config popup (right click on a breakpoint) and
@@ -47,8 +44,7 @@ public class BreakpointErrorStatusPanel
   private JPanel errorPanel;
   private JPanel mainPanel;
 
-  public BreakpointErrorStatusPanel() {
-  }
+  public BreakpointErrorStatusPanel() {}
 
   @NotNull
   @Override
@@ -78,9 +74,7 @@ public class BreakpointErrorStatusPanel
   }
 
   @Override
-  public void saveTo(@NotNull final XLineBreakpoint<CloudLineBreakpointProperties> ideBreakpoint) {
-  }
+  public void saveTo(@NotNull final XLineBreakpoint<CloudLineBreakpointProperties> ideBreakpoint) {}
 
-  private void createUIComponents() {
-  }
+  private void createUIComponents() {}
 }

@@ -18,19 +18,17 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
-
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 
-/**
- * Service implementation of {@link CloudSdkVersionNotifier}
- */
+/** Service implementation of {@link CloudSdkVersionNotifier} */
 public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
   @Override
   public void notifyIfUnsupportedVersion() {
-    if (CloudSdkService.getInstance().validateCloudSdk()
+    if (CloudSdkService.getInstance()
+        .validateCloudSdk()
         .contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
       showNotification();
     }
@@ -44,9 +42,8 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
             NotificationDisplayType.BALLOON,
             true);
 
-    String message = "<p>"
-        + CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage()
-        + "</p>";
+    String message =
+        "<p>" + CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage() + "</p>";
 
     notification
         .createNotification(
@@ -56,5 +53,4 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
             null /* notificationListener */)
         .notify(null /*project*/);
   }
-
 }

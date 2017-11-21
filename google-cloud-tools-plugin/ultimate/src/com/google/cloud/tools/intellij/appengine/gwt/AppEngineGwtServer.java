@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.gwt;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.gwt.facet.GwtFacet;
@@ -26,16 +25,11 @@ import com.intellij.gwt.run.GwtDevModeServer;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.ArrayUtil;
-
+import java.io.File;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-
-import javax.swing.Icon;
-
-/**
- * @author nik
- */
+/** @author nik */
 public class AppEngineGwtServer extends GwtDevModeServer {
 
   public AppEngineGwtServer(@NotNull ApplicationServer server) {
@@ -48,8 +42,8 @@ public class AppEngineGwtServer extends GwtDevModeServer {
   }
 
   @Override
-  public void patchParameters(@NotNull JavaParameters parameters, String originalOutputDir,
-      @NotNull GwtFacet gwtFacet) {
+  public void patchParameters(
+      @NotNull JavaParameters parameters, String originalOutputDir, @NotNull GwtFacet gwtFacet) {
     final ParametersList programParameters = parameters.getProgramParametersList();
     programParameters.add("-server");
     programParameters.add("com.google.appengine.tools.development.gwt.AppEngineLauncher");
@@ -61,8 +55,8 @@ public class AppEngineGwtServer extends GwtDevModeServer {
     // added to classpath before gwt-dev.jar, because otherwise wrong jsp compiler version will be
     // used (see IDEA-63068)
     if (sdkService.getLibraries() != null) {
-      for (File jar : ArrayUtil.mergeArrays(sdkService.getLibraries(),
-          sdkService.getJspLibraries())) {
+      for (File jar :
+          ArrayUtil.mergeArrays(sdkService.getLibraries(), sdkService.getJspLibraries())) {
         parameters.getClassPath().addFirst(FileUtil.toSystemIndependentName(jar.getAbsolutePath()));
       }
     }
