@@ -18,11 +18,9 @@ package com.google.cloud.tools.intellij.debugger.ui;
 import static org.junit.Assert.assertEquals;
 
 import com.google.api.services.clouddebugger.v2.model.Debuggee;
-
-import org.junit.Test;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.Test;
 
 public class DebugTargetTest {
 
@@ -38,7 +36,8 @@ public class DebugTargetTest {
     String version = "1";
     DebugTarget target = new DebugTarget(createDebuggee(/* module */ null, version), "projectname");
 
-    assertEquals(String.format(MODULE_VERSION_FORMAT, DEFAULT_MODULE_NAME, version),
+    assertEquals(
+        String.format(MODULE_VERSION_FORMAT, DEFAULT_MODULE_NAME, version),
         target.getDescription());
     assertEquals(DEFAULT_MODULE_NAME, target.getModule());
   }
@@ -49,8 +48,7 @@ public class DebugTargetTest {
     String version = "1";
     DebugTarget target = new DebugTarget(createDebuggee(module, version), "projectname");
 
-    assertEquals(String.format(MODULE_VERSION_FORMAT, module, version),
-        target.getDescription());
+    assertEquals(String.format(MODULE_VERSION_FORMAT, module, version), target.getDescription());
     assertEquals(module, target.getModule());
   }
 
@@ -58,7 +56,7 @@ public class DebugTargetTest {
     Debuggee defaultDebuggee = new Debuggee();
 
     Map<String, String> labels = new HashMap<String, String>();
-    if(module != null) {
+    if (module != null) {
       labels.put(MODULE, module);
     }
     labels.put(VERSION, version);

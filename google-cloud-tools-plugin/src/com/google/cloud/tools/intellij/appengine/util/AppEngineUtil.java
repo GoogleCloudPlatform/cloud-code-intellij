@@ -28,7 +28,6 @@ import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
-
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -44,10 +43,6 @@ import com.intellij.packaging.artifacts.ArtifactType;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.ui.ListCellRendererWrapper;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,13 +50,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-
 import javax.swing.JComboBox;
 import javax.swing.JList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * App Engine utility methods.
- */
+/** App Engine utility methods. */
 public class AppEngineUtil {
 
   public static final String APP_ENGINE_WEB_XML_NAME = "appengine-web.xml";
@@ -89,15 +83,19 @@ public class AppEngineUtil {
       if (facetManager.getFacetByType(AppEngineStandardFacetType.ID) != null
           || facetManager.getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
         final AppEngineEnvironment environment =
-            projectService.getModuleAppEngineEnvironment(module).orElseThrow(
-                () -> new RuntimeException("No environment."));
+            projectService
+                .getModuleAppEngineEnvironment(module)
+                .orElseThrow(() -> new RuntimeException("No environment."));
 
         Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
         sources.addAll(
-            artifacts.stream()
+            artifacts
+                .stream()
                 .filter(artifact -> doesArtifactMatchEnvironment(artifact, environment))
-                .map(artifact ->
-                    AppEngineUtil.createArtifactDeploymentSource(project, artifact, environment))
+                .map(
+                    artifact ->
+                        AppEngineUtil.createArtifactDeploymentSource(
+                            project, artifact, environment))
                 .collect(toList()));
       }
     }
@@ -105,12 +103,12 @@ public class AppEngineUtil {
     return sources;
   }
 
-  private static boolean doesArtifactMatchEnvironment(Artifact artifact,
-      AppEngineEnvironment environment) {
+  private static boolean doesArtifactMatchEnvironment(
+      Artifact artifact, AppEngineEnvironment environment) {
     AppEngineProjectService projectService = AppEngineProjectService.getInstance();
 
     return ((environment.isStandard() || environment.isFlexCompat())
-        && projectService.isAppEngineStandardArtifactType(artifact))
+            && projectService.isAppEngineStandardArtifactType(artifact))
         || (environment.isFlexible() && projectService.isAppEngineFlexArtifactType(artifact));
   }
 
@@ -137,13 +135,15 @@ public class AppEngineUtil {
       FacetManager facetManager = FacetManager.getInstance(module);
       if (facetManager.getFacetByType(AppEngineStandardFacetType.ID) != null
           || facetManager.getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
-        AppEngineEnvironment environment = projectService.getModuleAppEngineEnvironment(module)
-            .orElseThrow(() -> new RuntimeException("No environment."));
+        AppEngineEnvironment environment =
+            projectService
+                .getModuleAppEngineEnvironment(module)
+                .orElseThrow(() -> new RuntimeException("No environment."));
 
         if (ModuleType.is(module, JavaModuleType.getModuleType())
             && projectService.isJarOrWarMavenBuild(module)) {
-          moduleDeploymentSources
-              .add(createMavenBuildDeploymentSource(project, module, environment));
+          moduleDeploymentSources.add(
+              createMavenBuildDeploymentSource(project, module, environment));
         }
 
         if (environment.isStandard() || environment.isFlexCompat()) {
@@ -198,10 +198,12 @@ public class AppEngineUtil {
     Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
     Collection<Artifact> appEngineStandardArtifacts = Lists.newArrayList();
     appEngineStandardArtifacts.addAll(
-        artifacts.stream().filter(artifact ->
-            AppEngineProjectService.getInstance().isAppEngineStandardArtifactType(artifact))
-        .collect(toList())
-    );
+        artifacts
+            .stream()
+            .filter(
+                artifact ->
+                    AppEngineProjectService.getInstance().isAppEngineStandardArtifactType(artifact))
+            .collect(toList()));
 
     return appEngineStandardArtifacts.size() == 1
         ? appEngineStandardArtifacts.iterator().next()
@@ -219,17 +221,16 @@ public class AppEngineUtil {
   }
 
   private static MavenBuildDeploymentSource createMavenBuildDeploymentSource(
-      @NotNull Project project,
-      @NotNull Module module,
-      @NotNull AppEngineEnvironment environment) {
+      @NotNull Project project, @NotNull Module module, @NotNull AppEngineEnvironment environment) {
     return new MavenBuildDeploymentSource(
         ModulePointerManager.getInstance(project).create(module), project, environment);
   }
 
   private static UserSpecifiedPathDeploymentSource createUserSpecifiedPathDeploymentSource(
       @NotNull Project project) {
-    ModulePointer modulePointer = ModulePointerManager.getInstance(project)
-        .create(UserSpecifiedPathDeploymentSource.moduleName);
+    ModulePointer modulePointer =
+        ModulePointerManager.getInstance(project)
+            .create(UserSpecifiedPathDeploymentSource.moduleName);
 
     return new UserSpecifiedPathDeploymentSource(modulePointer);
   }

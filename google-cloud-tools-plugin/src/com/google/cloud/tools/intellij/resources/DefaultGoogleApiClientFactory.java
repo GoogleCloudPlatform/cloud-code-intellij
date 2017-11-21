@@ -39,19 +39,16 @@ public class DefaultGoogleApiClientFactory extends GoogleApiClientFactory {
   private static final JsonFactory jsonFactory = new JacksonFactory();
 
   @Override
-  public CloudResourceManager getCloudResourceManagerClient(@Nullable HttpRequestInitializer
-      httpRequestInitializer) {
-    return new CloudResourceManager.Builder(
-        httpTransport, jsonFactory, httpRequestInitializer)
+  public CloudResourceManager getCloudResourceManagerClient(
+      @Nullable HttpRequestInitializer httpRequestInitializer) {
+    return new CloudResourceManager.Builder(httpTransport, jsonFactory, httpRequestInitializer)
         .setApplicationName(getApplicationName())
         .build();
   }
 
   @Override
-  public Appengine getAppEngineApiClient(@Nullable HttpRequestInitializer
-      httpRequestInitializer) {
-    return new Appengine.Builder(
-        httpTransport, jsonFactory, httpRequestInitializer)
+  public Appengine getAppEngineApiClient(@Nullable HttpRequestInitializer httpRequestInitializer) {
+    return new Appengine.Builder(httpTransport, jsonFactory, httpRequestInitializer)
         .setApplicationName(getApplicationName())
         .build();
   }

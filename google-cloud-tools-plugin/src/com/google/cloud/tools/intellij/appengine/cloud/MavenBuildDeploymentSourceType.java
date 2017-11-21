@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.configurations.RunConfiguration;
@@ -26,7 +25,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
-
+import java.util.Collection;
+import java.util.List;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,12 +35,7 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.idea.maven.tasks.MavenBeforeRunTask;
 import org.jetbrains.idea.maven.tasks.MavenBeforeRunTasksProvider;
 
-import java.util.Collection;
-import java.util.List;
-
-/**
- * A Maven build deployment source type providing an auto configured pre-deploy build step.
- */
+/** A Maven build deployment source type providing an auto configured pre-deploy build step. */
 public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
 
   private static final String MAVEN_TASK_PACKAGE = "package";
@@ -56,8 +51,7 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
   @NotNull
   @Override
   protected List<? extends BeforeRunTask> getBuildTasks(
-      RunManagerEx runManager,
-      RunConfiguration configuration) {
+      RunManagerEx runManager, RunConfiguration configuration) {
     return runManager.getBeforeRunTasks(configuration, MavenBeforeRunTasksProvider.ID);
   }
 
@@ -84,8 +78,9 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
   public MavenBuildDeploymentSource load(@NotNull Element tag, @NotNull Project project) {
     final String moduleName = tag.getAttributeValue(NAME_ATTRIBUTE);
 
-    MavenBuildDeploymentSource source = new MavenBuildDeploymentSource(
-        ModulePointerManager.getInstance(project).create(moduleName), project);
+    MavenBuildDeploymentSource source =
+        new MavenBuildDeploymentSource(
+            ModulePointerManager.getInstance(project).create(moduleName), project);
     source.setProjectName(tag.getAttributeValue(PROJECT_ATTRIBUTE));
     source.setVersion(tag.getAttributeValue(VERSION_ATTRIBUTE));
 
@@ -100,8 +95,8 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
       AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
 
       if (deployable.getProjectName() != null) {
-        tag.setAttribute(PROJECT_ATTRIBUTE,
-            ((AppEngineDeployable) deploymentSource).getProjectName());
+        tag.setAttribute(
+            PROJECT_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getProjectName());
       }
 
       if (deployable.getVersion() != null) {
@@ -113,16 +108,20 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
   @Override
   protected boolean hasBuildTaskForModule(
       Collection<? extends BeforeRunTask> beforeRunTasks, final Module module) {
-    return !Collections2.filter(beforeRunTasks, new Predicate<BeforeRunTask>() {
-      @Override
-      public boolean apply(@Nullable BeforeRunTask beforeRunTask) {
-        return beforeRunTask != null
-            && beforeRunTask instanceof MavenBeforeRunTask
-            && MAVEN_TASK_PACKAGE.equals(((MavenBeforeRunTask) beforeRunTask).getGoal())
-            && ((MavenBeforeRunTask) beforeRunTask).getProjectPath()
-            .equals(getMavenModulePath(module));
-      }
-    }).isEmpty();
+    return !Collections2.filter(
+            beforeRunTasks,
+            new Predicate<BeforeRunTask>() {
+              @Override
+              public boolean apply(@Nullable BeforeRunTask beforeRunTask) {
+                return beforeRunTask != null
+                    && beforeRunTask instanceof MavenBeforeRunTask
+                    && MAVEN_TASK_PACKAGE.equals(((MavenBeforeRunTask) beforeRunTask).getGoal())
+                    && ((MavenBeforeRunTask) beforeRunTask)
+                        .getProjectPath()
+                        .equals(getMavenModulePath(module));
+              }
+            })
+        .isEmpty();
   }
 
   @Nullable
@@ -137,4 +136,3 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
     return mavenProject.getFile().getPath();
   }
 }
-

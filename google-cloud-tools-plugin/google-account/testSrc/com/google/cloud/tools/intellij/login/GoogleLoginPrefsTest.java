@@ -20,9 +20,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Tests for {@link GoogleLoginPrefs}.
- */
+/** Tests for {@link GoogleLoginPrefs}. */
 public class GoogleLoginPrefsTest {
 
   private String oldPreferencesPath;

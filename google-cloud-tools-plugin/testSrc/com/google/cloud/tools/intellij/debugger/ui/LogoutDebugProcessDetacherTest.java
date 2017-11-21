@@ -21,7 +21,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessHandler;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -29,8 +28,7 @@ import org.mockito.MockitoAnnotations;
 
 public class LogoutDebugProcessDetacherTest extends BasePluginTestCase {
 
-  @Mock
-  private CloudDebugProcessHandler processHandler;
+  @Mock private CloudDebugProcessHandler processHandler;
 
   @Before
   public void setUp() throws Exception {

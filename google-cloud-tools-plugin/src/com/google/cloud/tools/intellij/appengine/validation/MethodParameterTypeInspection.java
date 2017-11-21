@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
-
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
@@ -32,14 +31,12 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiPrimitiveType;
 import com.intellij.psi.PsiType;
-
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Inspection to check that parameter types do not contain multiple levels of collections or
- * arrays.
+ * Inspection to check that parameter types do not contain multiple levels of collections or arrays.
  */
 public class MethodParameterTypeInspection extends EndpointInspectionBase {
   // TODO: check if class has a transformer and add check that only parameter and entity types
@@ -100,7 +97,7 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
    * subtypes. Returns true otherwise.
    *
    * @param type The PsiType been validated.
-   * @param project The project that has the PsiElement associated with  <code>type</code>.
+   * @param project The project that has the PsiElement associated with <code>type</code>.
    */
   public boolean isValidInnerArrayType(PsiType type, Project project) {
     if (type instanceof PsiArrayType) {
@@ -108,8 +105,8 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
     }
 
     // Check if type is a Collection
-    PsiClassType collectionType = JavaPsiFacade.getElementFactory(project)
-        .createTypeByFQClassName("java.util.Collection");
+    PsiClassType collectionType =
+        JavaPsiFacade.getElementFactory(project).createTypeByFQClassName("java.util.Collection");
     if (collectionType.isAssignableFrom(type)) {
       return false;
     }
@@ -152,7 +149,8 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
         }
 
         if (!isValidArrayOrPrimitiveType(psiParameter.getType(), project)) {
-          holder.registerProblem(psiParameter,
+          holder.registerProblem(
+              psiParameter,
               "Illegal nested collection type " + psiParameter.getType().getPresentableText() + ".",
               LocalQuickFix.EMPTY_ARRAY);
         }
@@ -160,4 +158,3 @@ public class MethodParameterTypeInspection extends EndpointInspectionBase {
     };
   }
 }
-

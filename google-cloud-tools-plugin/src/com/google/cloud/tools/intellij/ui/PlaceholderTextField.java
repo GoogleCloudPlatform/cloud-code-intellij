@@ -19,12 +19,9 @@ package com.google.cloud.tools.intellij.ui;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import javax.swing.JTextField;
 
-/**
- * Extends JTextField to add placeholder text.
- */
+/** Extends JTextField to add placeholder text. */
 public class PlaceholderTextField extends JTextField {
 
   private String placeholderText;
@@ -44,12 +41,14 @@ public class PlaceholderTextField extends JTextField {
 
     updatePlaceholderText();
 
-    this.addPropertyChangeListener("editable", new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-        updatePlaceholderText();
-      }
-    });
+    this.addPropertyChangeListener(
+        "editable",
+        new PropertyChangeListener() {
+          @Override
+          public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+            updatePlaceholderText();
+          }
+        });
   }
 
   private void updatePlaceholderText() {

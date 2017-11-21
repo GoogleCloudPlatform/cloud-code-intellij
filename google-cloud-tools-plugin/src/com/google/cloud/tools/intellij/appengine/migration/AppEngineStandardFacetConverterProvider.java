@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.migration;
 
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
-
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionContext;
 import com.intellij.conversion.ConversionProcessor;
@@ -26,18 +25,14 @@ import com.intellij.conversion.ModuleSettings;
 import com.intellij.conversion.ProjectConverter;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.util.containers.ContainerUtil;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.serialization.facet.JpsFacetSerializer;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * @author nik
- */
+/** @author nik */
 public class AppEngineStandardFacetConverterProvider extends ConverterProvider {
 
   public AppEngineStandardFacetConverterProvider() {
@@ -62,8 +57,8 @@ public class AppEngineStandardFacetConverterProvider extends ConverterProvider {
     return "Google App Engine facets will be decoupled from Web facets";
   }
 
-  private static class GoogleAppEngineFacetConversionProcessor extends
-      ConversionProcessor<ModuleSettings> {
+  private static class GoogleAppEngineFacetConversionProcessor
+      extends ConversionProcessor<ModuleSettings> {
 
     @Override
     public boolean isConversionNeeded(ModuleSettings settings) {
@@ -80,8 +75,8 @@ public class AppEngineStandardFacetConverterProvider extends ConverterProvider {
       if (facetTag != null) {
         String facetName = facetTag.getAttributeValue(JpsFacetSerializer.NAME_ATTRIBUTE);
         Element configuration = facetTag.getChild(JpsFacetSerializer.CONFIGURATION_TAG);
-        settings.addFacetElement(AppEngineStandardFacetType.STRING_ID, facetName,
-            (Element) configuration.clone());
+        settings.addFacetElement(
+            AppEngineStandardFacetType.STRING_ID, facetName, (Element) configuration.clone());
       }
     }
 
@@ -89,10 +84,10 @@ public class AppEngineStandardFacetConverterProvider extends ConverterProvider {
     private static List<Element> getAppEngineFacetTags(@NotNull ModuleSettings settings) {
       List<Element> appEngineFacetTags = new ArrayList<Element>();
       for (Element webFacetTag : settings.getFacetElements("web")) {
-        for (Element childFacetTag : JDOMUtil
-            .getChildren(webFacetTag, JpsFacetSerializer.FACET_TAG)) {
-          if (AppEngineStandardFacetType.STRING_ID
-              .equals(childFacetTag.getAttributeValue(JpsFacetSerializer.TYPE_ATTRIBUTE))) {
+        for (Element childFacetTag :
+            JDOMUtil.getChildren(webFacetTag, JpsFacetSerializer.FACET_TAG)) {
+          if (AppEngineStandardFacetType.STRING_ID.equals(
+              childFacetTag.getAttributeValue(JpsFacetSerializer.TYPE_ATTRIBUTE))) {
             appEngineFacetTags.add(childFacetTag);
           }
         }

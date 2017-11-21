@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.cloud.standard;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
@@ -27,8 +27,8 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
-import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.testing.TestFixture;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import org.junit.After;

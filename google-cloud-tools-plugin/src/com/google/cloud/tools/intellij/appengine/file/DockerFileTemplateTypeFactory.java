@@ -18,12 +18,9 @@ package com.google.cloud.tools.intellij.appengine.file;
 
 import com.intellij.openapi.fileTypes.FileTypeConsumer;
 import com.intellij.openapi.fileTypes.FileTypeFactory;
-
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Factory for producing the Docker file type, registered in plugin.xml.
- */
+/** Factory for producing the Docker file type, registered in plugin.xml. */
 public class DockerFileTemplateTypeFactory extends FileTypeFactory {
 
   @Override

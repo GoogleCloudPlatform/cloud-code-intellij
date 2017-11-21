@@ -33,17 +33,14 @@ import com.intellij.remoteServer.runtime.ServerTaskExecutor;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 
-
 /**
- * This class hooks into IntelliJ's
- * <a href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a> configurations for
- * infrastructure based deployment flows.
+ * This class hooks into IntelliJ's <a
+ * href="https://www.jetbrains.com/idea/help/clouds.html>Cloud</a> configurations for infrastructure
+ * based deployment flows.
  */
 public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration> {
 
-  /**
-   * Initialize the App Engine Cloud Type and handle cleanup.
-   */
+  /** Initialize the App Engine Cloud Type and handle cleanup. */
   public AppEngineCloudType() {
     super("gcp-app-engine"); // "google-app-engine" is used by the native IJ app engine support.
   }
@@ -82,13 +79,14 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
   @NotNull
   @Override
-  public ServerConnector<?> createConnector(@NotNull AppEngineServerConfiguration configuration,
+  public ServerConnector<?> createConnector(
+      @NotNull AppEngineServerConfiguration configuration,
       @NotNull ServerTaskExecutor asyncTasksExecutor) {
     return new AppEngineServerConnector();
   }
 
-  public static class AppEngineServerConnector extends
-      ServerConnector<AppEngineDeploymentConfiguration> {
+  public static class AppEngineServerConnector
+      extends ServerConnector<AppEngineDeploymentConfiguration> {
 
     @Override
     public void connect(@NotNull ConnectionCallback<AppEngineDeploymentConfiguration> callback) {
@@ -101,11 +99,12 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
 
       if (!CloudSdkService.getInstance().isValidCloudSdk()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
-        Notification invalidSdkWarning = new Notification(
-            new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
-            GctBundle.message("settings.menu.item.cloud.sdk.text"),
-            GctBundle.message("appengine.deployment.error.invalid.cloudsdk"),
-            NotificationType.ERROR);
+        Notification invalidSdkWarning =
+            new Notification(
+                new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
+                GctBundle.message("settings.menu.item.cloud.sdk.text"),
+                GctBundle.message("appengine.deployment.error.invalid.cloudsdk"),
+                NotificationType.ERROR);
         Notifications.Bus.notify(invalidSdkWarning);
         // TODO Consider auto opening configuration panel
       }
@@ -113,5 +112,4 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       callback.connected(new AppEngineRuntimeInstance());
     }
   }
-
 }

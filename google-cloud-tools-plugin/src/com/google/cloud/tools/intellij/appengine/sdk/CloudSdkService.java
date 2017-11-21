@@ -17,22 +17,17 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.common.collect.ImmutableSet;
-
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.openapi.components.ServiceManager;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * IntelliJ configured service for providing the path to the Cloud SDK.
- */
+/** IntelliJ configured service for providing the path to the Cloud SDK. */
 public abstract class CloudSdkService {
 
   public static CloudSdkService getInstance() {
@@ -46,9 +41,7 @@ public abstract class CloudSdkService {
 
   protected abstract Set<CloudSdkValidationResult> validateCloudSdk(Path path);
 
-  /**
-   * Checks if the stored path contains a valid Cloud SDK.
-   */
+  /** Checks if the stored path contains a valid Cloud SDK. */
   public Set<CloudSdkValidationResult> validateCloudSdk() {
     return validateCloudSdk(getSdkHomePath());
   }
@@ -71,23 +64,17 @@ public abstract class CloudSdkService {
     return validateCloudSdk(Paths.get(path));
   }
 
-  /**
-   * Checks if the provided path contains a valid Cloud SDK installation.
-   */
+  /** Checks if the provided path contains a valid Cloud SDK installation. */
   public boolean isValidCloudSdk(String path) {
     return validateCloudSdk(path).isEmpty();
   }
 
-  /**
-   * Checks if the saved path contains a valid Cloud SDK installation.
-   */
+  /** Checks if the saved path contains a valid Cloud SDK installation. */
   public boolean isValidCloudSdk() {
     return validateCloudSdk(getSdkHomePath()).isEmpty();
   }
 
-  /**
-   * Checks for invalid characters that trigger an {@link InvalidPathException} on Windows.
-   */
+  /** Checks for invalid characters that trigger an {@link InvalidPathException} on Windows. */
   public boolean isMalformedCloudSdkPath(@Nullable String sdkPath) {
     if (sdkPath != null) {
       try {
@@ -117,5 +104,4 @@ public abstract class CloudSdkService {
   public abstract File getWebSchemeFile();
 
   public abstract void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters);
-
 }

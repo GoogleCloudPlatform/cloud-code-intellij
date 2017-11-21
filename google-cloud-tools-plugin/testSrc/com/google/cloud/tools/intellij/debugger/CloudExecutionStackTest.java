@@ -19,13 +19,14 @@ package com.google.cloud.tools.intellij.debugger;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.api.services.clouddebugger.v2.model.StackFrame;
 import com.google.api.services.clouddebugger.v2.model.Variable;
-
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XDebuggerTreeNodeHyperlink;
 import com.intellij.xdebugger.frame.XValueChildrenList;
-
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.Icon;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,17 +34,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.Icon;
-
 @Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class CloudExecutionStackTest {
 
-  @Mock
-  private Project project;
+  @Mock private Project project;
 
   @Test
   public void testGetTopFrame_nullFramesReturnsNull() {
@@ -93,25 +88,23 @@ public class CloudExecutionStackTest {
     }
 
     @Override
-    public void tooManyChildren(int remaining) {
-    }
+    public void tooManyChildren(int remaining) {}
 
     @Override
-    public void setAlreadySorted(boolean alreadySorted) {
-    }
+    public void setAlreadySorted(boolean alreadySorted) {}
 
     @Override
-    public void setErrorMessage(String errorMessage) {
-    }
+    public void setErrorMessage(String errorMessage) {}
 
     @Override
-    public void setErrorMessage(String errorMessage, XDebuggerTreeNodeHyperlink link) {
-    }
+    public void setErrorMessage(String errorMessage, XDebuggerTreeNodeHyperlink link) {}
 
     @Override
-    public void setMessage(String message, Icon icon,
-        SimpleTextAttributes attributes, XDebuggerTreeNodeHyperlink link) {
-    }
+    public void setMessage(
+        String message,
+        Icon icon,
+        SimpleTextAttributes attributes,
+        XDebuggerTreeNodeHyperlink link) {}
 
     @Override
     public boolean isObsolete() {

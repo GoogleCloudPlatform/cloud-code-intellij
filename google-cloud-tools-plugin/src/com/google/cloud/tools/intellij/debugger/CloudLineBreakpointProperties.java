@@ -19,18 +19,16 @@ package com.google.cloud.tools.intellij.debugger;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.util.xmlb.annotations.Tag;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
-
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Arrays;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * CloudLineBreakpointProperties holds custom properties not normally set on a java line breakpoint.
- * Right now, this is just watch expressions.  Custom conditions are supported by default as is the
+ * Right now, this is just watch expressions. Custom conditions are supported by default as is the
  * enabled state and other attributes such as source location.
  */
-public class CloudLineBreakpointProperties extends
-    XBreakpointProperties<CloudLineBreakpointProperties> {
+public class CloudLineBreakpointProperties
+    extends XBreakpointProperties<CloudLineBreakpointProperties> {
 
   private static final String[] EMPTY_ARRAY = new String[0];
   private boolean createdByServer = false;
@@ -73,14 +71,16 @@ public class CloudLineBreakpointProperties extends
   }
 
   /**
-   * Sets the watch expressions and returns if the passed in expression differ from the
-   * currently set ones.
+   * Sets the watch expressions and returns if the passed in expression differ from the currently
+   * set ones.
    */
   public final boolean setWatchExpressions(@Nullable String[] watchExpressions) {
     boolean changed = !arrayEqual(this.watchExpressions, watchExpressions);
     if (changed) {
-      this.watchExpressions = watchExpressions == null ? null
-          : Arrays.copyOf(watchExpressions, watchExpressions.length);
+      this.watchExpressions =
+          watchExpressions == null
+              ? null
+              : Arrays.copyOf(watchExpressions, watchExpressions.length);
     }
     return changed;
   }

@@ -41,9 +41,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author nik
- */
+/** @author nik */
 public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
   private final AppEngineStandardFacetConfiguration facetConfiguration;
@@ -52,15 +50,15 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   private AppEngineStandardLibraryPanel appEngineStandardLibraryPanel;
   private Listener libraryListener;
 
-
-  public AppEngineStandardFacetEditor(AppEngineStandardFacetConfiguration facetConfiguration,
-      FacetEditorContext context) {
+  public AppEngineStandardFacetEditor(
+      AppEngineStandardFacetConfiguration facetConfiguration, FacetEditorContext context) {
     this.facetConfiguration = facetConfiguration;
     this.context = context;
     libraryListener = new LibraryModificationListener();
 
     LibraryTablesRegistrar.getInstance()
-        .getLibraryTable(context.getProject()).addListener(libraryListener);
+        .getLibraryTable(context.getProject())
+        .addListener(libraryListener);
   }
 
   @Override
@@ -80,10 +78,10 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
       return false;
     }
 
-    Set<AppEngineStandardMavenLibrary> savedLibs
-        = facetConfiguration.getLibraries(context.getProject());
-    Set<AppEngineStandardMavenLibrary> selectedLibs
-        = appEngineStandardLibraryPanel.getSelectedLibraries();
+    Set<AppEngineStandardMavenLibrary> savedLibs =
+        facetConfiguration.getLibraries(context.getProject());
+    Set<AppEngineStandardMavenLibrary> selectedLibs =
+        appEngineStandardLibraryPanel.getSelectedLibraries();
 
     return !Objects.equals(savedLibs, selectedLibs);
   }
@@ -91,18 +89,18 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   @Override
   public void apply() {
     if (appEngineStandardLibraryPanel.isEnabled()) {
-      Set<AppEngineStandardMavenLibrary> savedLibs
-          = facetConfiguration.getLibraries(context.getProject());
-      Set<AppEngineStandardMavenLibrary> selectedLibs
-          = appEngineStandardLibraryPanel.getSelectedLibraries();
+      Set<AppEngineStandardMavenLibrary> savedLibs =
+          facetConfiguration.getLibraries(context.getProject());
+      Set<AppEngineStandardMavenLibrary> selectedLibs =
+          appEngineStandardLibraryPanel.getSelectedLibraries();
 
       Set<AppEngineStandardMavenLibrary> libsToAdd = Sets.difference(selectedLibs, savedLibs);
       Set<AppEngineStandardMavenLibrary> libsToRemove = Sets.difference(savedLibs, selectedLibs);
 
       if (!libsToAdd.isEmpty()) {
         for (AppEngineStandardMavenLibrary library : libsToAdd) {
-          MavenRepositoryLibraryDownloader.getInstance().downloadLibrary(
-              context.getModule(), library);
+          MavenRepositoryLibraryDownloader.getInstance()
+              .downloadLibrary(context.getModule(), library);
         }
       }
 
@@ -115,8 +113,8 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   @Override
   public void reset() {
     if (appEngineStandardLibraryPanel.isEnabled()) {
-      appEngineStandardLibraryPanel
-          .setSelectedLibraries(facetConfiguration.getLibraries(context.getProject()));
+      appEngineStandardLibraryPanel.setSelectedLibraries(
+          facetConfiguration.getLibraries(context.getProject()));
     }
   }
 
@@ -124,7 +122,8 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   public void disposeUIResources() {
     if (libraryListener != null) {
       LibraryTablesRegistrar.getInstance()
-          .getLibraryTable(context.getProject()).removeListener(libraryListener);
+          .getLibraryTable(context.getProject())
+          .removeListener(libraryListener);
     }
   }
 
@@ -171,28 +170,32 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
           library -> {
             final DependencyScope scope = library.getScope();
 
-            ApplicationManager.getApplication().runWriteAction(() -> {
-              ModifiableRootModel model =
-                  ModuleRootManager.getInstance(context.getModule()).getModifiableModel();
+            ApplicationManager.getApplication()
+                .runWriteAction(
+                    () -> {
+                      ModifiableRootModel model =
+                          ModuleRootManager.getInstance(context.getModule()).getModifiableModel();
 
-              model.addLibraryEntry(addedLibrary);
+                      model.addLibraryEntry(addedLibrary);
 
-              Arrays.stream(model.getOrderEntries())
-                  .filter(
-                      orderEntry -> orderEntry.getPresentableName().equals(addedLibrary.getName()))
-                  .forEach(orderEntry -> ((ExportableOrderEntry) orderEntry).setScope(scope));
+                      Arrays.stream(model.getOrderEntries())
+                          .filter(
+                              orderEntry ->
+                                  orderEntry.getPresentableName().equals(addedLibrary.getName()))
+                          .forEach(
+                              orderEntry -> ((ExportableOrderEntry) orderEntry).setScope(scope));
 
-              model.commit();
-            });
+                      model.commit();
+                    });
 
-            Artifact artifact = AppEngineStandardSupportProvider
-                .findOrCreateWebArtifact((AppEngineStandardFacet) context.getFacet());
+            Artifact artifact =
+                AppEngineStandardSupportProvider.findOrCreateWebArtifact(
+                    (AppEngineStandardFacet) context.getFacet());
             AppEngineStandardWebIntegration.getInstance()
                 .addLibraryToArtifact(addedLibrary, artifact, context.getProject());
 
             appEngineStandardLibraryPanel.toggleLibrary(library, true /* select */);
-          }
-      );
+          });
     }
 
     @Override

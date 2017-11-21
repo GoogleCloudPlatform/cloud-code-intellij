@@ -17,20 +17,16 @@
 package com.google.cloud.tools.intellij.appengine.util;
 
 import com.google.cloud.tools.intellij.appengine.GctConstants;
-
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
-
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Utility methods for endpoint validation checks.
- */
+/** Utility methods for endpoint validation checks. */
 public class EndpointUtilities {
 
   /**
@@ -63,8 +59,8 @@ public class EndpointUtilities {
 
     if (AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API, true)
         || AnnotationUtil.isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_CLASS, true)
-        || AnnotationUtil
-            .isAnnotated(psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_REFERENCE, true)) {
+        || AnnotationUtil.isAnnotated(
+            psiClass, GctConstants.APP_ENGINE_ANNOTATION_API_REFERENCE, true)) {
       return true;
     } else {
       return false;
@@ -86,16 +82,12 @@ public class EndpointUtilities {
     return false;
   }
 
-  /**
-   * Replace sequence of dots with single dot.
-   */
+  /** Replace sequence of dots with single dot. */
   public static String collapseSequenceOfDots(@NotNull String word) {
     return word.replaceAll("[.]+", ".");
   }
 
-  /**
-   * Checks if the supplied method is a public constructor with no parameters.
-   */
+  /** Checks if the supplied method is a public constructor with no parameters. */
   public static boolean isPublicNullaryConstructor(PsiMethod method) {
     if (!method.isConstructor()) {
       return false;
@@ -112,5 +104,4 @@ public class EndpointUtilities {
 
     return false;
   }
-
 }

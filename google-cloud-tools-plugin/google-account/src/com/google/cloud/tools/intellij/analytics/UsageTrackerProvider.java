@@ -19,9 +19,7 @@ package com.google.cloud.tools.intellij.analytics;
 import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Usage Tracker Provider (as a Service) for obtaining UsageTracker implementations.
- */
+/** Usage Tracker Provider (as a Service) for obtaining UsageTracker implementations. */
 public abstract class UsageTrackerProvider {
 
   @NotNull
@@ -29,10 +27,7 @@ public abstract class UsageTrackerProvider {
     return ServiceManager.getService(UsageTrackerProvider.class).getTracker();
   }
 
-  /**
-   * Do not return a tracker that includes PII.
-   */
+  /** Do not return a tracker that includes PII. */
   @NotNull
   protected abstract UsageTracker getTracker();
-
 }

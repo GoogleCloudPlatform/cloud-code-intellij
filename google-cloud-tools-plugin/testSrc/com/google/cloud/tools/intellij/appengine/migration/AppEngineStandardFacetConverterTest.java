@@ -17,13 +17,10 @@ package com.google.cloud.tools.intellij.appengine.migration;
 
 import java.io.IOException;
 
-/**
- * Unit tests for {@link AppEngineStandardFacetConverterProvider}
- */
+/** Unit tests for {@link AppEngineStandardFacetConverterProvider} */
 public class AppEngineStandardFacetConverterTest extends BaseConverterTest {
 
   public void testConvert() throws IOException {
     testConvert("conversion/appEngineFacet");
   }
-
 }

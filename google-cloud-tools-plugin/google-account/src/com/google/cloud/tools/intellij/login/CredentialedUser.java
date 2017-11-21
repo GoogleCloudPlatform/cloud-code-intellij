@@ -22,9 +22,7 @@ import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import java.awt.Image;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Class that represents a single logged in user.
- */
+/** Class that represents a single logged in user. */
 public class CredentialedUser {
   private String name;
   private Image image;
@@ -35,6 +33,7 @@ public class CredentialedUser {
 
   /**
    * Constructor. Should only be used as temporary place holder for user.
+   *
    * @param email Email address of user
    */
   protected CredentialedUser(String email) {
@@ -45,21 +44,20 @@ public class CredentialedUser {
     googleLoginState = null;
   }
 
-  /**
-   * Creates a credentialed user.
-   */
-  public CredentialedUser(GoogleLoginState state,
+  /** Creates a credentialed user. */
+  public CredentialedUser(
+      GoogleLoginState state,
       @Nullable final IGoogleLoginCompletedCallback loginCompletedCallback) {
     this.email = state.getEmail();
     googleLoginState = state;
     credential = googleLoginState.makeCredential();
-    GoogleLoginUtils
-        .getUserInfo(credential,
-            userInfoPlus -> initializeUserInfo(userInfoPlus, loginCompletedCallback));
+    GoogleLoginUtils.getUserInfo(
+        credential, userInfoPlus -> initializeUserInfo(userInfoPlus, loginCompletedCallback));
   }
 
   /**
    * Returns the email address of this user.
+   *
    * @return Email address of user.
    */
   public String getEmail() {
@@ -98,25 +96,28 @@ public class CredentialedUser {
 
   /**
    * Sets this user to active if <code>isActive</code> is true and false otherwise.
+   *
    * @param isActive True if this user should be set to active and false otherwise.
    */
   protected void setActive(boolean isActive) {
     this.isActive = isActive;
   }
 
-  private void initializeUserInfo(Userinfoplus userInfo,
-      @Nullable final IGoogleLoginCompletedCallback loginCompletedCallback) {
+  private void initializeUserInfo(
+      Userinfoplus userInfo, @Nullable final IGoogleLoginCompletedCallback loginCompletedCallback) {
     if (userInfo == null) {
       name = null;
       image = null;
     } else {
       name = userInfo.getName();
-      GoogleLoginUtils.provideUserPicture(userInfo, newImage -> {
-        image = newImage;
-        if (loginCompletedCallback != null) {
-          loginCompletedCallback.onLoginCompleted();
-        }
-      });
+      GoogleLoginUtils.provideUserPicture(
+          userInfo,
+          newImage -> {
+            image = newImage;
+            if (loginCompletedCallback != null) {
+              loginCompletedCallback.onLoginCompleted();
+            }
+          });
     }
   }
 }

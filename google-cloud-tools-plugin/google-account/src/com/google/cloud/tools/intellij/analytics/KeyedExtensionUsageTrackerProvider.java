@@ -32,6 +32,7 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
 
   /**
    * When using the usage tracker, do NOT include any information that can identify the user
+   *
    * @return the usage tracker for the current platform.
    */
   @NotNull
@@ -44,7 +45,7 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
   /**
    * For usage tracking in the Cloud Tools family of plugins, we only want one tracker pinging an
    * analytics backend for a given platform. New platform specific trackers can register with their
-   * platform prefix key and the UsageTrackerProvider will select them.  Otherwise, the no-op usage
+   * platform prefix key and the UsageTrackerProvider will select them. Otherwise, the no-op usage
    * tracker will be used.
    *
    * @param key A string search key associated with an extension
@@ -57,13 +58,14 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
     }
 
     return new NoOpUsageTracker();
-
   }
 
   private static class NoOpUsageTracker implements UsageTracker, SendsEvents {
 
     @Override
-    public void sendEvent(@NotNull String eventCategory, @NotNull String eventAction,
+    public void sendEvent(
+        @NotNull String eventCategory,
+        @NotNull String eventAction,
         @Nullable Map<String, String> metadataMap) {
       // Do nothing
     }
