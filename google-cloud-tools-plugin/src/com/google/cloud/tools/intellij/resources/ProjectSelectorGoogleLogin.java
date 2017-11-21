@@ -21,7 +21,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 /**
  * UI for the node that prompts for signin in the {@link ProjectSelector}.
  */
-class ProjectSelectorGoogleLogin extends BaseGoogleLoginUi {
+public class ProjectSelectorGoogleLogin extends BaseGoogleLoginUi {
 
   public ProjectSelectorGoogleLogin() {
     super(GctBundle.message("select.project.signin"));

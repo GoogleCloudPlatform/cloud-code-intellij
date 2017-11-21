@@ -23,7 +23,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 /** Model for project list table in {@link ProjectSelectionDialog}. */
-final class ProjectListTableModel extends AbstractTableModel {
+class ProjectListTableModel extends AbstractTableModel {
   private static final int PROJECT_NAME_COLUMN = 0;
   private static final int PROJECT_ID_COLUMN = 1;
 

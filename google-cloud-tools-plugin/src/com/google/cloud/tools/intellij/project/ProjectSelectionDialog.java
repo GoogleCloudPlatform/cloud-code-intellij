@@ -18,11 +18,14 @@ package com.google.cloud.tools.intellij.project;
 
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.GoogleLoginListener;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.project.ProjectLoader.ProjectLoaderResultCallback;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.base.Strings;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.DocumentAdapter;
@@ -30,12 +33,14 @@ import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.table.JBTable;
 import git4idea.DialogManager;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -66,6 +71,11 @@ public class ProjectSelectionDialog extends DialogWrapper {
   private JTable projectListTable;
   private JPanel centerPanel;
 
+  private JPanel centerPanelWrapper;
+  private ProjectSelectorSignInPanel signInScreen = new ProjectSelectorSignInPanel();
+
+  private RefreshAction refreshAction;
+
   private CloudProject cloudProject;
   private ProjectListTableModel projectListTableModel;
 
@@ -74,6 +84,18 @@ public class ProjectSelectionDialog extends DialogWrapper {
   ProjectSelectionDialog(Component parent) {
     super(parent, false);
     init();
+
+    projectLoader = new ProjectLoader();
+
+    Stream.of(ProjectManager.getInstance().getOpenProjects())
+        .forEach(
+            project ->
+                project
+                    .getMessageBus()
+                    .connect(getDisposable() /* disconnect once dialog is gone. */)
+                    .subscribe(
+                        GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC,
+                        this::loadUsersAndProjects));
   }
 
   /**
@@ -103,7 +125,7 @@ public class ProjectSelectionDialog extends DialogWrapper {
   @NotNull
   @Override
   protected Action[] createLeftSideActions() {
-    return new Action[] {new RefreshAction()};
+    return new Action[] {refreshAction};
   }
 
   private void createUIComponents() {
@@ -111,6 +133,9 @@ public class ProjectSelectionDialog extends DialogWrapper {
     accountComboBox = new ComboBox<>();
     accountComboBox.setRenderer(new AccountComboBoxRenderer());
     accountComboBox.addActionListener((event) -> updateProjectList());
+
+    addAccountButton = new JButton();
+    addAccountButton.addActionListener((event) -> Services.getLoginService().logIn());
 
     // prepare table model and rendering.
     projectListTable = new JBTable();
@@ -151,6 +176,10 @@ public class ProjectSelectionDialog extends DialogWrapper {
 
     // disabled unless project is selected in the list.
     getOKAction().setEnabled(false);
+    refreshAction = new RefreshAction();
+
+    // wrapper for center panel that holds either project selection or sign in screen.
+    centerPanelWrapper = new JPanel(new BorderLayout());
   }
 
   private void setCloudProject(CloudProject cloudProject) {
@@ -169,11 +198,13 @@ public class ProjectSelectionDialog extends DialogWrapper {
     if (credentialedUsers.isEmpty()) {
       showSignInRequest();
     } else {
+      hideSignInRequest();
+      accountComboBox.removeAllItems();
       for (CredentialedUser user : credentialedUsers) {
         accountComboBox.addItem(user);
       }
       accountComboBox.setSelectedItem(Services.getLoginService().getActiveUser());
-      updateProjectList();
+      // no need to update project list - account combo box will generate an event.
     }
   }
 
@@ -213,11 +244,25 @@ public class ProjectSelectionDialog extends DialogWrapper {
         // specified user is not in logged in user list, clear the account selection.
         accountComboBox.setSelectedItem(null);
       }
-      // no need to update project list - account combo box will generate event to reload.
+      // no need to update project list - account combo box will generate an event.
     }
   }
 
-  private void showSignInRequest() {}
+  private void showSignInRequest() {
+    centerPanelWrapper.removeAll();
+    centerPanelWrapper.add(signInScreen);
+    getButton(refreshAction).setVisible(false);
+    validate();
+  }
+
+  private void hideSignInRequest() {
+    if (!centerPanel.isShowing()) {
+      centerPanelWrapper.removeAll();
+      centerPanelWrapper.add(centerPanel);
+      getButton(refreshAction).setVisible(true);
+      validate();
+    }
+  }
 
   private void validateProjectSelection() {
     if (projectListTable.getSelectedRow() >= 0) {
@@ -249,7 +294,8 @@ public class ProjectSelectionDialog extends DialogWrapper {
   @Nullable
   @Override
   protected JComponent createCenterPanel() {
-    return centerPanel;
+    centerPanelWrapper.add(centerPanel);
+    return centerPanelWrapper;
   }
 
   // re-queries all signed in users and projects.
@@ -271,7 +317,10 @@ public class ProjectSelectionDialog extends DialogWrapper {
     public void customize(
         JList list, CredentialedUser user, int index, boolean selected, boolean hasFocus) {
       if (user != null) {
-        setText(user.getName() + " (" + user.getEmail() + ")");
+        // use just email if no name is set or email in "()" if set.
+        String displayName = Strings.isNullOrEmpty(user.getName()) ? "" : user.getName();
+        String displayEmail = displayName.isEmpty() ? user.getEmail() : " (" + user.getEmail() + ")";
+        setText(displayName + displayEmail);
         setIcon(GoogleLoginIcons.getScaledUserIcon(ProjectSelector.ACCOUNT_ICON_SIZE, user));
       }
     }
