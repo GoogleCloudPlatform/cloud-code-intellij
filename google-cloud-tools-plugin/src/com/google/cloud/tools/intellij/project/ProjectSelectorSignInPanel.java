@@ -20,12 +20,14 @@ import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
 import com.google.cloud.tools.intellij.resources.BaseGoogleLoginUi;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 
+/** Sign in panel shown in {@link ProjectSelectionDialog} when no users are logged in. */
 class ProjectSelectorSignInPanel extends BaseGoogleLoginUi {
 
   ProjectSelectorSignInPanel() {
@@ -37,7 +39,7 @@ class ProjectSelectorSignInPanel extends BaseGoogleLoginUi {
     JButton signInButton = new JButton(new SignInAction());
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridy = 2; // below sign in text.
-    constraints.anchor = GridBagConstraints.WEST;
+    constraints.anchor = GridBagConstraints.NORTHWEST;
     add(signInButton, constraints);
   }
 

@@ -21,18 +21,20 @@ import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
+import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBLabel;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import javax.swing.event.HyperlinkEvent.EventType;
 
 /**
  * ProjectSelector allows the user to select a GCP project id. It shows selected project name and
@@ -45,8 +47,8 @@ public class ProjectSelector extends JPanel {
 
   private final List<ProjectSelectionListener> projectSelectionListeners = new ArrayList<>();
 
-  private JBLabel projectNameLabel;
-  private JBLabel accountInfoLabel;
+  private HyperlinkLabelWithStateAccess projectNameLabel;
+  private HyperlinkLabelWithStateAccess accountInfoLabel;
   private JBLabel projectAccountSeparatorLabel;
 
   private CloudProject cloudProject;
@@ -96,22 +98,30 @@ public class ProjectSelector extends JPanel {
     setLayout(new BorderLayout());
 
     JPanel staticInfoPanel = new JPanel();
-    staticInfoPanel.setLayout(new BoxLayout(staticInfoPanel, BoxLayout.X_AXIS));
-    staticInfoPanel.setBorder(
-        BorderFactory.createCompoundBorder(
-            UIManager.getBorder("TextField.border"), BorderFactory.createEmptyBorder(2, 2, 2, 2)));
+    staticInfoPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 2));
+    staticInfoPanel.setBorder(UIManager.getBorder("TextField.border"));
 
-    projectNameLabel = new JBLabel();
+    projectNameLabel = new HyperlinkLabelWithStateAccess();
+    projectNameLabel.addHyperlinkListener(
+        (event) -> {
+          if (event.getEventType() == EventType.ACTIVATED) {
+            handleOpenProjectSelectionDialog();
+          }
+        });
     staticInfoPanel.add(projectNameLabel);
-    staticInfoPanel.add(Box.createHorizontalStrut(5));
+
     projectAccountSeparatorLabel = new JBLabel("/");
     projectAccountSeparatorLabel.setVisible(false /* only visible when project is selected. */);
     staticInfoPanel.add(projectAccountSeparatorLabel);
-    staticInfoPanel.add(Box.createHorizontalStrut(5));
 
-    accountInfoLabel = new JBLabel();
+    accountInfoLabel = new HyperlinkLabelWithStateAccess();
+    accountInfoLabel.addHyperlinkListener(
+        (event) -> {
+          if (event.getEventType() == EventType.ACTIVATED) {
+            handleOpenProjectSelectionDialog();
+          }
+        });
     staticInfoPanel.add(accountInfoLabel);
-    staticInfoPanel.add(Box.createHorizontalGlue());
 
     ComponentWithBrowseButton<JPanel> componentWithBrowseButton =
         new ComponentWithBrowseButton<>(
@@ -133,21 +143,22 @@ public class ProjectSelector extends JPanel {
   }
 
   private void updateProjectAndUserInformation(CloudProject selection) {
-    if (selection == null) {
-      projectNameLabel.setText(GctBundle.getString("project.selector.no.selected.project"));
-      accountInfoLabel.setText("");
+    if (selection == null || Strings.isNullOrEmpty(selection.getProjectName())) {
+      projectNameLabel.setHyperlinkText(
+          GctBundle.getString("project.selector.no.selected.project"));
+      accountInfoLabel.setHyperlinkText("");
       accountInfoLabel.setIcon(null);
       projectAccountSeparatorLabel.setVisible(false);
 
     } else {
-      projectNameLabel.setText(selection.getProjectName());
+      projectNameLabel.setHyperlinkText(selection.getProjectName());
       projectAccountSeparatorLabel.setVisible(true);
       // first just show account email, then expand with name/picture if this account is signed in.
-      accountInfoLabel.setText(selection.getGoogleUsername());
+      accountInfoLabel.setHyperlinkText(selection.getGoogleUsername());
       Optional<CredentialedUser> loggedInUser =
           Services.getLoginService().getLoggedInUser(selection.getGoogleUsername());
       if (loggedInUser.isPresent()) {
-        accountInfoLabel.setText(
+        accountInfoLabel.setHyperlinkText(
             loggedInUser.get().getName() + " (" + loggedInUser.get().getEmail() + ")");
       }
       accountInfoLabel.setIcon(
@@ -159,18 +170,46 @@ public class ProjectSelector extends JPanel {
     projectSelectionListeners.forEach(listener -> listener.projectSelected(cloudProject));
   }
 
+  /** Hyperlink label that provides access to its text and icon for testing purposes. */
+  @VisibleForTesting
+  static final class HyperlinkLabelWithStateAccess extends HyperlinkLabel {
+
+    private String text;
+    private Icon icon;
+
+    @Override
+    public void setHyperlinkText(String text) {
+      this.text = text;
+      super.setHyperlinkText(text);
+    }
+
+    @Override
+    public void setIcon(Icon icon) {
+      this.icon = icon;
+      super.setIcon(icon);
+    }
+
+    public String getText() {
+      return text;
+    }
+
+    public Icon getIcon() {
+      return icon;
+    }
+  }
+
   @VisibleForTesting
   ProjectSelectionDialog createProjectSelectionDialog(Component parent) {
     return new ProjectSelectionDialog();
   }
 
   @VisibleForTesting
-  JBLabel getProjectNameLabel() {
+  HyperlinkLabelWithStateAccess getProjectNameLabel() {
     return projectNameLabel;
   }
 
   @VisibleForTesting
-  JBLabel getAccountInfoLabel() {
+  HyperlinkLabelWithStateAccess getAccountInfoLabel() {
     return accountInfoLabel;
   }
 

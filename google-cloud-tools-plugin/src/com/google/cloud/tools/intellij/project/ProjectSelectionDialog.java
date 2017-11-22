@@ -29,6 +29,7 @@ import com.google.common.base.Strings;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.components.JBTextField;
@@ -129,11 +130,6 @@ public class ProjectSelectionDialog extends DialogWrapper {
 
   @VisibleForTesting
   void createUIComponents() {
-    // prepare account combobox model and rendering.
-    accountComboBox = new ComboBox<>();
-    accountComboBox.setRenderer(new AccountComboBoxRenderer());
-    accountComboBox.addActionListener((event) -> updateProjectList());
-
     addAccountButton = new JButton();
     addAccountButton.addActionListener((event) -> Services.getLoginService().logIn());
 
@@ -178,6 +174,11 @@ public class ProjectSelectionDialog extends DialogWrapper {
     getOKAction().setEnabled(false);
     refreshAction = new RefreshAction();
 
+    // prepare account combobox model and rendering.
+    accountComboBox = new ComboBox<>();
+    accountComboBox.setRenderer(new AccountComboBoxRenderer());
+    accountComboBox.addActionListener((event) -> updateProjectList());
+
     // wrapper for center panel that holds either project selection or sign in screen.
     centerPanelWrapper = new JPanel(new BorderLayout());
   }
@@ -193,7 +194,8 @@ public class ProjectSelectionDialog extends DialogWrapper {
     return new CloudProject(getSelectedProjectName(), user.getEmail());
   }
 
-  private void loadUsersAndProjects() {
+  @VisibleForTesting
+  void loadUsersAndProjects() {
     Collection<CredentialedUser> credentialedUsers =
         Services.getLoginService().getAllUsers().values();
     if (credentialedUsers.isEmpty()) {
@@ -210,9 +212,10 @@ public class ProjectSelectionDialog extends DialogWrapper {
   }
 
   private void updateProjectList() {
+    // clear list and reload for selected user, empty if user is not logged in/selection empty.
+    projectListTableModel.setProjectList(Collections.emptyList());
     CredentialedUser user = (CredentialedUser) accountComboBox.getSelectedItem();
     if (user != null) {
-      projectListTableModel.setProjectList(Collections.emptyList());
       ((JBTable) projectListTable).setPaintBusy(true);
       projectLoader.loadUserProjectsInBackground(
           user,
@@ -223,20 +226,23 @@ public class ProjectSelectionDialog extends DialogWrapper {
                   () -> {
                     projectListTableModel.setProjectList(result);
                     ((JBTable) projectListTable).setPaintBusy(false);
-                    showProjectInList(cloudProject.getProjectName());
+                    if (cloudProject != null) {
+                      showProjectInList(cloudProject.getProjectName());
+                    }
                   });
             }
 
             @Override
             public void onError(String errorDetails) {
               ((JBTable) projectListTable).setPaintBusy(false);
+              setErrorInfoAll(Collections.singletonList(new ValidationInfo(errorDetails)));
             }
           });
     }
   }
 
   private void updateProjectAccountInformation() {
-    if (cloudProject != null) {
+    if (cloudProject != null && !Strings.isNullOrEmpty(cloudProject.getGoogleUsername())) {
       Optional<CredentialedUser> loggedInUser =
           Services.getLoginService().getLoggedInUser(cloudProject.getGoogleUsername());
       if (loggedInUser.isPresent()) {
@@ -262,6 +268,7 @@ public class ProjectSelectionDialog extends DialogWrapper {
       centerPanelWrapper.add(centerPanel);
       getButton(refreshAction).setVisible(true);
       validate();
+      pack();
     }
   }
 
@@ -285,7 +292,8 @@ public class ProjectSelectionDialog extends DialogWrapper {
     }
   }
 
-  private String getSelectedProjectName() {
+  @VisibleForTesting
+  String getSelectedProjectName() {
     // row number change based on filtering state.
     int actualSelectedRow =
         projectListTable.getRowSorter().convertRowIndexToModel(projectListTable.getSelectedRow());
@@ -320,7 +328,8 @@ public class ProjectSelectionDialog extends DialogWrapper {
       if (user != null) {
         // use just email if no name is set or email in "()" if set.
         String displayName = Strings.isNullOrEmpty(user.getName()) ? "" : user.getName();
-        String displayEmail = displayName.isEmpty() ? user.getEmail() : " (" + user.getEmail() + ")";
+        String displayEmail =
+            displayName.isEmpty() ? user.getEmail() : " (" + user.getEmail() + ")";
         setText(displayName + displayEmail);
         setIcon(GoogleLoginIcons.getScaledUserIcon(ProjectSelector.ACCOUNT_ICON_SIZE, user));
       }
@@ -328,15 +337,33 @@ public class ProjectSelectionDialog extends DialogWrapper {
   }
 
   @VisibleForTesting
+  @Override
+  protected JButton getButton(@NotNull Action action) {
+    return super.getButton(action);
+  }
+
+  @VisibleForTesting
   JComboBox<CredentialedUser> getAccountComboBox() {
     return accountComboBox;
   }
+
   @VisibleForTesting
   JTable getProjectListTable() {
     return projectListTable;
   }
+
   @VisibleForTesting
-  public ProjectListTableModel getProjectListTableModel() {
+  ProjectListTableModel getProjectListTableModel() {
     return projectListTableModel;
+  }
+
+  @VisibleForTesting
+  JPanel getCenterPanelWrapper() {
+    return centerPanelWrapper;
+  }
+
+  @VisibleForTesting
+  void setProjectLoader(ProjectLoader projectLoader) {
+    this.projectLoader = projectLoader;
   }
 }

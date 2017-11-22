@@ -128,6 +128,13 @@ public class ProjectSelectorTest {
     verifyUiStateForProject(null);
   }
 
+  @Test
+  public void setEmptyProject_acceptsAndUpdatesUi() {
+    projectSelector.setSelectedProject(new CloudProject("", ""));
+
+    verifyUiStateForProject(null);
+  }
+
   private void verifyUiStateForProject(CloudProject project) {
     if (project == null) {
       assertThat(projectSelector.getProjectNameLabel().getText())
