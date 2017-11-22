@@ -28,7 +28,7 @@ Cloning into 'gcloud-intellij'...
 
 There are four modules:
 
-* google-clout-tools: Cloud debugger and code inspections
+* google-cloud-tools: Cloud debugger and code inspections
 * common-lib: Code shared between the above two
 * common-test-lib: test infrastructure code
 

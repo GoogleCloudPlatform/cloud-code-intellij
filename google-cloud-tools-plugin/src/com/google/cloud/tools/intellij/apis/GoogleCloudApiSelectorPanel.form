@@ -16,7 +16,7 @@
         </properties>
       </component>
       <scrollpane id="3cccd" class="com.intellij.ui.components.JBScrollPane" binding="leftScrollPane">
-        <constraints border-constraint="North"/>
+        <constraints border-constraint="West"/>
         <properties/>
         <border type="none"/>
         <children>
@@ -32,15 +32,37 @@
         </children>
       </scrollpane>
       <scrollpane id="349d1" class="com.intellij.ui.components.JBScrollPane" binding="rightScrollPane">
-        <constraints border-constraint="South"/>
+        <constraints border-constraint="East"/>
         <properties/>
         <border type="none"/>
         <children>
-          <nested-form id="a0864" form-file="com/google/cloud/tools/intellij/apis/GoogleCloudApiDetailsPanel.form" binding="detailsForm">
+          <nested-form id="a0864" form-file="com/google/cloud/tools/intellij/apis/GoogleCloudApiDetailsPanel.form" binding="detailsPanel">
             <constraints/>
           </nested-form>
         </children>
       </scrollpane>
+      <grid id="57a30" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="10" right="0"/>
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="383cb" class="javax.swing.JLabel" binding="modulesLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="messages/CloudToolsBundle" key="cloud.libraries.module.selector.label"/>
+            </properties>
+          </component>
+          <component id="ec336" class="com.intellij.application.options.ModulesComboBox" binding="modulesComboBox" custom-create="true">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+          </component>
+        </children>
+      </grid>
     </children>
   </grid>
 </form>

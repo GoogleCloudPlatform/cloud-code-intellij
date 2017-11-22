@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -77,6 +78,42 @@ public final class GoogleCloudApiDetailsPanel {
 
     currentCloudLibrary = library;
     updateUI();
+  }
+
+  /** Returns the {@link JLabel} that holds the library's icon. */
+  @VisibleForTesting
+  JLabel getIcon() {
+    return icon;
+  }
+
+  /** Returns the {@link JLabel} that holds the library's name. */
+  @VisibleForTesting
+  JLabel getNameLabel() {
+    return nameLabel;
+  }
+
+  /** Returns the {@link JLabel} that holds the library's version. */
+  @VisibleForTesting
+  JLabel getVersionLabel() {
+    return versionLabel;
+  }
+
+  /** Returns the {@link JLabel} that holds the library's status. */
+  @VisibleForTesting
+  JLabel getStatusLabel() {
+    return statusLabel;
+  }
+
+  /** Returns the {@link JTextPane} that holds the library's description. */
+  @VisibleForTesting
+  JTextPane getDescriptionTextPane() {
+    return descriptionTextPane;
+  }
+
+  /** Returns the {@link JTextPane} that holds the library's links. */
+  @VisibleForTesting
+  JTextPane getLinksTextPane() {
+    return linksTextPane;
   }
 
   /**
