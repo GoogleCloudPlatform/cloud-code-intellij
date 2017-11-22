@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.resources;
+package com.google.cloud.tools.intellij.project;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+/** GCP project and account. */
+public class CloudProject {
+  private final String projectName;
+  private final String googleUsername;
 
-/**
- * UI for the node that prompts for signin in the {@link ProjectSelector}.
- */
-public class ProjectSelectorGoogleLogin extends BaseGoogleLoginUi {
+  public CloudProject(String projectName, String googleUsername) {
+    this.projectName = projectName;
+    this.googleUsername = googleUsername;
+  }
 
-  public ProjectSelectorGoogleLogin() {
-    super(GctBundle.message("select.project.signin"));
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public String getGoogleUsername() {
+    return googleUsername;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.resources;
+package com.google.cloud.tools.intellij.project;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+/** Interface that must be implemented in order to be informed of project selection changes. */
+public interface ProjectSelectionListener {
 
-/**
- * UI for the node that prompts for signin in the {@link ProjectSelector}.
- */
-public class ProjectSelectorGoogleLogin extends BaseGoogleLoginUi {
-
-  public ProjectSelectorGoogleLogin() {
-    super(GctBundle.message("select.project.signin"));
-  }
+  /** @param cloudProject new project selection. Not called if project was not selected. */
+  void projectSelected(CloudProject cloudProject);
 }
