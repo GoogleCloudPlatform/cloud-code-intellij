@@ -16,10 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.Services;
-import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -41,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
 public final class AppEngineDeploymentConfigurationPanel {
 
   private JPanel commonConfigPanel;
-  private ProjectSelector projectSelector = new ProjectSelector();
+  private ProjectSelector projectSelector;
   private JLabel environmentLabel;
   private AppEngineApplicationInfoPanel applicationInfoPanel;
 
@@ -53,7 +50,6 @@ public final class AppEngineDeploymentConfigurationPanel {
   private JPanel appEngineCostWarningPanel;
   private HyperlinkLabel appEngineCostWarningLabel;
   private JLabel serviceLabel;
-  private com.google.cloud.tools.intellij.project.ProjectSelector projectSelectorNew;
 
   private static final boolean PROMOTE_DEFAULT = false;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
@@ -115,10 +111,6 @@ public final class AppEngineDeploymentConfigurationPanel {
     promoteCheckbox.setSelected(configuration.isPromote());
     versionIdField.setText(configuration.getVersion());
     projectSelector.setText(configuration.getCloudProjectName());
-
-    // TODO remove before review.
-    projectSelectorNew.setSelectedProject(new CloudProject(configuration.getCloudProjectName(), configuration.getGoogleUsername()));
-
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
 
@@ -161,10 +153,9 @@ public final class AppEngineDeploymentConfigurationPanel {
   }
 
   /**
-   * Updates the text of the panel as follows:
-   *   if the project text box is empty, no message is displayed,
-   *   if the project text represents a valid project, the project details are displayed,
-   *   if the project text represents an invalid project, an error message is displayed.
+   * Updates the text of the panel as follows: if the project text box is empty, no message is
+   * displayed, if the project text represents a valid project, the project details are displayed,
+   * if the project text represents an invalid project, an error message is displayed.
    */
   private void refreshApplicationInfoPanel() {
     if (Strings.isNullOrEmpty(projectSelector.getText())) {
