@@ -87,7 +87,10 @@ subprojects {
     dependencies {
         compile 'joda-time:joda-time:2.9.2'
 
-        testCompile ('com.google.truth:truth:0.30') {
+        testCompile ('com.google.truth:truth:0.36') {
+            exclude group: 'com.google.guava', module: 'guava'
+        }
+        testCompile ('com.google.truth.extensions:truth-java8-extension:0.36') {
             exclude group: 'com.google.guava', module: 'guava'
         }
         testCompile 'junit:junit:4.+'
