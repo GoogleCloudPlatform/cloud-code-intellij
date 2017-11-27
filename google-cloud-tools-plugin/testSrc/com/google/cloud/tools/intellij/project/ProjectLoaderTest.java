@@ -16,7 +16,9 @@
 
 package com.google.cloud.tools.intellij.project;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +37,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatcher;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 
 /** Tests for {@link ProjectLoader} */
@@ -116,6 +121,31 @@ public class ProjectLoaderTest {
     projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
 
     verify(mockResultCallback).projectListReady(Collections.emptyList());
+  }
+
+  @Test
+  public void multiPage_projectList_merged_correctly() throws IOException {
+    mockListProjectsResponse(null);
+    // emulate page with size 1, one token returned, then completed.
+    String pageToken = "token";
+    ListProjectsResponse firstResponse = new ListProjectsResponse();
+    firstResponse.setProjects(Collections.singletonList(testProject1));
+    firstResponse.setNextPageToken(pageToken);
+    ListProjectsResponse secondResponse = new ListProjectsResponse();
+    secondResponse.setProjects(Collections.singletonList(testProject2));
+    secondResponse.setNextPageToken("");
+
+    ArgumentCaptor<String> pageTokenCaptor = ArgumentCaptor.forClass(String.class);
+    when(mockList.setPageToken(pageTokenCaptor.capture())).thenReturn(mockList);
+    when(mockList.execute()).thenReturn(firstResponse, secondResponse);
+
+    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+
+    // check page token is called only for tokens returned in responses.
+    assertThat(pageTokenCaptor.getAllValues().size()).isEqualTo(1);
+    assertThat(pageTokenCaptor.getAllValues().get(0)).isEqualTo(pageToken);
+
+    verify(mockResultCallback).projectListReady(Arrays.asList(testProject1, testProject2));
   }
 
   /**
