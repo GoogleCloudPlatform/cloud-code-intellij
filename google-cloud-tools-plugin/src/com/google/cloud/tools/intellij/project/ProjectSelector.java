@@ -54,7 +54,7 @@ public class ProjectSelector extends JPanel {
   private CloudProject cloudProject;
 
   public ProjectSelector() {
-    createUIComponents();
+    initUi();
     setSelectedProject(null);
   }
 
@@ -92,7 +92,7 @@ public class ProjectSelector extends JPanel {
     projectSelectionListeners.remove(projectSelectionListener);
   }
 
-  private void createUIComponents() {
+  private void initUi() {
     // layout - in the center of panel, horizontal line of project/account labels in a panel
     // ends with a fixed size browse button.
     setLayout(new BorderLayout());
