@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.diagnostic.Logger;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -102,10 +103,15 @@ class ProjectLoader {
       }
     } catch (IOException ex) {
       // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/323
-      resultCallback.onError(GctBundle.getString("clouddebug.couldnotconnect"));
+      resultCallback.onError(GctBundle.getString("project.selector.loader.couldnotconnect"));
     } catch (RuntimeException ex) {
-      LOG.error("Exception loading projects for " + user.getName(), ex);
+      logError("Exception loading projects for " + user.getName(), ex);
       resultCallback.onError(ex.getMessage());
     }
+  }
+
+  @VisibleForTesting
+  void logError(String message, Throwable error) {
+    LOG.error(message, error);
   }
 }

@@ -18,7 +18,9 @@ package com.google.cloud.tools.intellij.project;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +32,8 @@ import com.google.cloud.tools.intellij.project.ProjectLoader.ProjectLoaderResult
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
+import com.google.cloud.tools.intellij.util.GctBundle;
+import com.intellij.openapi.diagnostic.Logger;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -121,6 +125,30 @@ public class ProjectLoaderTest {
     projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
 
     verify(mockResultCallback).projectListReady(Collections.emptyList());
+  }
+
+  @Test
+  public void ioError_resultsIn_valid_errorMessage() throws IOException {
+    mockListProjectsResponse(null);
+    when(mockList.execute()).thenThrow(new IOException("IO issue"));
+
+    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+
+    verify(mockResultCallback).onError(GctBundle.getString("project.selector.loader.couldnotconnect"));
+  }
+
+  @Test
+  public void runtimeException_resultsIn_exceptionMessage() throws IOException {
+    // remove IDEA logging which invokes AssertionError.
+    projectLoader = spy(new ProjectLoader());
+    doNothing().when(projectLoader).logError(any(), any());
+    mockListProjectsResponse(null);
+    String errorMessage = "Internal error";
+    when(mockList.execute()).thenThrow(new RuntimeException(errorMessage));
+
+    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+
+    verify(mockResultCallback).onError(ArgumentMatchers.contains(errorMessage));
   }
 
   @Test
