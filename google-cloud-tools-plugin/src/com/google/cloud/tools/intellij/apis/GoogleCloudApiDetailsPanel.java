@@ -161,7 +161,7 @@ public final class GoogleCloudApiDetailsPanel {
     descriptionTextPane.setText(currentCloudLibrary.getDescription());
 
     if (currentCloudLibrary.getClients() != null) {
-      CloudLibraryUtils.getJavaClient(currentCloudLibrary)
+      CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
                 if (client.getMavenCoordinates() != null) {

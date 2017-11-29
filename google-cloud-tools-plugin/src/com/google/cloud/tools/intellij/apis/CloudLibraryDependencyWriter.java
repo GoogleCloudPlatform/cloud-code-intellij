@@ -34,7 +34,7 @@ import org.jetbrains.idea.maven.model.MavenId;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
-/** A helper class that writes dependencies on Cloud libraries to a given module. */
+/** A helper class that adds dependencies of Cloud libraries to a given module. */
 final class CloudLibraryDependencyWriter {
 
   /** Prevents instantiation. */
@@ -50,7 +50,11 @@ final class CloudLibraryDependencyWriter {
    * @param libraries the set of {@link CloudLibrary CloudLibraries} to add
    * @param module the {@link Module} to add the libraries to
    */
-  static void addLibraries(Set<CloudLibrary> libraries, Module module) {
+  static void addLibraries(@NotNull Set<CloudLibrary> libraries, @NotNull Module module) {
+    if (libraries.isEmpty()) {
+      return;
+    }
+
     Project project = module.getProject();
     MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(module.getProject());
     MavenProject mavenProject = projectsManager.findProject(module);
@@ -74,12 +78,13 @@ final class CloudLibraryDependencyWriter {
         // dependencies, maybe a warning?
         libraries
             .stream()
-            .map(CloudLibraryUtils::getJavaClientMavenCoordinates)
+            .map(CloudLibraryUtils::getFirstJavaClientMavenCoordinates)
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(CloudLibraryDependencyWriter::toMavenId)
             .filter(mavenId -> isMavenIdNotInDependencyList(mavenId, dependencies))
-            .forEach(mavenId -> MavenDomUtil.createDomDependency(model, null, mavenId));
+            .forEach(
+                mavenId -> MavenDomUtil.createDomDependency(model, /* editor= */ null, mavenId));
       }
     }.execute();
   }

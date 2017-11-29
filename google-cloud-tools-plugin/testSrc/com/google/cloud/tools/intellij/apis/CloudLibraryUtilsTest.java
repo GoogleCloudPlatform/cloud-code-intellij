@@ -79,7 +79,7 @@ public final class CloudLibraryUtilsTest {
   @Test
   public void getJavaClient_withFullLibrary_returnsClient() {
     Optional<CloudLibraryClient> client =
-        CloudLibraryUtils.getJavaClient(LIBRARY_FULL.toCloudLibrary());
+        CloudLibraryUtils.getFirstJavaClient(LIBRARY_FULL.toCloudLibrary());
 
     // TODO(nkibler): Use .hasValue() once CloudLibrary classes have overridden equality methods.
     assertThat(client).isPresent();
@@ -89,7 +89,7 @@ public final class CloudLibraryUtilsTest {
   @Test
   public void getJavaClient_withNoClientsLibrary_returnsEmptyOptional() {
     Optional<CloudLibraryClient> client =
-        CloudLibraryUtils.getJavaClient(LIBRARY_NO_CLIENTS.toCloudLibrary());
+        CloudLibraryUtils.getFirstJavaClient(LIBRARY_NO_CLIENTS.toCloudLibrary());
 
     assertThat(client).isEmpty();
   }
@@ -97,7 +97,7 @@ public final class CloudLibraryUtilsTest {
   @Test
   public void getJavaClient_withNullClientsLibrary_returnsEmptyOptional() {
     Optional<CloudLibraryClient> client =
-        CloudLibraryUtils.getJavaClient(LIBRARY_NULL_CLIENTS.toCloudLibrary());
+        CloudLibraryUtils.getFirstJavaClient(LIBRARY_NULL_CLIENTS.toCloudLibrary());
 
     assertThat(client).isEmpty();
   }
@@ -105,7 +105,7 @@ public final class CloudLibraryUtilsTest {
   @Test
   public void getJavaClient_withPythonClientLibrary_returnsEmptyOptional() {
     Optional<CloudLibraryClient> client =
-        CloudLibraryUtils.getJavaClient(LIBRARY_PYTHON_CLIENT_ONLY.toCloudLibrary());
+        CloudLibraryUtils.getFirstJavaClient(LIBRARY_PYTHON_CLIENT_ONLY.toCloudLibrary());
 
     assertThat(client).isEmpty();
   }
@@ -113,7 +113,7 @@ public final class CloudLibraryUtilsTest {
   @Test
   public void getJavaClientMavenCoordinates_withFullLibrary_returnsMavenCoords() {
     Optional<CloudLibraryClientMavenCoordinates> mavenCoordinates =
-        CloudLibraryUtils.getJavaClientMavenCoordinates(LIBRARY_FULL.toCloudLibrary());
+        CloudLibraryUtils.getFirstJavaClientMavenCoordinates(LIBRARY_FULL.toCloudLibrary());
 
     // TODO(nkibler): Use .hasValue() once CloudLibrary classes have overridden equality methods.
     assertThat(mavenCoordinates).isPresent();
@@ -124,7 +124,7 @@ public final class CloudLibraryUtilsTest {
   @Test
   public void getJavaClientMavenCoordinates_withNoClientsLibrary_returnsEmptyOptional() {
     Optional<CloudLibraryClientMavenCoordinates> mavenCoordinates =
-        CloudLibraryUtils.getJavaClientMavenCoordinates(LIBRARY_NO_CLIENTS.toCloudLibrary());
+        CloudLibraryUtils.getFirstJavaClientMavenCoordinates(LIBRARY_NO_CLIENTS.toCloudLibrary());
 
     assertThat(mavenCoordinates).isEmpty();
   }
@@ -132,7 +132,7 @@ public final class CloudLibraryUtilsTest {
   @Test
   public void getJavaClientMavenCoordinates_withNullClientsLibrary_returnsEmptyOptional() {
     Optional<CloudLibraryClientMavenCoordinates> mavenCoordinates =
-        CloudLibraryUtils.getJavaClientMavenCoordinates(LIBRARY_NULL_CLIENTS.toCloudLibrary());
+        CloudLibraryUtils.getFirstJavaClientMavenCoordinates(LIBRARY_NULL_CLIENTS.toCloudLibrary());
 
     assertThat(mavenCoordinates).isEmpty();
   }
@@ -140,7 +140,7 @@ public final class CloudLibraryUtilsTest {
   @Test
   public void getJavaClientMavenCoordinates_withPythonClientLibrary_returnsEmptyOptional() {
     Optional<CloudLibraryClientMavenCoordinates> mavenCoordinates =
-        CloudLibraryUtils.getJavaClientMavenCoordinates(
+        CloudLibraryUtils.getFirstJavaClientMavenCoordinates(
             LIBRARY_PYTHON_CLIENT_ONLY.toCloudLibrary());
 
     assertThat(mavenCoordinates).isEmpty();
@@ -149,7 +149,8 @@ public final class CloudLibraryUtilsTest {
   @Test
   public void getJavaClientMavenCoordinates_withNoMavenCoords_returnsEmptyOptional() {
     Optional<CloudLibraryClientMavenCoordinates> mavenCoordinates =
-        CloudLibraryUtils.getJavaClientMavenCoordinates(LIBRARY_NO_MAVEN_COORDS.toCloudLibrary());
+        CloudLibraryUtils.getFirstJavaClientMavenCoordinates(
+            LIBRARY_NO_MAVEN_COORDS.toCloudLibrary());
 
     assertThat(mavenCoordinates).isEmpty();
   }

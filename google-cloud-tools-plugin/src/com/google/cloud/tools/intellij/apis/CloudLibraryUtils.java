@@ -35,7 +35,7 @@ final class CloudLibraryUtils {
    *
    * @param library the {@link CloudLibrary} to return the first Java client for
    */
-  static Optional<CloudLibraryClient> getJavaClient(CloudLibrary library) {
+  static Optional<CloudLibraryClient> getFirstJavaClient(CloudLibrary library) {
     if (library.getClients() == null) {
       return Optional.empty();
     }
@@ -52,12 +52,12 @@ final class CloudLibraryUtils {
    * {@link CloudLibrary}, or {@link Optional#empty()} if none exists.
    *
    * <p>For details on how the {@link CloudLibraryClient} is found, see {@link
-   * #getJavaClient(CloudLibrary)}.
+   * #getFirstJavaClient(CloudLibrary)}.
    *
    * @param library the {@link CloudLibrary} to return Maven coordinates for
    */
-  static Optional<CloudLibraryClientMavenCoordinates> getJavaClientMavenCoordinates(
+  static Optional<CloudLibraryClientMavenCoordinates> getFirstJavaClientMavenCoordinates(
       CloudLibrary library) {
-    return getJavaClient(library).map(CloudLibraryClient::getMavenCoordinates);
+    return getFirstJavaClient(library).map(CloudLibraryClient::getMavenCoordinates);
   }
 }
