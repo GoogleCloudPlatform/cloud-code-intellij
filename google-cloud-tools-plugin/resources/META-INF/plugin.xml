@@ -19,12 +19,12 @@
   <name>Google Cloud Tools</name>
   <description>
     <![CDATA[<html>
-      <p>Provides support for developing Google App Engine applications. Features include:</p>
+      <p>This plugin integrates Google Cloud Platform into your IDE development workflows. It includes features such as:</p>
       <ul>
-        <li>Debug Java applications running in the Google cloud from inside IDEA.</li>
-        <li>Code inspections for App Engine standard environment Java code.</li>
-        <li>Run and debug applications on a local development server.</li>
-        <li>Deploy to the App Engine standard and flexible environments.</li>
+        <li>Google App Engine support for local development and deployment.</li>
+        <li>Set Stackdriver Debugger snapshots to debug your applications running in the cloud.</li>
+        <li>Checkout or import your projects from Cloud Source Repositories.</li>
+        <li>Browse your Google Cloud Storage buckets and copy bucket paths into your clipboard.</li>
       </ul>
     </html>]]>
   </description>
