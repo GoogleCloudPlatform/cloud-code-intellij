@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.google.cloud.tools.intellij.project.ProjectSelector">
+  <grid id="27dc6" binding="rootPanel" layout-manager="BorderLayout" hgap="1" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="23"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="654e3" binding="hyperlinksPanel" custom-create="true" layout-manager="FlowLayout" hgap="2" vgap="2" flow-align="0">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="63cd0" class="com.intellij.ui.HyperlinkLabel" binding="projectNameLabel" custom-create="true">
+            <constraints/>
+            <properties/>
+          </component>
+          <component id="6cf34" class="com.intellij.ui.components.JBLabel" binding="projectAccountSeparatorLabel" custom-create="true">
+            <constraints/>
+            <properties>
+              <text value="/"/>
+            </properties>
+          </component>
+          <component id="c0192" class="com.intellij.ui.HyperlinkLabel" binding="accountInfoLabel" custom-create="true">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </grid>
+      <component id="70006" class="com.intellij.openapi.ui.FixedSizeButton" binding="browseButton" custom-create="true">
+        <constraints border-constraint="East"/>
+        <properties/>
+      </component>
+    </children>
+  </grid>
+</form>
