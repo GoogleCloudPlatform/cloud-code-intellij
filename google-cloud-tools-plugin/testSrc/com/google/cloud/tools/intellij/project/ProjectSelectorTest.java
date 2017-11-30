@@ -38,7 +38,7 @@ public class ProjectSelectorTest {
   @Mock private ProjectSelectionListener projectSelectionListener;
   @Mock private ProjectSelectionDialog projectSelectionDialog;
 
-  private static final CloudProject TEST_PROJECT = new CloudProject("test-1", "test@google.com");
+  private static final CloudProject TEST_PROJECT = CloudProject.create("test-1", "test@google.com");
 
   @Before
   public void setUp() {
@@ -71,10 +71,8 @@ public class ProjectSelectorTest {
 
     projectSelector.handleOpenProjectSelectionDialog();
 
-    assertThat(projectSelector.getSelectedProject().getProjectName())
-        .isEqualTo(TEST_PROJECT.getProjectName());
-    assertThat(projectSelector.getSelectedProject().getGoogleUsername())
-        .isEqualTo(TEST_PROJECT.getGoogleUsername());
+    assertThat(projectSelector.getSelectedProject())
+        .isEqualTo(TEST_PROJECT);
   }
 
   @Test
@@ -130,7 +128,7 @@ public class ProjectSelectorTest {
 
   @Test
   public void setEmptyProject_acceptsAndUpdatesUi() {
-    projectSelector.setSelectedProject(new CloudProject("", ""));
+    projectSelector.setSelectedProject(CloudProject.create("", ""));
 
     verifyUiStateForProject(null);
   }
@@ -145,10 +143,10 @@ public class ProjectSelectorTest {
       assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
     } else {
       assertThat(projectSelector.getProjectNameLabel().getText())
-          .isEqualTo(project.getProjectName());
+          .isEqualTo(project.projectName());
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isTrue();
       assertThat(projectSelector.getAccountInfoLabel().getText())
-          .isEqualTo(project.getGoogleUsername());
+          .isEqualTo(project.googleUsername());
       assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNotNull();
     }
   }

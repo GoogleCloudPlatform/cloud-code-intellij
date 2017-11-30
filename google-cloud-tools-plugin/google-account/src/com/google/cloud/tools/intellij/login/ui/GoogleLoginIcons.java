@@ -60,6 +60,7 @@ public final class GoogleLoginIcons {
   /**
    * Provides scaled icon for {@link com.google.cloud.tools.intellij.login.CredentialedUser}.
    *
+   * @param size size of user icon, scaled as needed.
    * @param user User to get picture for, null to return generic user placeholder icon.
    */
   public static Icon getScaledUserIcon(int size, CredentialedUser user) {

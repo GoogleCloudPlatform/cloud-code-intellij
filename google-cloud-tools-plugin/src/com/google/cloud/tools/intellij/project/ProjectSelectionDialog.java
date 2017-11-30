@@ -21,8 +21,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Modal project and account selection dialog. Contains account drop-down with user list, table with
  * project list and simple filter. {@link ProjectSelector} calls {@link #showDialog(CloudProject)}.
- * TODO(ivanporty) implementation in the following PRs
  */
+// TODO(ivanporty) implementation in the following PRs
 public class ProjectSelectionDialog {
 
   /**

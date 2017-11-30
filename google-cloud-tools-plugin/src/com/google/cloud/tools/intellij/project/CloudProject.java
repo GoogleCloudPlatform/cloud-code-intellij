@@ -16,21 +16,16 @@
 
 package com.google.cloud.tools.intellij.project;
 
+import com.google.auto.value.AutoValue;
+
 /** GCP project and account. */
-public class CloudProject {
-  private final String projectName;
-  private final String googleUsername;
-
-  public CloudProject(String projectName, String googleUsername) {
-    this.projectName = projectName;
-    this.googleUsername = googleUsername;
+@AutoValue
+public abstract class CloudProject {
+  public static CloudProject create(String projectName, String googleUsername) {
+    return new AutoValue_CloudProject(projectName, googleUsername);
   }
 
-  public String getProjectName() {
-    return projectName;
-  }
+  abstract String projectName();
 
-  public String getGoogleUsername() {
-    return googleUsername;
-  }
+  abstract String googleUsername();
 }

@@ -55,7 +55,6 @@ public class ProjectSelector extends JPanel {
 
   public ProjectSelector() {
     initUi();
-    setSelectedProject(null);
   }
 
   /** @return project selection or null if no project is selected. */
@@ -102,6 +101,7 @@ public class ProjectSelector extends JPanel {
     staticInfoPanel.setBorder(UIManager.getBorder("TextField.border"));
 
     projectNameLabel = new HyperlinkLabelWithStateAccess();
+    projectNameLabel.setHyperlinkText(GctBundle.getString("project.selector.no.selected.project"));
     projectNameLabel.addHyperlinkListener(
         (event) -> {
           if (event.getEventType() == EventType.ACTIVATED) {
@@ -143,7 +143,7 @@ public class ProjectSelector extends JPanel {
   }
 
   private void updateProjectAndUserInformation(CloudProject selection) {
-    if (selection == null || Strings.isNullOrEmpty(selection.getProjectName())) {
+    if (selection == null || Strings.isNullOrEmpty(selection.googleUsername())) {
       projectNameLabel.setHyperlinkText(
           GctBundle.getString("project.selector.no.selected.project"));
       accountInfoLabel.setHyperlinkText("");
@@ -151,15 +151,15 @@ public class ProjectSelector extends JPanel {
       projectAccountSeparatorLabel.setVisible(false);
 
     } else {
-      projectNameLabel.setHyperlinkText(selection.getProjectName());
+      projectNameLabel.setHyperlinkText(selection.projectName());
       projectAccountSeparatorLabel.setVisible(true);
       // first just show account email, then expand with name/picture if this account is signed in.
-      accountInfoLabel.setHyperlinkText(selection.getGoogleUsername());
+      accountInfoLabel.setHyperlinkText(selection.googleUsername());
       Optional<CredentialedUser> loggedInUser =
-          Services.getLoginService().getLoggedInUser(selection.getGoogleUsername());
+          Services.getLoginService().getLoggedInUser(selection.projectName());
       if (loggedInUser.isPresent()) {
         accountInfoLabel.setHyperlinkText(
-            loggedInUser.get().getName() + " (" + loggedInUser.get().getEmail() + ")");
+            String.format("%s (%s)", loggedInUser.get().getName(), loggedInUser.get().getEmail()));
       }
       accountInfoLabel.setIcon(
           GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, loggedInUser.orElse(null)));
@@ -168,6 +168,26 @@ public class ProjectSelector extends JPanel {
 
   private void notifyProjectSelectionListeners() {
     projectSelectionListeners.forEach(listener -> listener.projectSelected(cloudProject));
+  }
+
+  @VisibleForTesting
+  ProjectSelectionDialog createProjectSelectionDialog(Component parent) {
+    return new ProjectSelectionDialog();
+  }
+
+  @VisibleForTesting
+  HyperlinkLabelWithStateAccess getProjectNameLabel() {
+    return projectNameLabel;
+  }
+
+  @VisibleForTesting
+  HyperlinkLabelWithStateAccess getAccountInfoLabel() {
+    return accountInfoLabel;
+  }
+
+  @VisibleForTesting
+  JBLabel getProjectAccountSeparatorLabel() {
+    return projectAccountSeparatorLabel;
   }
 
   /** Hyperlink label that provides access to its text and icon for testing purposes. */
@@ -196,25 +216,5 @@ public class ProjectSelector extends JPanel {
     public Icon getIcon() {
       return icon;
     }
-  }
-
-  @VisibleForTesting
-  ProjectSelectionDialog createProjectSelectionDialog(Component parent) {
-    return new ProjectSelectionDialog();
-  }
-
-  @VisibleForTesting
-  HyperlinkLabelWithStateAccess getProjectNameLabel() {
-    return projectNameLabel;
-  }
-
-  @VisibleForTesting
-  HyperlinkLabelWithStateAccess getAccountInfoLabel() {
-    return accountInfoLabel;
-  }
-
-  @VisibleForTesting
-  JBLabel getProjectAccountSeparatorLabel() {
-    return projectAccountSeparatorLabel;
   }
 }
