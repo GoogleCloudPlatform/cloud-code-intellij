@@ -41,13 +41,6 @@ class ProjectLoader {
   private static final int PROJECTS_MAX_PAGE_SIZE = 300;
   private static final String PROJECT_DELETE_REQUESTED = "DELETE_REQUESTED";
 
-  /** Callback interface to receive project list results from async execution. */
-  interface ProjectLoaderResultCallback {
-    void projectListReady(List<Project> result);
-
-    void onError(String errorDetails);
-  }
-
   @SuppressWarnings("FutureReturnValueIgnored")
   void loadUserProjectsInBackground(
       CredentialedUser user, ProjectLoaderResultCallback resultCallback) {
@@ -113,5 +106,12 @@ class ProjectLoader {
   @VisibleForTesting
   void logError(String message, Throwable error) {
     LOG.error(message, error);
+  }
+
+  /** Callback interface to receive project list results from async execution. */
+  interface ProjectLoaderResultCallback {
+    void projectListReady(List<Project> result);
+
+    void onError(String errorDetails);
   }
 }
