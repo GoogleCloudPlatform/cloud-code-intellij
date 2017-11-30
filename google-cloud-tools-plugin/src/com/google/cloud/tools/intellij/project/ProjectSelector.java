@@ -22,12 +22,10 @@ import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import com.intellij.openapi.ui.ComponentWithBrowseButton;
+import com.intellij.openapi.ui.FixedSizeButton;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBLabel;
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,15 +45,14 @@ public class ProjectSelector extends JPanel {
 
   private final List<ProjectSelectionListener> projectSelectionListeners = new ArrayList<>();
 
-  private HyperlinkLabelWithStateAccess projectNameLabel;
-  private HyperlinkLabelWithStateAccess accountInfoLabel;
+  private HyperlinkLabel projectNameLabel;
+  private HyperlinkLabel accountInfoLabel;
   private JBLabel projectAccountSeparatorLabel;
+  private FixedSizeButton browseButton;
+  private JPanel hyperlinksPanel;
+  private JPanel rootPanel;
 
   private CloudProject cloudProject;
-
-  public ProjectSelector() {
-    initUi();
-  }
 
   /** @return project selection or null if no project is selected. */
   public CloudProject getSelectedProject() {
@@ -95,15 +92,7 @@ public class ProjectSelector extends JPanel {
     projectSelectionListeners.remove(projectSelectionListener);
   }
 
-  private void initUi() {
-    // layout - in the center of panel, horizontal line of project/account labels in a panel
-    // ends with a fixed size browse button.
-    setLayout(new BorderLayout());
-
-    JPanel staticInfoPanel = new JPanel();
-    staticInfoPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 2));
-    staticInfoPanel.setBorder(UIManager.getBorder("TextField.border"));
-
+  private void createUIComponents() {
     projectNameLabel = new HyperlinkLabelWithStateAccess();
     projectNameLabel.setHyperlinkText(GctBundle.getString("project.selector.no.selected.project"));
     projectNameLabel.addHyperlinkListener(
@@ -112,11 +101,9 @@ public class ProjectSelector extends JPanel {
             handleOpenProjectSelectionDialog();
           }
         });
-    staticInfoPanel.add(projectNameLabel);
 
     projectAccountSeparatorLabel = new JBLabel("/");
     projectAccountSeparatorLabel.setVisible(false /* only visible when project is selected. */);
-    staticInfoPanel.add(projectAccountSeparatorLabel);
 
     accountInfoLabel = new HyperlinkLabelWithStateAccess();
     accountInfoLabel.addHyperlinkListener(
@@ -125,13 +112,11 @@ public class ProjectSelector extends JPanel {
             handleOpenProjectSelectionDialog();
           }
         });
-    staticInfoPanel.add(accountInfoLabel);
 
-    ComponentWithBrowseButton<JPanel> componentWithBrowseButton =
-        new ComponentWithBrowseButton<>(
-            staticInfoPanel, (actionEvent) -> handleOpenProjectSelectionDialog());
-
-    add(componentWithBrowseButton);
+    hyperlinksPanel = new JPanel();
+    hyperlinksPanel.setBorder(UIManager.getBorder("TextField.border"));
+    browseButton = new FixedSizeButton(hyperlinksPanel);
+    browseButton.addActionListener((actionEvent) -> handleOpenProjectSelectionDialog());
   }
 
   @VisibleForTesting
@@ -179,12 +164,12 @@ public class ProjectSelector extends JPanel {
 
   @VisibleForTesting
   HyperlinkLabelWithStateAccess getProjectNameLabel() {
-    return projectNameLabel;
+    return (HyperlinkLabelWithStateAccess) projectNameLabel;
   }
 
   @VisibleForTesting
   HyperlinkLabelWithStateAccess getAccountInfoLabel() {
-    return accountInfoLabel;
+    return (HyperlinkLabelWithStateAccess) accountInfoLabel;
   }
 
   @VisibleForTesting
