@@ -222,6 +222,6 @@ final class CloudLibraryDependencyWriter {
         .stream()
         .map(MavenId::getDisplayString)
         .map(string -> "- " + string)
-        .collect(Collectors.joining("\n"));
+        .collect(Collectors.joining("<br>"));
   }
 }
