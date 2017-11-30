@@ -54,7 +54,7 @@ public class ProjectSelector extends JPanel {
 
   private CloudProject cloudProject;
 
-  /** @return project selection or null if no project is selected. */
+  /** Returns project selection or null if no project is selected. */
   public CloudProject getSelectedProject() {
     return cloudProject;
   }

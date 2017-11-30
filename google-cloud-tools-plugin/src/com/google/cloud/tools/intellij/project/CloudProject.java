@@ -25,7 +25,7 @@ public abstract class CloudProject {
     return new AutoValue_CloudProject(projectName, googleUsername);
   }
 
-  abstract String projectName();
+  public abstract String projectName();
 
-  abstract String googleUsername();
+  public abstract String googleUsername();
 }
