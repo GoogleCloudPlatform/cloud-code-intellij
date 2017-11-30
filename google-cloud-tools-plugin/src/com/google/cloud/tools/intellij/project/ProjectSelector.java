@@ -69,7 +69,11 @@ public class ProjectSelector extends JPanel {
    */
   public void setSelectedProject(CloudProject cloudProject) {
     this.cloudProject = cloudProject;
-    updateProjectAndUserInformation(cloudProject);
+    if (cloudProject == null || Strings.isNullOrEmpty(cloudProject.googleUsername())) {
+      updateEmptySelection();
+    } else {
+      updateCloudProjectSelection(cloudProject);
+    }
   }
 
   /**
@@ -142,28 +146,26 @@ public class ProjectSelector extends JPanel {
     }
   }
 
-  private void updateProjectAndUserInformation(CloudProject selection) {
-    if (selection == null || Strings.isNullOrEmpty(selection.googleUsername())) {
-      projectNameLabel.setHyperlinkText(
-          GctBundle.getString("project.selector.no.selected.project"));
-      accountInfoLabel.setHyperlinkText("");
-      accountInfoLabel.setIcon(null);
-      projectAccountSeparatorLabel.setVisible(false);
+  private void updateEmptySelection() {
+    projectNameLabel.setHyperlinkText(GctBundle.getString("project.selector.no.selected.project"));
+    accountInfoLabel.setHyperlinkText("");
+    accountInfoLabel.setIcon(null);
+    projectAccountSeparatorLabel.setVisible(false);
+  }
 
-    } else {
-      projectNameLabel.setHyperlinkText(selection.projectName());
-      projectAccountSeparatorLabel.setVisible(true);
-      // first just show account email, then expand with name/picture if this account is signed in.
-      accountInfoLabel.setHyperlinkText(selection.googleUsername());
-      Optional<CredentialedUser> loggedInUser =
-          Services.getLoginService().getLoggedInUser(selection.projectName());
-      if (loggedInUser.isPresent()) {
-        accountInfoLabel.setHyperlinkText(
-            String.format("%s (%s)", loggedInUser.get().getName(), loggedInUser.get().getEmail()));
-      }
-      accountInfoLabel.setIcon(
-          GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, loggedInUser.orElse(null)));
+  private void updateCloudProjectSelection(CloudProject selection) {
+    projectNameLabel.setHyperlinkText(selection.projectName());
+    projectAccountSeparatorLabel.setVisible(true);
+    // first just show account email, then expand with name/picture if this account is signed in.
+    accountInfoLabel.setHyperlinkText(selection.googleUsername());
+    Optional<CredentialedUser> loggedInUser =
+        Services.getLoginService().getLoggedInUser(selection.projectName());
+    if (loggedInUser.isPresent()) {
+      accountInfoLabel.setHyperlinkText(
+          String.format("%s (%s)", loggedInUser.get().getName(), loggedInUser.get().getEmail()));
     }
+    accountInfoLabel.setIcon(
+        GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, loggedInUser.orElse(null)));
   }
 
   private void notifyProjectSelectionListeners() {
