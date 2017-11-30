@@ -131,7 +131,8 @@ public class ProjectLoaderTest {
 
     projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
 
-    verify(mockResultCallback).onError(GctBundle.getString("project.selector.loader.couldnotconnect"));
+    verify(mockResultCallback)
+        .onError(GctBundle.getString("project.selector.loader.couldnotconnect"));
   }
 
   @Test
