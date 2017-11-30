@@ -21,10 +21,11 @@
     <![CDATA[<html>
       <p>This plugin integrates Google Cloud Platform into your IDE development workflows. It includes features such as:</p>
       <ul>
-        <li>Google App Engine support for local development and deployment.</li>
-        <li>Set Stackdriver Debugger snapshots to debug your applications running in the cloud.</li>
-        <li>Checkout or import your projects from Cloud Source Repositories.</li>
-        <li>Browse your Google Cloud Storage buckets and copy bucket paths into your clipboard.</li>
+        <li>Deploying to the Google App Engine standard and flexible environments.</li>
+        <li>Setting Stackdriver Debugger snapshots to debug your applications running in the cloud.</li>
+        <li>Checking out or importing your projects from Cloud Source Repositories.</li>
+        <li>Browsing your Google Cloud Storage buckets and copying bucket paths into your clipboard.</li>
+        <li>Running and debugging App Engine standard applications on a local development server.</li>
       </ul>
     </html>]]>
   </description>
