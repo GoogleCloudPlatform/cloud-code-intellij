@@ -65,7 +65,7 @@ class ProjectLoader {
         Set<Project> allProjects =
             new TreeSet<>(Comparator.comparing(project -> project.getName().toLowerCase()));
 
-        allProjects.addAll(response.getProjects());;
+        allProjects.addAll(response.getProjects());
 
         while (!Strings.isNullOrEmpty(response.getNextPageToken())) {
           response =
