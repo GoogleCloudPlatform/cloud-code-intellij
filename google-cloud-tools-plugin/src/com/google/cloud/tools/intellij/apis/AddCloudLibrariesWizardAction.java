@@ -58,6 +58,10 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
     if (e.getProject() != null) {
       AddCloudLibrariesWizard dialog = new AddCloudLibrariesWizard(e.getProject());
       DialogManager.show(dialog);
+      if (dialog.isOK()) {
+        CloudLibraryDependencyWriter.addLibraries(
+            dialog.getSelectedLibraries(), dialog.getSelectedModule());
+      }
     }
   }
 
@@ -77,6 +81,11 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
       addStep(selectClientLibrariesStep);
       addStep(manageCloudApisStep);
       init();
+    }
+
+    /** Returns the selected {@link Module}. */
+    Module getSelectedModule() {
+      return selectClientLibrariesStep.getSelectedModule();
     }
 
     /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */

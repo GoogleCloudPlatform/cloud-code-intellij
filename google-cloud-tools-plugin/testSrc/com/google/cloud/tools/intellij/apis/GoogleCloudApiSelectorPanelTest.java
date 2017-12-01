@@ -52,10 +52,22 @@ public final class GoogleCloudApiSelectorPanelTest {
       TestCloudLibraryClientMavenCoordinates.create("java", "client-2", "2.0.0");
   private static final TestCloudLibraryClient JAVA_CLIENT_1 =
       TestCloudLibraryClient.create(
-          "java", "API Ref 1", "alpha", "Source 1", "Lang Level 1", JAVA_CLIENT_MAVEN_COORDS_1);
+          "Client 1",
+          "java",
+          "API Ref 1",
+          "alpha",
+          "Source 1",
+          "Lang Level 1",
+          JAVA_CLIENT_MAVEN_COORDS_1);
   private static final TestCloudLibraryClient JAVA_CLIENT_2 =
       TestCloudLibraryClient.create(
-          "java", "API Ref 2", "beta", "Source 2", "Lang Level 2", JAVA_CLIENT_MAVEN_COORDS_2);
+          "Client 2",
+          "java",
+          "API Ref 2",
+          "beta",
+          "Source 2",
+          "Lang Level 2",
+          JAVA_CLIENT_MAVEN_COORDS_2);
 
   private static final TestCloudLibrary LIBRARY_1 =
       TestCloudLibrary.create(
