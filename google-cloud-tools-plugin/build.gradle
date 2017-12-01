@@ -69,6 +69,9 @@ dependencies {
     compile files('lib/google-api-services-source.jar')
     compile 'org.yaml:snakeyaml:1.18'
 
+    compileOnly 'com.google.auto.value:auto-value:1.4.1'
+    apt         'com.google.auto.value:auto-value:1.4.1'
+
     testCompile(project(':common-test-lib'))
     testRuntime files('google-account/lib/google-gct-login-context-ij-pg.jar')
 }
