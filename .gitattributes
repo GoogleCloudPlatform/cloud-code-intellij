@@ -22,3 +22,5 @@ CONTRIBUTORS text
 *.png binary
 *.jpg binary
 *.jar binary
+
+gradlew.bat eol=crlf
