@@ -74,6 +74,7 @@ public class ProjectLoaderTest {
   public void loadUserProjects_invokesCallback() {
     List<Project> projects = Arrays.asList(testProject1, testProject2);
     mockListProjectsResponse(projects);
+
     projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
 
     verify(mockResultCallback).projectListReady(projects);
@@ -82,6 +83,7 @@ public class ProjectLoaderTest {
   @Test
   public void nullProjectList_invokes_callback_withEmptyList() {
     mockListProjectsResponse(null);
+
     projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
 
     verify(mockResultCallback).projectListReady(Collections.emptyList());
@@ -151,27 +153,22 @@ public class ProjectLoaderTest {
 
   @Test
   public void multiPage_projectList_merged_correctly() throws IOException {
-    mockListProjectsResponse(null);
-    // emulate page with size 1, one token returned, then completed.
-    String pageToken = "token";
-    ListProjectsResponse firstResponse = new ListProjectsResponse();
-    firstResponse.setProjects(Collections.singletonList(testProject1));
-    firstResponse.setNextPageToken(pageToken);
-    ListProjectsResponse secondResponse = new ListProjectsResponse();
-    secondResponse.setProjects(Collections.singletonList(testProject2));
-    secondResponse.setNextPageToken("");
+    mockTwoPageProjectsRespose("");
 
-    ArgumentCaptor<String> pageTokenCaptor = ArgumentCaptor.forClass(String.class);
-    when(mockList.setPageToken(pageTokenCaptor.capture())).thenReturn(mockList);
-    when(mockList.execute()).thenReturn(firstResponse, secondResponse);
+    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+
+    verify(mockResultCallback).projectListReady(Arrays.asList(testProject1, testProject2));
+  }
+
+  @Test
+  public void multiPage_projectList_uses_valid_Tokens() throws IOException {
+    ArgumentCaptor<String> pageTokenCaptor = mockTwoPageProjectsRespose("token");
 
     projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
 
     // check page token is called only for tokens returned in responses.
     assertThat(pageTokenCaptor.getAllValues().size()).isEqualTo(1);
-    assertThat(pageTokenCaptor.getAllValues().get(0)).isEqualTo(pageToken);
-
-    verify(mockResultCallback).projectListReady(Arrays.asList(testProject1, testProject2));
+    assertThat(pageTokenCaptor.getAllValues().get(0)).isEqualTo("token");
   }
 
   /**
@@ -196,5 +193,29 @@ public class ProjectLoaderTest {
       // Should not happen when setting up these mocks.
       throw new AssertionError(e);
     }
+  }
+
+  /**
+   * Mocks {@link ListProjectsResponse} to contain two pages, one test project per each, using the
+   * specified token.
+   *
+   * @param token token to identify second page.
+   * @return Argument captor to check which tokens are requested.
+   */
+  private ArgumentCaptor<String> mockTwoPageProjectsRespose(String token) throws IOException {
+    mockListProjectsResponse(null);
+    // emulate page with size 1, one token returned, then completed.
+    ListProjectsResponse firstResponse = new ListProjectsResponse();
+    firstResponse.setProjects(Collections.singletonList(testProject1));
+    firstResponse.setNextPageToken(token);
+    ListProjectsResponse secondResponse = new ListProjectsResponse();
+    secondResponse.setProjects(Collections.singletonList(testProject2));
+    secondResponse.setNextPageToken("");
+
+    ArgumentCaptor<String> pageTokenCaptor = ArgumentCaptor.forClass(String.class);
+    when(mockList.setPageToken(pageTokenCaptor.capture())).thenReturn(mockList);
+    when(mockList.execute()).thenReturn(firstResponse, secondResponse);
+
+    return pageTokenCaptor;
   }
 }

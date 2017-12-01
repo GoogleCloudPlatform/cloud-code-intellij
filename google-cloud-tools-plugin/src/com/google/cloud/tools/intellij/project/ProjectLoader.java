@@ -65,13 +65,7 @@ class ProjectLoader {
         Set<Project> allProjects =
             new TreeSet<>(Comparator.comparing(project -> project.getName().toLowerCase()));
 
-        response
-            .getProjects()
-            .stream()
-            // Filter out any projects that are scheduled for deletion.
-            .filter((project) -> !PROJECT_DELETE_REQUESTED.equals(project.getLifecycleState()))
-            // Add remaining projects to the set.
-            .forEach(allProjects::add);
+        allProjects.addAll(response.getProjects());;
 
         while (!Strings.isNullOrEmpty(response.getNextPageToken())) {
           response =
@@ -84,11 +78,13 @@ class ProjectLoader {
           allProjects.addAll(response.getProjects());
         }
 
-        for (Project pantheonProject : allProjects) {
-          if (!Strings.isNullOrEmpty(pantheonProject.getProjectId())) {
-            result.add(pantheonProject);
-          }
-        }
+        allProjects
+            .stream()
+            // Filter out any projects that are scheduled for deletion.
+            .filter((project) -> !PROJECT_DELETE_REQUESTED.equals(project.getLifecycleState()))
+            .filter((project) -> !Strings.isNullOrEmpty(project.getProjectId()))
+            // Add remaining projects to the set.
+            .forEach(result::add);
 
         resultCallback.projectListReady(result);
       } else {
