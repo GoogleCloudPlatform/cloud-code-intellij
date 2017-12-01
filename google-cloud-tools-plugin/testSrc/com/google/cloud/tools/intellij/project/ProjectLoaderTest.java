@@ -153,7 +153,7 @@ public class ProjectLoaderTest {
 
   @Test
   public void multiPage_projectList_merged_correctly() throws IOException {
-    mockTwoPageProjectsRespose("");
+    mockTwoPageProjectsRespose("token");
 
     projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
 
