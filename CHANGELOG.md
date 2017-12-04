@@ -3,15 +3,14 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 
 ## 17.12.1
 
-The Google Account plugin has now been merged into the Cloud Tools plugin and is no longer a separate installation. If you previously had the Account Tools plugin installed, follow the new dialog prompt to remove it and restart the IDE to ensure that you don't experience any issues.
+### Changed   
+  - The Google Account plugin is now integrated into the Google Cloud Tools plugin and is no longer a separate installation.
+    If you previously installed the Account Tools plugin, follow the new dialog prompt to remove it and restart the IDE to
+    ensure that you don't experience any issues. [1735](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1735)
 
 ### Fixed
   - Fixed out of memory error when typing and searching for multiple projects in the cloud project 
     selector. [1742](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1742)
-    
-### Changed   
-  - The Google Account plugin is now integrated into the Google Cloud Tools plugin. A separate 
-    Google Account plugin installation is no longer required. [1735](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1735)
 
 ## 17.11.1
 
