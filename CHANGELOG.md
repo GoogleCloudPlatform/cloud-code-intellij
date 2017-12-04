@@ -1,6 +1,12 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 17.12.1
+
+### Fixed
+  - Fixed out of memory error when typing and searching for multiple projects in the cloud project 
+    selector. [1742](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1742)
+
 ## 17.11.1
 
 ### Added

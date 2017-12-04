@@ -45,6 +45,13 @@
       </p>
       <br/>
 
+      <h2>[17.12.1]</h2>
+
+      <h3>Fixed</h3>
+      <ul>
+        <li>Fixed out of memory error when typing and searching for multiple projects in the cloud project selector. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1742">#1742</a>)</li>
+      </ul>
+
       <h2>[17.11.1]</h2>
 
       <h3>Added</h3>
