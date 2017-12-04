@@ -44,6 +44,7 @@ import org.mockito.Spy;
 import org.mockito.stubbing.Answer;
 
 /** Tests for {@link ProjectLoader} */
+@SuppressWarnings("FutureReturnValueIgnored")
 public class ProjectLoaderTest {
   @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
