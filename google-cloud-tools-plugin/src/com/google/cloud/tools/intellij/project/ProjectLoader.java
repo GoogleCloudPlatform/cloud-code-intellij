@@ -22,13 +22,11 @@ import com.google.api.services.cloudresourcemanager.model.ListProjectsResponse;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
-import com.google.common.annotations.VisibleForTesting;
-import com.intellij.openapi.diagnostic.Logger;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -36,78 +34,52 @@ import java.util.TreeSet;
 
 /** Loads list of {@link Project} for a {@link CredentialedUser}. */
 class ProjectLoader {
-  private static final Logger LOG = Logger.getInstance(ProjectLoader.class);
-
   private static final int PROJECTS_MAX_PAGE_SIZE = 300;
   private static final String PROJECT_DELETE_REQUESTED = "DELETE_REQUESTED";
 
-  @SuppressWarnings("FutureReturnValueIgnored")
-  void loadUserProjectsInBackground(
-      CredentialedUser user, ProjectLoaderResultCallback resultCallback) {
-    ThreadUtil.getInstance().executeInBackground(() -> loadUserProjects(user, resultCallback));
+  /**
+   * Use {@link com.google.common.util.concurrent.Futures#addCallback(ListenableFuture,
+   * FutureCallback)} to receive notifications of load completion and result or exceptions.
+   */
+  ListenableFuture<List<Project>> loadUserProjectsInBackground(CredentialedUser user) {
+    return ThreadUtil.getInstance().executeInBackground(() -> loadUserProjects(user));
   }
 
-  private void loadUserProjects(CredentialedUser user, ProjectLoaderResultCallback resultCallback) {
+  private List<Project> loadUserProjects(CredentialedUser user) throws IOException {
     CloudResourceManager cloudResourceManagerClient =
         GoogleApiClientFactory.getInstance().getCloudResourceManagerClient(user.getCredential());
-    try {
-      final List<Project> result = new ArrayList<>();
+    final List<Project> result = new ArrayList<>();
 
-      ListProjectsResponse response =
-          cloudResourceManagerClient
-              .projects()
-              .list()
-              .setPageSize(PROJECTS_MAX_PAGE_SIZE)
-              .execute();
+    ListProjectsResponse response =
+        cloudResourceManagerClient.projects().list().setPageSize(PROJECTS_MAX_PAGE_SIZE).execute();
 
-      if (response != null && response.getProjects() != null) {
-        // Create a sorted set to sort the projects list by project name.
-        Set<Project> allProjects =
-            new TreeSet<>(Comparator.comparing(project -> project.getName().toLowerCase()));
+    if (response != null && response.getProjects() != null) {
+      // Create a sorted set to sort the projects list by project name.
+      Set<Project> allProjects =
+          new TreeSet<>(Comparator.comparing(project -> project.getName().toLowerCase()));
 
+      allProjects.addAll(response.getProjects());
+
+      while (!Strings.isNullOrEmpty(response.getNextPageToken())) {
+        response =
+            cloudResourceManagerClient
+                .projects()
+                .list()
+                .setPageToken(response.getNextPageToken())
+                .setPageSize(PROJECTS_MAX_PAGE_SIZE)
+                .execute();
         allProjects.addAll(response.getProjects());
-
-        while (!Strings.isNullOrEmpty(response.getNextPageToken())) {
-          response =
-              cloudResourceManagerClient
-                  .projects()
-                  .list()
-                  .setPageToken(response.getNextPageToken())
-                  .setPageSize(PROJECTS_MAX_PAGE_SIZE)
-                  .execute();
-          allProjects.addAll(response.getProjects());
-        }
-
-        allProjects
-            .stream()
-            // Filter out any projects that are scheduled for deletion.
-            .filter((project) -> !PROJECT_DELETE_REQUESTED.equals(project.getLifecycleState()))
-            .filter((project) -> !Strings.isNullOrEmpty(project.getProjectId()))
-            // Add remaining projects to the set.
-            .forEach(result::add);
-
-        resultCallback.projectListReady(result);
-      } else {
-        resultCallback.projectListReady(Collections.emptyList());
       }
-    } catch (IOException ex) {
-      // https://github.com/GoogleCloudPlatform/gcloud-intellij/issues/323
-      resultCallback.onError(GctBundle.getString("project.selector.loader.couldnotconnect"));
-    } catch (RuntimeException ex) {
-      logError("Exception loading projects for " + user.getName(), ex);
-      resultCallback.onError(ex.getMessage());
+
+      allProjects
+          .stream()
+          // Filter out any projects that are scheduled for deletion.
+          .filter((project) -> !PROJECT_DELETE_REQUESTED.equals(project.getLifecycleState()))
+          .filter((project) -> !Strings.isNullOrEmpty(project.getProjectId()))
+          // Add remaining projects to the set.
+          .forEach(result::add);
     }
-  }
 
-  @VisibleForTesting
-  void logError(String message, Throwable error) {
-    LOG.error(message, error);
-  }
-
-  /** Callback interface to receive project list results from async execution. */
-  interface ProjectLoaderResultCallback {
-    void projectListReady(List<Project> result);
-
-    void onError(String errorDetails);
+    return result;
   }
 }

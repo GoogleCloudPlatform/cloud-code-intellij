@@ -18,8 +18,6 @@ package com.google.cloud.tools.intellij.project;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,11 +25,12 @@ import com.google.api.services.cloudresourcemanager.CloudResourceManager;
 import com.google.api.services.cloudresourcemanager.model.ListProjectsResponse;
 import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.project.ProjectLoader.ProjectLoaderResultCallback;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,15 +39,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.stubbing.Answer;
 
 /** Tests for {@link ProjectLoader} */
 public class ProjectLoaderTest {
   @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
-  private ProjectLoader projectLoader;
-  @Mock private ProjectLoaderResultCallback mockResultCallback;
+  @Spy private ProjectLoader projectLoader;
+  @Mock private FutureCallback<List<Project>> mockFutureCallback;
   @TestService @Mock private GoogleApiClientFactory mockGoogleApiClientFactory;
   @Mock private CloudResourceManager mockCloudResourceManager;
   @Mock private CloudResourceManager.Projects mockProjects;
@@ -59,9 +59,18 @@ public class ProjectLoaderTest {
 
   @Before
   public void setUp() {
-    projectLoader = new ProjectLoader();
     when(mockGoogleApiClientFactory.getCloudResourceManagerClient(any()))
         .thenReturn(mockCloudResourceManager);
+    when(projectLoader.loadUserProjectsInBackground(any()))
+        .then(
+            (Answer<ListenableFuture<List<Project>>>)
+                invocation -> {
+                  @SuppressWarnings("unchecked")
+                  ListenableFuture<List<Project>> result =
+                      (ListenableFuture<List<Project>>) invocation.callRealMethod();
+                  Futures.addCallback(result, mockFutureCallback);
+                  return result;
+                });
     testProject1 = new Project();
     testProject1.setName("test-project");
     testProject1.setProjectId("test-project-ID");
@@ -75,18 +84,18 @@ public class ProjectLoaderTest {
     List<Project> projects = Arrays.asList(testProject1, testProject2);
     mockListProjectsResponse(projects);
 
-    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+    projectLoader.loadUserProjectsInBackground(mockUser);
 
-    verify(mockResultCallback).projectListReady(projects);
+    verify(mockFutureCallback).onSuccess(projects);
   }
 
   @Test
   public void nullProjectList_invokes_callback_withEmptyList() {
     mockListProjectsResponse(null);
 
-    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+    projectLoader.loadUserProjectsInBackground(mockUser);
 
-    verify(mockResultCallback).projectListReady(Collections.emptyList());
+    verify(mockFutureCallback).onSuccess(Collections.emptyList());
   }
 
   @Test
@@ -96,10 +105,9 @@ public class ProjectLoaderTest {
     aProject.setProjectId("The ID");
     mockListProjectsResponse(Arrays.asList(testProject1, testProject2, aProject));
 
-    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+    projectLoader.loadUserProjectsInBackground(mockUser);
 
-    verify(mockResultCallback)
-        .projectListReady(Arrays.asList(aProject, testProject1, testProject2));
+    verify(mockFutureCallback).onSuccess(Arrays.asList(aProject, testProject1, testProject2));
   }
 
   @Test
@@ -108,10 +116,10 @@ public class ProjectLoaderTest {
     testProject1.setLifecycleState("DELETE_REQUESTED");
     mockListProjectsResponse(projects);
 
-    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+    projectLoader.loadUserProjectsInBackground(mockUser);
 
     List<Project> expectedList = Collections.singletonList(testProject2);
-    verify(mockResultCallback).projectListReady(expectedList);
+    verify(mockFutureCallback).onSuccess(expectedList);
   }
 
   @Test
@@ -121,50 +129,36 @@ public class ProjectLoaderTest {
     testProject2.setProjectId("");
     mockListProjectsResponse(projects);
 
-    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+    projectLoader.loadUserProjectsInBackground(mockUser);
 
-    verify(mockResultCallback).projectListReady(Collections.emptyList());
+    verify(mockFutureCallback).onSuccess(Collections.emptyList());
   }
 
   @Test
-  public void ioError_resultsIn_valid_errorMessage() throws IOException {
+  public void exception_passed_intoCallback() throws IOException {
     mockListProjectsResponse(null);
-    when(mockList.execute()).thenThrow(new IOException("IO issue"));
+    IOException ioException = new IOException("IO issue");
+    when(mockList.execute()).thenThrow(ioException);
 
-    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+    projectLoader.loadUserProjectsInBackground(mockUser);
 
-    verify(mockResultCallback)
-        .onError(GctBundle.getString("project.selector.loader.couldnotconnect"));
-  }
-
-  @Test
-  public void runtimeException_resultsIn_exceptionMessage() throws IOException {
-    // remove IDEA logging which invokes AssertionError.
-    projectLoader = spy(new ProjectLoader());
-    doNothing().when(projectLoader).logError(any(), any());
-    mockListProjectsResponse(null);
-    String errorMessage = "Internal error";
-    when(mockList.execute()).thenThrow(new RuntimeException(errorMessage));
-
-    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
-
-    verify(mockResultCallback).onError(ArgumentMatchers.contains(errorMessage));
+    verify(mockFutureCallback).onFailure(ioException);
   }
 
   @Test
   public void multiPage_projectList_merged_correctly() throws IOException {
     mockTwoPageProjectsRespose("token");
 
-    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+    projectLoader.loadUserProjectsInBackground(mockUser);
 
-    verify(mockResultCallback).projectListReady(Arrays.asList(testProject1, testProject2));
+    verify(mockFutureCallback).onSuccess(Arrays.asList(testProject1, testProject2));
   }
 
   @Test
   public void multiPage_projectList_uses_valid_Tokens() throws IOException {
     ArgumentCaptor<String> pageTokenCaptor = mockTwoPageProjectsRespose("token");
 
-    projectLoader.loadUserProjectsInBackground(mockUser, mockResultCallback);
+    projectLoader.loadUserProjectsInBackground(mockUser);
 
     // check page token is called only for tokens returned in responses.
     assertThat(pageTokenCaptor.getAllValues().size()).isEqualTo(1);
