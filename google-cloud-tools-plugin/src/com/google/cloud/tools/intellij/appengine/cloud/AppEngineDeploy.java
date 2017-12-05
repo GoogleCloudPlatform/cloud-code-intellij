@@ -30,37 +30,32 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
-
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
-
-import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * Deploys an application to App Engine.
- */
+/** Deploys an application to App Engine. */
 public class AppEngineDeploy {
 
   private static final Logger logger = Logger.getInstance(AppEngineDeploy.class);
   private static final String APPENGINE_GENERATED_DIR = "WEB-INF/appengine-generated/";
-  private static final ImmutableList<String> APPENGINE_EXTRA_CONFIG_FILE_PATHS = ImmutableList.of(
-      APPENGINE_GENERATED_DIR + "index.yaml",
-      APPENGINE_GENERATED_DIR + "cron.yaml",
-      APPENGINE_GENERATED_DIR + "dos.yaml",
-      APPENGINE_GENERATED_DIR + "dispatch.yaml",
-      APPENGINE_GENERATED_DIR + "queue.yaml"
-  );
+  private static final ImmutableList<String> APPENGINE_EXTRA_CONFIG_FILE_PATHS =
+      ImmutableList.of(
+          APPENGINE_GENERATED_DIR + "index.yaml",
+          APPENGINE_GENERATED_DIR + "cron.yaml",
+          APPENGINE_GENERATED_DIR + "dos.yaml",
+          APPENGINE_GENERATED_DIR + "dispatch.yaml",
+          APPENGINE_GENERATED_DIR + "queue.yaml");
 
   private AppEngineHelper helper;
   private LoggingHandler loggingHandler;
@@ -68,9 +63,7 @@ public class AppEngineDeploy {
   private AppEngineEnvironment environment;
   private DeploymentOperationCallback callback;
 
-  /**
-   * Initialize the deployment dependencies.
-   */
+  /** Initialize the deployment dependencies. */
   public AppEngineDeploy(
       @NotNull AppEngineHelper helper,
       @NotNull LoggingHandler loggingHandler,
@@ -84,13 +77,10 @@ public class AppEngineDeploy {
     this.callback = callback;
   }
 
-  /**
-   * Given a staging directory, deploy the application to Google App Engine.
-   */
+  /** Given a staging directory, deploy the application to Google App Engine. */
   // TODO(eshaul) break this down into smaller parts
   public void deploy(
-      @NotNull Path stagingDirectory,
-      @NotNull ProcessStartListener deployStartListener) {
+      @NotNull Path stagingDirectory, @NotNull ProcessStartListener deployStartListener) {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
@@ -118,11 +108,13 @@ public class AppEngineDeploy {
       }
     }
 
-    List<File> deployables = APPENGINE_EXTRA_CONFIG_FILE_PATHS.stream()
-        .map(configFilePath -> stagingDirectory.resolve(configFilePath).toFile())
-        .filter(
-            configFile -> deploymentConfiguration.isDeployAllConfigs() && configFile.exists())
-        .collect(Collectors.toList());
+    List<File> deployables =
+        APPENGINE_EXTRA_CONFIG_FILE_PATHS
+            .stream()
+            .map(configFilePath -> stagingDirectory.resolve(configFilePath).toFile())
+            .filter(
+                configFile -> deploymentConfiguration.isDeployAllConfigs() && configFile.exists())
+            .collect(Collectors.toList());
     deployables.add(stagingDirectory.resolve(appYamlName).toFile());
     configuration.setDeployables(deployables);
 
@@ -144,12 +136,13 @@ public class AppEngineDeploy {
 
     ProcessExitListener deployExitListener = new DeployExitListener(rawDeployOutput);
 
-    CloudSdk sdk = helper.createSdk(
-        loggingHandler,
-        deployStartListener,
-        line -> loggingHandler.print(line + "\n"),
-        rawDeployOutput::append,
-        deployExitListener);
+    CloudSdk sdk =
+        helper.createSdk(
+            loggingHandler,
+            deployStartListener,
+            line -> loggingHandler.print(line + "\n"),
+            rawDeployOutput::append,
+            deployExitListener);
 
     // show a warning notification if the cloud sdk version is not supported
     CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
@@ -194,22 +187,29 @@ public class AppEngineDeploy {
           }
 
           if (deployOutput == null
-              || deployOutput.getService() == null || deployOutput.getVersion() == null) {
+              || deployOutput.getService() == null
+              || deployOutput.getVersion() == null) {
             loggingHandler.print(
-                GctBundle.message("appengine.deployment.version.extract.failure") + "\n"
-                    + GctBundle.message("appengine.action.error.update.message") + "\n");
+                GctBundle.message("appengine.deployment.version.extract.failure")
+                    + "\n"
+                    + GctBundle.message("appengine.action.error.update.message")
+                    + "\n");
           }
 
           callback.succeeded(
               new AppEngineDeploymentRuntime(
-                  loggingHandler, helper, deploymentConfiguration, environment,
+                  loggingHandler,
+                  helper,
+                  deploymentConfiguration,
+                  environment,
                   deployOutput != null ? deployOutput.getService() : null,
                   deployOutput != null ? deployOutput.getVersion() : null));
 
         } else {
           logger.warn("Deployment process exited with an error. Exit Code:" + exitCode);
           callback.errorOccurred(
-              GctBundle.message("appengine.deployment.error.with.code", exitCode) + "\n"
+              GctBundle.message("appengine.deployment.error.with.code", exitCode)
+                  + "\n"
                   + GctBundle.message("appengine.action.error.update.message"));
         }
       } finally {
@@ -229,15 +229,16 @@ public class AppEngineDeploy {
     Type deployOutputType = new TypeToken<DeployOutput>() {}.getType();
     DeployOutput deployOutput = new Gson().fromJson(jsonOutput, deployOutputType);
     if (deployOutput == null
-        || deployOutput.versions == null || deployOutput.versions.size() != 1) {
+        || deployOutput.versions == null
+        || deployOutput.versions.size() != 1) {
       throw new JsonParseException("Cannot get app version: unexpected gcloud JSON output format");
     }
     return deployOutput;
   }
 
   /**
-   * Holds de-serialized JSON output of gcloud app deploy. Don't change the field names
-   * because Gson uses it for automatic de-serialization.
+   * Holds de-serialized JSON output of gcloud app deploy. Don't change the field names because Gson
+   * uses it for automatic de-serialization.
    */
   static class DeployOutput {
     private static class Version {

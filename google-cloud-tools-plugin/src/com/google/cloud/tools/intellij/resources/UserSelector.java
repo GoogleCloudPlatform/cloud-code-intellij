@@ -88,7 +88,8 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
 
   @Override
   protected int getPreferredPopupHeight() {
-    return !needsToSignIn() ? PREFERRED_HEIGHT
+    return !needsToSignIn()
+        ? PREFERRED_HEIGHT
         : BaseGoogleLoginUi.PREFERRED_HEIGHT + POPUP_HEIGHTFRAMESIZE;
   }
 
@@ -109,8 +110,9 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
       PopupPanel popupPanel = new PopupPanel();
 
       popupPanel.initializeContent(getText());
-      ComponentPopupBuilder popup = JBPopupFactory.getInstance()
-          .createComponentPopupBuilder(popupPanel, popupPanel.getInitialFocus());
+      ComponentPopupBuilder popup =
+          JBPopupFactory.getInstance()
+              .createComponentPopupBuilder(popupPanel, popupPanel.getInitialFocus());
       this.popup = popup.createPopup();
     }
     if (!popup.isVisible()) {
@@ -159,42 +161,45 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
 
       getContentPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       getContentPane().setViewportView(jbList);
-      jbList.addListSelectionListener(new ListSelectionListener() {
-        @Override
-        public void valueChanged(ListSelectionEvent event) {
-          Object user = jbList.getSelectedValue();
-          if (user != null && user instanceof CredentialedUser) {
-            UserSelector.this.setText(((CredentialedUser) user).getEmail());
-            SwingUtilities.invokeLater(new Runnable() {
-              @Override
-              public void run() {
-                UserSelector.this.hidePopup();
+      jbList.addListSelectionListener(
+          new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent event) {
+              Object user = jbList.getSelectedValue();
+              if (user != null && user instanceof CredentialedUser) {
+                UserSelector.this.setText(((CredentialedUser) user).getEmail());
+                SwingUtilities.invokeLater(
+                    new Runnable() {
+                      @Override
+                      public void run() {
+                        UserSelector.this.hidePopup();
+                      }
+                    });
               }
-            });
-          }
-        }
-      });
+            }
+          });
 
-      jbList.addMouseMotionListener(new MouseAdapter() {
-        @Override
-        public void mouseMoved(MouseEvent me) {
-          Point point = new Point(me.getX(), me.getY());
-          int index = jbList.locationToIndex(point);
-          if (index != hoverIndex) {
-            int oldIndex = hoverIndex;
-            hoverIndex = index;
-            if (oldIndex >= 0) {
-              jbList.repaint(jbList.getUI().getCellBounds(jbList, oldIndex, oldIndex));
-            }
-            if (hoverIndex >= 0) {
-              if (jbList.getSelectedIndex() >= 0) {
-                jbList.clearSelection();
+      jbList.addMouseMotionListener(
+          new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent me) {
+              Point point = new Point(me.getX(), me.getY());
+              int index = jbList.locationToIndex(point);
+              if (index != hoverIndex) {
+                int oldIndex = hoverIndex;
+                hoverIndex = index;
+                if (oldIndex >= 0) {
+                  jbList.repaint(jbList.getUI().getCellBounds(jbList, oldIndex, oldIndex));
+                }
+                if (hoverIndex >= 0) {
+                  if (jbList.getSelectedIndex() >= 0) {
+                    jbList.clearSelection();
+                  }
+                  jbList.repaint(jbList.getUI().getCellBounds(jbList, hoverIndex, hoverIndex));
+                }
               }
-              jbList.repaint(jbList.getUI().getCellBounds(jbList, hoverIndex, hoverIndex));
             }
-          }
-        }
-      });
+          });
 
       jbList.requestFocusInWindow();
       int preferredWidth = UserSelector.this.getWidth();
@@ -204,34 +209,40 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
 
     @Override
     protected void doLogin() {
-      Services.getLoginService().logIn(null, new IGoogleLoginCompletedCallback() {
-        @Override
-        public void onLoginCompleted() {
-          SwingUtilities.invokeLater(new Runnable() {
-            @SuppressWarnings("ConstantConditions")
-            // This suppresses a nullref warning for GoogleLogin.getInstance().getActiveUser().
-            @Override
-            public void run() {
-              if (Services.getLoginService().getActiveUser() != null) {
-                UserSelector.this.setText(Services.getLoginService().getActiveUser().getEmail());
-              }
-            }
-          });
-        }
-      });
+      Services.getLoginService()
+          .logIn(
+              null,
+              new IGoogleLoginCompletedCallback() {
+                @Override
+                public void onLoginCompleted() {
+                  SwingUtilities.invokeLater(
+                      new Runnable() {
+                        @SuppressWarnings("ConstantConditions")
+                        // This suppresses a nullref warning for
+                        // GoogleLogin.getInstance().getActiveUser().
+                        @Override
+                        public void run() {
+                          if (Services.getLoginService().getActiveUser() != null) {
+                            UserSelector.this.setText(
+                                Services.getLoginService().getActiveUser().getEmail());
+                          }
+                        }
+                      });
+                }
+              });
     }
 
     @Override
-    public Component getListCellRendererComponent(JList list, Object value, int index,
-        boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(
+        JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
       if (value instanceof EmptyMarker) {
         return userSelectorGoogleLogin;
       }
 
       CredentialedUser targetUser = (CredentialedUser) value;
       if (targetUser != null) {
-        projectSelectorCredentialedUser
-            .initialize(targetUser.getPicture(), targetUser.getName(), targetUser.getEmail());
+        projectSelectorCredentialedUser.initialize(
+            targetUser.getPicture(), targetUser.getName(), targetUser.getEmail());
       } else {
         projectSelectorCredentialedUser.initialize(null, "", null);
       }
@@ -247,12 +258,8 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
       return projectSelectorCredentialedUser;
     }
 
-    /**
-     * This class marks an empty credential list, giving us an indication to show the signin UI.
-     */
-    class EmptyMarker {
-
-    }
+    /** This class marks an empty credential list, giving us an indication to show the signin UI. */
+    class EmptyMarker {}
   }
 
   @Override

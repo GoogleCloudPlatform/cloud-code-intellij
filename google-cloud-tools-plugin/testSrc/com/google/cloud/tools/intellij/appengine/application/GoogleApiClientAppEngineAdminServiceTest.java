@@ -57,10 +57,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-
-/**
- * Tests for {@link GoogleApiClientAppEngineAdminService}
- */
+/** Tests for {@link GoogleApiClientAppEngineAdminService} */
 public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase {
 
   @Mock private GoogleApiClientFactory apiClientFactoryMock;
@@ -97,8 +94,8 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
   }
 
   @Test(expected = GoogleApiException.class)
-  public void testGetApplicationForProjectId_GoogleJsonException() throws IOException,
-      GoogleApiException {
+  public void testGetApplicationForProjectId_GoogleJsonException()
+      throws IOException, GoogleApiException {
     when(appengineClientMock.getAppsGetQuery().execute())
         .thenThrow(GoogleJsonResponseException.class);
 
@@ -106,10 +103,10 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
   }
 
   @Test
-  public void testGetApplicationForProjectId_empty()
-      throws Exception {
+  public void testGetApplicationForProjectId_empty() throws Exception {
     String projectId = "some-id";
-    doThrow(AppEngineApplicationNotFoundException.class).when(service)
+    doThrow(AppEngineApplicationNotFoundException.class)
+        .when(service)
         .fetchApplicationForProjectId(eq(projectId), any(Credential.class));
 
     // call the method twice, then assert that the result was not cached
@@ -214,13 +211,13 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
   public void testGetAllAppEngineLocations_success() throws IOException, GoogleApiException {
     String pageToken = "page-token";
     ListLocationsResponse response1 = new ListLocationsResponse();
-    List<Location> locationsPage1 = Arrays.asList(
-        createMockLocation("location-1"), createMockLocation("location-2"));
+    List<Location> locationsPage1 =
+        Arrays.asList(createMockLocation("location-1"), createMockLocation("location-2"));
     response1.setLocations(locationsPage1);
     response1.setNextPageToken(pageToken);
 
-    List<Location> locationsPage2 = Arrays.asList(
-        createMockLocation("location-3"), createMockLocation("location-4"));
+    List<Location> locationsPage2 =
+        Arrays.asList(createMockLocation("location-3"), createMockLocation("location-4"));
     ListLocationsResponse response2 = new ListLocationsResponse();
     response2.setLocations(locationsPage2);
     response2.setNextPageToken(null);
@@ -229,8 +226,8 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
         .thenReturn(appengineClientMock.getAppsLocationsListQuery());
     when(appengineClientMock.getAppsLocationsListQuery().execute()).thenReturn(response1);
 
-    Appengine.Apps.Locations.List appsLocationsListQuery2
-        = mock(Appengine.Apps.Locations.List.class);
+    Appengine.Apps.Locations.List appsLocationsListQuery2 =
+        mock(Appengine.Apps.Locations.List.class);
     when(appengineClientMock.getAppsLocationsListQuery().setPageToken(eq(pageToken)))
         .thenReturn(appsLocationsListQuery2);
     when(appsLocationsListQuery2.execute()).thenReturn(response2);
@@ -289,12 +286,15 @@ public class GoogleApiClientAppEngineAdminServiceTest extends BasePluginTestCase
     public Apps.Get getAppsGetQuery() {
       return appsGet;
     }
+
     public Apps.Create getAppsCreateQuery() {
       return appsCreate;
     }
+
     public Apps.Operations.Get getAppsOperationsGetQuery() {
       return appsOperationsGet;
     }
+
     public Apps.Locations.List getAppsLocationsListQuery() {
       return appsLocationsList;
     }

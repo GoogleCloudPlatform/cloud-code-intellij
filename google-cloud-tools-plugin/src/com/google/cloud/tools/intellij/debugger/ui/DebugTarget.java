@@ -20,16 +20,11 @@ import com.google.api.services.clouddebugger.v2.model.Debuggee;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-
 import com.intellij.openapi.diagnostic.Logger;
-
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-
-/**
- * The class models out the details for a target debuggable module.
- */
+/** The class models out the details for a target debuggable module. */
 class DebugTarget implements DebugTargetSelectorItem {
 
   private static final Logger LOG = Logger.getInstance(DebugTarget.class);
@@ -51,7 +46,7 @@ class DebugTarget implements DebugTargetSelectorItem {
       version = "";
       String minorVersion = "";
 
-      //Get the module name, major version and minor version strings.
+      // Get the module name, major version and minor version strings.
       for (Map.Entry<String, String> entry : this.debuggee.getLabels().entrySet()) {
         if (entry.getKey().equalsIgnoreCase(MODULE)) {
           module = entry.getValue();
@@ -60,8 +55,8 @@ class DebugTarget implements DebugTargetSelectorItem {
         } else if (entry.getKey().equalsIgnoreCase(VERSION)) {
           version = entry.getValue();
         } else {
-          //This is fallback logic where we dump the labels verbatim if they
-          //change from underneath us.
+          // This is fallback logic where we dump the labels verbatim if they
+          // change from underneath us.
           description += String.format("%s:%s", entry.getKey(), entry.getValue());
         }
       }
@@ -71,13 +66,12 @@ class DebugTarget implements DebugTargetSelectorItem {
         module = GctBundle.getString("clouddebug.default.module.name");
       }
 
-      //Build a description from the strings.
+      // Build a description from the strings.
       if (!Strings.isNullOrEmpty(version)) {
-        description = GctBundle.getString("clouddebug.version.with.module.format",
-            module, version);
+        description = GctBundle.getString("clouddebug.version.with.module.format", module, version);
       }
 
-      //Record the minor version.  We only show the latest minor version.
+      // Record the minor version.  We only show the latest minor version.
       try {
         if (!Strings.isNullOrEmpty(minorVersion)) {
           this.minorVersion = Long.parseLong(minorVersion);
@@ -87,8 +81,8 @@ class DebugTarget implements DebugTargetSelectorItem {
       }
     }
 
-    //Finally if nothing worked (maybe labels aren't enabled?), we fall
-    //back to the old logic of using description with the project name stripped out.
+    // Finally if nothing worked (maybe labels aren't enabled?), we fall
+    // back to the old logic of using description with the project name stripped out.
     if (Strings.isNullOrEmpty(description)) {
       description = this.debuggee.getDescription();
       if (description != null

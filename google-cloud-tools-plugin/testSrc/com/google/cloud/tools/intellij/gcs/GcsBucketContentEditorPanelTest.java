@@ -67,9 +67,7 @@ public class GcsBucketContentEditorPanelTest {
 
   private GcsBucketContentEditorPanel editorPanel;
 
-  @TestService
-  @Mock
-  private IntegratedGoogleLoginService loginService;
+  @TestService @Mock private IntegratedGoogleLoginService loginService;
   @Mock private Blob binaryBlob;
   @Mock private Blob directoryBlob;
   @Mock private Blob binaryBlobInDirectory;

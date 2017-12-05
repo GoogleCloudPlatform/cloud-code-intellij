@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.Executor;
@@ -29,11 +28,9 @@ import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.ImmutableList;
 import com.intellij.util.xmlb.annotations.Transient;
-
+import java.util.ArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
 
 /**
  * CloudDebugProcessState is serializable state that stores the current set of snapshots for a given
@@ -69,8 +66,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    * use a separate serializer so we can ensure that the config is written to workspace.xml which is
    * not shared between users and is never checked in.
    */
-  public CloudDebugProcessState() {
-  }
+  public CloudDebugProcessState() {}
 
   /**
    * CloudDebugProcessState can be initialized with partial state to indicate preferences on the
@@ -85,7 +81,8 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
    *     debuggee
    * @param project the intelliJ IDE project
    */
-  public CloudDebugProcessState(@Nullable String userEmail,
+  public CloudDebugProcessState(
+      @Nullable String userEmail,
       @Nullable String debuggeeId,
       @Nullable String projectName,
       @Nullable String projectNumber,
@@ -107,7 +104,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * Returns a cached set of {@link Breakpoint} objects.  The list is periodically updated from a
+   * Returns a cached set of {@link Breakpoint} objects. The list is periodically updated from a
    * background timer.
    *
    * @return the current list of breakpoints and their state
@@ -118,9 +115,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
     return currentServerBreakpointList;
   }
 
-  /**
-   * Updates the state (breakpoint list).
-   */
+  /** Updates the state (breakpoint list). */
   public void setCurrentServerBreakpointList(ImmutableList<Breakpoint> newBreakpointList) {
     currentServerBreakpointList = newBreakpointList;
   }
@@ -135,9 +130,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
     return debuggeeId;
   }
 
-  /**
-   * Called during deserialization from {@link CloudDebugProcessStateSerializer}.
-   */
+  /** Called during deserialization from {@link CloudDebugProcessStateSerializer}. */
   public void setDebuggeeId(@Nullable String debuggeeId) {
     this.debuggeeId = debuggeeId;
   }
@@ -180,7 +173,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * The project number corresponds to the project name, but is not user friendly.  However its
+   * The project number corresponds to the project name, but is not user friendly. However its
    * required in calls to the debugger apiary.
    *
    * @return the numeric Id associated with the owning GCP project
@@ -191,7 +184,7 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
   }
 
   /**
-   * Sets the project number that identifies the debugee target. It's similar to project name.  We
+   * Sets the project number that identifies the debugee target. It's similar to project name. We
    * store both because locally we resolve project via name, but the server takes a project number.
    * We don't want to have to call elysium to resolve between the two if we don't have to.
    *
@@ -241,16 +234,12 @@ public class CloudDebugProcessState extends UserDataHolderBase implements RunPro
     this.waitToken = waitToken;
   }
 
-  /**
-   * Returns whether this state is configured to allow background listening.
-   */
+  /** Returns whether this state is configured to allow background listening. */
   public boolean isListenInBackground() {
     return listenInBackground;
   }
 
-  /**
-   * Set whether a service should look for events in the background for this state.
-   */
+  /** Set whether a service should look for events in the background for this state. */
   public void setListenInBackground(boolean listenInBackground) {
     this.listenInBackground = listenInBackground;
   }

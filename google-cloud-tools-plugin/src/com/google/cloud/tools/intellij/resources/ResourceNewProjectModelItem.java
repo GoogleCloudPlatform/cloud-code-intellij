@@ -18,11 +18,8 @@ package com.google.cloud.tools.intellij.resources;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-/**
- * This model item represents the "Click here to create a project" node in the project selector.
- */
+/** This model item represents the "Click here to create a project" node in the project selector. */
 class ResourceNewProjectModelItem extends DefaultMutableTreeNode {
 
-  public ResourceNewProjectModelItem() {
-  }
+  public ResourceNewProjectModelItem() {}
 }

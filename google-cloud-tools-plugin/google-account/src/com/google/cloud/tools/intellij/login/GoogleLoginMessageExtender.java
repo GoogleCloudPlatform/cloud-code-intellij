@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.login;
 
-
 import com.intellij.openapi.extensions.ExtensionPointName;
 
 public interface GoogleLoginMessageExtender {

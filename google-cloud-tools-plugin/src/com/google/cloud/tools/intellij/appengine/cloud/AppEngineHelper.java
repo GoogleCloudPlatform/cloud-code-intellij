@@ -20,25 +20,19 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
-
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
-/**
- * Provides basic Gcloud based App Engine functionality for our Cloud Tools plugin.
- */
+/** Provides basic Gcloud based App Engine functionality for our Cloud Tools plugin. */
 public interface AppEngineHelper {
 
-  /**
-   * The project within the context of this helper.
-   */
+  /** The project within the context of this helper. */
   Project getProject();
 
   /**
@@ -65,9 +59,8 @@ public interface AppEngineHelper {
    * @return the file representing the staging directory
    * @throws IOException if the staging fails
    */
-  Path createStagingDirectory(
-      LoggingHandler loggingHandler,
-      String cloudProjectName) throws IOException;
+  Path createStagingDirectory(LoggingHandler loggingHandler, String cloudProjectName)
+      throws IOException;
 
   /**
    * Creates a {@link CloudSdk} object that is used in execution of various App Engine actions.
@@ -93,8 +86,6 @@ public interface AppEngineHelper {
    */
   Optional<Path> stageCredentials(String googleUsername);
 
-  /**
-   * Deletes the locally staged credentials, if they exist.
-   */
+  /** Deletes the locally staged credentials, if they exist. */
   void deleteCredentials();
 }

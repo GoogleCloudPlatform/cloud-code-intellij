@@ -71,8 +71,7 @@ public class ProjectSelectorTest {
 
     projectSelector.handleOpenProjectSelectionDialog();
 
-    assertThat(projectSelector.getSelectedProject())
-        .isEqualTo(TEST_PROJECT);
+    assertThat(projectSelector.getSelectedProject()).isEqualTo(TEST_PROJECT);
   }
 
   @Test
@@ -142,8 +141,7 @@ public class ProjectSelectorTest {
       assertThat(projectSelector.getAccountInfoLabel().getText()).isEmpty();
       assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
     } else {
-      assertThat(projectSelector.getProjectNameLabel().getText())
-          .isEqualTo(project.projectName());
+      assertThat(projectSelector.getProjectNameLabel().getText()).isEqualTo(project.projectName());
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isTrue();
       assertThat(projectSelector.getAccountInfoLabel().getText())
           .isEqualTo(project.googleUsername());

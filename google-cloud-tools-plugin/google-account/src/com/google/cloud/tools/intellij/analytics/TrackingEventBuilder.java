@@ -21,9 +21,7 @@ import com.google.api.client.util.Maps;
 import com.google.cloud.tools.intellij.analytics.UsageTracker.FluentTrackingEventWithMetadata;
 import java.util.Map;
 
-/**
- * Implements the fluent interface exposed for tracking by {@link UsageTracker}.
- */
+/** Implements the fluent interface exposed for tracking by {@link UsageTracker}. */
 class TrackingEventBuilder implements FluentTrackingEventWithMetadata {
 
   private SendsEvents eventSender;

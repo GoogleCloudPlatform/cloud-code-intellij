@@ -55,9 +55,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * App Engine flexible facet editor configuration panel.
- */
+/** App Engine flexible facet editor configuration panel. */
 public class FlexibleFacetEditor extends FacetEditorTab {
 
   private static final AppEngineProjectService APP_ENGINE_PROJECT_SERVICE =
@@ -77,8 +75,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private HyperlinkLabel dockerfileErrorMessage;
   private AppEngineFlexibleFacetConfiguration facetConfiguration;
 
-  FlexibleFacetEditor(@NotNull AppEngineFlexibleFacetConfiguration facetConfiguration,
-      @NotNull Module module) {
+  FlexibleFacetEditor(
+      @NotNull AppEngineFlexibleFacetConfiguration facetConfiguration, @NotNull Module module) {
     this.module = module;
     this.facetConfiguration = facetConfiguration;
 
@@ -89,32 +87,39 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         GctBundle.message("appengine.flex.config.browse.app.yaml"),
         null /* description */,
         module.getProject(),
-        FileChooserDescriptorFactory.createSingleFileDescriptor().withFileFilter(
-            virtualFile -> Comparing.equal(virtualFile.getExtension(), "yaml")
-                || Comparing.equal(virtualFile.getExtension(), "yml")
-        )
-    );
+        FileChooserDescriptorFactory.createSingleFileDescriptor()
+            .withFileFilter(
+                virtualFile ->
+                    Comparing.equal(virtualFile.getExtension(), "yaml")
+                        || Comparing.equal(virtualFile.getExtension(), "yml")));
 
-    appYamlField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        validateConfiguration();
-      }
-    });
+    appYamlField
+        .getTextField()
+        .getDocument()
+        .addDocumentListener(
+            new DocumentAdapter() {
+              @Override
+              protected void textChanged(DocumentEvent event) {
+                validateConfiguration();
+              }
+            });
 
-    dockerDirectoryField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        validateDockerfile();
-      }
-    });
+    dockerDirectoryField
+        .getTextField()
+        .getDocument()
+        .addDocumentListener(
+            new DocumentAdapter() {
+              @Override
+              protected void textChanged(DocumentEvent event) {
+                validateDockerfile();
+              }
+            });
 
     dockerDirectoryField.addBrowseFolderListener(
         GctBundle.message("appengine.flex.config.browse.docker.directory"),
         null /* description */,
         module.getProject(),
-        FileChooserDescriptorFactory.createSingleFolderDescriptor()
-    );
+        FileChooserDescriptorFactory.createSingleFolderDescriptor());
 
     validateConfiguration();
   }
@@ -148,9 +153,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   private String getRuntimeText() throws MalformedYamlFileException {
-    return getRuntime()
-        .map(FlexibleRuntime::toString)
-        .orElse("");
+    return getRuntime().map(FlexibleRuntime::toString).orElse("");
   }
 
   private Optional<FlexibleRuntime> getRuntime() throws MalformedYamlFileException {
@@ -172,9 +175,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     return true;
   }
 
-  /**
-   * Validates the configuration and toggles on/off any necessary warnings and components.
-   */
+  /** Validates the configuration and toggles on/off any necessary warnings and components. */
   private void validateConfiguration() {
     boolean isValidAppYaml = validateAppYaml();
 
@@ -241,8 +242,10 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
   private void toggleInvalidDockerfileState(String message) {
     dockerfileErrorPanel.setVisible(true);
-    dockerfileErrorMessage.setHyperlinkText(message,
-        GctBundle.message("appengine.flex.facet.config.dockerfile.generate.link.text"),"");
+    dockerfileErrorMessage.setHyperlinkText(
+        message,
+        GctBundle.message("appengine.flex.facet.config.dockerfile.generate.link.text"),
+        "");
   }
 
   private void toggleValidDockerfileState() {
@@ -253,8 +256,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   public void onFacetInitialized(@NotNull Facet facet) {
     if (facet instanceof AppEngineFlexibleFacet) {
       ((AppEngineFlexibleFacet) facet).getConfiguration().setAppYamlPath(appYamlField.getText());
-      ((AppEngineFlexibleFacet) facet).getConfiguration().setDockerDirectory(
-          dockerDirectoryField.getText());
+      ((AppEngineFlexibleFacet) facet)
+          .getConfiguration()
+          .setDockerDirectory(dockerDirectoryField.getText());
     }
 
     // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
@@ -278,9 +282,10 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           .ping();
 
       String appYamlFilePath = appYamlField.getText();
-      String appYamlDirectoryPath = StringUtils.isEmpty(appYamlFilePath)
-          ? getDefaultConfigPath(DEFAULT_APP_YAML_DIRECTORY_NAME)
-          : getParentDirectory(appYamlFilePath);
+      String appYamlDirectoryPath =
+          StringUtils.isEmpty(appYamlFilePath)
+              ? getDefaultConfigPath(DEFAULT_APP_YAML_DIRECTORY_NAME)
+              : getParentDirectory(appYamlFilePath);
 
       SelectConfigDestinationFolderDialog dialog =
           new SelectConfigDestinationFolderDialog(
@@ -293,8 +298,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
         Path destinationFilePath = destinationFolderPath.resolve(APP_YAML_FILE_NAME);
 
         if (validateAndWarnFileGeneration(destinationFolderPath, destinationFilePath)) {
-          APP_ENGINE_PROJECT_SERVICE
-              .generateAppYaml(FlexibleRuntime.JAVA, module, destinationFolderPath);
+          APP_ENGINE_PROJECT_SERVICE.generateAppYaml(
+              FlexibleRuntime.JAVA, module, destinationFolderPath);
           appYamlField.setText(destinationFilePath.toString());
           validateConfiguration();
         }
@@ -325,9 +330,10 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           .addMetadata("source", "setOnModule")
           .addMetadata("env", "flex")
           .ping();
-      String dockerfileDirectoryPath = StringUtils.isEmpty(dockerDirectoryField.getText())
-          ? getDefaultConfigPath(DEFAULT_DOCKERFILE_DIRECTORY_NAME)
-          : dockerDirectoryField.getText();
+      String dockerfileDirectoryPath =
+          StringUtils.isEmpty(dockerDirectoryField.getText())
+              ? getDefaultConfigPath(DEFAULT_DOCKERFILE_DIRECTORY_NAME)
+              : dockerDirectoryField.getText();
 
       SelectDockerfileDestinationFolderDialog dialog =
           new SelectDockerfileDestinationFolderDialog(
@@ -349,12 +355,12 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     }
   }
 
-  /**
-   * Returns the canonical directory path for config file under src/main/{directoryName}.
-   */
+  /** Returns the canonical directory path for config file under src/main/{directoryName}. */
   private String getDefaultConfigPath(String directoryName) {
-    VirtualFile virtualFile = ModuleRootManager.getInstance(module).getContentRoots()[0]
-        .findFileByRelativePath("src/main");
+    VirtualFile virtualFile =
+        ModuleRootManager.getInstance(module)
+            .getContentRoots()[0]
+            .findFileByRelativePath("src/main");
 
     if (virtualFile == null) {
       return "";
@@ -364,8 +370,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   }
 
   /**
-   * Performs validation on the config file destination directory and file paths, and warns
-   * if generation cannot be performed.
+   * Performs validation on the config file destination directory and file paths, and warns if
+   * generation cannot be performed.
    */
   private boolean validateAndWarnFileGeneration(
       Path destinationFolderPath, Path destinationFilePath) {
@@ -398,8 +404,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
     private DockerfileArtifactTypePanel panel;
 
     SelectDockerfileDestinationFolderDialog(
-        @Nullable Project project,
-        String directoryPath, String title) {
+        @Nullable Project project, String directoryPath, String title) {
       super(project, directoryPath, title);
     }
 

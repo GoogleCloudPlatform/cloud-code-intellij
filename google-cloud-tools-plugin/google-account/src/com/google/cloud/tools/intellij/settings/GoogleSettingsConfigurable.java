@@ -23,9 +23,7 @@ import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Creates a Google menu item to contain various Google plugins related settings.
- */
+/** Creates a Google menu item to contain various Google plugins related settings. */
 public class GoogleSettingsConfigurable implements Configurable {
 
   @Nls
@@ -52,17 +50,11 @@ public class GoogleSettingsConfigurable implements Configurable {
   }
 
   @Override
-  public void apply() throws ConfigurationException {
-
-  }
+  public void apply() throws ConfigurationException {}
 
   @Override
-  public void reset() {
-
-  }
+  public void reset() {}
 
   @Override
-  public void disposeUIResources() {
-
-  }
+  public void disposeUIResources() {}
 }

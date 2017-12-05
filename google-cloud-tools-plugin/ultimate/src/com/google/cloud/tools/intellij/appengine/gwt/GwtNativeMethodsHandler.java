@@ -17,15 +17,11 @@
 package com.google.cloud.tools.intellij.appengine.gwt;
 
 import com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeHandler;
-
 import com.intellij.gwt.jsinject.JsInjector;
 import com.intellij.psi.PsiMethod;
-
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author nik
- */
+/** @author nik */
 public class GwtNativeMethodsHandler extends AppEngineForbiddenCodeHandler {
   @Override
   public boolean isNativeMethodAllowed(@NotNull PsiMethod method) {

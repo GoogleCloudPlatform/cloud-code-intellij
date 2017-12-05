@@ -18,17 +18,12 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
-
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.Icon;
-
-/**
- * The Flexible framework type.
- */
+/** The Flexible framework type. */
 public class AppEngineFlexibleFrameworkType extends FrameworkTypeEx {
 
   public static final String ID = "appengine-flexible";

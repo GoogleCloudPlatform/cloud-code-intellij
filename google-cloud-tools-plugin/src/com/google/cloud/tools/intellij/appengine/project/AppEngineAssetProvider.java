@@ -21,15 +21,11 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.psi.xml.XmlFile;
-
+import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-
-/**
- * Service to retrieve assets used by Google App Engine.
- */
+/** Service to retrieve assets used by Google App Engine. */
 public abstract class AppEngineAssetProvider {
 
   public static AppEngineAssetProvider getInstance() {
@@ -42,14 +38,15 @@ public abstract class AppEngineAssetProvider {
    * WEB-INF directory.
    */
   @Nullable
-  public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
-      @NotNull Artifact artifact);
+  public abstract XmlFile loadAppEngineStandardWebXml(
+      @NotNull Project project, @NotNull Artifact artifact);
 
   /**
    * Loads the configuration at the module level.
+   *
    * @see AppEngineAssetProvider#loadAppEngineStandardWebXml(Project, Artifact).
    */
   @Nullable
-  public abstract XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
-      @NotNull Collection<Module> module);
+  public abstract XmlFile loadAppEngineStandardWebXml(
+      @NotNull Project project, @NotNull Collection<Module> module);
 }

@@ -24,6 +24,5 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 class GoogleSignOnModelItem extends DefaultMutableTreeNode {
 
-  public GoogleSignOnModelItem() {
-  }
+  public GoogleSignOnModelItem() {}
 }

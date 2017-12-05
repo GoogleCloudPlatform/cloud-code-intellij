@@ -23,25 +23,17 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
-
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
-
+import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Path;
-
-/**
- * Stages an application in preparation for deployment to the App Engine flexible environment.
- */
+/** Stages an application in preparation for deployment to the App Engine flexible environment. */
 public class AppEngineStandardStage {
   private CloudSdkAppEngineHelper helper;
   private LoggingHandler loggingHandler;
   private Path deploymentArtifactPath;
 
-
-  /**
-   * Initialize the staging dependencies.
-   */
+  /** Initialize the staging dependencies. */
   public AppEngineStandardStage(
       @NotNull CloudSdkAppEngineHelper helper,
       @NotNull LoggingHandler loggingHandler,
@@ -62,19 +54,17 @@ public class AppEngineStandardStage {
       @NotNull ProcessStartListener startListener,
       @NotNull ProcessExitListener onStageComplete) {
 
-    ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
-      @Override
-      public void onOutputLine(String line) {
-        loggingHandler.print(line + "\n");
-      }
-    };
+    ProcessOutputLineListener outputListener =
+        new ProcessOutputLineListener() {
+          @Override
+          public void onOutputLine(String line) {
+            loggingHandler.print(line + "\n");
+          }
+        };
 
-    CloudSdk sdk = helper.createSdk(
-        loggingHandler,
-        startListener,
-        outputListener,
-        outputListener,
-        onStageComplete);
+    CloudSdk sdk =
+        helper.createSdk(
+            loggingHandler, startListener, outputListener, outputListener, onStageComplete);
 
     // TODO determine the default set of flags we want to set for AE standard staging
     DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();

@@ -52,18 +52,16 @@ import org.apache.commons.lang3.JavaVersion;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author nik
- */
+/** @author nik */
 public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionTool {
 
   @Override
-  public ProblemDescriptor[] checkFile(@NotNull PsiFile file,
-      @NotNull final InspectionManager manager, final boolean isOnTheFly) {
+  public ProblemDescriptor[] checkFile(
+      @NotNull PsiFile file, @NotNull final InspectionManager manager, final boolean isOnTheFly) {
     final Project project = manager.getProject();
     Module module = ModuleUtilCore.findModuleForPsiElement(file);
-    final AppEngineStandardFacet appEngineStandardFacet
-        = AppEngineStandardFacet.getAppEngineFacetByModule(module);
+    final AppEngineStandardFacet appEngineStandardFacet =
+        AppEngineStandardFacet.getAppEngineFacetByModule(module);
     if (appEngineStandardFacet == null) {
       return null;
     }
@@ -74,104 +72,124 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
 
     final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
     final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
-    file.accept(new JavaRecursiveElementWalkingVisitor() {
-      @Override
-      public void visitDocComment(PsiDocComment comment) {
-      }
+    file.accept(
+        new JavaRecursiveElementWalkingVisitor() {
+          @Override
+          public void visitDocComment(PsiDocComment comment) {}
 
-      @Override
-      public void visitMethod(PsiMethod method) {
-        final PsiModifierList modifierList = method.getModifierList();
-        if (modifierList.hasModifierProperty(PsiModifier.NATIVE)) {
-          if (!isNativeMethodAllowed(method)) {
-            problems.add(manager.createProblemDescriptor(modifierList,
-                "Native methods aren't allowed in App Engine application", isOnTheFly,
-                LocalQuickFix.EMPTY_ARRAY, ProblemHighlightType.GENERIC_ERROR_OR_WARNING));
-          }
-        }
-        super.visitMethod(method);
-      }
-
-      @Override
-      public void visitNewExpression(PsiNewExpression expression) {
-        final PsiJavaCodeReferenceElement classReference = expression.getClassReference();
-        if (classReference != null) {
-          final PsiElement resolved = classReference.resolve();
-          if (resolved instanceof PsiClass) {
-            final String qualifiedName = ((PsiClass) resolved).getQualifiedName();
-            if (qualifiedName != null
-                && CloudSdkService.getInstance().isMethodInBlacklist(qualifiedName, "new")) {
-              final String message =
-                  "App Engine application should not create new instances of '" + qualifiedName
-                      + "' class";
-              problems.add(manager.createProblemDescriptor(classReference, message, isOnTheFly,
-                  LocalQuickFix.EMPTY_ARRAY,
-                  ProblemHighlightType.GENERIC_ERROR_OR_WARNING));
-            }
-          }
-        }
-        super.visitNewExpression(expression);
-      }
-
-      @Override
-      public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-        final PsiReferenceExpression methodExpression = expression.getMethodExpression();
-        final PsiElement element = methodExpression.resolve();
-        if (element instanceof PsiMethod) {
-          final PsiMethod method = (PsiMethod) element;
-          final PsiClass psiClass = method.getContainingClass();
-          if (psiClass != null) {
-            final String qualifiedName = psiClass.getQualifiedName();
-            final String methodName = method.getName();
-            if (qualifiedName != null
-                && CloudSdkService.getInstance()
-                  .isMethodInBlacklist(qualifiedName, methodName)) {
-              final String message =
-                  "AppEngine application should not call '" + StringUtil.getShortName(qualifiedName)
-                      + ""
-                      + methodName + "' method";
-              problems.add(manager.createProblemDescriptor(methodExpression, message, isOnTheFly,
-                  LocalQuickFix.EMPTY_ARRAY,
-                  ProblemHighlightType.GENERIC_ERROR_OR_WARNING));
-            }
-          }
-        }
-        super.visitMethodCallExpression(expression);
-      }
-
-      @Override
-      public void visitReferenceElement(PsiJavaCodeReferenceElement reference) {
-        final PsiElement resolved = reference.resolve();
-        if (resolved instanceof PsiClass) {
-          final PsiFile psiFile = resolved.getContainingFile();
-          if (psiFile != null) {
-            final VirtualFile virtualFile = psiFile.getVirtualFile();
-            if (virtualFile != null && !fileIndex.isInSource(virtualFile)) {
-              final List<OrderEntry> list = fileIndex.getOrderEntriesForFile(virtualFile);
-              for (OrderEntry entry : list) {
-                if (entry instanceof JdkOrderEntry) {
-                  final String className = ClassUtil.getJVMClassName((PsiClass) resolved);
-                  if (className != null
-                      && !CloudSdkService.getInstance().isClassInWhiteList(className)) {
-                    problems.add(manager.createProblemDescriptor(reference,
-                        "Class '" + className + "' is not included in App Engine JRE White List",
-                        isOnTheFly, LocalQuickFix.EMPTY_ARRAY,
+          @Override
+          public void visitMethod(PsiMethod method) {
+            final PsiModifierList modifierList = method.getModifierList();
+            if (modifierList.hasModifierProperty(PsiModifier.NATIVE)) {
+              if (!isNativeMethodAllowed(method)) {
+                problems.add(
+                    manager.createProblemDescriptor(
+                        modifierList,
+                        "Native methods aren't allowed in App Engine application",
+                        isOnTheFly,
+                        LocalQuickFix.EMPTY_ARRAY,
                         ProblemHighlightType.GENERIC_ERROR_OR_WARNING));
+              }
+            }
+            super.visitMethod(method);
+          }
+
+          @Override
+          public void visitNewExpression(PsiNewExpression expression) {
+            final PsiJavaCodeReferenceElement classReference = expression.getClassReference();
+            if (classReference != null) {
+              final PsiElement resolved = classReference.resolve();
+              if (resolved instanceof PsiClass) {
+                final String qualifiedName = ((PsiClass) resolved).getQualifiedName();
+                if (qualifiedName != null
+                    && CloudSdkService.getInstance().isMethodInBlacklist(qualifiedName, "new")) {
+                  final String message =
+                      "App Engine application should not create new instances of '"
+                          + qualifiedName
+                          + "' class";
+                  problems.add(
+                      manager.createProblemDescriptor(
+                          classReference,
+                          message,
+                          isOnTheFly,
+                          LocalQuickFix.EMPTY_ARRAY,
+                          ProblemHighlightType.GENERIC_ERROR_OR_WARNING));
+                }
+              }
+            }
+            super.visitNewExpression(expression);
+          }
+
+          @Override
+          public void visitMethodCallExpression(PsiMethodCallExpression expression) {
+            final PsiReferenceExpression methodExpression = expression.getMethodExpression();
+            final PsiElement element = methodExpression.resolve();
+            if (element instanceof PsiMethod) {
+              final PsiMethod method = (PsiMethod) element;
+              final PsiClass psiClass = method.getContainingClass();
+              if (psiClass != null) {
+                final String qualifiedName = psiClass.getQualifiedName();
+                final String methodName = method.getName();
+                if (qualifiedName != null
+                    && CloudSdkService.getInstance()
+                        .isMethodInBlacklist(qualifiedName, methodName)) {
+                  final String message =
+                      "AppEngine application should not call '"
+                          + StringUtil.getShortName(qualifiedName)
+                          + ""
+                          + methodName
+                          + "' method";
+                  problems.add(
+                      manager.createProblemDescriptor(
+                          methodExpression,
+                          message,
+                          isOnTheFly,
+                          LocalQuickFix.EMPTY_ARRAY,
+                          ProblemHighlightType.GENERIC_ERROR_OR_WARNING));
+                }
+              }
+            }
+            super.visitMethodCallExpression(expression);
+          }
+
+          @Override
+          public void visitReferenceElement(PsiJavaCodeReferenceElement reference) {
+            final PsiElement resolved = reference.resolve();
+            if (resolved instanceof PsiClass) {
+              final PsiFile psiFile = resolved.getContainingFile();
+              if (psiFile != null) {
+                final VirtualFile virtualFile = psiFile.getVirtualFile();
+                if (virtualFile != null && !fileIndex.isInSource(virtualFile)) {
+                  final List<OrderEntry> list = fileIndex.getOrderEntriesForFile(virtualFile);
+                  for (OrderEntry entry : list) {
+                    if (entry instanceof JdkOrderEntry) {
+                      final String className = ClassUtil.getJVMClassName((PsiClass) resolved);
+                      if (className != null
+                          && !CloudSdkService.getInstance().isClassInWhiteList(className)) {
+                        problems.add(
+                            manager.createProblemDescriptor(
+                                reference,
+                                "Class '"
+                                    + className
+                                    + "' is not included in App Engine JRE White List",
+                                isOnTheFly,
+                                LocalQuickFix.EMPTY_ARRAY,
+                                ProblemHighlightType.GENERIC_ERROR_OR_WARNING));
+                      }
+                    }
                   }
                 }
               }
             }
+            super.visitReferenceElement(reference);
           }
-        }
-        super.visitReferenceElement(reference);
-      }
-    });
+        });
     return problems.toArray(new ProblemDescriptor[problems.size()]);
   }
 
   private static boolean isNativeMethodAllowed(PsiMethod method) {
-    for (AppEngineForbiddenCodeHandler handler : AppEngineForbiddenCodeHandler.EP_NAME
-        .getExtensions()) {
+    for (AppEngineForbiddenCodeHandler handler :
+        AppEngineForbiddenCodeHandler.EP_NAME.getExtensions()) {
       if (handler.isNativeMethodAllowed(method)) {
         return true;
       }

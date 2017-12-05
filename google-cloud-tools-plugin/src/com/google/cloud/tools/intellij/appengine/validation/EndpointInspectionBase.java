@@ -22,22 +22,17 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiInvalidElementAccessException;
 
-/**
- * The base class for all endpoint inspections.
- */
+/** The base class for all endpoint inspections. */
 public class EndpointInspectionBase extends LocalInspectionTool {
 
-  public static final Logger LOG =
-      Logger.getInstance(EndpointInspectionBase.class);
+  public static final Logger LOG = Logger.getInstance(EndpointInspectionBase.class);
 
   @Override
   public String getGroupDisplayName() {
     return "Google Cloud Platform";
   }
 
-  /**
-   * Get the project for the hierarchy.
-   */
+  /** Get the project for the hierarchy. */
   public Project getProject(PsiElement element) {
     Project project;
     try {

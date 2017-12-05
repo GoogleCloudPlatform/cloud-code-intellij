@@ -17,13 +17,10 @@
 package com.google.cloud.tools.intellij.resources;
 
 import com.intellij.ui.components.JBLabel;
-
 import javax.swing.BorderFactory;
 import javax.swing.SwingConstants;
 
-/**
- * UI for node in the repository selector representing a single GCP repository.
- */
+/** UI for node in the repository selector representing a single GCP repository. */
 public class RepositoryItem extends JBLabel {
 
   public RepositoryItem() {

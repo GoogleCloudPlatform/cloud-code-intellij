@@ -22,7 +22,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
-
 import com.intellij.appengine.AppEngineCodeInsightTestCase;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.Result;
@@ -34,20 +33,16 @@ import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.testFramework.PlatformTestCase;
-
-import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
 
-/**
- * Unit tests for {@link DefaultAppEngineProjectService}
- */
+/** Unit tests for {@link DefaultAppEngineProjectService} */
 public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
   private DefaultAppEngineProjectService appEngineProjectService;
@@ -64,7 +59,8 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     Module module = createModule("myModule");
     addAppEngineStandardFacet(module);
 
-    assertEquals(AppEngineEnvironment.APP_ENGINE_STANDARD,
+    assertEquals(
+        AppEngineEnvironment.APP_ENGINE_STANDARD,
         appEngineProjectService.getModuleAppEngineEnvironment(module).get());
   }
 
@@ -72,7 +68,8 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     Module module = createModule("myModule");
     addAppEngineFlexibleFacet(module);
 
-    assertEquals(AppEngineEnvironment.APP_ENGINE_FLEX,
+    assertEquals(
+        AppEngineEnvironment.APP_ENGINE_FLEX,
         appEngineProjectService.getModuleAppEngineEnvironment(module).get());
   }
 
@@ -87,13 +84,14 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
   public void testGetAppEngineStandardDeclaredRuntime_Java8() {
     XmlFile appEngineWebXml = loadTestWebXml("testData/descriptor/appengine-web_runtime-java8.xml");
-    assertEquals(AppEngineStandardRuntime.JAVA_8,
+    assertEquals(
+        AppEngineStandardRuntime.JAVA_8,
         appEngineProjectService.getAppEngineStandardDeclaredRuntime(appEngineWebXml));
   }
 
   public void testGetAppEngineStandardDeclaredRuntime_Invalid() {
-    XmlFile appEngineWebXml = loadTestWebXml(
-        "testData/descriptor/appengine-web_runtime-invalid.xml");
+    XmlFile appEngineWebXml =
+        loadTestWebXml("testData/descriptor/appengine-web_runtime-invalid.xml");
     assertNull(appEngineProjectService.getAppEngineStandardDeclaredRuntime(appEngineWebXml));
   }
 
@@ -101,8 +99,8 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     new WriteAction() {
       @Override
       protected void run(@NotNull Result result) throws Throwable {
-        FacetManager.getInstance(module).addFacet(
-            new AppEngineStandardFacetType(), "Google App Engine Standard", null);
+        FacetManager.getInstance(module)
+            .addFacet(new AppEngineStandardFacetType(), "Google App Engine Standard", null);
       }
     }.execute();
   }
@@ -111,57 +109,72 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
     new WriteAction() {
       @Override
       protected void run(@NotNull Result result) throws Throwable {
-        FacetManager.getInstance(module).addFacet(
-            new AppEngineFlexibleFacetType(), "Google App Engine Flexible", null);
+        FacetManager.getInstance(module)
+            .addFacet(new AppEngineFlexibleFacetType(), "Google App Engine Flexible", null);
       }
     }.execute();
   }
 
   private XmlFile loadTestWebXml(String path) {
-    VirtualFile vFile = LocalFileSystem.getInstance().findFileByIoFile(
-        new File(path));
+    VirtualFile vFile = LocalFileSystem.getInstance().findFileByIoFile(new File(path));
 
-    return vFile == null
-        ? null
-        : (XmlFile) PsiManager.getInstance(getProject()).findFile(vFile);
+    return vFile == null ? null : (XmlFile) PsiManager.getInstance(getProject()).findFile(vFile);
   }
 
   public void testGetServiceNameFromAppYaml() throws MalformedYamlFileException {
-    assertEquals("javaService",
-        appEngineProjectService.getServiceNameFromAppYaml(
-            Paths.get(getTestDataPath().toString(), "java.yaml").toString()).get());
+    assertEquals(
+        "javaService",
+        appEngineProjectService
+            .getServiceNameFromAppYaml(
+                Paths.get(getTestDataPath().toString(), "java.yaml").toString())
+            .get());
   }
 
   public void testGetServiceNameFromAppYaml_noService() throws MalformedYamlFileException {
-    assertFalse(appEngineProjectService.getServiceNameFromAppYaml(
-        Paths.get(getTestDataPath().toString(), "noservice.yaml").toString()).isPresent());
+    assertFalse(
+        appEngineProjectService
+            .getServiceNameFromAppYaml(
+                Paths.get(getTestDataPath().toString(), "noservice.yaml").toString())
+            .isPresent());
   }
 
   public void testGetFlexibleRuntimeFromAppYaml_javaRuntime() throws MalformedYamlFileException {
-    assertEquals(FlexibleRuntime.JAVA,
-        appEngineProjectService.getFlexibleRuntimeFromAppYaml(
-            Paths.get(getTestDataPath().toString(), "java.yaml").toString()).get());
+    assertEquals(
+        FlexibleRuntime.JAVA,
+        appEngineProjectService
+            .getFlexibleRuntimeFromAppYaml(
+                Paths.get(getTestDataPath().toString(), "java.yaml").toString())
+            .get());
   }
 
   public void testGetFlexibleRuntimeFromAppYaml_customRuntime() throws MalformedYamlFileException {
-    assertEquals(FlexibleRuntime.CUSTOM,
-        appEngineProjectService.getFlexibleRuntimeFromAppYaml(
-            Paths.get(getTestDataPath().toString(), "custom.yaml").toString()).get());
+    assertEquals(
+        FlexibleRuntime.CUSTOM,
+        appEngineProjectService
+            .getFlexibleRuntimeFromAppYaml(
+                Paths.get(getTestDataPath().toString(), "custom.yaml").toString())
+            .get());
   }
 
   public void testGetFlexibleRuntimeFromAppYaml_irregularFormatButValid()
       throws IOException, MalformedYamlFileException {
-    assertEquals(FlexibleRuntime.CUSTOM,
-        appEngineProjectService.getFlexibleRuntimeFromAppYaml(
-            createTempFile("app.yaml", "   runtime :    custom ").getAbsolutePath()).get());
+    assertEquals(
+        FlexibleRuntime.CUSTOM,
+        appEngineProjectService
+            .getFlexibleRuntimeFromAppYaml(
+                createTempFile("app.yaml", "   runtime :    custom ").getAbsolutePath())
+            .get());
   }
 
   public void testGetFlexibleRuntimeFromAppYaml_malformedYaml() throws IOException {
     try {
-      assertEquals(FlexibleRuntime.CUSTOM,
-          appEngineProjectService.getFlexibleRuntimeFromAppYaml(
-              createTempFile("app.yaml", "runtime: custom\nenv_variables:\n  'DBG_ENAB")
-                  .getAbsolutePath()).get());
+      assertEquals(
+          FlexibleRuntime.CUSTOM,
+          appEngineProjectService
+              .getFlexibleRuntimeFromAppYaml(
+                  createTempFile("app.yaml", "runtime: custom\nenv_variables:\n  'DBG_ENAB")
+                      .getAbsolutePath())
+              .get());
       fail("YAML is malformed.");
     } catch (MalformedYamlFileException myf) {
       // Success.
@@ -169,19 +182,22 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
   }
 
   public void testGetServiceNameFromAppEngineWebXml() {
-    assertEquals("java8Service",
+    assertEquals(
+        "java8Service",
         appEngineProjectService.getServiceNameFromAppEngineWebXml(
             loadTestWebXml("testData/descriptor/appengine-web_runtime-java8.xml")));
   }
 
   public void testGetServiceNameFromAppEngineWebXml_module() {
-    assertEquals("java8Service",
+    assertEquals(
+        "java8Service",
         appEngineProjectService.getServiceNameFromAppEngineWebXml(
             loadTestWebXml("testData/descriptor/appengine-web_runtime-java8-module.xml")));
   }
 
   public void testGetServiceNameFromAppEngineWebXml_serviceAndModule() {
-    assertEquals("java8Service",
+    assertEquals(
+        "java8Service",
         appEngineProjectService.getServiceNameFromAppEngineWebXml(
             loadTestWebXml(
                 "testData/descriptor/appengine-web_runtime-java8-serviceandmodule.xml")));
@@ -189,10 +205,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
   public void testGenerateAppYaml() {
     Path outputDir = Paths.get(getProject().getBasePath() + "/src/main/appengine");
-    appEngineProjectService.generateAppYaml(
-        FlexibleRuntime.JAVA,
-        getModule(),
-        outputDir);
+    appEngineProjectService.generateAppYaml(FlexibleRuntime.JAVA, getModule(), outputDir);
 
     File[] listOfFiles = outputDir.toFile().listFiles();
     Assert.assertEquals(1, listOfFiles.length);
@@ -202,9 +215,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
   public void testGenerateDockerfile_war() {
     Path outputDir = Paths.get(getProject().getBasePath() + "/src/main/docker");
     appEngineProjectService.generateDockerfile(
-        AppEngineFlexibleDeploymentArtifactType.WAR,
-        getModule(),
-        outputDir);
+        AppEngineFlexibleDeploymentArtifactType.WAR, getModule(), outputDir);
 
     File[] listOfFiles = outputDir.toFile().listFiles();
     Assert.assertEquals(1, listOfFiles.length);
@@ -215,9 +226,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
 
     Path outputDir = Paths.get(getProject().getBasePath() + "/src/main/docker");
     appEngineProjectService.generateDockerfile(
-        AppEngineFlexibleDeploymentArtifactType.JAR,
-        getModule(),
-        outputDir);
+        AppEngineFlexibleDeploymentArtifactType.JAR, getModule(), outputDir);
 
     File[] listOfFiles = outputDir.toFile().listFiles();
     Assert.assertEquals(1, listOfFiles.length);

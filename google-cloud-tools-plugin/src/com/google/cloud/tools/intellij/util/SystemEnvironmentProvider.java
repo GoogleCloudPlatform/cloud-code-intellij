@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.util;
 
 import com.intellij.execution.configurations.PathEnvironmentVariableUtil;
 import com.intellij.openapi.components.ServiceManager;
-
 import java.io.File;
 
 public class SystemEnvironmentProvider {

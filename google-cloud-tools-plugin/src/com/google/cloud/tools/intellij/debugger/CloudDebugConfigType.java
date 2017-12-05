@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.debugger;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
@@ -26,14 +25,10 @@ import com.intellij.execution.configurations.ConfigurationTypeUtil;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
-
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.Icon;
-
-/**
- * This class defines the runconfig type and factory for Cloud Debugger RunConfigurations.
- */
+/** This class defines the runconfig type and factory for Cloud Debugger RunConfigurations. */
 public class CloudDebugConfigType implements ConfigurationType {
 
   public static final String GCT_DEBUGGER_ENABLE = "enable.gct.debugger";
@@ -59,7 +54,7 @@ public class CloudDebugConfigType implements ConfigurationType {
 
   @Override
   public ConfigurationFactory[] getConfigurationFactories() {
-    return new ConfigurationFactory[]{factory};
+    return new ConfigurationFactory[] {factory};
   }
 
   @Override
@@ -90,8 +85,8 @@ public class CloudDebugConfigType implements ConfigurationType {
     }
 
     @Override
-    public void configureBeforeRunTaskDefaults(Key<? extends BeforeRunTask> providerId,
-        BeforeRunTask task) {
+    public void configureBeforeRunTaskDefaults(
+        Key<? extends BeforeRunTask> providerId, BeforeRunTask task) {
       task.setEnabled(false);
     }
 

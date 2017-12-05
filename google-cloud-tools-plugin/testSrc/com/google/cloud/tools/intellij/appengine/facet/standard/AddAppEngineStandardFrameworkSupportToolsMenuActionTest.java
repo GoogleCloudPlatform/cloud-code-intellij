@@ -24,11 +24,9 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Tests for {@link AddAppEngineStandardFrameworkSupportToolsMenuAction}
- */
-public class AddAppEngineStandardFrameworkSupportToolsMenuActionTest extends
-    AddAppEngineFrameworkSupportActionTest {
+/** Tests for {@link AddAppEngineStandardFrameworkSupportToolsMenuAction} */
+public class AddAppEngineStandardFrameworkSupportToolsMenuActionTest
+    extends AddAppEngineFrameworkSupportActionTest {
   private AddAppEngineStandardFrameworkSupportToolsMenuAction action;
 
   @NotNull
@@ -44,12 +42,15 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuActionTest extends
   }
 
   public void testIsActionRegistered() {
-    AnAction action = ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Standard");
+    AnAction action =
+        ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Standard");
     assertNotNull(action);
     Presentation presentation = action.getTemplatePresentation();
     assertEquals(GctBundle.message("appengine.standard.facet.name.title"), presentation.getText());
-    assertEquals(GctBundle.message("appengine.add.framework.support.tools.menu.description",
-        GctBundle.message("appengine.standard.facet.name")),
+    assertEquals(
+        GctBundle.message(
+            "appengine.add.framework.support.tools.menu.description",
+            GctBundle.message("appengine.standard.facet.name")),
         presentation.getDescription());
   }
 
@@ -59,7 +60,8 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuActionTest extends
   }
 
   @Override
-  public void testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
+  public void
+      testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
     super.testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet();
   }
 }
