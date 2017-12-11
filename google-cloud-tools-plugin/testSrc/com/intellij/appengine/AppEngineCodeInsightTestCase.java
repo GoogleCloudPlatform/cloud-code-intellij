@@ -31,6 +31,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileFilter;
+import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.builders.JavaModuleFixtureBuilder;
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
@@ -61,6 +62,7 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
+    VfsRootAccess.allowRootAccess(System.getProperty("user.dir"));
     final TestFixtureBuilder<IdeaProjectTestFixture> fixtureBuilder = JavaTestFixtureFactory.createFixtureBuilder(getName());
     myModuleBuilder = fixtureBuilder.addModule(JavaModuleFixtureBuilder.class);
     myProjectFixture = fixtureBuilder.getFixture();
