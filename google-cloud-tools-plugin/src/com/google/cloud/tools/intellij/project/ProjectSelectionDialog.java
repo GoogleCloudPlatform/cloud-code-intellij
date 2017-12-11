@@ -102,6 +102,8 @@ public class ProjectSelectionDialog {
       dialogWrapper.setTitle(GctBundle.getString("project.selector.dialog.title"));
       // disabled unless project is selected in the list.
       dialogWrapper.setOKActionEnabled(false);
+      // install additional IDEA UI.
+      installTableSpeedSearch(projectListTable);
 
       Stream.of(ProjectManager.getInstance().getOpenProjects())
           .forEach(
@@ -124,75 +126,13 @@ public class ProjectSelectionDialog {
   }
 
   @VisibleForTesting
-  void createUIComponents() {
-    addAccountButton = new JButton();
-    addAccountButton.addActionListener((event) -> Services.getLoginService().logIn());
-
-    // prepare table model and rendering.
-    projectListTable = new JBTable();
-    projectListTableModel = new ProjectListTableModel();
-    projectListTable.setModel(projectListTableModel);
-    projectListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    projectListTable.getSelectionModel().addListSelectionListener(e -> validateProjectSelection());
-    FilteredTextTableCellRenderer filterRenderer = new FilteredTextTableCellRenderer();
-    projectListTable.setDefaultRenderer(Object.class, filterRenderer);
-
-    // IDEA implementation of instant type-search within a table.
-    new TableSpeedSearch(projectListTable) {
-      // reflect this text in the filter text field.
-      @Override
-      protected void selectElement(Object element, String selectedText) {
-        filterTextField.setText(selectedText);
-        super.selectElement(element, selectedText);
-      }
-    };
-
-    // filter rows based on text field content.
-    filterTextField = new JBTextField();
-    TableRowSorter<TableModel> sorter = new TableRowSorter<>(projectListTableModel);
-    projectListTable.setRowSorter(sorter);
-
-    GeneralFilter filter =
-        new GeneralFilter() {
-          @Override
-          protected boolean include(Entry value, int index) {
-            return value
-                .getStringValue(index)
-                .toLowerCase()
-                .contains(filterTextField.getText().toLowerCase());
-          }
-        };
-    sorter.setRowFilter(filter);
-    // on filter types, update row filter and renderer.
-    filterTextField
-        .getDocument()
-        .addDocumentListener(
-            new DocumentAdapter() {
-              @Override
-              protected void textChanged(DocumentEvent e) {
-                sorter.allRowsChanged();
-                filterRenderer.setFilterText(filterTextField.getText());
-              }
-            });
-
-    refreshAction = new RefreshAction();
-
-    // prepare account combobox model and rendering.
-    accountComboBox = new ComboBox<>();
-    accountComboBox.setRenderer(new AccountComboBoxRenderer());
-    accountComboBox.addActionListener((event) -> updateProjectList());
-
-    // wrapper for center panel that holds either project selection or sign in screen.
-    centerPanelWrapper = new JPanel(new BorderLayout());
-  }
-
-  @VisibleForTesting
   void setCloudProject(CloudProject cloudProject) {
     this.cloudProject = cloudProject;
     updateProjectAccountInformation();
   }
 
-  private CloudProject getCloudProject() {
+  @VisibleForTesting
+  CloudProject getCloudProject() {
     CredentialedUser user = accountComboBox.getItemAt(accountComboBox.getSelectedIndex());
     return CloudProject.create(getSelectedProjectName(), user.getEmail());
   }
@@ -261,6 +201,72 @@ public class ProjectSelectionDialog {
     }
   }
 
+  @VisibleForTesting
+  void createUIComponents() {
+    addAccountButton = new JButton();
+    addAccountButton.addActionListener((event) -> Services.getLoginService().logIn());
+
+    // prepare table model and rendering.
+    projectListTable = new JBTable();
+    projectListTableModel = new ProjectListTableModel();
+    projectListTable.setModel(projectListTableModel);
+    projectListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    projectListTable.getSelectionModel().addListSelectionListener(e -> validateProjectSelection());
+    FilteredTextTableCellRenderer filterRenderer = new FilteredTextTableCellRenderer();
+    projectListTable.setDefaultRenderer(Object.class, filterRenderer);
+
+    // filter rows based on text field content.
+    filterTextField = new JBTextField();
+    TableRowSorter<TableModel> sorter = new TableRowSorter<>(projectListTableModel);
+    projectListTable.setRowSorter(sorter);
+
+    GeneralFilter filter =
+        new GeneralFilter() {
+          @Override
+          protected boolean include(Entry value, int index) {
+            return value
+                .getStringValue(index)
+                .toLowerCase()
+                .contains(filterTextField.getText().toLowerCase());
+          }
+        };
+    sorter.setRowFilter(filter);
+    // on filter types, update row filter and renderer.
+    filterTextField
+        .getDocument()
+        .addDocumentListener(
+            new DocumentAdapter() {
+              @Override
+              protected void textChanged(DocumentEvent e) {
+                sorter.allRowsChanged();
+                filterRenderer.setFilterText(filterTextField.getText());
+              }
+            });
+
+    refreshAction = new RefreshAction();
+
+    // prepare account combobox model and rendering.
+    accountComboBox = new ComboBox<>();
+    accountComboBox.setRenderer(new AccountComboBoxRenderer());
+    accountComboBox.addActionListener((event) -> updateProjectList());
+
+    // wrapper for center panel that holds either project selection or sign in screen.
+    centerPanelWrapper = new JPanel(new BorderLayout());
+  }
+
+  @VisibleForTesting
+  void installTableSpeedSearch(JTable projectListTable) {
+    // IDEA implementation of instant type-search within a table.
+    new TableSpeedSearch(projectListTable) {
+      // reflect this text in the filter text field.
+      @Override
+      protected void selectElement(Object element, String selectedText) {
+        filterTextField.setText(selectedText);
+        super.selectElement(element, selectedText);
+      }
+    };
+  }
+
   private void showSignInRequest() {
     centerPanelWrapper.removeAll();
     centerPanelWrapper.add(signInScreen);
@@ -286,8 +292,9 @@ public class ProjectSelectionDialog {
     }
   }
 
-  // finds if project list contains the project with given name, selects and scrolls to it.
-  private void showProjectInList(String projectName) {
+  /** finds if project list contains the project with given name, selects and scrolls to it. */
+  @VisibleForTesting
+  void showProjectInList(String projectName) {
     for (int i = 0; i < projectListTableModel.getRowCount(); i++) {
       String projectNameAtRow = projectListTableModel.getProjectNameAtRow(i);
       if (projectNameAtRow.equals(projectName)) {
@@ -347,9 +354,7 @@ public class ProjectSelectionDialog {
     Futures.addCallback(future, callback);
   }
 
-  /**
-   * Wraps this form as an IDEA dialog instead of inheriting dialog internals.
-   */
+  /** Wraps this form as an IDEA dialog instead of inheriting dialog internals. */
   @VisibleForTesting
   class ProjectSelectionDialogWrapper extends DialogWrapper {
 
@@ -368,7 +373,7 @@ public class ProjectSelectionDialog {
     @NotNull
     @Override
     protected Action[] createLeftSideActions() {
-      return new Action[]{refreshAction};
+      return new Action[] {refreshAction};
     }
 
     @Override
@@ -415,8 +420,7 @@ public class ProjectSelectionDialog {
         JList list, CredentialedUser user, int index, boolean selected, boolean hasFocus) {
       if (user != null) {
         // use just email if no name is set or email in "()" if set.
-        setText(String
-            .format("%s (%s)", Strings.nullToEmpty(user.getName()), user.getEmail()));
+        setText(String.format("%s (%s)", Strings.nullToEmpty(user.getName()), user.getEmail()));
         setIcon(GoogleLoginIcons.getScaledUserIcon(ProjectSelector.ACCOUNT_ICON_SIZE, user));
       }
     }

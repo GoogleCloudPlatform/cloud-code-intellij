@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.project;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,7 +32,6 @@ import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -58,12 +58,11 @@ public class ProjectSelectionDialogTest {
   private static final String TEST_PROJECT_NAME = "test-1";
 
   private CloudProject testUiProject;
-  private Project testCloudProject;
+  private Project testGoogleProject;
 
   @TestService @Mock private IntegratedGoogleLoginService googleLoginService;
   @Mock private CredentialedUser mockTestUser;
   @Mock private ProjectLoader mockProjectLoader;
-  @Mock private ListenableFuture<List<Project>> mockFuture;
 
   @Mock private JButton mockDialogButton;
   @Mock private ProjectSelectionDialogWrapper dialogWrapper;
@@ -71,20 +70,19 @@ public class ProjectSelectionDialogTest {
   @Spy private ProjectSelectionDialog projectSelectionDialog;
 
   @Before
-  public void setUp() throws Exception {
-    when(mockProjectLoader.loadUserProjectsInBackground(any())).thenReturn(mockFuture);
-
+  public void setUp() {
     projectSelectionDialog.setProjectLoader(mockProjectLoader);
     projectSelectionDialog.setDialogWrapper(dialogWrapper);
     doReturn(mockDialogButton).when(projectSelectionDialog).getDialogButton(any());
+    doNothing().when(projectSelectionDialog).installTableSpeedSearch(any());
 
     projectSelectionDialog.createUIComponents();
     projectSelectionDialog.loadUsersAndProjects();
 
     testUiProject = CloudProject.create(TEST_PROJECT_NAME, TEST_USER_EMAIL);
-    testCloudProject = new Project();
-    testCloudProject.setName(TEST_PROJECT_NAME);
-    testCloudProject.setProjectId(TEST_PROJECT_NAME + "-id");
+    testGoogleProject = new Project();
+    testGoogleProject.setName(TEST_PROJECT_NAME);
+    testGoogleProject.setProjectId(TEST_PROJECT_NAME + "-id");
 
     when(mockTestUser.getEmail()).thenReturn(TEST_USER_EMAIL);
   }
@@ -102,14 +100,15 @@ public class ProjectSelectionDialogTest {
   @Test
   public void existingSignedInUser_signInScreen_notVisible() {
     mockUserList(Collections.singletonList(mockTestUser));
-    projectSelectionDialog.loadUsersAndProjects();
+
+    cleanLoadUsersAndProjects();
 
     assertThat(projectSelectionDialog.getCenterPanelWrapper().getComponent(0))
         .isNotInstanceOf(ProjectSelectorSignInPanel.class);
   }
 
   @Test
-  public void nullProject_activeUser_selected_noProject_selected() {
+  public void nullCloudProject_activeUser_noUiSelection() {
     prepareOneTestUserOneTestProjectDialog(null);
 
     assertThat(projectSelectionDialog.getAccountComboBox().getSelectedItem())
@@ -119,7 +118,7 @@ public class ProjectSelectionDialogTest {
   }
 
   @Test
-  public void emptyCloudProject_activeUser_selected_noProject_selected() {
+  public void emptyCloudProject_activeUser_noUiSelection() {
     prepareOneTestUserOneTestProjectDialog(CloudProject.create("", ""));
 
     assertThat(projectSelectionDialog.getAccountComboBox().getSelectedItem())
@@ -135,22 +134,36 @@ public class ProjectSelectionDialogTest {
     assertThat(projectSelectionDialog.getAccountComboBox().getSelectedItem())
         .isEqualTo(mockTestUser);
     assertThat(projectSelectionDialog.getSelectedProjectName())
-        .isEqualTo(testCloudProject.getName());
+        .isEqualTo(testGoogleProject.getName());
     assertThat(projectSelectionDialog.getProjectListTable().getSelectedRow()).isEqualTo(0);
   }
 
   @Test
-  public void addActiveAccount_noProjects_clearsProjectList()
-      throws InvocationTargetException, InterruptedException {
+  public void getCloudProject_returns_selectedProject() {
+    prepareOneTestUserOneTestProjectDialog(testUiProject);
+    Project secondProject = new Project();
+    secondProject.setName("project-2");
+    secondProject.setProjectId("project-2-id");
+    mockUserProjects(mockTestUser, Arrays.asList(testGoogleProject, secondProject));
+
+    cleanLoadUsersAndProjects();
+    projectSelectionDialog.showProjectInList(secondProject.getName());
+    CloudProject selectedProject = projectSelectionDialog.getCloudProject();
+
+    CloudProject expected = CloudProject.create(secondProject.getName(), mockTestUser.getEmail());
+    assertThat(selectedProject).isEqualTo(expected);
+  }
+
+  @Test
+  public void addActiveAccount_withNoProjects_clearsProjectList() {
     prepareOneTestUserOneTestProjectDialog(testUiProject);
     String activeUserEmail = "active-test@google.com";
     CredentialedUser mockAnotherUser = mock(CredentialedUser.class);
     when(mockAnotherUser.getEmail()).thenReturn(activeUserEmail);
     mockUserList(Arrays.asList(mockAnotherUser /* active */, mockTestUser));
+    mockUserProjects(mockAnotherUser, Collections.emptyList());
 
-    SwingUtilities.invokeAndWait(() -> {
-      projectSelectionDialog.loadUsersAndProjects();
-    });
+    cleanLoadUsersAndProjects();
 
     assertThat(projectSelectionDialog.getAccountComboBox().getSelectedItem())
         .isEqualTo(mockAnotherUser);
@@ -165,14 +178,17 @@ public class ProjectSelectionDialogTest {
    */
   private void prepareOneTestUserOneTestProjectDialog(CloudProject selectedProject) {
     mockUserList(Collections.singletonList(mockTestUser));
-    mockUserProjects(Collections.singletonList(testCloudProject));
+    mockUserProjects(mockTestUser, Collections.singletonList(testGoogleProject));
+    projectSelectionDialog.setCloudProject(selectedProject);
+    cleanLoadUsersAndProjects();
+  }
 
+  /** Loads users and projects and ensures UI events are processed before returning. */
+  private void cleanLoadUsersAndProjects() {
     // wait until UI events are processed.
     try {
-      SwingUtilities.invokeAndWait(() -> {
-        projectSelectionDialog.loadUsersAndProjects();
-        projectSelectionDialog.setCloudProject(selectedProject);
-      });
+      SwingUtilities.invokeAndWait(() -> projectSelectionDialog.loadUsersAndProjects());
+      // second call to wait until project list is updated via invokeLater().
       SwingUtilities.invokeAndWait(() -> {});
     } catch (Exception ex) {
       // this should not happen in the test.
@@ -196,14 +212,21 @@ public class ProjectSelectionDialogTest {
   }
 
   /** Mocks list of project returned for a user when selection dialog calls for it. */
-  private void mockUserProjects(List<Project> projectList) {
-    doAnswer(new Answer() {
-      @Override
-      @SuppressWarnings("unchecked")
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        ((FutureCallback<List<Project>>)invocation.getArgument(1)).onSuccess(projectList);
-        return null;
-      }
-    }).when(projectSelectionDialog).addProjectListFutureCallback(any(), any());
+  private void mockUserProjects(CredentialedUser user, List<Project> projectList) {
+    @SuppressWarnings("unchecked")
+    ListenableFuture<List<Project>> mockFuture =
+        (ListenableFuture<List<Project>>) mock(ListenableFuture.class);
+    when(mockProjectLoader.loadUserProjectsInBackground(user)).thenReturn(mockFuture);
+    doAnswer(
+            new Answer() {
+              @Override
+              @SuppressWarnings("unchecked")
+              public Object answer(InvocationOnMock invocation) {
+                ((FutureCallback<List<Project>>) invocation.getArgument(1)).onSuccess(projectList);
+                return null;
+              }
+            })
+        .when(projectSelectionDialog)
+        .addProjectListFutureCallback(any(), any());
   }
 }
