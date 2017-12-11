@@ -4,7 +4,7 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 ## 17.12.2
 
 ### Fixed
-  - Fixed broken analytics property setup causing dropped analytics. [1733](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1733)
+  - Fixed broken analytics property setup causing dropped analytics. [1773](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1773)
 
 ## 17.12.1
 

@@ -49,7 +49,7 @@
 
       <h3>Fixed</h3>
       <ul>
-        <li>Fixed broken analytics property setup causing dropped analytics. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1733">#1733</a>)</li>
+        <li>Fixed broken analytics property setup causing dropped analytics. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1773">#1773</a>)</li>
       </ul>
 
       <h2>[17.12.1]</h2>
