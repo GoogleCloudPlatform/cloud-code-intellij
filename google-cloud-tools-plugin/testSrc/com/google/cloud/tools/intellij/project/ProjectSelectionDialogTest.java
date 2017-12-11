@@ -99,7 +99,7 @@ public class ProjectSelectionDialogTest {
 
   @Test
   public void existingSignedInUser_signInScreen_notVisible() {
-    mockUserList(Collections.singletonList(mockTestUser));
+    prepareOneTestUserOneTestProjectDialog(testUiProject);
 
     cleanLoadUsersAndProjects();
 
