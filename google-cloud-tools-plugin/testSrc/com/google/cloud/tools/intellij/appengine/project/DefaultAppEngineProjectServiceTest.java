@@ -56,7 +56,7 @@ public class DefaultAppEngineProjectServiceTest extends PlatformTestCase {
   protected void setUp() throws Exception {
     super.setUp();
     // Fixes https://youtrack.jetbrains.com/issue/IDEA-129297. Only occurs in Jenkins.
-    VfsRootAccess.allowRootAccess(System.getProperty("user.dir"));
+//    VfsRootAccess.allowRootAccess(System.getProperty("user.dir"));
     appEngineProjectService = new DefaultAppEngineProjectService();
   }
 
