@@ -34,6 +34,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.ListCellRendererWrapper;
+import com.intellij.ui.TableSpeedSearch;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.table.JBTable;
 import git4idea.DialogManager;
@@ -135,6 +136,16 @@ public class ProjectSelectionDialog {
     projectListTable.getSelectionModel().addListSelectionListener(e -> validateProjectSelection());
     FilteredTextTableCellRenderer filterRenderer = new FilteredTextTableCellRenderer();
     projectListTable.setDefaultRenderer(Object.class, filterRenderer);
+
+    // IDEA implementation of instant type-search within a table.
+    new TableSpeedSearch(projectListTable) {
+      // reflect this text in the filter text field.
+      @Override
+      protected void selectElement(Object element, String selectedText) {
+        filterTextField.setText(selectedText);
+        super.selectElement(element, selectedText);
+      }
+    };
 
     // filter rows based on text field content.
     filterTextField = new JBTextField();
