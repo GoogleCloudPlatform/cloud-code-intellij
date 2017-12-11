@@ -42,8 +42,8 @@ import javax.swing.tree.TreeNode;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * This model item represents a {@link IntegratedIntellijGoogleLoginService} credentialed user in the treeview
- * of the project selector.
+ * This model item represents a {@link IntegratedIntellijGoogleLoginService} credentialed user in
+ * the treeview of the project selector.
  */
 @SuppressWarnings("FutureReturnValueIgnored")
 class GoogleUserModelItem extends DefaultMutableTreeNode {

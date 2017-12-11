@@ -23,9 +23,7 @@ import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Creates a Usage Tracking item in the settings.
- */
+/** Creates a Usage Tracking item in the settings. */
 public class UsageTrackerConfigurable implements Configurable {
 
   private UsageTrackerPanel usageTrackerPanel;

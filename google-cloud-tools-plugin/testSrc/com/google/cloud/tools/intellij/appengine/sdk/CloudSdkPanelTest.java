@@ -26,13 +26,11 @@ import static org.mockito.Mockito.when;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.util.containers.HashSet;
-
+import java.util.Collections;
+import java.util.Set;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.picocontainer.MutablePicoContainer;
-
-import java.util.Collections;
-import java.util.Set;
 
 /** Tests for {@link CloudSdkPanel}. */
 public class CloudSdkPanelTest extends PlatformTestCase {

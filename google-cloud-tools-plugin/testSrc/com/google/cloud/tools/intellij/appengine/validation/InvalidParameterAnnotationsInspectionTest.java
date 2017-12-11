@@ -16,7 +16,6 @@
 package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.google.cloud.tools.intellij.appengine.GctConstants;
-
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
@@ -26,21 +25,19 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.testFramework.MockProblemDescriptor;
 
-/**
- * Tests for {@link InvalidParameterAnnotationsInspection}
- */
+/** Tests for {@link InvalidParameterAnnotationsInspection} */
 public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase {
   /**
-   * Tests that when a name is not specified in the path attribute of an @ApiMethod,
-   * no InvalidParameterAnnotationsInspection error produced.
+   * Tests that when a name is not specified in the path attribute of an @ApiMethod, no
+   * InvalidParameterAnnotationsInspection error produced.
    */
   public void testPathAttributeWithNoNameDeclared() {
     doTest();
   }
 
   /**
-   * Tests that when a variable name is specified in the path attribute of an @ApiMethod,
-   * and the corresponding method parameter has @DefaultValue, an InvalidParameterAnnotationsInspection
+   * Tests that when a variable name is specified in the path attribute of an @ApiMethod, and the
+   * corresponding method parameter has @DefaultValue, an InvalidParameterAnnotationsInspection
    * error is produced.
    */
   public void testPathNameWithDefaultValueAnnotation() {
@@ -48,41 +45,43 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
   }
 
   /**
-   * Tests that when a variable name is specified in the path attribute of an @ApiMethod,
-   * and the corresponding method parameter has @Nullable, an InvalidParameterAnnotationsInspection
-   * error is produced.
+   * Tests that when a variable name is specified in the path attribute of an @ApiMethod, and the
+   * corresponding method parameter has @Nullable, an InvalidParameterAnnotationsInspection error is
+   * produced.
    */
   public void testPathNameWithNullableAnnotation() {
     doTest();
   }
 
   /**
-   * Tests that when a variable name is specified in the path attribute of an @ApiMethod,
-   * and the corresponding method parameter does not have @Nullable or @DefaultValue,
-   * no InvalidParameterAnnotationsInspection error is produced.
+   * Tests that when a variable name is specified in the path attribute of an @ApiMethod, and the
+   * corresponding method parameter does not have @Nullable or @DefaultValue, no
+   * InvalidParameterAnnotationsInspection error is produced.
    */
   public void testPathNameWithNoNullableOrDefaultValue() {
     doTest();
   }
 
   /**
-   * Tests that the Quick fix for a parameter with no annotation returns the same
-   * parameter unchanged.
+   * Tests that the Quick fix for a parameter with no annotation returns the same parameter
+   * unchanged.
    */
   public void testQuickFix_noAnnotation() {
     Project myProject = myFixture.getProject();
-    PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
-      .createParameter("param", PsiType.BOOLEAN);
+    PsiParameter parameter =
+        JavaPsiFacade.getInstance(myProject)
+            .getElementFactory()
+            .createParameter("param", PsiType.BOOLEAN);
     runQuickFixTest(parameter, "boolean param");
   }
 
-  /**
-   * Test that the Quick fix for a parameter with @Named returns the same parameter unchanged.
-   */
+  /** Test that the Quick fix for a parameter with @Named returns the same parameter unchanged. */
   public void testQuickFix_withNamedAnnotation() {
     Project myProject = myFixture.getProject();
-    PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
-      .createParameter("param", PsiType.BOOLEAN);
+    PsiParameter parameter =
+        JavaPsiFacade.getInstance(myProject)
+            .getElementFactory()
+            .createParameter("param", PsiType.BOOLEAN);
     parameter.getModifierList().addAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NAMED);
     runQuickFixTest(parameter, "@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED + " boolean param");
   }
@@ -93,8 +92,10 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    */
   public void testQuickFix_withGaeNullableAnnotation() {
     Project myProject = myFixture.getProject();
-    PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
-      .createParameter("param", PsiType.BOOLEAN);
+    PsiParameter parameter =
+        JavaPsiFacade.getInstance(myProject)
+            .getElementFactory()
+            .createParameter("param", PsiType.BOOLEAN);
     parameter.getModifierList().addAnnotation(GctConstants.APP_ENGINE_ANNOTATION_NULLABLE);
     runQuickFixTest(parameter, " boolean param");
   }
@@ -105,8 +106,10 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    */
   public void testQuickFix_withJavaxNullableAnnotation() {
     Project myProject = myFixture.getProject();
-    PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
-      .createParameter("param", PsiType.BOOLEAN);
+    PsiParameter parameter =
+        JavaPsiFacade.getInstance(myProject)
+            .getElementFactory()
+            .createParameter("param", PsiType.BOOLEAN);
     parameter.getModifierList().addAnnotation("javax.annotation.Nullable");
     runQuickFixTest(parameter, " boolean param");
   }
@@ -117,28 +120,34 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
    */
   public void testQuickFix_withDefaultAnnotation() {
     Project myProject = myFixture.getProject();
-    PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
-      .createParameter("param", PsiType.BOOLEAN);
+    PsiParameter parameter =
+        JavaPsiFacade.getInstance(myProject)
+            .getElementFactory()
+            .createParameter("param", PsiType.BOOLEAN);
     parameter.getModifierList().addAnnotation(GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
     runQuickFixTest(parameter, " boolean param");
   }
 
   /**
-   * Tests that the Quick fix for a parameter with the javax @Nullable and @DefaultValue returns
-   * the parameter without @Nullable and @DefaultValue.
+   * Tests that the Quick fix for a parameter with the javax @Nullable and @DefaultValue returns the
+   * parameter without @Nullable and @DefaultValue.
    */
   public void testQuickFix_withJavaxNullableAndDefaultAnnotation() {
     Project myProject = myFixture.getProject();
-    PsiParameter parameter = JavaPsiFacade.getInstance(myProject).getElementFactory()
-      .createParameter("param", PsiType.BOOLEAN);
+    PsiParameter parameter =
+        JavaPsiFacade.getInstance(myProject)
+            .getElementFactory()
+            .createParameter("param", PsiType.BOOLEAN);
     parameter.getModifierList().addAnnotation("javax.annotation.Nullable");
     parameter.getModifierList().addAnnotation(GctConstants.APP_ENGINE_ANNOTATION_DEFAULT_VALUE);
     runQuickFixTest(parameter, " boolean param");
   }
 
   private void runQuickFixTest(PsiParameter parameter, String expectedString) {
-    InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix = new InvalidParameterAnnotationsInspection.MyQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR);
+    InvalidParameterAnnotationsInspection.MyQuickFix myQuickFix =
+        new InvalidParameterAnnotationsInspection.MyQuickFix();
+    MockProblemDescriptor problemDescriptor =
+        new MockProblemDescriptor(parameter, "", ProblemHighlightType.ERROR);
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);
     assertEquals(expectedString, parameter.getText());
   }
@@ -148,6 +157,7 @@ public class InvalidParameterAnnotationsInspectionTest extends EndpointTestBase 
     String testName = getTestName(true);
     myFixture.setTestDataPath(getTestDataPath());
     LocalInspectionToolWrapper toolWrapper = new LocalInspectionToolWrapper(localInspectionTool);
-    myFixture.testInspection("inspections/invalidParameterAnnotationsInspection/" + testName, toolWrapper);
+    myFixture.testInspection(
+        "inspections/invalidParameterAnnotationsInspection/" + testName, toolWrapper);
   }
 }

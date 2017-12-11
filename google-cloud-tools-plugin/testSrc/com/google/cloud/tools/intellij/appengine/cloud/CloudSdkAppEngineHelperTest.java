@@ -53,8 +53,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
   CloudSdkAppEngineHelper helper;
   @Mock private AppEngineDeploymentConfiguration deploymentConfiguration;
-  @Mock
-  private IntegratedGoogleLoginService googleLoginService;
+  @Mock private IntegratedGoogleLoginService googleLoginService;
   @Mock private CredentialedUser credentialedUser;
   @Mock private GoogleLoginState loginState;
   @Mock private LoggingHandler loggingHandler;
@@ -103,11 +102,9 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
   @Test
   public void testCreateDeployRunnerInvalidDeploymentSourceType_returnsNull() {
-    Optional<CancellableRunnable> runner = helper.createDeployRunner(
-        loggingHandler,
-        undeployableDeploymentSource,
-        deploymentConfiguration,
-        callback);
+    Optional<CancellableRunnable> runner =
+        helper.createDeployRunner(
+            loggingHandler, undeployableDeploymentSource, deploymentConfiguration, callback);
 
     assertFalse(runner.isPresent());
     verify(callback, times(1)).errorOccurred("Invalid deployment source.");
@@ -159,8 +156,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     when(flexSource.getFile()).thenReturn(mockSourceFile);
 
     Optional<CancellableRunnable> runner =
-        helper.createDeployRunner(
-            loggingHandler, flexSource, deploymentConfiguration, callback);
+        helper.createDeployRunner(loggingHandler, flexSource, deploymentConfiguration, callback);
 
     assertFalse(runner.isPresent());
     verify(callback, times(1)).errorOccurred("No app.yaml specified for flexible deployment.");

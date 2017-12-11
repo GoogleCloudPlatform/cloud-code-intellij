@@ -18,10 +18,9 @@ package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
+import com.google.cloud.tools.intellij.debugger.CloudBreakpointHandler;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcess;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessHandler;
-import com.google.cloud.tools.intellij.debugger.CloudBreakpointHandler;
-
 import com.intellij.ide.ui.UISettings;
 import com.intellij.mock.MockApplication;
 import com.intellij.mock.MockApplicationEx;
@@ -34,7 +33,9 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.xdebugger.XDebugSession;
-
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
@@ -42,11 +43,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JComponent;
 
 public class CloudDebugHistoricalSnapshotsTest {
 
@@ -60,8 +56,17 @@ public class CloudDebugHistoricalSnapshotsTest {
     ActionManagerEx manager = Mockito.mock(ActionManagerEx.class);
     ActionToolbar actionToolbar = Mockito.mock(ActionToolbar.class);
     Mockito.when(actionToolbar.getComponent()).thenReturn(new JComponent() {});
-    Mockito.when(manager.createActionToolbar(Mockito.anyString(), Mockito.any(ActionGroup.class), Mockito.anyBoolean())).thenReturn(actionToolbar);
-    Mockito.when(manager.createActionToolbar(Mockito.anyString(), Mockito.any(ActionGroup.class), Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(actionToolbar);
+    Mockito.when(
+            manager.createActionToolbar(
+                Mockito.anyString(), Mockito.any(ActionGroup.class), Mockito.anyBoolean()))
+        .thenReturn(actionToolbar);
+    Mockito.when(
+            manager.createActionToolbar(
+                Mockito.anyString(),
+                Mockito.any(ActionGroup.class),
+                Mockito.anyBoolean(),
+                Mockito.anyBoolean()))
+        .thenReturn(actionToolbar);
     application.addComponent(ActionManager.class, manager);
     application.registerService(UISettings.class);
     ApplicationManager.setApplication(application, parent);
@@ -158,14 +163,13 @@ public class CloudDebugHistoricalSnapshotsTest {
   }
 
   private void runModelSetter(CloudDebugHistoricalSnapshots snapshots) {
-    (snapshots.new ModelSetter(mockProcess.getCurrentBreakpointList(),
-        snapshots.getSelection())).run();
+    (snapshots.new ModelSetter(mockProcess.getCurrentBreakpointList(), snapshots.getSelection()))
+        .run();
   }
 
   private static class MockDisposable implements Disposable {
     @Override
-    public void dispose() {
-    }
+    public void dispose() {}
   }
 
   private static class MyMockApplicationEx extends MockApplicationEx {
@@ -173,10 +177,14 @@ public class CloudDebugHistoricalSnapshotsTest {
       super(parent);
     }
 
-
     @Override
-    public boolean runProcessWithProgressSynchronously(@NotNull Runnable task, @NotNull String progressTitle,
-        boolean canBeCanceled, @Nullable Project project, JComponent parentComponent, String cancelText) {
+    public boolean runProcessWithProgressSynchronously(
+        @NotNull Runnable task,
+        @NotNull String progressTitle,
+        boolean canBeCanceled,
+        @Nullable Project project,
+        JComponent parentComponent,
+        String cancelText) {
       task.run();
       return true;
     }

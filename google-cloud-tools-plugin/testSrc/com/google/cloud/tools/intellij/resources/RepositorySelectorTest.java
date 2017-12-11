@@ -28,13 +28,9 @@ import com.google.cloud.tools.intellij.resources.RepositorySelector.ProjectNotSe
 import com.google.cloud.tools.intellij.resources.RepositorySelector.RepositoryPanel;
 import com.google.cloud.tools.intellij.vcs.CloudRepositoryService;
 import com.google.cloud.tools.intellij.vcs.CloudRepositoryService.CloudRepositoryServiceException;
-
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.ui.awt.RelativePoint;
-
-import org.picocontainer.MutablePicoContainer;
-
 import java.awt.Point;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -43,14 +39,12 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import org.picocontainer.MutablePicoContainer;
 
-/**
- * Tests for {@link RepositorySelector}.
- */
+/** Tests for {@link RepositorySelector}. */
 public class RepositorySelectorTest extends PlatformTestCase {
 
   private CloudRepositoryService repositoryService;
@@ -59,8 +53,8 @@ public class RepositorySelectorTest extends PlatformTestCase {
   public void setUp() throws Exception {
     super.setUp();
 
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
+    MutablePicoContainer applicationContainer =
+        (MutablePicoContainer) ApplicationManager.getApplication().getPicoContainer();
 
     repositoryService = mock(CloudRepositoryService.class);
 
@@ -115,10 +109,8 @@ public class RepositorySelectorTest extends PlatformTestCase {
   }
 
   private JPanel getMissingProjectPanel() {
-    RepositorySelector selector = new RepositorySelector(
-        null /*cloudProject*/,
-        null /*user*/,
-        false /*canCreateRepository*/);
+    RepositorySelector selector =
+        new RepositorySelector(null /*cloudProject*/, null /*user*/, false /*canCreateRepository*/);
 
     selector.showPopup(new RelativePoint(selector, new Point(0, 0)));
 
@@ -126,8 +118,8 @@ public class RepositorySelectorTest extends PlatformTestCase {
   }
 
   /**
-   * Extracts the content of the repository tree
-   * e.g. a missing repositories message, or the repositories themseleves (only the first item).
+   * Extracts the content of the repository tree e.g. a missing repositories message, or the
+   * repositories themseleves (only the first item).
    */
   private Object getPanelObject(JPanel panel) {
     // Shows the repositories panel
@@ -147,14 +139,16 @@ public class RepositorySelectorTest extends PlatformTestCase {
     return children.nextElement();
   }
 
-  private RepositorySelector getEmptyRepositoriesPanel() throws IOException, GeneralSecurityException {
+  private RepositorySelector getEmptyRepositoriesPanel()
+      throws IOException, GeneralSecurityException {
     when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
         .thenReturn(CompletableFuture.completedFuture(new ListReposResponse()));
 
     return getSelector(true /*openPopup*/);
   }
 
-  private RepositorySelector getPopulatedRepositoriesPanel(boolean openPopup) throws IOException, GeneralSecurityException {
+  private RepositorySelector getPopulatedRepositoriesPanel(boolean openPopup)
+      throws IOException, GeneralSecurityException {
     ListReposResponse reposResponse = new ListReposResponse();
     reposResponse.setRepos(createRepos());
 
@@ -165,10 +159,11 @@ public class RepositorySelectorTest extends PlatformTestCase {
   }
 
   private RepositorySelector getErrorRepositoryPanel() {
-    CompletableFuture<ListReposResponse> failedListing
-        = CompletableFuture.supplyAsync(() -> {
-      throw new CloudRepositoryServiceException();
-    });
+    CompletableFuture<ListReposResponse> failedListing =
+        CompletableFuture.supplyAsync(
+            () -> {
+              throw new CloudRepositoryServiceException();
+            });
     failedListing.completeExceptionally(new CloudRepositoryServiceException());
 
     when(repositoryService.listAsync(any(CredentialedUser.class), anyString()))
@@ -200,9 +195,7 @@ public class RepositorySelectorTest extends PlatformTestCase {
 
   private RepositorySelector createInitializedSelector() {
     return new RepositorySelector(
-        "my-project",
-        mock(CredentialedUser.class),
-        false /*canCreateRepository*/);
+        "my-project", mock(CredentialedUser.class), false /*canCreateRepository*/);
   }
 
   @Override

@@ -22,9 +22,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import org.apache.commons.lang.WordUtils;
 
-/**
- * Defines the available App Engine standard maven-sourced libraries.
- */
+/** Defines the available App Engine standard maven-sourced libraries. */
 public enum AppEngineStandardMavenLibrary {
   SERVLET_API(
       GctBundle.message("appengine.library.servlet.api.name"),
@@ -65,7 +63,8 @@ public enum AppEngineStandardMavenLibrary {
 
   private static final String RELEASE_VERSION_ID = "RELEASE";
 
-  AppEngineStandardMavenLibrary(String displayName,
+  AppEngineStandardMavenLibrary(
+      String displayName,
       String groupId,
       String artifactId,
       String version,

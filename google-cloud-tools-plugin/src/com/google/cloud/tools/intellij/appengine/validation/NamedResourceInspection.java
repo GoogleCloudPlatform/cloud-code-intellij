@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.appengine.GctConstants;
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
 import com.google.common.collect.Maps;
-
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -35,12 +34,10 @@ import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
-
+import java.util.Map;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
 
 /**
  * Inspection to check named resource names for a parameters for a single endpoint method are unique
@@ -49,7 +46,8 @@ import java.util.Map;
 public class NamedResourceInspection extends EndpointInspectionBase {
 
   public enum NamedResourceError {
-    MISSING_NAME, DUPLICATE_PARAMETER
+    MISSING_NAME,
+    DUPLICATE_PARAMETER
   }
 
   @Override
@@ -98,8 +96,8 @@ public class NamedResourceInspection extends EndpointInspectionBase {
         }
       }
 
-      private void validateMethodNameUnique(PsiParameter psiParameter,
-          Map<String, PsiParameter> methodNames) {
+      private void validateMethodNameUnique(
+          PsiParameter psiParameter, Map<String, PsiParameter> methodNames) {
         PsiModifierList modifierList = psiParameter.getModifierList();
         if (modifierList == null) {
           return;
@@ -116,8 +114,8 @@ public class NamedResourceInspection extends EndpointInspectionBase {
         PsiNameValuePair[] nameValuePairs = annotation.getParameterList().getAttributes();
         if (nameValuePairs.length == 0) {
           // For @Named, @Named()
-          holder.registerProblem(annotation, "Parameter name must be specified.",
-              new MissingNameQuickFix());
+          holder.registerProblem(
+              annotation, "Parameter name must be specified.", new MissingNameQuickFix());
           return;
         } else if (nameValuePairs.length != 1) {
           return;
@@ -137,8 +135,8 @@ public class NamedResourceInspection extends EndpointInspectionBase {
 
         // For @Named("")
         if (nameValue.isEmpty()) {
-          holder.registerProblem(annotation, "Parameter name must be specified.",
-              new MissingNameQuickFix());
+          holder.registerProblem(
+              annotation, "Parameter name must be specified.", new MissingNameQuickFix());
           return;
         }
 
@@ -146,16 +144,16 @@ public class NamedResourceInspection extends EndpointInspectionBase {
         if (seenParameter == null) {
           methodNames.put(nameValue, psiParameter);
         } else {
-          holder.registerProblem(annotation, "Duplicate parameter name: " + nameValue
-              + ". Parameter names must be unique.", new DuplicateNameQuickFix());
+          holder.registerProblem(
+              annotation,
+              "Duplicate parameter name: " + nameValue + ". Parameter names must be unique.",
+              new DuplicateNameQuickFix());
         }
       }
     };
   }
 
-  /**
-   * LocalQuickFix to add "_1" to the end of a query name as specified by @Named.
-   */
+  /** LocalQuickFix to add "_1" to the end of a query name as specified by @Named. */
   public class DuplicateNameQuickFix implements LocalQuickFix {
 
     @NotNull
@@ -170,9 +168,7 @@ public class NamedResourceInspection extends EndpointInspectionBase {
       return getDisplayName();
     }
 
-    /**
-     * Adds "_1" to the query name in an @Named annotation in <code>descriptor</code>.
-     */
+    /** Adds "_1" to the query name in an @Named annotation in <code>descriptor</code>. */
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
       PsiElement element = descriptor.getPsiElement();
@@ -203,10 +199,12 @@ public class NamedResourceInspection extends EndpointInspectionBase {
 
       // Create new annotation with  value equal to  @Named's value plus "_1"
       String newNamedValue =
-          "@Named(\"" + EndpointUtilities.removeBeginningAndEndingQuotes(memberValue.getText())
+          "@Named(\""
+              + EndpointUtilities.removeBeginningAndEndingQuotes(memberValue.getText())
               + "_1\")";
       PsiAnnotation newAnnotation =
-          JavaPsiFacade.getInstance(project).getElementFactory()
+          JavaPsiFacade.getInstance(project)
+              .getElementFactory()
               .createAnnotationFromText(newNamedValue, null);
       assert (newAnnotation.getParameterList().getAttributes().length == 1);
 
@@ -215,9 +213,7 @@ public class NamedResourceInspection extends EndpointInspectionBase {
     }
   }
 
-  /**
-   * LocalQuickFix to add a query name to an @Named without a specified query name.
-   */
+  /** LocalQuickFix to add a query name to an @Named without a specified query name. */
   public class MissingNameQuickFix implements LocalQuickFix {
 
     private static final String DEFAULT_PARAMETER_NAME = "myName";
@@ -268,7 +264,8 @@ public class NamedResourceInspection extends EndpointInspectionBase {
       // Create dummy annotation with replacement value
       String newNamedValue = "@Named(\"" + nameValue + "\")";
       PsiAnnotation newAnnotation =
-          JavaPsiFacade.getInstance(project).getElementFactory()
+          JavaPsiFacade.getInstance(project)
+              .getElementFactory()
               .createAnnotationFromText(newNamedValue, null);
       assert (newAnnotation.getParameterList().getAttributes().length == 1);
 
@@ -277,4 +274,3 @@ public class NamedResourceInspection extends EndpointInspectionBase {
     }
   }
 }
-

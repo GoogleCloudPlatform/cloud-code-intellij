@@ -21,15 +21,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Package internal only interface used for providing multiple ping implementations to the
- * {@link TrackingEventBuilder}.
+ * Package internal only interface used for providing multiple ping implementations to the {@link
+ * TrackingEventBuilder}.
  */
 interface SendsEvents {
 
-  /**
-   * When tracking events, do NOT include any information that can identify the user.
-   */
-  void sendEvent(@NotNull String eventCategory,
+  /** When tracking events, do NOT include any information that can identify the user. */
+  void sendEvent(
+      @NotNull String eventCategory,
       @NotNull String eventAction,
       @Nullable Map<String, String> metadataMap);
 }

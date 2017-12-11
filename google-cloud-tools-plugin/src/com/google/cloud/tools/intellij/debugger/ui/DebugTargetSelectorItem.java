@@ -20,6 +20,4 @@ package com.google.cloud.tools.intellij.debugger.ui;
  * Parent class to serve as a base for actual debug targets or specific child classes used e.g. for
  * error handling
  */
-interface DebugTargetSelectorItem {
-
-}
+interface DebugTargetSelectorItem {}

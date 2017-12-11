@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.util;
 
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
-
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
@@ -31,7 +30,6 @@ import com.intellij.packaging.impl.artifacts.ArtifactManagerImpl;
 import com.intellij.packaging.impl.artifacts.JarArtifactType;
 import com.intellij.packaging.impl.elements.ArchivePackagingElement;
 import com.intellij.testFramework.PlatformTestCase;
-
 import java.util.Optional;
 
 /** Tests for {@link AppEngineUtil}. */

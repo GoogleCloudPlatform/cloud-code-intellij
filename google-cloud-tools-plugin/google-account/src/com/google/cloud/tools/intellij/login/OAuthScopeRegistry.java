@@ -21,9 +21,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Holds the list of OAuth2 scopes for Google Login.
- */
+/** Holds the list of OAuth2 scopes for Google Login. */
 class OAuthScopeRegistry {
   private static final SortedSet<String> SCOPES;
 

@@ -15,6 +15,9 @@
  */
 package com.google.cloud.tools.intellij.compiler.artifacts;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
@@ -31,21 +34,17 @@ import com.intellij.packaging.elements.PackagingElementResolvingContext;
 import com.intellij.packaging.impl.elements.ArchivePackagingElement;
 import com.intellij.packaging.impl.elements.DirectoryPackagingElement;
 import com.intellij.packaging.impl.elements.ManifestFileUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author nik
- *
- * todo: this class is copied from compiler-impl tests. We need to extract compiler tests framework to a separate artifact and use it instead.
+ *     <p>todo: this class is copied from compiler-impl tests. We need to extract compiler tests
+ *     framework to a separate artifact and use it instead.
  */
 public class ArtifactsTestUtil {
   public static String printToString(PackagingElement element, int level) {
@@ -99,24 +98,34 @@ public class ArtifactsTestUtil {
     assertEquals(expected, findArtifact(project, artifactName).getRootElement().getName());
   }
 
-  public static void setOutput(final Project project, final String artifactName, final String outputPath) {
+  public static void setOutput(
+      final Project project, final String artifactName, final String outputPath) {
     new WriteAction() {
       @Override
       protected void run(@NotNull final Result result) {
-        final ModifiableArtifactModel model = ArtifactManager.getInstance(project).createModifiableModel();
-        model.getOrCreateModifiableArtifact(findArtifact(project, artifactName)).setOutputPath(outputPath);
+        final ModifiableArtifactModel model =
+            ArtifactManager.getInstance(project).createModifiableModel();
+        model
+            .getOrCreateModifiableArtifact(findArtifact(project, artifactName))
+            .setOutputPath(outputPath);
         model.commit();
       }
     }.execute();
   }
 
-  public static void addArtifactToLayout(final Project project, final Artifact parent, final Artifact toAdd) {
+  public static void addArtifactToLayout(
+      final Project project, final Artifact parent, final Artifact toAdd) {
     new WriteAction() {
       @Override
       protected void run(@NotNull final Result result) {
-        final ModifiableArtifactModel model = ArtifactManager.getInstance(project).createModifiableModel();
-        final PackagingElement<?> artifactElement = PackagingElementFactory.getInstance().createArtifactElement(toAdd, project);
-        model.getOrCreateModifiableArtifact(parent).getRootElement().addOrFindChild(artifactElement);
+        final ModifiableArtifactModel model =
+            ArtifactManager.getInstance(project).createModifiableModel();
+        final PackagingElement<?> artifactElement =
+            PackagingElementFactory.getInstance().createArtifactElement(toAdd, project);
+        model
+            .getOrCreateModifiableArtifact(parent)
+            .getRootElement()
+            .addOrFindChild(artifactElement);
         model.commit();
       }
     }.execute();
@@ -129,21 +138,26 @@ public class ArtifactsTestUtil {
     return artifact;
   }
 
-  public static void assertManifest(Artifact artifact, PackagingElementResolvingContext context, @Nullable String mainClass, @Nullable String classpath) {
+  public static void assertManifest(
+      Artifact artifact,
+      PackagingElementResolvingContext context,
+      @Nullable String mainClass,
+      @Nullable String classpath) {
     final CompositePackagingElement<?> rootElement = artifact.getRootElement();
     final ArtifactType type = artifact.getArtifactType();
     assertManifest(rootElement, context, type, mainClass, classpath);
   }
 
-  public static void assertManifest(CompositePackagingElement<?> rootElement,
-                                    PackagingElementResolvingContext context,
-                                    ArtifactType type,
-                                    @Nullable String mainClass, @Nullable String classpath) {
+  public static void assertManifest(
+      CompositePackagingElement<?> rootElement,
+      PackagingElementResolvingContext context,
+      ArtifactType type,
+      @Nullable String mainClass,
+      @Nullable String classpath) {
     final VirtualFile file = ManifestFileUtil.findManifestFile(rootElement, context, type);
     assertNotNull(file);
     final Manifest manifest = ManifestFileUtil.readManifest(file);
     assertEquals(mainClass, manifest.getMainAttributes().getValue(Attributes.Name.MAIN_CLASS));
     assertEquals(classpath, manifest.getMainAttributes().getValue(Attributes.Name.CLASS_PATH));
   }
-
 }

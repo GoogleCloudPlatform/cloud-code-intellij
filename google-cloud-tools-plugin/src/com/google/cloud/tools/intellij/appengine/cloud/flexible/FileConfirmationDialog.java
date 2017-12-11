@@ -17,20 +17,16 @@
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.nio.file.Path;
-
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A dialog warning for, e.g., overwriting existing app.yaml and Dockerfile configuration files when
@@ -39,7 +35,9 @@ import javax.swing.JTextField;
 public class FileConfirmationDialog extends DialogWrapper {
 
   public enum DialogType {
-    CONFIRM_OVERWRITE, CONFIRM_CREATE_DIR, NOT_DIRECTORY_ERROR
+    CONFIRM_OVERWRITE,
+    CONFIRM_CREATE_DIR,
+    NOT_DIRECTORY_ERROR
   }
 
   private JPanel rootPanel;
@@ -48,9 +46,7 @@ public class FileConfirmationDialog extends DialogWrapper {
 
   private DialogType dialogType;
 
-  /**
-   * Initialize the dialog of the correct type.
-   */
+  /** Initialize the dialog of the correct type. */
   public FileConfirmationDialog(
       @Nullable Project project, DialogType dialogType, @NotNull Path targetPath) {
     super(project);
@@ -91,7 +87,7 @@ public class FileConfirmationDialog extends DialogWrapper {
   @Override
   protected Action[] createActions() {
     if (dialogType == DialogType.NOT_DIRECTORY_ERROR) {
-      return new Action[]{getOKAction()};
+      return new Action[] {getOKAction()};
     } else {
       return super.createActions();
     }

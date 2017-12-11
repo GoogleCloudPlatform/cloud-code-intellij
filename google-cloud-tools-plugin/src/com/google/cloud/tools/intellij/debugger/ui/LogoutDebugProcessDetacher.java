@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.gdt.eclipse.login.common.LoginListener;
-
 import com.intellij.execution.process.ProcessHandler;
 
 /**

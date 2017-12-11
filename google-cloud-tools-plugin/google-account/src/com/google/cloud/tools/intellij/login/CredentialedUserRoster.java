@@ -95,9 +95,7 @@ public class CredentialedUserRoster {
     }
   }
 
-  /**
-   * If there is an active user, makes the active use no longer active.
-   */
+  /** If there is an active user, makes the active use no longer active. */
   public void removeActiveUser() {
     synchronized (this) {
       if (activeUser != null) {
@@ -169,9 +167,7 @@ public class CredentialedUserRoster {
     }
   }
 
-  /**
-   * Removes all logged in users. There is no active user after this.
-   */
+  /** Removes all logged in users. There is no active user after this. */
   public void removeAllUsers() {
     synchronized (this) {
       allUsers.clear();

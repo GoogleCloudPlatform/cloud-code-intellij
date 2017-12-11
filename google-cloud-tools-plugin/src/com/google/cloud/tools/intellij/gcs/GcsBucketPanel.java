@@ -79,14 +79,13 @@ final class GcsBucketPanel {
     bucketList.setFixedCellHeight(25);
     bucketList.setBackground(bucketListPanel.getBackground());
 
-    projectSelector
-        .addTextChangedListener(
-            new DocumentAdapter() {
-              @Override
-              protected void textChanged(DocumentEvent event) {
-                refresh();
-              }
-            });
+    projectSelector.addTextChangedListener(
+        new DocumentAdapter() {
+          @Override
+          protected void textChanged(DocumentEvent event) {
+            refresh();
+          }
+        });
 
     bucketList.addMouseListener(
         new MouseAdapter() {

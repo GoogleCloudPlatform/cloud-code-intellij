@@ -23,7 +23,6 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
@@ -48,11 +47,6 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.xmlb.SkipDefaultValuesSerializationFilters;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Tag;
-
-import org.jdom.Element;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -60,12 +54,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * @author nik
- */
-public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStartupOnly,
-    RunConfiguration, Cloneable {
+/** @author nik */
+public class AppEngineServerModel
+    implements ServerModel, DeploysArtifactsOnStartupOnly, RunConfiguration, Cloneable {
 
   public static final String JVM_FLAG_DELIMITER = " ";
   private ArtifactPointer artifactPointer;
@@ -92,8 +87,10 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   @Override
   @NotNull
   public String getDefaultUrlForBrowser() {
-    String host = settings.getHost() != null && settings.getHost().compareTo("") != 0
-        ? settings.getHost() : commonModel.getHost();
+    String host =
+        settings.getHost() != null && settings.getHost().compareTo("") != 0
+            ? settings.getHost()
+            : commonModel.getHost();
     return "http://" + host + ":" + settings.getPort();
   }
 
@@ -103,8 +100,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   @Override
-  public OutputProcessor createOutputProcessor(ProcessHandler processHandler,
-      J2EEServerInstance serverInstance) {
+  public OutputProcessor createOutputProcessor(
+      ProcessHandler processHandler, J2EEServerInstance serverInstance) {
     return new DefaultOutputProcessor(processHandler);
   }
 
@@ -132,8 +129,10 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     }
 
     AppEngineUtil.findAppEngineStandardFacet(commonModel.getProject(), artifact)
-        .orElseThrow(() -> new RuntimeConfigurationWarning(
-            "App Engine facet not found in '" + artifact.getName() + "' artifact"));
+        .orElseThrow(
+            () ->
+                new RuntimeConfigurationWarning(
+                    "App Engine facet not found in '" + artifact.getName() + "' artifact"));
 
     if (!CloudSdkService.getInstance().isValidCloudSdk()) {
       throw new RuntimeConfigurationError(
@@ -162,9 +161,7 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     return clone;
   }
 
-  /**
-   * Only to be used in cloning.
-   */
+  /** Only to be used in cloning. */
   private void setSettings(AppEngineModelSettings settings) {
     this.settings = settings;
   }
@@ -179,8 +176,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
     XmlSerializer.deserializeInto(settings, element);
     final String artifactName = settings.getArtifact();
     if (artifactName != null) {
-      artifactPointer = ArtifactPointerManager.getInstance(commonModel.getProject())
-          .createPointer(artifactName);
+      artifactPointer =
+          ArtifactPointerManager.getInstance(commonModel.getProject()).createPointer(artifactName);
     } else {
       artifactPointer = null;
     }
@@ -198,8 +195,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
   public void setArtifact(@Nullable Artifact artifact) {
     if (artifact != null) {
-      artifactPointer = ArtifactPointerManager.getInstance(commonModel.getProject())
-          .createPointer(artifact);
+      artifactPointer =
+          ArtifactPointerManager.getInstance(commonModel.getProject()).createPointer(artifact);
       settings.setArtifact(artifact.getName());
     } else {
       artifactPointer = null;
@@ -287,9 +284,12 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
   }
 
   public void appendJvmFlags(Collection<String> flags) {
-    settings.setJvmFlags(settings.getJvmFlags() == null
-        ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
-        : settings.getJvmFlags() + JVM_FLAG_DELIMITER + Joiner.on(JVM_FLAG_DELIMITER).join(flags));
+    settings.setJvmFlags(
+        settings.getJvmFlags() == null
+            ? Joiner.on(JVM_FLAG_DELIMITER).join(flags)
+            : settings.getJvmFlags()
+                + JVM_FLAG_DELIMITER
+                + Joiner.on(JVM_FLAG_DELIMITER).join(flags));
   }
 
   @Override
@@ -365,8 +365,8 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
    * int, String, etc.).
    *
    * <p>We use this class to store data and use {@link AppEngineServerModel} as an interface to get
-   * that data. We need to interface some non-basic types (e.g., File, Path).
-   * {@link AppEngineServerModel} translates stored data in its basic form to non-basic form.
+   * that data. We need to interface some non-basic types (e.g., File, Path). {@link
+   * AppEngineServerModel} translates stored data in its basic form to non-basic form.
    */
   private static class AppEngineModelSettings implements Cloneable {
 
@@ -375,12 +375,16 @@ public class AppEngineServerModel implements ServerModel, DeploysArtifactsOnStar
 
     @Tag("host")
     private String host = "localhost";
+
     @Tag("port")
     private Integer port = 8080;
+
     @Tag("jvm_flags")
     private String jvmFlags;
+
     @Tag("environment")
     private Map<String, String> environment;
+
     @Tag("default_gcs_bucket_name")
     private String defaultGcsBucketName;
 

@@ -16,12 +16,8 @@
 
 package com.google.cloud.tools.intellij.login;
 
-/**
- * Callback for when a login is completed.
- */
+/** Callback for when a login is completed. */
 public interface IGoogleLoginCompletedCallback {
-  /**
-   * Called when log in is complete.
-   */
+  /** Called when log in is complete. */
   void onLoginCompleted();
 }

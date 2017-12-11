@@ -18,24 +18,19 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeId;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
-
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.Icon;
-
-/**
- * The Flexible facet type.
- */
-public class AppEngineFlexibleFacetType extends
-    FacetType<AppEngineFlexibleFacet, AppEngineFlexibleFacetConfiguration> {
+/** The Flexible facet type. */
+public class AppEngineFlexibleFacetType
+    extends FacetType<AppEngineFlexibleFacet, AppEngineFlexibleFacetConfiguration> {
 
   public static final FacetTypeId<AppEngineFlexibleFacet> ID =
       new FacetTypeId<>("appEngineFlexible");
@@ -51,8 +46,11 @@ public class AppEngineFlexibleFacetType extends
   }
 
   @Override
-  public AppEngineFlexibleFacet createFacet(@NotNull Module module, String name,
-      @NotNull AppEngineFlexibleFacetConfiguration configuration, @Nullable Facet underlyingFacet) {
+  public AppEngineFlexibleFacet createFacet(
+      @NotNull Module module,
+      String name,
+      @NotNull AppEngineFlexibleFacetConfiguration configuration,
+      @Nullable Facet underlyingFacet) {
     return new AppEngineFlexibleFacet(this, module, name, configuration);
   }
 

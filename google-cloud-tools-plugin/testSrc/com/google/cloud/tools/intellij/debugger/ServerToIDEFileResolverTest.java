@@ -57,14 +57,14 @@ public class ServerToIDEFileResolverTest extends JavaCodeInsightFixtureTestCase 
   public void ignore_testGetFileFromPath_fullPath() {
     // TODO(joaomartins): Find out why project.getBaseDir() is returning a different tempDir to
     // myFixture.
-    PsiFile file1 = this.myFixture
-        .addFileToProject("path/to/prj/src/main/com/java/package/Class.java", "");
-    this.myFixture
-        .addFileToProject("path/to/prj/src/test/com/java/package/ClassTest.java", "");
+    PsiFile file1 =
+        this.myFixture.addFileToProject("path/to/prj/src/main/com/java/package/Class.java", "");
+    this.myFixture.addFileToProject("path/to/prj/src/test/com/java/package/ClassTest.java", "");
 
     ServerToIdeFileResolver fileResolver = new ServerToIdeFileResolver();
     assertEquals(
-        fileResolver.getFileFromPath(getProject(), "path/to/prj/src/main/com/java/package/Class.java"),
+        fileResolver.getFileFromPath(
+            getProject(), "path/to/prj/src/main/com/java/package/Class.java"),
         file1.getVirtualFile());
   }
 

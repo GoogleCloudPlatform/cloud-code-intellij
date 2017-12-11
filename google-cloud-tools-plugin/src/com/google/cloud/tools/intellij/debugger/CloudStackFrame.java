@@ -20,7 +20,6 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.model.StackFrame;
 import com.google.api.services.clouddebugger.v2.model.Variable;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.ColoredTextContainer;
@@ -34,11 +33,9 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.frame.XValueGroup;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
-
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * CloudStackFrame represents a single frame in a {@link CloudExecutionStack}. It returns the set of
@@ -46,16 +43,14 @@ import java.util.List;
  */
 public class CloudStackFrame extends XStackFrame {
 
-  @Nullable
-  private final List<Variable> evaluatedExpressions;
+  @Nullable private final List<Variable> evaluatedExpressions;
   private final StackFrame frame;
   private final List<Variable> variableTable;
   private final XSourcePosition sourcePosition;
 
-  /**
-   * Initialize the frame.
-   */
-  public CloudStackFrame(@NotNull Project project,
+  /** Initialize the frame. */
+  public CloudStackFrame(
+      @NotNull Project project,
       @NotNull StackFrame frame,
       @NotNull List<Variable> variableTable,
       @Nullable List<Variable> evaluatedExpressions,
@@ -65,9 +60,10 @@ public class CloudStackFrame extends XStackFrame {
     this.evaluatedExpressions = evaluatedExpressions;
     String path = frame.getLocation().getPath();
     if (!Strings.isNullOrEmpty(path)) {
-      sourcePosition = XDebuggerUtil.getInstance().createPosition(
-          fileResolver.getFileFromPath(project, path),
-          frame.getLocation().getLine() - 1);
+      sourcePosition =
+          XDebuggerUtil.getInstance()
+              .createPosition(
+                  fileResolver.getFileFromPath(project, path), frame.getLocation().getLine() - 1);
     } else {
       sourcePosition = null;
     }
@@ -116,13 +112,12 @@ public class CloudStackFrame extends XStackFrame {
         packageName = frame.getFunction().substring(0, classNameDot);
       }
     }
-    component
-        .append(functionName + "():" + frame.getLocation().getLine().toString() + ", " + className,
-            sourcePosition != null
-                ? SimpleTextAttributes.REGULAR_ATTRIBUTES
-                : SimpleTextAttributes.GRAYED_ATTRIBUTES);
+    component.append(
+        functionName + "():" + frame.getLocation().getLine().toString() + ", " + className,
+        sourcePosition != null
+            ? SimpleTextAttributes.REGULAR_ATTRIBUTES
+            : SimpleTextAttributes.GRAYED_ATTRIBUTES);
     component.append(" (" + packageName + ")", SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES);
-
   }
 
   @Override
@@ -142,12 +137,13 @@ public class CloudStackFrame extends XStackFrame {
     private final List<Variable> variableTable;
 
     public MyValue(@NotNull Variable variable, @NotNull List<Variable> variableTable) {
-      //Note that we have to examine the variable table for some cases depending on how the
+      // Note that we have to examine the variable table for some cases depending on how the
       // server compressed results.
       this.variableTable = variableTable;
-      this.variable = variable.getVarTableIndex() != null ? variableTable
-          .get(variable.getVarTableIndex().intValue())
-          : variable;
+      this.variable =
+          variable.getVarTableIndex() != null
+              ? variableTable.get(variable.getVarTableIndex().intValue())
+              : variable;
       members = this.variable.getMembers();
     }
 
@@ -172,9 +168,13 @@ public class CloudStackFrame extends XStackFrame {
     @Override
     public void computePresentation(@NotNull XValueNode node, @NotNull XValuePlace place) {
       String status = BreakpointUtil.getUserMessage(variable.getStatus());
-      String value = !Strings.isNullOrEmpty(status)
-          ? String.format("%s (%s)", variable.getValue(), status) : variable.getValue();
-      node.setPresentation(null, members != null && members.size() > 0 ? "..." : null,
+      String value =
+          !Strings.isNullOrEmpty(status)
+              ? String.format("%s (%s)", variable.getValue(), status)
+              : variable.getValue();
+      node.setPresentation(
+          null,
+          members != null && members.size() > 0 ? "..." : null,
           value != null ? value : "",
           members != null && members.size() > 0);
     }

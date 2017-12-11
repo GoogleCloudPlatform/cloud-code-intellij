@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.appengine.GctConstants;
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
 import com.google.common.collect.Maps;
-
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -33,12 +32,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
-
+import java.util.Map;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
 
 /**
  * Inspection to check that the full method names are unique. The full method name is made up of the
@@ -71,9 +68,7 @@ public class FullMethodNameInspection extends EndpointInspectionBase {
   @Override
   public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
     return new EndpointPsiElementVisitor() {
-      /**
-       * Flags @ApiMethods that have a duplicate API method name.
-       */
+      /** Flags @ApiMethods that have a duplicate API method name. */
       @Override
       public void visitClass(PsiClass psiClass) {
         if (!EndpointUtilities.isEndpointClass(psiClass)) {
@@ -89,11 +84,11 @@ public class FullMethodNameInspection extends EndpointInspectionBase {
       }
 
       /**
-       * Checks that the API method name specified in @APiMethod's name attribute is unique.
-       * API methods.
+       * Checks that the API method name specified in @APiMethod's name attribute is unique. API
+       * methods.
        */
-      private void validateBackendMethodNameUnique(PsiMethod psiMethod,
-          Map<String, PsiMethod> apiMethodNames) {
+      private void validateBackendMethodNameUnique(
+          PsiMethod psiMethod, Map<String, PsiMethod> apiMethodNames) {
         // Check if method is a public or non-static
         if (!EndpointUtilities.isApiMethod(psiMethod)) {
           return;
@@ -105,14 +100,14 @@ public class FullMethodNameInspection extends EndpointInspectionBase {
 
         // Get @ApiMethod's name attribute
         PsiModifierList modifierList = psiMethod.getModifierList();
-        PsiAnnotation apiMethodAnnotation = modifierList
-            .findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD);
+        PsiAnnotation apiMethodAnnotation =
+            modifierList.findAnnotation(GctConstants.APP_ENGINE_ANNOTATION_API_METHOD);
         if (apiMethodAnnotation == null) {
           return;
         }
 
-        PsiAnnotationMemberValue apiMethodNameAttribute = apiMethodAnnotation
-            .findAttributeValue(API_METHOD_NAME_ATTRIBUTE);
+        PsiAnnotationMemberValue apiMethodNameAttribute =
+            apiMethodAnnotation.findAttributeValue(API_METHOD_NAME_ATTRIBUTE);
         if (apiMethodNameAttribute == null) {
           return;
         }
@@ -128,12 +123,17 @@ public class FullMethodNameInspection extends EndpointInspectionBase {
         if (seenMethod == null) {
           apiMethodNames.put(nameValue, psiMethod);
         } else {
-          holder.registerProblem(apiMethodAnnotation,
-              "Multiple methods with same API method name are prohibited. \"" + nameValue
-                  + "\" is the API method name for " + psiMethod.getName() + " and " + seenMethod
-                  .getName() + ".", new MyQuickFix());
+          holder.registerProblem(
+              apiMethodAnnotation,
+              "Multiple methods with same API method name are prohibited. \""
+                  + nameValue
+                  + "\" is the API method name for "
+                  + psiMethod.getName()
+                  + " and "
+                  + seenMethod.getName()
+                  + ".",
+              new MyQuickFix());
         }
-
       }
     };
   }
@@ -164,8 +164,8 @@ public class FullMethodNameInspection extends EndpointInspectionBase {
         return;
       }
 
-      PsiAnnotationMemberValue apiMethodNameAttribute = annotation
-          .findAttributeValue(API_METHOD_NAME_ATTRIBUTE);
+      PsiAnnotationMemberValue apiMethodNameAttribute =
+          annotation.findAttributeValue(API_METHOD_NAME_ATTRIBUTE);
       if (apiMethodNameAttribute == null) {
         return;
       }
@@ -175,11 +175,12 @@ public class FullMethodNameInspection extends EndpointInspectionBase {
       String nameValue = EndpointUtilities.removeBeginningAndEndingQuotes(nameValueWithQuotes);
 
       // @A(name = "someName")
-      PsiAnnotationMemberValue newMemberValue = JavaPsiFacade.getInstance(project)
-          .getElementFactory()
-          .createAnnotationFromText(
-              "@A(" + API_METHOD_NAME_ATTRIBUTE + " = \"" + nameValue + "_1\")", null)
-          .findDeclaredAttributeValue(API_METHOD_NAME_ATTRIBUTE);
+      PsiAnnotationMemberValue newMemberValue =
+          JavaPsiFacade.getInstance(project)
+              .getElementFactory()
+              .createAnnotationFromText(
+                  "@A(" + API_METHOD_NAME_ATTRIBUTE + " = \"" + nameValue + "_1\")", null)
+              .findDeclaredAttributeValue(API_METHOD_NAME_ATTRIBUTE);
 
       apiMethodNameAttribute.replace(newMemberValue);
     }

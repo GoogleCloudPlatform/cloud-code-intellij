@@ -22,7 +22,6 @@ import com.google.cloud.tools.intellij.debugger.CloudDebugRunConfiguration;
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -33,7 +32,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.util.Key;
 import com.intellij.xdebugger.XDebuggerUtil;
-
 import java.awt.event.MouseEvent;
 
 /**
@@ -45,11 +43,10 @@ public class ToggleSnapshotLocationAction extends AnAction {
   public static final Key<Integer> POPUP_LINE = Key.create("SnapshotTargetLine");
   private static final Logger LOG = Logger.getInstance(ToggleSnapshotLocationAction.class);
 
-  /**
-   * Initialize the action.
-   */
+  /** Initialize the action. */
   public ToggleSnapshotLocationAction() {
-    super(GctBundle.getString("clouddebug.snapshot.location"),
+    super(
+        GctBundle.getString("clouddebug.snapshot.location"),
         GctBundle.getString("clouddebug.adds.snapshot.location"),
         GoogleCloudToolsIcons.CLOUD);
   }
@@ -72,7 +69,9 @@ public class ToggleSnapshotLocationAction extends AnAction {
         return;
       }
       XDebuggerUtil.getInstance()
-          .toggleLineBreakpoint(exEditor.getProject(), CloudLineBreakpointType.getInstance(),
+          .toggleLineBreakpoint(
+              exEditor.getProject(),
+              CloudLineBreakpointType.getInstance(),
               exEditor.getVirtualFile(),
               editor.getUserData(POPUP_LINE));
     }

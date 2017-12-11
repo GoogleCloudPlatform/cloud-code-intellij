@@ -28,7 +28,8 @@ import org.jetbrains.annotations.NotNull;
  * Creates a shortcut in the tools menu to add the App Engine Flexible framework support to a
  * module.
  */
-public class AddAppEngineFlexibleFrameworkSupportToolsMenuAction extends AddAppEngineFrameworkSupportAction {
+public class AddAppEngineFlexibleFrameworkSupportToolsMenuAction
+    extends AddAppEngineFrameworkSupportAction {
   public AddAppEngineFlexibleFrameworkSupportToolsMenuAction() {
     super(
         GctBundle.message("appengine.flexible.facet.name.title"),
@@ -46,5 +47,4 @@ public class AddAppEngineFlexibleFrameworkSupportToolsMenuAction extends AddAppE
   public FrameworkSupportInModuleProvider getModuleProvider() {
     return new AppEngineFlexibleSupportProvider();
   }
-
 }

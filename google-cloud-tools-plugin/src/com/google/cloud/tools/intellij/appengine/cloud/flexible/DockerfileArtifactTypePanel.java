@@ -17,14 +17,11 @@
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-/**
- * Configuration panel for selecting the type of artifact to be referenced in the Dockerfile.
- */
+/** Configuration panel for selecting the type of artifact to be referenced in the Dockerfile. */
 public class DockerfileArtifactTypePanel {
 
   private JPanel panel;

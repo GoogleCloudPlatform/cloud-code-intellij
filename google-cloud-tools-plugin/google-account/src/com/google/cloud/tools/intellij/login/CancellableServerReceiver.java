@@ -34,53 +34,39 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * A cancellable Server Receiver.
- */
+/** A cancellable Server Receiver. */
 class CancellableServerReceiver implements VerificationCodeReceiver {
 
   private static final String CALLBACK_PATH = "/Callback";
   public static final String REQUEST_CANCELLED_STRING = "Request cancelled.";
 
-  /**
-   * Server or {@code null} before {@link #getRedirectUri()}.
-   */
+  /** Server or {@code null} before {@link #getRedirectUri()}. */
   private Server server;
 
-  /**
-   * Verification code or {@code null} for none.
-   */
+  /** Verification code or {@code null} for none. */
   String code;
 
-  /**
-   * Error code or {@code null} for none.
-   */
+  /** Error code or {@code null} for none. */
   String error;
 
-  /**
-   * Lock on the code and error.
-   */
+  /** Lock on the code and error. */
   final Lock lock = new ReentrantLock();
 
-  /**
-   * Condition for receiving an authorization response.
-   */
+  /** Condition for receiving an authorization response. */
   final Condition gotAuthorizationResponse = lock.newCondition();
 
-  /**
-   * Port to use or {@code -1} to select an unused port in {@link #getRedirectUri()}.
-   */
+  /** Port to use or {@code -1} to select an unused port in {@link #getRedirectUri()}. */
   private int port;
 
-  /**
-   * Host name to use.
-   */
+  /** Host name to use. */
   private final String host;
 
   /**
    * Constructor that starts the server on {@code "localhost"} selects an unused port.
-   * <p/>
-   * <p> Use {@link Builder} if you need to specify any of the optional parameters. </p>
+   *
+   * <p>
+   *
+   * <p>Use {@link Builder} if you need to specify any of the optional parameters.
    */
   public CancellableServerReceiver() {
     this("localhost", -1);
@@ -159,9 +145,7 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
     }
   }
 
-  /**
-   * Returns the host name to use.
-   */
+  /** Returns the host name to use. */
   public String getHost() {
     return host;
   }
@@ -185,53 +169,41 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
 
   /**
    * Builder.
-   * <p/>
-   * <p> Implementation is not thread-safe. </p>
+   *
+   * <p>
+   *
+   * <p>Implementation is not thread-safe.
    */
   public static final class Builder {
 
-    /**
-     * Host name to use.
-     */
+    /** Host name to use. */
     private String host = "localhost";
 
-    /**
-     * Port to use or {@code -1} to select an unused port.
-     */
+    /** Port to use or {@code -1} to select an unused port. */
     private int port = -1;
 
-    /**
-     * Builds the {@link LocalServerReceiver}.
-     */
+    /** Builds the {@link LocalServerReceiver}. */
     public CancellableServerReceiver build() {
       return new CancellableServerReceiver(host, port);
     }
 
-    /**
-     * Returns the host name to use.
-     */
+    /** Returns the host name to use. */
     public String getHost() {
       return host;
     }
 
-    /**
-     * Sets the host name to use.
-     */
+    /** Sets the host name to use. */
     public Builder setHost(String host) {
       this.host = host;
       return this;
     }
 
-    /**
-     * Returns the port to use or {@code -1} to select an unused port.
-     */
+    /** Returns the port to use or {@code -1} to select an unused port. */
     public int getPort() {
       return port;
     }
 
-    /**
-     * Sets the port to use or {@code -1} to select an unused port.
-     */
+    /** Sets the port to use or {@code -1} to select an unused port. */
     public Builder setPort(int port) {
       this.port = port;
       return this;
@@ -245,8 +217,9 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
   class CallbackHandler extends AbstractHandler {
 
     @Override
-    public void handle(String target, HttpServletRequest request, HttpServletResponse response,
-        int dispatch) throws IOException {
+    public void handle(
+        String target, HttpServletRequest request, HttpServletResponse response, int dispatch)
+        throws IOException {
       if (!CALLBACK_PATH.equals(target)) {
         return;
       }
@@ -267,8 +240,8 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
 
     @NotNull
     private String getFailureLandingPage() {
-      IntelliJPlatform currentPlatform = IntelliJPlatform
-          .fromPrefix(PlatformUtils.getPlatformPrefix());
+      IntelliJPlatform currentPlatform =
+          IntelliJPlatform.fromPrefix(PlatformUtils.getPlatformPrefix());
       if (currentPlatform == IntelliJPlatform.ANDROID_STUDIO) {
         return LandingPages.ANDROID_STUDIO.getFailurePage();
       }
@@ -277,8 +250,8 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
 
     @NotNull
     private String getSuccessLandingPage() {
-      IntelliJPlatform currentPlatform = IntelliJPlatform
-          .fromPrefix(PlatformUtils.getPlatformPrefix());
+      IntelliJPlatform currentPlatform =
+          IntelliJPlatform.fromPrefix(PlatformUtils.getPlatformPrefix());
       if (currentPlatform == IntelliJPlatform.ANDROID_STUDIO) {
         return LandingPages.ANDROID_STUDIO.getSuccessPage();
       }

@@ -18,22 +18,17 @@ package com.google.cloud.tools.intellij.appengine.migration;
 
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.common.annotations.VisibleForTesting;
-
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionProcessor;
 import com.intellij.conversion.ModuleSettings;
-
 import org.jdom.Element;
 import org.jetbrains.jps.model.serialization.facet.JpsFacetSerializer;
 
-/**
- * Performs conversions from deprecated App Engine Facets to their new version.
- */
-public class AppEngineStandardFacetMigrationConversionProcessor extends
-    ConversionProcessor<ModuleSettings> {
+/** Performs conversions from deprecated App Engine Facets to their new version. */
+public class AppEngineStandardFacetMigrationConversionProcessor
+    extends ConversionProcessor<ModuleSettings> {
 
-  @VisibleForTesting
-  static final String DEPRECATED_APP_ENGINE_FACET_ID = "google-app-engine";
+  @VisibleForTesting static final String DEPRECATED_APP_ENGINE_FACET_ID = "google-app-engine";
 
   @Override
   public boolean isConversionNeeded(ModuleSettings settings) {
@@ -50,8 +45,8 @@ public class AppEngineStandardFacetMigrationConversionProcessor extends
       String facetName = deprecatedTag.getAttributeValue(JpsFacetSerializer.NAME_ATTRIBUTE);
 
       // add a new tag with all the same settings as the old one, but the new facet type id
-      settings.addFacetElement(AppEngineStandardFacetType.STRING_ID, facetName,
-          configuration.clone());
+      settings.addFacetElement(
+          AppEngineStandardFacetType.STRING_ID, facetName, configuration.clone());
     }
   }
 }
