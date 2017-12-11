@@ -1,6 +1,11 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 17.12.2
+
+### Fixed
+  - Fixed broken analytics property setup causing dropped analytics. [1733](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1733)
+
 ## 17.12.1
 
 The Google Account plugin has now been merged into the Cloud Tools plugin and is no longer a separate installation. If you previously had the Account Tools plugin installed, follow the new dialog prompt to remove it and restart the IDE to ensure that you don't experience any issues.
