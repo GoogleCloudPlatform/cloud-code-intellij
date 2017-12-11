@@ -23,6 +23,7 @@ import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A JSON object for {@link CloudLibrary} instances that need to be built in unit tests.
@@ -73,6 +74,7 @@ public abstract class TestCloudLibrary extends TestJson {
   public abstract String icon();
 
   /** @see CloudLibrary#clients */
+  @Nullable
   public abstract List<TestCloudLibraryClient> clients();
 
   /** Returns a newly built {@link CloudLibrary} for the parameters in this class. */
@@ -95,7 +97,7 @@ public abstract class TestCloudLibrary extends TestJson {
      * built with empty strings too.
      */
     public static TestCloudLibraryClient createEmpty() {
-      return create("", "", "", "", "", TestCloudLibraryClientMavenCoordinates.createEmpty());
+      return create("", "", "", "", "", "", TestCloudLibraryClientMavenCoordinates.createEmpty());
     }
 
     /**
@@ -104,6 +106,7 @@ public abstract class TestCloudLibrary extends TestJson {
      * @see CloudLibraryClient
      */
     public static TestCloudLibraryClient create(
+        String name,
         String language,
         String apireference,
         String launchStage,
@@ -111,8 +114,11 @@ public abstract class TestCloudLibrary extends TestJson {
         String languageLevel,
         TestCloudLibraryClientMavenCoordinates mavenCoordinates) {
       return new AutoValue_TestCloudLibrary_TestCloudLibraryClient(
-          language, apireference, launchStage, source, languageLevel, mavenCoordinates);
+          name, language, apireference, launchStage, source, languageLevel, mavenCoordinates);
     }
+
+    /** @see CloudLibraryClient#name */
+    public abstract String name();
 
     /** @see CloudLibraryClient#language */
     public abstract String language();
@@ -130,7 +136,13 @@ public abstract class TestCloudLibrary extends TestJson {
     public abstract String languageLevel();
 
     /** @see CloudLibraryClient#mavenCoordinates */
+    @Nullable
     public abstract TestCloudLibraryClientMavenCoordinates mavenCoordinates();
+
+    /** Returns a newly built {@link CloudLibraryClient} for the parameters in this class. */
+    public CloudLibraryClient toCloudLibraryClient() {
+      return new Gson().fromJson(toJson(), CloudLibraryClient.class);
+    }
   }
 
   /**

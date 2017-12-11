@@ -55,14 +55,18 @@ abstract class TestJson {
             .flatMap(
                 method -> {
                   try {
+                    Object object = method.invoke(this);
+                    if (object == null) {
+                      return Stream.of();
+                    }
+
                     if (Collection.class.isAssignableFrom(method.getReturnType())) {
-                      Collection<?> objects = (Collection<?>) method.invoke(this);
+                      Collection<?> objects = (Collection<?>) object;
                       String mergedResult =
                           objects.stream().map(Object::toString).collect(Collectors.joining(","));
                       return Stream.of(String.format("%s:[%s]", method.getName(), mergedResult));
                     }
 
-                    Object object = method.invoke(this);
                     String format = (object instanceof String) ? "%s:\"%s\"" : "%s:%s";
                     return Stream.of(String.format(format, method.getName(), object.toString()));
                   } catch (IllegalAccessException | InvocationTargetException e) {

@@ -45,7 +45,6 @@ import org.jetbrains.annotations.Nullable;
 /** The form-bound class for the Cloud API details panel. */
 public final class GoogleCloudApiDetailsPanel {
 
-  private static final String JAVA_CLIENT_LANGUAGE = "java";
   private static final String LINKS_SEPARATOR = " | ";
 
   private JLabel icon;
@@ -162,11 +161,7 @@ public final class GoogleCloudApiDetailsPanel {
     descriptionTextPane.setText(currentCloudLibrary.getDescription());
 
     if (currentCloudLibrary.getClients() != null) {
-      currentCloudLibrary
-          .getClients()
-          .stream()
-          .filter(client -> JAVA_CLIENT_LANGUAGE.equals(client.getLanguage()))
-          .findFirst()
+      CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
                 if (client.getMavenCoordinates() != null) {
