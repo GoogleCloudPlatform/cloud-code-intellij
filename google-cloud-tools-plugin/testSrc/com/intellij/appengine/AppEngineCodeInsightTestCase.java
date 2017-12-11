@@ -62,7 +62,6 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    VfsRootAccess.allowRootAccess(System.getProperty("user.dir"));
     final TestFixtureBuilder<IdeaProjectTestFixture> fixtureBuilder = JavaTestFixtureFactory.createFixtureBuilder(getName());
     myModuleBuilder = fixtureBuilder.addModule(JavaModuleFixtureBuilder.class);
     myProjectFixture = fixtureBuilder.getFixture();
