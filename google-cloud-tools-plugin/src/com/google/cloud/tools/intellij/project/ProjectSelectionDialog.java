@@ -99,7 +99,7 @@ public class ProjectSelectionDialog {
     if (dialogWrapper == null) {
       dialogWrapper = new ProjectSelectionDialogWrapper();
 
-      dialogWrapper.setTitle(GctBundle.getString("project.selector.dialog.title"));
+      dialogWrapper.setTitle(GctBundle.getString("cloud.project.selector.dialog.title"));
       // disabled unless project is selected in the list.
       dialogWrapper.setOKActionEnabled(false);
       // install additional IDEA UI.

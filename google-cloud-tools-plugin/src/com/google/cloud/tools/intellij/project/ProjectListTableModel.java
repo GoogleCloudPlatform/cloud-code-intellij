@@ -46,21 +46,21 @@ class ProjectListTableModel extends AbstractTableModel {
         return projectList.get(row).getName();
       case PROJECT_ID_COLUMN:
         return projectList.get(row).getProjectId();
+      default:
+        return "";
     }
-
-    return "";
   }
 
   @Override
   public String getColumnName(int column) {
     switch (column) {
       case PROJECT_NAME_COLUMN:
-        return GctBundle.getString("project.selector.project.list.project.name.column");
+        return GctBundle.getString("cloud.project.selector.project.list.project.name.column");
       case PROJECT_ID_COLUMN:
-        return GctBundle.getString("project.selector.project.list.project.id.column");
+        return GctBundle.getString("cloud.project.selector.project.list.project.id.column");
+      default:
+        return "";
     }
-
-    return "";
   }
 
   String getProjectNameAtRow(int row) {

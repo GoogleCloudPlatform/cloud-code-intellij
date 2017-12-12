@@ -136,7 +136,7 @@ public class ProjectSelectorTest {
   private void verifyUiStateForProject(CloudProject project) {
     if (project == null) {
       assertThat(projectSelector.getProjectNameLabel().getText())
-          .isEqualTo(GctBundle.getString("project.selector.no.selected.project"));
+          .isEqualTo(GctBundle.getString("cloud.project.selector.no.selected.project"));
       // no account information UI is visible/populated.
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isFalse();
       assertThat(projectSelector.getAccountInfoLabel().getText()).isEmpty();

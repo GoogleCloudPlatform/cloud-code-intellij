@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
 import com.google.cloud.tools.intellij.resources.BaseGoogleLoginUi;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
@@ -31,7 +30,7 @@ import javax.swing.JButton;
 class ProjectSelectorSignInPanel extends BaseGoogleLoginUi {
 
   ProjectSelectorSignInPanel() {
-    super(GctBundle.message("select.project.signin"));
+    super(GctBundle.message("cloud.project.selector.signin.message"));
     init();
   }
 
