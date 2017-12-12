@@ -20,7 +20,6 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.1.10'
         classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.13"
         classpath "gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.6"
         classpath "net.ltgt.gradle:gradle-apt-plugin:0.13"
@@ -29,6 +28,7 @@ buildscript {
 
 plugins {
     id 'net.researchgate.release' version '2.3.4'
+    id "org.jetbrains.intellij" version "0.2.17" apply false
 }
 
 subprojects {
