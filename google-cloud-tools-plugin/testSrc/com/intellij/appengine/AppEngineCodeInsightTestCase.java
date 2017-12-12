@@ -62,6 +62,7 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
+    // Fixes https://youtrack.jetbrains.com/issue/IDEA-129297. Only occurs in Jenkins.
     VfsRootAccess.allowRootAccess(System.getProperty("user.dir"));
     final TestFixtureBuilder<IdeaProjectTestFixture> fixtureBuilder = JavaTestFixtureFactory.createFixtureBuilder(getName());
     myModuleBuilder = fixtureBuilder.addModule(JavaModuleFixtureBuilder.class);
