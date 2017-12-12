@@ -25,6 +25,7 @@ import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -43,6 +44,7 @@ import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.swing.AbstractAction;
@@ -66,6 +68,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Modal project and account selection dialog. Contains account drop-down with user list, table with
  * project list and simple filter. {@link ProjectSelector} calls {@link #showDialog(CloudProject)}.
+ * Calls {@link ProjectLoader#} to load projects for all known accounts and caches them.
  */
 public class ProjectSelectionDialog {
 
@@ -82,10 +85,15 @@ public class ProjectSelectionDialog {
 
   private RefreshAction refreshAction;
 
-  private CloudProject cloudProject;
   private ProjectListTableModel projectListTableModel;
 
   private ProjectLoader projectLoader = new ProjectLoader();
+
+  private Map<CredentialedUser, ListenableFuture<List<Project>>> runningProjectLoaderJobs =
+      Maps.newHashMap();
+  // last project name selection made by user for an account.
+  private Map<CredentialedUser, String> selectedProjectsByAccount = Maps.newHashMap();
+  private Map<CredentialedUser, List<Project>> cachedProjectList = Maps.newHashMap();
 
   /**
    * Creates and shows modal dialog to select project/account. Blocks EDT until choice is made.
@@ -127,8 +135,18 @@ public class ProjectSelectionDialog {
 
   @VisibleForTesting
   void setCloudProject(CloudProject cloudProject) {
-    this.cloudProject = cloudProject;
-    updateProjectAccountInformation();
+    if (cloudProject != null && !Strings.isNullOrEmpty(cloudProject.googleUsername())) {
+      Optional<CredentialedUser> loggedInUser =
+          Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
+      if (loggedInUser.isPresent()) {
+        selectedProjectsByAccount.put(loggedInUser.get(), cloudProject.projectName());
+        accountComboBox.setSelectedItem(loggedInUser.get());
+        updateProjectList(loggedInUser.get());
+      } else {
+        // specified user is not in logged in user list, clear the account selection.
+        accountComboBox.setSelectedItem(null);
+      }
+    }
   }
 
   @VisibleForTesting
@@ -145,21 +163,29 @@ public class ProjectSelectionDialog {
       showSignInRequest();
     } else {
       hideSignInRequest();
+      cachedProjectList.clear();
       accountComboBox.removeAllItems();
       for (CredentialedUser user : credentialedUsers) {
         accountComboBox.addItem(user);
+        updateProjectList(user);
       }
       accountComboBox.setSelectedItem(Services.getLoginService().getActiveUser());
-      // no need to update project list - account combo box will generate an event.
     }
   }
 
-  private void updateProjectList() {
+  private void updateProjectList(CredentialedUser user) {
     // clear list and reload for selected user, empty if user is not logged in/selection empty.
     projectListTableModel.setProjectList(Collections.emptyList());
-    CredentialedUser user = (CredentialedUser) accountComboBox.getSelectedItem();
-    if (user != null) {
-      ((JBTable) projectListTable).setPaintBusy(true);
+    if (user == null) {
+      return;
+    }
+
+    // check if cached, if not then check if already loading, and finally start loading if not.
+    if (cachedProjectList.containsKey(user)) {
+      projectListTableModel.setProjectList(cachedProjectList.get(user));
+      showProjectInList(selectedProjectsByAccount.get(user));
+    } else if (!runningProjectLoaderJobs.containsKey(user)) {
+      // not cached and not loading - start loading project list here and keep the future reference.
       ListenableFuture<List<Project>> futureResult =
           projectLoader.loadUserProjectsInBackground(user);
       addProjectListFutureCallback(
@@ -169,35 +195,28 @@ public class ProjectSelectionDialog {
             public void onSuccess(List<Project> projects) {
               SwingUtilities.invokeLater(
                   () -> {
-                    projectListTableModel.setProjectList(projects);
-                    ((JBTable) projectListTable).setPaintBusy(false);
-                    if (cloudProject != null) {
-                      showProjectInList(cloudProject.projectName());
+                    // record job result and clear future reference.
+                    runningProjectLoaderJobs.remove(user);
+                    cachedProjectList.put(user, projects);
+                    // update project list if this list is for currently selected account.
+                    if (user.equals(accountComboBox.getSelectedItem())) {
+                      projectListTableModel.setProjectList(projects);
+                      showProjectInList(selectedProjectsByAccount.get(user));
                     }
                   });
             }
 
             @Override
             public void onFailure(Throwable throwable) {
-              ((JBTable) projectListTable).setPaintBusy(false);
-              dialogWrapper.setErrorInfoAll(
-                  Collections.singletonList(new ValidationInfo(throwable.getMessage())));
+              SwingUtilities.invokeLater(
+                  () -> {
+                    runningProjectLoaderJobs.remove(user);
+                    dialogWrapper.setErrorInfoAll(
+                        Collections.singletonList(new ValidationInfo(throwable.getMessage())));
+                  });
             }
           });
-    }
-  }
-
-  private void updateProjectAccountInformation() {
-    if (cloudProject != null && !Strings.isNullOrEmpty(cloudProject.googleUsername())) {
-      Optional<CredentialedUser> loggedInUser =
-          Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
-      if (loggedInUser.isPresent()) {
-        accountComboBox.setSelectedItem(loggedInUser.get());
-      } else {
-        // specified user is not in logged in user list, clear the account selection.
-        accountComboBox.setSelectedItem(null);
-      }
-      // no need to update project list - account combo box will generate an event.
+      runningProjectLoaderJobs.put(user, futureResult);
     }
   }
 
@@ -248,7 +267,8 @@ public class ProjectSelectionDialog {
     // prepare account combobox model and rendering.
     accountComboBox = new ComboBox<>();
     accountComboBox.setRenderer(new AccountComboBoxRenderer());
-    accountComboBox.addActionListener((event) -> updateProjectList());
+    accountComboBox.addActionListener(
+        (event) -> updateProjectList((CredentialedUser) accountComboBox.getSelectedItem()));
 
     // wrapper for center panel that holds either project selection or sign in screen.
     centerPanelWrapper = new JPanel(new BorderLayout());

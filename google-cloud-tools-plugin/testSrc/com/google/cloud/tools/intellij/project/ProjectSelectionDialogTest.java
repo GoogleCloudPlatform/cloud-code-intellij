@@ -179,8 +179,8 @@ public class ProjectSelectionDialogTest {
   private void prepareOneTestUserOneTestProjectDialog(CloudProject selectedProject) {
     mockUserList(Collections.singletonList(mockTestUser));
     mockUserProjects(mockTestUser, Collections.singletonList(testGoogleProject));
-    projectSelectionDialog.setCloudProject(selectedProject);
     cleanLoadUsersAndProjects();
+    projectSelectionDialog.setCloudProject(selectedProject);
   }
 
   /** Loads users and projects and ensures UI events are processed before returning. */
