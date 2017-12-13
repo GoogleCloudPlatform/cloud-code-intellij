@@ -121,10 +121,10 @@ public class ProjectSelectionDialog {
                       .connect(dialogWrapper.getDisposable() /* disconnect once dialog is gone. */)
                       .subscribe(
                           GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC,
-                          this::loadUsersAndProjects));
+                          this::loadAllProjects));
     }
 
-    loadUsersAndProjects();
+    loadAllProjects();
     setSelectedProject(cloudProject);
 
     DialogManager.show(dialogWrapper);
@@ -155,7 +155,7 @@ public class ProjectSelectionDialog {
   }
 
   @VisibleForTesting
-  void loadUsersAndProjects() {
+  void loadAllProjects() {
     Collection<CredentialedUser> credentialedUsers =
         Services.getLoginService().getAllUsers().values();
     if (credentialedUsers.isEmpty()) {
@@ -430,7 +430,7 @@ public class ProjectSelectionDialog {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      loadUsersAndProjects();
+      loadAllProjects();
     }
   }
 

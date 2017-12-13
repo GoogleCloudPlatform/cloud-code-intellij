@@ -77,7 +77,7 @@ public class ProjectSelectionDialogTest {
     doNothing().when(projectSelectionDialog).installTableSpeedSearch(any());
 
     projectSelectionDialog.createUIComponents();
-    projectSelectionDialog.loadUsersAndProjects();
+    projectSelectionDialog.loadAllProjects();
 
     testUiProject = CloudProject.create(TEST_PROJECT_NAME, TEST_USER_EMAIL);
     testGoogleProject = new Project();
@@ -187,7 +187,7 @@ public class ProjectSelectionDialogTest {
   private void cleanLoadUsersAndProjects() {
     // wait until UI events are processed.
     try {
-      SwingUtilities.invokeAndWait(() -> projectSelectionDialog.loadUsersAndProjects());
+      SwingUtilities.invokeAndWait(() -> projectSelectionDialog.loadAllProjects());
       // second call to wait until project list is updated via invokeLater().
       SwingUtilities.invokeAndWait(() -> {});
     } catch (Exception ex) {
