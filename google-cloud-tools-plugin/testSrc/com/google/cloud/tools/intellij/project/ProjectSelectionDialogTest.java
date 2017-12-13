@@ -56,6 +56,7 @@ public class ProjectSelectionDialogTest {
 
   private static final String TEST_USER_EMAIL = "test@google.com";
   private static final String TEST_PROJECT_NAME = "test-1";
+  private static final String TEST_PROJECT_ID = "test-1-id";
 
   private CloudProject testUiProject;
   private Project testGoogleProject;
@@ -79,7 +80,7 @@ public class ProjectSelectionDialogTest {
     projectSelectionDialog.createUIComponents();
     projectSelectionDialog.loadAllProjects();
 
-    testUiProject = CloudProject.create(TEST_PROJECT_NAME, TEST_USER_EMAIL);
+    testUiProject = CloudProject.create(TEST_PROJECT_NAME, TEST_PROJECT_ID, TEST_USER_EMAIL);
     testGoogleProject = new Project();
     testGoogleProject.setName(TEST_PROJECT_NAME);
     testGoogleProject.setProjectId(TEST_PROJECT_NAME + "-id");
@@ -119,7 +120,7 @@ public class ProjectSelectionDialogTest {
 
   @Test
   public void emptyCloudProject_activeUser_noUiSelection() {
-    prepareOneTestUserOneTestProjectDialog(CloudProject.create("", ""));
+    prepareOneTestUserOneTestProjectDialog(CloudProject.create("", "", ""));
 
     assertThat(projectSelectionDialog.getAccountComboBox().getSelectedItem())
         .isEqualTo(mockTestUser);
@@ -135,6 +136,8 @@ public class ProjectSelectionDialogTest {
         .isEqualTo(mockTestUser);
     assertThat(projectSelectionDialog.getSelectedProjectName())
         .isEqualTo(testGoogleProject.getName());
+    assertThat(projectSelectionDialog.getSelectedProjectId())
+        .isEqualTo(testGoogleProject.getProjectId());
     assertThat(projectSelectionDialog.getProjectListTable().getSelectedRow()).isEqualTo(0);
   }
 
@@ -150,7 +153,9 @@ public class ProjectSelectionDialogTest {
     projectSelectionDialog.showProjectInList(secondProject.getName());
     CloudProject selectedProject = projectSelectionDialog.getSelectedProject();
 
-    CloudProject expected = CloudProject.create(secondProject.getName(), mockTestUser.getEmail());
+    CloudProject expected =
+        CloudProject.create(
+            secondProject.getName(), secondProject.getProjectId(), mockTestUser.getEmail());
     assertThat(selectedProject).isEqualTo(expected);
   }
 

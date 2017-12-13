@@ -21,11 +21,13 @@ import com.google.auto.value.AutoValue;
 /** GCP project and account. */
 @AutoValue
 public abstract class CloudProject {
-  public static CloudProject create(String projectName, String googleUsername) {
-    return new AutoValue_CloudProject(projectName, googleUsername);
+  public static CloudProject create(String projectName, String projectId, String googleUsername) {
+    return new AutoValue_CloudProject(projectName, projectId, googleUsername);
   }
 
   public abstract String projectName();
+
+  public abstract String projectId();
 
   public abstract String googleUsername();
 }

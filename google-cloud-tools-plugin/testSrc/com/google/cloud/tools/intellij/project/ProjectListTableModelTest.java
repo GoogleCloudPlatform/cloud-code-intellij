@@ -62,6 +62,14 @@ public class ProjectListTableModelTest {
   }
 
   @Test
+  public void returns_validProjectId() {
+    model.setProjectList(Arrays.asList(testProject1, testProject2));
+
+    assertThat(model.getProjectIdAtRow(0)).isEqualTo(testProject1.getProjectId());
+    assertThat(model.getProjectIdAtRow(1)).isEqualTo(testProject2.getProjectId());
+  }
+
+  @Test
   public void setProjectList_clearsPreviousState() {
     model.setProjectList(Arrays.asList(testProject1, testProject2));
     model.setProjectList(Collections.singletonList(testProject2));

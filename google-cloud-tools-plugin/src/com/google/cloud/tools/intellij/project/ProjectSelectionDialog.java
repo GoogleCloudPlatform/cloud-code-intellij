@@ -120,8 +120,7 @@ public class ProjectSelectionDialog {
                       .getMessageBus()
                       .connect(dialogWrapper.getDisposable() /* disconnect once dialog is gone. */)
                       .subscribe(
-                          GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC,
-                          this::loadAllProjects));
+                          GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, this::loadAllProjects));
     }
 
     loadAllProjects();
@@ -151,7 +150,7 @@ public class ProjectSelectionDialog {
   @VisibleForTesting
   CloudProject getSelectedProject() {
     CredentialedUser user = accountComboBox.getItemAt(accountComboBox.getSelectedIndex());
-    return CloudProject.create(getSelectedProjectName(), user.getEmail());
+    return CloudProject.create(getSelectedProjectName(), getSelectedProjectId(), user.getEmail());
   }
 
   @VisibleForTesting
@@ -333,6 +332,14 @@ public class ProjectSelectionDialog {
     int actualSelectedRow =
         projectListTable.getRowSorter().convertRowIndexToModel(projectListTable.getSelectedRow());
     return projectListTableModel.getProjectNameAtRow(actualSelectedRow);
+  }
+
+  @VisibleForTesting
+  String getSelectedProjectId() {
+    // row number change based on filtering state.
+    int actualSelectedRow =
+        projectListTable.getRowSorter().convertRowIndexToModel(projectListTable.getSelectedRow());
+    return projectListTableModel.getProjectIdAtRow(actualSelectedRow);
   }
 
   @VisibleForTesting
