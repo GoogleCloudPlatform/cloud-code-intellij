@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.swing.AbstractAction;
@@ -144,6 +145,9 @@ public class ProjectSelectionDialog {
         // specified user is not in logged in user list, clear the account selection.
         accountComboBox.setSelectedItem(null);
       }
+    } else {
+      // no project set, show active user projects by default.
+      accountComboBox.setSelectedItem(Services.getLoginService().getActiveUser());
     }
   }
 
@@ -165,24 +169,14 @@ public class ProjectSelectionDialog {
       accountComboBox.removeAllItems();
       for (CredentialedUser user : credentialedUsers) {
         accountComboBox.addItem(user);
-        updateProjectList(user);
+        loadProjectList(user);
       }
-      accountComboBox.setSelectedItem(Services.getLoginService().getActiveUser());
     }
   }
 
-  private void updateProjectList(CredentialedUser user) {
-    // clear list and reload for selected user, empty if user is not logged in/selection empty.
-    projectListTableModel.setProjectList(Collections.emptyList());
-    if (user == null) {
-      return;
-    }
-
+  private void loadProjectList(CredentialedUser user) {
     // check if cached, if not then check if already loading, and finally start loading if not.
-    if (cachedProjectList.containsKey(user)) {
-      projectListTableModel.setProjectList(cachedProjectList.get(user));
-      showProjectInList(selectedProjectsByAccount.get(user));
-    } else if (!runningProjectLoaderJobs.containsKey(user)) {
+    if (!cachedProjectList.containsKey(user) && !runningProjectLoaderJobs.containsKey(user)) {
       // not cached and not loading - start loading project list here and keep the future reference.
       ListenableFuture<List<Project>> futureResult =
           projectLoader.loadUserProjectsInBackground(user);
@@ -196,11 +190,7 @@ public class ProjectSelectionDialog {
                     // record job result and clear future reference.
                     runningProjectLoaderJobs.remove(user);
                     cachedProjectList.put(user, projects);
-                    // update project list if this list is for currently selected account.
-                    if (user.equals(accountComboBox.getSelectedItem())) {
-                      projectListTableModel.setProjectList(projects);
-                      showProjectInList(selectedProjectsByAccount.get(user));
-                    }
+                    refreshProjectListUi(user);
                   });
             }
 
@@ -211,10 +201,29 @@ public class ProjectSelectionDialog {
                     runningProjectLoaderJobs.remove(user);
                     dialogWrapper.setErrorInfoAll(
                         Collections.singletonList(new ValidationInfo(throwable.getMessage())));
+                    refreshProjectListUi(user);
                   });
             }
           });
       runningProjectLoaderJobs.put(user, futureResult);
+    }
+  }
+
+  private void refreshProjectListUi(@Nullable CredentialedUser user) {
+    // update project list if this list is for currently selected account. if not, do nothing.
+    if ( Objects.equals(user, accountComboBox.getSelectedItem())) {
+      if (cachedProjectList.containsKey(user)) {
+        ((JBTable)projectListTable).setPaintBusy(false);
+        projectListTableModel.setProjectList(cachedProjectList.get(user));
+        showProjectInList(selectedProjectsByAccount.get(user));
+      } else {
+        // no data clears the list.
+        projectListTableModel.setProjectList(Collections.emptyList());
+      }
+      // if project list is loading, mark table as busy.
+      if (runningProjectLoaderJobs.containsKey(user)) {
+        ((JBTable)projectListTable).setPaintBusy(true);
+      }
     }
   }
 
@@ -266,7 +275,7 @@ public class ProjectSelectionDialog {
     accountComboBox = new ComboBox<>();
     accountComboBox.setRenderer(new AccountComboBoxRenderer());
     accountComboBox.addActionListener(
-        (event) -> updateProjectList((CredentialedUser) accountComboBox.getSelectedItem()));
+        (event) -> refreshProjectListUi((CredentialedUser) accountComboBox.getSelectedItem()));
 
     // wrapper for center panel that holds either project selection or sign in screen.
     centerPanelWrapper = new JPanel(new BorderLayout());
