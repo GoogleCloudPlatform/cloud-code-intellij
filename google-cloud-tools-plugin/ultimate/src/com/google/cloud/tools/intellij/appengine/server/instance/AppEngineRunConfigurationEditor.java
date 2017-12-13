@@ -16,9 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
+import com.google.common.collect.Lists;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -26,19 +27,20 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
+import com.intellij.remoteServer.impl.configuration.deployment.ArtifactDeploymentSourceImpl;
 import com.intellij.ui.IdeBorderFactory.PlainSmallWithoutIndent;
+import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.PanelWithAnchor;
 import com.intellij.ui.components.JBLabel;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author nik
@@ -50,7 +52,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private JPanel myMainPanel;
   private JComponent anchor;
   private JBLabel myWebArtifactToDeployLabel;
-  private JComboBox myArtifactComboBox;
+  private JComboBox<Artifact> myArtifactComboBox;
   private JTextField host;
   private JBLabel myPortLabel;
   private JTextField port;
@@ -143,7 +145,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   @NotNull
   @Override
   protected JComponent createEditor() {
-    AppEngineUtil.setupAppEngineStandardArtifactCombobox(myProject, myArtifactComboBox);
+    initDeploymentSources();
     return myMainPanel;
   }
 
@@ -157,5 +159,30 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     this.anchor = anchor;
     myWebArtifactToDeployLabel.setAnchor(anchor);
     myPortLabel.setAnchor(anchor);
+  }
+
+  /**
+   * Initializes the 'artifact to deploy' combobox with the eligible artifact deployment sources.
+   */
+  private void initDeploymentSources() {
+    myArtifactComboBox.setRenderer(
+        new ListCellRendererWrapper<Artifact>() {
+          @Override
+          public void customize(
+              JList list, Artifact value, int index, boolean selected, boolean hasFocus) {
+            if (value != null) {
+              setIcon(value.getArtifactType().getIcon());
+              setText(value.getName());
+            }
+          }
+        });
+
+    List<AppEngineArtifactDeploymentSource> deploymentSources = Lists.newArrayList();
+    deploymentSources.addAll(AppEngineUtil.createArtifactDeploymentSources(myProject));
+
+    deploymentSources
+        .stream()
+        .map(ArtifactDeploymentSourceImpl::getArtifact)
+        .forEach(myArtifactComboBox::addItem);
   }
 }
