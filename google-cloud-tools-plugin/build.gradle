@@ -26,13 +26,12 @@ intellij {
 
     pluginName = 'google-cloud-tools'
     plugins 'Groovy', 'gradle', 'git4idea', 'properties', 'junit', 'maven', 'yaml'
+}
 
-    publish {
-        pluginId '8079'
-        username System.getenv('IJ_REPO_USERNAME')
-        password System.getenv('IJ_REPO_PASSWORD')
-        channel ijPluginRepoChannel
-    }
+publishPlugin {
+    username System.getenv('IJ_REPO_USERNAME')
+    password System.getenv('IJ_REPO_PASSWORD')
+    channels ijPluginRepoChannel
 }
 
 project.afterEvaluate {
@@ -85,6 +84,16 @@ configurations {
     // this is already obtained from google-api-java-client-min-repackaged
     compile.exclude group: 'com.google.api-client', module: 'google-api-client'
     tests
+}
+
+processResources {
+    def trackerProperty =  System.getenv("ANALYTICS_ID")
+    if (trackerProperty) {
+        inputs.property("usageTrackerProperty", trackerProperty)
+        filesMatching("**/config.properties") {
+            expand "usageTrackerProperty": trackerProperty
+        }
+    }
 }
 
 artifacts {
