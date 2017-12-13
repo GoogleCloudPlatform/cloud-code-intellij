@@ -148,7 +148,7 @@ public class ProjectSelectionDialogTest {
 
     cleanLoadUsersAndProjects();
     projectSelectionDialog.showProjectInList(secondProject.getName());
-    CloudProject selectedProject = projectSelectionDialog.getCloudProject();
+    CloudProject selectedProject = projectSelectionDialog.getSelectedProject();
 
     CloudProject expected = CloudProject.create(secondProject.getName(), mockTestUser.getEmail());
     assertThat(selectedProject).isEqualTo(expected);
@@ -180,7 +180,7 @@ public class ProjectSelectionDialogTest {
     mockUserList(Collections.singletonList(mockTestUser));
     mockUserProjects(mockTestUser, Collections.singletonList(testGoogleProject));
     cleanLoadUsersAndProjects();
-    projectSelectionDialog.setCloudProject(selectedProject);
+    projectSelectionDialog.setSelectedProject(selectedProject);
   }
 
   /** Loads users and projects and ensures UI events are processed before returning. */

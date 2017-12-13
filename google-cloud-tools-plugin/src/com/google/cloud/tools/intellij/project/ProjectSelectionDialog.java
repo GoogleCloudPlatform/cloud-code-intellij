@@ -125,23 +125,22 @@ public class ProjectSelectionDialog {
     }
 
     loadUsersAndProjects();
-    setCloudProject(cloudProject);
+    setSelectedProject(cloudProject);
 
     DialogManager.show(dialogWrapper);
 
     int result = dialogWrapper.getExitCode();
-    return result == DialogWrapper.OK_EXIT_CODE ? getCloudProject() : null;
+    return result == DialogWrapper.OK_EXIT_CODE ? getSelectedProject() : null;
   }
 
   @VisibleForTesting
-  void setCloudProject(CloudProject cloudProject) {
+  void setSelectedProject(CloudProject cloudProject) {
     if (cloudProject != null && !Strings.isNullOrEmpty(cloudProject.googleUsername())) {
       Optional<CredentialedUser> loggedInUser =
           Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
       if (loggedInUser.isPresent()) {
         selectedProjectsByAccount.put(loggedInUser.get(), cloudProject.projectName());
         accountComboBox.setSelectedItem(loggedInUser.get());
-        updateProjectList(loggedInUser.get());
       } else {
         // specified user is not in logged in user list, clear the account selection.
         accountComboBox.setSelectedItem(null);
@@ -150,7 +149,7 @@ public class ProjectSelectionDialog {
   }
 
   @VisibleForTesting
-  CloudProject getCloudProject() {
+  CloudProject getSelectedProject() {
     CredentialedUser user = accountComboBox.getItemAt(accountComboBox.getSelectedIndex());
     return CloudProject.create(getSelectedProjectName(), user.getEmail());
   }
@@ -307,8 +306,11 @@ public class ProjectSelectionDialog {
   private void validateProjectSelection() {
     if (projectListTable.getSelectedRow() >= 0) {
       dialogWrapper.setOKActionEnabled(true);
+      selectedProjectsByAccount.put(
+          (CredentialedUser) accountComboBox.getSelectedItem(), getSelectedProjectName());
     } else {
       dialogWrapper.setOKActionEnabled(false);
+      selectedProjectsByAccount.remove((CredentialedUser) accountComboBox.getSelectedItem());
     }
   }
 
