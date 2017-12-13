@@ -17,20 +17,24 @@
 package com.google.cloud.tools.intellij.util;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /** Utilities for working with threads. */
 public final class ThreadUtil {
 
   private static final ThreadUtil INSTANCE = new ThreadUtil();
 
-  private ExecutorService backgroundExecutorService;
+  private ListeningExecutorService backgroundExecutorService;
 
   /** Visibility is restricted internally; use {@link #getInstance()} instead. */
   private ThreadUtil() {
-    this.backgroundExecutorService = Executors.newCachedThreadPool();
+    this.backgroundExecutorService =
+        MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
   }
 
   /** Returns the static instance of this utility. */
@@ -39,12 +43,22 @@ public final class ThreadUtil {
   }
 
   /**
+   * Executes the given {@link Callable} on the background {@link ExecutorService} and returns the
+   * {@link ListenableFuture} result.
+   *
+   * @param callable the {@link Callable} to run on the background {@link ExecutorService}
+   */
+  public <T> ListenableFuture<T> executeInBackground(Callable<T> callable) {
+    return backgroundExecutorService.submit(callable);
+  }
+
+  /**
    * Executes the given {@link Runnable} on the background {@link ExecutorService} and returns the
-   * {@link Future} result.
+   * {@link ListenableFuture} result.
    *
    * @param runnable the {@link Runnable} to run on the background {@link ExecutorService}
    */
-  public Future<?> executeInBackground(Runnable runnable) {
+  public ListenableFuture<?> executeInBackground(Runnable runnable) {
     return backgroundExecutorService.submit(runnable);
   }
 
@@ -65,6 +79,6 @@ public final class ThreadUtil {
    */
   @VisibleForTesting
   public void setBackgroundExecutorService(ExecutorService backgroundExecutorService) {
-    this.backgroundExecutorService = backgroundExecutorService;
+    this.backgroundExecutorService = MoreExecutors.listeningDecorator(backgroundExecutorService);
   }
 }

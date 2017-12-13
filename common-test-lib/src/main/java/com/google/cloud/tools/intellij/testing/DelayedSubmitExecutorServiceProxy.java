@@ -68,8 +68,11 @@ public final class DelayedSubmitExecutorServiceProxy extends AbstractExecutorSer
   }
 
   @Override
-  public void execute(@NotNull Runnable command) {
-    executor.execute(command);
+  public void execute(@NotNull Runnable task) {
+    if (this.task != null) {
+      throw new AssertionError("A task has already been submitted to this executor.");
+    }
+    this.task = task;
   }
 
   /** Stores the submitted {@code task} to be submitted later on {@link #doSubmit()}. */

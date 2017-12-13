@@ -21,10 +21,11 @@
     <![CDATA[<html>
       <p>This plugin integrates Google Cloud Platform into your IDE development workflows. It includes features such as:</p>
       <ul>
-        <li>Google App Engine support for local development and deployment.</li>
-        <li>Set Stackdriver Debugger snapshots to debug your applications running in the cloud.</li>
-        <li>Checkout or import your projects from Cloud Source Repositories.</li>
-        <li>Browse your Google Cloud Storage buckets and copy bucket paths into your clipboard.</li>
+        <li>Deploying to the Google App Engine standard and flexible environments.</li>
+        <li>Setting Stackdriver Debugger snapshots to debug your applications running in the cloud.</li>
+        <li>Checking out or importing your projects from Cloud Source Repositories.</li>
+        <li>Browsing your Google Cloud Storage buckets and copying bucket paths into your clipboard.</li>
+        <li>Running and debugging App Engine standard applications on a local development server.</li>
       </ul>
     </html>]]>
   </description>
@@ -43,6 +44,27 @@
       shell to ensure you have the latest Cloud SDK release.
       </p>
       <br/>
+
+      <h2>[17.12.2]</h2>
+
+      <h3>Fixed</h3>
+      <ul>
+        <li>Fixed broken analytics property setup causing dropped analytics. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1773">#1773</a>)</li>
+      </ul>
+
+      <h2>[17.12.1]</h2>
+
+      <p>The Google Account plugin has now been merged into the Cloud Tools plugin and is no longer a separate installation. If you previously had the Account Tools plugin installed, follow the new dialog prompt to remove it and restart the IDE to ensure that you don't experience any issues.</p>
+
+      <h3>Fixed</h3>
+      <ul>
+        <li>Fixed out of memory error when typing and searching for multiple projects in the cloud project selector. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1742">#1742</a>)</li>
+      </ul>
+
+      <h3>Changed</h3>
+      <ul>
+        <li>The Google Account plugin is now integrated into the Google Cloud Tools plugin. A separate Google Account plugin installation is no longer required. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1735">#1735</a>)</li>
+      </ul>
 
       <h2>[17.11.1]</h2>
 

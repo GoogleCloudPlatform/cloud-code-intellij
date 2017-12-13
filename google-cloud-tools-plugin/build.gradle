@@ -26,13 +26,12 @@ intellij {
 
     pluginName = 'google-cloud-tools'
     plugins 'Groovy', 'gradle', 'git4idea', 'properties', 'junit', 'maven', 'yaml'
+}
 
-    publish {
-        pluginId '8079'
-        username System.getenv('IJ_REPO_USERNAME')
-        password System.getenv('IJ_REPO_PASSWORD')
-        channel ijPluginRepoChannel
-    }
+publishPlugin {
+    username System.getenv('IJ_REPO_USERNAME')
+    password System.getenv('IJ_REPO_PASSWORD')
+    channels ijPluginRepoChannel
 }
 
 project.afterEvaluate {
@@ -69,6 +68,9 @@ dependencies {
     compile files('lib/google-api-services-source.jar')
     compile 'org.yaml:snakeyaml:1.18'
 
+    compileOnly 'com.google.auto.value:auto-value:1.4.1'
+    apt         'com.google.auto.value:auto-value:1.4.1'
+
     testCompile(project(':common-test-lib'))
     testRuntime files('google-account/lib/google-gct-login-context-ij-pg.jar')
 }
@@ -82,6 +84,16 @@ configurations {
     // this is already obtained from google-api-java-client-min-repackaged
     compile.exclude group: 'com.google.api-client', module: 'google-api-client'
     tests
+}
+
+processResources {
+    def trackerProperty =  System.getenv("ANALYTICS_ID")
+    if (trackerProperty) {
+        inputs.property("usageTrackerProperty", trackerProperty)
+        filesMatching("**/config.properties") {
+            expand "usageTrackerProperty": trackerProperty
+        }
+    }
 }
 
 artifacts {
