@@ -94,7 +94,7 @@ public class ProjectSelector extends JPanel {
 
   private void createUIComponents() {
     projectNameLabel = new HyperlinkLabelWithStateAccess();
-    projectNameLabel.setHyperlinkText(GctBundle.getString("project.selector.no.selected.project"));
+    projectNameLabel.setHyperlinkText(GctBundle.getString("cloud.project.selector.no.selected.project"));
     projectNameLabel.addHyperlinkListener(
         (event) -> {
           if (event.getEventType() == EventType.ACTIVATED) {
@@ -132,7 +132,7 @@ public class ProjectSelector extends JPanel {
   }
 
   private void updateEmptySelection() {
-    projectNameLabel.setHyperlinkText(GctBundle.getString("project.selector.no.selected.project"));
+    projectNameLabel.setHyperlinkText(GctBundle.getString("cloud.project.selector.no.selected.project"));
     accountInfoLabel.setHyperlinkText("");
     accountInfoLabel.setIcon(null);
     projectAccountSeparatorLabel.setVisible(false);
@@ -144,7 +144,7 @@ public class ProjectSelector extends JPanel {
     // first just show account email, then expand with name/picture if this account is signed in.
     accountInfoLabel.setHyperlinkText(selection.googleUsername());
     Optional<CredentialedUser> loggedInUser =
-        Services.getLoginService().getLoggedInUser(selection.projectName());
+        Services.getLoginService().getLoggedInUser(selection.googleUsername());
     if (loggedInUser.isPresent()) {
       accountInfoLabel.setHyperlinkText(
           String.format("%s (%s)", loggedInUser.get().getName(), loggedInUser.get().getEmail()));

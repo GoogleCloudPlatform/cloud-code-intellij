@@ -36,7 +36,7 @@ import javax.swing.SwingConstants;
 /**
  * UI for the node that prompts for Google Login.
  */
-class BaseGoogleLoginUi extends JPanel {
+public class BaseGoogleLoginUi extends JPanel {
 
   public static final int PREFERRED_HEIGHT = 150;
   public static final int MIN_WIDTH = 450;
