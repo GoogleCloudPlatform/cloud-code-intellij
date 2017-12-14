@@ -108,6 +108,7 @@ subprojects {
         java {
             googleJavaFormat('1.5')
         }
+        lineEndings 'PLATFORM_NATIVE'
     }
 
     apply plugin: 'checkstyle'
