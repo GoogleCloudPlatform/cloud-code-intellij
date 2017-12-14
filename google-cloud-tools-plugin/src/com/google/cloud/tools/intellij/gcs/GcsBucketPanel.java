@@ -119,12 +119,11 @@ final class GcsBucketPanel {
       notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
     } else {
       CloudProject cloudProject = projectSelector.getSelectedProject();
-      String projectId = cloudProject.projectId();
       Optional<CredentialedUser> user =
           Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
 
       if (user.isPresent()) {
-        loadAndDisplayBuckets(projectId, user.get());
+        loadAndDisplayBuckets(cloudProject.projectId(), user.get());
       } else {
         notificationLabel.setText(
             GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
