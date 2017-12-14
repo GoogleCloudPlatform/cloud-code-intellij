@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
 import com.google.cloud.tools.intellij.debugger.CloudDebugRunConfiguration;
-
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configuration.ConfigurationFactoryEx;
@@ -44,11 +43,9 @@ import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerCon
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
 import com.intellij.util.containers.ContainerUtil;
-
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * @author nik
@@ -62,12 +59,6 @@ public abstract class AppEngineStandardWebIntegration {
   @Nullable
   public abstract VirtualFile suggestParentDirectoryForAppEngineWebXml(@NotNull Module module,
       @NotNull ModifiableRootModel rootModel);
-
-  @NotNull
-  public List<ArtifactType> getAppEngineTargetArtifactTypes() {
-    return ContainerUtil
-        .packNullables(getAppEngineWebArtifactType());
-  }
 
   @NotNull
   public abstract ArtifactType getAppEngineWebArtifactType();

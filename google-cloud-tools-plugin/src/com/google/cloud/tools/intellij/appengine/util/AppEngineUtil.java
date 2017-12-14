@@ -25,10 +25,8 @@ import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPat
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
-
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -38,26 +36,16 @@ import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.artifacts.ArtifactManager;
 import com.intellij.packaging.artifacts.ArtifactPointerManager;
-import com.intellij.packaging.artifacts.ArtifactType;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
-import com.intellij.ui.ListCellRendererWrapper;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-
-import javax.swing.JComboBox;
-import javax.swing.JList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * App Engine utility methods.
@@ -159,24 +147,6 @@ public class AppEngineUtil {
     return moduleDeploymentSources;
   }
 
-  public static void setupAppEngineStandardArtifactCombobox(
-      @NotNull Project project, final @NotNull JComboBox comboBox) {
-    comboBox.setRenderer(
-        new ListCellRendererWrapper<Artifact>() {
-          @Override
-          public void customize(
-              JList list, Artifact value, int index, boolean selected, boolean hasFocus) {
-            if (value != null) {
-              setIcon(value.getArtifactType().getIcon());
-              setText(value.getName());
-            }
-          }
-        });
-
-    comboBox.removeAllItems();
-    collectAppEngineStandardArtifacts(project).forEach(comboBox::addItem);
-  }
-
   public static Optional<AppEngineStandardFacet> findAppEngineStandardFacet(
       @NotNull Project project, @NotNull Artifact artifact) {
     // TODO(joaomartins): Find out why the GAE facet isn't being added to Gradle projects.
@@ -208,7 +178,7 @@ public class AppEngineUtil {
         : null;
   }
 
-  public static AppEngineArtifactDeploymentSource createArtifactDeploymentSource(
+  private static AppEngineArtifactDeploymentSource createArtifactDeploymentSource(
       @NotNull Project project,
       @NotNull Artifact artifact,
       @NotNull AppEngineEnvironment environment) {
@@ -234,19 +204,4 @@ public class AppEngineUtil {
     return new UserSpecifiedPathDeploymentSource(modulePointer);
   }
 
-  private static List<Artifact> collectAppEngineStandardArtifacts(@NotNull Project project) {
-    final List<Artifact> artifacts = new ArrayList<>();
-    if (project.isDefault()) {
-      return artifacts;
-    }
-
-    List<ArtifactType> artifactTypes =
-        AppEngineStandardWebIntegration.getInstance().getAppEngineTargetArtifactTypes();
-
-    return Arrays.stream(ArtifactManager.getInstance(project).getArtifacts())
-        .filter(artifact -> artifactTypes.contains(artifact.getArtifactType()))
-        .filter(artifact -> findAppEngineStandardFacet(project, artifact).isPresent())
-        .sorted(ArtifactManager.ARTIFACT_COMPARATOR)
-        .collect(toList());
-  }
 }
