@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.project;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -76,6 +77,7 @@ public class ProjectSelectionDialogTest {
     projectSelectionDialog.setDialogWrapper(dialogWrapper);
     doReturn(mockDialogButton).when(projectSelectionDialog).getDialogButton(any());
     doNothing().when(projectSelectionDialog).installTableSpeedSearch(any());
+    doNothing().when(projectSelectionDialog).setLoading(anyBoolean());
 
     projectSelectionDialog.createUIComponents();
     projectSelectionDialog.loadAllProjects();

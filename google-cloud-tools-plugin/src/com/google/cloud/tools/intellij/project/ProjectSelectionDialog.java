@@ -34,6 +34,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.JBProgressBar;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.TableSpeedSearch;
 import com.intellij.ui.components.JBTextField;
@@ -53,6 +54,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -88,6 +90,8 @@ public class ProjectSelectionDialog {
 
   private ProjectListTableModel projectListTableModel;
 
+  private JBProgressBar progressBar;
+
   private ProjectLoader projectLoader = new ProjectLoader();
 
   private Map<CredentialedUser, ListenableFuture<List<Project>>> runningProjectLoaderJobs =
@@ -111,8 +115,9 @@ public class ProjectSelectionDialog {
       dialogWrapper.setTitle(GctBundle.getString("cloud.project.selector.dialog.title"));
       // disabled unless project is selected in the list.
       dialogWrapper.setOKActionEnabled(false);
-      // install additional IDEA UI.
+      // install additional dialog only/IDEA UI.
       installTableSpeedSearch(projectListTable);
+      installProgressBar(dialogWrapper);
 
       Stream.of(ProjectManager.getInstance().getOpenProjects())
           .forEach(
@@ -121,7 +126,7 @@ public class ProjectSelectionDialog {
                       .getMessageBus()
                       .connect(dialogWrapper.getDisposable() /* disconnect once dialog is gone. */)
                       .subscribe(
-                          GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, this::loadAllProjects));
+                          GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, this::refreshDialog));
     }
 
     loadAllProjects();
@@ -141,9 +146,6 @@ public class ProjectSelectionDialog {
       if (loggedInUser.isPresent()) {
         selectedProjectsByAccount.put(loggedInUser.get(), cloudProject.projectName());
         accountComboBox.setSelectedItem(loggedInUser.get());
-      } else {
-        // specified user is not in logged in user list, clear the account selection.
-        accountComboBox.setSelectedItem(null);
       }
     } else {
       // no project set, show active user projects by default.
@@ -174,8 +176,8 @@ public class ProjectSelectionDialog {
     }
   }
 
+  /** Check if cached, if not then check if already loading, and finally start loading if not. */
   private void loadProjectList(CredentialedUser user) {
-    // check if cached, if not then check if already loading, and finally start loading if not.
     if (!cachedProjectList.containsKey(user) && !runningProjectLoaderJobs.containsKey(user)) {
       // not cached and not loading - start loading project list here and keep the future reference.
       ListenableFuture<List<Project>> futureResult =
@@ -209,11 +211,18 @@ public class ProjectSelectionDialog {
     }
   }
 
+  /** Preserves currently selected account and refreshes accounts and project lists. */
+  private void refreshDialog() {
+    CredentialedUser currentUser = (CredentialedUser) accountComboBox.getSelectedItem();
+    loadAllProjects();
+    accountComboBox.setSelectedItem(currentUser);
+  }
+
+  /** Updates project list if this list is for currently selected account. if not, does nothing. */
   private void refreshProjectListUi(@Nullable CredentialedUser user) {
-    // update project list if this list is for currently selected account. if not, do nothing.
-    if ( Objects.equals(user, accountComboBox.getSelectedItem())) {
+    if (Objects.equals(user, accountComboBox.getSelectedItem())) {
       if (cachedProjectList.containsKey(user)) {
-        ((JBTable)projectListTable).setPaintBusy(false);
+        setLoading(false);
         projectListTableModel.setProjectList(cachedProjectList.get(user));
         showProjectInList(selectedProjectsByAccount.get(user));
       } else {
@@ -222,9 +231,22 @@ public class ProjectSelectionDialog {
       }
       // if project list is loading, mark table as busy.
       if (runningProjectLoaderJobs.containsKey(user)) {
-        ((JBTable)projectListTable).setPaintBusy(true);
+        setLoading(true);
       }
     }
+  }
+
+  @VisibleForTesting
+  void setLoading(boolean loading) {
+    progressBar.setVisible(loading);
+    int progressBarLength = 150;
+    // center progress bar in the center of table scroll pane.
+    progressBar.setBounds(
+        dialogWrapper.getSize().width / 2 - progressBarLength / 2,
+        dialogWrapper.getSize().height / 2,
+        progressBarLength,
+        progressBar.getPreferredSize().height);
+    ((JBTable) projectListTable).setPaintBusy(loading);
   }
 
   @VisibleForTesting
@@ -277,6 +299,10 @@ public class ProjectSelectionDialog {
     accountComboBox.addActionListener(
         (event) -> refreshProjectListUi((CredentialedUser) accountComboBox.getSelectedItem()));
 
+    progressBar = new JBProgressBar();
+    progressBar.setIndeterminate(true);
+    progressBar.setVisible(false);
+
     // wrapper for center panel that holds either project selection or sign in screen.
     centerPanelWrapper = new JPanel(new BorderLayout());
   }
@@ -292,6 +318,10 @@ public class ProjectSelectionDialog {
         super.selectElement(element, selectedText);
       }
     };
+  }
+
+  private void installProgressBar(ProjectSelectionDialogWrapper dialogWrapper) {
+    dialogWrapper.getRootPane().getLayeredPane().add(progressBar, JLayeredPane.DRAG_LAYER);
   }
 
   private void showSignInRequest() {
@@ -446,7 +476,7 @@ public class ProjectSelectionDialog {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      loadAllProjects();
+      refreshDialog();
     }
   }
 
