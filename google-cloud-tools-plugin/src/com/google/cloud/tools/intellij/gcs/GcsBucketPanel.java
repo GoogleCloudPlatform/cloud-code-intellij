@@ -22,8 +22,9 @@ import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
@@ -35,7 +36,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.DocumentAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
@@ -48,8 +48,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -79,14 +77,7 @@ final class GcsBucketPanel {
     bucketList.setFixedCellHeight(25);
     bucketList.setBackground(bucketListPanel.getBackground());
 
-    projectSelector
-        .addTextChangedListener(
-            new DocumentAdapter() {
-              @Override
-              protected void textChanged(DocumentEvent event) {
-                refresh();
-              }
-            });
+    projectSelector.addProjectSelectionListener((selected) -> refresh());
 
     bucketList.addMouseListener(
         new MouseAdapter() {
@@ -124,14 +115,15 @@ final class GcsBucketPanel {
 
     if (!Services.getLoginService().isLoggedIn()) {
       notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.not.logged.in"));
-    } else if (StringUtils.isEmpty(projectSelector.getText())) {
+    } else if (projectSelector.getSelectedProject() == null) {
       notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
     } else {
-      String projectId = projectSelector.getText();
-      CredentialedUser user = projectSelector.getSelectedUser();
+      CloudProject cloudProject = projectSelector.getSelectedProject();
+      Optional<CredentialedUser> user =
+          Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
 
-      if (user != null) {
-        loadAndDisplayBuckets(projectId, user);
+      if (user.isPresent()) {
+        loadAndDisplayBuckets(cloudProject.projectId(), user.get());
       } else {
         notificationLabel.setText(
             GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
