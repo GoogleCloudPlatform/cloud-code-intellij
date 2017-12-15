@@ -19,19 +19,18 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
-/**
- * The result of a failed validation of a CloudSdk installation.
- */
+/** The result of a failed validation of a CloudSdk installation. */
 public enum CloudSdkValidationResult {
-
   CLOUD_SDK_NOT_FOUND(GctBundle.message("appengine.cloudsdk.location.invalid.message"), true),
   CLOUD_SDK_VERSION_NOT_SUPPORTED(
-      GctBundle.message("appengine.cloudsdk.version.support.message",
-          CloudSdk.MINIMUM_VERSION), false),
+      GctBundle.message("appengine.cloudsdk.version.support.message", CloudSdk.MINIMUM_VERSION),
+      false),
   MALFORMED_PATH(GctBundle.message("appengine.cloudsdk.location.badchars.message"), true),
   NO_APP_ENGINE_COMPONENT(
-      GctBundle.message("appengine.cloudsdk.java.components.missing") + "\n"
-          + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"), false);
+      GctBundle.message("appengine.cloudsdk.java.components.missing")
+          + "\n"
+          + GctBundle.message("appengine.cloudsdk.java.components.howtoinstall"),
+      false);
 
   private final String message;
   private final boolean isError;
@@ -52,5 +51,4 @@ public enum CloudSdkValidationResult {
   public String getMessage() {
     return message;
   }
-
 }

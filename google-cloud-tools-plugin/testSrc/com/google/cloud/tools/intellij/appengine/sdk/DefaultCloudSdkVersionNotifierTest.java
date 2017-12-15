@@ -23,27 +23,19 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.common.collect.Sets;
-
 import com.intellij.util.containers.HashSet;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Spy;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-/**
- * Unit tests for {@link DefaultCloudSdkVersionNotifier}
- */
+/** Unit tests for {@link DefaultCloudSdkVersionNotifier} */
 public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
 
   // Wrap the class under test in a spy so we can perform verifications on it
   @Spy private DefaultCloudSdkVersionNotifier checker;
 
   @Mock private CloudSdkService cloudSdkServiceMock;
-
 
   @Before
   public void setUp() throws ProcessRunnerException {
@@ -82,5 +74,4 @@ public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
     checker.notifyIfUnsupportedVersion();
     verify(checker, times(0)).showNotification();
   }
-
 }

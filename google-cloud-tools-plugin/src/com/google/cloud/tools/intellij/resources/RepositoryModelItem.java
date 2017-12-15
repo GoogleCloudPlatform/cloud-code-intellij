@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.resources;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-/**
- * TreeNode representing a single GCP repository.
- */
+/** TreeNode representing a single GCP repository. */
 public class RepositoryModelItem extends DefaultMutableTreeNode {
 
   private String repositoryName;

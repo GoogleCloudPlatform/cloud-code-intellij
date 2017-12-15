@@ -17,39 +17,31 @@
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.text.StringUtil;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * A widget for selecting a folder in which to generate Flexible source files.
- */
+/** A widget for selecting a folder in which to generate Flexible source files. */
 public class SelectConfigDestinationFolderDialog extends DialogWrapper {
 
   private JPanel rootPanel;
   private TextFieldWithBrowseButton destinationFolderChooser;
   private JPanel additionalConfigurationPanel;
 
-  /**
-   * Initialize the widget and set the default paths.
-   */
-  public SelectConfigDestinationFolderDialog(@Nullable Project project, String directoryPath,
-      String title) {
+  /** Initialize the widget and set the default paths. */
+  public SelectConfigDestinationFolderDialog(
+      @Nullable Project project, String directoryPath, String title) {
     super(project);
     setTitle(title);
 
@@ -58,8 +50,7 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
         GctBundle.message("appengine.flex.config.choose.destination.folder.window.title"),
         null,
         project,
-        FileChooserDescriptorFactory.createSingleFolderDescriptor()
-    );
+        FileChooserDescriptorFactory.createSingleFolderDescriptor());
 
     if (directoryPath != null) {
       try {
@@ -92,8 +83,9 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
   @Override
   protected ValidationInfo doValidate() {
     if (StringUtil.isEmpty(destinationFolderChooser.getText())) {
-      return new ValidationInfo(GctBundle.message(
-          "appengine.flex.config.destination.chooser.directory.missing"), destinationFolderChooser);
+      return new ValidationInfo(
+          GctBundle.message("appengine.flex.config.destination.chooser.directory.missing"),
+          destinationFolderChooser);
     }
     return null;
   }

@@ -23,9 +23,7 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Provides Google user authentication services.
- */
+/** Provides Google user authentication services. */
 public interface IntegratedGoogleLoginService {
 
   /**
@@ -33,8 +31,8 @@ public interface IntegratedGoogleLoginService {
    * headers to use to make http requests. If the user has not signed in, this method will block and
    * pop up the login dialog to the user. If the user cancels signing in, this method will return
    * null.
-   * <p/>
-   * If the access token that was used to sign this transport was revoked or has expired, then
+   *
+   * <p>If the access token that was used to sign this transport was revoked or has expired, then
    * execute() invoked on Request objects constructed from this transport will throw an exception,
    * for example, "com.google.api.client.http.HttpResponseException: 401 Unauthorized"
    *
@@ -47,60 +45,49 @@ public interface IntegratedGoogleLoginService {
   HttpRequestFactory createRequestFactory(@Nullable String message);
 
   /**
-   * Returns the credentials of the active user. If there is no active user,
-   * returns credentials with the access token and refresh token set to {@code null}.
+   * Returns the credentials of the active user. If there is no active user, returns credentials
+   * with the access token and refresh token set to {@code null}.
    */
   @Nullable
   Credential getCredential();
 
-  /**
-   * Returns the active user's email address, or {@code null} if there is no active user.
-   */
+  /** Returns the active user's email address, or {@code null} if there is no active user. */
   @Nullable
   String getEmail();
 
-  /**
-   * Verifies whether there is an active user of not.
-   */
+  /** Verifies whether there is an active user of not. */
   boolean isLoggedIn();
 
   void logInIfNot();
 
-  /**
-   * See {@link #logIn(String, IGoogleLoginCompletedCallback)}.
-   */
+  /** See {@link #logIn(String, IGoogleLoginCompletedCallback)}. */
   void logIn();
 
   /**
-   * Opens an external browser to allow the user to sign in.
-   * If the user is already signed in, this updates the user's credentials.
-   * If the logging process fails, a message dialog will pop up to notify
-   * the user. If the logging process succeeds, a logging event will be fired.
+   * Opens an external browser to allow the user to sign in. If the user is already signed in, this
+   * updates the user's credentials. If the logging process fails, a message dialog will pop up to
+   * notify the user. If the logging process succeeds, a logging event will be fired.
    *
-   * @param message if not null, then this message is displayed above the
-   *          login dialog. This is for when the user is presented
-   *          the login dialog from doing something other than logging in, such
-   *          as accessing Google API services. It should say something like
-   *          "Importing a project from Google Project Hosting requires signing
-   *          in."
-   * @param callback if not null, then this callback is called when the login
-   *     either succeeds or fails.
+   * @param message if not null, then this message is displayed above the login dialog. This is for
+   *     when the user is presented the login dialog from doing something other than logging in,
+   *     such as accessing Google API services. It should say something like "Importing a project
+   *     from Google Project Hosting requires signing in."
+   * @param callback if not null, then this callback is called when the login either succeeds or
+   *     fails.
    */
   void logIn(@Nullable String message, @Nullable IGoogleLoginCompletedCallback callback);
 
   /**
    * Logs out the active user and all other signed in users.
    *
-   * @param showPrompt if true, opens a prompt asking if the user really wants
-   *          to log out. If false, the user is logged out
-   * @return true if the user was logged out or is already logged out, and false
-   *         if the user chose not to log out
+   * @param showPrompt if true, opens a prompt asking if the user really wants to log out. If false,
+   *     the user is logged out
+   * @return true if the user was logged out or is already logged out, and false if the user chose
+   *     not to log out
    */
   boolean logOut(boolean showPrompt);
 
-  /**
-   * Returns a copy of the map of the current logged in users.
-   */
+  /** Returns a copy of the map of the current logged in users. */
   Map<String, CredentialedUser> getAllUsers();
 
   /**
@@ -110,24 +97,20 @@ public interface IntegratedGoogleLoginService {
   @NotNull
   Optional<CredentialedUser> getLoggedInUser(String username);
 
-  /**
-   * Returns the active user.
-   */
+  /** Returns the active user. */
   @Nullable
   CredentialedUser getActiveUser();
 
   /**
-   * Sets the active user to <code>userEmail</code> if <code>userEmail</code> is a logged
-   * in user.
+   * Sets the active user to <code>userEmail</code> if <code>userEmail</code> is a logged in user.
+   *
    * @param userEmail The user to be set as active.
-   * @throws IllegalArgumentException if the <code>userEmail</code> does not exist i.e. is
-   *     not a logged in user.
+   * @throws IllegalArgumentException if the <code>userEmail</code> does not exist i.e. is not a
+   *     logged in user.
    */
   void setActiveUser(String userEmail) throws IllegalArgumentException;
 
-  /**
-   * Initializes the service from the persisted credential store.
-   */
+  /** Initializes the service from the persisted credential store. */
   void loadPersistedCredentials();
 
   /**

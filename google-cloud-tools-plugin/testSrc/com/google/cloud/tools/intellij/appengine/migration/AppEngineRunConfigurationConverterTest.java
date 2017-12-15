@@ -7,15 +7,11 @@ import static org.mockito.Mockito.when;
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.RunManagerSettings;
 import com.intellij.testFramework.PlatformTestCase;
-
-import org.jdom.Element;
-
 import java.util.Collection;
 import java.util.Collections;
+import org.jdom.Element;
 
-/**
- * Unit tests for {@link AppEngineRunConfigurationConverter}.
- */
+/** Unit tests for {@link AppEngineRunConfigurationConverter}. */
 public class AppEngineRunConfigurationConverterTest extends PlatformTestCase {
 
   private AppEngineRunConfigurationConverter converter;

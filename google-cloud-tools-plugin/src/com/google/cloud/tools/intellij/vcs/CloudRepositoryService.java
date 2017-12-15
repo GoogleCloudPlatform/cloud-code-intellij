@@ -29,18 +29,13 @@ import com.google.api.services.source.SourceRequest;
 import com.google.api.services.source.model.ListReposResponse;
 import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-
 import com.intellij.openapi.components.ServiceManager;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.CompletableFuture;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * Service for interacting with Google Cloud Source Repositories.
- */
+/** Service for interacting with Google Cloud Source Repositories. */
 public class CloudRepositoryService {
 
   private static final String CLOUD_SOURCE_API_ROOT_URL = "https://source.googleapis.com/";
@@ -52,25 +47,26 @@ public class CloudRepositoryService {
       throws CloudRepositoryServiceException {
     try {
       Credential credential = user.getCredential();
-      HttpRequestInitializer initializer = httpRequest -> {
-        HttpHeaders headers = new HttpHeaders();
-        httpRequest.setConnectTimeout(LIST_TIMEOUT_MS);
-        httpRequest.setReadTimeout(LIST_TIMEOUT_MS);
-        httpRequest.setHeaders(headers);
-        credential.initialize(httpRequest);
-      };
+      HttpRequestInitializer initializer =
+          httpRequest -> {
+            HttpHeaders headers = new HttpHeaders();
+            httpRequest.setConnectTimeout(LIST_TIMEOUT_MS);
+            httpRequest.setReadTimeout(LIST_TIMEOUT_MS);
+            httpRequest.setHeaders(headers);
+            credential.initialize(httpRequest);
+          };
 
       HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-      String userAgent = ServiceManager
-          .getService(CloudToolsPluginInfoService.class).getUserAgent();
+      String userAgent =
+          ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent();
 
-      Source source = new Source.Builder(httpTransport, JacksonFactory.getDefaultInstance(),
-          initializer)
-          .setRootUrl(CLOUD_SOURCE_API_ROOT_URL)
-          .setServicePath("")
-          // this ends up prefixed to user agent
-          .setApplicationName(userAgent)
-          .build();
+      Source source =
+          new Source.Builder(httpTransport, JacksonFactory.getDefaultInstance(), initializer)
+              .setRootUrl(CLOUD_SOURCE_API_ROOT_URL)
+              .setServicePath("")
+              // this ends up prefixed to user agent
+              .setApplicationName(userAgent)
+              .build();
 
       return new CustomUrlSourceRequest(source, cloudProject).execute();
     } catch (IOException | GeneralSecurityException ex) {
@@ -78,30 +74,27 @@ public class CloudRepositoryService {
     }
   }
 
-  public CompletableFuture<ListReposResponse> listAsync(CredentialedUser user,
-      String cloudProject) {
+  public CompletableFuture<ListReposResponse> listAsync(
+      CredentialedUser user, String cloudProject) {
     return CompletableFuture.supplyAsync(() -> list(user, cloudProject));
   }
 
   /**
-   * The currently used version of the Source API in
-   * {@link com.google.api.services.source.Source.Repos.List} uses an outdated endpoint for listing
-   * repos. This extends the base class {@link SourceRequest} to set the correct url.
+   * The currently used version of the Source API in {@link
+   * com.google.api.services.source.Source.Repos.List} uses an outdated endpoint for listing repos.
+   * This extends the base class {@link SourceRequest} to set the correct url.
    */
   public static class CustomUrlSourceRequest extends SourceRequest<ListReposResponse> {
 
-    @Key
-    private String projectId;
+    @Key private String projectId;
 
     CustomUrlSourceRequest(Source client, String projectId) {
       super(client, "GET", CLOUD_SOURCE_API_LIST_URL, null, ListReposResponse.class);
 
-      this.projectId = Preconditions
-          .checkNotNull(projectId, "Required parameter projectId must be specified.");
+      this.projectId =
+          Preconditions.checkNotNull(projectId, "Required parameter projectId must be specified.");
     }
   }
 
-  public static class CloudRepositoryServiceException extends RuntimeException {
-
-  }
+  public static class CloudRepositoryServiceException extends RuntimeException {}
 }

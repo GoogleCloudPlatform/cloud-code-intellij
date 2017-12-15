@@ -94,7 +94,8 @@ public class ProjectSelector extends JPanel {
 
   private void createUIComponents() {
     projectNameLabel = new HyperlinkLabelWithStateAccess();
-    projectNameLabel.setHyperlinkText(GctBundle.getString("cloud.project.selector.no.selected.project"));
+    projectNameLabel.setHyperlinkText(
+        GctBundle.getString("cloud.project.selector.no.selected.project"));
     projectNameLabel.addHyperlinkListener(
         (event) -> {
           if (event.getEventType() == EventType.ACTIVATED) {
@@ -132,7 +133,8 @@ public class ProjectSelector extends JPanel {
   }
 
   private void updateEmptySelection() {
-    projectNameLabel.setHyperlinkText(GctBundle.getString("cloud.project.selector.no.selected.project"));
+    projectNameLabel.setHyperlinkText(
+        GctBundle.getString("cloud.project.selector.no.selected.project"));
     accountInfoLabel.setHyperlinkText("");
     accountInfoLabel.setIcon(null);
     projectAccountSeparatorLabel.setVisible(false);

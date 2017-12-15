@@ -17,24 +17,21 @@
 package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
-import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
 
-/**
- * Encapsulates a task to be run on Google App Engine.
- */
+/** Encapsulates a task to be run on Google App Engine. */
 public abstract class AppEngineTask {
 
   /**
    * Executes an App Engine task.
+   *
    * @param startListener a callback for retrieving the running process
    */
   abstract void execute(ProcessStartListener startListener);
 
   /**
-   * Gets invoked when the task gets cancelled by {@link AppEngineExecutor}.
-   * Intentionally left empty - it is up to implementors to decide if they need extra
-   * action on cancellation.
+   * Gets invoked when the task gets cancelled by {@link
+   * com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor}. Intentionally left
+   * empty - it is up to implementors to decide if they need extra action on cancellation.
    */
-  void onCancel() {
-  }
+  void onCancel() {}
 }

@@ -26,7 +26,6 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
-
 import java.io.File;
 
 public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
@@ -47,16 +46,12 @@ public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
   protected void tearDown() throws Exception {
     try {
       removeEndpointsSdkFromProject();
-    }
-    finally {
+    } finally {
       super.tearDown();
     }
   }
 
-
-  /**
-   * Adds the App Engine - Endpoint SDK to the test project's library
-   */
+  /** Adds the App Engine - Endpoint SDK to the test project's library */
   private void addEndpointSdkToProject() {
     LocalFileSystem fs = LocalFileSystem.getInstance();
     final VirtualFile libDir = fs.findFileByPath(getTestDataPath());
@@ -64,46 +59,53 @@ public abstract class EndpointTestBase extends JavaCodeInsightFixtureTestCase {
     if (libDir != null) {
       final VirtualFile pluginsDir = libDir.findChild("lib");
       if (pluginsDir != null) {
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
-          @Override
-          public void run() {
-            final LibraryTable table = LibraryTablesRegistrar.getInstance()
-                .getLibraryTableByLevel(LibraryTablesRegistrar.APPLICATION_LEVEL, myModule.getProject());
-            assert table != null;
-            final LibraryTable.ModifiableModel tableModel = table.getModifiableModel();
-            final Library library = tableModel.createLibrary("endpoints-lib");
-            final Library.ModifiableModel libraryModel = library.getModifiableModel();
-            libraryModel.addJarDirectory(pluginsDir, true);
-            libraryModel.commit();
-            tableModel.commit();
+        ApplicationManager.getApplication()
+            .runWriteAction(
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    final LibraryTable table =
+                        LibraryTablesRegistrar.getInstance()
+                            .getLibraryTableByLevel(
+                                LibraryTablesRegistrar.APPLICATION_LEVEL, myModule.getProject());
+                    assert table != null;
+                    final LibraryTable.ModifiableModel tableModel = table.getModifiableModel();
+                    final Library library = tableModel.createLibrary("endpoints-lib");
+                    final Library.ModifiableModel libraryModel = library.getModifiableModel();
+                    libraryModel.addJarDirectory(pluginsDir, true);
+                    libraryModel.commit();
+                    tableModel.commit();
 
-            ModifiableRootModel rootModel = ModuleRootManager.getInstance(myModule).getModifiableModel();
-            Library jar = table.getLibraries()[0];
-            rootModel.addLibraryEntry(jar); // Endpoint is the only jar added
-            rootModel.commit();
-          }
-        });
+                    ModifiableRootModel rootModel =
+                        ModuleRootManager.getInstance(myModule).getModifiableModel();
+                    Library jar = table.getLibraries()[0];
+                    rootModel.addLibraryEntry(jar); // Endpoint is the only jar added
+                    rootModel.commit();
+                  }
+                });
       }
     }
   }
 
   private void removeEndpointsSdkFromProject() {
-    ApplicationManager.getApplication().runWriteAction(new Runnable() {
-      @Override
-      public void run() {
-        LibraryTable table = LibraryTablesRegistrar.getInstance()
-            .getLibraryTableByLevel(LibraryTablesRegistrar.APPLICATION_LEVEL,
-                myModule.getProject());
-        if (table != null) {
-          LibraryTable.ModifiableModel tableModel = table.getModifiableModel();
-          Library library = tableModel.getLibraryByName("endpoints-lib");
-          if (library != null) {
-            tableModel.removeLibrary(library);
-            tableModel.commit();
-          }
-        }
-      }
-    });
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            new Runnable() {
+              @Override
+              public void run() {
+                LibraryTable table =
+                    LibraryTablesRegistrar.getInstance()
+                        .getLibraryTableByLevel(
+                            LibraryTablesRegistrar.APPLICATION_LEVEL, myModule.getProject());
+                if (table != null) {
+                  LibraryTable.ModifiableModel tableModel = table.getModifiableModel();
+                  Library library = tableModel.getLibraryByName("endpoints-lib");
+                  if (library != null) {
+                    tableModel.removeLibrary(library);
+                    tableModel.commit();
+                  }
+                }
+              }
+            });
   }
-
 }

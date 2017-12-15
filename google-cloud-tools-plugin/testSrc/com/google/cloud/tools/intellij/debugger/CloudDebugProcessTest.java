@@ -83,7 +83,7 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     // not fail the test if an error is logged using @BeforeClass. Since this is a JUnit3 test
     // case, we need to elaborately initialize a user in GoogleLogin
     CloudDebugProcessState state =
-        new CloudDebugProcessState(); //Mockito.mock(CloudDebugProcessState.class);
+        new CloudDebugProcessState(); // Mockito.mock(CloudDebugProcessState.class);
     state.setUserEmail("mockUser@foo.com");
 
     CredentialedUser credentialedUser = mock(CredentialedUser.class);

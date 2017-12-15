@@ -18,14 +18,11 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
-
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
 
-/**
- * Tests for {@link AppEngineDeployToolsMenuAction}.
- */
+/** Tests for {@link AppEngineDeployToolsMenuAction}. */
 public class AppEngineDeployToolsMenuActionTest extends PlatformTestCase {
 
   private AppEngineDeployToolsMenuAction action;
@@ -42,21 +39,30 @@ public class AppEngineDeployToolsMenuActionTest extends PlatformTestCase {
   }
 
   public void testIsAppEngineProjectCheck_flexibleFacet() {
-    ApplicationManager.getApplication().runWriteAction(() -> {
-      FacetManager.getInstance(getModule()).addFacet(AppEngineFlexibleFacet.getFacetType(),
-          "flex facet", null /* underlyingFacet */);
-    });
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              FacetManager.getInstance(getModule())
+                  .addFacet(
+                      AppEngineFlexibleFacet.getFacetType(),
+                      "flex facet",
+                      null /* underlyingFacet */);
+            });
 
     assertTrue(action.isAppEngineProject(getProject()));
   }
 
   public void testIsAppEngineProjectCheck_standardFacet() {
-    ApplicationManager.getApplication().runWriteAction(() -> {
-      FacetManager.getInstance(getModule()).addFacet(AppEngineStandardFacet.getFacetType(),
-          "standard facet", null /* underlyingFacet */);
-    });
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              FacetManager.getInstance(getModule())
+                  .addFacet(
+                      AppEngineStandardFacet.getFacetType(),
+                      "standard facet",
+                      null /* underlyingFacet */);
+            });
 
     assertTrue(action.isAppEngineProject(getProject()));
   }
-
 }

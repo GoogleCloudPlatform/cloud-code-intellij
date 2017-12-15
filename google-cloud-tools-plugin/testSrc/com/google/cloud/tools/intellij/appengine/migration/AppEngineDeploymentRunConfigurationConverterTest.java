@@ -5,16 +5,12 @@ import static org.mockito.Mockito.when;
 
 import com.intellij.conversion.RunManagerSettings;
 import com.intellij.testFramework.PlatformTestCase;
-
-import org.jdom.Element;
-
 import java.util.Collection;
 import java.util.Collections;
+import org.jdom.Element;
 
-/**
- * Unit tests for {@link AppEngineDeploymentRunConfigurationConverter}.
- */
-public class AppEngineDeploymentRunConfigurationConverterTest extends PlatformTestCase{
+/** Unit tests for {@link AppEngineDeploymentRunConfigurationConverter}. */
+public class AppEngineDeploymentRunConfigurationConverterTest extends PlatformTestCase {
 
   private AppEngineDeploymentRunConfigurationConverter converter;
   private RunManagerSettings runManagerSettings;
@@ -42,5 +38,4 @@ public class AppEngineDeploymentRunConfigurationConverterTest extends PlatformTe
 
     assertFalse(converter.isConversionNeeded(runManagerSettings));
   }
-
 }

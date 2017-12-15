@@ -18,22 +18,22 @@ package com.google.cloud.tools.intellij.appengine.application;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 
-/**
- * Exception type for errors encountered when calling a Google API.
- */
+/** Exception type for errors encountered when calling a Google API. */
 public class GoogleApiException extends Exception {
 
   private final int statusCode;
 
   /**
-   * Static builder to construct a {@code GoogleApiException} from a
-   * {@link GoogleJsonResponseException}
+   * Static builder to construct a {@code GoogleApiException} from a {@link
+   * GoogleJsonResponseException}
    *
    * @param exception a GoogleJsonResponseException that was thrown by a Google API call
    */
   public static GoogleApiException from(GoogleJsonResponseException exception) {
-    String message = exception.getDetails() != null ? exception.getDetails().getMessage()
-        : exception.getMessage();
+    String message =
+        exception.getDetails() != null
+            ? exception.getDetails().getMessage()
+            : exception.getMessage();
     return new GoogleApiException(message, exception, exception.getStatusCode());
   }
 
@@ -50,5 +50,4 @@ public class GoogleApiException extends Exception {
   public int getStatusCode() {
     return this.statusCode;
   }
-
 }

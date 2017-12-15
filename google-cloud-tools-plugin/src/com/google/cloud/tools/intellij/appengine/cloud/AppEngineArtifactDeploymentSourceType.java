@@ -26,14 +26,11 @@ import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
 import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
-
-import org.jdom.Element;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Arrays;
 import java.util.Optional;
-
 import javax.swing.JComponent;
+import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A {@link DeploymentSourceType} loading and saving of a {@link AppEngineArtifactDeploymentSource}.
@@ -58,27 +55,30 @@ public class AppEngineArtifactDeploymentSourceType
 
     if (settings != null) {
       Artifact[] artifacts = ArtifactManager.getInstance(project).getArtifacts();
-      Optional<Artifact> artifact = Arrays.stream(artifacts)
-          .filter(candidate -> candidate.getName().equals(artifactName))
-          .findFirst();
+      Optional<Artifact> artifact =
+          Arrays.stream(artifacts)
+              .filter(candidate -> candidate.getName().equals(artifactName))
+              .findFirst();
 
-      String environment = settings.getAttributeValue(
-          AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
+      String environment =
+          settings.getAttributeValue(AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE);
 
       if (artifact.isPresent() && environment != null) {
-        return createDeploymentSource(AppEngineEnvironment.valueOf(environment),
-            ArtifactPointerManager.getInstance(project).createPointer(artifact.get()), tag);
+        return createDeploymentSource(
+            AppEngineEnvironment.valueOf(environment),
+            ArtifactPointerManager.getInstance(project).createPointer(artifact.get()),
+            tag);
       }
     }
 
     return createDeploymentSource(
         null /*environment */,
-        ArtifactPointerManager.getInstance(project).createPointer(artifactName), tag);
+        ArtifactPointerManager.getInstance(project).createPointer(artifactName),
+        tag);
   }
 
   @Override
-  public void save(@NotNull ArtifactDeploymentSource deploymentSource,
-      @NotNull Element tag) {
+  public void save(@NotNull ArtifactDeploymentSource deploymentSource, @NotNull Element tag) {
     tag.setAttribute(NAME_ATTRIBUTE, deploymentSource.getPresentableName());
 
     if (deploymentSource instanceof AppEngineDeployable) {
@@ -95,8 +95,8 @@ public class AppEngineArtifactDeploymentSourceType
   }
 
   @Override
-  public void setBuildBeforeRunTask(@NotNull RunConfiguration configuration,
-      @NotNull ArtifactDeploymentSource source) {
+  public void setBuildBeforeRunTask(
+      @NotNull RunConfiguration configuration, @NotNull ArtifactDeploymentSource source) {
     Artifact artifact = source.getArtifact();
     if (artifact != null) {
       BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRun(
@@ -105,9 +105,11 @@ public class AppEngineArtifactDeploymentSourceType
   }
 
   @Override
-  public void updateBuildBeforeRunOption(@NotNull JComponent runConfigurationEditorComponent,
+  public void updateBuildBeforeRunOption(
+      @NotNull JComponent runConfigurationEditorComponent,
       @NotNull Project project,
-      @NotNull ArtifactDeploymentSource source, boolean select) {
+      @NotNull ArtifactDeploymentSource source,
+      boolean select) {
     Artifact artifact = source.getArtifact();
     if (artifact != null) {
       BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRunOption(
@@ -117,12 +119,11 @@ public class AppEngineArtifactDeploymentSourceType
 
   private AppEngineArtifactDeploymentSource createDeploymentSource(
       AppEngineEnvironment environment, ArtifactPointer artifactPointer, Element persistedData) {
-    AppEngineArtifactDeploymentSource source
-        = new AppEngineArtifactDeploymentSource(environment, artifactPointer);
+    AppEngineArtifactDeploymentSource source =
+        new AppEngineArtifactDeploymentSource(environment, artifactPointer);
     source.setProjectName(persistedData.getAttributeValue(PROJECT_ATTRIBUTE));
     source.setVersion(persistedData.getAttributeValue(VERSION_ATTRIBUTE));
 
     return source;
   }
-
 }

@@ -18,9 +18,5 @@ package com.google.cloud.tools.intellij.service;
 
 import com.google.cloud.tools.intellij.PluginConfigurationService;
 
-/**
- * Use this service to change the Google Account plugins configuration.
- */
-public interface AccountPluginConfigurationService extends PluginConfigurationService {
-
-}
+/** Use this service to change the Google Account plugins configuration. */
+public interface AccountPluginConfigurationService extends PluginConfigurationService {}

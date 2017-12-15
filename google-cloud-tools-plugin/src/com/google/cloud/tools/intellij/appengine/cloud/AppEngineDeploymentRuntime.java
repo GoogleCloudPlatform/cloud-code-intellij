@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStopTask;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -28,15 +27,11 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
-
+import javax.swing.SwingUtilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.SwingUtilities;
-
-/**
- * Takes care of undeploy and stop of App Engine applications.
- */
+/** Takes care of undeploy and stop of App Engine applications. */
 public class AppEngineDeploymentRuntime extends DeploymentRuntime {
 
   private static final String STOP_CONFIRMATION_URI_OPEN_TAG =
@@ -68,47 +63,49 @@ public class AppEngineDeploymentRuntime extends DeploymentRuntime {
   @Override
   public boolean isUndeploySupported() {
     return environment != AppEngineEnvironment.APP_ENGINE_STANDARD
-        && service != null && version != null;
+        && service != null
+        && version != null;
   }
 
   @Override
   public void undeploy(@NotNull final UndeploymentTaskCallback callback) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        int doStop = Messages
-            .showOkCancelDialog(
-                GctBundle.message(
-                    "appengine.stop.modules.version.confirmation.message",
-                    STOP_CONFIRMATION_URI_OPEN_TAG,
-                    STOP_CONFIRMATION_URI_CLOSE_TAG),
-                GctBundle.message("appengine.stop.modules.version.confirmation.title"),
-                General.Warning);
+    SwingUtilities.invokeLater(
+        new Runnable() {
+          @Override
+          public void run() {
+            int doStop =
+                Messages.showOkCancelDialog(
+                    GctBundle.message(
+                        "appengine.stop.modules.version.confirmation.message",
+                        STOP_CONFIRMATION_URI_OPEN_TAG,
+                        STOP_CONFIRMATION_URI_CLOSE_TAG),
+                    GctBundle.message("appengine.stop.modules.version.confirmation.title"),
+                    General.Warning);
 
-        if (doStop == Messages.YES) {
-          stop(callback);
-        } else {
-          callback.errorOccurred(
-              GctBundle.message("appengine.stop.modules.version.canceled.message"));
-        }
-      }
-    });
+            if (doStop == Messages.YES) {
+              stop(callback);
+            } else {
+              callback.errorOccurred(
+                  GctBundle.message("appengine.stop.modules.version.canceled.message"));
+            }
+          }
+        });
   }
 
   private void stop(@NotNull UndeploymentTaskCallback callback) {
-    AppEngineStop stop = new AppEngineStop(
-        appEngineHelper, loggingHandler, configuration, callback);
+    AppEngineStop stop =
+        new AppEngineStop(appEngineHelper, loggingHandler, configuration, callback);
 
     final AppEngineExecutor stopRunner =
         new AppEngineExecutor(new AppEngineStopTask(stop, service, version));
 
     ProgressManager.getInstance()
-        .run(new Task.Backgroundable(appEngineHelper.getProject(), "Stop App Engine", true,
-            null) {
-          @Override
-          public void run(@NotNull ProgressIndicator indicator) {
-            ApplicationManager.getApplication().invokeLater(stopRunner);
-          }
-        });
+        .run(
+            new Task.Backgroundable(appEngineHelper.getProject(), "Stop App Engine", true, null) {
+              @Override
+              public void run(@NotNull ProgressIndicator indicator) {
+                ApplicationManager.getApplication().invokeLater(stopRunner);
+              }
+            });
   }
 }

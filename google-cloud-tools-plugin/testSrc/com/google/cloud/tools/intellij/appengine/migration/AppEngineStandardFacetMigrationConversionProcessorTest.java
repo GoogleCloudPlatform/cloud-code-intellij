@@ -22,15 +22,11 @@ import static org.mockito.Mockito.when;
 
 import com.intellij.conversion.ModuleSettings;
 import com.intellij.testFramework.PlatformTestCase;
-
-import org.jdom.Element;
-
 import java.util.Collection;
 import java.util.Collections;
+import org.jdom.Element;
 
-/**
- * Unit tests for {@link AppEngineStandardFacetMigrationConversionProcessor}
- */
+/** Unit tests for {@link AppEngineStandardFacetMigrationConversionProcessor} */
 public class AppEngineStandardFacetMigrationConversionProcessorTest extends PlatformTestCase {
 
   private ModuleSettings moduleSettingsMock;
@@ -48,9 +44,11 @@ public class AppEngineStandardFacetMigrationConversionProcessorTest extends Plat
   }
 
   public void testIsConversionNeeded_oldFacetsAreNotPresent() {
-    when(moduleSettingsMock.getFacetElements(getOldFacetId())).thenReturn((Collection) Collections.emptyList());
+    when(moduleSettingsMock.getFacetElements(getOldFacetId()))
+        .thenReturn((Collection) Collections.emptyList());
     assertFalse(processor.isConversionNeeded(moduleSettingsMock));
   }
+
   public void testIsConversionNeeded_oldFacetsArePresent() {
     when(moduleSettingsMock.getFacetElements(getOldFacetId())).thenReturn(testFacetElements);
     assertTrue(processor.isConversionNeeded(moduleSettingsMock));
@@ -59,6 +57,4 @@ public class AppEngineStandardFacetMigrationConversionProcessorTest extends Plat
   private String getOldFacetId() {
     return eq(AppEngineStandardFacetMigrationConversionProcessor.DEPRECATED_APP_ENGINE_FACET_ID);
   }
-
 }
-

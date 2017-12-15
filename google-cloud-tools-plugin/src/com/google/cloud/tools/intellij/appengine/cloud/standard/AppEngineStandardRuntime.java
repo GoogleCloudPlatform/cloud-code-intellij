@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.cloud.standard;
 import org.jetbrains.annotations.Nullable;
 
 public enum AppEngineStandardRuntime {
-
   JAVA_8("java8");
 
   private final String label;
@@ -44,7 +43,5 @@ public enum AppEngineStandardRuntime {
       default:
         return null;
     }
-
   }
-
 }

@@ -23,7 +23,6 @@ import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,18 +31,16 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>Stores the Flexible configuration files locations.
  */
-public class AppEngineFlexibleFacetConfiguration implements FacetConfiguration,
-    PersistentStateComponent<AppEngineFlexibleFacetConfiguration> {
+public class AppEngineFlexibleFacetConfiguration
+    implements FacetConfiguration, PersistentStateComponent<AppEngineFlexibleFacetConfiguration> {
 
   private String appYamlPath;
   private String dockerDirectory;
 
   @Override
-  public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
-      FacetValidatorsManager validatorsManager) {
-    return new FacetEditorTab[]{
-      new FlexibleFacetEditor(this, editorContext.getModule())
-    };
+  public FacetEditorTab[] createEditorTabs(
+      FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
+    return new FacetEditorTab[] {new FlexibleFacetEditor(this, editorContext.getModule())};
   }
 
   @Override

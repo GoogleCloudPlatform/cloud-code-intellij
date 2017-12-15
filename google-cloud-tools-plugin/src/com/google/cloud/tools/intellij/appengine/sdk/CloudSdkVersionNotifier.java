@@ -23,16 +23,11 @@ import com.intellij.openapi.components.ServiceManager;
  */
 public abstract class CloudSdkVersionNotifier {
 
-  /**
-   * Returns a registered instance of CloudSdkVersionNotifier.
-   */
+  /** Returns a registered instance of CloudSdkVersionNotifier. */
   public static CloudSdkVersionNotifier getInstance() {
     return ServiceManager.getService(CloudSdkVersionNotifier.class);
   }
 
-  /**
-   * Notifies the user if the saved Cloud SDK is not supported.
-   */
+  /** Notifies the user if the saved Cloud SDK is not supported. */
   public abstract void notifyIfUnsupportedVersion();
-
 }

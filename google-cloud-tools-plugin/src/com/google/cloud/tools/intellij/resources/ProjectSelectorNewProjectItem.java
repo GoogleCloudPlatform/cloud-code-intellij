@@ -34,9 +34,7 @@ import javax.swing.event.MouseInputListener;
 import javax.swing.tree.TreeModel;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * UI for the "click here to add a project" node.
- */
+/** UI for the "click here to add a project" node. */
 class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, MouseInputListener {
 
   private static final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
@@ -74,8 +72,7 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
   }
 
   @Override
-  public void mouseClicked(MouseEvent event) {
-  }
+  public void mouseClicked(MouseEvent event) {}
 
   @Override
   public void mousePressed(MouseEvent event) {
@@ -92,20 +89,16 @@ class ProjectSelectorNewProjectItem extends JPanel implements MouseListener, Mou
   }
 
   @Override
-  public void mouseReleased(MouseEvent event) {
-  }
+  public void mouseReleased(MouseEvent event) {}
 
   @Override
-  public void mouseEntered(MouseEvent event) {
-  }
+  public void mouseEntered(MouseEvent event) {}
 
   @Override
-  public void mouseExited(MouseEvent event) {
-  }
+  public void mouseExited(MouseEvent event) {}
 
   @Override
-  public void mouseDragged(MouseEvent event) {
-  }
+  public void mouseDragged(MouseEvent event) {}
 
   @Override
   public void mouseMoved(MouseEvent event) {

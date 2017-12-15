@@ -16,18 +16,14 @@
 
 package com.google.cloud.tools.intellij.login;
 
-/**
- * Configures the correct Google login landing page based off of the IJ platform.
- */
+/** Configures the correct Google login landing page based off of the IJ platform. */
 public enum LandingPages {
   INTELLIJ(
       "https://cloud.google.com/tools/intellij/auth_success",
-      "https://cloud.google.com/tools/intellij/auth_failure"
-  ),
+      "https://cloud.google.com/tools/intellij/auth_failure"),
   ANDROID_STUDIO(
       "https://developers.google.com/cloud/mobile/auth_success",
-      "https://developers.google.com/cloud/mobile/auth_failure"
-  );
+      "https://developers.google.com/cloud/mobile/auth_failure");
 
   private final String successPage;
   private final String failurePage;

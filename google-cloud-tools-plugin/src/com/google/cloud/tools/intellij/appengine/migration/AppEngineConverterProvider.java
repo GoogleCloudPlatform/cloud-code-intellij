@@ -17,22 +17,17 @@
 package com.google.cloud.tools.intellij.appengine.migration;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.conversion.ConversionContext;
 import com.intellij.conversion.ConversionProcessor;
 import com.intellij.conversion.ConverterProvider;
 import com.intellij.conversion.ModuleSettings;
 import com.intellij.conversion.ProjectConverter;
 import com.intellij.conversion.RunManagerSettings;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Converter provider to migrate projects created by the legacy plugin to work with this one.
- */
-public class AppEngineConverterProvider
-  extends ConverterProvider {
+/** Converter provider to migrate projects created by the legacy plugin to work with this one. */
+public class AppEngineConverterProvider extends ConverterProvider {
 
   public AppEngineConverterProvider() {
     super("google-app-engine-migration");

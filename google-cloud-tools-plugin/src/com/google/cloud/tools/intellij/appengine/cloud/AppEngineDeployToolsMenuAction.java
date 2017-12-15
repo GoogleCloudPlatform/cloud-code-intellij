@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
-
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
@@ -33,24 +32,19 @@ import com.intellij.remoteServer.ServerType;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.RemoteServersManager;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfigurationManager;
-import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
-import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerSettingsEditor;
 import com.intellij.util.containers.ContainerUtil;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * Creates a shortcut to App Engine deployment configuration in the tools menu.
- */
+/** Creates a shortcut to App Engine deployment configuration in the tools menu. */
 public class AppEngineDeployToolsMenuAction extends AnAction {
 
   private static final Logger logger = Logger.getInstance(AppEngineDeployToolsMenuAction.class);
 
   public AppEngineDeployToolsMenuAction() {
-    super(GctBundle.message("appengine.tools.menu.deploy.text"),
+    super(
+        GctBundle.message("appengine.tools.menu.deploy.text"),
         GctBundle.message("appengine.tools.menu.deploy.description"),
         GoogleCloudToolsIcons.APP_ENGINE);
   }
@@ -112,7 +106,9 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
     AppEngineProjectService projectService = AppEngineProjectService.getInstance();
 
     return Stream.of(ModuleManager.getInstance(project).getModules())
-        .anyMatch(module -> projectService.hasAppEngineStandardFacet(module)
-            || projectService.hasAppEngineFlexFacet(module));
+        .anyMatch(
+            module ->
+                projectService.hasAppEngineStandardFacet(module)
+                    || projectService.hasAppEngineFlexFacet(module));
   }
 }

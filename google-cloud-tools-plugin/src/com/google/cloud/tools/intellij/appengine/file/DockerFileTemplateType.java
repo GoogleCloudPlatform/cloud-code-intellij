@@ -18,11 +18,9 @@ package com.google.cloud.tools.intellij.appengine.file;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.fileTypes.StdFileTypes;
-
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.Icon;
 
 /**
  * Representation of the Docker configuration file type used for generation of Dockerfile's from

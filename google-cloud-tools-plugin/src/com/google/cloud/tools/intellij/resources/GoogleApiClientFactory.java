@@ -25,9 +25,7 @@ import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Factory class for creating instances of Google API clients.
- */
+/** Factory class for creating instances of Google API clients. */
 public abstract class GoogleApiClientFactory {
 
   public static GoogleApiClientFactory getInstance() {
@@ -36,17 +34,19 @@ public abstract class GoogleApiClientFactory {
 
   /**
    * Creates a new instance of a {@link CloudResourceManager} client
+   *
    * @param httpRequestInitializer optional HttpRequestInitializer
    */
-  public abstract CloudResourceManager getCloudResourceManagerClient(@Nullable HttpRequestInitializer
-      httpRequestInitializer);
+  public abstract CloudResourceManager getCloudResourceManagerClient(
+      @Nullable HttpRequestInitializer httpRequestInitializer);
 
   /**
    * Creates a new instance of a {@link Appengine} client
+   *
    * @param httpRequestInitializer optional HttpRequestInitializer
    */
-  public abstract Appengine getAppEngineApiClient(@Nullable HttpRequestInitializer
-      httpRequestInitializer);
+  public abstract Appengine getAppEngineApiClient(
+      @Nullable HttpRequestInitializer httpRequestInitializer);
 
   /**
    * Creates a new instance of {@link Storage} client.

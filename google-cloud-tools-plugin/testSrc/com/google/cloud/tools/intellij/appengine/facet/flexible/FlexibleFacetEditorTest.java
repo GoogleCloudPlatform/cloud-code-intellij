@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.testFramework.PlatformTestCase;
-
 import java.io.File;
 
 public class FlexibleFacetEditorTest extends PlatformTestCase {

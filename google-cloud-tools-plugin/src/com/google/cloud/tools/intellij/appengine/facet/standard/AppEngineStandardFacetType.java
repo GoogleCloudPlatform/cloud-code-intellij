@@ -18,22 +18,17 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeId;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
-
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.Icon;
-
-/**
- * @author nik
- */
+/** @author nik */
 public class AppEngineStandardFacetType
     extends FacetType<AppEngineStandardFacet, AppEngineStandardFacetConfiguration> {
 
@@ -50,10 +45,11 @@ public class AppEngineStandardFacetType
   }
 
   @Override
-  public AppEngineStandardFacet createFacet(@NotNull Module module,
-                                    String name,
-                                    @NotNull AppEngineStandardFacetConfiguration configuration,
-                                    @Nullable Facet underlyingFacet) {
+  public AppEngineStandardFacet createFacet(
+      @NotNull Module module,
+      String name,
+      @NotNull AppEngineStandardFacetConfiguration configuration,
+      @Nullable Facet underlyingFacet) {
     return new AppEngineStandardFacet(this, module, name, configuration);
   }
 

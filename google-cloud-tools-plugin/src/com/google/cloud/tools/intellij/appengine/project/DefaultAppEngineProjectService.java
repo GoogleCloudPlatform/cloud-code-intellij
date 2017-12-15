@@ -24,7 +24,6 @@ import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineTemplateGroupDescriptorFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-
 import com.intellij.facet.FacetManager;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
@@ -47,15 +46,6 @@ import com.intellij.remoteServer.configuration.deployment.ArtifactDeploymentSour
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.usageView.UsageInfo;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.idea.maven.project.MavenProject;
-import org.jetbrains.idea.maven.project.MavenProjectsManager;
-import org.jetbrains.plugins.gradle.util.GradleConstants;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.scanner.ScannerException;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -68,10 +58,15 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.idea.maven.project.MavenProject;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
+import org.jetbrains.plugins.gradle.util.GradleConstants;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.scanner.ScannerException;
 
-/**
- * Implementation of methods for inspecting an App Engine project's structure and configuration.
- */
+/** Implementation of methods for inspecting an App Engine project's structure and configuration. */
 public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   private static Logger logger = Logger.getInstance(DefaultAppEngineProjectService.class);
@@ -121,8 +116,9 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     // The order here is important -- Standard must come before Flexible so that when both Standard
     // and Flexible are selected from the New Project/Module dialog, Standard takes precedence.
     if (hasAppEngineStandardFacet(module)) {
-      if (isFlexCompat(AppEngineAssetProvider.getInstance().loadAppEngineStandardWebXml(
-          module.getProject(), ImmutableList.of(module)))) {
+      if (isFlexCompat(
+          AppEngineAssetProvider.getInstance()
+              .loadAppEngineStandardWebXml(module.getProject(), ImmutableList.of(module)))) {
         return Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX_COMPAT);
       }
 
@@ -163,8 +159,7 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(module.getProject());
     MavenProject mavenProject = projectsManager.findProject(module);
 
-    return mavenProject != null
-        && projectsManager.isMavenizedModule(module);
+    return mavenProject != null && projectsManager.isMavenizedModule(module);
   }
 
   @Override
@@ -180,17 +175,15 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     return mavenProject != null
         && isMavenModule(module)
         && ("jar".equalsIgnoreCase(mavenProject.getPackaging())
-        || "war".equalsIgnoreCase(mavenProject.getPackaging()));
+            || "war".equalsIgnoreCase(mavenProject.getPackaging()));
   }
 
   @Nullable
-  private XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
-      @Nullable DeploymentSource source) {
+  private XmlFile loadAppEngineStandardWebXml(
+      @NotNull Project project, @Nullable DeploymentSource source) {
     if (source instanceof ArtifactDeploymentSource) {
       Artifact artifact = ((ArtifactDeploymentSource) source).getArtifact();
-      return artifact != null
-          ? assetProvider.loadAppEngineStandardWebXml(project, artifact)
-          : null;
+      return artifact != null ? assetProvider.loadAppEngineStandardWebXml(project, artifact) : null;
     } else if (source instanceof ModuleDeploymentSource) {
       Module module = ((ModuleDeploymentSource) source).getModule();
       return module != null
@@ -202,8 +195,8 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   /**
-   * Given an artifact, returns the xml tag corresponding to the artifact's
-   * appengine-web.xml compat configuration or null if there isn't one.
+   * Given an artifact, returns the xml tag corresponding to the artifact's appengine-web.xml compat
+   * configuration or null if there isn't one.
    */
   @Nullable
   private XmlTag getFlexCompatXmlConfiguration(@Nullable XmlFile webXml) {
@@ -243,21 +236,17 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
     }
   }
 
-  /**
-   * @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed
-   */
+  /** @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed */
   @Override
   public Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPathString)
       throws MalformedYamlFileException {
     return getValueFromAppYaml(appYamlPathString, SERVICE_TAG_NAME);
   }
 
-  /**
-   * @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed
-   */
+  /** @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed */
   @Override
-  public Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(
-      @NotNull String appYamlPathString) throws MalformedYamlFileException {
+  public Optional<FlexibleRuntime> getFlexibleRuntimeFromAppYaml(@NotNull String appYamlPathString)
+      throws MalformedYamlFileException {
     try {
       return getValueFromAppYaml(appYamlPathString, RUNTIME_TAG_NAME)
           .map(String::toUpperCase)
@@ -268,14 +257,15 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   /**
-   * Returns the value of a key-value pair for a given {@code key}, on the file located at
-   * {@code appYamlPathString}.
-   * @return a String with the value, or an empty Optional if app.yaml isn't a regular file, or
-   * if there is any error getting the value
+   * Returns the value of a key-value pair for a given {@code key}, on the file located at {@code
+   * appYamlPathString}.
+   *
+   * @return a String with the value, or an empty Optional if app.yaml isn't a regular file, or if
+   *     there is any error getting the value
    * @throws MalformedYamlFileException when an app.yaml isn't syntactically well formed
    */
-  private Optional<String> getValueFromAppYaml(@NotNull String appYamlPathString,
-      @NotNull String key) throws MalformedYamlFileException {
+  private Optional<String> getValueFromAppYaml(
+      @NotNull String appYamlPathString, @NotNull String key) throws MalformedYamlFileException {
     Yaml yamlParser = new Yaml();
 
     Path appYamlPath = Paths.get(appYamlPathString);
@@ -332,79 +322,83 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
 
   @Override
   public void generateAppYaml(FlexibleRuntime runtime, Module module, Path outputFolderPath) {
-    Properties templateProperties =
-        FileTemplateManager.getDefaultInstance().getDefaultProperties();
+    Properties templateProperties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
     templateProperties.put("RUNTIME", runtime.toString());
 
-    ApplicationManager.getApplication().runWriteAction(() -> {
-      generateFromTemplate(
-          AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE,
-          "app.yaml",
-          outputFolderPath,
-          templateProperties,
-          module);
-    });
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              generateFromTemplate(
+                  AppEngineTemplateGroupDescriptorFactory.APP_YAML_TEMPLATE,
+                  "app.yaml",
+                  outputFolderPath,
+                  templateProperties,
+                  module);
+            });
   }
 
   @Override
-  public void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type, Module module,
-      Path outputFolderPath) {
+  public void generateDockerfile(
+      AppEngineFlexibleDeploymentArtifactType type, Module module, Path outputFolderPath) {
     if (type == AppEngineFlexibleDeploymentArtifactType.UNKNOWN) {
       throw new RuntimeException("Cannot generate Dockerfile for unknown artifact type.");
     }
 
-    ApplicationManager.getApplication().runWriteAction(() -> {
-      PsiElement element = generateFromTemplate(
-          type == AppEngineFlexibleDeploymentArtifactType.JAR
-              ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
-              : AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_WAR_TEMPLATE,
-          "Dockerfile",
-          outputFolderPath,
-          FileTemplateManager.getDefaultInstance().getDefaultProperties(),
-          module);
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              PsiElement element =
+                  generateFromTemplate(
+                      type == AppEngineFlexibleDeploymentArtifactType.JAR
+                          ? AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_JAR_TEMPLATE
+                          : AppEngineTemplateGroupDescriptorFactory.DOCKERFILE_WAR_TEMPLATE,
+                      "Dockerfile",
+                      outputFolderPath,
+                      FileTemplateManager.getDefaultInstance().getDefaultProperties(),
+                      module);
 
-      if (element != null) {
-        // Remove the .docker extension to satisfy the Docker convention. This extension was added
-        // since the templating mechanism requires an extension or else a default template type of
-        // "java" will be assumed.
-        RenamePsiElementProcessor.DEFAULT.renameElement(
-            element,
-            "Dockerfile" /*newName*/,
-            UsageInfo.EMPTY_ARRAY,
-            null /*listener*/);
-      }
-    });
+              if (element != null) {
+                // Remove the .docker extension to satisfy the Docker convention. This extension was
+                // added
+                // since the templating mechanism requires an extension or else a default template
+                // type of
+                // "java" will be assumed.
+                RenamePsiElementProcessor.DEFAULT.renameElement(
+                    element, "Dockerfile" /*newName*/, UsageInfo.EMPTY_ARRAY, null /*listener*/);
+              }
+            });
   }
 
   @Nullable
-  private PsiElement generateFromTemplate(String templateName, String outputFileName,
-      Path outputFolderPath, Properties templateProperties, Module module) {
-    FileTemplate configTemplate = FileTemplateManager.getDefaultInstance().getInternalTemplate(
-        templateName);
+  private PsiElement generateFromTemplate(
+      String templateName,
+      String outputFileName,
+      Path outputFolderPath,
+      Properties templateProperties,
+      Module module) {
+    FileTemplate configTemplate =
+        FileTemplateManager.getDefaultInstance().getInternalTemplate(templateName);
 
     File outputFolder = outputFolderPath.toFile();
     if (!outputFolder.exists() && !outputFolder.mkdirs()) {
       logger.warn("Failed to create " + outputFileName + " directory: " + outputFolder.toString());
       return null;
     }
-    VirtualFile virtualOutputFolder = LocalFileSystem.getInstance().
-        refreshAndFindFileByIoFile(outputFolder);
+    VirtualFile virtualOutputFolder =
+        LocalFileSystem.getInstance().refreshAndFindFileByIoFile(outputFolder);
     if (virtualOutputFolder == null) {
       logger.warn("Failed to locate " + outputFolder.toString() + "directory");
       return null;
     }
-    PsiDirectory outputPsiDirectory = PsiManager.getInstance(module.getProject())
-        .findDirectory(virtualOutputFolder);
+    PsiDirectory outputPsiDirectory =
+        PsiManager.getInstance(module.getProject()).findDirectory(virtualOutputFolder);
 
     if (outputPsiDirectory != null
         && FileTemplateUtil.canCreateFromTemplate(
-        new PsiDirectory[]{outputPsiDirectory}, configTemplate)) {
+            new PsiDirectory[] {outputPsiDirectory}, configTemplate)) {
       try {
         return FileTemplateUtil.createFromTemplate(
-            configTemplate,
-            outputFileName,
-            templateProperties,
-            outputPsiDirectory);
+            configTemplate, outputFileName, templateProperties, outputPsiDirectory);
       } catch (Exception e) {
         // If the file already exists, this exception will be thrown by createFromTemplate
         // We want to silently skip the generation in this case.

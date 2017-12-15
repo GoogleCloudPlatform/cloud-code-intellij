@@ -62,13 +62,14 @@ public class GoogleLoginPrefs {
     if (userEmail != null) {
       Preferences prefs = getPrefs();
 
-      prefs.put(getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY, userEmail),
-          credentials.getRefreshToken());
+      prefs.put(
+          getCustomUserKey(OAUTH_DATA_REFRESH_TOKEN_KEY, userEmail), credentials.getRefreshToken());
 
       // we save the scopes so that if the user updates the plugin and the
       // scopes change, we can force the plugin to log out.
       Joiner joiner = Joiner.on(DELIMITER);
-      prefs.put(getCustomUserKey(OAUTH_SCOPES_KEY, userEmail),
+      prefs.put(
+          getCustomUserKey(OAUTH_SCOPES_KEY, userEmail),
           joiner.join(credentials.getStoredScopes()));
 
       prefs.put(getCustomUserKey(OAUTH_DATA_EMAIL_KEY, userEmail), userEmail);
@@ -83,7 +84,7 @@ public class GoogleLoginPrefs {
    * Retrieves the persistently stored {@link OAuthData} object for the active user, if any.
    *
    * @return the persistently stored {@code OAuthData} object for the active user if it exists or an
-   * {@code OAuthData} object all of whose getters return {@code null} .
+   *     {@code OAuthData} object all of whose getters return {@code null} .
    */
   public static OAuthData loadOAuthData() {
     String refreshToken = null;
@@ -106,9 +107,7 @@ public class GoogleLoginPrefs {
     return new OAuthData(null, refreshToken, storedEmail, storedScopes, 0);
   }
 
-  /**
-   * Clears the persistently stored {@link OAuthData} object for the active user, if any.
-   */
+  /** Clears the persistently stored {@link OAuthData} object for the active user, if any. */
   public static void clearStoredOAuthData() {
     CredentialedUser activeUser = Services.getLoginService().getActiveUser();
     if (activeUser == null) {
@@ -124,8 +123,7 @@ public class GoogleLoginPrefs {
   }
 
   /**
-   * Stores the specified preference of the active user to display only the icon in the login
-   * panel.
+   * Stores the specified preference of the active user to display only the icon in the login panel.
    *
    * @param logoutOnExit the preference of the active user to display only the icon in the login
    *     panel.
@@ -190,18 +188,14 @@ public class GoogleLoginPrefs {
     flushPrefs(prefs);
   }
 
-  /**
-   * Clears the persistently stored active user.
-   */
+  /** Clears the persistently stored active user. */
   public static void removeActiveUser() {
     Preferences prefs = getPrefs();
     prefs.remove(ACTIVE_USER);
     flushPrefs(prefs);
   }
 
-  /**
-   * Clears all persistently stored users. There is no active user after this.
-   */
+  /** Clears all persistently stored users. There is no active user after this. */
   public static void removeAllUsers() {
     Preferences prefs = getPrefs();
     prefs.remove(USERS);

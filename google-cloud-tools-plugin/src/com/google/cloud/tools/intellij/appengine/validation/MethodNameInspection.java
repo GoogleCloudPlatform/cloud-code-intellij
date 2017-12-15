@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.appengine.GctConstants;
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
 import com.google.common.annotations.VisibleForTesting;
-
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.codeInspection.LocalQuickFix;
@@ -36,12 +35,10 @@ import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiUtilBase;
-
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.regex.Pattern;
 
 /**
  * Inspection to check that a specified method name provided in @ApiMethod is in the correct
@@ -96,19 +93,20 @@ public class MethodNameInspection extends EndpointInspectionBase {
           return;
         }
 
-        if (!API_NAME_PATTERN.matcher(EndpointUtilities.collapseSequenceOfDots(nameValue))
+        if (!API_NAME_PATTERN
+            .matcher(EndpointUtilities.collapseSequenceOfDots(nameValue))
             .matches()) {
-          holder.registerProblem(memberValue,
+          holder.registerProblem(
+              memberValue,
               "Invalid method name: letters, digits, underscores and dots are acceptable "
-                  + "characters. Leading and trailing dots are prohibited.", new MyQuickFix());
+                  + "characters. Leading and trailing dots are prohibited.",
+              new MyQuickFix());
         }
       }
     };
   }
 
-  /**
-   * Quick fix for {@link MethodNameInspection} problems by providing a valid API method name.
-   */
+  /** Quick fix for {@link MethodNameInspection} problems by providing a valid API method name. */
   public class MyQuickFix implements LocalQuickFix {
 
     @NotNull
@@ -124,8 +122,8 @@ public class MethodNameInspection extends EndpointInspectionBase {
     }
 
     /**
-     * Provides a replacement API method name that matches the
-     * {@link MethodNameInspection.API_NAME_PATTERN}.
+     * Provides a replacement API method name that matches the {@link
+     * MethodNameInspection.API_NAME_PATTERN}.
      *
      * @param project {@link com.intellij.openapi.project.Project}
      * @param descriptor problem reported by the tool which provided this quick fix action
@@ -157,9 +155,7 @@ public class MethodNameInspection extends EndpointInspectionBase {
       lookupManager.showLookup(editor, LookupElementBuilder.create(variant));
     }
 
-    /**
-     * Returns a valid API method name. An empty string is valid.
-     */
+    /** Returns a valid API method name. An empty string is valid. */
     @VisibleForTesting
     public String getMethodNameSuggestions(String baseString) {
       if (baseString == null) {

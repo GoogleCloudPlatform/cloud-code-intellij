@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
+import static com.google.cloud.tools.intellij.testing.TestUtils.expectThrows;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.verify;
-import static com.google.cloud.tools.intellij.testing.TestUtils.expectThrows;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
@@ -264,7 +264,8 @@ public final class AppEngineFlexibleStageTest {
   }
 
   @Test
-  public void stage_withUnknownArtifact_andLegacyStagedNameBit_doesStageTarget() throws IOException {
+  public void stage_withUnknownArtifact_andLegacyStagedNameBit_doesStageTarget()
+      throws IOException {
     deploymentConfiguration.setStagedArtifactNameLegacy(true);
     stage =
         new AppEngineFlexibleStage(

@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.appengine.file;
 
 import com.intellij.lang.Language;
 
-/**
- * Barebones implementation for the Docker language required by {@link DockerFileTemplateType}.
- */
+/** Barebones implementation for the Docker language required by {@link DockerFileTemplateType}. */
 public class DockerFileTemplateLanguage extends Language {
 
   static final DockerFileTemplateLanguage INSTANCE = new DockerFileTemplateLanguage();
