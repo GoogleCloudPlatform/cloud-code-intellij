@@ -22,7 +22,6 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Maps;
-
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ProgramRunner;
@@ -34,15 +33,11 @@ import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
-
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Arrays;
 import java.util.Map;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * Runs a Google App Engine Standard app locally with devappserver, through the tools lib.
- */
+/** Runs a Google App Engine Standard app locally with devappserver, through the tools lib. */
 public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
   // The startup process handler is kept so the process can be explicitly terminated, since we're
@@ -65,7 +60,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
           @Override
           public OSProcessHandler createProcessHandler(
-              String workingDirectory, Map<String, String> configuredEnvironment) throws ExecutionException {
+              String workingDirectory, Map<String, String> configuredEnvironment)
+              throws ExecutionException {
 
             if (!CloudSdkService.getInstance().isValidCloudSdk()) {
               throw new ExecutionException(
@@ -106,8 +102,9 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             executor.run();
 
             Process devappserverProcess = executor.getProcess();
-            startupProcessHandler = new OSProcessHandler(devappserverProcess,
-                GctBundle.getString("appengine.run.startupscript"));
+            startupProcessHandler =
+                new OSProcessHandler(
+                    devappserverProcess, GctBundle.getString("appengine.run.startupscript"));
             return startupProcessHandler;
           }
         };

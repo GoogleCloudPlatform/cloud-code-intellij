@@ -18,44 +18,41 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 
 import com.google.cloud.tools.intellij.appengine.file.DockerFileTemplateType;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
-
 import org.jetbrains.annotations.NonNls;
 
-/**
- * @author nik
- */
+/** @author nik */
 public class AppEngineTemplateGroupDescriptorFactory implements FileTemplateGroupDescriptorFactory {
 
-  @NonNls
-  public static final String APP_ENGINE_WEB_XML_TEMPLATE = "GctAppEngineWeb.xml";
-  @NonNls
-  public static final String APP_YAML_TEMPLATE = "app.yaml";
-  @NonNls
-  public static final String DOCKERFILE_WAR_TEMPLATE = "WarDockerfile.gaedocker";
-  @NonNls
-  public static final String DOCKERFILE_JAR_TEMPLATE = "JarDockerfile.gaedocker";
+  @NonNls public static final String APP_ENGINE_WEB_XML_TEMPLATE = "GctAppEngineWeb.xml";
+  @NonNls public static final String APP_YAML_TEMPLATE = "app.yaml";
+  @NonNls public static final String DOCKERFILE_WAR_TEMPLATE = "WarDockerfile.gaedocker";
+  @NonNls public static final String DOCKERFILE_JAR_TEMPLATE = "JarDockerfile.gaedocker";
 
   @Override
   public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
-    final FileTemplateDescriptor appEngineXml = new FileTemplateDescriptor(
-        APP_ENGINE_WEB_XML_TEMPLATE, StdFileTypes.XML.getIcon());
+    final FileTemplateDescriptor appEngineXml =
+        new FileTemplateDescriptor(APP_ENGINE_WEB_XML_TEMPLATE, StdFileTypes.XML.getIcon());
 
-    final FileTemplateDescriptor appYaml = new FileTemplateDescriptor(
-        APP_YAML_TEMPLATE, FileTypeManager.getInstance().getStdFileType("YAML").getIcon());
+    final FileTemplateDescriptor appYaml =
+        new FileTemplateDescriptor(
+            APP_YAML_TEMPLATE, FileTypeManager.getInstance().getStdFileType("YAML").getIcon());
 
-    final FileTemplateDescriptor warDockerfile = new FileTemplateDescriptor(
-        DOCKERFILE_WAR_TEMPLATE, DockerFileTemplateType.INSTANCE.getIcon());
+    final FileTemplateDescriptor warDockerfile =
+        new FileTemplateDescriptor(
+            DOCKERFILE_WAR_TEMPLATE, DockerFileTemplateType.INSTANCE.getIcon());
 
-    final FileTemplateDescriptor jarDockerfile = new FileTemplateDescriptor(
-        DOCKERFILE_JAR_TEMPLATE, DockerFileTemplateType.INSTANCE.getIcon());
+    final FileTemplateDescriptor jarDockerfile =
+        new FileTemplateDescriptor(
+            DOCKERFILE_JAR_TEMPLATE, DockerFileTemplateType.INSTANCE.getIcon());
 
-    return new FileTemplateGroupDescriptor("Google App Engine", GoogleCloudToolsIcons.APP_ENGINE,
+    return new FileTemplateGroupDescriptor(
+        "Google App Engine",
+        GoogleCloudToolsIcons.APP_ENGINE,
         appEngineXml,
         appYaml,
         warDockerfile,

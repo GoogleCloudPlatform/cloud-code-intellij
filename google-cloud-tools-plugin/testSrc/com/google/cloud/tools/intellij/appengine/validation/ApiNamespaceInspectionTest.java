@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.google.cloud.tools.intellij.appengine.GctConstants;
-
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
@@ -26,10 +25,8 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.testFramework.MockProblemDescriptor;
 
-/**
- * Tests for {@link ApiNamespaceInspection}
- */
-public class ApiNamespaceInspectionTest extends EndpointTestBase  {
+/** Tests for {@link ApiNamespaceInspection} */
+public class ApiNamespaceInspectionTest extends EndpointTestBase {
   public void testApiNamespaceAttribute_complete() {
     doTest();
   }
@@ -51,60 +48,87 @@ public class ApiNamespaceInspectionTest extends EndpointTestBase  {
   }
 
   public void testQuickFix_allAttributesSpecified() throws Exception {
-    String annotationString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-      + "(ownerName = \"myName\", ownerDomain = \"myDomain\", packagePath = \"myPath\")";
-    String expectedString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-      + "(ownerName = \"myName\", ownerDomain = \"myDomain\", packagePath = \"myPath\")";
+    String annotationString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"myName\", ownerDomain = \"myDomain\", packagePath = \"myPath\")";
+    String expectedString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"myName\", ownerDomain = \"myDomain\", packagePath = \"myPath\")";
     runQuickFixTest(annotationString, expectedString);
   }
 
   public void testQuickFix_noAttributesSpecified() throws Exception {
-    String annotationString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-                              + "(ownerName = \"\", ownerDomain = \"\", packagePath = \"\")";
-    String expectedString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-                            + "(ownerName = \"YourCo\", ownerDomain = \"your-company.com\", packagePath = \"\")";
+    String annotationString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"\", ownerDomain = \"\", packagePath = \"\")";
+    String expectedString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"YourCo\", ownerDomain = \"your-company.com\", packagePath = \"\")";
     runQuickFixTest(annotationString, expectedString);
   }
 
-  public void testQuickFix_nameAndDomainSet(){
-    String annotationString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-                              + "(ownerName = \"myName\", ownerDomain = \"myDomain\", packagePath = \"\")";
-    String expectedString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-                            + "(ownerName = \"myName\", ownerDomain = \"myDomain\", packagePath = \"\")";
+  public void testQuickFix_nameAndDomainSet() {
+    String annotationString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"myName\", ownerDomain = \"myDomain\", packagePath = \"\")";
+    String expectedString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"myName\", ownerDomain = \"myDomain\", packagePath = \"\")";
     runQuickFixTest(annotationString, expectedString);
   }
 
-  public void testQuickFix_domainAndPathSet(){
-    String annotationString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-                              + "(ownerName = \"\", ownerDomain = \"myDomain\", packagePath = \"myPath\")";
-    String expectedString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-                            + "(ownerName = \"YourCo\", ownerDomain = \"myDomain\", packagePath = \"myPath\")";
+  public void testQuickFix_domainAndPathSet() {
+    String annotationString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"\", ownerDomain = \"myDomain\", packagePath = \"myPath\")";
+    String expectedString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"YourCo\", ownerDomain = \"myDomain\", packagePath = \"myPath\")";
     runQuickFixTest(annotationString, expectedString);
   }
 
-  public void testQuickFix_nameSet(){
-    String annotationString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-                              + "(ownerName = \"myName\", ownerDomain = \"\", packagePath = \"\")";
-    String expectedString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-                            + "(ownerName = \"myName\", ownerDomain = \"your-company.com\", packagePath = \"\")";
+  public void testQuickFix_nameSet() {
+    String annotationString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"myName\", ownerDomain = \"\", packagePath = \"\")";
+    String expectedString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"myName\", ownerDomain = \"your-company.com\", packagePath = \"\")";
     runQuickFixTest(annotationString, expectedString);
   }
 
-  public void testQuickFix_pathSet(){
-    String annotationString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-                              + "(ownerName = \"\", ownerDomain = \"\", packagePath = \"myPath\")";
-    String expectedString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
-                            + "(ownerName = \"YourCo\", ownerDomain = \"your-company.com\", packagePath = \"myPath\")";
+  public void testQuickFix_pathSet() {
+    String annotationString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"\", ownerDomain = \"\", packagePath = \"myPath\")";
+    String expectedString =
+        "@"
+            + GctConstants.APP_ENGINE_ANNOTATION_API_NAMESPACE
+            + "(ownerName = \"YourCo\", ownerDomain = \"your-company.com\", packagePath = \"myPath\")";
     runQuickFixTest(annotationString, expectedString);
   }
 
   private void runQuickFixTest(String annotationString, String expectedString) {
-   final Project myProject = myFixture.getProject();
-    PsiAnnotation annotation = JavaPsiFacade.getInstance(myProject).getElementFactory()
-      .createAnnotationFromText(annotationString, null);
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
+    final Project myProject = myFixture.getProject();
+    PsiAnnotation annotation =
+        JavaPsiFacade.getInstance(myProject)
+            .getElementFactory()
+            .createAnnotationFromText(annotationString, null);
+    MockProblemDescriptor problemDescriptor =
+        new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
 
-    ApiNamespaceInspection.MyQuickFix myQuickFix = new ApiNamespaceInspection().new  MyQuickFix();
+    ApiNamespaceInspection.MyQuickFix myQuickFix = new ApiNamespaceInspection().new MyQuickFix();
     myQuickFix.applyFix(myProject, problemDescriptor);
     assertEquals(expectedString, annotation.getText());
   }
@@ -114,6 +138,8 @@ public class ApiNamespaceInspectionTest extends EndpointTestBase  {
     String testName = getTestName(true);
     final String testDataPath = getTestDataPath();
     myFixture.setTestDataPath(testDataPath);
-    myFixture.testInspection("inspections/apiNamespaceInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    myFixture.testInspection(
+        "inspections/apiNamespaceInspection/" + testName,
+        new LocalInspectionToolWrapper(localInspectionTool));
   }
 }

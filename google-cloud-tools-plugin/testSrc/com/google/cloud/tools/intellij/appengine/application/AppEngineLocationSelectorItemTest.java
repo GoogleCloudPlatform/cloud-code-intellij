@@ -20,17 +20,13 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 import com.google.api.services.appengine.v1.model.Location;
-
+import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.HashMap;
-
-/**
- * Tests for {@link AppEngineLocationSelectorItem}.
- */
+/** Tests for {@link AppEngineLocationSelectorItem}. */
 @RunWith(MockitoJUnitRunner.class)
 public class AppEngineLocationSelectorItemTest {
 
@@ -44,56 +40,60 @@ public class AppEngineLocationSelectorItemTest {
 
   @Test
   public void testIsStandardSupported_true() {
-    location.getMetadata()
+    location
+        .getMetadata()
         .put(AppEngineLocationSelectorItem.STANDARD_ENV_AVAILABLE_KEY, Boolean.TRUE);
     assertTrue(new AppEngineLocationSelectorItem(location).isStandardSupported());
   }
 
   @Test
   public void testIsStandardSupported_false() {
-    location.getMetadata()
+    location
+        .getMetadata()
         .put(AppEngineLocationSelectorItem.STANDARD_ENV_AVAILABLE_KEY, Boolean.FALSE);
     assertFalse(new AppEngineLocationSelectorItem(location).isStandardSupported());
   }
 
   @Test
   public void testIsStandardSupported_null() {
-    location.getMetadata()
-        .put(AppEngineLocationSelectorItem.STANDARD_ENV_AVAILABLE_KEY, null);
+    location.getMetadata().put(AppEngineLocationSelectorItem.STANDARD_ENV_AVAILABLE_KEY, null);
     assertFalse(new AppEngineLocationSelectorItem(location).isStandardSupported());
   }
 
   @Test
   public void testIsStandardSupported_wrongType() {
-    location.getMetadata()
+    location
+        .getMetadata()
         .put(AppEngineLocationSelectorItem.STANDARD_ENV_AVAILABLE_KEY, Integer.valueOf(1));
     assertFalse(new AppEngineLocationSelectorItem(location).isStandardSupported());
   }
 
   @Test
   public void testIsFlexSupported_true() {
-    location.getMetadata()
+    location
+        .getMetadata()
         .put(AppEngineLocationSelectorItem.FLEXIBLE_ENV_AVAILABLE_KEY, Boolean.TRUE);
     assertTrue(new AppEngineLocationSelectorItem(location).isFlexSupported());
   }
 
   @Test
   public void testIsFlexSupported_false() {
-    location.getMetadata()
+    location
+        .getMetadata()
         .put(AppEngineLocationSelectorItem.FLEXIBLE_ENV_AVAILABLE_KEY, Boolean.FALSE);
     assertFalse(new AppEngineLocationSelectorItem(location).isFlexSupported());
   }
 
   @Test
   public void testIsFlexSupported_null() {
-    location.getMetadata()
-        .put(AppEngineLocationSelectorItem.FLEXIBLE_ENV_AVAILABLE_KEY, null);
+    location.getMetadata().put(AppEngineLocationSelectorItem.FLEXIBLE_ENV_AVAILABLE_KEY, null);
     assertFalse(new AppEngineLocationSelectorItem(location).isFlexSupported());
   }
 
   @Test
   public void testIsFlexSupported_wrongType() {
-    location.getMetadata()
+    location
+        .getMetadata()
         .put(AppEngineLocationSelectorItem.FLEXIBLE_ENV_AVAILABLE_KEY, Integer.valueOf(1));
     assertFalse(new AppEngineLocationSelectorItem(location).isFlexSupported());
   }

@@ -18,15 +18,11 @@ package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.ui.HyperlinkLabel;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-/**
- * This is the config UI for cloud debug run configs.
- */
+/** This is the config UI for cloud debug run configs. */
 public class CloudDebugRunConfigurationPanel {
 
   private ProjectSelector elysiumProjectId;

@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
-
 import com.intellij.codeInsight.daemon.ImplicitUsageProvider;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;

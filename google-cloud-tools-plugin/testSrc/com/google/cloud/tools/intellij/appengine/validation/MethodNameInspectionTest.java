@@ -18,38 +18,33 @@ package com.google.cloud.tools.intellij.appengine.validation;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 
-/**
- * Test for {@link MethodNameInspection}.
- */
+/** Test for {@link MethodNameInspection}. */
 public class MethodNameInspectionTest extends EndpointTestBase {
 
-  /**
-   *  Test to verify that a valid API method name does not generate
-   *  a MethodNameInspection error.
-   */
+  /** Test to verify that a valid API method name does not generate a MethodNameInspection error. */
   public void testValidMethodName() {
     doTest();
   }
 
   /**
-   *  Test to verify that a valid API method name with special characters
-   *  generates a MethodNameInspection error.
+   * Test to verify that a valid API method name with special characters generates a
+   * MethodNameInspection error.
    */
   public void testMethodNameWithSpecialCharacter() {
     doTest();
   }
 
   /**
-   *  Test to verify that a valid API method name containing a dot does not
-   *  generate a MethodNameInspection error.
+   * Test to verify that a valid API method name containing a dot does not generate a
+   * MethodNameInspection error.
    */
   public void testMethodNameContainingDot() {
     doTest();
   }
 
   /**
-   * Tests that {@link MethodNameInspection.MyQuickFix} returns the same value when passed
-   * in a valid API method name.
+   * Tests that {@link MethodNameInspection.MyQuickFix} returns the same value when passed in a
+   * valid API method name.
    */
   public void testQuickFix_validName() {
     MethodNameInspection.MyQuickFix myQuickFix = new MethodNameInspection().new MyQuickFix();
@@ -58,9 +53,8 @@ public class MethodNameInspectionTest extends EndpointTestBase {
   }
 
   /**
-   * Tests that {@link MethodNameInspection.MyQuickFix} returns the same value without
-   * the starting and trailing dots when the API method name is a valid string with starting
-   * and trailing dots.
+   * Tests that {@link MethodNameInspection.MyQuickFix} returns the same value without the starting
+   * and trailing dots when the API method name is a valid string with starting and trailing dots.
    */
   public void testQuickFix_nameWithStartingTrailingDots() {
     MethodNameInspection.MyQuickFix myQuickFix = new MethodNameInspection().new MyQuickFix();
@@ -68,8 +62,8 @@ public class MethodNameInspectionTest extends EndpointTestBase {
   }
 
   /**
-   * Tests that {@link MethodNameInspection.MyQuickFix} provides the correct suggestion for an
-   * API names with invalid characters.
+   * Tests that {@link MethodNameInspection.MyQuickFix} provides the correct suggestion for an API
+   * names with invalid characters.
    */
   public void testQuickFix_nameWithIllegalCharacter() {
     MethodNameInspection.MyQuickFix myQuickFix = new MethodNameInspection().new MyQuickFix();
@@ -81,6 +75,8 @@ public class MethodNameInspectionTest extends EndpointTestBase {
     String testName = getTestName(true);
     final String testDataPath = getTestDataPath();
     myFixture.setTestDataPath(testDataPath);
-    myFixture.testInspection("inspections/methodNameInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    myFixture.testInspection(
+        "inspections/methodNameInspection/" + testName,
+        new LocalInspectionToolWrapper(localInspectionTool));
   }
 }

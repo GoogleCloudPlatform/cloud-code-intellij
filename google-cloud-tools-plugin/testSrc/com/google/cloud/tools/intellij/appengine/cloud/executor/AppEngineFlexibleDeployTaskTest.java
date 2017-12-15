@@ -61,8 +61,7 @@ public class AppEngineFlexibleDeployTaskTest {
 
   @Before
   public void setUp() throws IOException {
-    when(helper.createStagingDirectory(any(), any()))
-        .thenReturn(Paths.get("myFile.jar"));
+    when(helper.createStagingDirectory(any(), any())).thenReturn(Paths.get("myFile.jar"));
     when(stage.stage(Paths.get("myFile.jar"))).thenReturn(true);
     when(deploy.getHelper()).thenReturn(helper);
     when(deploy.getCallback()).thenReturn(callback);
@@ -86,8 +85,7 @@ public class AppEngineFlexibleDeployTaskTest {
 
   @Test
   public void testCreateStagingDirectory_error() throws IOException {
-    when(helper.createStagingDirectory(any(), any()))
-        .thenThrow(new IOException());
+    when(helper.createStagingDirectory(any(), any())).thenThrow(new IOException());
 
     task.execute(startListener);
     verify(callback, times(1))

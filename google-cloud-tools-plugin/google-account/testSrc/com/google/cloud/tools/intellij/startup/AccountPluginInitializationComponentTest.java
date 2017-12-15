@@ -36,22 +36,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * Tests to validate initialization on supported platforms
- */
+/** Tests to validate initialization on supported platforms */
 @RunWith(MockitoJUnitRunner.class)
 public class AccountPluginInitializationComponentTest extends BasePluginTestCase {
 
   private static final String PLUGIN_ID_STRING = "com.google.gct.core";
-  @Mock
-  AccountPluginInfoService pluginInfoService;
-  @Mock
-  AccountPluginConfigurationService pluginConfigurationService;
-  @Mock
-  IntegratedGoogleLoginService googleLoginService;
+  @Mock AccountPluginInfoService pluginInfoService;
+  @Mock AccountPluginConfigurationService pluginConfigurationService;
+  @Mock IntegratedGoogleLoginService googleLoginService;
 
   AccountPluginInitializationComponent testComponent;
-
 
   @Before
   public void registerMockServices() {
@@ -66,7 +60,8 @@ public class AccountPluginInitializationComponentTest extends BasePluginTestCase
     Application mockApplication = spy(ApplicationManager.getApplication());
     when(mockApplication.isUnitTestMode()).thenReturn(false);
     ApplicationManager.setApplication(mockApplication, mock(Disposable.class));
-    AccountPluginInitializationComponent testComponent = spy(new AccountPluginInitializationComponent());
+    AccountPluginInitializationComponent testComponent =
+        spy(new AccountPluginInitializationComponent());
     doNothing().when(testComponent).configureUsageTracking();
     testComponent.initComponent();
     verify(testComponent).configureUsageTracking();
@@ -77,7 +72,8 @@ public class AccountPluginInitializationComponentTest extends BasePluginTestCase
     Application mockApplication = spy(ApplicationManager.getApplication());
     when(mockApplication.isUnitTestMode()).thenReturn(true);
     ApplicationManager.setApplication(mockApplication, mock(Disposable.class));
-    AccountPluginInitializationComponent testComponent = spy(new AccountPluginInitializationComponent());
+    AccountPluginInitializationComponent testComponent =
+        spy(new AccountPluginInitializationComponent());
     testComponent.initComponent();
     verify(testComponent, never()).configureUsageTracking();
   }

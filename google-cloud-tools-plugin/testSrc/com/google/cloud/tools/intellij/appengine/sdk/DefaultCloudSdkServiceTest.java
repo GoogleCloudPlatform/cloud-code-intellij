@@ -38,9 +38,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * Unit tests for {@link DefaultCloudSdkService}
- */
+/** Unit tests for {@link DefaultCloudSdkService} */
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
@@ -51,11 +49,9 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
   private DefaultCloudSdkService service;
 
-  @Mock
-  private CloudSdk mockSdk;
+  @Mock private CloudSdk mockSdk;
 
-  @Mock
-  private Path mockPath;
+  @Mock private Path mockPath;
 
   @Before
   public void setUp() throws Exception {
@@ -63,7 +59,7 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   }
 
   @Test
-  public void testValidateCloudSdk_cloudSdkNotFound() throws  IOException {
+  public void testValidateCloudSdk_cloudSdkNotFound() throws IOException {
     doThrow(CloudSdkNotFoundException.class).when(mockSdk).validateCloudSdk();
     Set<CloudSdkValidationResult> results = service.validateCloudSdk();
     assertEquals(1, results.size());
@@ -76,8 +72,8 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
     doThrow(CloudSdkOutOfDateException.class).when(mockSdk).validateCloudSdk();
     Set<CloudSdkValidationResult> results = service.validateCloudSdk();
     assertEquals(1, results.size());
-    assertEquals(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED,
-        results.iterator().next());
+    assertEquals(
+        CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED, results.iterator().next());
     assertFalse(service.isValidCloudSdk());
   }
 
@@ -129,7 +125,8 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
   @Test
   public void testValidateJavaComponents() throws IOException {
-    doThrow(AppEngineJavaComponentsNotInstalledException.class).when(mockSdk)
+    doThrow(AppEngineJavaComponentsNotInstalledException.class)
+        .when(mockSdk)
         .validateAppEngineJavaComponents();
     Set<CloudSdkValidationResult> results = service.validateCloudSdk("/good/path");
     assertEquals(1, results.size());
@@ -138,7 +135,8 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
 
   @Test
   public void testValidateCloudSdk_multipleResults() throws IOException {
-    doThrow(AppEngineJavaComponentsNotInstalledException.class).when(mockSdk)
+    doThrow(AppEngineJavaComponentsNotInstalledException.class)
+        .when(mockSdk)
         .validateAppEngineJavaComponents();
     doThrow(CloudSdkOutOfDateException.class).when(mockSdk).validateCloudSdk();
 

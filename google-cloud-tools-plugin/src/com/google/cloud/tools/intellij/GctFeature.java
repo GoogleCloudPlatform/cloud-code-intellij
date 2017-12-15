@@ -18,10 +18,8 @@ package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
 import com.google.common.collect.ImmutableSet;
-
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Set;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The set of Google Cloud Tools features that we want to be able to conditionally enable.
@@ -57,7 +55,9 @@ public enum GctFeature implements Feature {
    * @param systemFlagName a Java system property name that would be read for the flag value
    */
   GctFeature(
-      ImmutableSet<IntelliJPlatform> supportedPlatforms, String resourceFlagName, String systemFlagName) {
+      ImmutableSet<IntelliJPlatform> supportedPlatforms,
+      String resourceFlagName,
+      String systemFlagName) {
     this.supportedPlatforms = supportedPlatforms;
     this.resourceFlagName = resourceFlagName;
     this.systemFlagName = systemFlagName;

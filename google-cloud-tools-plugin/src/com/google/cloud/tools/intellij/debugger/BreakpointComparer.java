@@ -19,22 +19,17 @@ package com.google.cloud.tools.intellij.debugger;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
-
-import org.joda.time.format.ISODateTimeFormat;
-
 import java.util.Comparator;
 import java.util.Date;
+import org.joda.time.format.ISODateTimeFormat;
 
-/**
- * BreakpointComparer is a comparer used to sort breakpoints in the historical snapshot list.
- */
+/** BreakpointComparer is a comparer used to sort breakpoints in the historical snapshot list. */
 public class BreakpointComparer implements Comparator<Breakpoint> {
 
   private static final BreakpointComparer DEFAULT_INSTANCE = new BreakpointComparer();
   private static final Date MINIMUM_DATE = new Date(Long.MIN_VALUE);
 
-  private BreakpointComparer() {
-  }
+  private BreakpointComparer() {}
 
   public static BreakpointComparer getDefaultInstance() {
     return DEFAULT_INSTANCE;
@@ -50,7 +45,7 @@ public class BreakpointComparer implements Comparator<Breakpoint> {
       return -1;
     }
     if (o2.getFinalTime() == null && o1.getFinalTime() == null) {
-      //compare file and line
+      // compare file and line
       SourceLocation s1 = o1.getLocation();
       SourceLocation s2 = o2.getLocation();
       boolean s1Valid = isSourceLocationValid(s1);

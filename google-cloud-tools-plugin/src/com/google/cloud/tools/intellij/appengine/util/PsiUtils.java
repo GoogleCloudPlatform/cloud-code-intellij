@@ -35,21 +35,17 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeVisitor;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
-
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Utilities for working with Intellij Psi constructs.
- */
+/** Utilities for working with Intellij Psi constructs. */
 public class PsiUtils {
 
   // don't instantiate
-  private PsiUtils() {
-  }
+  private PsiUtils() {}
 
   /**
-   * NOTE: requires readAction, if not on the dispatch thread Get the public class in a file that
-   * is annotated with a certain annotation.
+   * NOTE: requires readAction, if not on the dispatch thread Get the public class in a file that is
+   * annotated with a certain annotation.
    */
   public static PsiClass getPublicAnnotatedClass(PsiJavaFile psiJavaFile, String annotationFqn) {
     PsiClass[] classes = psiJavaFile.getClasses();
@@ -130,9 +126,7 @@ public class PsiUtils {
     return parent.createSubdirectory(dirName);
   }
 
-  /**
-   * NOTE: This must run in a runWriteAction Delete a directory (no error if it doesn't exist).
-   */
+  /** NOTE: This must run in a runWriteAction Delete a directory (no error if it doesn't exist). */
   public static void deleteIfExists(PsiDirectory parent, String dirName) {
     final PsiDirectory existingDir = parent.findSubdirectory(dirName);
     if (existingDir != null) {
@@ -144,10 +138,10 @@ public class PsiUtils {
    * NOTE: this must run in a runWriteAction Create a file using intellijs built in system with the
    * defined type and format it.
    */
-  public static PsiFile createFormattedFile(Project project, String filename, FileType fileType,
-      String fileContents) {
-    final PsiFile rawFile = PsiFileFactory.getInstance(project)
-        .createFileFromText(filename, fileType, fileContents);
+  public static PsiFile createFormattedFile(
+      Project project, String filename, FileType fileType, String fileContents) {
+    final PsiFile rawFile =
+        PsiFileFactory.getInstance(project).createFileFromText(filename, fileType, fileContents);
     final PsiFile formattedFile = (PsiFile) CodeStyleManager.getInstance(project).reformat(rawFile);
     return formattedFile;
   }
@@ -159,7 +153,8 @@ public class PsiUtils {
    * @param element the PsiElement we want to know the class of.
    */
   public static PsiClass findClass(PsiElement element) {
-    return (element instanceof PsiClass) ? (PsiClass) element
+    return (element instanceof PsiClass)
+        ? (PsiClass) element
         : PsiTreeUtil.getParentOfType(element, PsiClass.class);
   }
 
@@ -190,13 +185,15 @@ public class PsiUtils {
       return false;
     }
 
-    Boolean accepted = type.accept(new PsiTypeVisitor<Boolean>() {
-      @Nullable
-      @Override
-      public Boolean visitClassType(PsiClassType classType) {
-        return classType.getParameterCount() > 0;
-      }
-    });
+    Boolean accepted =
+        type.accept(
+            new PsiTypeVisitor<Boolean>() {
+              @Nullable
+              @Override
+              public Boolean visitClassType(PsiClassType classType) {
+                return classType.getParameterCount() > 0;
+              }
+            });
     return Boolean.TRUE.equals(accepted);
   }
 }

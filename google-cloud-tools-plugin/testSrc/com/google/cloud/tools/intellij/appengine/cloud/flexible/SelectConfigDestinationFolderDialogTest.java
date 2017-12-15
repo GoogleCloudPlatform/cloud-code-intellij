@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestCase;
-
 import java.io.File;
 
 public class SelectConfigDestinationFolderDialogTest extends PlatformTestCase {

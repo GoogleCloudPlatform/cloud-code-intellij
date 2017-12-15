@@ -32,27 +32,20 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gdt.eclipse.login.common.LoginListener;
-
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
-
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.concurrent.ConcurrentHashMap;
-
-/**
- * Helper class to return clients on a per user email basis.
- */
+/** Helper class to return clients on a per user email basis. */
 public class CloudDebuggerClient {
 
-  @VisibleForTesting
-  static final int LONG_CONNECTION_TIMEOUT_MS = 120 * 1000;
-  @VisibleForTesting
-  static final int SHORT_CONNECTION_TIMEOUT_MS = 10 * 1000;
+  @VisibleForTesting static final int LONG_CONNECTION_TIMEOUT_MS = 120 * 1000;
+  @VisibleForTesting static final int SHORT_CONNECTION_TIMEOUT_MS = 10 * 1000;
 
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final Logger LOG = Logger.getInstance(CloudDebuggerClient.class);
@@ -60,8 +53,7 @@ public class CloudDebuggerClient {
   private static final ConcurrentHashMap<String, Debugger> debuggerClientsFromUserEmail =
       new ConcurrentHashMap<String, Debugger>();
 
-  private CloudDebuggerClient() {
-  }
+  private CloudDebuggerClient() {}
 
   /**
    * Returns a cloud debugger connection given {@link CloudDebugProcessState} to indicate the
@@ -103,36 +95,41 @@ public class CloudDebuggerClient {
         final CredentialedUser user = Services.getLoginService().getAllUsers().get(userEmail);
         final Credential credential = (user != null ? user.getCredential() : null);
         if (credential != null) {
-          user.getGoogleLoginState().addLoginListener(new LoginListener() {
-            @Override
-            public void statusChanged(boolean login) {
-              if (!login) {
-                // aggressively remove the cached item on any status change.
-                debuggerClientsFromUserEmail.remove(hashkey);
-              } else { // NOPMD
-                // user logged in, should we do something?
-              }
-            }
-          });
-          HttpRequestInitializer initializer = new HttpRequestInitializer() {
-            @Override
-            public void initialize(HttpRequest httpRequest) throws IOException {
-              HttpHeaders headers = new HttpHeaders();
-              httpRequest.setConnectTimeout(timeout);
-              httpRequest.setReadTimeout(timeout);
-              httpRequest.setHeaders(headers);
-              credential.initialize(httpRequest);
-            }
-          };
+          user.getGoogleLoginState()
+              .addLoginListener(
+                  new LoginListener() {
+                    @Override
+                    public void statusChanged(boolean login) {
+                      if (!login) {
+                        // aggressively remove the cached item on any status change.
+                        debuggerClientsFromUserEmail.remove(hashkey);
+                      } else { // NOPMD
+                        // user logged in, should we do something?
+                      }
+                    }
+                  });
+          HttpRequestInitializer initializer =
+              new HttpRequestInitializer() {
+                @Override
+                public void initialize(HttpRequest httpRequest) throws IOException {
+                  HttpHeaders headers = new HttpHeaders();
+                  httpRequest.setConnectTimeout(timeout);
+                  httpRequest.setReadTimeout(timeout);
+                  httpRequest.setHeaders(headers);
+                  credential.initialize(httpRequest);
+                }
+              };
 
           HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-          String userAgent = ServiceManager
-              .getService(CloudToolsPluginInfoService.class).getUserAgent();
-          cloudDebuggerClient = new Builder(httpTransport, JSON_FACTORY, initializer)
-              .setRootUrl(ROOT_URL)
-              // this ends up prefixed to user agent
-              .setApplicationName(userAgent)
-              .build().debugger();
+          String userAgent =
+              ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent();
+          cloudDebuggerClient =
+              new Builder(httpTransport, JSON_FACTORY, initializer)
+                  .setRootUrl(ROOT_URL)
+                  // this ends up prefixed to user agent
+                  .setApplicationName(userAgent)
+                  .build()
+                  .debugger();
         }
       } catch (IOException ex) {
         LOG.warn("Error connecting to Cloud Debugger API", ex);

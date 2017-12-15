@@ -92,9 +92,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           // Apparently the hit type should always be of type 'pageview'.
           new BasicNameValuePair(HIT_TYPE_KEY, PAGE_VIEW_VALUE),
           new BasicNameValuePair(IS_NON_INTERACTIVE_KEY, STRING_FALSE_VALUE),
-          new BasicNameValuePair(
-              UNIQUE_CLIENT_ID_KEY,
-              PermanentInstallationID.get()),
+          new BasicNameValuePair(UNIQUE_CLIENT_ID_KEY, PermanentInstallationID.get()),
           new BasicNameValuePair(PAGE_HOST_KEY, PAGE_HOST_VALUE));
   private final String analyticsId;
   private final String externalPluginName;

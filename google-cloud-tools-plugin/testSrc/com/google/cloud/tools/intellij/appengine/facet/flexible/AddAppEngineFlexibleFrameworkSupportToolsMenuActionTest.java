@@ -24,11 +24,9 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Tests for {@link AddAppEngineFlexibleFrameworkSupportToolsMenuAction}
- */
-public class AddAppEngineFlexibleFrameworkSupportToolsMenuActionTest extends
-    AddAppEngineFrameworkSupportActionTest {
+/** Tests for {@link AddAppEngineFlexibleFrameworkSupportToolsMenuAction} */
+public class AddAppEngineFlexibleFrameworkSupportToolsMenuActionTest
+    extends AddAppEngineFrameworkSupportActionTest {
   private AddAppEngineFlexibleFrameworkSupportToolsMenuAction action;
 
   @NotNull
@@ -44,12 +42,15 @@ public class AddAppEngineFlexibleFrameworkSupportToolsMenuActionTest extends
   }
 
   public void testIsActionRegistered() {
-    AnAction action = ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Flexible");
+    AnAction action =
+        ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Flexible");
     assertNotNull(action);
     Presentation presentation = action.getTemplatePresentation();
     assertEquals(GctBundle.message("appengine.flexible.facet.name.title"), presentation.getText());
-    assertEquals(GctBundle.message("appengine.add.framework.support.tools.menu.description",
-        GctBundle.message("appengine.flexible.facet.name")),
+    assertEquals(
+        GctBundle.message(
+            "appengine.add.framework.support.tools.menu.description",
+            GctBundle.message("appengine.flexible.facet.name")),
         presentation.getDescription());
   }
 
@@ -59,8 +60,8 @@ public class AddAppEngineFlexibleFrameworkSupportToolsMenuActionTest extends
   }
 
   @Override
-  public void testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
+  public void
+      testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
     super.testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet();
   }
-
 }

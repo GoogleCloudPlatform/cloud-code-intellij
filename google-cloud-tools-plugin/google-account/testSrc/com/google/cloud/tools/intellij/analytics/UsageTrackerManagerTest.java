@@ -30,16 +30,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * Tests for {@link UsageTrackerManager}.
- */
+/** Tests for {@link UsageTrackerManager}. */
 @RunWith(MockitoJUnitRunner.class)
 public class UsageTrackerManagerTest {
 
-  @Mock
-  private PropertiesComponent mockComponent;
-  @Mock
-  private PluginFlags mockFlags;
+  @Mock private PropertiesComponent mockComponent;
+  @Mock private PluginFlags mockFlags;
 
   private UsageTrackerManager manager;
 

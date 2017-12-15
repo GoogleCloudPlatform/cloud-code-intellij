@@ -16,17 +16,13 @@
 package com.google.cloud.tools.intellij.login;
 
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.intellij.util.containers.HashMap;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
-/**
- * Tests for {@link CredentialedUserRoster}.
- */
+/** Tests for {@link CredentialedUserRoster}. */
 public class CredentialedUserRosterTest extends BasePluginTestCase {
 
   private CredentialedUserRoster users;
@@ -81,10 +77,9 @@ public class CredentialedUserRosterTest extends BasePluginTestCase {
     Assert.assertNull(users.getActiveUser());
 
     boolean exceptionThrown = false;
-    try{
+    try {
       users.setActiveUser(user2.getEmail());
-    }
-    catch (IllegalArgumentException ex) {
+    } catch (IllegalArgumentException ex) {
       exceptionThrown = true;
     }
     Assert.assertTrue(exceptionThrown);
@@ -188,7 +183,7 @@ public class CredentialedUserRosterTest extends BasePluginTestCase {
     Assert.assertEquals(user1.getEmail(), users.getActiveUser().getEmail());
 
     boolean exceptionThrown = false;
-    try{
+    try {
       users.setActiveUser("noUser");
     } catch (IllegalArgumentException ex) {
       exceptionThrown = true;

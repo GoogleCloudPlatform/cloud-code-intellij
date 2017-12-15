@@ -20,14 +20,10 @@ import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-/**
- * Unit test for {@link EndpointUtilities}.
- */
+/** Unit test for {@link EndpointUtilities}. */
 public class EndpointUtilitiesTest extends TestCase {
 
-  /**
-   *  Tests {@link EndpointUtilities#removeBeginningAndEndingQuotes(String)} }
-   */
+  /** Tests {@link EndpointUtilities#removeBeginningAndEndingQuotes(String)} } */
   public void testRemoveBeginningAndEndingQuotes() {
     String a = "";
     String b = "abc";
@@ -36,7 +32,7 @@ public class EndpointUtilitiesTest extends TestCase {
     String d = "\"\"abc\"\"";
     String dResult = "\"abc\"";
     String e = "a\"a";
-    String f =  "\"abc";
+    String f = "\"abc";
     String g = "abc\"";
 
     Assert.assertEquals(null, EndpointUtilities.removeBeginningAndEndingQuotes(null));
@@ -48,5 +44,4 @@ public class EndpointUtilitiesTest extends TestCase {
     Assert.assertEquals(f, EndpointUtilities.removeBeginningAndEndingQuotes(f));
     Assert.assertEquals(g, EndpointUtilities.removeBeginningAndEndingQuotes(g));
   }
-
 }

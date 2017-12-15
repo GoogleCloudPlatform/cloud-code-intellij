@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.resources;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 
-/**
- * UI for the node that prompts for signin in the {@link UserSelector}.
- */
+/** UI for the node that prompts for signin in the {@link UserSelector}. */
 class UserSelectorGoogleLogin extends BaseGoogleLoginUi {
 
   public UserSelectorGoogleLogin() {

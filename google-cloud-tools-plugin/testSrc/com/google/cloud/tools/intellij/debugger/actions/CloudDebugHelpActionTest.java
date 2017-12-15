@@ -25,7 +25,6 @@ import com.intellij.CommonBundle;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.util.IconLoader;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

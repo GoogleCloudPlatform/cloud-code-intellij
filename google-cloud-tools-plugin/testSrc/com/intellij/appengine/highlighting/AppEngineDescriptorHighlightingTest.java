@@ -19,9 +19,7 @@ import com.intellij.appengine.AppEngineCodeInsightTestCase;
 import com.intellij.testFramework.TestDataPath;
 import com.intellij.xml.util.CheckXmlFileWithXercesValidatorInspection;
 
-/**
- * @author nik
- */
+/** @author nik */
 @TestDataPath("$CONTENT_ROOT/testData/highlighting/descriptor/")
 public class AppEngineDescriptorHighlightingTest extends AppEngineCodeInsightTestCase {
   public void testAppEngineWeb() throws Exception {

@@ -77,5 +77,4 @@ public class ProjectListTableModelTest {
     assertThat(model.getRowCount()).isEqualTo(1);
     assertThat(model.getProjectNameAtRow(0)).isEqualTo(testProject2.getName());
   }
-
 }

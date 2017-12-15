@@ -30,9 +30,7 @@ import com.intellij.testFramework.PlatformTestCase;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Provides tests for classes that inherit from {@link AddAppEngineFrameworkSupportAction}
- */
+/** Provides tests for classes that inherit from {@link AddAppEngineFrameworkSupportAction} */
 public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTestCase {
 
   public abstract @NotNull AddAppEngineFrameworkSupportAction getAction();
@@ -54,7 +52,8 @@ public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTes
     assertEquals(3, suitableModules.size());
   }
 
-  public void testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
+  public void
+      testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
     Project project = getProject();
     ModuleType moduleType = JavaModuleType.getModuleType();
     String path = project.getBaseDir().getPath();
@@ -66,12 +65,12 @@ public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTes
       @Override
       protected void run(@NotNull Result result) throws Throwable {
         FacetType appEngineStandardFacet = AppEngineStandardFacet.getFacetType();
-        FacetManager.getInstance(module2).
-            addFacet(appEngineStandardFacet, appEngineStandardFacet.getPresentableName(), null);
+        FacetManager.getInstance(module2)
+            .addFacet(appEngineStandardFacet, appEngineStandardFacet.getPresentableName(), null);
 
         FacetType appEngineFlexibleFacet = AppEngineFlexibleFacet.getFacetType();
-        FacetManager.getInstance(module3).
-            addFacet(appEngineFlexibleFacet, appEngineFlexibleFacet.getPresentableName(), null);
+        FacetManager.getInstance(module3)
+            .addFacet(appEngineFlexibleFacet, appEngineFlexibleFacet.getPresentableName(), null);
       }
     }.execute();
 
@@ -79,5 +78,4 @@ public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTes
     assertEquals(1, suitableModules.size());
     assertEquals("module1", suitableModules.get(0).getName());
   }
-
 }

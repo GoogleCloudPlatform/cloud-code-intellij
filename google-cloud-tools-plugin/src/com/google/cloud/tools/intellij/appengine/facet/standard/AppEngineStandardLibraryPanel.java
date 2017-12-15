@@ -20,20 +20,15 @@ import static java.util.stream.Collectors.toSet;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.event.ItemEvent;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * UI panel for configuring App Engine standard environment libraries.
- */
+/** UI panel for configuring App Engine standard environment libraries. */
 public class AppEngineStandardLibraryPanel {
 
   private JPanel mainPanel;
@@ -45,8 +40,13 @@ public class AppEngineStandardLibraryPanel {
   private JCheckBox endpointsCheckBox;
   private JCheckBox objectifyCheckBox;
 
-  private List<JCheckBox> libraries = ImmutableList.of(servletApiCheckbox, jstlCheckbox,
-      appEngineApiCheckBox, endpointsCheckBox, objectifyCheckBox);
+  private List<JCheckBox> libraries =
+      ImmutableList.of(
+          servletApiCheckbox,
+          jstlCheckbox,
+          appEngineApiCheckBox,
+          endpointsCheckBox,
+          objectifyCheckBox);
 
   private boolean enabled = true;
 
@@ -61,46 +61,47 @@ public class AppEngineStandardLibraryPanel {
     // Objectify and Endpoints are dependencies of the App Engine API.
     objectifyCheckBox.setSelected(false);
     endpointsCheckBox.setSelected(false);
-    appEngineApiCheckBox.addItemListener(event -> {
-      JCheckBox checkbox = (JCheckBox) event.getItem();
+    appEngineApiCheckBox.addItemListener(
+        event -> {
+          JCheckBox checkbox = (JCheckBox) event.getItem();
 
-      if (!checkbox.isSelected()) {
-        objectifyCheckBox.setSelected(false);
-        endpointsCheckBox.setSelected(false);
-      }
-    });
+          if (!checkbox.isSelected()) {
+            objectifyCheckBox.setSelected(false);
+            endpointsCheckBox.setSelected(false);
+          }
+        });
     objectifyCheckBox.addItemListener(this::handleAppEngineApiDependencyCheckboxEvent);
     endpointsCheckBox.addItemListener(this::handleAppEngineApiDependencyCheckboxEvent);
   }
 
   public Set<AppEngineStandardMavenLibrary> getSelectedLibraries() {
-    return libraries.stream()
+    return libraries
+        .stream()
         .filter(JCheckBox::isSelected)
-        .map(
-            library ->
-                AppEngineStandardMavenLibrary.getLibraryByDisplayName(library.getText()))
+        .map(library -> AppEngineStandardMavenLibrary.getLibraryByDisplayName(library.getText()))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(toSet());
   }
 
   public void setSelectedLibraries(Set<AppEngineStandardMavenLibrary> mavenLibraries) {
-    Set<String> availableLibraryNames = mavenLibraries.stream()
-        .map(AppEngineStandardMavenLibrary::getDisplayName)
-        .collect(toSet());
+    Set<String> availableLibraryNames =
+        mavenLibraries.stream().map(AppEngineStandardMavenLibrary::getDisplayName).collect(toSet());
 
     libraries.forEach(
         checkbox -> checkbox.setSelected(availableLibraryNames.contains(checkbox.getText())));
   }
 
   public void selectLibraryByName(String name) {
-    libraries.stream()
+    libraries
+        .stream()
         .filter(library -> library.getText().equals(name))
         .forEach(checkbox -> checkbox.setSelected(true));
   }
 
   public void toggleLibrary(AppEngineStandardMavenLibrary library, boolean select) {
-    libraries.stream()
+    libraries
+        .stream()
         .filter(checkbox -> checkbox.getText().equals(library.getDisplayName()))
         .forEach(checkbox -> checkbox.setSelected(select));
   }
@@ -116,7 +117,8 @@ public class AppEngineStandardLibraryPanel {
 
   @VisibleForTesting
   JCheckBox getLibraryCheckbox(String name) {
-    return libraries.stream()
+    return libraries
+        .stream()
         .filter(library -> library.getText().equals(name))
         .findAny()
         .orElse(null);
