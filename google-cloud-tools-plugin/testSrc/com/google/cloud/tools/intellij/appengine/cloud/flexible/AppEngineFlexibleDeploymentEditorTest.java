@@ -28,7 +28,8 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFile;
 import com.google.cloud.tools.intellij.testing.TestFixture;
@@ -175,12 +176,12 @@ public final class AppEngineFlexibleDeploymentEditorTest {
 
   @Test
   public void applyEditorTo_doesSetCloudProjectName() throws Exception {
-    String project = "some-project";
-    when(projectSelector.getText()).thenReturn(project);
+    CloudProject project = CloudProject.create("some-project", "some-project", EMAIL);
+    when(projectSelector.getSelectedProject()).thenReturn(project);
 
     editor.applyEditorTo(configuration);
 
-    assertThat(configuration.getCloudProjectName()).isEqualTo(project);
+    assertThat(configuration.getCloudProjectName()).isEqualTo(project.projectId());
   }
 
   @Test
@@ -195,7 +196,8 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   @Test
   public void applyEditorTo_withUser_doesSetGoogleUsername() throws Exception {
     when(credentialedUser.getEmail()).thenReturn(EMAIL);
-    when(projectSelector.getSelectedUser()).thenReturn(credentialedUser);
+    CloudProject project = CloudProject.create("some-project", "some-project", EMAIL);
+    when(projectSelector.getSelectedProject()).thenReturn(project);
 
     editor.applyEditorTo(configuration);
 
@@ -335,10 +337,12 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   public void resetEditorFrom_withCloudProjectName_doesSetCloudProjectName() {
     String projectName = "some-project";
     configuration.setCloudProjectName(projectName);
+    configuration.setGoogleUsername(EMAIL);
 
     editor.resetEditorFrom(configuration);
 
-    verify(projectSelector).setText(projectName);
+    CloudProject expectedProject = CloudProject.create(projectName, projectName, EMAIL);
+    verify(projectSelector).setSelectedProject(expectedProject);
   }
 
   @Test
