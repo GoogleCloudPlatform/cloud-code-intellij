@@ -123,16 +123,9 @@ public class AppEngineServerModel
 
   @Override
   public void checkConfiguration() throws RuntimeConfigurationException {
-    Artifact artifact;
-    if (artifactPointer == null || (artifact = artifactPointer.getArtifact()) == null) {
+    if (artifactPointer == null || artifactPointer.getArtifact() == null) {
       throw new RuntimeConfigurationError("Artifact isn't specified");
     }
-
-    AppEngineUtil.findAppEngineStandardFacet(commonModel.getProject(), artifact)
-        .orElseThrow(
-            () ->
-                new RuntimeConfigurationWarning(
-                    "App Engine facet not found in '" + artifact.getName() + "' artifact"));
 
     if (!CloudSdkService.getInstance().isValidCloudSdk()) {
       throw new RuntimeConfigurationError(
