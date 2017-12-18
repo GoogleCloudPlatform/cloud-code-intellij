@@ -271,7 +271,7 @@ public final class AppEngineStandardDeploymentEditorTest {
   }
 
   @Test
-  public void resetEditorFrom_doesSetCloudProjectName() {
+  public void resetEditorFrom_doesSet_matchingCloudProject() {
     String projectId = "some-project";
     configuration.setCloudProjectName(projectId);
     configuration.setGoogleUsername(EMAIL);
@@ -281,17 +281,4 @@ public final class AppEngineStandardDeploymentEditorTest {
     CloudProject expectedProject = CloudProject.create(projectId, projectId, EMAIL);
     verify(projectSelector).setSelectedProject(expectedProject);
   }
-
-  /*@Test
-  public void resetEditorFrom_doesNotSetGoogleUsername() {
-    String projectId = "some-project";
-    String googleUsername = "some@user.name";
-    configuration.setGoogleUsername(googleUsername);
-    configuration.setCloudProjectName(projectId);
-
-    editor.resetEditorFrom(configuration);
-
-    CloudProject expectedProject = CloudProject.create(projectId, projectId, EMAIL);
-    assertThat(editor.getCommonConfig().getProjectSelector().getSelectedUser()).isNull();
-  }*/
 }

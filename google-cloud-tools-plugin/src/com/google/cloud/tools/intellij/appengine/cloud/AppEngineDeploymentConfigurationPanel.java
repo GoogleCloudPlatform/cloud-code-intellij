@@ -104,12 +104,12 @@ public final class AppEngineDeploymentConfigurationPanel {
 
     // TODO(ivanporty) add project name to configuration and then use separate project ID field.
     if (configuration.getCloudProjectName() != null && configuration.getGoogleUsername() != null) {
-      CloudProject cloudProject = CloudProject.create(
-          configuration.getCloudProjectName(),
-          configuration.getCloudProjectName(),
-          configuration.getGoogleUsername());
-      refreshApplicationInfoPanel(
-          cloudProject);
+      CloudProject cloudProject =
+          CloudProject.create(
+              configuration.getCloudProjectName(),
+              configuration.getCloudProjectName(),
+              configuration.getGoogleUsername());
+      refreshApplicationInfoPanel(cloudProject);
       projectSelector.setSelectedProject(cloudProject);
     } else {
       // uninitialized or incomplete configuration.
