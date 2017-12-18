@@ -122,7 +122,8 @@ public class AppEngineServerModel
   @Override
   public void checkConfiguration() throws RuntimeConfigurationException {
     if (artifactPointer == null || artifactPointer.getArtifact() == null) {
-      throw new RuntimeConfigurationError("Artifact isn't specified");
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.run.server.artifact.missing"));
     }
 
     if (!CloudSdkService.getInstance().isValidCloudSdk()) {
