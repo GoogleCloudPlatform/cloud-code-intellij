@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -26,7 +25,6 @@ import com.google.common.collect.ImmutableList;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
-import com.intellij.execution.configurations.RuntimeConfigurationWarning;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.javaee.deployment.DeploymentProvider;
 import com.intellij.javaee.run.configuration.CommonModel;
@@ -123,16 +121,10 @@ public class AppEngineServerModel
 
   @Override
   public void checkConfiguration() throws RuntimeConfigurationException {
-    Artifact artifact;
-    if (artifactPointer == null || (artifact = artifactPointer.getArtifact()) == null) {
-      throw new RuntimeConfigurationError("Artifact isn't specified");
+    if (artifactPointer == null || artifactPointer.getArtifact() == null) {
+      throw new RuntimeConfigurationError(
+          GctBundle.message("appengine.run.server.artifact.missing"));
     }
-
-    AppEngineUtil.findAppEngineStandardFacet(commonModel.getProject(), artifact)
-        .orElseThrow(
-            () ->
-                new RuntimeConfigurationWarning(
-                    "App Engine facet not found in '" + artifact.getName() + "' artifact"));
 
     if (!CloudSdkService.getInstance().isValidCloudSdk()) {
       throw new RuntimeConfigurationError(
