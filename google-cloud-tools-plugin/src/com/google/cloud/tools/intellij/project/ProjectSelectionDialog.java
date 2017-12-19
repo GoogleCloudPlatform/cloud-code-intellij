@@ -34,6 +34,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.DoubleClickListener;
 import com.intellij.ui.JBProgressBar;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.TableSpeedSearch;
@@ -42,6 +43,7 @@ import com.intellij.ui.table.JBTable;
 import git4idea.DialogManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -215,7 +217,12 @@ public class ProjectSelectionDialog {
   private void refreshDialog() {
     CredentialedUser currentUser = (CredentialedUser) accountComboBox.getSelectedItem();
     loadAllProjects();
-    accountComboBox.setSelectedItem(currentUser);
+    if (currentUser != null) {
+      accountComboBox.setSelectedItem(currentUser);
+    } else {
+      // no selection before, select active user by default.
+      accountComboBox.setSelectedItem(Services.getLoginService().getActiveUser());
+    }
   }
 
   /** Updates project list if this list is for currently selected account. if not, does nothing. */
@@ -246,7 +253,6 @@ public class ProjectSelectionDialog {
         dialogWrapper.getSize().height / 2,
         progressBarLength,
         progressBar.getPreferredSize().height);
-    ((JBTable) projectListTable).setPaintBusy(loading);
   }
 
   @VisibleForTesting
@@ -262,6 +268,15 @@ public class ProjectSelectionDialog {
     projectListTable.getSelectionModel().addListSelectionListener(e -> validateProjectSelection());
     FilteredTextTableCellRenderer filterRenderer = new FilteredTextTableCellRenderer();
     projectListTable.setDefaultRenderer(Object.class, filterRenderer);
+
+    DoubleClickListener tableDoubleClickListener = new DoubleClickListener() {
+      @Override
+      protected boolean onDoubleClick(MouseEvent event) {
+        dialogWrapper.clickDefaultButton();
+        return true;
+      }
+    };
+    tableDoubleClickListener.installOn(projectListTable);
 
     // filter rows based on text field content.
     filterTextField = new JBTextField();
