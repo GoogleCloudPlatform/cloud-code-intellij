@@ -26,6 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.HyperlinkLabel;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
 import java.util.Optional;
 import javax.swing.JCheckBox;
@@ -49,6 +50,7 @@ public final class AppEngineDeploymentConfigurationPanel {
   private JPanel appEngineCostWarningPanel;
   private HyperlinkLabel appEngineCostWarningLabel;
   private JLabel serviceLabel;
+  private JCheckBox hiddenValidationTrigger;
 
   private static final boolean PROMOTE_DEFAULT = false;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
@@ -84,7 +86,13 @@ public final class AppEngineDeploymentConfigurationPanel {
     appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appEngineCostWarningLabel.setHyperlinkTarget(CloudSdkAppEngineHelper.APP_ENGINE_BILLING_URL);
 
-    projectSelector.addProjectSelectionListener(this::refreshApplicationInfoPanel);
+    projectSelector.addProjectSelectionListener(
+        (selected) -> {
+          refreshApplicationInfoPanel(selected);
+          // manually trigger validate, hyperlinks events not caught by standard settings editor
+          // watcher.
+          triggerSettingsEditorValidation();
+        });
   }
 
   /**
@@ -152,6 +160,12 @@ public final class AppEngineDeploymentConfigurationPanel {
     }
   }
 
+  /** Triggers validation and marks settings as 'changed' using hidden component. */
+  // TODO(ivanporty) explore UserActivityProviderComponent usage.
+  public void triggerSettingsEditorValidation() {
+    hiddenValidationTrigger.doClick();
+  }
+
   /**
    * Updates the text of the panel as follows: if no project is selected, no message is displayed,
    * if the project represents a valid project, the project details are displayed, if the project
@@ -171,6 +185,11 @@ public final class AppEngineDeploymentConfigurationPanel {
       applicationInfoPanel.setMessage(
           GctBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
     }
+  }
+
+  private void createUIComponents() {
+    hiddenValidationTrigger = new JBCheckBox();
+    hiddenValidationTrigger.setVisible(false);
   }
 
   public ProjectSelector getProjectSelector() {

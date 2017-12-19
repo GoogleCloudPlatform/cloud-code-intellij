@@ -77,7 +77,6 @@ public final class AppEngineFlexibleDeploymentEditor
   private JPanel archiveSelectorPanel;
   private JComboBox<AppEngineFlexibleFacet> appYamlCombobox;
   private JButton editAppYamlButton;
-  private JCheckBox hiddenValidationTrigger;
   private HyperlinkLabel dockerfileDirectoryPathLink;
   private JPanel noAppYamlsWarningPanel;
   private AppEngineFlexibleRuntimePanel runtimePanel;
@@ -154,17 +153,6 @@ public final class AppEngineFlexibleDeploymentEditor
     editAppYamlButton.addActionListener(event -> openModuleSettings());
     dockerfileDirectoryPathLink.addHyperlinkListener(event -> openModuleSettings());
 
-    // we need to add a separate state change listener for project selector since hyperlinks are not
-    // caught by standard settings editor watcher.
-    commonConfig
-        .getProjectSelector()
-        .addProjectSelectionListener(
-            (selected) -> {
-              if (selected != null) {
-                hiddenValidationTrigger.doClick();
-              }
-            });
-
     updateSelectors();
     toggleDockerfileSection();
     toggleYamlEditButton();
@@ -186,7 +174,7 @@ public final class AppEngineFlexibleDeploymentEditor
       // isn't caught anywhere, and fireEditorStateChanged() doesn't trigger any listeners
       // called from here. Emulating a user action triggers apply(), so that's what we're
       // doing here.
-      hiddenValidationTrigger.doClick();
+      commonConfig.triggerSettingsEditorValidation();
     }
   }
 
