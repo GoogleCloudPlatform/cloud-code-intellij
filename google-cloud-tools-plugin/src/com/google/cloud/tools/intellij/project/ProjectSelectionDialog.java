@@ -269,13 +269,14 @@ public class ProjectSelectionDialog {
     FilteredTextTableCellRenderer filterRenderer = new FilteredTextTableCellRenderer();
     projectListTable.setDefaultRenderer(Object.class, filterRenderer);
 
-    DoubleClickListener tableDoubleClickListener = new DoubleClickListener() {
-      @Override
-      protected boolean onDoubleClick(MouseEvent event) {
-        dialogWrapper.clickDefaultButton();
-        return true;
-      }
-    };
+    DoubleClickListener tableDoubleClickListener =
+        new DoubleClickListener() {
+          @Override
+          protected boolean onDoubleClick(MouseEvent event) {
+            dialogWrapper.clickDefaultButton();
+            return true;
+          }
+        };
     tableDoubleClickListener.installOn(projectListTable);
 
     // filter rows based on text field content.
