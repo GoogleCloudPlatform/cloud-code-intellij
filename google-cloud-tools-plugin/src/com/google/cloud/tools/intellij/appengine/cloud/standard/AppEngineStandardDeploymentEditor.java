@@ -24,8 +24,10 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.jdesktop.swingx.renderer.JRendererCheckBox;
 import org.jetbrains.annotations.NotNull;
 
 /** Editor for an App Engine Deployment runtime configuration. */
@@ -33,6 +35,7 @@ public final class AppEngineStandardDeploymentEditor
     extends SettingsEditor<AppEngineDeploymentConfiguration> {
   private AppEngineDeploymentConfigurationPanel commonConfig;
   private JPanel editorPanel;
+  private JCheckBox hiddenValidationTrigger;
 
   private Project project;
   private AppEngineDeployable deploymentSource;
@@ -60,6 +63,17 @@ public final class AppEngineStandardDeploymentEditor
         commonConfig.getAppEngineCostWarningPanel().setVisible(false);
       }
     }
+
+    // we need to add a separate state change listener for project selector since hyperlinks are not
+    // caught by standard settings editor watcher.
+    commonConfig
+        .getProjectSelector()
+        .addProjectSelectionListener(
+            (selected) -> {
+              if (selected != null) {
+                hiddenValidationTrigger.doClick();
+              }
+            });
   }
 
   @Override
@@ -89,5 +103,10 @@ public final class AppEngineStandardDeploymentEditor
   @VisibleForTesting
   AppEngineDeploymentConfigurationPanel getCommonConfig() {
     return commonConfig;
+  }
+
+  private void createUIComponents() {
+    hiddenValidationTrigger = new JRendererCheckBox();
+    hiddenValidationTrigger.setVisible(false);
   }
 }

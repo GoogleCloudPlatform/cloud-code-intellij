@@ -181,10 +181,6 @@ public final class AppEngineDeploymentConfigurationPanel {
     return environmentLabel;
   }
 
-  public AppEngineApplicationInfoPanel getApplicationInfoPanel() {
-    return applicationInfoPanel;
-  }
-
   public JCheckBox getStopPreviousVersionCheckbox() {
     return stopPreviousVersionCheckbox;
   }

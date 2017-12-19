@@ -33,7 +33,6 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
@@ -155,6 +154,17 @@ public final class AppEngineFlexibleDeploymentEditor
     editAppYamlButton.addActionListener(event -> openModuleSettings());
     dockerfileDirectoryPathLink.addHyperlinkListener(event -> openModuleSettings());
 
+    // we need to add a separate state change listener for project selector since hyperlinks are not
+    // caught by standard settings editor watcher.
+    commonConfig
+        .getProjectSelector()
+        .addProjectSelectionListener(
+            (selected) -> {
+              if (selected != null) {
+                hiddenValidationTrigger.doClick();
+              }
+            });
+
     updateSelectors();
     toggleDockerfileSection();
     toggleYamlEditButton();
@@ -262,8 +272,7 @@ public final class AppEngineFlexibleDeploymentEditor
   }
 
   @Override
-  protected void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration)
-      throws ConfigurationException {
+  protected void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.applyEditorTo(configuration);
     commonConfig.setDeploymentProjectAndVersion(deploymentSource);
 
