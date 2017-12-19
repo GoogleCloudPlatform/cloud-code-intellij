@@ -128,7 +128,11 @@ public class ProjectSelectionDialog {
                       .getMessageBus()
                       .connect(dialogWrapper.getDisposable() /* disconnect once dialog is gone. */)
                       .subscribe(
-                          GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, this::refreshDialog));
+                          GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC,
+                          () -> {
+                            refreshDialog(
+                                false /* list of users changed, switch to new active user. */);
+                          }));
     }
 
     loadAllProjects();
@@ -213,15 +217,20 @@ public class ProjectSelectionDialog {
     }
   }
 
-  /** Preserves currently selected account and refreshes accounts and project lists. */
-  private void refreshDialog() {
+  /**
+   * Preserves currently selected account if requested and refreshes accounts and project lists.
+   *
+   * @param keepPreviousSelection true to keep current user selected after refresh. false to select
+   *     active user instead.
+   */
+  private void refreshDialog(boolean keepPreviousSelection) {
     CredentialedUser currentUser = (CredentialedUser) accountComboBox.getSelectedItem();
     loadAllProjects();
-    if (currentUser != null) {
-      accountComboBox.setSelectedItem(currentUser);
-    } else {
-      // no selection before, select active user by default.
+    if (currentUser == null || !keepPreviousSelection) {
+      // no selection before or no need to keep selection, select active user.
       accountComboBox.setSelectedItem(Services.getLoginService().getActiveUser());
+    } else {
+      accountComboBox.setSelectedItem(currentUser);
     }
   }
 
@@ -492,7 +501,7 @@ public class ProjectSelectionDialog {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      refreshDialog();
+      refreshDialog(true /* keep selection after manual refresh. */);
     }
   }
 
