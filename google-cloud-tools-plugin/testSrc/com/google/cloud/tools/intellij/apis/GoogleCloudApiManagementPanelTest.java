@@ -84,7 +84,8 @@ public class GoogleCloudApiManagementPanelTest {
   }
 
   @Test
-  public void allApiTable_showsDifferenceofAllLibrariesAndSelectedLibraries() { GoogleCloudApiManagementPanel panel = createPanel();
+  public void allApiTable_showsDifferenceofAllLibrariesAndSelectedLibraries() {
+    GoogleCloudApiManagementPanel panel = createPanel();
 
     panel
         .getProjectSelector()
