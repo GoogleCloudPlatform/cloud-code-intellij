@@ -32,7 +32,6 @@ import com.intellij.ui.TableUtil;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
@@ -47,11 +46,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import org.jetbrains.annotations.NotNull;
 
@@ -84,6 +80,10 @@ final class GoogleCloudApiSelectorPanel {
   /** Adds the given {@link ActionListener} to the {@link ModulesComboBox}. */
   void addModuleSelectionListener(ActionListener listener) {
     modulesComboBox.addActionListener(listener);
+  }
+
+  void addLibrarySelectionListener(TableModelListener listener) {
+    cloudLibrariesTable.getModel().addTableModelListener(listener);
   }
 
   /** Returns the selected {@link Module}. */
@@ -159,6 +159,7 @@ final class GoogleCloudApiSelectorPanel {
       super(new CloudLibraryTableModel(libraries));
 
       setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       setDefaultRenderer(CloudLibrary.class, new CloudLibraryRenderer());
       setDefaultRenderer(Boolean.class, new BooleanTableCellRenderer());
       setDefaultEditor(Boolean.class, new BooleanTableCellEditor());
@@ -170,34 +171,6 @@ final class GoogleCloudApiSelectorPanel {
     public void paint(@NotNull Graphics g) {
       super.paint(g);
       UIUtil.fixOSXEditorBackground(this);
-    }
-  }
-
-  /**
-   * The custom {@link javax.swing.table.TableCellRenderer TableCellRenderer} for {@link
-   * CloudLibrary} objects.
-   */
-  private static final class CloudLibraryRenderer extends DefaultTableCellRenderer {
-
-    private static final Border NO_FOCUS_BORDER = new EmptyBorder(5, 5, 5, 5);
-
-    @Override
-    public Component getTableCellRendererComponent(
-        JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-      Component component =
-          super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-      setBorder(NO_FOCUS_BORDER);
-      return component;
-    }
-
-    @Override
-    public void setValue(Object value) {
-      if (value instanceof CloudLibrary) {
-        CloudLibrary library = (CloudLibrary) value;
-        setText(library.getName());
-      } else {
-        setText("");
-      }
     }
   }
 

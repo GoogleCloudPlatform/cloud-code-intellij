@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.event.TableModelListener;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -68,14 +68,24 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
   /** The wizard for the "Add Cloud Libraries" menu action. */
   private static final class AddCloudLibrariesWizard extends AbstractWizard<Step> {
 
+    private List<CloudLibrary> libraries;
+
     private final SelectClientLibrariesStep selectClientLibrariesStep;
     private final ManageCloudApisStep manageCloudApisStep;
 
     AddCloudLibrariesWizard(Project project) {
       super(GctBundle.message("cloud.libraries.dialog.title"), project);
 
-      selectClientLibrariesStep = new SelectClientLibrariesStep(project);
+      try {
+        libraries = CloudLibraries.getCloudLibraries();
+      } catch (IOException e) {
+        logger.error(e);
+        libraries = ImmutableList.of();
+      }
+
+      selectClientLibrariesStep = new SelectClientLibrariesStep(libraries, project);
       selectClientLibrariesStep.addModuleSelectionListener(event -> updateButtons());
+      selectClientLibrariesStep.addLibrarySelectionListener(event -> updateButtons());
       manageCloudApisStep = new ManageCloudApisStep();
 
       addStep(selectClientLibrariesStep);
@@ -95,7 +105,17 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
 
     @Override
     protected boolean canGoNext() {
-      return selectClientLibrariesStep.getSelectedModule() != null;
+      return selectClientLibrariesStep.getSelectedModule() != null
+          && !getSelectedLibraries().isEmpty();
+    }
+
+    @Override
+    protected void updateStep() {
+      super.updateStep();
+
+      if (getCurrentStepObject() instanceof ManageCloudApisStep) {
+        manageCloudApisStep.init(libraries, getSelectedLibraries());
+      }
     }
 
     @Nullable
@@ -110,21 +130,18 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
 
     private final GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
 
-    SelectClientLibrariesStep(Project project) {
-      List<CloudLibrary> libraries;
-      try {
-        libraries = CloudLibraries.getCloudLibraries();
-      } catch (IOException e) {
-        logger.error(e);
-        libraries = ImmutableList.of();
-      }
-
+    SelectClientLibrariesStep(List<CloudLibrary> libraries, Project project) {
       this.cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries, project);
     }
 
     /** Adds the given {@link ActionListener} to the panel's module combobox. */
     void addModuleSelectionListener(ActionListener listener) {
       cloudApiSelectorPanel.addModuleSelectionListener(listener);
+    }
+
+    /** Adds the given {@link TableModelListener} to the panel's library table. */
+    void addLibrarySelectionListener(TableModelListener listener) {
+      cloudApiSelectorPanel.addLibrarySelectionListener(listener);
     }
 
     /** Returns the selected {@link Module}. */
@@ -146,11 +163,19 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
   /** The wizard step encapsulating the cloud API management panel. */
   private static final class ManageCloudApisStep extends StepAdapter {
 
+    private final GoogleCloudApiManagementPanel cloudApiManagementPanel;
+
+    ManageCloudApisStep() {
+      cloudApiManagementPanel = new GoogleCloudApiManagementPanel();
+    }
+
+    void init(List<CloudLibrary> allLibraries, Set<CloudLibrary> selectedLibraries) {
+      cloudApiManagementPanel.init(allLibraries, selectedLibraries);
+    }
+
     @Override
-    // TODO(eshaul): Implement the cloud API management panel; this panel can be opened as part of
-    // this wizard, or as a standalone dialog.
     public JComponent getComponent() {
-      return new JPanel();
+      return cloudApiManagementPanel.getPanel();
     }
   }
 }
