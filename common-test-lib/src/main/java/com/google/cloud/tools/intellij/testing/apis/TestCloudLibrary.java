@@ -44,9 +44,9 @@ public abstract class TestCloudLibrary extends TestJson {
   }
 
   /** Returns an instance with only the name set. All other fields are empty strings. */
-    public static TestCloudLibrary createWithName(String name) {
-      return create(name, "", "", "", "", ImmutableList.of(TestCloudLibraryClient.createEmpty()));
-    }
+  public static TestCloudLibrary createWithName(String name) {
+    return create(name, "", "", "", "", ImmutableList.of(TestCloudLibraryClient.createEmpty()));
+  }
 
   /**
    * Returns a new instance for the given parameters.
