@@ -28,12 +28,11 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
@@ -78,7 +77,6 @@ public final class AppEngineFlexibleDeploymentEditor
   private JPanel archiveSelectorPanel;
   private JComboBox<AppEngineFlexibleFacet> appYamlCombobox;
   private JButton editAppYamlButton;
-  private JCheckBox hiddenValidationTrigger;
   private HyperlinkLabel dockerfileDirectoryPathLink;
   private JPanel noAppYamlsWarningPanel;
   private AppEngineFlexibleRuntimePanel runtimePanel;
@@ -176,7 +174,7 @@ public final class AppEngineFlexibleDeploymentEditor
       // isn't caught anywhere, and fireEditorStateChanged() doesn't trigger any listeners
       // called from here. Emulating a user action triggers apply(), so that's what we're
       // doing here.
-      hiddenValidationTrigger.doClick();
+      commonConfig.triggerSettingsEditorValidation();
     }
   }
 
@@ -262,8 +260,7 @@ public final class AppEngineFlexibleDeploymentEditor
   }
 
   @Override
-  protected void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration)
-      throws ConfigurationException {
+  protected void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.applyEditorTo(configuration);
     commonConfig.setDeploymentProjectAndVersion(deploymentSource);
 

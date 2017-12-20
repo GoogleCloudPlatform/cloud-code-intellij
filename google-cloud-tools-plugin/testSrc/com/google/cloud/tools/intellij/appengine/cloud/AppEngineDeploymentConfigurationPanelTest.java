@@ -20,31 +20,34 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.services.cloudresourcemanager.model.Project;
-import com.google.cloud.tools.intellij.appengine.application.GoogleApiException;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import java.io.IOException;
+import java.util.Optional;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /** Unit tests for {@link AppEngineDeploymentConfigurationPanel}. */
-@RunWith(MockitoJUnitRunner.class)
 public final class AppEngineDeploymentConfigurationPanelTest {
   private AppEngineDeploymentConfigurationPanel configurationPanel;
   private AppEngineDeploymentConfiguration deploymentConfiguration;
 
+  @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
+  @TestService @Mock private IntegratedGoogleLoginService mockGoogleLoginService;
   @Mock private AppEngineApplicationInfoPanel infoPanel;
   @Mock private ProjectSelector projectSelector;
   @Mock private CredentialedUser credentialedUser;
   @Mock private Credential credential;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     configurationPanel = new AppEngineDeploymentConfigurationPanel();
     deploymentConfiguration = new AppEngineDeploymentConfiguration();
     configurationPanel.setApplicationInfoPanel(infoPanel);
@@ -59,25 +62,29 @@ public final class AppEngineDeploymentConfigurationPanelTest {
 
   @Test
   public void projectSelector_invalidProjectSelected_infoPanelShowsError() {
-    when(projectSelector.getText()).thenReturn("projectId");
+    CloudProject project = CloudProject.create("projectId", "projectId", "some-user-id");
+    when(projectSelector.getSelectedProject()).thenReturn(project);
+
     deploymentConfiguration.setCloudProjectName("projectName");
+    deploymentConfiguration.setGoogleUsername("some-user-id");
     configurationPanel.resetEditorFrom(deploymentConfiguration);
+
     verify(infoPanel)
         .setMessage(GctBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
   }
 
   @Test
-  public void projectSelector_validProjectSelected_infoPanelShowsProjectDetails()
-      throws IOException, GoogleApiException {
+  public void projectSelector_validProjectSelected_infoPanelShowsProjectDetails() {
     String projectId = "projectId";
-    Project project = new Project();
-    project.setProjectId(projectId);
+    String googleUsername = "some-user-id";
+    CloudProject project = CloudProject.create(projectId, projectId, googleUsername);
     when(credentialedUser.getCredential()).thenReturn(credential);
-    when(projectSelector.getProject()).thenReturn(project);
-    when(projectSelector.getSelectedUser()).thenReturn(credentialedUser);
-    when(projectSelector.getText()).thenReturn(projectId);
+    when(mockGoogleLoginService.getLoggedInUser(googleUsername))
+        .thenReturn(Optional.of(credentialedUser));
+    when(projectSelector.getSelectedProject()).thenReturn(project);
 
     deploymentConfiguration.setCloudProjectName(projectId);
+    deploymentConfiguration.setGoogleUsername(googleUsername);
     configurationPanel.resetEditorFrom(deploymentConfiguration);
 
     verify(infoPanel).refresh(projectId, credential);

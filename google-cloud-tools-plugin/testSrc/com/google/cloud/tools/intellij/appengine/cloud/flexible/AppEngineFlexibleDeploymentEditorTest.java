@@ -28,7 +28,8 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFile;
 import com.google.cloud.tools.intellij.testing.TestFixture;
@@ -93,7 +94,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   private AppEngineFlexibleDeploymentEditor editor;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     FacetManager.getInstance(javaModule)
         .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId())
         .getConfiguration()
@@ -140,7 +141,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
-  public void applyEditorTo_withDefaultConfiguration_doesSetDefaults() throws Exception {
+  public void applyEditorTo_withDefaultConfiguration_doesSetDefaults() {
     editor.applyEditorTo(configuration);
 
     assertThat(configuration.getCloudProjectName()).isNull();
@@ -165,7 +166,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
-  public void applyEditorTo_doesSetPromote() throws Exception {
+  public void applyEditorTo_doesSetPromote() {
     editor.getCommonConfig().getPromoteCheckbox().setSelected(true);
 
     editor.applyEditorTo(configuration);
@@ -174,17 +175,17 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
-  public void applyEditorTo_doesSetCloudProjectName() throws Exception {
-    String project = "some-project";
-    when(projectSelector.getText()).thenReturn(project);
+  public void applyEditorTo_doesSetCloudProjectName() {
+    CloudProject project = CloudProject.create("some-project", "some-project", EMAIL);
+    when(projectSelector.getSelectedProject()).thenReturn(project);
 
     editor.applyEditorTo(configuration);
 
-    assertThat(configuration.getCloudProjectName()).isEqualTo(project);
+    assertThat(configuration.getCloudProjectName()).isEqualTo(project.projectId());
   }
 
   @Test
-  public void applyEditorTo_doesSetStopPreviousVersion() throws Exception {
+  public void applyEditorTo_doesSetStopPreviousVersion() {
     editor.getCommonConfig().getStopPreviousVersionCheckbox().setSelected(true);
 
     editor.applyEditorTo(configuration);
@@ -193,9 +194,10 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
-  public void applyEditorTo_withUser_doesSetGoogleUsername() throws Exception {
+  public void applyEditorTo_withUser_doesSetGoogleUsername() {
     when(credentialedUser.getEmail()).thenReturn(EMAIL);
-    when(projectSelector.getSelectedUser()).thenReturn(credentialedUser);
+    CloudProject project = CloudProject.create("some-project", "some-project", EMAIL);
+    when(projectSelector.getSelectedProject()).thenReturn(project);
 
     editor.applyEditorTo(configuration);
 
@@ -203,7 +205,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
-  public void applyEditorTo_withStagedArtifactName_doesSetStagedArtifactName() throws Exception {
+  public void applyEditorTo_withStagedArtifactName_doesSetStagedArtifactName() {
     String stagedArtifactName = "some-artifact.war";
     editor.getStagedArtifactNameTextField().setText(stagedArtifactName);
 
@@ -213,7 +215,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
-  public void applyEditorTo_withUnknown_doesSetUserSpecifiedArtifactPath() throws Exception {
+  public void applyEditorTo_withUnknown_doesSetUserSpecifiedArtifactPath() {
     userSpecifiedPathDeploymentSource.setFilePath(unknownArtifact.getPath());
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
     editor.getArchiveSelector().setText(unknownArtifact.getPath());
@@ -224,7 +226,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
-  public void applyEditorTo_withWar_doesSetUserSpecifiedArtifactPath() throws Exception {
+  public void applyEditorTo_withWar_doesSetUserSpecifiedArtifactPath() {
     userSpecifiedPathDeploymentSource.setFilePath(warArtifact.getPath());
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
     editor.getArchiveSelector().setText(warArtifact.getPath());
@@ -235,7 +237,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
-  public void applyEditorTo_withJar_doesSetUserSpecifiedArtifactPath() throws Exception {
+  public void applyEditorTo_withJar_doesSetUserSpecifiedArtifactPath() {
     userSpecifiedPathDeploymentSource.setFilePath(jarArtifact.getPath());
     editor.setDeploymentSource(userSpecifiedPathDeploymentSource);
     editor.getArchiveSelector().setText(jarArtifact.getPath());
@@ -246,7 +248,7 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   }
 
   @Test
-  public void applyEditorTo_withNoAppYamlSelected_doesSetModuleNameToNull() throws Exception {
+  public void applyEditorTo_withNoAppYamlSelected_doesSetModuleNameToNull() {
     editor.getAppYamlCombobox().setSelectedIndex(-1);
 
     editor.applyEditorTo(configuration);
@@ -335,10 +337,12 @@ public final class AppEngineFlexibleDeploymentEditorTest {
   public void resetEditorFrom_withCloudProjectName_doesSetCloudProjectName() {
     String projectName = "some-project";
     configuration.setCloudProjectName(projectName);
+    configuration.setGoogleUsername(EMAIL);
 
     editor.resetEditorFrom(configuration);
 
-    verify(projectSelector).setText(projectName);
+    CloudProject expectedProject = CloudProject.create(projectName, projectName, EMAIL);
+    verify(projectSelector).setSelectedProject(expectedProject);
   }
 
   @Test

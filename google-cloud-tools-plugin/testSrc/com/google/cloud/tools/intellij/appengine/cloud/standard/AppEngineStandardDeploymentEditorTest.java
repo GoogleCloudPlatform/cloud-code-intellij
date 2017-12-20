@@ -25,7 +25,8 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfig
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -58,7 +59,7 @@ public final class AppEngineStandardDeploymentEditorTest {
   private AppEngineStandardDeploymentEditor editor;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     configuration = new AppEngineDeploymentConfiguration();
     editor = new AppEngineStandardDeploymentEditor(testFixture.getProject(), deploymentSource);
     editor.getCommonConfig().setProjectSelector(projectSelector);
@@ -159,12 +160,13 @@ public final class AppEngineStandardDeploymentEditorTest {
 
   @Test
   public void applyEditorTo_doesSetCloudProjectName() throws Exception {
-    String project = "some-project";
-    when(projectSelector.getText()).thenReturn(project);
+    String projectId = "some-project";
+    CloudProject project = CloudProject.create(projectId, projectId, EMAIL);
+    when(projectSelector.getSelectedProject()).thenReturn(project);
 
     editor.applyEditorTo(configuration);
 
-    assertThat(configuration.getCloudProjectName()).isEqualTo(project);
+    assertThat(configuration.getCloudProjectName()).isEqualTo(projectId);
   }
 
   @Test
@@ -188,7 +190,9 @@ public final class AppEngineStandardDeploymentEditorTest {
   @Test
   public void applyEditorTo_withUser_doesSetGoogleUsername() throws Exception {
     when(credentialedUser.getEmail()).thenReturn(EMAIL);
-    when(projectSelector.getSelectedUser()).thenReturn(credentialedUser);
+    String projectId = "some-project";
+    CloudProject project = CloudProject.create(projectId, projectId, EMAIL);
+    when(projectSelector.getSelectedProject()).thenReturn(project);
 
     editor.applyEditorTo(configuration);
 
@@ -212,7 +216,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     assertThat(editor.getCommonConfig().getVersionIdField().getText()).isEmpty();
     assertThat(editor.getCommonConfig().getPromoteCheckbox().isSelected()).isFalse();
-    assertThat(editor.getCommonConfig().getProjectSelector().getText()).isNull();
+    assertThat(editor.getCommonConfig().getProjectSelector().getSelectedProject()).isNull();
     assertThat(editor.getCommonConfig().getStopPreviousVersionCheckbox().isSelected()).isFalse();
     assertThat(editor.getCommonConfig().getDeployAllConfigsCheckbox().isSelected()).isFalse();
     assertThat(editor.getCommonConfig().getEnvironmentLabel().getText()).isEmpty();
@@ -267,21 +271,14 @@ public final class AppEngineStandardDeploymentEditorTest {
   }
 
   @Test
-  public void resetEditorFrom_doesSetCloudProjectName() {
-    String projectName = "some-project";
-    configuration.setCloudProjectName(projectName);
+  public void resetEditorFrom_doesSet_matchingCloudProject() {
+    String projectId = "some-project";
+    configuration.setCloudProjectName(projectId);
+    configuration.setGoogleUsername(EMAIL);
 
     editor.resetEditorFrom(configuration);
 
-    verify(projectSelector).setText(projectName);
-  }
-
-  @Test
-  public void resetEditorFrom_doesNotSetGoogleUsername() {
-    configuration.setGoogleUsername("some@user.name");
-
-    editor.resetEditorFrom(configuration);
-
-    assertThat(editor.getCommonConfig().getProjectSelector().getSelectedUser()).isNull();
+    CloudProject expectedProject = CloudProject.create(projectId, projectId, EMAIL);
+    verify(projectSelector).setSelectedProject(expectedProject);
   }
 }

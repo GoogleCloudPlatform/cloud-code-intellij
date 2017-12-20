@@ -17,21 +17,21 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
-import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkLabel;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
-import com.intellij.util.ui.tree.TreeModelAdapter;
+import java.util.Optional;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.TreeModelEvent;
 import org.jetbrains.annotations.NotNull;
 
 /** Common App Engine deployment configuration UI shared by flexible and standard deployments. */
@@ -50,6 +50,7 @@ public final class AppEngineDeploymentConfigurationPanel {
   private JPanel appEngineCostWarningPanel;
   private HyperlinkLabel appEngineCostWarningLabel;
   private JLabel serviceLabel;
+  private JCheckBox hiddenValidationTrigger;
 
   private static final boolean PROMOTE_DEFAULT = false;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
@@ -85,20 +86,12 @@ public final class AppEngineDeploymentConfigurationPanel {
     appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appEngineCostWarningLabel.setHyperlinkTarget(CloudSdkAppEngineHelper.APP_ENGINE_BILLING_URL);
 
-    projectSelector.addModelListener(
-        new TreeModelAdapter() {
-          @Override
-          public void treeStructureChanged(TreeModelEvent event) {
-            // projects have finished loading
-            refreshApplicationInfoPanel();
-          }
-        });
-    projectSelector.addTextChangedListener(
-        new DocumentAdapter() {
-          @Override
-          protected void textChanged(DocumentEvent e) {
-            refreshApplicationInfoPanel();
-          }
+    projectSelector.addProjectSelectionListener(
+        (selectedCloudProject) -> {
+          refreshApplicationInfoPanel(selectedCloudProject);
+          // manually trigger validate, hyperlinks events not caught by standard settings editor
+          // watcher.
+          triggerSettingsEditorValidation();
         });
   }
 
@@ -110,7 +103,6 @@ public final class AppEngineDeploymentConfigurationPanel {
   public void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     promoteCheckbox.setSelected(configuration.isPromote());
     versionIdField.setText(configuration.getVersion());
-    projectSelector.setText(configuration.getCloudProjectName());
     stopPreviousVersionCheckbox.setSelected(configuration.isStopPreviousVersion());
     deployAllConfigsCheckbox.setSelected(configuration.isDeployAllConfigs());
 
@@ -118,7 +110,19 @@ public final class AppEngineDeploymentConfigurationPanel {
       environmentLabel.setText(configuration.getEnvironment().localizedLabel());
     }
 
-    refreshApplicationInfoPanel();
+    // TODO(ivanporty) add project name to configuration and then use separate project ID field.
+    if (configuration.getCloudProjectName() != null && configuration.getGoogleUsername() != null) {
+      CloudProject cloudProject =
+          CloudProject.create(
+              configuration.getCloudProjectName(),
+              configuration.getCloudProjectName(),
+              configuration.getGoogleUsername());
+      refreshApplicationInfoPanel(cloudProject);
+      projectSelector.setSelectedProject(cloudProject);
+    } else {
+      // uninitialized or incomplete configuration.
+      refreshApplicationInfoPanel(null);
+    }
   }
 
   /**
@@ -129,13 +133,13 @@ public final class AppEngineDeploymentConfigurationPanel {
   public void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     configuration.setVersion(versionIdField.getText());
     configuration.setPromote(promoteCheckbox.isSelected());
-    configuration.setCloudProjectName(projectSelector.getText());
     configuration.setStopPreviousVersion(stopPreviousVersionCheckbox.isSelected());
     configuration.setDeployAllConfigs(deployAllConfigsCheckbox.isSelected());
 
-    CredentialedUser user = getProjectSelector().getSelectedUser();
-    if (user != null) {
-      configuration.setGoogleUsername(user.getEmail());
+    CloudProject selectedProject = projectSelector.getSelectedProject();
+    if (selectedProject != null) {
+      configuration.setCloudProjectName(selectedProject.projectId());
+      configuration.setGoogleUsername(selectedProject.googleUsername());
     }
   }
 
@@ -145,29 +149,47 @@ public final class AppEngineDeploymentConfigurationPanel {
    */
   public void setDeploymentProjectAndVersion(DeploymentSource deploymentSource) {
     if (deploymentSource instanceof AppEngineDeployable) {
-      ((AppEngineDeployable) deploymentSource).setProjectName(projectSelector.getText());
+      ((AppEngineDeployable) deploymentSource)
+          .setProjectName(
+              Optional.ofNullable(projectSelector.getSelectedProject())
+                  .map(CloudProject::projectId)
+                  .orElse(""));
       ((AppEngineDeployable) deploymentSource)
           .setVersion(
               Strings.isNullOrEmpty(versionIdField.getText()) ? "auto" : versionIdField.getText());
     }
   }
 
+  /** Triggers validation and marks settings as 'changed' using hidden component. */
+  // TODO(ivanporty) explore UserActivityProviderComponent usage.
+  public void triggerSettingsEditorValidation() {
+    hiddenValidationTrigger.doClick();
+  }
+
   /**
-   * Updates the text of the panel as follows: if the project text box is empty, no message is
-   * displayed, if the project text represents a valid project, the project details are displayed,
-   * if the project text represents an invalid project, an error message is displayed.
+   * Updates the text of the panel as follows: if no project is selected, no message is displayed,
+   * if the project represents a valid project, the project details are displayed, if the project
+   * represents an invalid project, an error message is displayed.
    */
-  private void refreshApplicationInfoPanel() {
-    if (Strings.isNullOrEmpty(projectSelector.getText())) {
+  private void refreshApplicationInfoPanel(CloudProject selectedProject) {
+    if (selectedProject == null) {
       applicationInfoPanel.clearMessage();
-    } else if (projectSelector.getProject() != null && projectSelector.getSelectedUser() != null) {
-      applicationInfoPanel.refresh(
-          projectSelector.getProject().getProjectId(),
-          projectSelector.getSelectedUser().getCredential());
+      return;
+    }
+
+    Optional<CredentialedUser> user =
+        Services.getLoginService().getLoggedInUser(selectedProject.googleUsername());
+    if (user.isPresent()) {
+      applicationInfoPanel.refresh(selectedProject.projectId(), user.get().getCredential());
     } else {
       applicationInfoPanel.setMessage(
           GctBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
     }
+  }
+
+  private void createUIComponents() {
+    hiddenValidationTrigger = new JBCheckBox();
+    hiddenValidationTrigger.setVisible(false);
   }
 
   public ProjectSelector getProjectSelector() {
@@ -176,10 +198,6 @@ public final class AppEngineDeploymentConfigurationPanel {
 
   public JLabel getEnvironmentLabel() {
     return environmentLabel;
-  }
-
-  public AppEngineApplicationInfoPanel getApplicationInfoPanel() {
-    return applicationInfoPanel;
   }
 
   public JCheckBox getStopPreviousVersionCheckbox() {
