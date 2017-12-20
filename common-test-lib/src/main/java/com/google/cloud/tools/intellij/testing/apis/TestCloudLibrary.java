@@ -43,6 +43,11 @@ public abstract class TestCloudLibrary extends TestJson {
     return create("", "", "", "", "", ImmutableList.of(TestCloudLibraryClient.createEmpty()));
   }
 
+  /** Returns an instance with only the name set. All other fields are empty strings. */
+    public static TestCloudLibrary createWithName(String name) {
+      return create(name, "", "", "", "", ImmutableList.of(TestCloudLibraryClient.createEmpty()));
+    }
+
   /**
    * Returns a new instance for the given parameters.
    *
@@ -99,6 +104,8 @@ public abstract class TestCloudLibrary extends TestJson {
     public static TestCloudLibraryClient createEmpty() {
       return create("", "", "", "", "", "", TestCloudLibraryClientMavenCoordinates.createEmpty());
     }
+
+
 
     /**
      * Returns a new instance for the given parameters.

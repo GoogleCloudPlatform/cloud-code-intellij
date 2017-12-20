@@ -155,7 +155,8 @@ public class ProjectSelector extends JPanel {
         GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, loggedInUser.orElse(null)));
   }
 
-  private void notifyProjectSelectionListeners() {
+  @VisibleForTesting
+  public void notifyProjectSelectionListeners() {
     projectSelectionListeners.forEach(listener -> listener.projectSelected(cloudProject));
   }
 

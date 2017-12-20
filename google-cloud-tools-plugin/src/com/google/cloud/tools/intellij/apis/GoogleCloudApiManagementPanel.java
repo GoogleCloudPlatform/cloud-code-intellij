@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.apis;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.util.Couple;
@@ -92,6 +93,8 @@ public class GoogleCloudApiManagementPanel {
   }
 
   /** Initializes the table models of the API tables based on the user's library selection. */
+  // TODO(eshaul) its very important that we add an equals method to CloudLibrary so that the set
+  // operation is reliable
   void init(List<CloudLibrary> allLibraries, Set<CloudLibrary> selectedLibraries) {
     selectedApisTable.setModel(new ApisTableModel(selectedLibraries));
     selectedApisTable
@@ -119,6 +122,31 @@ public class GoogleCloudApiManagementPanel {
     return panel;
   }
 
+  @VisibleForTesting
+  JBScrollPane getApisScrollPane() {
+    return apisScrollPane;
+  }
+
+  @VisibleForTesting
+  JLabel getSelectProjectLabel() {
+    return selectProjectLabel;
+  }
+
+  @VisibleForTesting
+  JTable getSelectedApisTable() {
+    return selectedApisTable;
+  }
+
+  @VisibleForTesting
+  JTable getAllApisTable() {
+    return allApisTable;
+  }
+
+  @VisibleForTesting
+  ProjectSelector getProjectSelector() {
+    return projectSelector;
+  }
+
   private void createUIComponents() {
     selectedApisTable = new ApisTable();
     selectedApisTable.setTableHeader(null);
@@ -135,7 +163,8 @@ public class GoogleCloudApiManagementPanel {
   }
 
   /** Custom {@link TableModel} for the API enablement table instances. */
-  private static final class ApisTableModel implements TableModel {
+  @VisibleForTesting
+  static final class ApisTableModel implements TableModel {
 
     private final SortedMap<CloudLibrary, Boolean> librariesToEnabledStatus =
         new TreeMap<>(Comparator.comparing(CloudLibrary::getName));
@@ -202,7 +231,8 @@ public class GoogleCloudApiManagementPanel {
    */
   private static final class CloudApiEnablementRenderer extends DefaultTableCellRenderer {
 
-    private final JButton enableButton = new JButton("cloud.apis.management.enable.button");
+    private final JButton enableButton =
+        new JButton(GctBundle.message("cloud.apis.management.enable.button"));
 
     CloudApiEnablementRenderer() {
       super();
