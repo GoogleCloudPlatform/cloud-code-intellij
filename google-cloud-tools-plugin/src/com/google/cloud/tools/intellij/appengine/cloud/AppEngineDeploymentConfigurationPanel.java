@@ -87,8 +87,8 @@ public final class AppEngineDeploymentConfigurationPanel {
     appEngineCostWarningLabel.setHyperlinkTarget(CloudSdkAppEngineHelper.APP_ENGINE_BILLING_URL);
 
     projectSelector.addProjectSelectionListener(
-        (selected) -> {
-          refreshApplicationInfoPanel(selected);
+        (selectedCloudProject) -> {
+          refreshApplicationInfoPanel(selectedCloudProject);
           // manually trigger validate, hyperlinks events not caught by standard settings editor
           // watcher.
           triggerSettingsEditorValidation();
