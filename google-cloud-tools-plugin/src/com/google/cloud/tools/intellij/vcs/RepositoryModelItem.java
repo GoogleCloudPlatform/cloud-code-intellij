@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.resources;
+package com.google.cloud.tools.intellij.vcs;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-/** This model item is shown when a resource manager call is outstanding. */
-public class ResourceLoadingModelItem extends DefaultMutableTreeNode {}
+/** TreeNode representing a single GCP repository. */
+public class RepositoryModelItem extends DefaultMutableTreeNode {
+
+  private String repositoryName;
+
+  public RepositoryModelItem(String repositoryName) {
+    super(repositoryName);
+    this.repositoryName = repositoryName;
+  }
+
+  public String getRepositoryId() {
+    return repositoryName;
+  }
+}

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.resources;
+package com.google.cloud.tools.intellij.vcs;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.resources.ProjectRepositoriesModelItem;
+import com.google.cloud.tools.intellij.resources.ResourceLoadingModelItem;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
