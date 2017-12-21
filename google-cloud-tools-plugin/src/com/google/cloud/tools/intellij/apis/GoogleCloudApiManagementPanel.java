@@ -51,7 +51,7 @@ import javax.swing.table.TableModel;
  */
 public class GoogleCloudApiManagementPanel {
 
-  private JPanel panel;
+  private JPanel contentPanel;
   private ProjectSelector projectSelector;
   private JLabel selectProjectLabel;
   private JBScrollPane apisScrollPane;
@@ -118,8 +118,8 @@ public class GoogleCloudApiManagementPanel {
         .setMinWidth(MIN_CLOUD_API_ENABLEMENT_COL_WIDTH);
   }
 
-  JPanel getPanel() {
-    return panel;
+  JPanel getContentPanel() {
+    return contentPanel;
   }
 
   @VisibleForTesting

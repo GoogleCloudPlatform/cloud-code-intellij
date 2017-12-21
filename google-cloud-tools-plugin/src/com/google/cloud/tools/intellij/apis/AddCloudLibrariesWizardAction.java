@@ -175,7 +175,7 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
 
     @Override
     public JComponent getComponent() {
-      return cloudApiManagementPanel.getPanel();
+      return cloudApiManagementPanel.getContentPanel();
     }
   }
 }
