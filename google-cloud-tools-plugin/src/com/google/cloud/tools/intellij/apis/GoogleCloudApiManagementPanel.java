@@ -22,12 +22,9 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.intellij.openapi.util.Couple;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
-import com.intellij.util.ui.UIUtil;
-import java.awt.Color;
 import java.awt.Component;
 import java.util.Collection;
 import java.util.Comparator;
@@ -252,10 +249,6 @@ public class GoogleCloudApiManagementPanel {
     @Override
     public Component getTableCellRendererComponent(
         JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-      Couple<Color> colors = UIUtil.getCellColors(table, isSelected, row, column);
-      setForeground(colors.getFirst());
-      setBackground(table.getBackground());
-
       JComponent component =
           (JComponent)
               super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
