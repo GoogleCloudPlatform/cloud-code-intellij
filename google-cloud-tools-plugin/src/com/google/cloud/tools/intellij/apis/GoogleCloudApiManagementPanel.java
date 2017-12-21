@@ -89,7 +89,7 @@ public class GoogleCloudApiManagementPanel {
     selectProjectLabel.setVisible(false);
   }
 
-  /** Initializes the table models of the API tables based on the user's library selection. */
+  /** Initializes the table model data of the API tables based on the user's library selection. */
   // TODO(eshaul) its very important that we add an equals method to CloudLibrary so that the set
   // operation is reliable
   void init(List<CloudLibrary> allLibraries, Set<CloudLibrary> selectedLibraries) {
