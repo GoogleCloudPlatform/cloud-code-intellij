@@ -38,7 +38,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 
@@ -93,26 +93,14 @@ public class GoogleCloudApiManagementPanel {
   // TODO(eshaul) its very important that we add an equals method to CloudLibrary so that the set
   // operation is reliable
   void init(List<CloudLibrary> allLibraries, Set<CloudLibrary> selectedLibraries) {
-    selectedApisTable.setModel(new ApisTableModel(selectedLibraries));
-    selectedApisTable
-        .getColumnModel()
-        .getColumn(CLOUD_API_NAME_COL)
-        .setMinWidth(MIN_CLOUD_API_COL_WIDTH);
-    selectedApisTable
-        .getColumnModel()
-        .getColumn(CLOUD_API_ENABLEMENT_COL)
-        .setMinWidth(MIN_CLOUD_API_ENABLEMENT_COL_WIDTH);
+    ApisTableModel selectedApisTableModel = ((ApisTableModel) selectedApisTable.getModel());
+    selectedApisTableModel.setLibraries(selectedLibraries);
+    selectedApisTableModel.fireTableDataChanged();
 
-    allApisTable.setModel(
-        new ApisTableModel(Sets.difference(Sets.newHashSet(allLibraries), selectedLibraries)));
-    allApisTable
-        .getColumnModel()
-        .getColumn(CLOUD_API_NAME_COL)
-        .setMinWidth(MIN_CLOUD_API_COL_WIDTH);
-    allApisTable
-        .getColumnModel()
-        .getColumn(CLOUD_API_ENABLEMENT_COL)
-        .setMinWidth(MIN_CLOUD_API_ENABLEMENT_COL_WIDTH);
+    ApisTableModel allApisTableModel = ((ApisTableModel) allApisTable.getModel());
+    allApisTableModel.setLibraries(
+        (Sets.difference(Sets.newHashSet(allLibraries), selectedLibraries)));
+    allApisTableModel.fireTableDataChanged();
   }
 
   JPanel getContentPanel() {
@@ -146,10 +134,28 @@ public class GoogleCloudApiManagementPanel {
 
   private void createUIComponents() {
     selectedApisTable = new ApisTable();
+    selectedApisTable.setModel(new ApisTableModel());
     selectedApisTable.setTableHeader(null);
+    selectedApisTable
+        .getColumnModel()
+        .getColumn(CLOUD_API_NAME_COL)
+        .setMinWidth(MIN_CLOUD_API_COL_WIDTH);
+    selectedApisTable
+        .getColumnModel()
+        .getColumn(CLOUD_API_ENABLEMENT_COL)
+        .setMinWidth(MIN_CLOUD_API_ENABLEMENT_COL_WIDTH);
 
     allApisTable = new ApisTable();
+    allApisTable.setModel(new ApisTableModel());
     allApisTable.setTableHeader(null);
+    allApisTable
+        .getColumnModel()
+        .getColumn(CLOUD_API_NAME_COL)
+        .setMinWidth(MIN_CLOUD_API_COL_WIDTH);
+    allApisTable
+        .getColumnModel()
+        .getColumn(CLOUD_API_ENABLEMENT_COL)
+        .setMinWidth(MIN_CLOUD_API_ENABLEMENT_COL_WIDTH);
   }
 
   private static final class ApisTable extends JBTable {
@@ -161,12 +167,12 @@ public class GoogleCloudApiManagementPanel {
 
   /** Custom {@link TableModel} for the API enablement table instances. */
   @VisibleForTesting
-  static final class ApisTableModel implements TableModel {
+  static final class ApisTableModel extends AbstractTableModel {
 
     private final SortedMap<CloudLibrary, Boolean> librariesToEnabledStatus =
         new TreeMap<>(Comparator.comparing(CloudLibrary::getName));
 
-    ApisTableModel(Collection<CloudLibrary> libraries) {
+    void setLibraries(Collection<CloudLibrary> libraries) {
       librariesToEnabledStatus.putAll(Maps.toMap(libraries, this::getEnabledStatus));
     }
 
@@ -183,11 +189,6 @@ public class GoogleCloudApiManagementPanel {
     @Override
     public int getColumnCount() {
       return 2;
-    }
-
-    @Override
-    public String getColumnName(int columnIndex) {
-      return null;
     }
 
     @Override
@@ -218,15 +219,6 @@ public class GoogleCloudApiManagementPanel {
           throw new IndexOutOfBoundsException();
       }
     }
-
-    @Override
-    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {}
-
-    @Override
-    public void addTableModelListener(TableModelListener l) {}
-
-    @Override
-    public void removeTableModelListener(TableModelListener l) {}
   }
 
   /**
