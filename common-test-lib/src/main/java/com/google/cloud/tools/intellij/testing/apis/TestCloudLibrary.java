@@ -105,8 +105,6 @@ public abstract class TestCloudLibrary extends TestJson {
       return create("", "", "", "", "", "", TestCloudLibraryClientMavenCoordinates.createEmpty());
     }
 
-
-
     /**
      * Returns a new instance for the given parameters.
      *
