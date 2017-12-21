@@ -159,7 +159,6 @@ final class GoogleCloudApiSelectorPanel {
       super(new CloudLibraryTableModel(libraries));
 
       setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       setDefaultRenderer(CloudLibrary.class, new CloudLibraryRenderer());
       setDefaultRenderer(Boolean.class, new BooleanTableCellRenderer());
       setDefaultEditor(Boolean.class, new BooleanTableCellEditor());
