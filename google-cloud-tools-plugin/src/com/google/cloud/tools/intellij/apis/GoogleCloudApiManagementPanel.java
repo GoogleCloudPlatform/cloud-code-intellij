@@ -242,7 +242,6 @@ public class GoogleCloudApiManagementPanel {
     CloudApiEnablementRenderer() {
       super();
 
-      setOpaque(false);
       enableButton.setOpaque(false);
     }
 
