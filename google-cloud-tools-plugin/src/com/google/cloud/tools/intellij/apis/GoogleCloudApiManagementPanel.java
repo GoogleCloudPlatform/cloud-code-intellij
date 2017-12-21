@@ -195,11 +195,14 @@ public class GoogleCloudApiManagementPanel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-      if (columnIndex == 0) {
-        return CloudLibrary.class;
+      switch (columnIndex) {
+        case CLOUD_API_NAME_COL:
+          return CloudLibrary.class;
+        case CLOUD_API_ENABLEMENT_COL:
+          return Boolean.class;
+        default:
+          throw new IndexOutOfBoundsException();
       }
-
-      return Boolean.class;
     }
 
     @Override
@@ -209,9 +212,14 @@ public class GoogleCloudApiManagementPanel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-      return columnIndex == 0
-          ? librariesToEnabledStatus.keySet().toArray()[rowIndex]
-          : librariesToEnabledStatus.values().toArray()[rowIndex];
+      switch (columnIndex) {
+        case CLOUD_API_NAME_COL:
+          return librariesToEnabledStatus.keySet().toArray()[rowIndex];
+        case CLOUD_API_ENABLEMENT_COL:
+          return librariesToEnabledStatus.values().toArray()[rowIndex];
+        default:
+          throw new IndexOutOfBoundsException();
+      }
     }
 
     @Override
