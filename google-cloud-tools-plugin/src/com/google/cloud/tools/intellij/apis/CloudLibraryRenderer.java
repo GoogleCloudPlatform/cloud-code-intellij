@@ -17,10 +17,10 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.intellij.util.ui.JBUI;
 import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 /**
@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 final class CloudLibraryRenderer extends DefaultTableCellRenderer {
 
-  private static final Border NO_FOCUS_BORDER = new EmptyBorder(5, 5, 5, 5);
+  private static final Border NO_FOCUS_BORDER = JBUI.Borders.empty(5);
 
   @Override
   public Component getTableCellRendererComponent(
