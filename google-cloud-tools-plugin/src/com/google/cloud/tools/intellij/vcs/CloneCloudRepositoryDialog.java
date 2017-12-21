@@ -18,7 +18,9 @@ package com.google.cloud.tools.intellij.vcs;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.resources.RepositorySelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.dvcs.ui.DvcsBundle;
@@ -35,6 +37,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import java.awt.Dimension;
 import java.io.File;
+import java.util.Optional;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -86,8 +89,9 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
 
   @Nullable
   public String getGcpUserName() {
-    CredentialedUser selectedUser = projectSelector.getSelectedUser();
-    return selectedUser != null ? selectedUser.getEmail() : null;
+    return Optional.ofNullable(projectSelector.getSelectedProject())
+        .map(CloudProject::googleUsername)
+        .orElse(null);
   }
 
   private void initComponents() {
@@ -143,8 +147,13 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
 
   /** Check fields and display error in the wrapper if there is a problem. */
   private void updateButtons() {
-    if (!StringUtil.isEmpty(projectSelector.getText())
-        && projectSelector.getSelectedUser() == null) {
+    CloudProject selectedProject = projectSelector.getSelectedProject();
+    Optional<CredentialedUser> selectedUser =
+        selectedProject == null
+            ? Optional.empty()
+            : Services.getLoginService().getLoggedInUser(selectedProject.googleUsername());
+
+    if (selectedProject != null && !selectedUser.isPresent()) {
       setErrorText(GctBundle.message("cloud.repository.dialog.invalid.project"));
       setOKActionEnabled(false);
       return;
@@ -157,7 +166,7 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
       return;
     }
 
-    if (projectSelector.getSelectedUser() == null
+    if (!selectedUser.isPresent()
         || StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
       setErrorText(null);
       setOKActionEnabled(false);
@@ -190,50 +199,28 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
 
   @Nullable
   private String getCurrentUrlText() {
-    CredentialedUser selectedUser = projectSelector.getSelectedUser();
+    CloudProject selectedProject = projectSelector.getSelectedProject();
+    Optional<CredentialedUser> selectedUser =
+        selectedProject == null
+            ? Optional.empty()
+            : Services.getLoginService().getLoggedInUser(selectedProject.googleUsername());
 
-    if (selectedUser == null
-        || StringUtil.isEmpty(projectSelector.getText())
+    if (selectedProject == null
+        || !selectedUser.isPresent()
         || StringUtil.isEmpty(repositorySelector.getText())) {
       return null;
     }
 
     return GcpHttpAuthDataProvider.getGcpUrl(
-        projectSelector.getText(), repositorySelector.getText());
+        selectedProject.projectId(), repositorySelector.getText());
   }
 
   private void createUIComponents() {
     projectSelector = new ProjectSelector();
-    projectSelector.setMinimumSize(new Dimension(300, 0));
-    projectSelector.addTextChangedListener(
-        new DocumentAdapter() {
-          @Override
-          protected void textChanged(DocumentEvent event) {
-            if (defaultDirectoryName.equals(directoryName.getText())
-                || directoryName.getText().length() == 0) {
-              // modify field if it was unmodified or blank
-              String projectDescription = projectSelector.getProjectDescription();
-              if (!Strings.isNullOrEmpty(projectDescription)) {
-                defaultDirectoryName = projectDescription.replaceAll(INVALID_FILENAME_CHARS, "");
-                defaultDirectoryName = defaultDirectoryName.replaceAll("\\s", "");
-              } else {
-                defaultDirectoryName = "";
-              }
-
-              directoryName.setText(defaultDirectoryName);
-            }
-            repositorySelector.setCloudProject(projectSelector.getText());
-            repositorySelector.setUser(projectSelector.getSelectedUser());
-            repositorySelector.setText("");
-            repositorySelector.loadRepositories();
-            updateButtons();
-          }
-        });
+    projectSelector.setMinimumSize(new Dimension(400, 0));
+    projectSelector.addProjectSelectionListener(this::updateRepositorySelector);
     repositorySelector =
-        new RepositorySelector(
-            projectSelector.getText(),
-            projectSelector.getSelectedUser(),
-            false /*canCreateRepository*/);
+        new RepositorySelector(projectSelector.getSelectedProject(), false /*canCreateRepository*/);
 
     repositorySelector
         .getDocument()
@@ -244,6 +231,26 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
                 updateButtons();
               }
             });
+  }
+
+  private void updateRepositorySelector(@NotNull CloudProject selectedProject) {
+    if (defaultDirectoryName.equals(directoryName.getText())
+        || directoryName.getText().length() == 0) {
+      // modify field if it was unmodified or blank
+      String projectDescription = selectedProject.projectName();
+      if (!Strings.isNullOrEmpty(projectDescription)) {
+        defaultDirectoryName = projectDescription.replaceAll(INVALID_FILENAME_CHARS, "");
+        defaultDirectoryName = defaultDirectoryName.replaceAll("\\s", "");
+      } else {
+        defaultDirectoryName = "";
+      }
+
+      directoryName.setText(defaultDirectoryName);
+    }
+    repositorySelector.setCloudProject(selectedProject);
+    repositorySelector.setText("");
+    repositorySelector.loadRepositories();
+    updateButtons();
   }
 
   @Nullable

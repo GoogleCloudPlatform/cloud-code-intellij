@@ -34,6 +34,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.DoubleClickListener;
 import com.intellij.ui.JBProgressBar;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.TableSpeedSearch;
@@ -42,6 +43,7 @@ import com.intellij.ui.table.JBTable;
 import git4idea.DialogManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -126,7 +128,10 @@ public class ProjectSelectionDialog {
                       .getMessageBus()
                       .connect(dialogWrapper.getDisposable() /* disconnect once dialog is gone. */)
                       .subscribe(
-                          GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, this::refreshDialog));
+                          GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC,
+                          () -> {
+                            refreshDialog(Services.getLoginService().getActiveUser());
+                          }));
     }
 
     loadAllProjects();
@@ -211,11 +216,10 @@ public class ProjectSelectionDialog {
     }
   }
 
-  /** Preserves currently selected account and refreshes accounts and project lists. */
-  private void refreshDialog() {
-    CredentialedUser currentUser = (CredentialedUser) accountComboBox.getSelectedItem();
+  /** Refreshes accounts and project lists and selects given account. */
+  private void refreshDialog(@Nullable CredentialedUser userToSelect) {
     loadAllProjects();
-    accountComboBox.setSelectedItem(currentUser);
+    accountComboBox.setSelectedItem(userToSelect);
   }
 
   /** Updates project list if this list is for currently selected account. if not, does nothing. */
@@ -246,7 +250,6 @@ public class ProjectSelectionDialog {
         dialogWrapper.getSize().height / 2,
         progressBarLength,
         progressBar.getPreferredSize().height);
-    ((JBTable) projectListTable).setPaintBusy(loading);
   }
 
   @VisibleForTesting
@@ -262,6 +265,16 @@ public class ProjectSelectionDialog {
     projectListTable.getSelectionModel().addListSelectionListener(e -> validateProjectSelection());
     FilteredTextTableCellRenderer filterRenderer = new FilteredTextTableCellRenderer();
     projectListTable.setDefaultRenderer(Object.class, filterRenderer);
+
+    DoubleClickListener tableDoubleClickListener =
+        new DoubleClickListener() {
+          @Override
+          protected boolean onDoubleClick(MouseEvent event) {
+            dialogWrapper.clickDefaultButton();
+            return true;
+          }
+        };
+    tableDoubleClickListener.installOn(projectListTable);
 
     // filter rows based on text field content.
     filterTextField = new JBTextField();
@@ -476,7 +489,7 @@ public class ProjectSelectionDialog {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      refreshDialog();
+      refreshDialog((CredentialedUser) accountComboBox.getSelectedItem());
     }
   }
 

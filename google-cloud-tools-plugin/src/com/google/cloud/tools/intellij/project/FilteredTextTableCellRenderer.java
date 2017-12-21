@@ -44,7 +44,7 @@ public class FilteredTextTableCellRenderer extends DefaultTableCellRenderer {
   @VisibleForTesting
   String highlightFilterText(String filterText, String text) {
     if (!Strings.isNullOrEmpty(filterText) && !Strings.isNullOrEmpty(text)) {
-      return "<html>" + text.replace(filterText, "<b>" + filterText + "</b>");
+      return "<html>" + text.replaceAll("(?i)(" + filterText + ")", "<b>$1</b>");
     }
     return text;
   }

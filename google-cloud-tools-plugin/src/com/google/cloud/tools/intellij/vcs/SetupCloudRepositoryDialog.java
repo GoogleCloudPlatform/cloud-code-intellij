@@ -98,8 +98,8 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
     projectSelector = new ProjectSelector();
     projectSelector.setMinimumSize(new Dimension(400, 0));
 
-    /* TODO(ivanporty) use 'default' project to init selector when available. */
-    repositorySelector = new RepositorySelector("", null, true /*canCreateRepository*/);
+    repositorySelector =
+        new RepositorySelector(projectSelector.getSelectedProject(), true /*canCreateRepository*/);
 
     remoteNameSelector = new RepositoryRemotePanel(gitRepository);
 
@@ -129,9 +129,7 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
   }
 
   private void updateRepositorySelector(CloudProject cloudProject) {
-    repositorySelector.setCloudProject(cloudProject.projectId());
-    repositorySelector.setUser(
-        Services.getLoginService().getLoggedInUser(cloudProject.googleUsername()).orElse(null));
+    repositorySelector.setCloudProject(cloudProject);
     repositorySelector.setText("");
     repositorySelector.loadRepositories();
     updateButtons();

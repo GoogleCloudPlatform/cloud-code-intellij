@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.resources;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -29,17 +31,19 @@ import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.treeStructure.Tree;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Enumeration;
+import java.util.Optional;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -67,14 +71,11 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
   private JBPopup popup;
   private JPanel panel;
   private ProjectRepositoriesModelItem repositories;
-  private String cloudProject;
-  private CredentialedUser user;
+  private CloudProject cloudProject;
   private boolean canCreateRepository;
 
-  public RepositorySelector(
-      @Nullable String cloudProject, @Nullable CredentialedUser user, boolean canCreateRepository) {
+  public RepositorySelector(@Nullable CloudProject cloudProject, boolean canCreateRepository) {
     this.cloudProject = cloudProject;
-    this.user = user;
     this.canCreateRepository = canCreateRepository;
 
     getTextField()
@@ -101,20 +102,21 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
     return null;
   }
 
-  public void setCloudProject(String cloudProject) {
+  public void setCloudProject(@Nullable CloudProject cloudProject) {
     this.cloudProject = cloudProject;
-  }
-
-  public void setUser(CredentialedUser user) {
-    this.user = user;
   }
 
   public void loadRepositories() {
     loadRepositories(null /*onComplete*/);
   }
 
-  public void loadRepositories(@Nullable Runnable onComplete) {
-    if (user == null || cloudProject == null) {
+  private void loadRepositories(@Nullable Runnable onComplete) {
+    if (cloudProject == null) {
+      return;
+    }
+    Optional<CredentialedUser> user =
+        Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
+    if (!user.isPresent()) {
       return;
     }
 
@@ -122,12 +124,16 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       repositories = new ProjectRepositoriesModelItem();
     }
 
-    repositories.loadRepositories(cloudProject, user, onComplete);
+    repositories.loadRepositories(cloudProject.projectId(), user.get(), onComplete);
   }
 
   @Override
   public void showPopup(RelativePoint showTarget) {
-    if (user != null) {
+    Optional<CredentialedUser> user =
+        cloudProject == null
+            ? Optional.empty()
+            : Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
+    if (user.isPresent()) {
       if (popup == null || popup.isDisposed()) {
         panel = new RepositoryPanel();
 
@@ -190,7 +196,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
   }
 
   @VisibleForTesting
-  public class ProjectNotSelectedPanel extends JPanel {
+  class ProjectNotSelectedPanel extends JPanel {
 
     private static final int HEIGHT = 30;
 
@@ -216,7 +222,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
       setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-      repositoryTree = new JTree(treeModel);
+      repositoryTree = new Tree(treeModel);
       repositoryTree.setRowHeight(0);
       repositoryTree.setRootVisible(false);
       repositoryTree.setOpaque(false);
@@ -251,7 +257,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       JPanel buttonPanel = new JPanel();
 
       bottomPane.setLayout(new BorderLayout());
-      bottomPane.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+      bottomPane.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.LIGHT_GRAY));
       buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
       buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -273,10 +279,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
       JButton refreshButton = new JButton();
       refreshButton.setIcon(GoogleCloudToolsIcons.REFRESH);
-      refreshButton.addActionListener(
-          event -> {
-            refresh();
-          });
+      refreshButton.addActionListener(event -> refresh());
 
       buttonPanel.add(Box.createHorizontalGlue());
       buttonPanel.add(refreshButton);

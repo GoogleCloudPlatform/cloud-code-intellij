@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class FilteredTextTableCellRendererTest {
-  private static final String SAMPLE_TEXT = "your project name and project id.";
+  private static final String SAMPLE_TEXT = "your project name and PROJECT id.";
 
   private FilteredTextTableCellRenderer renderer;
 
@@ -55,7 +55,7 @@ public class FilteredTextTableCellRendererTest {
   @Test
   public void highlights_matchingText() {
     String result = renderer.highlightFilterText("project", SAMPLE_TEXT);
-    String expected = "<html>your <b>project</b> name and <b>project</b> id.";
+    String expected = "<html>your <b>project</b> name and <b>PROJECT</b> id.";
 
     assertThat(result).isEqualTo(expected);
   }
@@ -63,7 +63,7 @@ public class FilteredTextTableCellRendererTest {
   @Test
   public void highlights_matchingText_atStart() {
     String result = renderer.highlightFilterText("you", SAMPLE_TEXT);
-    String expected = "<html><b>you</b>r project name and project id.";
+    String expected = "<html><b>you</b>r project name and PROJECT id.";
 
     assertThat(result).isEqualTo(expected);
   }
@@ -71,7 +71,7 @@ public class FilteredTextTableCellRendererTest {
   @Test
   public void highlights_matchingText_atEnd() {
     String result = renderer.highlightFilterText("id.", SAMPLE_TEXT);
-    String expected = "<html>your project name and project <b>id.</b>";
+    String expected = "<html>your project name and PROJECT <b>id.</b>";
 
     assertThat(result).isEqualTo(expected);
   }
