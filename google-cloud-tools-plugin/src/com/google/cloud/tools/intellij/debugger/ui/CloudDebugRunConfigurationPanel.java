@@ -16,7 +16,8 @@
 
 package com.google.cloud.tools.intellij.debugger.ui;
 
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.ui.HyperlinkLabel;
 import javax.swing.JLabel;
@@ -25,10 +26,10 @@ import javax.swing.JPanel;
 /** This is the config UI for cloud debug run configs. */
 public class CloudDebugRunConfigurationPanel {
 
-  private ProjectSelector elysiumProjectId;
   private JPanel panel;
   private HyperlinkLabel docsLink;
   private JLabel description;
+  private ProjectSelector projectSelector;
 
   public CloudDebugRunConfigurationPanel() {
     docsLink.setHyperlinkText(
@@ -43,11 +44,11 @@ public class CloudDebugRunConfigurationPanel {
     return panel;
   }
 
-  public String getProjectName() {
-    return elysiumProjectId.getText();
+  public CloudProject getCloudProject() {
+    return projectSelector.getSelectedProject();
   }
 
-  public void setProjectName(String name) {
-    elysiumProjectId.setText(name);
+  public void setCloudProject(CloudProject cloudProject) {
+    projectSelector.setSelectedProject(cloudProject);
   }
 }

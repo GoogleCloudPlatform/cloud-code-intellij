@@ -182,8 +182,7 @@ public class CloudAttachDialog extends DialogWrapper {
 
     CloudProject selectedCloudProject = projectSelector.getSelectedProject();
     if (selectedCloudProject == null) {
-      return new ValidationInfo(
-          GctBundle.getString("clouddebug.noprojectid"), projectSelector);
+      return new ValidationInfo(GctBundle.getString("clouddebug.noprojectid"), projectSelector);
     }
 
     // validation should run only after the query for debug targets has results
@@ -193,8 +192,7 @@ public class CloudAttachDialog extends DialogWrapper {
       if (targetSelector.getItemCount() > 0) {
         if (targetSelector.getSelectedItem() instanceof ErrorHolder) {
           return new ValidationInfo(
-              ((ErrorHolder) targetSelector.getSelectedItem()).getErrorMessage(),
-              projectSelector);
+              ((ErrorHolder) targetSelector.getSelectedItem()).getErrorMessage(), projectSelector);
         } else {
           return new ValidationInfo(
               GctBundle.getString("clouddebug.nomodulesfound"), projectSelector);

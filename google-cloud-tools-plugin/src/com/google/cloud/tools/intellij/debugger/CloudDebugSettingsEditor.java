@@ -17,8 +17,11 @@
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.cloud.tools.intellij.debugger.ui.CloudDebugRunConfigurationPanel;
-import com.intellij.openapi.options.ConfigurationException;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.intellij.openapi.options.SettingsEditor;
+import java.util.Optional;
 import javax.swing.JComponent;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,14 +33,13 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
 
   private final CloudDebugRunConfigurationPanel settingsPanel;
 
-  public CloudDebugSettingsEditor() {
+  CloudDebugSettingsEditor() {
     settingsPanel = new CloudDebugRunConfigurationPanel();
   }
 
   @Override
-  protected void applyEditorTo(CloudDebugRunConfiguration runConfiguration)
-      throws ConfigurationException {
-    runConfiguration.setCloudProjectName(settingsPanel.getProjectName());
+  protected void applyEditorTo(@NotNull CloudDebugRunConfiguration runConfiguration) {
+    runConfiguration.setCloudProjectName(settingsPanel.getCloudProject().projectId());
   }
 
   @NotNull
@@ -47,7 +49,14 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
   }
 
   @Override
-  protected void resetEditorFrom(CloudDebugRunConfiguration runConfiguration) {
-    settingsPanel.setProjectName(runConfiguration.getCloudProjectName());
+  protected void resetEditorFrom(@NotNull CloudDebugRunConfiguration runConfiguration) {
+    settingsPanel.setCloudProject(
+        CloudProject.create(
+            runConfiguration.getCloudProjectName(),
+            runConfiguration.getCloudProjectName(),
+            null,
+            Optional.ofNullable(Services.getLoginService().getActiveUser())
+                .map(CredentialedUser::getEmail)
+                .orElse("")));
   }
 }
