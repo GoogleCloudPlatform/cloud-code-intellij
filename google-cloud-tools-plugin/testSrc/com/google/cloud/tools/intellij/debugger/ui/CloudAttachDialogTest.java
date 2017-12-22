@@ -190,7 +190,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
 
   private CloudAttachDialog initDialog() {
     CloudAttachDialog dialog = new CloudAttachDialog(this.getProject(), binding);
-    projectSelector = dialog.getElysiumProjectSelector();
+    projectSelector = dialog.getProjectSelector();
     targetSelector = dialog.getTargetSelector();
     warningHeader = dialog.getWarningHeader();
     warningMessage = dialog.getWarningMessage();

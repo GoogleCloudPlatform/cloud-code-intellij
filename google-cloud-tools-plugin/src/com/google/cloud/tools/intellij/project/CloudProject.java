@@ -16,18 +16,29 @@
 
 package com.google.cloud.tools.intellij.project;
 
+import com.google.api.services.cloudresourcemanager.model.Project;
 import com.google.auto.value.AutoValue;
+import org.jetbrains.annotations.Nullable;
 
 /** GCP project and account. */
 @AutoValue
 public abstract class CloudProject {
   public static CloudProject create(String projectName, String projectId, String googleUsername) {
-    return new AutoValue_CloudProject(projectName, projectId, googleUsername);
+    return new AutoValue_CloudProject(projectName, projectId, null /* unset */, googleUsername);
+  }
+
+  public static CloudProject create(
+      String projectName, String projectId, Long projectNumber, String googleUsername) {
+    return new AutoValue_CloudProject(projectName, projectId, projectNumber, googleUsername);
   }
 
   public abstract String projectName();
 
   public abstract String projectId();
+
+  /** See {@link Project#getProjectNumber()} */
+  @Nullable
+  public abstract Long projectNumber();
 
   public abstract String googleUsername();
 }

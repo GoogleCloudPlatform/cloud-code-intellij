@@ -161,7 +161,11 @@ public class ProjectSelectionDialog {
   @VisibleForTesting
   CloudProject getSelectedProject() {
     CredentialedUser user = accountComboBox.getItemAt(accountComboBox.getSelectedIndex());
-    return CloudProject.create(getSelectedProjectName(), getSelectedProjectId(), user.getEmail());
+    return CloudProject.create(
+        getSelectedProjectName(),
+        getSelectedProjectId(),
+        getSelectedProjectNumber(),
+        user.getEmail());
   }
 
   @VisibleForTesting
@@ -392,6 +396,14 @@ public class ProjectSelectionDialog {
     int actualSelectedRow =
         projectListTable.getRowSorter().convertRowIndexToModel(projectListTable.getSelectedRow());
     return projectListTableModel.getProjectIdAtRow(actualSelectedRow);
+  }
+
+  @VisibleForTesting
+  Long getSelectedProjectNumber() {
+    // row number change based on filtering state.
+    int actualSelectedRow =
+        projectListTable.getRowSorter().convertRowIndexToModel(projectListTable.getSelectedRow());
+    return projectListTableModel.getProjectNumberAtRow(actualSelectedRow);
   }
 
   @VisibleForTesting

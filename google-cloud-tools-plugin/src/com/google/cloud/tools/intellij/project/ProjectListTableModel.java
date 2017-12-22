@@ -71,6 +71,10 @@ class ProjectListTableModel extends AbstractTableModel {
     return getValueAt(row, ProjectListTableModel.PROJECT_ID_COLUMN).toString();
   }
 
+  Long getProjectNumberAtRow(int row) {
+    return projectList.get(row).getProjectNumber();
+  }
+
   void setProjectList(List<Project> updatedList) {
     projectList.clear();
     projectList.addAll(updatedList);

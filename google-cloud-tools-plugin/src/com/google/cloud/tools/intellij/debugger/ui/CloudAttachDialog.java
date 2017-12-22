@@ -22,7 +22,8 @@ import com.google.cloud.tools.intellij.debugger.ProjectRepositoryState;
 import com.google.cloud.tools.intellij.debugger.ProjectRepositoryValidator;
 import com.google.cloud.tools.intellij.debugger.SyncResult;
 import com.google.cloud.tools.intellij.login.Services;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
@@ -49,8 +50,6 @@ import git4idea.repo.GitRepository;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -75,7 +74,6 @@ public class CloudAttachDialog extends DialogWrapper {
   private final ProjectDebuggeeBinding wireup;
   private ProjectRepositoryValidator projectRepositoryValidator;
   private JComboBox targetSelector; // Module & version combo box
-  private ProjectSelector elysiumProjectSelector; // Project combo box
   private JBLabel infoMessage;
   private String originalBranchName;
   private JPanel panel;
@@ -86,6 +84,7 @@ public class CloudAttachDialog extends DialogWrapper {
   private JBCheckBox syncStashCheckbox;
   private JBLabel warningHeader;
   private JBLabel warningMessage;
+  private ProjectSelector projectSelector;
 
   /** Initializes the cloud debugger dialog. */
   public CloudAttachDialog(
@@ -100,15 +99,12 @@ public class CloudAttachDialog extends DialogWrapper {
     infoMessage.setVisible(true);
     syncStashCheckbox.setVisible(false);
     syncStashCheckbox.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent event) {
-            if (syncStashCheckbox.isVisible()) {
-              warningHeader.setVisible(!syncStashCheckbox.isSelected());
-              warningMessage.setVisible(!syncStashCheckbox.isSelected());
-              // Show force attach text if the user chooses not to sync/stash
-              setOkText(!syncStashCheckbox.isSelected());
-            }
+        event -> {
+          if (syncStashCheckbox.isVisible()) {
+            warningHeader.setVisible(!syncStashCheckbox.isSelected());
+            warningMessage.setVisible(!syncStashCheckbox.isSelected());
+            // Show force attach text if the user chooses not to sync/stash
+            setOkText(!syncStashCheckbox.isSelected());
           }
         });
 
@@ -137,20 +133,17 @@ public class CloudAttachDialog extends DialogWrapper {
 
     this.wireup =
         wireup == null
-            ? new ProjectDebuggeeBinding(elysiumProjectSelector, targetSelector, getOKAction())
+            ? new ProjectDebuggeeBinding(projectSelector, targetSelector, getOKAction())
             : wireup;
     targetSelector.setEnabled(false);
     targetSelector.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent event) {
-            if (targetSelector.isEnabled()) {
-              buildResult();
-              checkSyncStashState();
-            } else {
-              warningHeader.setVisible(false);
-              warningMessage.setVisible(false);
-            }
+        event -> {
+          if (targetSelector.isEnabled()) {
+            buildResult();
+            checkSyncStashState();
+          } else {
+            warningHeader.setVisible(false);
+            warningMessage.setVisible(false);
           }
         });
 
@@ -187,9 +180,10 @@ public class CloudAttachDialog extends DialogWrapper {
       return new ValidationInfo(GctBundle.getString("clouddebug.nologin"));
     }
 
-    if (Strings.isNullOrEmpty(elysiumProjectSelector.getText())) {
+    CloudProject selectedCloudProject = projectSelector.getSelectedProject();
+    if (selectedCloudProject == null) {
       return new ValidationInfo(
-          GctBundle.getString("clouddebug.noprojectid"), elysiumProjectSelector);
+          GctBundle.getString("clouddebug.noprojectid"), projectSelector);
     }
 
     // validation should run only after the query for debug targets has results
@@ -200,15 +194,15 @@ public class CloudAttachDialog extends DialogWrapper {
         if (targetSelector.getSelectedItem() instanceof ErrorHolder) {
           return new ValidationInfo(
               ((ErrorHolder) targetSelector.getSelectedItem()).getErrorMessage(),
-              elysiumProjectSelector);
+              projectSelector);
         } else {
           return new ValidationInfo(
-              GctBundle.getString("clouddebug.nomodulesfound"), elysiumProjectSelector);
+              GctBundle.getString("clouddebug.nomodulesfound"), projectSelector);
         }
       } else if (wireup.isCdbQueried()) {
         // We went to CDB and detected no debuggees.
         return new ValidationInfo(
-            GctBundle.getString("clouddebug.debug.targets.accessdenied"), elysiumProjectSelector);
+            GctBundle.getString("clouddebug.debug.targets.accessdenied"), projectSelector);
       }
     }
 
@@ -232,8 +226,8 @@ public class CloudAttachDialog extends DialogWrapper {
   }
 
   @VisibleForTesting
-  ProjectSelector getElysiumProjectSelector() {
-    return elysiumProjectSelector;
+  ProjectSelector getProjectSelector() {
+    return projectSelector;
   }
 
   @VisibleForTesting
@@ -397,7 +391,7 @@ public class CloudAttachDialog extends DialogWrapper {
       GitHandlerUtil.doSynchronously(
           handler, GitBundle.getString("stashing.title"), handler.printableCommandLine());
     } finally {
-      DvcsUtil.workingTreeChangeFinished(project, token);
+      token.finish();
     }
     return true;
   }
@@ -441,12 +435,7 @@ public class CloudAttachDialog extends DialogWrapper {
           syncResult.getTargetSyncSha(),
           false,
           Collections.singletonList(sourceRepository),
-          new Runnable() {
-            @Override
-            public void run() {
-              refreshAndClose();
-            }
-          });
+          this::refreshAndClose);
     } else {
       refreshAndClose();
     }
