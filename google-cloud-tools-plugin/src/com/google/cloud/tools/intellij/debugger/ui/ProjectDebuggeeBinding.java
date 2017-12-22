@@ -139,6 +139,9 @@ class ProjectDebuggeeBinding {
               this.inputState.getProjectName(),
               projectNumber,
               this.inputState.getUserEmail()));
+
+      // update the state here as well
+      refreshDebugTargetList(projectSelector.getSelectedProject());
     }
   }
 
