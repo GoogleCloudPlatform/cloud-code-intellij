@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.debugger.ui.CloudDebugRunConfigurationPan
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.common.base.Strings;
 import com.intellij.openapi.options.SettingsEditor;
 import java.util.Optional;
 import javax.swing.JComponent;
@@ -35,11 +36,21 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
 
   CloudDebugSettingsEditor() {
     settingsPanel = new CloudDebugRunConfigurationPanel();
+    settingsPanel
+        .getProjectSelector()
+        .addProjectSelectionListener(
+            (selectedProject) -> {
+              // settings editor does not see all the changes by default, use explicit notification.
+              settingsPanel.triggerValidation();
+            });
   }
 
   @Override
   protected void applyEditorTo(@NotNull CloudDebugRunConfiguration runConfiguration) {
-    runConfiguration.setCloudProjectName(settingsPanel.getCloudProject().projectId());
+    runConfiguration.setCloudProjectName(
+        Optional.ofNullable(settingsPanel.getProjectSelector().getSelectedProject())
+            .map(CloudProject::projectId)
+            .orElse(""));
   }
 
   @NotNull
@@ -50,13 +61,20 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
 
   @Override
   protected void resetEditorFrom(@NotNull CloudDebugRunConfiguration runConfiguration) {
-    settingsPanel.setCloudProject(
-        CloudProject.create(
-            runConfiguration.getCloudProjectName(),
-            runConfiguration.getCloudProjectName(),
-            null,
-            Optional.ofNullable(Services.getLoginService().getActiveUser())
-                .map(CredentialedUser::getEmail)
-                .orElse("")));
+    String projectId = runConfiguration.getCloudProjectName();
+    if (Strings.isNullOrEmpty(projectId)) {
+      settingsPanel.getProjectSelector().setSelectedProject(null);
+    } else {
+      settingsPanel
+          .getProjectSelector()
+          .setSelectedProject(
+              CloudProject.create(
+                  projectId,
+                  projectId,
+                  null,
+                  Optional.ofNullable(Services.getLoginService().getActiveUser())
+                      .map(CredentialedUser::getEmail)
+                      .orElse("")));
+    }
   }
 }

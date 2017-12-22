@@ -16,10 +16,11 @@
 
 package com.google.cloud.tools.intellij.debugger.ui;
 
-import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.ui.HyperlinkLabel;
+import com.intellij.ui.components.JBCheckBox;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -30,6 +31,7 @@ public class CloudDebugRunConfigurationPanel {
   private HyperlinkLabel docsLink;
   private JLabel description;
   private ProjectSelector projectSelector;
+  private JCheckBox hiddenValidationTrigger;
 
   public CloudDebugRunConfigurationPanel() {
     docsLink.setHyperlinkText(
@@ -44,11 +46,16 @@ public class CloudDebugRunConfigurationPanel {
     return panel;
   }
 
-  public CloudProject getCloudProject() {
-    return projectSelector.getSelectedProject();
+  public ProjectSelector getProjectSelector() {
+    return projectSelector;
   }
 
-  public void setCloudProject(CloudProject cloudProject) {
-    projectSelector.setSelectedProject(cloudProject);
+  public void triggerValidation() {
+    hiddenValidationTrigger.doClick();
+  }
+
+  private void createUIComponents() {
+    hiddenValidationTrigger = new JBCheckBox();
+    hiddenValidationTrigger.setVisible(false);
   }
 }
