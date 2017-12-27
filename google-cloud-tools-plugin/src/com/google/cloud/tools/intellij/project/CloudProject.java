@@ -32,11 +32,13 @@ public abstract class CloudProject {
     return new AutoValue_CloudProject(projectName, projectId, projectNumber, googleUsername);
   }
 
+  /** See {@link Project#getName()}. */
   public abstract String projectName();
 
+  /** See {@link Project#getProjectId()}. */
   public abstract String projectId();
 
-  /** See {@link Project#getProjectNumber()} */
+  /** See {@link Project#getProjectNumber()}. */
   @Nullable
   public abstract Long projectNumber();
 

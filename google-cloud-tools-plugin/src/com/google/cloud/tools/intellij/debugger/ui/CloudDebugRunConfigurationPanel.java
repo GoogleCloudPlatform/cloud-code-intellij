@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.debugger.ui;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.ui.HyperlinkLabel;
@@ -46,16 +47,27 @@ public class CloudDebugRunConfigurationPanel {
     return panel;
   }
 
-  public ProjectSelector getProjectSelector() {
-    return projectSelector;
+  public CloudProject getSelectedCloudProject() {
+    return projectSelector.getSelectedProject();
   }
 
-  public void triggerValidation() {
+  public void setSelectedCloudProject(CloudProject cloudProject) {
+    projectSelector.setSelectedProject(cloudProject);
+  }
+
+  private void triggerValidation() {
     hiddenValidationTrigger.doClick();
   }
 
   private void createUIComponents() {
     hiddenValidationTrigger = new JBCheckBox();
     hiddenValidationTrigger.setVisible(false);
+
+    projectSelector = new ProjectSelector();
+    projectSelector.addProjectSelectionListener(
+        (selectedProject) -> {
+          // settings editor does not see all the changes by default, use explicit notification.
+          triggerValidation();
+        });
   }
 }
