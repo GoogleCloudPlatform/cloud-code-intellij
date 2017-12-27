@@ -27,6 +27,7 @@ import com.intellij.ide.wizard.StepAdapter;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import git4idea.DialogManager;
@@ -35,7 +36,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -58,7 +58,26 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
     if (e.getProject() != null) {
       AddCloudLibrariesWizard dialog = new AddCloudLibrariesWizard(e.getProject());
       DialogManager.show(dialog);
+
       if (dialog.isOK()) {
+        Set<CloudLibrary> apisToEnable = dialog.getApisToEnable();
+
+        if (!apisToEnable.isEmpty()) {
+          CloudApiManagementDialog managementDialog = new CloudApiManagementDialog(e.getProject());
+          DialogManager.show(managementDialog);
+
+          if (managementDialog.isOK()) {
+            ProgressManager.getInstance()
+                .runProcessWithProgressSynchronously(
+                    () ->
+                        CloudApiManager.enableApis(
+                            apisToEnable, managementDialog.getCloudProject()),
+                    "Enabling APIs on Google Cloud Platform",
+                    true,
+                    e.getProject());
+          }
+        }
+
         CloudLibraryDependencyWriter.addLibraries(
             dialog.getSelectedLibraries(), dialog.getSelectedModule());
       }
@@ -69,17 +88,14 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
   private static final class AddCloudLibrariesWizard extends AbstractWizard<Step> {
 
     private final SelectClientLibrariesStep selectClientLibrariesStep;
-    private final ManageCloudApisStep manageCloudApisStep;
 
     AddCloudLibrariesWizard(Project project) {
       super(GctBundle.message("cloud.libraries.dialog.title"), project);
 
       selectClientLibrariesStep = new SelectClientLibrariesStep(project);
       selectClientLibrariesStep.addModuleSelectionListener(event -> updateButtons());
-      manageCloudApisStep = new ManageCloudApisStep();
 
       addStep(selectClientLibrariesStep);
-      addStep(manageCloudApisStep);
       init();
     }
 
@@ -91,6 +107,10 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
     /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
     Set<CloudLibrary> getSelectedLibraries() {
       return selectClientLibrariesStep.getSelectedLibraries();
+    }
+
+    Set<CloudLibrary> getApisToEnable() {
+      return selectClientLibrariesStep.getApisToEnable();
     }
 
     @Override
@@ -137,20 +157,13 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
       return cloudApiSelectorPanel.getSelectedLibraries();
     }
 
+    Set<CloudLibrary> getApisToEnable() {
+      return cloudApiSelectorPanel.getApisToEnable();
+    }
+
     @Override
     public JComponent getComponent() {
       return cloudApiSelectorPanel.getPanel();
-    }
-  }
-
-  /** The wizard step encapsulating the cloud API management panel. */
-  private static final class ManageCloudApisStep extends StepAdapter {
-
-    @Override
-    // TODO(eshaul): Implement the cloud API management panel; this panel can be opened as part of
-    // this wizard, or as a standalone dialog.
-    public JComponent getComponent() {
-      return new JPanel();
     }
   }
 }

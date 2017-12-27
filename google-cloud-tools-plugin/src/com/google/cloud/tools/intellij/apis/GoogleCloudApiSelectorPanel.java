@@ -39,10 +39,14 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -67,12 +71,20 @@ final class GoogleCloudApiSelectorPanel {
   private JLabel modulesLabel;
   private ModulesComboBox modulesComboBox;
 
+  private final Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap;
   private final List<CloudLibrary> libraries;
+
   private final Project project;
 
   GoogleCloudApiSelectorPanel(List<CloudLibrary> libraries, Project project) {
     this.libraries = libraries;
     this.project = project;
+
+    apiManagementMap =
+        libraries
+            .stream()
+            .collect(Collectors.toMap(Function.identity(), lib -> new CloudApiManagementSpec()));
+
     panel.setPreferredSize(new Dimension(800, 600));
   }
 
@@ -94,6 +106,14 @@ final class GoogleCloudApiSelectorPanel {
   /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
   Set<CloudLibrary> getSelectedLibraries() {
     return ((CloudLibraryTableModel) cloudLibrariesTable.getModel()).getSelectedLibraries();
+  }
+
+  Set<CloudLibrary> getApisToEnable() {
+    return getSelectedLibraries()
+        .stream()
+        .filter(library -> Objects.nonNull(library.getServiceName()))
+        .filter(library -> apiManagementMap.get(library).shouldEnable())
+        .collect(Collectors.toSet());
   }
 
   /** Returns the {@link ModulesComboBox} in this panel. */
@@ -147,7 +167,7 @@ final class GoogleCloudApiSelectorPanel {
                 int selectedIndex = model.getMinSelectionIndex();
                 CloudLibrary library =
                     (CloudLibrary) cloudLibrariesTable.getModel().getValueAt(selectedIndex, 0);
-                detailsPanel.setCloudLibrary(library);
+                detailsPanel.setCloudLibrary(library, apiManagementMap.get(library));
               }
             });
   }

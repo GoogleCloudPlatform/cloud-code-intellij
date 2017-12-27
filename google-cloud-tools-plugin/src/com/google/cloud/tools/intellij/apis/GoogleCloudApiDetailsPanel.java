@@ -25,8 +25,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.ui.IdeBorderFactory;
 import com.intellij.util.SVGLoader;
 import java.awt.Image;
+import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
@@ -54,8 +57,11 @@ public final class GoogleCloudApiDetailsPanel {
   private JPanel panel;
   private JTextPane descriptionTextPane;
   private JTextPane linksTextPane;
+  private JPanel apiManagementPanel;
+  private JCheckBox enableApiCheckbox;
 
   private CloudLibrary currentCloudLibrary;
+  private CloudApiManagementSpec currentCloudApiManagementSpec;
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
   JPanel getPanel() {
@@ -70,12 +76,13 @@ public final class GoogleCloudApiDetailsPanel {
    *
    * @param library the {@link CloudLibrary} to display
    */
-  void setCloudLibrary(CloudLibrary library) {
+  void setCloudLibrary(CloudLibrary library, CloudApiManagementSpec cloudApiManagementSpec) {
     if (cloudLibrariesEqual(currentCloudLibrary, library)) {
       return;
     }
 
     currentCloudLibrary = library;
+    currentCloudApiManagementSpec = cloudApiManagementSpec;
     updateUI();
   }
 
@@ -143,6 +150,17 @@ public final class GoogleCloudApiDetailsPanel {
     linksTextPane = new JTextPane();
     linksTextPane.setOpaque(false);
     linksTextPane.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+
+    apiManagementPanel = new JPanel();
+    apiManagementPanel.setBorder(
+        IdeBorderFactory.createTitledBorder("Google Cloud Platform API Management"));
+
+    enableApiCheckbox = new JCheckBox();
+    enableApiCheckbox.setSelected(true);
+    enableApiCheckbox.addItemListener(
+        event ->
+            currentCloudApiManagementSpec.setShouldEnable(
+                event.getStateChange() == ItemEvent.SELECTED));
   }
 
   /**
@@ -187,6 +205,9 @@ public final class GoogleCloudApiDetailsPanel {
                 linksTextPane.setText(joinLinks(links));
               });
     }
+
+    apiManagementPanel.setVisible(true);
+    enableApiCheckbox.setSelected(currentCloudApiManagementSpec.shouldEnable());
   }
 
   /**
