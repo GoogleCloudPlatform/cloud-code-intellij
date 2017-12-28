@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.debugger;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
-import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.configurations.ConfigurationFactory;
@@ -138,7 +137,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   /**
    * Returns either cached state (if we were previously watching this state in this or the last IDE
    * session) Or it returns a partially valid state, which will later be filled in by the {@link
-   * com.google.gct.idea.debugger.CloudDebuggerRunner}
+   * CloudDebuggerRunner}
    *
    * @param executor the execution mode selected by the user (run, debug, profile etc.)
    * @param environment the environment object containing additional settings for executing the
@@ -147,8 +146,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   @Nullable
   @Override
   public RunProfileState getState(
-      @NotNull Executor executor, @NotNull ExecutionEnvironment environment)
-      throws ExecutionException {
+      @NotNull Executor executor, @NotNull ExecutionEnvironment environment) {
     if (processState == null) {
       return new CloudDebugProcessState(null, null, cloudProjectName, null, getProject());
     }
