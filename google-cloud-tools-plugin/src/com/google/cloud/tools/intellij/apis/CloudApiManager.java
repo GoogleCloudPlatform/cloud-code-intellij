@@ -26,17 +26,21 @@ import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.common.collect.Lists;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.diagnostic.Logger;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Cloud API manager responsible for API management tasks on GCP such as APIs */
+/** Cloud API manager responsible for API management tasks on GCP such as API enablement. */
 class CloudApiManager {
+  private static final Logger LOG = Logger.getInstance(CloudApiManager.class);
 
   private static final NotificationGroup NOTIFICATION_GROUP =
       new NotificationGroup(
@@ -60,12 +64,15 @@ class CloudApiManager {
         Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
 
     if (!user.isPresent()) {
-      // todo logging
+      LOG.warn("Cannot enable APIs: logged in user not found.");
       return;
     }
 
     ServiceManagement serviceManagement =
         GoogleApiClientFactory.getInstance().getServiceManagementClient(user.get().getCredential());
+
+    List<CloudLibrary> enabledApis = Lists.newArrayList();
+    List<String> erroredApiNames = Lists.newArrayList();
 
     libraries.forEach(
         library -> {
@@ -79,16 +86,23 @@ class CloudApiManager {
                             String.format(
                                 SERVICE_REQUEST_PROJECT_PATTERN, cloudProject.projectId())))
                 .execute();
+            enabledApis.add(library);
           } catch (IOException e) {
-            // todo
-            e.printStackTrace();
+            LOG.warn(
+                "Exception occurred attempting to enable API " + library.getName() + " on GCP", e);
+            erroredApiNames.add(library.getName());
           }
         });
 
-    notifyApisEnabled(libraries, cloudProject.projectId());
+    if (!erroredApiNames.isEmpty()) {
+      notifyApiEnableError(erroredApiNames);
+    }
+    if (!enabledApis.isEmpty()) {
+      notifyApisEnabled(enabledApis, cloudProject.projectId());
+    }
   }
 
-  private static void notifyApisEnabled(Set<CloudLibrary> libraries, String cloudProjectId) {
+  private static void notifyApisEnabled(List<CloudLibrary> libraries, String cloudProjectId) {
     Notifications.Bus.notify(
         NOTIFICATION_GROUP.createNotification(
             GctBundle.message("cloud.apis.enabled.title"),
@@ -98,7 +112,20 @@ class CloudApiManager {
             NotificationType.INFORMATION));
   }
 
-  private static String joinEnabledLibraryNames(Set<CloudLibrary> libraries) {
+  private static void notifyApiEnableError(List<String> apiNames) {
+    Notifications.Bus.notify(
+        NOTIFICATION_GROUP.createNotification(
+            GctBundle.message("cloud.apis.enable.error.title"),
+            null /*subtitle*/,
+            GctBundle.message("cloud.apis.enable.error.message", joinErroredApiNames(apiNames)),
+            NotificationType.ERROR));
+  }
+
+  private static String joinEnabledLibraryNames(List<CloudLibrary> libraries) {
     return libraries.stream().map(CloudLibrary::getName).collect(Collectors.joining("<br>"));
+  }
+
+  private static String joinErroredApiNames(List<String> apiNames) {
+    return apiNames.stream().collect(Collectors.joining("<br>"));
   }
 }
