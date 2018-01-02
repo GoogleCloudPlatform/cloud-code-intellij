@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -44,6 +45,7 @@ class CloudApiManager {
           true,
           null,
           GoogleCloudToolsIcons.CLOUD);
+  private static final String SERVICE_REQUEST_PROJECT_PATTERN = "project:%s";
 
   private CloudApiManager() {}
 
@@ -67,7 +69,9 @@ class CloudApiManager {
                 .enable(
                     library.getServiceName(),
                     new EnableServiceRequest()
-                        .setConsumerId(String.format("project:%s", cloudProject.projectId())))
+                        .setConsumerId(
+                            String.format(
+                                SERVICE_REQUEST_PROJECT_PATTERN, cloudProject.projectId())))
                 .execute();
           } catch (IOException e) {
             // todo
@@ -75,11 +79,20 @@ class CloudApiManager {
           }
         });
 
+    notifyApisEnabled(libraries, cloudProject.projectId());
+  }
+
+  private static void notifyApisEnabled(Set<CloudLibrary> libraries, String cloudProjectId) {
     Notifications.Bus.notify(
         NOTIFICATION_GROUP.createNotification(
-            "APIs Enabled on GCP",
+            GctBundle.message("cloud.apis.enabled.title"),
             null /*subtitle*/,
-            libraries.stream().map(CloudLibrary::getName).collect(Collectors.joining("<br />")),
+            GctBundle.message(
+                "cloud.apis.enabled.message", cloudProjectId, joinEnabledLibraryNames(libraries)),
             NotificationType.INFORMATION));
+  }
+
+  private static String joinEnabledLibraryNames(Set<CloudLibrary> libraries) {
+    return libraries.stream().map(CloudLibrary::getName).collect(Collectors.joining("<br>"));
   }
 }
