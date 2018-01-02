@@ -16,12 +16,12 @@
 
 package com.google.cloud.tools.intellij.apis;
 
-/** Created by eshaul on 12/26/17. */
-public class CloudApiManagementSpec {
+/** Defines the management specification of a single GCP API for actions such as API enablement. */
+class CloudApiManagementSpec {
   private boolean shouldEnable;
 
-  CloudApiManagementSpec() {
-    shouldEnable = true;
+  CloudApiManagementSpec(boolean shouldEnable) {
+    this.shouldEnable = shouldEnable;
   }
 
   boolean shouldEnable() {

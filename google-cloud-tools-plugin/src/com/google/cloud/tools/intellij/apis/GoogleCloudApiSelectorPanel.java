@@ -76,6 +76,8 @@ final class GoogleCloudApiSelectorPanel {
 
   private final Project project;
 
+  private static final boolean SHOULD_ENALBE_API_DEFAULT = true;
+
   GoogleCloudApiSelectorPanel(List<CloudLibrary> libraries, Project project) {
     this.libraries = libraries;
     this.project = project;
@@ -83,7 +85,10 @@ final class GoogleCloudApiSelectorPanel {
     apiManagementMap =
         libraries
             .stream()
-            .collect(Collectors.toMap(Function.identity(), lib -> new CloudApiManagementSpec()));
+            .collect(
+                Collectors.toMap(
+                    Function.identity(),
+                    lib -> new CloudApiManagementSpec(SHOULD_ENALBE_API_DEFAULT)));
 
     panel.setPreferredSize(new Dimension(800, 600));
   }

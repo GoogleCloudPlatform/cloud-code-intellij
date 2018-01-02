@@ -67,6 +67,7 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
   }
 
   /** The wizard for the "Add Cloud Libraries" menu action. */
+  // TODO(eshaul) this does not need to be a wizard and can be converted to a simple dialog.
   private static final class AddCloudLibrariesWizard extends AbstractWizard<Step> {
 
     private final Project project;

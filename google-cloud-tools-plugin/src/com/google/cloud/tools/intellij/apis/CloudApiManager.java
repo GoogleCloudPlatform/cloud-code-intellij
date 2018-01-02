@@ -35,7 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Created by eshaul on 12/26/17. */
+/** Cloud API manager responsible for API management tasks on GCP such as APIs */
 class CloudApiManager {
 
   private static final NotificationGroup NOTIFICATION_GROUP =
@@ -49,6 +49,12 @@ class CloudApiManager {
 
   private CloudApiManager() {}
 
+  /**
+   * Enables the supplied set of {@link CloudLibrary CloudLibraries} on GCP.
+   *
+   * @param libraries the set of {@link CloudLibrary CloudLibraries} to enable on GCP
+   * @param cloudProject the {@link CloudProject CloudProject} on which to enable the APIs
+   */
   static void enableApis(Set<CloudLibrary> libraries, CloudProject cloudProject) {
     Optional<CredentialedUser> user =
         Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());

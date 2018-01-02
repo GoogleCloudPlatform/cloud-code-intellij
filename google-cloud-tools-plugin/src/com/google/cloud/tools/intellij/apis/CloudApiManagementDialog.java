@@ -24,13 +24,16 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.jetbrains.annotations.Nullable;
 
-/** Created by eshaul on 12/26/17. */
+/**
+ * The dialog confirming GCP API management actions such as API enablement. Allows selection of an
+ * {@link CloudProject CloudProject} on which to perform the actions.
+ */
 public class CloudApiManagementDialog extends DialogWrapper {
 
   private JPanel panel;
   private ProjectSelector projectSelector;
 
-  public CloudApiManagementDialog(@Nullable Project project) {
+  CloudApiManagementDialog(@Nullable Project project) {
     super(project);
     init();
     setTitle("Enable APIs and Update Service Accounts");

@@ -34,18 +34,23 @@ public abstract class GoogleApiClientFactory {
   }
 
   /**
-   * Creates a new instance of a {@link CloudResourceManager} client
+   * Creates a new instance of a {@link CloudResourceManager} client.
    *
    * @param httpRequestInitializer optional HttpRequestInitializer
    */
   public abstract CloudResourceManager getCloudResourceManagerClient(
       @Nullable HttpRequestInitializer httpRequestInitializer);
 
+  /**
+   * Creates a new instance of a {@link ServiceManagement} client.
+   *
+   * @param httpRequestInitializer optional HttpRequestInitializer
+   */
   public abstract ServiceManagement getServiceManagementClient(
       @Nullable HttpRequestInitializer httpRequestInitializer);
 
   /**
-   * Creates a new instance of a {@link Appengine} client
+   * Creates a new instance of a {@link Appengine} client.
    *
    * @param httpRequestInitializer optional HttpRequestInitializer
    */
