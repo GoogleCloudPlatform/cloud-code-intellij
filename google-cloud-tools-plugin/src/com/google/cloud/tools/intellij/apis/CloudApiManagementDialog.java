@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import javax.swing.JComponent;
@@ -33,16 +34,17 @@ public class CloudApiManagementDialog extends DialogWrapper {
   private JPanel panel;
   private ProjectSelector projectSelector;
 
+  /**
+   * Initializes the dialog and enables the OK button if a {@link CloudProject CloudProject} is
+   * selected and disables it otherwise.
+   */
   CloudApiManagementDialog(@Nullable Project project) {
     super(project);
     init();
-    setTitle("Enable APIs and Update Service Accounts");
+    setTitle(GctBundle.message("cloud.apis.management.dialog.title"));
 
     setOKActionEnabled(getCloudProject() != null);
-    projectSelector.addProjectSelectionListener(
-        cloudProject -> {
-          setOKActionEnabled(true);
-        });
+    projectSelector.addProjectSelectionListener(cloudProject -> setOKActionEnabled(true));
   }
 
   @Nullable

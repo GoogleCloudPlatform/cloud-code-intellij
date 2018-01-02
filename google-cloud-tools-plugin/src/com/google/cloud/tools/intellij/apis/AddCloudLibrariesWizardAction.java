@@ -123,8 +123,8 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
               .runProcessWithProgressSynchronously(
                   () ->
                       CloudApiManager.enableApis(apisToEnable, managementDialog.getCloudProject()),
-                  "Enabling APIs on Google Cloud Platform",
-                  true,
+                  GctBundle.message("cloud.apis.enable.progress.title"),
+                  true /*canBeCanceled*/,
                   project);
 
           super.doOKAction();
