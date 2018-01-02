@@ -23,24 +23,22 @@ import com.intellij.facet.FacetTypeRegistry;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * The App Engine Flexible facet.
- */
+/** The App Engine Flexible facet. */
 public class AppEngineFlexibleFacet extends Facet<AppEngineFlexibleFacetConfiguration> {
 
-  public AppEngineFlexibleFacet(@NotNull FacetType facetType,
+  public AppEngineFlexibleFacet(
+      @NotNull FacetType facetType,
       @NotNull Module module,
       @NotNull String name,
       @NotNull AppEngineFlexibleFacetConfiguration configuration) {
     super(facetType, module, name, configuration, null /* underlyingFacet */);
   }
 
-  public static FacetType<AppEngineFlexibleFacet,
-      AppEngineFlexibleFacetConfiguration> getFacetType() {
+  public static FacetType<AppEngineFlexibleFacet, AppEngineFlexibleFacetConfiguration>
+      getFacetType() {
     return FacetTypeRegistry.getInstance().findFacetType(AppEngineFlexibleFacetType.ID);
   }
 

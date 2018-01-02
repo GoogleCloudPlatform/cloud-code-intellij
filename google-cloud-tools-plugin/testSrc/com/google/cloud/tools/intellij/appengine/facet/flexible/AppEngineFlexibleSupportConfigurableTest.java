@@ -22,7 +22,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleSupportProvider.AppEngineFlexibleSupportConfigurable;
-
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
@@ -30,12 +29,9 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.testFramework.PlatformTestCase;
-
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Tests for {@link AppEngineFlexibleSupportConfigurable}.
- */
+/** Tests for {@link AppEngineFlexibleSupportConfigurable}. */
 public class AppEngineFlexibleSupportConfigurableTest extends PlatformTestCase {
 
   private static AppEngineFlexibleSupportConfigurable supportConfigurable;
@@ -50,15 +46,16 @@ public class AppEngineFlexibleSupportConfigurableTest extends PlatformTestCase {
   public void testAddSupportPostStartup() {
     Module module = createModule("testModule");
 
-    doNothing().when(supportConfigurable)
+    doNothing()
+        .when(supportConfigurable)
         .addAppEngineFlexibleSupport(
             any(ModifiableRootModel.class), any(AppEngineFlexibleFacet.class));
 
     new WriteAction() {
       @Override
       protected void run(@NotNull Result result) throws Throwable {
-        supportConfigurable
-            .addSupport(module, mock(ModifiableRootModel.class), mock(ModifiableModelsProvider.class));
+        supportConfigurable.addSupport(
+            module, mock(ModifiableRootModel.class), mock(ModifiableModelsProvider.class));
       }
     }.execute();
 

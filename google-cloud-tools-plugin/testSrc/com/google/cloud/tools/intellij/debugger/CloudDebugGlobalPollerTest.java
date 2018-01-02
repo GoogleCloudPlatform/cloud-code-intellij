@@ -27,18 +27,15 @@ import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees.Breakpoints;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-
 import com.intellij.notification.Notification;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-
+import java.io.IOException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-
-import java.io.IOException;
 
 public class CloudDebugGlobalPollerTest extends BasePluginTestCase {
 
@@ -88,27 +85,27 @@ public class CloudDebugGlobalPollerTest extends BasePluginTestCase {
     // sending out notificationsHandler relies on several static method calls in
     // com.intellij.notification.Notifications, let's subscribe to them and do verification this way
     Application application = ApplicationManager.getApplication();
-    getProject().getMessageBus().connect(application).subscribe(Notifications.TOPIC,
-                                                               handler);
+    getProject().getMessageBus().connect(application).subscribe(Notifications.TOPIC, handler);
     return handler;
   }
 
-  private void setupCloudDebuggerBackendMockWithException(String userEmail, IOException e) throws IOException {
+  private void setupCloudDebuggerBackendMockWithException(String userEmail, IOException e)
+      throws IOException {
     Breakpoints breakpoints = mock(Breakpoints.class);
     when(breakpoints.list(anyString())).thenThrow(e);
     Debuggees debuggees = mock(Debuggees.class);
     when(debuggees.breakpoints()).thenReturn(breakpoints);
     Debugger debugger = mock(Debugger.class);
     when(debugger.debuggees()).thenReturn(debuggees);
-    CloudDebuggerClient
-        .setClient(userEmail + CloudDebuggerClient.SHORT_CONNECTION_TIMEOUT_MS, debugger);
+    CloudDebuggerClient.setClient(
+        userEmail + CloudDebuggerClient.SHORT_CONNECTION_TIMEOUT_MS, debugger);
   }
 
   private void verifyNotificationFired() {
-	ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
-	verify(notificationsHandler).notify(captor.capture());
-	assertEquals(1, captor.getAllValues().size());
-    assertEquals("Error while connecting to the Stackdriver Debugger backend",
-        captor.getValue().getTitle());
+    ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
+    verify(notificationsHandler).notify(captor.capture());
+    assertEquals(1, captor.getAllValues().size());
+    assertEquals(
+        "Error while connecting to the Stackdriver Debugger backend", captor.getValue().getTitle());
   }
 }

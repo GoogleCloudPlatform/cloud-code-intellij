@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
-/**
- * Executor of {@link AppEngineTask}'s.
- */
+/** Executor of {@link AppEngineTask}'s. */
 public class AppEngineExecutor implements CancellableRunnable {
 
   private Process process;

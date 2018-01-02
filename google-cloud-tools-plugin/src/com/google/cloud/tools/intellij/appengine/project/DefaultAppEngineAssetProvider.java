@@ -22,7 +22,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Booleans;
-
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -33,16 +32,14 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.xml.XmlFile;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
   private static final Logger logger = Logger.getInstance(DefaultAppEngineAssetProvider.class);
@@ -50,21 +47,22 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
   @Nullable
   @Override
   public XmlFile loadAppEngineStandardWebXml(@NotNull Project project, @NotNull Artifact artifact) {
-    Set<Module> modules
-        = ArtifactUtil.getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
+    Set<Module> modules =
+        ArtifactUtil.getModulesIncludedInArtifacts(Collections.singletonList(artifact), project);
 
     return loadAppEngineStandardWebXml(project, modules);
   }
 
   @Nullable
   @Override
-  public XmlFile loadAppEngineStandardWebXml(@NotNull Project project,
-      @NotNull Collection<Module> modules) {
+  public XmlFile loadAppEngineStandardWebXml(
+      @NotNull Project project, @NotNull Collection<Module> modules) {
     List<VirtualFile> appEngineWebXmls = new ArrayList<>();
 
     for (Module module : modules) {
-      appEngineWebXmls.addAll(FilenameIndex.getVirtualFilesByName(
-          project, "appengine-web.xml", module.getModuleContentScope()));
+      appEngineWebXmls.addAll(
+          FilenameIndex.getVirtualFilesByName(
+              project, "appengine-web.xml", module.getModuleContentScope()));
     }
 
     VirtualFile appEngineWebXml = findHighestPriorityAppEngineWebXml(appEngineWebXmls);
@@ -75,9 +73,11 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
       if (psiFile instanceof XmlFile) {
         return (XmlFile) psiFile;
       } else {
-        logger.error(String.format("appengine-web.xml PSI File %s with name %s is not an XmlFile. "
-            + "It was chosen from the following appengine-web.xml's that were found: %s",
-            psiFile, psiFile != null ? psiFile.getName() : null, appEngineWebXmls));
+        logger.error(
+            String.format(
+                "appengine-web.xml PSI File %s with name %s is not an XmlFile. "
+                    + "It was chosen from the following appengine-web.xml's that were found: %s",
+                psiFile, psiFile != null ? psiFile.getName() : null, appEngineWebXmls));
       }
     }
     return null;
@@ -94,8 +94,10 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
       // Prefer the appengine-web.xml located under the WEB-INF directory
       Collections.sort(nonNulls, new AppEngineWebXmlOrdering());
 
-      logger.warn("The following appengine-web.xml's were found: " + nonNulls
-          + "\nThe first one in the list will be used.");
+      logger.warn(
+          "The following appengine-web.xml's were found: "
+              + nonNulls
+              + "\nThe first one in the list will be used.");
     }
 
     if (!nonNulls.isEmpty()) {
@@ -116,8 +118,7 @@ public class DefaultAppEngineAssetProvider extends AppEngineAssetProvider {
     }
 
     private boolean hasWebInfParent(VirtualFile file) {
-      return file != null
-          && "WEB-INF".equalsIgnoreCase(file.getParent().getName());
+      return file != null && "WEB-INF".equalsIgnoreCase(file.getParent().getName());
     }
   }
 }

@@ -16,12 +16,9 @@
 
 package com.google.cloud.tools.intellij.login;
 
-
 import com.intellij.openapi.components.ServiceManager;
 
-/**
- * TODO: Describe this class well.
- */
+/** TODO: Describe this class well. */
 public class Services {
 
   public static IntegratedGoogleLoginService getLoginService() {

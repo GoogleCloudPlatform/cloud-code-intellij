@@ -37,27 +37,27 @@ import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
-/**
- * A {@link ServerRuntimeInstance} for the {@link AppEngineCloudType}.
- */
-public class AppEngineRuntimeInstance extends
-    ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
+/** A {@link ServerRuntimeInstance} for the {@link AppEngineCloudType}. */
+public class AppEngineRuntimeInstance
+    extends ServerRuntimeInstance<AppEngineDeploymentConfiguration> {
 
   private final Multimap<Project, CancellableRunnable> createdDeployments;
   private final ProjectManagerListener projectClosingListener;
 
   AppEngineRuntimeInstance() {
     createdDeployments = ArrayListMultimap.create();
-    projectClosingListener = new ProjectManagerListener() {
-      @Override
-      public void projectClosing(Project project) {
-        disconnect();
-      }
-    };
+    projectClosingListener =
+        new ProjectManagerListener() {
+          @Override
+          public void projectClosing(Project project) {
+            disconnect();
+          }
+        };
   }
 
   @Override
-  public void deploy(@NotNull final DeploymentTask<AppEngineDeploymentConfiguration> task,
+  public void deploy(
+      @NotNull final DeploymentTask<AppEngineDeploymentConfiguration> task,
       @NotNull final DeploymentLogManager logManager,
       @NotNull final DeploymentOperationCallback callback) {
 
@@ -100,13 +100,13 @@ public class AppEngineRuntimeInstance extends
   }
 
   /**
-   * Disambiguates running deployment line items by prepending a timestamp. Also appends the
-   * cloud project and version id's to the deployment string.
+   * Disambiguates running deployment line items by prepending a timestamp. Also appends the cloud
+   * project and version id's to the deployment string.
    */
   @NotNull
   @Override
-  public String getDeploymentName(@NotNull DeploymentSource source,
-      AppEngineDeploymentConfiguration configuration) {
+  public String getDeploymentName(
+      @NotNull DeploymentSource source, AppEngineDeploymentConfiguration configuration) {
     String deploymentName = String.format("[%s] ", DateTime.now().toString("yyyy-MM-dd HH:mm:ss"));
 
     // If its a user specified archive source then we want to label it by the name of the archive
@@ -132,8 +132,7 @@ public class AppEngineRuntimeInstance extends
   }
 
   @Override
-  public void computeDeployments(@NotNull ComputeDeploymentsCallback callback) {
-  }
+  public void computeDeployments(@NotNull ComputeDeploymentsCallback callback) {}
 
   @Override
   public void disconnect() {

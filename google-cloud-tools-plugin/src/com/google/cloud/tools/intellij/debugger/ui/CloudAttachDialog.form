@@ -28,12 +28,6 @@
           <text resource-bundle="messages/CloudToolsBundle" key="clouddebug.target"/>
         </properties>
       </component>
-      <component id="30c54" class="com.google.cloud.tools.intellij.resources.ProjectSelector" binding="elysiumProjectSelector">
-        <constraints>
-          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties/>
-      </component>
       <component id="bdb09" class="javax.swing.JComboBox" binding="targetSelector">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
@@ -102,6 +96,11 @@
           <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
         </constraints>
       </vspacer>
+      <nested-form id="d109b" form-file="com/google/cloud/tools/intellij/project/ProjectSelector.form" binding="projectSelector">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </nested-form>
     </children>
   </grid>
 </form>

@@ -19,8 +19,8 @@ package com.google.cloud.tools.intellij.appengine.project;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 /**
- * Checked exception that signals that a YAML file is malformed, which causes the parser to
- * throw unchecked exceptions.
+ * Checked exception that signals that a YAML file is malformed, which causes the parser to throw
+ * unchecked exceptions.
  */
 public class MalformedYamlFileException extends Exception {
   public MalformedYamlFileException(Throwable throwable) {

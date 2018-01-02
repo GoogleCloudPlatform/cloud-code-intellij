@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2017 Google Inc. All Rights Reserved.
  *
@@ -41,15 +40,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class CloudDebuggerClientTest extends BasePluginTestCase {
 
-  @Mock
-  CloudToolsPluginInfoService mockInfoService;
+  @Mock CloudToolsPluginInfoService mockInfoService;
 
   @Before
   public void setUp() {
     IntegratedGoogleLoginService mockLogin = Mockito.mock(IntegratedGoogleLoginService.class);
     registerService(IntegratedGoogleLoginService.class, mockLogin);
     registerService(CloudToolsPluginInfoService.class, mockInfoService);
-    LinkedHashMap<String, CredentialedUser> allUsers = new LinkedHashMap<String, CredentialedUser>();
+    LinkedHashMap<String, CredentialedUser> allUsers =
+        new LinkedHashMap<String, CredentialedUser>();
     CredentialedUser user = Mockito.mock(CredentialedUser.class);
     allUsers.put("foo@example.com", user);
     when(mockLogin.getAllUsers()).thenReturn(allUsers);
@@ -85,5 +84,4 @@ public class CloudDebuggerClientTest extends BasePluginTestCase {
   public void testGetShortTimeoutClient_fromNullUserEmail() {
     Assert.assertNull(CloudDebuggerClient.getShortTimeoutClient((String) null));
   }
-
 }

@@ -16,9 +16,7 @@
 
 package com.google.cloud.tools.intellij.util;
 
-/**
- * Class defining client-side event actions we want to track.
- */
+/** Class defining client-side event actions we want to track. */
 public class GctTracking {
 
   // Event actions
@@ -36,7 +34,8 @@ public class GctTracking {
   public static final String APP_ENGINE_APPLICATION_CREATE_FAIL =
       "appengine.application.create.fail";
   public static final String APP_ENGINE_FACET_ADD = "appengine.facet.add";
-  public static final String APP_ENGINE_GENERATE_FILE_APPYAML = "appengine.generate.file.appyaml.click";
+  public static final String APP_ENGINE_GENERATE_FILE_APPYAML =
+      "appengine.generate.file.appyaml.click";
   public static final String APP_ENGINE_GENERATE_FILE_DOCKERFILE =
       "appengine.generate.file.dockerfile.click";
   public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =
@@ -80,6 +79,8 @@ public class GctTracking {
 
   public static final String ACCOUNT_PLUGIN_DETECTED = "account.plugin.detected";
   public static final String ACCOUNT_PLUGIN_UNINSTALLED = "account.plugin.uninstalled";
-  public static final String ACCOUNT_PLUGIN_RESTART_DIALOG_YES_ACTION = "account.plugin.restart.dialog.yes.action";
-  public static final String ACCOUNT_PLUGIN_RESTART_DIALOG_NO_ACTION = "account.plugin.restart.dialog.no.action";
+  public static final String ACCOUNT_PLUGIN_RESTART_DIALOG_YES_ACTION =
+      "account.plugin.restart.dialog.yes.action";
+  public static final String ACCOUNT_PLUGIN_RESTART_DIALOG_NO_ACTION =
+      "account.plugin.restart.dialog.no.action";
 }

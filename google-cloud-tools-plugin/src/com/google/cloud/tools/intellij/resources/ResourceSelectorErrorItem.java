@@ -17,18 +17,13 @@
 package com.google.cloud.tools.intellij.resources;
 
 import com.intellij.ui.components.JBLabel;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.Color;
 import java.awt.Font;
-
 import javax.swing.BorderFactory;
 import javax.swing.SwingConstants;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * UI for the node that displays error information if a resource manager call fails.
- */
+/** UI for the node that displays error information if a resource manager call fails. */
 public class ResourceSelectorErrorItem extends JBLabel {
 
   public ResourceSelectorErrorItem(@NotNull Color errorForeground) {

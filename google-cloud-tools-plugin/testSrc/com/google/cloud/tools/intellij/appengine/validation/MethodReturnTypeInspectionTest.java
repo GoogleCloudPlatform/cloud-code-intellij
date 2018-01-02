@@ -19,9 +19,7 @@ package com.google.cloud.tools.intellij.appengine.validation;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 
-/**
- * Tests for {@link MethodReturnTypeInspection},
- */
+/** Tests for {@link MethodReturnTypeInspection}, */
 public class MethodReturnTypeInspectionTest extends EndpointTestBase {
 
   @Override

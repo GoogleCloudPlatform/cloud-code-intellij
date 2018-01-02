@@ -30,11 +30,10 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author nik
- */
-public class AppEngineStandardFrameworkDetector extends
-    FacetBasedFrameworkDetector<AppEngineStandardFacet, AppEngineStandardFacetConfiguration> {
+/** @author nik */
+public class AppEngineStandardFrameworkDetector
+    extends FacetBasedFrameworkDetector<
+        AppEngineStandardFacet, AppEngineStandardFacetConfiguration> {
 
   public AppEngineStandardFrameworkDetector() {
     super("appengine-java-standard");
@@ -42,10 +41,11 @@ public class AppEngineStandardFrameworkDetector extends
 
   @Override
   public void setupFacet(@NotNull AppEngineStandardFacet facet, ModifiableRootModel model) {
-    AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
-        AppEngineUtil.findOneAppEngineStandardArtifact(facet.getModule()),
-        model.getModule(),
-        null /*existingConfiguration*/);
+    AppEngineStandardWebIntegration.getInstance()
+        .setupRunConfigurations(
+            AppEngineUtil.findOneAppEngineStandardArtifact(facet.getModule()),
+            model.getModule(),
+            null /*existingConfiguration*/);
 
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
@@ -73,7 +73,8 @@ public class AppEngineStandardFrameworkDetector extends
   @NotNull
   @Override
   public ElementPattern<FileContent> createSuitableFilePattern() {
-    return FileContentPattern.fileContent().withName(AppEngineUtil.APP_ENGINE_WEB_XML_NAME)
+    return FileContentPattern.fileContent()
+        .withName(AppEngineUtil.APP_ENGINE_WEB_XML_NAME)
         .xmlWithRootTag("appengine-web-app");
   }
 }

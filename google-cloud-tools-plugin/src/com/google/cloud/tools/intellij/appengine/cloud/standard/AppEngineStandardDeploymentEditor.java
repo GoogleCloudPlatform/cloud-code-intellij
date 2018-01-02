@@ -22,15 +22,11 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfig
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.common.annotations.VisibleForTesting;
-
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.jetbrains.annotations.NotNull;
 
 /** Editor for an App Engine Deployment runtime configuration. */
 public final class AppEngineStandardDeploymentEditor
@@ -56,7 +52,9 @@ public final class AppEngineStandardDeploymentEditor
                 .getServiceNameFromAppEngineWebXml(project, deploymentSource));
 
     if (deploymentSource.getEnvironment() != null) {
-      commonConfig.getEnvironmentLabel().setText(deploymentSource.getEnvironment().localizedLabel());
+      commonConfig
+          .getEnvironmentLabel()
+          .setText(deploymentSource.getEnvironment().localizedLabel());
 
       if (!deploymentSource.getEnvironment().isFlexCompat()) {
         commonConfig.getAppEngineCostWarningPanel().setVisible(false);
@@ -70,8 +68,7 @@ public final class AppEngineStandardDeploymentEditor
   }
 
   @Override
-  protected void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration)
-      throws ConfigurationException {
+  protected void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.applyEditorTo(configuration);
     commonConfig.setDeploymentProjectAndVersion(deploymentSource);
 
@@ -93,4 +90,6 @@ public final class AppEngineStandardDeploymentEditor
   AppEngineDeploymentConfigurationPanel getCommonConfig() {
     return commonConfig;
   }
+
+  private void createUIComponents() {}
 }

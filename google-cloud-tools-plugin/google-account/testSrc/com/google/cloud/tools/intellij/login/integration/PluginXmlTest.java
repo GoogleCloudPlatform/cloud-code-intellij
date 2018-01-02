@@ -22,9 +22,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-/**
- * Test that the plugin.xml file is at least marginally sensible.
- */
+/** Test that the plugin.xml file is at least marginally sensible. */
 public class PluginXmlTest {
 
   @Test

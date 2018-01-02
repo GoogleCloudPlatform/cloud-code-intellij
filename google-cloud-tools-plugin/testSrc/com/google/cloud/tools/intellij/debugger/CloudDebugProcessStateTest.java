@@ -122,8 +122,8 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     PsiManager psiManager = Mockito.mock(PsiManager.class);
     project.registerService(PsiManager.class, psiManager);
 
-    IntegratedGoogleLoginService mockLoginService = TestUtils
-        .installMockService(IntegratedGoogleLoginService.class);
+    IntegratedGoogleLoginService mockLoginService =
+        TestUtils.installMockService(IntegratedGoogleLoginService.class);
 
     GoogleLoginState googleLoginState = Mockito.mock(GoogleLoginState.class);
     CredentialedUser user = Mockito.mock(CredentialedUser.class);
@@ -180,7 +180,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     List<Breakpoint> currentList = state.getCurrentServerBreakpointList();
     assertNotEmpty(currentList);
 
-    //verifies the sort order...
+    // verifies the sort order...
     assertTrue(verifyList(currentList, "bp5", "bp6", "bp7", "bp4", "bp8", "bp3", "bp2", "bp1"));
   }
 

@@ -16,20 +16,13 @@
 
 package com.google.cloud.tools.intellij.resources;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+/** This model item is shown when a resource manager call is outstanding. */
+class ResourceLoadingModelItem extends DefaultMutableTreeNode {}
 
-/**
- * This model item is shown when a resource manager call is outstanding.
- */
-class ResourceLoadingModelItem extends DefaultMutableTreeNode {
-
-}
-
-/**
- * This model item is shown when a resource manager call returns an empty result.
- */
+/** This model item is shown when a resource manager call returns an empty result. */
 class ResourceEmptyModelItem extends DefaultMutableTreeNode {
 
   private String message;

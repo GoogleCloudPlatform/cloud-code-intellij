@@ -30,9 +30,7 @@ import java.nio.file.Paths;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Represents an App Engine Standard run task. (i.e., devappserver)
- */
+/** Represents an App Engine Standard run task. (i.e., devappserver) */
 public class AppEngineStandardRunTask extends AppEngineTask {
 
   private RunConfiguration runConfig;
@@ -47,8 +45,8 @@ public class AppEngineStandardRunTask extends AppEngineTask {
    * @param runnerId typically "Run" or "Debug", to indicate type of local run. To be used in
    *     metrics
    */
-  public AppEngineStandardRunTask(@NotNull RunConfiguration runConfig, @NotNull Sdk javaSdk,
-      @Nullable String runnerId) {
+  public AppEngineStandardRunTask(
+      @NotNull RunConfiguration runConfig, @NotNull Sdk javaSdk, @Nullable String runnerId) {
     this.runConfig = runConfig;
     this.javaSdk = javaSdk;
     this.runnerId = runnerId;
@@ -61,10 +59,11 @@ public class AppEngineStandardRunTask extends AppEngineTask {
     // show a warning notification if the cloud sdk version is not supported
     CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
 
-    CloudSdk.Builder sdkBuilder = new CloudSdk.Builder()
-        .sdkPath(sdkService.getSdkHomePath())
-        .async(true)
-        .startListener(startListener);
+    CloudSdk.Builder sdkBuilder =
+        new CloudSdk.Builder()
+            .sdkPath(sdkService.getSdkHomePath())
+            .async(true)
+            .startListener(startListener);
 
     if (javaSdk.getHomePath() != null) {
       sdkBuilder.javaHome(Paths.get(javaSdk.getHomePath()));
@@ -77,6 +76,5 @@ public class AppEngineStandardRunTask extends AppEngineTask {
         .trackEvent(GctTracking.APP_ENGINE_RUN)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, Strings.nullToEmpty(runnerId))
         .ping();
-
   }
 }

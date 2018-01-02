@@ -16,7 +16,6 @@
 package com.google.cloud.tools.intellij.appengine.validation;
 
 import com.google.cloud.tools.intellij.appengine.GctConstants;
-
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
@@ -24,58 +23,60 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.testFramework.MockProblemDescriptor;
-
 import junit.framework.Assert;
 
-/**
- * Tests for {@link FullMethodNameInspection}.
- */
+/** Tests for {@link FullMethodNameInspection}. */
 public class FullMethodNameInspectionTest extends EndpointTestBase {
 
-  /**
-   * Tests that the FullMethodNameInspection does not flag methods with
-   * unique API method names.
-   */
+  /** Tests that the FullMethodNameInspection does not flag methods with unique API method names. */
   public void testClassWithUniqueFullMethodNames() {
     doTest();
   }
 
-  /**
-   * Tests that the FullMethodNameInspection flag methods with
-   * duplicate API method names.
-   */
+  /** Tests that the FullMethodNameInspection flag methods with duplicate API method names. */
   public void testClassWithDuplicateFullMethodNames() {
     doTest();
   }
 
   /**
-   * Tests that the FullMethodNameInspection's quick fix updates
-   * the name attribute of {@link GctConstants.APP_ENGINE_ANNOTATION_API_METHOD}
-   * by adding "_1" as a suffix.
+   * Tests that the FullMethodNameInspection's quick fix updates the name attribute of {@link
+   * GctConstants.APP_ENGINE_ANNOTATION_API_METHOD} by adding "_1" as a suffix.
    */
   public void testQuickFix_ApiMethodAnnotation() {
     Project myProject = myFixture.getProject();
-    String annotationString = "@" + GctConstants.APP_ENGINE_ANNOTATION_API_METHOD + "(name = \"someName\")";
+    String annotationString =
+        "@" + GctConstants.APP_ENGINE_ANNOTATION_API_METHOD + "(name = \"someName\")";
     PsiAnnotation annotation =
-      JavaPsiFacade.getInstance(myProject).getElementFactory().createAnnotationFromText(annotationString, null);
-    FullMethodNameInspection.MyQuickFix myQuickFix = new FullMethodNameInspection().new MyQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
+        JavaPsiFacade.getInstance(myProject)
+            .getElementFactory()
+            .createAnnotationFromText(annotationString, null);
+    FullMethodNameInspection.MyQuickFix myQuickFix =
+        new FullMethodNameInspection().new MyQuickFix();
+    MockProblemDescriptor problemDescriptor =
+        new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
 
     myQuickFix.applyFix(myProject, problemDescriptor);
-    Assert.assertEquals("@" + GctConstants.APP_ENGINE_ANNOTATION_API_METHOD + "(name = \"someName_1\")", annotation.getText());
+    Assert.assertEquals(
+        "@" + GctConstants.APP_ENGINE_ANNOTATION_API_METHOD + "(name = \"someName_1\")",
+        annotation.getText());
   }
 
   /**
-   * Tests that the FullMethodNameInspection's quick fix does not update
-   * an annotation that is not {@link GctConstants.APP_ENGINE_ANNOTATION_API_METHOD}
+   * Tests that the FullMethodNameInspection's quick fix does not update an annotation that is not
+   * {@link GctConstants.APP_ENGINE_ANNOTATION_API_METHOD}
    */
   public void testQuickFix_NonApiMethodAnnotation() {
     Project myProject = myFixture.getProject();
-    String annotationString = "@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED + "(name = \"someName\")";
+    String annotationString =
+        "@" + GctConstants.APP_ENGINE_ANNOTATION_NAMED + "(name = \"someName\")";
     PsiAnnotation annotation =
-      JavaPsiFacade.getInstance(myProject).getElementFactory().createAnnotationFromText(annotationString, null);
-    FullMethodNameInspection.MyQuickFix myQuickFix = new FullMethodNameInspection().new MyQuickFix();
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
+        JavaPsiFacade.getInstance(myProject)
+            .getElementFactory()
+            .createAnnotationFromText(annotationString, null);
+    FullMethodNameInspection.MyQuickFix myQuickFix =
+        new FullMethodNameInspection().new MyQuickFix();
+    MockProblemDescriptor problemDescriptor =
+        new MockProblemDescriptor(annotation, "", ProblemHighlightType.ERROR);
 
     myQuickFix.applyFix(myProject, problemDescriptor);
     Assert.assertEquals(annotationString, annotation.getText());
@@ -85,6 +86,8 @@ public class FullMethodNameInspectionTest extends EndpointTestBase {
     LocalInspectionTool localInspectionTool = new FullMethodNameInspection();
     String testName = getTestName(true);
     myFixture.setTestDataPath(getTestDataPath());
-    myFixture.testInspection("inspections/fullMethodNameInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    myFixture.testInspection(
+        "inspections/fullMethodNameInspection/" + testName,
+        new LocalInspectionToolWrapper(localInspectionTool));
   }
 }

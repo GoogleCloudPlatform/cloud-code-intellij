@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 
 import com.intellij.testFramework.PlatformTestCase;
 
-/**
- * Tests for {@link DockerfileArtifactTypePanel}.
- */
+/** Tests for {@link DockerfileArtifactTypePanel}. */
 public class DockerfileArtifactTypePanelTest extends PlatformTestCase {
 
   @Override

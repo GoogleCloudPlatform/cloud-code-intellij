@@ -21,9 +21,7 @@ import com.google.common.base.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * This model item represents a single GCP project.
- */
+/** This model item represents a single GCP project. */
 final class ResourceProjectModelItem extends ProjectModelItem {
 
   @NotNull private final Project project;
@@ -73,8 +71,9 @@ final class ResourceProjectModelItem extends ProjectModelItem {
   /**
    * Returns {@code true} if this project should be visible, {@code false} otherwise.
    *
-   * <p>This is determined by the given {@link #filter} (settable via {@link #setFilter(String)}). If
-   * the label's text contains the filter or if the filter is empty, the project should be visible.
+   * <p>This is determined by the given {@link #filter} (settable via {@link #setFilter(String)}).
+   * If the label's text contains the filter or if the filter is empty, the project should be
+   * visible.
    */
   boolean isVisible() {
     return isVisible;

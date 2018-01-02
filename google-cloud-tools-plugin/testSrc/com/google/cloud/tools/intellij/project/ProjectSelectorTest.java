@@ -38,7 +38,8 @@ public class ProjectSelectorTest {
   @Mock private ProjectSelectionListener projectSelectionListener;
   @Mock private ProjectSelectionDialog projectSelectionDialog;
 
-  private static final CloudProject TEST_PROJECT = CloudProject.create("test-1", "test@google.com");
+  private static final CloudProject TEST_PROJECT =
+      CloudProject.create("test-1", "test-1-id", "test@google.com");
 
   @Before
   public void setUp() {
@@ -71,8 +72,7 @@ public class ProjectSelectorTest {
 
     projectSelector.handleOpenProjectSelectionDialog();
 
-    assertThat(projectSelector.getSelectedProject())
-        .isEqualTo(TEST_PROJECT);
+    assertThat(projectSelector.getSelectedProject()).isEqualTo(TEST_PROJECT);
   }
 
   @Test
@@ -128,7 +128,7 @@ public class ProjectSelectorTest {
 
   @Test
   public void setEmptyProject_acceptsAndUpdatesUi() {
-    projectSelector.setSelectedProject(CloudProject.create("", ""));
+    projectSelector.setSelectedProject(CloudProject.create("", "", ""));
 
     verifyUiStateForProject(null);
   }
@@ -136,14 +136,13 @@ public class ProjectSelectorTest {
   private void verifyUiStateForProject(CloudProject project) {
     if (project == null) {
       assertThat(projectSelector.getProjectNameLabel().getText())
-          .isEqualTo(GctBundle.getString("project.selector.no.selected.project"));
+          .isEqualTo(GctBundle.getString("cloud.project.selector.no.selected.project"));
       // no account information UI is visible/populated.
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isFalse();
       assertThat(projectSelector.getAccountInfoLabel().getText()).isEmpty();
       assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
     } else {
-      assertThat(projectSelector.getProjectNameLabel().getText())
-          .isEqualTo(project.projectName());
+      assertThat(projectSelector.getProjectNameLabel().getText()).isEqualTo(project.projectName());
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isTrue();
       assertThat(projectSelector.getAccountInfoLabel().getText())
           .isEqualTo(project.googleUsername());

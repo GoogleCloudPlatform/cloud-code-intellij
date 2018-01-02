@@ -43,8 +43,8 @@ public final class GoogleCloudToolsIcons {
   public static final Icon CLOUD_BREAKPOINT_ERROR = load("/icons/cloudbreakpointerror.png");
   public static final Icon CLOUD_BREAKPOINT_DISABLED = load("/icons/cloudbreakpointdisabled.png");
   public static final Icon CLOUD_DEBUG_SAVE_EXIT = load("/icons/debugsaveexit.png");
-  public static final Icon CLOUD_DEBUG_REACTIVATE_BREAKPOINT = load(
-      "/icons/debugreactivatebreakpoint.png");
+  public static final Icon CLOUD_DEBUG_REACTIVATE_BREAKPOINT =
+      load("/icons/debugreactivatebreakpoint.png");
   public static final Icon CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS = load("/icons/debugdeleteall.png");
   public static final Icon LOADING = loadGif("/icons/loading.gif");
   public static final Icon STACKDRIVER_DEBUGGER = load("/icons/stackdriverdebugger.png");
