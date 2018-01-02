@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.intellij.application.options.ModulesComboBox;
@@ -86,9 +87,11 @@ final class GoogleCloudApiSelectorPanel {
         libraries
             .stream()
             .collect(
-                Collectors.toMap(
-                    Function.identity(),
-                    lib -> new CloudApiManagementSpec(SHOULD_ENABLE_API_DEFAULT)));
+                Collectors.collectingAndThen(
+                    Collectors.toMap(
+                        Function.identity(),
+                        lib -> new CloudApiManagementSpec(SHOULD_ENABLE_API_DEFAULT)),
+                    ImmutableMap::copyOf));
 
     panel.setPreferredSize(new Dimension(800, 600));
   }
@@ -147,7 +150,7 @@ final class GoogleCloudApiSelectorPanel {
    * CloudApiManagementSpec}.
    */
   @VisibleForTesting
-  public Map<CloudLibrary, CloudApiManagementSpec> getApiManagementMap() {
+  Map<CloudLibrary, CloudApiManagementSpec> getApiManagementMap() {
     return apiManagementMap;
   }
 
