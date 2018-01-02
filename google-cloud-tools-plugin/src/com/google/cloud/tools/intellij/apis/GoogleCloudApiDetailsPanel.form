@@ -126,7 +126,7 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Enable the API on the Google Cloud Platform"/>
+              <text resource-bundle="messages/CloudToolsBundle" key="cloud.apis.enable.checkbox.text"/>
             </properties>
           </component>
           <component id="b5e18" class="javax.swing.JLabel">
@@ -136,7 +136,7 @@
             <properties>
               <icon value="general/information.png"/>
               <text value=""/>
-              <toolTipText value="If you plan to deploy your application to GCP or access GCP APIs remotely, then note that some APIs need to be explicitly enabled. Enabling the API associates it with the specified project, enables billing, and more."/>
+              <toolTipText resource-bundle="messages/CloudToolsBundle" key="cloud.apis.enable.checkbox.tooltip.text"/>
             </properties>
           </component>
         </children>
