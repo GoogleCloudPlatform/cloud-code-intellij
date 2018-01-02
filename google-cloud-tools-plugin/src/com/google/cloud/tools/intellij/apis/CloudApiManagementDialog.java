@@ -26,8 +26,8 @@ import javax.swing.JPanel;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The dialog confirming GCP API management actions such as API enablement. Allows selection of an
- * {@link CloudProject CloudProject} on which to perform the actions.
+ * Dialog confirming GCP API management actions such as API enablement. Allows selection of a {@link
+ * CloudProject CloudProject} on which to perform the actions.
  */
 public class CloudApiManagementDialog extends DialogWrapper {
 
