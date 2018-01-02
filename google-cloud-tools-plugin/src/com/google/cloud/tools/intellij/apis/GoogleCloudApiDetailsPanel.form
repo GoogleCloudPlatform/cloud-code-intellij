@@ -14,7 +14,9 @@
     <constraints>
       <xy x="26" y="20" width="1369" height="417"/>
     </constraints>
-    <properties/>
+    <properties>
+      <visible value="false"/>
+    </properties>
     <border type="empty">
       <size top="25" left="25" bottom="25" right="25"/>
     </border>
@@ -117,7 +119,7 @@
           <forms/>
         </constraints>
         <properties>
-          <visible value="false"/>
+          <visible value="true"/>
         </properties>
         <border type="none"/>
         <children>

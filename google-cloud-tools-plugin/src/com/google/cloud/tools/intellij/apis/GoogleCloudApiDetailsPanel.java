@@ -174,6 +174,8 @@ public final class GoogleCloudApiDetailsPanel {
    * #currentCloudLibrary}.
    */
   private void updateUI() {
+    panel.setVisible(true);
+
     if (currentCloudLibrary.getIcon() == null) {
       icon.setIcon(null);
     } else {
@@ -212,7 +214,6 @@ public final class GoogleCloudApiDetailsPanel {
               });
     }
 
-    apiManagementPanel.setVisible(true);
     enableApiCheckbox.setSelected(currentCloudApiManagementSpec.shouldEnable());
   }
 
