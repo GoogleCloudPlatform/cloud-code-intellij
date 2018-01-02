@@ -159,7 +159,8 @@ public final class GoogleCloudApiDetailsPanel {
 
     apiManagementPanel = new JPanel();
     apiManagementPanel.setBorder(
-        IdeBorderFactory.createTitledBorder("Google Cloud Platform API Management"));
+        IdeBorderFactory.createTitledBorder(
+            GctBundle.message("cloud.apis.management.section.title")));
 
     enableApiCheckbox = new JCheckBox();
     enableApiCheckbox.addItemListener(
