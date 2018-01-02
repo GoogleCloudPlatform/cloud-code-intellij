@@ -56,30 +56,12 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
   @Override
   public void actionPerformed(AnActionEvent e) {
     if (e.getProject() != null) {
-      AddCloudLibrariesWizard dialog = new AddCloudLibrariesWizard(e.getProject());
-      DialogManager.show(dialog);
+      AddCloudLibrariesWizard librariesDialog = new AddCloudLibrariesWizard(e.getProject());
+      DialogManager.show(librariesDialog);
 
-      if (dialog.isOK()) {
-        Set<CloudLibrary> apisToEnable = dialog.getApisToEnable();
-
-        if (!apisToEnable.isEmpty()) {
-          CloudApiManagementDialog managementDialog = new CloudApiManagementDialog(e.getProject());
-          DialogManager.show(managementDialog);
-
-          if (managementDialog.isOK()) {
-            ProgressManager.getInstance()
-                .runProcessWithProgressSynchronously(
-                    () ->
-                        CloudApiManager.enableApis(
-                            apisToEnable, managementDialog.getCloudProject()),
-                    "Enabling APIs on Google Cloud Platform",
-                    true,
-                    e.getProject());
-          }
-        }
-
+      if (librariesDialog.isOK()) {
         CloudLibraryDependencyWriter.addLibraries(
-            dialog.getSelectedLibraries(), dialog.getSelectedModule());
+            librariesDialog.getSelectedLibraries(), librariesDialog.getSelectedModule());
       }
     }
   }
@@ -87,10 +69,13 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
   /** The wizard for the "Add Cloud Libraries" menu action. */
   private static final class AddCloudLibrariesWizard extends AbstractWizard<Step> {
 
+    private final Project project;
     private final SelectClientLibrariesStep selectClientLibrariesStep;
 
     AddCloudLibrariesWizard(Project project) {
       super(GctBundle.message("cloud.libraries.dialog.title"), project);
+
+      this.project = project;
 
       selectClientLibrariesStep = new SelectClientLibrariesStep(project);
       selectClientLibrariesStep.addModuleSelectionListener(event -> updateButtons());
@@ -122,6 +107,30 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
     @Override
     protected String getHelpID() {
       return null;
+    }
+
+    @Override
+    protected void doOKAction() {
+      Set<CloudLibrary> apisToEnable = getApisToEnable();
+
+      if (!apisToEnable.isEmpty()) {
+        CloudApiManagementDialog managementDialog = new CloudApiManagementDialog(project);
+        DialogManager.show(managementDialog);
+
+        if (managementDialog.isOK()) {
+          ProgressManager.getInstance()
+              .runProcessWithProgressSynchronously(
+                  () ->
+                      CloudApiManager.enableApis(apisToEnable, managementDialog.getCloudProject()),
+                  "Enabling APIs on Google Cloud Platform",
+                  true,
+                  project);
+
+          super.doOKAction();
+        }
+      } else {
+        super.doOKAction();
+      }
     }
   }
 
