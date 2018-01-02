@@ -92,6 +92,11 @@ public class ProjectSelector extends JPanel {
     projectSelectionListeners.remove(projectSelectionListener);
   }
 
+  /** Returns the list of registered {@link ProjectSelectionListener ProjectSelectionListeners}. */
+  public List<ProjectSelectionListener> getProjectSelectionListeners() {
+    return projectSelectionListeners;
+  }
+
   private void createUIComponents() {
     projectNameLabel = new HyperlinkLabelWithStateAccess();
     projectNameLabel.setHyperlinkText(

@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.apis;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import javax.swing.JComponent;
@@ -56,5 +57,10 @@ public class CloudApiManagementDialog extends DialogWrapper {
   @Override
   protected JComponent createCenterPanel() {
     return panel;
+  }
+
+  @VisibleForTesting
+  public ProjectSelector getProjectSelector() {
+    return projectSelector;
   }
 }
