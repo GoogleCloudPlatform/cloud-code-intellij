@@ -76,7 +76,7 @@ final class GoogleCloudApiSelectorPanel {
 
   private final Project project;
 
-  private static final boolean SHOULD_ENALBE_API_DEFAULT = true;
+  private static final boolean SHOULD_ENABLE_API_DEFAULT = true;
 
   GoogleCloudApiSelectorPanel(List<CloudLibrary> libraries, Project project) {
     this.libraries = libraries;
@@ -88,7 +88,7 @@ final class GoogleCloudApiSelectorPanel {
             .collect(
                 Collectors.toMap(
                     Function.identity(),
-                    lib -> new CloudApiManagementSpec(SHOULD_ENALBE_API_DEFAULT)));
+                    lib -> new CloudApiManagementSpec(SHOULD_ENABLE_API_DEFAULT)));
 
     panel.setPreferredSize(new Dimension(800, 600));
   }
@@ -140,6 +140,15 @@ final class GoogleCloudApiSelectorPanel {
   @VisibleForTesting
   GoogleCloudApiDetailsPanel getDetailsPanel() {
     return detailsPanel;
+  }
+
+  /**
+   * Returns the API management map holding the mapping from {@link CloudLibrary} to {@link
+   * CloudApiManagementSpec}.
+   */
+  @VisibleForTesting
+  public Map<CloudLibrary, CloudApiManagementSpec> getApiManagementMap() {
+    return apiManagementMap;
   }
 
   /**

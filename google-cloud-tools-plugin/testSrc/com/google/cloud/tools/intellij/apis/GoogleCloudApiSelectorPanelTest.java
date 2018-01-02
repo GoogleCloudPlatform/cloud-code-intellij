@@ -32,6 +32,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JPanel;
@@ -73,6 +74,7 @@ public final class GoogleCloudApiSelectorPanelTest {
       TestCloudLibrary.create(
           "Library 1",
           "ID 1",
+          "service_1",
           "Docs Link 1",
           "Description 1",
           "Icon Link 1",
@@ -81,6 +83,7 @@ public final class GoogleCloudApiSelectorPanelTest {
       TestCloudLibrary.create(
           "Library 2",
           "ID 2",
+          "service_2",
           "Docs Link 2",
           "Description 2",
           "Icon Link 2",
@@ -320,6 +323,90 @@ public final class GoogleCloudApiSelectorPanelTest {
     checkCheckbox(table, 1);
 
     assertThat(panel.getSelectedLibraries()).containsExactly(library1, library2);
+  }
+
+  @Test
+  public void getApisToEnable_shouldEnableSelectedLibraryByDefault() {
+    CloudLibrary library = LIBRARY_1.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+    checkCheckbox(table, 0);
+
+    Set<CloudLibrary> apisToEnable = panel.getApisToEnable();
+    assertThat(apisToEnable).containsExactly(library);
+  }
+
+  @Test
+  public void
+      getApisToEnable_withAllLibrariesChecked_AndNoShouldEnableChecked_returnsNoneEnabled() {
+    CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
+    CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library1, library2), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+
+    checkCheckbox(table, 0);
+    checkCheckbox(table, 1);
+
+    Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
+
+    panel.getDetailsPanel().setCloudLibrary(library1, apiManagementMap.get(library1));
+    panel.getDetailsPanel().getEnableApiCheckbox().setSelected(false);
+
+    panel.getDetailsPanel().setCloudLibrary(library2, apiManagementMap.get(library2));
+    panel.getDetailsPanel().getEnableApiCheckbox().setSelected(false);
+
+    assertThat(panel.getApisToEnable()).isEmpty();
+  }
+
+  @Test
+  public void
+      getApisToEnable_withAllLibrariesChecked_AndSomeShouldEnableChecked_returnsSomeEnabled() {
+    CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
+    CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library1, library2), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+
+    checkCheckbox(table, 0);
+    checkCheckbox(table, 1);
+
+    Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
+
+    panel.getDetailsPanel().setCloudLibrary(library1, apiManagementMap.get(library1));
+    panel.getDetailsPanel().getEnableApiCheckbox().setSelected(false);
+
+    panel.getDetailsPanel().setCloudLibrary(library2, apiManagementMap.get(library2));
+    panel.getDetailsPanel().getEnableApiCheckbox().setSelected(true);
+
+    assertThat(panel.getApisToEnable()).containsExactly(library2);
+  }
+
+  @Test
+  public void
+      getApisToEnable_withNoLibrariesChecked_AndAllShouldEnableChecked_returnsNoneEnabled() {
+    CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
+    CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library1, library2), testFixture.getProject());
+
+    Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
+
+    panel.getDetailsPanel().setCloudLibrary(library1, apiManagementMap.get(library1));
+    panel.getDetailsPanel().getEnableApiCheckbox().setSelected(true);
+
+    panel.getDetailsPanel().setCloudLibrary(library2, apiManagementMap.get(library2));
+    panel.getDetailsPanel().getEnableApiCheckbox().setSelected(true);
+
+    assertThat(panel.getApisToEnable()).isEmpty();
   }
 
   /**

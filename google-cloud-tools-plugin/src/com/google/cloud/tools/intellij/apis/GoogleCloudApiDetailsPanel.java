@@ -122,6 +122,12 @@ public final class GoogleCloudApiDetailsPanel {
     return linksTextPane;
   }
 
+  /** Returns the {@link JCheckBox} that selects if the API should be enabled on GCP. */
+  @VisibleForTesting
+  JCheckBox getEnableApiCheckbox() {
+    return enableApiCheckbox;
+  }
+
   /**
    * Initializes some UI components in this panel that require special set-up.
    *
