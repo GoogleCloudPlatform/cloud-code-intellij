@@ -57,7 +57,8 @@ public final class CloudLibraryUtilsTest {
           "",
           ImmutableList.of(PYTHON_CLIENT_FULL, JAVA_CLIENT_FULL));
   private static final TestCloudLibrary LIBRARY_NO_CLIENTS =
-      TestCloudLibrary.create("No Clients Library", "no-clients", "", "", "", "", ImmutableList.of());
+      TestCloudLibrary.create(
+          "No Clients Library", "no-clients", "", "", "", "", ImmutableList.of());
   private static final TestCloudLibrary LIBRARY_NULL_CLIENTS =
       TestCloudLibrary.create("Null Clients Library", "null-clients", "", "", "", "", null);
   private static final TestCloudLibrary LIBRARY_PYTHON_CLIENT_ONLY =
