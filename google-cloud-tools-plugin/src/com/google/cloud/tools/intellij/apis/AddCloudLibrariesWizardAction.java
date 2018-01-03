@@ -30,6 +30,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import git4idea.DialogManager;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -110,6 +111,14 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
       return null;
     }
 
+    /**
+     * Overrides {@link DialogWrapper#doOKAction()} to first check if there are any APIs to enable
+     * on GCP.
+     *
+     * <p>If so, the {@link CloudApiManagementDialog} is opened allowing the user to select a cloud
+     * project and confirm. If the user cancels, the user is returned to this parent dialog.
+     * Otherwise, it is closed.
+     */
     @Override
     protected void doOKAction() {
       Set<CloudLibrary> apisToEnable = getApisToEnable();
