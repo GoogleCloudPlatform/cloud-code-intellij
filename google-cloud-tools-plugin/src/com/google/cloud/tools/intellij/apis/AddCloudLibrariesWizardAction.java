@@ -131,7 +131,8 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
           ProgressManager.getInstance()
               .runProcessWithProgressSynchronously(
                   () ->
-                      CloudApiManager.enableApis(apisToEnable, managementDialog.getCloudProject()),
+                      CloudApiManager.enableApis(
+                          apisToEnable, managementDialog.getCloudProject(), project),
                   GctBundle.message("cloud.apis.enable.progress.title"),
                   true /*canBeCanceled*/,
                   project);

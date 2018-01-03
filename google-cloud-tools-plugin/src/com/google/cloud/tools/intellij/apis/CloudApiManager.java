@@ -27,11 +27,12 @@ import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.Lists;
+import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +60,7 @@ class CloudApiManager {
    * @param libraries the set of {@link CloudLibrary CloudLibraries} to enable on GCP
    * @param cloudProject the {@link CloudProject CloudProject} on which to enable the APIs
    */
-  static void enableApis(Set<CloudLibrary> libraries, CloudProject cloudProject) {
+  static void enableApis(Set<CloudLibrary> libraries, CloudProject cloudProject, Project project) {
     Optional<CredentialedUser> user =
         Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
 
@@ -95,30 +96,33 @@ class CloudApiManager {
         });
 
     if (!erroredApiNames.isEmpty()) {
-      notifyApiEnableError(erroredApiNames);
+      notifyApiEnableError(erroredApiNames, project);
     }
     if (!enabledApis.isEmpty()) {
-      notifyApisEnabled(enabledApis, cloudProject.projectId());
+      notifyApisEnabled(enabledApis, cloudProject.projectId(), project);
     }
   }
 
-  private static void notifyApisEnabled(List<CloudLibrary> libraries, String cloudProjectId) {
-    Notifications.Bus.notify(
+  private static void notifyApisEnabled(
+      List<CloudLibrary> libraries, String cloudProjectId, Project project) {
+    Notification notification =
         NOTIFICATION_GROUP.createNotification(
             GctBundle.message("cloud.apis.enabled.title"),
             null /*subtitle*/,
             GctBundle.message(
                 "cloud.apis.enabled.message", cloudProjectId, joinEnabledLibraryNames(libraries)),
-            NotificationType.INFORMATION));
+            NotificationType.INFORMATION);
+    notification.notify(project);
   }
 
-  private static void notifyApiEnableError(List<String> apiNames) {
-    Notifications.Bus.notify(
+  private static void notifyApiEnableError(List<String> apiNames, Project project) {
+    Notification notification =
         NOTIFICATION_GROUP.createNotification(
             GctBundle.message("cloud.apis.enable.error.title"),
             null /*subtitle*/,
             GctBundle.message("cloud.apis.enable.error.message", joinErroredApiNames(apiNames)),
-            NotificationType.ERROR));
+            NotificationType.ERROR);
+    notification.notify(project);
   }
 
   private static String joinEnabledLibraryNames(List<CloudLibrary> libraries) {
