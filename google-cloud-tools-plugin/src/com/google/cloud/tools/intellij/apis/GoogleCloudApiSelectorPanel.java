@@ -187,26 +187,18 @@ final class GoogleCloudApiSelectorPanel {
                 CloudLibrary library =
                     (CloudLibrary)
                         cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
-                boolean addLibrary =
-                    (boolean)
-                        cloudLibrariesTable
-                            .getModel()
-                            .getValueAt(selectedIndex, CLOUD_LIBRARY_SELECT_COL);
                 detailsPanel.setCloudLibrary(library, apiManagementMap.get(library));
-                detailsPanel.setManagementUIEnabled(addLibrary);
+                updateManagementUI();
               }
             });
-    cloudLibrariesTable
-        .getModel()
-        .addTableModelListener(
-            e -> {
-              TableModel model = (TableModel) e.getSource();
-              boolean isSelected =
-                  (boolean)
-                      model.getValueAt(
-                          cloudLibrariesTable.getSelectedRow(), CLOUD_LIBRARY_SELECT_COL);
-              detailsPanel.setManagementUIEnabled(isSelected);
-            });
+    cloudLibrariesTable.getModel().addTableModelListener(e -> updateManagementUI());
+  }
+
+  private void updateManagementUI() {
+    TableModel model = cloudLibrariesTable.getModel();
+    boolean addLibrary =
+        (boolean) model.getValueAt(cloudLibrariesTable.getSelectedRow(), CLOUD_LIBRARY_SELECT_COL);
+    detailsPanel.setManagementUIEnabled(addLibrary);
   }
 
   /** The custom {@link JBTable} for the table of supported Cloud libraries. */
