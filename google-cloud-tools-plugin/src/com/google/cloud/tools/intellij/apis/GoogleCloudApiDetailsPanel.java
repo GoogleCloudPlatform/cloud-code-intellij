@@ -86,6 +86,16 @@ public final class GoogleCloudApiDetailsPanel {
     updateUI();
   }
 
+  /**
+   * Enables or disables the components of the GCP API management UI based on if the library is
+   * selected or not.
+   *
+   * @param enabled whether to enable or disable the the management UI components
+   */
+  void setManagementUIEnabled(boolean enabled) {
+    enableApiCheckbox.setEnabled(enabled);
+  }
+
   /** Returns the {@link JLabel} that holds the library's icon. */
   @VisibleForTesting
   JLabel getIcon() {
@@ -174,6 +184,8 @@ public final class GoogleCloudApiDetailsPanel {
    * #currentCloudLibrary}.
    */
   private void updateUI() {
+    panel.setVisible(true);
+
     if (currentCloudLibrary.getIcon() == null) {
       icon.setIcon(null);
     } else {
@@ -212,7 +224,6 @@ public final class GoogleCloudApiDetailsPanel {
               });
     }
 
-    apiManagementPanel.setVisible(true);
     enableApiCheckbox.setSelected(currentCloudApiManagementSpec.shouldEnable());
   }
 

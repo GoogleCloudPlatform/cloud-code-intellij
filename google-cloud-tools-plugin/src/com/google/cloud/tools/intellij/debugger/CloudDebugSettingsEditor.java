@@ -17,8 +17,12 @@
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.cloud.tools.intellij.debugger.ui.CloudDebugRunConfigurationPanel;
-import com.intellij.openapi.options.ConfigurationException;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.common.base.Strings;
 import com.intellij.openapi.options.SettingsEditor;
+import java.util.Optional;
 import javax.swing.JComponent;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,14 +34,17 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
 
   private final CloudDebugRunConfigurationPanel settingsPanel;
 
-  public CloudDebugSettingsEditor() {
+  CloudDebugSettingsEditor() {
     settingsPanel = new CloudDebugRunConfigurationPanel();
   }
 
   @Override
-  protected void applyEditorTo(CloudDebugRunConfiguration runConfiguration)
-      throws ConfigurationException {
-    runConfiguration.setCloudProjectName(settingsPanel.getProjectName());
+  protected void applyEditorTo(@NotNull CloudDebugRunConfiguration runConfiguration) {
+    // TODO(ivanporty) CloudDebugRunConfiguration uses `cloudProjectName` for project ID.
+    runConfiguration.setCloudProjectName(
+        Optional.ofNullable(settingsPanel.getSelectedCloudProject())
+            .map(CloudProject::projectId)
+            .orElse(""));
   }
 
   @NotNull
@@ -47,7 +54,22 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
   }
 
   @Override
-  protected void resetEditorFrom(CloudDebugRunConfiguration runConfiguration) {
-    settingsPanel.setProjectName(runConfiguration.getCloudProjectName());
+  protected void resetEditorFrom(@NotNull CloudDebugRunConfiguration runConfiguration) {
+    // TODO(ivanporty) CloudDebugRunConfiguration uses `cloudProjectName` for project ID.
+    String projectId = runConfiguration.getCloudProjectName();
+    if (Strings.isNullOrEmpty(projectId)) {
+      settingsPanel.setSelectedCloudProject(null);
+    } else {
+      settingsPanel.setSelectedCloudProject(
+          CloudProject.create(
+              // TODO(ivanporty) no project name in CloudDebugRunConfiguration.
+              projectId,
+              projectId,
+              null,
+              // TODO(ivanporty) no user name in CloudDebugRunConfiguration.
+              Optional.ofNullable(Services.getLoginService().getActiveUser())
+                  .map(CredentialedUser::getEmail)
+                  .orElse("")));
+    }
   }
 }

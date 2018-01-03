@@ -27,7 +27,8 @@ import com.google.cloud.tools.intellij.debugger.SyncResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.TestUtils;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.intellij.openapi.project.Project;
@@ -190,7 +191,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
 
   private CloudAttachDialog initDialog() {
     CloudAttachDialog dialog = new CloudAttachDialog(this.getProject(), binding);
-    projectSelector = dialog.getElysiumProjectSelector();
+    projectSelector = dialog.getProjectSelector();
     targetSelector = dialog.getTargetSelector();
     warningHeader = dialog.getWarningHeader();
     warningMessage = dialog.getWarningMessage();
@@ -201,7 +202,10 @@ public class CloudAttachDialogTest extends PlatformTestCase {
 
   @SuppressWarnings("unchecked")
   private void selectEmptyProject() {
-    projectSelector.setText("emptyProject");
+    String projectName = "emptyProject";
+    projectSelector.setSelectedProject(
+        CloudProject.create(projectName, projectName, null, "some-user-id"));
+
     targetSelector.removeAllItems();
     targetSelector.setEnabled(false);
     targetSelector.addItem(NO_MODULES_FOUND_WARNING);
@@ -210,7 +214,8 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   @SuppressWarnings("unchecked")
   private void selectProjectWithDebuggableModules() {
     String projectName = "projectWithDebuggableModules";
-    projectSelector.setText(projectName);
+    projectSelector.setSelectedProject(
+        CloudProject.create(projectName, projectName, null, "some-user-id"));
     targetSelector.removeAllItems();
     targetSelector.setEnabled(true);
 
@@ -220,7 +225,8 @@ public class CloudAttachDialogTest extends PlatformTestCase {
 
   private void selectInProgressProject() {
     String projectName = "unknownProject";
-    projectSelector.setText(projectName);
+    projectSelector.setSelectedProject(
+        CloudProject.create(projectName, projectName, null, "some-user-id"));
   }
 
   private void mockCredentials() throws Exception {

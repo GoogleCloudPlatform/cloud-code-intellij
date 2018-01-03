@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.intellij.application.options.ModulesComboBox;
@@ -86,9 +87,11 @@ final class GoogleCloudApiSelectorPanel {
         libraries
             .stream()
             .collect(
-                Collectors.toMap(
-                    Function.identity(),
-                    lib -> new CloudApiManagementSpec(SHOULD_ENABLE_API_DEFAULT)));
+                Collectors.collectingAndThen(
+                    Collectors.toMap(
+                        Function.identity(),
+                        lib -> new CloudApiManagementSpec(SHOULD_ENABLE_API_DEFAULT)),
+                    ImmutableMap::copyOf));
 
     panel.setPreferredSize(new Dimension(800, 600));
   }
@@ -147,7 +150,7 @@ final class GoogleCloudApiSelectorPanel {
    * CloudApiManagementSpec}.
    */
   @VisibleForTesting
-  public Map<CloudLibrary, CloudApiManagementSpec> getApiManagementMap() {
+  Map<CloudLibrary, CloudApiManagementSpec> getApiManagementMap() {
     return apiManagementMap;
   }
 
@@ -181,8 +184,21 @@ final class GoogleCloudApiSelectorPanel {
                 int selectedIndex = model.getMinSelectionIndex();
                 CloudLibrary library =
                     (CloudLibrary) cloudLibrariesTable.getModel().getValueAt(selectedIndex, 0);
+                boolean isSelected =
+                    (boolean) cloudLibrariesTable.getModel().getValueAt(selectedIndex, 1);
                 detailsPanel.setCloudLibrary(library, apiManagementMap.get(library));
+                detailsPanel.setManagementUIEnabled(isSelected);
               }
+            });
+    cloudLibrariesTable
+        .getModel()
+        .addTableModelListener(
+            e -> {
+              int row = e.getFirstRow();
+              int column = e.getColumn();
+              TableModel model = (TableModel) e.getSource();
+              boolean isSelected = (boolean) model.getValueAt(row, column);
+              detailsPanel.setManagementUIEnabled(isSelected);
             });
   }
 
@@ -191,7 +207,6 @@ final class GoogleCloudApiSelectorPanel {
 
     CloudLibraryTable(List<CloudLibrary> libraries) {
       super(new CloudLibraryTableModel(libraries));
-
       setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       setDefaultRenderer(CloudLibrary.class, new CloudLibraryRenderer());
       setDefaultRenderer(Boolean.class, new BooleanTableCellRenderer());

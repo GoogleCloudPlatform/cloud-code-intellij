@@ -64,7 +64,7 @@ class CloudApiManager {
         Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
 
     if (!user.isPresent()) {
-      LOG.warn("Cannot enable APIs: logged in user not found.");
+      LOG.error("Cannot enable APIs: logged in user not found.");
       return;
     }
 
