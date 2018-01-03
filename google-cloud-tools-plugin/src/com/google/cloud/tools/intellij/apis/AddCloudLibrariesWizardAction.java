@@ -117,7 +117,7 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
      *
      * <p>If so, the {@link CloudApiManagementDialog} is opened allowing the user to select a cloud
      * project and confirm. If the user cancels, the user is returned to this parent dialog.
-     * Otherwise, it is closed.
+     * Otherwise, it is closed and the default {@link DialogWrapper#doOKAction()} is invoked.
      */
     @Override
     protected void doOKAction() {
