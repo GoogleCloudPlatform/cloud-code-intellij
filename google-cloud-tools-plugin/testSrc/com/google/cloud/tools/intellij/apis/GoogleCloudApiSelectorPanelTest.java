@@ -409,6 +409,32 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat(panel.getApisToEnable()).isEmpty();
   }
 
+  @Test
+  public void getEnableCheckbox_withLibraryUnselected_isDisabled() {
+    CloudLibrary library = LIBRARY_1.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
+
+    panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
+
+    assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isFalse();
+  }
+
+  @Test
+  public void getEnableCheckbox_withLibrarySelected_isEnabled() {
+    CloudLibrary library = LIBRARY_1.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+    checkCheckbox(table, 0);
+
+    panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
+
+    assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isTrue();
+  }
+
   /**
    * Forcibly checks the checkbox in the given {@link JTable} at the given row number.
    *
