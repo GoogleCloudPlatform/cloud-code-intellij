@@ -8,11 +8,15 @@
     <rowspec value="center:p:noGrow"/>
     <rowspec value="center:p:noGrow"/>
     <rowspec value="center:p:noGrow"/>
+    <rowspec value="top:3dlu:noGrow"/>
+    <rowspec value="center:max(d;4px):noGrow"/>
     <colspec value="fill:d:grow"/>
     <constraints>
-      <xy x="26" y="20" width="494" height="417"/>
+      <xy x="26" y="20" width="1369" height="417"/>
     </constraints>
-    <properties/>
+    <properties>
+      <visible value="false"/>
+    </properties>
     <border type="empty">
       <size top="25" left="25" bottom="25" right="25"/>
     </border>
@@ -105,6 +109,38 @@
             <clientProperties>
               <JEditorPane.honorDisplayProperties class="java.lang.Boolean" value="true"/>
             </clientProperties>
+          </component>
+        </children>
+      </grid>
+      <grid id="1821f" binding="apiManagementPanel" custom-create="true" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties>
+          <visible value="true"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="4c671" class="javax.swing.JCheckBox" binding="enableApiCheckbox" custom-create="true">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <enabled value="false"/>
+              <text resource-bundle="messages/CloudToolsBundle" key="cloud.apis.enable.checkbox.text"/>
+            </properties>
+          </component>
+          <component id="b5e18" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="3" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <icon value="general/information.png"/>
+              <text value=""/>
+              <toolTipText resource-bundle="messages/CloudToolsBundle" key="cloud.apis.enable.checkbox.tooltip.text"/>
+            </properties>
           </component>
         </children>
       </grid>

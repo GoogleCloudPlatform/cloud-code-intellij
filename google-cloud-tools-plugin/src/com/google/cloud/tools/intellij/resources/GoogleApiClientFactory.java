@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.resources;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.services.appengine.v1.Appengine;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
+import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.intellij.openapi.components.ServiceManager;
@@ -33,7 +34,7 @@ public abstract class GoogleApiClientFactory {
   }
 
   /**
-   * Creates a new instance of a {@link CloudResourceManager} client
+   * Creates a new instance of a {@link CloudResourceManager} client.
    *
    * @param httpRequestInitializer optional HttpRequestInitializer
    */
@@ -41,7 +42,15 @@ public abstract class GoogleApiClientFactory {
       @Nullable HttpRequestInitializer httpRequestInitializer);
 
   /**
-   * Creates a new instance of a {@link Appengine} client
+   * Creates a new instance of a {@link ServiceManagement} client.
+   *
+   * @param httpRequestInitializer optional HttpRequestInitializer
+   */
+  public abstract ServiceManagement getServiceManagementClient(
+      @Nullable HttpRequestInitializer httpRequestInitializer);
+
+  /**
+   * Creates a new instance of a {@link Appengine} client.
    *
    * @param httpRequestInitializer optional HttpRequestInitializer
    */

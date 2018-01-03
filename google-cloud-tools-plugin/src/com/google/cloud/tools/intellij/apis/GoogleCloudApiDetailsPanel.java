@@ -25,8 +25,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.ui.IdeBorderFactory;
 import com.intellij.util.SVGLoader;
 import java.awt.Image;
+import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
@@ -54,8 +57,11 @@ public final class GoogleCloudApiDetailsPanel {
   private JPanel panel;
   private JTextPane descriptionTextPane;
   private JTextPane linksTextPane;
+  private JPanel apiManagementPanel;
+  private JCheckBox enableApiCheckbox;
 
   private CloudLibrary currentCloudLibrary;
+  private CloudApiManagementSpec currentCloudApiManagementSpec;
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
   JPanel getPanel() {
@@ -70,13 +76,24 @@ public final class GoogleCloudApiDetailsPanel {
    *
    * @param library the {@link CloudLibrary} to display
    */
-  void setCloudLibrary(CloudLibrary library) {
+  void setCloudLibrary(CloudLibrary library, CloudApiManagementSpec cloudApiManagementSpec) {
     if (cloudLibrariesEqual(currentCloudLibrary, library)) {
       return;
     }
 
     currentCloudLibrary = library;
+    currentCloudApiManagementSpec = cloudApiManagementSpec;
     updateUI();
+  }
+
+  /**
+   * Enables or disables the components of the GCP API management UI based on if the library is
+   * selected or not.
+   *
+   * @param enabled whether to enable or disable the the management UI components
+   */
+  void setManagementUIEnabled(boolean enabled) {
+    enableApiCheckbox.setEnabled(enabled);
   }
 
   /** Returns the {@link JLabel} that holds the library's icon. */
@@ -115,6 +132,12 @@ public final class GoogleCloudApiDetailsPanel {
     return linksTextPane;
   }
 
+  /** Returns the {@link JCheckBox} that selects if the API should be enabled on GCP. */
+  @VisibleForTesting
+  JCheckBox getEnableApiCheckbox() {
+    return enableApiCheckbox;
+  }
+
   /**
    * Initializes some UI components in this panel that require special set-up.
    *
@@ -143,6 +166,17 @@ public final class GoogleCloudApiDetailsPanel {
     linksTextPane = new JTextPane();
     linksTextPane.setOpaque(false);
     linksTextPane.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+
+    apiManagementPanel = new JPanel();
+    apiManagementPanel.setBorder(
+        IdeBorderFactory.createTitledBorder(
+            GctBundle.message("cloud.apis.management.section.title")));
+
+    enableApiCheckbox = new JCheckBox();
+    enableApiCheckbox.addItemListener(
+        event ->
+            currentCloudApiManagementSpec.setShouldEnable(
+                event.getStateChange() == ItemEvent.SELECTED));
   }
 
   /**
@@ -150,6 +184,8 @@ public final class GoogleCloudApiDetailsPanel {
    * #currentCloudLibrary}.
    */
   private void updateUI() {
+    panel.setVisible(true);
+
     if (currentCloudLibrary.getIcon() == null) {
       icon.setIcon(null);
     } else {
@@ -187,6 +223,8 @@ public final class GoogleCloudApiDetailsPanel {
                 linksTextPane.setText(joinLinks(links));
               });
     }
+
+    enableApiCheckbox.setSelected(currentCloudApiManagementSpec.shouldEnable());
   }
 
   /**
