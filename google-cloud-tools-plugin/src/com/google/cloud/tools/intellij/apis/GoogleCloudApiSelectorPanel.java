@@ -78,6 +78,8 @@ final class GoogleCloudApiSelectorPanel {
   private final Project project;
 
   private static final boolean SHOULD_ENABLE_API_DEFAULT = true;
+  private static int CLOUD_LIBRARY_COL = 0;
+  private static int CLOUD_LIBRARY_SELECT_COL = 1;
 
   GoogleCloudApiSelectorPanel(List<CloudLibrary> libraries, Project project) {
     this.libraries = libraries;
@@ -183,9 +185,13 @@ final class GoogleCloudApiSelectorPanel {
               if (!model.isSelectionEmpty()) {
                 int selectedIndex = model.getMinSelectionIndex();
                 CloudLibrary library =
-                    (CloudLibrary) cloudLibrariesTable.getModel().getValueAt(selectedIndex, 0);
+                    (CloudLibrary)
+                        cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
                 boolean isSelected =
-                    (boolean) cloudLibrariesTable.getModel().getValueAt(selectedIndex, 1);
+                    (boolean)
+                        cloudLibrariesTable
+                            .getModel()
+                            .getValueAt(selectedIndex, CLOUD_LIBRARY_SELECT_COL);
                 detailsPanel.setCloudLibrary(library, apiManagementMap.get(library));
                 detailsPanel.setManagementUIEnabled(isSelected);
               }
@@ -194,10 +200,11 @@ final class GoogleCloudApiSelectorPanel {
         .getModel()
         .addTableModelListener(
             e -> {
-              int row = e.getFirstRow();
-              int column = e.getColumn();
               TableModel model = (TableModel) e.getSource();
-              boolean isSelected = (boolean) model.getValueAt(row, column);
+              boolean isSelected =
+                  (boolean)
+                      model.getValueAt(
+                          cloudLibrariesTable.getSelectedRow(), CLOUD_LIBRARY_SELECT_COL);
               detailsPanel.setManagementUIEnabled(isSelected);
             });
   }
@@ -288,7 +295,7 @@ final class GoogleCloudApiSelectorPanel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-      if (columnIndex == 0) {
+      if (columnIndex == CLOUD_LIBRARY_COL) {
         return CloudLibrary.class;
       }
       return Boolean.class;
@@ -296,12 +303,12 @@ final class GoogleCloudApiSelectorPanel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-      return columnIndex == 1;
+      return columnIndex == CLOUD_LIBRARY_SELECT_COL;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-      if (columnIndex == 0) {
+      if (columnIndex == CLOUD_LIBRARY_COL) {
         return librariesMap.keySet().toArray()[rowIndex];
       }
       return librariesMap.values().toArray()[rowIndex];
@@ -309,7 +316,7 @@ final class GoogleCloudApiSelectorPanel {
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-      if (columnIndex == 0) {
+      if (columnIndex == CLOUD_LIBRARY_COL) {
         throw new UnsupportedOperationException("The first column is immutable.");
       }
 
