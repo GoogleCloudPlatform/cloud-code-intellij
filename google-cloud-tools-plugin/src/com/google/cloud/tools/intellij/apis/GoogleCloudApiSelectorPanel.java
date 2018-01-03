@@ -187,13 +187,13 @@ final class GoogleCloudApiSelectorPanel {
                 CloudLibrary library =
                     (CloudLibrary)
                         cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
-                boolean isSelected =
+                boolean addLibrary =
                     (boolean)
                         cloudLibrariesTable
                             .getModel()
                             .getValueAt(selectedIndex, CLOUD_LIBRARY_SELECT_COL);
                 detailsPanel.setCloudLibrary(library, apiManagementMap.get(library));
-                detailsPanel.setManagementUIEnabled(isSelected);
+                detailsPanel.setManagementUIEnabled(addLibrary);
               }
             });
     cloudLibrariesTable
