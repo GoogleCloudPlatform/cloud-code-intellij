@@ -66,7 +66,7 @@
           <text resource-bundle="messages/CloudToolsBundle" key="cloud.repository.dialog.repository.label"/>
         </properties>
       </component>
-      <component id="eae97" class="com.google.cloud.tools.intellij.resources.RepositorySelector" binding="repositorySelector" custom-create="true">
+      <component id="eae97" class="com.google.cloud.tools.intellij.vcs.RepositorySelector" binding="repositorySelector" custom-create="true">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,18 @@
 package com.google.cloud.tools.intellij.resources;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import org.jetbrains.annotations.NotNull;
 
-/** TreeNode representing a single GCP repository. */
-public class RepositoryModelItem extends DefaultMutableTreeNode {
+/** This model item is shown when a resource manager call returns an empty result. */
+public class ResourceEmptyModelItem extends DefaultMutableTreeNode {
 
-  private String repositoryName;
+  private String message;
 
-  public RepositoryModelItem(String repositoryName) {
-    super(repositoryName);
-    this.repositoryName = repositoryName;
+  public ResourceEmptyModelItem(@NotNull String message) {
+    this.message = message;
   }
 
-  public String getRepositoryId() {
-    return repositoryName;
+  public String getMessage() {
+    return message;
   }
 }

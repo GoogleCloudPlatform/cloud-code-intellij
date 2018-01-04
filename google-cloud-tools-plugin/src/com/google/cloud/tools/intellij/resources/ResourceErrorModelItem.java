@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,22 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.intellij.ui.components.JBLabel;
-import javax.swing.BorderFactory;
-import javax.swing.SwingConstants;
+import javax.swing.tree.DefaultMutableTreeNode;
+import org.jetbrains.annotations.NotNull;
 
-/** UI for node in the repository selector representing a single GCP repository. */
-public class RepositoryItem extends JBLabel {
+/**
+ * This model item represents a node shown when an error occurs attempting to query a resource
+ * manager.
+ */
+public class ResourceErrorModelItem extends DefaultMutableTreeNode {
 
-  public RepositoryItem() {
-    setBorder(BorderFactory.createEmptyBorder(2, 15, 2, 0));
-    setOpaque(false);
-    setHorizontalAlignment(SwingConstants.LEFT);
-    setVerticalAlignment(SwingConstants.CENTER);
+  private String errorMessage;
+
+  public ResourceErrorModelItem(@NotNull String errorMessage) {
+    this.errorMessage = errorMessage;
+  }
+
+  public String getErrorMessage() {
+    return errorMessage;
   }
 }
