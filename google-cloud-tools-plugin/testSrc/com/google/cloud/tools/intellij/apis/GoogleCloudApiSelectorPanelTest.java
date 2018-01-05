@@ -437,7 +437,7 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
-  public void getManagementInfoPanel_withProjectAndLibraryUnselected_isHidden() {
+  public void getManagementInfoPanel_withProjectAndLibraryUnselected_isVisible() {
     CloudLibrary library = LIBRARY_1.toCloudLibrary();
 
     GoogleCloudApiSelectorPanel panel =
@@ -449,7 +449,7 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
-  public void getManagementInfoPanel_withProjectAndLibrarySelected_isVisible() {
+  public void getManagementInfoPanel_withProjectAndLibrarySelected_isHidden() {
     CloudLibrary library = LIBRARY_1.toCloudLibrary();
 
     GoogleCloudApiSelectorPanel panel =
