@@ -41,7 +41,7 @@
           </nested-form>
         </children>
       </scrollpane>
-      <grid id="57a30" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="57a30" layout-manager="GridLayoutManager" row-count="1" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="10" right="0"/>
         <constraints border-constraint="North"/>
         <properties/>
@@ -55,12 +55,30 @@
               <text resource-bundle="messages/CloudToolsBundle" key="cloud.libraries.module.selector.label"/>
             </properties>
           </component>
+          <component id="8cb02" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="GCP Project:"/>
+            </properties>
+          </component>
           <component id="ec336" class="com.intellij.application.options.ModulesComboBox" binding="modulesComboBox" custom-create="true">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
           </component>
+          <nested-form id="9c4a1" form-file="com/google/cloud/tools/intellij/project/ProjectSelector.form" binding="projectSelector" custom-create="true">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </nested-form>
+          <hspacer id="c1d1d">
+            <constraints>
+              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </hspacer>
         </children>
       </grid>
     </children>

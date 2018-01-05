@@ -59,6 +59,8 @@ public final class GoogleCloudApiDetailsPanel {
   private JTextPane linksTextPane;
   private JPanel apiManagementPanel;
   private JCheckBox enableApiCheckbox;
+  private JPanel managementInfoPanel;
+  private JTextPane managementInfoTextPane;
 
   private CloudLibrary currentCloudLibrary;
   private CloudApiManagementSpec currentCloudApiManagementSpec;
@@ -93,6 +95,7 @@ public final class GoogleCloudApiDetailsPanel {
    * @param enabled whether to enable or disable the the management UI components
    */
   void setManagementUIEnabled(boolean enabled) {
+    managementInfoPanel.setVisible(!enabled);
     enableApiCheckbox.setEnabled(enabled);
   }
 
@@ -139,6 +142,15 @@ public final class GoogleCloudApiDetailsPanel {
   }
 
   /**
+   * Returns the {@link JPanel} containing the wording explaining how to enable the management
+   * controls.
+   */
+  @VisibleForTesting
+  JPanel getManagementInfoPanel() {
+    return managementInfoPanel;
+  }
+
+  /**
    * Initializes some UI components in this panel that require special set-up.
    *
    * <p>This is automatically called by the IDEA SDK and should not be directly invoked.
@@ -171,6 +183,9 @@ public final class GoogleCloudApiDetailsPanel {
     apiManagementPanel.setBorder(
         IdeBorderFactory.createTitledBorder(
             GctBundle.message("cloud.apis.management.section.title")));
+
+    managementInfoTextPane = new JTextPane();
+    managementInfoTextPane.setOpaque(false);
 
     enableApiCheckbox = new JCheckBox();
     enableApiCheckbox.addItemListener(
@@ -225,6 +240,7 @@ public final class GoogleCloudApiDetailsPanel {
     }
 
     enableApiCheckbox.setSelected(currentCloudApiManagementSpec.shouldEnable());
+    managementInfoTextPane.setText(GctBundle.message("cloud.apis.management.section.info.text"));
   }
 
   /**

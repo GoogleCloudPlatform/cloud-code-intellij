@@ -419,6 +419,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
 
     assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isFalse();
+    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isTrue();
   }
 
   @Test
@@ -433,6 +434,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
 
     assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isTrue();
+    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isFalse();
   }
 
   /**

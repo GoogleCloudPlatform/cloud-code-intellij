@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -71,6 +73,7 @@ final class GoogleCloudApiSelectorPanel {
   private JTable cloudLibrariesTable;
   private JLabel modulesLabel;
   private ModulesComboBox modulesComboBox;
+  private ProjectSelector projectSelector;
 
   private final Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap;
   private final List<CloudLibrary> libraries;
@@ -114,6 +117,10 @@ final class GoogleCloudApiSelectorPanel {
   /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
   Set<CloudLibrary> getSelectedLibraries() {
     return ((CloudLibraryTableModel) cloudLibrariesTable.getModel()).getSelectedLibraries();
+  }
+
+  CloudProject getCloudProject() {
+    return projectSelector.getSelectedProject();
   }
 
   Set<CloudLibrary> getApisToEnable() {
@@ -190,13 +197,16 @@ final class GoogleCloudApiSelectorPanel {
               }
             });
     cloudLibrariesTable.getModel().addTableModelListener(e -> updateManagementUI());
+
+    projectSelector = new ProjectSelector();
+    projectSelector.addProjectSelectionListener(cloudProject -> updateManagementUI());
   }
 
   private void updateManagementUI() {
     TableModel model = cloudLibrariesTable.getModel();
     boolean addLibrary =
         (boolean) model.getValueAt(cloudLibrariesTable.getSelectedRow(), CLOUD_LIBRARY_SELECT_COL);
-    detailsPanel.setManagementUIEnabled(addLibrary);
+    detailsPanel.setManagementUIEnabled(addLibrary && projectSelector.getSelectedProject() != null);
   }
 
   /** The custom {@link JBTable} for the table of supported Cloud libraries. */
