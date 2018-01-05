@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
@@ -419,7 +420,6 @@ public final class GoogleCloudApiSelectorPanelTest {
     panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
 
     assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isFalse();
-    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isTrue();
   }
 
   @Test
@@ -434,9 +434,35 @@ public final class GoogleCloudApiSelectorPanelTest {
     panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
 
     assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isTrue();
-    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isFalse();
   }
 
+  @Test
+  public void getManagementInfoPanel_withProjectAndLibraryUnselected_isHidden() {
+    CloudLibrary library = LIBRARY_1.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
+
+    panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
+
+    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isTrue();
+  }
+
+  @Test
+  public void getManagementInfoPanel_withProjectAndLibrarySelected_isVisible() {
+    CloudLibrary library = LIBRARY_1.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
+
+    panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
+    JTable table = panel.getCloudLibrariesTable();
+    checkCheckbox(table, 0);
+
+    panel.getProjectSelector().setSelectedProject(CloudProject.create("name", "id", "user"));
+
+    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isFalse();
+  }
   /**
    * Forcibly checks the checkbox in the given {@link JTable} at the given row number.
    *

@@ -161,6 +161,12 @@ final class GoogleCloudApiSelectorPanel {
     return apiManagementMap;
   }
 
+  /** Returns the {@link ProjectSelector} in this panel. */
+  @VisibleForTesting
+  ProjectSelector getProjectSelector() {
+    return projectSelector;
+  }
+
   /**
    * Initializes some UI components in this panel that require special set-up.
    *
