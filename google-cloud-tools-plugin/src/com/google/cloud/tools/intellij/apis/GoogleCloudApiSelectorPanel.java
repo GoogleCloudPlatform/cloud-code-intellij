@@ -89,11 +89,9 @@ final class GoogleCloudApiSelectorPanel {
         libraries
             .stream()
             .collect(
-                Collectors.collectingAndThen(
-                    Collectors.toMap(
-                        Function.identity(),
-                        lib -> new CloudApiManagementSpec(SHOULD_ENABLE_API_DEFAULT)),
-                    ImmutableMap::copyOf));
+                ImmutableMap.toImmutableMap(
+                    Function.identity(),
+                    lib -> new CloudApiManagementSpec(SHOULD_ENABLE_API_DEFAULT)));
 
     panel.setPreferredSize(new Dimension(800, 600));
   }
