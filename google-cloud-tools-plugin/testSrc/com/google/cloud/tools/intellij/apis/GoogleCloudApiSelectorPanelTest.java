@@ -446,18 +446,6 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isFalse();
   }
 
-  @Test
-  public void getManagementInfoPanel_withProjectAndLibraryUnselected_isVisible() {
-    CloudLibrary library = LIBRARY_1.toCloudLibrary();
-
-    GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
-
-    panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
-
-    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isTrue();
-  }
-
   /**
    * Forcibly checks the checkbox in the given {@link JTable} at the given row number.
    *
