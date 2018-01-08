@@ -39,9 +39,21 @@ import javax.swing.event.HyperlinkEvent.EventType;
  * user account information. To change selection it uses {@link ProjectSelectionDialog} to call into
  * {@link com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService} to get the set of
  * credentialed users and then into resource manager to get the set of projects.
+ *
+ * <p>Initial selection is empty unless set in constructor to {@link
+ * ProjectSelectorInitialState#ACTIVE_CLOUD_PROJECT}. In this case project selector is pre-populated
+ * with active cloud project. See {@link ActiveCloudProjectHolder}.
  */
 public class ProjectSelector extends JPanel {
+
+  public enum ProjectSelectorInitialState {
+    EMPTY,
+    ACTIVE_CLOUD_PROJECT
+  }
+
   static final int ACCOUNT_ICON_SIZE = 16;
+
+  private ProjectSelectorInitialState initialState = ProjectSelectorInitialState.EMPTY;
 
   private final List<ProjectSelectionListener> projectSelectionListeners = new ArrayList<>();
 
@@ -53,6 +65,14 @@ public class ProjectSelector extends JPanel {
   private JPanel rootPanel;
 
   private CloudProject cloudProject;
+
+  public ProjectSelector() {
+    this(ProjectSelectorInitialState.EMPTY);
+  }
+
+  public ProjectSelector(ProjectSelectorInitialState initialState) {
+    this.initialState = initialState;
+  }
 
   /** Returns project selection or null if no project is selected. */
   public CloudProject getSelectedProject() {
@@ -81,6 +101,17 @@ public class ProjectSelector extends JPanel {
    */
   public void addProjectSelectionListener(ProjectSelectionListener projectSelectionListener) {
     projectSelectionListeners.add(projectSelectionListener);
+    // if we pre-select active project, notify the listeners one time.
+    if (projectSelectionListeners.size() == 1) {
+      // initialize selection to current active project. it might be null if not set yet.
+      switch (initialState) {
+        case ACTIVE_CLOUD_PROJECT:
+          loadActiveCloudProject();
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   /**
@@ -133,6 +164,16 @@ public class ProjectSelector extends JPanel {
     // if null, it means no change or user cancelled selection dialog - no update required.
     if (newSelection != null) {
       setSelectedProject(newSelection);
+      notifyProjectSelectionListeners();
+      ActiveCloudProjectHolder.getInstance().setActiveCloudProject(newSelection);
+    }
+  }
+
+  private void loadActiveCloudProject() {
+    CloudProject active = ActiveCloudProjectHolder.getInstance().getActiveCloudProject();
+    System.out.println("active received: " + active);
+    if (active != null) {
+      setSelectedProject(active);
       notifyProjectSelectionListeners();
     }
   }

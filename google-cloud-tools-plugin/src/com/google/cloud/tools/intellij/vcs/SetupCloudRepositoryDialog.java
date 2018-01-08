@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
+import com.google.cloud.tools.intellij.project.ProjectSelector.ProjectSelectorInitialState;
 import com.google.cloud.tools.intellij.resources.RepositoryRemotePanel;
 import com.google.cloud.tools.intellij.resources.RepositorySelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -95,7 +96,7 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
   }
 
   private void createUIComponents() {
-    projectSelector = new ProjectSelector();
+    projectSelector = new ProjectSelector(ProjectSelectorInitialState.ACTIVE_CLOUD_PROJECT);
     projectSelector.setMinimumSize(new Dimension(400, 0));
 
     repositorySelector =
