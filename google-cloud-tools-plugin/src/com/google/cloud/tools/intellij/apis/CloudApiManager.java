@@ -26,14 +26,17 @@ import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -57,6 +60,9 @@ class CloudApiManager {
   /**
    * Enables the supplied set of {@link CloudLibrary CloudLibraries} on GCP.
    *
+   * <p>Configures the {@link ProgressIndicator} to display the progress of the tasks. Also notifies
+   * the user of the success / failure of API enablement via messages on the event log.
+   *
    * @param libraries the set of {@link CloudLibrary CloudLibraries} to enable on GCP
    * @param cloudProject the {@link CloudProject CloudProject} on which to enable the APIs
    */
@@ -69,67 +75,99 @@ class CloudApiManager {
       return;
     }
 
-    ServiceManagement serviceManagement =
-        GoogleApiClientFactory.getInstance().getServiceManagementClient(user.get().getCredential());
+    List<CloudLibrary> libraryList = new ArrayList<>(libraries);
+    Set<CloudLibrary> enabledApis = Sets.newHashSet();
+    Set<CloudLibrary> erroredApis = Sets.newHashSet();
 
-    List<CloudLibrary> enabledApis = Lists.newArrayList();
-    List<String> erroredApiNames = Lists.newArrayList();
+    for (int i = 0; i < libraryList.size(); i++) {
+      CloudLibrary library = libraryList.get(i);
 
-    libraries.forEach(
-        library -> {
-          try {
-            serviceManagement
-                .services()
-                .enable(
-                    library.getServiceName(),
-                    new EnableServiceRequest()
-                        .setConsumerId(
-                            String.format(
-                                SERVICE_REQUEST_PROJECT_PATTERN, cloudProject.projectId())))
-                .execute();
-            enabledApis.add(library);
-          } catch (IOException e) {
-            LOG.warn(
-                "Exception occurred attempting to enable API " + library.getName() + " on GCP", e);
-            erroredApiNames.add(library.getName());
-          }
-        });
+      try {
+        ProgressIndicator progress = ProgressManager.getInstance().getProgressIndicator();
 
-    if (!erroredApiNames.isEmpty()) {
-      notifyApiEnableError(erroredApiNames, project);
+        if (progress.isCanceled()) {
+          LOG.info("API enablement canceled by user");
+          notifyApiEnableSkipped(Sets.difference(libraries, enabledApis), project);
+          return;
+        }
+
+        setApiEnableProgress(
+            progress,
+            library.getName(),
+            cloudProject.projectName(),
+            (double) i / libraryList.size());
+        enableApi(library, cloudProject, user.get());
+
+        enabledApis.add(library);
+      } catch (IOException e) {
+        LOG.warn("Exception occurred attempting to enable API " + library.getName() + " on GCP", e);
+        erroredApis.add(library);
+      }
+    }
+
+    if (!erroredApis.isEmpty()) {
+      notifyApiEnableError(erroredApis, project);
     }
     if (!enabledApis.isEmpty()) {
       notifyApisEnabled(enabledApis, cloudProject.projectId(), project);
     }
   }
 
+  private static void enableApi(
+      CloudLibrary library, CloudProject cloudProject, CredentialedUser user) throws IOException {
+    ServiceManagement serviceManagement =
+        GoogleApiClientFactory.getInstance().getServiceManagementClient(user.getCredential());
+
+    serviceManagement
+        .services()
+        .enable(
+            library.getServiceName(),
+            new EnableServiceRequest()
+                .setConsumerId(
+                    String.format(SERVICE_REQUEST_PROJECT_PATTERN, cloudProject.projectId())))
+        .execute();
+  }
+
   private static void notifyApisEnabled(
-      List<CloudLibrary> libraries, String cloudProjectId, Project project) {
+      Set<CloudLibrary> libraries, String cloudProjectId, Project project) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
             GctBundle.message("cloud.apis.enabled.title"),
             null /*subtitle*/,
             GctBundle.message(
-                "cloud.apis.enabled.message", cloudProjectId, joinEnabledLibraryNames(libraries)),
+                "cloud.apis.enabled.message", cloudProjectId, joinApiNames(libraries)),
             NotificationType.INFORMATION);
     notification.notify(project);
   }
 
-  private static void notifyApiEnableError(List<String> apiNames, Project project) {
+  private static void notifyApiEnableError(Set<CloudLibrary> apis, Project project) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
             GctBundle.message("cloud.apis.enable.error.title"),
             null /*subtitle*/,
-            GctBundle.message("cloud.apis.enable.error.message", joinErroredApiNames(apiNames)),
+            GctBundle.message("cloud.apis.enable.error.message", joinApiNames(apis)),
             NotificationType.ERROR);
     notification.notify(project);
   }
 
-  private static String joinEnabledLibraryNames(List<CloudLibrary> libraries) {
-    return libraries.stream().map(CloudLibrary::getName).collect(Collectors.joining("<br>"));
+  private static void notifyApiEnableSkipped(Set<CloudLibrary> apis, Project project) {
+    Notification notification =
+        NOTIFICATION_GROUP.createNotification(
+            GctBundle.message("cloud.apis.enable.skipped.title"),
+            null /*subtitle*/,
+            GctBundle.message("cloud.apis.enable.skipped.message", joinApiNames(apis)),
+            NotificationType.ERROR);
+    notification.notify(project);
   }
 
-  private static String joinErroredApiNames(List<String> apiNames) {
-    return apiNames.stream().collect(Collectors.joining("<br>"));
+  private static String joinApiNames(Set<CloudLibrary> apis) {
+    return apis.stream().map(CloudLibrary::getName).collect(Collectors.joining("<br>"));
+  }
+
+  private static void setApiEnableProgress(
+      ProgressIndicator indicator, String apiName, String cloudProjectName, double fraction) {
+    indicator.setText(
+        GctBundle.message("cloud.apis.enable.progress.message", apiName, cloudProjectName));
+    indicator.setFraction(fraction);
   }
 }
