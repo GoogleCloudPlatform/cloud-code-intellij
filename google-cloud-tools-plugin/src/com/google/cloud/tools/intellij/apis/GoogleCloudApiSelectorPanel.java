@@ -211,7 +211,9 @@ final class GoogleCloudApiSelectorPanel {
   private void updateManagementUI() {
     TableModel model = cloudLibrariesTable.getModel();
     boolean addLibrary =
-        (boolean) model.getValueAt(cloudLibrariesTable.getSelectedRow(), CLOUD_LIBRARY_SELECT_COL);
+        cloudLibrariesTable.getSelectedRow() != -1
+            && (boolean)
+                model.getValueAt(cloudLibrariesTable.getSelectedRow(), CLOUD_LIBRARY_SELECT_COL);
     detailsPanel.setManagementUIEnabled(addLibrary && projectSelector.getSelectedProject() != null);
   }
 
