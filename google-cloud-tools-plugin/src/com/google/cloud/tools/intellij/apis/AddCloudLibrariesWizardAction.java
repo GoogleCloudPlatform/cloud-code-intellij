@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.CloudLibraries;
@@ -96,6 +97,10 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
       return selectClientLibrariesStep.getSelectedLibraries();
     }
 
+    CloudProject getCloudProject() {
+      return selectClientLibrariesStep.getCloudProject();
+    }
+
     Set<CloudLibrary> getApisToEnable() {
       return selectClientLibrariesStep.getApisToEnable();
     }
@@ -115,24 +120,24 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
      * Overrides {@link DialogWrapper#doOKAction()} to first check if there are any APIs to enable
      * on GCP.
      *
-     * <p>If so, the {@link CloudApiManagementDialog} is opened allowing the user to select a cloud
-     * project and confirm. If the user cancels, the user is returned to this parent dialog.
+     * <p>If so, the {@link CloudApiManagementConfirmationDialog} is opened confirming the API
+     * changes to be made. If the user cancels, the user is returned to this parent dialog.
      * Otherwise, it is closed and the default {@link DialogWrapper#doOKAction()} is invoked.
      */
     @Override
     protected void doOKAction() {
+      CloudProject cloudProject = getCloudProject();
       Set<CloudLibrary> apisToEnable = getApisToEnable();
 
-      if (!apisToEnable.isEmpty()) {
-        CloudApiManagementDialog managementDialog = new CloudApiManagementDialog(project);
+      if (cloudProject != null && !apisToEnable.isEmpty()) {
+        CloudApiManagementConfirmationDialog managementDialog =
+            new CloudApiManagementConfirmationDialog(project, apisToEnable);
         DialogManager.show(managementDialog);
 
         if (managementDialog.isOK()) {
           ProgressManager.getInstance()
               .runProcessWithProgressSynchronously(
-                  () ->
-                      CloudApiManager.enableApis(
-                          apisToEnable, managementDialog.getCloudProject(), project),
+                  () -> CloudApiManager.enableApis(apisToEnable, cloudProject, project),
                   GctBundle.message("cloud.apis.enable.progress.title"),
                   true /*canBeCanceled*/,
                   project);
@@ -175,6 +180,10 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
     /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
     Set<CloudLibrary> getSelectedLibraries() {
       return cloudApiSelectorPanel.getSelectedLibraries();
+    }
+
+    CloudProject getCloudProject() {
+      return cloudApiSelectorPanel.getCloudProject();
     }
 
     Set<CloudLibrary> getApisToEnable() {

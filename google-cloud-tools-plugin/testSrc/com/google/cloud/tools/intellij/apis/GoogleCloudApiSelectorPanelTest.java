@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.apis;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
@@ -410,7 +412,7 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
-  public void getEnableCheckbox_withLibraryUnselected_isDisabled() {
+  public void getManagementUI_withLibraryAndProjectUnselected_isDisabled() {
     CloudLibrary library = LIBRARY_1.toCloudLibrary();
 
     GoogleCloudApiSelectorPanel panel =
@@ -419,20 +421,29 @@ public final class GoogleCloudApiSelectorPanelTest {
     panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
 
     assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isFalse();
+    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isTrue();
   }
 
   @Test
-  public void getEnableCheckbox_withLibrarySelected_isEnabled() {
+  public void getManagementUI_withLibraryAndProjectSelected_isEnabled() {
     CloudLibrary library = LIBRARY_1.toCloudLibrary();
 
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
-    checkCheckbox(table, 0);
 
+    checkCheckbox(table, 0);
     panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
 
+    CloudProject cloudProject = CloudProject.create("name", "id", "user");
+    ProjectSelector projectSelector = panel.getProjectSelector();
+    projectSelector.setSelectedProject(cloudProject);
+    projectSelector
+        .getProjectSelectionListeners()
+        .forEach(listener -> listener.projectSelected(cloudProject));
+
     assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isTrue();
+    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isFalse();
   }
 
   /**
