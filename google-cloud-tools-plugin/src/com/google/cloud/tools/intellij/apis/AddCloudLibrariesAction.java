@@ -22,9 +22,6 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.CloudLibraries;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
-import com.intellij.ide.wizard.AbstractWizard;
-import com.intellij.ide.wizard.Step;
-import com.intellij.ide.wizard.StepAdapter;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -33,22 +30,20 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import git4idea.DialogManager;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JComponent;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The action in the Google Cloud Tools menu group that opens the wizard to add client libraries to
  * the user's project and manage cloud APIs.
  */
-public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
+public final class AddCloudLibrariesAction extends DumbAwareAction {
 
-  private static final Logger logger = Logger.getInstance(AddCloudLibrariesWizardAction.class);
+  private static final Logger logger = Logger.getInstance(AddCloudLibrariesAction.class);
 
-  public AddCloudLibrariesWizardAction() {
+  public AddCloudLibrariesAction() {
     super(
         GctBundle.message("cloud.libraries.menu.action.text"),
         GctBundle.message("cloud.libraries.menu.action.description"),
@@ -58,7 +53,7 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
   @Override
   public void actionPerformed(AnActionEvent e) {
     if (e.getProject() != null) {
-      AddCloudLibrariesWizard librariesDialog = new AddCloudLibrariesWizard(e.getProject());
+      AddCloudLibrariesDialog librariesDialog = new AddCloudLibrariesDialog(e.getProject());
       DialogManager.show(librariesDialog);
 
       if (librariesDialog.isOK()) {
@@ -68,52 +63,53 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
     }
   }
 
-  /** The wizard for the "Add Cloud Libraries" menu action. */
-  // TODO(eshaul) this does not need to be a wizard and can be converted to a simple dialog.
-  private static final class AddCloudLibrariesWizard extends AbstractWizard<Step> {
+  /** The dialog for the "Add Cloud Libraries" menu action. */
+  private static final class AddCloudLibrariesDialog extends DialogWrapper {
 
     private final Project project;
-    private final SelectClientLibrariesStep selectClientLibrariesStep;
+    private final GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
 
-    AddCloudLibrariesWizard(Project project) {
-      super(GctBundle.message("cloud.libraries.dialog.title"), project);
+    AddCloudLibrariesDialog(Project project) {
+      super(false);
+
+      List<CloudLibrary> libraries;
+      try {
+        libraries = CloudLibraries.getCloudLibraries();
+      } catch (IOException e) {
+        logger.error(e);
+        libraries = ImmutableList.of();
+      }
 
       this.project = project;
-
-      selectClientLibrariesStep = new SelectClientLibrariesStep(project);
-      selectClientLibrariesStep.addModuleSelectionListener(event -> updateButtons());
-
-      addStep(selectClientLibrariesStep);
+      this.cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries, project);
       init();
+    }
+
+    @Override
+    protected void init() {
+      super.init();
+      setTitle(GctBundle.message("cloud.libraries.dialog.title"));
+      setOKButtonText(GctBundle.message("cloud.libraries.ok.button.text"));
     }
 
     /** Returns the selected {@link Module}. */
     Module getSelectedModule() {
-      return selectClientLibrariesStep.getSelectedModule();
+      return cloudApiSelectorPanel.getSelectedModule();
     }
 
     /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
     Set<CloudLibrary> getSelectedLibraries() {
-      return selectClientLibrariesStep.getSelectedLibraries();
+      return cloudApiSelectorPanel.getSelectedLibraries();
     }
 
+    /** Returns the selected {@link CloudProject}. */
     CloudProject getCloudProject() {
-      return selectClientLibrariesStep.getCloudProject();
+      return cloudApiSelectorPanel.getCloudProject();
     }
 
+    /** Returns the set of {@link CloudLibrary APIs} to enable. */
     Set<CloudLibrary> getApisToEnable() {
-      return selectClientLibrariesStep.getApisToEnable();
-    }
-
-    @Override
-    protected boolean canGoNext() {
-      return selectClientLibrariesStep.getSelectedModule() != null;
-    }
-
-    @Nullable
-    @Override
-    protected String getHelpID() {
-      return null;
+      return cloudApiSelectorPanel.getApisToEnable();
     }
 
     /**
@@ -148,50 +144,9 @@ public final class AddCloudLibrariesWizardAction extends DumbAwareAction {
         super.doOKAction();
       }
     }
-  }
-
-  /** The wizard step encapsulating the client library selection panel. */
-  private static final class SelectClientLibrariesStep extends StepAdapter {
-
-    private final GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
-
-    SelectClientLibrariesStep(Project project) {
-      List<CloudLibrary> libraries;
-      try {
-        libraries = CloudLibraries.getCloudLibraries();
-      } catch (IOException e) {
-        logger.error(e);
-        libraries = ImmutableList.of();
-      }
-
-      this.cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries, project);
-    }
-
-    /** Adds the given {@link ActionListener} to the panel's module combobox. */
-    void addModuleSelectionListener(ActionListener listener) {
-      cloudApiSelectorPanel.addModuleSelectionListener(listener);
-    }
-
-    /** Returns the selected {@link Module}. */
-    Module getSelectedModule() {
-      return cloudApiSelectorPanel.getSelectedModule();
-    }
-
-    /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
-    Set<CloudLibrary> getSelectedLibraries() {
-      return cloudApiSelectorPanel.getSelectedLibraries();
-    }
-
-    CloudProject getCloudProject() {
-      return cloudApiSelectorPanel.getCloudProject();
-    }
-
-    Set<CloudLibrary> getApisToEnable() {
-      return cloudApiSelectorPanel.getApisToEnable();
-    }
 
     @Override
-    public JComponent getComponent() {
+    protected JComponent createCenterPanel() {
       return cloudApiSelectorPanel.getPanel();
     }
   }
