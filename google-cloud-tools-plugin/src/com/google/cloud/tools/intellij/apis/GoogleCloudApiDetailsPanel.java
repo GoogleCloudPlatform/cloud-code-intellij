@@ -28,7 +28,6 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.util.SVGLoader;
 import java.awt.Image;
-import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -97,6 +96,10 @@ public final class GoogleCloudApiDetailsPanel {
   void setManagementUIEnabled(boolean enabled) {
     managementInfoPanel.setVisible(!enabled);
     enableApiCheckbox.setEnabled(enabled);
+
+    // If the checkbox is disabled it should always be unchecked.
+    // Otherwise, it should be checked according to the saved value
+    enableApiCheckbox.setSelected(enabled && currentCloudApiManagementSpec.shouldEnable());
   }
 
   /** Returns the {@link JLabel} that holds the library's icon. */
@@ -188,10 +191,10 @@ public final class GoogleCloudApiDetailsPanel {
     managementInfoTextPane.setOpaque(false);
 
     enableApiCheckbox = new JCheckBox();
-    enableApiCheckbox.addItemListener(
+    enableApiCheckbox.addActionListener(
         event ->
             currentCloudApiManagementSpec.setShouldEnable(
-                event.getStateChange() == ItemEvent.SELECTED));
+                ((JCheckBox) event.getSource()).isSelected()));
   }
 
   /**
@@ -239,7 +242,6 @@ public final class GoogleCloudApiDetailsPanel {
               });
     }
 
-    enableApiCheckbox.setSelected(currentCloudApiManagementSpec.shouldEnable());
     managementInfoTextPane.setText(GctBundle.message("cloud.apis.management.section.info.text"));
   }
 
