@@ -64,7 +64,8 @@ class CloudApiManager {
    * the user of the success / failure of API enablement via messages on the event log.
    *
    * @param libraries the set of {@link CloudLibrary CloudLibraries} to enable on GCP
-   * @param cloudProject the {@link CloudProject CloudProject} on which to enable the APIs
+   * @param cloudProject the {@link CloudProject} on which to enable the APIs
+   * @param project the currently open IntelliJ {@link Project}
    */
   static void enableApis(Set<CloudLibrary> libraries, CloudProject cloudProject, Project project) {
     Optional<CredentialedUser> user =
