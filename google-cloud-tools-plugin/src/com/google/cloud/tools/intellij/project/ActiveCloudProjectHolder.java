@@ -19,9 +19,7 @@ package com.google.cloud.tools.intellij.project;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Longs;
-import com.intellij.ide.DataManager;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +27,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Holds active cloud project, one per IDE project. Active cloud project is the last cloud project
  * selected by a user in most of the GCP related UI reported by {@link ProjectSelector}.
+ *
+ * <p>Must only be used on Swing/IDE EDT.
  */
 public class ActiveCloudProjectHolder {
   private static final String PROJECT_ACCOUNT_KEY = "ACTIVE_CLOUD_PROJECT_ACCOUNT";
@@ -47,35 +47,22 @@ public class ActiveCloudProjectHolder {
     ActiveCloudProjectHolder.instance = instance;
   }
 
-  @SuppressWarnings("deprecation")
-  public void setActiveCloudProject(@NotNull CloudProject activeCloudProject) {
-    Project ideProject =
-        DataManager.getInstance().getDataContext().getData(PlatformDataKeys.PROJECT);
-    if (ideProject != null) {
-      PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(ideProject);
-      System.out.println("SetActive: ide: " + ideProject + ", props: " + propertiesComponent);
+  public void setActiveCloudProject(
+      @NotNull CloudProject activeCloudProject, @NotNull Project ideProject) {
+    PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(ideProject);
 
-      propertiesComponent.setValue(PROJECT_ACCOUNT_KEY, activeCloudProject.googleUsername());
-      propertiesComponent.setValue(PROJECT_NAME_KEY, activeCloudProject.projectName());
-      propertiesComponent.setValue(PROJECT_ID_KEY, activeCloudProject.projectId());
-      if (activeCloudProject.projectNumber() != null) {
-        propertiesComponent.setValue(
-            PROJECT_NUMBER_KEY, activeCloudProject.projectNumber().toString());
-      }
+    propertiesComponent.setValue(PROJECT_ACCOUNT_KEY, activeCloudProject.googleUsername());
+    propertiesComponent.setValue(PROJECT_NAME_KEY, activeCloudProject.projectName());
+    propertiesComponent.setValue(PROJECT_ID_KEY, activeCloudProject.projectId());
+    if (activeCloudProject.projectNumber() != null) {
+      propertiesComponent.setValue(
+          PROJECT_NUMBER_KEY, activeCloudProject.projectNumber().toString());
     }
   }
 
-  @SuppressWarnings("deprecation")
   @Nullable
-  public CloudProject getActiveCloudProject() {
-    Project ideProject =
-        DataManager.getInstance().getDataContext().getData(PlatformDataKeys.PROJECT);
-    if (ideProject == null) {
-      return null;
-    }
-
+  public CloudProject getActiveCloudProject(@NotNull Project ideProject) {
     PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(ideProject);
-    System.out.println("getActive: ide: " + ideProject + ", props: " + propertiesComponent);
 
     String projectAccount = propertiesComponent.getValue(PROJECT_ACCOUNT_KEY);
     String projectName = propertiesComponent.getValue(PROJECT_NAME_KEY);

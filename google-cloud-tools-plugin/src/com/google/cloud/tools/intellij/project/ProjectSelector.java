@@ -22,6 +22,7 @@ import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.FixedSizeButton;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBLabel;
@@ -33,6 +34,7 @@ import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent.EventType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * ProjectSelector allows the user to select a GCP project id. It shows selected project name and
@@ -40,20 +42,13 @@ import javax.swing.event.HyperlinkEvent.EventType;
  * {@link com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService} to get the set of
  * credentialed users and then into resource manager to get the set of projects.
  *
- * <p>Initial selection is empty unless set in constructor to {@link
- * ProjectSelectorInitialState#ACTIVE_CLOUD_PROJECT}. In this case project selector is pre-populated
- * with active cloud project. See {@link ActiveCloudProjectHolder}.
+ * <p>Initial selection is empty unless. Project selector can be pre-populated with active cloud
+ * project ({@link #loadActiveCloudProject()})from current IDE project, set in {@link
+ * #ProjectSelector(Project)}. See also {@link ActiveCloudProjectHolder}.
  */
 public class ProjectSelector extends JPanel {
 
-  public enum ProjectSelectorInitialState {
-    EMPTY,
-    ACTIVE_CLOUD_PROJECT
-  }
-
   static final int ACCOUNT_ICON_SIZE = 16;
-
-  private ProjectSelectorInitialState initialState = ProjectSelectorInitialState.EMPTY;
 
   private final List<ProjectSelectionListener> projectSelectionListeners = new ArrayList<>();
 
@@ -65,13 +60,15 @@ public class ProjectSelector extends JPanel {
   private JPanel rootPanel;
 
   private CloudProject cloudProject;
+  // null by default. set by caller to allow project selector to pre-select active project.
+  private Project ideProject;
 
   public ProjectSelector() {
-    this(ProjectSelectorInitialState.EMPTY);
+    this(null);
   }
 
-  public ProjectSelector(ProjectSelectorInitialState initialState) {
-    this.initialState = initialState;
+  public ProjectSelector(@Nullable Project ideProject) {
+    this.ideProject = ideProject;
   }
 
   /** Returns project selection or null if no project is selected. */
@@ -93,6 +90,27 @@ public class ProjectSelector extends JPanel {
     }
   }
 
+  /** Sets IDE {@link Project} to be used to update active cloud project settings. */
+  public void setIdeProject(Project ideProject) {
+    this.ideProject = ideProject;
+  }
+
+  /**
+   * Loads active {@link CloudProject}, if IDE {@link Project} has been specified. This should be
+   * called when project selector and the related UI are completely initialized. Calls listeners to
+   * notify on new project selection.
+   */
+  public void loadActiveCloudProject() {
+    Optional<CloudProject> projectOptional =
+        Optional.ofNullable(ideProject)
+            .map(p -> ActiveCloudProjectHolder.getInstance().getActiveCloudProject(p));
+    projectOptional.ifPresent(
+        activeCloudProject -> {
+          setSelectedProject(activeCloudProject);
+          notifyProjectSelectionListeners();
+        });
+  }
+
   /**
    * Adds a {@link ProjectSelectionListener} to this class's internal list of listeners. All
    * ProjectSelectionListeners are notified when the selection is changed to a valid project.
@@ -101,17 +119,6 @@ public class ProjectSelector extends JPanel {
    */
   public void addProjectSelectionListener(ProjectSelectionListener projectSelectionListener) {
     projectSelectionListeners.add(projectSelectionListener);
-    // if we pre-select active project, notify the listeners one time.
-    if (projectSelectionListeners.size() == 1) {
-      // initialize selection to current active project. it might be null if not set yet.
-      switch (initialState) {
-        case ACTIVE_CLOUD_PROJECT:
-          loadActiveCloudProject();
-          break;
-        default:
-          break;
-      }
-    }
   }
 
   /**
@@ -152,8 +159,11 @@ public class ProjectSelector extends JPanel {
 
     hyperlinksPanel = new JPanel();
     hyperlinksPanel.setBorder(UIManager.getBorder("TextField.border"));
+
     browseButton = new FixedSizeButton(hyperlinksPanel);
     browseButton.addActionListener((actionEvent) -> handleOpenProjectSelectionDialog());
+    browseButton.setFocusable(true);
+    browseButton.setToolTipText(GctBundle.getString("cloud.project.selector.open.dialog.tooltip"));
   }
 
   @VisibleForTesting
@@ -165,16 +175,10 @@ public class ProjectSelector extends JPanel {
     if (newSelection != null) {
       setSelectedProject(newSelection);
       notifyProjectSelectionListeners();
-      ActiveCloudProjectHolder.getInstance().setActiveCloudProject(newSelection);
-    }
-  }
-
-  private void loadActiveCloudProject() {
-    CloudProject active = ActiveCloudProjectHolder.getInstance().getActiveCloudProject();
-    System.out.println("active received: " + active);
-    if (active != null) {
-      setSelectedProject(active);
-      notifyProjectSelectionListeners();
+      // keep as last active project if IDE project has been specified.
+      if (ideProject != null) {
+        ActiveCloudProjectHolder.getInstance().setActiveCloudProject(newSelection, ideProject);
+      }
     }
   }
 

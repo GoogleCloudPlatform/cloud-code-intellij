@@ -96,6 +96,8 @@ public class CloudAttachDialog extends DialogWrapper {
     initValidation();
     setTitle(GctBundle.getString("clouddebug.attachtitle"));
     setOKButtonText(GctBundle.getString("clouddebug.attach"));
+
+    projectSelector.setIdeProject(project);
     infoMessage.setVisible(true);
     syncStashCheckbox.setVisible(false);
     syncStashCheckbox.addActionListener(

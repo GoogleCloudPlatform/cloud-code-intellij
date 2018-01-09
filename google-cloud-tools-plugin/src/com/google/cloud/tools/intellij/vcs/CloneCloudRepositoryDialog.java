@@ -70,6 +70,9 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
     initComponents();
     setTitle(GctBundle.message("clonefromgcp.title"));
     setOKButtonText(GctBundle.message("clonefromgcp.button"));
+
+    projectSelector.setIdeProject(project);
+    projectSelector.loadActiveCloudProject();
   }
 
   @Nullable
