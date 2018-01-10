@@ -24,6 +24,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import java.util.Set;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import org.jetbrains.annotations.Nullable;
@@ -36,6 +37,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
   private JPanel panel;
   private JList<String> apisToEnableList;
+  private JLabel enableConfirmationLabel;
 
   /**
    * Initializes the Cloud API management confirmation dialog.
@@ -43,10 +45,13 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
    * @param project the current {@link Project}
    * @param apisToEnable the set of APIs to be enabled on GCP
    */
-  CloudApiManagementConfirmationDialog(@Nullable Project project, Set<CloudLibrary> apisToEnable) {
+  CloudApiManagementConfirmationDialog(
+      @Nullable Project project, CloudProject cloudProject, Set<CloudLibrary> apisToEnable) {
     super(project);
     init();
     setTitle(GctBundle.message("cloud.apis.management.dialog.title"));
+    enableConfirmationLabel.setText(
+        GctBundle.message("cloud.apis.management.dialog.header", cloudProject.projectName()));
 
     DefaultListModel<String> apiListModel = new DefaultListModel<>();
     apisToEnable.forEach(library -> apiListModel.addElement(library.getName()));

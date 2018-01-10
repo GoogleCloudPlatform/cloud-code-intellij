@@ -98,7 +98,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
 
     if (cloudProject != null && !apisToEnable.isEmpty()) {
       CloudApiManagementConfirmationDialog managementDialog =
-          new CloudApiManagementConfirmationDialog(project, apisToEnable);
+          new CloudApiManagementConfirmationDialog(project, cloudProject, apisToEnable);
       DialogManager.show(managementDialog);
 
       if (managementDialog.isOK()) {
