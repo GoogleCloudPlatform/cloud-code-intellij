@@ -466,7 +466,7 @@ public final class GoogleCloudApiSelectorPanelTest {
    * Checks or unchecks the given checkbox. {@link ActionListener} does not respond to {@link
    * JCheckBox#setSelected(boolean)} so the attached listeners are manually invoked.
    *
-   * @param checkbox the select or unselect the checkbox
+   * @param checkbox the checkbox to check or uncheck
    * @param select whether to check or uncheck it
    */
   private static void checkEnableCheckbox(JCheckBox checkbox, boolean select) {
