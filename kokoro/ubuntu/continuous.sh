@@ -30,5 +30,5 @@
 
 cd github/google-cloud-intellij
 ./gradlew check \
-    -Dorg.gradle.project.intellijRepoUrl="https://www.jetbrains.com/intellij-repository" \
+    -PintellijRepoUrl = https://storage.googleapis.com/cloud-tools-for-java-team-kokoro-build-cache/idea-distributions \
     --stacktrace
