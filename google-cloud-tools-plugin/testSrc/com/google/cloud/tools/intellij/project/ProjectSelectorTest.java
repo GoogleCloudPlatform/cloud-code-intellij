@@ -23,10 +23,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
-import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.project.Project;
-import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.awt.Component;
 import org.junit.Before;
 import org.junit.Rule;
