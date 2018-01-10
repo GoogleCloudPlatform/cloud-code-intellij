@@ -58,9 +58,7 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
   protected void resetEditorFrom(@NotNull CloudDebugRunConfiguration runConfiguration) {
     // TODO(ivanporty) CloudDebugRunConfiguration uses `cloudProjectName` for project ID.
     String projectId = runConfiguration.getCloudProjectName();
-    if (Strings.isNullOrEmpty(projectId)) {
-      settingsPanel.setSelectedCloudProject(null);
-    } else {
+    if (!Strings.isNullOrEmpty(projectId)) {
       settingsPanel.setSelectedCloudProject(
           CloudProject.create(
               // TODO(ivanporty) no project name in CloudDebugRunConfiguration.

@@ -47,7 +47,7 @@ public class ProjectSelectorTest {
   @Before
   public void setUp() {
     projectSelector =
-        new ProjectSelector() {
+        new ProjectSelector(null /* no IDE project by default for tests. */) {
           @Override
           ProjectSelectionDialog createProjectSelectionDialog(Component parent) {
             return projectSelectionDialog;

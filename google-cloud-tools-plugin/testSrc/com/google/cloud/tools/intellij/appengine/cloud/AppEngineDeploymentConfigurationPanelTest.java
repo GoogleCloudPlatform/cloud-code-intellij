@@ -48,7 +48,7 @@ public final class AppEngineDeploymentConfigurationPanelTest {
 
   @Before
   public void setUp() {
-    configurationPanel = new AppEngineDeploymentConfigurationPanel();
+    configurationPanel = new AppEngineDeploymentConfigurationPanel(null);
     deploymentConfiguration = new AppEngineDeploymentConfiguration();
     configurationPanel.setApplicationInfoPanel(infoPanel);
     configurationPanel.setProjectSelector(projectSelector);

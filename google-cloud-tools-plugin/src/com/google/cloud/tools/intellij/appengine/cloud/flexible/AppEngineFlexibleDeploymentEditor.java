@@ -95,8 +95,6 @@ public final class AppEngineFlexibleDeploymentEditor
     commonConfig.getDeployAllConfigsCheckbox().setSelected(false);
     commonConfig.getDeployAllConfigsCheckbox().setVisible(false);
 
-    commonConfig.getProjectSelector().setIdeProject(project);
-
     addSettingsEditorListener(editor -> updateStagedArtifactNameEmptyText());
 
     archiveSelector.addBrowseFolderListener(
@@ -459,5 +457,9 @@ public final class AppEngineFlexibleDeploymentEditor
   @VisibleForTesting
   void fireStateChange() {
     fireEditorStateChanged();
+  }
+
+  private void createUIComponents() {
+    commonConfig = new AppEngineDeploymentConfigurationPanel(project);
   }
 }

@@ -60,18 +60,11 @@ public final class AppEngineStandardDeploymentEditor
         commonConfig.getAppEngineCostWarningPanel().setVisible(false);
       }
     }
-
-    commonConfig.getProjectSelector().setIdeProject(project);
   }
 
   @Override
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
-
-    // if cloud project was not set at all, use active cloud project.
-    if (commonConfig.getProjectSelector().getSelectedProject() == null) {
-      commonConfig.getProjectSelector().loadActiveCloudProject();
-    }
   }
 
   @Override
@@ -98,5 +91,7 @@ public final class AppEngineStandardDeploymentEditor
     return commonConfig;
   }
 
-  private void createUIComponents() {}
+  private void createUIComponents() {
+    commonConfig = new AppEngineDeploymentConfigurationPanel(project);
+  }
 }

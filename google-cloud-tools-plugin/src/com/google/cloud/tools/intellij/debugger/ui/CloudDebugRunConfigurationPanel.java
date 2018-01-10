@@ -35,15 +35,17 @@ public class CloudDebugRunConfigurationPanel {
   private ProjectSelector projectSelector;
   private JCheckBox hiddenValidationTrigger;
 
-  public CloudDebugRunConfigurationPanel(Project project) {
+  private Project ideProject;
+
+  public CloudDebugRunConfigurationPanel(Project ideProject) {
+    this.ideProject = ideProject;
+
     docsLink.setHyperlinkText(
         GctBundle.message("clouddebug.runconfig.formoredetails"),
         GctBundle.message("clouddebug.runconfig.documentation.url.text"),
         ".");
     docsLink.setHyperlinkTarget(GctBundle.message("clouddebug.runconfig.documentation.url"));
     description.setText(GctBundle.message("clouddebug.runconfig.description"));
-
-    projectSelector.setIdeProject(project);
   }
 
   public JPanel getMainPanel() {
@@ -55,12 +57,7 @@ public class CloudDebugRunConfigurationPanel {
   }
 
   public void setSelectedCloudProject(CloudProject cloudProject) {
-    // if cloud project was not set at all, use active cloud project.
-    if (cloudProject == null) {
-      projectSelector.loadActiveCloudProject();
-    } else {
-      projectSelector.setSelectedProject(cloudProject);
-    }
+    projectSelector.setSelectedProject(cloudProject);
   }
 
   private void triggerValidation() {
@@ -71,11 +68,13 @@ public class CloudDebugRunConfigurationPanel {
     hiddenValidationTrigger = new JBCheckBox();
     hiddenValidationTrigger.setVisible(false);
 
-    projectSelector = new ProjectSelector();
+    projectSelector = new ProjectSelector(ideProject);
     projectSelector.addProjectSelectionListener(
         (selectedProject) -> {
           // settings editor does not see all the changes by default, use explicit notification.
           triggerValidation();
         });
+
+    projectSelector.loadActiveCloudProject();
   }
 }

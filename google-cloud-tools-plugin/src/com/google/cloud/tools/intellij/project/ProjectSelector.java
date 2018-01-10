@@ -63,10 +63,6 @@ public class ProjectSelector extends JPanel {
   // null by default. set by caller to allow project selector to pre-select active project.
   private Project ideProject;
 
-  public ProjectSelector() {
-    this(null);
-  }
-
   /** @param ideProject IDE {@link Project} to be used to update active cloud project settings. */
   public ProjectSelector(@Nullable Project ideProject) {
     this.ideProject = ideProject;
@@ -89,11 +85,6 @@ public class ProjectSelector extends JPanel {
     } else {
       updateCloudProjectSelection(cloudProject);
     }
-  }
-
-  /** Sets IDE {@link Project} to be used to update active cloud project settings. */
-  public void setIdeProject(Project ideProject) {
-    this.ideProject = ideProject;
   }
 
   /**
@@ -208,6 +199,12 @@ public class ProjectSelector extends JPanel {
 
   private void notifyProjectSelectionListeners() {
     projectSelectionListeners.forEach(listener -> listener.projectSelected(cloudProject));
+  }
+
+  /** Sets IDE {@link Project} to be used to update active cloud project settings. */
+  @VisibleForTesting
+  void setIdeProject(Project ideProject) {
+    this.ideProject = ideProject;
   }
 
   @VisibleForTesting

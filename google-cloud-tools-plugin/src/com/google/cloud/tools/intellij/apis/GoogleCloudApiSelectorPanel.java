@@ -204,7 +204,7 @@ final class GoogleCloudApiSelectorPanel {
             });
     cloudLibrariesTable.getModel().addTableModelListener(e -> updateManagementUI());
 
-    projectSelector = new ProjectSelector();
+    projectSelector = new ProjectSelector(project);
     projectSelector.addProjectSelectionListener(cloudProject -> updateManagementUI());
   }
 
