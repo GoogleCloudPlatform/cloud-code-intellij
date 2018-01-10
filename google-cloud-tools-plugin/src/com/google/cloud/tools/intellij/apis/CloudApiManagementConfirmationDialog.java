@@ -17,12 +17,14 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.project.CloudProject;
-import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.annotations.VisibleForTesting;
+import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import java.util.Set;
+import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,37 +32,30 @@ import org.jetbrains.annotations.Nullable;
  * Dialog confirming GCP API management actions such as API enablement. Allows selection of a {@link
  * CloudProject CloudProject} on which to perform the actions.
  */
-public class CloudApiManagementDialog extends DialogWrapper {
+public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
   private JPanel panel;
-  private ProjectSelector projectSelector;
+  private JList<String> apisToEnableList;
 
   /**
-   * Initializes the dialog and enables the OK button if a {@link CloudProject CloudProject} is
-   * selected and disables it otherwise.
+   * Initializes the Cloud API management confirmation dialog.
+   *
+   * @param project the current {@link Project}
+   * @param apisToEnable the set of APIs to be enabled on GCP
    */
-  CloudApiManagementDialog(@Nullable Project project) {
+  CloudApiManagementConfirmationDialog(@Nullable Project project, Set<CloudLibrary> apisToEnable) {
     super(project);
     init();
     setTitle(GctBundle.message("cloud.apis.management.dialog.title"));
 
-    setOKActionEnabled(getCloudProject() != null);
-    projectSelector.addProjectSelectionListener(cloudProject -> setOKActionEnabled(true));
-  }
-
-  @Nullable
-  CloudProject getCloudProject() {
-    return projectSelector.getSelectedProject();
+    DefaultListModel<String> apiListModel = new DefaultListModel<>();
+    apisToEnable.forEach(library -> apiListModel.addElement(library.getName()));
+    apisToEnableList.setModel(apiListModel);
   }
 
   @Nullable
   @Override
   protected JComponent createCenterPanel() {
     return panel;
-  }
-
-  @VisibleForTesting
-  public ProjectSelector getProjectSelector() {
-    return projectSelector;
   }
 }
