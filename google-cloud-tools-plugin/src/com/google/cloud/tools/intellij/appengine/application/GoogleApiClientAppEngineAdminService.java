@@ -29,7 +29,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -161,11 +160,11 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
       @NotNull String projectId, @NotNull String operationName, @NotNull Credential credential)
       throws IOException {
     // The operation ID is the final slash-separated component of the operation name.
-    String[] nameParts = Iterables.toArray(Splitter.on("/").split(operationName), String.class);
-    if (nameParts.length < 1) {
+    List<String> nameParts = Splitter.on("/").splitToList(operationName);
+    if (nameParts.size() < 1) {
       throw new IllegalArgumentException("Operation name " + operationName + " is malformatted");
     }
-    String id = nameParts[nameParts.length - 1];
+    String id = nameParts.get(nameParts.size() - 1);
 
     return GoogleApiClientFactory.getInstance()
         .getAppEngineApiClient(credential)

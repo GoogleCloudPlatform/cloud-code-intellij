@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.debugger;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.StandardFileSystems;
@@ -33,6 +32,7 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import java.util.Collection;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -112,17 +112,17 @@ public class ServerToIdeFileResolver {
    */
   @VisibleForTesting
   static String getPackageFromPath(String path) {
-    String[] tokens = Iterables.toArray(Splitter.on("/").split(path), String.class);
+    List<String> tokens = Splitter.on("/").splitToList(path);
     StringBuilder packageBuilder = new StringBuilder();
-    if (tokens.length > 1) {
-      if (tokens[0].length() > 0) {
-        packageBuilder.append(tokens[0]);
+    if (tokens.size() > 1) {
+      if (tokens.get(0).length() > 0) {
+        packageBuilder.append(tokens.get(0));
       }
-      for (int token = 1; token < tokens.length - 1; token++) {
-        if (tokens[token].length() > 0 && packageBuilder.length() > 0) {
+      for (int token = 1; token < tokens.size() - 1; token++) {
+        if (tokens.get(token).length() > 0 && packageBuilder.length() > 0) {
           packageBuilder.append(".");
         }
-        packageBuilder.append(tokens[token]);
+        packageBuilder.append(tokens.get(token));
       }
     }
 
