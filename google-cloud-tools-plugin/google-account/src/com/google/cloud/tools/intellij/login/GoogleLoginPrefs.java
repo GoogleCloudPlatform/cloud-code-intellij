@@ -99,7 +99,7 @@ public class GoogleLoginPrefs {
       String storedScopesString = prefs.get(getCustomUserKey(OAUTH_SCOPES_KEY), "");
 
       // Use a set to ensure uniqueness.
-      for (String scope : storedScopesString.split(DELIMITER)) {
+      for (String scope : Splitter.on(DELIMITER).split(storedScopesString)) {
         storedScopes.add(scope);
       }
     }
@@ -283,7 +283,7 @@ public class GoogleLoginPrefs {
   private static void removeUser(Preferences prefs, String user) {
     String allUsersString = prefs.get(USERS, "");
     List<String> allUsers = Lists.newArrayList();
-    for (String scope : allUsersString.split(DELIMITER)) {
+    for (String scope : Splitter.on(DELIMITER).split(allUsersString)) {
       allUsers.add(scope);
     }
 
