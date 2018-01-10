@@ -29,7 +29,7 @@
 
 cd github/google-cloud-intellij
 
-set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_151
+set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_144
 
 @rem Omit the spotlessCheck on Windows because Kokoro Windows uses git checkout in a way that
 @rem doesn't correctly configure native line endings which causes spotlessCheck to fail.
