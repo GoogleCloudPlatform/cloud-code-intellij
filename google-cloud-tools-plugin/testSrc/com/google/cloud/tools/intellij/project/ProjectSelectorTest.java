@@ -23,7 +23,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.intellij.openapi.project.Project;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.awt.Component;
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,6 +40,8 @@ public class ProjectSelectorTest {
   private ProjectSelector projectSelector;
   @Mock private ProjectSelectionListener projectSelectionListener;
   @Mock private ProjectSelectionDialog projectSelectionDialog;
+  @Mock private Project mockIdeProject;
+  @Mock private ActiveCloudProjectHolder mockActiveCloudProjectHolder;
 
   private static final CloudProject TEST_PROJECT =
       CloudProject.create("test-1", "test-1-id", "test@google.com");
@@ -51,6 +56,8 @@ public class ProjectSelectorTest {
           }
         };
     projectSelector.addProjectSelectionListener(projectSelectionListener);
+
+    ActiveCloudProjectHolder.setInstance(mockActiveCloudProjectHolder);
   }
 
   @Test
@@ -131,6 +138,53 @@ public class ProjectSelectorTest {
     projectSelector.setSelectedProject(CloudProject.create("", "", ""));
 
     verifyUiStateForProject(null);
+  }
+
+  @Test
+  public void loadActiveProject_withoutIdeProject_doesNothing() {
+    projectSelector.loadActiveCloudProject();
+
+    assertThat(projectSelector.getSelectedProject()).isNull();
+    verifyUiStateForProject(null);
+  }
+
+  @Test
+  public void loadActiveProject_withoutIdeProject_doesNotChangeSelection() {
+    projectSelector.setSelectedProject(TEST_PROJECT);
+    projectSelector.loadActiveCloudProject();
+
+    assertThat(projectSelector.getSelectedProject()).isEqualTo(TEST_PROJECT);
+    verifyUiStateForProject(TEST_PROJECT);
+  }
+
+  @Test
+  public void lastSelectedProject_saved_withValidIdeProject() {
+    projectSelector.setIdeProject(mockIdeProject);
+    when(projectSelectionDialog.showDialog(any())).thenReturn(TEST_PROJECT);
+    projectSelector.handleOpenProjectSelectionDialog();
+
+    verify(mockActiveCloudProjectHolder).setActiveCloudProject(TEST_PROJECT, mockIdeProject);
+  }
+
+  @Test
+  public void loadActiveProject_setsValidProject_withValidIdeProject() {
+    projectSelector.setIdeProject(mockIdeProject);
+    when(mockActiveCloudProjectHolder.getActiveCloudProject(mockIdeProject))
+        .thenReturn(TEST_PROJECT);
+    projectSelector.loadActiveCloudProject();
+
+    assertThat(projectSelector.getSelectedProject()).isEqualTo(TEST_PROJECT);
+    verifyUiStateForProject(TEST_PROJECT);
+  }
+
+  @Test
+  public void loadActiveProject_validProject_triggerListeners() {
+    projectSelector.setIdeProject(mockIdeProject);
+    when(mockActiveCloudProjectHolder.getActiveCloudProject(mockIdeProject))
+        .thenReturn(TEST_PROJECT);
+    projectSelector.loadActiveCloudProject();
+
+    verify(projectSelectionListener).projectSelected(TEST_PROJECT);
   }
 
   private void verifyUiStateForProject(CloudProject project) {

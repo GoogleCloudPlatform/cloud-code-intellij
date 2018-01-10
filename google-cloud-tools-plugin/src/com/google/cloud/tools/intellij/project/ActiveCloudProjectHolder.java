@@ -38,16 +38,16 @@ public class ActiveCloudProjectHolder {
 
   private static ActiveCloudProjectHolder instance = new ActiveCloudProjectHolder();
 
-  public static ActiveCloudProjectHolder getInstance() {
+  static ActiveCloudProjectHolder getInstance() {
     return instance;
   }
 
   @VisibleForTesting
-  public static void setInstance(ActiveCloudProjectHolder instance) {
+  static void setInstance(ActiveCloudProjectHolder instance) {
     ActiveCloudProjectHolder.instance = instance;
   }
 
-  public void setActiveCloudProject(
+  void setActiveCloudProject(
       @NotNull CloudProject activeCloudProject, @NotNull Project ideProject) {
     PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(ideProject);
 
@@ -61,7 +61,7 @@ public class ActiveCloudProjectHolder {
   }
 
   @Nullable
-  public CloudProject getActiveCloudProject(@NotNull Project ideProject) {
+  CloudProject getActiveCloudProject(@NotNull Project ideProject) {
     PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(ideProject);
 
     String projectAccount = propertiesComponent.getValue(PROJECT_ACCOUNT_KEY);
