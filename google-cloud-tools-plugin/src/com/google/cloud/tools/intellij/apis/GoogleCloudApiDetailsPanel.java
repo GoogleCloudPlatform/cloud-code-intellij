@@ -59,7 +59,7 @@ public final class GoogleCloudApiDetailsPanel {
   private JPanel apiManagementPanel;
   private JCheckBox enableApiCheckbox;
   private JPanel managementInfoPanel;
-  private JTextPane managementInfoTextPane;
+  private JTextPane managementWarningTextPane;
 
   private CloudLibrary currentCloudLibrary;
   private CloudApiManagementSpec currentCloudApiManagementSpec;
@@ -187,8 +187,8 @@ public final class GoogleCloudApiDetailsPanel {
         IdeBorderFactory.createTitledBorder(
             GctBundle.message("cloud.apis.management.section.title")));
 
-    managementInfoTextPane = new JTextPane();
-    managementInfoTextPane.setOpaque(false);
+    managementWarningTextPane = new JTextPane();
+    managementWarningTextPane.setOpaque(false);
 
     enableApiCheckbox = new JCheckBox();
     enableApiCheckbox.addActionListener(
@@ -242,7 +242,7 @@ public final class GoogleCloudApiDetailsPanel {
               });
     }
 
-    managementInfoTextPane.setText(GctBundle.message("cloud.apis.management.section.info.text"));
+    managementWarningTextPane.setText(GctBundle.message("cloud.apis.management.section.info.text"));
   }
 
   /**
