@@ -61,7 +61,6 @@ subprojects {
         version = ideaVersion
         updateSinceUntilBuild = false
         downloadSources = true
-        intellijRepo = intellijRepoUrl
     }
 
     configurations.runtime {
