@@ -95,6 +95,8 @@ public final class AppEngineFlexibleDeploymentEditor
     commonConfig.getDeployAllConfigsCheckbox().setSelected(false);
     commonConfig.getDeployAllConfigsCheckbox().setVisible(false);
 
+    commonConfig.getProjectSelector().setIdeProject(project);
+
     addSettingsEditorListener(editor -> updateStagedArtifactNameEmptyText());
 
     archiveSelector.addBrowseFolderListener(
@@ -235,6 +237,11 @@ public final class AppEngineFlexibleDeploymentEditor
   @Override
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
+
+    // if cloud project was not set at all, use active cloud project.
+    if (commonConfig.getProjectSelector().getSelectedProject() == null) {
+      commonConfig.getProjectSelector().loadActiveCloudProject();
+    }
 
     if (!StringUtils.isEmpty(configuration.getModuleName())) {
       appYamlCombobox.setSelectedItem(

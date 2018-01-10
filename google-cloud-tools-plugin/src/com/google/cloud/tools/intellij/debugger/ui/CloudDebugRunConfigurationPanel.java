@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.debugger.ui;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBCheckBox;
 import javax.swing.JCheckBox;
@@ -34,13 +35,15 @@ public class CloudDebugRunConfigurationPanel {
   private ProjectSelector projectSelector;
   private JCheckBox hiddenValidationTrigger;
 
-  public CloudDebugRunConfigurationPanel() {
+  public CloudDebugRunConfigurationPanel(Project project) {
     docsLink.setHyperlinkText(
         GctBundle.message("clouddebug.runconfig.formoredetails"),
         GctBundle.message("clouddebug.runconfig.documentation.url.text"),
         ".");
     docsLink.setHyperlinkTarget(GctBundle.message("clouddebug.runconfig.documentation.url"));
     description.setText(GctBundle.message("clouddebug.runconfig.description"));
+
+    projectSelector.setIdeProject(project);
   }
 
   public JPanel getMainPanel() {
@@ -52,7 +55,12 @@ public class CloudDebugRunConfigurationPanel {
   }
 
   public void setSelectedCloudProject(CloudProject cloudProject) {
-    projectSelector.setSelectedProject(cloudProject);
+    // if cloud project was not set at all, use active cloud project.
+    if (cloudProject == null) {
+      projectSelector.loadActiveCloudProject();
+    } else {
+      projectSelector.setSelectedProject(cloudProject);
+    }
   }
 
   private void triggerValidation() {

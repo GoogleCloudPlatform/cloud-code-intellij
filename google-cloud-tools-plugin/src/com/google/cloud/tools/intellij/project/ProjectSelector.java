@@ -42,8 +42,8 @@ import org.jetbrains.annotations.Nullable;
  * {@link com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService} to get the set of
  * credentialed users and then into resource manager to get the set of projects.
  *
- * <p>Initial selection is empty unless. Project selector can be pre-populated with active cloud
- * project ({@link #loadActiveCloudProject()})from current IDE project, set in {@link
+ * <p>Initial selection is empty. Project selector can be pre-populated with active cloud project
+ * ({@link #loadActiveCloudProject()})from current IDE project, set in {@link
  * #ProjectSelector(Project)}. See also {@link ActiveCloudProjectHolder}.
  */
 public class ProjectSelector extends JPanel {
@@ -67,6 +67,7 @@ public class ProjectSelector extends JPanel {
     this(null);
   }
 
+  /** @param ideProject IDE {@link Project} to be used to update active cloud project settings. */
   public ProjectSelector(@Nullable Project ideProject) {
     this.ideProject = ideProject;
   }
