@@ -36,7 +36,7 @@ public class AppEngineDeploymentConfigurator
 
   private static final Logger logger = Logger.getInstance(AppEngineDeploymentConfigurator.class);
 
-  private final Project project;
+  private Project project;
 
   AppEngineDeploymentConfigurator(Project project) {
     this.project = project;
