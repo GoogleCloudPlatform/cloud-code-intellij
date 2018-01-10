@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.StandardFileSystems;
@@ -110,7 +112,7 @@ public class ServerToIdeFileResolver {
    */
   @VisibleForTesting
   static String getPackageFromPath(String path) {
-    String[] tokens = path.split("/");
+    String[] tokens = Iterables.toArray(Splitter.on("/").split(path), String.class);
     StringBuilder packageBuilder = new StringBuilder();
     if (tokens.length > 1) {
       if (tokens[0].length() > 0) {
