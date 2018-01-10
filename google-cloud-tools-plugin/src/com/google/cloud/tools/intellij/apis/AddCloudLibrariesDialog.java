@@ -52,7 +52,13 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     }
 
     this.project = project;
-    this.cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries, project);
+
+    cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries, project);
+    cloudApiSelectorPanel.addModuleSelectionListener(
+        listener -> setOKActionEnabled(isReadyToSubmit()));
+    cloudApiSelectorPanel.addTableModelListener(
+        cloudProject -> setOKActionEnabled(isReadyToSubmit()));
+
     init();
   }
 
@@ -61,6 +67,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     super.init();
     setTitle(GctBundle.message("cloud.libraries.dialog.title"));
     setOKButtonText(GctBundle.message("cloud.libraries.ok.button.text"));
+    setOKActionEnabled(isReadyToSubmit());
   }
 
   /** Returns the selected {@link Module}. */
@@ -119,5 +126,9 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   @Override
   protected JComponent createCenterPanel() {
     return cloudApiSelectorPanel.getPanel();
+  }
+
+  private boolean isReadyToSubmit() {
+    return getSelectedModule() != null && !getSelectedLibraries().isEmpty();
   }
 }
