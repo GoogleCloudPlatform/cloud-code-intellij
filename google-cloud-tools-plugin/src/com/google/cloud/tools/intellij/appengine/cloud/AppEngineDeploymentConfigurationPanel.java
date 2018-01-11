@@ -98,8 +98,6 @@ public final class AppEngineDeploymentConfigurationPanel {
           // watcher.
           triggerSettingsEditorValidation();
         });
-
-    projectSelector.loadActiveCloudProject();
   }
 
   /**
@@ -125,6 +123,9 @@ public final class AppEngineDeploymentConfigurationPanel {
               configuration.getCloudProjectName(),
               configuration.getGoogleUsername());
       projectSelector.setSelectedProject(cloudProject);
+    } else {
+      // unset project, load default active cloud project (if available for this IDE project)
+      projectSelector.loadActiveCloudProject();
     }
 
     refreshApplicationInfoPanel(projectSelector.getSelectedProject());

@@ -57,7 +57,12 @@ public class CloudDebugRunConfigurationPanel {
   }
 
   public void setSelectedCloudProject(CloudProject cloudProject) {
-    projectSelector.setSelectedProject(cloudProject);
+    if (cloudProject != null) {
+      projectSelector.setSelectedProject(cloudProject);
+    } else {
+      // project unset or not configured yet, use active one.
+      projectSelector.loadActiveCloudProject();
+    }
   }
 
   private void triggerValidation() {
@@ -74,7 +79,5 @@ public class CloudDebugRunConfigurationPanel {
           // settings editor does not see all the changes by default, use explicit notification.
           triggerValidation();
         });
-
-    projectSelector.loadActiveCloudProject();
   }
 }

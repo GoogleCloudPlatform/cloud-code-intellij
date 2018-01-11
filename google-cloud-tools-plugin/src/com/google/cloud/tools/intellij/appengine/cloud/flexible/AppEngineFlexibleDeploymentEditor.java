@@ -236,11 +236,6 @@ public final class AppEngineFlexibleDeploymentEditor
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
 
-    // if cloud project was not set at all, use active cloud project.
-    if (commonConfig.getProjectSelector().getSelectedProject() == null) {
-      commonConfig.getProjectSelector().loadActiveCloudProject();
-    }
-
     if (!StringUtils.isEmpty(configuration.getModuleName())) {
       appYamlCombobox.setSelectedItem(
           AppEngineFlexibleFacet.getFacetByModuleName(configuration.getModuleName(), project));

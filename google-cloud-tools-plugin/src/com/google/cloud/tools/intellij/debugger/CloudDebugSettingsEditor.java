@@ -69,6 +69,8 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
               Optional.ofNullable(Services.getLoginService().getActiveUser())
                   .map(CredentialedUser::getEmail)
                   .orElse("")));
+    } else {
+      settingsPanel.setSelectedCloudProject(null);
     }
   }
 }
