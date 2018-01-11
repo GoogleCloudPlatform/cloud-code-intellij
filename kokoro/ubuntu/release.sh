@@ -87,4 +87,5 @@ gothub upload --tag $GIT_TAG_NAME --file \
 echo "Upload complete."
 
 echo "Publishing plugin to Jetbrains plugin repository"
-./gradlew :google-cloud-tools-plugin:publishPlugin
+./gradlew :google-cloud-tools-plugin:publishPlugin \
+    -PintellijRepoUrl=https://storage.googleapis.com/cloud-tools-for-java-team-kokoro-build-cache/idea-distributions

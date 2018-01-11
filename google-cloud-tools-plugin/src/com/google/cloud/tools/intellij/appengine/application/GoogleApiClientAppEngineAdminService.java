@@ -26,6 +26,7 @@ import com.google.api.services.appengine.v1.model.Operation;
 import com.google.api.services.appengine.v1.model.Status;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.io.IOException;
@@ -159,11 +160,11 @@ public class GoogleApiClientAppEngineAdminService extends AppEngineAdminService 
       @NotNull String projectId, @NotNull String operationName, @NotNull Credential credential)
       throws IOException {
     // The operation ID is the final slash-separated component of the operation name.
-    String[] nameParts = operationName.split("/");
-    if (nameParts.length < 1) {
+    List<String> nameParts = Splitter.on("/").splitToList(operationName);
+    if (nameParts.size() < 1) {
       throw new IllegalArgumentException("Operation name " + operationName + " is malformatted");
     }
-    String id = nameParts[nameParts.length - 1];
+    String id = nameParts.get(nameParts.size() - 1);
 
     return GoogleApiClientFactory.getInstance()
         .getAppEngineApiClient(credential)

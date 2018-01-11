@@ -29,4 +29,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cd github/google-cloud-intellij
-./gradlew check --stacktrace
+./gradlew check \
+    -PintellijRepoUrl=https://storage.googleapis.com/cloud-tools-for-java-team-kokoro-build-cache/idea-distributions \
+    --stacktrace
