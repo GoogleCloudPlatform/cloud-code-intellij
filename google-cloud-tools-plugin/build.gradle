@@ -108,7 +108,7 @@ test {
         showCauses true
     }
     doLast{
-       println "IDEA leaked check: " + System.getProperty('idea.log.leaked.projects.in.tests')
+       println "IDEA leaked project check: " + System.getProperty('idea.log.leaked.projects.in.tests')
        println "View report at file://$buildDir/reports/tests/index.html"
     }
 }
