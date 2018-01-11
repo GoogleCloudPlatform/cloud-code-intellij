@@ -104,10 +104,11 @@ artifacts {
 test {
     testLogging {
         events "skipped", "failed"
-        exceptionFormat "full"
+        exceptionFormat "full"4
         showCauses true
     }
     doLast{
+       println "IDEA leaked check: " + System.getProperty('idea.log.leaked.projects.in.tests')
        println "View report at file://$buildDir/reports/tests/index.html"
     }
 }
