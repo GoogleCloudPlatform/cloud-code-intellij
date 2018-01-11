@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.CloudLibraries;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressManager;
@@ -102,10 +103,12 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   protected void doOKAction() {
     CloudProject cloudProject = getCloudProject();
     Set<CloudLibrary> apisToEnable = getApisToEnable();
+    Set<CloudLibrary> apisNotEnabled = Sets.difference(getSelectedLibraries(), apisToEnable);
 
-    if (cloudProject != null && !apisToEnable.isEmpty()) {
+    if (cloudProject != null && (!apisToEnable.isEmpty() || !apisNotEnabled.isEmpty())) {
       CloudApiManagementConfirmationDialog managementDialog =
-          new CloudApiManagementConfirmationDialog(project, cloudProject, apisToEnable);
+          new CloudApiManagementConfirmationDialog(
+              getSelectedModule(), cloudProject, apisToEnable, apisNotEnabled);
       DialogManager.show(managementDialog);
 
       if (managementDialog.isOK()) {

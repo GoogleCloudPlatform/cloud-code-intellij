@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.apis;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.ui.DialogWrapper;
 import java.util.Set;
 import javax.swing.DefaultListModel;
@@ -36,31 +36,49 @@ import org.jetbrains.annotations.Nullable;
 public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
   private JPanel panel;
+  private JPanel apisToEnablePanel;
+  private JPanel apisNotSelectedToEnablePanel;
   private JList<String> apisToEnableList;
+  private JList<String> apisNotSelectedToEnableList;
   private JLabel enableConfirmationLabel;
+  private JLabel wontEnableConfirmationLabel;
 
   /**
    * Initializes the Cloud API management confirmation dialog.
    *
-   * @param project the current {@link Project}
+   * @param module the {@link Module} the client libraries are added to
    * @param apisToEnable the set of APIs to be enabled on GCP
    */
   CloudApiManagementConfirmationDialog(
-      @Nullable Project project, CloudProject cloudProject, Set<CloudLibrary> apisToEnable) {
-    super(project);
+      Module module,
+      CloudProject cloudProject,
+      Set<CloudLibrary> apisToEnable,
+      Set<CloudLibrary> apisNotToEnable) {
+    super(module.getProject());
     init();
     setTitle(GctBundle.message("cloud.apis.management.dialog.title"));
     enableConfirmationLabel.setText(
-        GctBundle.message("cloud.apis.management.dialog.header", cloudProject.projectName()));
+        GctBundle.message(
+            "cloud.apis.management.dialog.apistoenable.header", cloudProject.projectName()));
+    wontEnableConfirmationLabel.setText(
+        GctBundle.message("cloud.apis.management.dialog.apisnottoenable.header", module.getName()));
 
-    DefaultListModel<String> apiListModel = new DefaultListModel<>();
-    apisToEnable.forEach(library -> apiListModel.addElement(library.getName()));
-    apisToEnableList.setModel(apiListModel);
+    apisToEnablePanel.setVisible(!apisToEnable.isEmpty());
+    apisNotSelectedToEnablePanel.setVisible(!apisNotToEnable.isEmpty());
+
+    populateLibraryList(apisToEnableList, apisToEnable);
+    populateLibraryList(apisNotSelectedToEnableList, apisNotToEnable);
   }
 
   @Nullable
   @Override
   protected JComponent createCenterPanel() {
     return panel;
+  }
+
+  private void populateLibraryList(JList<String> list, Set<CloudLibrary> libraries) {
+    DefaultListModel<String> listModel = new DefaultListModel<>();
+    libraries.forEach(library -> listModel.addElement(library.getName()));
+    list.setModel(listModel);
   }
 }
