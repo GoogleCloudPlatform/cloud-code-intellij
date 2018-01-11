@@ -30,5 +30,4 @@
 
 cd github/google-cloud-intellij
 ./gradlew check \
-    -Dorg.gradle.project.intellijRepoUrl="https://www.jetbrains.com/intellij-repository" \
     -Dorg.gradle.project.ideaVersion="LATEST-EAP-SNAPSHOT" --stacktrace

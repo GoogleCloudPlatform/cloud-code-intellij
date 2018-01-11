@@ -34,6 +34,8 @@ set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_144
 
 @rem Omit the spotlessCheck on Windows because Kokoro Windows uses git checkout in a way that
 @rem doesn't correctly configure native line endings which causes spotlessCheck to fail.
-gradlew.bat check --stacktrace -x spotlessCheck
+gradlew.bat check ^
+    -PintellijRepoUrl=https://storage.googleapis.com/cloud-tools-for-java-team-kokoro-build-cache/idea-distributions ^
+    --stacktrace -x spotlessCheck
 
 exit /b %ERRORLEVEL%
