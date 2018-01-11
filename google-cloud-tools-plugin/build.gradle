@@ -102,6 +102,9 @@ artifacts {
 }
 
 test {
+    configure {
+        println "IDEA leaked check: " + System.getProperty('idea.log.leaked.projects.in.tests')
+    }
     testLogging {
         events "skipped", "failed"
         exceptionFormat "full"
