@@ -109,6 +109,11 @@ final class GoogleCloudApiSelectorPanel {
     modulesComboBox.addActionListener(listener);
   }
 
+  /** Adds the given {@link TableModelListener} to the {@link TableModel}. */
+  void addTableModelListener(TableModelListener listener) {
+    cloudLibrariesTable.getModel().addTableModelListener(listener);
+  }
+
   /** Returns the selected {@link Module}. */
   Module getSelectedModule() {
     return modulesComboBox.getSelectedModule();
@@ -202,7 +207,7 @@ final class GoogleCloudApiSelectorPanel {
                 updateManagementUI();
               }
             });
-    cloudLibrariesTable.getModel().addTableModelListener(e -> updateManagementUI());
+    addTableModelListener(e -> updateManagementUI());
 
     projectSelector = new ProjectSelector();
     projectSelector.addProjectSelectionListener(cloudProject -> updateManagementUI());

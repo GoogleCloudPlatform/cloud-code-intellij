@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.CloudLibraries;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressManager;
@@ -52,7 +53,13 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     }
 
     this.project = project;
-    this.cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries, project);
+
+    cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries, project);
+    cloudApiSelectorPanel.addModuleSelectionListener(
+        listener -> setOKActionEnabled(isReadyToSubmit()));
+    cloudApiSelectorPanel.addTableModelListener(
+        cloudProject -> setOKActionEnabled(isReadyToSubmit()));
+
     init();
   }
 
@@ -61,6 +68,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     super.init();
     setTitle(GctBundle.message("cloud.libraries.dialog.title"));
     setOKButtonText(GctBundle.message("cloud.libraries.ok.button.text"));
+    setOKActionEnabled(isReadyToSubmit());
   }
 
   /** Returns the selected {@link Module}. */
@@ -95,10 +103,12 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   protected void doOKAction() {
     CloudProject cloudProject = getCloudProject();
     Set<CloudLibrary> apisToEnable = getApisToEnable();
+    Set<CloudLibrary> apisNotEnabled = Sets.difference(getSelectedLibraries(), apisToEnable);
 
-    if (cloudProject != null && !apisToEnable.isEmpty()) {
+    if (cloudProject != null && (!apisToEnable.isEmpty() || !apisNotEnabled.isEmpty())) {
       CloudApiManagementConfirmationDialog managementDialog =
-          new CloudApiManagementConfirmationDialog(project, apisToEnable);
+          new CloudApiManagementConfirmationDialog(
+              getSelectedModule(), cloudProject, apisToEnable, apisNotEnabled);
       DialogManager.show(managementDialog);
 
       if (managementDialog.isOK()) {
@@ -119,5 +129,9 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   @Override
   protected JComponent createCenterPanel() {
     return cloudApiSelectorPanel.getPanel();
+  }
+
+  private boolean isReadyToSubmit() {
+    return getSelectedModule() != null && !getSelectedLibraries().isEmpty();
   }
 }
