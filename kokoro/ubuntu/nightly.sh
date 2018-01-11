@@ -43,4 +43,7 @@ cd github/google-cloud-intellij
 
 echo "Publishing plugin to Jetbrains plugin repository nightly channel"
 nightly_release_date=`date "+%Y%m%d"`
-./gradlew :google-cloud-tools-plugin:publishPlugin -PijPluginRepoChannel=nightly -Pversion=${nightly_release_date} --info
+./gradlew :google-cloud-tools-plugin:publishPlugin \
+    -PijPluginRepoChannel=nightly \
+    -PintellijRepoUrl=https://storage.googleapis.com/cloud-tools-for-java-team-kokoro-build-cache/idea-distributions \
+    -Pversion=${nightly_release_date} --info
