@@ -44,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>Initial selection is empty. Project selector can be pre-populated with active cloud project
  * ({@link #loadActiveCloudProject()})from current IDE project, set in {@link
- * #ProjectSelector(Project)}. See also {@link ActiveCloudProjectHolder}.
+ * #ProjectSelector(Project)}. See also {@link ActiveCloudProjectManager}.
  */
 public class ProjectSelector extends JPanel {
 
@@ -95,7 +95,7 @@ public class ProjectSelector extends JPanel {
   public void loadActiveCloudProject() {
     Optional<CloudProject> projectOptional =
         Optional.ofNullable(ideProject)
-            .map(p -> ActiveCloudProjectHolder.getInstance().getActiveCloudProject(p));
+            .map(p -> ActiveCloudProjectManager.getInstance().getActiveCloudProject(p));
     projectOptional.ifPresent(
         activeCloudProject -> {
           setSelectedProject(activeCloudProject);
@@ -169,7 +169,7 @@ public class ProjectSelector extends JPanel {
       notifyProjectSelectionListeners();
       // keep as last active project if IDE project has been specified.
       if (ideProject != null) {
-        ActiveCloudProjectHolder.getInstance().setActiveCloudProject(newSelection, ideProject);
+        ActiveCloudProjectManager.getInstance().setActiveCloudProject(newSelection, ideProject);
       }
     }
   }

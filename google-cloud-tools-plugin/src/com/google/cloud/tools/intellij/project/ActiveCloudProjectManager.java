@@ -30,21 +30,21 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>Must only be used on Swing/IDE EDT.
  */
-public class ActiveCloudProjectHolder {
+public class ActiveCloudProjectManager {
   private static final String PROJECT_ACCOUNT_KEY = "ACTIVE_CLOUD_PROJECT_ACCOUNT";
   private static final String PROJECT_NAME_KEY = "ACTIVE_CLOUD_PROJECT_NAME";
   private static final String PROJECT_ID_KEY = "ACTIVE_CLOUD_PROJECT_ID";
   private static final String PROJECT_NUMBER_KEY = "ACTIVE_CLOUD_PROJECT_NUMBER";
 
-  private static ActiveCloudProjectHolder instance = new ActiveCloudProjectHolder();
+  private static ActiveCloudProjectManager instance = new ActiveCloudProjectManager();
 
-  static ActiveCloudProjectHolder getInstance() {
+  static ActiveCloudProjectManager getInstance() {
     return instance;
   }
 
   @VisibleForTesting
-  static void setInstance(ActiveCloudProjectHolder instance) {
-    ActiveCloudProjectHolder.instance = instance;
+  static void setInstance(ActiveCloudProjectManager instance) {
+    ActiveCloudProjectManager.instance = instance;
   }
 
   void setActiveCloudProject(

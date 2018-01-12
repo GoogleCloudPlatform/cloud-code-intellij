@@ -108,6 +108,7 @@ final class GcsBucketPanel {
         });
 
     projectSelector.loadActiveCloudProject();
+    refresh();
   }
 
   void refresh() {

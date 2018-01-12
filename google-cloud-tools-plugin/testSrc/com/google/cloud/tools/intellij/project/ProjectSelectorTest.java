@@ -39,7 +39,7 @@ public class ProjectSelectorTest {
   @Mock private ProjectSelectionListener projectSelectionListener;
   @Mock private ProjectSelectionDialog projectSelectionDialog;
   @Mock private Project mockIdeProject;
-  @Mock private ActiveCloudProjectHolder mockActiveCloudProjectHolder;
+  @Mock private ActiveCloudProjectManager mockActiveCloudProjectManager;
 
   private static final CloudProject TEST_PROJECT =
       CloudProject.create("test-1", "test-1-id", "test@google.com");
@@ -55,7 +55,7 @@ public class ProjectSelectorTest {
         };
     projectSelector.addProjectSelectionListener(projectSelectionListener);
 
-    ActiveCloudProjectHolder.setInstance(mockActiveCloudProjectHolder);
+    ActiveCloudProjectManager.setInstance(mockActiveCloudProjectManager);
   }
 
   @Test
@@ -161,13 +161,13 @@ public class ProjectSelectorTest {
     when(projectSelectionDialog.showDialog(any())).thenReturn(TEST_PROJECT);
     projectSelector.handleOpenProjectSelectionDialog();
 
-    verify(mockActiveCloudProjectHolder).setActiveCloudProject(TEST_PROJECT, mockIdeProject);
+    verify(mockActiveCloudProjectManager).setActiveCloudProject(TEST_PROJECT, mockIdeProject);
   }
 
   @Test
   public void loadActiveProject_setsValidProject_withValidIdeProject() {
     projectSelector.setIdeProject(mockIdeProject);
-    when(mockActiveCloudProjectHolder.getActiveCloudProject(mockIdeProject))
+    when(mockActiveCloudProjectManager.getActiveCloudProject(mockIdeProject))
         .thenReturn(TEST_PROJECT);
     projectSelector.loadActiveCloudProject();
 
@@ -178,7 +178,7 @@ public class ProjectSelectorTest {
   @Test
   public void loadActiveProject_validProject_triggerListeners() {
     projectSelector.setIdeProject(mockIdeProject);
-    when(mockActiveCloudProjectHolder.getActiveCloudProject(mockIdeProject))
+    when(mockActiveCloudProjectManager.getActiveCloudProject(mockIdeProject))
         .thenReturn(TEST_PROJECT);
     projectSelector.loadActiveCloudProject();
 

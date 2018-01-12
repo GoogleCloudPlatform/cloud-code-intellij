@@ -57,12 +57,11 @@ public class CloudDebugRunConfigurationPanel {
   }
 
   public void setSelectedCloudProject(CloudProject cloudProject) {
-    if (cloudProject != null) {
-      projectSelector.setSelectedProject(cloudProject);
-    } else {
-      // project unset or not configured yet, use active one.
-      projectSelector.loadActiveCloudProject();
-    }
+    projectSelector.setSelectedProject(cloudProject);
+  }
+
+  public void loadActiveCloudProject() {
+    projectSelector.loadActiveCloudProject();
   }
 
   private void triggerValidation() {

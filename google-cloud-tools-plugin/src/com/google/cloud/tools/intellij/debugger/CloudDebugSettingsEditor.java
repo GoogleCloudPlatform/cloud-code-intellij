@@ -70,7 +70,7 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
                   .map(CredentialedUser::getEmail)
                   .orElse("")));
     } else {
-      settingsPanel.setSelectedCloudProject(null);
+      settingsPanel.loadActiveCloudProject();
     }
   }
 }
