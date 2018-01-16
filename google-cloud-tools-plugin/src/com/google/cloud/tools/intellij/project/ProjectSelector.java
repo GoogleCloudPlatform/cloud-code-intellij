@@ -30,6 +30,7 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -151,6 +152,7 @@ public class ProjectSelector extends JPanel {
 
     hyperlinksPanel = new JPanel();
     hyperlinksPanel.setBorder(UIManager.getBorder("TextField.border"));
+    hyperlinksPanel.setLayout(new BoxLayout(hyperlinksPanel, BoxLayout.X_AXIS));
 
     browseButton = new FixedSizeButton(hyperlinksPanel);
     browseButton.addActionListener((actionEvent) -> handleOpenProjectSelectionDialog());
