@@ -47,7 +47,7 @@
           </component>
         </children>
       </grid>
-      <nested-form id="dbb3b" form-file="com/google/cloud/tools/intellij/project/ProjectSelector.form" binding="projectSelector">
+      <nested-form id="dbb3b" form-file="com/google/cloud/tools/intellij/project/ProjectSelector.form" binding="projectSelector" custom-create="true">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>

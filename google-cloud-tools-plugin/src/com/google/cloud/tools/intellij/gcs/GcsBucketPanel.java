@@ -107,6 +107,7 @@ final class GcsBucketPanel {
           }
         });
 
+    projectSelector.loadActiveCloudProject();
     refresh();
   }
 
@@ -160,6 +161,10 @@ final class GcsBucketPanel {
   @VisibleForTesting
   void setProjectSelector(ProjectSelector projectSelector) {
     this.projectSelector = projectSelector;
+  }
+
+  private void createUIComponents() {
+    projectSelector = new ProjectSelector(project);
   }
 
   private void loadAndDisplayBuckets(String projectId, CredentialedUser credentialedUser) {

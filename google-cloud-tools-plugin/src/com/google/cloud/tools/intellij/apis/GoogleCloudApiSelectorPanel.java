@@ -97,6 +97,8 @@ final class GoogleCloudApiSelectorPanel {
                     lib -> new CloudApiManagementSpec(SHOULD_ENABLE_API_DEFAULT)));
 
     panel.setPreferredSize(new Dimension(800, 600));
+
+    projectSelector.loadActiveCloudProject();
   }
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
@@ -209,7 +211,7 @@ final class GoogleCloudApiSelectorPanel {
             });
     addTableModelListener(e -> updateManagementUI());
 
-    projectSelector = new ProjectSelector();
+    projectSelector = new ProjectSelector(project);
     projectSelector.addProjectSelectionListener(cloudProject -> updateManagementUI());
   }
 

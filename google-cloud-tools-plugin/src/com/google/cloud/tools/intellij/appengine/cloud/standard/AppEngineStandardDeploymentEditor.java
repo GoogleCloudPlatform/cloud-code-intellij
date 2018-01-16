@@ -91,5 +91,7 @@ public final class AppEngineStandardDeploymentEditor
     return commonConfig;
   }
 
-  private void createUIComponents() {}
+  private void createUIComponents() {
+    commonConfig = new AppEngineDeploymentConfigurationPanel(project);
+  }
 }

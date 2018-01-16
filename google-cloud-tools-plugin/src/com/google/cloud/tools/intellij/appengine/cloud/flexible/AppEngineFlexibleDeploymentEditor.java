@@ -453,4 +453,8 @@ public final class AppEngineFlexibleDeploymentEditor
   void fireStateChange() {
     fireEditorStateChanged();
   }
+
+  private void createUIComponents() {
+    commonConfig = new AppEngineDeploymentConfigurationPanel(project);
+  }
 }

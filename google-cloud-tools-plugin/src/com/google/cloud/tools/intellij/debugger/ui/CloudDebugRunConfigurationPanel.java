@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.debugger.ui;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBCheckBox;
 import javax.swing.JCheckBox;
@@ -34,7 +35,11 @@ public class CloudDebugRunConfigurationPanel {
   private ProjectSelector projectSelector;
   private JCheckBox hiddenValidationTrigger;
 
-  public CloudDebugRunConfigurationPanel() {
+  private Project ideProject;
+
+  public CloudDebugRunConfigurationPanel(Project ideProject) {
+    this.ideProject = ideProject;
+
     docsLink.setHyperlinkText(
         GctBundle.message("clouddebug.runconfig.formoredetails"),
         GctBundle.message("clouddebug.runconfig.documentation.url.text"),
@@ -55,6 +60,10 @@ public class CloudDebugRunConfigurationPanel {
     projectSelector.setSelectedProject(cloudProject);
   }
 
+  public void loadActiveCloudProject() {
+    projectSelector.loadActiveCloudProject();
+  }
+
   private void triggerValidation() {
     hiddenValidationTrigger.doClick();
   }
@@ -63,7 +72,7 @@ public class CloudDebugRunConfigurationPanel {
     hiddenValidationTrigger = new JBCheckBox();
     hiddenValidationTrigger.setVisible(false);
 
-    projectSelector = new ProjectSelector();
+    projectSelector = new ProjectSelector(ideProject);
     projectSelector.addProjectSelectionListener(
         (selectedProject) -> {
           // settings editor does not see all the changes by default, use explicit notification.

@@ -70,6 +70,8 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
     initComponents();
     setTitle(GctBundle.message("clonefromgcp.title"));
     setOKButtonText(GctBundle.message("clonefromgcp.button"));
+
+    projectSelector.loadActiveCloudProject();
   }
 
   @Nullable
@@ -216,7 +218,7 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
   }
 
   private void createUIComponents() {
-    projectSelector = new ProjectSelector();
+    projectSelector = new ProjectSelector(project);
     projectSelector.setMinimumSize(new Dimension(400, 0));
     projectSelector.addProjectSelectionListener(this::updateRepositorySelector);
     repositorySelector =

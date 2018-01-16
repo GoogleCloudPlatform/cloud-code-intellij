@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBCheckBox;
@@ -52,10 +53,14 @@ public final class AppEngineDeploymentConfigurationPanel {
   private JLabel serviceLabel;
   private JCheckBox hiddenValidationTrigger;
 
+  private final Project ideProject;
+
   private static final boolean PROMOTE_DEFAULT = false;
   private static final boolean STOP_PREVIOUS_VERSION_DEFAULT = false;
 
-  public AppEngineDeploymentConfigurationPanel() {
+  public AppEngineDeploymentConfigurationPanel(Project ideProject) {
+    this.ideProject = ideProject;
+
     versionIdField
         .getEmptyText()
         .setText(GctBundle.message("appengine.flex.version.placeholder.text"));
@@ -117,12 +122,13 @@ public final class AppEngineDeploymentConfigurationPanel {
               configuration.getCloudProjectName(),
               configuration.getCloudProjectName(),
               configuration.getGoogleUsername());
-      refreshApplicationInfoPanel(cloudProject);
       projectSelector.setSelectedProject(cloudProject);
     } else {
-      // uninitialized or incomplete configuration.
-      refreshApplicationInfoPanel(null);
+      // unset project, load default active cloud project (if available for this IDE project)
+      projectSelector.loadActiveCloudProject();
     }
+
+    refreshApplicationInfoPanel(projectSelector.getSelectedProject());
   }
 
   /**
@@ -190,6 +196,8 @@ public final class AppEngineDeploymentConfigurationPanel {
   private void createUIComponents() {
     hiddenValidationTrigger = new JBCheckBox();
     hiddenValidationTrigger.setVisible(false);
+
+    projectSelector = new ProjectSelector(ideProject);
   }
 
   public ProjectSelector getProjectSelector() {
