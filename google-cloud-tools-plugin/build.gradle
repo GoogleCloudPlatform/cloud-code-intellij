@@ -102,6 +102,8 @@ artifacts {
 }
 
 test {
+    systemProperty "idea.log.leaked.projects.in.tests", System.getProperty("idea.log.leaked.projects.in.tests")
+
     testLogging {
         events "skipped", "failed"
         exceptionFormat "full"
