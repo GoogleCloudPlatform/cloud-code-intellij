@@ -68,7 +68,7 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   @SuppressWarnings("FutureReturnValueIgnored")
   public void refresh(final String projectId, final Credential credential) {
     ApplicationManager.getApplication()
-        .executeOnPooledThread(
+        .invokeLater(
             () -> {
               if (projectId.isEmpty()) {
                 clearMessage();
