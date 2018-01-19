@@ -31,4 +31,20 @@ public interface CloudSdkService {
   Path getSdkHomePath();
 
   void setSdkHomePath(String path);
+  
+    /*enum SdkStatus {
+    READY, INSTALLING, INVALID, NOT_AVAILABLE
+  }
+
+  static interface SdkStatusUpdateListener {
+    void onSdkStatusChange(CloudSdkService sdkService, SdkStatus status);
+  }
+
+  abstract SdkStatus getStatus();
+
+  abstract boolean installAutomatically();
+
+  void addStatusUpdateListener(SdkStatusUpdateListener listener) {
+
+  }*/
 }
